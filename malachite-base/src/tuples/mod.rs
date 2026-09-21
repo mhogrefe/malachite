@@ -581,8 +581,53 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 pub mod exhaustive;
-/// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for the unit type, the
-/// 0-tuple.
+/// [`ToLatex`](crate::strings::latex::ToLatex) implementations for the unit type and for tuples of
+/// up to eight elements, converting them to LaTeX math-mode fragments.
+///
+/// The elements' fragments are separated by commas and wrapped in parentheses, so that a tuple's
+/// fragment is built out of its elements' own. They need not have the same type, and a tuple may
+/// hold another tuple.
+///
+/// Rust has no way to write one implementation for every arity, so these stop at eight, which is as
+/// far as the rest of this crate's tuple machinery goes. The orphan rule keeps another crate from
+/// implementing the trait for a longer tuple, so the [`latex_tuple`](crate::latex_tuple) macro
+/// writes those fragments instead.
+///
+/// # fmt_latex
+/// ```
+/// use malachite_base::strings::latex::ToLatex;
+///
+/// assert_eq!((1u8,).to_latex().to_string(), r"\left(1\right)");
+/// assert_eq!((1u8, 2u8).to_latex().to_string(), r"\left(1, 2\right)");
+///
+/// // the elements need not have the same type, and each writes its own fragment
+/// assert_eq!(
+///     ('α', "hi", true).to_latex().to_string(),
+///     r"\left(\alpha, \text{hi}, \text{T}\right)"
+/// );
+///
+/// // tuples nest
+/// assert_eq!(
+///     ((1u8, 2u8), 3u8).to_latex().to_string(),
+///     r"\left(\left(1, 2\right), 3\right)"
+/// );
+///
+/// // up to eight elements
+/// assert_eq!(
+///     (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8)
+///         .to_latex()
+///         .to_string(),
+///     r"\left(1, 2, 3, 4, 5, 6, 7, 8\right)"
+/// );
+/// ```
+///
+/// | value               | fragment                                   | renders as                                 |
+/// |---------------------|--------------------------------------------|--------------------------------------------|
+/// | `(1u8,)`            | `\left(1\right)`                           | $\left(1\right)$                           |
+/// | `(1u8, 2u8)`        | `\left(1, 2\right)`                        | $\left(1, 2\right)$                        |
+/// | `('α', "hi", true)` | `\left(\alpha, \text{hi}, \text{T}\right)` | $\left(\alpha, \text{hi}, \text{T}\right)$ |
+/// | `((1u8, 2u8), 3u8)` | `\left(\left(1, 2\right), 3\right)`        | $\left(\left(1, 2\right), 3\right)$        |
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate tuples randomly.
@@ -813,6 +858,47 @@ pub mod latex;
 /// );
 /// ```
 pub mod random;
-/// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for the unit type, the
-/// 0-tuple.
+/// [`ToTypst`](crate::strings::typst::ToTypst) implementations for the unit type and for tuples of
+/// up to eight elements, converting them to Typst math-mode fragments.
+///
+/// The elements' fragments are separated by commas and wrapped in parentheses, so that a tuple's
+/// fragment is built out of its elements' own. They need not have the same type, and a tuple may
+/// hold another tuple.
+///
+/// Rust has no way to write one implementation for every arity, so these stop at eight, which is as
+/// far as the rest of this crate's tuple machinery goes. The orphan rule keeps another crate from
+/// implementing the trait for a longer tuple, so the [`typst_tuple`](crate::typst_tuple) macro
+/// writes those fragments instead.
+///
+/// # fmt_typst
+/// ```
+/// use malachite_base::strings::typst::ToTypst;
+///
+/// assert_eq!((1u8,).to_typst().to_string(), "(1)");
+/// assert_eq!((1u8, 2u8).to_typst().to_string(), "(1, 2)");
+///
+/// // the elements need not have the same type, and each writes its own fragment
+/// assert_eq!(
+///     ('α', "hi", true).to_typst().to_string(),
+///     r#"("α", "hi", "T")"#
+/// );
+///
+/// // tuples nest
+/// assert_eq!(((1u8, 2u8), 3u8).to_typst().to_string(), "((1, 2), 3)");
+///
+/// // up to eight elements
+/// assert_eq!(
+///     (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8)
+///         .to_typst()
+///         .to_string(),
+///     "(1, 2, 3, 4, 5, 6, 7, 8)"
+/// );
+/// ```
+///
+/// | value               | fragment           |
+/// |---------------------|--------------------|
+/// | `(1u8,)`            | `(1)`              |
+/// | `(1u8, 2u8)`        | `(1, 2)`           |
+/// | `('α', "hi", true)` | `("α", "hi", "T")` |
+/// | `((1u8, 2u8), 3u8)` | `((1, 2), 3)`      |
 pub mod typst;

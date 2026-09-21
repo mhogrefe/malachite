@@ -80,6 +80,15 @@ documented by git history.
   `{1 |-> 10, 2 |-> 20}`. Two-line matrix notation was considered and rejected, since it means a
   permutation specifically. As for `HashSet`, a `HashMap`'s entries are sorted by key first, so its
   implementations ask for `Ord` where a `HashMap` does not.
+- `ToLatex` and `ToTypst` for tuples of one to eight elements, whenever every element type has them.
+  The elements' fragments are separated by commas and wrapped in parentheses, so `(1u8, 2u8)`
+  becomes `\left(1, 2\right)` and `(1, 2)`; the elements need not share a type, and a tuple may hold
+  another. Rust has no way to write one implementation for every arity, so these stop at eight, as
+  the rest of this crate's tuple machinery does. Since the orphan rule keeps another crate from
+  implementing either trait for a longer tuple, the new `latex_tuple!` and `typst_tuple!` macros
+  write those fragments instead, as do the `latex_tuple` and `typst_tuple` functions they call,
+  which take their elements as trait objects. That works because `fmt_latex` and `fmt_typst` are
+  object-safe.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:
