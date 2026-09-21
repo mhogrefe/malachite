@@ -881,6 +881,7 @@ pub mod u64_polynomial {
     pub mod conversion {
         pub mod from_coefficients_asc;
         pub mod from_u64;
+        pub mod serde;
         pub mod string {
             pub mod from_string;
             pub mod latex;

@@ -17,6 +17,9 @@ pub mod from_natural_polynomial;
 /// [`U64Polynomial`](malachite_base::u64_polynomial::U64Polynomial) to an
 /// [`IntegerPolynomial`](super::IntegerPolynomial).
 pub mod from_u64_polynomial;
+/// Implementations of traits for serialization and deserialization using
+/// [serde](https://serde.rs/).
+pub mod serde;
 /// Functions for converting an [`IntegerPolynomial`](super::IntegerPolynomial) to and from a
 /// [`String`](alloc::string::String).
 pub mod string;

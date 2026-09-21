@@ -26,7 +26,7 @@ default = [ "std", "naturals_and_integers", "rationals", "floats" ]
 # that was not asked for. (malachite-base is not optional, so it takes no `?`.)
 std = [ "malachite-base/std", "malachite-nz?/std", "malachite-q?/std", "malachite-float?/std" ]
 enable_pyo3 = [ "naturals_and_integers", "malachite-nz/enable_pyo3" ]
-enable_serde = [ "malachite-nz?/enable_serde", "malachite-q?/enable_serde", "malachite-float?/enable_serde" ]
+enable_serde = [ "malachite-base/enable_serde", "malachite-nz?/enable_serde", "malachite-q?/enable_serde", "malachite-float?/enable_serde" ]
 random = ["malachite-base/random", "malachite-nz?/random", "malachite-q?/random", "malachite-float?/random"]
 32_bit_limbs = ["malachite-nz?/32_bit_limbs", "malachite-q?/32_bit_limbs", "malachite-float?/32_bit_limbs"]
 

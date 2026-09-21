@@ -9,6 +9,9 @@
 /// Implementations of traits for converting a value that a [`u64`](u64) can be converted from into
 /// a constant [`U64Polynomial`](super::U64Polynomial).
 pub mod from_u64;
+/// Implementations of traits for serialization and deserialization using
+/// [serde](https://serde.rs/).
+pub mod serde;
 /// Functions for converting a [`U64Polynomial`](super::U64Polynomial) to and from a
 /// [`String`](alloc::string::String).
 pub mod string;

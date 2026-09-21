@@ -11,9 +11,11 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     from_coefficients_asc::register(runner);
     from_u64::register(runner);
+    serde::register(runner);
     string::register(runner);
 }
 
 mod from_coefficients_asc;
 mod from_u64;
+mod serde;
 mod string;

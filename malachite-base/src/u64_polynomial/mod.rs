@@ -30,9 +30,25 @@ pub mod random;
 /// The field is private, since not every [`Vec`] of [`u64`]s is one:
 /// [`from_coefficients_asc`](U64Polynomial::from_coefficients_asc) is how a [`Vec`] becomes one.
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(try_from = "SerdeU64Polynomial", into = "SerdeU64Polynomial")
+)]
 pub struct U64Polynomial {
     coefficients: Vec<u64>,
 }
+
+// A `U64Polynomial` is its coefficients, so this is what is serialized: the list of them, in the
+// order they are held in. The wrapper is transparent, so the encoding is the list itself and
+// nothing around it.
+//
+// Deserializing goes through `TryFrom`, which rejects a list whose last coefficient is zero: such a
+// list is not a `U64Polynomial`'s coefficients, and accepting it would build one that two equal
+// polynomials could disagree with.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub(crate) struct SerdeU64Polynomial(pub(crate) Vec<u64>);
 
 /// The constant 0.
 impl Zero for U64Polynomial {

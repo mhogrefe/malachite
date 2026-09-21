@@ -152,6 +152,9 @@
 
 #[macro_use]
 extern crate alloc;
+#[cfg(feature = "serde")]
+#[macro_use]
+extern crate serde;
 
 #[cfg(feature = "test_build")]
 #[doc(hidden)]

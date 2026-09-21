@@ -47,9 +47,28 @@ pub mod conversion;
 /// every other polynomial's leading coefficient is nonzero. The zero polynomial's denominator is 1.
 /// Together these make a polynomial's representation unique, which is what lets [`Eq`] be derived.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(try_from = "SerdeRationalPolynomial", into = "SerdeRationalPolynomial")
+)]
 pub struct RationalPolynomial {
     numerator: IntegerPolynomial,
     denominator: Natural,
+}
+
+// A `RationalPolynomial` is a numerator and a denominator, so both are serialized, under short
+// names since an encoding is not read by people. Serializing the coefficients instead would make
+// the encoding uniform with the other polynomial types, but it would also throw away the shared
+// denominator and make deserializing clear the coefficients' denominators all over again.
+//
+// Deserializing goes through `TryFrom`, which checks the three things that make the pair canonical.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub(crate) struct SerdeRationalPolynomial {
+    #[cfg_attr(feature = "serde", serde(rename = "n"))]
+    pub(crate) numerator: IntegerPolynomial,
+    #[cfg_attr(feature = "serde", serde(rename = "d"))]
+    pub(crate) denominator: Natural,
 }
 
 /// The constant 0.

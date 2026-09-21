@@ -39,9 +39,25 @@ static ZERO: Natural = Natural::ZERO;
 /// [`from_coefficients_asc`](NaturalPolynomial::from_coefficients_asc) is how a [`Vec`] becomes
 /// one.
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(try_from = "SerdeNaturalPolynomial", into = "SerdeNaturalPolynomial")
+)]
 pub struct NaturalPolynomial {
     coefficients: Vec<Natural>,
 }
+
+// A `NaturalPolynomial` is its coefficients, so this is what is serialized: the list of them, in
+// the order they are held in, each one serialized the way a `Natural` is. The wrapper is
+// transparent, so the encoding is the list itself and nothing around it.
+//
+// Deserializing goes through `TryFrom`, which rejects a list whose last coefficient is zero: such a
+// list is not a `NaturalPolynomial`'s coefficients, and accepting it would build one that two equal
+// polynomials could disagree with.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub(crate) struct SerdeNaturalPolynomial(pub(crate) Vec<Natural>);
 
 /// The constant 0.
 impl Zero for NaturalPolynomial {

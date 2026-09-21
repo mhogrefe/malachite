@@ -21,6 +21,9 @@ pub mod from_rational;
 /// [`U64Polynomial`](malachite_base::u64_polynomial::U64Polynomial) to a
 /// [`RationalPolynomial`](super::RationalPolynomial).
 pub mod from_u64_polynomial;
+/// Implementations of traits for serialization and deserialization using
+/// [serde](https://serde.rs/).
+pub mod serde;
 /// Functions for converting an [`RationalPolynomial`](super::RationalPolynomial) to and from a
 /// [`String`](alloc::string::String).
 pub mod string;

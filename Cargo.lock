@@ -1506,6 +1506,8 @@ dependencies = [
  "rand 0.9.5",
  "rand_chacha 0.9.0",
  "ryu",
+ "serde",
+ "serde_json",
  "sha3",
  "time",
  "typst",

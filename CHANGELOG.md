@@ -307,6 +307,14 @@ documented by git history.
   generators never produce the zero polynomial, which has no degree and so falls in no range.
   Unlike the bignum generators, none of them takes a mean bit count: a [`u64`] coefficient is
   uniform over its whole range.
+- A new `enable_serde` feature, and with it malachite-base's first
+  [serde](https://serde.rs/) support: `Serialize` and `Deserialize` for `U64Polynomial`. A
+  polynomial is its coefficients, so the encoding is the list of them and nothing around it —
+  `x^2+3*x+2` is `[2,3,1]`, and the zero polynomial, which has no coefficients, is `[]`.
+  Deserializing goes through `TryFrom` rather than building the value directly, so that it can
+  re-check the one thing that makes a polynomial's representation unique: a list whose last
+  coefficient is zero is rejected rather than quietly trimmed, since accepting it would build a
+  polynomial that an equal one would not match.
 - Fixed a bug in `random_hash_sets` and the rest of the `sets::random` [`HashSet`] generators,
   which under `no_std` returned a `hashbrown::HashSet` and under `std` — where the rest of the
   crate returns `std::collections::HashSet` — returned one too. The module gated its import on the
@@ -360,6 +368,11 @@ documented by git history.
   every [`Natural`] is an [`Integer`]. The coefficients are converted one by one and the leading
   one stays nonzero, so the degree is unchanged and the written form is identical. The narrowing
   directions are not provided, since they can fail.
+- `Serialize` and `Deserialize` for `NaturalPolynomial` and `IntegerPolynomial`, under the
+  existing `enable_serde` feature. As for `U64Polynomial`, the encoding is the coefficient list
+  and nothing around it, each coefficient written the way a [`Natural`] or an [`Integer`] is, so
+  that `x^2-3*x+2` is `["0x2","-0x3","0x1"]`; and a list whose last coefficient is zero is
+  rejected rather than trimmed.
 
 ### malachite-q
 
@@ -392,6 +405,14 @@ documented by git history.
   denominator is 1 — a pair that is canonical whatever the numerator is, since everything is
   coprime with 1, so no content or GCD is computed. The other two convert their coefficients and
   then take that path.
+- `Serialize` and `Deserialize` for `RationalPolynomial`, under the existing `enable_serde`
+  feature. Unlike the other polynomial types, this one writes both of the parts it is made of
+  rather than a coefficient list: `1/2*x+1/3` is `{"n":["0x2","0x3"],"d":"0x6"}`. Writing the
+  coefficients instead would make the encoding uniform with the others, but it would also throw
+  away the shared denominator and make deserializing clear every coefficient's denominator over
+  again. Deserializing re-checks all three conditions that make the pair canonical — a nonzero
+  denominator, a denominator of 1 for the zero polynomial, and a numerator whose content shares
+  no factor with the denominator — the way deserializing a [`Rational`] does.
 
 ### Documentation
 

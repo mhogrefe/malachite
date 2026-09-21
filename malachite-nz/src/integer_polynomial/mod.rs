@@ -39,9 +39,20 @@ static ZERO: Integer = Integer::ZERO;
 /// [`from_coefficients_asc`](IntegerPolynomial::from_coefficients_asc) is how a [`Vec`] becomes
 /// one.
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(try_from = "SerdeIntegerPolynomial", into = "SerdeIntegerPolynomial")
+)]
 pub struct IntegerPolynomial {
     coefficients: Vec<Integer>,
 }
+
+// As for a `NaturalPolynomial`: the coefficients are the polynomial, so the encoding is the list of
+// them and nothing around it, and a list whose last coefficient is zero is rejected.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub(crate) struct SerdeIntegerPolynomial(pub(crate) Vec<Integer>);
 
 /// The constant 0.
 impl Zero for IntegerPolynomial {
