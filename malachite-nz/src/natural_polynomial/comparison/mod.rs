@@ -6,14 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::test_util::runner::Runner;
-
-pub(crate) fn register(runner: &mut Runner) {
-    basic::register(runner);
-    comparison::register(runner);
-    conversion::register(runner);
-}
-
-mod basic;
-mod comparison;
-mod conversion;
+/// Implementations of [`Ord`] and [`PartialOrd`] for
+/// [`NaturalPolynomial`](super::NaturalPolynomial), comparing two polynomials by their behavior for
+/// large arguments.
+pub mod cmp;

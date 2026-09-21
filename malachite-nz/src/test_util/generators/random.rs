@@ -195,6 +195,30 @@ pub fn random_natural_polynomial_gen(config: &GenConfig) -> It<NaturalPolynomial
     ))
 }
 
+pub fn random_natural_polynomial_pair_gen(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial)> {
+    Box::new(random_pairs_from_single(random_natural_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
+pub fn random_natural_polynomial_triple_gen(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial)> {
+    Box::new(random_triples_from_single(random_natural_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
 pub fn random_integer_polynomial_gen(config: &GenConfig) -> It<IntegerPolynomial> {
     Box::new(random_integer_polynomials(
         EXAMPLE_SEED,

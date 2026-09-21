@@ -373,6 +373,18 @@ documented by git history.
   and nothing around it, each coefficient written the way a [`Natural`] or an [`Integer`] is, so
   that `x^2-3*x+2` is `["0x2","-0x3","0x1"]`; and a list whose last coefficient is zero is
   rejected rather than trimmed.
+- `Ord` and `PartialOrd` for `NaturalPolynomial`, comparing two polynomials by how they behave for
+  large arguments: the greater one is the one that is eventually greater, $f(p, q) = \lim_{x \to
+  \infty} \operatorname{cmp}(p(x), q(x))$. The limit always exists, since $p - q$ has finitely many
+  roots and past the largest of them its sign is its leading coefficient's and never changes again;
+  that also makes the order total and agreeing with `Eq`. No evaluation is needed to find it — a
+  higher degree eventually outgrows a lower one whatever the coefficients, so the degrees decide
+  first and the zero polynomial is least, and equal degrees are decided by the highest-degree
+  coefficient at which the two differ. This is the order that makes the polynomials an ordered
+  ring, and restricted to the constants it is the order on the [`Natural`]s. It is deliberately not
+  a well-order, and no order compatible with addition can be: $x > x - 1 > x - 2 > \ldots$ descends
+  forever. A well-order weighing size against degree is a separate thing, and will live on a
+  wrapper type rather than displace this one.
 
 ### malachite-q
 

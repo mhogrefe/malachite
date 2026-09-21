@@ -177,6 +177,19 @@ pub fn exhaustive_natural_polynomial_gen() -> It<NaturalPolynomial> {
     Box::new(exhaustive_natural_polynomials())
 }
 
+pub fn exhaustive_natural_polynomial_pair_gen() -> It<(NaturalPolynomial, NaturalPolynomial)> {
+    Box::new(exhaustive_pairs_from_single(
+        exhaustive_natural_polynomials(),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_triple_gen()
+-> It<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial)> {
+    Box::new(exhaustive_triples_from_single(
+        exhaustive_natural_polynomials(),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_gen() -> It<IntegerPolynomial> {
     Box::new(exhaustive_integer_polynomials())
 }

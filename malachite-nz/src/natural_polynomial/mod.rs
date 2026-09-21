@@ -13,6 +13,9 @@ use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 
+/// Implementations of [`Ord`] and [`PartialOrd`] for [`NaturalPolynomial`], comparing two
+/// polynomials by their behavior for large arguments.
+pub mod comparison;
 /// Functions for converting a [`NaturalPolynomial`] to and from other types.
 pub mod conversion;
 /// Iterators that generate [`NaturalPolynomial`]s without repetition.

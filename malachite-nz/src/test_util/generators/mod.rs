@@ -68,6 +68,23 @@ pub fn natural_polynomial_gen() -> Generator<NaturalPolynomial> {
     )
 }
 
+pub fn natural_polynomial_pair_gen() -> Generator<(NaturalPolynomial, NaturalPolynomial)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_pair_gen,
+        &random_natural_polynomial_pair_gen,
+        &special_random_natural_polynomial_pair_gen,
+    )
+}
+
+pub fn natural_polynomial_triple_gen()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_triple_gen,
+        &random_natural_polynomial_triple_gen,
+        &special_random_natural_polynomial_triple_gen,
+    )
+}
+
 pub fn integer_polynomial_gen() -> Generator<IntegerPolynomial> {
     Generator::new(
         &exhaustive_integer_polynomial_gen,
