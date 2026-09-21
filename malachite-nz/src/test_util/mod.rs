@@ -12,5 +12,7 @@ pub mod extra_variadic;
 pub mod gaussian_integer;
 pub mod generators;
 pub mod integer;
+pub mod integer_polynomial;
 pub mod natural;
+pub mod natural_polynomial;
 pub mod scratch;

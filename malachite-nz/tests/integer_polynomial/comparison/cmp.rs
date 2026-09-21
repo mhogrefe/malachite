@@ -10,14 +10,13 @@ use core::cmp::Ordering::*;
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::common::test_cmp_helper;
-use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::{
     integer_polynomial_gen, integer_polynomial_pair_gen, integer_polynomial_triple_gen,
     natural_polynomial_pair_gen,
 };
+use malachite_nz::test_util::integer_polynomial::comparison::cmp::*;
 
 #[test]
 fn test_cmp() {
@@ -51,17 +50,6 @@ fn test_cmp_sign_of_dominating_term() {
     test("-122", "-123");
 }
 
-// `p` evaluated at `x`, by Horner's rule. Polynomial arithmetic is not implemented yet, so the
-// tests that check what the ordering means do this themselves.
-fn evaluate(p: &IntegerPolynomial, x: &Integer) -> Integer {
-    let mut sum = Integer::ZERO;
-    for c in p.coefficients_asc().iter().rev() {
-        sum *= x;
-        sum += c;
-    }
-    sum
-}
-
 #[test]
 fn cmp_properties() {
     integer_polynomial_pair_gen().test_properties(|(p, q)| {
@@ -70,18 +58,9 @@ fn cmp_properties() {
         assert_eq!(q.cmp(&p), c.reverse());
         assert_eq!(p == q, c == Equal);
 
-        // What the ordering says is what the polynomials eventually do. Past the largest root of
-        // the difference the comparison of the values no longer changes, and a bound on that is
-        // four times the largest coefficient of either: there the leading term of the difference
-        // outgrows everything below it.
-        let bound = Integer::from(4u32)
-            << p.coefficients_asc()
-                .iter()
-                .chain(q.coefficients_asc().iter())
-                .map(SignificantBits::significant_bits)
-                .max()
-                .unwrap_or(0);
-        assert_eq!(evaluate(&p, &bound).cmp(&evaluate(&q, &bound)), c);
+        // What the ordering says is what the polynomials eventually do: evaluating both past the
+        // largest root of their difference gives the same answer.
+        assert_eq!(integer_polynomial_cmp_evaluated(&p, &q), c);
 
         // Unlike over the `Natural`s, the degrees alone do not decide: the dominating polynomial is
         // the greater one exactly when its leading coefficient is positive.

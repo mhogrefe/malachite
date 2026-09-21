@@ -11,11 +11,12 @@ use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::u64_polynomial_pair_gen;
 use malachite_base::test_util::runner::Runner;
+use malachite_base::test_util::u64_polynomial::comparison::cmp::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_u64_polynomial_cmp);
 
-    register_bench!(runner, benchmark_u64_polynomial_cmp);
+    register_bench!(runner, benchmark_u64_polynomial_cmp_algorithms);
 }
 
 fn demo_u64_polynomial_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -26,15 +27,27 @@ fn demo_u64_polynomial_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
 
 // `cmp`'s result is what is being timed, so the benchmark discards it on purpose.
 #[allow(unused_must_use)]
-fn benchmark_u64_polynomial_cmp(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+fn benchmark_u64_polynomial_cmp_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "U64Polynomial.cmp(&U64Polynomial)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         u64_polynomial_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_u64_polynomial_max_bit_bucketer("p", "q"),
-        &mut [("Malachite", &mut |(p, q)| no_out!(p.cmp(&q)))],
+        &mut [
+            ("default", &mut |(p, q)| no_out!(p.cmp(&q))),
+            // Gives up where the values do not fit in a `u128`, so this arm is doing less work than
+            // the default one on the larger inputs rather than more.
+            ("evaluating both polynomials", &mut |(p, q)| {
+                no_out!(u64_polynomial_cmp_evaluated(&p, &q));
+            }),
+        ],
     );
 }

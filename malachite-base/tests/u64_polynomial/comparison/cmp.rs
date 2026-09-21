@@ -13,6 +13,7 @@ use malachite_base::test_util::common::test_cmp_helper;
 use malachite_base::test_util::generators::{
     u64_polynomial_gen, u64_polynomial_pair_gen, u64_polynomial_triple_gen,
 };
+use malachite_base::test_util::u64_polynomial::comparison::cmp::*;
 use malachite_base::u64_polynomial::U64Polynomial;
 
 #[test]
@@ -40,18 +41,6 @@ fn test_cmp_degree_dominates() {
     test("x^10", "18446744073709551615*x^9+18446744073709551615");
 }
 
-// `p` evaluated at `x`, by Horner's rule, or `None` if the value does not fit in a `u128`.
-// Polynomial arithmetic is not implemented yet, so the test that checks what the ordering means
-// does this itself; it is skipped where the value is too large to hold, which a wider type would
-// only push further out rather than solve.
-fn checked_evaluate(p: &U64Polynomial, x: u128) -> Option<u128> {
-    let mut sum = 0u128;
-    for &c in p.coefficients_asc().iter().rev() {
-        sum = sum.checked_mul(x)?.checked_add(u128::from(c))?;
-    }
-    Some(sum)
-}
-
 #[test]
 fn cmp_properties() {
     u64_polynomial_pair_gen().test_properties(|(p, q)| {
@@ -66,20 +55,10 @@ fn cmp_properties() {
             d => assert_eq!(c, d),
         }
 
-        // What the ordering says is what the polynomials eventually do. Past the largest root of
-        // the difference the comparison of the values no longer changes, and a bound on that is two
-        // more than the largest coefficient of either: there the leading term of the difference
-        // outgrows everything below it.
-        let bound = u128::from(
-            p.coefficients_asc()
-                .iter()
-                .chain(q.coefficients_asc().iter())
-                .copied()
-                .max()
-                .unwrap_or(0),
-        ) + 2;
-        if let (Some(x), Some(y)) = (checked_evaluate(&p, bound), checked_evaluate(&q, bound)) {
-            assert_eq!(x.cmp(&y), c);
+        // What the ordering says is what the polynomials eventually do, wherever the values are
+        // small enough to evaluate at all.
+        if let Some(evaluated) = u64_polynomial_cmp_evaluated(&p, &q) {
+            assert_eq!(evaluated, c);
         }
     });
 

@@ -12,11 +12,12 @@ use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer_polynomial::ShortlexIntegerPolynomialRef;
 use malachite_nz::test_util::bench::bucketers::pair_integer_polynomial_max_bit_bucketer;
 use malachite_nz::test_util::generators::integer_polynomial_pair_gen;
+use malachite_nz::test_util::integer_polynomial::comparison::cmp::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_shortlex_integer_polynomial_cmp);
 
-    register_bench!(runner, benchmark_shortlex_integer_polynomial_cmp);
+    register_bench!(runner, benchmark_shortlex_integer_polynomial_cmp_algorithms);
 }
 
 fn demo_shortlex_integer_polynomial_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -32,7 +33,7 @@ fn demo_shortlex_integer_polynomial_cmp(gm: GenMode, config: &GenConfig, limit: 
 
 // `cmp`'s result is what is being timed, so the benchmark discards it on purpose.
 #[allow(unused_must_use)]
-fn benchmark_shortlex_integer_polynomial_cmp(
+fn benchmark_shortlex_integer_polynomial_cmp_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -40,14 +41,19 @@ fn benchmark_shortlex_integer_polynomial_cmp(
 ) {
     run_benchmark(
         "ShortlexIntegerPolynomialRef.cmp(&ShortlexIntegerPolynomialRef)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         integer_polynomial_pair_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_integer_polynomial_max_bit_bucketer("p", "q"),
-        &mut [("Malachite", &mut |(p, q)| {
-            no_out!(ShortlexIntegerPolynomialRef(&p).cmp(&ShortlexIntegerPolynomialRef(&q)));
-        })],
+        &mut [
+            ("default", &mut |(p, q)| {
+                no_out!(ShortlexIntegerPolynomialRef(&p).cmp(&ShortlexIntegerPolynomialRef(&q)));
+            }),
+            ("walking the coefficients", &mut |(p, q)| {
+                no_out!(integer_polynomial_shortlex_cmp_naive(&p, &q));
+            }),
+        ],
     );
 }

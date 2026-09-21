@@ -18,6 +18,7 @@ use malachite_nz::test_util::generators::{
     integer_polynomial_gen, integer_polynomial_pair_gen, integer_polynomial_triple_gen,
     natural_polynomial_pair_gen,
 };
+use malachite_nz::test_util::integer_polynomial::comparison::cmp::*;
 
 fn shortlex(p: &IntegerPolynomial, q: &IntegerPolynomial) -> core::cmp::Ordering {
     ShortlexIntegerPolynomialRef(p).cmp(&ShortlexIntegerPolynomialRef(q))
@@ -66,6 +67,9 @@ fn shortlex_cmp_properties() {
         // Comparison is antisymmetric, and agrees with `Eq`.
         assert_eq!(shortlex(&q, &p), c.reverse());
         assert_eq!(p == q, c == Equal);
+
+        // The screens give the same answer as an explicit walk down the coefficients.
+        assert_eq!(integer_polynomial_shortlex_cmp_naive(&p, &q), c);
 
         // The owned wrapper and the borrowing one agree, and both agree with `as_ref`.
         let owned = ShortlexIntegerPolynomial(p.clone());
