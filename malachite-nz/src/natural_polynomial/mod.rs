@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
+use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::named::Named;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 
 /// Functions for converting a [`NaturalPolynomial`] to and from other types.
@@ -37,6 +38,13 @@ pub struct NaturalPolynomial {
     coefficients: Vec<Natural>,
 }
 
+/// The constant 0.
+impl Zero for NaturalPolynomial {
+    const ZERO: Self = Self {
+        coefficients: Vec::new(),
+    };
+}
+
 impl NaturalPolynomial {
     // Returns true iff `self` is valid.
     //
@@ -53,6 +61,79 @@ impl NaturalPolynomial {
         while self.coefficients.last() == Some(&Natural::ZERO) {
             self.coefficients.pop();
         }
+    }
+
+    /// The constant polynomial 1.
+    ///
+    /// This is a function rather than an associated constant, and
+    /// [`One`](malachite_base::num::basic::traits::One) is not implemented, because a polynomial
+    /// holds its coefficients in a [`Vec`] and a [`Vec`] with anything in it cannot be built at
+    /// compile time. The zero polynomial has no coefficients, so
+    /// [`ZERO`](malachite_base::num::basic::traits::Zero::ZERO) is a constant after all.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// assert_eq!(NaturalPolynomial::one().to_string(), "1");
+    /// assert_eq!(NaturalPolynomial::one().degree(), Some(0));
+    /// ```
+    pub fn one() -> Self {
+        Self {
+            coefficients: vec![Natural::ONE],
+        }
+    }
+
+    /// The constant polynomial 2.
+    ///
+    /// This is a function rather than an associated constant, for the reason given by
+    /// [`one`](Self::one).
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// assert_eq!(NaturalPolynomial::two().to_string(), "2");
+    /// assert_eq!(NaturalPolynomial::two().degree(), Some(0));
+    /// ```
+    pub fn two() -> Self {
+        Self {
+            coefficients: vec![Natural::TWO],
+        }
+    }
+
+    /// Returns a reference to a [`NaturalPolynomial`]'s coefficients, in ascending order.
+    ///
+    /// The first is the constant term and the last is the leading coefficient, so the slice is what
+    /// [`from_coefficients_asc`](Self::from_coefficients_asc) would take back. It holds no trailing
+    /// zeros, and for the zero polynomial it is empty.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// let p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();
+    /// assert_eq!(p.coefficients_asc().to_debug_string(), "[2, 3, 1]");
+    /// assert_eq!(
+    ///     NaturalPolynomial::ZERO.coefficients_asc().to_debug_string(),
+    ///     "[]"
+    /// );
+    /// ```
+    #[inline]
+    pub fn coefficients_asc(&self) -> &[Natural] {
+        &self.coefficients
     }
 
     /// Converts a [`Vec`] of [`Natural`]s to a [`NaturalPolynomial`].
@@ -74,13 +155,12 @@ impl NaturalPolynomial {
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
-    /// // 2 + 3x + x^2
     /// let p = NaturalPolynomial::from_coefficients_asc(vec![
     ///     Natural::TWO,
     ///     Natural::from(3u32),
     ///     Natural::ONE,
     /// ]);
-    /// assert_eq!(p.degree(), Some(2));
+    /// assert_eq!(p.to_string(), "x^2+3*x+2");
     ///
     /// // The trailing zeros are not part of the polynomial.
     /// let q = NaturalPolynomial::from_coefficients_asc(vec![
@@ -90,17 +170,47 @@ impl NaturalPolynomial {
     ///     Natural::ZERO,
     ///     Natural::ZERO,
     /// ]);
-    /// assert_eq!(p, q);
+    /// assert_eq!(q.to_string(), "x^2+3*x+2");
     ///
     /// assert_eq!(
-    ///     NaturalPolynomial::from_coefficients_asc(vec![]),
-    ///     NaturalPolynomial::default()
+    ///     NaturalPolynomial::from_coefficients_asc(vec![]).to_string(),
+    ///     "0"
     /// );
     /// ```
     pub fn from_coefficients_asc(coefficients: Vec<Natural>) -> Self {
         let mut p = Self { coefficients };
         p.trim();
         p
+    }
+
+    /// Converts a [`NaturalPolynomial`] to a [`Vec`] of [`Natural`]s, in ascending order.
+    ///
+    /// The first is the constant term and the last is the leading coefficient, so the [`Vec`] is
+    /// what [`from_coefficients_asc`](Self::from_coefficients_asc) would take back. It holds no
+    /// trailing zeros, and for the zero polynomial it is empty.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// let p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();
+    /// assert_eq!(p.into_coefficients_asc().to_debug_string(), "[2, 3, 1]");
+    /// assert_eq!(
+    ///     NaturalPolynomial::ZERO
+    ///         .into_coefficients_asc()
+    ///         .to_debug_string(),
+    ///     "[]"
+    /// );
+    /// ```
+    #[inline]
+    pub fn into_coefficients_asc(self) -> Vec<Natural> {
+        self.coefficients
     }
 
     /// Returns the degree of a [`NaturalPolynomial`].
@@ -113,15 +223,16 @@ impl NaturalPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_nz::natural::Natural;
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
-    /// assert_eq!(NaturalPolynomial::default().degree(), None);
-    /// assert_eq!(NaturalPolynomial::from(5u32).degree(), Some(0));
+    /// assert_eq!(NaturalPolynomial::ZERO.degree(), None);
+    /// assert_eq!(NaturalPolynomial::from_str("5").unwrap().degree(), Some(0));
+    /// assert_eq!(NaturalPolynomial::from_str("x").unwrap().degree(), Some(1));
     /// assert_eq!(
-    ///     NaturalPolynomial::from_coefficients_asc(vec![Natural::ZERO, Natural::ONE]).degree(),
-    ///     Some(1)
+    ///     NaturalPolynomial::from_str("x^2+3*x+2").unwrap().degree(),
+    ///     Some(2)
     /// );
     /// ```
     #[inline]
@@ -140,16 +251,10 @@ impl NaturalPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{One, Two};
-    /// use malachite_nz::natural::Natural;
+    /// use core::str::FromStr;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
-    /// // 2 + 3x + x^2
-    /// let p = NaturalPolynomial::from_coefficients_asc(vec![
-    ///     Natural::TWO,
-    ///     Natural::from(3u32),
-    ///     Natural::ONE,
-    /// ]);
+    /// let p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();
     /// assert_eq!(*p.coefficient(0), 2);
     /// assert_eq!(*p.coefficient(1), 3);
     /// assert_eq!(*p.coefficient(2), 1);
@@ -174,18 +279,13 @@ impl NaturalPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Two;
-    /// use malachite_nz::natural::Natural;
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
-    /// // 2 + 3x + x^2
-    /// let p = NaturalPolynomial::from_coefficients_asc(vec![
-    ///     Natural::TWO,
-    ///     Natural::from(3u32),
-    ///     Natural::from(7u32),
-    /// ]);
+    /// let p = NaturalPolynomial::from_str("7*x^2+3*x+2").unwrap();
     /// assert_eq!(*p.leading_coefficient(), 7);
-    /// assert_eq!(*NaturalPolynomial::default().leading_coefficient(), 0);
+    /// assert_eq!(*NaturalPolynomial::ZERO.leading_coefficient(), 0);
     /// ```
     #[inline]
     pub fn leading_coefficient(&self) -> &Natural {
@@ -213,31 +313,27 @@ impl NaturalPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{One, Two, Zero};
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
-    /// // 2 + 3x + x^2
-    /// let mut p = NaturalPolynomial::from_coefficients_asc(vec![
-    ///     Natural::TWO,
-    ///     Natural::from(3u32),
-    ///     Natural::ONE,
-    /// ]);
+    /// let mut p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();
     ///
     /// let ret = p.mutate_coefficient(1, |c| {
     ///     *c += Natural::ONE;
     ///     true
     /// });
-    /// assert_eq!(*p.coefficient(1), 4);
+    /// assert_eq!(p.to_string(), "x^2+4*x+2");
     /// assert_eq!(ret, true);
     ///
     /// // The polynomial grows to reach a coefficient it did not have.
     /// p.mutate_coefficient(5, |c| *c += Natural::ONE);
-    /// assert_eq!(p.degree(), Some(5));
+    /// assert_eq!(p.to_string(), "x^5+x^2+4*x+2");
     ///
     /// // Clearing the leading coefficient lowers the degree.
     /// p.mutate_coefficient(5, |c| *c = Natural::ZERO);
-    /// assert_eq!(p.degree(), Some(2));
+    /// assert_eq!(p.to_string(), "x^2+4*x+2");
     /// ```
     pub fn mutate_coefficient<F: FnOnce(&mut Natural) -> T, T>(&mut self, index: u64, f: F) -> T {
         let index = usize::exact_from(index);

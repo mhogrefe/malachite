@@ -28,16 +28,15 @@ impl<T: Into<Natural>> From<T> for NaturalPolynomial {
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
-    /// assert_eq!(NaturalPolynomial::from(123u32).degree(), Some(0));
-    /// assert_eq!(*NaturalPolynomial::from(123u32).coefficient(0), 123);
+    /// assert_eq!(NaturalPolynomial::from(123u32).to_string(), "123");
+    /// assert_eq!(NaturalPolynomial::from(true).to_string(), "1");
     /// assert_eq!(
-    ///     NaturalPolynomial::from(Natural::from(10u32).pow(20)).degree(),
-    ///     Some(0)
+    ///     NaturalPolynomial::from(Natural::from(10u32).pow(20)).to_string(),
+    ///     "100000000000000000000"
     /// );
-    /// assert_eq!(NaturalPolynomial::from(true).degree(), Some(0));
     ///
     /// // Zero is the zero polynomial, which has no coefficients.
-    /// assert_eq!(NaturalPolynomial::from(0u32), NaturalPolynomial::default());
+    /// assert_eq!(NaturalPolynomial::from(0u32).to_string(), "0");
     /// ```
     #[inline]
     fn from(x: T) -> Self {
