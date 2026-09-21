@@ -6,14 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::iterators::NonzeroValues;
+use crate::iterators::{NonzeroValues, nonzero_values};
+use crate::num::basic::integers::PrimitiveInt;
+use crate::num::logic::traits::LowMask;
 use crate::num::random::geometric::GeometricRandomNaturalValues;
 use crate::num::random::striped::{
-    StripedRandomUnsignedBitChunks, striped_random_positive_unsigneds, striped_random_unsigneds,
+    StripedRandomUnsignedBitChunks, StripedRandomUnsignedInclusiveRange,
+    striped_random_positive_unsigneds, striped_random_unsigned_bit_chunks,
+    striped_random_unsigned_range, striped_random_unsigneds,
 };
 use crate::num::random::{
-    RandomPrimitiveInts, RandomUnsignedInclusiveRange, random_positive_unsigneds,
-    random_primitive_ints,
+    RandomPrimitiveInts, RandomUnsignedInclusiveRange, RandomUnsignedRange,
+    random_positive_unsigneds, random_primitive_ints, random_unsigned_inclusive_range,
+    random_unsigned_range,
 };
 use crate::random::Seed;
 use crate::u64_polynomial::U64Polynomial;
@@ -739,4 +744,319 @@ pub fn striped_random_u64_polynomials_degree_inclusive_range(
             )
         },
     ))
+}
+
+/// The type of the [`U64Polynomial`] generator whose coefficients are reduced modulo a power of 2.
+pub type RandomU64PolynomialsReducedModPowerOf2 = RandomU64Polynomials<
+    GeometricRandomNaturalValues<u64>,
+    RandomUnsignedInclusiveRange<u64>,
+    RandomUnsignedInclusiveRange<u64>,
+>;
+
+/// Generates random [`U64Polynomial`]s that are reduced modulo $2^k$.
+///
+/// A polynomial is reduced modulo $2^k$ when every one of its coefficients is, so the coefficients
+/// are sampled uniformly from $[0, 2^k)$ and the leading coefficient, which may not be zero, from
+/// $[1, 2^k)$.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of coefficients of the $i$th output.
+///
+/// # Panics
+/// Panics if `pow` is zero or greater than 64, if `mean_length_numerator` or
+/// `mean_length_denominator` are zero, or if their ratio is greater than or equal to $2^{64}$. The
+/// only polynomial reduced modulo $2^0$ is the zero polynomial, which leaves no leading coefficient
+/// to choose, and no [`u64`] has more than 64 bits.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::u64_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 4, 2, 1),
+///         5
+///     ),
+///     "[3*x^5+8*x^4+11*x^2+5*x+5, 7, \
+///     9*x^7+8*x^6+6*x^5+14*x^4+11*x^3+12*x^2+8*x+8, 11, \
+///     7*x^13+2*x^12+11*x^11+x^10+13*x^9+9*x^8+14*x^7+11*x^6+2*x^5+6*x^4+13*x^3+15*x^2+12*x+11, \
+///     ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_u64_polynomials_reduced_mod_power_of_2(
+    seed: Seed,
+    pow: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomU64PolynomialsReducedModPowerOf2 {
+    assert_ne!(
+        pow, 0,
+        "the only polynomial reduced modulo 2^0 is the zero polynomial"
+    );
+    assert!(pow <= u64::WIDTH);
+    let max = u64::low_mask(pow);
+    random_u64_polynomials_from_iterators(
+        seed,
+        &|seed_2| random_unsigned_inclusive_range(seed_2, 0, max),
+        &|seed_2| random_unsigned_inclusive_range(seed_2, 1, max),
+        mean_length_numerator,
+        mean_length_denominator,
+    )
+}
+
+/// The type of the striped [`U64Polynomial`] generator whose coefficients are reduced modulo a
+/// power of 2.
+pub type StripedRandomU64PolynomialsReducedModPowerOf2 = RandomU64Polynomials<
+    GeometricRandomNaturalValues<u64>,
+    StripedRandomUnsignedBitChunks<u64>,
+    NonzeroValues<StripedRandomUnsignedBitChunks<u64>>,
+>;
+
+/// Generates random [`U64Polynomial`]s that are reduced modulo $2^k$, with striped coefficients.
+///
+/// A coefficient is a striped bit chunk $k$ bits wide, which is exactly a value below $2^k$, so the
+/// striping and the reduction are the same restriction rather than two: the bit chunk's width is
+/// what makes the polynomial reduced. The leading coefficient, which may not be zero, is drawn from
+/// the same source with the zeros filtered out.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of coefficients of the $i$th output.
+///
+/// # Panics
+/// Panics if `pow` is zero or greater than 64, if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_length_numerator` or
+/// `mean_length_denominator` are zero, or if their ratio is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::u64_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 8, 8, 1, 2, 1),
+///         5
+///     ),
+///     "[248*x^5+7*x^4+31*x^3+248*x^2+220*x+255, 224, \
+///     111*x^7+112*x^4+255*x^3+255*x^2+x+3, 241, \
+///     124*x^13+159*x^12+127*x^11+239*x^10+63*x^9+252*x^8+216*x^7+135*x^6+32*x^5+3*x^4+255*x^3+\
+///     x^2, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_u64_polynomials_reduced_mod_power_of_2(
+    seed: Seed,
+    pow: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> StripedRandomU64PolynomialsReducedModPowerOf2 {
+    assert_ne!(
+        pow, 0,
+        "the only polynomial reduced modulo 2^0 is the zero polynomial"
+    );
+    assert!(pow <= u64::WIDTH);
+    random_u64_polynomials_from_iterators(
+        seed,
+        &|seed_2| {
+            striped_random_unsigned_bit_chunks(
+                seed_2,
+                pow,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            )
+        },
+        &|seed_2| {
+            nonzero_values(striped_random_unsigned_bit_chunks(
+                seed_2,
+                pow,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            ))
+        },
+        mean_length_numerator,
+        mean_length_denominator,
+    )
+}
+
+/// The type of the [`U64Polynomial`] generator whose coefficients are reduced modulo a number.
+pub type RandomU64PolynomialsReducedMod = RandomU64Polynomials<
+    GeometricRandomNaturalValues<u64>,
+    RandomUnsignedRange<u64>,
+    RandomUnsignedRange<u64>,
+>;
+
+/// Generates random [`U64Polynomial`]s that are reduced modulo $m$.
+///
+/// A polynomial is reduced modulo $m$ when every one of its coefficients is, so the coefficients
+/// are sampled uniformly from $[0, m)$ and the leading coefficient, which may not be zero, from
+/// $[1, m)$.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`.
+///
+/// Where $m$ is a power of 2, [`random_u64_polynomials_reduced_mod_power_of_2`] generates from the
+/// same set, though not the same sequence.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of coefficients of the $i$th output.
+///
+/// # Panics
+/// Panics if `m` is less than 2, if `mean_length_numerator` or `mean_length_denominator` are zero,
+/// or if their ratio is greater than or equal to $2^{64}$. Nothing is reduced modulo 0, and the
+/// only polynomial reduced modulo 1 is the zero polynomial, which leaves no leading coefficient to
+/// choose.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::u64_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_u64_polynomials_reduced_mod(EXAMPLE_SEED, 10, 2, 1),
+///         5
+///     ),
+///     "[3*x^5+8*x^4+8*x^3+5*x+5, 7, 9*x^7+x^6+9*x^5+2*x^4+6*x^3+8*x^2+6*x+8, 7, \
+///     9*x^13+5*x^12+9*x^11+7*x^10+8*x^9+9*x^7+6*x^6+5*x^5+x^4+6*x^3+2*x^2+2, ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_u64_polynomials_reduced_mod(
+    seed: Seed,
+    m: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomU64PolynomialsReducedMod {
+    assert!(
+        m >= 2,
+        "nothing is reduced modulo 0, and only the zero polynomial is reduced modulo 1"
+    );
+    random_u64_polynomials_from_iterators(
+        seed,
+        &|seed_2| random_unsigned_range(seed_2, 0, m),
+        &|seed_2| random_unsigned_range(seed_2, 1, m),
+        mean_length_numerator,
+        mean_length_denominator,
+    )
+}
+
+/// The type of the striped [`U64Polynomial`] generator whose coefficients are reduced modulo a
+/// number.
+pub type StripedRandomU64PolynomialsReducedMod = RandomU64Polynomials<
+    GeometricRandomNaturalValues<u64>,
+    StripedRandomUnsignedInclusiveRange<u64>,
+    StripedRandomUnsignedInclusiveRange<u64>,
+>;
+
+/// Generates random [`U64Polynomial`]s that are reduced modulo $m$, with striped coefficients.
+///
+/// The coefficients are striped values in $[0, m)$, and the leading coefficient, which may not be
+/// zero, is a striped value in $[1, m)$.
+///
+/// Unlike [`striped_random_u64_polynomials_reduced_mod_power_of_2`], where a striped bit chunk of
+/// the right width is already a reduced coefficient, an arbitrary $m$ is not a bit-width boundary,
+/// so the striping and the reduction are two restrictions rather than one. A striped value in a
+/// range keeps the long runs of equal bits that the range allows, so the coefficients just below
+/// $m$ are the ones whose bit patterns are least free.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of coefficients of the $i$th output.
+///
+/// # Panics
+/// Panics if `m` is less than 2, if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_length_numerator` or `mean_length_denominator` are zero, or
+/// if their ratio is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::u64_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_u64_polynomials_reduced_mod(EXAMPLE_SEED, 1000, 8, 1, 2, 1),
+///         5
+///     ),
+///     "[x^5+3*x^4+x^3+62*x^2+952*x+999, 1, x^7+511*x^3+7*x^2+999*x+7, 775, \
+///     992*x^13+959*x^12+3*x^11+481*x^10+512*x^9+636*x^8+992*x^7+33*x^6+799*x^5+639*x^4+542*x^3+\
+///     479*x^2+992*x+127, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_u64_polynomials_reduced_mod(
+    seed: Seed,
+    m: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> StripedRandomU64PolynomialsReducedMod {
+    assert!(
+        m >= 2,
+        "nothing is reduced modulo 0, and only the zero polynomial is reduced modulo 1"
+    );
+    random_u64_polynomials_from_iterators(
+        seed,
+        &|seed_2| {
+            striped_random_unsigned_range(
+                seed_2,
+                0,
+                m,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            )
+        },
+        &|seed_2| {
+            striped_random_unsigned_range(
+                seed_2,
+                1,
+                m,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            )
+        },
+        mean_length_numerator,
+        mean_length_denominator,
+    )
 }

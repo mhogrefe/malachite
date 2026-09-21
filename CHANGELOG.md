@@ -365,6 +365,26 @@ documented by git history.
   `height_significant_bits() <= pow`, the same shape as the primitive integer implementation,
   which never builds the height at all since bit length is monotone. The zero polynomial, having
   no coefficients, is reduced modulo everything, including $2^0$.
+- `exhaustive_u64_polynomials_reduced_mod_power_of_2`,
+  `random_u64_polynomials_reduced_mod_power_of_2`, and
+  `striped_random_u64_polynomials_reduced_mod_power_of_2`, generating the `U64Polynomial`s that
+  are reduced modulo $2^k$ — those whose coefficients are all less than $2^k$, for which
+  `mod_power_of_2_is_reduced` returns `true`. Restricting the coefficients does not bound the
+  degree, so the output is still infinite and degrees still spread out; only the coefficients are
+  confined. The striped generator needs no separate restriction, a striped bit chunk $k$ bits wide
+  being exactly a value below $2^k$: the chunk width is what makes the polynomial reduced. All
+  three panic on a `pow` of 0, the only polynomial reduced modulo $2^0$ being the zero polynomial,
+  which leaves no leading coefficient to choose.
+- `exhaustive_u64_polynomials_reduced_mod`, `random_u64_polynomials_reduced_mod`, and
+  `striped_random_u64_polynomials_reduced_mod`, the same for an arbitrary modulus rather than a
+  power of 2: the `U64Polynomial`s whose coefficients are all less than $m$, for which
+  `mod_is_reduced` returns `true`. Where $m$ is a power of 2 the exhaustive one generates exactly
+  what the power-of-2 version does, in the same order. The striped one differs from its power-of-2
+  counterpart in needing two restrictions rather than one — an arbitrary $m$ is not a bit-width
+  boundary, so the coefficients are striped values drawn from a range instead of bit chunks whose
+  width already bounds them. All three panic on an `m` below 2: nothing is reduced modulo 0, and
+  the only polynomial reduced modulo 1 is the zero polynomial, which leaves no leading coefficient
+  to choose.
 
 ### malachite-nz
 

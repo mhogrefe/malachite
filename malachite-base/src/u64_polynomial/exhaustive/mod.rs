@@ -6,9 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::basic::integers::PrimitiveInt;
 use crate::num::exhaustive::{
     PrimitiveIntIncreasingRange, exhaustive_positive_primitive_ints, exhaustive_unsigneds,
+    primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
 };
+use crate::num::logic::traits::LowMask;
 use crate::u64_polynomial::U64Polynomial;
 use crate::vecs::exhaustive::{
     ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
@@ -347,4 +350,114 @@ pub fn exhaustive_u64_polynomials_degree_inclusive_range(
         exhaustive_unsigneds::<u64>(),
         exhaustive_positive_primitive_ints::<u64>(),
     ))
+}
+
+/// The type of the [`U64Polynomial`] generator whose coefficients are reduced modulo a power of 2.
+pub type ExhaustiveU64PolynomialsReducedModPowerOf2 =
+    ExhaustiveU64Polynomials<PrimitiveIntIncreasingRange<u64>, PrimitiveIntIncreasingRange<u64>>;
+
+/// Generates all [`U64Polynomial`]s that are reduced modulo $2^k$.
+///
+/// A polynomial is reduced modulo $2^k$ when every one of its coefficients is, so these are the
+/// polynomials whose coefficients are all less than $2^k$ — which is to say, those for which
+/// [`mod_power_of_2_is_reduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced::
+/// mod_power_of_2_is_reduced) returns `true`.
+///
+/// The output is infinite: restricting the coefficients does not bound the degree. The zero
+/// polynomial, having no coefficients, is reduced modulo every power of 2 and comes first.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of coefficients of the $i$th output.
+///
+/// # Panics
+/// Panics if `pow` is zero or greater than 64. The only polynomial reduced modulo $2^0$ is the zero
+/// polynomial, which leaves no leading coefficient to choose, and no [`u64`] has more than 64 bits.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::u64_polynomial::exhaustive::*;
+///
+/// // Modulo 4, every coefficient is 0, 1, 2, or 3.
+/// assert_eq!(
+///     prefix_to_string(exhaustive_u64_polynomials_reduced_mod_power_of_2(2), 10),
+///     "[0, 1, 2, x, 3, 2*x, x+1, x^2, x^3, x^4, ...]"
+/// );
+///
+/// // Modulo 2, the coefficients are all 0 or 1, so these are the polynomials over GF(2).
+/// assert_eq!(
+///     prefix_to_string(exhaustive_u64_polynomials_reduced_mod_power_of_2(1), 10),
+///     "[0, 1, x, x^2, x+1, x^2+x, x^2+1, x^3, x^4, x^5, ...]"
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_u64_polynomials_reduced_mod_power_of_2(
+    pow: u64,
+) -> ExhaustiveU64PolynomialsReducedModPowerOf2 {
+    assert_ne!(
+        pow, 0,
+        "the only polynomial reduced modulo 2^0 is the zero polynomial"
+    );
+    assert!(pow <= u64::WIDTH);
+    let max = u64::low_mask(pow);
+    exhaustive_u64_polynomials_from_iterators(
+        primitive_int_increasing_inclusive_range(0, max),
+        primitive_int_increasing_inclusive_range(1, max),
+    )
+}
+
+/// The type of the [`U64Polynomial`] generator whose coefficients are reduced modulo a number.
+pub type ExhaustiveU64PolynomialsReducedMod =
+    ExhaustiveU64Polynomials<PrimitiveIntIncreasingRange<u64>, PrimitiveIntIncreasingRange<u64>>;
+
+/// Generates all [`U64Polynomial`]s that are reduced modulo $m$.
+///
+/// A polynomial is reduced modulo $m$ when every one of its coefficients is, so these are the
+/// polynomials whose coefficients are all less than $m$ — which is to say, those for which
+/// [`mod_is_reduced`](crate::num::arithmetic::traits::ModIsReduced::mod_is_reduced) returns `true`.
+///
+/// The output is infinite: restricting the coefficients does not bound the degree. The zero
+/// polynomial, having no coefficients, is reduced modulo every $m$ and comes first.
+///
+/// Where $m$ is a power of 2, [`exhaustive_u64_polynomials_reduced_mod_power_of_2`] generates the
+/// same polynomials.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of coefficients of the $i$th output.
+///
+/// # Panics
+/// Panics if `m` is less than 2. Nothing is reduced modulo 0, and the only polynomial reduced
+/// modulo 1 is the zero polynomial, which leaves no leading coefficient to choose.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::u64_polynomial::exhaustive::*;
+///
+/// // Modulo 3, every coefficient is 0, 1, or 2.
+/// assert_eq!(
+///     prefix_to_string(exhaustive_u64_polynomials_reduced_mod(3), 10),
+///     "[0, 1, 2, x, 2*x, x^2, x+1, 2*x^2, x^3, x^4, ...]"
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_u64_polynomials_reduced_mod(m: u64) -> ExhaustiveU64PolynomialsReducedMod {
+    assert!(
+        m >= 2,
+        "nothing is reduced modulo 0, and only the zero polynomial is reduced modulo 1"
+    );
+    exhaustive_u64_polynomials_from_iterators(
+        primitive_int_increasing_range(0, m),
+        primitive_int_increasing_range(1, m),
+    )
 }
