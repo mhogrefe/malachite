@@ -14,7 +14,9 @@ use crate::num::exhaustive::{
     PrimitiveIntIncreasingRange, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
     primitive_int_increasing_range,
 };
-use crate::num::iterators::{RulerSequence, ruler_sequence};
+use crate::num::iterators::{
+    BitDistributorSequence, RulerSequence, bit_distributor_sequence, ruler_sequence,
+};
 use crate::num::logic::traits::SignificantBits;
 use crate::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, ExhaustivePairs,
@@ -1703,6 +1705,485 @@ where
     exhaustive_vecs_from_length_iterator(
         primitive_int_increasing_inclusive_range(min_length, u64::MAX),
         xs,
+    )
+}
+
+/// Generates all [`Vec`]s of a given length whose last element comes from a different iterator than
+/// the rest.
+///
+/// This `struct` is created by [`exhaustive_vecs_with_last_fixed_length`]; see its documentation
+/// for more.
+#[allow(clippy::large_enum_variant)]
+#[derive(Clone, Debug)]
+pub enum ExhaustiveFixedLengthVecsWithLast<T: Clone, I: Iterator<Item = T>, J: Iterator<Item = T>> {
+    Zero(Once<Vec<T>>),
+    One(J),
+    GreaterThanOne(ExhaustiveFixedLengthVecs2Inputs<T, I, J>),
+}
+
+impl<T: Clone, I: Iterator<Item = T>, J: Iterator<Item = T>> Iterator
+    for ExhaustiveFixedLengthVecsWithLast<T, I, J>
+{
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Vec<T>> {
+        match self {
+            Self::Zero(xss) => xss.next(),
+            Self::One(ys) => ys.next().map(|y| vec![y]),
+            Self::GreaterThanOne(xss) => xss.next(),
+        }
+    }
+}
+
+/// Generates all length-$n$ [`Vec`]s whose last element is drawn from a different iterator than the
+/// rest.
+///
+/// The first $n-1$ elements come from `xs` and the last comes from `ys`. If `len` is 0 there is no
+/// last element, and the output is a single empty [`Vec`]; if `len` is 1 the [`Vec`] is all last
+/// element, and `xs` does not come into it.
+///
+/// If `xs` and `ys` are both finite, the output length is $m^{n-1}k$, where $m$ is `xs.count()`,
+/// $k$ is `ys.count()`, and $n$ is `len`. If either is infinite and `len` is positive, the output
+/// is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n + T^\prime(i))$
+///
+/// $M(i) = O(n + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs` and `ys`, and $n$ is `len`.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_with_last_fixed_length;
+///
+/// let xs = [0u8, 1].iter().cloned();
+/// let ys = [8u8, 9].iter().cloned();
+/// let xss = exhaustive_vecs_with_last_fixed_length(3, xs, ys).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[0, 0, 8][..],
+///         &[0, 0, 9],
+///         &[0, 1, 8],
+///         &[0, 1, 9],
+///         &[1, 0, 8],
+///         &[1, 0, 9],
+///         &[1, 1, 8],
+///         &[1, 1, 9]
+///     ]
+/// );
+/// ```
+pub fn exhaustive_vecs_with_last_fixed_length<
+    T: Clone,
+    I: Iterator<Item = T>,
+    J: Iterator<Item = T>,
+>(
+    len: u64,
+    xs: I,
+    ys: J,
+) -> ExhaustiveFixedLengthVecsWithLast<T, I, J> {
+    match len {
+        // The empty `Vec` has no last element, so neither iterator has anything to say about it.
+        // There is one of it, and it is generated once.
+        0 => ExhaustiveFixedLengthVecsWithLast::Zero(once(vec![])),
+        // A `Vec` of one element is all last element, so `xs` does not come into it. The general
+        // case cannot be used here: it would map no output slot to `xs`, which the multiple-input
+        // generator does not allow.
+        1 => ExhaustiveFixedLengthVecsWithLast::One(ys),
+        _ => {
+            let len = usize::exact_from(len);
+            // Every slot advances through its iterator at the same rate, as it does in
+            // `exhaustive_vecs`; the only difference is which iterator the last slot reads from.
+            let mut output_types = vec![(BitDistributorOutputType::normal(1), 0); len];
+            output_types[len - 1].1 = 1;
+            ExhaustiveFixedLengthVecsWithLast::GreaterThanOne(
+                exhaustive_vecs_fixed_length_2_inputs(xs, ys, &output_types),
+            )
+        }
+    }
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+struct ExhaustiveVecsWithLastGenerator<
+    T: Clone,
+    I: Clone + Iterator<Item = T>,
+    J: Clone + Iterator<Item = T>,
+> {
+    xs: I,
+    ys: J,
+}
+
+impl<T: Clone, I: Clone + Iterator<Item = T>, J: Clone + Iterator<Item = T>>
+    ExhaustiveDependentPairsYsGenerator<u64, Vec<T>, ExhaustiveFixedLengthVecsWithLast<T, I, J>>
+    for ExhaustiveVecsWithLastGenerator<T, I, J>
+{
+    #[inline]
+    fn get_ys(&self, &len: &u64) -> ExhaustiveFixedLengthVecsWithLast<T, I, J> {
+        exhaustive_vecs_with_last_fixed_length(len, self.xs.clone(), self.ys.clone())
+    }
+}
+
+/// Generates all [`Vec`]s with lengths from one iterator, elements from another, and last elements
+/// from a third.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveVecsWithLast<
+    T: Clone,
+    I: Iterator<Item = u64>,
+    J: Clone + Iterator<Item = T>,
+    K: Clone + Iterator<Item = T>,
+>(
+    ExhaustiveDependentPairs<
+        u64,
+        Vec<T>,
+        BitDistributorSequence,
+        ExhaustiveVecsWithLastGenerator<T, J, K>,
+        I,
+        ExhaustiveFixedLengthVecsWithLast<T, J, K>,
+    >,
+);
+
+impl<
+    T: Clone,
+    I: Iterator<Item = u64>,
+    J: Clone + Iterator<Item = T>,
+    K: Clone + Iterator<Item = T>,
+> Iterator for ExhaustiveVecsWithLast<T, I, J, K>
+{
+    type Item = Vec<T>;
+
+    #[inline]
+    fn next(&mut self) -> Option<Vec<T>> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+/// Generates all [`Vec`]s whose last element is drawn from a different iterator than the rest, and
+/// with lengths from a third iterator.
+///
+/// The length-generating iterator is `lengths`, the element-generating iterator is `xs`, and the
+/// last-element-generating iterator is `ys`. A [`Vec`] of length $n \geq 1$ has its first $n-1$
+/// elements from `xs` and its last from `ys`; the empty [`Vec`], which has no last element, takes
+/// nothing from either.
+///
+/// This is [`exhaustive_vecs_from_length_iterator`] with one element singled out. It distributes
+/// bits among the output slots exactly as that function does, so the last element grows no faster
+/// or slower than the others; pairing a shorter [`Vec`] with a last element would grow the two
+/// apart instead.
+///
+/// It differs from that function in how often it visits each length. Singling out the last element
+/// makes a one-element [`Vec`] a kind of its own — it is all last element and nothing else —
+/// and the ruler sequence that [`exhaustive_vecs_from_length_iterator`] steps through lengths with
+/// would spend half of its time there. This one steps through them with a
+/// [`bit_distributor_sequence`] instead, which reaches the length $\ell$ after $O(\ell^3)$ outputs
+/// rather than $O(2^\ell)$.
+///
+/// If the lengths iterator has repetitions, then the generated [`Vec`]s will be repeated too.
+///
+/// There's one quirk if `xs` or `ys` is empty: then the iterator will stop at some point after it
+/// encounters a length it cannot fill, even if there are smaller lengths later on. This prevents
+/// the iterator hanging.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_with_last_from_length_iterator;
+///
+/// let xss = exhaustive_vecs_with_last_from_length_iterator(
+///     [0, 1, 2, 3].iter().cloned(),
+///     [0u8, 1].iter().cloned(),
+///     [8u8, 9].iter().cloned(),
+/// )
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[][..],
+///         &[8],
+///         &[9],
+///         &[0, 8],
+///         &[0, 9],
+///         &[0, 0, 8],
+///         &[1, 8],
+///         &[0, 0, 9],
+///         &[1, 9],
+///         &[0, 1, 8],
+///         &[0, 1, 9],
+///         &[1, 0, 8],
+///         &[1, 0, 9],
+///         &[1, 1, 8],
+///         &[1, 1, 9]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_with_last_from_length_iterator<
+    T: Clone,
+    I: Iterator<Item = u64>,
+    J: Clone + Iterator<Item = T>,
+    K: Clone + Iterator<Item = T>,
+>(
+    lengths: I,
+    xs: J,
+    ys: K,
+) -> ExhaustiveVecsWithLast<T, I, J, K> {
+    ExhaustiveVecsWithLast(exhaustive_dependent_pairs_stop_after_empty_ys(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(2),
+        ),
+        lengths,
+        ExhaustiveVecsWithLastGenerator { xs, ys },
+    ))
+}
+
+/// Generates all [`Vec`]s whose last element is drawn from a different iterator than the rest.
+///
+/// A [`Vec`] of length $n \geq 1$ has its first $n-1$ elements from `xs` and its last from `ys`.
+/// The empty [`Vec`], which has no last element, is generated once, from neither.
+///
+/// This is [`exhaustive_vecs`] with one element singled out, and it is what generates the
+/// coefficients of a polynomial, whose leading coefficient is the one that may not be zero.
+///
+/// The lengths of the output [`Vec`]s grow logarithmically.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs` and `ys`, and $\ell$ is the number of
+/// elements in the $i$th output.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::exhaustive::{
+///     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
+/// };
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_with_last;
+///
+/// let xss = exhaustive_vecs_with_last(
+///     exhaustive_unsigneds::<u8>(),
+///     exhaustive_positive_primitive_ints::<u8>(),
+/// )
+/// .take(20)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[][..],
+///         &[1],
+///         &[2],
+///         &[0, 1],
+///         &[3],
+///         &[0, 2],
+///         &[4],
+///         &[1, 1],
+///         &[0, 0, 1],
+///         &[0, 0, 0, 1],
+///         &[0, 0, 2],
+///         &[0, 0, 0, 2],
+///         &[0, 1, 1],
+///         &[0, 0, 1, 1],
+///         &[0, 1, 2],
+///         &[0, 0, 1, 2],
+///         &[5],
+///         &[1, 2],
+///         &[6],
+///         &[0, 3]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_with_last<
+    T: Clone,
+    J: Clone + Iterator<Item = T>,
+    K: Clone + Iterator<Item = T>,
+>(
+    xs: J,
+    ys: K,
+) -> ExhaustiveVecsWithLast<T, PrimitiveIntIncreasingRange<u64>, J, K> {
+    exhaustive_vecs_with_last_from_length_iterator(exhaustive_unsigneds(), xs, ys)
+}
+
+/// Generates all [`Vec`]s with a minimum length whose last element is drawn from a different
+/// iterator than the rest.
+///
+/// A [`Vec`] of length $n \geq 1$ has its first $n-1$ elements from `xs` and its last from `ys`.
+/// The empty [`Vec`], which has no last element, is generated once if `min_length` is 0, and not at
+/// all otherwise.
+///
+/// The lengths of the output [`Vec`]s grow as the cube root of the iteration number, as they do in
+/// [`exhaustive_vecs_with_last`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs` and `ys`, and $\ell$ is the number of
+/// elements in the $i$th output.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::exhaustive::{
+///     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
+/// };
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_with_last_min_length;
+///
+/// let xss = exhaustive_vecs_with_last_min_length(
+///     2,
+///     exhaustive_unsigneds::<u8>(),
+///     exhaustive_positive_primitive_ints::<u8>(),
+/// )
+/// .take(10)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[0, 1][..],
+///         &[0, 0, 1],
+///         &[0, 2],
+///         &[0, 0, 2],
+///         &[1, 1],
+///         &[0, 1, 1],
+///         &[1, 2],
+///         &[0, 1, 2],
+///         &[0, 0, 0, 1],
+///         &[0, 0, 0, 0, 1]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_with_last_min_length<
+    T: Clone,
+    J: Clone + Iterator<Item = T>,
+    K: Clone + Iterator<Item = T>,
+>(
+    min_length: u64,
+    xs: J,
+    ys: K,
+) -> ExhaustiveVecsWithLast<T, PrimitiveIntIncreasingRange<u64>, J, K> {
+    exhaustive_vecs_with_last_from_length_iterator(
+        primitive_int_increasing_inclusive_range(min_length, u64::MAX),
+        xs,
+        ys,
+    )
+}
+
+/// Generates all [`Vec`]s with lengths in $[a, b)$ whose last element is drawn from a different
+/// iterator than the rest.
+///
+/// A [`Vec`] of length $n \geq 1$ has its first $n-1$ elements from `xs` and its last from `ys`.
+/// The empty [`Vec`], which has no last element, is generated once if $a$ is 0, and not at all
+/// otherwise.
+///
+/// If $a \geq b$, the output is empty.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs` and `ys`, and $\ell$ is the number of
+/// elements in the $i$th output.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_with_last_length_range;
+///
+/// let xss = exhaustive_vecs_with_last_length_range(
+///     1,
+///     3,
+///     [0u8, 1].iter().cloned(),
+///     [8u8, 9].iter().cloned(),
+/// )
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[&[8][..], &[0, 8], &[9], &[0, 9], &[1, 8], &[1, 9]]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_with_last_length_range<
+    T: Clone,
+    J: Clone + Iterator<Item = T>,
+    K: Clone + Iterator<Item = T>,
+>(
+    a: u64,
+    mut b: u64,
+    xs: J,
+    ys: K,
+) -> ExhaustiveVecsWithLast<T, PrimitiveIntIncreasingRange<u64>, J, K> {
+    if a > b {
+        b = a;
+    }
+    exhaustive_vecs_with_last_from_length_iterator(primitive_int_increasing_range(a, b), xs, ys)
+}
+
+/// Generates all [`Vec`]s with lengths in $[a, b]$ whose last element is drawn from a different
+/// iterator than the rest.
+///
+/// A [`Vec`] of length $n \geq 1$ has its first $n-1$ elements from `xs` and its last from `ys`.
+/// The empty [`Vec`], which has no last element, is generated once if $a$ is 0, and not at all
+/// otherwise.
+///
+/// If $a > b$, the output is empty.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs` and `ys`, and $\ell$ is the number of
+/// elements in the $i$th output.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_with_last_length_inclusive_range;
+///
+/// let xss = exhaustive_vecs_with_last_length_inclusive_range(
+///     1,
+///     2,
+///     [0u8, 1].iter().cloned(),
+///     [8u8, 9].iter().cloned(),
+/// )
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[&[8][..], &[0, 8], &[9], &[0, 9], &[1, 8], &[1, 9]]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_with_last_length_inclusive_range<
+    T: Clone,
+    J: Clone + Iterator<Item = T>,
+    K: Clone + Iterator<Item = T>,
+>(
+    mut a: u64,
+    mut b: u64,
+    xs: J,
+    ys: K,
+) -> ExhaustiveVecsWithLast<T, PrimitiveIntIncreasingRange<u64>, J, K> {
+    if a > b {
+        a = 1;
+        b = 0;
+    }
+    exhaustive_vecs_with_last_from_length_iterator(
+        primitive_int_increasing_range(a, b.saturating_add(1)),
+        xs,
+        ys,
     )
 }
 

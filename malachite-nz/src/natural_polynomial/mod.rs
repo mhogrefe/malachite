@@ -15,6 +15,8 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 /// Functions for converting a [`NaturalPolynomial`] to and from other types.
 pub mod conversion;
+/// Iterators that generate [`NaturalPolynomial`]s without repetition.
+pub mod exhaustive;
 
 // The zero `Natural`, as something a reference can be handed out to.
 //
