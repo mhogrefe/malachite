@@ -100,7 +100,9 @@ impl Height for U64Polynomial {
     ///     2
     /// );
     /// assert_eq!(
-    ///     U64Polynomial::from_str("0").unwrap().height_significant_bits(),
+    ///     U64Polynomial::from_str("0")
+    ///         .unwrap()
+    ///         .height_significant_bits(),
     ///     0
     /// );
     /// ```

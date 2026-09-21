@@ -39,7 +39,9 @@ impl Height for NaturalPolynomial {
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// assert_eq!(
-    ///     NaturalPolynomial::from_str("x^2+3*x+2").unwrap().to_height(),
+    ///     NaturalPolynomial::from_str("x^2+3*x+2")
+    ///         .unwrap()
+    ///         .to_height(),
     ///     3
     /// );
     /// assert_eq!(NaturalPolynomial::from_str("x^100").unwrap().to_height(), 1);

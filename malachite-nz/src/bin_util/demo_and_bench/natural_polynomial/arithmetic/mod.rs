@@ -10,6 +10,8 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     height::register(runner);
+    mod_is_reduced::register(runner);
 }
 
 mod height;
+mod mod_is_reduced;

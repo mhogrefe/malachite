@@ -9,3 +9,10 @@
 /// An implementation of [`Height`](crate::num::arithmetic::traits::Height), the largest of a
 /// polynomial's coefficients.
 pub mod height;
+/// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
+/// checks whether every coefficient of a polynomial is less than a given modulus.
+pub mod mod_is_reduced;
+/// An implementation of
+/// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
+/// whether every coefficient of a polynomial is less than a given power of 2.
+pub mod mod_power_of_2_is_reduced;

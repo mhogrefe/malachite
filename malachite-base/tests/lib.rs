@@ -873,6 +873,7 @@ pub mod vars {
 pub mod u64_polynomial {
     pub mod arithmetic {
         pub mod height;
+        pub mod mod_is_reduced;
     }
     pub mod basic {
         pub mod coefficients;

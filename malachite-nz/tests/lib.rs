@@ -590,6 +590,7 @@ pub mod integer_polynomial {
 pub mod natural_polynomial {
     pub mod arithmetic {
         pub mod height;
+        pub mod mod_is_reduced;
     }
     pub mod basic {
         pub mod coefficients;

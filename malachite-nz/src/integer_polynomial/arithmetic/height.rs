@@ -50,7 +50,9 @@ impl Height for IntegerPolynomial {
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// assert_eq!(
-    ///     IntegerPolynomial::from_str("x^2-3*x+2").unwrap().to_height(),
+    ///     IntegerPolynomial::from_str("x^2-3*x+2")
+    ///         .unwrap()
+    ///         .to_height(),
     ///     3
     /// );
     /// assert_eq!(

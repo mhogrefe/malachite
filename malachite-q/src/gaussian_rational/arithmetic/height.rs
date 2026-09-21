@@ -43,10 +43,7 @@ impl Height for GaussianRational {
     ///     GaussianRational::from_str("1/3+i/2").unwrap().to_height(),
     ///     3
     /// );
-    /// assert_eq!(
-    ///     GaussianRational::from_str("22/7").unwrap().to_height(),
-    ///     22
-    /// );
+    /// assert_eq!(GaussianRational::from_str("22/7").unwrap().to_height(), 22);
     /// assert_eq!(GaussianRational::from_str("0").unwrap().to_height(), 1);
     /// ```
     #[inline]
@@ -69,9 +66,7 @@ impl Height for GaussianRational {
     /// use malachite_q::gaussian_rational::GaussianRational;
     ///
     /// assert_eq!(
-    ///     GaussianRational::from_str("1/3+i/2")
-    ///         .unwrap()
-    ///         .into_height(),
+    ///     GaussianRational::from_str("1/3+i/2").unwrap().into_height(),
     ///     3
     /// );
     /// assert_eq!(GaussianRational::from_str("0").unwrap().into_height(), 1);
@@ -139,9 +134,7 @@ impl HeightRef for GaussianRational {
     /// use malachite_q::gaussian_rational::GaussianRational;
     ///
     /// assert_eq!(
-    ///     *GaussianRational::from_str("1/3+i/2")
-    ///         .unwrap()
-    ///         .height_ref(),
+    ///     *GaussianRational::from_str("1/3+i/2").unwrap().height_ref(),
     ///     3
     /// );
     /// assert_eq!(*GaussianRational::from_str("0").unwrap().height_ref(), 1);

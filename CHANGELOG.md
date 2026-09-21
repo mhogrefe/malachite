@@ -358,6 +358,13 @@ documented by git history.
   3.6.0, for nonnegative coefficients. Its `Output` is a [`u64`] rather than a
   [`Natural`](malachite_nz::natural::Natural), and it does not implement `HeightRef`, there being
   no clone to avoid.
+- `ModIsReduced` and `ModPowerOf2IsReduced` for `U64Polynomial`. A polynomial is reduced modulo
+  $m$ when every one of its coefficients is, and asking that of every coefficient is asking it of
+  the largest — so both are questions about the polynomial's height. `mod_is_reduced` compares the
+  height against the modulus, and `mod_power_of_2_is_reduced` is
+  `height_significant_bits() <= pow`, the same shape as the primitive integer implementation,
+  which never builds the height at all since bit length is monotone. The zero polynomial, having
+  no coefficients, is reduced modulo everything, including $2^0$.
 
 ### malachite-nz
 
@@ -447,6 +454,9 @@ documented by git history.
   signed coefficients too. `into_height` moves the coefficient out rather than cloning it.
 - `Height` and `HeightRef` for `GaussianInteger`: the larger of the magnitudes of its real and
   imaginary parts, which is again already held and so can be lent.
+- `ModIsReduced` and `ModPowerOf2IsReduced` for `NaturalPolynomial`, as for `U64Polynomial`:
+  both are questions about the height, since a polynomial is reduced exactly when its largest
+  coefficient is. `mod_is_reduced` borrows the height through `HeightRef` rather than cloning it.
 
 ### malachite-q
 
