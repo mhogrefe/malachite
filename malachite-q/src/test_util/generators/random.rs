@@ -15,6 +15,8 @@ use crate::rational::random::{
     RandomRationalsFromDoubleAndSign, random_negative_rationals, random_non_negative_rationals,
     random_nonzero_rationals, random_positive_rationals, random_rationals,
 };
+use crate::rational_polynomial::RationalPolynomial;
+use crate::rational_polynomial::random::random_rational_polynomials;
 use crate::test_util::extra_variadic::{
     random_ordered_unique_triples, random_quadruples, random_quadruples_from_single,
     random_quadruples_xxyz, random_triples, random_triples_from_single, random_triples_xxy,
@@ -2185,5 +2187,33 @@ pub fn random_rational_vec_gen(config: &GenConfig) -> It<Vec<Rational>> {
         },
         config.get_or("mean_len_n", 4),
         config.get_or("mean_len_d", 1),
+    ))
+}
+
+pub fn random_rational_polynomial_gen(config: &GenConfig) -> It<RationalPolynomial> {
+    Box::new(random_rational_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn random_rational_polynomial_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
 }

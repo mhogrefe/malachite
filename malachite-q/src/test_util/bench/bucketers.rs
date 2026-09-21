@@ -8,6 +8,7 @@
 
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
+use crate::rational_polynomial::RationalPolynomial;
 use malachite_base::max;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -526,5 +527,39 @@ pub fn quadruple_1_2_3_rational_rational_primitive_int_max_bit_bucketer<'a, T: P
             "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
             {z_name}.significant_bits())"
         ),
+    }
+}
+
+pub fn rational_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, RationalPolynomial> {
+    Bucketer {
+        bucketing_function: &|p| {
+            usize::exact_from(
+                p.numerator_ref()
+                    .coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>()
+                    + p.denominator_ref().significant_bits(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total stored bits"),
+    }
+}
+
+pub fn pair_1_rational_polynomial_bit_bucketer<T>(
+    var_name: &str,
+) -> Bucketer<'_, (RationalPolynomial, T)> {
+    Bucketer {
+        bucketing_function: &|(p, _)| {
+            usize::exact_from(
+                p.numerator_ref()
+                    .coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>()
+                    + p.denominator_ref().significant_bits(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total stored bits"),
     }
 }

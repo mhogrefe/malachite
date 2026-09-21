@@ -160,6 +160,29 @@ pub mod gaussian_rational {
     }
 }
 
+pub mod rational_polynomial {
+    pub mod basic {
+        pub mod coefficients;
+        pub mod constants;
+        pub mod mutate_coefficient;
+    }
+    pub mod conversion {
+        pub mod from_coefficients_asc;
+        pub mod from_rational;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+    }
+    pub mod exhaustive {
+        pub mod exhaustive_rational_polynomials;
+    }
+    pub mod random {
+        pub mod random_rational_polynomials;
+    }
+}
 pub mod rational {
     pub mod arithmetic {
         pub mod abs;

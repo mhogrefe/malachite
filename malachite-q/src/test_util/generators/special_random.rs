@@ -17,6 +17,8 @@ use crate::rational::random::{
     striped_random_non_negative_rationals, striped_random_nonzero_rationals,
     striped_random_positive_rationals, striped_random_rationals,
 };
+use crate::rational_polynomial::RationalPolynomial;
+use crate::rational_polynomial::random::striped_random_rational_polynomials;
 use crate::test_util::extra_variadic::{
     random_ordered_unique_triples, random_quadruples, random_quadruples_from_single,
     random_quadruples_xxyz, random_triples, random_triples_from_single, random_triples_xxy,
@@ -40,6 +42,7 @@ use malachite_base::num::random::geometric::{
     geometric_random_signeds, geometric_random_unsigned_inclusive_range,
     geometric_random_unsigneds,
 };
+use malachite_base::num::random::random_unsigned_inclusive_range;
 use malachite_base::num::random::striped::{
     striped_random_signeds, striped_random_unsigned_inclusive_range, striped_random_unsigneds,
 };
@@ -2413,5 +2416,37 @@ pub fn special_random_rational_vec_gen(config: &GenConfig) -> It<Vec<Rational>> 
         },
         config.get_or("mean_len_n", 4),
         config.get_or("mean_len_d", 1),
+    ))
+}
+
+pub fn special_random_rational_polynomial_gen(config: &GenConfig) -> It<RationalPolynomial> {
+    Box::new(striped_random_rational_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn special_random_rational_polynomial_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
 }

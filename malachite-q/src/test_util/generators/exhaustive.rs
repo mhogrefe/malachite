@@ -16,6 +16,8 @@ use crate::rational::exhaustive::{
     exhaustive_negative_rationals, exhaustive_non_negative_rationals, exhaustive_nonzero_rationals,
     exhaustive_positive_rationals, exhaustive_rationals,
 };
+use crate::rational_polynomial::RationalPolynomial;
+use crate::rational_polynomial::exhaustive::exhaustive_rational_polynomials;
 use crate::test_util::extra_variadic::{
     exhaustive_ordered_unique_triples, exhaustive_quadruples_from_single,
     exhaustive_quadruples_xxyz, exhaustive_quadruples_xyyy, exhaustive_triples_from_single,
@@ -959,4 +961,15 @@ pub fn exhaustive_gaussian_rational_vec_gen() -> It<Vec<GaussianRational>> {
 
 pub fn exhaustive_rational_vec_gen() -> It<Vec<Rational>> {
     Box::new(exhaustive_vecs(exhaustive_rationals()))
+}
+
+pub fn exhaustive_rational_polynomial_gen() -> It<RationalPolynomial> {
+    Box::new(exhaustive_rational_polynomials())
+}
+
+pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_1() -> It<(RationalPolynomial, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_rational_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
 }

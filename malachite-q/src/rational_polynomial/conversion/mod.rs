@@ -6,14 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::test_util::runner::Runner;
-
-pub(crate) fn register(runner: &mut Runner) {
-    gaussian_rational::register(runner);
-    rational::register(runner);
-    rational_polynomial::register(runner);
-}
-
-mod gaussian_rational;
-mod rational;
-mod rational_polynomial;
+/// Implementations of traits for converting a value that a [`Rational`](crate::Rational) can be
+/// converted from into a constant [`RationalPolynomial`](super::RationalPolynomial).
+pub mod from_rational;
+/// Functions for converting an [`RationalPolynomial`](super::RationalPolynomial) to and from a
+/// [`String`](alloc::string::String).
+pub mod string;
