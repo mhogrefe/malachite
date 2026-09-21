@@ -151,6 +151,7 @@ pub mod chars {
         pub mod random_char_range;
         pub mod random_chars;
     }
+    pub mod scripts;
     pub mod typst;
 }
 pub mod extra_variadic;
@@ -845,6 +846,14 @@ pub mod unions {
     }
     pub mod typst;
     pub mod unwrap;
+}
+pub mod vars {
+    pub mod abc;
+    pub mod greek;
+    pub mod indexed;
+    pub mod list;
+    pub mod var;
+    pub mod xyz;
 }
 pub mod vecs {
     pub mod exhaustive {

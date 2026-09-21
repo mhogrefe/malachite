@@ -102,5 +102,7 @@ mod latex_table;
 #[cfg(feature = "random")]
 /// Iterators that generate [`char`]s randomly.
 pub mod random;
+/// Functions for writing and reading numbers as runs of Unicode script digits.
+pub mod scripts;
 /// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for [`char`].
 pub mod typst;

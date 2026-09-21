@@ -371,7 +371,9 @@ pub mod tuples;
 /// | `Union3::B(5)`     | `"B"(5)`   |
 /// | `Union3::C(false)` | `"C"("F")` |
 pub mod unions;
-/// Functions for working with [`Vec`]s.
+/// Functions for working with [`Vec`]s. Schemes for naming variables, for instance the variables of
+/// a polynomial.
+pub mod vars;
 pub mod vecs;
 
 #[cfg(feature = "test_build")]

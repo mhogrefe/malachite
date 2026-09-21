@@ -82,6 +82,7 @@ pub(crate) fn register(runner: &mut Runner) {
     rounding_modes::register(runner);
     slices::register(runner);
     strings::register(runner);
+    vars::register(runner);
     vecs::register(runner);
 }
 
@@ -94,4 +95,5 @@ mod options;
 mod rounding_modes;
 mod slices;
 mod strings;
+mod vars;
 mod vecs;

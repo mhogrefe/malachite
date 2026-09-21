@@ -211,3 +211,12 @@ impl ToLatex for char {
         fmt_latex_chars(core::iter::once(*self), f)
     }
 }
+
+// The LaTeX spelling of a `char`, if the table has one.
+//
+// This is the spelling alone, without the table's word on whether it is a math-mode or a text-mode
+// one. A caller that already knows the context a character will stand in — a variable's name,
+// say, which is always math mode — needs only the spelling.
+pub(crate) fn latex_spelling(c: char) -> Option<&'static str> {
+    lookup(c).map(|(_, latex)| latex)
+}

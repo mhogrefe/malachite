@@ -139,6 +139,47 @@ documented by git history.
   one, lifted into a real power of ten, so `1.3e30` becomes `1.3 \times 10^{30}`. As with `Display`,
   the digit count follows the `Float`'s precision rather than its value, and the two zeros are kept
   apart.
+- A new `vars` module, holding schemes for naming variables. A polynomial's variables are numbered
+  rather than named, so something has to turn those numbers into names and names back into numbers;
+  the new `VarScheme` trait is that something, and it lets one polynomial be shown as $x_0 + x_1$,
+  or as $x + y$, or with whatever names a caller has in mind, while the polynomial itself knows
+  nothing about any of them. A scheme names a variable in three languages — as plain text, as
+  LaTeX, and as Typst — of which only the plain name is read back, by `parse_var`. `VarScheme::var`
+  gives a `Var` handle, a scheme together with an index, which implements `Display`, `ToLatex`, and
+  `ToTypst`, so that a variable can be written wherever any of those is expected; `Var::new` does
+  the same for a scheme behind a `dyn`, which the trait supports, so a scheme may be chosen at run
+  time. The trait's contract is that a name is never empty, holds no reserved character, belongs to
+  one variable alone, and reads back as that variable; the new `char_is_reserved` says which
+  characters are reserved, namely the digits, `+`, `-`, `*`, `/`, `^`, `(`, `)`, `,`, and
+  whitespace. Keeping those out of the names is what lets a polynomial be written without
+  separators and still be read back, since a name is then exactly a longest run of unreserved
+  characters. The design follows the `Var` and `ParsableVar` classes of Azurite, a separate project
+  of the author's, where the same four conditions are theorems rather than a contract; the `n` that
+  bounds a variable type there becomes the scheme's `capacity`, which a scheme with no bound
+  reports as `None`.
+- Nine naming schemes, one per module under `vars`: `IndexedVars` and `IndexedCapsVars`, which name
+  variables `x₀, x₁, x₂, …` and `X₀, X₁, X₂, …`, writing the index as a run of Unicode subscript
+  digits and, in LaTeX and Typst, as a real subscript, braced or parenthesized only when it is more
+  than one digit long; `AbcVars` and `AbcCapsVars`, the 26 letters in their usual order; `XyzVars`
+  and `XyzCapsVars`, the same 26 letters ordered as a mathematician reaches for them, `x, y, z, w,
+  v, …, a`; `GreekVars` and `GreekCapsVars`, the 24 Greek letters, skipping the final sigma, which
+  is a second form of a letter already named, and the one code point Unicode leaves unassigned
+  among the capitals; and `ListVars`, which takes its names from the caller and checks them once,
+  when it is made, so that the scheme itself cannot fail. Only `IndexedVars` and `IndexedCapsVars`
+  have no capacity, since an index is written out rather than looked up. In LaTeX a Greek letter is
+  written with its macro where it has one and as the Latin letter it looks like where it does not,
+  since LaTeX has no `\omicron` or `\Alpha`; the spelling is read off the same character table that
+  `ToLatex for char` consults, rather than written out a second time. In Typst a Greek letter is
+  written as itself, which Typst reads natively. A name that is a single ASCII letter is written
+  bare in both languages, so that both set it in math italics as a variable should be, and a longer
+  name is set upright; that is what the trait's two markup methods do by default, which is why
+  `ListVars` needs only three methods and a scheme written outside this crate needs only the same
+  three.
+- `chars::scripts`, with `fmt_subscript_digits` and `parse_subscript_digits`, which write and read a
+  number as a run of Unicode subscript digits. The two are inverse: parsing accepts exactly what
+  writing produces and nothing else, rejecting the empty string, ASCII digits, a leading zero, and a
+  number too large for a `u64`, so that a number has one spelling rather than several. `IndexedVars`
+  is built on them.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:
