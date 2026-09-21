@@ -1,0 +1,253 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::natural::Natural;
+use alloc::vec::Vec;
+use malachite_base::named::Named;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
+
+/// Functions for converting a [`NaturalPolynomial`] to and from other types.
+pub mod conversion;
+
+// The zero `Natural`, as something a reference can be handed out to.
+//
+// A `Natural` owns a `Vec` when it is large, so it has a destructor, and a `&Natural::ZERO` written
+// where a reference is returned would point at a temporary that does not outlive the call. A
+// `static` is the same zero with a lifetime long enough to hand out.
+static ZERO: Natural = Natural::ZERO;
+
+/// A polynomial in one variable whose coefficients are [`Natural`]s.
+///
+/// The coefficients are held in ascending order, so that the coefficient of $x^i$ is the one at
+/// index $i$, and the last is the leading one. Trailing zero coefficients are not held at all: the
+/// zero polynomial has no coefficients, and every other polynomial's last coefficient is nonzero.
+/// That is what makes a polynomial's representation unique, and so what lets [`Eq`] be derived.
+///
+/// The field is private, since not every [`Vec`] of [`Natural`]s is one:
+/// [`from_coefficients_asc`](NaturalPolynomial::from_coefficients_asc) is how a [`Vec`] becomes
+/// one.
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+pub struct NaturalPolynomial {
+    coefficients: Vec<Natural>,
+}
+
+impl NaturalPolynomial {
+    // Returns true iff `self` is valid.
+    //
+    // To be valid, its last coefficient, if it has one at all, must be nonzero. All
+    // `NaturalPolynomial`s must be valid.
+    #[cfg(feature = "test_build")]
+    pub fn is_valid(&self) -> bool {
+        self.coefficients.last() != Some(&Natural::ZERO)
+    }
+
+    // Drops the trailing zero coefficients, which is what makes a `Vec` of coefficients the one
+    // representation of its polynomial.
+    fn trim(&mut self) {
+        while self.coefficients.last() == Some(&Natural::ZERO) {
+            self.coefficients.pop();
+        }
+    }
+
+    /// Converts a [`Vec`] of [`Natural`]s to a [`NaturalPolynomial`].
+    ///
+    /// The coefficients are in ascending order, so that the first is the constant term. Trailing
+    /// zeros are dropped, since a polynomial does not hold them; the [`Vec`] may therefore end with
+    /// as many as it likes, and the empty [`Vec`] is the zero polynomial.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `coefficients.len()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two, Zero};
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// // 2 + 3x + x^2
+    /// let p = NaturalPolynomial::from_coefficients_asc(vec![
+    ///     Natural::TWO,
+    ///     Natural::from(3u32),
+    ///     Natural::ONE,
+    /// ]);
+    /// assert_eq!(p.degree(), Some(2));
+    ///
+    /// // The trailing zeros are not part of the polynomial.
+    /// let q = NaturalPolynomial::from_coefficients_asc(vec![
+    ///     Natural::TWO,
+    ///     Natural::from(3u32),
+    ///     Natural::ONE,
+    ///     Natural::ZERO,
+    ///     Natural::ZERO,
+    /// ]);
+    /// assert_eq!(p, q);
+    ///
+    /// assert_eq!(
+    ///     NaturalPolynomial::from_coefficients_asc(vec![]),
+    ///     NaturalPolynomial::default()
+    /// );
+    /// ```
+    pub fn from_coefficients_asc(coefficients: Vec<Natural>) -> Self {
+        let mut p = Self { coefficients };
+        p.trim();
+        p
+    }
+
+    /// Returns the degree of a [`NaturalPolynomial`].
+    ///
+    /// The zero polynomial has no degree, and gives `None`. Every other polynomial's degree is the
+    /// index of its leading coefficient, so that a nonzero constant has degree 0.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// assert_eq!(NaturalPolynomial::default().degree(), None);
+    /// assert_eq!(NaturalPolynomial::from(5u32).degree(), Some(0));
+    /// assert_eq!(
+    ///     NaturalPolynomial::from_coefficients_asc(vec![Natural::ZERO, Natural::ONE]).degree(),
+    ///     Some(1)
+    /// );
+    /// ```
+    #[inline]
+    pub fn degree(&self) -> Option<u64> {
+        self.coefficients.len().checked_sub(1).map(u64::exact_from)
+    }
+
+    /// Returns a reference to one of a [`NaturalPolynomial`]'s coefficients.
+    ///
+    /// The index is the power of the variable the coefficient belongs to, so that index 0 gives the
+    /// constant term. An index past the degree gives zero, which is the coefficient a polynomial
+    /// has there.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// // 2 + 3x + x^2
+    /// let p = NaturalPolynomial::from_coefficients_asc(vec![
+    ///     Natural::TWO,
+    ///     Natural::from(3u32),
+    ///     Natural::ONE,
+    /// ]);
+    /// assert_eq!(*p.coefficient(0), 2);
+    /// assert_eq!(*p.coefficient(1), 3);
+    /// assert_eq!(*p.coefficient(2), 1);
+    /// assert_eq!(*p.coefficient(100), 0);
+    /// ```
+    #[inline]
+    pub fn coefficient(&self, index: u64) -> &Natural {
+        usize::try_from(index)
+            .ok()
+            .and_then(|i| self.coefficients.get(i))
+            .unwrap_or(&ZERO)
+    }
+
+    /// Returns a reference to a [`NaturalPolynomial`]'s leading coefficient.
+    ///
+    /// This is the coefficient of the highest power of the variable that the polynomial has one
+    /// for. The zero polynomial has no such power, and gives zero, which is what every one of its
+    /// coefficients is.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Two;
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// // 2 + 3x + x^2
+    /// let p = NaturalPolynomial::from_coefficients_asc(vec![
+    ///     Natural::TWO,
+    ///     Natural::from(3u32),
+    ///     Natural::from(7u32),
+    /// ]);
+    /// assert_eq!(*p.leading_coefficient(), 7);
+    /// assert_eq!(*NaturalPolynomial::default().leading_coefficient(), 0);
+    /// ```
+    #[inline]
+    pub fn leading_coefficient(&self) -> &Natural {
+        self.coefficients.last().unwrap_or(&ZERO)
+    }
+
+    /// Mutates one of a [`NaturalPolynomial`]'s coefficients using a provided closure, and then
+    /// returns whatever the closure returns.
+    ///
+    /// The index is the power of the variable the coefficient belongs to. An index past the degree
+    /// is not an error: the polynomial grows to reach it, and the closure is handed the zero that
+    /// was there all along.
+    ///
+    /// After the closure executes, this function drops whatever trailing zero coefficients the
+    /// polynomial has acquired, so that a coefficient set to zero, or a growth that came to
+    /// nothing, leaves no trace.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n + m)$
+    ///
+    /// $M(n, m) = O(n + m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `index`, and $m$ is the cost of the
+    /// closure.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two, Zero};
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// // 2 + 3x + x^2
+    /// let mut p = NaturalPolynomial::from_coefficients_asc(vec![
+    ///     Natural::TWO,
+    ///     Natural::from(3u32),
+    ///     Natural::ONE,
+    /// ]);
+    ///
+    /// let ret = p.mutate_coefficient(1, |c| {
+    ///     *c += Natural::ONE;
+    ///     true
+    /// });
+    /// assert_eq!(*p.coefficient(1), 4);
+    /// assert_eq!(ret, true);
+    ///
+    /// // The polynomial grows to reach a coefficient it did not have.
+    /// p.mutate_coefficient(5, |c| *c += Natural::ONE);
+    /// assert_eq!(p.degree(), Some(5));
+    ///
+    /// // Clearing the leading coefficient lowers the degree.
+    /// p.mutate_coefficient(5, |c| *c = Natural::ZERO);
+    /// assert_eq!(p.degree(), Some(2));
+    /// ```
+    pub fn mutate_coefficient<F: FnOnce(&mut Natural) -> T, T>(&mut self, index: u64, f: F) -> T {
+        let index = usize::exact_from(index);
+        if index >= self.coefficients.len() {
+            self.coefficients.resize(index + 1, Natural::ZERO);
+        }
+        let out = f(&mut self.coefficients[index]);
+        self.trim();
+        out
+    }
+}
+
+impl_named!(NaturalPolynomial);
