@@ -16,6 +16,8 @@ pub mod from_sci_string;
 /// [`FromStringBase`](malachite_base::num::conversion::traits::FromStringBase), a trait for
 /// converting strings in a specified base to numbers.
 pub mod from_string;
+/// The implementation of [`ToLatex`](malachite_base::strings::latex::ToLatex) for a [`Integer`].
+pub mod latex;
 /// Implementations of [`ToSci`](malachite_base::num::conversion::traits::ToSci), a trait for
 /// converting a number to string, possibly using scientific notation.
 pub mod to_sci;
@@ -25,3 +27,5 @@ pub mod to_sci;
 /// [`ToStringBase`](malachite_base::num::conversion::traits::ToStringBase) trait, used for
 /// converting numbers to strings.
 pub mod to_string;
+/// The implementation of [`ToTypst`](malachite_base::strings::typst::ToTypst) for a [`Integer`].
+pub mod typst;

@@ -119,6 +119,13 @@ documented by git history.
   the factorization of 90 becomes `2 \times 3^2 \times 5` and `2 times 3^2 times 5`. An exponent of
   1 is left off, as it is when a factorization is written by hand, and the factorization of 1, which
   has no prime factors, becomes `1`: the empty product, which is what it multiplies out to.
+- `ToLatex` and `ToTypst` for `Natural`, `Integer`, `GaussianInteger`, and the
+  `ComparableGaussianInteger` and `ComparableGaussianIntegerRef` wrappers. Each fragment is what
+  `Display` gives, which is already what math mode wants: decimal digits for a `Natural`, those with
+  a leading minus for an `Integer`, and for a `GaussianInteger` the usual `2-3i`, with coefficients
+  of 1 and -1 elided and a purely real or imaginary value written as one term. The imaginary unit is
+  a plain `i`, set in italics as most mathematical writing sets it. The wrappers write what the
+  value they wrap does, since they exist to give an ordering.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:

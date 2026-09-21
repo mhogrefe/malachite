@@ -131,7 +131,9 @@ pub mod gaussian_integer {
         pub mod serde;
         pub mod string {
             pub mod from_string;
+            pub mod latex;
             pub mod to_string;
+            pub mod typst;
         }
     }
     pub mod exhaustive {
@@ -253,8 +255,10 @@ pub mod integer {
             pub mod format_integer;
             pub mod from_sci_string;
             pub mod from_string;
+            pub mod latex;
             pub mod to_sci;
             pub mod to_string;
+            pub mod typst;
         }
         pub mod to_twos_complement_limbs;
     }
@@ -481,8 +485,10 @@ pub mod natural {
             pub mod format_natural;
             pub mod from_sci_string;
             pub mod from_string;
+            pub mod latex;
             pub mod to_sci;
             pub mod to_string;
+            pub mod typst;
         }
         pub mod to_limbs;
     }
