@@ -10,7 +10,15 @@
 /// [`NaturalPolynomial`](super::super::NaturalPolynomial) whose variable is named by any
 /// [`VarScheme`](malachite_base::vars::VarScheme).
 pub mod from_string;
+/// Implementations of [`ToLatex`](malachite_base::strings::latex::ToLatex), and a function for
+/// writing a [`NaturalPolynomial`](super::super::NaturalPolynomial) whose variable is named by any
+/// [`VarScheme`](malachite_base::vars::VarScheme).
+pub mod latex;
 /// An implementation of [`Display`](core::fmt::Display), and a function for writing a
 /// [`NaturalPolynomial`](super::super::NaturalPolynomial) whose variable is named by any
 /// [`VarScheme`](malachite_base::vars::VarScheme).
 pub mod to_string;
+/// Implementations of [`ToTypst`](malachite_base::strings::typst::ToTypst), and a function for
+/// writing a [`NaturalPolynomial`](super::super::NaturalPolynomial) whose variable is named by any
+/// [`VarScheme`](malachite_base::vars::VarScheme).
+pub mod typst;
