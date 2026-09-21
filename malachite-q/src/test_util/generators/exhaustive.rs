@@ -966,6 +966,18 @@ pub fn exhaustive_rational_vec_gen() -> It<Vec<Rational>> {
 pub fn exhaustive_rational_polynomial_gen() -> It<RationalPolynomial> {
     Box::new(exhaustive_rational_polynomials())
 }
+pub fn exhaustive_rational_polynomial_pair_gen() -> It<(RationalPolynomial, RationalPolynomial)> {
+    Box::new(exhaustive_pairs_from_single(
+        exhaustive_rational_polynomials(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_triple_gen()
+-> It<(RationalPolynomial, RationalPolynomial, RationalPolynomial)> {
+    Box::new(exhaustive_triples_from_single(
+        exhaustive_rational_polynomials(),
+    ))
+}
 
 pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_1() -> It<(RationalPolynomial, u64)> {
     Box::new(exhaustive_pairs_big_tiny(

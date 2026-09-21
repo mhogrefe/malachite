@@ -8,6 +8,7 @@
 
 use crate::Rational;
 use alloc::vec::Vec;
+use core::ops::Deref;
 use malachite_base::named::Named;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::CoprimeWith;
@@ -24,6 +25,9 @@ pub mod exhaustive;
 /// Iterators that generate [`RationalPolynomial`]s randomly.
 pub mod random;
 
+/// Implementations of [`Ord`] and [`PartialOrd`] for [`RationalPolynomial`], comparing two
+/// polynomials by their behavior for large arguments.
+pub mod comparison;
 /// Functions for converting a [`RationalPolynomial`] to and from other types.
 pub mod conversion;
 
@@ -557,3 +561,100 @@ fn content(p: &IntegerPolynomial) -> Natural {
 }
 
 impl_named!(RationalPolynomial);
+
+/// `ShortlexRationalPolynomial` is a wrapper around a [`RationalPolynomial`], taking the
+/// [`RationalPolynomial`] by value.
+///
+/// [`RationalPolynomial`] is ordered by how its polynomials behave for large arguments, which is
+/// the order that respects their arithmetic. Sometimes a different order is wanted: one that puts
+/// the smaller polynomials first, whatever their signs. Wrapping a [`RationalPolynomial`] in a
+/// `ShortlexRationalPolynomial` provides one: polynomials are compared first by degree and then, in
+/// case of a tie, by their coefficients from highest to lowest. This is a total order whose
+/// equality agrees with [`RationalPolynomial`] equality.
+///
+/// This is the order FLINT gives polynomials, the one `fmpq_poly_cmp` implements, so it is the
+/// wrapper rather than the bare type that matches FLINT.
+///
+/// The difference from the [`Ord`] implementation on [`RationalPolynomial`] is what happens when
+/// the degrees differ. There, a polynomial of higher degree dominates, so it is the greater one
+/// only if its leading coefficient is positive, and $-x^3 < x^2$. Here, degree decides outright, so
+/// $-x^3 > x^2$.
+///
+/// Neither order is a well-order. Ordering by degree first does not make one: $x > x - 1 > x - 2 >
+/// \ldots$ all have degree 1, and the constants $1 > 1/2 > 1/3 > \ldots$ descend forever without
+/// even leaving degree 0. No order that restricts to the usual order on the constant polynomials
+/// can be a well-order, since the [`Rational`](crate::Rational)s are not well-ordered.
+///
+/// `ShortlexRationalPolynomial` owns its value. This is useful in many cases, for example if you
+/// want to use [`RationalPolynomial`]s as keys in a map. In other situations, it is better to use
+/// [`ShortlexRationalPolynomialRef`], which only has a reference to its value.
+// Serialized as its inner `RationalPolynomial`, since the wrapper adds no data of its own.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub struct ShortlexRationalPolynomial(pub RationalPolynomial);
+
+/// `ShortlexRationalPolynomialRef` is a wrapper around a [`RationalPolynomial`], taking the
+/// [`RationalPolynomial`] by reference.
+///
+/// See the [`ShortlexRationalPolynomial`] documentation for details.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct ShortlexRationalPolynomialRef<'a>(pub &'a RationalPolynomial);
+
+impl ShortlexRationalPolynomial {
+    /// Borrows a [`ShortlexRationalPolynomial`] as a [`ShortlexRationalPolynomialRef`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_q::rational_polynomial::{
+    ///     RationalPolynomial, ShortlexRationalPolynomial, ShortlexRationalPolynomialRef,
+    /// };
+    ///
+    /// let p = RationalPolynomial::from_str("1/2*x+1/3").unwrap();
+    /// let x = ShortlexRationalPolynomial(p.clone());
+    /// assert_eq!(x.as_ref(), ShortlexRationalPolynomialRef(&p));
+    /// ```
+    pub const fn as_ref(&self) -> ShortlexRationalPolynomialRef<'_> {
+        ShortlexRationalPolynomialRef(&self.0)
+    }
+}
+
+impl Deref for ShortlexRationalPolynomial {
+    type Target = RationalPolynomial;
+
+    /// Allows a [`ShortlexRationalPolynomial`] to dereference to a [`RationalPolynomial`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_q::rational_polynomial::{RationalPolynomial, ShortlexRationalPolynomial};
+    ///
+    /// let p = RationalPolynomial::from_str("1/2*x+1/3").unwrap();
+    /// let x = ShortlexRationalPolynomial(p.clone());
+    /// assert_eq!(*x, p);
+    /// ```
+    fn deref(&self) -> &RationalPolynomial {
+        &self.0
+    }
+}
+
+impl Deref for ShortlexRationalPolynomialRef<'_> {
+    type Target = RationalPolynomial;
+
+    /// Allows a [`ShortlexRationalPolynomialRef`] to dereference to a [`RationalPolynomial`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_q::rational_polynomial::{RationalPolynomial, ShortlexRationalPolynomialRef};
+    ///
+    /// let p = RationalPolynomial::from_str("1/2*x+1/3").unwrap();
+    /// let x = ShortlexRationalPolynomialRef(&p);
+    /// assert_eq!(*x, p);
+    /// ```
+    fn deref(&self) -> &RationalPolynomial {
+        self.0
+    }
+}

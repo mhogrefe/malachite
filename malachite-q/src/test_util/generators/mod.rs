@@ -1274,6 +1274,22 @@ pub fn rational_polynomial_gen() -> Generator<RationalPolynomial> {
         &special_random_rational_polynomial_gen,
     )
 }
+pub fn rational_polynomial_pair_gen() -> Generator<(RationalPolynomial, RationalPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_pair_gen,
+        &random_rational_polynomial_pair_gen,
+        &special_random_rational_polynomial_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_triple_gen()
+-> Generator<(RationalPolynomial, RationalPolynomial, RationalPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_triple_gen,
+        &random_rational_polynomial_triple_gen,
+        &special_random_rational_polynomial_triple_gen,
+    )
+}
 
 pub fn rational_polynomial_unsigned_pair_gen_var_1() -> Generator<(RationalPolynomial, u64)> {
     Generator::new(

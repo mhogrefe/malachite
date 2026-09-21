@@ -459,6 +459,27 @@ documented by git history.
   again. Deserializing re-checks all three conditions that make the pair canonical — a nonzero
   denominator, a denominator of 1 for the zero polynomial, and a numerator whose content shares
   no factor with the denominator — the way deserializing a [`Rational`] does.
+- `Ord` and `PartialOrd` for `RationalPolynomial`, comparing two polynomials by how they behave
+  for large arguments, as the other polynomial types do: $f(p, q) = \lim_{x \to \infty}
+  \operatorname{cmp}(p(x), q(x))$. As over the [`Integer`]s, a dominating polynomial with a
+  negative leading coefficient runs off to $-\infty$ and is the smaller of the two.
+  Nothing is reduced along the way and the difference is never formed. Writing the two as $P/a$
+  and $Q/b$ with $a, b > 0$, the deciding sign is that of the leading coefficient of $bP - aQ$,
+  and the $ab$ underneath it is positive and so irrelevant — so a coefficient comparison is one of
+  $b P_i$ against $a Q_i$, with no GCD, no LCM, and no common denominator built. The screens, in
+  order: degrees settle it with no arithmetic at all; equal denominators cancel, which covers
+  every pair of integer-coefficient polynomials; a denominator of 1 scales nothing; within a
+  coefficient, differing signs settle it outright, since a positive denominator leaves a sign
+  alone; and the two products' bit counts settle it whenever they are more than one apart, a
+  product's bit count being the sum of its factors' give or take one. Everything derived from the
+  denominators is computed once, outside the loop.
+- `ShortlexRationalPolynomial` and `ShortlexRationalPolynomialRef`, wrappers supplying the order
+  FLINT gives polynomials: first by degree, then by coefficients from highest to lowest, with the
+  zero polynomial first. This is what `fmpq_poly_cmp` implements, so it is the wrapper rather than
+  the bare type that matches FLINT. It differs from the bare [`Ord`] exactly where the degrees
+  differ and the dominating polynomial's leading coefficient is negative. Once the degrees agree
+  the two orders are identical, so they share one coefficient comparison — the reduction-free one
+  above, which is also the shape `_fmpq_poly_cmp` uses.
 
 ### Documentation
 

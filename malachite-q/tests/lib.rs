@@ -168,6 +168,10 @@ pub mod rational_polynomial {
         pub mod named;
         pub mod size;
     }
+    pub mod comparison {
+        pub mod cmp;
+        pub mod shortlex_cmp;
+    }
     pub mod conversion {
         pub mod from_coefficients_asc;
         pub mod from_integer_polynomial;

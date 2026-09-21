@@ -2430,6 +2430,37 @@ pub fn special_random_rational_polynomial_gen(config: &GenConfig) -> It<Rational
         config.get_or("mean_length_d", 1),
     ))
 }
+pub fn special_random_rational_polynomial_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, RationalPolynomial)> {
+    Box::new(random_pairs_from_single(
+        striped_random_rational_polynomials(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+    ))
+}
+
+pub fn special_random_rational_polynomial_triple_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, RationalPolynomial, RationalPolynomial)> {
+    Box::new(random_triples_from_single(
+        striped_random_rational_polynomials(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+    ))
+}
 
 pub fn special_random_rational_polynomial_unsigned_pair_gen_var_1(
     config: &GenConfig,
