@@ -89,6 +89,12 @@ documented by git history.
   write those fragments instead, as do the `latex_tuple` and `typst_tuple` functions they call,
   which take their elements as trait objects. That works because `fmt_latex` and `fmt_typst` are
   object-safe.
+- `ToLatex` and `ToTypst` for `FoerSequence<T>`, whenever the element type has them. The elements
+  are bracketed and comma-separated as a sequence's are, and the repeating part, if there is one,
+  goes under a vinculum: `[1, 2, [3, 4]]` becomes `\left[1, 2, \overline{3, 4}\right]` and `[1, 2,
+  overline(3 comma 4)]`. Inside the Typst vinculum the elements are separated by Typst's `comma`
+  symbol rather than by a literal comma, since `overline` takes a single body and a literal comma
+  there would be read as an argument separator.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:

@@ -672,8 +672,10 @@ pub mod foer_sequences {
         pub mod to_vecs;
     }
     pub mod exhaustive;
+    pub mod latex;
     pub mod random;
     pub mod to_string;
+    pub mod typst;
 }
 pub mod rounding_modes {
     pub mod clone;

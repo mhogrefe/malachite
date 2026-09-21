@@ -241,8 +241,12 @@ pub mod cmp;
 pub mod conversion;
 /// Functions for generating all [`FoerSequence`]s over a set of elements.
 pub mod exhaustive;
+/// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for a [`FoerSequence`].
+pub mod latex;
 #[cfg(feature = "random")]
 /// Functions for generating random [`FoerSequence`]s from a set of elements.
 pub mod random;
 /// Functions for displaying a [`FoerSequence`].
 pub mod to_string;
+/// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for a [`FoerSequence`].
+pub mod typst;
