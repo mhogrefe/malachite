@@ -875,6 +875,8 @@ pub mod u64_polynomial {
         pub mod coefficients;
         pub mod constants;
         pub mod mutate_coefficient;
+        pub mod named;
+        pub mod size;
     }
     pub mod conversion {
         pub mod from_coefficients_asc;
