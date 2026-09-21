@@ -778,13 +778,7 @@ fn next_with_last<T, I: Iterator<Item = T>, J: Iterator<Item = T>>(
 ///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
-///     &[
-///         &[5, 5, 92][..],
-///         &[0, 8, 96],
-///         &[8, 8, 98],
-///         &[6, 8, 96],
-///         &[6, 2, 98]
-///     ]
+///     &[&[5, 5, 92][..], &[0, 8, 96], &[8, 8, 98], &[6, 8, 96], &[6, 2, 98]]
 /// );
 /// ```
 #[inline]

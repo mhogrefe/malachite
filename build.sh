@@ -215,133 +215,135 @@ echo "Step 100. Testing malachite-base doctests" &&
 bash ../rundoc.sh --features test_build &&
 echo "Step 101. Testing malachite-base doctests with random" &&
 bash ../rundoc.sh --features test_build --features random &&
-echo "Step 102. Documenting malachite-base" &&
+echo "Step 102. Testing malachite-base doctests with random, without test_build" &&
+bash ../rundoc.sh --features random &&
+echo "Step 103. Documenting malachite-base" &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --lib --no-deps --features random &&
-echo "Step 103. Building malachite-base lib for wasm" &&
+echo "Step 104. Building malachite-base lib for wasm" &&
 cargo build --lib --release --target wasm32-unknown-unknown &&
 cd ../malachite-nz &&
-echo "Step 104. Updating malachite-nz" &&
+echo "Step 105. Updating malachite-nz" &&
 cargo update &&
-echo "Step 105. Formatting malachite-nz" &&
+echo "Step 106. Formatting malachite-nz" &&
 bash ../superfmt.sh &&
-echo "Step 106. Running clippy on malachite-nz" &&
+echo "Step 107. Running clippy on malachite-nz" &&
 cargo clippy --all-targets --features bin_build --features enable_serde &&
-echo "Step 107. Running clippy on malachite-nz with 32_bit_limbs" &&
+echo "Step 108. Running clippy on malachite-nz with 32_bit_limbs" &&
 cargo clippy --all-targets --features bin_build --features 32_bit_limbs --features enable_serde &&
-echo "Step 108. Running clippy on malachite-nz with no std" &&
+echo "Step 109. Running clippy on malachite-nz with no std" &&
 cargo clippy --all-targets --features bin_build --features enable_serde --no-default-features &&
-echo "Step 109. Running clippy on malachite-nz with 32_bit_limbs and no std" &&
+echo "Step 110. Running clippy on malachite-nz with 32_bit_limbs and no std" &&
 cargo clippy --all-targets --features bin_build --features 32_bit_limbs --features enable_serde --no-default-features &&
-echo "Step 110. Testing malachite-nz" &&
+echo "Step 111. Testing malachite-nz" &&
 cargo test --release --tests --features test_build --features enable_serde &&
-echo "Step 111. Testing malachite-nz doctests" &&
+echo "Step 112. Testing malachite-nz doctests" &&
 bash ../rundoc.sh --features test_build &&
-echo "Step 112. Testing malachite-nz with 32_bit_limbs" &&
+echo "Step 113. Testing malachite-nz with 32_bit_limbs" &&
 cargo test --release --tests --features test_build --features 32_bit_limbs --features enable_serde &&
-echo "Step 113. Testing malachite-nz doctests with 32_bit_limbs" &&
+echo "Step 114. Testing malachite-nz doctests with 32_bit_limbs" &&
 bash ../rundoc.sh --features test_build --features 32_bit_limbs&&
-echo "Step 114. Testing malachite-nz doctests with 32_bit_limbs and random" &&
+echo "Step 115. Testing malachite-nz doctests with 32_bit_limbs and random" &&
 bash ../rundoc.sh --features test_build --features 32_bit_limbs --features random &&
-echo "Step 115. Running extra tests for malachite-nz" &&
+echo "Step 116. Running extra tests for malachite-nz" &&
 python3 extra-tests.py &&
-echo "Step 116. Documenting malachite-nz" &&
+echo "Step 117. Documenting malachite-nz" &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --lib --no-deps --features doc-images --features random &&
-echo "Step 117. Building malachite-nz lib for wasm with 32_bit_limbs" &&
+echo "Step 118. Building malachite-nz lib for wasm with 32_bit_limbs" &&
 cargo build --lib --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
-echo "Step 118. Building malachite-nz lib for wasm" &&
+echo "Step 119. Building malachite-nz lib for wasm" &&
 cargo build --lib --release --target wasm32-unknown-unknown &&
 cd ../malachite-q &&
-echo "Step 119. Updating malachite-q" &&
+echo "Step 120. Updating malachite-q" &&
 cargo update &&
-echo "Step 120. Formatting malachite-q" &&
+echo "Step 121. Formatting malachite-q" &&
 bash ../superfmt.sh &&
-echo "Step 121. Running clippy on malachite-q" &&
+echo "Step 122. Running clippy on malachite-q" &&
 cargo clippy --all-targets --features bin_build --features enable_serde &&
-echo "Step 122. Running clippy on malachite-q with 32_bit_limbs" &&
+echo "Step 123. Running clippy on malachite-q with 32_bit_limbs" &&
 cargo clippy --all-targets --features bin_build --features enable_serde --features 32_bit_limbs &&
-echo "Step 123. Running clippy on malachite-q with no std" &&
+echo "Step 124. Running clippy on malachite-q with no std" &&
 cargo clippy --all-targets --features bin_build --features enable_serde --no-default-features &&
-echo "Step 124. Running clippy on malachite-q with 32_bit_limbs and no std" &&
+echo "Step 125. Running clippy on malachite-q with 32_bit_limbs and no std" &&
 cargo clippy --all-targets --features bin_build --features enable_serde --features 32_bit_limbs --no-default-features &&
-echo "Step 125. Testing malachite-q" &&
+echo "Step 126. Testing malachite-q" &&
 cargo test --release --tests --features bin_build --features enable_serde &&
-echo "Step 126. Testing malachite-q doctests" &&
+echo "Step 127. Testing malachite-q doctests" &&
 bash ../rundoc.sh --features test_build &&
-echo "Step 127. Testing malachite-q with 32_bit_limbs" &&
+echo "Step 128. Testing malachite-q with 32_bit_limbs" &&
 cargo test --release --tests --features bin_build --features enable_serde --features 32_bit_limbs &&
-echo "Step 128. Testing malachite-q doctests with 32_bit_limbs" &&
+echo "Step 129. Testing malachite-q doctests with 32_bit_limbs" &&
 bash ../rundoc.sh --features test_build --features 32_bit_limbs &&
-echo "Step 129. Testing malachite-q doctests with random" &&
+echo "Step 130. Testing malachite-q doctests with random" &&
 bash ../rundoc.sh --features test_build --features random &&
-echo "Step 130. Testing malachite-q doctests with random and 32_bit_limbs" &&
+echo "Step 131. Testing malachite-q doctests with random and 32_bit_limbs" &&
 bash ../rundoc.sh --features test_build --features random --features 32_bit_limbs &&
-echo "Step 131. Documenting malachite-q" &&
+echo "Step 132. Documenting malachite-q" &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --lib --no-deps --features random &&
-echo "Step 132. Building malachite-q lib for wasm" &&
+echo "Step 133. Building malachite-q lib for wasm" &&
 cargo build --lib --release --target wasm32-unknown-unknown &&
-echo "Step 133. Building malachite-q lib for wasm with 32_bit_limbs" &&
+echo "Step 134. Building malachite-q lib for wasm with 32_bit_limbs" &&
 cargo build --lib --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
 cd ../malachite-float &&
-echo "Step 134. Updating malachite-float" &&
+echo "Step 135. Updating malachite-float" &&
 cargo update &&
-echo "Step 135. Formatting malachite-float" &&
+echo "Step 136. Formatting malachite-float" &&
 bash ../superfmt.sh &&
-echo "Step 136. Running clippy on malachite-float" &&
+echo "Step 137. Running clippy on malachite-float" &&
 cargo clippy --all-targets --features bin_build --features enable_serde &&
-echo "Step 137. Running clippy on malachite-float with 32_bit_limbs" &&
+echo "Step 138. Running clippy on malachite-float with 32_bit_limbs" &&
 cargo clippy --all-targets --features bin_build --features enable_serde --features 32_bit_limbs &&
-echo "Step 138. Running clippy on malachite-float with no std" &&
+echo "Step 139. Running clippy on malachite-float with no std" &&
 cargo clippy --all-targets --features bin_build --features enable_serde --no-default-features &&
-echo "Step 139. Running clippy on malachite-float with 32_bit_limbs and no std" &&
+echo "Step 140. Running clippy on malachite-float with 32_bit_limbs and no std" &&
 cargo clippy --all-targets --features bin_build --features enable_serde --features 32_bit_limbs --no-default-features &&
-echo "Step 140. Testing malachite-float" &&
+echo "Step 141. Testing malachite-float" &&
 cargo test --release --tests --features bin_build --features enable_serde &&
-echo "Step 141. Testing malachite-float doctests" &&
+echo "Step 142. Testing malachite-float doctests" &&
 bash ../rundoc.sh --features test_build &&
-echo "Step 142. Testing malachite-float with 32_bit_limbs" &&
+echo "Step 143. Testing malachite-float with 32_bit_limbs" &&
 cargo test --release --tests --features bin_build --features 32_bit_limbs &&
-echo "Step 143. Testing malachite-float doctests with 32_bit_limbs" &&
+echo "Step 144. Testing malachite-float doctests with 32_bit_limbs" &&
 bash ../rundoc.sh --features test_build --features 32_bit_limbs &&
-echo "Step 144. Testing malachite-float doctests with random" &&
+echo "Step 145. Testing malachite-float doctests with random" &&
 bash ../rundoc.sh --features test_build --features random &&
-echo "Step 145. Testing malachite-float doctests with random and 32_bit_limbs" &&
+echo "Step 146. Testing malachite-float doctests with random and 32_bit_limbs" &&
 bash ../rundoc.sh --features test_build --features random --features 32_bit_limbs &&
-echo "Step 146. Documenting malachite-float" &&
+echo "Step 147. Documenting malachite-float" &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --lib --no-deps --features random &&
-echo "Step 147. Building malachite-float lib for wasm" &&
+echo "Step 148. Building malachite-float lib for wasm" &&
 cargo build --lib --release --target wasm32-unknown-unknown &&
-echo "Step 148. Building malachite-float lib for wasm with 32_bit_limbs" &&
+echo "Step 149. Building malachite-float lib for wasm with 32_bit_limbs" &&
 cargo build --lib --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
 cd ../malachite-bigint &&
-echo "Step 149. Updating malachite-bigint" &&
+echo "Step 150. Updating malachite-bigint" &&
 cargo update &&
-echo "Step 150. Formatting malachite-bigint" &&
+echo "Step 151. Formatting malachite-bigint" &&
 bash ../superfmt.sh &&
-echo "Step 151. Running clippy on malachite-bigint" &&
+echo "Step 152. Running clippy on malachite-bigint" &&
 cargo clippy --all-targets &&
-echo "Step 152. Running clippy on malachite-bigint with no std" &&
+echo "Step 153. Running clippy on malachite-bigint with no std" &&
 cargo clippy --all-targets --no-default-features &&
-echo "Step 153. Testing malachite-bigint" &&
+echo "Step 154. Testing malachite-bigint" &&
 cargo test --release &&
-echo "Step 154. Documenting malachite-bigint" &&
+echo "Step 155. Documenting malachite-bigint" &&
 cargo doc --lib --no-deps &&
-echo "Step 155. Building malachite-bigint lib for wasm" &&
+echo "Step 156. Building malachite-bigint lib for wasm" &&
 cargo build --lib --release --target wasm32-unknown-unknown &&
 cd ../malachite &&
-echo "Step 156. Documenting malachite" &&
+echo "Step 157. Documenting malachite" &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --lib --no-deps --features random &&
 cd ../malachite-criterion-bench &&
-echo "Step 157. Updating malachite-criterion-bench" &&
+echo "Step 158. Updating malachite-criterion-bench" &&
 cargo update &&
-echo "Step 158. Formatting malachite-criterion-bench" &&
+echo "Step 159. Formatting malachite-criterion-bench" &&
 bash ../superfmt.sh &&
 cd .. &&
-echo "Step 159. Running additional-lints" &&
+echo "Step 160. Running additional-lints" &&
 bash additional-lints.sh &&
-echo "Step 160. Testing against FLINT" &&
+echo "Step 161. Testing against FLINT" &&
 cd cpp-test &&
 cargo run --release &&
 cd .. &&
-echo "Step 161. Checking links" &&
+echo "Step 162. Checking links" &&
 cd ../check-malachite-links &&
 cargo run --release

@@ -16,12 +16,12 @@ use crate::num::random::{
     random_unsigned_range,
 };
 use crate::random::Seed;
-#[cfg(not(feature = "test_build"))]
+#[cfg(not(feature = "std"))]
 use alloc::collections::BTreeSet;
 use core::hash::Hash;
-#[cfg(not(feature = "test_build"))]
+#[cfg(not(feature = "std"))]
 use hashbrown::HashSet;
-#[cfg(feature = "test_build")]
+#[cfg(feature = "std")]
 use std::collections::{BTreeSet, HashSet};
 
 /// Generates random [`HashSet`]s of a fixed length, where the [`Vec`]s have no repeated elements,
