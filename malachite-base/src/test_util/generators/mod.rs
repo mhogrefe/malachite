@@ -4902,6 +4902,22 @@ pub fn u64_polynomial_gen() -> Generator<U64Polynomial> {
     )
 }
 
+pub fn u64_polynomial_pair_gen() -> Generator<(U64Polynomial, U64Polynomial)> {
+    Generator::new(
+        &exhaustive_u64_polynomial_pair_gen,
+        &random_u64_polynomial_pair_gen,
+        &special_random_u64_polynomial_pair_gen,
+    )
+}
+
+pub fn u64_polynomial_triple_gen() -> Generator<(U64Polynomial, U64Polynomial, U64Polynomial)> {
+    Generator::new(
+        &exhaustive_u64_polynomial_triple_gen,
+        &random_u64_polynomial_triple_gen,
+        &special_random_u64_polynomial_triple_gen,
+    )
+}
+
 pub fn u64_polynomial_unsigned_pair_gen_var_1() -> Generator<(U64Polynomial, u64)> {
     Generator::new(
         &exhaustive_u64_polynomial_unsigned_pair_gen_var_1,

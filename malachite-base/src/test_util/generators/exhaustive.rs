@@ -6445,6 +6445,14 @@ pub fn exhaustive_u64_polynomial_gen() -> It<U64Polynomial> {
     Box::new(exhaustive_u64_polynomials())
 }
 
+pub fn exhaustive_u64_polynomial_pair_gen() -> It<(U64Polynomial, U64Polynomial)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_u64_polynomials()))
+}
+
+pub fn exhaustive_u64_polynomial_triple_gen() -> It<(U64Polynomial, U64Polynomial, U64Polynomial)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_u64_polynomials()))
+}
+
 pub fn exhaustive_u64_polynomial_unsigned_pair_gen_var_1() -> It<(U64Polynomial, u64)> {
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_u64_polynomials(),

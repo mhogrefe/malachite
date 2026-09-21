@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::test_util::generators::u64_polynomial_gen;
+use malachite_base::test_util::generators::{u64_polynomial_gen, u64_polynomial_pair_gen};
 use malachite_base::u64_polynomial::U64Polynomial;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
@@ -50,5 +50,16 @@ fn from_u64_polynomial_properties() {
         for i in 0..5 {
             assert_eq!(*q.coefficient(i), Natural::from(p.coefficient(i)));
         }
+    });
+
+    u64_polynomial_pair_gen().test_properties(|(p, q)| {
+        // The two types order their polynomials the same way. This is what pins down
+        // `U64Polynomial`'s asymptotic ordering: malachite-base has no bignums, so its own test can
+        // only evaluate polynomials small enough to fit in a `u128`, while `NaturalPolynomial`'s
+        // ordering is checked against exact evaluation at any size.
+        assert_eq!(
+            p.cmp(&q),
+            NaturalPolynomial::from(p.clone()).cmp(&NaturalPolynomial::from(q.clone()))
+        );
     });
 }

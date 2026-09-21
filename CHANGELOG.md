@@ -325,6 +325,18 @@ documented by git history.
   different types. The fix also makes 31 `vecs::random` doctests reachable that had been silently
   skipped, and `build.sh` gained a step that runs the malachite-base doctests with `random` but
   without `test_build`, which is the configuration that would have caught it.
+- `Ord` and `PartialOrd` for `U64Polynomial`, comparing two polynomials by how they behave for
+  large arguments: the greater one is the one that is eventually greater, $f(p, q) = \lim_{x \to
+  \infty} \operatorname{cmp}(p(x), q(x))$. The coefficients are read as the numbers they are, so
+  the values compared are the ones a polynomial over the integers would take, not ones reduced by
+  any modulus. The limit always exists, since $p - q$ has finitely many roots and past the largest
+  of them its sign is its leading coefficient's and never changes again; that also makes the order
+  total and agreeing with `Eq`. No evaluation is needed to find it — a higher degree eventually
+  outgrows a lower one whatever the coefficients, so the degrees decide first and the zero
+  polynomial is least, and equal degrees are decided by the highest-degree coefficient at which the
+  two differ. This is the order that makes the polynomials an ordered ring, and restricted to the
+  constants it is the order on the [`u64`]s. It is deliberately not a well-order, and no order
+  compatible with addition can be: $x > x - 1 > x - 2 > \ldots$ descends forever.
 
 ### malachite-nz
 
@@ -385,6 +397,28 @@ documented by git history.
   a well-order, and no order compatible with addition can be: $x > x - 1 > x - 2 > \ldots$ descends
   forever. A well-order weighing size against degree is a separate thing, and will live on a
   wrapper type rather than displace this one.
+- `Ord` and `PartialOrd` for `IntegerPolynomial`, comparing two polynomials by how they behave for
+  large arguments: the greater one is the one that is eventually greater, $f(p, q) = \lim_{x \to
+  \infty} \operatorname{cmp}(p(x), q(x))$. Unlike over the [`Natural`]s, a higher degree alone does
+  not settle it. A polynomial of higher degree does dominate, so the difference's leading
+  coefficient is its own — but that coefficient may be negative, in which case the dominating
+  polynomial runs off to $-\infty$ and is the *smaller* of the two, so $-x^3 < x^2$ and the zero
+  polynomial sits above every polynomial with a negative leading coefficient. Equal degrees are
+  decided by the highest-degree coefficient at which the two differ. This is the order that makes
+  the polynomials an ordered ring, and restricted to the constants it is the order on the
+  [`Integer`]s.
+- `ShortlexIntegerPolynomial` and `ShortlexIntegerPolynomialRef`, wrappers supplying a second
+  order: polynomials are compared first by degree and then, in case of a tie, by their coefficients
+  from highest to lowest, with the zero polynomial first. This is FLINT's order for polynomials —
+  what `fmpq_poly_cmp` implements, and the only polynomial ordering FLINT has, since there is no
+  `fmpz_poly_cmp`. It differs from the bare [`Ord`] exactly where the degrees differ and the
+  dominating polynomial's leading coefficient is negative: shortlex has $-x^3 > x^2$ where the
+  asymptotic order has $-x^3 < x^2$. Neither is a well-order, and ordering by degree first does not
+  make one: $x > x - 1 > x - 2 > \ldots$ all have degree 1, so the chain descends forever under
+  either. No order restricting to the usual order on the constants can be a well-order, the
+  [`Integer`]s not being well-ordered. The wrappers follow `ComparableGaussianInteger`: one owns
+  its value, one borrows it, both dereference to the polynomial, and the owning one serializes
+  transparently.
 
 ### malachite-q
 

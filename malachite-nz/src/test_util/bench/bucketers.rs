@@ -126,6 +126,29 @@ pub fn integer_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, IntegerPo
     }
 }
 
+pub fn pair_integer_polynomial_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (IntegerPolynomial, IntegerPolynomial)> {
+    Bucketer {
+        bucketing_function: &|(p, q)| {
+            usize::exact_from(max(
+                p.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+                q.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}'s total coefficient bits, {y_name}'s total coefficient bits)"
+        ),
+    }
+}
+
 pub fn natural_bit_bucketer(var_name: &str) -> Bucketer<'_, Natural> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x.significant_bits()),

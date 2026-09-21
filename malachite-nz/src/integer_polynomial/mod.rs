@@ -9,10 +9,14 @@
 use crate::integer::Integer;
 use alloc::vec;
 use alloc::vec::Vec;
+use core::ops::Deref;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 
+/// Implementations of [`Ord`] and [`PartialOrd`] for [`IntegerPolynomial`], comparing two
+/// polynomials by their behavior for large arguments.
+pub mod comparison;
 /// Functions for converting an [`IntegerPolynomial`] to and from other types.
 pub mod conversion;
 /// Iterators that generate [`IntegerPolynomial`]s without repetition.
@@ -384,3 +388,98 @@ impl IntegerPolynomial {
 }
 
 impl_named!(IntegerPolynomial);
+
+/// `ShortlexIntegerPolynomial` is a wrapper around an [`IntegerPolynomial`], taking the
+/// [`IntegerPolynomial`] by value.
+///
+/// [`IntegerPolynomial`] is ordered by how its polynomials behave for large arguments, which is the
+/// order that respects their arithmetic. Sometimes a different order is wanted: one that puts the
+/// smaller polynomials first, whatever their signs, so that a list of them is enumerated from the
+/// simplest upward. Wrapping an [`IntegerPolynomial`] in a `ShortlexIntegerPolynomial` provides
+/// one: polynomials are compared first by degree and then, in case of a tie, by their coefficients
+/// from highest to lowest. This is a total order whose equality agrees with [`IntegerPolynomial`]
+/// equality; it is FLINT's order for polynomials, the one `fmpq_poly_cmp` implements.
+///
+/// The difference from the [`Ord`] implementation on [`IntegerPolynomial`] is what happens when the
+/// degrees differ. There, a polynomial of higher degree dominates, so it is the greater one only if
+/// its leading coefficient is positive, and $-x^3 < x^2$. Here, degree decides outright, so $-x^3 >
+/// x^2$.
+///
+/// Neither order is a well-order. Ordering by degree first does not make one: $x > x - 1 > x - 2 >
+/// \ldots$ all have degree 1, so the chain descends forever under either order. No order that
+/// restricts to the usual order on the constant polynomials can be a well-order, since the
+/// [`Integer`]s are not well-ordered.
+///
+/// `ShortlexIntegerPolynomial` owns its value. This is useful in many cases, for example if you
+/// want to use [`IntegerPolynomial`]s as keys in a map. In other situations, it is better to use
+/// [`ShortlexIntegerPolynomialRef`], which only has a reference to its value.
+// Serialized as its inner `IntegerPolynomial`, since the wrapper adds no data of its own.
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub struct ShortlexIntegerPolynomial(pub IntegerPolynomial);
+
+/// `ShortlexIntegerPolynomialRef` is a wrapper around an [`IntegerPolynomial`], taking the
+/// [`IntegerPolynomial`] by reference.
+///
+/// See the [`ShortlexIntegerPolynomial`] documentation for details.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct ShortlexIntegerPolynomialRef<'a>(pub &'a IntegerPolynomial);
+
+impl ShortlexIntegerPolynomial {
+    /// Borrows a [`ShortlexIntegerPolynomial`] as a [`ShortlexIntegerPolynomialRef`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_polynomial::{
+    ///     IntegerPolynomial, ShortlexIntegerPolynomial, ShortlexIntegerPolynomialRef,
+    /// };
+    ///
+    /// let p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();
+    /// let x = ShortlexIntegerPolynomial(p.clone());
+    /// assert_eq!(x.as_ref(), ShortlexIntegerPolynomialRef(&p));
+    /// ```
+    pub const fn as_ref(&self) -> ShortlexIntegerPolynomialRef<'_> {
+        ShortlexIntegerPolynomialRef(&self.0)
+    }
+}
+
+impl Deref for ShortlexIntegerPolynomial {
+    type Target = IntegerPolynomial;
+
+    /// Allows a [`ShortlexIntegerPolynomial`] to dereference to an [`IntegerPolynomial`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_polynomial::{IntegerPolynomial, ShortlexIntegerPolynomial};
+    ///
+    /// let p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();
+    /// let x = ShortlexIntegerPolynomial(p.clone());
+    /// assert_eq!(*x, p);
+    /// ```
+    fn deref(&self) -> &IntegerPolynomial {
+        &self.0
+    }
+}
+
+impl Deref for ShortlexIntegerPolynomialRef<'_> {
+    type Target = IntegerPolynomial;
+
+    /// Allows a [`ShortlexIntegerPolynomialRef`] to dereference to an [`IntegerPolynomial`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_polynomial::{IntegerPolynomial, ShortlexIntegerPolynomialRef};
+    ///
+    /// let p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();
+    /// let x = ShortlexIntegerPolynomialRef(&p);
+    /// assert_eq!(*x, p);
+    /// ```
+    fn deref(&self) -> &IntegerPolynomial {
+        self.0
+    }
+}

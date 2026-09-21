@@ -93,6 +93,23 @@ pub fn integer_polynomial_gen() -> Generator<IntegerPolynomial> {
     )
 }
 
+pub fn integer_polynomial_pair_gen() -> Generator<(IntegerPolynomial, IntegerPolynomial)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_pair_gen,
+        &random_integer_polynomial_pair_gen,
+        &special_random_integer_polynomial_pair_gen,
+    )
+}
+
+pub fn integer_polynomial_triple_gen()
+-> Generator<(IntegerPolynomial, IntegerPolynomial, IntegerPolynomial)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_triple_gen,
+        &random_integer_polynomial_triple_gen,
+        &special_random_integer_polynomial_triple_gen,
+    )
+}
+
 pub fn gaussian_integer_gen() -> Generator<GaussianInteger> {
     Generator::new(
         &exhaustive_gaussian_integer_gen,

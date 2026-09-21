@@ -166,6 +166,19 @@ pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_1() -> It<(NaturalPol
     ))
 }
 
+pub fn exhaustive_integer_polynomial_pair_gen() -> It<(IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(exhaustive_pairs_from_single(
+        exhaustive_integer_polynomials(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_triple_gen()
+-> It<(IntegerPolynomial, IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(exhaustive_triples_from_single(
+        exhaustive_integer_polynomials(),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_1() -> It<(IntegerPolynomial, u64)> {
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_integer_polynomials(),

@@ -228,6 +228,29 @@ pub fn random_integer_polynomial_gen(config: &GenConfig) -> It<IntegerPolynomial
         config.get_or("mean_length_d", 1),
     ))
 }
+pub fn random_integer_polynomial_pair_gen(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(random_pairs_from_single(random_integer_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
+pub fn random_integer_polynomial_triple_gen(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(random_triples_from_single(random_integer_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
 
 pub fn random_gaussian_integer_gen(config: &GenConfig) -> It<GaussianInteger> {
     Box::new(random_gaussian_integers(

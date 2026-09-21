@@ -9,11 +9,9 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    basic::register(runner);
-    comparison::register(runner);
-    conversion::register(runner);
+    cmp::register(runner);
+    shortlex_cmp::register(runner);
 }
 
-mod basic;
-mod comparison;
-mod conversion;
+mod cmp;
+mod shortlex_cmp;

@@ -8523,6 +8523,24 @@ pub fn random_u64_polynomial_gen(config: &GenConfig) -> It<U64Polynomial> {
     ))
 }
 
+pub fn random_u64_polynomial_pair_gen(config: &GenConfig) -> It<(U64Polynomial, U64Polynomial)> {
+    Box::new(random_pairs_from_single(random_u64_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
+pub fn random_u64_polynomial_triple_gen(
+    config: &GenConfig,
+) -> It<(U64Polynomial, U64Polynomial, U64Polynomial)> {
+    Box::new(random_triples_from_single(random_u64_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
 pub fn random_u64_polynomial_unsigned_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(U64Polynomial, u64)> {

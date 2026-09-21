@@ -12,6 +12,9 @@ use crate::num::conversion::traits::ExactFrom;
 use alloc::vec;
 use alloc::vec::Vec;
 
+/// Implementations of [`Ord`] and [`PartialOrd`] for [`U64Polynomial`], comparing two polynomials
+/// by their behavior for large arguments.
+pub mod comparison;
 /// Functions for converting a [`U64Polynomial`] to and from other types.
 pub mod conversion;
 /// Iterators that generate [`U64Polynomial`]s without repetition.
