@@ -551,3 +551,26 @@ pub mod natural {
         pub mod uniform_random_natural_range;
     }
 }
+pub mod natural_polynomial {
+    pub mod basic {
+        pub mod coefficients;
+        pub mod constants;
+        pub mod mutate_coefficient;
+    }
+    pub mod conversion {
+        pub mod from_coefficients_asc;
+        pub mod from_natural;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+    }
+    pub mod exhaustive {
+        pub mod exhaustive_natural_polynomials;
+    }
+    pub mod random {
+        pub mod random_natural_polynomials;
+    }
+}

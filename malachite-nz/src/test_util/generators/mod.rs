@@ -41,7 +41,16 @@ use std::ops::{Shl, Shr};
 
 // -- GaussianInteger --
 
-// All `NaturalPolynomial`s.
+// All `NaturalPolynomial`s. All `(NaturalPolynomial, u64)` pairs, where the `u64` is a small
+// coefficient index.
+pub fn natural_polynomial_unsigned_pair_gen_var_1() -> Generator<(NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_pair_gen_var_1,
+        &random_natural_polynomial_unsigned_pair_gen_var_1,
+        &special_random_natural_polynomial_unsigned_pair_gen_var_1,
+    )
+}
+
 pub fn natural_polynomial_gen() -> Generator<NaturalPolynomial> {
     Generator::new(
         &exhaustive_natural_polynomial_gen,

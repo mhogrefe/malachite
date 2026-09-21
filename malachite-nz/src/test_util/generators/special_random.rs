@@ -144,6 +144,26 @@ use std::ops::{Shl, Shr};
 
 // -- GaussianInteger --
 
+pub fn special_random_natural_polynomial_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
+}
+
 pub fn special_random_natural_polynomial_gen(config: &GenConfig) -> It<NaturalPolynomial> {
     Box::new(striped_random_natural_polynomials(
         EXAMPLE_SEED,

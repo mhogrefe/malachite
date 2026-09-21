@@ -154,6 +154,16 @@ use std::ops::{Shl, Shr};
 
 // -- GaussianInteger --
 
+// The index is kept small on purpose. `mutate_coefficient` grows a polynomial to reach whatever
+// index it is handed, so an index drawn from the whole of `u64` would ask for a `Vec` of that many
+// coefficients.
+pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_1() -> It<(NaturalPolynomial, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_natural_polynomial_gen() -> It<NaturalPolynomial> {
     Box::new(exhaustive_natural_polynomials())
 }

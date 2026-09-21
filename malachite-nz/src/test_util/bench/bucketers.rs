@@ -42,6 +42,22 @@ pub fn gaussian_integer_bit_bucketer(var_name: &str) -> Bucketer<'_, GaussianInt
     }
 }
 
+pub fn pair_1_natural_polynomial_bit_bucketer<T>(
+    var_name: &str,
+) -> Bucketer<'_, (NaturalPolynomial, T)> {
+    Bucketer {
+        bucketing_function: &|(p, _)| {
+            usize::exact_from(
+                p.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total coefficient bits"),
+    }
+}
+
 pub fn natural_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalPolynomial> {
     Bucketer {
         bucketing_function: &|p| {
