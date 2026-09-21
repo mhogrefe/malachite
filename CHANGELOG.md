@@ -101,6 +101,17 @@ documented by git history.
   variants holding equal values apart. The implementations are written by `union_struct!`, so a
   `Union3` or longer union defined outside this crate gets them too. They use fully qualified paths,
   so the macro asks its callers for no new imports.
+- `ToLatex` and `ToTypst` for `&T` whenever `T` has them, so a reference is invisible: it writes
+  what its referent would, which is what lets a collection of references be written at all. `&str`
+  and slices keep implementations of their own rather than reaching the blanket one, since their
+  referents are unsized; they write the same fragments either way.
+- `ToLatex` and `ToTypst` for arrays `[T; N]`, which write what the slice of them would. Before this
+  an array had no implementation at all: the `to_latex` and `to_typst` methods require `Self:
+  Sized`, so an array could not reach the slice implementation by coercion.
+- `ToLatex` and `ToTypst` for `Factors`, writing a prime factorization as a product of prime powers:
+  the factorization of 90 becomes `2 \times 3^2 \times 5` and `2 times 3^2 times 5`. An exponent of
+  1 is left off, as it is when a factorization is written by hand, and the factorization of 1, which
+  has no prime factors, becomes `1`: the empty product, which is what it multiplies out to.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:

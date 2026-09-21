@@ -192,3 +192,41 @@ impl ToTypst for String {
         fmt_typst_chars(self.chars(), f)
     }
 }
+
+impl<T: ToTypst> ToTypst for &T {
+    /// Writes a reference as a Typst math-mode fragment.
+    ///
+    /// The fragment is the referent's own, so a reference is invisible: `&5u8` and `5u8` have the
+    /// same fragment. That is what lets a value be written without being dereferenced first, and a
+    /// collection of references be written at all.
+    ///
+    /// [`&str`] and slices have implementations of their own rather than reaching this one, since
+    /// their referents are unsized. They write the same fragments either way.
+    ///
+    /// # Worst-case complexity
+    /// Same as the time and additional memory complexity of `fmt_typst` for `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::typst::ToTypst;
+    ///
+    /// // A reference is invisible, which is what lets a collection of references be written.
+    /// assert_eq!(
+    ///     vec![&1u8, &2u8].to_typst().to_string(),
+    ///     vec![1u8, 2u8].to_typst().to_string()
+    /// );
+    ///
+    /// // A method call on a reference resolves to the referent's own implementation, so this is
+    /// // reached through a generic context instead.
+    /// fn fragment<T: ToTypst>(x: T) -> String {
+    ///     x.to_typst().to_string()
+    /// }
+    /// let n = 5u8;
+    /// let n_ref: &u8 = &n;
+    /// assert_eq!(fragment(n_ref), "5");
+    /// ```
+    #[inline]
+    fn fmt_typst(&self, f: &mut Formatter) -> Result {
+        (**self).fmt_typst(f)
+    }
+}

@@ -205,3 +205,41 @@ impl ToLatex for String {
         fmt_latex_chars(self.chars(), f)
     }
 }
+
+impl<T: ToLatex> ToLatex for &T {
+    /// Writes a reference as a LaTeX math-mode fragment.
+    ///
+    /// The fragment is the referent's own, so a reference is invisible: `&5u8` and `5u8` have the
+    /// same fragment. That is what lets a value be written without being dereferenced first, and a
+    /// collection of references be written at all.
+    ///
+    /// [`&str`] and slices have implementations of their own rather than reaching this one, since
+    /// their referents are unsized. They write the same fragments either way.
+    ///
+    /// # Worst-case complexity
+    /// Same as the time and additional memory complexity of `fmt_latex` for `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// // A reference is invisible, which is what lets a collection of references be written.
+    /// assert_eq!(
+    ///     vec![&1u8, &2u8].to_latex().to_string(),
+    ///     vec![1u8, 2u8].to_latex().to_string()
+    /// );
+    ///
+    /// // A method call on a reference resolves to the referent's own implementation, so this is
+    /// // reached through a generic context instead.
+    /// fn fragment<T: ToLatex>(x: T) -> String {
+    ///     x.to_latex().to_string()
+    /// }
+    /// let n = 5u8;
+    /// let n_ref: &u8 = &n;
+    /// assert_eq!(fragment(n_ref), "5");
+    /// ```
+    #[inline]
+    fn fmt_latex(&self, f: &mut Formatter) -> Result {
+        (**self).fmt_latex(f)
+    }
+}

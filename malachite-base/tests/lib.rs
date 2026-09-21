@@ -472,12 +472,14 @@ pub mod num {
         pub mod is_power;
         pub mod is_prime;
         pub mod is_square;
+        pub mod latex;
         pub mod prime_indicator_sequence;
         pub mod prime_indicator_sequence_less_than;
         pub mod prime_sieve;
         pub mod primes;
         pub mod primitive_root_prime;
         pub mod remove_power;
+        pub mod typst;
     }
     pub mod float {
         pub mod basic {

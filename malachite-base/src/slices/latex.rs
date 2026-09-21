@@ -79,3 +79,42 @@ impl<T: ToLatex> ToLatex for &[T] {
         fmt_latex_slice(self, f)
     }
 }
+
+impl<T: ToLatex, const N: usize> ToLatex for [T; N] {
+    /// Writes an array as a LaTeX math-mode fragment.
+    ///
+    /// This is the same as the slice implementation.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n + \sum_{i=0}^{n-1}T^\prime(i))$
+    ///
+    /// $M(n) = O(\max_{i=0}^{n-1}M^\prime(i))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `N`, $i$ is an element's index, and
+    /// $T^\prime$ and $M^\prime$ are the time and memory functions of `fmt_latex` for `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!([0u8; 0].to_latex().to_string(), r"\left[\right]");
+    /// assert_eq!([5u8].to_latex().to_string(), r"\left[5\right]");
+    /// assert_eq!([1u8, 2, 3].to_latex().to_string(), r"\left[1, 2, 3\right]");
+    /// assert_eq!(
+    ///     [[1u8, 2], [3, 4]].to_latex().to_string(),
+    ///     r"\left[\left[1, 2\right], \left[3, 4\right]\right]"
+    /// );
+    /// ```
+    ///
+    /// | value                | fragment                                            | renders as                                          |
+    /// |----------------------|-----------------------------------------------------|-----------------------------------------------------|
+    /// | `[0u8; 0]`           | `\left[\right]`                                     | $\left[\right]$                                     |
+    /// | `[5u8]`              | `\left[5\right]`                                    | $\left[5\right]$                                    |
+    /// | `[1u8, 2, 3]`        | `\left[1, 2, 3\right]`                              | $\left[1, 2, 3\right]$                              |
+    /// | `[[1u8, 2], [3, 4]]` | `\left[\left[1, 2\right], \left[3, 4\right]\right]` | $\left[\left[1, 2\right], \left[3, 4\right]\right]$ |
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+    #[inline]
+    fn fmt_latex(&self, f: &mut Formatter) -> Result {
+        fmt_latex_slice(self, f)
+    }
+}

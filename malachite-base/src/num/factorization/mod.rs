@@ -70,6 +70,8 @@ pub mod is_prime;
 /// assert!(!128u64.is_square());
 /// ```
 pub mod is_square;
+/// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for a prime factorization.
+pub mod latex;
 /// An efficient prime sieve.
 pub mod prime_sieve;
 /// [`Primes`](traits::Primes), a trait for generating prime numbers.
@@ -174,3 +176,5 @@ pub mod primitive_root_prime;
 pub mod remove_power;
 /// Various traits for generating primes, primality testing, and factorization.
 pub mod traits;
+/// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for a prime factorization.
+pub mod typst;

@@ -79,3 +79,50 @@ fn slice_to_latex_properties() {
         );
     });
 }
+
+#[test]
+fn test_array_to_latex() {
+    // An array writes what the slice of it would.
+    assert_eq!([0u8; 0].to_latex().to_string(), r"\left[\right]");
+    assert_eq!([5u8].to_latex().to_string(), r"\left[5\right]");
+    assert_eq!(
+        [1u8, 2, 3].to_latex().to_string(),
+        [1u8, 2, 3].as_slice().to_latex().to_string()
+    );
+    assert_eq!(
+        [[1u8, 2], [3, 4]].to_latex().to_string(),
+        r"\left[\left[1, 2\right], \left[3, 4\right]\right]"
+    );
+}
+
+#[test]
+fn test_reference_to_latex() {
+    // A method call on a reference resolves to the referent's own implementation, so the blanket
+    // one is reached through a generic context instead -- which is where it is needed.
+    fn fragment<T: ToLatex>(x: T) -> String {
+        x.to_latex().to_string()
+    }
+    let n = 5u8;
+    let n_ref: &u8 = &n;
+    let n_ref_ref: &&u8 = &n_ref;
+    assert_eq!(fragment(n_ref), fragment(n));
+    assert_eq!(fragment(n_ref_ref), fragment(n));
+
+    let xs = vec![1u8, 2];
+    let xs_ref: &Vec<u8> = &xs;
+    assert_eq!(fragment(xs_ref), fragment(xs.clone()));
+
+    // It is what lets a collection of references be written at all.
+    assert_eq!(
+        vec![&1u8, &2u8].to_latex().to_string(),
+        vec![1u8, 2u8].to_latex().to_string()
+    );
+
+    // `&str` and slices keep their own implementations, and agree with it.
+    let s = "hi";
+    let s_ref: &&str = &s;
+    assert_eq!(fragment(s_ref), fragment(s));
+    let sl = xs.as_slice();
+    let sl_ref: &&[u8] = &sl;
+    assert_eq!(fragment(sl_ref), fragment(sl));
+}

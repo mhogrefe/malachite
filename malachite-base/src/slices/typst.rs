@@ -76,3 +76,41 @@ impl<T: ToTypst> ToTypst for &[T] {
         fmt_typst_slice(self, f)
     }
 }
+
+impl<T: ToTypst, const N: usize> ToTypst for [T; N] {
+    /// Writes an array as a Typst math-mode fragment.
+    ///
+    /// This is the same as the slice implementation.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n + \sum_{i=0}^{n-1}T^\prime(i))$
+    ///
+    /// $M(n) = O(\max_{i=0}^{n-1}M^\prime(i))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `N`, $i$ is an element's index, and
+    /// $T^\prime$ and $M^\prime$ are the time and memory functions of `fmt_typst` for `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::typst::ToTypst;
+    ///
+    /// assert_eq!([0u8; 0].to_typst().to_string(), "[]");
+    /// assert_eq!([5u8].to_typst().to_string(), "[5]");
+    /// assert_eq!([1u8, 2, 3].to_typst().to_string(), "[1, 2, 3]");
+    /// assert_eq!(
+    ///     [[1u8, 2], [3, 4]].to_typst().to_string(),
+    ///     "[[1, 2], [3, 4]]"
+    /// );
+    /// ```
+    ///
+    /// | value                | fragment           |
+    /// |----------------------|--------------------|
+    /// | `[0u8; 0]`           | `[]`               |
+    /// | `[5u8]`              | `[5]`              |
+    /// | `[1u8, 2, 3]`        | `[1, 2, 3]`        |
+    /// | `[[1u8, 2], [3, 4]]` | `[[1, 2], [3, 4]]` |
+    #[inline]
+    fn fmt_typst(&self, f: &mut Formatter) -> Result {
+        fmt_typst_slice(self, f)
+    }
+}
