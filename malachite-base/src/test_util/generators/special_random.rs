@@ -97,8 +97,11 @@ use crate::unions::Union2;
 use crate::unions::random::random_union2s;
 use alloc::collections::{BTreeMap, BTreeSet};
 
+#[cfg(not(feature = "std"))]
+use hashbrown::{HashMap, HashSet};
 use itertools::{Itertools, repeat_n};
 use std::cmp::{Ordering::*, max, min};
+#[cfg(feature = "std")]
 use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 

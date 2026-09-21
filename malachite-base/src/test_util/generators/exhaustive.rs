@@ -93,8 +93,11 @@ use crate::vecs::exhaustive::{
 use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
 
+#[cfg(not(feature = "std"))]
+use hashbrown::{HashMap, HashSet};
 use itertools::{Itertools, repeat_n};
 use std::cmp::{max, min};
+#[cfg(feature = "std")]
 use std::collections::{HashMap, HashSet};
 use std::iter::once;
 use std::marker::PhantomData;

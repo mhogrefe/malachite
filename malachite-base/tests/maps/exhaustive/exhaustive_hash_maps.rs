@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::hash::Hash;
+#[cfg(not(feature = "std"))]
+use hashbrown::HashMap;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::maps::exhaustive::exhaustive_hash_maps;
 use malachite_base::nevers::nevers;
@@ -14,6 +16,7 @@ use malachite_base::test_util::maps::exhaustive::{
     exhaustive_hash_maps_helper_helper, exhaustive_hash_maps_small_helper_helper,
 };
 use malachite_base::tuples::exhaustive::exhaustive_units;
+#[cfg(feature = "std")]
 use std::collections::HashMap;
 use std::fmt::Debug;
 

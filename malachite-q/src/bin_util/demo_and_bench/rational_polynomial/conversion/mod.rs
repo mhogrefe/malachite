@@ -10,10 +10,16 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     from_coefficients_asc::register(runner);
+    from_integer_polynomial::register(runner);
+    from_natural_polynomial::register(runner);
     from_rational::register(runner);
+    from_u64_polynomial::register(runner);
     string::register(runner);
 }
 
 mod from_coefficients_asc;
+mod from_integer_polynomial;
+mod from_natural_polynomial;
 mod from_rational;
+mod from_u64_polynomial;
 mod string;

@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(not(feature = "std"))]
+use hashbrown::HashSet;
 use itertools::Itertools;
 use malachite_base::bools::random::random_bools;
 use malachite_base::num::random::geometric::geometric_random_unsigneds;
@@ -13,6 +15,7 @@ use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::sets::random::random_hash_sets_from_length_iterator;
 use malachite_base::vecs::random_values_from_vec;
+#[cfg(feature = "std")]
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;

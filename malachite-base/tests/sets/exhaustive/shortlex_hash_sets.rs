@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(not(feature = "std"))]
+use hashbrown::HashSet;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
@@ -14,6 +16,7 @@ use malachite_base::test_util::sets::exhaustive::{
     exhaustive_hash_sets_helper_helper, exhaustive_hash_sets_small_helper_helper,
 };
 use malachite_base::tuples::exhaustive::exhaustive_units;
+#[cfg(feature = "std")]
 use std::collections::HashSet;
 use std::fmt::Debug;
 use std::hash::Hash;

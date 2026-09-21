@@ -109,6 +109,21 @@ const SAMPLE_OUTPUT_TYPES_3: [[BitDistributorOutputType; 3]; 9] = [
     ],
 ];
 
+// `maplit`'s `hashset!` and `hashmap!` always build `std` collections, but with the `std` feature
+// off the hash collections are `hashbrown`'s. These shadow them and build whichever `HashSet` or
+// `HashMap` is in scope at the call site, so a test compiles in either configuration. The
+// `btreeset!` and `btreemap!` macros need no such treatment, since `alloc` provides the B-tree
+// collections whatever the features are.
+macro_rules! hashset {
+    () => { HashSet::default() };
+    ($($x:expr),+ $(,)?) => { HashSet::from_iter([$($x),+]) };
+}
+
+macro_rules! hashmap {
+    () => { HashMap::default() };
+    ($($k:expr => $v:expr),+ $(,)?) => { HashMap::from_iter([$(($k, $v)),+]) };
+}
+
 pub mod bools {
     pub mod constants;
     pub mod exhaustive;

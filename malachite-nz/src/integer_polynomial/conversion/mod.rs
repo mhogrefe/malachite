@@ -9,6 +9,14 @@
 /// Implementations of traits for converting a value that a [`Integer`](crate::integer::Integer) can
 /// be converted from into a constant [`IntegerPolynomial`](super::IntegerPolynomial).
 pub mod from_integer;
+/// Implementations of traits for converting a
+/// [`NaturalPolynomial`](crate::natural_polynomial::NaturalPolynomial) to an
+/// [`IntegerPolynomial`](super::IntegerPolynomial).
+pub mod from_natural_polynomial;
+/// Implementations of traits for converting a
+/// [`U64Polynomial`](malachite_base::u64_polynomial::U64Polynomial) to an
+/// [`IntegerPolynomial`](super::IntegerPolynomial).
+pub mod from_u64_polynomial;
 /// Functions for converting an [`IntegerPolynomial`](super::IntegerPolynomial) to and from a
 /// [`String`](alloc::string::String).
 pub mod string;

@@ -7,12 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::hash::Hash;
+#[cfg(not(feature = "std"))]
+use hashbrown::HashSet;
 use itertools::Itertools;
 use malachite_base::chars::random::random_char_inclusive_range;
 use malachite_base::num::random::geometric::geometric_random_unsigneds;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::sets::random::random_hash_sets_length_range;
+#[cfg(feature = "std")]
 use std::collections::HashSet;
 use std::fmt::Debug;
 

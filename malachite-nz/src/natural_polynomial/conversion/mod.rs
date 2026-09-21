@@ -9,6 +9,10 @@
 /// Implementations of traits for converting a value that a [`Natural`](crate::natural::Natural) can
 /// be converted from into a constant [`NaturalPolynomial`](super::NaturalPolynomial).
 pub mod from_natural;
+/// Implementations of traits for converting a
+/// [`U64Polynomial`](malachite_base::u64_polynomial::U64Polynomial) to a
+/// [`NaturalPolynomial`](super::NaturalPolynomial).
+pub mod from_u64_polynomial;
 /// Functions for converting a [`NaturalPolynomial`](super::NaturalPolynomial) to and from a
 /// [`String`](alloc::string::String).
 pub mod string;

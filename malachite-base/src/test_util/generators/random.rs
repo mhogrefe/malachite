@@ -102,8 +102,11 @@ use crate::vecs::random_values_from_vec;
 use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
 
+#[cfg(not(feature = "std"))]
+use hashbrown::{HashMap, HashSet};
 use itertools::{Itertools, repeat_n};
 use std::cmp::{Ordering::*, max, min};
+#[cfg(feature = "std")]
 use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 use std::mem::swap;

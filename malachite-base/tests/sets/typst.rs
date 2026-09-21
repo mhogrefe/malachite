@@ -7,10 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::strings::typst::assert_typst_compiles;
+#[cfg(not(feature = "std"))]
+use hashbrown::HashSet;
 use itertools::Itertools;
 use malachite_base::strings::typst::ToTypst;
 use malachite_base::test_util::generators::unsigned_vec_gen;
-use std::collections::{BTreeSet, HashSet};
+use std::collections::BTreeSet;
+#[cfg(feature = "std")]
+use std::collections::HashSet;
 
 #[test]
 fn test_set_to_typst() {

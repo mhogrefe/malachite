@@ -7,12 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::hash::Hash;
+#[cfg(not(feature = "std"))]
+use hashbrown::HashMap;
 use itertools::{Itertools, repeat_n};
 use malachite_base::bools::random::random_bools;
 use malachite_base::chars::random::random_char_inclusive_range;
 use malachite_base::maps::random::random_hash_maps_fixed_size;
 use malachite_base::num::random::{random_primitive_ints, random_unsigned_inclusive_range};
 use malachite_base::random::EXAMPLE_SEED;
+#[cfg(feature = "std")]
 use std::collections::HashMap;
 use std::fmt::Debug;
 

@@ -32,6 +32,9 @@ use crate::u64_polynomial::U64Polynomial;
 use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
 
+#[cfg(not(feature = "std"))]
+use hashbrown::{HashMap, HashSet};
+#[cfg(feature = "std")]
 use std::collections::{HashMap, HashSet};
 
 // general

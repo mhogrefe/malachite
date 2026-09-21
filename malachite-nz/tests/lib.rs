@@ -561,6 +561,7 @@ pub mod integer_polynomial {
         pub mod from_coefficients_asc;
         pub mod from_integer;
         pub mod from_natural_polynomial;
+        pub mod from_u64_polynomial;
         pub mod string {
             pub mod from_string;
             pub mod latex;
@@ -584,6 +585,7 @@ pub mod natural_polynomial {
     pub mod conversion {
         pub mod from_coefficients_asc;
         pub mod from_natural;
+        pub mod from_u64_polynomial;
         pub mod string {
             pub mod from_string;
             pub mod latex;

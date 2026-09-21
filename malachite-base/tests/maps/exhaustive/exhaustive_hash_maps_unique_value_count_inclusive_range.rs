@@ -7,8 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::hash::Hash;
+#[cfg(not(feature = "std"))]
+use hashbrown::HashMap;
 use malachite_base::maps::exhaustive::exhaustive_hash_maps_unique_value_count_inclusive_range;
 use malachite_base::test_util::maps::exhaustive::exhaustive_hash_maps_small_helper_helper;
+#[cfg(feature = "std")]
 use std::collections::HashMap;
 use std::fmt::Debug;
 

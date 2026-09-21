@@ -7,10 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::strings::typst::assert_typst_compiles;
+#[cfg(not(feature = "std"))]
+use hashbrown::HashMap;
 use itertools::Itertools;
 use malachite_base::strings::typst::ToTypst;
 use malachite_base::test_util::generators::unsigned_vec_gen;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
+#[cfg(feature = "std")]
+use std::collections::HashMap;
 
 #[test]
 fn test_map_to_typst() {

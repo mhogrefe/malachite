@@ -350,10 +350,16 @@ documented by git history.
   [`Vec`] generators new to malachite-base. The degree-bounded generators never produce the zero
   polynomial, which has no degree and so falls in no range.
 - A new `IntegerPolynomial` type, the same thing over [`Integer`]s, with the same functions plus
-  `negative_one`, and with `From<NaturalPolynomial>`. Its string format differs only in its signs:
-  a term is joined to the one before it with `+` unless it already begins with `-`, a coefficient
-  of `-1` is written as a bare `-`, and `FromStr` splits on a `-` while keeping it with the term
-  that follows. Exhaustive, random, and striped random generators mirror the [`Natural`] ones.
+  `negative_one`. Its string format differs only in its signs: a term is joined to the one before
+  it with `+` unless it already begins with `-`, a coefficient of `-1` is written as a bare `-`,
+  and `FromStr` splits on a `-` while keeping it with the term that follows. Exhaustive, random,
+  and striped random generators mirror the [`Natural`] ones.
+- `From<U64Polynomial>` for `NaturalPolynomial`, and `From<U64Polynomial>` and
+  `From<NaturalPolynomial>` for `IntegerPolynomial`: the widening conversions among the polynomial
+  types, each of which loses nothing and cannot fail, since every [`u64`] is a [`Natural`] and
+  every [`Natural`] is an [`Integer`]. The coefficients are converted one by one and the leading
+  one stays nonzero, so the degree is unchanged and the written form is identical. The narrowing
+  directions are not provided, since they can fail.
 
 ### malachite-q
 
@@ -379,6 +385,13 @@ documented by git history.
   `_with` variants, writing each coefficient as a [`Rational`] does: `1/2*x+1/3` in plain text,
   `\frac{1}{2}x+\frac{1}{3}` in LaTeX, and `frac(1, 2)x+frac(1, 3)` in Typst. Exhaustive, random,
   and striped random generators mirror the ones in malachite-nz.
+- `From<U64Polynomial>`, `From<NaturalPolynomial>`, and `From<IntegerPolynomial>` for
+  `RationalPolynomial`, completing the widening conversions among the polynomial types. The
+  `IntegerPolynomial` one is free: a `RationalPolynomial` is a numerator and a denominator, and an
+  `IntegerPolynomial` is already the numerator it needs, so it is moved rather than copied and the
+  denominator is 1 — a pair that is canonical whatever the numerator is, since everything is
+  coprime with 1, so no content or GCD is computed. The other two convert their coefficients and
+  then take that path.
 
 ### Documentation
 
