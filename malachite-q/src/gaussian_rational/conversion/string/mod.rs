@@ -9,5 +9,11 @@
 /// Implementations of traits for converting strings to
 /// [`GaussianRational`](crate::gaussian_rational::GaussianRational)s.
 pub mod from_string;
+/// The implementation of [`ToLatex`](malachite_base::strings::latex::ToLatex) for a
+/// [`GaussianRational`].
+pub mod latex;
 /// Implementations of traits for converting to strings.
 pub mod to_string;
+/// The implementation of [`ToTypst`](malachite_base::strings::typst::ToTypst) for a
+/// [`GaussianRational`].
+pub mod typst;

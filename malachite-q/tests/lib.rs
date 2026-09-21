@@ -137,7 +137,9 @@ pub mod gaussian_rational {
         pub mod serde;
         pub mod string {
             pub mod from_string;
+            pub mod latex;
             pub mod to_string;
+            pub mod typst;
         }
     }
     pub mod exhaustive {
@@ -276,8 +278,10 @@ pub mod rational {
             pub mod format_rational;
             pub mod from_sci_string;
             pub mod from_string;
+            pub mod latex;
             pub mod to_sci;
             pub mod to_string;
+            pub mod typst;
         }
         pub mod to_numerator_or_denominator;
     }

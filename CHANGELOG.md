@@ -126,6 +126,13 @@ documented by git history.
   of 1 and -1 elided and a purely real or imaginary value written as one term. The imaginary unit is
   a plain `i`, set in italics as most mathematical writing sets it. The wrappers write what the
   value they wrap does, since they exist to give an ordering.
+- `ToLatex` and `ToTypst` for `Rational`, `GaussianRational`, and the `ComparableGaussianRational`
+  and `ComparableGaussianRationalRef` wrappers. A value whose denominator is 1 is written as its
+  numerator alone, and otherwise as a fraction: `\frac{22}{7}` and `frac(22, 7)`. A sign is written
+  outside the fraction, as `-\frac{2}{3}` rather than `\frac{-2}{3}`, since it belongs to the value
+  and not to its numerator. An imaginary term puts the imaginary unit in the numerator, so 5/6 times
+  i is `\frac{5i}{6}` rather than a fraction with an `i` hung off it, matching how `Display` writes
+  `5i/6`; coefficients of 1 are elided, giving `\frac{i}{2}`.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:
