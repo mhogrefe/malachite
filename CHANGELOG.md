@@ -65,6 +65,14 @@ documented by git history.
   2, 3\right]` and `[1, 2, 3]`. The brackets are not decoration; without them `[1, 2]` and `[[1],
   [2]]` would share a fragment. LaTeX's grow with `\left` and `\right`, and Typst's grow on their
   own.
+- `ToLatex` and `ToTypst` for `HashSet<T>` and `BTreeSet<T>`, whenever the element type has them.
+  These are as the slice implementations are, but wrapped in braces, as a set is written in
+  mathematics: `BTreeSet::from([3u8, 1, 2])` becomes `\left\{1, 2, 3\right\}` and `{1, 2, 3}`. A
+  `HashSet`'s elements are sorted first, which is why its implementations ask for `Ord` where a
+  `HashSet` does not: a `HashSet` iterates in an order that depends on its hasher, so without
+  sorting two equal sets could have different fragments, and the same set could have a different
+  fragment in the next run. Sorting also makes a `HashSet`'s fragment agree with the `BTreeSet` of
+  the same elements.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:

@@ -8,6 +8,10 @@
 
 /// Iterators that generate sets without repetition.
 pub mod exhaustive;
+/// The implementations of [`ToLatex`](crate::strings::latex::ToLatex) for sets.
+pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate sets randomly.
 pub mod random;
+/// The implementations of [`ToTypst`](crate::strings::typst::ToTypst) for sets.
+pub mod typst;

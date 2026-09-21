@@ -732,6 +732,7 @@ pub mod sets {
         #[cfg(feature = "std")]
         pub mod shortlex_hash_sets_min_length;
     }
+    pub mod latex;
     pub mod random {
         pub mod random_b_tree_sets;
         pub mod random_b_tree_sets_fixed_length;
@@ -746,6 +747,7 @@ pub mod sets {
         pub mod random_hash_sets_length_range;
         pub mod random_hash_sets_min_length;
     }
+    pub mod typst;
 }
 pub mod slices {
     pub mod exhaustive_slice_permutations;

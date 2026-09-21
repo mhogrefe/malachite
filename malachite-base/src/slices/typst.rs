@@ -9,16 +9,26 @@
 use crate::strings::typst::ToTypst;
 use core::fmt::{Formatter, Result};
 
-// Writes a sequence of values as one bracketed, comma-separated Typst math-mode fragment.
-pub(crate) fn fmt_typst_slice<T: ToTypst>(xs: &[T], f: &mut Formatter) -> Result {
-    f.write_str("[")?;
-    for (i, x) in xs.iter().enumerate() {
+// Writes a sequence of values as one delimited, comma-separated Typst math-mode fragment.
+pub(crate) fn fmt_typst_sequence<'a, T: ToTypst + 'a>(
+    xs: impl Iterator<Item = &'a T>,
+    open: &str,
+    close: &str,
+    f: &mut Formatter,
+) -> Result {
+    f.write_str(open)?;
+    for (i, x) in xs.enumerate() {
         if i != 0 {
             f.write_str(", ")?;
         }
         x.fmt_typst(f)?;
     }
-    f.write_str("]")
+    f.write_str(close)
+}
+
+// Writes a sequence of values as one bracketed, comma-separated Typst math-mode fragment.
+pub(crate) fn fmt_typst_slice<T: ToTypst>(xs: &[T], f: &mut Formatter) -> Result {
+    fmt_typst_sequence(xs.iter(), "[", "]", f)
 }
 
 impl<T: ToTypst> ToTypst for &[T] {

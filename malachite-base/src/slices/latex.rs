@@ -9,16 +9,26 @@
 use crate::strings::latex::ToLatex;
 use core::fmt::{Formatter, Result};
 
-// Writes a sequence of values as one bracketed, comma-separated LaTeX math-mode fragment.
-pub(crate) fn fmt_latex_slice<T: ToLatex>(xs: &[T], f: &mut Formatter) -> Result {
-    f.write_str("\\left[")?;
-    for (i, x) in xs.iter().enumerate() {
+// Writes a sequence of values as one delimited, comma-separated LaTeX math-mode fragment.
+pub(crate) fn fmt_latex_sequence<'a, T: ToLatex + 'a>(
+    xs: impl Iterator<Item = &'a T>,
+    open: &str,
+    close: &str,
+    f: &mut Formatter,
+) -> Result {
+    f.write_str(open)?;
+    for (i, x) in xs.enumerate() {
         if i != 0 {
             f.write_str(", ")?;
         }
         x.fmt_latex(f)?;
     }
-    f.write_str("\\right]")
+    f.write_str(close)
+}
+
+// Writes a sequence of values as one bracketed, comma-separated LaTeX math-mode fragment.
+pub(crate) fn fmt_latex_slice<T: ToLatex>(xs: &[T], f: &mut Formatter) -> Result {
+    fmt_latex_sequence(xs.iter(), "\\left[", "\\right]", f)
 }
 
 impl<T: ToLatex> ToLatex for &[T] {
