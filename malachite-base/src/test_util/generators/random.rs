@@ -14,6 +14,7 @@ use crate::chars::random::{
 use crate::foer_sequences::FoerSequence;
 use crate::foer_sequences::random::random_foer_sequences;
 use crate::iterators::with_special_value;
+use crate::maps::random::{random_b_tree_maps, random_hash_maps};
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, CoprimeWith, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
@@ -59,6 +60,7 @@ use crate::orderings::random::random_orderings;
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
+use crate::sets::random::{random_b_tree_sets, random_hash_sets};
 use crate::slices::slice_test_zero;
 use crate::strings::random::{random_strings, random_strings_using_chars};
 use crate::strings::strings_from_char_vecs;
@@ -95,10 +97,12 @@ use crate::vecs::random::{
     random_vecs_min_length,
 };
 use crate::vecs::random_values_from_vec;
+use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
+
 use itertools::{Itertools, repeat_n};
 use std::cmp::{Ordering::*, max, min};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 use std::mem::swap;
 
@@ -5575,6 +5579,46 @@ pub fn random_bool_vec_gen_var_5(config: &GenConfig) -> It<Vec<bool>> {
 }
 
 // -- Vec<PrimitiveInt> --
+
+pub fn random_primitive_int_hash_set_gen<T: PrimitiveInt>(config: &GenConfig) -> It<HashSet<T>> {
+    Box::new(random_hash_sets(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn random_primitive_int_b_tree_set_gen<T: PrimitiveInt>(config: &GenConfig) -> It<BTreeSet<T>> {
+    Box::new(random_b_tree_sets(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn random_primitive_int_hash_map_gen<T: PrimitiveInt>(config: &GenConfig) -> It<HashMap<T, T>> {
+    Box::new(random_hash_maps(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &random_primitive_ints,
+        config.get_or("mean_size_n", 4),
+        config.get_or("mean_size_d", 1),
+    ))
+}
+
+pub fn random_primitive_int_b_tree_map_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<BTreeMap<T, T>> {
+    Box::new(random_b_tree_maps(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &random_primitive_ints,
+        config.get_or("mean_size_n", 4),
+        config.get_or("mean_size_d", 1),
+    ))
+}
 
 pub fn random_primitive_int_vec_gen<T: PrimitiveInt>(config: &GenConfig) -> It<Vec<T>> {
     Box::new(random_vecs(

@@ -13,6 +13,7 @@ use crate::foer_sequences::FoerSequence;
 use crate::foer_sequences::exhaustive::exhaustive_foer_sequences;
 use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::iterators::iter_windows;
+use crate::maps::exhaustive::{exhaustive_b_tree_maps, exhaustive_hash_maps};
 use crate::max;
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, CheckedNeg, CoprimeWith, DivRound, Parity, PowerOf2, ShrRound,
@@ -46,6 +47,7 @@ use crate::options::exhaustive::exhaustive_options;
 use crate::orderings::exhaustive::exhaustive_orderings;
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use crate::sets::exhaustive::{exhaustive_b_tree_sets, exhaustive_hash_sets};
 use crate::slices::slice_test_zero;
 use crate::strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
 use crate::strings::{StringsFromCharVecs, strings_from_char_vecs};
@@ -86,9 +88,12 @@ use crate::vecs::exhaustive::{
     lex_vecs_fixed_length_from_single, shortlex_vecs, shortlex_vecs_length_inclusive_range,
     shortlex_vecs_min_length,
 };
+use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
+
 use itertools::{Itertools, repeat_n};
 use std::cmp::{max, min};
+use std::collections::{HashMap, HashSet};
 use std::iter::once;
 use std::marker::PhantomData;
 use std::vec::IntoIter;
@@ -4123,6 +4128,28 @@ pub fn exhaustive_bool_vec_gen_var_5() -> It<Vec<bool>> {
 }
 
 // -- Vec<PrimitiveUnsigned> --
+
+pub fn exhaustive_unsigned_hash_set_gen<T: PrimitiveUnsigned>() -> It<HashSet<T>> {
+    Box::new(exhaustive_hash_sets(exhaustive_unsigneds::<T>()))
+}
+
+pub fn exhaustive_unsigned_b_tree_set_gen<T: PrimitiveUnsigned>() -> It<BTreeSet<T>> {
+    Box::new(exhaustive_b_tree_sets(exhaustive_unsigneds::<T>()))
+}
+
+pub fn exhaustive_unsigned_hash_map_gen<T: PrimitiveUnsigned>() -> It<HashMap<T, T>> {
+    Box::new(exhaustive_hash_maps(
+        exhaustive_unsigneds::<T>(),
+        exhaustive_unsigneds::<T>(),
+    ))
+}
+
+pub fn exhaustive_unsigned_b_tree_map_gen<T: PrimitiveUnsigned>() -> It<BTreeMap<T, T>> {
+    Box::new(exhaustive_b_tree_maps(
+        exhaustive_unsigneds::<T>(),
+        exhaustive_unsigneds::<T>(),
+    ))
+}
 
 pub fn exhaustive_unsigned_vec_gen<T: PrimitiveUnsigned>() -> It<Vec<T>> {
     Box::new(exhaustive_vecs(exhaustive_unsigneds()))

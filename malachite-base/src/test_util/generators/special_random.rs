@@ -15,6 +15,7 @@ use crate::chars::random::{
 use crate::foer_sequences::FoerSequence;
 use crate::foer_sequences::random::random_foer_sequences;
 use crate::iterators::{NonzeroValues, with_special_value};
+use crate::maps::random::{random_b_tree_maps, random_hash_maps};
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
@@ -63,6 +64,7 @@ use crate::num::random::{
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
+use crate::sets::random::{random_b_tree_sets, random_hash_sets};
 use crate::slices::slice_test_zero;
 use crate::strings::random::random_strings_using_chars;
 use crate::test_util::extra_variadic::{
@@ -90,9 +92,11 @@ use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
 use crate::unions::Union2;
 use crate::unions::random::random_union2s;
+use alloc::collections::{BTreeMap, BTreeSet};
+
 use itertools::{Itertools, repeat_n};
 use std::cmp::{Ordering::*, max, min};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 
 // -- char --
@@ -6513,6 +6517,90 @@ pub fn special_random_bool_vec_gen_var_5(config: &GenConfig) -> It<Vec<bool>> {
 }
 
 // -- Vec<PrimitiveUnsigned> --
+
+// There is no striped set or map generator to reach for, so the striping is applied to the elements
+// and the collection is built out of them.
+pub fn special_random_unsigned_hash_set_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<HashSet<T>> {
+    Box::new(random_hash_sets(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_b_tree_set_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<BTreeSet<T>> {
+    Box::new(random_b_tree_sets(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_hash_map_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<HashMap<T, T>> {
+    Box::new(random_hash_maps(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        config.get_or("mean_size_n", 4),
+        config.get_or("mean_size_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_b_tree_map_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<BTreeMap<T, T>> {
+    Box::new(random_b_tree_maps(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        config.get_or("mean_size_n", 4),
+        config.get_or("mean_size_d", 1),
+    ))
+}
 
 pub fn special_random_unsigned_vec_gen<T: PrimitiveUnsigned>(config: &GenConfig) -> It<Vec<T>> {
     Box::new(striped_random_unsigned_vecs(

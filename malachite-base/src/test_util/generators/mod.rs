@@ -28,7 +28,10 @@ use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
 use crate::tuples::exhaustive::{ExhaustivePairs, exhaustive_pairs_custom_output};
+use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
+
+use std::collections::{HashMap, HashSet};
 
 // general
 
@@ -3539,6 +3542,42 @@ pub fn bool_vec_gen_var_5() -> Generator<Vec<bool>> {
 }
 
 // -- Vec<PrimitiveUnsigned> --
+
+// All `HashSet`s of unsigneds.
+pub fn unsigned_hash_set_gen<T: PrimitiveUnsigned>() -> Generator<HashSet<T>> {
+    Generator::new(
+        &exhaustive_unsigned_hash_set_gen,
+        &random_primitive_int_hash_set_gen,
+        &special_random_unsigned_hash_set_gen,
+    )
+}
+
+// All `BTreeSet`s of unsigneds.
+pub fn unsigned_b_tree_set_gen<T: PrimitiveUnsigned>() -> Generator<BTreeSet<T>> {
+    Generator::new(
+        &exhaustive_unsigned_b_tree_set_gen,
+        &random_primitive_int_b_tree_set_gen,
+        &special_random_unsigned_b_tree_set_gen,
+    )
+}
+
+// All `HashMap`s from unsigneds to unsigneds.
+pub fn unsigned_hash_map_gen<T: PrimitiveUnsigned>() -> Generator<HashMap<T, T>> {
+    Generator::new(
+        &exhaustive_unsigned_hash_map_gen,
+        &random_primitive_int_hash_map_gen,
+        &special_random_unsigned_hash_map_gen,
+    )
+}
+
+// All `BTreeMap`s from unsigneds to unsigneds.
+pub fn unsigned_b_tree_map_gen<T: PrimitiveUnsigned>() -> Generator<BTreeMap<T, T>> {
+    Generator::new(
+        &exhaustive_unsigned_b_tree_map_gen,
+        &random_primitive_int_b_tree_map_gen,
+        &special_random_unsigned_b_tree_map_gen,
+    )
+}
 
 pub fn unsigned_vec_gen<T: PrimitiveUnsigned>() -> Generator<Vec<T>> {
     Generator::new(
