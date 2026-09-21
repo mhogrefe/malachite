@@ -836,10 +836,12 @@ pub mod unions {
         pub mod lex_unions;
     }
     pub mod from_str;
+    pub mod latex;
     pub mod ord;
     pub mod random {
         pub mod random_unions;
     }
+    pub mod typst;
     pub mod unwrap;
 }
 pub mod vecs {

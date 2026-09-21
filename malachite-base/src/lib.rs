@@ -301,6 +301,75 @@ pub mod tuples;
 ///     panic!("wrong error variant")
 /// }
 /// ```
+/// # fmt_latex
+/// ```
+/// use malachite_base::strings::latex::ToLatex;
+/// use malachite_base::union_struct;
+/// use malachite_base::unions::UnionFromStrError;
+/// use std::fmt::{self, Display, Formatter};
+/// use std::str::FromStr;
+///
+/// union_struct!(
+///     (pub(crate)),
+///     Union3,
+///     Union3<T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c]
+/// );
+///
+/// let mut u: Union3<char, u32, bool>;
+///
+/// u = Union3::A('a');
+/// assert_eq!(u.to_latex().to_string(), r"\text{A}\left(\text{a}\right)");
+///
+/// u = Union3::B(5);
+/// assert_eq!(u.to_latex().to_string(), r"\text{B}\left(5\right)");
+///
+/// u = Union3::C(false);
+/// assert_eq!(u.to_latex().to_string(), r"\text{C}\left(\text{F}\right)");
+/// ```
+///
+/// | value              | fragment                        | renders as                      |
+/// |--------------------|---------------------------------|---------------------------------|
+/// | `Union3::A('a')`   | `\text{A}\left(\text{a}\right)` | $\text{A}\left(\text{a}\right)$ |
+/// | `Union3::B(5)`     | `\text{B}\left(5\right)`        | $\text{B}\left(5\right)$        |
+/// | `Union3::C(false)` | `\text{C}\left(\text{F}\right)` | $\text{C}\left(\text{F}\right)$ |
+///
+/// # fmt_typst
+/// ```
+/// use malachite_base::strings::typst::ToTypst;
+/// use malachite_base::union_struct;
+/// use malachite_base::unions::UnionFromStrError;
+/// use std::fmt::{self, Display, Formatter};
+/// use std::str::FromStr;
+///
+/// union_struct!(
+///     (pub(crate)),
+///     Union3,
+///     Union3<T, T, T>,
+///     [A, A, 'A', a],
+///     [B, B, 'B', b],
+///     [C, C, 'C', c]
+/// );
+///
+/// let mut u: Union3<char, u32, bool>;
+///
+/// u = Union3::A('a');
+/// assert_eq!(u.to_typst().to_string(), r#""A"("a")"#);
+///
+/// u = Union3::B(5);
+/// assert_eq!(u.to_typst().to_string(), r#""B"(5)"#);
+///
+/// u = Union3::C(false);
+/// assert_eq!(u.to_typst().to_string(), r#""C"("F")"#);
+/// ```
+///
+/// | value              | fragment   |
+/// |--------------------|------------|
+/// | `Union3::A('a')`   | `"A"("a")` |
+/// | `Union3::B(5)`     | `"B"(5)`   |
+/// | `Union3::C(false)` | `"C"("F")` |
 pub mod unions;
 /// Functions for working with [`Vec`]s.
 pub mod vecs;

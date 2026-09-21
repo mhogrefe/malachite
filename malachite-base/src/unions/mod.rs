@@ -143,6 +143,68 @@ macro_rules! union_struct {
             }
         }
 
+        impl<$($t: $crate::strings::latex::ToLatex),*> $crate::strings::latex::ToLatex
+            for $name<$($t),*>
+        {
+            /// Writes a union as a LaTeX math-mode fragment.
+            ///
+            /// The fragment is the variant's letter, upright, followed by the wrapped value's own
+            /// fragment in parentheses. The letter is what keeps two variants holding equal values
+            /// apart.
+            ///
+            /// # Worst-case complexity
+            /// Same as the time and additional memory complexity of `fmt_latex` for the wrapped
+            /// value.
+            ///
+            /// # Examples
+            /// See [here](self#fmt_latex).
+            #[inline]
+            fn fmt_latex(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                match self {
+                    $(
+                        $name::$cons($x) => {
+                            ::core::fmt::Write::write_str(f, "\\text{")?;
+                            ::core::fmt::Write::write_char(f, $c)?;
+                            ::core::fmt::Write::write_str(f, "}\\left(")?;
+                            $crate::strings::latex::ToLatex::fmt_latex($x, f)?;
+                            ::core::fmt::Write::write_str(f, "\\right)")
+                        }
+                    ),*
+                }
+            }
+        }
+
+        impl<$($t: $crate::strings::typst::ToTypst),*> $crate::strings::typst::ToTypst
+            for $name<$($t),*>
+        {
+            /// Writes a union as a Typst math-mode fragment.
+            ///
+            /// The fragment is the variant's letter, upright, followed by the wrapped value's own
+            /// fragment in parentheses. The letter is what keeps two variants holding equal values
+            /// apart.
+            ///
+            /// # Worst-case complexity
+            /// Same as the time and additional memory complexity of `fmt_typst` for the wrapped
+            /// value.
+            ///
+            /// # Examples
+            /// See [here](self#fmt_typst).
+            #[inline]
+            fn fmt_typst(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                match self {
+                    $(
+                        $name::$cons($x) => {
+                            ::core::fmt::Write::write_char(f, '"')?;
+                            ::core::fmt::Write::write_char(f, $c)?;
+                            ::core::fmt::Write::write_str(f, "\"(")?;
+                            $crate::strings::typst::ToTypst::fmt_typst($x, f)?;
+                            ::core::fmt::Write::write_char(f, ')')
+                        }
+                    ),*
+                }
+            }
+        }
+
         impl<$($t: FromStr),*> FromStr for $name<$($t),*> {
             type Err = UnionFromStrError<$name<$($t::Err),*>>;
 

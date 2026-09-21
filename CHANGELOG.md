@@ -95,6 +95,12 @@ documented by git history.
   overline(3 comma 4)]`. Inside the Typst vinculum the elements are separated by Typst's `comma`
   symbol rather than by a literal comma, since `overline` takes a single body and a literal comma
   there would be read as an argument separator.
+- `ToLatex` and `ToTypst` for the union types, whenever every variant's type has them. The fragment
+  is the variant's letter, upright, followed by the wrapped value's own fragment in parentheses, so
+  `Union2::A(2)` becomes `\text{A}\left(2\right)` and `"A"(2)`; the letter is what keeps two
+  variants holding equal values apart. The implementations are written by `union_struct!`, so a
+  `Union3` or longer union defined outside this crate gets them too. They use fully qualified paths,
+  so the macro asks its callers for no new imports.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:
