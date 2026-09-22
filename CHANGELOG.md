@@ -477,6 +477,35 @@ documented by git history.
 - `ModIsReduced` and `ModPowerOf2IsReduced` for `NaturalPolynomial`, as for `U64Polynomial`:
   both are questions about the height, since a polynomial is reduced exactly when its largest
   coefficient is. `mod_is_reduced` borrows the height through `HeightRef` rather than cloning it.
+- `random_naturals_less_than_power_of_2` and `striped_random_naturals_less_than_power_of_2`,
+  generating [`Natural`]s below $2^k$. A [`Natural`] below $2^k$ is one with no more than $k$
+  significant bits, and such a [`Natural`] can be built directly out of that many random bits, so
+  unlike `random_naturals_less_than`, which draws a [`Natural`] of the right bit length and
+  rejects it when it is too large, nothing here is ever drawn and thrown away. The striped version
+  takes its bits from a `StripedBitSource`.
+- `exhaustive_natural_polynomials_reduced_mod_power_of_2`,
+  `random_natural_polynomials_reduced_mod_power_of_2`, and
+  `striped_random_natural_polynomials_reduced_mod_power_of_2`, generating the
+  `NaturalPolynomial`s that are reduced modulo $2^k$ — those whose coefficients are all less than
+  $2^k$, for which `mod_power_of_2_is_reduced` returns `true`. The random ones are built on the
+  two generators above, so a coefficient is reduced by construction rather than by rejection.
+  Restricting the coefficients does not bound the degree, so the output is still infinite. Unlike
+  `random_natural_polynomials`, these take no mean bit count: the coefficients are uniform over
+  the whole of $[0, 2^k)$. All three panic on a `pow` of 0, the only polynomial reduced modulo
+  $2^0$ being the zero polynomial, which leaves no leading coefficient to choose. The exhaustive
+  one enumerates the same polynomials in the same order as
+  `exhaustive_u64_polynomials_reduced_mod_power_of_2`.
+- `exhaustive_natural_polynomials_reduced_mod`, `random_natural_polynomials_reduced_mod`, and
+  `striped_random_natural_polynomials_reduced_mod`, the same for an arbitrary modulus rather than
+  a power of 2: the `NaturalPolynomial`s whose coefficients are all less than $m$, for which
+  `mod_is_reduced` returns `true`. Unlike the power-of-2 versions, a coefficient here cannot be
+  built reduced — $m$ is not a bit-width boundary, so a [`Natural`] of the right bit length may
+  still be too large and has to be drawn again, though at most half of the draws are wasted since
+  $m$ is more than half of the next power of 2. Where $m$ is a power of 2 the exhaustive one
+  enumerates the same polynomials in the same order as the power-of-2 version, and as
+  `exhaustive_u64_polynomials_reduced_mod`. The two random generators take `m` by reference, since
+  they clone it once per coefficient source rather than consuming it. All three panic on an `m`
+  below 2.
 
 ### malachite-q
 

@@ -8,10 +8,15 @@
 
 use crate::natural::Natural;
 use crate::natural::random::{
-    RandomNaturals, StripedRandomNaturals, random_naturals, random_positive_naturals,
-    striped_random_naturals, striped_random_positive_naturals,
+    RandomNaturals, RandomNaturalsLessThan, RandomNaturalsWithUpToBits,
+    StripedRandomNaturalInclusiveRange, StripedRandomNaturals, StripedRandomNaturalsWithUpToBits,
+    random_naturals, random_naturals_less_than, random_naturals_less_than_power_of_2,
+    random_positive_naturals, striped_random_natural_range, striped_random_naturals,
+    striped_random_naturals_less_than_power_of_2, striped_random_positive_naturals,
 };
 use crate::natural_polynomial::NaturalPolynomial;
+use malachite_base::iterators::{NonzeroValues, nonzero_values};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::random::RandomUnsignedInclusiveRange;
 use malachite_base::num::random::geometric::GeometricRandomNaturalValues;
 use malachite_base::random::Seed;
@@ -788,4 +793,332 @@ pub fn striped_random_natural_polynomials_degree_inclusive_range(
             )
         },
     ))
+}
+
+/// The type of the [`NaturalPolynomial`] generator whose coefficients are reduced modulo a power of
+/// 2.
+pub type RandomNaturalPolynomialsReducedModPowerOf2 = RandomNaturalPolynomials<
+    GeometricRandomNaturalValues<u64>,
+    RandomNaturalsWithUpToBits,
+    NonzeroValues<RandomNaturalsWithUpToBits>,
+>;
+
+/// Generates random [`NaturalPolynomial`]s that are reduced modulo $2^k$.
+///
+/// A polynomial is reduced modulo $2^k$ when every one of its coefficients is, so the coefficients
+/// are [`Natural`]s with no more than $k$ bits, built directly out of random bits rather than drawn
+/// and rejected; the leading coefficient, which may not be zero, comes from the same source with
+/// the zeros filtered out.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`. Unlike [`random_natural_polynomials`], there is no mean bit count to
+/// choose: the coefficients are uniform over the whole of $[0, 2^k)$.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell k)$
+///
+/// $M(i) = O(\ell k)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $k$ is `pow`.
+///
+/// # Panics
+/// Panics if `pow` is zero, if `mean_length_numerator` or `mean_length_denominator` are zero, or if
+/// their ratio is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_natural_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 4, 2, 1),
+///         5
+///     ),
+///     "[2*x^5+10*x^4+5*x^3+14*x^2+6*x+5, 4, 13*x^7+9*x^5+x^4+10*x^3+5*x^2+13*x+2, 11, \
+///     12*x^13+14*x^12+9*x^11+12*x^10+3*x^9+9*x^8+11*x^7+x^6+7*x^5+4*x^4+4*x^3+13*x^2+9*x+14, \
+///     ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_natural_polynomials_reduced_mod_power_of_2(
+    seed: Seed,
+    pow: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomNaturalPolynomialsReducedModPowerOf2 {
+    assert_ne!(
+        pow, 0,
+        "the only polynomial reduced modulo 2^0 is the zero polynomial"
+    );
+    random_natural_polynomials_from_iterators(
+        seed,
+        &|seed_2| random_naturals_less_than_power_of_2(seed_2, pow),
+        &|seed_2| nonzero_values(random_naturals_less_than_power_of_2(seed_2, pow)),
+        mean_length_numerator,
+        mean_length_denominator,
+    )
+}
+
+/// The type of the striped [`NaturalPolynomial`] generator whose coefficients are reduced modulo a
+/// power of 2.
+pub type StripedRandomNaturalPolynomialsReducedModPowerOf2 = RandomNaturalPolynomials<
+    GeometricRandomNaturalValues<u64>,
+    StripedRandomNaturalsWithUpToBits,
+    NonzeroValues<StripedRandomNaturalsWithUpToBits>,
+>;
+
+/// Generates random [`NaturalPolynomial`]s that are reduced modulo $2^k$, with striped
+/// coefficients.
+///
+/// As for [`random_natural_polynomials_reduced_mod_power_of_2`], each coefficient is built directly
+/// out of $k$ bits, so it is reduced by construction; here those bits come from a
+/// [`StripedBitSource`](malachite_base::num::random::striped::StripedBitSource), so they come in
+/// long runs of equal bits.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell k)$
+///
+/// $M(i) = O(\ell k)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $k$ is `pow`.
+///
+/// # Panics
+/// Panics if `pow` is zero, if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_length_numerator` or `mean_length_denominator` are zero, or
+/// if their ratio is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_natural_polynomials_reduced_mod_power_of_2(
+///             EXAMPLE_SEED,
+///             8,
+///             8,
+///             1,
+///             2,
+///             1
+///         ),
+///         5
+///     ),
+///     "[31*x^5+224*x^4+248*x^3+31*x^2+59*x+255, 7, \
+///     246*x^7+14*x^4+255*x^3+255*x^2+128*x+192, 143, \
+///     62*x^13+249*x^12+254*x^11+247*x^10+252*x^9+63*x^8+27*x^7+225*x^6+4*x^5+192*x^4+255*x^3+\
+///     128*x^2, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_natural_polynomials_reduced_mod_power_of_2(
+    seed: Seed,
+    pow: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> StripedRandomNaturalPolynomialsReducedModPowerOf2 {
+    assert_ne!(
+        pow, 0,
+        "the only polynomial reduced modulo 2^0 is the zero polynomial"
+    );
+    random_natural_polynomials_from_iterators(
+        seed,
+        &|seed_2| {
+            striped_random_naturals_less_than_power_of_2(
+                seed_2,
+                pow,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            )
+        },
+        &|seed_2| {
+            nonzero_values(striped_random_naturals_less_than_power_of_2(
+                seed_2,
+                pow,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            ))
+        },
+        mean_length_numerator,
+        mean_length_denominator,
+    )
+}
+
+/// The type of the [`NaturalPolynomial`] generator whose coefficients are reduced modulo a number.
+pub type RandomNaturalPolynomialsReducedMod = RandomNaturalPolynomials<
+    GeometricRandomNaturalValues<u64>,
+    RandomNaturalsLessThan,
+    NonzeroValues<RandomNaturalsLessThan>,
+>;
+
+/// Generates random [`NaturalPolynomial`]s that are reduced modulo $m$.
+///
+/// A polynomial is reduced modulo $m$ when every one of its coefficients is, so the coefficients
+/// are sampled uniformly from $[0, m)$ and the leading coefficient, which may not be zero, from
+/// $[1, m)$ — which is the same distribution with the zeros filtered out.
+///
+/// Unlike [`random_natural_polynomials_reduced_mod_power_of_2`], a coefficient here cannot be built
+/// reduced: $m$ is not a bit-width boundary, so a [`Natural`] of the right bit length may still be
+/// too large and has to be drawn again. At most half of the draws are wasted, since $m$ is more
+/// than half of the next power of 2.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(\ell n)$
+///
+/// $M(i) = O(\ell n)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $n$ is `m.significant_bits()`.
+///
+/// # Panics
+/// Panics if `m` is less than 2, if `mean_length_numerator` or `mean_length_denominator` are zero,
+/// or if their ratio is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_natural_polynomials_reduced_mod(EXAMPLE_SEED, &Natural::from(10u32), 2, 1),
+///         5
+///     ),
+///     "[2*x^5+5*x^4+2*x^3+5*x^2+6*x+5, 4, 6*x^7+7*x^6+4*x^5+4*x^4+9*x^3+9*x+1, 2, \
+///     9*x^13+3*x^12+3*x^11+6*x^10+5*x^9+9*x^8+7*x^7+4*x^6+3*x^5+9*x^3+3*x^2+9*x+1, ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_natural_polynomials_reduced_mod(
+    seed: Seed,
+    m: &Natural,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomNaturalPolynomialsReducedMod {
+    assert!(
+        *m >= 2u32,
+        "nothing is reduced modulo 0, and only the zero polynomial is reduced modulo 1"
+    );
+    random_natural_polynomials_from_iterators(
+        seed,
+        &|seed_2| random_naturals_less_than(seed_2, m.clone()),
+        &|seed_2| nonzero_values(random_naturals_less_than(seed_2, m.clone())),
+        mean_length_numerator,
+        mean_length_denominator,
+    )
+}
+
+/// The type of the striped [`NaturalPolynomial`] generator whose coefficients are reduced modulo a
+/// number.
+pub type StripedRandomNaturalPolynomialsReducedMod = RandomNaturalPolynomials<
+    GeometricRandomNaturalValues<u64>,
+    StripedRandomNaturalInclusiveRange,
+    StripedRandomNaturalInclusiveRange,
+>;
+
+/// Generates random [`NaturalPolynomial`]s that are reduced modulo $m$, with striped coefficients.
+///
+/// The coefficients are striped [`Natural`]s in $[0, m)$, and the leading coefficient, which may
+/// not be zero, is a striped [`Natural`] in $[1, m)$.
+///
+/// As for [`random_natural_polynomials_reduced_mod`], an arbitrary $m$ is not a bit-width boundary,
+/// so the striping and the reduction are two restrictions rather than one: a striped value in a
+/// range keeps the long runs of equal bits that the range allows, and the coefficients just below
+/// $m$ are the ones whose bit patterns are least free.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(\ell n)$
+///
+/// $M(i) = O(\ell n)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $n$ is `m.significant_bits()`.
+///
+/// # Panics
+/// Panics if `m` is less than 2, if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_length_numerator` or `mean_length_denominator` are zero, or
+/// if their ratio is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_natural_polynomials_reduced_mod(
+///             EXAMPLE_SEED,
+///             &Natural::from(1000u32),
+///             8,
+///             1,
+///             2,
+///             1
+///         ),
+///         5
+///     ),
+///     "[x^5+3*x^4+x^3+62*x^2+952*x+999, 1, x^7+511*x^3+7*x^2+999*x+7, 775, \
+///     992*x^13+959*x^12+3*x^11+481*x^10+512*x^9+636*x^8+992*x^7+33*x^6+799*x^5+639*x^4+542*x^3+\
+///     479*x^2+992*x+127, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_natural_polynomials_reduced_mod(
+    seed: Seed,
+    m: &Natural,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> StripedRandomNaturalPolynomialsReducedMod {
+    assert!(
+        *m >= 2u32,
+        "nothing is reduced modulo 0, and only the zero polynomial is reduced modulo 1"
+    );
+    random_natural_polynomials_from_iterators(
+        seed,
+        &|seed_2| {
+            striped_random_natural_range(
+                seed_2,
+                Natural::ZERO,
+                m.clone(),
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            )
+        },
+        &|seed_2| {
+            striped_random_natural_range(
+                seed_2,
+                Natural::ONE,
+                m.clone(),
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            )
+        },
+        mean_length_numerator,
+        mean_length_denominator,
+    )
 }

@@ -486,6 +486,142 @@ impl Iterator for RandomNaturalsLessThan {
     }
 }
 
+/// Uniformly generates random [`Natural`]s with up to a given number of bits.
+///
+/// This `struct` is created by [`random_naturals_less_than_power_of_2`]; see its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct RandomNaturalsWithUpToBits {
+    bits: u64,
+    limbs: RandomPrimitiveInts<u64>,
+}
+
+impl Iterator for RandomNaturalsWithUpToBits {
+    type Item = Natural;
+
+    fn next(&mut self) -> Option<Natural> {
+        Some(get_random_natural_with_up_to_bits(
+            &mut self.limbs,
+            self.bits,
+        ))
+    }
+}
+
+/// Uniformly generates random [`Natural`]s less than $2^k$.
+///
+/// A [`Natural`] less than $2^k$ is one with no more than $k$ significant bits, and such a
+/// [`Natural`] can be built directly out of random bits — so unlike
+/// [`random_naturals_less_than`], which draws a [`Natural`] of the right bit length and rejects it
+/// if it is too large, nothing here is ever drawn and thrown away.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     2^{-k} & \text{if} \\quad x < 2^k, \\\\
+///     0 & \\text{otherwise}.
+/// \\end{cases}
+/// $$
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::random::random_naturals_less_than_power_of_2;
+///
+/// assert_eq!(
+///     prefix_to_string(random_naturals_less_than_power_of_2(EXAMPLE_SEED, 4), 10),
+///     "[1, 7, 13, 5, 7, 9, 2, 8, 2, 11, ...]"
+/// );
+///
+/// // Zero bits leaves only zero.
+/// assert_eq!(
+///     prefix_to_string(random_naturals_less_than_power_of_2(EXAMPLE_SEED, 0), 3),
+///     "[0, 0, 0, ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_naturals_less_than_power_of_2(seed: Seed, pow: u64) -> RandomNaturalsWithUpToBits {
+    RandomNaturalsWithUpToBits {
+        bits: pow,
+        limbs: random_primitive_ints(seed),
+    }
+}
+
+/// Generates striped random [`Natural`]s with up to a given number of bits.
+///
+/// This `struct` is created by [`striped_random_naturals_less_than_power_of_2`]; see its
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct StripedRandomNaturalsWithUpToBits {
+    bits: u64,
+    bit_source: StripedBitSource,
+}
+
+impl Iterator for StripedRandomNaturalsWithUpToBits {
+    type Item = Natural;
+
+    fn next(&mut self) -> Option<Natural> {
+        Some(get_striped_random_natural_with_up_to_bits(
+            &mut self.bit_source,
+            self.bits,
+        ))
+    }
+}
+
+/// Generates striped random [`Natural`]s less than $2^k$.
+///
+/// As for [`random_naturals_less_than_power_of_2`], the [`Natural`] is built directly out of bits,
+/// so nothing is ever drawn and thrown away; here the bits come from a [`StripedBitSource`], so
+/// they come in long runs of equal bits.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero or if `mean_stripe_numerator <
+/// mean_stripe_denominator`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::random::striped_random_naturals_less_than_power_of_2;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_naturals_less_than_power_of_2(EXAMPLE_SEED, 8, 8, 1),
+///         10
+///     ),
+///     "[32, 252, 0, 255, 0, 1, 0, 128, 254, 31, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_naturals_less_than_power_of_2(
+    seed: Seed,
+    pow: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomNaturalsWithUpToBits {
+    StripedRandomNaturalsWithUpToBits {
+        bits: pow,
+        bit_source: StripedBitSource::new(seed, mean_stripe_numerator, mean_stripe_denominator),
+    }
+}
+
 /// Uniformly generates random [`Natural`]s less than a positive `limit`.
 ///
 /// $$
