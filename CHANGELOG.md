@@ -385,6 +385,14 @@ documented by git history.
   width already bounds them. All three panic on an `m` below 2: nothing is reduced modulo 0, and
   the only polynomial reduced modulo 1 is the zero polynomial, which leaves no leading coefficient
   to choose.
+- `ModPowerOf2` and `ModPowerOf2Assign` for `U64Polynomial`, reducing every coefficient modulo
+  $2^k$. Both by-value and by-reference forms are provided, as for [`Natural`]. The result is
+  always reduced, so `mod_power_of_2_is_reduced` holds for it and reducing again changes nothing.
+  Reducing can lower the degree, and can give the zero polynomial: a leading coefficient that is a
+  multiple of $2^k$ becomes zero, and a polynomial holds no trailing zero coefficients, so
+  $4x^2 + 3$ modulo $4$ is the constant $3$ rather than a quadratic with a zero leading
+  coefficient, and $4x^2 + 4x + 4$ modulo $4$ is zero. Interior zeros are untouched: only the
+  leading ones are dropped.
 
 ### malachite-nz
 
