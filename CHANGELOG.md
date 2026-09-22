@@ -393,9 +393,20 @@ documented by git history.
   $4x^2 + 3$ modulo $4$ is the constant $3$ rather than a quadratic with a zero leading
   coefficient, and $4x^2 + 4x + 4$ modulo $4$ is zero. Interior zeros are untouched: only the
   leading ones are dropped.
-
-### malachite-nz
-
+- `Rem<u64>`, `RemAssign<u64>`, `Mod<u64>` and `ModAssign<u64>` for `U64Polynomial`. Each reduces
+  every coefficient modulo `m`, in by-value and by-reference forms. A `U64Polynomial`'s
+  coefficients are never negative, so `mod_op` and `%` agree everywhere and the mod-family names
+  are the same operation. $p \% m$ is the polynomial whose $i$th coefficient is $p_i \% m$, which
+  is `fmpz_poly_scalar_mod_fmpz` from `fmpz_poly/scalar_mod_fmpz.c`, FLINT 3.6.0, for nonnegative
+  coefficients — and it is the remainder of dividing by the constant polynomial `m` under the
+  convention that applies over the integers, where a remainder is bounded coefficient by
+  coefficient rather than by degree. Over a field the answer would be 0 instead, a remainder there
+  having to be of lower degree than the divisor. As for `ModPowerOf2`, reducing can lower the
+  degree and can give the zero polynomial, since a leading coefficient that is a multiple of `m`
+  becomes zero and a polynomial holds no trailing zero coefficients. Where `m` is a power of 2
+  this agrees with `mod_power_of_2`, which reaches the same answer by masking rather than
+  dividing. Panics on a zero divisor — including for the zero polynomial, which has no
+  coefficients for the division to fail on.  ### malachite-nz
 - A new `NaturalPolynomial` type, a univariate polynomial whose coefficients are [`Natural`]s, held
   as a [`Vec`] in ascending order of degree with no trailing zero — so the zero polynomial has no
   coefficients at all, which is what makes the representation unique and lets `Eq`, `Hash`, and

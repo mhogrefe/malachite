@@ -12,8 +12,10 @@ pub(crate) fn register(runner: &mut Runner) {
     height::register(runner);
     mod_is_reduced::register(runner);
     mod_power_of_2::register(runner);
+    mod_op::register(runner);
 }
 
 mod height;
 mod mod_is_reduced;
+mod mod_op;
 mod mod_power_of_2;
