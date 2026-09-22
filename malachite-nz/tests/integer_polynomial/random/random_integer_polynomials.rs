@@ -7,241 +7,131 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::iterators::prefix_to_string;
-use malachite_base::num::logic::traits::BitIterable;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_nz::integer::random::{random_integers, random_nonzero_integers};
-use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::random::*;
+
+fn random_integer_polynomials_helper(
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+    expected_values: &[&str],
+) {
+    assert_eq!(
+        random_integer_polynomials(
+            EXAMPLE_SEED,
+            mean_bits_numerator,
+            mean_bits_denominator,
+            mean_length_numerator,
+            mean_length_denominator
+        )
+        .take(20)
+        .map(|p| p.to_string())
+        .collect_vec(),
+        expected_values
+    );
+}
 
 #[test]
 fn test_random_integer_polynomials() {
-    assert_eq!(
-        prefix_to_string(random_integer_polynomials(EXAMPLE_SEED, 4, 1, 1, 1), 5),
-        "[14, -2*x-497, 2*x-1, 122*x+1, 1, ...]"
+    // mean bits = 65/64, mean length = 2/1
+    random_integer_polynomials_helper(
+        65,
+        64,
+        2,
+        1,
+        &[
+            "x^5+x^4+3*x^3+5*x^2-x-3",
+            "-1",
+            "2*x^7+x^6+x^5-3*x^4+3*x^3",
+            "1",
+            "x^13-2*x^10-3*x^9-2*x^8-x^7+3*x^6+x^5-3*x^3+78*x",
+            "0",
+            "x^4-x^3-4*x^2+x-1",
+            "-x^3+x^2+3",
+            "-1",
+            "0",
+            "-x^5+4*x^3+x^2+2",
+            "-x",
+            "0",
+            "0",
+            "-1",
+            "x^2+x",
+            "0",
+            "-1",
+            "0",
+            "-1",
+        ],
     );
-    // The convenience function is the general one with the usual iterators.
-    assert_eq!(
-        prefix_to_string(
-            random_integer_polynomials_from_iterators(
-                EXAMPLE_SEED,
-                &|seed| random_integers(seed, 4, 1),
-                &|seed| random_nonzero_integers(seed, 4, 1),
-                1,
-                1,
-            ),
-            5
-        ),
-        prefix_to_string(random_integer_polynomials(EXAMPLE_SEED, 4, 1, 1, 1), 5)
+    // mean bits = 2, mean length = 2/1
+    random_integer_polynomials_helper(
+        2,
+        1,
+        2,
+        1,
+        &[
+            "x^5+11*x^4+3*x^3+3*x^2+3*x",
+            "-38",
+            "x^7-846*x^6+x^5+18*x^4-3*x^2+x-7",
+            "1",
+            "2*x^13-4*x^12-3*x^11-6*x^9+x^8+x^7-6*x^5+11*x^4-81*x^3+3*x-11",
+            "0",
+            "x^4-4012*x^3-23*x^2-3",
+            "-2*x^3-x^2+50*x+1",
+            "-1",
+            "0",
+            "-x^5+7*x^4-x^2+1487*x+1",
+            "-2*x-484",
+            "0",
+            "0",
+            "-1",
+            "4*x^2+x-3",
+            "0",
+            "-3",
+            "0",
+            "-4",
+        ],
     );
-}
-
-#[test]
-fn test_random_integer_polynomials_degree_bounds() {
-    assert_eq!(
-        prefix_to_string(
-            random_integer_polynomials_with_degree(EXAMPLE_SEED, 2, 4, 1),
-            5
-        ),
-        "[14*x^2-x-497, -2*x^2+19*x+1, 2*x^2+799*x+799, 122*x^2+66*x-1, x^2+334*x-10721, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            random_integer_polynomials_min_degree(EXAMPLE_SEED, 1, 4, 1, 3, 1),
-            5
-        ),
-        "[14*x^2-x-497, -2*x^3+799*x^2+19*x+1, 2*x^3+66*x^2-x+799, \
-        122*x^3+59*x^2+334*x-10721, x^2-5*x-119, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            random_integer_polynomials_degree_range(EXAMPLE_SEED, 1, 3, 4, 1),
-            5
-        ),
-        "[14*x^2-x-497, -2*x+1, 2*x^2+799*x+19, 122*x^2-x+799, x+66, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            random_integer_polynomials_degree_inclusive_range(EXAMPLE_SEED, 1, 2, 4, 1),
-            5
-        ),
-        prefix_to_string(
-            random_integer_polynomials_degree_range(EXAMPLE_SEED, 1, 3, 4, 1),
-            5
-        )
-    );
-}
-
-#[test]
-fn test_striped_random_integer_polynomials() {
-    assert_eq!(
-        prefix_to_string(
-            striped_random_integer_polynomials(EXAMPLE_SEED, 16, 1, 4, 1, 1, 1),
-            5
-        ),
-        "[15, -2*x-496, 2*x-1, 65*x+1, 1, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_integer_polynomials_with_degree(EXAMPLE_SEED, 2, 16, 1, 4, 1),
-            5
-        ),
-        "[15*x^2-x-496, -2*x^2+16*x+1, 2*x^2+543*x+512, 65*x^2+127*x-1, x^2+383*x-10239, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_integer_polynomials_min_degree(EXAMPLE_SEED, 1, 16, 1, 4, 1, 3, 1),
-            5
-        ),
-        "[15*x^2-x-496, -2*x^3+512*x^2+16*x+1, 2*x^3+127*x^2-x+543, \
-        65*x^3+36*x^2+383*x-10239, x^2-4*x-127, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_integer_polynomials_degree_range(EXAMPLE_SEED, 1, 3, 16, 1, 4, 1),
-            5
-        ),
-        "[15*x^2-x-496, -2*x+1, 2*x^2+512*x+16, 65*x^2-x+543, x+127, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_integer_polynomials_degree_inclusive_range(
-                EXAMPLE_SEED,
-                1,
-                2,
-                16,
-                1,
-                4,
-                1
-            ),
-            5
-        ),
-        prefix_to_string(
-            striped_random_integer_polynomials_degree_range(EXAMPLE_SEED, 1, 3, 16, 1, 4, 1),
-            5
-        )
+    // mean bits = 4, mean length = 3/1
+    random_integer_polynomials_helper(
+        4,
+        1,
+        3,
+        1,
+        &[
+            "14*x^7-x^6+799*x^5+799*x^4+19*x^3+x^2-x-497",
+            "-2",
+            "2*x^10-x^8-131*x^7-5*x^5-119*x^4+59*x^3+334*x^2-10721*x+66",
+            "122",
+            "x^17-280*x^16+463*x^15+190*x^14-132*x^13+2*x^12-6*x^11+28*x^8-903*x^7-x^6-37408*x^4\
+            +11*x^3+10*x^2-x+7",
+            "0",
+            "x^6-18*x^5+x^4+x^3-19203*x^2-36*x+1",
+            "-6*x^5-39*x^4-1107*x^3-x^2+88*x-1",
+            "-34",
+            "-3",
+            "-14*x^7+218*x^6+459*x^5+1142*x^4+6*x^3-8091*x^2",
+            "-x+3",
+            "0",
+            "0",
+            "8",
+            "-x^3+6*x^2-21747*x-12",
+            "-8*x+8567",
+            "-7",
+            "0",
+            "-7853*x+3",
+        ],
     );
 }
 
 #[test]
 #[should_panic]
-fn random_integer_polynomials_degree_range_fail() {
-    random_integer_polynomials_degree_range(EXAMPLE_SEED, 3, 3, 4, 1);
+fn random_integer_polynomials_fail_1() {
+    let _ = random_integer_polynomials(EXAMPLE_SEED, 1, 0, 2, 1);
 }
 
 #[test]
 #[should_panic]
-fn random_integer_polynomials_degree_inclusive_range_fail() {
-    random_integer_polynomials_degree_inclusive_range(EXAMPLE_SEED, 3, 2, 4, 1);
-}
-
-#[test]
-#[should_panic]
-fn striped_random_integer_polynomials_degree_range_fail() {
-    striped_random_integer_polynomials_degree_range(EXAMPLE_SEED, 3, 2, 16, 1, 4, 1);
-}
-
-// The mean fraction of adjacent bit pairs that differ, across every coefficient. A striped
-// generator's runs are long, so this is small; an unstriped one's bits are independent, so it is
-// about a half.
-fn transition_rate(ps: &[IntegerPolynomial]) -> f64 {
-    let (mut changes, mut bits) = (0u64, 0u64);
-    for p in ps {
-        for c in p.coefficients_asc() {
-            let mut prev = None;
-            for b in c.bits() {
-                if prev.is_some_and(|q| q != b) {
-                    changes += 1;
-                }
-                prev = Some(b);
-                bits += 1;
-            }
-        }
-    }
-    changes as f64 / bits as f64
-}
-
-#[test]
-fn random_integer_polynomials_properties() {
-    let ps = random_integer_polynomials(EXAMPLE_SEED, 32, 1, 3, 1)
-        .take(2000)
-        .collect_vec();
-    assert!(ps.iter().all(IntegerPolynomial::is_valid));
-    // The unbounded generator reaches the zero polynomial and a spread of degrees.
-    assert!(ps.iter().any(|p| p.degree().is_none()));
-    assert!(ps.iter().any(|p| p.degree() == Some(0)));
-    assert!(ps.iter().any(|p| p.degree().is_some_and(|d| d > 5)));
-
-    for d in 0..4u64 {
-        let ps = random_integer_polynomials_with_degree(EXAMPLE_SEED, d, 32, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(IntegerPolynomial::is_valid));
-        assert!(ps.iter().all(|p| p.degree() == Some(d)));
-
-        let ps = random_integer_polynomials_min_degree(EXAMPLE_SEED, d, 32, 1, d + 2, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(|p| p.degree().unwrap() >= d));
-    }
-
-    for (a, b) in [(0u64, 1u64), (1, 3), (2, 5)] {
-        let ps = random_integer_polynomials_degree_range(EXAMPLE_SEED, a, b, 32, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(|p| {
-            let d = p.degree().unwrap();
-            d >= a && d < b
-        }));
-        let ps = random_integer_polynomials_degree_inclusive_range(EXAMPLE_SEED, a, b, 32, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(|p| {
-            let d = p.degree().unwrap();
-            d >= a && d <= b
-        }));
-    }
-}
-
-#[test]
-fn striped_random_integer_polynomials_properties() {
-    let striped = striped_random_integer_polynomials(EXAMPLE_SEED, 16, 1, 32, 1, 3, 1)
-        .take(2000)
-        .collect_vec();
-    assert!(striped.iter().all(IntegerPolynomial::is_valid));
-    assert!(striped.iter().any(|p| p.degree().is_none()));
-    assert!(striped.iter().any(|p| p.degree().is_some_and(|d| d > 5)));
-
-    for d in 0..4u64 {
-        let ps = striped_random_integer_polynomials_with_degree(EXAMPLE_SEED, d, 16, 1, 32, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(IntegerPolynomial::is_valid));
-        assert!(ps.iter().all(|p| p.degree() == Some(d)));
-
-        let ps =
-            striped_random_integer_polynomials_min_degree(EXAMPLE_SEED, d, 16, 1, 32, 1, d + 2, 1)
-                .take(300)
-                .collect_vec();
-        assert!(ps.iter().all(|p| p.degree().unwrap() >= d));
-    }
-
-    for (a, b) in [(0u64, 1u64), (1, 3), (2, 5)] {
-        let ps = striped_random_integer_polynomials_degree_range(EXAMPLE_SEED, a, b, 16, 1, 32, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(|p| {
-            let d = p.degree().unwrap();
-            d >= a && d < b
-        }));
-    }
-
-    // The striping reaches the coefficients: their bits change far less often than unstriped ones.
-    let plain = random_integer_polynomials(EXAMPLE_SEED, 32, 1, 3, 1)
-        .take(2000)
-        .collect_vec();
-    let s = transition_rate(&striped);
-    let u = transition_rate(&plain);
-    assert!(s < 0.15, "striped transition rate {s}");
-    assert!(u > 0.4, "unstriped transition rate {u}");
+fn random_integer_polynomials_fail_2() {
+    let _ = random_integer_polynomials(EXAMPLE_SEED, 2, 1, 1, 0);
 }

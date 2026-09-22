@@ -194,7 +194,17 @@ pub mod rational_polynomial {
         pub mod exhaustive_rational_polynomials;
     }
     pub mod random {
+        pub mod properties;
         pub mod random_rational_polynomials;
+        pub mod random_rational_polynomials_degree_inclusive_range;
+        pub mod random_rational_polynomials_degree_range;
+        pub mod random_rational_polynomials_min_degree;
+        pub mod random_rational_polynomials_with_degree;
+        pub mod striped_random_rational_polynomials;
+        pub mod striped_random_rational_polynomials_degree_inclusive_range;
+        pub mod striped_random_rational_polynomials_degree_range;
+        pub mod striped_random_rational_polynomials_min_degree;
+        pub mod striped_random_rational_polynomials_with_degree;
     }
 }
 pub mod rational {

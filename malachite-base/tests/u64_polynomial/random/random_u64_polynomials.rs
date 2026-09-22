@@ -7,377 +7,171 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::iterators::prefix_to_string;
-use malachite_base::num::arithmetic::traits::{Height, ModIsReduced, ModPowerOf2IsReduced};
-use malachite_base::num::logic::traits::{BitIterable, LowMask};
-use malachite_base::num::random::{random_positive_unsigneds, random_primitive_ints};
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::u64_polynomial::U64Polynomial;
 use malachite_base::u64_polynomial::random::*;
+
+fn random_u64_polynomials_helper(
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+    expected_values: &[&str],
+) {
+    assert_eq!(
+        random_u64_polynomials(EXAMPLE_SEED, mean_length_numerator, mean_length_denominator)
+            .take(20)
+            .map(|p| p.to_string())
+            .collect_vec(),
+        expected_values
+    );
+}
 
 #[test]
 fn test_random_u64_polynomials() {
-    assert_eq!(
-        prefix_to_string(random_u64_polynomials(EXAMPLE_SEED, 1, 1), 5),
-        "[6282517168718784610, 3854918945212287108*x+16126131237969988437, 3848495687584076941*x+16\
-        908237734149745446, 8242875068444962379*x+10938355129926736414, 33570146165392012, ...]"
+    // mean length = 1/1
+    random_u64_polynomials_helper(
+        1,
+        1,
+        &[
+            "6282517168718784610",
+            "3854918945212287108*x+16126131237969988437",
+            "3848495687584076941*x+16908237734149745446",
+            "8242875068444962379*x+10938355129926736414",
+            "33570146165392012",
+            "1581093541351523807*x+12663883950309859797",
+            "0",
+            "0",
+            "17580674005203639830",
+            "0",
+            "0",
+            "0",
+            "985495283534891314",
+            "5262163828948177753*x^3+5274967849189775789*x^2+16030916309388628338*x+143285080290\
+            84493994",
+            "0",
+            "16395975300252768011*x+6855165495190718789",
+            "0",
+            "2644000139732919052*x^4+4929296619887363376*x^3+18084098515246349065*x^2+5364743571\
+            823285937*x+12452306358869796714",
+            "16243027292956976549",
+            "10614542942872277190",
+        ],
     );
-    // The convenience function is the general one with the usual iterators.
-    assert_eq!(
-        prefix_to_string(
-            random_u64_polynomials_from_iterators(
-                EXAMPLE_SEED,
-                &|seed| random_primitive_ints(seed),
-                &|seed| random_positive_unsigneds(seed),
-                1,
-                1,
-            ),
-            5
-        ),
-        prefix_to_string(random_u64_polynomials(EXAMPLE_SEED, 1, 1), 5)
+    // mean length = 2/1
+    random_u64_polynomials_helper(
+        2,
+        1,
+        &[
+            "6282517168718784610*x^5+14328508029084493994*x^4+12663883950309859797*x^3+109383551\
+            29926736414*x^2+16908237734149745446*x+16126131237969988437",
+            "3854918945212287108",
+            "3848495687584076941*x^7+4929296619887363376*x^6+18084098515246349065*x^5+5364743571\
+            823285937*x^4+12452306358869796714*x^3+6855165495190718789*x^2+5274967849189775789*x\
+            +16030916309388628338",
+            "8242875068444962379",
+            "33570146165392012*x^13+4042518734391281966*x^12+5799718956463847353*x^11+7321335884\
+            194326556*x^10+7302066164643325347*x^9+13278249034234833257*x^8+15816946663310690555\
+            *x^7+8896218915076694385*x^6+11159618536114539543*x^5+12011232285882986260*x^4+85348\
+            87809013916308*x^3+5695140100314877469*x^2+4001260060885588185*x+8082601913180739774",
+            "0",
+            "1581093541351523807*x^4+12831608679968618560*x^3+2019075391003709918*x^2+1250225901\
+            3159897071*x+8732207380342292346",
+            "17580674005203639830*x^3+14223787268378284260*x^2+8316369894096577775*x+29093220421\
+            36193251",
+            "985495283534891314",
+            "0",
+            "5262163828948177753*x^5+1085073003158599774*x^4+1372385597973877686*x^3+13301370948\
+            712062037*x^2+17182188607829803481*x+1655151457071799127",
+            "16395975300252768011*x+8724967809846298799",
+            "0",
+            "0",
+            "2644000139732919052",
+            "16243027292956976549*x^2+14672638928462894619*x+8979006534907634478",
+            "0",
+            "10614542942872277190",
+            "0",
+            "3884538521225379395",
+        ],
     );
-}
-
-#[test]
-fn test_random_u64_polynomials_degree_bounds() {
-    assert_eq!(
-        prefix_to_string(random_u64_polynomials_with_degree(EXAMPLE_SEED, 2), 5),
-        "[6282517168718784610*x^2+16908237734149745446*x+16126131237969988437, 3854918945212287108*\
-        x^2+12663883950309859797*x+10938355129926736414, 3848495687584076941*x^2+160309163093886283\
-        38*x+14328508029084493994, 8242875068444962379*x^2+6855165495190718789*x+527496784918977578\
-        9, 33570146165392012*x^2+5364743571823285937*x+12452306358869796714, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(random_u64_polynomials_min_degree(EXAMPLE_SEED, 1, 3, 1), 5),
-        "[6282517168718784610*x^2+16908237734149745446*x+16126131237969988437, 3854918945212287108*\
-        x^3+14328508029084493994*x^2+12663883950309859797*x+10938355129926736414, 38484956875840769\
-        41*x^3+6855165495190718789*x^2+5274967849189775789*x+16030916309388628338, 8242875068444962\
-        379*x^3+18084098515246349065*x^2+5364743571823285937*x+12452306358869796714, 33570146165392\
-        012*x^2+8082601913180739774*x+4929296619887363376, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(random_u64_polynomials_degree_range(EXAMPLE_SEED, 1, 3), 5),
-        "[6282517168718784610*x^2+16908237734149745446*x+16126131237969988437, 3854918945212287108*\
-        x+10938355129926736414, 3848495687584076941*x^2+14328508029084493994*x+12663883950309859797\
-        , 8242875068444962379*x^2+5274967849189775789*x+16030916309388628338, 33570146165392012*x+6\
-        855165495190718789, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            random_u64_polynomials_degree_inclusive_range(EXAMPLE_SEED, 1, 2),
-            5
-        ),
-        prefix_to_string(random_u64_polynomials_degree_range(EXAMPLE_SEED, 1, 3), 5)
-    );
-}
-
-#[test]
-fn test_striped_random_u64_polynomials() {
-    assert_eq!(
-        prefix_to_string(striped_random_u64_polynomials(EXAMPLE_SEED, 16, 1, 1, 1), 5),
-        "[271656550527, 27127151148662784*x+18302682203357708288, 8866461766451184*x+18446744005015\
-        272960, 18446181398633971712*x+9727775212300075008, 18446708889362628608, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_u64_polynomials_with_degree(EXAMPLE_SEED, 2, 16, 1),
-            5
-        ),
-        "[271656550527*x^2+18446744005015272960*x+18302682203357708288, 27127151148662784*x^2+22517\
-        99813816318*x+9727775212300075008, 8866461766451184*x^2+79164805742588*x+4398046510592, 184\
-        46181398633971712*x^2+13835058055549583359*x+31525223161659391, 18446708889362628608*x^2+90\
-        07199254740543*x+9223652962075148288, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_u64_polynomials_min_degree(EXAMPLE_SEED, 1, 16, 1, 3, 1),
-            5
-        ),
-        "[271656550527*x^2+18446744005015272960*x+18302682203357708288, 27127151148662784*x^3+43980\
-        46510592*x^2+2251799813816318*x+9727775212300075008, 8866461766451184*x^3+13835058055549583\
-        359*x^2+31525223161659391*x+79164805742588, 18446181398633971712*x^3+4398046446591*x^2+9007\
-        199254740543*x+9223652962075148288, 18446708889362628608*x^2+35047000244217*x, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_u64_polynomials_degree_range(EXAMPLE_SEED, 1, 3, 16, 1),
-            5
-        ),
-        "[271656550527*x^2+18446744005015272960*x+18302682203357708288, 27127151148662784*x+9727775\
-        212300075008, 8866461766451184*x^2+4398046510592*x+2251799813816318, 18446181398633971712*x\
-        ^2+31525223161659391*x+79164805742588, 18446708889362628608*x+13835058055549583359, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_u64_polynomials_degree_inclusive_range(EXAMPLE_SEED, 1, 2, 16, 1),
-            5
-        ),
-        prefix_to_string(
-            striped_random_u64_polynomials_degree_range(EXAMPLE_SEED, 1, 3, 16, 1),
-            5
-        )
-    );
-}
-
-#[test]
-#[should_panic]
-fn random_u64_polynomials_degree_range_fail() {
-    random_u64_polynomials_degree_range(EXAMPLE_SEED, 3, 3);
-}
-
-#[test]
-#[should_panic]
-fn random_u64_polynomials_degree_inclusive_range_fail() {
-    random_u64_polynomials_degree_inclusive_range(EXAMPLE_SEED, 3, 2);
-}
-
-#[test]
-#[should_panic]
-fn striped_random_u64_polynomials_degree_range_fail() {
-    striped_random_u64_polynomials_degree_range(EXAMPLE_SEED, 3, 2, 16, 1);
-}
-
-// The mean fraction of adjacent bit pairs that differ, across every coefficient. A striped
-// generator's runs are long, so this is small; an unstriped one's bits are independent, so it is
-// about a half.
-fn transition_rate(ps: &[U64Polynomial]) -> f64 {
-    let (mut changes, mut bits) = (0u64, 0u64);
-    for p in ps {
-        for c in p.coefficients_asc() {
-            let mut prev = None;
-            for b in c.bits() {
-                if prev.is_some_and(|q| q != b) {
-                    changes += 1;
-                }
-                prev = Some(b);
-                bits += 1;
-            }
-        }
-    }
-    changes as f64 / bits as f64
-}
-
-#[test]
-fn random_u64_polynomials_properties() {
-    let ps = random_u64_polynomials(EXAMPLE_SEED, 3, 1)
-        .take(2000)
-        .collect_vec();
-    assert!(ps.iter().all(U64Polynomial::is_valid));
-    // The unbounded generator reaches the zero polynomial and a spread of degrees.
-    assert!(ps.iter().any(|p| p.degree().is_none()));
-    assert!(ps.iter().any(|p| p.degree() == Some(0)));
-    assert!(ps.iter().any(|p| p.degree().is_some_and(|d| d > 5)));
-
-    for d in 0..4u64 {
-        let ps = random_u64_polynomials_with_degree(EXAMPLE_SEED, d)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(U64Polynomial::is_valid));
-        assert!(ps.iter().all(|p| p.degree() == Some(d)));
-
-        let ps = random_u64_polynomials_min_degree(EXAMPLE_SEED, d, d + 2, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(|p| p.degree().unwrap() >= d));
-    }
-
-    for (a, b) in [(0u64, 1u64), (1, 3), (2, 5)] {
-        let ps = random_u64_polynomials_degree_range(EXAMPLE_SEED, a, b)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(|p| {
-            let d = p.degree().unwrap();
-            d >= a && d < b
-        }));
-        let ps = random_u64_polynomials_degree_inclusive_range(EXAMPLE_SEED, a, b)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(|p| {
-            let d = p.degree().unwrap();
-            d >= a && d <= b
-        }));
-    }
-}
-
-#[test]
-fn striped_random_u64_polynomials_properties() {
-    let striped = striped_random_u64_polynomials(EXAMPLE_SEED, 16, 1, 3, 1)
-        .take(2000)
-        .collect_vec();
-    assert!(striped.iter().all(U64Polynomial::is_valid));
-    assert!(striped.iter().any(|p| p.degree().is_none()));
-    assert!(striped.iter().any(|p| p.degree().is_some_and(|d| d > 5)));
-
-    for d in 0..4u64 {
-        let ps = striped_random_u64_polynomials_with_degree(EXAMPLE_SEED, d, 16, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(U64Polynomial::is_valid));
-        assert!(ps.iter().all(|p| p.degree() == Some(d)));
-
-        let ps = striped_random_u64_polynomials_min_degree(EXAMPLE_SEED, d, 16, 1, d + 2, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(|p| p.degree().unwrap() >= d));
-    }
-
-    for (a, b) in [(0u64, 1u64), (1, 3), (2, 5)] {
-        let ps = striped_random_u64_polynomials_degree_range(EXAMPLE_SEED, a, b, 16, 1)
-            .take(300)
-            .collect_vec();
-        assert!(ps.iter().all(|p| {
-            let d = p.degree().unwrap();
-            d >= a && d < b
-        }));
-    }
-
-    // The striping reaches the coefficients: their bits change far less often than unstriped ones.
-    let plain = random_u64_polynomials(EXAMPLE_SEED, 3, 1)
-        .take(2000)
-        .collect_vec();
-    let s = transition_rate(&striped);
-    let u = transition_rate(&plain);
-    assert!(s < 0.15, "striped transition rate {s}");
-    assert!(u > 0.4, "unstriped transition rate {u}");
-}
-
-#[test]
-fn test_random_u64_polynomials_reduced_mod_power_of_2() {
-    assert_eq!(
-        prefix_to_string(
-            random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 4, 2, 1),
-            3
-        ),
-        "[3*x^5+8*x^4+11*x^2+5*x+5, 7, 9*x^7+8*x^6+6*x^5+14*x^4+11*x^3+12*x^2+8*x+8, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 8, 8, 1, 2, 1),
-            3
-        ),
-        "[248*x^5+7*x^4+31*x^3+248*x^2+220*x+255, 224, \
-        111*x^7+112*x^4+255*x^3+255*x^2+x+3, ...]"
+    // mean length = 8/1
+    random_u64_polynomials_helper(
+        8,
+        1,
+        &[
+            "6282517168718784610*x^20+15816946663310690555*x^19+8896218915076694385*x^18+1115961\
+            8536114539543*x^17+12011232285882986260*x^16+8534887809013916308*x^15+56951401003148\
+            77469*x^14+4001260060885588185*x^13+8082601913180739774*x^12+4929296619887363376*x^1\
+            1+18084098515246349065*x^10+5364743571823285937*x^9+12452306358869796714*x^8+6855165\
+            495190718789*x^7+5274967849189775789*x^6+16030916309388628338*x^5+143285080290844939\
+            94*x^4+12663883950309859797*x^3+10938355129926736414*x^2+16908237734149745446*x+1612\
+            6131237969988437",
+            "3854918945212287108*x^14+17182188607829803481*x^13+1655151457071799127*x^12+1422378\
+            7268378284260*x^11+8316369894096577775*x^10+2909322042136193251*x^9+1283160867996861\
+            8560*x^8+2019075391003709918*x^7+12502259013159897071*x^6+8732207380342292346*x^5+40\
+            42518734391281966*x^4+5799718956463847353*x^3+7321335884194326556*x^2+73020661646433\
+            25347*x+13278249034234833257",
+            "3848495687584076941*x^16+13084668821159532873*x^15+7185524033464454973*x^14+9908183\
+            132232154791*x^13+11249696617660426885*x^12+14559975428266027596*x^11+81600833174399\
+            46443*x^10+5238552202607063583*x^9+2372834412357474576*x^8+10789427121825612403*x^7+\
+            4772880303614856163*x^6+14672638928462894619*x^5+8979006534907634478*x^4+87249678098\
+            46298799*x^3+1085073003158599774*x^2+1372385597973877686*x+13301370948712062037",
+            "8242875068444962379*x^2+2717819966287744952*x+13080305930846917303",
+            "33570146165392012*x^10+13889518037926366225*x^9+17679066767102507726*x^8+2148815531\
+            011722306*x^7+5359175121125910570*x^6+18371637681613109311*x^5+12222115879196902970*\
+            x^4+11424687852231440273*x^3+14570679550176809905*x^2+9386646810154202081*x+71246506\
+            06640517852",
+            "1581093541351523807",
+            "17580674005203639830*x^22+13423243087758132387*x^21+8659485206830156469*x^20+881832\
+            5570889918907*x^19+5048725452063866206*x^18+862892606080353458*x^17+2252218169318269\
+            834*x^16+591089135516199459*x^15+9463751064224151456*x^14+10319623255002503349*x^13+\
+            6236295300549613743*x^12+5585730561604558759*x^11+16292175871113024008*x^10+34779586\
+            11236241232*x^9+16492808515310020304*x^8+18125356898477139174*x^7+728656576768901919\
+            2*x^6+17457059674168741173*x^5+16998073653641921623*x^4+10985406156730349404*x^3+123\
+            44925657382248051*x^2+3850193493174698358*x+15536855403462802743",
+            "985495283534891314*x^3+17552568882310631283*x^2+726189598260086702*x+59316386516838\
+            36702",
+            "5262163828948177753*x+16362554893644374308",
+            "16395975300252768011*x^8+18379760227315341655*x^7+8240095392791493806*x^6+324980894\
+            3561478386*x^5+1219676338169570619*x^4+7551068411167036177*x^3+8531670718492391711*x\
+            ^2+1658933737262819201*x+2407211671412641092",
+            "2644000139732919052*x^21+10773127135872532578*x^20+9239423352480429745*x^19+7127187\
+            304413875110*x^18+17768397379068248272*x^17+15620921255634335582*x^16+76266771447838\
+            52491*x^15+4729909244293992358*x^14+8581067395248196883*x^13+8175215950976649646*x^1\
+            2+5778325638584493526*x^11+9751703358656322718*x^10+7272423850473130597*x^9+83830304\
+            45894670697*x^8+10224737295140518487*x^7+18006879800705758675*x^6+775263543940255933\
+            4*x^5+3809403759956883034*x^4+15466746727219811764*x^3+6316977119306097487*x^2+17914\
+            601533857880122*x+15217742262236663404",
+            "16243027292956976549*x^3+1500102187759340861*x^2+13675889406323696326*x+19207658469\
+            30701049",
+            "10614542942872277190*x^3+3971270809656380539*x^2+700285074870404065*x+3248562725073\
+            491466",
+            "3884538521225379395*x^4+6526808062955231456*x^3+3529265287393781115*x^2+18109428411\
+            681337209*x+18250501087737959163",
+            "6130511140056748336*x^6+6667057976024670169*x^5+1696081765547463181*x^4+10773708046\
+            092426596*x^3+6435679724430966751*x^2+16000459616595386688*x+6198949521434554662",
+            "12645370925143291439*x^2+3499872558946439920*x+8160305223892670227",
+            "4327248194017912823*x^6+12674577504520267301*x^5+920512941949878081*x^4+34574615131\
+            41553991*x^3+11557222613812203951*x^2+2586907484721060262*x+5293323813451376966",
+            "1164539921264494516*x^6+9699563400367179868*x^5+12477967999237839912*x^4+6340872448\
+            936048312*x^3+721410781348085927*x^2+12793647247127872904*x+8595970306026290173",
+            "16604095581906733529*x^20+3127480951269562901*x^19+15301911548777318482*x^18+386541\
+            1772833670535*x^17+5036951925297209178*x^16+11499201856292192796*x^15+11686943305756\
+            774556*x^14+8934632839470728485*x^13+4004324607444141911*x^12+6014363823900639724*x^\
+            11+4756731509895858863*x^10+11189580871170291036*x^9+9080284580105332721*x^8+3475204\
+            668099960195*x^7+3258077464606535093*x^6+14950790692798524722*x^5+174472010754804030\
+            20*x^4+13674837618725376025*x^3+6942078690340863029*x^2+15631376202918889469*x+14620\
+            905640885265073",
+            "4407095145932878545",
+        ],
     );
 }
 
 #[test]
 #[should_panic]
-fn random_u64_polynomials_reduced_mod_power_of_2_fail_zero() {
-    random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 0, 2, 1);
+fn random_u64_polynomials_fail_1() {
+    let _ = random_u64_polynomials(EXAMPLE_SEED, 1, 0);
 }
 
 #[test]
 #[should_panic]
-fn striped_random_u64_polynomials_reduced_mod_power_of_2_fail_too_wide() {
-    striped_random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 65, 8, 1, 2, 1);
-}
-
-#[test]
-fn random_u64_polynomials_reduced_mod_power_of_2_properties() {
-    for pow in [1, 2, 3, 8, 63, 64] {
-        let ps = random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, pow, 4, 1)
-            .take(1000)
-            .collect_vec();
-        assert!(ps.iter().all(U64Polynomial::is_valid));
-        // Everything generated is reduced, which is the whole point.
-        assert!(ps.iter().all(|p| p.mod_power_of_2_is_reduced(pow)));
-        // The restriction is on the coefficients, not the degree, so degrees still spread out, and
-        // the zero polynomial is still reachable.
-        assert!(ps.iter().any(|p| p.degree().is_none()));
-        assert!(ps.iter().any(|p| p.degree().is_some_and(|d| d > 5)));
-        // Every coefficient below the modulus is reachable, so the largest one shows up.
-        if pow <= 3 {
-            assert!(ps.iter().any(|p| p.to_height() == u64::low_mask(pow)));
-        }
-
-        let ps =
-            striped_random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, pow, 8, 1, 4, 1)
-                .take(1000)
-                .collect_vec();
-        assert!(ps.iter().all(U64Polynomial::is_valid));
-        assert!(ps.iter().all(|p| p.mod_power_of_2_is_reduced(pow)));
-        assert!(ps.iter().any(|p| p.degree().is_none()));
-    }
-
-    // Striping still reaches the coefficients: their bits change far less often than unstriped ones
-    // of the same width.
-    let striped =
-        striped_random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 64, 16, 1, 3, 1)
-            .take(2000)
-            .collect_vec();
-    let plain = random_u64_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 64, 3, 1)
-        .take(2000)
-        .collect_vec();
-    let s = transition_rate(&striped);
-    let u = transition_rate(&plain);
-    assert!(s < 0.15, "striped transition rate {s}");
-    assert!(u > 0.4, "unstriped transition rate {u}");
-}
-
-#[test]
-fn test_random_u64_polynomials_reduced_mod() {
-    assert_eq!(
-        prefix_to_string(
-            random_u64_polynomials_reduced_mod(EXAMPLE_SEED, 10, 2, 1),
-            3
-        ),
-        "[3*x^5+8*x^4+8*x^3+5*x+5, 7, 9*x^7+x^6+9*x^5+2*x^4+6*x^3+8*x^2+6*x+8, ...]"
-    );
-    assert_eq!(
-        prefix_to_string(
-            striped_random_u64_polynomials_reduced_mod(EXAMPLE_SEED, 1000, 8, 1, 2, 1),
-            3
-        ),
-        "[x^5+3*x^4+x^3+62*x^2+952*x+999, 1, x^7+511*x^3+7*x^2+999*x+7, ...]"
-    );
-}
-
-#[test]
-#[should_panic]
-fn random_u64_polynomials_reduced_mod_fail_one() {
-    random_u64_polynomials_reduced_mod(EXAMPLE_SEED, 1, 2, 1);
-}
-
-#[test]
-#[should_panic]
-fn striped_random_u64_polynomials_reduced_mod_fail_zero() {
-    striped_random_u64_polynomials_reduced_mod(EXAMPLE_SEED, 0, 8, 1, 2, 1);
-}
-
-#[test]
-fn random_u64_polynomials_reduced_mod_properties() {
-    for m in [2, 3, 5, 10, 1000, u64::MAX, u64::MAX - 1] {
-        let ps = random_u64_polynomials_reduced_mod(EXAMPLE_SEED, m, 4, 1)
-            .take(1000)
-            .collect_vec();
-        assert!(ps.iter().all(U64Polynomial::is_valid));
-        // Everything generated is reduced, which is the whole point.
-        assert!(ps.iter().all(|p| p.mod_is_reduced(&m)));
-        // The restriction is on the coefficients, not the degree.
-        assert!(ps.iter().any(|p| p.degree().is_none()));
-        assert!(ps.iter().any(|p| p.degree().is_some_and(|d| d > 5)));
-        // Every coefficient below the modulus is reachable, so the largest one shows up.
-        if m <= 5 {
-            assert!(ps.iter().any(|p| p.to_height() == m - 1));
-        }
-
-        let ps = striped_random_u64_polynomials_reduced_mod(EXAMPLE_SEED, m, 8, 1, 4, 1)
-            .take(1000)
-            .collect_vec();
-        assert!(ps.iter().all(U64Polynomial::is_valid));
-        assert!(ps.iter().all(|p| p.mod_is_reduced(&m)));
-        assert!(ps.iter().any(|p| p.degree().is_none()));
-    }
-
-    // Striping still reaches the coefficients, with a modulus that is not a bit-width boundary.
-    let striped = striped_random_u64_polynomials_reduced_mod(EXAMPLE_SEED, u64::MAX, 16, 1, 3, 1)
-        .take(2000)
-        .collect_vec();
-    let plain = random_u64_polynomials_reduced_mod(EXAMPLE_SEED, u64::MAX, 3, 1)
-        .take(2000)
-        .collect_vec();
-    let s = transition_rate(&striped);
-    let u = transition_rate(&plain);
-    assert!(s < 0.15, "striped transition rate {s}");
-    assert!(u > 0.4, "unstriped transition rate {u}");
+fn random_u64_polynomials_fail_2() {
+    let _ = random_u64_polynomials(EXAMPLE_SEED, u64::MAX, 1);
 }

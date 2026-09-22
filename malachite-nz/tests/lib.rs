@@ -584,7 +584,17 @@ pub mod integer_polynomial {
         pub mod exhaustive_integer_polynomials;
     }
     pub mod random {
+        pub mod properties;
         pub mod random_integer_polynomials;
+        pub mod random_integer_polynomials_degree_inclusive_range;
+        pub mod random_integer_polynomials_degree_range;
+        pub mod random_integer_polynomials_min_degree;
+        pub mod random_integer_polynomials_with_degree;
+        pub mod striped_random_integer_polynomials;
+        pub mod striped_random_integer_polynomials_degree_inclusive_range;
+        pub mod striped_random_integer_polynomials_degree_range;
+        pub mod striped_random_integer_polynomials_min_degree;
+        pub mod striped_random_integer_polynomials_with_degree;
     }
 }
 pub mod natural_polynomial {
@@ -618,6 +628,20 @@ pub mod natural_polynomial {
         pub mod exhaustive_natural_polynomials;
     }
     pub mod random {
+        pub mod properties;
         pub mod random_natural_polynomials;
+        pub mod random_natural_polynomials_degree_inclusive_range;
+        pub mod random_natural_polynomials_degree_range;
+        pub mod random_natural_polynomials_min_degree;
+        pub mod random_natural_polynomials_reduced_mod;
+        pub mod random_natural_polynomials_reduced_mod_power_of_2;
+        pub mod random_natural_polynomials_with_degree;
+        pub mod striped_random_natural_polynomials;
+        pub mod striped_random_natural_polynomials_degree_inclusive_range;
+        pub mod striped_random_natural_polynomials_degree_range;
+        pub mod striped_random_natural_polynomials_min_degree;
+        pub mod striped_random_natural_polynomials_reduced_mod;
+        pub mod striped_random_natural_polynomials_reduced_mod_power_of_2;
+        pub mod striped_random_natural_polynomials_with_degree;
     }
 }
