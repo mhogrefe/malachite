@@ -218,6 +218,7 @@ pub mod slices;
 pub mod strings;
 /// Functions for working with tuples.
 pub mod tuples;
+pub mod unions;
 /// Unions (sum types). These are essentially generic enums.
 ///
 /// # unwrap
@@ -373,10 +374,9 @@ pub mod tuples;
 /// | `Union3::A('a')`   | `"A"("a")` |
 /// | `Union3::B(5)`     | `"B"(5)`   |
 /// | `Union3::C(false)` | `"C"("F")` |
-/// [`U64Polynomial`](u64_polynomial::U64Polynomial), a type representing polynomials in one
-/// variable whose coefficients are [`u64`]s.
-pub mod u64_polynomial;
-pub mod unions;
+/// [`UnsignedPolynomial`](unsigned_polynomial::UnsignedPolynomial), a type representing polynomials
+/// in one variable whose coefficients are [`u64`]s.
+pub mod unsigned_polynomial;
 /// Functions for working with [`Vec`]s. Schemes for naming variables, for instance the variables of
 /// a polynomial.
 pub mod vars;

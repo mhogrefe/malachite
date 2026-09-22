@@ -521,6 +521,10 @@ impl RationalPolynomial {
     /// where $T$ is time, $M$ is additional memory, $n$ is the number of coefficients after the
     /// mutation, and $m$ is the largest number of bits of any of them.
     ///
+    /// # Panics
+    /// Panics if `index` does not fit in a [`usize`], which cannot happen on a target with 64-bit
+    /// pointers, or if growing to reach `index` would exceed the maximum length of a [`Vec`].
+    ///
     /// # Examples
     /// ```
     /// use core::str::FromStr;

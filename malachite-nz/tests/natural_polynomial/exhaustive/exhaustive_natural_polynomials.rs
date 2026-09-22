@@ -10,7 +10,7 @@ use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOf2IsReduced, PowerOf2};
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::u64_polynomial::exhaustive::*;
+use malachite_base::unsigned_polynomial::exhaustive::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::{exhaustive_naturals, exhaustive_positive_naturals};
 use malachite_nz::natural_polynomial::NaturalPolynomial;
@@ -201,7 +201,10 @@ fn exhaustive_natural_polynomials_reduced_mod_power_of_2_properties() {
                 exhaustive_natural_polynomials_reduced_mod_power_of_2(pow),
                 50
             ),
-            prefix_to_string(exhaustive_u64_polynomials_reduced_mod_power_of_2(pow), 50)
+            prefix_to_string(
+                exhaustive_unsigned_polynomials_reduced_mod_power_of_2::<u64>(pow),
+                50
+            )
         );
     }
 }
@@ -274,7 +277,7 @@ fn exhaustive_natural_polynomials_reduced_mod_properties() {
                 exhaustive_natural_polynomials_reduced_mod(Natural::from(m)),
                 50
             ),
-            prefix_to_string(exhaustive_u64_polynomials_reduced_mod(m), 50)
+            prefix_to_string(exhaustive_unsigned_polynomials_reduced_mod::<u64>(m), 50)
         );
     }
 }

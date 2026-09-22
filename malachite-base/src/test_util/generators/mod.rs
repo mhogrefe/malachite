@@ -28,7 +28,7 @@ use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
 use crate::tuples::exhaustive::{ExhaustivePairs, exhaustive_pairs_custom_output};
-use crate::u64_polynomial::U64Polynomial;
+use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
 
@@ -4894,34 +4894,39 @@ where
     )
 }
 
-pub fn u64_polynomial_gen() -> Generator<U64Polynomial> {
+pub fn unsigned_polynomial_gen() -> Generator<UnsignedPolynomial<u64>> {
     Generator::new(
-        &exhaustive_u64_polynomial_gen,
-        &random_u64_polynomial_gen,
-        &special_random_u64_polynomial_gen,
+        &exhaustive_unsigned_polynomial_gen,
+        &random_unsigned_polynomial_gen,
+        &special_random_unsigned_polynomial_gen,
     )
 }
 
-pub fn u64_polynomial_pair_gen() -> Generator<(U64Polynomial, U64Polynomial)> {
+pub fn unsigned_polynomial_pair_gen()
+-> Generator<(UnsignedPolynomial<u64>, UnsignedPolynomial<u64>)> {
     Generator::new(
-        &exhaustive_u64_polynomial_pair_gen,
-        &random_u64_polynomial_pair_gen,
-        &special_random_u64_polynomial_pair_gen,
+        &exhaustive_unsigned_polynomial_pair_gen,
+        &random_unsigned_polynomial_pair_gen,
+        &special_random_unsigned_polynomial_pair_gen,
     )
 }
 
-pub fn u64_polynomial_triple_gen() -> Generator<(U64Polynomial, U64Polynomial, U64Polynomial)> {
+pub fn unsigned_polynomial_triple_gen() -> Generator<(
+    UnsignedPolynomial<u64>,
+    UnsignedPolynomial<u64>,
+    UnsignedPolynomial<u64>,
+)> {
     Generator::new(
-        &exhaustive_u64_polynomial_triple_gen,
-        &random_u64_polynomial_triple_gen,
-        &special_random_u64_polynomial_triple_gen,
+        &exhaustive_unsigned_polynomial_triple_gen,
+        &random_unsigned_polynomial_triple_gen,
+        &special_random_unsigned_polynomial_triple_gen,
     )
 }
 
-pub fn u64_polynomial_unsigned_pair_gen_var_1() -> Generator<(U64Polynomial, u64)> {
+pub fn unsigned_polynomial_unsigned_pair_gen_var_1() -> Generator<(UnsignedPolynomial<u64>, u64)> {
     Generator::new(
-        &exhaustive_u64_polynomial_unsigned_pair_gen_var_1,
-        &random_u64_polynomial_unsigned_pair_gen_var_1,
-        &special_random_u64_polynomial_unsigned_pair_gen_var_1,
+        &exhaustive_unsigned_polynomial_unsigned_pair_gen_var_1,
+        &random_unsigned_polynomial_unsigned_pair_gen_var_1,
+        &special_random_unsigned_polynomial_unsigned_pair_gen_var_1,
     )
 }

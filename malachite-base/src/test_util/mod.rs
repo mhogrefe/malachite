@@ -18,6 +18,6 @@ pub mod runner;
 pub mod sets;
 pub mod slices;
 pub mod stats;
-pub mod u64_polynomial;
+pub mod unsigned_polynomial;
 pub mod vars;
 pub mod vecs;

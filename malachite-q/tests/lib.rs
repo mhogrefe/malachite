@@ -181,7 +181,7 @@ pub mod rational_polynomial {
         pub mod from_integer_polynomial;
         pub mod from_natural_polynomial;
         pub mod from_rational;
-        pub mod from_u64_polynomial;
+        pub mod from_unsigned_polynomial;
         pub mod serde;
         pub mod string {
             pub mod from_string;

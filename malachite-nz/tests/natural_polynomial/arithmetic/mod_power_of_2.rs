@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{
     Height, ModPowerOf2, ModPowerOf2Assign, ModPowerOf2IsReduced,
 };
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::test_util::generators::u64_polynomial_gen;
+use malachite_base::test_util::generators::unsigned_polynomial_gen;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::{
     natural_polynomial_gen, natural_polynomial_unsigned_pair_gen_var_1,
@@ -45,8 +45,8 @@ fn test_mod_power_of_2() {
 
 #[test]
 fn test_mod_power_of_2_beyond_a_word() {
-    // A `Natural` coefficient can be larger than any power of 2, so unlike a `U64Polynomial` there
-    // is no width past which this stops doing anything.
+    // A `Natural` coefficient can be larger than any power of 2, so unlike a `UnsignedPolynomial`
+    // there is no width past which this stops doing anything.
     let test = |s, pow, out| {
         assert_eq!(
             NaturalPolynomial::from_str(s)
@@ -131,7 +131,7 @@ fn mod_power_of_2_properties() {
         }
     });
 
-    u64_polynomial_gen().test_properties(|p| {
+    unsigned_polynomial_gen().test_properties(|p| {
         // The `u64` and `Natural` polynomials agree, the conversion changing no coefficient.
         let q = NaturalPolynomial::from(p.clone());
         for pow in 0..8 {

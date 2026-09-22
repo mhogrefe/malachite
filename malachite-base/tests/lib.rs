@@ -870,7 +870,7 @@ pub mod vars {
     pub mod var;
     pub mod xyz;
 }
-pub mod u64_polynomial {
+pub mod unsigned_polynomial {
     pub mod arithmetic {
         pub mod height;
         pub mod mod_is_reduced;
@@ -889,7 +889,7 @@ pub mod u64_polynomial {
     }
     pub mod conversion {
         pub mod from_coefficients_asc;
-        pub mod from_u64;
+        pub mod from_unsigned;
         pub mod serde;
         pub mod string {
             pub mod from_string;
@@ -899,24 +899,24 @@ pub mod u64_polynomial {
         }
     }
     pub mod exhaustive {
-        pub mod exhaustive_u64_polynomials;
+        pub mod exhaustive_unsigned_polynomials;
     }
     pub mod random {
         pub mod properties;
-        pub mod random_u64_polynomials;
-        pub mod random_u64_polynomials_degree_inclusive_range;
-        pub mod random_u64_polynomials_degree_range;
-        pub mod random_u64_polynomials_min_degree;
-        pub mod random_u64_polynomials_reduced_mod;
-        pub mod random_u64_polynomials_reduced_mod_power_of_2;
-        pub mod random_u64_polynomials_with_degree;
-        pub mod striped_random_u64_polynomials;
-        pub mod striped_random_u64_polynomials_degree_inclusive_range;
-        pub mod striped_random_u64_polynomials_degree_range;
-        pub mod striped_random_u64_polynomials_min_degree;
-        pub mod striped_random_u64_polynomials_reduced_mod;
-        pub mod striped_random_u64_polynomials_reduced_mod_power_of_2;
-        pub mod striped_random_u64_polynomials_with_degree;
+        pub mod random_unsigned_polynomials;
+        pub mod random_unsigned_polynomials_degree_inclusive_range;
+        pub mod random_unsigned_polynomials_degree_range;
+        pub mod random_unsigned_polynomials_min_degree;
+        pub mod random_unsigned_polynomials_reduced_mod;
+        pub mod random_unsigned_polynomials_reduced_mod_power_of_2;
+        pub mod random_unsigned_polynomials_with_degree;
+        pub mod striped_random_unsigned_polynomials;
+        pub mod striped_random_unsigned_polynomials_degree_inclusive_range;
+        pub mod striped_random_unsigned_polynomials_degree_range;
+        pub mod striped_random_unsigned_polynomials_min_degree;
+        pub mod striped_random_unsigned_polynomials_reduced_mod;
+        pub mod striped_random_unsigned_polynomials_reduced_mod_power_of_2;
+        pub mod striped_random_unsigned_polynomials_with_degree;
     }
 }
 pub mod vecs {

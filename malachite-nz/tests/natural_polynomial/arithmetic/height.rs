@@ -9,7 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Height, HeightRef};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::test_util::generators::u64_polynomial_gen;
+use malachite_base::test_util::generators::unsigned_polynomial_gen;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
@@ -61,7 +61,7 @@ fn height_properties() {
         assert_eq!(IntegerPolynomial::from(p.clone()).to_height(), height);
     });
 
-    u64_polynomial_gen().test_properties(|p| {
+    unsigned_polynomial_gen().test_properties(|p| {
         // The `u64` and `Natural` polynomials agree on heights, as they must, the conversion
         // changing no coefficient's value.
         assert_eq!(

@@ -12,7 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     from_coefficients_asc::register(runner);
     from_integer::register(runner);
     from_natural_polynomial::register(runner);
-    from_u64_polynomial::register(runner);
+    from_unsigned_polynomial::register(runner);
     serde::register(runner);
     string::register(runner);
 }
@@ -20,6 +20,6 @@ pub(crate) fn register(runner: &mut Runner) {
 mod from_coefficients_asc;
 mod from_integer;
 mod from_natural_polynomial;
-mod from_u64_polynomial;
+mod from_unsigned_polynomial;
 mod serde;
 mod string;

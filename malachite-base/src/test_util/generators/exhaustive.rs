@@ -81,8 +81,8 @@ use crate::tuples::exhaustive::{
     exhaustive_quadruples, exhaustive_triples, exhaustive_triples_custom_output,
     exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
 };
-use crate::u64_polynomial::U64Polynomial;
-use crate::u64_polynomial::exhaustive::exhaustive_u64_polynomials;
+use crate::unsigned_polynomial::UnsignedPolynomial;
+use crate::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
 use crate::vecs::exhaustive::{
     ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, LexFixedLengthVecsFromSingle, ShortlexVecs,
     exhaustive_vecs, exhaustive_vecs_fixed_length_from_single,
@@ -6441,21 +6441,31 @@ where
     )
 }
 
-pub fn exhaustive_u64_polynomial_gen() -> It<U64Polynomial> {
-    Box::new(exhaustive_u64_polynomials())
+pub fn exhaustive_unsigned_polynomial_gen() -> It<UnsignedPolynomial<u64>> {
+    Box::new(exhaustive_unsigned_polynomials())
 }
 
-pub fn exhaustive_u64_polynomial_pair_gen() -> It<(U64Polynomial, U64Polynomial)> {
-    Box::new(exhaustive_pairs_from_single(exhaustive_u64_polynomials()))
+pub fn exhaustive_unsigned_polynomial_pair_gen()
+-> It<(UnsignedPolynomial<u64>, UnsignedPolynomial<u64>)> {
+    Box::new(exhaustive_pairs_from_single(
+        exhaustive_unsigned_polynomials(),
+    ))
 }
 
-pub fn exhaustive_u64_polynomial_triple_gen() -> It<(U64Polynomial, U64Polynomial, U64Polynomial)> {
-    Box::new(exhaustive_triples_from_single(exhaustive_u64_polynomials()))
+pub fn exhaustive_unsigned_polynomial_triple_gen() -> It<(
+    UnsignedPolynomial<u64>,
+    UnsignedPolynomial<u64>,
+    UnsignedPolynomial<u64>,
+)> {
+    Box::new(exhaustive_triples_from_single(
+        exhaustive_unsigned_polynomials(),
+    ))
 }
 
-pub fn exhaustive_u64_polynomial_unsigned_pair_gen_var_1() -> It<(U64Polynomial, u64)> {
+pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_1() -> It<(UnsignedPolynomial<u64>, u64)>
+{
     Box::new(exhaustive_pairs_big_tiny(
-        exhaustive_u64_polynomials(),
+        exhaustive_unsigned_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
 }

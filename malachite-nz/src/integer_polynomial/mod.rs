@@ -354,6 +354,10 @@ impl IntegerPolynomial {
     /// where $T$ is time, $M$ is additional memory, $n$ is `index`, and $m$ is the cost of the
     /// closure.
     ///
+    /// # Panics
+    /// Panics if `index` does not fit in a [`usize`], which cannot happen on a target with 64-bit
+    /// pointers, or if growing to reach `index` would exceed the maximum length of a [`Vec`].
+    ///
     /// # Examples
     /// ```
     /// use core::str::FromStr;

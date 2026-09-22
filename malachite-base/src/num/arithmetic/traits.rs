@@ -125,42 +125,47 @@ pub trait MulIPowAssign {
 /// Determines whether a number is a unit of its ring, meaning that it has a multiplicative inverse
 /// in the same ring.
 ///
-/// The Gaussian integers have four units, $\pm 1$ and $\pm i$; in a field every nonzero element is
-/// a unit. No type in this crate implements this trait; it exists for complex types downstream,
-/// like Gaussian integers.
+/// Which elements these are depends on the ring: the only unit of $\mathbb{N}$ is 1, the units of
+/// $\mathbb{Z}$ are $\pm 1$, the Gaussian integers have four, $\pm 1$ and $\pm i$, and in a field
+/// every nonzero element is a unit.
+///
+/// The implementations for the primitive integers follow suit, and the ones for the primitive
+/// floats count every finite nonzero value.
 pub trait IsUnit {
     fn is_unit(&self) -> bool;
 }
 
-/// Finds the power of $i$ that brings a complex number into canonical unit form.
+/// Finds the power of $i$ that brings a number into canonical unit form.
 ///
 /// A nonzero complex number has four associates under multiplication by the units $\pm 1$ and $\pm
 /// i$; the canonical one is the associate whose argument lies in $(-\pi/4, \pi/4]$, meaning that
 /// its real part is positive and its imaginary part $b$ satisfies $-a < b \leq a$. This function
 /// returns the $k \in \\{0, 1, 2, 3\\}$ such that $x i^k$ is canonical, and 0 for zero.
 ///
-/// No type in this crate implements this trait; it exists for complex types downstream, like
-/// Gaussian integers.
+/// A real number has only the two associates $\pm x$ to choose between, so the answer there is 0
+/// for a nonnegative number and 2 for a negative one, $i^2$ being $-1$. That is what the primitive
+/// implementations return.
 pub trait CanonicalUnitIPow {
     fn canonical_unit_i_pow(&self) -> u64;
 }
 
-/// Brings a complex number into canonical unit form by multiplying it by a power of $i$.
+/// Brings a number into canonical unit form by multiplying it by a power of $i$.
 ///
 /// The canonical associate is the one whose argument lies in $(-\pi/4, \pi/4]$; see
-/// [`CanonicalUnitIPow`]. No type in this crate implements this trait; it exists for complex types
-/// downstream, like Gaussian integers.
+/// [`CanonicalUnitIPow`]. On the real line that leaves the absolute value, which is what the signed
+/// and floating-point implementations return; an unsigned number is already canonical, so theirs is
+/// the identity.
 pub trait CanonicalizeUnit {
     type Output;
 
     fn canonicalize_unit(self) -> Self::Output;
 }
 
-/// Replaces a complex number with its canonical unit form, multiplying it by a power of $i$.
+/// Replaces a number with its canonical unit form, multiplying it by a power of $i$.
 ///
 /// The canonical associate is the one whose argument lies in $(-\pi/4, \pi/4]$; see
-/// [`CanonicalUnitIPow`]. No type in this crate implements this trait; it exists for complex types
-/// downstream, like Gaussian integers.
+/// [`CanonicalUnitIPow`]. This is the in-place form of [`CanonicalizeUnit`], and the same per-type
+/// behaviour applies.
 pub trait CanonicalizeUnitAssign {
     fn canonicalize_unit_assign(&mut self);
 }

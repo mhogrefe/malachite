@@ -18,9 +18,9 @@ pub mod from_natural_polynomial;
 /// converted from into a constant [`RationalPolynomial`](super::RationalPolynomial).
 pub mod from_rational;
 /// Implementations of traits for converting a
-/// [`U64Polynomial`](malachite_base::u64_polynomial::U64Polynomial) to a
+/// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial) to a
 /// [`RationalPolynomial`](super::RationalPolynomial).
-pub mod from_u64_polynomial;
+pub mod from_unsigned_polynomial;
 /// Implementations of traits for serialization and deserialization using
 /// [serde](https://serde.rs/).
 pub mod serde;

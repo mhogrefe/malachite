@@ -16,7 +16,7 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::SignificantBits;
-use crate::u64_polynomial::U64Polynomial;
+use crate::unsigned_polynomial::UnsignedPolynomial;
 use std::cmp::{max, min};
 
 pub struct Bucketer<'a, T> {
@@ -1050,7 +1050,7 @@ pub fn quadruple_1_foer_sequence_len_bucketer<'a, T: Eq, U, V, W>(
     }
 }
 
-pub fn u64_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, U64Polynomial> {
+pub fn unsigned_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, UnsignedPolynomial<u64>> {
     Bucketer {
         bucketing_function: &|p| {
             usize::exact_from(
@@ -1065,10 +1065,10 @@ pub fn u64_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, U64Polynomial
     }
 }
 
-pub fn pair_u64_polynomial_max_bit_bucketer<'a>(
+pub fn pair_unsigned_polynomial_max_bit_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,
-) -> Bucketer<'a, (U64Polynomial, U64Polynomial)> {
+) -> Bucketer<'a, (UnsignedPolynomial<u64>, UnsignedPolynomial<u64>)> {
     Bucketer {
         bucketing_function: &|(p, q)| {
             usize::exact_from(max(
@@ -1090,7 +1090,9 @@ pub fn pair_u64_polynomial_max_bit_bucketer<'a>(
     }
 }
 
-pub fn pair_1_u64_polynomial_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (U64Polynomial, T)> {
+pub fn pair_1_unsigned_polynomial_bit_bucketer<T>(
+    var_name: &str,
+) -> Bucketer<'_, (UnsignedPolynomial<u64>, T)> {
     Bucketer {
         bucketing_function: &|(p, _)| {
             usize::exact_from(

@@ -10,9 +10,9 @@
 /// be converted from into a constant [`NaturalPolynomial`](super::NaturalPolynomial).
 pub mod from_natural;
 /// Implementations of traits for converting a
-/// [`U64Polynomial`](malachite_base::u64_polynomial::U64Polynomial) to a
+/// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial) to a
 /// [`NaturalPolynomial`](super::NaturalPolynomial).
-pub mod from_u64_polynomial;
+pub mod from_unsigned_polynomial;
 /// Implementations of traits for serialization and deserialization using
 /// [serde](https://serde.rs/).
 pub mod serde;

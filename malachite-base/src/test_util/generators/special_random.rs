@@ -91,10 +91,10 @@ use crate::test_util::generators::{
 };
 use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
-use crate::u64_polynomial::U64Polynomial;
-use crate::u64_polynomial::random::striped_random_u64_polynomials;
 use crate::unions::Union2;
 use crate::unions::random::random_union2s;
+use crate::unsigned_polynomial::UnsignedPolynomial;
+use crate::unsigned_polynomial::random::striped_random_unsigned_polynomials;
 use alloc::collections::{BTreeMap, BTreeSet};
 
 #[cfg(not(feature = "std"))]
@@ -9993,8 +9993,8 @@ where
     )
 }
 
-pub fn special_random_u64_polynomial_gen(config: &GenConfig) -> It<U64Polynomial> {
-    Box::new(striped_random_u64_polynomials(
+pub fn special_random_unsigned_polynomial_gen(config: &GenConfig) -> It<UnsignedPolynomial<u64>> {
+    Box::new(striped_random_unsigned_polynomials(
         EXAMPLE_SEED,
         config.get_or("mean_stripe_n", 32),
         config.get_or("mean_stripe_d", 1),
@@ -10003,37 +10003,45 @@ pub fn special_random_u64_polynomial_gen(config: &GenConfig) -> It<U64Polynomial
     ))
 }
 
-pub fn special_random_u64_polynomial_pair_gen(
+pub fn special_random_unsigned_polynomial_pair_gen(
     config: &GenConfig,
-) -> It<(U64Polynomial, U64Polynomial)> {
-    Box::new(random_pairs_from_single(striped_random_u64_polynomials(
-        EXAMPLE_SEED,
-        config.get_or("mean_stripe_n", 32),
-        config.get_or("mean_stripe_d", 1),
-        config.get_or("mean_length_n", 4),
-        config.get_or("mean_length_d", 1),
-    )))
+) -> It<(UnsignedPolynomial<u64>, UnsignedPolynomial<u64>)> {
+    Box::new(random_pairs_from_single(
+        striped_random_unsigned_polynomials(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+    ))
 }
 
-pub fn special_random_u64_polynomial_triple_gen(
+pub fn special_random_unsigned_polynomial_triple_gen(
     config: &GenConfig,
-) -> It<(U64Polynomial, U64Polynomial, U64Polynomial)> {
-    Box::new(random_triples_from_single(striped_random_u64_polynomials(
-        EXAMPLE_SEED,
-        config.get_or("mean_stripe_n", 32),
-        config.get_or("mean_stripe_d", 1),
-        config.get_or("mean_length_n", 4),
-        config.get_or("mean_length_d", 1),
-    )))
+) -> It<(
+    UnsignedPolynomial<u64>,
+    UnsignedPolynomial<u64>,
+    UnsignedPolynomial<u64>,
+)> {
+    Box::new(random_triples_from_single(
+        striped_random_unsigned_polynomials(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+    ))
 }
 
-pub fn special_random_u64_polynomial_unsigned_pair_gen_var_1(
+pub fn special_random_unsigned_polynomial_unsigned_pair_gen_var_1(
     config: &GenConfig,
-) -> It<(U64Polynomial, u64)> {
+) -> It<(UnsignedPolynomial<u64>, u64)> {
     Box::new(random_pairs(
         EXAMPLE_SEED,
         &|seed| {
-            striped_random_u64_polynomials(
+            striped_random_unsigned_polynomials(
                 seed,
                 config.get_or("mean_stripe_n", 32),
                 config.get_or("mean_stripe_d", 1),

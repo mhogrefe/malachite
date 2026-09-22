@@ -280,7 +280,8 @@ documented by git history.
   `random_vecs_with_last_from_length_iterator`, the random counterparts of the above. The lengths
   come from a geometric distribution, as they do for `random_vecs`, except where a length range is
   given and they are uniform.
-- A new `U64Polynomial` type, a univariate polynomial whose coefficients are [`u64`]s, held as a
+- A new `UnsignedPolynomial<T>` type, a univariate polynomial whose coefficients are unsigned
+  primitive integers, held as a
   [`Vec`] in ascending order of degree with no trailing zero — so the zero polynomial has no
   coefficients at all, and `Eq`, `Hash`, and `Debug` can be derived. It is the small-coefficient
   member of the polynomial family, meant for polynomials modulo a small modulus, and it mirrors
@@ -296,27 +297,27 @@ documented by git history.
   `ZERO`, and `one` and `two` are provided as functions rather than constants, since a nonzero
   constant polynomial owns a heap allocation. `From` is implemented for everything a [`u64`] can
   be converted from.
-- `Display` and `FromStr` for `U64Polynomial`, along with `to_string_with` and `from_string_with`,
+- `Display` and `FromStr` for `UnsignedPolynomial`, along with `to_string_with` and `from_string_with`,
   which name the variable with any `VarScheme` rather than the default `x`. The format is the one
   Azurite uses: terms in decreasing degree joined with `+`, an exponent of one elided, a
   coefficient of one elided, and `*` between a coefficient and its variable, so that `x^2+3*x+2`
   reads back as itself. The zero polynomial is `0`. `FromStr` accepts the terms in any order and
   tolerates a leading zero or an explicit `^1`, but rejects anything `Display` would never write,
   such as a zero coefficient in a term, two terms of the same degree, or a space.
-- `ToLatex` and `ToTypst` for `U64Polynomial`, with `to_latex_string_with` and
+- `ToLatex` and `ToTypst` for `UnsignedPolynomial`, with `to_latex_string_with` and
   `to_typst_string_with` for a named variable. Neither language writes the `*`, and LaTeX braces
   an exponent of more than one digit while Typst parenthesizes it.
-- Exhaustive and random `U64Polynomial` generators, in `u64_polynomial::exhaustive` and
-  `u64_polynomial::random`: `exhaustive_u64_polynomials` and `random_u64_polynomials`, each with
+- Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
+  `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a
   `_from_iterators` form that takes the coefficient and leading-coefficient iterators; and
-  `striped_random_u64_polynomials`, with the same variants, whose coefficients have long runs of
+  `striped_random_unsigned_polynomials`, with the same variants, whose coefficients have long runs of
   equal bits. They are built on the `_with_last` [`Vec`] generators above. The degree-bounded
   generators never produce the zero polynomial, which has no degree and so falls in no range.
   Unlike the bignum generators, none of them takes a mean bit count: a [`u64`] coefficient is
   uniform over its whole range.
 - A new `enable_serde` feature, and with it malachite-base's first
-  [serde](https://serde.rs/) support: `Serialize` and `Deserialize` for `U64Polynomial`. A
+  [serde](https://serde.rs/) support: `Serialize` and `Deserialize` for `UnsignedPolynomial`. A
   polynomial is its coefficients, so the encoding is the list of them and nothing around it —
   `x^2+3*x+2` is `[2,3,1]`, and the zero polynomial, which has no coefficients, is `[]`.
   Deserializing goes through `TryFrom` rather than building the value directly, so that it can
@@ -333,7 +334,7 @@ documented by git history.
   different types. The fix also makes 31 `vecs::random` doctests reachable that had been silently
   skipped, and `build.sh` gained a step that runs the malachite-base doctests with `random` but
   without `test_build`, which is the configuration that would have caught it.
-- `Ord` and `PartialOrd` for `U64Polynomial`, comparing two polynomials by how they behave for
+- `Ord` and `PartialOrd` for `UnsignedPolynomial`, comparing two polynomials by how they behave for
   large arguments: the greater one is the one that is eventually greater, $f(p, q) = \lim_{x \to
   \infty} \operatorname{cmp}(p(x), q(x))$. The coefficients are read as the numbers they are, so
   the values compared are the ones a polynomial over the integers would take, not ones reduced by
@@ -353,21 +354,21 @@ documented by git history.
   usually cheaper than materializing the height, bit length being monotone. `HeightRef` adds
   `height_ref`, which lends the height rather than building it; it is a separate trait because
   not every height is a value the type already holds.
-- `Height` for `U64Polynomial`: the largest of its coefficients, with the zero polynomial, having
+- `Height` for `UnsignedPolynomial`: the largest of its coefficients, with the zero polynomial, having
   no coefficients, having height 0. This is `fmpz_poly_height` from `fmpz_poly/norms.c`, FLINT
   3.6.0, for nonnegative coefficients. Its `Output` is a [`u64`] rather than a
   [`Natural`](malachite_nz::natural::Natural), and it does not implement `HeightRef`, there being
   no clone to avoid.
-- `ModIsReduced` and `ModPowerOf2IsReduced` for `U64Polynomial`. A polynomial is reduced modulo
+- `ModIsReduced` and `ModPowerOf2IsReduced` for `UnsignedPolynomial`. A polynomial is reduced modulo
   $m$ when every one of its coefficients is, and asking that of every coefficient is asking it of
   the largest — so both are questions about the polynomial's height. `mod_is_reduced` compares the
   height against the modulus, and `mod_power_of_2_is_reduced` is
   `height_significant_bits() <= pow`, the same shape as the primitive integer implementation,
   which never builds the height at all since bit length is monotone. The zero polynomial, having
   no coefficients, is reduced modulo everything, including $2^0$.
-- `exhaustive_u64_polynomials_reduced_mod_power_of_2`,
-  `random_u64_polynomials_reduced_mod_power_of_2`, and
-  `striped_random_u64_polynomials_reduced_mod_power_of_2`, generating the `U64Polynomial`s that
+- `exhaustive_unsigned_polynomials_reduced_mod_power_of_2`,
+  `random_unsigned_polynomials_reduced_mod_power_of_2`, and
+  `striped_random_unsigned_polynomials_reduced_mod_power_of_2`, generating the `UnsignedPolynomial`s that
   are reduced modulo $2^k$ — those whose coefficients are all less than $2^k$, for which
   `mod_power_of_2_is_reduced` returns `true`. Restricting the coefficients does not bound the
   degree, so the output is still infinite and degrees still spread out; only the coefficients are
@@ -375,9 +376,9 @@ documented by git history.
   being exactly a value below $2^k$: the chunk width is what makes the polynomial reduced. All
   three panic on a `pow` of 0, the only polynomial reduced modulo $2^0$ being the zero polynomial,
   which leaves no leading coefficient to choose.
-- `exhaustive_u64_polynomials_reduced_mod`, `random_u64_polynomials_reduced_mod`, and
-  `striped_random_u64_polynomials_reduced_mod`, the same for an arbitrary modulus rather than a
-  power of 2: the `U64Polynomial`s whose coefficients are all less than $m$, for which
+- `exhaustive_unsigned_polynomials_reduced_mod`, `random_unsigned_polynomials_reduced_mod`, and
+  `striped_random_unsigned_polynomials_reduced_mod`, the same for an arbitrary modulus rather than a
+  power of 2: the `UnsignedPolynomial`s whose coefficients are all less than $m$, for which
   `mod_is_reduced` returns `true`. Where $m$ is a power of 2 the exhaustive one generates exactly
   what the power-of-2 version does, in the same order. The striped one differs from its power-of-2
   counterpart in needing two restrictions rather than one — an arbitrary $m$ is not a bit-width
@@ -385,7 +386,7 @@ documented by git history.
   width already bounds them. All three panic on an `m` below 2: nothing is reduced modulo 0, and
   the only polynomial reduced modulo 1 is the zero polynomial, which leaves no leading coefficient
   to choose.
-- `ModPowerOf2` and `ModPowerOf2Assign` for `U64Polynomial`, reducing every coefficient modulo
+- `ModPowerOf2` and `ModPowerOf2Assign` for `UnsignedPolynomial`, reducing every coefficient modulo
   $2^k$. Both by-value and by-reference forms are provided, as for [`Natural`]. The result is
   always reduced, so `mod_power_of_2_is_reduced` holds for it and reducing again changes nothing.
   Reducing can lower the degree, and can give the zero polynomial: a leading coefficient that is a
@@ -393,8 +394,8 @@ documented by git history.
   $4x^2 + 3$ modulo $4$ is the constant $3$ rather than a quadratic with a zero leading
   coefficient, and $4x^2 + 4x + 4$ modulo $4$ is zero. Interior zeros are untouched: only the
   leading ones are dropped.
-- `Rem<u64>`, `RemAssign<u64>`, `Mod<u64>` and `ModAssign<u64>` for `U64Polynomial`. Each reduces
-  every coefficient modulo `m`, in by-value and by-reference forms. A `U64Polynomial`'s
+- `Rem<u64>`, `RemAssign<u64>`, `Mod<u64>` and `ModAssign<u64>` for `UnsignedPolynomial`. Each reduces
+  every coefficient modulo `m`, in by-value and by-reference forms. A `UnsignedPolynomial`'s
   coefficients are never negative, so `mod_op` and `%` agree everywhere and the mod-family names
   are the same operation. $p \% m$ is the polynomial whose $i$th coefficient is $p_i \% m$, which
   is `fmpz_poly_scalar_mod_fmpz` from `fmpz_poly/scalar_mod_fmpz.c`, FLINT 3.6.0, for nonnegative
@@ -441,14 +442,14 @@ documented by git history.
   it with `+` unless it already begins with `-`, a coefficient of `-1` is written as a bare `-`,
   and `FromStr` splits on a `-` while keeping it with the term that follows. Exhaustive, random,
   and striped random generators mirror the [`Natural`] ones.
-- `From<U64Polynomial>` for `NaturalPolynomial`, and `From<U64Polynomial>` and
+- `From<UnsignedPolynomial>` for `NaturalPolynomial`, and `From<UnsignedPolynomial>` and
   `From<NaturalPolynomial>` for `IntegerPolynomial`: the widening conversions among the polynomial
   types, each of which loses nothing and cannot fail, since every [`u64`] is a [`Natural`] and
   every [`Natural`] is an [`Integer`]. The coefficients are converted one by one and the leading
   one stays nonzero, so the degree is unchanged and the written form is identical. The narrowing
   directions are not provided, since they can fail.
 - `Serialize` and `Deserialize` for `NaturalPolynomial` and `IntegerPolynomial`, under the
-  existing `enable_serde` feature. As for `U64Polynomial`, the encoding is the coefficient list
+  existing `enable_serde` feature. As for `UnsignedPolynomial`, the encoding is the coefficient list
   and nothing around it, each coefficient written the way a [`Natural`] or an [`Integer`] is, so
   that `x^2-3*x+2` is `["0x2","-0x3","0x1"]`; and a list whose last coefficient is zero is
   rejected rather than trimmed.
@@ -493,7 +494,7 @@ documented by git history.
   signed coefficients too. `into_height` moves the coefficient out rather than cloning it.
 - `Height` and `HeightRef` for `GaussianInteger`: the larger of the magnitudes of its real and
   imaginary parts, which is again already held and so can be lent.
-- `ModIsReduced` and `ModPowerOf2IsReduced` for `NaturalPolynomial`, as for `U64Polynomial`:
+- `ModIsReduced` and `ModPowerOf2IsReduced` for `NaturalPolynomial`, as for `UnsignedPolynomial`:
   both are questions about the height, since a polynomial is reduced exactly when its largest
   coefficient is. `mod_is_reduced` borrows the height through `HeightRef` rather than cloning it.
 - `random_naturals_less_than_power_of_2` and `striped_random_naturals_less_than_power_of_2`,
@@ -513,7 +514,7 @@ documented by git history.
   the whole of $[0, 2^k)$. All three panic on a `pow` of 0, the only polynomial reduced modulo
   $2^0$ being the zero polynomial, which leaves no leading coefficient to choose. The exhaustive
   one enumerates the same polynomials in the same order as
-  `exhaustive_u64_polynomials_reduced_mod_power_of_2`.
+  `exhaustive_unsigned_polynomials_reduced_mod_power_of_2`.
 - `exhaustive_natural_polynomials_reduced_mod`, `random_natural_polynomials_reduced_mod`, and
   `striped_random_natural_polynomials_reduced_mod`, the same for an arbitrary modulus rather than
   a power of 2: the `NaturalPolynomial`s whose coefficients are all less than $m$, for which
@@ -522,13 +523,13 @@ documented by git history.
   still be too large and has to be drawn again, though at most half of the draws are wasted since
   $m$ is more than half of the next power of 2. Where $m$ is a power of 2 the exhaustive one
   enumerates the same polynomials in the same order as the power-of-2 version, and as
-  `exhaustive_u64_polynomials_reduced_mod`. The two random generators take `m` by reference, since
+  `exhaustive_unsigned_polynomials_reduced_mod`. The two random generators take `m` by reference, since
   they clone it once per coefficient source rather than consuming it. All three panic on an `m`
   below 2.
 - `ModPowerOf2` and `ModPowerOf2Assign` for `NaturalPolynomial`, reducing every coefficient modulo
-  $2^k$, in by-value and by-reference forms. As for `U64Polynomial`, the result is always reduced
+  $2^k$, in by-value and by-reference forms. As for `UnsignedPolynomial`, the result is always reduced
   and reducing can lower the degree, since a leading coefficient that is a multiple of $2^k$
-  becomes zero and a polynomial holds no trailing zero coefficients. Unlike `U64Polynomial`, there
+  becomes zero and a polynomial holds no trailing zero coefficients. Unlike `UnsignedPolynomial`, there
   is no power wide enough to leave every polynomial alone: a [`Natural`] coefficient can exceed
   any $2^k$, so a $k$ past 64 is as meaningful as a small one, and there is no width short circuit
   to take.
@@ -557,7 +558,7 @@ documented by git history.
   `_with` variants, writing each coefficient as a [`Rational`] does: `1/2*x+1/3` in plain text,
   `\frac{1}{2}x+\frac{1}{3}` in LaTeX, and `frac(1, 2)x+frac(1, 3)` in Typst. Exhaustive, random,
   and striped random generators mirror the ones in malachite-nz.
-- `From<U64Polynomial>`, `From<NaturalPolynomial>`, and `From<IntegerPolynomial>` for
+- `From<UnsignedPolynomial>`, `From<NaturalPolynomial>`, and `From<IntegerPolynomial>` for
   `RationalPolynomial`, completing the widening conversions among the polynomial types. The
   `IntegerPolynomial` one is free: a `RationalPolynomial` is a numerator and a denominator, and an
   `IntegerPolynomial` is already the numerator it needs, so it is moved rather than copied and the

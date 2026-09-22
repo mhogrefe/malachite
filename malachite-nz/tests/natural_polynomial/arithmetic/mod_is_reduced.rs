@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{
     Height, ModIsReduced, ModPowerOf2IsReduced, PowerOf2,
 };
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::test_util::generators::u64_polynomial_gen;
+use malachite_base::test_util::generators::unsigned_polynomial_gen;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::natural_polynomial_gen;
@@ -105,7 +105,7 @@ fn mod_is_reduced_properties() {
         }
     });
 
-    u64_polynomial_gen().test_properties(|p| {
+    unsigned_polynomial_gen().test_properties(|p| {
         // The `u64` and `Natural` polynomials agree, the conversion changing no coefficient.
         let q = NaturalPolynomial::from(p.clone());
         for pow in 0..8 {
