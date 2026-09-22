@@ -601,6 +601,7 @@ pub mod natural_polynomial {
     pub mod arithmetic {
         pub mod height;
         pub mod mod_is_reduced;
+        pub mod mod_power_of_2;
     }
     pub mod basic {
         pub mod coefficients;

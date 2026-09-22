@@ -525,6 +525,13 @@ documented by git history.
   `exhaustive_u64_polynomials_reduced_mod`. The two random generators take `m` by reference, since
   they clone it once per coefficient source rather than consuming it. All three panic on an `m`
   below 2.
+- `ModPowerOf2` and `ModPowerOf2Assign` for `NaturalPolynomial`, reducing every coefficient modulo
+  $2^k$, in by-value and by-reference forms. As for `U64Polynomial`, the result is always reduced
+  and reducing can lower the degree, since a leading coefficient that is a multiple of $2^k$
+  becomes zero and a polynomial holds no trailing zero coefficients. Unlike `U64Polynomial`, there
+  is no power wide enough to leave every polynomial alone: a [`Natural`] coefficient can exceed
+  any $2^k$, so a $k$ past 64 is as meaningful as a small one, and there is no width short circuit
+  to take.
 
 ### malachite-q
 
