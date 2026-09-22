@@ -1814,15 +1814,15 @@ pub trait ModShlAssign<RHS, M = Self> {
     fn mod_shl_assign(&mut self, other: RHS, m: M);
 }
 
-/// Left-shifts a number (divides it by a power of 2) modulo another number $m$. The number must be
-/// already reduced modulo $m$.
+/// Right-shifts a number (divides it by a power of 2) modulo another number $m$. The number must
+/// be already reduced modulo $m$.
 pub trait ModShr<RHS, M = Self> {
     type Output;
 
     fn mod_shr(self, other: RHS, m: M) -> Self::Output;
 }
 
-/// Left-shifts a number (divides it by a power of 2) modulo another number $m$, in place. The
+/// Right-shifts a number (divides it by a power of 2) modulo another number $m$, in place. The
 /// number must be already reduced modulo $m$.
 pub trait ModShrAssign<RHS, M = Self> {
     fn mod_shr_assign(&mut self, other: RHS, m: M);
