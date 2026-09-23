@@ -8,6 +8,7 @@
 
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{Abs, Height};
+use malachite_base::num::basic::traits::One;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
@@ -94,7 +95,7 @@ fn exhaustive_rationals_by_height_properties() {
         .take(N)
         .collect_vec();
     let mut seen = HashSet::new();
-    let mut previous_height = Natural::from(1u32);
+    let mut previous_height = Natural::ONE;
     for x in &xs {
         assert!(x.is_valid());
         assert!(*x > 0u32);

@@ -10,7 +10,9 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, LogBase, LogBaseAssign, Reciprocal};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
+use malachite_base::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, Two, Zero,
+};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -140,7 +142,7 @@ fn test_log_base_prec_round() {
         "0x5.00#10",
         Equal,
     ); // 7^5
-    test(Float::from(1), 10, 10, Exact, "0.0", "0x0.0", Equal);
+    test(Float::ONE, 10, 10, Exact, "0.0", "0x0.0", Equal);
     // Base a power of 2: delegates to log_base_power_of_2.
     test(
         Float::from(64),
@@ -186,7 +188,7 @@ fn test_log_base_prec_round() {
         Greater,
     );
     test(
-        Float::from(2),
+        Float::TWO,
         3,
         20,
         Nearest,
@@ -196,7 +198,7 @@ fn test_log_base_prec_round() {
     );
     // x in (0, 1): negative result.
     test(
-        Float::from(1) >> 3u32,
+        Float::ONE >> 3u32,
         3,
         20,
         Nearest,
@@ -253,11 +255,11 @@ fn test_log_base_directed_consistency() {
         (Float::from(1000), 10, 30),
         (Float::from(50), 10, 30),
         (Float::from(81), 3, 30),
-        (Float::from(2), 3, 30),
+        (Float::TWO, 3, 30),
         (Float::from(7), 5, 40),
         (Float::from(8), 2, 30),            // power-of-2 base
         (Float::from(64), 4, 30),           // power-of-2 base
-        (Float::from(1) >> 5u32, 3, 30),    // 1/32, negative result
+        (Float::ONE >> 5u32, 3, 30),        // 1/32, negative result
         (Float::from(5) >> 1u32, 3, 30),    // 2.5, a non-integer >= 1
         (Float::from(3) << 1000u32, 5, 10), // huge exponent: exercises the balloon-safety guard
     ];
@@ -308,7 +310,7 @@ fn test_log_base() {
     };
     test(Float::from(1000), 10, "3.000", "0x3.00#7");
     test(Float::from(81), 3, "4.000", "0x4.0#7");
-    test(Float::from(1), 10, "0.0", "0x0.0");
+    test(Float::ONE, 10, "0.0", "0x0.0");
     test(Float::NAN, 10, "NaN", "NaN");
     test(Float::INFINITY, 10, "Infinity", "Infinity");
     test(Float::ZERO, 10, "-Infinity", "-Infinity");
@@ -325,7 +327,7 @@ fn log_base_prec_round_fail() {
     assert_panic!(Float::from(10).log_base(1));
     // Exact rounding of an inexact result panics.
     assert_panic!(Float::from(50).log_base_prec_round(10, 10, Exact));
-    assert_panic!(Float::from(2).log_base_prec_round(3, 10, Exact));
+    assert_panic!(Float::TWO.log_base_prec_round(3, 10, Exact));
 }
 
 // Verifies the `_prec` variant against `_prec_round(..., Nearest)`, plus by-value/ref/assign

@@ -9,7 +9,7 @@
 use core::cmp::Ordering::{self, *};
 use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{Cbrt, Root};
-use malachite_base::num::basic::traits::NaN as NanTrait;
+use malachite_base::num::basic::traits::{NaN as NanTrait, Two};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
@@ -202,7 +202,7 @@ fn test_cbrt_rational_prec() {
     };
     test(Rational::from(27), 10, "3.0000", "0x3.00#10", Equal);
     test(Rational::from(-8), 10, "-2.0000", "-0x2.00#10", Equal);
-    test(Rational::from(2), 10, "1.2598", "0x1.428#10", Less);
+    test(Rational::TWO, 10, "1.2598", "0x1.428#10", Less);
 }
 
 #[test]

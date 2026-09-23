@@ -101,7 +101,7 @@ fn reciprocal_properties() {
         );
         assert_eq!(
             GaussianRational::from(x.clone()).mul_i().reciprocal(),
-            GaussianRational::from(Rational::from(0u32) - x.reciprocal()).mul_i()
+            GaussianRational::from(Rational::ZERO - x.reciprocal()).mul_i()
         );
     });
 }

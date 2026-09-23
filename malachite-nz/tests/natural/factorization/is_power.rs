@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{Pow, Square};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::factorization::traits::{ExpressAsPower, IsPower};
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
@@ -101,10 +102,10 @@ fn test_is_power_edge_cases() {
     // Test some specific edge cases
 
     // Powers of 2 that are perfect powers
-    let power_of_2_power: Natural = Natural::from(1u64) << 0x1000u32;
+    let power_of_2_power: Natural = Natural::ONE << 0x1000u32;
     assert!(power_of_2_power.is_power());
 
-    let power_of_2_non_power = power_of_2_power + Natural::from(1u64);
+    let power_of_2_non_power = power_of_2_power + Natural::ONE;
     assert!(!power_of_2_non_power.is_power());
 
     // Large powers
@@ -112,7 +113,7 @@ fn test_is_power_edge_cases() {
     let big_power = (&big_base).pow(3);
     assert!(big_power.is_power());
 
-    let big_non_power = &big_power + Natural::from(1u32);
+    let big_non_power = &big_power + Natural::ONE;
     assert!(!big_non_power.is_power());
 
     // Test prime 1009 (SMALLEST_OMITTED_PRIME) - ensures termination

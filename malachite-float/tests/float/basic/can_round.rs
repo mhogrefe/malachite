@@ -9,7 +9,7 @@
 use gmp_mpfr_sys::mpfr::{self, rnd_t};
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::NaN;
+use malachite_base::num::basic::traits::{NaN, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -199,8 +199,8 @@ fn can_round_soundness() {
                                 let first = results.next().unwrap();
                                 for r in results {
                                     assert_eq!(
-                                        malachite_float::ComparableFloat(r),
-                                        malachite_float::ComparableFloat(first.clone()),
+                                        ComparableFloat(r),
+                                        ComparableFloat(first.clone()),
                                         "{x} {err} {rnd1} {rnd2} {prec}"
                                     );
                                 }
@@ -218,7 +218,7 @@ fn can_round_special() {
     // - NaN, infinities, and zeros can never be rounded
     assert!(!Float::NAN.can_round(100, Nearest, Nearest, 10));
     assert!(!Float::from(f64::INFINITY).can_round(100, Nearest, Nearest, 10));
-    assert!(!Float::from(0u32).can_round(100, Nearest, Nearest, 10));
+    assert!(!Float::ZERO.can_round(100, Nearest, Nearest, 10));
     // - a nonpositive error never allows rounding
     let x = Float::from(3u32);
     assert!(!x.can_round(0, Nearest, Nearest, 10));

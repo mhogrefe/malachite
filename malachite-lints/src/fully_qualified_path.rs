@@ -69,14 +69,20 @@ impl<'tcx> LateLintPass<'tcx> for FullyQualifiedPath {
         if !crate_name.as_str().starts_with("malachite") {
             return;
         }
-        let last = path.segments.last().unwrap().ident;
+        // The item to import is the first segment past the modules: the type in
+        // `malachite_nz::natural::Natural::from`, the trait in `...::traits::Mod::mod_op`.
+        let item = path.segments[1..]
+            .iter()
+            .find(|segment| !matches!(segment.res, Res::Def(DefKind::Mod, _)))
+            .unwrap_or_else(|| path.segments.last().unwrap())
+            .ident;
         span_lint_and_help(
             cx,
             FULLY_QUALIFIED_PATH,
             path.span,
-            format!("`{last}` is named by its full path"),
+            format!("`{item}` is named by its full path"),
             None,
-            format!("import it with `use` and refer to it as `{last}`"),
+            format!("import it with `use` and refer to it as `{item}`"),
         );
     }
 }

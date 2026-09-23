@@ -13,6 +13,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::pair_1_natural_polynomial_bit_bucketer;
 use malachite_nz::test_util::generators::{
@@ -205,9 +206,7 @@ fn benchmark_natural_polynomial_rem_unsigned_algorithms<
             (
                 "reducing modulo a Natural, then converting",
                 &mut |(p, m)| {
-                    let _ = malachite_base::unsigned_polynomial::UnsignedPolynomial::<T>::try_from(
-                        &p % Natural::from(m),
-                    );
+                    let _ = UnsignedPolynomial::<T>::try_from(&p % Natural::from(m));
                 },
             ),
         ],

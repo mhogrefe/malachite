@@ -641,21 +641,11 @@ fn test_sub_mul_prec_round() {
 
 #[test]
 fn sub_mul_prec_round_fail() {
-    assert_panic!(Float::from(1u32).sub_mul_prec_round(Float::ONE, Float::ONE, 0, Nearest));
-    assert_panic!(Float::from(1u32).sub_mul_prec_round_ref_ref_ref(
-        &Float::ONE,
-        &Float::ONE,
-        0,
-        Nearest
-    ));
+    assert_panic!(Float::ONE.sub_mul_prec_round(Float::ONE, Float::ONE, 0, Nearest));
+    assert_panic!(Float::ONE.sub_mul_prec_round_ref_ref_ref(&Float::ONE, &Float::ONE, 0, Nearest));
     // Exact with an inexact difference: 1 - 3*3 = -8 is representable, but 1 - 3*5 = -14 is not
     // representable with 2 bits
-    assert_panic!(Float::from(1u32).sub_mul_prec_round(
-        Float::from(3u32),
-        Float::from(5u32),
-        2,
-        Exact
-    ));
+    assert_panic!(Float::ONE.sub_mul_prec_round(Float::from(3u32), Float::from(5u32), 2, Exact));
     // Exact with an overflowing product of the addend's sign
     assert_panic!((-Float::ONE).sub_mul_prec_round(
         Float::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
@@ -1229,15 +1219,15 @@ fn sub_mul_properties() {
 
 #[test]
 fn sub_mul_prec_fail() {
-    assert_panic!(Float::from(1u32).sub_mul_prec(Float::ONE, Float::ONE, 0));
-    assert_panic!(Float::from(1u32).sub_mul_prec_ref_ref_ref(&Float::ONE, &Float::ONE, 0));
+    assert_panic!(Float::ONE.sub_mul_prec(Float::ONE, Float::ONE, 0));
+    assert_panic!(Float::ONE.sub_mul_prec_ref_ref_ref(&Float::ONE, &Float::ONE, 0));
 }
 
 #[test]
 fn sub_mul_round_fail() {
     // Exact with an inexact result at the natural precision: 1 - 5 * 7 = -34 needs 4 bits
-    assert_panic!(Float::from(1u32).sub_mul_round(Float::from(5u32), Float::from(7u32), Exact));
-    assert_panic!(Float::from(1u32).sub_mul_round_ref_ref_ref(
+    assert_panic!(Float::ONE.sub_mul_round(Float::from(5u32), Float::from(7u32), Exact));
+    assert_panic!(Float::ONE.sub_mul_round_ref_ref_ref(
         &Float::from(5u32),
         &Float::from(7u32),
         Exact
@@ -1583,14 +1573,14 @@ fn test_sub_mul_rational_prec_round() {
 
 #[test]
 fn sub_mul_rational_prec_round_fail() {
-    assert_panic!(Float::from(1u32).sub_mul_rational_prec_round(
+    assert_panic!(Float::ONE.sub_mul_rational_prec_round(
         Float::ONE,
         Rational::from_signeds(1i32, 3i32),
         0,
         Nearest
     ));
     // Exact with an inexact result
-    assert_panic!(Float::from(1u32).sub_mul_rational_prec_round(
+    assert_panic!(Float::ONE.sub_mul_rational_prec_round(
         Float::ONE,
         Rational::from_signeds(1i32, 3i32),
         2,

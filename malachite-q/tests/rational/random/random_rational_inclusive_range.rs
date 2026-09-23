@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::basic::traits::OneHalf;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::stats::moments::MomentStats;
@@ -348,7 +349,7 @@ fn random_rational_inclusive_range_fail_4() {
 fn random_rational_inclusive_range_fail_5() {
     random_rational_inclusive_range(
         EXAMPLE_SEED,
-        Rational::from_unsigneds(1u32, 2),
+        Rational::ONE_HALF,
         Rational::from_unsigneds(1u32, 3),
         2,
         3,

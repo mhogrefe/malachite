@@ -171,7 +171,18 @@ dedicated constructors `one_prec`, `two_prec`, `negative_one_prec`, and `one_hal
 literal precision of 1. The named constant says what the value is at a glance and involves no
 conversion. For `Float`, only precision-1 constructions are flagged: the named constants have
 precision 1, so `Float::one_prec(p)` with any other `p` is not the same value-and-precision.
-Tests, demos, and test utilities are exempt.
+Tests, demos, and test utilities are linted like library code, except under `conversion/`,
+`basic/constants`, and `comparison/` directories (and the matching doctests), which exercise these
+constructions on purpose.
+
+### `fully_qualified_path`
+
+Flags a path that names an item of a Malachite crate starting from the crate root, such as
+`malachite_nz::natural::Natural::from(k)` or the type `malachite_q::Rational`, anywhere but in a
+`use` item. House style is to import the item and refer to it by name. Only paths rooted at a `malachite*` crate are flagged: `crate::` paths have
+legitimate uses (a module re-exporting a platform constant under the same name cannot import it),
+and `std`/`core` paths are out of scope. Paths written by macros are skipped. Applies everywhere,
+tests and doctests included.
 
 ### `runtime_literal_conversion`
 

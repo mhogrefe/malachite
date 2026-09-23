@@ -621,20 +621,10 @@ fn test_add_mul_prec_round() {
 
 #[test]
 fn add_mul_prec_round_fail() {
-    assert_panic!(Float::from(1u32).add_mul_prec_round(Float::ONE, Float::ONE, 0, Nearest));
-    assert_panic!(Float::from(1u32).add_mul_prec_round_ref_ref_ref(
-        &Float::ONE,
-        &Float::ONE,
-        0,
-        Nearest
-    ));
+    assert_panic!(Float::ONE.add_mul_prec_round(Float::ONE, Float::ONE, 0, Nearest));
+    assert_panic!(Float::ONE.add_mul_prec_round_ref_ref_ref(&Float::ONE, &Float::ONE, 0, Nearest));
     // Exact with an inexact sum: 1 + 3*3 = 10 is not representable with 2 bits
-    assert_panic!(Float::from(1u32).add_mul_prec_round(
-        Float::from(3u32),
-        Float::from(3u32),
-        2,
-        Exact
-    ));
+    assert_panic!(Float::ONE.add_mul_prec_round(Float::from(3u32), Float::from(3u32), 2, Exact));
     // Exact with an overflowing product of the addend's sign
     assert_panic!((Float::ONE).add_mul_prec_round(
         Float::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
@@ -1195,15 +1185,15 @@ fn add_mul_properties() {
 
 #[test]
 fn add_mul_prec_fail() {
-    assert_panic!(Float::from(1u32).add_mul_prec(Float::ONE, Float::ONE, 0));
-    assert_panic!(Float::from(1u32).add_mul_prec_ref_ref_ref(&Float::ONE, &Float::ONE, 0));
+    assert_panic!(Float::ONE.add_mul_prec(Float::ONE, Float::ONE, 0));
+    assert_panic!(Float::ONE.add_mul_prec_ref_ref_ref(&Float::ONE, &Float::ONE, 0));
 }
 
 #[test]
 fn add_mul_round_fail() {
     // Exact with an inexact result at the natural precision
-    assert_panic!(Float::from(1u32).add_mul_round(Float::from(3u32), Float::from(3u32), Exact));
-    assert_panic!(Float::from(1u32).add_mul_round_ref_ref_ref(
+    assert_panic!(Float::ONE.add_mul_round(Float::from(3u32), Float::from(3u32), Exact));
+    assert_panic!(Float::ONE.add_mul_round_ref_ref_ref(
         &Float::from(3u32),
         &Float::from(3u32),
         Exact
@@ -1538,14 +1528,14 @@ fn test_add_mul_rational_prec_round() {
 
 #[test]
 fn add_mul_rational_prec_round_fail() {
-    assert_panic!(Float::from(1u32).add_mul_rational_prec_round(
+    assert_panic!(Float::ONE.add_mul_rational_prec_round(
         Float::ONE,
         Rational::from_signeds(1i32, 3i32),
         0,
         Nearest
     ));
     // Exact with an inexact result
-    assert_panic!(Float::from(1u32).add_mul_rational_prec_round(
+    assert_panic!(Float::ONE.add_mul_rational_prec_round(
         Float::ONE,
         Rational::from_signeds(1i32, 3i32),
         2,

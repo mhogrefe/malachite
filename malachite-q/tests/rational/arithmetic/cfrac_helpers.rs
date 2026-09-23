@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{Abs, Floor, Reciprocal};
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 use malachite_q::rational::arithmetic::cfrac_helpers::ball_get_cfrac_for_testing;
@@ -91,8 +91,8 @@ fn ball_get_cfrac_properties() {
         // A narrow ball greater than one, with a numerator wide enough to reach the Lehmer floor:
         // the endpoints then share a long continued-fraction prefix, which is what the engine is
         // for. A wide ball would diverge on the first term and test nothing.
-        let x = ((&a).abs() + Rational::from(2u32)) << 200u32;
-        let width = ((&b).abs() + Rational::from(2u32)).reciprocal() >> 20u32;
+        let x = ((&a).abs() + Rational::TWO) << 200u32;
+        let width = ((&b).abs() + Rational::TWO).reciprocal() >> 20u32;
         let y = &x + width;
         if x >= y {
             return;

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, Pow, SubMul};
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_triple_gen;
 use malachite_q::Rational;
@@ -112,7 +112,7 @@ fn add_mul_properties() {
         assert_eq!((&x).add_mul(&Rational::ONE, &y), &x + &y);
         assert_eq!(Rational::ZERO.add_mul(&x, &y), &x * &y);
         // adding a value's own negation through the fused operation
-        assert_eq!((&x).add_mul(&x, &Rational::from(-1)), Rational::ZERO);
+        assert_eq!((&x).add_mul(&x, &Rational::NEGATIVE_ONE), Rational::ZERO);
     });
 
     integer_triple_gen().test_properties(|(x, y, z)| {

@@ -11,8 +11,8 @@ use malachite_base::strings::typst::ToTypst;
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::string_gen;
 use malachite_base::test_util::runner::Runner;
-use malachite_base::vars::VarScheme;
 use malachite_base::vars::list::ListVars;
+use malachite_base::vars::{VarScheme, char_is_reserved};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_list_vars_var);
@@ -24,7 +24,7 @@ pub(crate) fn register(runner: &mut Runner) {
 // as.
 fn demo_list_vars_var(gm: GenMode, config: &GenConfig, limit: usize) {
     for s in string_gen().get(gm, config).take(limit) {
-        if s.is_empty() || s.chars().any(malachite_base::vars::char_is_reserved) {
+        if s.is_empty() || s.chars().any(char_is_reserved) {
             continue;
         }
         let vars = ListVars::new([s.clone()]);

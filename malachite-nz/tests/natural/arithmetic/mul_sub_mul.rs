@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{CheckedMulSubMul, MulSubMul, MulSubMulAssign};
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_quadruple_gen;
 use std::panic::catch_unwind;
@@ -64,14 +65,8 @@ fn test_mul_sub_mul() {
 fn mul_sub_mul_fail() {
     // 1 * 1 - 2 * 2 is negative.
     assert!(
-        catch_unwind(|| {
-            Natural::from(1u32).mul_sub_mul(
-                Natural::from(1u32),
-                Natural::from(2u32),
-                Natural::from(2u32),
-            )
-        })
-        .is_err()
+        catch_unwind(|| { Natural::ONE.mul_sub_mul(Natural::ONE, Natural::TWO, Natural::TWO,) })
+            .is_err()
     );
 }
 

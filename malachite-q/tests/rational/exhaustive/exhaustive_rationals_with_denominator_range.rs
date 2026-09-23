@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{One, OneHalf, Zero};
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
@@ -105,7 +105,7 @@ fn exhaustive_rationals_with_denominator_range_fail_1() {
     exhaustive_rationals_with_denominator_range(
         Natural::ZERO,
         Rational::from_unsigneds(1u32, 3),
-        Rational::from_unsigneds(1u32, 2),
+        Rational::ONE_HALF,
     );
 }
 
@@ -124,7 +124,7 @@ fn exhaustive_rationals_with_denominator_range_fail_2() {
 fn exhaustive_rationals_with_denominator_range_fail_3() {
     exhaustive_rationals_with_denominator_range(
         Natural::ONE,
-        Rational::from_unsigneds(1u32, 2),
+        Rational::ONE_HALF,
         Rational::from_unsigneds(1u32, 3),
     );
 }

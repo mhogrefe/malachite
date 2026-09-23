@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{
     LogBase10Of1PlusX, LogBase10Of1PlusXAssign, PowerOf2,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeOne, Zero};
+use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeOne, One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -35,6 +35,7 @@ use malachite_float::test_util::generators::{
     float_unsigned_rounding_mode_triple_gen_var_35,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::Rational;
 use std::panic::catch_unwind;
 
 // Cross-checks the by-value/by-reference/assigning variants, precision, and the rug oracle. Returns
@@ -194,7 +195,7 @@ fn log_base_10_1_plus_x_prec_round_fail() {
     // Precision must be nonzero.
     assert_panic!(Float::from(7).log_base_10_1_plus_x_prec_round(0, Nearest));
     // Exact is not allowed when the result is not exactly representable.
-    assert_panic!(Float::from(1).log_base_10_1_plus_x_prec_round(10, Exact));
+    assert_panic!(Float::ONE.log_base_10_1_plus_x_prec_round(10, Exact));
 }
 
 // log_10(1 + x) can underflow: dividing log_2(1 + x) by log_2(10) > 1 can push the result below
@@ -288,7 +289,7 @@ fn log_base_10_1_plus_x_underflow() {
 fn test_log_base_10_1_plus_x_prec_round() {
     let test =
         |n: i64, d: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
-            let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
+            let x = Float::exact_from(Rational::from_signeds(n, i64::exact_from(d)));
             let (log, o) = check(&x, prec, rm);
             assert_eq!(log.to_string(), out);
             assert_eq!(to_hex_string(&log), out_hex);
@@ -346,7 +347,7 @@ fn test_log_base_10_1_plus_x_prec_round() {
 fn test_log_base_10_1_plus_x_prec() {
     // The `_prec` methods round to nearest; cross-checked against the rug oracle.
     let test = |n: i64, d: u64, prec: u64, out: &str, out_hex: &str, o_out: Ordering| {
-        let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
+        let x = Float::exact_from(Rational::from_signeds(n, i64::exact_from(d)));
 
         let (log, o) = x.clone().log_base_10_1_plus_x_prec(prec);
         assert!(log.is_valid());
@@ -387,7 +388,7 @@ fn test_log_base_10_1_plus_x_prec() {
 fn test_log_base_10_1_plus_x() {
     // The `LogBase10Of1PlusX` trait: rounds to the input's precision, to nearest.
     let test = |n: i64, d: u64, out: &str, out_hex: &str| {
-        let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
+        let x = Float::exact_from(Rational::from_signeds(n, i64::exact_from(d)));
         let log = x.clone().log_base_10_1_plus_x();
         assert!(log.is_valid());
         assert_eq!(log.to_string(), out);
@@ -422,7 +423,7 @@ fn test_log_base_10_1_plus_x() {
 #[test]
 fn test_log_base_10_1_plus_x_round() {
     let test = |n: i64, d: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
-        let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
+        let x = Float::exact_from(Rational::from_signeds(n, i64::exact_from(d)));
         // log_base_10_1_plus_x_round uses the input's precision; `check` cross-checks the oracle.
         let (log, o) = check(&x, x.significant_bits().max(1), rm);
         let (log2, o2) = x.clone().log_base_10_1_plus_x_round(rm);

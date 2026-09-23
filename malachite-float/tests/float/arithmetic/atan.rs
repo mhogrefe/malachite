@@ -10,7 +10,7 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{Atan, AtanAssign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, Two, Zero,
 };
 use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
@@ -5055,7 +5055,7 @@ fn atan_with_period_prec_round_fail_1() {
 #[should_panic]
 fn atan_with_period_prec_round_fail_2() {
     // atan(2) is not an exact number of sevenths of a turn
-    Float::from(2u32).atan_with_period_prec_round(7, 10, Exact);
+    Float::TWO.atan_with_period_prec_round(7, 10, Exact);
 }
 
 #[test]
@@ -5080,7 +5080,7 @@ fn atan_with_period_prec_fail() {
 #[test]
 #[should_panic]
 fn atan_with_period_round_fail() {
-    Float::from(2u32).atan_with_period_round(7, Exact);
+    Float::TWO.atan_with_period_round(7, Exact);
 }
 
 // Whether atanu(x, u) is exactly representable at `prec`: only at zero and NaN, at u = 0, and at

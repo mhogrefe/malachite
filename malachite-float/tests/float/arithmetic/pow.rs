@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{CheckedRoot, IsPowerOf2, Pow, PowAssign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
@@ -58,6 +58,7 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_primitive_float_pair_gen;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
@@ -282,7 +283,7 @@ fn test_pow_integer_underflow_boundary() {
     let z_mid = (((emin as f64) - 1.5) / log2_x) as i64;
     for dz in [-8i64, -2, -1, 0, 1, 2, 8] {
         let z = z_mid + dz;
-        let y = Float::exact_from(&malachite_nz::integer::Integer::from(z));
+        let y = Float::exact_from(&Integer::from(z));
         let (p, o) = x.pow_prec_round_ref_ref(&y, 5, Nearest);
         let (rug_p, rug_o) = rug_pow_prec_round(
             &rug::Float::exact_from(&x),
@@ -336,7 +337,7 @@ fn test_pow_exact_bottom_binade() {
 #[test]
 fn test_pow_early_underflow_bound_equality() {
     let x = Float::from(4.0f64);
-    let y = -(Float::exact_from(&malachite_nz::natural::Natural::from(1u32)) << 29u32);
+    let y = -(Float::exact_from(&Natural::ONE) << 29u32);
     for rm in [Floor, Ceiling, Down, Up, Nearest, Exact] {
         let (p, o) = x.pow_prec_round_ref_ref(&y, 10, rm);
         assert_eq!(o, Equal);
@@ -4446,14 +4447,14 @@ fn test_pow_rational_tiny() {
 #[test]
 #[should_panic]
 fn pow_rational_prec_round_fail_1() {
-    Float::from(3).pow_rational_prec_round(Rational::from_signeds(1, 2), 0, Floor);
+    Float::from(3).pow_rational_prec_round(Rational::ONE_HALF, 0, Floor);
 }
 
 #[test]
 #[should_panic]
 fn pow_rational_prec_round_fail_2() {
     // 2^(1/2) is irrational, so it cannot be represented exactly.
-    Float::from(2).pow_rational_prec_round(Rational::from_signeds(1, 2), 10, Exact);
+    Float::TWO.pow_rational_prec_round(Rational::ONE_HALF, 10, Exact);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -4864,24 +4865,14 @@ fn test_rational_pow_rational() {
 #[test]
 #[should_panic]
 fn rational_pow_rational_prec_round_fail_1() {
-    Float::rational_pow_rational_prec_round(
-        Rational::from(3),
-        Rational::from_signeds(1, 2),
-        0,
-        Floor,
-    );
+    Float::rational_pow_rational_prec_round(Rational::from(3), Rational::ONE_HALF, 0, Floor);
 }
 
 #[test]
 #[should_panic]
 fn rational_pow_rational_prec_round_fail_2() {
     // 2^(1/2) is irrational, so it cannot be represented exactly.
-    Float::rational_pow_rational_prec_round(
-        Rational::from(2),
-        Rational::from_signeds(1, 2),
-        10,
-        Exact,
-    );
+    Float::rational_pow_rational_prec_round(Rational::TWO, Rational::ONE_HALF, 10, Exact);
 }
 
 // An extreme dyadic base whose exponent is near 2^30 bypasses the in-range `Float::pow_rational`
@@ -4892,8 +4883,7 @@ fn rational_pow_rational_prec_round_fail_2() {
 fn test_rational_pow_rational_extreme() {
     let k = 1i64 << 30;
     let x = Rational::from(9) * Rational::power_of_2(k);
-    let (p, o) =
-        Float::rational_pow_rational_prec_round_ref(&x, &Rational::from_signeds(1, 2), 20, Nearest);
+    let (p, o) = Float::rational_pow_rational_prec_round_ref(&x, &Rational::ONE_HALF, 20, Nearest);
     assert!(p.is_valid());
     assert_eq!(o, Equal);
     assert_eq!(p.get_prec(), Some(20));

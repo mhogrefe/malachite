@@ -9,16 +9,13 @@
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::DivMod;
+use malachite_base::num::basic::traits::One;
 
 // Rounds t / n to the nearest integer, rounding ties up: the floor, plus one when the remainder is
 // at least half the divisor.
 fn round_half_up(t: Integer, n: &Integer) -> Integer {
     let (q, r) = t.div_mod(n);
-    if r << 1u32 >= *n {
-        q + Integer::from(1u32)
-    } else {
-        q
-    }
+    if r << 1u32 >= *n { q + Integer::ONE } else { q }
 }
 
 // Schoolbook: the exact quotient is ((ac + bd) + (bc - ad)i) / (c^2 + d^2); round each part to the

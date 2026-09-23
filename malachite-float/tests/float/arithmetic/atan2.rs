@@ -11,7 +11,7 @@ use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{Atan2, Atan2Assign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, Two, Zero,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
@@ -56988,20 +56988,20 @@ fn primitive_float_atan2_with_period_rational_properties() {
 #[test]
 #[should_panic]
 fn atan2_with_period_rational_prec_round_fail_1() {
-    Float::atan2_with_period_rational_prec_round(Rational::ONE, Rational::from(2), 360, 0, Floor);
+    Float::atan2_with_period_rational_prec_round(Rational::ONE, Rational::TWO, 360, 0, Floor);
 }
 
 #[test]
 #[should_panic]
 fn atan2_with_period_rational_prec_round_fail_2() {
     // 1/2 is not a quadrant diagonal, so no precision makes its angle exact
-    Float::atan2_with_period_rational_prec_round(Rational::ONE, Rational::from(2), 360, 10, Exact);
+    Float::atan2_with_period_rational_prec_round(Rational::ONE, Rational::TWO, 360, 10, Exact);
 }
 
 #[test]
 #[should_panic]
 fn atan2_with_period_rational_prec_fail() {
-    Float::atan2_with_period_rational_prec(Rational::ONE, Rational::from(2), 360, 0);
+    Float::atan2_with_period_rational_prec(Rational::ONE, Rational::TWO, 360, 0);
 }
 
 #[test]
@@ -67060,5 +67060,5 @@ fn atan2_pi_prec_round_fail() {
 #[should_panic]
 fn atan2_pi_rational_prec_round_fail() {
     // 1/2 is not a quadrant diagonal, so no precision makes its angle exact
-    Float::atan2_pi_rational_prec_round(Rational::ONE, Rational::from(2), 10, Exact);
+    Float::atan2_pi_rational_prec_round(Rational::ONE, Rational::TWO, 10, Exact);
 }

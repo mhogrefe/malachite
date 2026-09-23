@@ -13,7 +13,7 @@ use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{Abs, ModPowerOf2, NegAssign, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Zero,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
@@ -882,7 +882,7 @@ fn test_quotient_bits_wrap_corner() {
     let (r, o, quo) = x.rem_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest);
     assert_eq!(quo, i64::MAX);
     assert_eq!(o, Equal);
-    assert_eq!(Rational::exact_from(&r), Rational::from_signeds(1, 2));
+    assert_eq!(Rational::exact_from(&r), Rational::ONE_HALF);
     let (r, o, quo) = x.ieee_remainder_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest);
     assert_eq!(quo, 0);
     assert_eq!(o, Equal);
@@ -1860,40 +1860,34 @@ fn test_rem_unsigned() {
 
 #[test]
 fn rem_prec_round_fail() {
-    assert_panic!(Float::from(1u32).rem_prec_round(Float::from(3u32), 0, Nearest));
-    assert_panic!(Float::from(1u32).rem_prec_round_val_ref(&Float::from(3u32), 0, Nearest));
-    assert_panic!(Float::from(1u32).rem_prec_round_ref_val(Float::from(3u32), 0, Nearest));
-    assert_panic!(Float::from(1u32).rem_prec_round_ref_ref(&Float::from(3u32), 0, Nearest));
+    assert_panic!(Float::ONE.rem_prec_round(Float::from(3u32), 0, Nearest));
+    assert_panic!(Float::ONE.rem_prec_round_val_ref(&Float::from(3u32), 0, Nearest));
+    assert_panic!(Float::ONE.rem_prec_round_ref_val(Float::from(3u32), 0, Nearest));
+    assert_panic!(Float::ONE.rem_prec_round_ref_ref(&Float::from(3u32), 0, Nearest));
     // Exact with an inexact remainder
     assert_panic!(Float::from(10u32).rem_prec_round(Float::from(7u32), 1, Exact));
 }
 
 #[test]
 fn ieee_remainder_prec_round_fail() {
-    assert_panic!(Float::from(1u32).ieee_remainder_prec_round(Float::from(3u32), 0, Nearest));
+    assert_panic!(Float::ONE.ieee_remainder_prec_round(Float::from(3u32), 0, Nearest));
     assert_panic!(Float::from(10u32).ieee_remainder_prec_round(Float::from(7u32), 1, Exact));
 }
 
 #[test]
 fn rem_and_quotient_bits_prec_round_fail() {
-    assert_panic!(Float::from(1u32).rem_and_quotient_bits_prec_round(
+    assert_panic!(Float::ONE.rem_and_quotient_bits_prec_round(Float::from(3u32), 0, Nearest));
+    assert_panic!(Float::ONE.ieee_remainder_and_quotient_bits_prec_round(
         Float::from(3u32),
         0,
         Nearest
     ));
-    assert_panic!(
-        Float::from(1u32).ieee_remainder_and_quotient_bits_prec_round(
-            Float::from(3u32),
-            0,
-            Nearest
-        )
-    );
 }
 
 #[test]
 fn rem_unsigned_prec_round_fail() {
-    assert_panic!(Float::from(1u32).rem_unsigned_prec_round(3, 0, Nearest));
-    assert_panic!(Float::from(1u32).rem_unsigned_prec_round_ref(3, 0, Nearest));
+    assert_panic!(Float::ONE.rem_unsigned_prec_round(3, 0, Nearest));
+    assert_panic!(Float::ONE.rem_unsigned_prec_round_ref(3, 0, Nearest));
 }
 
 fn test_rationals() -> Vec<Rational> {
@@ -3342,14 +3336,14 @@ fn test_rem_rational_operators() {
 
 #[test]
 fn rem_rational_fail() {
-    assert_panic!(Float::from(1u32).rem_rational_prec_round(
+    assert_panic!(Float::ONE.rem_rational_prec_round(
         Rational::from_signeds(1i32, 3i32),
         0,
         Nearest
     ));
     assert_panic!(Float::rational_rem_float_prec_round(
         Rational::from_signeds(1i32, 3i32),
-        Float::from(1u32),
+        Float::ONE,
         0,
         Nearest
     ));

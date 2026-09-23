@@ -10,7 +10,7 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{Csc, CscAssign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Two, Zero,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
@@ -5081,7 +5081,7 @@ fn test_csc_with_period_overflow() {
     let p = (1u64 << 30) + 74;
     // just past a half turn: x/u = 1/2 + 2^(-2^30 - 72), so the sine is negative and tiny and the
     // cosecant is negative and huge, beyond the largest finite `Float`
-    let above = Float::from_rational_prec_round(Rational::from(2u32) + &eps, p, Exact).0;
+    let above = Float::from_rational_prec_round(Rational::TWO + &eps, p, Exact).0;
     let (s, o) = above.csc_with_period_prec_round_ref(4, 10, Nearest);
     assert_eq!(
         ComparableFloat(s),
@@ -5098,7 +5098,7 @@ fn test_csc_with_period_overflow() {
     assert_eq!(ComparableFloatRef(&s), ComparableFloatRef(&-max.clone()));
     assert_eq!(o, Greater);
     // just below a half turn: the sine is positive and tiny, so the cosecant is positive and huge
-    let below = Float::from_rational_prec_round(Rational::from(2u32) - eps, p, Exact).0;
+    let below = Float::from_rational_prec_round(Rational::TWO - eps, p, Exact).0;
     let (s, o) = below.csc_with_period_prec_round_ref(4, 10, Nearest);
     assert_eq!(ComparableFloat(s), ComparableFloat(Float::INFINITY));
     assert_eq!(o, Greater);
@@ -5660,7 +5660,7 @@ fn test_csc_with_period_rational_overflow() {
     let eps = Rational::power_of_2(-((1i64 << 30) + 70));
     // just past a half turn: the sine is negative and tiny, so the cosecant is negative and beyond
     // the largest finite `Float`
-    let above = Rational::from_unsigneds(1u32, 2u32) + &eps;
+    let above = Rational::ONE_HALF + &eps;
     let (t, o) = Float::csc_with_period_rational_prec_round_ref(&above, 1, 10, Nearest);
     assert_eq!(
         ComparableFloat(t),
@@ -5671,7 +5671,7 @@ fn test_csc_with_period_rational_overflow() {
     assert_eq!(ComparableFloatRef(&t), ComparableFloatRef(&-max.clone()));
     assert_eq!(o, Greater);
     // just below a half turn: the cosecant is positive and beyond the largest finite `Float`
-    let below = Rational::from_unsigneds(1u32, 2u32) - &eps;
+    let below = Rational::ONE_HALF - &eps;
     let (t, o) = Float::csc_with_period_rational_prec_round_ref(&below, 1, 10, Nearest);
     assert_eq!(ComparableFloat(t), ComparableFloat(Float::INFINITY));
     assert_eq!(o, Greater);
@@ -5679,7 +5679,7 @@ fn test_csc_with_period_rational_overflow() {
     assert_eq!(ComparableFloatRef(&t), ComparableFloatRef(&max));
     assert_eq!(o, Less);
     // a non-dyadic version: 1/2 + 1/(3 * 2^(2^30 + 70)) of a turn
-    let above = Rational::from_unsigneds(1u32, 2u32) + &eps / Rational::from(3u32);
+    let above = Rational::ONE_HALF + &eps / Rational::from(3u32);
     let (t, o) = Float::csc_with_period_rational_prec_round_ref(&above, 1, 10, Nearest);
     assert_eq!(
         ComparableFloat(t),

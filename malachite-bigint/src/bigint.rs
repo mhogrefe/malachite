@@ -23,8 +23,9 @@ use malachite_base::{
     num::{
         arithmetic::traits::{
             Abs, DivEuclidean, DivExact, DivMod, DivModEuclidean, DivRem, DivRound, DivisibleBy,
-            Mod, ModEuclidean, Parity, UnsignedAbs,
+            Mod, ModEuclidean, Parity, Sign as _, UnsignedAbs,
         },
+        basic::traits::{One as _, Zero as _},
         conversion::traits::{RoundingInto, ToStringBase},
         logic::traits::{BitAccess, NotAssign},
     },
@@ -200,7 +201,7 @@ impl From<BigUint> for BigInt {
 impl Zero for BigInt {
     #[inline]
     fn zero() -> Self {
-        Self(<Integer as malachite_base::num::basic::traits::Zero>::ZERO)
+        Self(Integer::ZERO)
     }
 
     #[inline]
@@ -212,7 +213,7 @@ impl Zero for BigInt {
 impl One for BigInt {
     #[inline]
     fn one() -> Self {
-        Self(<Integer as malachite_base::num::basic::traits::One>::ONE)
+        Self(Integer::ONE)
     }
 }
 
@@ -365,12 +366,12 @@ impl num_integer::Integer for BigInt {
 
     #[inline]
     fn dec(&mut self) {
-        self.0 -= <Integer as malachite_base::num::basic::traits::One>::ONE;
+        self.0 -= Integer::ONE;
     }
 
     #[inline]
     fn inc(&mut self) {
-        self.0 += <Integer as malachite_base::num::basic::traits::One>::ONE;
+        self.0 += Integer::ONE;
     }
 }
 
@@ -582,7 +583,7 @@ impl BigInt {
 
     #[inline]
     pub fn sign(&self) -> Sign {
-        match <_ as malachite_base::num::arithmetic::traits::Sign>::sign(&self.0) {
+        match self.0.sign() {
             Ordering::Less => Minus,
             Ordering::Equal => NoSign,
             Ordering::Greater => Plus,

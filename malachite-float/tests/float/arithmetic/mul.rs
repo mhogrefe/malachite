@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, Two, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
@@ -7487,17 +7487,17 @@ fn test_mul_prec_round() {
 #[test]
 fn mul_prec_round_fail() {
     const THREE: Float = Float::const_from_unsigned(3);
-    assert_panic!(Float::one_prec(1).mul_prec_round(Float::two_prec(1), 0, Floor));
-    assert_panic!(Float::one_prec(1).mul_prec_round_val_ref(&Float::two_prec(1), 0, Floor));
-    assert_panic!(Float::one_prec(1).mul_prec_round_ref_val(Float::two_prec(1), 0, Floor));
-    assert_panic!(Float::one_prec(1).mul_prec_round_ref_ref(&Float::two_prec(1), 0, Floor));
+    assert_panic!(Float::ONE.mul_prec_round(Float::TWO, 0, Floor));
+    assert_panic!(Float::ONE.mul_prec_round_val_ref(&Float::TWO, 0, Floor));
+    assert_panic!(Float::ONE.mul_prec_round_ref_val(Float::TWO, 0, Floor));
+    assert_panic!(Float::ONE.mul_prec_round_ref_ref(&Float::TWO, 0, Floor));
     assert_panic!({
-        let mut x = Float::one_prec(1);
-        x.mul_prec_round_assign(Float::two_prec(1), 0, Floor)
+        let mut x = Float::ONE;
+        x.mul_prec_round_assign(Float::TWO, 0, Floor)
     });
     assert_panic!({
-        let mut x = Float::one_prec(1);
-        x.mul_prec_round_assign_ref(&Float::two_prec(1), 0, Floor)
+        let mut x = Float::ONE;
+        x.mul_prec_round_assign_ref(&Float::TWO, 0, Floor)
     });
 
     assert_panic!(THREE.mul_prec_round(THREE, 1, Exact));
@@ -10322,33 +10322,29 @@ fn test_mul_rational_prec_round() {
 
 #[test]
 fn mul_rational_prec_round_fail() {
-    assert_panic!(Float::one_prec(1).mul_rational_prec_round(Rational::ONE, 0, Exact));
-    assert_panic!(Float::one_prec(1).mul_rational_prec_round(
-        Rational::from_unsigneds(5u32, 8),
-        1,
-        Exact
-    ));
-    assert_panic!(Float::one_prec(1).mul_rational_prec_round_val_ref(
+    assert_panic!(Float::ONE.mul_rational_prec_round(Rational::ONE, 0, Exact));
+    assert_panic!(Float::ONE.mul_rational_prec_round(Rational::from_unsigneds(5u32, 8), 1, Exact));
+    assert_panic!(Float::ONE.mul_rational_prec_round_val_ref(
         &Rational::from_unsigneds(5u32, 8),
         1,
         Exact
     ));
-    assert_panic!(Float::one_prec(1).mul_rational_prec_round_ref_val(
+    assert_panic!(Float::ONE.mul_rational_prec_round_ref_val(
         Rational::from_unsigneds(5u32, 8),
         1,
         Exact
     ));
-    assert_panic!(Float::one_prec(1).mul_rational_prec_round_ref_ref(
+    assert_panic!(Float::ONE.mul_rational_prec_round_ref_ref(
         &Rational::from_unsigneds(5u32, 8),
         1,
         Exact
     ));
     assert_panic!({
-        let mut x = Float::one_prec(1);
+        let mut x = Float::ONE;
         x.mul_rational_prec_round_assign(Rational::from_unsigneds(5u32, 8), 1, Exact)
     });
     assert_panic!({
-        let mut x = Float::one_prec(1);
+        let mut x = Float::ONE;
         x.mul_rational_prec_round_assign_ref(&Rational::from_unsigneds(5u32, 8), 1, Exact)
     });
 }

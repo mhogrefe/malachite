@@ -9,7 +9,9 @@
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{LogBase, LogBaseAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
+use malachite_base::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, One, OneHalf, Two, Zero,
+};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -421,16 +423,12 @@ fn log_base_rational_base_fail() {
     // Base must be greater than 1.
     assert_panic!(Float::from(8).log_base_rational_base_prec_round(&Rational::ONE, 10, Nearest));
     assert_panic!(Float::from(8).log_base_rational_base_prec_round(
-        &Rational::from_unsigneds(1u32, 2),
+        &Rational::ONE_HALF,
         10,
         Nearest
     ));
     // Exact is not allowed when the result is not exactly representable.
-    assert_panic!(Float::from(2).log_base_rational_base_prec_round(
-        &Rational::from(3u32),
-        10,
-        Exact
-    ));
+    assert_panic!(Float::TWO.log_base_rational_base_prec_round(&Rational::from(3u32), 10, Exact));
 }
 
 #[test]

@@ -9,7 +9,7 @@
 use core::iter::Sum;
 use malachite_base::apply_fn_to_primitive_floats;
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, Zero};
+use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -233,10 +233,7 @@ fn test_sum_round() {
 
 #[test]
 fn sum_round_fail() {
-    assert_panic!(Float::sum_round(
-        &[Float::from(1), Float::from(1) >> 5u32],
-        Exact
-    ));
+    assert_panic!(Float::sum_round(&[Float::ONE, Float::ONE >> 5u32], Exact));
 }
 
 #[test]
@@ -907,13 +904,13 @@ fn sum_prec_round_fail() {
     assert_panic!(Float::sum_prec_round(&[Float::from(3)], 0, Floor));
     // 1 + 1/32 needs 6 bits
     assert_panic!(Float::sum_prec_round(
-        &[Float::from(1), Float::from(1) >> 5u32, Float::from(1) >> 5u32],
+        &[Float::ONE, Float::ONE >> 5u32, Float::ONE >> 5u32],
         4,
         Exact
     ));
     // sum of three 1s is 3, which needs 2 bits
     assert_panic!(Float::sum_prec_round(
-        &[Float::from(1), Float::from(1), Float::from(1)],
+        &[Float::ONE, Float::ONE, Float::ONE],
         1,
         Exact
     ));

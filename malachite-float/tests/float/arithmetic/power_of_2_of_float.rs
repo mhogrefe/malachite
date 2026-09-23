@@ -11,7 +11,9 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{PowerOf2, PowerOf2Assign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
+use malachite_base::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Zero,
+};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -289,18 +291,14 @@ fn test_power_of_2_of_float_prec_round() {
 
 #[test]
 fn power_of_2_of_float_prec_round_fail() {
-    assert_panic!(Float::power_of_2_of_float_prec_round(
-        Float::one_prec(1),
-        0,
-        Floor
-    ));
+    assert_panic!(Float::power_of_2_of_float_prec_round(Float::ONE, 0, Floor));
     assert_panic!(Float::power_of_2_of_float_prec_round_ref(
-        &Float::one_prec(1),
+        &Float::ONE,
         0,
         Floor
     ));
     assert_panic!({
-        let mut x = Float::one_prec(1);
+        let mut x = Float::ONE;
         x.power_of_2_of_float_prec_round_assign(0, Floor)
     });
 
@@ -786,13 +784,13 @@ fn test_power_of_2_rational_prec() {
 #[test]
 #[should_panic]
 fn power_of_2_rational_prec_fail() {
-    Float::power_of_2_rational_prec(Rational::from(1), 0);
+    Float::power_of_2_rational_prec(Rational::ONE, 0);
 }
 
 #[test]
 #[should_panic]
 fn power_of_2_rational_prec_ref_fail() {
-    Float::power_of_2_rational_prec_ref(&Rational::from(1), 0);
+    Float::power_of_2_rational_prec_ref(&Rational::ONE, 0);
 }
 
 #[test]
@@ -974,8 +972,7 @@ fn test_power_of_2_rational_prec_round() {
     test_big(-min1, 1, Nearest, "1.0", "0x1.0#1", Greater);
     // Non-integer x too large to be a finite Float (exp_x >= MAX_EXPONENT): 2^x overflows (x > 0)
     // or underflows (x < 0).
-    let big =
-        Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 2u32);
+    let big = Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::ONE_HALF;
     test_big(big.clone(), 1, Nearest, "Infinity", "Infinity", Greater);
     test_big(-big, 1, Nearest, "0.0", "0x0.0", Less);
 }
@@ -1011,20 +1008,20 @@ fn power_of_2_rational_near_one_compute_huge() {
 #[test]
 #[should_panic]
 fn power_of_2_rational_prec_round_fail_1() {
-    Float::power_of_2_rational_prec_round(Rational::from(1), 0, Floor);
+    Float::power_of_2_rational_prec_round(Rational::ONE, 0, Floor);
 }
 
 #[test]
 #[should_panic]
 fn power_of_2_rational_prec_round_fail_2() {
     // 2^(1/2) is transcendental, so Exact panics.
-    Float::power_of_2_rational_prec_round(Rational::from_unsigneds(1u32, 2u32), 10, Exact);
+    Float::power_of_2_rational_prec_round(Rational::ONE_HALF, 10, Exact);
 }
 
 #[test]
 #[should_panic]
 fn power_of_2_rational_prec_round_ref_fail() {
-    Float::power_of_2_rational_prec_round_ref(&Rational::from_unsigneds(1u32, 2u32), 10, Exact);
+    Float::power_of_2_rational_prec_round_ref(&Rational::ONE_HALF, 10, Exact);
 }
 
 #[allow(clippy::needless_pass_by_value)]

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{BalancedCrt, CoprimeWith, UnsignedAbs};
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -138,15 +138,11 @@ fn test_balanced_crt() {
 
 #[test]
 fn balanced_crt_fail() {
-    assert_panic!(Integer::from(2).balanced_crt(Natural::from(2u8), Natural::ZERO, Natural::ONE));
-    assert_panic!(Integer::from(-3).balanced_crt(Natural::from(2u8), Natural::ZERO, Natural::ONE));
+    assert_panic!(Integer::TWO.balanced_crt(Natural::TWO, Natural::ZERO, Natural::ONE));
+    assert_panic!(Integer::from(-3).balanced_crt(Natural::TWO, Natural::ZERO, Natural::ONE));
     assert_panic!(Integer::ZERO.balanced_crt(Natural::ONE, Natural::from(3u8), Natural::from(3u8)));
     assert_panic!(Integer::ZERO.balanced_crt(Natural::ZERO, Natural::ZERO, Natural::ONE));
-    assert_panic!((&Integer::from(2)).balanced_crt(
-        &Natural::from(2u8),
-        &Natural::ZERO,
-        &Natural::ONE
-    ));
+    assert_panic!((&Integer::TWO).balanced_crt(&Natural::TWO, &Natural::ZERO, &Natural::ONE));
 }
 
 #[test]

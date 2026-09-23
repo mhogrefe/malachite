@@ -10,7 +10,7 @@ use core::cmp::Ordering::{self, *};
 use gmp_mpfr_sys::mpfr::{self, rnd_t};
 use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::PowerOf2;
-use malachite_base::num::basic::traits::{NaN, NegativeInfinity};
+use malachite_base::num::basic::traits::{NaN, NegativeInfinity, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::LowMask;
@@ -155,12 +155,12 @@ fn fractional_part_special() {
     assert_eq!(o, Equal);
     // the fractional part of an infinity is a zero with the same sign
     let (r, o) = Float::NEGATIVE_INFINITY.fractional_part_ref();
-    assert_eq!(ComparableFloat(r), ComparableFloat(-Float::from(0u32)));
+    assert_eq!(ComparableFloat(r), ComparableFloat(-Float::ZERO));
     assert_eq!(o, Equal);
     // the integral part of an infinity is itself, and its fractional part is a signed zero
     let ((i, io), (f, fo)) = Float::NEGATIVE_INFINITY.integer_and_fractional_parts_ref();
     assert_eq!(i, Float::NEGATIVE_INFINITY);
-    assert_eq!(ComparableFloat(f), ComparableFloat(-Float::from(0u32)));
+    assert_eq!(ComparableFloat(f), ComparableFloat(-Float::ZERO));
     assert_eq!((io, fo), (Equal, Equal));
     // variants agree
     let x = Float::from(2.5f64);
@@ -457,16 +457,16 @@ fn test_integer_and_fractional_parts_prec_round() {
 
 #[test]
 fn fractional_part_prec_round_fail() {
-    assert_panic!(Float::from(1u32).fractional_part_prec_round(0, Nearest));
-    assert_panic!(Float::from(1u32).fractional_part_prec_round_ref(0, Nearest));
+    assert_panic!(Float::ONE.fractional_part_prec_round(0, Nearest));
+    assert_panic!(Float::ONE.fractional_part_prec_round_ref(0, Nearest));
     // Exact with an inexact fraction
     assert_panic!(parse_hex_string("0xa.50#9").fractional_part_prec_round(1, Exact));
 }
 
 #[test]
 fn integer_and_fractional_parts_prec_round_fail() {
-    assert_panic!(Float::from(1u32).integer_and_fractional_parts_prec_round(0, 1, Nearest));
-    assert_panic!(Float::from(1u32).integer_and_fractional_parts_prec_round(1, 0, Nearest));
+    assert_panic!(Float::ONE.integer_and_fractional_parts_prec_round(0, 1, Nearest));
+    assert_panic!(Float::ONE.integer_and_fractional_parts_prec_round(1, 0, Nearest));
     assert_panic!(
         parse_hex_string("0xa.50#9").integer_and_fractional_parts_prec_round(2, 1, Exact)
     );

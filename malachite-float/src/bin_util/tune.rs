@@ -20,6 +20,7 @@
 //! crossovers are for information). Results are garbage on a busy machine.
 
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::RoundingMode::Nearest;
@@ -45,7 +46,7 @@ fn random_inputs(prec: u64) -> Vec<Float> {
             let n = Natural::from_owned_limbs_asc(limbs)
                 >> (prec.div_ceil(Limb::WIDTH) * Limb::WIDTH - prec);
             // the top bit set, then scaled to [1/2, 1)
-            let n = n | (Natural::from(1u32) << (prec - 1));
+            let n = n | (Natural::ONE << (prec - 1));
             Float::from_natural_prec(n, prec).0 >> prec
         })
         .collect()

@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::BalancedMod;
+use malachite_base::num::basic::traits::One;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -49,7 +50,7 @@ fn benchmark_integer_multi_balanced_crt_algorithms(
                 no_out!(Integer::multi_balanced_crt(&ms, &vs));
             }),
             ("canonical then balance", &mut |(ms, vs)| {
-                let p = ms.iter().fold(Natural::from(1u32), |acc, m| acc * m);
+                let p = ms.iter().fold(Natural::ONE, |acc, m| acc * m);
                 no_out!(
                     Natural::multi_crt(&ms, &vs)
                         .map(|x| Integer::from(x).balanced_mod(Integer::from(p)))

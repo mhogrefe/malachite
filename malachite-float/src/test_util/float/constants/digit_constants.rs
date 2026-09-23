@@ -8,7 +8,7 @@
 
 use crate::Float;
 use malachite_base::num::arithmetic::traits::Pow;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{Digits, ExactFrom};
 use malachite_base::num::factorization::traits::Primes;
 use malachite_base::rounding_modes::RoundingMode;
@@ -37,7 +37,7 @@ pub fn digit_constant_prec_round_naive<I: Iterator<Item = u64>>(
         }
         let den = Natural::from(base).pow(count);
         let lo = Rational::from_naturals(num.clone(), den.clone());
-        let hi = Rational::from_naturals(num + Natural::from(1u32), den);
+        let hi = Rational::from_naturals(num + Natural::ONE, den);
         let (f_lo, _) = Float::from_rational_prec_round(lo.clone(), prec, rm);
         let (f_hi, _) = Float::from_rational_prec_round(hi.clone(), prec, rm);
         if f_lo == f_hi {

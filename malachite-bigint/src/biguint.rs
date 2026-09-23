@@ -24,6 +24,7 @@ use malachite_base::{
             DivExact, DivMod, DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModInverse,
             ModPow, Parity,
         },
+        basic::traits::{One as _, Zero as _},
         conversion::traits::{Digits, FromStringBase, PowerOf2Digits, RoundingInto, ToStringBase},
         logic::traits::{BitAccess, BitIterable, CountOnes, SignificantBits},
     },
@@ -170,7 +171,7 @@ impl FromPrimitive for BigUint {
 impl Zero for BigUint {
     #[inline]
     fn zero() -> Self {
-        Self(<Natural as malachite_base::num::basic::traits::Zero>::ZERO)
+        Self(Natural::ZERO)
     }
 
     #[inline]
@@ -182,7 +183,7 @@ impl Zero for BigUint {
 impl One for BigUint {
     #[inline]
     fn one() -> Self {
-        Self(<Natural as malachite_base::num::basic::traits::One>::ONE)
+        Self(Natural::ONE)
     }
 }
 
@@ -310,12 +311,12 @@ impl num_integer::Integer for BigUint {
 
     #[inline]
     fn dec(&mut self) {
-        self.0 -= <Natural as malachite_base::num::basic::traits::One>::ONE;
+        self.0 -= Natural::ONE;
     }
 
     #[inline]
     fn inc(&mut self) {
-        self.0 += <Natural as malachite_base::num::basic::traits::One>::ONE;
+        self.0 += Natural::ONE;
     }
 }
 

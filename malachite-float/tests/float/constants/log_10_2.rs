@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::basic::traits::Log102;
+use malachite_base::num::basic::traits::{Log102, Two};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
@@ -27,7 +27,7 @@ fn test_log_10_2_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: Orderin
     assert_eq!(to_hex_string(&x), out_hex);
     assert_eq!(o, out_o);
 
-    let (x_alt, o_alt) = Float::log_base_10_prec(Float::from(2), prec);
+    let (x_alt, o_alt) = Float::log_base_10_prec(Float::TWO, prec);
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
     assert_eq!(o_alt, o);
 
@@ -322,7 +322,7 @@ fn log_10_2_prec_properties() {
         );
         assert_eq!(o_alt, o);
 
-        let (log_10_2_alt, o_alt) = Float::log_base_10_prec(Float::from(2), prec);
+        let (log_10_2_alt, o_alt) = Float::log_base_10_prec(Float::TWO, prec);
         assert_eq!(
             ComparableFloatRef(&log_10_2_alt),
             ComparableFloatRef(&log_10_2)

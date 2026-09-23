@@ -1522,10 +1522,10 @@ fn test_sqrt_prec_round() {
 #[test]
 fn sqrt_prec_round_fail() {
     const THREE: Float = Float::const_from_unsigned(3);
-    assert_panic!(Float::one_prec(1).sqrt_prec_round(0, Floor));
-    assert_panic!(Float::one_prec(1).sqrt_prec_round_ref(0, Floor));
+    assert_panic!(Float::ONE.sqrt_prec_round(0, Floor));
+    assert_panic!(Float::ONE.sqrt_prec_round_ref(0, Floor));
     assert_panic!({
-        let mut x = Float::one_prec(1);
+        let mut x = Float::ONE;
         x.sqrt_prec_round_assign(0, Floor)
     });
 

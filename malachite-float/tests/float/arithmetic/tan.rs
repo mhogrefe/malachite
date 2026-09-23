@@ -10,7 +10,7 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{PowerOf2, Tan, TanAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Two, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
@@ -7833,7 +7833,7 @@ fn test_tan_with_period_underflow_and_overflow() {
     let eps = Rational::power_of_2(-((1i64 << 30) + 70));
     let p = (1u64 << 30) + 74;
     // just past a half turn: x/u = 1/2 + 2^(-2^30 - 72), so the tangent is positive and tiny
-    let above = Float::from_rational_prec_round(Rational::from(2u32) + &eps, p, Exact).0;
+    let above = Float::from_rational_prec_round(Rational::TWO + &eps, p, Exact).0;
     let (t, o) = above.tan_with_period_prec_round_ref(4, 10, Nearest);
     assert_eq!(ComparableFloat(t), ComparableFloat(Float::ZERO));
     assert_eq!(o, Less);
@@ -8436,7 +8436,7 @@ fn test_tan_with_period_rational_underflow_and_overflow() {
     let min_positive = Float::one_prec(10) >> (1u64 << 30);
     let eps = Rational::power_of_2(-((1i64 << 30) + 70));
     // just past a half turn: the tangent is positive and tiny
-    let above = Rational::from_unsigneds(1u32, 2u32) + &eps;
+    let above = Rational::ONE_HALF + &eps;
     let (t, o) = Float::tan_with_period_rational_prec_round_ref(&above, 1, 10, Nearest);
     assert_eq!(ComparableFloat(t), ComparableFloat(Float::ZERO));
     assert_eq!(o, Less);
@@ -8579,7 +8579,7 @@ fn test_primitive_float_tan_with_period_rational() {
         -1.7053589139920642e300,
     );
     // just off a zero: the tangent underflows to a subnormal or to zero
-    let half = Rational::from_unsigneds(1u8, 2);
+    let half = Rational::ONE_HALF;
     test_q::<f32>(&(&half + Rational::power_of_2(-140i64)), 1, 4.508e-42);
     test_q::<f32>(&(&half + Rational::power_of_2(-160i64)), 1, 0.0);
     test_q::<f64>(

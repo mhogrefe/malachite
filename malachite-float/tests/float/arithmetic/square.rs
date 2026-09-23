@@ -2437,10 +2437,10 @@ fn test_square_prec_round() {
 #[test]
 fn square_prec_round_fail() {
     const THREE: Float = Float::const_from_unsigned(3);
-    assert_panic!(Float::one_prec(1).square_prec_round(0, Floor));
-    assert_panic!(Float::one_prec(1).square_prec_round_ref(0, Floor));
+    assert_panic!(Float::ONE.square_prec_round(0, Floor));
+    assert_panic!(Float::ONE.square_prec_round_ref(0, Floor));
     assert_panic!({
-        let mut x = Float::one_prec(1);
+        let mut x = Float::ONE;
         x.square_prec_round_assign(0, Floor)
     });
 

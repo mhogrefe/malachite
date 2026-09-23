@@ -490,7 +490,7 @@ fn test_mul_sub_mul_prec_round() {
 
 #[test]
 fn mul_sub_mul_prec_round_fail() {
-    assert_panic!(Float::from(1u32).mul_sub_mul_prec_round(
+    assert_panic!(Float::ONE.mul_sub_mul_prec_round(
         Float::ONE,
         Float::ONE,
         Float::ONE,
@@ -1100,7 +1100,7 @@ fn test_mul_sub_mul_rational_prec_round() {
 
 #[test]
 fn mul_sub_mul_rational_prec_round_fail() {
-    assert_panic!(Float::from(1u32).mul_sub_mul_rational_prec_round(
+    assert_panic!(Float::ONE.mul_sub_mul_rational_prec_round(
         Float::ONE,
         Float::ONE,
         Rational::from_signeds(1i32, 3i32),
@@ -1108,7 +1108,7 @@ fn mul_sub_mul_rational_prec_round_fail() {
         Nearest
     ));
     // Exact with an inexact result
-    assert_panic!(Float::from(1u32).mul_sub_mul_rational_prec_round(
+    assert_panic!(Float::ONE.mul_sub_mul_rational_prec_round(
         Float::ONE,
         Float::ONE,
         Rational::from_signeds(1i32, 3i32),

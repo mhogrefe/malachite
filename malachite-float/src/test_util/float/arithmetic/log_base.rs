@@ -10,6 +10,7 @@ use crate::Float;
 use crate::test_util::common::{rounding_mode_from_rug_round, rug_float_significant_bits};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{CheckedLogBase, Floor};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
@@ -25,7 +26,7 @@ use rug::ops::AssignRound;
 pub(crate) fn simplest_dyadic_in(lo: &Rational, hi: &Rational) -> Rational {
     let mut k = 0u64;
     loop {
-        let m = (lo << k).floor() + Integer::from(1u32); // smallest integer m with m / 2^k > lo
+        let m = (lo << k).floor() + Integer::ONE; // smallest integer m with m / 2^k > lo
         let candidate = Rational::from(m) >> k;
         if candidate < *hi {
             return candidate;

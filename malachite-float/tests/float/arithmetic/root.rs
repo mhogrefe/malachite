@@ -1292,13 +1292,13 @@ fn test_root_s_rational() {
 #[test]
 fn root_u_rational_prec_round_fail() {
     assert_panic!(Float::root_u_rational_prec_round(
-        Rational::from(2),
+        Rational::TWO,
         2,
         0,
         Floor
     ));
     assert_panic!(Float::root_u_rational_prec_round(
-        Rational::from(2),
+        Rational::TWO,
         2,
         10,
         Exact
@@ -1308,13 +1308,13 @@ fn root_u_rational_prec_round_fail() {
 #[test]
 fn root_s_rational_prec_round_fail() {
     assert_panic!(Float::root_s_rational_prec_round(
-        Rational::from(2),
+        Rational::TWO,
         -2,
         0,
         Floor
     ));
     assert_panic!(Float::root_s_rational_prec_round(
-        Rational::from(2),
+        Rational::TWO,
         -2,
         10,
         Exact

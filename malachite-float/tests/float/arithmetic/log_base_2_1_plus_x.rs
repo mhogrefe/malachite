@@ -736,10 +736,10 @@ fn test_log_base_2_1_plus_x_prec_round() {
 
 #[test]
 fn log_base_2_1_plus_x_prec_round_fail() {
-    assert_panic!(Float::one_prec(1).log_base_2_1_plus_x_prec_round(0, Floor));
-    assert_panic!(Float::one_prec(1).log_base_2_1_plus_x_prec_round_ref(0, Floor));
+    assert_panic!(Float::ONE.log_base_2_1_plus_x_prec_round(0, Floor));
+    assert_panic!(Float::ONE.log_base_2_1_plus_x_prec_round_ref(0, Floor));
     assert_panic!({
-        let mut x = Float::one_prec(1);
+        let mut x = Float::ONE;
         x.log_base_2_1_plus_x_prec_round_assign(0, Floor)
     });
 

@@ -10,7 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{
     Abs, DivisibleBy, Mod, ModIsReduced, ModPowerOf2, PowerOf2, UnsignedAbs,
 };
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
@@ -404,7 +404,7 @@ fn rem_properties() {
 
     integer_polynomial_gen().test_properties(|p| {
         // Modulo 1 or -1 everything vanishes.
-        assert_eq!(&p % Integer::from(1), IntegerPolynomial::ZERO);
-        assert_eq!(&p % Integer::from(-1), IntegerPolynomial::ZERO);
+        assert_eq!(&p % Integer::ONE, IntegerPolynomial::ZERO);
+        assert_eq!(&p % Integer::NEGATIVE_ONE, IntegerPolynomial::ZERO);
     });
 }

@@ -10,7 +10,7 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{LogBaseOf1PlusX, LogBaseOf1PlusXAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Two, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
@@ -135,7 +135,7 @@ fn test_log_base_float_base_1_plus_x_prec_round() {
 fn test_log_base_float_base_1_plus_x_specials() {
     let p = |x: Float, base: Float| x.log_base_float_base_1_plus_x_prec(&base, 10).0;
     let cf = |x: Float| ComparableFloat(x);
-    let two = Float::from(2);
+    let two = Float::TWO;
     let half = Float::from(0.5);
 
     // NaN / domain.
@@ -345,17 +345,17 @@ fn log_base_float_base_1_plus_x_prec_round_properties() {
     // The special cases hold for every precision and rounding mode.
     unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
         let f = |x: Float, base: Float| x.log_base_float_base_1_plus_x_prec_round(&base, prec, rm);
-        assert!(f(Float::NAN, Float::from(2)).0.is_nan());
-        assert!(f(Float::from(-2), Float::from(2)).0.is_nan());
+        assert!(f(Float::NAN, Float::TWO).0.is_nan());
+        assert!(f(Float::from(-2), Float::TWO).0.is_nan());
         assert!(f(Float::from(5), Float::from(-2)).0.is_nan());
-        assert_eq!(f(Float::INFINITY, Float::from(2)), (Float::INFINITY, Equal));
+        assert_eq!(f(Float::INFINITY, Float::TWO), (Float::INFINITY, Equal));
         assert_eq!(
-            f(Float::NEGATIVE_ONE, Float::from(2)),
+            f(Float::NEGATIVE_ONE, Float::TWO),
             (Float::NEGATIVE_INFINITY, Equal)
         );
         assert!(f(Float::ZERO, Float::ONE).0.is_nan());
         assert_eq!(
-            ComparableFloat(f(Float::ZERO, Float::from(2)).0),
+            ComparableFloat(f(Float::ZERO, Float::TWO).0),
             ComparableFloat(Float::ZERO)
         );
     });
@@ -426,11 +426,7 @@ fn log_base_float_base_1_plus_x_fail() {
         Nearest
     ));
     // Exact is not allowed when the result is not exactly representable.
-    assert_panic!(Float::from(1).log_base_float_base_1_plus_x_prec_round(
-        &Float::from(3),
-        10,
-        Exact
-    ));
+    assert_panic!(Float::ONE.log_base_float_base_1_plus_x_prec_round(&Float::from(3), 10, Exact));
 }
 
 #[test]

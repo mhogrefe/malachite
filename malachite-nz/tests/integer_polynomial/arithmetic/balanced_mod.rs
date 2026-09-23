@@ -11,10 +11,11 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{
     BalancedMod, BalancedModAssign, DivisibleBy, Mod, UnsignedAbs,
 };
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::comparison::traits::OrdDouble;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
+use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
     integer_polynomial_gen, integer_polynomial_integer_pair_gen_var_1,
 };
@@ -155,15 +156,15 @@ fn balanced_mod_properties() {
 
     integer_polynomial_gen().test_properties(|p| {
         // Modulo 1 or -1 everything vanishes.
-        assert_eq!((&p).balanced_mod(Integer::from(1)), IntegerPolynomial::ZERO);
+        assert_eq!((&p).balanced_mod(Integer::ONE), IntegerPolynomial::ZERO);
         assert_eq!(
-            (&p).balanced_mod(Integer::from(-1)),
+            (&p).balanced_mod(Integer::NEGATIVE_ONE),
             IntegerPolynomial::ZERO
         );
         // Modulo 2 every odd coefficient becomes 1 and every even one 0, which is `mod_op`.
         assert_eq!(
-            (&p).balanced_mod(Integer::from(2)),
-            IntegerPolynomial::from((&p).mod_op(malachite_nz::natural::Natural::from(2u32)))
+            (&p).balanced_mod(Integer::TWO),
+            IntegerPolynomial::from((&p).mod_op(Natural::TWO))
         );
     });
 }

@@ -9,7 +9,7 @@
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
@@ -150,10 +150,10 @@ fn test_log_base_rational_float_base_prec_round() {
 fn test_log_base_rational_float_base_specials() {
     let p = |x: Rational, base: Float| Float::log_base_rational_float_base_prec(x, base, 10).0;
     let cf = |x: Float| ComparableFloat(x);
-    let two = Float::from(2);
+    let two = Float::TWO;
     let half = Float::from(0.5);
     let five = Rational::from(5);
-    let h = Rational::from_signeds(1, 2);
+    let h = Rational::ONE_HALF;
 
     // base out of domain.
     assert!(p(five.clone(), Float::NAN).is_nan());
@@ -277,15 +277,15 @@ fn log_base_rational_float_base_prec_round_properties() {
             Float::log_base_rational_float_base_prec_round(x, base, prec, rm)
         };
         assert!(f(Rational::from(5), Float::NAN).0.is_nan());
-        assert!(f(Rational::from(-3), Float::from(2)).0.is_nan());
+        assert!(f(Rational::from(-3), Float::TWO).0.is_nan());
         assert!(f(Rational::from(5), Float::from(-2)).0.is_nan());
         assert_eq!(
-            f(Rational::ZERO, Float::from(2)),
+            f(Rational::ZERO, Float::TWO),
             (Float::NEGATIVE_INFINITY, Equal)
         );
         assert!(f(Rational::ONE, Float::ONE).0.is_nan());
         assert_eq!(
-            ComparableFloat(f(Rational::ONE, Float::from(2)).0),
+            ComparableFloat(f(Rational::ONE, Float::TWO).0),
             ComparableFloat(Float::ZERO)
         );
     });
@@ -320,7 +320,7 @@ fn log_base_rational_float_base_fail() {
     ));
     // Exact is not allowed when the result is not exactly representable.
     assert_panic!(Float::log_base_rational_float_base_prec_round(
-        Rational::from(2),
+        Rational::TWO,
         Float::from(3),
         10,
         Exact
@@ -341,7 +341,7 @@ fn test_primitive_float_log_base_rational_float_base() {
         );
     }
     test::<f32>(&Rational::from(8), f32::NAN, f32::NAN); // base NaN
-    test::<f32>(&Rational::from(-1), 10.0, f32::NAN); // x < 0
+    test::<f32>(&Rational::NEGATIVE_ONE, 10.0, f32::NAN); // x < 0
     test::<f32>(&Rational::from(8), -2.0, f32::NAN); // base < 0
     test::<f32>(&Rational::from(8), 4.0, 1.5); // log_4(8) = 3/2
     test::<f32>(&Rational::from(4), 0.5, -2.0); // log_(1/2)(4) = -2
@@ -353,15 +353,11 @@ fn test_primitive_float_log_base_rational_float_base() {
     test::<f32>(&Rational::ONE, 10.0, 0.0); // log_b(1) = 0
     test::<f32>(&Rational::from(8), f32::INFINITY, 0.0); // base = inf, x > 0
     test::<f32>(&Rational::from(8), 1.0, f32::INFINITY); // base = 1, x > 1
-    test::<f32>(
-        &Rational::from_unsigneds(1u8, 2),
-        1.0,
-        f32::NEGATIVE_INFINITY,
-    ); // base = 1, 0<x<1
+    test::<f32>(&Rational::ONE_HALF, 1.0, f32::NEGATIVE_INFINITY); // base = 1, 0<x<1
     test::<f32>(&Rational::ONE, 1.0, f32::NAN); // base = 1, x = 1
 
     test::<f64>(&Rational::from(8), f64::NAN, f64::NAN); // base NaN
-    test::<f64>(&Rational::from(-1), 10.0, f64::NAN); // x < 0
+    test::<f64>(&Rational::NEGATIVE_ONE, 10.0, f64::NAN); // x < 0
     test::<f64>(&Rational::from(8), -2.0, f64::NAN); // base < 0
     test::<f64>(&Rational::from(8), 4.0, 1.5); // log_4(8) = 3/2
     test::<f64>(&Rational::from(4), 0.5, -2.0); // log_(1/2)(4) = -2
@@ -377,11 +373,7 @@ fn test_primitive_float_log_base_rational_float_base() {
     test::<f64>(&Rational::ONE, 10.0, 0.0); // log_b(1) = 0
     test::<f64>(&Rational::from(8), f64::INFINITY, 0.0); // base = inf, x > 0
     test::<f64>(&Rational::from(8), 1.0, f64::INFINITY); // base = 1, x > 1
-    test::<f64>(
-        &Rational::from_unsigneds(1u8, 2),
-        1.0,
-        f64::NEGATIVE_INFINITY,
-    ); // base = 1, 0<x<1
+    test::<f64>(&Rational::ONE_HALF, 1.0, f64::NEGATIVE_INFINITY); // base = 1, 0<x<1
     test::<f64>(&Rational::ONE, 1.0, f64::NAN); // base = 1, x = 1
 }
 

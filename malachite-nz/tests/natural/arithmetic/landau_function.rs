@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{DivisibleBy, Lcm};
+use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::landau_function::landau_function_prefix;
 
@@ -14,7 +15,7 @@ use malachite_nz::natural::arithmetic::landau_function::landau_function_prefix;
 fn test_landau_function_prefix() {
     // - the empty and one-element prefixes, and the g(0) = g(1) = 1 edge
     assert!(landau_function_prefix(0).is_empty());
-    assert_eq!(landau_function_prefix(1), vec![Natural::from(1u32)]);
+    assert_eq!(landau_function_prefix(1), vec![Natural::ONE]);
     // - the OEIS A000793 prefix, crossing the first repeated values (g(5) = g(6) = 6) and the first
     //   prime-power parts beyond single primes
     let prefix = landau_function_prefix(20);
@@ -45,7 +46,7 @@ fn landau_function_properties() {
         // whenever the DP chose that step, but universally, g(n) >= g(n - 1) and g(n) divides
         // lcm(1..n); check the latter
     }
-    let mut l = Natural::from(1u32);
+    let mut l = Natural::ONE;
     for i in 1..150u32 {
         l = (&l).lcm(Natural::from(i));
     }

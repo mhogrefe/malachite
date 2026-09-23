@@ -10,7 +10,9 @@ use malachite_base::num::arithmetic::traits::{
     Abs, Hypot, HypotAssign, IsPowerOf2, PowerOf2, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
+use malachite_base::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -378,7 +380,7 @@ fn test_hypot_round() {
 
 #[test]
 fn hypot_round_fail() {
-    assert_panic!(Float::from(1).hypot_round(Float::from(1), Exact));
+    assert_panic!(Float::ONE.hypot_round(Float::ONE, Exact));
     assert_panic!(Float::from(3).hypot_round(Float::from(4), Exact));
 }
 
@@ -935,13 +937,13 @@ fn hypot_prec_round_fail() {
     assert_panic!(Float::from(3).hypot_prec_round(Float::from(4), 0, Floor));
     assert_panic!(Float::from(3).hypot_prec_round_ref_ref(&Float::from(4), 0, Floor));
     // sqrt(2) is irrational
-    assert_panic!(Float::from(1).hypot_prec_round(Float::from(1), 10, Exact));
+    assert_panic!(Float::ONE.hypot_prec_round(Float::ONE, 10, Exact));
     // 5 needs 3 bits
     assert_panic!(Float::from(3).hypot_prec_round(Float::from(4), 2, Exact));
     // the shortcut regime is never exact
     assert_panic!({
-        let y = Float::from(1) >> 1000u32;
-        Float::from(1).hypot_prec_round(y, 10, Exact)
+        let y = Float::ONE >> 1000u32;
+        Float::ONE.hypot_prec_round(y, 10, Exact)
     });
 }
 

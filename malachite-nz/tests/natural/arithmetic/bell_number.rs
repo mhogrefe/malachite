@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{BellNumber, BinomialCoefficient};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_nz::natural::Natural;
@@ -67,7 +68,7 @@ fn bell_number_recurrence() {
     // triangle width boundaries (42, 58), and into the multi-modular tier.
     let mut bells = vec![Natural::bell_number(0)];
     for n in 0..120u64 {
-        let mut next = Natural::from(0u32);
+        let mut next = Natural::ZERO;
         for (k, b) in bells.iter().enumerate() {
             next += Natural::binomial_coefficient(Natural::from(n), Natural::from(k as u64)) * b;
         }
@@ -107,7 +108,7 @@ fn bell_numbers_iterator_agrees_with_bell_number() {
 fn test_bell_numbers_prefix() {
     // - the empty prefix, and the one-element prefix
     assert!(bell_numbers_prefix(0).is_empty());
-    assert_eq!(bell_numbers_prefix(1), vec![Natural::from(1u32)]);
+    assert_eq!(bell_numbers_prefix(1), vec![Natural::ONE]);
     // - a prefix served by the triangle, agreeing with the iterator
     let prefix = bell_numbers_prefix(80);
     assert_eq!(prefix.len(), 80);
@@ -123,14 +124,14 @@ fn test_bell_numbers_prefix() {
     }
     // - the word triangle's length guards: length 1 fills only the leading entry, length 2 also the
     //   second, and length 3 is the first to run the triangle proper
-    assert_eq!(bell_numbers_prefix_multi_mod(1), vec![Natural::from(1u32)]);
+    assert_eq!(bell_numbers_prefix_multi_mod(1), vec![Natural::ONE]);
     assert_eq!(
         bell_numbers_prefix_multi_mod(2),
-        vec![Natural::from(1u32), Natural::from(1u32)]
+        vec![Natural::ONE, Natural::ONE]
     );
     assert_eq!(
         bell_numbers_prefix_multi_mod(3),
-        vec![Natural::from(1u32), Natural::from(1u32), Natural::from(2u32)]
+        vec![Natural::ONE, Natural::ONE, Natural::TWO]
     );
 }
 
@@ -141,6 +142,6 @@ fn test_bell_numbers_prefix_dispatch_high() {
     //   arm that no smaller row can reach
     let prefix = bell_numbers_prefix(5000);
     assert_eq!(prefix.len(), 5000);
-    assert_eq!(prefix[0], Natural::from(1u32));
+    assert_eq!(prefix[0], Natural::ONE);
     assert_eq!(prefix[4999], Natural::bell_number(4999));
 }

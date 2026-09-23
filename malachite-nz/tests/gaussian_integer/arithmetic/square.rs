@@ -128,9 +128,9 @@ fn test_square_branch_coverage() {
     // - both parts fit in a signed word
     check(gi(Integer::from(i64::MAX), Integer::from(i64::MIN)));
     // - the value is purely real, and too large for the double-word path
-    check(gi(big(100, 3), Integer::from(0)));
+    check(gi(big(100, 3), Integer::ZERO));
     // - the value is purely imaginary, and too large for the double-word path
-    check(gi(Integer::from(0), -big(100, 3)));
+    check(gi(Integer::ZERO, -big(100, 3)));
     // - both parts are large and balanced, engaging the three-squarings path
     check(gi(big(1100, 3), -big(1101, 17)));
     // - the parts are unbalanced, so the general path is used

@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, ShlRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
@@ -756,7 +756,7 @@ where
 
     natural_gen().test_properties(|n| {
         assert_eq!(&n << U::ZERO, n);
-        assert_eq!(&n << U::ONE, n * Natural::from(2u32));
+        assert_eq!(&n << U::ONE, n * Natural::TWO);
     });
 
     unsigned_gen_var_5::<U>().test_properties(|u| {

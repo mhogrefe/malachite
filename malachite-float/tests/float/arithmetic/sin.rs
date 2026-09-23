@@ -10,7 +10,7 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{PowerOf2, Sin, SinAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Zero,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
@@ -12698,7 +12698,7 @@ fn test_sin_with_period_rational_underflow() {
     assert_eq!(o, Less);
     // a non-dyadic version: 1/2 + 1/(3 * 2^(2^30 + 70)) of a turn
     let tiny = Rational::power_of_2(-((1i64 << 30) + 70)) / Rational::from(3u32);
-    let x = Rational::from_unsigneds(1u32, 2u32) + tiny;
+    let x = Rational::ONE_HALF + tiny;
     let (s, o) = Float::sin_with_period_rational_prec_round_ref(&x, 1, 10, Nearest);
     assert_eq!(ComparableFloat(s), ComparableFloat(Float::NEGATIVE_ZERO));
     assert_eq!(o, Greater);

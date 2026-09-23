@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{Agm, AgmAssign, PowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Two, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
@@ -2318,10 +2318,10 @@ fn test_agm_round() {
 
 #[test]
 fn agm_round_fail() {
-    assert_panic!(Float::one_prec(1).agm_round(Float::two_prec(1), Exact));
-    assert_panic!(Float::one_prec(1).agm_round_val_ref(&Float::two_prec(1), Exact));
-    assert_panic!(Float::one_prec(1).agm_round_ref_val(Float::two_prec(1), Exact));
-    assert_panic!(Float::one_prec(1).agm_round_ref_ref(&Float::two_prec(1), Exact));
+    assert_panic!(Float::ONE.agm_round(Float::TWO, Exact));
+    assert_panic!(Float::ONE.agm_round_val_ref(&Float::TWO, Exact));
+    assert_panic!(Float::ONE.agm_round_ref_val(Float::TWO, Exact));
+    assert_panic!(Float::ONE.agm_round_ref_ref(&Float::TWO, Exact));
 }
 
 #[test]
@@ -4173,30 +4173,30 @@ fn test_agm_prec_round() {
 
 #[test]
 fn agm_prec_round_fail() {
-    assert_panic!(Float::one_prec(1).agm_prec_round(Float::two_prec(1), 0, Floor));
-    assert_panic!(Float::one_prec(1).agm_prec_round_val_ref(&Float::two_prec(1), 0, Floor));
-    assert_panic!(Float::one_prec(1).agm_prec_round_ref_val(Float::two_prec(1), 0, Floor));
-    assert_panic!(Float::one_prec(1).agm_prec_round_ref_ref(&Float::two_prec(1), 0, Floor));
+    assert_panic!(Float::ONE.agm_prec_round(Float::TWO, 0, Floor));
+    assert_panic!(Float::ONE.agm_prec_round_val_ref(&Float::TWO, 0, Floor));
+    assert_panic!(Float::ONE.agm_prec_round_ref_val(Float::TWO, 0, Floor));
+    assert_panic!(Float::ONE.agm_prec_round_ref_ref(&Float::TWO, 0, Floor));
     assert_panic!({
-        let mut x = Float::one_prec(1);
-        x.agm_prec_round_assign(Float::two_prec(1), 0, Floor)
+        let mut x = Float::ONE;
+        x.agm_prec_round_assign(Float::TWO, 0, Floor)
     });
     assert_panic!({
-        let mut x = Float::one_prec(1);
-        x.agm_prec_round_assign_ref(&Float::two_prec(1), 0, Floor)
+        let mut x = Float::ONE;
+        x.agm_prec_round_assign_ref(&Float::TWO, 0, Floor)
     });
 
-    assert_panic!(Float::one_prec(1).agm_prec_round(Float::two_prec(1), 1, Exact));
-    assert_panic!(Float::one_prec(1).agm_prec_round_val_ref(&Float::two_prec(1), 1, Exact));
-    assert_panic!(Float::one_prec(1).agm_prec_round_ref_val(Float::two_prec(1), 1, Exact));
-    assert_panic!(Float::one_prec(1).agm_prec_round_ref_ref(&Float::two_prec(1), 1, Exact));
+    assert_panic!(Float::ONE.agm_prec_round(Float::TWO, 1, Exact));
+    assert_panic!(Float::ONE.agm_prec_round_val_ref(&Float::TWO, 1, Exact));
+    assert_panic!(Float::ONE.agm_prec_round_ref_val(Float::TWO, 1, Exact));
+    assert_panic!(Float::ONE.agm_prec_round_ref_ref(&Float::TWO, 1, Exact));
     assert_panic!({
-        let mut x = Float::one_prec(1);
-        x.agm_prec_round_assign(Float::two_prec(1), 1, Exact)
+        let mut x = Float::ONE;
+        x.agm_prec_round_assign(Float::TWO, 1, Exact)
     });
     assert_panic!({
-        let mut x = Float::one_prec(1);
-        x.agm_prec_round_assign_ref(&Float::two_prec(1), 1, Exact)
+        let mut x = Float::ONE;
+        x.agm_prec_round_assign_ref(&Float::TWO, 1, Exact)
     });
 }
 

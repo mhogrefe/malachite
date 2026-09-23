@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::{
     Average, AverageAssign, AverageRound, AverageRoundAssign, DivRound, Parity,
 };
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
@@ -135,10 +136,7 @@ fn average_properties() {
         assert_eq!(mut_x, avg);
 
         // an independent computation: divide the sum by 2
-        assert_eq!(
-            (&x + &y).div_round(Integer::from(2u32), rm),
-            (avg.clone(), o)
-        );
+        assert_eq!((&x + &y).div_round(Integer::TWO, rm), (avg.clone(), o));
 
         assert!(avg >= core::cmp::min(&x, &y).clone());
         assert!(avg <= core::cmp::max(&x, &y).clone());
@@ -150,7 +148,7 @@ fn average_properties() {
             assert_eq!(floor, ceiling);
             assert_eq!(floor_o, Equal);
         } else {
-            assert_eq!(ceiling, &floor + Integer::from(1u32));
+            assert_eq!(ceiling, &floor + Integer::ONE);
             assert_eq!(floor_o, Less);
             assert_eq!(ceiling_o, Greater);
             match o {

@@ -9,7 +9,7 @@
 use core::cmp::Ordering::{self, *};
 use gmp_mpfr_sys::mpfr::{self, rnd_t};
 use malachite_base::num::arithmetic::traits::PowerOf2;
-use malachite_base::num::basic::traits::{NaN, NegativeInfinity};
+use malachite_base::num::basic::traits::{NaN, NegativeInfinity, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::LowMask;
@@ -21,6 +21,7 @@ use malachite_float::float::arithmetic::round_to_integer::{
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::natural::Natural;
+use malachite_q::Rational;
 
 const fn mpfr_rnd(rm: RoundingMode) -> rnd_t {
     match rm {
@@ -203,8 +204,8 @@ fn round_to_integer_special() {
     assert_eq!(r, Float::NEGATIVE_INFINITY);
     assert_eq!(o, Equal);
     assert!(!is_int);
-    let (r, o, is_int) = Float::from(0u32).round_to_integer_ref();
-    assert_eq!(ComparableFloat(r), ComparableFloat(Float::from(0u32)));
+    let (r, o, is_int) = Float::ZERO.round_to_integer_ref();
+    assert_eq!(ComparableFloat(r), ComparableFloat(Float::ZERO));
     assert_eq!(o, Equal);
     assert!(is_int);
     // variants agree
@@ -239,11 +240,7 @@ fn test_round_to_integer_then_overflow_extreme() {
     let prec_x = u64::from(u32::exact_from(Float::MAX_EXPONENT)) + 9;
     // Constructed through a Rational so that the exponent is in range from the start; building the
     // integer first would overflow before the scaling shift.
-    let x = Float::from_rational_prec(
-        malachite_q::Rational::from(Natural::low_mask(prec_x)) >> 9u32,
-        prec_x,
-    )
-    .0;
+    let x = Float::from_rational_prec(Rational::from(Natural::low_mask(prec_x)) >> 9u32, prec_x).0;
     let b = rug::Float::exact_from(&x);
     for (rm, expect_infinite) in [(Up, true), (Nearest, true), (Floor, false), (Down, false)] {
         let (ours, o) = x.round_to_integer_then_prec_round_ref(Up, 2, rm);

@@ -544,6 +544,7 @@ where
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("1000000000001*x^2+2000000000003*x+5").unwrap();
@@ -551,7 +552,7 @@ where
     /// assert_eq!(q.to_string(), "x^2+3*x+5");
     ///
     /// // The result's coefficient type is the modulus's.
-    /// let q: malachite_base::unsigned_polynomial::UnsignedPolynomial<u8> = &p % 7u8;
+    /// let q: UnsignedPolynomial<u8> = &p % 7u8;
     /// assert_eq!(q.to_string(), "2*x^2+5*x+5");
     ///
     /// // Reducing the leading coefficient to zero lowers the degree.

@@ -57,7 +57,8 @@ use malachite_nz::natural::arithmetic::mul::mul_low::{
     limbs_mul_low_same_length_divide_and_conquer_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::toom::{
-    limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    TUNE_PROGRAM_BUILD, limbs_mul_greater_to_out_toom_6h,
+    limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
     limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
     limbs_mul_greater_to_out_toom_8h_scratch_len, limbs_mul_greater_to_out_toom_22,
@@ -82,14 +83,16 @@ use malachite_nz::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
 };
 use malachite_nz::natural::arithmetic::square::{
-    limbs_square_to_out_basecase, limbs_square_to_out_toom_2,
+    SQR_TOOM2_THRESHOLD, limbs_square_to_out_basecase, limbs_square_to_out_toom_2,
     limbs_square_to_out_toom_2_scratch_len, limbs_square_to_out_toom_3,
     limbs_square_to_out_toom_3_scratch_len, limbs_square_to_out_toom_4,
     limbs_square_to_out_toom_4_scratch_len, limbs_square_to_out_toom_6,
     limbs_square_to_out_toom_6_scratch_len, limbs_square_to_out_toom_8,
     limbs_square_to_out_toom_8_scratch_len,
 };
-use malachite_nz::natural::conversion::digits::general_digits::limbs_to_digits_small_base_basecase;
+use malachite_nz::natural::conversion::digits::general_digits::{
+    GET_STR_PRECOMPUTE_THRESHOLD, limbs_to_digits_small_base_basecase,
+};
 use malachite_nz::platform::Limb;
 use std::hint::black_box;
 
@@ -239,7 +242,7 @@ fn sqr_basecase_algo<'a>() -> Algo<'a> {
         // The basecase's stack buffer is sized by the compiled-in threshold, so it cannot be
         // measured above it; the crossover scan is capped accordingly. To scan higher, raise
         // SQR_TOOM2_THRESHOLD in platform_64.rs and rebuild.
-        valid: &|n| n <= malachite_nz::natural::arithmetic::square::SQR_TOOM2_THRESHOLD,
+        valid: &|n| n <= SQR_TOOM2_THRESHOLD,
         scratch_len: &|_| 0,
         run: &|out, xs, _, _| limbs_square_to_out_basecase(out, xs),
     }
@@ -284,7 +287,7 @@ fn tune_sqr_toom2() {
     find_crossover(&Level {
         threshold_name: "SQR_TOOM2_THRESHOLD",
         min_size: 4,
-        max_size: malachite_nz::natural::arithmetic::square::SQR_TOOM2_THRESHOLD,
+        max_size: SQR_TOOM2_THRESHOLD,
         lower: sqr_basecase_algo(),
         upper: sqr_toom2_algo(),
     });
@@ -2044,11 +2047,11 @@ fn tune_get_str_precompute() {
     // The basecase asserts xs_len < GET_STR_PRECOMPUTE_THRESHOLD (its stack buffers are sized by
     // it), so the scan is capped just below the compiled-in value; lower the constant and rebuild
     // to scan higher.
-    let max_size = if malachite_nz::natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD {
+    let max_size = if TUNE_PROGRAM_BUILD {
         // GET_STR_THRESHOLD_LIMIT: the basecase's lifted buffer bound under TUNE_PROGRAM_BUILD.
         150
     } else {
-        malachite_nz::natural::conversion::digits::general_digits::GET_STR_PRECOMPUTE_THRESHOLD - 1
+        GET_STR_PRECOMPUTE_THRESHOLD - 1
     };
     find_crossover(&Level {
         threshold_name: "GET_STR_PRECOMPUTE_THRESHOLD",

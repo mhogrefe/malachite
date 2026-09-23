@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{Ln1PlusX, Ln1PlusXAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
-    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, Zero,
+    Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
@@ -1706,10 +1706,10 @@ fn test_ln_1_plus_x_prec_round() {
 #[test]
 fn ln_1_plus_x_prec_round_fail() {
     const THREE: Float = Float::const_from_unsigned(3);
-    assert_panic!(Float::one_prec(1).ln_1_plus_x_prec_round(0, Floor));
-    assert_panic!(Float::one_prec(1).ln_1_plus_x_prec_round_ref(0, Floor));
+    assert_panic!(Float::ONE.ln_1_plus_x_prec_round(0, Floor));
+    assert_panic!(Float::ONE.ln_1_plus_x_prec_round_ref(0, Floor));
     assert_panic!({
-        let mut x = Float::one_prec(1);
+        let mut x = Float::ONE;
         x.ln_1_plus_x_prec_round_assign(0, Floor)
     });
 

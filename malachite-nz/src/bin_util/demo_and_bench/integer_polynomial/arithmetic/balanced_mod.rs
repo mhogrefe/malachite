@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{BalancedMod, BalancedModAssign};
+use malachite_base::num::basic::traits::{NegativeOne, One, Two};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -66,7 +67,7 @@ fn demo_integer_polynomial_balanced_mod_small_moduli(
     limit: usize,
 ) {
     for p in integer_polynomial_gen().get(gm, config).take(limit) {
-        for m in [Integer::from(1), Integer::from(-1), Integer::from(2)] {
+        for m in [Integer::ONE, Integer::NEGATIVE_ONE, Integer::TWO] {
             println!("(&({p})).balanced_mod({m}) = {}", (&p).balanced_mod(&m));
         }
     }
