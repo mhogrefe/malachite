@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::strings::ToDebugString;
@@ -44,6 +45,24 @@ fn test_degree() {
     test("x", Some(1));
     test("x^2+3*x+2", Some(2));
     test("x^100", Some(100));
+}
+
+#[test]
+fn test_len() {
+    let test = |s, out| {
+        assert_eq!(UnsignedPolynomial::<u64>::from_str(s).unwrap().len(), out);
+    };
+    test("0", 0);
+    test("1", 1);
+    test("5", 1);
+    test("x", 2);
+    test("x^2+3*x+2", 3);
+    test("x^100", 101);
+    // The constant polynomials have no coefficients, or one, or two.
+    assert_eq!(UnsignedPolynomial::<u64>::ZERO.len(), 0);
+    assert_eq!(UnsignedPolynomial::<u64>::one().len(), 1);
+    assert_eq!(UnsignedPolynomial::<u64>::two().len(), 1);
+    assert_eq!(UnsignedPolynomial::<u64>::x().len(), 2);
 }
 
 #[test]
@@ -126,5 +145,21 @@ fn coefficients_properties() {
         if p.degree().is_none_or(|d| i > d) {
             assert_eq!(c, 0);
         }
+    });
+}
+
+#[test]
+fn len_properties() {
+    unsigned_polynomial_gen().test_properties(|p| {
+        let len = p.len();
+        // The length is the number of coefficients held, which is one more than the degree.
+        assert_eq!(len, u64::exact_from(p.coefficients_asc().len()));
+        assert_eq!(
+            len,
+            u64::exact_from(p.clone().into_coefficients_asc().len())
+        );
+        assert_eq!(len, p.degree().map_or(0, |d| d + 1));
+        // Only the zero polynomial has length 0.
+        assert_eq!(len == 0, p == UnsignedPolynomial::<u64>::ZERO);
     });
 }

@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::strings::ToDebugString;
+use malachite_nz::test_util::generators::integer_polynomial_gen;
 use malachite_q::Rational;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{
@@ -43,6 +44,24 @@ fn test_degree() {
     test("x", Some(1));
     test("x^2+3*x+2", Some(2));
     test("x^100", Some(100));
+}
+
+#[test]
+fn test_len() {
+    let test = |s, out| {
+        assert_eq!(RationalPolynomial::from_str(s).unwrap().len(), out);
+    };
+    test("0", 0);
+    test("1", 1);
+    test("1/2", 1);
+    test("x", 2);
+    test("1/2*x^2-3*x+2/3", 3);
+    test("-1/7*x^100", 101);
+    // The constant polynomials have no coefficients, or one, or two.
+    assert_eq!(RationalPolynomial::ZERO.len(), 0);
+    assert_eq!(RationalPolynomial::one().len(), 1);
+    assert_eq!(RationalPolynomial::two().len(), 1);
+    assert_eq!(RationalPolynomial::x().len(), 2);
 }
 
 #[test]
@@ -123,5 +142,28 @@ fn coefficients_properties() {
         if p.degree().is_none_or(|d| i > d) {
             assert_eq!(c, 0);
         }
+    });
+}
+
+#[test]
+fn len_properties() {
+    rational_polynomial_gen().test_properties(|p| {
+        let len = p.len();
+        // The length is the number of coefficients held, which is one more than the degree.
+        assert_eq!(len, u64::exact_from(p.to_coefficients_asc().len()));
+        assert_eq!(
+            len,
+            u64::exact_from(p.clone().into_coefficients_asc().len())
+        );
+        assert_eq!(len, p.degree().map_or(0, |d| d + 1));
+        // Only the zero polynomial has length 0.
+        assert_eq!(len == 0, p == RationalPolynomial::ZERO);
+        // The length is the numerator's; the denominator plays no part.
+        assert_eq!(len, p.numerator_ref().len());
+    });
+
+    integer_polynomial_gen().test_properties(|p| {
+        // A polynomial keeps its length when its coefficients are widened to `Rational`s.
+        assert_eq!(RationalPolynomial::from(p.clone()).len(), p.len());
     });
 }

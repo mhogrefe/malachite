@@ -15,6 +15,10 @@ use alloc::vec::Vec;
 ///
 /// The functions here are the ones whose meaning does not depend on what the coefficients are. Each
 /// implementation documents its own complexity and gives its own examples.
+// There is no `is_empty` to go with `len`. Whether a polynomial is zero is asked by comparing it
+// with `ZERO`, which every polynomial type has, and a second spelling of that question, under a
+// name that suits a collection better than a polynomial, would add nothing.
+#[allow(clippy::len_without_is_empty)]
 pub trait Polynomial: Sized {
     /// The type of a coefficient.
     type Coefficient;
@@ -64,6 +68,12 @@ pub trait Polynomial: Sized {
     /// The zero polynomial has no degree, and gives `None`. Every other polynomial's degree is the
     /// index of its leading coefficient, so that a nonzero constant has degree 0.
     fn degree(&self) -> Option<u64>;
+
+    /// Returns the length of a polynomial: the number of coefficients it holds.
+    ///
+    /// A polynomial holds no trailing zeros, so its length is one more than its degree, and the
+    /// zero polynomial, which has no degree, has length 0.
+    fn len(&self) -> u64;
 
     /// Returns one of a polynomial's coefficients.
     ///

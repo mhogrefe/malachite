@@ -14,7 +14,7 @@ use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::{
-    integer_polynomial_gen, integer_polynomial_unsigned_pair_gen_var_1,
+    integer_polynomial_gen, integer_polynomial_unsigned_pair_gen_var_1, natural_polynomial_gen,
 };
 
 #[test]
@@ -43,6 +43,24 @@ fn test_degree() {
     test("x", Some(1));
     test("x^2+3*x+2", Some(2));
     test("x^100", Some(100));
+}
+
+#[test]
+fn test_len() {
+    let test = |s, out| {
+        assert_eq!(IntegerPolynomial::from_str(s).unwrap().len(), out);
+    };
+    test("0", 0);
+    test("1", 1);
+    test("-5", 1);
+    test("x", 2);
+    test("x^2-3*x+2", 3);
+    test("-x^100", 101);
+    // The constant polynomials have no coefficients, or one, or two.
+    assert_eq!(IntegerPolynomial::ZERO.len(), 0);
+    assert_eq!(IntegerPolynomial::one().len(), 1);
+    assert_eq!(IntegerPolynomial::two().len(), 1);
+    assert_eq!(IntegerPolynomial::x().len(), 2);
 }
 
 #[test]
@@ -123,5 +141,26 @@ fn coefficients_properties() {
         if p.degree().is_none_or(|d| i > d) {
             assert_eq!(*c, 0);
         }
+    });
+}
+
+#[test]
+fn len_properties() {
+    integer_polynomial_gen().test_properties(|p| {
+        let len = p.len();
+        // The length is the number of coefficients held, which is one more than the degree.
+        assert_eq!(len, u64::exact_from(p.coefficients_asc().len()));
+        assert_eq!(
+            len,
+            u64::exact_from(p.clone().into_coefficients_asc().len())
+        );
+        assert_eq!(len, p.degree().map_or(0, |d| d + 1));
+        // Only the zero polynomial has length 0.
+        assert_eq!(len == 0, p == IntegerPolynomial::ZERO);
+    });
+
+    natural_polynomial_gen().test_properties(|p| {
+        // A polynomial keeps its length when its coefficients are widened to `Integer`s.
+        assert_eq!(IntegerPolynomial::from(p.clone()).len(), p.len());
     });
 }

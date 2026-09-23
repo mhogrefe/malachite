@@ -510,6 +510,38 @@ impl Polynomial for RationalPolynomial {
         self.numerator.degree()
     }
 
+    /// Returns the length of a [`RationalPolynomial`]: the number of coefficients it holds.
+    ///
+    /// A polynomial holds no trailing zeros, so its length is one more than its
+    /// [`degree`](Self::degree), and the zero polynomial, which has no degree, has length 0.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// assert_eq!(RationalPolynomial::ZERO.len(), 0);
+    /// assert_eq!(RationalPolynomial::from_str("1/2").unwrap().len(), 1);
+    /// assert_eq!(RationalPolynomial::from_str("x").unwrap().len(), 2);
+    /// assert_eq!(
+    ///     RationalPolynomial::from_str("1/2*x^2-3*x+2/3")
+    ///         .unwrap()
+    ///         .len(),
+    ///     3
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpq_poly_length` from `fmpq_poly.h`, FLINT 3.6.0.
+    #[inline]
+    fn len(&self) -> u64 {
+        self.numerator.len()
+    }
+
     /// Returns one of a [`RationalPolynomial`]'s coefficients.
     ///
     /// The index is the power of the variable the coefficient belongs to, so that index 0 gives the

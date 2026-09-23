@@ -20,12 +20,14 @@ use malachite_nz::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_degree);
+    register_demo!(runner, demo_integer_polynomial_len);
     register_demo!(runner, demo_integer_polynomial_coefficients_asc);
     register_demo!(runner, demo_integer_polynomial_into_coefficients_asc);
     register_demo!(runner, demo_integer_polynomial_coefficient);
     register_demo!(runner, demo_integer_polynomial_leading_coefficient);
 
     register_bench!(runner, benchmark_integer_polynomial_degree);
+    register_bench!(runner, benchmark_integer_polynomial_len);
     register_bench!(runner, benchmark_integer_polynomial_coefficients_asc);
     register_bench!(runner, benchmark_integer_polynomial_into_coefficients_asc);
     register_bench!(runner, benchmark_integer_polynomial_coefficient);
@@ -35,6 +37,12 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_integer_polynomial_degree(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in integer_polynomial_gen().get(gm, config).take(limit) {
         println!("({p}).degree() = {:?}", p.degree());
+    }
+}
+
+fn demo_integer_polynomial_len(gm: GenMode, config: &GenConfig, limit: usize) {
+    for p in integer_polynomial_gen().get(gm, config).take(limit) {
+        println!("({p}).len() = {}", p.len());
     }
 }
 
@@ -86,6 +94,24 @@ fn benchmark_integer_polynomial_degree(
         file_name,
         &integer_polynomial_bit_bucketer("p"),
         &mut [("Malachite", &mut |p| no_out!(p.degree()))],
+    );
+}
+
+fn benchmark_integer_polynomial_len(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "IntegerPolynomial.len()",
+        BenchmarkType::Single,
+        integer_polynomial_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &integer_polynomial_bit_bucketer("p"),
+        &mut [("Malachite", &mut |p| no_out!(p.len()))],
     );
 }
 

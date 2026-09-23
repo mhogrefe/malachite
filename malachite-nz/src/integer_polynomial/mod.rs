@@ -323,6 +323,33 @@ impl Polynomial for IntegerPolynomial {
         self.coefficients.len().checked_sub(1).map(u64::exact_from)
     }
 
+    /// Returns the length of a [`IntegerPolynomial`]: the number of coefficients it holds.
+    ///
+    /// A polynomial holds no trailing zeros, so its length is one more than its
+    /// [`degree`](Self::degree), and the zero polynomial, which has no degree, has length 0.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// assert_eq!(IntegerPolynomial::ZERO.len(), 0);
+    /// assert_eq!(IntegerPolynomial::from_str("-5").unwrap().len(), 1);
+    /// assert_eq!(IntegerPolynomial::from_str("x").unwrap().len(), 2);
+    /// assert_eq!(IntegerPolynomial::from_str("x^2-3*x+2").unwrap().len(), 3);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_length` from `fmpz_poly.h`, FLINT 3.6.0.
+    #[inline]
+    fn len(&self) -> u64 {
+        u64::exact_from(self.coefficients.len())
+    }
+
     /// Returns a reference to one of an [`IntegerPolynomial`]'s coefficients.
     ///
     /// The index is the power of the variable the coefficient belongs to, so that index 0 gives the

@@ -20,12 +20,14 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_unsigned_polynomial_degree);
+    register_demo!(runner, demo_unsigned_polynomial_len);
     register_demo!(runner, demo_unsigned_polynomial_coefficients_asc);
     register_demo!(runner, demo_unsigned_polynomial_into_coefficients_asc);
     register_demo!(runner, demo_unsigned_polynomial_coefficient);
     register_demo!(runner, demo_unsigned_polynomial_leading_coefficient);
 
     register_bench!(runner, benchmark_unsigned_polynomial_degree);
+    register_bench!(runner, benchmark_unsigned_polynomial_len);
     register_bench!(runner, benchmark_unsigned_polynomial_coefficients_asc);
     register_bench!(runner, benchmark_unsigned_polynomial_into_coefficients_asc);
     register_bench!(runner, benchmark_unsigned_polynomial_coefficient);
@@ -35,6 +37,12 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_unsigned_polynomial_degree(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in unsigned_polynomial_gen().get(gm, config).take(limit) {
         println!("({p}).degree() = {:?}", p.degree());
+    }
+}
+
+fn demo_unsigned_polynomial_len(gm: GenMode, config: &GenConfig, limit: usize) {
+    for p in unsigned_polynomial_gen().get(gm, config).take(limit) {
+        println!("({p}).len() = {}", p.len());
     }
 }
 
@@ -86,6 +94,24 @@ fn benchmark_unsigned_polynomial_degree(
         file_name,
         &unsigned_polynomial_bit_bucketer("p"),
         &mut [("Malachite", &mut |p| no_out!(p.degree()))],
+    );
+}
+
+fn benchmark_unsigned_polynomial_len(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "UnsignedPolynomial<u64>.len()",
+        BenchmarkType::Single,
+        unsigned_polynomial_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_polynomial_bit_bucketer("p"),
+        &mut [("Malachite", &mut |p| no_out!(p.len()))],
     );
 }
 
