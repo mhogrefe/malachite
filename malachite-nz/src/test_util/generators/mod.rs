@@ -154,6 +154,67 @@ pub fn integer_polynomial_triple_gen()
     )
 }
 
+pub fn integer_polynomial_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(IntegerPolynomial, T)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_unsigned_pair_gen,
+        &random_integer_polynomial_primitive_int_pair_gen,
+        &special_random_integer_polynomial_unsigned_pair_gen,
+    )
+}
+
+pub fn integer_polynomial_signed_pair_gen<T: PrimitiveSigned>() -> Generator<(IntegerPolynomial, T)>
+{
+    Generator::new(
+        &exhaustive_integer_polynomial_signed_pair_gen,
+        &random_integer_polynomial_primitive_int_pair_gen,
+        &special_random_integer_polynomial_signed_pair_gen,
+    )
+}
+
+pub fn integer_polynomial_gaussian_integer_pair_gen()
+-> Generator<(IntegerPolynomial, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_gaussian_integer_pair_gen,
+        &random_integer_polynomial_gaussian_integer_pair_gen,
+        &special_random_integer_polynomial_gaussian_integer_pair_gen,
+    )
+}
+
+pub fn integer_polynomial_integer_pair_gen() -> Generator<(IntegerPolynomial, Integer)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_pair_gen,
+        &random_integer_polynomial_integer_pair_gen,
+        &special_random_integer_polynomial_integer_pair_gen,
+    )
+}
+
+pub fn integer_polynomial_natural_pair_gen() -> Generator<(IntegerPolynomial, Natural)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_natural_pair_gen,
+        &random_integer_polynomial_natural_pair_gen,
+        &special_random_integer_polynomial_natural_pair_gen,
+    )
+}
+
+pub fn integer_polynomial_natural_polynomial_pair_gen()
+-> Generator<(IntegerPolynomial, NaturalPolynomial)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_natural_polynomial_pair_gen,
+        &random_integer_polynomial_natural_polynomial_pair_gen,
+        &special_random_integer_polynomial_natural_polynomial_pair_gen,
+    )
+}
+
+pub fn integer_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(IntegerPolynomial, UnsignedPolynomial<T>)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_unsigned_polynomial_pair_gen,
+        &random_integer_polynomial_unsigned_polynomial_pair_gen,
+        &special_random_integer_polynomial_unsigned_polynomial_pair_gen,
+    )
+}
+
 pub fn gaussian_integer_gen() -> Generator<GaussianInteger> {
     Generator::new(
         &exhaustive_gaussian_integer_gen,

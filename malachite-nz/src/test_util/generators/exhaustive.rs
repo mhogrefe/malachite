@@ -181,6 +181,60 @@ pub fn exhaustive_integer_polynomial_triple_gen()
     ))
 }
 
+pub fn exhaustive_integer_polynomial_signed_pair_gen<T: PrimitiveSigned>()
+-> It<(IntegerPolynomial, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_gaussian_integer_pair_gen()
+-> It<(IntegerPolynomial, GaussianInteger)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_gaussian_integers(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_integer_pair_gen() -> It<(IntegerPolynomial, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_integers(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_natural_pair_gen() -> It<(IntegerPolynomial, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_naturals(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_natural_polynomial_pair_gen()
+-> It<(IntegerPolynomial, NaturalPolynomial)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_natural_polynomials(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
+-> It<(IntegerPolynomial, UnsignedPolynomial<T>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_unsigned_polynomials(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> It<(IntegerPolynomial, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_1() -> It<(IntegerPolynomial, u64)> {
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_integer_polynomials(),

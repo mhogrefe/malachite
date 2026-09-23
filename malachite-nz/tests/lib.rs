@@ -565,6 +565,12 @@ pub mod integer_polynomial {
     }
     pub mod comparison {
         pub mod cmp;
+        pub mod partial_eq_gaussian_integer;
+        pub mod partial_eq_integer;
+        pub mod partial_eq_natural;
+        pub mod partial_eq_natural_polynomial;
+        pub mod partial_eq_primitive_int;
+        pub mod partial_eq_unsigned_polynomial;
         pub mod shortlex_cmp;
     }
     pub mod conversion {

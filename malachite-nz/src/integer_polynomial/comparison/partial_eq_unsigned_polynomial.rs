@@ -6,21 +6,21 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::Natural;
-use crate::natural_polynomial::NaturalPolynomial;
+use crate::integer::Integer;
+use crate::integer_polynomial::IntegerPolynomial;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
-impl<T: PrimitiveUnsigned> PartialEq<UnsignedPolynomial<T>> for NaturalPolynomial
+impl<T: PrimitiveUnsigned> PartialEq<UnsignedPolynomial<T>> for IntegerPolynomial
 where
-    Natural: PartialEq<T>,
+    Integer: PartialEq<T>,
 {
-    /// Determines whether a [`NaturalPolynomial`] is equal to an [`UnsignedPolynomial`].
+    /// Determines whether an [`IntegerPolynomial`] is equal to an [`UnsignedPolynomial`].
     ///
     /// The two are equal when they have the same coefficients, which, since neither stores
     /// trailing zeros, means the same number of coefficients and equal coefficients in each
-    /// position. So the zero polynomials are equal, and a [`NaturalPolynomial`] with a coefficient
-    /// too large for `T` is equal to no [`UnsignedPolynomial<T>`].
+    /// position. So the zero polynomials are equal, and an [`IntegerPolynomial`] with a negative
+    /// coefficient, or one too large for `T`, is equal to no [`UnsignedPolynomial<T>`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -39,11 +39,11 @@ where
     }
 }
 
-impl<T: PrimitiveUnsigned> PartialEq<NaturalPolynomial> for UnsignedPolynomial<T>
+impl<T: PrimitiveUnsigned> PartialEq<IntegerPolynomial> for UnsignedPolynomial<T>
 where
-    Natural: PartialEq<T>,
+    Integer: PartialEq<T>,
 {
-    /// Determines whether an [`UnsignedPolynomial`] is equal to a [`NaturalPolynomial`].
+    /// Determines whether an [`UnsignedPolynomial`] is equal to an [`IntegerPolynomial`].
     ///
     /// The two are equal when they have the same coefficients, so the zero polynomials are equal.
     ///
@@ -58,7 +58,7 @@ where
     /// # Examples
     /// See [here](super::partial_eq_unsigned_polynomial#partial_eq).
     #[inline]
-    fn eq(&self, other: &NaturalPolynomial) -> bool {
+    fn eq(&self, other: &IntegerPolynomial) -> bool {
         other == self
     }
 }

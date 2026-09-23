@@ -1,0 +1,58 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::integer_polynomial::IntegerPolynomial;
+use crate::natural_polynomial::NaturalPolynomial;
+
+impl PartialEq<NaturalPolynomial> for IntegerPolynomial {
+    /// Determines whether an [`IntegerPolynomial`] is equal to a [`NaturalPolynomial`].
+    ///
+    /// The two are equal when they have the same coefficients, which, since neither stores
+    /// trailing zeros, means the same number of coefficients and equal coefficients in each
+    /// position. So the zero polynomials are equal, and an [`IntegerPolynomial`] with a negative
+    /// coefficient is equal to no [`NaturalPolynomial`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the smaller of the two polynomials'
+    /// total number of bits, summed over their coefficients. Polynomials of different degrees are
+    /// compared in constant time.
+    ///
+    /// # Examples
+    /// See [here](super::partial_eq_natural_polynomial#partial_eq).
+    fn eq(&self, other: &NaturalPolynomial) -> bool {
+        let other = other.coefficients_asc();
+        self.coefficients.len() == other.len()
+            && self.coefficients.iter().zip(other).all(|(x, y)| x == y)
+    }
+}
+
+impl PartialEq<IntegerPolynomial> for NaturalPolynomial {
+    /// Determines whether a [`NaturalPolynomial`] is equal to an [`IntegerPolynomial`].
+    ///
+    /// The two are equal when they have the same coefficients, so the zero polynomials are equal.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the smaller of the two polynomials'
+    /// total number of bits, summed over their coefficients. Polynomials of different degrees are
+    /// compared in constant time.
+    ///
+    /// # Examples
+    /// See [here](super::partial_eq_natural_polynomial#partial_eq).
+    #[inline]
+    fn eq(&self, other: &IntegerPolynomial) -> bool {
+        other == self
+    }
+}
