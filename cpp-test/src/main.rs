@@ -392,6 +392,195 @@ fn main() {
     run_oracle(&oracle, "fmpz_multi_CRT", Some(TEST_OUT));
     run_oracle(&oracle, "fmpz_multi_CRT_balanced", Some(TEST_OUT));
 
+    // Every case from test_balanced_mod in malachite-nz's IntegerPolynomial tests, including the
+    // negative moduli, which the oracle passes to FLINT as their absolute values.
+    println!("testing IntegerPolynomial balanced_mod unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for line in [
+            "(0).balanced_mod(1) = 0",
+            "(0).balanced_mod(-7) = 0",
+            "(x^2+27*x-23).balanced_mod(1) = 0",
+            "(x^2+27*x-23).balanced_mod(-1) = 0",
+            "(x^2+27*x-23).balanced_mod(10) = x^2-3*x-3",
+            "(x^2+27*x-23).balanced_mod(-10) = x^2-3*x-3",
+            "(5*x-5).balanced_mod(10) = 5*x+5",
+            "(x^2+x+1).balanced_mod(2) = x^2+x+1",
+            "(-x^2-x-1).balanced_mod(2) = x^2+x+1",
+            "(2*x-2).balanced_mod(5) = 2*x-2",
+            "(3*x-3).balanced_mod(5) = -2*x+2",
+            "(10*x^2+7*x+5).balanced_mod(-10) = -3*x+5",
+            "(-6*x^2-3*x-9).balanced_mod(3) = 0",
+            "(x^3-6*x^2+2).balanced_mod(3) = x^3-1",
+            "(1000000000000000000000000*x+1).balanced_mod(1234567890987) = 530068894399*x+1",
+        ] {
+            writeln!(output_file, "{line}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_scalar_smod_fmpz", Some(TEST_OUT));
+    // The generated cases from balanced_mod_properties: the (polynomial, nonzero modulus) pairs,
+    // by value, by reference, and in place, and every polynomial against the moduli 1, -1, and 2.
+    for demo_name in [
+        "demo_integer_polynomial_balanced_mod",
+        "demo_integer_polynomial_balanced_mod_ref",
+        "demo_integer_polynomial_balanced_mod_assign",
+        "demo_integer_polynomial_balanced_mod_small_moduli",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_poly_scalar_smod_fmpz",
+        );
+    }
+
+    // Every case from test_mod_op in malachite-nz's IntegerPolynomial tests, and the
+    // u128 cases from test_mod_op_unsigned, whose modulus is too wide for an nmod_poly.
+    println!("testing IntegerPolynomial mod_op unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for line in [
+            "(0).mod_op(1) = 0",
+            "(0).mod_op(7) = 0",
+            "(x^2-4*x-5).mod_op(1) = 0",
+            "(x^2-4*x-5).mod_op(3) = x^2+2*x+1",
+            "(-1).mod_op(10) = 9",
+            "(-x).mod_op(18446744073709551616) = 18446744073709551615*x",
+            "(x^2+4*x+5).mod_op(3) = x^2+x+2",
+            "(-6*x+1).mod_op(3) = 1",
+            "(-6*x^2+3*x-1).mod_op(3) = 2",
+            "(-6*x^2-3*x-9).mod_op(3) = 0",
+            "(x^3-6*x^2+2).mod_op(3) = x^3+2",
+            "(-1000000000000000000000000*x+1).mod_op(1234567890987) = 704498996588*x+1",
+            "(x^2-4*x+5).mod_op(1000000000000000000000000) = x^2+999999999999999999999996*x+5",
+            "(-x).mod_op(340282366920938463463374607431768211455) = 340282366920938463463374607431768211454*x",
+        ] {
+            writeln!(output_file, "{line}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_scalar_mod_fmpz", Some(TEST_OUT));
+    // The generated cases from mod_op_properties, and the u128 ones from
+    // mod_op_unsigned_properties.
+    for demo_name in [
+        "demo_integer_polynomial_mod_op",
+        "demo_integer_polynomial_mod_op_ref",
+        "demo_integer_polynomial_mod_op_power_of_2_moduli",
+        "demo_integer_polynomial_mod_op_unsigned_u128",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_poly_scalar_mod_fmpz",
+        );
+    }
+
+    // The cases from test_mod_op_unsigned whose modulus fits in a word.
+    println!("testing IntegerPolynomial mod_op by a word unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for line in [
+            "(0).mod_op(1) = 0",
+            "(0).mod_op(7) = 0",
+            "(x^2-4*x-5).mod_op(3) = x^2+2*x+1",
+            "(x^2-4*x-5).mod_op(1) = 0",
+            "(-1).mod_op(255) = 254",
+            "(-1).mod_op(18446744073709551615) = 18446744073709551614",
+            "(-1000000000001*x^2+2000000000003*x-5).mod_op(7) = 5*x^2+5*x+2",
+            "(-100000000000000000000*x+1).mod_op(18446744073709551615) = 10680464442257309690*x+1",
+            "(-1024*x^2-3).mod_op(4) = 1",
+            "(-4294967296*x^2+4294967296).mod_op(65536) = 0",
+        ] {
+            writeln!(output_file, "{line}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_get_nmod_poly", Some(TEST_OUT));
+    // The generated cases from mod_op_unsigned_properties, for every word-sized type.
+    for demo_name in [
+        "demo_integer_polynomial_mod_op_unsigned_u8",
+        "demo_integer_polynomial_mod_op_unsigned_u16",
+        "demo_integer_polynomial_mod_op_unsigned_u32",
+        "demo_integer_polynomial_mod_op_unsigned_u64",
+        "demo_integer_polynomial_mod_op_unsigned_usize",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_poly_get_nmod_poly",
+        );
+    }
+
+    // Every case from test_rem, test_rem_lowers_the_degree, test_rem_unsigned, and test_mod_op
+    // in malachite-nz's NaturalPolynomial tests.
+    println!("testing NaturalPolynomial rem unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for line in [
+            "(0) % 1 = 0",
+            "(0) % 7 = 0",
+            "(x^2+4*x+5) % 3 = x^2+x+2",
+            "(x^2+4*x+5) % 7 = x^2+4*x+5",
+            "(x^2+4*x+5) % 1 = 0",
+            "(1000000000001*x^2+2000000000003*x+5) % 1000000000000 = x^2+3*x+5",
+            "(1000000000000000000000000*x+1) % 1234567890987 = 530068894399*x+1",
+            "(x^2+4*x+5) % 1000000000000000000000000 = x^2+4*x+5",
+            "(4*x^2+3) % 4 = 3",
+            "(6*x^2+3*x+2) % 3 = 2",
+            "(6*x^2+3*x+9) % 3 = 0",
+            "(x^3+6*x^2+2) % 3 = x^3+2",
+            "(5*x^5+10*x^4+15*x^3+1) % 5 = 1",
+            "(2000000000000*x^2+1000000000000*x+7) % 1000000000000 = 7",
+            "(0) % 1 = 0",
+            "(0) % 7 = 0",
+            "(x^2+4*x+5) % 3 = x^2+x+2",
+            "(x^2+4*x+5) % 1 = 0",
+            "(1000000000001*x^2+2000000000003*x+5) % 1000 = x^2+3*x+5",
+            "(1000000000001*x^2+2000000000003*x+5) % 7 = 2*x^2+5*x+5",
+            "(256*x^2+257*x+3) % 255 = x^2+2*x+3",
+            "(100000000000000000000*x+1) % 18446744073709551615 = 7766279631452241925*x+1",
+            "(1000000000000000000000000000000000000000*x) % 340282366920938463463374607431768211455 = 319435266158123073073250785136463577090*x",
+            "(1024*x^2+3) % 4 = 3",
+            "(4294967296*x^2+4294967296) % 65536 = 0",
+            "(0).mod_op(1) = 0",
+            "(x^2+4*x+5).mod_op(3) = x^2+x+2",
+            "(x^2+4*x+5).mod_op(1) = 0",
+            "(4*x^2+3).mod_op(4) = 3",
+            "(1000000000000000000000000*x+1).mod_op(1234567890987) = 530068894399*x+1",
+        ] {
+            writeln!(output_file, "{line}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_mod_poly_set_fmpz_poly", Some(TEST_OUT));
+    // The generated cases from rem_properties and rem_unsigned_properties, in every form.
+    for demo_name in [
+        "demo_natural_polynomial_rem",
+        "demo_natural_polynomial_rem_ref",
+        "demo_natural_polynomial_rem_assign",
+        "demo_natural_polynomial_mod_op",
+        "demo_natural_polynomial_mod_assign",
+        "demo_natural_polynomial_rem_special_moduli",
+        "demo_natural_polynomial_rem_unsigned_u8",
+        "demo_natural_polynomial_rem_unsigned_u16",
+        "demo_natural_polynomial_rem_unsigned_u32",
+        "demo_natural_polynomial_rem_unsigned_u64",
+        "demo_natural_polynomial_rem_unsigned_u128",
+        "demo_natural_polynomial_rem_unsigned_usize",
+        "demo_natural_polynomial_rem_unsigned_ref_u8",
+        "demo_natural_polynomial_rem_unsigned_ref_u16",
+        "demo_natural_polynomial_rem_unsigned_ref_u32",
+        "demo_natural_polynomial_rem_unsigned_ref_u64",
+        "demo_natural_polynomial_rem_unsigned_ref_u128",
+        "demo_natural_polynomial_rem_unsigned_ref_usize",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_mod_poly_set_fmpz_poly",
+        );
+    }
+
     for demo_name in [
         "demo_u8_primitive_root_prime",
         "demo_u16_primitive_root_prime",

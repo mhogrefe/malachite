@@ -54,6 +54,10 @@ static const oracle_mode modes[] = {
     {"fmpq_next_signed_minimal", run_fmpq_next_signed_minimal},
     {"fmpq_reconstruct", run_fmpq_reconstruct},
     {"fmpq_reconstruct_2", run_fmpq_reconstruct_2},
+    {"fmpz_poly_scalar_smod_fmpz", run_fmpz_poly_scalar_smod_fmpz},
+    {"fmpz_poly_scalar_mod_fmpz", run_fmpz_poly_scalar_mod_fmpz},
+    {"fmpz_poly_get_nmod_poly", run_fmpz_poly_get_nmod_poly},
+    {"fmpz_mod_poly_set_fmpz_poly", run_fmpz_mod_poly_set_fmpz_poly},
 };
 
 int

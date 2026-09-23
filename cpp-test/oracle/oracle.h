@@ -18,6 +18,7 @@
 
 #include <flint/flint.h>
 #include <flint/fmpz.h>
+#include <flint/fmpz_poly.h>
 
 /* util.c */
 
@@ -38,6 +39,26 @@ int split_method_call(char * line, const char * method, char ** pieces, int n_pi
    case and returning 0 in the `None` case. The `Some` case mutates `rest` in place. */
 int parse_option_fmpz(char * rest, fmpz_t expected);
 int parse_option_ulong(const char * rest, ulong * expected);
+
+/* Parses a polynomial as Malachite displays it, such as `x^2-3*x-3`, `-x+1`, or `0`: terms of
+   the form `c*x^e`, with a coefficient of 1 and an exponent of 1 left out, and a sign between
+   terms. Returns 1 on success and 0 if the text is not in that form. */
+int fmpz_poly_set_str_malachite(fmpz_poly_t poly, const char * s);
+
+/* Splits, in place, a line in which a polynomial `P` is combined with a scalar `M` to give `R`.
+   The shapes recognized are `(P).method(M) = R`, `(&(P)).method(M) = R`,
+   `p := P; p.assign_method(M); p = R`, `(P) op M = R`, `&(P) op M = R`, and
+   `p := P; p op= M; p = R`; pass NULL for `method`, `assign_method`, or `op` to skip those
+   shapes. The in-place name is passed separately because it is not always derivable from the
+   other (`mod_op` goes with `mod_assign`). Strips a trailing newline. Returns 1 and sets the
+   three pointers on success, and 0 if the line has none of the shapes. */
+int split_polynomial_scalar_line(char * line, const char * method, const char * assign_method,
+                                 const char * op, char ** receiver, char ** arg, char ** result);
+
+/* Returns 0 if `checked` is positive, and otherwise reports that no line of the input had the
+   shape the mode `name` looks for and returns 1. A mode skips lines it cannot parse, so without
+   this check a change to a demo's output format would make every run pass vacuously. */
+int require_some_lines(const char * name, long checked);
 
 /* Mode entry points, one per file. `arg` is the input-file path, except for `sqrtmod_stress`,
    where it is the iteration count. */
@@ -94,5 +115,13 @@ int run_fmpq_next_signed_minimal(const char * arg);
 /* fmpq_reconstruct.c */
 int run_fmpq_reconstruct(const char * arg);
 int run_fmpq_reconstruct_2(const char * arg);
+
+/* fmpz_poly_smod.c */
+int run_fmpz_poly_scalar_smod_fmpz(const char * arg);
+
+/* fmpz_poly_mod.c */
+int run_fmpz_poly_scalar_mod_fmpz(const char * arg);
+int run_fmpz_poly_get_nmod_poly(const char * arg);
+int run_fmpz_mod_poly_set_fmpz_poly(const char * arg);
 
 #endif

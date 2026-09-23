@@ -51,9 +51,10 @@ impl<'tcx> LateLintPass<'tcx> for UseNamedConstant {
         if expr.span.from_expansion() {
             return;
         }
-        // Tests, demos, and test utilities construct constants the long way on purpose, to exercise
-        // the constructors themselves.
-        if crate::in_test_code(cx, expr.span) {
+        // Tests of conversions, constants, and comparisons construct constants the long way on
+        // purpose, to exercise the constructors themselves. Everywhere else, including the rest of
+        // the tests, demos, and test utilities, a constant is written by name.
+        if crate::in_constructor_test_code(cx, expr.span) {
             return;
         }
         let ExprKind::Call(callee, args) = expr.kind else {

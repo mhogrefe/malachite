@@ -30,6 +30,7 @@ mod compare_with_primitive;
 mod div_mod_projection;
 mod duplicate_const;
 mod factor_out_assignment;
+mod fully_qualified_path;
 mod hoist_shifts;
 mod let_tuple_underscore_to_field;
 mod long_lines;
@@ -493,6 +494,31 @@ fn in_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> boo
     }
 }
 
+// Whether the span lies in test code that exercises constructors or conversions on purpose: tests,
+// demos, and test utilities under a `conversion`, `basic/constants`, or `comparison` directory, or
+// the doctests of those modules. Elsewhere in test code, a value like `Natural::from(2u32)` is just
+// a value, and should be written the way library code writes it.
+fn in_constructor_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> bool {
+    use rustc_lint::LintContext;
+    if !in_test_code(cx, span) {
+        return false;
+    }
+    // In doctest mode, in_test_code is already true only for the constructor-demonstrating docs.
+    if std::env::var_os("MALACHITE_LINT_DOCTESTS").is_some() {
+        return true;
+    }
+    if let rustc_span::FileName::Real(real) = cx.sess().source_map().span_to_filename(span)
+        && let Some(path) = real.local_path()
+    {
+        let path = path.to_string_lossy().replace('\\', "/");
+        path.contains("/conversion/")
+            || path.contains("/basic/constants")
+            || path.contains("/comparison/")
+    } else {
+        false
+    }
+}
+
 #[expect(clippy::no_mangle_with_rust_abi)]
 #[unsafe(no_mangle)]
 pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint::LintStore) {
@@ -544,6 +570,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_exact_from::USE_EXACT_FROM,
         use_fused_mul::USE_FUSED_MUL,
         factor_out_assignment::FACTOR_OUT_ASSIGNMENT,
+        fully_qualified_path::FULLY_QUALIFIED_PATH,
         use_get_bit::USE_GET_BIT,
         use_mod_power_of_2::USE_MOD_POWER_OF_2,
         use_mod_square::USE_MOD_SQUARE,
@@ -642,6 +669,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_unary_assign::UseUnaryAssign));
     lint_store.register_late_pass(|_| Box::new(use_abs_comparison::UseAbsComparison));
     lint_store.register_late_pass(|_| Box::new(use_width_mask::UseWidthMask));
+    lint_store.register_late_pass(|_| Box::new(fully_qualified_path::FullyQualifiedPath));
 }
 
 #[test]

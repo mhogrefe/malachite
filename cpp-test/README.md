@@ -49,6 +49,10 @@ shared state: don't run the driver and a manual demo regeneration concurrently.
 | `fmpz_sqrtmod` | `fmpz_sqrtmod` | `demo_natural_mod_sqrt` (malachite-nz) |
 | `n_sqrtmod` | `n_sqrtmod` | `demo_mod_sqrt_u64` (malachite-base) |
 | `n_primitive_root_prime` | `n_primitive_root_prime` | `demo_*_primitive_root_prime` (malachite-base) |
+| `fmpz_poly_scalar_smod_fmpz` | `fmpz_poly_scalar_smod_fmpz` | `demo_integer_polynomial_balanced_mod`, `_ref`, `_assign`, and `_small_moduli` (malachite-nz), plus unit rows |
+| `fmpz_poly_scalar_mod_fmpz` | `fmpz_poly_scalar_mod_fmpz` | `demo_integer_polynomial_mod_op`, `_ref`, `_power_of_2_moduli`, and `_unsigned_u128` (malachite-nz), plus unit rows |
+| `fmpz_poly_get_nmod_poly` | `fmpz_poly_get_nmod_poly` | `demo_integer_polynomial_mod_op_unsigned_*` for every word-sized type (malachite-nz), plus unit rows |
+| `fmpz_mod_poly_set_fmpz_poly` | `fmpz_mod_poly_set_fmpz_poly` | `demo_natural_polynomial_rem`, `_ref`, `_assign`, `_special_moduli`, `_unsigned_*`, and `_unsigned_ref_*`, and `demo_natural_polynomial_mod_op` and `_mod_assign` (malachite-nz), plus unit rows |
 | `sqrtmod_stress` | `fmpz_sqrtmod` | none — a memory-stress diagnostic, run manually |
 
 The `sqrtmod` modes skip documented divergence windows, noted in comments in
@@ -62,6 +66,11 @@ and FLINT's behavior rests on undefined or wrapping operations.
 2. Add a mode file under `oracle/` that parses that format (one `run_*` entry point; declare it
    in `oracle/oracle.h` and add a row to the table in `oracle/main.c`),
    recomputes with FLINT, and returns 1 with a diagnostic on the first mismatch.
+   Make the mode strict when its input holds one kind of line: treat any unrecognized nonempty
+   line as an error, and fail an input in which nothing was checked (`require_some_lines`).
+   Otherwise a change to the demo's output format makes every run pass without checking anything.
+   The polynomial modes do this, and share `split_polynomial_scalar_line` and
+   `fmpz_poly_set_str_malachite` from `oracle/util.c`.
 3. Register the demo in `src/main.rs` with `check_demo_against_flint`.
 4. Prove the harness can fail: corrupt one line of `test-out.txt` by hand and check that the
    oracle catches it.

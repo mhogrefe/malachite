@@ -6,6 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), which
+/// reduces every coefficient of a polynomial to the representative closest to zero, producing an
+/// [`IntegerPolynomial`](crate::integer_polynomial::IntegerPolynomial).
+pub mod balanced_mod;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
 /// of a polynomial's coefficients.

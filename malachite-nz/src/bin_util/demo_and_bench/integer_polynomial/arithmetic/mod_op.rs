@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::Mod;
+use malachite_base::num::arithmetic::traits::{Mod, PowerOf2};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
@@ -15,13 +15,14 @@ use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::pair_1_integer_polynomial_bit_bucketer;
 use malachite_nz::test_util::generators::{
-    integer_polynomial_integer_pair_gen_var_1, integer_polynomial_natural_pair_gen_var_1,
-    integer_polynomial_unsigned_pair_gen,
+    integer_polynomial_gen, integer_polynomial_integer_pair_gen_var_1,
+    integer_polynomial_natural_pair_gen_var_1, integer_polynomial_unsigned_pair_gen,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_mod_op);
     register_demo!(runner, demo_integer_polynomial_mod_op_ref);
+    register_demo!(runner, demo_integer_polynomial_mod_op_power_of_2_moduli);
 
     register_unsigned_demos!(runner, demo_integer_polynomial_mod_op_unsigned);
     register_demo!(runner, demo_integer_polynomial_rem);
@@ -55,6 +56,17 @@ fn demo_integer_polynomial_mod_op_ref(gm: GenMode, config: &GenConfig, limit: us
         .take(limit)
     {
         println!("(&({p})).mod_op({m}) = {}", (&p).mod_op(&m));
+    }
+}
+
+// The moduli 1, 2, 2^7, 2^64, and 2^100 are the ones the property tests single out: everything
+// vanishes for the first, and the others agree with `mod_power_of_2`.
+fn demo_integer_polynomial_mod_op_power_of_2_moduli(gm: GenMode, config: &GenConfig, limit: usize) {
+    for p in integer_polynomial_gen().get(gm, config).take(limit) {
+        for pow in [0, 1, 7, 64, 100] {
+            let m = Natural::power_of_2(pow);
+            println!("(&({p})).mod_op({m}) = {}", (&p).mod_op(&m));
+        }
     }
 }
 
