@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::integer_polynomial_gen;
@@ -15,19 +16,33 @@ fn test_constants() {
     assert!(IntegerPolynomial::ZERO.is_valid());
     assert!(IntegerPolynomial::one().is_valid());
     assert!(IntegerPolynomial::two().is_valid());
+    assert!(IntegerPolynomial::negative_one().is_valid());
+    assert!(IntegerPolynomial::x().is_valid());
 
     assert_eq!(IntegerPolynomial::ZERO.to_string(), "0");
     assert_eq!(IntegerPolynomial::one().to_string(), "1");
     assert_eq!(IntegerPolynomial::two().to_string(), "2");
+    assert_eq!(IntegerPolynomial::negative_one().to_string(), "-1");
+    assert_eq!(IntegerPolynomial::x().to_string(), "x");
 
-    // The zero polynomial has no degree at all; the other two are constants.
+    // The zero polynomial has no degree at all; the others are constants, except x.
     assert_eq!(IntegerPolynomial::ZERO.degree(), None);
     assert_eq!(IntegerPolynomial::one().degree(), Some(0));
     assert_eq!(IntegerPolynomial::two().degree(), Some(0));
+    assert_eq!(IntegerPolynomial::negative_one().degree(), Some(0));
+    assert_eq!(IntegerPolynomial::x().degree(), Some(1));
 
     assert_eq!(IntegerPolynomial::from(0u32), IntegerPolynomial::ZERO);
     assert_eq!(IntegerPolynomial::from(1u32), IntegerPolynomial::one());
     assert_eq!(IntegerPolynomial::from(2u32), IntegerPolynomial::two());
+    assert_eq!(
+        IntegerPolynomial::from(-1i32),
+        IntegerPolynomial::negative_one()
+    );
+    assert_eq!(
+        IntegerPolynomial::from_str("x").unwrap(),
+        IntegerPolynomial::x()
+    );
 }
 
 #[test]

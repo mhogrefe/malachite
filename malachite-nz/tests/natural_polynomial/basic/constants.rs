@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::natural_polynomial_gen;
@@ -15,19 +16,26 @@ fn test_constants() {
     assert!(NaturalPolynomial::ZERO.is_valid());
     assert!(NaturalPolynomial::one().is_valid());
     assert!(NaturalPolynomial::two().is_valid());
+    assert!(NaturalPolynomial::x().is_valid());
 
     assert_eq!(NaturalPolynomial::ZERO.to_string(), "0");
     assert_eq!(NaturalPolynomial::one().to_string(), "1");
     assert_eq!(NaturalPolynomial::two().to_string(), "2");
+    assert_eq!(NaturalPolynomial::x().to_string(), "x");
 
-    // The zero polynomial has no degree at all; the other two are constants.
+    // The zero polynomial has no degree at all; the others are constants, except x.
     assert_eq!(NaturalPolynomial::ZERO.degree(), None);
     assert_eq!(NaturalPolynomial::one().degree(), Some(0));
     assert_eq!(NaturalPolynomial::two().degree(), Some(0));
+    assert_eq!(NaturalPolynomial::x().degree(), Some(1));
 
     assert_eq!(NaturalPolynomial::from(0u32), NaturalPolynomial::ZERO);
     assert_eq!(NaturalPolynomial::from(1u32), NaturalPolynomial::one());
     assert_eq!(NaturalPolynomial::from(2u32), NaturalPolynomial::two());
+    assert_eq!(
+        NaturalPolynomial::from_str("x").unwrap(),
+        NaturalPolynomial::x()
+    );
 }
 
 #[test]

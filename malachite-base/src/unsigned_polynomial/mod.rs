@@ -130,6 +130,27 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
         }
     }
 
+    /// The polynomial $x$, of degree 1 with leading coefficient 1 and constant term 0.
+    ///
+    /// This is a function rather than an associated constant, for the reason given by
+    /// [`one`](Self::one).
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// assert_eq!(UnsignedPolynomial::<u64>::x().to_string(), "x");
+    /// assert_eq!(UnsignedPolynomial::<u64>::x().degree(), Some(1));
+    /// ```
+    pub fn x() -> Self {
+        Self {
+            coefficients: vec![T::ZERO, T::ONE],
+        }
+    }
+
     /// Returns a reference to a [`UnsignedPolynomial`]'s coefficients, in ascending order.
     ///
     /// The first is the constant term and the last is the leading coefficient, so the slice is what

@@ -13,7 +13,7 @@ use malachite_base::named::Named;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::CoprimeWith;
 use malachite_base::num::arithmetic::traits::{DivExact, Gcd, GcdAssign, LcmAssign};
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
@@ -204,6 +204,50 @@ impl RationalPolynomial {
     pub fn negative_one() -> Self {
         Self {
             numerator: IntegerPolynomial::negative_one(),
+            denominator: Natural::ONE,
+        }
+    }
+
+    /// The constant polynomial 1/2.
+    ///
+    /// This is a function rather than an associated constant, for the reason given by
+    /// [`one`](Self::one).
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// assert_eq!(RationalPolynomial::one_half().to_string(), "1/2");
+    /// assert_eq!(RationalPolynomial::one_half().degree(), Some(0));
+    /// ```
+    pub fn one_half() -> Self {
+        Self {
+            numerator: IntegerPolynomial::one(),
+            denominator: Natural::TWO,
+        }
+    }
+
+    /// The polynomial $x$, of degree 1 with leading coefficient 1 and constant term 0.
+    ///
+    /// This is a function rather than an associated constant, for the reason given by
+    /// [`one`](Self::one).
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// assert_eq!(RationalPolynomial::x().to_string(), "x");
+    /// assert_eq!(RationalPolynomial::x().degree(), Some(1));
+    /// ```
+    pub fn x() -> Self {
+        Self {
+            numerator: IntegerPolynomial::x(),
             denominator: Natural::ONE,
         }
     }
