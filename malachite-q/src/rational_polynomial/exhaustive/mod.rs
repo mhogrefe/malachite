@@ -13,6 +13,7 @@ use crate::rational::exhaustive::{
 use crate::rational_polynomial::RationalPolynomial;
 use core::iter::{Chain, Once};
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::vecs::exhaustive::{
     ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
     exhaustive_vecs_with_last_fixed_length, exhaustive_vecs_with_last_length_inclusive_range,

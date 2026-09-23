@@ -9,14 +9,14 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural_polynomial::NaturalPolynomial;
+use malachite_base::polynomial::Polynomial;
 
 impl From<NaturalPolynomial> for IntegerPolynomial {
     /// Converts a [`NaturalPolynomial`] to an [`IntegerPolynomial`].
     ///
     /// Every polynomial with [`Natural`](crate::natural::Natural) coefficients is one with
-    /// [`Integer`](crate::integer::Integer) coefficients, so nothing is lost and nothing can fail.
-    /// The coefficients are converted one by one, and the leading one stays nonzero, so the degree
-    /// is unchanged.
+    /// [`Integer`] coefficients, so nothing is lost and nothing can fail. The coefficients are
+    /// converted one by one, and the leading one stays nonzero, so the degree is unchanged.
     ///
     /// $f(p) = p$, read on the left over $\N$ and on the right over $\Z$.
     ///

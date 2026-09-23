@@ -60,8 +60,9 @@ your project. Notes:
   nothing to protect there. Lints that are purely about readability and structure, such as
   `let_tuple_underscore_to_field`, `collapse_adjacent_ifs`, `duplicate_const`,
   `factor_out_assignment`, and `assign_then_returned`, apply everywhere, as do `long_lines`,
-  `collapse_adjacent_imports`, `bignum_literal_suffix`, and `fully_qualified_path`. Doctests are
-  linted in full, except the docs of conversions, constants, and comparisons.
+  `collapse_adjacent_imports`, `bignum_literal_suffix`, `fully_qualified_path`, and
+  `redundant_crate_prefix`. Doctests are linted in full, except the docs of conversions,
+  constants, and comparisons.
 
 ## Lints
 
@@ -190,10 +191,19 @@ constructions on purpose.
 
 Flags a path that names an item of a Malachite crate starting from the crate root, such as
 `malachite_nz::natural::Natural::from(k)` or the type `malachite_q::Rational`, anywhere but in a
-`use` item. House style is to import the item and refer to it by name. Only paths rooted at a `malachite*` crate are flagged: `crate::` paths have
-legitimate uses (a module re-exporting a platform constant under the same name cannot import it),
-and `std`/`core` paths are out of scope. Paths written by macros are skipped. Applies everywhere,
-tests and doctests included.
+`use` item. House style is to import the item and refer to it by name. Only paths rooted at a
+`malachite*` crate are flagged: `crate::` paths have legitimate uses (a module re-exporting a
+platform constant under the same name cannot import it), and `std`/`core` paths are out of scope.
+Paths written by macros are skipped. Applies everywhere, tests and doctests included.
+
+### `redundant_crate_prefix`
+
+Flags a path that reaches another crate through `crate::`, such as
+`use crate::malachite_base::num::basic::traits::Zero;`. The prefix is not needed: the path
+compiles only because the crate root declares `extern crate malachite_base;`, which puts the crate
+at `crate::malachite_base` as well as under its own name. Write `malachite_base::...` instead. A
+`use` item with a braced list is reported once. `crate::` paths to the crate's own items are not
+flagged, even in the crate root where the prefix could be dropped. Applies everywhere.
 
 ### `runtime_literal_conversion`
 

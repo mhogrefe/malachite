@@ -59,10 +59,10 @@ impl ListVars {
     /// length of the longest one.
     ///
     /// # Panics
-    /// Panics if any name is empty, if any name holds a character that
-    /// [`char_is_reserved`](crate::vars::char_is_reserved) rejects, or if two names are the same.
-    /// These are the three things the [`VarScheme`] contract asks of a scheme's names, and checking
-    /// them here is what lets everything after this take them for granted.
+    /// Panics if any name is empty, if any name holds a character that [`char_is_reserved`]
+    /// rejects, or if two names are the same. These are the three things the [`VarScheme`] contract
+    /// asks of a scheme's names, and checking them here is what lets everything after this take
+    /// them for granted.
     ///
     /// # Examples
     /// See [here](self).

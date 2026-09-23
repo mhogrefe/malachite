@@ -9,8 +9,8 @@
 /// An implementation of [`Height`](crate::num::arithmetic::traits::Height), the largest of a
 /// polynomial's coefficients.
 pub mod height;
-/// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
-/// determining whether a number is a unit of its ring.
+/// An implementation of [`IsUnit`](crate::num::arithmetic::traits::IsUnit), a trait for determining
+/// whether a number is a unit of its ring.
 pub mod is_unit;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given modulus.

@@ -15,12 +15,12 @@ impl ToLatex for Float {
     /// Writes a [`Float`] as a LaTeX math-mode fragment.
     ///
     /// This is as the primitive floats are written. A NaN becomes `\text{NaN}` and the infinities
-    /// become `\infty` and `-\infty`. A finite [`Float`] is written as [`Display`] writes it, with
-    /// the exponent, if there is one, lifted into a real power of ten: `1.3e30` becomes ``1.3
-    /// \times 10^{30}``.
+    /// become `\infty` and `-\infty`. A finite [`Float`] is written as
+    /// [`Display`](core::fmt::Display) writes it, with the exponent, if there is one, lifted into a
+    /// real power of ten: `1.3e30` becomes ``1.3 \times 10^{30}``.
     ///
-    /// As with [`Display`], the digit count is determined by the [`Float`]'s precision rather than
-    /// by its value, and the two zeros are kept apart.
+    /// As with [`Display`](core::fmt::Display), the digit count is determined by the [`Float`]'s
+    /// precision rather than by its value, and the two zeros are kept apart.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

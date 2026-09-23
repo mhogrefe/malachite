@@ -34,10 +34,10 @@ declare_lint! {
     /// Two cases need care. Division of a *signed* integer truncates toward zero, whereas `>>`
     /// takes the floor, so the two disagree for negative values; the faithful rewrite is
     /// `shr_round(k, Down)` (or plain `>>` when the floor is really what is wanted). (`div_round`
-    /// and `shr_round` round the exact quotient the same way, so that rewrite needs no such
-    /// care.) And unlike
-    /// `*`, a shift does not detect value overflow (`<<` silently drops the high bits where `*`
-    /// would panic in a debug build), so only reach for `<<` where overflow is already ruled out.
+    /// and `shr_round` round the exact quotient the same way, so that rewrite needs no such care.)
+    /// And unlike `*`, a shift does not detect value overflow (`<<` silently drops the high bits
+    /// where `*` would panic in a debug build), so only reach for `<<` where overflow is already
+    /// ruled out.
     ///
     /// ### Example
     ///

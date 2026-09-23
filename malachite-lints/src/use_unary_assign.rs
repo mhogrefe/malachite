@@ -20,8 +20,8 @@ declare_lint! {
     ///
     /// ### Why is this bad?
     ///
-    /// The in-place variants say what is happening directly and avoid spelling the place twice;
-    /// for bignums they also reuse the existing allocation.
+    /// The in-place variants say what is happening directly and avoid spelling the place twice; for
+    /// bignums they also reuse the existing allocation.
     ///
     /// ### Example
     ///

@@ -11,6 +11,7 @@ use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOf2IsReduced};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::exhaustive::{exhaustive_positive_primitive_ints, exhaustive_unsigneds};
+use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::exhaustive::*;
 use std::collections::HashSet;

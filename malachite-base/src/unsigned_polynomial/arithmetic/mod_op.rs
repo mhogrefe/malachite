@@ -8,6 +8,7 @@
 
 use crate::num::arithmetic::traits::{Mod, ModAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::polynomial::Polynomial;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec::Vec;
 use core::ops::{Rem, RemAssign};

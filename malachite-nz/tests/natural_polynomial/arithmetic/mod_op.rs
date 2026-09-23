@@ -13,6 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::unsigned_polynomial_unsigned_pair_gen_var_1;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_nz::natural::Natural;

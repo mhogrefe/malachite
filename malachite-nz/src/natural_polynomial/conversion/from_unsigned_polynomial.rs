@@ -9,6 +9,7 @@
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
 impl<T: PrimitiveUnsigned> From<UnsignedPolynomial<T>> for NaturalPolynomial

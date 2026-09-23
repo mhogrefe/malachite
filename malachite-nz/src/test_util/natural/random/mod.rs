@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::itertools::Itertools;
 use crate::natural::Natural;
+use itertools::Itertools;
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::stats::common_values_map::common_values_map;

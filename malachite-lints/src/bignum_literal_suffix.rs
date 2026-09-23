@@ -26,11 +26,11 @@ declare_lint! {
     ///
     /// The bignum types implement comparisons and shifts against every primitive integer type, so
     /// any suffix compiles, and an unsuffixed literal silently selects the `i32` implementation.
-    /// The `u32`/`i32` convention is the fastest choice: on 64-bit limbs every width takes the
-    /// same single-limb path, and on 32-bit limbs a `u64` comparand is wider than a limb, so
-    /// comparing with it walks the limbs in a loop (and, for `Float`, builds a `Natural` from it).
-    /// Shift counts are converted to `u64` internally whatever their type, so the shorter suffix
-    /// costs nothing there, and one convention for both is easier to remember.
+    /// The `u32`/`i32` convention is the fastest choice: on 64-bit limbs every width takes the same
+    /// single-limb path, and on 32-bit limbs a `u64` comparand is wider than a limb, so comparing
+    /// with it walks the limbs in a loop (and, for `Float`, builds a `Natural` from it). Shift
+    /// counts are converted to `u64` internally whatever their type, so the shorter suffix costs
+    /// nothing there, and one convention for both is easier to remember.
     ///
     /// ### Example
     ///

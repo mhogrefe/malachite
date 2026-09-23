@@ -9,6 +9,7 @@
 use core::cmp::Ordering::*;
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::common::test_cmp_helper;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::{

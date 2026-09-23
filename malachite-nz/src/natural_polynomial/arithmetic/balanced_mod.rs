@@ -11,6 +11,7 @@ use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::BalancedMod;
+use malachite_base::polynomial::Polynomial;
 
 impl BalancedMod<Natural> for NaturalPolynomial {
     type Output = IntegerPolynomial;

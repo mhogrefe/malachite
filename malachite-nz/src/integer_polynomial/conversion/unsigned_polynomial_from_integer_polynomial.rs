@@ -10,6 +10,7 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec::Vec;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
 /// The error returned when an [`IntegerPolynomial`] has a coefficient that is negative or too large

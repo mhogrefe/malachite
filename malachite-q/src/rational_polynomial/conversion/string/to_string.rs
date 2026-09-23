@@ -8,7 +8,6 @@
 
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
-use alloc::string::String;
 use core::fmt::{Display, Formatter, Result, Write};
 use malachite_base::strings::latex::ToLatex;
 use malachite_base::strings::typst::ToTypst;
@@ -102,53 +101,14 @@ impl RationalPolynomial {
         }
         Ok(())
     }
-
-    /// Converts an [`RationalPolynomial`] to a [`String`], naming its variable with any
-    /// [`VarScheme`].
-    ///
-    /// The syntax is the one [`Display`] writes, which that implementation describes; the only
-    /// difference is that the variable is whichever one is handed in rather than `x`.
-    ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
-    ///
-    /// $M(n) = O(n \log n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the sum of the bits of the
-    /// coefficients.
-    ///
-    /// # Panics
-    /// Panics if `var`'s index is not less than its scheme's [`capacity`](VarScheme::capacity).
-    ///
-    /// # Examples
-    /// ```
-    /// use core::str::FromStr;
-    /// use malachite_base::vars::VarScheme;
-    /// use malachite_base::vars::greek::GreekVars;
-    /// use malachite_base::vars::indexed::IndexedVars;
-    /// use malachite_base::vars::list::ListVars;
-    /// use malachite_q::rational_polynomial::RationalPolynomial;
-    ///
-    /// let p = RationalPolynomial::from_str("x^2+3*x+2").unwrap();
-    /// assert_eq!(p.to_string_with(GreekVars.var(0)), "α^2+3*α+2");
-    /// assert_eq!(p.to_string_with(IndexedVars.var(7)), "x₇^2+3*x₇+2");
-    ///
-    /// let vars = ListVars::new(["t"]);
-    /// assert_eq!(p.to_string_with(vars.var(0)), "t^2+3*t+2");
-    /// ```
-    pub fn to_string_with<S: VarScheme + ?Sized>(&self, var: Var<'_, S>) -> String {
-        let mut s = String::new();
-        // Writing to a `String` cannot fail, so the result is the string itself.
-        self.write_with_var(var, Language::Plain, &mut s).unwrap();
-        s
-    }
 }
 
 impl Display for RationalPolynomial {
     /// Converts an [`RationalPolynomial`] to a [`String`].
     ///
-    /// The variable is called `x`. [`to_string_with`](RationalPolynomial::to_string_with) is the
-    /// way to call it something else.
+    /// The variable is called `x`.
+    /// [`to_string_with`](malachite_base::polynomial::Polynomial::to_string_with) is the way to
+    /// call it something else.
     ///
     /// The terms are written in order of decreasing degree and joined with `+`. A term is its
     /// coefficient, then `*`, then the variable, then `^` and the exponent; but a coefficient of 1

@@ -10,6 +10,11 @@ use crate::named::Named;
 use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
+use crate::polynomial::Polynomial;
+use crate::unsigned_polynomial::conversion::string::from_string::from_string_with;
+use crate::unsigned_polynomial::conversion::string::to_string::Language;
+use crate::vars::{Var, VarScheme};
+use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -85,72 +90,6 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
         }
     }
 
-    /// The constant polynomial 1.
-    ///
-    /// This is a function rather than an associated constant, and
-    /// [`One`](malachite_base::num::basic::traits::One) is not implemented, because a polynomial
-    /// holds its coefficients in a [`Vec`] and a [`Vec`] with anything in it cannot be built at
-    /// compile time. The zero polynomial has no coefficients, so
-    /// [`ZERO`](malachite_base::num::basic::traits::Zero::ZERO) is a constant after all.
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
-    ///
-    /// assert_eq!(UnsignedPolynomial::<u64>::one().to_string(), "1");
-    /// assert_eq!(UnsignedPolynomial::<u64>::one().degree(), Some(0));
-    /// ```
-    pub fn one() -> Self {
-        Self {
-            coefficients: vec![T::ONE],
-        }
-    }
-
-    /// The constant polynomial 2.
-    ///
-    /// This is a function rather than an associated constant, for the reason given by
-    /// [`one`](Self::one).
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
-    ///
-    /// assert_eq!(UnsignedPolynomial::<u64>::two().to_string(), "2");
-    /// assert_eq!(UnsignedPolynomial::<u64>::two().degree(), Some(0));
-    /// ```
-    pub fn two() -> Self {
-        Self {
-            coefficients: vec![T::TWO],
-        }
-    }
-
-    /// The polynomial $x$, of degree 1 with leading coefficient 1 and constant term 0.
-    ///
-    /// This is a function rather than an associated constant, for the reason given by
-    /// [`one`](Self::one).
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
-    ///
-    /// assert_eq!(UnsignedPolynomial::<u64>::x().to_string(), "x");
-    /// assert_eq!(UnsignedPolynomial::<u64>::x().degree(), Some(1));
-    /// ```
-    pub fn x() -> Self {
-        Self {
-            coefficients: vec![T::ZERO, T::ONE],
-        }
-    }
-
     /// Returns a reference to a [`UnsignedPolynomial`]'s coefficients, in ascending order.
     ///
     /// The first is the constant term and the last is the leading coefficient, so the slice is what
@@ -180,6 +119,92 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     pub fn coefficients_asc(&self) -> &[T] {
         &self.coefficients
     }
+}
+
+macro_rules! impl_named_unsigned_polynomial {
+    ($t:ident, $name:expr) => {
+        impl Named for UnsignedPolynomial<$t> {
+            /// The name of this type, with its coefficient type spelled out.
+            const NAME: &'static str = $name;
+        }
+    };
+}
+
+impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
+    type Coefficient = T;
+    type CoefficientOutput<'a>
+        = T
+    where
+        Self: 'a;
+
+    /// The constant polynomial 1.
+    ///
+    /// This is a function rather than an associated constant, and
+    /// [`One`](crate::num::basic::traits::One) is not implemented, because a polynomial holds its
+    /// coefficients in a [`Vec`] and a [`Vec`] with anything in it cannot be built at compile time.
+    /// The zero polynomial has no coefficients, so [`ZERO`](crate::num::basic::traits::Zero::ZERO)
+    /// is a constant after all.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// assert_eq!(UnsignedPolynomial::<u64>::one().to_string(), "1");
+    /// assert_eq!(UnsignedPolynomial::<u64>::one().degree(), Some(0));
+    /// ```
+    fn one() -> Self {
+        Self {
+            coefficients: vec![T::ONE],
+        }
+    }
+
+    /// The constant polynomial 2.
+    ///
+    /// This is a function rather than an associated constant, for the reason given by
+    /// [`one`](Self::one).
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// assert_eq!(UnsignedPolynomial::<u64>::two().to_string(), "2");
+    /// assert_eq!(UnsignedPolynomial::<u64>::two().degree(), Some(0));
+    /// ```
+    fn two() -> Self {
+        Self {
+            coefficients: vec![T::TWO],
+        }
+    }
+
+    /// The polynomial $x$, of degree 1 with leading coefficient 1 and constant term 0.
+    ///
+    /// This is a function rather than an associated constant, for the reason given by
+    /// [`one`](Self::one).
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// assert_eq!(UnsignedPolynomial::<u64>::x().to_string(), "x");
+    /// assert_eq!(UnsignedPolynomial::<u64>::x().degree(), Some(1));
+    /// ```
+    fn x() -> Self {
+        Self {
+            coefficients: vec![T::ZERO, T::ONE],
+        }
+    }
 
     /// Converts a [`Vec`] of [`u64`]s to a [`UnsignedPolynomial`].
     ///
@@ -197,6 +222,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     /// use u64;
     ///
@@ -212,7 +238,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     ///     "0"
     /// );
     /// ```
-    pub fn from_coefficients_asc(coefficients: Vec<T>) -> Self {
+    fn from_coefficients_asc(coefficients: Vec<T>) -> Self {
         let mut p = Self { coefficients };
         p.trim();
         p
@@ -231,6 +257,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
@@ -244,7 +271,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// );
     /// ```
     #[inline]
-    pub fn into_coefficients_asc(self) -> Vec<T> {
+    fn into_coefficients_asc(self) -> Vec<T> {
         self.coefficients
     }
 
@@ -260,6 +287,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// assert_eq!(UnsignedPolynomial::<u64>::ZERO.degree(), None);
@@ -279,7 +307,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// );
     /// ```
     #[inline]
-    pub fn degree(&self) -> Option<u64> {
+    fn degree(&self) -> Option<u64> {
         self.coefficients.len().checked_sub(1).map(u64::exact_from)
     }
 
@@ -295,6 +323,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u64>::from_str("x^2+3*x+2").unwrap();
@@ -304,7 +333,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// assert_eq!(p.coefficient(100), 0);
     /// ```
     #[inline]
-    pub fn coefficient(&self, index: u64) -> T {
+    fn coefficient(&self, index: u64) -> T {
         usize::try_from(index)
             .ok()
             .and_then(|i| self.coefficients.get(i))
@@ -325,6 +354,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u64>::from_str("7*x^2+3*x+2").unwrap();
@@ -332,7 +362,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// assert_eq!(UnsignedPolynomial::<u64>::ZERO.leading_coefficient(), 0);
     /// ```
     #[inline]
-    pub fn leading_coefficient(&self) -> T {
+    fn leading_coefficient(&self) -> T {
         self.coefficients.last().copied().unwrap_or(T::ZERO)
     }
 
@@ -362,6 +392,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     /// use u64;
     ///
@@ -382,7 +413,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
     /// p.mutate_coefficient(5, |c| *c = 0);
     /// assert_eq!(p.to_string(), "x^2+4*x+2");
     /// ```
-    pub fn mutate_coefficient<F: FnOnce(&mut T) -> U, U>(&mut self, index: u64, f: F) -> U {
+    fn mutate_coefficient<F: FnOnce(&mut T) -> U, U>(&mut self, index: u64, f: F) -> U {
         let index = usize::exact_from(index);
         if index >= self.coefficients.len() {
             self.coefficients.resize(index + 1, T::ZERO);
@@ -391,16 +422,183 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
         self.trim();
         out
     }
+
+    /// Converts a [`UnsignedPolynomial`] to a [`String`], naming its variable with any
+    /// [`VarScheme`].
+    ///
+    /// The syntax is the one [`Display`](core::fmt::Display) writes, which that implementation
+    /// describes; the only difference is that the variable is whichever one is handed in rather
+    /// than `x`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the sum of the bits of the
+    /// coefficients.
+    ///
+    /// # Panics
+    /// Panics if `var`'s index is not less than its scheme's [`capacity`](VarScheme::capacity).
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    /// use malachite_base::vars::VarScheme;
+    /// use malachite_base::vars::greek::GreekVars;
+    /// use malachite_base::vars::indexed::IndexedVars;
+    /// use malachite_base::vars::list::ListVars;
+    ///
+    /// let p = UnsignedPolynomial::<u64>::from_str("x^2+3*x+2").unwrap();
+    /// assert_eq!(p.to_string_with(GreekVars.var(0)), "α^2+3*α+2");
+    /// assert_eq!(p.to_string_with(IndexedVars.var(7)), "x₇^2+3*x₇+2");
+    ///
+    /// let vars = ListVars::new(["t"]);
+    /// assert_eq!(p.to_string_with(vars.var(0)), "t^2+3*t+2");
+    /// ```
+    fn to_string_with<S: VarScheme + ?Sized>(&self, var: Var<'_, S>) -> String {
+        let mut s = String::new();
+        // Writing to a `String` cannot fail, so the result is the string itself.
+        self.write_with_var(var, Language::Plain, &mut s).unwrap();
+        s
+    }
+
+    /// Converts a [`UnsignedPolynomial`] to a LaTeX math-mode fragment, naming its variable with
+    /// any [`VarScheme`].
+    ///
+    /// The fragment is the one [`ToLatex`](crate::strings::latex::ToLatex) writes, which that
+    /// implementation describes; the only difference is that the variable is whichever one is
+    /// handed in rather than `x`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the sum of the bits of the
+    /// coefficients.
+    ///
+    /// # Panics
+    /// Panics if `var`'s index is not less than its scheme's [`capacity`](VarScheme::capacity).
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    /// use malachite_base::vars::VarScheme;
+    /// use malachite_base::vars::greek::GreekVars;
+    /// use malachite_base::vars::indexed::IndexedVars;
+    ///
+    /// let p = UnsignedPolynomial::<u64>::from_str("x^2+3*x+2").unwrap();
+    /// assert_eq!(
+    ///     p.to_latex_string_with(GreekVars.var(0)),
+    ///     r"\alpha^2+3\alpha+2"
+    /// );
+    /// assert_eq!(p.to_latex_string_with(IndexedVars.var(7)), "x_7^2+3x_7+2");
+    /// ```
+    ///
+    /// The polynomial is `x^2+3*x+2` in each row; only its variable differs.
+    ///
+    /// | variable | fragment             | renders as           |
+    /// |----------|----------------------|----------------------|
+    /// | `α`      | `\alpha^2+3\alpha+2` | $\alpha^2+3\alpha+2$ |
+    /// | `x₇`     | `x_7^2+3x_7+2`       | $x_7^2+3x_7+2$       |
+    fn to_latex_string_with<S: VarScheme + ?Sized>(&self, var: Var<'_, S>) -> String {
+        let mut s = String::new();
+        // Writing to a `String` cannot fail, so the result is the string itself.
+        self.write_with_var(var, Language::Latex, &mut s).unwrap();
+        s
+    }
+
+    /// Converts a [`UnsignedPolynomial`] to a Typst math-mode fragment, naming its variable with
+    /// any [`VarScheme`].
+    ///
+    /// The fragment is the one [`ToTypst`](crate::strings::typst::ToTypst) writes, which that
+    /// implementation describes; the only difference is that the variable is whichever one is
+    /// handed in rather than `x`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the sum of the bits of the
+    /// coefficients.
+    ///
+    /// # Panics
+    /// Panics if `var`'s index is not less than its scheme's [`capacity`](VarScheme::capacity).
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    /// use malachite_base::vars::VarScheme;
+    /// use malachite_base::vars::greek::GreekVars;
+    /// use malachite_base::vars::indexed::IndexedVars;
+    ///
+    /// let p = UnsignedPolynomial::<u64>::from_str("x^2+3*x+2").unwrap();
+    /// assert_eq!(p.to_typst_string_with(GreekVars.var(0)), "α^2+3α+2");
+    /// assert_eq!(p.to_typst_string_with(IndexedVars.var(7)), "x_7^2+3x_7+2");
+    /// ```
+    ///
+    /// The polynomial is `x^2+3*x+2` in each row; only its variable differs.
+    ///
+    /// | variable | fragment       |
+    /// |----------|----------------|
+    /// | `α`      | `α^2+3α+2`     |
+    /// | `x₇`     | `x_7^2+3x_7+2` |
+    fn to_typst_string_with<S: VarScheme + ?Sized>(&self, var: Var<'_, S>) -> String {
+        let mut s = String::new();
+        // Writing to a `String` cannot fail, so the result is the string itself.
+        self.write_with_var(var, Language::Typst, &mut s).unwrap();
+        s
+    }
+
+    /// Converts a string to a [`UnsignedPolynomial`], with its variable named by any [`VarScheme`].
+    ///
+    /// The syntax is the one [`FromStr`](core::str::FromStr) reads, which that implementation
+    /// describes; the only difference is that the variable is whichever one is handed in rather
+    /// than `x`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    /// use malachite_base::vars::VarScheme;
+    /// use malachite_base::vars::greek::GreekVars;
+    /// use malachite_base::vars::list::ListVars;
+    ///
+    /// let p = UnsignedPolynomial::<u64>::from_string_with(GreekVars.var(0), "α^2+3*α+2").unwrap();
+    /// assert_eq!(p.to_string(), "x^2+3*x+2");
+    ///
+    /// let vars = ListVars::new(["t"]);
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u64>::from_string_with(vars.var(0), "t^2+1")
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "x^2+1"
+    /// );
+    ///
+    /// // The variable must be the one that was asked for.
+    /// assert!(UnsignedPolynomial::<u64>::from_string_with(GreekVars.var(0), "β^2").is_none());
+    /// ```
+    #[inline]
+    fn from_string_with<S: VarScheme + ?Sized>(var: Var<'_, S>, s: &str) -> Option<Self> {
+        from_string_with(var, s)
+    }
 }
 
-macro_rules! impl_named_unsigned_polynomial {
-    ($t:ident, $name:expr) => {
-        impl Named for UnsignedPolynomial<$t> {
-            /// The name of this type, with its coefficient type spelled out.
-            const NAME: &'static str = $name;
-        }
-    };
-}
 impl_named_unsigned_polynomial!(u8, "UnsignedPolynomial<u8>");
 impl_named_unsigned_polynomial!(u16, "UnsignedPolynomial<u16>");
 impl_named_unsigned_polynomial!(u32, "UnsignedPolynomial<u32>");

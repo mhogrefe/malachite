@@ -10,6 +10,7 @@ use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOf2IsReduced, PowerOf2};
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::exhaustive::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::{exhaustive_naturals, exhaustive_positive_naturals};

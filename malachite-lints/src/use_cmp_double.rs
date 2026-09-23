@@ -14,15 +14,15 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or `GaussianRational`) against another
-    /// value doubled by `<< 1`, like `x.cmp(&(y << 1))` or `x < y << 1`. Covers the comparison
-    /// operators, `cmp`, `partial_cmp`, `lt`/`le`/`gt`/`ge`, `eq`/`ne`, and each of their `_abs`
-    /// counterparts; the shift amount may be written `1` or `T::ONE`. The doubled value may be on
-    /// either side.
+    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or
+    /// `GaussianRational`) against another value doubled by `<< 1`, like `x.cmp(&(y << 1))` or `x <
+    /// y << 1`. Covers the comparison operators, `cmp`, `partial_cmp`, `lt`/`le`/`gt`/`ge`,
+    /// `eq`/`ne`, and each of their `_abs` counterparts; the shift amount may be written `1` or
+    /// `T::ONE`. The doubled value may be on either side.
     ///
-    /// Also flags the mirror image, comparing against a value *halved* by `>> 1`, but only for
-    /// `<=` and `>` (and the mirrored `>=` and `<`). `a <= b >> 1` is exactly `2a <= b`, since
-    /// `a <= floor(x)` iff `a <= x` for integral `a` — but `a < b >> 1` is *not* `2a < b`, and the
+    /// Also flags the mirror image, comparing against a value *halved* by `>> 1`, but only for `<=`
+    /// and `>` (and the mirrored `>=` and `<`). `a <= b >> 1` is exactly `2a <= b`, since `a <=
+    /// floor(x)` iff `a <= x` for integral `a` — but `a < b >> 1` is *not* `2a < b`, and the
     /// `_abs` comparisons do not survive the flooring either, so those are left alone.
     ///
     /// ### Why is this bad?

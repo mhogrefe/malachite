@@ -90,7 +90,7 @@ fn fmt_name_typst(name: &str, f: &mut Formatter) -> Result {
 /// - belongs to that variable alone.
 ///
 /// The last three are what let a polynomial be written without separators and still be read back.
-/// [`var_scheme_properties`](crate::test_util::vars::var_scheme_properties) checks all four.
+/// `var_scheme_properties`, in the test utilities, checks all four.
 ///
 /// # Typst
 /// Typst reads a run of two or more letters as a single identifier, so an `x` and a `y` written
@@ -148,12 +148,10 @@ pub trait VarScheme {
 
     /// Gives a handle to one of the scheme's variables.
     ///
-    /// The handle is what carries the name around: it implements [`Display`],
-    /// [`ToLatex`](crate::strings::latex::ToLatex), and
-    /// [`ToTypst`](crate::strings::typst::ToTypst), so that a variable can be written wherever any
-    /// of those is expected. Nothing is checked here; an index past the scheme's
-    /// [`capacity`](VarScheme::capacity) panics when the handle is written rather than when it is
-    /// made.
+    /// The handle is what carries the name around: it implements [`Display`], [`ToLatex`], and
+    /// [`ToTypst`], so that a variable can be written wherever any of those is expected. Nothing is
+    /// checked here; an index past the scheme's [`capacity`](VarScheme::capacity) panics when the
+    /// handle is written rather than when it is made.
     ///
     /// A scheme behind a `dyn` has no `var` of its own, since the handle's type mentions the
     /// scheme's; [`Var::new`] does the same thing for one.
@@ -181,8 +179,7 @@ pub trait VarScheme {
 /// One variable of a [`VarScheme`], which is to say a scheme together with an index.
 ///
 /// It is returned by [`VarScheme::var`], and it is what a variable's name is written from: it
-/// implements [`Display`], [`ToLatex`](crate::strings::latex::ToLatex), and
-/// [`ToTypst`](crate::strings::typst::ToTypst).
+/// implements [`Display`], [`ToLatex`], and [`ToTypst`].
 pub struct Var<'a, S: VarScheme + ?Sized> {
     scheme: &'a S,
     index: usize,
@@ -252,7 +249,7 @@ impl<S: VarScheme + ?Sized> Clone for Var<'_, S> {
 impl<S: VarScheme + ?Sized> Copy for Var<'_, S> {}
 
 impl<S: VarScheme + ?Sized> Display for Var<'_, S> {
-    /// Converts a variable to a [`String`](alloc::string::String).
+    /// Converts a variable to a [`String`].
     ///
     /// This is the plain name, the one [`VarScheme::parse_var`] reads back.
     ///
@@ -273,7 +270,7 @@ impl<S: VarScheme + ?Sized> Display for Var<'_, S> {
 }
 
 impl<S: VarScheme + ?Sized> Debug for Var<'_, S> {
-    /// Converts a variable to a [`String`](alloc::string::String).
+    /// Converts a variable to a [`String`].
     ///
     /// This is the same as the [`Display`] implementation: a variable is its name, and a scheme is
     /// not required to have a depiction of its own.

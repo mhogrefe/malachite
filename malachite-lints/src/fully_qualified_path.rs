@@ -17,14 +17,13 @@ declare_lint! {
     ///
     /// Flags a path that names an item of a Malachite crate starting from the crate root, such as
     /// `malachite_nz::natural::Natural::from(2u32)` or a type written as
-    /// `malachite_base::unsigned_polynomial::UnsignedPolynomial<u8>`, anywhere but in a `use`
-    /// item.
+    /// `malachite_base::unsigned_polynomial::UnsignedPolynomial<u8>`, anywhere but in a `use` item.
     ///
     /// ### Why is this bad?
     ///
-    /// House style is to import items and refer to them by name. A full path buries the
-    /// expression it appears in, and hides a dependency that the imports at the top of the file
-    /// would otherwise show.
+    /// House style is to import items and refer to them by name. A full path buries the expression
+    /// it appears in, and hides a dependency that the imports at the top of the file would
+    /// otherwise show.
     ///
     /// ### Example
     ///

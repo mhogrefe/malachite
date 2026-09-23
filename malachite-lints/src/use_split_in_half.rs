@@ -146,7 +146,8 @@ impl<'tcx> LateLintPass<'tcx> for UseSplitInHalf {
             } else {
                 (lower, upper)
             };
-            // The test-code check is comparatively expensive, so it runs after the structural checks.
+            // The test-code check is comparatively expensive, so it runs after the structural
+            // checks.
             if crate::in_cross_check_code(cx, first) {
                 continue;
             }

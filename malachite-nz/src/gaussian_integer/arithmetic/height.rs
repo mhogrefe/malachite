@@ -110,9 +110,8 @@ impl HeightRef for GaussianInteger {
     /// Returns a reference to the height of a [`GaussianInteger`]: the larger of the absolute
     /// values of its real and imaginary parts.
     ///
-    /// An [`Integer`](crate::integer::Integer) holds its magnitude as a
-    /// [`Natural`](crate::natural::Natural), so the height is already there to be lent and nothing
-    /// needs to be built.
+    /// An [`Integer`](crate::integer::Integer) holds its magnitude as a [`Natural`], so the height
+    /// is already there to be lent and nothing needs to be built.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

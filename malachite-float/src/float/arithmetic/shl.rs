@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
-use crate::malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use core::ops::{Shl, ShlAssign};
+use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use malachite_base::rounding_modes::RoundingMode::*;
 
 macro_rules! impl_shl {

@@ -8,12 +8,12 @@
 
 use crate::Float;
 use crate::InnerFloat::Finite;
-use crate::malachite_base::num::logic::traits::SignificantBits;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, ShlRound, ShlRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::traits::SaturatingInto;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 impl Float {

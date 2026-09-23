@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::malachite_base::num::basic::integers::PrimitiveInt;
 use crate::{Float, floor_and_ceiling};
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::platform::Limb;
 use std::cmp::Ordering::{self, *};

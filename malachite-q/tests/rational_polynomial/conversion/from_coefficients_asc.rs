@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_q::Rational;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::rational_vec_gen;

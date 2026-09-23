@@ -44,6 +44,7 @@ mod missing_inline_on_delegator;
 mod mul_div_by_power_of_2;
 mod mul_div_by_power_of_2_literal;
 mod redundant_cmp_reverse;
+mod redundant_crate_prefix;
 mod redundant_from_in_comparison;
 mod redundant_from_in_literal_comparison;
 mod redundant_nearest;
@@ -272,8 +273,8 @@ fn assign_trait_impl<'tcx>(
 
 // Whether `ty` implements the trait named by the full path `path` with `Self` as its right-hand
 // side. Unlike `implements_trait_by_path`, which leaves the right-hand side to inference, this
-// works for the four-variant families: `DivMod<T>` and `DivMod<&T>` both exist on the bignum
-// types, so inference has no unambiguous choice and silently reports no implementation at all.
+// works for the four-variant families: `DivMod<T>` and `DivMod<&T>` both exist on the bignum types,
+// so inference has no unambiguous choice and silently reports no implementation at all.
 fn implements_trait_with_self_rhs<'tcx>(
     cx: &rustc_lint::LateContext<'tcx>,
     ty: rustc_middle::ty::Ty<'tcx>,
@@ -288,8 +289,8 @@ fn implements_trait_with_self_rhs<'tcx>(
 }
 
 // Whether `ty` implements the trait named by the full path `path`. The traits this is used with are
-// generic in their right-hand side (`SaturatingMulAssign<RHS = Self>`, `OrdDouble<Rhs = Self>`); any
-// right-hand side counts, so every parameter past `Self` is left to inference.
+// generic in their right-hand side (`SaturatingMulAssign<RHS = Self>`, `OrdDouble<Rhs = Self>`);
+// any right-hand side counts, so every parameter past `Self` is left to inference.
 fn implements_trait_by_path<'tcx>(
     cx: &rustc_lint::LateContext<'tcx>,
     ty: rustc_middle::ty::Ty<'tcx>,
@@ -328,8 +329,8 @@ fn assign_variant_for_ty<'tcx>(
     }
 }
 
-// Whether `ty` is `core::cmp::Ordering`.
-// Whether `e` (after peeling `&`) is an associated constant named `ZERO`.
+// Whether `ty` is `core::cmp::Ordering`. Whether `e` (after peeling `&`) is an associated constant
+// named `ZERO`.
 fn is_zero_assoc_const<'tcx>(
     cx: &rustc_lint::LateContext<'tcx>,
     e: &'tcx rustc_hir::Expr<'tcx>,
@@ -461,15 +462,15 @@ fn in_bin_util_or_tests(cx: &rustc_lint::LateContext<'_>, hir_id: rustc_hir::Hir
 
 // Whether the span lies in test-oriented code: tests, demos and benches (`bin_util`), test
 // utilities, or any code compiled only as part of a test harness (which covers `#[cfg(test)]`
-// modules inside `src`). Lints do not call this directly; they call one of the helpers below,
-// whose names say why the lint stands down there.
+// modules inside `src`). Lints do not call this directly; they call one of the helpers below, whose
+// names say why the lint stands down there.
 fn in_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> bool {
     use rustc_lint::LintContext;
     // The extracted-doctests crate compiles doc examples as test targets, but they are
     // documentation, not tests, and should be linted in full; rundoc.sh sets this variable when
-    // sweeping them. The exceptions are the conversion docs and the docs of the dedicated
-    // constant constructors, whose examples demonstrate the very constructions the lints would
-    // rewrite; the extracted file names encode their origins.
+    // sweeping them. The exceptions are the conversion docs and the docs of the dedicated constant
+    // constructors, whose examples demonstrate the very constructions the lints would rewrite; the
+    // extracted file names encode their origins.
     static LINT_DOCTESTS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     if *LINT_DOCTESTS.get_or_init(|| std::env::var_os("MALACHITE_LINT_DOCTESTS").is_some()) {
         if let rustc_span::FileName::Real(real) = cx.sess().source_map().span_to_filename(span)
@@ -591,6 +592,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_fused_mul::USE_FUSED_MUL,
         factor_out_assignment::FACTOR_OUT_ASSIGNMENT,
         fully_qualified_path::FULLY_QUALIFIED_PATH,
+        redundant_crate_prefix::REDUNDANT_CRATE_PREFIX,
         use_get_bit::USE_GET_BIT,
         use_mod_power_of_2::USE_MOD_POWER_OF_2,
         use_mod_square::USE_MOD_SQUARE,
@@ -690,6 +692,8 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_abs_comparison::UseAbsComparison));
     lint_store.register_late_pass(|_| Box::new(use_width_mask::UseWidthMask));
     lint_store.register_late_pass(|_| Box::new(fully_qualified_path::FullyQualifiedPath));
+    lint_store
+        .register_late_pass(|_| Box::new(redundant_crate_prefix::RedundantCratePrefix::default()));
 }
 
 #[test]

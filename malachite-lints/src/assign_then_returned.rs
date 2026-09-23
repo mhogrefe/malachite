@@ -31,14 +31,13 @@ declare_lint! {
     ///
     /// This completes the family: `use_assign_variant` prefers the in-place form when a persisted
     /// variable is reassigned its own result, `assign_then_consumed_once` prefers a chain when a
-    /// fresh binding is mutated once and moved once, and this lint prefers a by-value call when
-    /// the mutation's only purpose is to produce the block's value.
+    /// fresh binding is mutated once and moved once, and this lint prefers a by-value call when the
+    /// mutation's only purpose is to produce the block's value.
     ///
     /// Only non-`Copy` receivers are flagged: for a `Copy` type the tail expression copies the
     /// mutated local, which may still be read afterwards, and the rewrite would change what those
     /// later reads see. Functions whose own name is in the same family as the assign method are
-    /// also skipped, since the by-value variants are themselves implemented by exactly this
-    /// shape.
+    /// also skipped, since the by-value variants are themselves implemented by exactly this shape.
     ///
     /// ### Example
     ///
@@ -60,9 +59,9 @@ declare_lint! {
 
 declare_lint_pass!(AssignThenReturned => [ASSIGN_THEN_RETURNED]);
 
-// The local a whole-local path expression refers to. Unlike
-// `path_to_local_with_projections`, a field or index projection does not count: the receiver and
-// the tail must be the same complete place for the rewrite to apply.
+// The local a whole-local path expression refers to. Unlike `path_to_local_with_projections`, a
+// field or index projection does not count: the receiver and the tail must be the same complete
+// place for the rewrite to apply.
 fn whole_local(e: &Expr<'_>) -> Option<HirId> {
     match e.kind {
         ExprKind::Path(QPath::Resolved(
@@ -108,11 +107,11 @@ impl<'tcx> LateLintPass<'tcx> for AssignThenReturned {
             return;
         }
         // The by-value variants of the operations are themselves implemented by this very shape:
-        // `fn gcd(self, mut other: Natural) -> Natural { other.gcd_assign(self); other }`. Inside
-        // a function of the same family as the assign method, the rewrite would be a call to the
+        // `fn gcd(self, mut other: Natural) -> Natural { other.gcd_assign(self); other }`. Inside a
+        // function of the same family as the assign method, the rewrite would be a call to the
         // function being defined. Both names are normalized by dropping `_assign` and the
-        // `_val`/`_ref` variant suffixes, and prefix matching covers helpers like
-        // `add_assign_limb` inside `add`.
+        // `_val`/`_ref` variant suffixes, and prefix matching covers helpers like `add_assign_limb`
+        // inside `add`.
         let owner = cx.tcx.hir_enclosing_body_owner(e.hir_id);
         if let Some(f) = cx.tcx.opt_item_name(owner.to_def_id()) {
             let f = f.as_str();

@@ -116,9 +116,8 @@ impl HeightRef for GaussianRational {
     /// Returns a reference to the height of a [`GaussianRational`]: the larger of the heights of
     /// its real and imaginary parts.
     ///
-    /// Each part holds its numerator's magnitude and its denominator as
-    /// [`Natural`](malachite_nz::natural::Natural)s, so the height is one of those four and is
-    /// already there to be lent.
+    /// Each part holds its numerator's magnitude and its denominator as [`Natural`]s, so the height
+    /// is one of those four and is already there to be lent.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

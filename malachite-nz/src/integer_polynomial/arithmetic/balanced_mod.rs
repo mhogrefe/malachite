@@ -10,6 +10,7 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{BalancedMod, BalancedModAssign};
+use malachite_base::polynomial::Polynomial;
 
 impl BalancedMod<Integer> for IntegerPolynomial {
     type Output = Self;

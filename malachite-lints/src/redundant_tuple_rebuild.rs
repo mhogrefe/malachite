@@ -18,9 +18,9 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags taking a tuple apart in a pattern and then putting the same tuple back together, as
-    /// in `|&((n_2, n_1), (d_1, d_0))| (n_2, n_1) < (d_1, d_0)`, where `(n_2, n_1)` and
-    /// `(d_1, d_0)` are rebuilt exactly as they were destructured.
+    /// Flags taking a tuple apart in a pattern and then putting the same tuple back together, as in
+    /// `|&((n_2, n_1), (d_1, d_0))| (n_2, n_1) < (d_1, d_0)`, where `(n_2, n_1)` and `(d_1, d_0)`
+    /// are rebuilt exactly as they were destructured.
     ///
     /// ### Why is this bad?
     ///

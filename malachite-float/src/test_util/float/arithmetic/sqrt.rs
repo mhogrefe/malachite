@@ -8,11 +8,11 @@
 
 use crate::Float;
 use crate::float::arithmetic::sqrt::generic_sqrt_rational_ref;
-use crate::malachite_base::num::basic::traits::NaN;
 use crate::test_util::common::rug_float_significant_bits;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{CheckedSqrt, FloorLogBase2};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::NaN;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};

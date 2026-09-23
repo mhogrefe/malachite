@@ -10,6 +10,7 @@ use crate::rational_polynomial::RationalPolynomial;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 

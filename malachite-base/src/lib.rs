@@ -170,9 +170,10 @@ pub const fn fail_on_untested_path(_message: &str) {}
 
 // TODO links for malachite-nz and malachite-q
 
-/// The [`Named`](named::Named) trait, for getting a type's name. Functions for working with
-/// [`HashMap`](std::collections::HashMap)s and [`BTreeMap`](std::collections::BTreeMap)s.
+/// Functions for working with [`HashMap`](std::collections::HashMap)s and
+/// [`BTreeMap`](std::collections::BTreeMap)s.
 pub mod maps;
+/// The [`Named`](named::Named) trait, for getting a type's name.
 #[macro_use]
 pub mod named;
 
@@ -199,10 +200,12 @@ pub mod num;
 /// eventually repeating (which is what "foer" abbreviates), just like the digits of a rational
 /// number.
 pub mod foer_sequences;
-/// Functions for working with [`Ordering`](std::cmp::Ordering)s.
-pub mod options;
 /// Functions for working with [`Option`]s.
+pub mod options;
+/// Functions for working with [`Ordering`](std::cmp::Ordering)s.
 pub mod orderings;
+/// The [`Polynomial`](polynomial::Polynomial) trait, for what every polynomial type has in common.
+pub mod polynomial;
 #[cfg(feature = "random")]
 /// Functions for generating random values.
 pub mod random;
@@ -218,7 +221,6 @@ pub mod slices;
 pub mod strings;
 /// Functions for working with tuples.
 pub mod tuples;
-pub mod unions;
 /// Unions (sum types). These are essentially generic enums.
 ///
 /// # unwrap
@@ -374,12 +376,13 @@ pub mod unions;
 /// | `Union3::A('a')`   | `"A"("a")` |
 /// | `Union3::B(5)`     | `"B"(5)`   |
 /// | `Union3::C(false)` | `"C"("F")` |
+pub mod unions;
 /// [`UnsignedPolynomial`](unsigned_polynomial::UnsignedPolynomial), a type representing polynomials
-/// in one variable whose coefficients are [`u64`]s.
+/// in one variable whose coefficients are primitive unsigned integers.
 pub mod unsigned_polynomial;
-/// Functions for working with [`Vec`]s. Schemes for naming variables, for instance the variables of
-/// a polynomial.
+/// Schemes for naming variables, for instance the variables of a polynomial.
 pub mod vars;
+/// Functions for working with [`Vec`]s.
 pub mod vecs;
 
 #[cfg(feature = "test_build")]

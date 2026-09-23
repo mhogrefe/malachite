@@ -319,10 +319,10 @@ impl Iterator for ExhaustivePositiveRationalsByHeight {
 /// Generates all positive [`Rational`]s, in order of increasing height.
 ///
 /// The height of a [`Rational`] is the larger of its numerator and its denominator; see
-/// [`Rational::to_height`](crate::Rational::to_height). This iterator generates every positive
-/// [`Rational`] once, in nondecreasing order of height. Within a height $h$, the numerators $p$
-/// coprime to $h$ with $1 \leq p < h$ are visited in increasing order, each fraction $p/h$
-/// immediately followed by its reciprocal $h/p$.
+/// [`Rational::to_height`](malachite_base::num::arithmetic::traits::Height::to_height). This
+/// iterator generates every positive [`Rational`] once, in nondecreasing order of height. Within a
+/// height $h$, the numerators $p$ coprime to $h$ with $1 \leq p < h$ are visited in increasing
+/// order, each fraction $p/h$ immediately followed by its reciprocal $h/p$.
 ///
 /// The numerators and denominators grow more slowly than in the Calkin-Wilf order of
 /// [`exhaustive_positive_rationals`]: the $n$th element here has height $O(\sqrt n)$, against

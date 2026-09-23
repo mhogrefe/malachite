@@ -12,6 +12,7 @@
 
 use itertools::Itertools;
 use malachite_base::num::logic::traits::BitIterable;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::rational_polynomial::random::*;

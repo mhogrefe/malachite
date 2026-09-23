@@ -25,6 +25,7 @@ impl IsUnit for NaturalPolynomial {
     /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::IsUnit;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// assert_eq!(NaturalPolynomial::one().is_unit(), true);

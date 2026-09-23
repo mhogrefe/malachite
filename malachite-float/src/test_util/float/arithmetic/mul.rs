@@ -8,9 +8,9 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::malachite_base::num::arithmetic::traits::NegAssign;
 use crate::test_util::common::rug_float_significant_bits;
 use core::cmp::Ordering::{self, *};
+use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;

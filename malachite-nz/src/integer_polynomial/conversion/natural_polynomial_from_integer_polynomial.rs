@@ -10,6 +10,7 @@ use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
+use malachite_base::polynomial::Polynomial;
 
 /// The error returned when an [`IntegerPolynomial`] with a negative coefficient is converted to a
 /// [`NaturalPolynomial`].

@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::strings::ToDebugString;
 use malachite_q::Rational;
 use malachite_q::rational_polynomial::RationalPolynomial;

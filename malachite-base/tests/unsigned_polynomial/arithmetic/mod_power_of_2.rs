@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::{
     unsigned_polynomial_gen, unsigned_polynomial_unsigned_pair_gen_var_1,
 };

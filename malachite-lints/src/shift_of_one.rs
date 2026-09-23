@@ -92,8 +92,8 @@ fn is_const_amount(cx: &LateContext<'_>, e: &Expr<'_>) -> bool {
 
 // Whether `ty` is a type the lint rewrites shifts of one for: a primitive integer or a Malachite
 // bignum with a `PowerOf2` implementation. Returns whether the type also has `LowMask` and
-// `BitAccess`, so that the mask and bit-test forms apply (the primitives, `Natural`, and
-// `Integer`; `Rational` and `GaussianInteger` have only `PowerOf2`).
+// `BitAccess`, so that the mask and bit-test forms apply (the primitives, `Natural`, and `Integer`;
+// `Rational` and `GaussianInteger` have only `PowerOf2`).
 fn shift_target<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> Option<bool> {
     if ty.is_integral() {
         return Some(true);

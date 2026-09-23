@@ -12,6 +12,7 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{Height, HeightRef, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::polynomial::Polynomial;
 
 // The coefficient of largest magnitude, or a reference to zero if there are no coefficients. The
 // `Integer` is returned rather than its magnitude so that both the borrowing and the consuming

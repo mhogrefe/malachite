@@ -27,11 +27,11 @@ declare_lint! {
     ///
     /// ### Why is this bad?
     ///
-    /// The `EqAbs` and `PartialOrdAbs` traits compare magnitudes directly: `x.le_abs(&y)` reads
-    /// the sign bits and compares the magnitudes in place, whereas `(&x).abs() <= y` builds a
-    /// whole new bignum (or, by value, consumes `x`) just to throw its sign away. The `*_abs`
-    /// spelling also says what is meant. The rewrite is only offered when the other operand is
-    /// known to be nonnegative, since the `*_abs` methods compare the magnitudes of *both* sides.
+    /// The `EqAbs` and `PartialOrdAbs` traits compare magnitudes directly: `x.le_abs(&y)` reads the
+    /// sign bits and compares the magnitudes in place, whereas `(&x).abs() <= y` builds a whole new
+    /// bignum (or, by value, consumes `x`) just to throw its sign away. The `*_abs` spelling also
+    /// says what is meant. The rewrite is only offered when the other operand is known to be
+    /// nonnegative, since the `*_abs` methods compare the magnitudes of *both* sides.
     ///
     /// ### Example
     ///
@@ -76,8 +76,8 @@ fn abs_call<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<&'tcx E
 }
 
 // If `e` is something known to be nonnegative -- a nonnegative integer literal, an unsigned
-// primitive, a `Natural`, or an `abs()` of a bignum -- returns the expression to put on the
-// right of the `*_abs` call (for an `abs()`, its receiver).
+// primitive, a `Natural`, or an `abs()` of a bignum -- returns the expression to put on the right
+// of the `*_abs` call (for an `abs()`, its receiver).
 fn nonnegative<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<&'tcx Expr<'tcx>> {
     if let Some(recv) = abs_call(cx, e) {
         return Some(recv);
@@ -148,8 +148,8 @@ fn lint<'tcx>(
     );
 }
 
-// The comparison modules and their tests cross-check the `*_abs` comparisons against `abs()`
-// on purpose.
+// The comparison modules and their tests cross-check the `*_abs` comparisons against `abs()` on
+// purpose.
 fn in_comparison_module(cx: &LateContext<'_>, span: rustc_span::Span) -> bool {
     let rustc_span::FileName::Real(real) = cx.sess().source_map().span_to_filename(span) else {
         return false;

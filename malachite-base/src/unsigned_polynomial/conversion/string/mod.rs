@@ -8,17 +8,17 @@
 
 /// An implementation of [`FromStr`](core::str::FromStr), and a function for reading a
 /// [`UnsignedPolynomial`](super::super::UnsignedPolynomial) whose variable is named by any
-/// [`VarScheme`](malachite_base::vars::VarScheme).
+/// [`VarScheme`](crate::vars::VarScheme).
 pub mod from_string;
-/// Implementations of [`ToLatex`](malachite_base::strings::latex::ToLatex), and a function for
-/// writing a [`UnsignedPolynomial`](super::super::UnsignedPolynomial) whose variable is named by
-/// any [`VarScheme`](malachite_base::vars::VarScheme).
+/// Implementations of [`ToLatex`](crate::strings::latex::ToLatex), and a function for writing a
+/// [`UnsignedPolynomial`](super::super::UnsignedPolynomial) whose variable is named by any
+/// [`VarScheme`](crate::vars::VarScheme).
 pub mod latex;
 /// An implementation of [`Display`](core::fmt::Display), and a function for writing a
 /// [`UnsignedPolynomial`](super::super::UnsignedPolynomial) whose variable is named by any
-/// [`VarScheme`](malachite_base::vars::VarScheme).
+/// [`VarScheme`](crate::vars::VarScheme).
 pub mod to_string;
-/// Implementations of [`ToTypst`](malachite_base::strings::typst::ToTypst), and a function for
-/// writing a [`UnsignedPolynomial`](super::super::UnsignedPolynomial) whose variable is named by
-/// any [`VarScheme`](malachite_base::vars::VarScheme).
+/// Implementations of [`ToTypst`](crate::strings::typst::ToTypst), and a function for writing a
+/// [`UnsignedPolynomial`](super::super::UnsignedPolynomial) whose variable is named by any
+/// [`VarScheme`](crate::vars::VarScheme).
 pub mod typst;

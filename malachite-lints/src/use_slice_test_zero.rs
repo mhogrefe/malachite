@@ -15,8 +15,8 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags `xs.iter().any(|&x| x != 0)` and `xs.iter().all(|&x| x == 0)` on slices of
-    /// integers, suggesting `!slice_test_zero(xs)` and `slice_test_zero(xs)`.
+    /// Flags `xs.iter().any(|&x| x != 0)` and `xs.iter().all(|&x| x == 0)` on slices of integers,
+    /// suggesting `!slice_test_zero(xs)` and `slice_test_zero(xs)`.
     ///
     /// ### Why is this bad?
     ///
@@ -25,8 +25,8 @@ declare_lint! {
     ///
     /// ### Known problems
     ///
-    /// Only direct `iter()` receivers are recognized. The implementation of
-    /// `slice_test_zero` itself is exempt.
+    /// Only direct `iter()` receivers are recognized. The implementation of `slice_test_zero`
+    /// itself is exempt.
     ///
     /// ### Example
     ///

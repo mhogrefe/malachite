@@ -13,6 +13,7 @@ use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{Mod, ModAssign};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
 impl Rem<Natural> for NaturalPolynomial {

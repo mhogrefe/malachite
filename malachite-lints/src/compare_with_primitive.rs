@@ -17,10 +17,10 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or `GaussianRational`) with a small named
-    /// bignum constant, or with `from(primitive)` in a comparison method, when the bignum could be
-    /// compared with the primitive directly: `x == Rational::ONE`, `x.cmp(&Rational::ONE)`, or
-    /// `x.partial_cmp(&Natural::from(10u32))`.
+    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or
+    /// `GaussianRational`) with a small named bignum constant, or with `from(primitive)` in a
+    /// comparison method, when the bignum could be compared with the primitive directly: `x ==
+    /// Rational::ONE`, `x.cmp(&Rational::ONE)`, or `x.partial_cmp(&Natural::from(10u32))`.
     ///
     /// ### Why is this bad?
     ///
@@ -133,10 +133,10 @@ fn primitive_comparable<'tcx>(
 
 impl<'tcx> LateLintPass<'tcx> for CompareWithPrimitive {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        // Unlike most lints, this one applies to tests, demos, and test utilities too: a
-        // comparison with a bignum constant is never something a test needs to exercise on purpose
-        // (the comparison operators are tested through generators, and the constants through their
-        // own tests), and the direct primitive comparison is just as clear there. Only the
+        // Unlike most lints, this one applies to tests, demos, and test utilities too: a comparison
+        // with a bignum constant is never something a test needs to exercise on purpose (the
+        // comparison operators are tested through generators, and the constants through their own
+        // tests), and the direct primitive comparison is just as clear there. Only the
         // `from(primitive)` method form keeps the exemption, below.
         if expr.span.from_expansion() {
             return;
@@ -186,8 +186,8 @@ impl<'tcx> LateLintPass<'tcx> for CompareWithPrimitive {
                 if crate::bignum_name(cx, recv_ty).is_none() {
                     return;
                 }
-                // `cmp` against a `ZERO` constant is `use_sign`'s, with the better
-                // suggestion `sign()`.
+                // `cmp` against a `ZERO` constant is `use_sign`'s, with the better suggestion
+                // `sign()`.
                 if name == "cmp" && crate::is_zero_assoc_const(cx, arg) {
                     return;
                 }

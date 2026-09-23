@@ -11,6 +11,7 @@ use crate::integer::exhaustive::{IntegerUpDown, exhaustive_integers, exhaustive_
 use crate::integer_polynomial::IntegerPolynomial;
 use core::iter::{Chain, Once};
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::vecs::exhaustive::{
     ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
     exhaustive_vecs_with_last_fixed_length, exhaustive_vecs_with_last_length_inclusive_range,

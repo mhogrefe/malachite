@@ -16,7 +16,8 @@ pub mod from_sci_string;
 /// [`FromStringBase`](malachite_base::num::conversion::traits::FromStringBase), traits for parsing
 /// strings in base 10 or in other bases.
 pub mod from_string;
-/// The implementation of [`ToLatex`](malachite_base::strings::latex::ToLatex) for a [`Rational`].
+/// The implementation of [`ToLatex`](malachite_base::strings::latex::ToLatex) for a
+/// [`Rational`](crate::Rational).
 pub mod latex;
 /// Implementations of [`ToSci`](malachite_base::num::conversion::traits::ToSci), a trait for
 /// converting a number to string, possibly using scientific notation.
@@ -26,5 +27,6 @@ pub mod to_sci;
 /// and [`ToStringBase`](malachite_base::num::conversion::traits::ToStringBase), traits for
 /// converting a number to a string in base 10 or in other bases.
 pub mod to_string;
-/// The implementation of [`ToTypst`](malachite_base::strings::typst::ToTypst) for a [`Rational`].
+/// The implementation of [`ToTypst`](malachite_base::strings::typst::ToTypst) for a
+/// [`Rational`](crate::Rational).
 pub mod typst;

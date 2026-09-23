@@ -9,6 +9,7 @@
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer::exhaustive::{exhaustive_integers, exhaustive_nonzero_integers};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::exhaustive::*;

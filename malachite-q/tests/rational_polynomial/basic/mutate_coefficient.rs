@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::polynomial::Polynomial;
 use malachite_q::Rational;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::rational_polynomial_unsigned_pair_gen_var_1;

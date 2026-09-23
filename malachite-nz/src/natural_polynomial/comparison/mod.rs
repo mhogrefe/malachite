@@ -17,6 +17,7 @@ pub mod cmp;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{One, Zero};
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::gaussian_integer::GaussianInteger;
 /// use malachite_nz::natural_polynomial::NaturalPolynomial;
 ///
@@ -40,6 +41,7 @@ pub mod partial_eq_gaussian_integer;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::natural_polynomial::NaturalPolynomial;
 ///
@@ -65,6 +67,7 @@ pub mod partial_eq_integer;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{One, Zero};
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural_polynomial::NaturalPolynomial;
 ///
@@ -91,6 +94,7 @@ pub mod partial_eq_natural;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::natural_polynomial::NaturalPolynomial;
 ///
 /// assert!(NaturalPolynomial::ZERO == 0u32);
@@ -117,6 +121,7 @@ pub mod partial_eq_unsigned;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 /// use malachite_nz::natural_polynomial::NaturalPolynomial;
 ///

@@ -16,9 +16,9 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags comparing two sequences of values lexicographically by hand, like
-    /// `a_1 < b_1 || a_1 == b_1 && a_0 < b_0`, when comparing tuples says the same thing:
-    /// `(a_1, a_0) < (b_1, b_0)`. Covers `<`, `<=`, `>`, and `>=`, and chains of any length.
+    /// Flags comparing two sequences of values lexicographically by hand, like `a_1 < b_1 || a_1 ==
+    /// b_1 && a_0 < b_0`, when comparing tuples says the same thing: `(a_1, a_0) < (b_1, b_0)`.
+    /// Covers `<`, `<=`, `>`, and `>=`, and chains of any length.
     ///
     /// ### Why is this bad?
     ///

@@ -51,7 +51,7 @@ pub mod natural_polynomial_from_integer_polynomial;
 /// [serde](https://serde.rs/).
 pub mod serde;
 /// Functions for converting an [`IntegerPolynomial`](super::IntegerPolynomial) to and from a
-/// [`String`](alloc::string::String).
+/// [`String`].
 pub mod string;
 /// Implementations of traits for converting an [`IntegerPolynomial`](super::IntegerPolynomial) to
 /// an [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).

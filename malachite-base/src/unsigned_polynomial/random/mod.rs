@@ -20,6 +20,7 @@ use crate::num::random::{
     random_positive_unsigneds, random_primitive_ints, random_unsigned_inclusive_range,
     random_unsigned_range,
 };
+use crate::polynomial::Polynomial;
 use crate::random::Seed;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::vecs::random::{

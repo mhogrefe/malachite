@@ -131,8 +131,8 @@ impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2 {
                 (false, true, "Integer") => {
                     "use `shr_round_assign` with `Down` (or `>>=`, which takes the floor)"
                 }
-                // `GaussianInteger` division rounds to the nearest Gaussian integer and there is
-                // no right shift, so there is nothing cheaper to suggest.
+                // `GaussianInteger` division rounds to the nearest Gaussian integer and there is no
+                // right shift, so there is nothing cheaper to suggest.
                 (false, _, "GaussianInteger") => return,
                 (false, false, _) => "use `>>`",
                 (false, true, _) => "use `>>=`",

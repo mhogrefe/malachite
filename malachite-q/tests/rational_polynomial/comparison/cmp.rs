@@ -10,6 +10,7 @@ use core::cmp::Ordering::*;
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::common::test_cmp_helper;
 use malachite_nz::test_util::generators::integer_polynomial_pair_gen;
 use malachite_q::rational_polynomial::RationalPolynomial;

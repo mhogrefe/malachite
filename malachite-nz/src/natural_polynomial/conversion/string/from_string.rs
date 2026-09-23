@@ -11,6 +11,7 @@ use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::polynomial::Polynomial;
 use malachite_base::vars::xyz::XyzVars;
 use malachite_base::vars::{Var, VarScheme, char_is_reserved};
 
@@ -64,59 +65,27 @@ fn parse_term<S: VarScheme + ?Sized>(var: Var<'_, S>, term: &str) -> Option<(Nat
     }
 }
 
-impl NaturalPolynomial {
-    /// Converts a string to a [`NaturalPolynomial`], with its variable named by any [`VarScheme`].
-    ///
-    /// The syntax is the one [`FromStr`] reads, which that implementation describes; the only
-    /// difference is that the variable is whichever one is handed in rather than `x`.
-    ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
-    ///
-    /// $M(n) = O(n \log n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::vars::VarScheme;
-    /// use malachite_base::vars::greek::GreekVars;
-    /// use malachite_base::vars::list::ListVars;
-    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
-    ///
-    /// let p = NaturalPolynomial::from_string_with(GreekVars.var(0), "α^2+3*α+2").unwrap();
-    /// assert_eq!(p.to_string(), "x^2+3*x+2");
-    ///
-    /// let vars = ListVars::new(["t"]);
-    /// assert_eq!(
-    ///     NaturalPolynomial::from_string_with(vars.var(0), "t^2+1")
-    ///         .unwrap()
-    ///         .to_string(),
-    ///     "x^2+1"
-    /// );
-    ///
-    /// // The variable must be the one that was asked for.
-    /// assert!(NaturalPolynomial::from_string_with(GreekVars.var(0), "β^2").is_none());
-    /// ```
-    pub fn from_string_with<S: VarScheme + ?Sized>(var: Var<'_, S>, s: &str) -> Option<Self> {
-        // The zero polynomial has no terms, so it is the one string that the loop below could not
-        // read.
-        if s == "0" {
-            return Some(Self::ZERO);
-        }
-        let mut coefficients: Vec<Natural> = Vec::new();
-        for term in s.split('+') {
-            let (coefficient, exponent) = parse_term(var, term)?;
-            if exponent >= coefficients.len() {
-                coefficients.resize(exponent + 1, Natural::ZERO);
-            } else if coefficients[exponent] != 0u32 {
-                // Two terms of the same degree. Which of them to believe is not for this to decide.
-                return None;
-            }
-            coefficients[exponent] = coefficient;
-        }
-        Some(Self::from_coefficients_asc(coefficients))
+// The implementation of `NaturalPolynomial::from_string_with`.
+pub(crate) fn from_string_with<S: VarScheme + ?Sized>(
+    var: Var<'_, S>,
+    s: &str,
+) -> Option<NaturalPolynomial> {
+    // The zero polynomial has no terms, so it is the one string that the loop below could not read.
+    if s == "0" {
+        return Some(NaturalPolynomial::ZERO);
     }
+    let mut coefficients: Vec<Natural> = Vec::new();
+    for term in s.split('+') {
+        let (coefficient, exponent) = parse_term(var, term)?;
+        if exponent >= coefficients.len() {
+            coefficients.resize(exponent + 1, Natural::ZERO);
+        } else if coefficients[exponent] != 0u32 {
+            // Two terms of the same degree. Which of them to believe is not for this to decide.
+            return None;
+        }
+        coefficients[exponent] = coefficient;
+    }
+    Some(NaturalPolynomial::from_coefficients_asc(coefficients))
 }
 
 impl FromStr for NaturalPolynomial {

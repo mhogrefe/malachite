@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
 };
+use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::unsigned_gen_var_11;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};

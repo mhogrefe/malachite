@@ -22,16 +22,16 @@ declare_lint! {
     ///
     /// ### Why is this bad?
     ///
-    /// Each `vec![x; n]` is a separate allocation, and back-to-back buffer allocations of the
-    /// same type can be a single allocation split into pieces with `split_at_mut`. The right
-    /// shape for the fix varies. If all the buffers are scratch space, one `Vec` and two
-    /// `split_at_mut` calls suffice. If one buffer must end up owned — passed to
-    /// `Natural::from_owned_limbs_asc`, say — make it the parent's prefix, `truncate` the
-    /// parent once the other pieces are no longer in use, and `shrink_to_fit` so the escaping
-    /// value does not retain the scratch capacity. And occasionally separate allocations
-    /// are genuinely right: if two of the buffers each end up owned, or the algorithm swaps the
-    /// buffers as it runs, merging would force a copy that costs more than the saved allocation;
-    /// such sites should carry an `allow` with a comment saying why.
+    /// Each `vec![x; n]` is a separate allocation, and back-to-back buffer allocations of the same
+    /// type can be a single allocation split into pieces with `split_at_mut`. The right shape for
+    /// the fix varies. If all the buffers are scratch space, one `Vec` and two `split_at_mut` calls
+    /// suffice. If one buffer must end up owned — passed to `Natural::from_owned_limbs_asc`, say
+    /// — make it the parent's prefix, `truncate` the parent once the other pieces are no longer
+    /// in use, and `shrink_to_fit` so the escaping value does not retain the scratch capacity. And
+    /// occasionally separate allocations are genuinely right: if two of the buffers each end up
+    /// owned, or the algorithm swaps the buffers as it runs, merging would force a copy that costs
+    /// more than the saved allocation; such sites should carry an `allow` with a comment saying
+    /// why.
     ///
     /// ### Example
     ///
@@ -76,7 +76,8 @@ impl<'tcx> LateLintPass<'tcx> for AdjacentVecAllocations {
         // Each run entry is (span of the `let`, init expr, repeated element).
         let mut run: Vec<(Span, &Expr<'_>, &Expr<'_>)> = Vec::new();
         let flush = |run: &mut Vec<(Span, &Expr<'_>, &Expr<'_>)>| {
-            // The test-code check is comparatively expensive, so it runs after the structural checks.
+            // The test-code check is comparatively expensive, so it runs after the structural
+            // checks.
             if run.len() >= 2 && !crate::in_performance_insensitive_code(cx, run[0].0) {
                 span_lint_and_help(
                     cx,

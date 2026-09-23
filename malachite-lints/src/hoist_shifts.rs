@@ -14,31 +14,30 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags a shifted operand inside a multiplication or (for `Rational` and `GaussianRational`) a division when the
-    /// shift can be hoisted out of the operation: `(a << s) * b` computes the same value as
-    /// `(a * b) << s`.
+    /// Flags a shifted operand inside a multiplication or (for `Rational` and `GaussianRational`) a
+    /// division when the shift can be hoisted out of the operation: `(a << s) * b` computes the
+    /// same value as `(a * b) << s`.
     ///
     /// ### Why is this bad?
     ///
     /// A left shift makes a bignum `s` bits longer, so `(a << s) * b` multiplies a longer number
     /// than `(a * b) << s` does. Hoisting the shift performs the same multiplication on smaller
-    /// operands and shifts once at the end. For `Rational`s, an inner shift also drags a power
-    /// of 2 through the reduction to lowest terms before the operation throws it away or
-    /// restores it.
+    /// operands and shifts once at the end. For `Rational`s, an inner shift also drags a power of 2
+    /// through the reduction to lowest terms before the operation throws it away or restores it.
     ///
     /// ### Known problems
     ///
-    /// Only exact rewrites are suggested. `Natural` and `Integer` right shifts are floor
-    /// divisions, so `(a >> s) * b` is not `(a * b) >> s`, and `/` on those types truncates, so
-    /// no shift commutes with it; only `<<` inside `*` is flagged for them. For `Rational`, both
-    /// shift directions commute with both `*` and `/` in either operand, and all combinations
-    /// are flagged, with the direction reversed when the shifted operand is a divisor. `Float`
-    /// is excluded entirely: its shifts saturate at the exponent-range boundaries, so
-    /// `(a << s) * b` can overflow to infinity where `(a * b) << s` is finite, and there is
-    /// nothing to gain, a `Float` multiplication's cost not depending on the exponents.
-    /// Primitive integers are excluded because the rewrite moves the point at which an overflow
-    /// occurs. The compound-assignment forms (`x *= &a << s`) are not flagged, since the rewrite
-    /// would need two statements.
+    /// Only exact rewrites are suggested. `Natural` and `Integer` right shifts are floor divisions,
+    /// so `(a >> s) * b` is not `(a * b) >> s`, and `/` on those types truncates, so no shift
+    /// commutes with it; only `<<` inside `*` is flagged for them. For `Rational`, both shift
+    /// directions commute with both `*` and `/` in either operand, and all combinations are
+    /// flagged, with the direction reversed when the shifted operand is a divisor. `Float` is
+    /// excluded entirely: its shifts saturate at the exponent-range boundaries, so `(a << s) * b`
+    /// can overflow to infinity where `(a * b) << s` is finite, and there is nothing to gain, a
+    /// `Float` multiplication's cost not depending on the exponents. Primitive integers are
+    /// excluded because the rewrite moves the point at which an overflow occurs. The
+    /// compound-assignment forms (`x *= &a << s`) are not flagged, since the rewrite would need two
+    /// statements.
     ///
     /// ### Example
     ///

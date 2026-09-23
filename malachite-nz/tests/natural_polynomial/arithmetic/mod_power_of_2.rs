@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{
     Height, ModPowerOf2, ModPowerOf2Assign, ModPowerOf2IsReduced,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::unsigned_polynomial_gen;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::{

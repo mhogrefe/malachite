@@ -10,6 +10,7 @@ use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
 /// The error returned when a [`NaturalPolynomial`] has a coefficient too large for the coefficient

@@ -17,6 +17,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::BitIterable;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;

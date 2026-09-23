@@ -15,8 +15,8 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags `x.cmp(&0)` on integers, and `x.cmp(&T::ZERO)` on bignum types, where `x.sign()`
-    /// says the same thing.
+    /// Flags `x.cmp(&0)` on integers, and `x.cmp(&T::ZERO)` on bignum types, where `x.sign()` says
+    /// the same thing.
     ///
     /// ### Why is this bad?
     ///

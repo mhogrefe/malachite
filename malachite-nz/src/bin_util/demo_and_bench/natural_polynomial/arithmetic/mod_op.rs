@@ -87,9 +87,9 @@ fn demo_natural_polynomial_rem_assign(gm: GenMode, config: &GenConfig, limit: us
     }
 }
 
-// The moduli the property tests single out: 1, where everything vanishes; one more than the
-// largest coefficient, which leaves the polynomial alone; and 2, 2^7, 2^64, and 2^100, which agree
-// with `mod_power_of_2`.
+// The moduli the property tests single out: 1, where everything vanishes; one more than the largest
+// coefficient, which leaves the polynomial alone; and 2, 2^7, 2^64, and 2^100, which agree with
+// `mod_power_of_2`.
 fn demo_natural_polynomial_rem_special_moduli(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in natural_polynomial_gen().get(gm, config).take(limit) {
         let above = p

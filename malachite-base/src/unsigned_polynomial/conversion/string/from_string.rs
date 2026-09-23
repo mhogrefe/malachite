@@ -8,6 +8,7 @@
 
 use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::polynomial::Polynomial;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::vars::xyz::XyzVars;
 use crate::vars::{Var, VarScheme, char_is_reserved};
@@ -67,59 +68,27 @@ fn parse_term<T: PrimitiveUnsigned, S: VarScheme + ?Sized>(
     }
 }
 
-impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
-    /// Converts a string to a [`UnsignedPolynomial`], with its variable named by any [`VarScheme`].
-    ///
-    /// The syntax is the one [`FromStr`] reads, which that implementation describes; the only
-    /// difference is that the variable is whichever one is handed in rather than `x`.
-    ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
-    ///
-    /// $M(n) = O(n \log n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
-    /// use malachite_base::vars::VarScheme;
-    /// use malachite_base::vars::greek::GreekVars;
-    /// use malachite_base::vars::list::ListVars;
-    ///
-    /// let p = UnsignedPolynomial::<u64>::from_string_with(GreekVars.var(0), "α^2+3*α+2").unwrap();
-    /// assert_eq!(p.to_string(), "x^2+3*x+2");
-    ///
-    /// let vars = ListVars::new(["t"]);
-    /// assert_eq!(
-    ///     UnsignedPolynomial::<u64>::from_string_with(vars.var(0), "t^2+1")
-    ///         .unwrap()
-    ///         .to_string(),
-    ///     "x^2+1"
-    /// );
-    ///
-    /// // The variable must be the one that was asked for.
-    /// assert!(UnsignedPolynomial::<u64>::from_string_with(GreekVars.var(0), "β^2").is_none());
-    /// ```
-    pub fn from_string_with<S: VarScheme + ?Sized>(var: Var<'_, S>, s: &str) -> Option<Self> {
-        // The zero polynomial has no terms, so it is the one string that the loop below could not
-        // read.
-        if s == "0" {
-            return Some(Self::ZERO);
-        }
-        let mut coefficients: Vec<T> = Vec::new();
-        for term in s.split('+') {
-            let (coefficient, exponent) = parse_term(var, term)?;
-            if exponent >= coefficients.len() {
-                coefficients.resize(exponent + 1, T::ZERO);
-            } else if coefficients[exponent] != T::ZERO {
-                // Two terms of the same degree. Which of them to believe is not for this to decide.
-                return None;
-            }
-            coefficients[exponent] = coefficient;
-        }
-        Some(Self::from_coefficients_asc(coefficients))
+// The implementation of `UnsignedPolynomial::from_string_with`.
+pub(crate) fn from_string_with<T: PrimitiveUnsigned, S: VarScheme + ?Sized>(
+    var: Var<'_, S>,
+    s: &str,
+) -> Option<UnsignedPolynomial<T>> {
+    // The zero polynomial has no terms, so it is the one string that the loop below could not read.
+    if s == "0" {
+        return Some(UnsignedPolynomial::<T>::ZERO);
     }
+    let mut coefficients: Vec<T> = Vec::new();
+    for term in s.split('+') {
+        let (coefficient, exponent) = parse_term(var, term)?;
+        if exponent >= coefficients.len() {
+            coefficients.resize(exponent + 1, T::ZERO);
+        } else if coefficients[exponent] != T::ZERO {
+            // Two terms of the same degree. Which of them to believe is not for this to decide.
+            return None;
+        }
+        coefficients[exponent] = coefficient;
+    }
+    Some(UnsignedPolynomial::<T>::from_coefficients_asc(coefficients))
 }
 
 impl<T: PrimitiveUnsigned> FromStr for UnsignedPolynomial<T> {
@@ -127,9 +96,8 @@ impl<T: PrimitiveUnsigned> FromStr for UnsignedPolynomial<T> {
 
     /// Converts a string to a [`UnsignedPolynomial`].
     ///
-    /// The variable is called `x`.
-    /// [`from_string_with`](UnsignedPolynomial::from_string_with) is the way to call it
-    /// something else.
+    /// The variable is called `x`. [`from_string_with`](UnsignedPolynomial::from_string_with) is
+    /// the way to call it something else.
     ///
     /// This reads back everything [`Display`](core::fmt::Display) writes, and more besides: the
     /// terms may come in any order, an exponent may be written `^1`, and a coefficient may have

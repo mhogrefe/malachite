@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_q::Rational;

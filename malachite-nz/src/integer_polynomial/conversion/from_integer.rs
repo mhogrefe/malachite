@@ -9,6 +9,7 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec;
+use malachite_base::polynomial::Polynomial;
 
 impl<T: Into<Integer>> From<T> for IntegerPolynomial {
     /// Converts a value to a constant [`IntegerPolynomial`].

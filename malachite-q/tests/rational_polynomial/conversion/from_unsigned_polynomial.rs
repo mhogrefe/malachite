@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::IsInteger;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::unsigned_polynomial_gen;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_nz::integer_polynomial::IntegerPolynomial;

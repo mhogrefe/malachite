@@ -9,6 +9,7 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
 impl<T: PrimitiveUnsigned> From<UnsignedPolynomial<T>> for IntegerPolynomial

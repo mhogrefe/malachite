@@ -14,22 +14,21 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags `if`/`else if`/`else` chains in which every branch consists of a single
-    /// assignment to the same target, suggesting a single assignment of the conditional
-    /// expression.
+    /// Flags `if`/`else if`/`else` chains in which every branch consists of a single assignment to
+    /// the same target, suggesting a single assignment of the conditional expression.
     ///
     /// ### Why is this bad?
     ///
-    /// Repeating `x = ` in every branch obscures that the chain computes one value; assigning
-    /// the `if` expression once names the target a single time and lets the compiler check
-    /// that every branch produces a value.
+    /// Repeating `x = ` in every branch obscures that the chain computes one value; assigning the
+    /// `if` expression once names the target a single time and lets the compiler check that every
+    /// branch produces a value.
     ///
     /// ### Known problems
     ///
-    /// Only chains in which each branch's final statement is a plain assignment are
-    /// recognized; compound assignments and differing targets are not flagged. Statements
-    /// before the assignment are fine: they move into the corresponding arm of the factored
-    /// expression. A chain with no final `else` cannot be rewritten and is not flagged.
+    /// Only chains in which each branch's final statement is a plain assignment are recognized;
+    /// compound assignments and differing targets are not flagged. Statements before the assignment
+    /// are fine: they move into the corresponding arm of the factored expression. A chain with no
+    /// final `else` cannot be rewritten and is not flagged.
     ///
     /// ### Example
     ///
@@ -53,8 +52,8 @@ declare_lint! {
 
 declare_lint_pass!(FactorOutAssignment => [FACTOR_OUT_ASSIGNMENT]);
 
-// If the block's final statement is a plain assignment (with no trailing tail expression),
-// returns the assignment's target.
+// If the block's final statement is a plain assignment (with no trailing tail expression), returns
+// the assignment's target.
 fn final_assignment_target<'tcx>(block: &'tcx Expr<'tcx>) -> Option<&'tcx Expr<'tcx>> {
     let ExprKind::Block(block, _) = block.kind else {
         return None;
@@ -77,8 +76,8 @@ impl<'tcx> LateLintPass<'tcx> for FactorOutAssignment {
         if expr.span.from_expansion() {
             return;
         }
-        // Only consider the head of a chain: if this `if` is itself an else branch of another
-        // `if`, it is checked as part of the outer chain.
+        // Only consider the head of a chain: if this `if` is itself an else branch of another `if`,
+        // it is checked as part of the outer chain.
         if let Some(parent) = clippy_utils::get_parent_expr(cx, expr)
             && let ExprKind::If(_, _, Some(els)) = parent.kind
             && els.hir_id == expr.hir_id

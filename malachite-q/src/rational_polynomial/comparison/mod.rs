@@ -17,6 +17,7 @@ pub mod cmp;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::gaussian_integer::GaussianInteger;
 /// use malachite_q::rational_polynomial::RationalPolynomial;
 ///
@@ -40,6 +41,7 @@ pub mod partial_eq_gaussian_integer;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{OneHalf, Zero};
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_q::gaussian_rational::GaussianRational;
 /// use malachite_q::rational_polynomial::RationalPolynomial;
 ///
@@ -67,6 +69,7 @@ pub mod partial_eq_gaussian_rational;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::integer::Integer;
 /// use malachite_q::rational_polynomial::RationalPolynomial;
 ///
@@ -92,6 +95,7 @@ pub mod partial_eq_integer;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::integer_polynomial::IntegerPolynomial;
 /// use malachite_q::rational_polynomial::RationalPolynomial;
 ///
@@ -122,6 +126,7 @@ pub mod partial_eq_integer_polynomial;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{One, Zero};
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::natural::Natural;
 /// use malachite_q::rational_polynomial::RationalPolynomial;
 ///
@@ -145,6 +150,7 @@ pub mod partial_eq_natural;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::natural_polynomial::NaturalPolynomial;
 /// use malachite_q::rational_polynomial::RationalPolynomial;
 ///
@@ -174,6 +180,7 @@ pub mod partial_eq_natural_polynomial;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_q::rational_polynomial::RationalPolynomial;
 ///
 /// assert!(RationalPolynomial::ZERO == 0u32);
@@ -202,6 +209,7 @@ pub mod partial_eq_primitive_int;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{NegativeOne, One, OneHalf, Zero};
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_q::Rational;
 /// use malachite_q::rational_polynomial::RationalPolynomial;
 ///
@@ -227,6 +235,7 @@ pub mod partial_eq_rational;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 /// use malachite_q::rational_polynomial::RationalPolynomial;
 ///

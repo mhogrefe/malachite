@@ -27,8 +27,8 @@ declare_lint! {
     /// ### Known problems
     ///
     /// The precomputed forms are only flagged for `Natural` receivers: for primitive integers,
-    /// `mod_square_precomputed` takes the modular-exponentiation data `(inverse, shift)`, so a
-    /// call site holding only the bare multiplication inverse cannot be rewritten mechanically.
+    /// `mod_square_precomputed` takes the modular-exponentiation data `(inverse, shift)`, so a call
+    /// site holding only the bare multiplication inverse cannot be rewritten mechanically.
     ///
     /// ### Example
     ///

@@ -1,0 +1,22 @@
+error: `malachite_base` is reached through a `crate::` prefix that is not needed
+  --> $DIR/redundant_crate_prefix.rs:12:5
+   |
+LL | use crate::malachite_base::num::arithmetic::traits::Mod;
+   |     ^^^^^^^^^^^^^^^^^^^^^ help: remove the prefix: `malachite_base`
+   |
+   = note: `#[deny(redundant_crate_prefix)]` on by default
+
+error: `malachite_base` is reached through a `crate::` prefix that is not needed
+  --> $DIR/redundant_crate_prefix.rs:13:5
+   |
+LL | use crate::malachite_base::num::basic::traits::{One, Zero};
+   |     ^^^^^^^^^^^^^^^^^^^^^ help: remove the prefix: `malachite_base`
+
+error: `malachite_base` is reached through a `crate::` prefix that is not needed
+  --> $DIR/redundant_crate_prefix.rs:24:5
+   |
+LL |     crate::malachite_base::num::arithmetic::traits::Mod::mod_op(5u32, 3)
+   |     ^^^^^^^^^^^^^^^^^^^^^ help: remove the prefix: `malachite_base`
+
+error: aborting due to 3 previous errors
+

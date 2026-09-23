@@ -49,8 +49,8 @@ declare_lint_pass!(CollapseAdjacentImports => [COLLAPSE_ADJACENT_IMPORTS]);
 // final component, and the visibility, since `pub use` and `use` cannot share a brace group.
 type Key = (Vec<String>, String);
 
-// The merge key of a `use` item, or `None` if the item is not a mergeable `use` — which also makes
-// it a run-breaker, since anything between two imports means they are not adjacent.
+// The merge key of a `use` item, or `None` if the item is not a mergeable `use` — which also
+// makes it a run-breaker, since anything between two imports means they are not adjacent.
 fn merge_key(cx: &EarlyContext<'_>, item: &Item) -> Option<Key> {
     // An attribute (`#[cfg(...)]`, a doc comment) applies to the whole item, so it cannot be
     // carried into a shared brace group.
@@ -104,9 +104,9 @@ fn merged_leaves(cx: &EarlyContext<'_>, run: &[&Item]) -> Option<Vec<String>> {
                     None => last.to_string(),
                 });
             }
-            // Reuse the source text rather than reprinting the tree: a nested group may itself
-            // nest (`{b::{C, D}, E}`), and its contents are already a comma-separated list that
-            // drops straight into the merged group.
+            // Reuse the source text rather than reprinting the tree: a nested group may itself nest
+            // (`{b::{C, D}, E}`), and its contents are already a comma-separated list that drops
+            // straight into the merged group.
             UseTreeKind::Nested { span, .. } => {
                 let text = snippet_opt(cx, *span)?;
                 let inner = text

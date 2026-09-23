@@ -29,8 +29,7 @@ pub fn unsigned_polynomial_checked_evaluate(p: &UnsignedPolynomial<u64>, x: u128
 ///
 /// Since a [`u128`] holds only so much, this gives up rather than answer wrongly; a wider type
 /// would push the giving-up further out rather than remove it, which is why malachite-nz cross-
-/// checks this ordering against [`NaturalPolynomial`](malachite_nz::natural_polynomial::
-/// NaturalPolynomial)'s, where the evaluation is exact at any size.
+/// checks this ordering against `NaturalPolynomial`'s, where the evaluation is exact at any size.
 pub fn unsigned_polynomial_cmp_evaluated(
     p: &UnsignedPolynomial<u64>,
     q: &UnsignedPolynomial<u64>,

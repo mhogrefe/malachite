@@ -14,9 +14,9 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or `GaussianRational`) with
-    /// `power_of_2(..)`, whether via the comparison operators or via `cmp`, `partial_cmp`, or the
-    /// `*_abs` comparison methods.
+    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or
+    /// `GaussianRational`) with `power_of_2(..)`, whether via the comparison operators or via
+    /// `cmp`, `partial_cmp`, or the `*_abs` comparison methods.
     ///
     /// ### Why is this bad?
     ///

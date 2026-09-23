@@ -19,9 +19,9 @@ declare_lint! {
     ///
     /// Flags a numeric conversion of a compile-time constant — either an `as` cast (`const { (A
     /// - B) << 1 } as f64`) or a `from`/`exact_from`/`wrapping_from` call
-    /// (`u64::exact_from(Self::MAX_EXPONENT)`). The whole expression is a compile-time constant,
-    /// so the conversion should be an `as` cast inside a `const { .. }` block: `const { ((A - B)
-    /// << 1) as f64 }` / `const { Self::MAX_EXPONENT as u64 }`.
+    /// (`u64::exact_from(Self::MAX_EXPONENT)`). The whole expression is a compile-time constant, so
+    /// the conversion should be an `as` cast inside a `const { .. }` block: `const { ((A - B) << 1)
+    /// as f64 }` / `const { Self::MAX_EXPONENT as u64 }`.
     ///
     /// The operand may be an existing `const { .. }` block, a named constant, or any constant
     /// expression built from them.

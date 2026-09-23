@@ -15,6 +15,7 @@ use crate::natural_polynomial::NaturalPolynomial;
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::vecs::exhaustive::{
     ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
     exhaustive_vecs_with_last_fixed_length, exhaustive_vecs_with_last_length_inclusive_range,
@@ -362,8 +363,9 @@ pub type ExhaustiveNaturalPolynomialsReducedModPowerOf2 =
 ///
 /// A polynomial is reduced modulo $2^k$ when every one of its coefficients is, so these are the
 /// polynomials whose coefficients are all less than $2^k$ — which is to say, those for which
-/// [`mod_power_of_2_is_reduced`](malachite_base::num::arithmetic::traits::
-/// ModPowerOf2IsReduced::mod_power_of_2_is_reduced) returns `true`.
+/// [`mod_power_of_2_is_reduced`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced::mod_power_of_2_is_reduced)
+/// returns `true`.
 ///
 /// The output is infinite: restricting the coefficients does not bound the degree. The zero
 /// polynomial, having no coefficients, is reduced modulo every power of 2 and comes first.

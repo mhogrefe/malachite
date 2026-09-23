@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Height, HeightRef};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::unsigned_polynomial_gen;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;

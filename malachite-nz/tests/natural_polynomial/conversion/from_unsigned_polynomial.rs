@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::{
     unsigned_polynomial_gen, unsigned_polynomial_pair_gen,
 };

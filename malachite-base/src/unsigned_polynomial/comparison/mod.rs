@@ -17,6 +17,7 @@ pub mod cmp;
 /// ```
 /// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::polynomial::Polynomial;
 /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 ///
 /// assert!(UnsignedPolynomial::<u64>::ZERO == 0);

@@ -23,8 +23,8 @@ declare_lint! {
     ///
     /// ### Why is this bad?
     ///
-    /// `join_halves(hi, lo)` and `x.upper_half()` say the same thing directly, and cannot get
-    /// the shift amount wrong.
+    /// `join_halves(hi, lo)` and `x.upper_half()` say the same thing directly, and cannot get the
+    /// shift amount wrong.
     ///
     /// ### Example
     ///

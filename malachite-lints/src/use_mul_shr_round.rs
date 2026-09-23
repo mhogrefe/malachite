@@ -21,11 +21,11 @@ declare_lint! {
     ///
     /// ### Why is this bad?
     ///
-    /// For bignums, `mul_shr_round` never computes the part of the product that the shift
-    /// discards: when most of it is discarded, the fused operation is faster by an unbounded
-    /// factor (measured up to ~48x at 33-kilobit products). For primitives, the fused operation
-    /// says directly what the widening spelling encodes indirectly, and handles the rounding
-    /// mode and exactness uniformly.
+    /// For bignums, `mul_shr_round` never computes the part of the product that the shift discards:
+    /// when most of it is discarded, the fused operation is faster by an unbounded factor (measured
+    /// up to ~48x at 33-kilobit products). For primitives, the fused operation says directly what
+    /// the widening spelling encodes indirectly, and handles the rounding mode and exactness
+    /// uniformly.
     ///
     /// ### Known problems
     ///
@@ -71,8 +71,8 @@ fn as_mul<'tcx>(e: &'tcx Expr<'tcx>) -> Option<(&'tcx Expr<'tcx>, &'tcx Expr<'tc
     }
 }
 
-// If `e` widens a narrower expression -- `W::from(x)`, `From::from(x)`, or `x as W` -- returns
-// the type of the narrower expression.
+// If `e` widens a narrower expression -- `W::from(x)`, `From::from(x)`, or `x as W` -- returns the
+// type of the narrower expression.
 fn widened_from<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<Ty<'tcx>> {
     match crate::peel_clone_and_borrows(e).kind {
         ExprKind::Call(callee, [arg]) => {
@@ -90,9 +90,8 @@ fn widened_from<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<Ty<
     }
 }
 
-// Whether the product `l * r`, of type `prod_ty`, is a doubled-width product of two equal
-// narrower primitive-integer expressions -- the manual spelling of what `mul_shr_round` does
-// internally.
+// Whether the product `l * r`, of type `prod_ty`, is a doubled-width product of two equal narrower
+// primitive-integer expressions -- the manual spelling of what `mul_shr_round` does internally.
 fn is_widening_product<'tcx>(
     cx: &LateContext<'tcx>,
     prod_ty: Ty<'tcx>,

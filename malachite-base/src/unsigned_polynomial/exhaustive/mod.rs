@@ -11,6 +11,7 @@ use crate::num::exhaustive::{
     PrimitiveIntIncreasingRange, exhaustive_positive_primitive_ints, exhaustive_unsigneds,
     primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
 };
+use crate::polynomial::Polynomial;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::vecs::exhaustive::{
     ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
@@ -388,8 +389,8 @@ pub type ExhaustiveUnsignedPolynomialsReducedModPowerOf2<T> = ExhaustiveUnsigned
 ///
 /// A polynomial is reduced modulo $2^k$ when every one of its coefficients is, so these are the
 /// polynomials whose coefficients are all less than $2^k$ — which is to say, those for which
-/// [`mod_power_of_2_is_reduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced::
-/// mod_power_of_2_is_reduced) returns `true`.
+/// [`mod_power_of_2_is_reduced`](
+/// crate::num::arithmetic::traits::ModPowerOf2IsReduced::mod_power_of_2_is_reduced) returns `true`.
 ///
 /// The output is infinite: restricting the coefficients does not bound the degree. The zero
 /// polynomial, having no coefficients, is reduced modulo every power of 2 and comes first.

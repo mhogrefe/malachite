@@ -14,14 +14,14 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags projecting one component out of the pair returned by a combined
-    /// division-and-remainder function, such as `x.div_mod(y).0`.
+    /// Flags projecting one component out of the pair returned by a combined division-and-remainder
+    /// function, such as `x.div_mod(y).0`.
     ///
     /// ### Why is this bad?
     ///
     /// The combined functions exist for callers that need both results; taking only one computes
-    /// and allocates the other for nothing, and hides which result is meant. A dedicated
-    /// division or remainder function says it directly.
+    /// and allocates the other for nothing, and hides which result is meant. A dedicated division
+    /// or remainder function says it directly.
     ///
     /// ### Example
     ///
@@ -41,9 +41,9 @@ declare_lint! {
 
 declare_lint_pass!(DivModProjection => [DIV_MOD_PROJECTION]);
 
-// The tuple-returning quotient-and-remainder families, with the dedicated function to use for
-// each component. The quotient suggestions name the rounding mode, since plain `/` truncates
-// while `div_mod` floors.
+// The tuple-returning quotient-and-remainder families, with the dedicated function to use for each
+// component. The quotient suggestions name the rounding mode, since plain `/` truncates while
+// `div_mod` floors.
 const FAMILIES: [(&str, &str, &str); 4] = [
     (
         "div_mod",
@@ -68,10 +68,10 @@ impl<'tcx> LateLintPass<'tcx> for DivModProjection {
         if expr.span.from_expansion() {
             return;
         }
-        // Demo-and-bench comparison arms and cross-function consistency properties in tests
-        // project these results on purpose, measuring or asserting one component against the
-        // dedicated function; they are exempt. Test-utility reference implementations are not:
-        // a projection there is just an unclear way to ask for one component.
+        // Demo-and-bench comparison arms and cross-function consistency properties in tests project
+        // these results on purpose, measuring or asserting one component against the dedicated
+        // function; they are exempt. Test-utility reference implementations are not: a projection
+        // there is just an unclear way to ask for one component.
         if crate::in_bin_util_or_tests(cx, expr.hir_id) {
             return;
         }

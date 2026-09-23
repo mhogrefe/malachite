@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::IsUnit;
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::test_util::generators::integer_polynomial_gen;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::rational_polynomial_gen;

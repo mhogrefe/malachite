@@ -149,7 +149,7 @@ extern crate rug;
 pub mod gaussian_rational;
 pub mod rational;
 /// [`RationalPolynomial`](rational_polynomial::RationalPolynomial), a type representing polynomials
-/// in one variable whose coefficients are [`Rational`](Rational)s.
+/// in one variable whose coefficients are [`Rational`]s.
 pub mod rational_polynomial;
 pub use rational::Rational;
 

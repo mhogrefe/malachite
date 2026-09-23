@@ -10,6 +10,7 @@ use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, RemPowerOf2, RemPowerOf2Assign};
+use malachite_base::polynomial::Polynomial;
 
 impl ModPowerOf2 for IntegerPolynomial {
     type Output = NaturalPolynomial;
@@ -17,13 +18,12 @@ impl ModPowerOf2 for IntegerPolynomial {
     /// Divides every coefficient of an [`IntegerPolynomial`] by $2^k$, keeping the remainders as a
     /// [`NaturalPolynomial`], taking the polynomial by value.
     ///
-    /// Each remainder is non-negative, as with
-    /// [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2) for
+    /// Each remainder is non-negative, as with [`ModPowerOf2`] for
     /// [`Integer`](crate::integer::Integer): a negative coefficient $c$ becomes $2^k - (-c \bmod
     /// 2^k)$ unless it is a multiple of $2^k$. So the result has natural coefficients, and is
-    /// reduced modulo $2^k$, which is to say that
-    /// [`mod_power_of_2_is_reduced`](malachite_base::num::arithmetic::traits::
-    /// ModPowerOf2IsReduced::mod_power_of_2_is_reduced) returns `true` for it.
+    /// reduced modulo $2^k$, which is to say that [`mod_power_of_2_is_reduced`](
+    /// malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced::mod_power_of_2_is_reduced)
+    /// returns `true` for it.
     ///
     /// Reducing can lower the degree, and can even give the zero polynomial: a leading coefficient
     /// that is a multiple of $2^k$ becomes zero, and a polynomial does not hold trailing zero

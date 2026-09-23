@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::vars::greek::GreekVars;
 use malachite_base::vars::indexed::IndexedVars;
 use malachite_base::vars::list::ListVars;

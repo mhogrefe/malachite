@@ -1814,8 +1814,8 @@ pub trait ModShlAssign<RHS, M = Self> {
     fn mod_shl_assign(&mut self, other: RHS, m: M);
 }
 
-/// Right-shifts a number (divides it by a power of 2) modulo another number $m$. The number must
-/// be already reduced modulo $m$.
+/// Right-shifts a number (divides it by a power of 2) modulo another number $m$. The number must be
+/// already reduced modulo $m$.
 pub trait ModShr<RHS, M = Self> {
     type Output;
 

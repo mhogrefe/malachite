@@ -9,6 +9,7 @@
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_q::rational::exhaustive::{exhaustive_nonzero_rationals, exhaustive_rationals};
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::rational_polynomial::exhaustive::*;

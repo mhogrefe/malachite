@@ -10,10 +10,10 @@
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s.
 pub mod from_string;
 /// The implementation of [`ToLatex`](malachite_base::strings::latex::ToLatex) for a
-/// [`GaussianInteger`].
+/// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger).
 pub mod latex;
 /// Implementations of traits for converting to strings.
 pub mod to_string;
 /// The implementation of [`ToTypst`](malachite_base::strings::typst::ToTypst) for a
-/// [`GaussianInteger`].
+/// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger).
 pub mod typst;

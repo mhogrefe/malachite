@@ -21,6 +21,7 @@ impl IsUnit for RationalPolynomial {
     /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::IsUnit;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(RationalPolynomial::one().is_unit(), true);

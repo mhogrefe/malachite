@@ -59,8 +59,8 @@ fn demo_integer_polynomial_balanced_mod_assign(gm: GenMode, config: &GenConfig, 
     }
 }
 
-// The moduli 1, -1, and 2 are the edge cases the property tests single out: everything vanishes
-// for the first two, and the third leaves only 0s and 1s.
+// The moduli 1, -1, and 2 are the edge cases the property tests single out: everything vanishes for
+// the first two, and the third leaves only 0s and 1s.
 fn demo_integer_polynomial_balanced_mod_small_moduli(
     gm: GenMode,
     config: &GenConfig,

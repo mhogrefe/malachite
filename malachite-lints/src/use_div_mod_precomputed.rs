@@ -32,8 +32,8 @@ declare_lint! {
     /// Primitive-integer divisions are deliberately not flagged: on processors with fast hardware
     /// dividers, the preinverted form can lose to plain division, so that rewrite is a judgment
     /// call. Loops that run very few times gain little; such sites can carry an `expect` with a
-    /// justifying comment. Only divisors that are plain locals are recognized, and only `hir`
-    /// loops -- divisions inside iterator closures are not seen.
+    /// justifying comment. Only divisors that are plain locals are recognized, and only `hir` loops
+    /// -- divisions inside iterator closures are not seen.
     ///
     /// ### Example
     ///

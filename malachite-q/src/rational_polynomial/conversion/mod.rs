@@ -85,7 +85,7 @@ pub mod natural_polynomial_from_rational_polynomial;
 /// [serde](https://serde.rs/).
 pub mod serde;
 /// Functions for converting an [`RationalPolynomial`](super::RationalPolynomial) to and from a
-/// [`String`](alloc::string::String).
+/// [`String`].
 pub mod string;
 /// Implementations of traits for converting a [`RationalPolynomial`](super::RationalPolynomial) to
 /// an [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).

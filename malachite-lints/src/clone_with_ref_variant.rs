@@ -185,9 +185,8 @@ impl<'tcx> LateLintPass<'tcx> for CloneWithRefVariant {
                 if name.ends_with("_ref") {
                     return;
                 }
-                // Only inherent associated functions: a trait method's parent is the trait
-                // itself, which has no self type, and the `f`/`f_ref` convention is an inherent
-                // one anyway.
+                // Only inherent associated functions: a trait method's parent is the trait itself,
+                // which has no self type, and the `f`/`f_ref` convention is an inherent one anyway.
                 if cx.tcx.trait_of_assoc(fn_did).is_some() {
                     return;
                 }

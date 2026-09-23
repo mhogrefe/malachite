@@ -28,11 +28,11 @@ declare_lint! {
     /// ### Known problems
     ///
     /// Only unsigned primitives and `Natural` are flagged: for signed types and `Integer`,
-    /// `mod_power_of_2` returns the unsigned/`Natural` remainder, so the rewrite changes the
-    /// type. Masks that are named constants of primitive type, like `WIDTH_MASK`, are not
-    /// flagged; the name already carries the meaning, and `use_width_mask` deliberately steers
-    /// toward one of them. Masks of 1 belong to `use_parity`. Masks built by calling
-    /// `low_mask(k)` are also flagged, with `mod_power_of_2(k)` suggested.
+    /// `mod_power_of_2` returns the unsigned/`Natural` remainder, so the rewrite changes the type.
+    /// Masks that are named constants of primitive type, like `WIDTH_MASK`, are not flagged; the
+    /// name already carries the meaning, and `use_width_mask` deliberately steers toward one of
+    /// them. Masks of 1 belong to `use_parity`. Masks built by calling `low_mask(k)` are also
+    /// flagged, with `mod_power_of_2(k)` suggested.
     ///
     /// ### Example
     ///

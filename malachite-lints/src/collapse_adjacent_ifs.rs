@@ -20,15 +20,15 @@ declare_lint! {
     ///
     /// ### Why is this bad?
     ///
-    /// The chain is longer than the single `if` and hides the fact that all the conditions have
-    /// the same consequence. Because the shared body diverges and `||` short-circuits, the merged
-    /// form evaluates exactly the same conditions in the same order.
+    /// The chain is longer than the single `if` and hides the fact that all the conditions have the
+    /// same consequence. Because the shared body diverges and `||` short-circuits, the merged form
+    /// evaluates exactly the same conditions in the same order.
     ///
     /// ### Known problems
     ///
     /// Only diverging bodies are flagged: for a non-diverging body, the chain runs the body once
-    /// per satisfied condition, so merging would change behavior. Chains whose ifs are separated
-    /// by other statements are not seen.
+    /// per satisfied condition, so merging would change behavior. Chains whose ifs are separated by
+    /// other statements are not seen.
     ///
     /// ### Example
     ///
@@ -55,8 +55,8 @@ declare_lint! {
 
 declare_lint_pass!(CollapseAdjacentIfs => [COLLAPSE_ADJACENT_IFS]);
 
-// Whether a condition contains a `let`, as in `if let` or a let chain. Such a condition cannot
-// be joined to another with `||`.
+// Whether a condition contains a `let`, as in `if let` or a let chain. Such a condition cannot be
+// joined to another with `||`.
 fn contains_let(e: &Expr<'_>) -> bool {
     match e.kind {
         ExprKind::Let(_) => true,
@@ -84,8 +84,7 @@ fn as_plain_if<'tcx>(stmt: &Stmt<'tcx>) -> Option<(&'tcx Expr<'tcx>, &'tcx Block
     Some((cond, block))
 }
 
-// Whether the block's final statement or expression diverges via `return`, `break`, or
-// `continue`.
+// Whether the block's final statement or expression diverges via `return`, `break`, or `continue`.
 fn diverges(block: &Block<'_>) -> bool {
     let last = match (block.expr, block.stmts.last()) {
         (Some(e), _) => e,

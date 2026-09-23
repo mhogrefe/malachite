@@ -9,6 +9,7 @@
 use crate::integer_polynomial::IntegerPolynomial;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
+use malachite_base::polynomial::Polynomial;
 
 impl PartialOrd for IntegerPolynomial {
     /// Compares two [`IntegerPolynomial`]s.

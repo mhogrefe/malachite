@@ -307,6 +307,16 @@ documented by git history.
 - `ToLatex` and `ToTypst` for `UnsignedPolynomial`, with `to_latex_string_with` and
   `to_typst_string_with` for a named variable. Neither language writes the `*`, and LaTeX braces
   an exponent of more than one digit while Typst parenthesizes it.
+- A new `Polynomial` trait, in `malachite_base::polynomial`, holding what every polynomial type
+  has in common: `one`, `two`, `x`, `from_coefficients_asc`, `into_coefficients_asc`, `degree`,
+  `coefficient`, `leading_coefficient`, `mutate_coefficient`, `to_string_with`,
+  `to_latex_string_with`, `to_typst_string_with`, and `from_string_with`. It is implemented for
+  `UnsignedPolynomial`, `NaturalPolynomial`, `IntegerPolynomial`, and `RationalPolynomial`, and
+  those functions are its methods rather than inherent ones, so code that calls them needs
+  `use malachite_base::polynomial::Polynomial;`. A coefficient is returned as a
+  `CoefficientOutput`, which is a reference where a polynomial holds its coefficients as bignums
+  and a value where a coefficient is a primitive or has to be built, as a `RationalPolynomial`'s
+  is.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

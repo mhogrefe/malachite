@@ -9,6 +9,7 @@
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
 use alloc::vec;
+use malachite_base::polynomial::Polynomial;
 
 impl<T: Into<Rational>> From<T> for RationalPolynomial {
     /// Converts a value to a constant [`RationalPolynomial`].

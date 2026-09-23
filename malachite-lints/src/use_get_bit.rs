@@ -15,8 +15,8 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags `x & power_of_2(k) == 0` and `x & power_of_2(k) != 0` (in any operand order),
-    /// suggesting `get_bit(k)`, and the same comparisons against a constant named
-    /// `LIMB_HIGH_BIT` or ending in `HIGH_BIT`, suggesting `get_highest_bit()`.
+    /// suggesting `get_bit(k)`, and the same comparisons against a constant named `LIMB_HIGH_BIT`
+    /// or ending in `HIGH_BIT`, suggesting `get_highest_bit()`.
     ///
     /// ### Why is this bad?
     ///
@@ -25,9 +25,9 @@ declare_lint! {
     ///
     /// ### Known problems
     ///
-    /// Only the compared forms are flagged: a bare `x & power_of_2(k)` whose value is used
-    /// as a number is not a bit test. Functions implementing `get_bit` or `get_highest_bit`
-    /// themselves are exempt.
+    /// Only the compared forms are flagged: a bare `x & power_of_2(k)` whose value is used as a
+    /// number is not a bit test. Functions implementing `get_bit` or `get_highest_bit` themselves
+    /// are exempt.
     ///
     /// ### Example
     ///

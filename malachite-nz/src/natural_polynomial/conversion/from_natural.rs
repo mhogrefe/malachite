@@ -9,6 +9,7 @@
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec;
+use malachite_base::polynomial::Polynomial;
 
 impl<T: Into<Natural>> From<T> for NaturalPolynomial {
     /// Converts a value to a constant [`NaturalPolynomial`].

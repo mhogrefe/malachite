@@ -13,6 +13,7 @@
 
 use itertools::Itertools;
 use malachite_base::num::logic::traits::BitIterable;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::random::*;

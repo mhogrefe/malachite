@@ -11,6 +11,7 @@ use crate::natural_polynomial::{NaturalPolynomial, ZERO};
 use malachite_base::num::arithmetic::traits::{Height, HeightRef};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::polynomial::Polynomial;
 
 impl Height for NaturalPolynomial {
     type Output = Natural;

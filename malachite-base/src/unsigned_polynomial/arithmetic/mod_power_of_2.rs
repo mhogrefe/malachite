@@ -8,6 +8,7 @@
 
 use crate::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Assign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::polynomial::Polynomial;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec::Vec;
 
@@ -17,9 +18,9 @@ impl<T: PrimitiveUnsigned> ModPowerOf2 for UnsignedPolynomial<T> {
     /// Divides every coefficient of a [`UnsignedPolynomial`] by $2^k$, keeping the remainders,
     /// taking the polynomial by value.
     ///
-    /// The result is reduced modulo $2^k$, which is to say that
-    /// [`mod_power_of_2_is_reduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced::
-    /// mod_power_of_2_is_reduced) returns `true` for it.
+    /// The result is reduced modulo $2^k$, which is to say that [`mod_power_of_2_is_reduced`](
+    /// crate::num::arithmetic::traits::ModPowerOf2IsReduced::mod_power_of_2_is_reduced) returns
+    /// `true` for it.
     ///
     /// Reducing can lower the degree, and can even give the zero polynomial: a leading coefficient
     /// that is a multiple of $2^k$ becomes zero, and a polynomial does not hold trailing zero

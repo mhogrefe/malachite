@@ -19,6 +19,7 @@ use malachite_base::iterators::{NonzeroValues, nonzero_values};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::random::RandomUnsignedInclusiveRange;
 use malachite_base::num::random::geometric::GeometricRandomNaturalValues;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::random::Seed;
 use malachite_base::vecs::random::{
     RandomFixedLengthVecsWithLast, RandomVecsWithLast, random_vecs_with_last,

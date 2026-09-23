@@ -14,6 +14,7 @@
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{Height, ModIsReduced, ModPowerOf2IsReduced};
 use malachite_base::num::logic::traits::{BitIterable, LowMask};
+use malachite_base::polynomial::Polynomial;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::random::*;

@@ -27,6 +27,7 @@ impl<T: PrimitiveUnsigned> IsUnit for UnsignedPolynomial<T> {
     /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::IsUnit;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// assert_eq!(UnsignedPolynomial::<u64>::one().is_unit(), true);
