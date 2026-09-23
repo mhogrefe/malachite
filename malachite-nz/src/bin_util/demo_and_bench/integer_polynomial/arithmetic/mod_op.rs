@@ -15,7 +15,8 @@ use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::pair_1_integer_polynomial_bit_bucketer;
 use malachite_nz::test_util::generators::{
-    integer_polynomial_natural_pair_gen_var_1, integer_polynomial_unsigned_pair_gen,
+    integer_polynomial_integer_pair_gen_var_1, integer_polynomial_natural_pair_gen_var_1,
+    integer_polynomial_unsigned_pair_gen,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -23,6 +24,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_mod_op_ref);
 
     register_unsigned_demos!(runner, demo_integer_polynomial_mod_op_unsigned);
+    register_demo!(runner, demo_integer_polynomial_rem);
+    register_demo!(runner, demo_integer_polynomial_rem_ref);
+    register_demo!(runner, demo_integer_polynomial_rem_assign);
 
     register_bench!(
         runner,
@@ -32,6 +36,7 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_integer_polynomial_mod_op_unsigned_algorithms
     );
+    register_bench!(runner, benchmark_integer_polynomial_rem_evaluation_strategy);
 }
 
 fn demo_integer_polynomial_mod_op(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -134,6 +139,69 @@ fn benchmark_integer_polynomial_mod_op_unsigned_algorithms<
                     );
                 },
             ),
+        ],
+    );
+}
+
+fn demo_integer_polynomial_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, m) in integer_polynomial_integer_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let p_old = p.clone();
+        println!("({p_old}) % {m} = {}", p % &m);
+    }
+}
+
+fn demo_integer_polynomial_rem_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, m) in integer_polynomial_integer_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("&({p}) % {m} = {}", &p % &m);
+    }
+}
+
+fn demo_integer_polynomial_rem_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut p, m) in integer_polynomial_integer_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let p_old = p.clone();
+        p %= &m;
+        println!("p := {p_old}; p %= {m}; p = {p}");
+    }
+}
+
+// The remainders are what is being timed, so the benchmark discards them on purpose.
+#[allow(unused_must_use)]
+fn benchmark_integer_polynomial_rem_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "IntegerPolynomial % Integer",
+        BenchmarkType::EvaluationStrategy,
+        integer_polynomial_integer_pair_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_integer_polynomial_bit_bucketer("p"),
+        &mut [
+            ("IntegerPolynomial % Integer", &mut |(p, m)| no_out!(p % m)),
+            ("IntegerPolynomial % &Integer", &mut |(p, m)| {
+                no_out!(p % &m);
+            }),
+            ("&IntegerPolynomial % Integer", &mut |(p, m)| {
+                no_out!(&p % m);
+            }),
+            ("&IntegerPolynomial % &Integer", &mut |(p, m)| {
+                no_out!(&p % &m);
+            }),
+            ("IntegerPolynomial %= Integer", &mut |(mut p, m)| p %= m),
+            ("IntegerPolynomial %= &Integer", &mut |(mut p, m)| p %= &m),
         ],
     );
 }

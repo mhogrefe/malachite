@@ -198,6 +198,15 @@ pub fn integer_polynomial_integer_pair_gen() -> Generator<(IntegerPolynomial, In
     )
 }
 
+// The `Integer` is nonzero.
+pub fn integer_polynomial_integer_pair_gen_var_1() -> Generator<(IntegerPolynomial, Integer)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_pair_gen_var_1,
+        &random_integer_polynomial_integer_pair_gen_var_1,
+        &special_random_integer_polynomial_integer_pair_gen_var_1,
+    )
+}
+
 pub fn integer_polynomial_natural_pair_gen() -> Generator<(IntegerPolynomial, Natural)> {
     Generator::new(
         &exhaustive_integer_polynomial_natural_pair_gen,

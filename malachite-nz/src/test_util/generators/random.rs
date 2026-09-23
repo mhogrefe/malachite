@@ -458,6 +458,30 @@ pub fn random_integer_polynomial_integer_pair_gen(
     ))
 }
 
+pub fn random_integer_polynomial_integer_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_nonzero_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_integer_polynomial_natural_pair_gen(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, Natural)> {

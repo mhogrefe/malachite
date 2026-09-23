@@ -11,6 +11,7 @@ use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
+use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{Mod, NegMod};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -234,11 +235,11 @@ where
     /// integer type, keeping the remainders as an [`UnsignedPolynomial`] with that coefficient
     /// type, taking the polynomial by reference.
     ///
-    /// Each remainder is taken in $[0, m)$, so negative coefficients become non-negative, and
-    /// every remainder fits in `m`'s type. Apart from the result's type, this is the same
-    /// operation as reducing modulo `Natural::from(m)`; see the documentation for the [`Mod`]
-    /// implementation on [`IntegerPolynomial`] that takes both arguments by value for details,
-    /// including how reducing can lower the degree.
+    /// Each remainder is taken in $[0, m)$, so negative coefficients become non-negative, and every
+    /// remainder fits in `m`'s type. Apart from the result's type, this is the same operation as
+    /// reducing modulo `Natural::from(m)`; see the documentation for the [`Mod`] implementation on
+    /// [`IntegerPolynomial`] that takes both arguments by value for details, including how reducing
+    /// can lower the degree.
     ///
     /// The result is reduced modulo $m$, which is to say that
     /// [`mod_is_reduced`](malachite_base::num::arithmetic::traits::ModIsReduced::mod_is_reduced)
@@ -327,5 +328,276 @@ where
     #[inline]
     fn mod_op(self, m: T) -> UnsignedPolynomial<T> {
         (&self).mod_op(m)
+    }
+}
+
+impl Rem<Integer> for IntegerPolynomial {
+    type Output = Self;
+
+    /// Divides every coefficient of an [`IntegerPolynomial`] by an [`Integer`], keeping the
+    /// remainders, taking the polynomial by value and the modulus by value.
+    ///
+    /// Each remainder has the sign of its coefficient and a smaller absolute value than $m$, as
+    /// with [`Rem`] for [`Integer`]s, so the sign of $m$ makes no difference. This is the remainder
+    /// of truncating division: with the coefficient-wise quotient $q_i = \operatorname{
+    /// sgn}(p_im)\lfloor |p_i/m| \rfloor$, $p = mq + r$ holds exactly. For a remainder that is
+    /// always non-negative, and a [`NaturalPolynomial`] result, use [`Mod`].
+    ///
+    /// Reducing can lower the degree, and can even give the zero polynomial: a leading coefficient
+    /// that is a multiple of $m$ becomes zero, and a polynomial does not hold trailing zero
+    /// coefficients. So $-6x^2 + 3x - 1$ modulo $3$ is the constant $-1$.
+    ///
+    /// $$
+    /// f(p, m) = r, \quad \text{where} \quad r_i = p_i - m \operatorname{sgn}(p_im)
+    ///     \left \lfloor \left | \frac{p_i}{m} \right | \right \rfloor.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// polynomial's coefficients.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// // Every coefficient is taken modulo 3, keeping its sign.
+    /// let p = IntegerPolynomial::from_str("x^2-4*x-5").unwrap();
+    /// assert_eq!((p.clone() % Integer::from(3)).to_string(), "x^2-x-2");
+    ///
+    /// // The sign of the modulus makes no difference, and reducing the leading coefficient to zero
+    /// // lowers the degree.
+    /// let p = IntegerPolynomial::from_str("-6*x^2+3*x-1").unwrap();
+    /// assert_eq!((p % Integer::from(-3)).to_string(), "-1");
+    /// ```
+    #[inline]
+    fn rem(mut self, m: Integer) -> Self {
+        self %= m;
+        self
+    }
+}
+
+impl<'a> Rem<&'a Integer> for IntegerPolynomial {
+    type Output = Self;
+
+    /// Divides every coefficient of an [`IntegerPolynomial`] by an [`Integer`], keeping the
+    /// remainders, taking the polynomial by value and the modulus by reference.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerPolynomial`] that takes
+    /// both arguments by value for details, including the signs of the remainders and how reducing
+    /// can lower the degree.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// polynomial's coefficients.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// // Every coefficient is taken modulo 3, keeping its sign.
+    /// let p = IntegerPolynomial::from_str("x^2-4*x-5").unwrap();
+    /// assert_eq!((p.clone() % &Integer::from(3)).to_string(), "x^2-x-2");
+    ///
+    /// // The sign of the modulus makes no difference, and reducing the leading coefficient to zero
+    /// // lowers the degree.
+    /// let p = IntegerPolynomial::from_str("-6*x^2+3*x-1").unwrap();
+    /// assert_eq!((p % &Integer::from(-3)).to_string(), "-1");
+    /// ```
+    #[inline]
+    fn rem(mut self, m: &'a Integer) -> Self {
+        self %= m;
+        self
+    }
+}
+
+impl Rem<Integer> for &IntegerPolynomial {
+    type Output = IntegerPolynomial;
+
+    /// Divides every coefficient of an [`IntegerPolynomial`] by an [`Integer`], keeping the
+    /// remainders, taking the polynomial by reference and the modulus by value.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerPolynomial`] that takes
+    /// both arguments by value for details, including the signs of the remainders and how reducing
+    /// can lower the degree.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// polynomial's coefficients.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// // Every coefficient is taken modulo 3, keeping its sign.
+    /// let p = IntegerPolynomial::from_str("x^2-4*x-5").unwrap();
+    /// assert_eq!((&p % Integer::from(3)).to_string(), "x^2-x-2");
+    ///
+    /// // The sign of the modulus makes no difference, and reducing the leading coefficient to zero
+    /// // lowers the degree.
+    /// let p = IntegerPolynomial::from_str("-6*x^2+3*x-1").unwrap();
+    /// assert_eq!((&p % Integer::from(-3)).to_string(), "-1");
+    /// // The polynomial is left alone.
+    /// assert_eq!(p.to_string(), "-6*x^2+3*x-1");
+    /// ```
+    #[inline]
+    fn rem(self, m: Integer) -> IntegerPolynomial {
+        self % &m
+    }
+}
+
+impl<'a> Rem<&'a Integer> for &IntegerPolynomial {
+    type Output = IntegerPolynomial;
+
+    /// Divides every coefficient of an [`IntegerPolynomial`] by an [`Integer`], keeping the
+    /// remainders, taking the polynomial by reference and the modulus by reference.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerPolynomial`] that takes
+    /// both arguments by value for details, including the signs of the remainders and how reducing
+    /// can lower the degree.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// polynomial's coefficients.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// // Every coefficient is taken modulo 3, keeping its sign.
+    /// let p = IntegerPolynomial::from_str("x^2-4*x-5").unwrap();
+    /// assert_eq!((&p % &Integer::from(3)).to_string(), "x^2-x-2");
+    ///
+    /// // The sign of the modulus makes no difference, and reducing the leading coefficient to zero
+    /// // lowers the degree.
+    /// let p = IntegerPolynomial::from_str("-6*x^2+3*x-1").unwrap();
+    /// assert_eq!((&p % &Integer::from(-3)).to_string(), "-1");
+    /// // The polynomial is left alone.
+    /// assert_eq!(p.to_string(), "-6*x^2+3*x-1");
+    /// ```
+    fn rem(self, m: &'a Integer) -> IntegerPolynomial {
+        assert_ne!(*m, 0u32, "division by zero");
+        // `from_coefficients_asc` trims, which is what makes the degree fall when the leading
+        // coefficient reduces to zero.
+        IntegerPolynomial::from_coefficients_asc(
+            self.coefficients.iter().map(|c| c % m).collect::<Vec<_>>(),
+        )
+    }
+}
+
+impl RemAssign<Integer> for IntegerPolynomial {
+    /// Divides every coefficient of an [`IntegerPolynomial`] by an [`Integer`], replacing the
+    /// polynomial by the one whose coefficients are the remainders, taking the modulus by value.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerPolynomial`] that takes
+    /// both arguments by value for details, including the signs of the remainders and how reducing
+    /// can lower the degree.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// polynomial's coefficients.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// let mut p = IntegerPolynomial::from_str("x^2-4*x-5").unwrap();
+    /// p %= Integer::from(3);
+    /// assert_eq!(p.to_string(), "x^2-x-2");
+    ///
+    /// let mut p = IntegerPolynomial::from_str("-6*x^2+3*x-1").unwrap();
+    /// p %= Integer::from(-3);
+    /// assert_eq!(p.to_string(), "-1");
+    /// ```
+    #[inline]
+    fn rem_assign(&mut self, m: Integer) {
+        *self %= &m;
+    }
+}
+
+impl<'a> RemAssign<&'a Integer> for IntegerPolynomial {
+    /// Divides every coefficient of an [`IntegerPolynomial`] by an [`Integer`], replacing the
+    /// polynomial by the one whose coefficients are the remainders, taking the modulus by
+    /// reference.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerPolynomial`] that takes
+    /// both arguments by value for details, including the signs of the remainders and how reducing
+    /// can lower the degree.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// polynomial's coefficients.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// let mut p = IntegerPolynomial::from_str("x^2-4*x-5").unwrap();
+    /// p %= &Integer::from(3);
+    /// assert_eq!(p.to_string(), "x^2-x-2");
+    ///
+    /// let mut p = IntegerPolynomial::from_str("-6*x^2+3*x-1").unwrap();
+    /// p %= &Integer::from(-3);
+    /// assert_eq!(p.to_string(), "-1");
+    /// ```
+    fn rem_assign(&mut self, m: &'a Integer) {
+        assert_ne!(*m, 0u32, "division by zero");
+        for c in &mut self.coefficients {
+            *c %= m;
+        }
+        self.trim();
     }
 }
