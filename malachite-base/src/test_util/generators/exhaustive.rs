@@ -6462,6 +6462,13 @@ pub fn exhaustive_unsigned_polynomial_triple_gen() -> It<(
     ))
 }
 
+pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen() -> It<(UnsignedPolynomial<u64>, u64)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigned_polynomials(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_1() -> It<(UnsignedPolynomial<u64>, u64)>
 {
     Box::new(exhaustive_pairs_big_tiny(

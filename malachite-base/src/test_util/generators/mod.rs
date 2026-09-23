@@ -4923,6 +4923,14 @@ pub fn unsigned_polynomial_triple_gen() -> Generator<(
     )
 }
 
+pub fn unsigned_polynomial_unsigned_pair_gen() -> Generator<(UnsignedPolynomial<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_pair_gen,
+        &random_unsigned_polynomial_unsigned_pair_gen,
+        &special_random_unsigned_polynomial_unsigned_pair_gen,
+    )
+}
+
 pub fn unsigned_polynomial_unsigned_pair_gen_var_1() -> Generator<(UnsignedPolynomial<u64>, u64)> {
     Generator::new(
         &exhaustive_unsigned_polynomial_unsigned_pair_gen_var_1,

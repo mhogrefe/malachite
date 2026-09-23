@@ -13,7 +13,7 @@
 /// ```
 /// use malachite_base::num::conversion::traits::Digits;
 ///
-/// assert_eq!(0u8.to_digits_asc(&6u64), &[]);
+/// assert!(0u8.to_digits_asc(&6u64).is_empty());
 /// assert_eq!(2u16.to_digits_asc(&6u32), &[2]);
 /// assert_eq!(
 ///     123456u32.to_digits_asc(&3u16),
@@ -25,8 +25,8 @@
 /// ```
 /// use malachite_base::num::conversion::traits::Digits;
 ///
-/// assert_eq!(0u8.to_digits_asc(&6u64), &[]);
-/// assert_eq!(2u16.to_digits_asc(&6u32), &[2]);
+/// assert!(0u8.to_digits_desc(&6u64).is_empty());
+/// assert_eq!(2u16.to_digits_desc(&6u32), &[2]);
 /// assert_eq!(
 ///     123456u32.to_digits_desc(&3u16),
 ///     &[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]
@@ -108,10 +108,7 @@ pub mod power_of_2_digit_iterable;
 /// ```
 /// use malachite_base::num::conversion::traits::PowerOf2Digits;
 ///
-/// assert_eq!(
-///     PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&0u8, 6),
-///     &[]
-/// );
+/// assert!(PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&0u8, 6).is_empty());
 /// assert_eq!(
 ///     PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&2u16, 6),
 ///     &[2]
@@ -127,10 +124,7 @@ pub mod power_of_2_digit_iterable;
 /// ```
 /// use malachite_base::num::conversion::traits::PowerOf2Digits;
 ///
-/// assert_eq!(
-///     PowerOf2Digits::<u64>::to_power_of_2_digits_desc(&0u8, 6),
-///     &[]
-/// );
+/// assert!(PowerOf2Digits::<u64>::to_power_of_2_digits_desc(&0u8, 6).is_empty());
 /// assert_eq!(
 ///     PowerOf2Digits::<u64>::to_power_of_2_digits_desc(&2u16, 6),
 ///     &[2]

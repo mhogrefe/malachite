@@ -8547,6 +8547,22 @@ pub fn random_unsigned_polynomial_triple_gen(
     )))
 }
 
+pub fn random_unsigned_polynomial_unsigned_pair_gen(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<u64>, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_unsigned_polynomials(
+                seed,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
 pub fn random_unsigned_polynomial_unsigned_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(UnsignedPolynomial<u64>, u64)> {

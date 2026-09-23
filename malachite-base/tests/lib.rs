@@ -886,6 +886,7 @@ pub mod unsigned_polynomial {
     }
     pub mod comparison {
         pub mod cmp;
+        pub mod partial_eq_unsigned;
     }
     pub mod conversion {
         pub mod from_coefficients_asc;
