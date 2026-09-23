@@ -19,3 +19,36 @@ pub mod serde;
 /// Functions for converting a [`NaturalPolynomial`](super::NaturalPolynomial) to and from a
 /// [`String`](alloc::string::String).
 pub mod string;
+/// Implementations of traits for converting a [`NaturalPolynomial`](super::NaturalPolynomial) to
+/// an [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
+///
+/// # try_from
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+///
+/// let p = NaturalPolynomial::from_str("3*x^2+255").unwrap();
+/// assert_eq!(
+///     UnsignedPolynomial::<u8>::try_from(&p).unwrap().to_string(),
+///     "3*x^2+255"
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u64>::try_from(p).unwrap().to_string(),
+///     "3*x^2+255"
+/// );
+///
+/// let p = NaturalPolynomial::from_str("3*x^2+256").unwrap();
+/// assert!(UnsignedPolynomial::<u8>::try_from(&p).is_err());
+/// assert_eq!(
+///     UnsignedPolynomial::<u16>::try_from(&p).unwrap().to_string(),
+///     "3*x^2+256"
+/// );
+///
+/// assert_eq!(
+///     UnsignedPolynomial::<u32>::try_from(NaturalPolynomial::ZERO),
+///     Ok(UnsignedPolynomial::<u32>::ZERO)
+/// );
+/// ```
+pub mod unsigned_polynomial_from_natural_polynomial;

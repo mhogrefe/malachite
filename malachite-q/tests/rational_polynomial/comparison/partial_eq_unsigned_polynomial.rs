@@ -48,8 +48,7 @@ fn test_partial_eq_unsigned_polynomial() {
     test::<usize>("x^3+x", "x^2+x", false);
 }
 
-// Comparing with a converted polynomial is the reference the direct comparison is checked
-// against.
+// Comparing with a converted polynomial is the reference the direct comparison is checked against.
 #[allow(clippy::cmp_owned, clippy::op_ref)]
 fn partial_eq_unsigned_polynomial_properties_helper<T: PrimitiveUnsigned>()
 where
@@ -58,9 +57,8 @@ where
     rational_polynomial_unsigned_polynomial_pair_gen::<T>().test_properties(|(p, q)| {
         let eq = p == q;
         assert_eq!(q == p, eq);
-        // Extra refs for type inference: with
-        // `RationalPolynomial: PartialEq<UnsignedPolynomial<T>>` in scope, `p == q` would look for
-        // that impl.
+        // Extra refs for type inference: with `RationalPolynomial:
+        // PartialEq<UnsignedPolynomial<T>>` in scope, `p == q` would look for that impl.
         assert_eq!(&p == &RationalPolynomial::from(q.clone()), eq);
         // Going through an IntegerPolynomial gives the same answer.
         assert_eq!(p == IntegerPolynomial::from(q.clone()), eq);

@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     from_unsigned_polynomial::register(runner);
     serde::register(runner);
     string::register(runner);
+    unsigned_polynomial_from_natural_polynomial::register(runner);
 }
 
 mod from_coefficients_asc;
@@ -21,3 +22,4 @@ mod from_natural;
 mod from_unsigned_polynomial;
 mod serde;
 mod string;
+mod unsigned_polynomial_from_natural_polynomial;

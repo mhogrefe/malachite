@@ -14,8 +14,11 @@ pub(crate) fn register(runner: &mut Runner) {
     from_natural_polynomial::register(runner);
     from_rational::register(runner);
     from_unsigned_polynomial::register(runner);
+    integer_polynomial_from_rational_polynomial::register(runner);
+    natural_polynomial_from_rational_polynomial::register(runner);
     serde::register(runner);
     string::register(runner);
+    unsigned_polynomial_from_rational_polynomial::register(runner);
 }
 
 mod from_coefficients_asc;
@@ -23,5 +26,8 @@ mod from_integer_polynomial;
 mod from_natural_polynomial;
 mod from_rational;
 mod from_unsigned_polynomial;
+mod integer_polynomial_from_rational_polynomial;
+mod natural_polynomial_from_rational_polynomial;
 mod serde;
 mod string;
+mod unsigned_polynomial_from_rational_polynomial;

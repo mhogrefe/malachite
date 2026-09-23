@@ -192,6 +192,8 @@ pub mod rational_polynomial {
         pub mod from_natural_polynomial;
         pub mod from_rational;
         pub mod from_unsigned_polynomial;
+        pub mod integer_polynomial_from_rational_polynomial;
+        pub mod natural_polynomial_from_rational_polynomial;
         pub mod serde;
         pub mod string {
             pub mod from_string;
@@ -199,6 +201,7 @@ pub mod rational_polynomial {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod unsigned_polynomial_from_rational_polynomial;
     }
     pub mod exhaustive {
         pub mod exhaustive_rational_polynomials;

@@ -579,6 +579,7 @@ pub mod integer_polynomial {
         pub mod from_integer;
         pub mod from_natural_polynomial;
         pub mod from_unsigned_polynomial;
+        pub mod natural_polynomial_from_integer_polynomial;
         pub mod serde;
         pub mod string {
             pub mod from_string;
@@ -586,6 +587,7 @@ pub mod integer_polynomial {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod unsigned_polynomial_from_integer_polynomial;
     }
     pub mod exhaustive {
         pub mod exhaustive_integer_polynomials;
@@ -637,6 +639,7 @@ pub mod natural_polynomial {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod unsigned_polynomial_from_natural_polynomial;
     }
     pub mod exhaustive {
         pub mod exhaustive_natural_polynomials;

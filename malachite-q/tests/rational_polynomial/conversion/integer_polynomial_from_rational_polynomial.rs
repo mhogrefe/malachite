@@ -1,0 +1,71 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use core::str::FromStr;
+use malachite_base::num::basic::traits::Zero;
+use malachite_nz::integer_polynomial::IntegerPolynomial;
+use malachite_nz::test_util::generators::integer_polynomial_gen;
+use malachite_q::rational_polynomial::RationalPolynomial;
+use malachite_q::rational_polynomial::conversion::integer_polynomial_from_rational_polynomial::*;
+use malachite_q::test_util::generators::rational_polynomial_gen;
+
+#[test]
+fn test_integer_polynomial_from_rational_polynomial() {
+    let test = |s, out: Option<&str>| {
+        let p = RationalPolynomial::from_str(s).unwrap();
+        let q = IntegerPolynomial::try_from(&p);
+        assert_eq!(q.as_ref().ok().map(ToString::to_string).as_deref(), out);
+        if let Ok(q) = &q {
+            assert!(q.is_valid());
+        } else {
+            assert_eq!(q, Err(IntegerPolynomialFromRationalPolynomialError));
+        }
+        assert_eq!(IntegerPolynomial::try_from(p), q);
+    };
+    test("0", Some("0"));
+    test("1", Some("1"));
+    test("-1", Some("-1"));
+    test("4/2", Some("2"));
+    test("x", Some("x"));
+    test("-3*x^2+5", Some("-3*x^2+5"));
+    // One non-integer coefficient is enough, wherever it is.
+    test("1/2", None);
+    test("1/2*x+1", None);
+    test("x^2+x+1/3", None);
+    test("-1/1000000000000000000000000*x", None);
+}
+
+#[test]
+fn integer_polynomial_from_rational_polynomial_properties() {
+    rational_polynomial_gen().test_properties(|p| {
+        let q = IntegerPolynomial::try_from(&p);
+        assert_eq!(IntegerPolynomial::try_from(p.clone()), q);
+        // The conversion succeeds exactly when the denominator is 1.
+        assert_eq!(q.is_ok(), *p.denominator_ref() == 1u32);
+        if let Ok(q) = q {
+            assert!(q.is_valid());
+            assert!(p == q);
+            assert_eq!(q.degree(), p.degree());
+            assert_eq!(RationalPolynomial::from(q), p);
+        }
+    });
+
+    integer_polynomial_gen().test_properties(|q| {
+        // Converting to a RationalPolynomial and back is the identity.
+        assert_eq!(
+            IntegerPolynomial::try_from(RationalPolynomial::from(q.clone())),
+            Ok(q)
+        );
+    });
+
+    assert_eq!(
+        IntegerPolynomial::try_from(RationalPolynomial::ZERO),
+        Ok(IntegerPolynomial::ZERO)
+    );
+    assert!(IntegerPolynomial::try_from(RationalPolynomial::one_half()).is_err());
+}
