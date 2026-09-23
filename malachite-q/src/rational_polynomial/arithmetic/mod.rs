@@ -9,3 +9,6 @@
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height), the largest of
 /// the heights of a polynomial's coefficients.
 pub mod height;
+/// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
+/// determining whether a number is a unit of its ring.
+pub mod is_unit;

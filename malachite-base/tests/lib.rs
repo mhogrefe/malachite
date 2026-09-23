@@ -873,6 +873,7 @@ pub mod vars {
 pub mod unsigned_polynomial {
     pub mod arithmetic {
         pub mod height;
+        pub mod is_unit;
         pub mod mod_is_reduced;
         pub mod mod_op;
         pub mod mod_power_of_2;
