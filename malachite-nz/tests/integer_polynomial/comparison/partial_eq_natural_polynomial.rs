@@ -44,8 +44,7 @@ fn test_partial_eq_natural_polynomial() {
     test("x^3+x", "x^2+x", false);
 }
 
-// Comparing with a converted polynomial is the reference the direct comparison is checked
-// against.
+// Comparing with a converted polynomial is the reference the direct comparison is checked against.
 #[allow(clippy::cmp_owned)]
 #[test]
 fn partial_eq_natural_polynomial_properties() {

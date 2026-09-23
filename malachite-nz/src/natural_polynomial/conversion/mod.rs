@@ -19,8 +19,8 @@ pub mod serde;
 /// Functions for converting a [`NaturalPolynomial`](super::NaturalPolynomial) to and from a
 /// [`String`](alloc::string::String).
 pub mod string;
-/// Implementations of traits for converting a [`NaturalPolynomial`](super::NaturalPolynomial) to
-/// an [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
+/// Implementations of traits for converting a [`NaturalPolynomial`](super::NaturalPolynomial) to an
+/// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
 ///
 /// # try_from
 /// ```

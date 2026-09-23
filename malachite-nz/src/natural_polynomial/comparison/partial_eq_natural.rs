@@ -46,8 +46,8 @@ impl PartialEq<NaturalPolynomial> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.coefficient(0).significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.coefficient(0).significant_bits())`.
     ///
     /// # Examples
     /// See [here](super::partial_eq_natural#partial_eq).

@@ -16,6 +16,11 @@ pub mod is_unit;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
+/// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
+/// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), [`Rem`](core::ops::Rem), and
+/// [`RemAssign`](core::ops::RemAssign), traits for reducing every coefficient of a polynomial
+/// modulo a number.
+pub mod mod_op;
 /// Implementations of [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2) and
 /// [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign), which reduce
 /// every coefficient of a polynomial modulo a power of 2.

@@ -12,10 +12,10 @@ use crate::natural_polynomial::NaturalPolynomial;
 impl PartialEq<NaturalPolynomial> for IntegerPolynomial {
     /// Determines whether an [`IntegerPolynomial`] is equal to a [`NaturalPolynomial`].
     ///
-    /// The two are equal when they have the same coefficients, which, since neither stores
-    /// trailing zeros, means the same number of coefficients and equal coefficients in each
-    /// position. So the zero polynomials are equal, and an [`IntegerPolynomial`] with a negative
-    /// coefficient is equal to no [`NaturalPolynomial`].
+    /// The two are equal when they have the same coefficients, which, since neither stores trailing
+    /// zeros, means the same number of coefficients and equal coefficients in each position. So the
+    /// zero polynomials are equal, and an [`IntegerPolynomial`] with a negative coefficient is
+    /// equal to no [`NaturalPolynomial`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

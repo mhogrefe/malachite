@@ -17,8 +17,8 @@ pub mod from_natural_polynomial;
 /// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial) to an
 /// [`IntegerPolynomial`](super::IntegerPolynomial).
 pub mod from_unsigned_polynomial;
-/// Implementations of traits for converting an [`IntegerPolynomial`](super::IntegerPolynomial) to
-/// a [`NaturalPolynomial`](crate::natural_polynomial::NaturalPolynomial).
+/// Implementations of traits for converting an [`IntegerPolynomial`](super::IntegerPolynomial) to a
+/// [`NaturalPolynomial`](crate::natural_polynomial::NaturalPolynomial).
 ///
 /// # try_from
 /// ```

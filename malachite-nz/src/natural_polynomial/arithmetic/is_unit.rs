@@ -13,9 +13,9 @@ impl IsUnit for NaturalPolynomial {
     /// Determines whether a [`NaturalPolynomial`] is a unit: whether it is the constant polynomial
     /// 1, the only polynomial with natural coefficients that has a multiplicative inverse.
     ///
-    /// No modulus is involved, as with [`IsUnit`] for [`Natural`](crate::natural::Natural).
-    /// Modulo $n$, every constant coprime to $n$ is also a unit, and so, when $n$ is composite, are
-    /// some polynomials of positive degree.
+    /// No modulus is involved, as with [`IsUnit`] for [`Natural`](crate::natural::Natural). Modulo
+    /// $n$, every constant coprime to $n$ is also a unit, and so, when $n$ is composite, are some
+    /// polynomials of positive degree.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

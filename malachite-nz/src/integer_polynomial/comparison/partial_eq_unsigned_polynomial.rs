@@ -17,10 +17,10 @@ where
 {
     /// Determines whether an [`IntegerPolynomial`] is equal to an [`UnsignedPolynomial`].
     ///
-    /// The two are equal when they have the same coefficients, which, since neither stores
-    /// trailing zeros, means the same number of coefficients and equal coefficients in each
-    /// position. So the zero polynomials are equal, and an [`IntegerPolynomial`] with a negative
-    /// coefficient, or one too large for `T`, is equal to no [`UnsignedPolynomial<T>`].
+    /// The two are equal when they have the same coefficients, which, since neither stores trailing
+    /// zeros, means the same number of coefficients and equal coefficients in each position. So the
+    /// zero polynomials are equal, and an [`IntegerPolynomial`] with a negative coefficient, or one
+    /// too large for `T`, is equal to no [`UnsignedPolynomial<T>`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

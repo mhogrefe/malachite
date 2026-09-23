@@ -49,8 +49,7 @@ fn test_partial_eq_unsigned_polynomial() {
     test::<usize>("x^3+x", "x^2+x", false);
 }
 
-// Comparing with a converted polynomial is the reference the direct comparison is checked
-// against.
+// Comparing with a converted polynomial is the reference the direct comparison is checked against.
 #[allow(clippy::cmp_owned, clippy::op_ref)]
 fn partial_eq_unsigned_polynomial_properties_helper<T: PrimitiveUnsigned>()
 where
