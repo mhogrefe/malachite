@@ -712,6 +712,139 @@ impl Polynomial for RationalPolynomial {
         *self = Self::canonicalize(numerator, denominator);
     }
 
+    /// Reverses the coefficients of a [`RationalPolynomial`], considered as having length `len`,
+    /// taking the polynomial by reference.
+    ///
+    /// The polynomial is first truncated, or padded with zeros, to exactly `len` coefficients, and
+    /// those are then reversed, so that the result's coefficient of $x^i$ is the polynomial's
+    /// coefficient of $x^{\mathrm{len} - 1 - i}$:
+    ///
+    /// $$
+    /// f(p, n) = x^{n-1} \left( p \bmod x^n \right)\!\left(\frac{1}{x}\right).
+    /// $$
+    ///
+    /// A polynomial holds no trailing zeros, so the result may have fewer than `len` coefficients:
+    /// it does whenever the polynomial's constant term is zero. Truncating may leave coefficients
+    /// that need a smaller denominator, so a truncated result is reduced to lowest terms again.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the larger of `len` and `self.len()`,
+    /// and $m$ is the largest number of bits of any coefficient's numerator or denominator.
+    ///
+    /// # Panics
+    /// Panics if `len` exceeds `self.len()` and does not fit in a [`usize`], which cannot happen on
+    /// a target with 64-bit pointers.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// assert_eq!(
+    ///     RationalPolynomial::from_str("1/2*x^2+1/3*x+1")
+    ///         .unwrap()
+    ///         .reverse(3)
+    ///         .to_string(),
+    ///     "x^2+1/3*x+1/2"
+    /// );
+    /// // Padding to length 5 adds low zeros.
+    /// assert_eq!(
+    ///     RationalPolynomial::from_str("1/2*x^2+1/3*x+1")
+    ///         .unwrap()
+    ///         .reverse(5)
+    ///         .to_string(),
+    ///     "x^4+1/3*x^3+1/2*x^2"
+    /// );
+    /// // Truncating to length 2 drops x^2/2 first, and x+1 needs no denominator.
+    /// assert_eq!(
+    ///     RationalPolynomial::from_str("1/2*x^2+x+1")
+    ///         .unwrap()
+    ///         .reverse(2)
+    ///         .to_string(),
+    ///     "x+1"
+    /// );
+    /// // A zero constant term becomes a trailing zero, and is dropped.
+    /// assert_eq!(
+    ///     RationalPolynomial::from_str("1/2*x^2+1/3*x")
+    ///         .unwrap()
+    ///         .reverse(3)
+    ///         .to_string(),
+    ///     "1/3*x+1/2"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpq_poly_reverse` from `fmpq_poly/reverse.c`, FLINT 3.6.0.
+    fn reverse(&self, len: u64) -> Self {
+        let numerator = self.numerator.reverse(len);
+        if len >= self.len() {
+            // Nothing was truncated, so the coefficients are the same ones, sharing nothing more
+            // with the denominator than before.
+            Self {
+                numerator,
+                denominator: self.denominator.clone(),
+            }
+        } else {
+            Self::canonicalize(numerator, self.denominator.clone())
+        }
+    }
+
+    /// Reverses the coefficients of a [`RationalPolynomial`], considered as having length `len`, in
+    /// place.
+    ///
+    /// See [`reverse`](Self::reverse) for what the result is.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the larger of `len` and `self.len()`,
+    /// and $m$ is the largest number of bits of any coefficient's numerator or denominator.
+    ///
+    /// # Panics
+    /// Panics if `len` exceeds `self.len()` and does not fit in a [`usize`], which cannot happen on
+    /// a target with 64-bit pointers.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// let mut p;
+    /// p = RationalPolynomial::from_str("1/2*x^2+1/3*x+1").unwrap();
+    /// p.reverse_assign(3);
+    /// assert_eq!(p.to_string(), "x^2+1/3*x+1/2");
+    /// // Padding to length 5 adds low zeros.
+    /// p = RationalPolynomial::from_str("1/2*x^2+1/3*x+1").unwrap();
+    /// p.reverse_assign(5);
+    /// assert_eq!(p.to_string(), "x^4+1/3*x^3+1/2*x^2");
+    /// // Truncating to length 2 drops x^2/2 first, and x+1 needs no denominator.
+    /// p = RationalPolynomial::from_str("1/2*x^2+x+1").unwrap();
+    /// p.reverse_assign(2);
+    /// assert_eq!(p.to_string(), "x+1");
+    /// // A zero constant term becomes a trailing zero, and is dropped.
+    /// p = RationalPolynomial::from_str("1/2*x^2+1/3*x").unwrap();
+    /// p.reverse_assign(3);
+    /// assert_eq!(p.to_string(), "1/3*x+1/2");
+    /// ```
+    ///
+    /// This is equivalent to `fmpq_poly_reverse` from `fmpq_poly/reverse.c`, FLINT 3.6.0.
+    fn reverse_assign(&mut self, len: u64) {
+        let truncated = len < self.len();
+        self.numerator.reverse_assign(len);
+        if truncated {
+            let numerator = core::mem::take(&mut self.numerator);
+            let denominator = core::mem::take(&mut self.denominator);
+            *self = Self::canonicalize(numerator, denominator);
+        }
+    }
+
     /// Converts an [`RationalPolynomial`] to a [`String`], naming its variable with any
     /// [`VarScheme`].
     ///

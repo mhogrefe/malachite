@@ -307,21 +307,22 @@ documented by git history.
 - `ToLatex` and `ToTypst` for `UnsignedPolynomial`, with `to_latex_string_with` and
   `to_typst_string_with` for a named variable. Neither language writes the `*`, and LaTeX braces
   an exponent of more than one digit while Typst parenthesizes it.
-- A new `Polynomial` trait, in `malachite_base::polynomial`, holding what every polynomial type
-  has in common: `one`, `two`, `x`, `from_coefficients_asc`, `into_coefficients_asc`, `degree`,
-  `len`, `coefficient`, `leading_coefficient`, `mutate_coefficient`, `zero_coefficients`,
-  `to_string_with`, `to_latex_string_with`, `to_typst_string_with`, and `from_string_with`. `len`
-  is the number of coefficients a polynomial holds, like FLINT's `fmpz_poly_length`: one more than
-  the degree, and 0 for the zero polynomial. `zero_coefficients(start, end)` sets the coefficients
-  of $x^i$ for $i$ in `start..end` to zero, like `fmpz_poly_zero_coeffs`, lowering the degree when
-  the range reaches the leading coefficient; a `RationalPolynomial` is reduced to lowest terms
-  again afterwards. It is implemented for
-  `UnsignedPolynomial`, `NaturalPolynomial`, `IntegerPolynomial`, and `RationalPolynomial`, and
-  those functions are its methods rather than inherent ones, so code that calls them needs
-  `use malachite_base::polynomial::Polynomial;`. A coefficient is returned as a
-  `CoefficientOutput`, which is a reference where a polynomial holds its coefficients as bignums
-  and a value where a coefficient is a primitive or has to be built, as a `RationalPolynomial`'s
-  is.
+- A new `Polynomial` trait, in `malachite_base::polynomial`, holding what every polynomial type has
+  in common: `one`, `two`, `x`, `from_coefficients_asc`, `into_coefficients_asc`, `degree`, `len`,
+  `coefficient`, `leading_coefficient`, `mutate_coefficient`, `zero_coefficients`, `reverse`,
+  `reverse_assign`, `to_string_with`, `to_latex_string_with`, `to_typst_string_with`, and
+  `from_string_with`. `len` is the number of coefficients a polynomial holds, like FLINT's
+  `fmpz_poly_length`: one more than the degree, and 0 for the zero polynomial.
+  `zero_coefficients(start, end)` sets the coefficients of $x^i$ for $i$ in `start..end` to zero,
+  like `fmpz_poly_zero_coeffs`, lowering the degree when the range reaches the leading coefficient;
+  a `RationalPolynomial` is reduced to lowest terms again afterwards. `reverse(len)` and
+  `reverse_assign(len)` truncate or zero-pad a polynomial to `len` coefficients and reverse them,
+  like `fmpz_poly_reverse`, so that the result is $x^{len-1} (p \bmod x^{len})(1/x)$. The trait is
+  implemented for `UnsignedPolynomial`, `NaturalPolynomial`, `IntegerPolynomial`, and
+  `RationalPolynomial`, and those functions are its methods rather than inherent ones, so code that
+  calls them needs `use malachite_base::polynomial::Polynomial;`. A coefficient is returned as a
+  `CoefficientOutput`, which is a reference where a polynomial holds its coefficients as bignums and
+  a value where a coefficient is a primitive or has to be built, as a `RationalPolynomial`'s is.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

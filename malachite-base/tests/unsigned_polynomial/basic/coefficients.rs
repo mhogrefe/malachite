@@ -95,6 +95,35 @@ fn zero_coefficients_fail() {
 }
 
 #[test]
+fn test_reverse() {
+    let test = |s, len, out| {
+        let p = UnsignedPolynomial::<u64>::from_str(s).unwrap();
+        let q = p.reverse(len);
+        assert!(q.is_valid());
+        assert_eq!(q.to_string(), out);
+
+        let mut q = p;
+        q.reverse_assign(len);
+        assert!(q.is_valid());
+        assert_eq!(q.to_string(), out);
+    };
+    test("0", 0, "0");
+    test("0", 3, "0");
+    test("0", u64::MAX, "0");
+    test("x^2+2*x+3", 0, "0");
+    test("x^2+2*x+3", 1, "3");
+    test("x^2+2*x+3", 2, "3*x+2");
+    test("x^2+2*x+3", 3, "3*x^2+2*x+1");
+    test("x^2+2*x+3", 5, "3*x^4+2*x^3+x^2");
+    test("x^2+2*x", 3, "2*x+1");
+    test("x^2+2*x", 1, "0");
+    test("x^3", 4, "1");
+    test("x^3", 6, "x^2");
+    test("7", 1, "7");
+    test("7", 4, "7*x^3");
+}
+
+#[test]
 fn test_coefficient() {
     let test = |s, i, out| {
         assert_eq!(
@@ -235,5 +264,45 @@ fn zero_coefficients_properties() {
         assert_eq!(q, p);
         q.zero_coefficients(0, u64::MAX);
         assert_eq!(q, UnsignedPolynomial::<u64>::ZERO);
+    });
+}
+
+#[test]
+fn reverse_properties() {
+    unsigned_polynomial_unsigned_pair_gen_var_1().test_properties(|(p, i)| {
+        let len = p.len();
+        for n in [i, len, len + i] {
+            let q = p.reverse(n);
+            assert!(q.is_valid());
+            let mut q_alt = p.clone();
+            q_alt.reverse_assign(n);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
+
+            // It agrees with truncating or padding the coefficients to n of them and reversing.
+            let n_usize = usize::exact_from(n);
+            let mut cs = p.clone().into_coefficients_asc();
+            cs.truncate(n_usize);
+            cs.resize(n_usize, 0);
+            cs.reverse();
+            assert_eq!(UnsignedPolynomial::<u64>::from_coefficients_asc(cs), q);
+
+            assert!(q.len() <= n);
+            for j in 0..n {
+                assert_eq!(q.coefficient(j), p.coefficient(n - 1 - j));
+            }
+
+            // Reversing twice with the same length leaves the polynomial truncated to that length.
+            let mut truncated = p.clone().into_coefficients_asc();
+            truncated.truncate(n_usize);
+            assert_eq!(
+                q.reverse(n),
+                UnsignedPolynomial::<u64>::from_coefficients_asc(truncated)
+            );
+        }
+
+        // Reversing to the polynomial's own length and back gives it back.
+        assert_eq!(p.reverse(len).reverse(len), p);
+        assert_eq!(p.reverse(0), UnsignedPolynomial::<u64>::ZERO);
     });
 }

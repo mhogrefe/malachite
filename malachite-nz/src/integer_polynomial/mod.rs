@@ -516,6 +516,145 @@ impl Polynomial for IntegerPolynomial {
         }
     }
 
+    /// Reverses the coefficients of a [`IntegerPolynomial`], considered as having length `len`,
+    /// taking the polynomial by reference.
+    ///
+    /// The polynomial is first truncated, or padded with zeros, to exactly `len` coefficients, and
+    /// those are then reversed, so that the result's coefficient of $x^i$ is the polynomial's
+    /// coefficient of $x^{\mathrm{len} - 1 - i}$:
+    ///
+    /// $$
+    /// f(p, n) = x^{n-1} \left( p \bmod x^n \right)\!\left(\frac{1}{x}\right).
+    /// $$
+    ///
+    /// A polynomial holds no trailing zeros, so the result may have fewer than `len` coefficients:
+    /// it does whenever the polynomial's constant term is zero.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n + m)$
+    ///
+    /// $M(n, m) = O(n + m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $m$ is the total number of
+    /// bits of the coefficients.
+    ///
+    /// # Panics
+    /// Panics if `len` exceeds `self.len()` and does not fit in a [`usize`], which cannot happen on
+    /// a target with 64-bit pointers.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// assert_eq!(
+    ///     IntegerPolynomial::from_str("x^2-2*x+3")
+    ///         .unwrap()
+    ///         .reverse(3)
+    ///         .to_string(),
+    ///     "3*x^2-2*x+1"
+    /// );
+    /// // Padding to length 5 adds low zeros.
+    /// assert_eq!(
+    ///     IntegerPolynomial::from_str("x^2-2*x+3")
+    ///         .unwrap()
+    ///         .reverse(5)
+    ///         .to_string(),
+    ///     "3*x^4-2*x^3+x^2"
+    /// );
+    /// // Truncating to length 2 drops x^2 first.
+    /// assert_eq!(
+    ///     IntegerPolynomial::from_str("x^2-2*x+3")
+    ///         .unwrap()
+    ///         .reverse(2)
+    ///         .to_string(),
+    ///     "3*x-2"
+    /// );
+    /// // A zero constant term becomes a trailing zero, and is dropped.
+    /// assert_eq!(
+    ///     IntegerPolynomial::from_str("x^2-2*x")
+    ///         .unwrap()
+    ///         .reverse(3)
+    ///         .to_string(),
+    ///     "-2*x+1"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_reverse` from `fmpz_poly/reverse.c`, FLINT 3.6.0.
+    fn reverse(&self, len: u64) -> Self {
+        let kept = usize::try_from(len).map_or(self.coefficients.len(), |len| {
+            len.min(self.coefficients.len())
+        });
+        if kept == 0 {
+            return Self::ZERO;
+        }
+        // The coefficients past the kept ones become the result's low zeros.
+        let mut coefficients = vec![Integer::ZERO; usize::exact_from(len) - kept];
+        coefficients.extend(self.coefficients[..kept].iter().rev().cloned());
+        Self::from_coefficients_asc(coefficients)
+    }
+
+    /// Reverses the coefficients of a [`IntegerPolynomial`], considered as having length `len`, in
+    /// place.
+    ///
+    /// See [`reverse`](Self::reverse) for what the result is.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the larger of `len` and
+    /// `self.len()`.
+    ///
+    /// # Panics
+    /// Panics if `len` exceeds `self.len()` and does not fit in a [`usize`], which cannot happen on
+    /// a target with 64-bit pointers.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// let mut p;
+    /// p = IntegerPolynomial::from_str("x^2-2*x+3").unwrap();
+    /// p.reverse_assign(3);
+    /// assert_eq!(p.to_string(), "3*x^2-2*x+1");
+    /// // Padding to length 5 adds low zeros.
+    /// p = IntegerPolynomial::from_str("x^2-2*x+3").unwrap();
+    /// p.reverse_assign(5);
+    /// assert_eq!(p.to_string(), "3*x^4-2*x^3+x^2");
+    /// // Truncating to length 2 drops x^2 first.
+    /// p = IntegerPolynomial::from_str("x^2-2*x+3").unwrap();
+    /// p.reverse_assign(2);
+    /// assert_eq!(p.to_string(), "3*x-2");
+    /// // A zero constant term becomes a trailing zero, and is dropped.
+    /// p = IntegerPolynomial::from_str("x^2-2*x").unwrap();
+    /// p.reverse_assign(3);
+    /// assert_eq!(p.to_string(), "-2*x+1");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_reverse` from `fmpz_poly/reverse.c`, FLINT 3.6.0.
+    fn reverse_assign(&mut self, len: u64) {
+        let kept = usize::try_from(len).map_or(self.coefficients.len(), |len| {
+            len.min(self.coefficients.len())
+        });
+        if kept == 0 {
+            *self = Self::ZERO;
+            return;
+        }
+        self.coefficients.truncate(kept);
+        self.coefficients.reverse();
+        // Pad at the high end and rotate the padding down, so that it becomes the low zeros.
+        let len = usize::exact_from(len);
+        self.coefficients.resize(len, Integer::ZERO);
+        self.coefficients.rotate_right(len - kept);
+        // The polynomial's low zeros, if any, are now at the top.
+        self.trim();
+    }
+
     /// Converts an [`IntegerPolynomial`] to a [`String`], naming its variable with any
     /// [`VarScheme`].
     ///

@@ -106,6 +106,25 @@ pub trait Polynomial: Sized {
     /// Panics if `start > end`.
     fn zero_coefficients(&mut self, start: u64, end: u64);
 
+    /// Reverses the coefficients of a polynomial, considered as having length `len`, taking the
+    /// polynomial by reference.
+    ///
+    /// The polynomial is first truncated, or padded with zeros, to exactly `len` coefficients, and
+    /// those are then reversed, so that the result's coefficient of $x^i$ is the polynomial's
+    /// coefficient of $x^{\mathrm{len} - 1 - i}$:
+    ///
+    /// $$
+    /// f(p, n) = x^{n-1} \left( p \bmod x^n \right)\!\left(\frac{1}{x}\right).
+    /// $$
+    ///
+    /// A polynomial holds no trailing zeros, so the result may have fewer than `len` coefficients.
+    fn reverse(&self, len: u64) -> Self;
+
+    /// Reverses the coefficients of a polynomial, considered as having length `len`, in place.
+    ///
+    /// See [`reverse`](Self::reverse).
+    fn reverse_assign(&mut self, len: u64);
+
     /// Converts a polynomial to a [`String`], naming its variable with any [`VarScheme`].
     fn to_string_with<S: VarScheme + ?Sized>(&self, var: Var<'_, S>) -> String;
 
