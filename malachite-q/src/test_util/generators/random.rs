@@ -53,15 +53,21 @@ use malachite_base::tuples::random::{
 };
 use malachite_base::unions::Union2;
 use malachite_base::unions::random::random_union2s;
+use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+use malachite_base::unsigned_polynomial::random::random_unsigned_polynomials;
 use malachite_base::vecs::random::random_vecs;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::gaussian_integer::random::random_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::random_integers;
+use malachite_nz::integer_polynomial::IntegerPolynomial;
+use malachite_nz::integer_polynomial::random::random_integer_polynomials;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::random::{
     random_natural_range_to_infinity, random_naturals, random_positive_naturals,
 };
+use malachite_nz::natural_polynomial::NaturalPolynomial;
+use malachite_nz::natural_polynomial::random::random_natural_polynomials;
 use malachite_nz::test_util::generators::random::random_gmp_format_strings;
 use num::BigRational;
 use std::cmp::Ordering::*;
@@ -2221,6 +2227,220 @@ pub fn random_rational_polynomial_triple_gen(
         config.get_or("mean_length_n", 4),
         config.get_or("mean_length_d", 1),
     )))
+}
+
+pub fn random_rational_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, UnsignedPolynomial<T>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_unsigned_polynomials(
+                seed,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_polynomial_integer_polynomial_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, IntegerPolynomial)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_integer_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_polynomial_natural_polynomial_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, NaturalPolynomial)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_natural_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_polynomial_gaussian_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, GaussianRational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_polynomial_gaussian_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, GaussianInteger)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_polynomial_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_polynomial_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_polynomial_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_polynomial_primitive_int_pair_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
 }
 
 pub fn random_rational_polynomial_unsigned_pair_gen_var_1(

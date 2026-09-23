@@ -53,15 +53,21 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples, exhaustive_triples_custom_output, exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output, lex_pairs,
 };
+use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+use malachite_base::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
 use malachite_base::vecs::exhaustive::exhaustive_vecs;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::gaussian_integer::exhaustive::exhaustive_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
+use malachite_nz::integer_polynomial::IntegerPolynomial;
+use malachite_nz::integer_polynomial::exhaustive::exhaustive_integer_polynomials;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
 };
+use malachite_nz::natural_polynomial::NaturalPolynomial;
+use malachite_nz::natural_polynomial::exhaustive::exhaustive_natural_polynomials;
 use malachite_nz::test_util::generators::common::{
     GMP_FORMAT_COMBO_COUNT, gmp_format_string_from_parts,
 };
@@ -976,6 +982,83 @@ pub fn exhaustive_rational_polynomial_triple_gen()
 -> It<(RationalPolynomial, RationalPolynomial, RationalPolynomial)> {
     Box::new(exhaustive_triples_from_single(
         exhaustive_rational_polynomials(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
+-> It<(RationalPolynomial, UnsignedPolynomial<T>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_unsigned_polynomials(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_integer_polynomial_pair_gen()
+-> It<(RationalPolynomial, IntegerPolynomial)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_integer_polynomials(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_natural_polynomial_pair_gen()
+-> It<(RationalPolynomial, NaturalPolynomial)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_natural_polynomials(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_gaussian_rational_pair_gen()
+-> It<(RationalPolynomial, GaussianRational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_gaussian_rationals(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_gaussian_integer_pair_gen()
+-> It<(RationalPolynomial, GaussianInteger)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_gaussian_integers(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_rational_pair_gen() -> It<(RationalPolynomial, Rational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_rationals(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_integer_pair_gen() -> It<(RationalPolynomial, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_integers(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_natural_pair_gen() -> It<(RationalPolynomial, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_naturals(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_signed_pair_gen<T: PrimitiveSigned>()
+-> It<(RationalPolynomial, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> It<(RationalPolynomial, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_unsigneds(),
     ))
 }
 

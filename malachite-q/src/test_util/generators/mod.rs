@@ -25,9 +25,12 @@ use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
+use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural_polynomial::NaturalPolynomial;
 use num::BigRational;
 use std::ops::Shr;
 
@@ -1288,6 +1291,93 @@ pub fn rational_polynomial_triple_gen()
         &exhaustive_rational_polynomial_triple_gen,
         &random_rational_polynomial_triple_gen,
         &special_random_rational_polynomial_triple_gen,
+    )
+}
+
+pub fn rational_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(RationalPolynomial, UnsignedPolynomial<T>)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_unsigned_polynomial_pair_gen,
+        &random_rational_polynomial_unsigned_polynomial_pair_gen,
+        &special_random_rational_polynomial_unsigned_polynomial_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_integer_polynomial_pair_gen()
+-> Generator<(RationalPolynomial, IntegerPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_integer_polynomial_pair_gen,
+        &random_rational_polynomial_integer_polynomial_pair_gen,
+        &special_random_rational_polynomial_integer_polynomial_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_natural_polynomial_pair_gen()
+-> Generator<(RationalPolynomial, NaturalPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_natural_polynomial_pair_gen,
+        &random_rational_polynomial_natural_polynomial_pair_gen,
+        &special_random_rational_polynomial_natural_polynomial_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_gaussian_rational_pair_gen()
+-> Generator<(RationalPolynomial, GaussianRational)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_gaussian_rational_pair_gen,
+        &random_rational_polynomial_gaussian_rational_pair_gen,
+        &special_random_rational_polynomial_gaussian_rational_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_gaussian_integer_pair_gen()
+-> Generator<(RationalPolynomial, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_gaussian_integer_pair_gen,
+        &random_rational_polynomial_gaussian_integer_pair_gen,
+        &special_random_rational_polynomial_gaussian_integer_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_rational_pair_gen() -> Generator<(RationalPolynomial, Rational)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_rational_pair_gen,
+        &random_rational_polynomial_rational_pair_gen,
+        &special_random_rational_polynomial_rational_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_integer_pair_gen() -> Generator<(RationalPolynomial, Integer)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_integer_pair_gen,
+        &random_rational_polynomial_integer_pair_gen,
+        &special_random_rational_polynomial_integer_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_natural_pair_gen() -> Generator<(RationalPolynomial, Natural)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_natural_pair_gen,
+        &random_rational_polynomial_natural_pair_gen,
+        &special_random_rational_polynomial_natural_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(RationalPolynomial, T)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_unsigned_pair_gen,
+        &random_rational_polynomial_primitive_int_pair_gen,
+        &special_random_rational_polynomial_unsigned_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_signed_pair_gen<T: PrimitiveSigned>()
+-> Generator<(RationalPolynomial, T)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_signed_pair_gen,
+        &random_rational_polynomial_primitive_int_pair_gen,
+        &special_random_rational_polynomial_signed_pair_gen,
     )
 }
 
