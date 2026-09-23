@@ -137,6 +137,8 @@ use malachite_base::tuples::random::{
 };
 use malachite_base::unions::Union2;
 use malachite_base::unions::random::random_union2s;
+use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+use malachite_base::unsigned_polynomial::random::random_unsigned_polynomials;
 use malachite_base::vecs::random::{
     RandomVecs, random_vecs, random_vecs_length_range, random_vecs_min_length,
 };
@@ -217,6 +219,120 @@ pub fn random_natural_polynomial_triple_gen(
         config.get_or("mean_length_n", 4),
         config.get_or("mean_length_d", 1),
     )))
+}
+
+pub fn random_natural_polynomial_unsigned_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+pub fn random_natural_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, UnsignedPolynomial<T>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_unsigned_polynomials(
+                seed,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_natural_polynomial_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_natural_polynomial_gaussian_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, GaussianInteger)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_natural_polynomial_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
 }
 
 pub fn random_integer_polynomial_gen(config: &GenConfig) -> It<IntegerPolynomial> {

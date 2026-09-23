@@ -612,6 +612,11 @@ pub mod natural_polynomial {
     }
     pub mod comparison {
         pub mod cmp;
+        pub mod partial_eq_gaussian_integer;
+        pub mod partial_eq_integer;
+        pub mod partial_eq_natural;
+        pub mod partial_eq_unsigned;
+        pub mod partial_eq_unsigned_polynomial;
     }
     pub mod conversion {
         pub mod from_coefficients_asc;

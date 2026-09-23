@@ -10,6 +10,16 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     cmp::register(runner);
+    partial_eq_gaussian_integer::register(runner);
+    partial_eq_integer::register(runner);
+    partial_eq_natural::register(runner);
+    partial_eq_unsigned::register(runner);
+    partial_eq_unsigned_polynomial::register(runner);
 }
 
 mod cmp;
+mod partial_eq_gaussian_integer;
+mod partial_eq_integer;
+mod partial_eq_natural;
+mod partial_eq_unsigned;
+mod partial_eq_unsigned_polynomial;

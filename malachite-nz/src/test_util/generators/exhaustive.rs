@@ -143,6 +143,8 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples, exhaustive_triples_custom_output, exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output, lex_pairs,
 };
+use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+use malachite_base::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
 use malachite_base::vecs::exhaustive::{
     ExhaustiveVecs, LexFixedLengthVecsFromSingle, exhaustive_vecs,
     exhaustive_vecs_fixed_length_from_single, exhaustive_vecs_length_range,
@@ -200,6 +202,44 @@ pub fn exhaustive_natural_polynomial_triple_gen()
 -> It<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial)> {
     Box::new(exhaustive_triples_from_single(
         exhaustive_natural_polynomials(),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> It<(NaturalPolynomial, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_polynomials(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
+-> It<(NaturalPolynomial, UnsignedPolynomial<T>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_polynomials(),
+        exhaustive_unsigned_polynomials(),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_natural_pair_gen() -> It<(NaturalPolynomial, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_polynomials(),
+        exhaustive_naturals(),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_gaussian_integer_pair_gen()
+-> It<(NaturalPolynomial, GaussianInteger)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_polynomials(),
+        exhaustive_gaussian_integers(),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_integer_pair_gen() -> It<(NaturalPolynomial, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_polynomials(),
+        exhaustive_integers(),
     ))
 }
 

@@ -36,6 +36,7 @@ use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
+use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
 use num::{BigInt, BigUint};
 use std::ops::{Shl, Shr};
@@ -82,6 +83,49 @@ pub fn natural_polynomial_triple_gen()
         &exhaustive_natural_polynomial_triple_gen,
         &random_natural_polynomial_triple_gen,
         &special_random_natural_polynomial_triple_gen,
+    )
+}
+
+pub fn natural_polynomial_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(NaturalPolynomial, T)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_pair_gen,
+        &random_natural_polynomial_unsigned_pair_gen,
+        &special_random_natural_polynomial_unsigned_pair_gen,
+    )
+}
+
+pub fn natural_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(NaturalPolynomial, UnsignedPolynomial<T>)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_polynomial_pair_gen,
+        &random_natural_polynomial_unsigned_polynomial_pair_gen,
+        &special_random_natural_polynomial_unsigned_polynomial_pair_gen,
+    )
+}
+
+pub fn natural_polynomial_natural_pair_gen() -> Generator<(NaturalPolynomial, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_pair_gen,
+        &random_natural_polynomial_natural_pair_gen,
+        &special_random_natural_polynomial_natural_pair_gen,
+    )
+}
+
+pub fn natural_polynomial_gaussian_integer_pair_gen()
+-> Generator<(NaturalPolynomial, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_gaussian_integer_pair_gen,
+        &random_natural_polynomial_gaussian_integer_pair_gen,
+        &special_random_natural_polynomial_gaussian_integer_pair_gen,
+    )
+}
+
+pub fn natural_polynomial_integer_pair_gen() -> Generator<(NaturalPolynomial, Integer)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_integer_pair_gen,
+        &random_natural_polynomial_integer_pair_gen,
+        &special_random_natural_polynomial_integer_pair_gen,
     )
 }
 
