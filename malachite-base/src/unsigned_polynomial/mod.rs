@@ -455,6 +455,61 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         out
     }
 
+    /// Sets the coefficients of a [`UnsignedPolynomial`] of $x^i$ for $i$ in `start..end` to zero.
+    ///
+    /// Indices past the degree are allowed; the coefficients there are zero already. Zeroing the
+    /// leading coefficient lowers the degree, to that of the highest nonzero coefficient that
+    /// remains.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()`.
+    ///
+    /// # Panics
+    /// Panics if `start > end`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// let mut p;
+    /// p = UnsignedPolynomial::<u64>::from_str("x^4+x^3+x^2+x+1").unwrap();
+    /// p.zero_coefficients(1, 3);
+    /// assert_eq!(p.to_string(), "x^4+x^3+1");
+    /// p = UnsignedPolynomial::<u64>::from_str("x^4+x^3+x^2+x+1").unwrap();
+    /// p.zero_coefficients(2, 10);
+    /// assert_eq!(p.to_string(), "x+1");
+    /// p = UnsignedPolynomial::<u64>::from_str("x^4+x^3+x^2+x+1").unwrap();
+    /// p.zero_coefficients(5, 10);
+    /// assert_eq!(p.to_string(), "x^4+x^3+x^2+x+1");
+    /// ```
+    ///
+    /// FLINT has no counterpart for `nmod_poly`; this is the counterpart of `fmpz_poly_zero_coeffs`
+    /// from `fmpz_poly/zero_coeffs.c`, FLINT 3.6.0.
+    fn zero_coefficients(&mut self, start: u64, end: u64) {
+        assert!(start <= end);
+        let len = self.coefficients.len();
+        let Ok(start) = usize::try_from(start) else {
+            return;
+        };
+        if start >= len {
+            return;
+        }
+        let end = usize::try_from(end).map_or(len, |end| end.min(len));
+        if end == len {
+            // The range reaches the leading coefficient, so the zeros it leaves are trailing.
+            self.coefficients.truncate(start);
+            self.trim();
+        } else {
+            self.coefficients[start..end].fill(T::ZERO);
+        }
+    }
+
     /// Converts a [`UnsignedPolynomial`] to a [`String`], naming its variable with any
     /// [`VarScheme`].
     ///

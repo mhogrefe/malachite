@@ -309,10 +309,13 @@ documented by git history.
   an exponent of more than one digit while Typst parenthesizes it.
 - A new `Polynomial` trait, in `malachite_base::polynomial`, holding what every polynomial type
   has in common: `one`, `two`, `x`, `from_coefficients_asc`, `into_coefficients_asc`, `degree`,
-  `len`, `coefficient`, `leading_coefficient`, `mutate_coefficient`, `to_string_with`,
-  `to_latex_string_with`, `to_typst_string_with`, and `from_string_with`. `len` is the number of
-  coefficients a polynomial holds, like FLINT's `fmpz_poly_length`: one more than the degree, and
-  0 for the zero polynomial. It is implemented for
+  `len`, `coefficient`, `leading_coefficient`, `mutate_coefficient`, `zero_coefficients`,
+  `to_string_with`, `to_latex_string_with`, `to_typst_string_with`, and `from_string_with`. `len`
+  is the number of coefficients a polynomial holds, like FLINT's `fmpz_poly_length`: one more than
+  the degree, and 0 for the zero polynomial. `zero_coefficients(start, end)` sets the coefficients
+  of $x^i$ for $i$ in `start..end` to zero, like `fmpz_poly_zero_coeffs`, lowering the degree when
+  the range reaches the leading coefficient; a `RationalPolynomial` is reduced to lowest terms
+  again afterwards. It is implemented for
   `UnsignedPolynomial`, `NaturalPolynomial`, `IntegerPolynomial`, and `RationalPolynomial`, and
   those functions are its methods rather than inherent ones, so code that calls them needs
   `use malachite_base::polynomial::Polynomial;`. A coefficient is returned as a

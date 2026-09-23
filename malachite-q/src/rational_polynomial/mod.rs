@@ -664,6 +664,54 @@ impl Polynomial for RationalPolynomial {
         out
     }
 
+    /// Sets the coefficients of a [`RationalPolynomial`] of $x^i$ for $i$ in `start..end` to zero.
+    ///
+    /// Indices past the degree are allowed; the coefficients there are zero already. Zeroing the
+    /// leading coefficient lowers the degree, to that of the highest nonzero coefficient that
+    /// remains.
+    ///
+    /// The coefficients that remain may share a factor with the denominator that the zeroed ones
+    /// did not, so the polynomial is reduced to lowest terms again afterwards.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.len()`, and $m$ is the largest
+    /// number of bits of any coefficient's numerator or denominator.
+    ///
+    /// # Panics
+    /// Panics if `start > end`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// let mut p;
+    /// p = RationalPolynomial::from_str("1/2*x^2+1/3*x+1/2").unwrap();
+    /// p.zero_coefficients(1, 2);
+    /// assert_eq!(p.to_string(), "1/2*x^2+1/2");
+    /// // (x+2)/2 loses its x term, and what remains, 2/2, is reduced to 1.
+    /// p = RationalPolynomial::from_str("1/2*x+1").unwrap();
+    /// p.zero_coefficients(1, 2);
+    /// assert_eq!(p.to_string(), "1");
+    /// p = RationalPolynomial::from_str("1/2*x^2+1/3*x+1/2").unwrap();
+    /// p.zero_coefficients(1, 10);
+    /// assert_eq!(p.to_string(), "1/2");
+    /// ```
+    ///
+    /// FLINT has no counterpart for `fmpq_poly`; this is the counterpart of `fmpz_poly_zero_coeffs`
+    /// from `fmpz_poly/zero_coeffs.c`, FLINT 3.6.0.
+    fn zero_coefficients(&mut self, start: u64, end: u64) {
+        self.numerator.zero_coefficients(start, end);
+        let numerator = core::mem::take(&mut self.numerator);
+        let denominator = core::mem::take(&mut self.denominator);
+        *self = Self::canonicalize(numerator, denominator);
+    }
+
     /// Converts an [`RationalPolynomial`] to a [`String`], naming its variable with any
     /// [`VarScheme`].
     ///

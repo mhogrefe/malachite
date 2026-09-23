@@ -65,6 +65,35 @@ fn test_len() {
 }
 
 #[test]
+fn test_zero_coefficients() {
+    let test = |s, start, end, out| {
+        let mut p = RationalPolynomial::from_str(s).unwrap();
+        p.zero_coefficients(start, end);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+    };
+    test("0", 0, 5, "0");
+    test("1/2*x^2+1/3*x+1/2", 1, 2, "1/2*x^2+1/2");
+    test("1/2*x^2+1/3*x+1/2", 1, 10, "1/2");
+    test("1/2*x+1", 1, 2, "1");
+    test("1/2*x+1", 0, 1, "1/2*x");
+    test("1/6*x^2+1/2*x+1/3", 1, 2, "1/6*x^2+1/3");
+    test("1/6*x^2+1/2*x+1/3", 0, 1, "1/6*x^2+1/2*x");
+    test("1/6*x^2+1/2*x+1/3", 2, 2, "1/6*x^2+1/2*x+1/3");
+    test("1/6*x^2+1/2*x+1/3", 3, 10, "1/6*x^2+1/2*x+1/3");
+    test("1/6*x^2+1/2*x+1/3", 0, u64::MAX, "0");
+    test("1/6*x^2+1/2*x+1/3", u64::MAX, u64::MAX, "1/6*x^2+1/2*x+1/3");
+}
+
+#[test]
+#[should_panic]
+fn zero_coefficients_fail() {
+    RationalPolynomial::from_str("x^2+x+1")
+        .unwrap()
+        .zero_coefficients(2, 1);
+}
+
+#[test]
 fn test_coefficient() {
     let test = |s, i, out| {
         assert_eq!(RationalPolynomial::from_str(s).unwrap().coefficient(i), out);
@@ -165,5 +194,50 @@ fn len_properties() {
     integer_polynomial_gen().test_properties(|p| {
         // A polynomial keeps its length when its coefficients are widened to `Rational`s.
         assert_eq!(RationalPolynomial::from(p.clone()).len(), p.len());
+    });
+}
+
+#[test]
+fn zero_coefficients_properties() {
+    rational_polynomial_unsigned_pair_gen_var_1().test_properties(|(p, i)| {
+        let len = p.len();
+        for (start, end) in
+            [(i, i), (i >> 1, i), (0, i), (i, i + 1), (i, len.max(i)), (i, u64::MAX)]
+        {
+            let mut q = p.clone();
+            q.zero_coefficients(start, end);
+            assert!(q.is_valid());
+
+            // It agrees with zeroing the coefficients one at a time and rebuilding.
+            let mut cs = p.clone().into_coefficients_asc();
+            for (j, c) in cs.iter_mut().enumerate() {
+                if (start..end).contains(&u64::exact_from(j)) {
+                    *c = Rational::ZERO;
+                }
+            }
+            assert_eq!(q, RationalPolynomial::from_coefficients_asc(cs));
+
+            // Nothing outside the range changes, and nothing inside it survives.
+            for j in 0..len {
+                if (start..end).contains(&j) {
+                    assert_eq!(q.coefficient(j), 0);
+                } else {
+                    assert_eq!(q.coefficient(j), p.coefficient(j));
+                }
+            }
+            assert!(q.len() <= len);
+
+            // Zeroing is idempotent.
+            let mut r = q.clone();
+            r.zero_coefficients(start, end);
+            assert_eq!(r, q);
+        }
+
+        // An empty range changes nothing, and the whole range leaves nothing.
+        let mut q = p.clone();
+        q.zero_coefficients(i, i);
+        assert_eq!(q, p);
+        q.zero_coefficients(0, u64::MAX);
+        assert_eq!(q, RationalPolynomial::ZERO);
     });
 }

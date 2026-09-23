@@ -97,6 +97,15 @@ pub trait Polynomial: Sized {
         f: F,
     ) -> T;
 
+    /// Sets the coefficients of $x^i$ for $i$ in `start..end` to zero.
+    ///
+    /// Indices past the degree are allowed; the coefficients there are zero already. Zeroing the
+    /// leading coefficient lowers the degree.
+    ///
+    /// # Panics
+    /// Panics if `start > end`.
+    fn zero_coefficients(&mut self, start: u64, end: u64);
+
     /// Converts a polynomial to a [`String`], naming its variable with any [`VarScheme`].
     fn to_string_with<S: VarScheme + ?Sized>(&self, var: Var<'_, S>) -> String;
 
