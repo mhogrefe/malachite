@@ -206,6 +206,15 @@ pub fn integer_polynomial_natural_pair_gen() -> Generator<(IntegerPolynomial, Na
     )
 }
 
+// The `Natural` is positive.
+pub fn integer_polynomial_natural_pair_gen_var_1() -> Generator<(IntegerPolynomial, Natural)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_natural_pair_gen_var_1,
+        &random_integer_polynomial_natural_pair_gen_var_1,
+        &special_random_integer_polynomial_natural_pair_gen_var_1,
+    )
+}
+
 pub fn integer_polynomial_natural_polynomial_pair_gen()
 -> Generator<(IntegerPolynomial, NaturalPolynomial)> {
     Generator::new(

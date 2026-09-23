@@ -523,8 +523,8 @@ where
     /// way to go from a polynomial with arbitrarily large coefficients to one reduced modulo a
     /// word-sized modulus. Apart from the result's type, it is the same operation as reducing
     /// modulo `Natural::from(m)`; see the documentation for the [`Rem`] implementation on
-    /// [`NaturalPolynomial`] that takes both arguments by value for details, including how
-    /// reducing can lower the degree.
+    /// [`NaturalPolynomial`] that takes both arguments by value for details, including how reducing
+    /// can lower the degree.
     ///
     /// The result is reduced modulo $m$, which is to say that
     /// [`mod_is_reduced`](malachite_base::num::arithmetic::traits::ModIsReduced::mod_is_reduced)

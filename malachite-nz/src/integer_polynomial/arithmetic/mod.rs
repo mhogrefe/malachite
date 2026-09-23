@@ -13,3 +13,11 @@ pub mod height;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
+/// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod), which reduces every
+/// coefficient of a polynomial modulo a [`Natural`](crate::natural::Natural), producing a
+/// [`NaturalPolynomial`](crate::natural_polynomial::NaturalPolynomial).
+pub mod mod_op;
+/// An implementation of [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2),
+/// which reduces every coefficient of a polynomial modulo a power of 2, producing a
+/// [`NaturalPolynomial`](crate::natural_polynomial::NaturalPolynomial).
+pub mod mod_power_of_2;

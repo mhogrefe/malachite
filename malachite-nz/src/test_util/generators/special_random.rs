@@ -576,6 +576,34 @@ pub fn special_random_integer_polynomial_natural_pair_gen(
     ))
 }
 
+pub fn special_random_integer_polynomial_natural_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_positive_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_integer_polynomial_natural_polynomial_pair_gen(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, NaturalPolynomial)> {

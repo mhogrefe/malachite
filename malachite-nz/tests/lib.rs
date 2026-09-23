@@ -556,6 +556,8 @@ pub mod integer_polynomial {
     pub mod arithmetic {
         pub mod height;
         pub mod is_unit;
+        pub mod mod_op;
+        pub mod mod_power_of_2;
     }
     pub mod basic {
         pub mod coefficients;

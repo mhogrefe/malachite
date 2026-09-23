@@ -211,6 +211,13 @@ pub fn exhaustive_integer_polynomial_natural_pair_gen() -> It<(IntegerPolynomial
     ))
 }
 
+pub fn exhaustive_integer_polynomial_natural_pair_gen_var_1() -> It<(IntegerPolynomial, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_positive_naturals(),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_natural_polynomial_pair_gen()
 -> It<(IntegerPolynomial, NaturalPolynomial)> {
     Box::new(exhaustive_pairs(
