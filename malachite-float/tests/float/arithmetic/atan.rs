@@ -906,7 +906,7 @@ fn atan_properties() {
         assert!(x_alt.is_valid());
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&s));
 
-        let (s_alt, _) = x.atan_prec_round_ref(x.significant_bits(), Nearest);
+        let s_alt = x.atan_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
 
         assert_eq!(
@@ -5257,7 +5257,9 @@ fn atan_with_period_properties() {
         t_alt.atan_with_period_assign(u);
         assert!(t_alt.is_valid());
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
-        let (t_alt, _) = x.atan_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        let t_alt = x
+            .atan_with_period_prec_round_ref(u, x.significant_bits(), Nearest)
+            .0;
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
         // atan_with_period is odd
         assert_eq!(
@@ -5369,8 +5371,7 @@ where
                 NiceFloat(-t)
             );
             // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let (t_float, _) =
-                Float::atan_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64);
+            let t_float = Float::atan_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
             assert_eq!(
                 NiceFloat(T::rounding_from(&t_float, Nearest).0),
                 NiceFloat(t)
@@ -8228,7 +8229,7 @@ fn test_atan_with_period_rational_underflow() {
             // case this is
             let min_positive = Float::min_positive_value_prec(53);
             let positive = big > 0u32;
-            let (away_t, _) = Float::atan_with_period_rational_prec_round_ref(&big, 1, 53, Up);
+            let away_t = Float::atan_with_period_rational_prec_round_ref(&big, 1, 53, Up).0;
             if !away_t.eq_abs(&min_positive) {
                 continue;
             }
@@ -8366,7 +8367,7 @@ where
             );
         }
         // the same as the `Float` version taken with 64 bits to spare and rounded once
-        let (t_float, _) = Float::atan_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64);
+        let t_float = Float::atan_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).0;
         assert_eq!(
             NiceFloat(T::rounding_from(&t_float, Nearest).0),
             NiceFloat(t)
@@ -12139,7 +12140,7 @@ fn atan_pi_properties() {
         // precision, to nearest
         let t_alt = x.atan_with_period_ref(2);
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
-        let (t_alt, _) = x.atan_pi_prec_round_ref(x.significant_bits(), Nearest);
+        let t_alt = x.atan_pi_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
     });
 }

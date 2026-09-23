@@ -8,14 +8,14 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::test_util::gaussian_integer::factorization::remove_one_plus_i::*;
-use malachite_base::num::arithmetic::traits::{AbsSquared, CanonicalizeUnit, DivRem};
+use malachite_base::num::arithmetic::traits::{AbsSquared, CanonicalizeUnit};
 
 // The plain Euclidean algorithm over the nearest-quotient division.
 pub fn gaussian_integer_gcd_euclidean(x: &GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
     let mut x = x.clone();
     let mut y = y.clone();
     while y != 0u32 {
-        let (_, r) = (&x).div_rem(&y);
+        let r = &x % &y;
         x = y;
         y = r;
     }

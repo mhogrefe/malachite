@@ -634,7 +634,7 @@ fn from_sci_string_inferred_precision_properties() {
         }
         // Reading at the original precision instead gives the original value back, so the inferred
         // reading is the same value at whatever precision the digits alone justify.
-        let (w, _) = Float::from_sci_string_prec(&s, prec).unwrap();
+        let w = Float::from_sci_string_prec(&s, prec).unwrap().0;
         assert_eq!(ComparableFloat(w), ComparableFloat(x));
     });
 

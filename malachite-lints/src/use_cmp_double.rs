@@ -111,7 +111,7 @@ fn halving_test(name: &str, halved_on_right: bool) -> Option<&'static str> {
 
 impl<'tcx> LateLintPass<'tcx> for UseCmpDouble {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         // A comparison of `a` and `b`: an operator, or one of the comparison methods.

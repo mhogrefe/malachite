@@ -94,7 +94,7 @@ fn shift_amount(cx: &LateContext<'_>, p: PowerOf2, power: &Expr<'_>) -> (String,
 
 impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2Literal {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         // `x.div_round(pow2, rm)` and `x.div_round_assign(pow2, rm)`: `shr_round` and

@@ -98,7 +98,7 @@ fn changes_direction(from: Ty<'_>, to: Ty<'_>) -> bool {
 
 impl<'tcx> LateLintPass<'tcx> for RedundantShiftConversion {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         let Some((lang_item, operator)) = shift_lang_item(expr) else {

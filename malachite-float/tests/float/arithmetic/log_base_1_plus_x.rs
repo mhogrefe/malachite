@@ -209,7 +209,7 @@ fn log_base_1_plus_x_round_properties() {
 fn log_base_1_plus_x_properties() {
     let f = |x: Float, base: u64, extreme: bool| {
         let prec = x.significant_bits();
-        let (expected, _) = check(&x, base, prec, Nearest, extreme);
+        let expected = check(&x, base, prec, Nearest, extreme).0;
         let log = x.clone().log_base_1_plus_x(base);
         assert!(log.is_valid());
         assert_eq!(ComparableFloatRef(&log), ComparableFloatRef(&expected));

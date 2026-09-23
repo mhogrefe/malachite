@@ -847,7 +847,7 @@ fn tan_properties() {
         assert!(x_alt.is_valid());
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&s));
 
-        let (s_alt, _) = x.tan_prec_round_ref(x.significant_bits(), Nearest);
+        let s_alt = x.tan_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
 
         assert_eq!(
@@ -7814,7 +7814,9 @@ fn tan_with_period_properties() {
         assert!(t_alt.is_valid());
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
         // the same as rounding to the input's precision, to nearest
-        let (t_alt, _) = x.tan_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        let t_alt = x
+            .tan_with_period_prec_round_ref(u, x.significant_bits(), Nearest)
+            .0;
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
         // tan_with_period is odd
         assert_eq!(
@@ -7969,8 +7971,7 @@ where
             assert_eq!(NiceFloat(rug_t), NiceFloat(t));
             // the result is infinite only at a pole, and never through overflow: no f32 or f64 is
             // merely close enough to an odd quarter turn for its tangent to leave the range
-            let (t_wide, _) =
-                Float::tan_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64);
+            let t_wide = Float::tan_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
             assert_eq!(t.is_infinite(), t_wide.is_infinite());
         }
     });
@@ -9570,7 +9571,7 @@ fn tan_pi_properties() {
         // to nearest
         let t_alt = x.tan_with_period_ref(2);
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
-        let (t_alt, _) = x.tan_pi_prec_round_ref(x.significant_bits(), Nearest);
+        let t_alt = x.tan_pi_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
     });
 }

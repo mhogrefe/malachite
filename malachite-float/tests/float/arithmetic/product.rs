@@ -18,7 +18,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_float::float::arithmetic::product::primitive_float_product;
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, to_hex_string,
+    assert_rounding_ordering_consistent, exponent_in_gate, parse_hex_string, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::product::{
     naive_product, naive_product_prec, naive_product_prec_round, naive_product_round,
@@ -1015,13 +1015,6 @@ fn product_prec_round_extreme_lengths() {
     assert_eq!(o_alt, o);
 }
 
-const EXPONENT_GATE: i64 = 1 << 16;
-
-fn in_gate(x: &Float) -> bool {
-    x.get_exponent()
-        .is_none_or(|e| i64::from(e).abs() < EXPONENT_GATE)
-}
-
 #[allow(clippy::needless_pass_by_value)]
 fn product_prec_round_properties_helper(xs: Vec<Float>, prec: u64, rm: RoundingMode) {
     let (product, o) = Float::product_prec_round(&xs, prec, rm);
@@ -1118,7 +1111,7 @@ fn product_prec_round_properties_helper(xs: Vec<Float>, prec: u64, rm: RoundingM
         assert_eq!(o_alt, o);
     }
 
-    if xs.iter().all(in_gate) {
+    if xs.iter().all(exponent_in_gate) {
         // the complete exact-Rational oracle
         let exact = Rational::product(xs.iter().map(Rational::exact_from));
         let (product_alt, o_alt) = Float::from_rational_prec_round(exact, prec, rm);
@@ -1288,7 +1281,7 @@ where
         if xs.iter().all(|x| x.is_finite()) {
             let exact = Rational::product(xs.iter().map(|&x| Rational::exact_from(x)));
             if exact != 0u32 {
-                let (product_alt, _) = T::rounding_from(exact, Nearest);
+                let product_alt = T::rounding_from(exact, Nearest).0;
                 assert_eq!(NiceFloat(product_alt), NiceFloat(product));
             }
         }

@@ -38,8 +38,8 @@ pub fn digit_constant_prec_round_naive<I: Iterator<Item = u64>>(
         let den = Natural::from(base).pow(count);
         let lo = Rational::from_naturals(num.clone(), den.clone());
         let hi = Rational::from_naturals(num + Natural::ONE, den);
-        let (f_lo, _) = Float::from_rational_prec_round(lo.clone(), prec, rm);
-        let (f_hi, _) = Float::from_rational_prec_round(hi.clone(), prec, rm);
+        let f_lo = Float::from_rational_prec_round(lo.clone(), prec, rm).0;
+        let f_hi = Float::from_rational_prec_round(hi.clone(), prec, rm).0;
         if f_lo == f_hi {
             let q = Rational::exact_from(&f_lo);
             if q <= lo {

@@ -57,7 +57,7 @@ impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2 {
         }
         // Tests, demos, and test utilities multiply by `power_of_2` on purpose, to cross-check the
         // shift operators themselves.
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         // `x.div_round(T::power_of_2(k), rm)` and the assign form: `shr_round` and

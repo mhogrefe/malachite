@@ -879,7 +879,7 @@ fn compound_properties() {
         x_alt.compound_assign(n);
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&c));
 
-        let (c_alt, _) = x.compound_round_ref(n, Nearest);
+        let c_alt = x.compound_round_ref(n, Nearest).0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
 
         if i32::convertible_from(n) {
@@ -978,7 +978,7 @@ where
                 }
             } else if n.unsigned_abs() <= 24 {
                 let exact = (Rational::ONE + Rational::exact_from(x)).pow(n);
-                let (c_alt, _) = T::rounding_from(exact, Nearest);
+                let c_alt = T::rounding_from(exact, Nearest).0;
                 assert_eq!(NiceFloat(c_alt), NiceFloat(c));
             }
         }

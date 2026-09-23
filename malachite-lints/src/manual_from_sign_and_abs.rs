@@ -140,7 +140,7 @@ impl<'tcx> LateLintPass<'tcx> for ManualFromSignAndAbs {
             {
                 continue;
             }
-            if crate::in_test_code(cx, s1.span) {
+            if crate::in_cross_check_code(cx, s1.span) {
                 continue;
             }
             span_lint_and_help(

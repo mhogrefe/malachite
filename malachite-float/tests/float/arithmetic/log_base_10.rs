@@ -1600,7 +1600,7 @@ fn log_base_10_properties_helper(x: Float) {
         ComparableFloatRef(&log_base_10)
     );
 
-    let (log_base_10_alt, _) = x.log_base_10_round_ref(Nearest);
+    let log_base_10_alt = x.log_base_10_round_ref(Nearest).0;
     assert_eq!(
         ComparableFloatRef(&log_base_10_alt),
         ComparableFloatRef(&log_base_10)

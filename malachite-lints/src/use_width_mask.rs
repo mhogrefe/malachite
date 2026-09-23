@@ -43,7 +43,7 @@ declare_lint_pass!(UseWidthMask => [USE_WIDTH_MASK]);
 
 impl<'tcx> LateLintPass<'tcx> for UseWidthMask {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         let ExprKind::Binary(op, x, divisor) = expr.kind else {

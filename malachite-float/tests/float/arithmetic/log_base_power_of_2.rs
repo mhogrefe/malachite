@@ -1204,8 +1204,8 @@ fn log_base_power_of_2_rational_prec_round_properties_helper(
         // Cross-check: pow * log_{2^pow}(x) == log_2(x). The exact value of the result times pow
         // must lie between the base-2 logarithm's Floor and Ceiling brackets (computed at the same
         // precision), since both are correctly-rounded approximations of the same real number.
-        let (l2_lo, _) = Float::log_base_2_rational_prec_round_ref(&x, prec, Floor);
-        let (l2_hi, _) = Float::log_base_2_rational_prec_round_ref(&x, prec, Ceiling);
+        let l2_lo = Float::log_base_2_rational_prec_round_ref(&x, prec, Floor).0;
+        let l2_hi = Float::log_base_2_rational_prec_round_ref(&x, prec, Ceiling).0;
         if l2_lo.is_normal() && l2_hi.is_normal() {
             let prod = Rational::exact_from(&log) * Rational::from(pow);
             let r_lo = Rational::exact_from(&l2_lo);

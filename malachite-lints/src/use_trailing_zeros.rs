@@ -85,7 +85,7 @@ impl<'tcx> LateLintPass<'tcx> for UseTrailingZeros {
         // The condition span is the user's source (the loop header itself is a desugaring); skip
         // macro-generated loops and test code.
         if while_loop.condition.span.from_expansion()
-            || crate::in_test_code(cx, while_loop.condition.span)
+            || crate::in_cross_check_code(cx, while_loop.condition.span)
         {
             return;
         }

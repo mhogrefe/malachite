@@ -86,7 +86,7 @@ fn suggestion<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> Option<&'static str
 impl<'tcx> LateLintPass<'tcx> for UseDivMod {
     fn check_block(&mut self, cx: &LateContext<'tcx>, block: &'tcx Block<'tcx>) {
         for (s1, s2) in block.stmts.iter().zip(block.stmts.iter().skip(1)) {
-            if s1.span.from_expansion() || crate::in_test_code(cx, s1.span) {
+            if s1.span.from_expansion() || crate::in_cross_check_code(cx, s1.span) {
                 continue;
             }
             let (StmtKind::Let(l1), StmtKind::Let(l2)) = (&s1.kind, &s2.kind) else {

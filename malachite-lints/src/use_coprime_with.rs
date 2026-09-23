@@ -65,7 +65,7 @@ impl<'tcx> LateLintPass<'tcx> for UseCoprimeWith {
         if expr.span.from_expansion() {
             return;
         }
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         let ExprKind::Binary(op, lhs, rhs) = expr.kind else {

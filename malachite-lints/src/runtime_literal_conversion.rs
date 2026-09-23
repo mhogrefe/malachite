@@ -68,7 +68,7 @@ impl<'tcx> LateLintPass<'tcx> for RuntimeLiteralConversion {
         if expr.span.from_expansion() {
             return;
         }
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_performance_insensitive_code(cx, expr.span) {
             return;
         }
         let ExprKind::Call(callee, args) = expr.kind else {

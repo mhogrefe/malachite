@@ -65,7 +65,7 @@ impl<'tcx> LateLintPass<'tcx> for CompareWithPowerOf2 {
         }
         // Tests, demos, and test utilities compare against `power_of_2` on purpose, to cross-check
         // the log functions themselves.
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         // A comparison of `a` and `b`: an operator, or one of the comparison methods.

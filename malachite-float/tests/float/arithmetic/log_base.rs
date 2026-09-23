@@ -264,9 +264,9 @@ fn test_log_base_directed_consistency() {
         (Float::from(3) << 1000u32, 5, 10), // huge exponent: exercises the balloon-safety guard
     ];
     for (x, base, prec) in inputs {
-        let (floor, _) = check(x, *base, *prec, Floor);
-        let (ceiling, _) = check(x, *base, *prec, Ceiling);
-        let (nearest, _) = check(x, *base, *prec, Nearest);
+        let floor = check(x, *base, *prec, Floor).0;
+        let ceiling = check(x, *base, *prec, Ceiling).0;
+        let nearest = check(x, *base, *prec, Nearest).0;
         let _ = check(x, *base, *prec, Down);
         let _ = check(x, *base, *prec, Up);
         if floor.is_normal() && ceiling.is_normal() {
@@ -408,7 +408,7 @@ fn log_base_round_properties() {
 fn log_base_properties() {
     let f = |x: Float, base: u64| {
         let prec = x.significant_bits();
-        let (expected, _) = check(&x, base, prec, Nearest);
+        let expected = check(&x, base, prec, Nearest).0;
         let log = x.clone().log_base(base);
         assert!(log.is_valid());
         assert_eq!(ComparableFloatRef(&log), ComparableFloatRef(&expected));

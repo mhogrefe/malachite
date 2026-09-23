@@ -66,7 +66,7 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
         if expr.span.from_expansion() {
             return;
         }
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         let ExprKind::Assign(lhs, rhs, _) = expr.kind else {
@@ -116,7 +116,7 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
         if local.span.from_expansion() {
             return;
         }
-        if crate::in_test_code(cx, local.span) {
+        if crate::in_cross_check_code(cx, local.span) {
             return;
         }
         let Some(init) = local.init else {

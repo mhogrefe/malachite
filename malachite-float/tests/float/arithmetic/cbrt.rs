@@ -169,7 +169,7 @@ fn test_cbrt() {
         assert_eq!(ComparableFloatRef(&cbrt_alt), ComparableFloatRef(&cbrt));
 
         // At the precision of the input and rounding to nearest, cbrt agrees with cbrt_prec.
-        let (cbrt_prec, _) = x.cbrt_prec_ref(x.significant_bits());
+        let cbrt_prec = x.cbrt_prec_ref(x.significant_bits()).0;
         assert_eq!(ComparableFloatRef(&cbrt_prec), ComparableFloatRef(&cbrt));
     };
     test("NaN", "NaN", "NaN");
@@ -301,7 +301,7 @@ fn cbrt_properties() {
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
 
         // The trait uses the precision of the input, rounding to nearest, and equals root_u(., 3).
-        let (c_prec, _) = x.cbrt_prec_ref(x.significant_bits());
+        let c_prec = x.cbrt_prec_ref(x.significant_bits()).0;
         assert_eq!(ComparableFloatRef(&c_prec), ComparableFloatRef(&c));
         let root = (&x).root(3u64);
         assert_eq!(ComparableFloatRef(&root), ComparableFloatRef(&c));

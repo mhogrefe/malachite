@@ -53,7 +53,7 @@ declare_lint_pass!(UseConstBinding => [USE_CONST_BINDING]);
 
 impl<'tcx> LateLintPass<'tcx> for UseConstBinding {
     fn check_local(&mut self, cx: &LateContext<'tcx>, local: &'tcx LetStmt<'tcx>) {
-        if local.span.from_expansion() || crate::in_test_code(cx, local.span) {
+        if local.span.from_expansion() || crate::in_performance_insensitive_code(cx, local.span) {
             return;
         }
         // An immutable, by-value binding of a single name: `let x = ..`.

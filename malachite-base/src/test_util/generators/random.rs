@@ -1113,8 +1113,8 @@ pub fn get_two_highest<T: Ord>(xs: &[T]) -> (&T, &T) {
     for x in &xs[2..] {
         if x > next_hi {
             if x > hi {
-                hi = x;
                 next_hi = hi;
+                hi = x;
             } else {
                 next_hi = x;
             }

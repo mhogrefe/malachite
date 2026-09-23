@@ -684,8 +684,8 @@ fn pow_properties() {
 
         // x^1 == x (rounded to the working precision)
         let prec = x.significant_bits().max(y.significant_bits());
-        let (p1, _) = x.pow_prec_round_ref_val(Float::ONE, prec, Nearest);
-        let (x_rounded, _) = Float::from_float_prec_round_ref(&x, prec, Nearest);
+        let p1 = x.pow_prec_round_ref_val(Float::ONE, prec, Nearest).0;
+        let x_rounded = Float::from_float_prec_round_ref(&x, prec, Nearest).0;
         assert_eq!(ComparableFloatRef(&p1), ComparableFloatRef(&x_rounded));
     });
 
@@ -1508,7 +1508,7 @@ fn test_rational_pow_exact_bound_regression() {
     let exact = Rational::from_unsigneds(1419857u32, 32u32);
     for prec in [21u64, 25] {
         let (p, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, Exact);
-        let (ep, _) = Float::from_rational_prec_round(exact.clone(), prec, Exact);
+        let ep = Float::from_rational_prec_round(exact.clone(), prec, Exact).0;
         assert_eq!(ComparableFloatRef(&p), ComparableFloatRef(&ep));
         assert_eq!(o, Equal);
     }
@@ -1875,7 +1875,7 @@ fn pow_integer_properties() {
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
 
         // The trait rounds to the nearest value at the base's precision.
-        let (p_alt, _) = x.pow_integer_round_ref_ref(&z, Nearest);
+        let p_alt = x.pow_integer_round_ref_ref(&z, Nearest).0;
         assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
 
         let rug_p = rug_pow_integer(&rug::Float::exact_from(&x), &rug::Integer::from(&z));
@@ -2735,7 +2735,7 @@ fn pow_u_properties() {
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
 
         // The trait rounds to the nearest value at the base's precision.
-        let (p_alt, _) = x.pow_u_round_ref(n, Nearest);
+        let p_alt = x.pow_u_round_ref(n, Nearest).0;
         assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
 
         let rug_p = rug_pow_u(&rug::Float::exact_from(&x), n);
@@ -3276,7 +3276,7 @@ fn pow_s_properties() {
         x_alt.pow_assign(n);
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
 
-        let (p_alt, _) = x.pow_s_round_ref(n, Nearest);
+        let p_alt = x.pow_s_round_ref(n, Nearest).0;
         assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
 
         let rug_p = rug_pow_s(&rug::Float::exact_from(&x), n);
@@ -4606,7 +4606,7 @@ fn pow_rational_properties() {
         let mut p_assign = x.clone();
         p_assign.pow_assign(&y);
         assert_eq!(ComparableFloatRef(&p_assign), ComparableFloatRef(&p));
-        let (p_alt, _) = x.pow_rational_round_ref_ref(&y, Nearest);
+        let p_alt = x.pow_rational_round_ref_ref(&y, Nearest).0;
         assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
     });
 }

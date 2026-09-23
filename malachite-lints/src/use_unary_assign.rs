@@ -47,7 +47,7 @@ impl<'tcx> LateLintPass<'tcx> for UseUnaryAssign {
         if expr.span.from_expansion() {
             return;
         }
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         let ExprKind::Assign(lhs, rhs, _) = expr.kind else {

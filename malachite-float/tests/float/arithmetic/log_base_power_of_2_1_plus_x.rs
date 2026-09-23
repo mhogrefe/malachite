@@ -681,8 +681,8 @@ fn log_base_power_of_2_1_plus_x_prec_round_properties_helper(
         // inputs, whose `Float`-to-`Rational` conversions produce astronomically large numerators
         // or denominators and would make the test intolerably slow.
         if !extreme && !underflowed {
-            let (l2_lo, _) = x.log_base_2_1_plus_x_prec_round_ref(prec, Floor);
-            let (l2_hi, _) = x.log_base_2_1_plus_x_prec_round_ref(prec, Ceiling);
+            let l2_lo = x.log_base_2_1_plus_x_prec_round_ref(prec, Floor).0;
+            let l2_hi = x.log_base_2_1_plus_x_prec_round_ref(prec, Ceiling).0;
             if l2_lo.is_normal() && l2_hi.is_normal() {
                 let prod = Rational::exact_from(&log) * Rational::from(pow);
                 let r_lo = Rational::exact_from(&l2_lo);

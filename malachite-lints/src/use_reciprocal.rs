@@ -46,7 +46,7 @@ impl<'tcx> LateLintPass<'tcx> for UseReciprocal {
         if expr.span.from_expansion() {
             return;
         }
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         let ExprKind::Binary(op, num, _) = expr.kind else {

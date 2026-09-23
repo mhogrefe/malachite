@@ -102,7 +102,7 @@ pub(crate) fn conversion<'tcx>(
 
 impl<'tcx> LateLintPass<'tcx> for UseConstCast {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_performance_insensitive_code(cx, expr.span) {
             return;
         }
         let Some((operand, target)) = conversion(cx, expr) else {

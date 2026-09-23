@@ -74,7 +74,7 @@ fn final_assignment_target<'tcx>(block: &'tcx Expr<'tcx>) -> Option<&'tcx Expr<'
 
 impl<'tcx> LateLintPass<'tcx> for FactorOutAssignment {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() {
             return;
         }
         // Only consider the head of a chain: if this `if` is itself an else branch of another

@@ -46,7 +46,7 @@ declare_lint_pass!(UseExactFrom => [USE_EXACT_FROM]);
 
 impl<'tcx> LateLintPass<'tcx> for UseExactFrom {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         // `<recv>.unwrap()`.

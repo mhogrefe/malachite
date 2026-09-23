@@ -669,7 +669,7 @@ fn mul_add_mul_shorthand_properties() {
             c.significant_bits(),
             d.significant_bits()
         );
-        let (sum, _) = a.mul_add_mul_prec_ref_ref_ref_ref(&b, &c, &d, prec);
+        let sum = a.mul_add_mul_prec_ref_ref_ref_ref(&b, &c, &d, prec).0;
         let sum_alt = a.clone().mul_add_mul(b.clone(), c.clone(), d.clone());
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         let sum_alt = (&a).mul_add_mul(&b, &c, &d);
@@ -1260,7 +1260,9 @@ fn mul_add_mul_rational_shorthand_properties() {
             y.significant_bits(),
             z.significant_bits()
         );
-        let (sum, _) = x.mul_add_mul_rational_prec_ref_ref_ref_ref(&y, &z, &w, prec);
+        let sum = x
+            .mul_add_mul_rational_prec_ref_ref_ref_ref(&y, &z, &w, prec)
+            .0;
         let sum_alt = x.clone().mul_add_mul(y.clone(), z.clone(), w.clone());
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         let sum_alt = (&x).mul_add_mul(&y, &z, &w);

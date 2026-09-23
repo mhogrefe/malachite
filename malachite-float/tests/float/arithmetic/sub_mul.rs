@@ -1169,7 +1169,7 @@ fn sub_mul_properties_helper(x: Float, y: Float, z: Float) {
         y.significant_bits(),
         z.significant_bits()
     );
-    let (diff, _) = x.sub_mul_prec_ref_ref_ref(&y, &z, prec);
+    let diff = x.sub_mul_prec_ref_ref_ref(&y, &z, prec).0;
     let diff_alt = x.clone().sub_mul(y.clone(), z.clone());
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
     let diff_alt = x.clone().sub_mul(y.clone(), &z);
@@ -1746,7 +1746,7 @@ fn sub_mul_rational_shorthand_properties() {
 
     float_float_rational_triple_gen().test_properties(|(x, y, z)| {
         let prec = cmp_max(x.significant_bits(), y.significant_bits());
-        let (diff, _) = x.sub_mul_rational_prec_ref_ref_ref(&y, &z, prec);
+        let diff = x.sub_mul_rational_prec_ref_ref_ref(&y, &z, prec).0;
         let diff_alt = x.clone().sub_mul(y.clone(), z.clone());
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         let diff_alt = x.clone().sub_mul(y.clone(), &z);

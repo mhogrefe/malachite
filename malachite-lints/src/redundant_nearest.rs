@@ -136,7 +136,7 @@ impl<'tcx> LateLintPass<'tcx> for RedundantNearest {
                 return;
             }
         }
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         span_lint(

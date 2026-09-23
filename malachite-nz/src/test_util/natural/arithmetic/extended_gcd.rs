@@ -67,7 +67,7 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
     let mut t1;
     while v3 != 0u32 {
         d = &u3 - &v3;
-        if u3 < (&v3 << 2u32) {
+        v3 = if u3 < (&v3 << 2u32) {
             if d < v3 {
                 // quot = 1
                 t2 = v2.clone();
@@ -79,7 +79,7 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
                 v2 -= v1;
                 v2.neg_assign();
                 v1 = t2;
-                v3 = d;
+                d
             } else if d < (&v3 << 1u32) {
                 // quot = 2
                 t1 = u2.clone();
@@ -89,7 +89,7 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
                 t2 = v2.clone();
                 v2 = v1 - (v2 << 1u32);
                 v1 = t2;
-                v3 = d - &u3;
+                d - &u3
             } else {
                 // quot = 3
                 t1 = u2.clone();
@@ -99,7 +99,7 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
                 t2 = v2.clone();
                 v2 = v1 - Integer::from(3u32) * &v2;
                 v1 = t2;
-                v3 = d - (&u3 << 1u32);
+                d - (&u3 << 1u32)
             }
         } else {
             let (quot, rem) = u3.div_mod(&v3);
@@ -111,8 +111,8 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
             t2 = v2.clone();
             v2 = v1 - quot * &v2;
             v1 = t2;
-            v3 = rem;
-        }
+            rem
+        };
     }
     // The cofactors at this point are not necessarily minimal, so we may need to adjust.
     let gcd = u3;

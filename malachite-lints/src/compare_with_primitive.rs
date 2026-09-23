@@ -194,7 +194,7 @@ impl<'tcx> LateLintPass<'tcx> for CompareWithPrimitive {
                 // The `from(primitive)` method form is exempt in test code: comparison tests
                 // cross-check `Bignum::from(x).cmp(&Bignum::from(y))` against `x.cmp(&y)` on
                 // purpose, and the rewrite would test the cross-type comparison instead.
-                let allow_from = !crate::in_test_code(cx, expr.span);
+                let allow_from = !crate::in_cross_check_code(cx, expr.span);
                 let Some((lit, signed)) = primitive_equivalent(cx, arg, allow_from) else {
                     return;
                 };

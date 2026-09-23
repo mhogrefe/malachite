@@ -1135,7 +1135,7 @@ fn add_mul_properties_helper(x: Float, y: Float, z: Float) {
         y.significant_bits(),
         z.significant_bits()
     );
-    let (sum, _) = x.add_mul_prec_ref_ref_ref(&y, &z, prec);
+    let sum = x.add_mul_prec_ref_ref_ref(&y, &z, prec).0;
     let sum_alt = x.clone().add_mul(y.clone(), z.clone());
     assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
     let sum_alt = x.clone().add_mul(y.clone(), &z);
@@ -1697,7 +1697,7 @@ fn add_mul_rational_shorthand_properties() {
 
     float_float_rational_triple_gen().test_properties(|(x, y, z)| {
         let prec = cmp_max(x.significant_bits(), y.significant_bits());
-        let (sum, _) = x.add_mul_rational_prec_ref_ref_ref(&y, &z, prec);
+        let sum = x.add_mul_rational_prec_ref_ref_ref(&y, &z, prec).0;
         let sum_alt = x.clone().add_mul(y.clone(), z.clone());
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         let sum_alt = x.clone().add_mul(y.clone(), &z);

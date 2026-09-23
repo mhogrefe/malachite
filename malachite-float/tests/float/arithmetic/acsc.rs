@@ -500,7 +500,7 @@ fn acsc_properties() {
         assert!(c_alt.is_valid());
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         // the same as rounding to the input's precision, to nearest
-        let (c_alt, _) = x.acsc_prec_ref(x.significant_bits());
+        let c_alt = x.acsc_prec_ref(x.significant_bits()).0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         if x.is_finite() && x != 0u32 && x.get_exponent().unwrap().unsigned_abs() <= 1000 {
             let c_alt = Float::from(&rug_acsc(&rug::Float::exact_from(&x)));
@@ -865,7 +865,7 @@ where
             // the same as the `Float` version taken with 64 bits to spare and rounded once -- but
             // only where the result is normal, a subnormal one being rounded twice here
             if c.is_normal() {
-                let (c_float, _) = Float::acsc_prec(Float::from(x), T::MANTISSA_WIDTH + 64);
+                let c_float = Float::acsc_prec(Float::from(x), T::MANTISSA_WIDTH + 64).0;
                 assert_eq!(
                     NiceFloat(T::rounding_from(&c_float, Nearest).0),
                     NiceFloat(c)
@@ -896,7 +896,7 @@ where
             // only where the result is normal, a subnormal one being rounded twice here and once by
             // `emulate_rational_to_float_fn`
             if c.is_normal() {
-                let (c_float, _) = Float::acsc_rational_prec_ref(&x, T::MANTISSA_WIDTH + 64);
+                let c_float = Float::acsc_rational_prec_ref(&x, T::MANTISSA_WIDTH + 64).0;
                 assert_eq!(
                     NiceFloat(T::rounding_from(&c_float, Nearest).0),
                     NiceFloat(c)
@@ -1794,7 +1794,7 @@ fn acsc_with_period_properties() {
         assert!(c_alt.is_valid());
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         // the same as rounding to the input's precision, to nearest
-        let (c_alt, _) = x.acsc_with_period_prec_ref(u, x.significant_bits());
+        let c_alt = x.acsc_with_period_prec_ref(u, x.significant_bits()).0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
     });
 }
@@ -1874,8 +1874,8 @@ where
             // the same as the `Float` version taken with 64 bits to spare and rounded once -- but
             // only where the result is normal, a subnormal one being rounded twice here
             if c.is_normal() {
-                let (c_float, _) =
-                    Float::acsc_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64);
+                let c_float =
+                    Float::acsc_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
                 assert_eq!(
                     NiceFloat(T::rounding_from(&c_float, Nearest).0),
                     NiceFloat(c)
@@ -2395,8 +2395,8 @@ where
             // the same as the `Float` version taken with 64 bits to spare and rounded once -- but
             // only where the result is normal, a subnormal one being rounded twice here
             if c.is_normal() {
-                let (c_float, _) =
-                    Float::acsc_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64);
+                let c_float =
+                    Float::acsc_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).0;
                 assert_eq!(
                     NiceFloat(T::rounding_from(&c_float, Nearest).0),
                     NiceFloat(c)
@@ -2870,7 +2870,7 @@ fn acsc_pi_properties() {
         // precision, to nearest
         let c_alt = x.acsc_with_period_ref(2);
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
-        let (c_alt, _) = x.acsc_pi_prec_round_ref(x.significant_bits(), Nearest);
+        let c_alt = x.acsc_pi_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
     });
 }

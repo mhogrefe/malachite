@@ -84,7 +84,7 @@ fn references_local<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> bool {
 
 impl<'tcx> LateLintPass<'tcx> for UseConstBlock {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_performance_insensitive_code(cx, expr.span) {
             return;
         }
         // A computed expression, derived from at least one named constant, outside any const

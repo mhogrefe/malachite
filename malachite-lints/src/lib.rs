@@ -442,9 +442,6 @@ fn references_named_const(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<
     }
 }
 
-// Whether the span lies in test-oriented code: tests, demos and benches (`bin_util`), test
-// utilities, or any code compiled only as part of a test harness (which covers `#[cfg(test)]`
-// modules inside `src`). Such code exercises the discouraged spellings on purpose.
 // Whether the span lives in demo-and-bench or test code, where algorithm-comparison arms and
 // cross-function consistency properties legitimately spell out forms the lints would otherwise
 // flag. Unlike in_test_code, this does NOT exempt test_util: reference implementations there are
@@ -462,6 +459,10 @@ fn in_bin_util_or_tests(cx: &rustc_lint::LateContext<'_>, hir_id: rustc_hir::Hir
     }
 }
 
+// Whether the span lies in test-oriented code: tests, demos and benches (`bin_util`), test
+// utilities, or any code compiled only as part of a test harness (which covers `#[cfg(test)]`
+// modules inside `src`). Lints do not call this directly; they call one of the helpers below,
+// whose names say why the lint stands down there.
 fn in_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> bool {
     use rustc_lint::LintContext;
     // The extracted-doctests crate compiles doc examples as test targets, but they are
@@ -492,6 +493,25 @@ fn in_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> boo
     } else {
         false
     }
+}
+
+// Whether the span lies in test-oriented code that spells out a discouraged form on purpose:
+// property tests cross-check a dedicated function against its spelled-out equivalent (`square`
+// against `&x * &x`, shifts against multiplication by a power of 2), test utilities keep naive
+// reference implementations independent of the optimized code they check, and tests call the
+// by-value, in-place, and rounding variants they are testing. Rewriting any of these would remove
+// what the code exists to check.
+fn in_cross_check_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> bool {
+    in_test_code(cx, span)
+}
+
+// Whether the span lies in test-oriented code, where a lint that guards only performance
+// (evaluating at compile time, inlining, avoiding an allocation) has nothing to protect.
+fn in_performance_insensitive_code(
+    cx: &rustc_lint::LateContext<'_>,
+    span: rustc_span::Span,
+) -> bool {
+    in_test_code(cx, span)
 }
 
 // Whether the span lies in test code that exercises constructors or conversions on purpose: tests,

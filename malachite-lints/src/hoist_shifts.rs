@@ -72,7 +72,7 @@ fn shift_direction<'tcx>(e: &'tcx Expr<'tcx>) -> Option<bool> {
 
 impl<'tcx> LateLintPass<'tcx> for HoistShifts {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         let ExprKind::Binary(op, lhs, rhs) = expr.kind else {

@@ -17,8 +17,8 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_float::float::arithmetic::sum::primitive_float_sum;
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, exponent_in_gate, parse_hex_string,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::sum::{
     naive_sum, naive_sum_prec, naive_sum_prec_round, naive_sum_round, rug_sum, rug_sum_prec,
@@ -53,7 +53,7 @@ fn test_sum() {
         assert!(sum_alt.is_valid());
         assert_eq!(ComparableFloatRef(&sum), ComparableFloatRef(&sum_alt));
 
-        if xs.iter().all(in_gate) {
+        if xs.iter().all(exponent_in_gate) {
             let sum_alt = naive_sum(&xs);
             assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         }
@@ -100,7 +100,7 @@ fn test_sum_prec() {
         assert_eq!(to_hex_string(&sum), out_hex);
         assert_eq!(o, o_out);
 
-        if xs.iter().all(in_gate) {
+        if xs.iter().all(exponent_in_gate) {
             let (sum_alt, o_alt) = naive_sum_prec(&xs, prec);
             assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
             assert_eq!(o_alt, o);
@@ -163,7 +163,7 @@ fn test_sum_round() {
         assert_eq!(to_hex_string(&sum), out_hex);
         assert_eq!(o, o_out);
 
-        if xs.iter().all(in_gate) {
+        if xs.iter().all(exponent_in_gate) {
             let (sum_alt, o_alt) = naive_sum_round(&xs, rm);
             assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
             assert_eq!(o_alt, o);
@@ -252,7 +252,7 @@ fn test_sum_prec_round() {
         assert_eq!(to_hex_string(&sum), out_hex);
         assert_eq!(o, o_out);
 
-        if xs.iter().all(in_gate) {
+        if xs.iter().all(exponent_in_gate) {
             let (sum_alt, o_alt) = naive_sum_prec_round(&xs, prec, rm);
             assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
             assert_eq!(o_alt, o);
@@ -935,13 +935,6 @@ fn rational_oracle(xs: &[Float], prec: u64, rm: RoundingMode) -> (Float, Orderin
     }
 }
 
-const EXPONENT_GATE: i64 = 1 << 16;
-
-fn in_gate(x: &Float) -> bool {
-    x.get_exponent()
-        .is_none_or(|e| i64::from(e).abs() < EXPONENT_GATE)
-}
-
 #[allow(clippy::needless_pass_by_value)]
 fn sum_prec_round_properties_helper(xs: Vec<Float>, prec: u64, rm: RoundingMode) {
     let (sum, o) = Float::sum_prec_round(&xs, prec, rm);
@@ -973,7 +966,7 @@ fn sum_prec_round_properties_helper(xs: Vec<Float>, prec: u64, rm: RoundingMode)
 
     // the naive exact-accumulation oracle, which extends precisions so that every partial sum is
     // exact and rounds only once
-    if xs.iter().all(in_gate) {
+    if xs.iter().all(exponent_in_gate) {
         let (sum_alt, o_alt) = naive_sum_prec_round(&xs, prec, rm);
         assert_eq!(ComparableFloat(sum_alt), ComparableFloat(sum.clone()));
         assert_eq!(o_alt, o);
@@ -996,7 +989,7 @@ fn sum_prec_round_properties_helper(xs: Vec<Float>, prec: u64, rm: RoundingMode)
         assert_eq!(o_alt, o);
     }
 
-    if xs.iter().all(in_gate) && !xs.is_empty() && xs.iter().any(|x| *x != 0u32) {
+    if xs.iter().all(exponent_in_gate) && !xs.is_empty() && xs.iter().any(|x| *x != 0u32) {
         // the complete exact-Rational oracle
         let (sum_alt, o_alt) = rational_oracle(&xs, prec, rm);
         assert_eq!(ComparableFloat(sum_alt), ComparableFloat(sum.clone()));
@@ -1094,10 +1087,10 @@ fn sum_properties_helper(xs: Vec<Float>) {
         .map(SignificantBits::significant_bits)
         .max()
         .unwrap_or(1);
-    let (sum_alt, _) = Float::sum_prec_round(&xs, prec, Nearest);
+    let sum_alt = Float::sum_prec_round(&xs, prec, Nearest).0;
     assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
 
-    if xs.iter().all(in_gate) {
+    if xs.iter().all(exponent_in_gate) {
         let rug_xs: Vec<rug::Float> = xs.iter().map(rug::Float::exact_from).collect();
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_sum(&rug_xs))),
@@ -1154,7 +1147,7 @@ where
         if xs.iter().all(|x| x.is_finite()) {
             let exact: Rational = xs.iter().map(|&x| Rational::exact_from(x)).sum();
             if exact != 0u32 {
-                let (sum_alt, _) = T::rounding_from(exact, Nearest);
+                let sum_alt = T::rounding_from(exact, Nearest).0;
                 assert_eq!(NiceFloat(sum_alt), NiceFloat(sum));
             }
         }

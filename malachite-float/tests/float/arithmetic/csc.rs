@@ -858,7 +858,7 @@ fn csc_properties() {
         assert!(x_alt.is_valid());
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&s));
 
-        let (s_alt, _) = x.csc_prec_round_ref(x.significant_bits(), Nearest);
+        let s_alt = x.csc_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
 
         assert_eq!(
@@ -5061,7 +5061,9 @@ fn csc_with_period_properties() {
         t_alt.csc_with_period_assign(u);
         assert!(t_alt.is_valid());
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
-        let (t_alt, _) = x.csc_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        let t_alt = x
+            .csc_with_period_prec_round_ref(u, x.significant_bits(), Nearest)
+            .0;
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
         // csc_with_period is odd
         assert_eq!(
@@ -5214,8 +5216,7 @@ where
                 NiceFloat(-s)
             );
             // the same as the `Float` cosecant taken with 64 bits to spare and rounded once
-            let (s_float, _) =
-                Float::csc_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64);
+            let s_float = Float::csc_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
             assert_eq!(
                 NiceFloat(T::rounding_from(&s_float, Nearest).0),
                 NiceFloat(s)
@@ -5815,8 +5816,7 @@ where
                 );
             }
             // the same as the `Float` cosecant taken with 64 bits to spare and rounded once
-            let (s_float, _) =
-                Float::csc_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64);
+            let s_float = Float::csc_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).0;
             assert_eq!(
                 NiceFloat(T::rounding_from(&s_float, Nearest).0),
                 NiceFloat(s)
@@ -6717,7 +6717,7 @@ fn csc_pi_properties() {
         // to nearest
         let t_alt = x.csc_with_period_ref(2);
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
-        let (t_alt, _) = x.csc_pi_prec_round_ref(x.significant_bits(), Nearest);
+        let t_alt = x.csc_pi_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
     });
 }

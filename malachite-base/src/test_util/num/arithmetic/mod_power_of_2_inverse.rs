@@ -32,7 +32,7 @@ pub fn mod_power_of_2_inverse_euclidean<
         U::wrapping_from(y - S::wrapping_from(q) * x)
     } else {
         let m = U::power_of_2(pow);
-        let (_, x, _) = extended_gcd_unsigned_euclidean::<U, S>(a, m);
+        let x = extended_gcd_unsigned_euclidean::<U, S>(a, m).1;
         if x >= S::ZERO {
             U::wrapping_from(x)
         } else {

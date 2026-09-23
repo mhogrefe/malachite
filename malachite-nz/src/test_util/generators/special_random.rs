@@ -9059,10 +9059,7 @@ pub fn special_random_large_type_gen_var_20(
                 return None;
             }
             let actual_scratch_len = x - i_len;
-            if actual_scratch_len < d_len + i_len {
-                return None;
-            }
-            if scratch.len() < actual_scratch_len {
+            if actual_scratch_len < d_len + i_len || scratch.len() < actual_scratch_len {
                 return None;
             }
             scratch.truncate(actual_scratch_len);

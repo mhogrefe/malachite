@@ -1276,7 +1276,7 @@ fn min_properties_helper(x: Float, y: Float) {
     }
 
     if !x.is_nan() && !y.is_nan() {
-        let (max, _) = x.max_ref_ref(&y);
+        let max = x.max_ref_ref(&y).0;
         assert!(min <= max);
         assert!(min == x && max == y || min == y && max == x);
     }
@@ -1425,15 +1425,21 @@ fn test_min_max_rational() {
     let (expected, expected_o) = Float::from_rational_prec_round_ref(&third, 10, Nearest);
     assert_eq!(ComparableFloat(r), ComparableFloat(expected));
     assert_eq!(o, expected_o);
-    let (r, _) = Float::NAN.max_rational_prec_round_ref_ref(&third, 10, Nearest);
+    let r = Float::NAN
+        .max_rational_prec_round_ref_ref(&third, 10, Nearest)
+        .0;
     assert!(!r.is_nan());
     // infinities compare exactly
-    let (r, _) = Float::INFINITY.min_rational_prec_round_ref_ref(&third, 10, Nearest);
+    let r = Float::INFINITY
+        .min_rational_prec_round_ref_ref(&third, 10, Nearest)
+        .0;
     assert_eq!(
         ComparableFloat(r),
         ComparableFloat(Float::from_rational_prec_round_ref(&third, 10, Nearest).0)
     );
-    let (r, _) = Float::NEGATIVE_INFINITY.min_rational_prec_round_ref_ref(&third, 10, Nearest);
+    let r = Float::NEGATIVE_INFINITY
+        .min_rational_prec_round_ref_ref(&third, 10, Nearest)
+        .0;
     assert_eq!(
         ComparableFloat(r),
         ComparableFloat(Float::NEGATIVE_INFINITY)
@@ -1445,7 +1451,9 @@ fn test_min_max_rational() {
     let (r, o) = Float::NEGATIVE_ZERO.max_rational_prec_round_ref_ref(&Rational::ZERO, 10, Nearest);
     assert_eq!(ComparableFloat(r), ComparableFloat(Float::ZERO));
     assert_eq!(o, Equal);
-    let (r, _) = Float::ZERO.min_rational_prec_round_ref_ref(&Rational::ZERO, 10, Nearest);
+    let r = Float::ZERO
+        .min_rational_prec_round_ref_ref(&Rational::ZERO, 10, Nearest)
+        .0;
     assert_eq!(ComparableFloat(r), ComparableFloat(Float::ZERO));
     // the boundary case that motivates the mixed function: q is just below x, so q is the true
     // minimum, even though q rounds (at the output precision) to x's value

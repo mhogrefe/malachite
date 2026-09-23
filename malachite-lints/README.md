@@ -49,8 +49,19 @@ your project. Notes:
 - `long_lines` enforces Malachite's 100-column house style and is configured through a
   `dylint.toml` at your workspace root; if you don't want it, allow it at crate level with
   `#![cfg_attr(dylint_lib = "malachite_lints", allow(long_lines))]`.
-- Code under `tests/`, `bin_util/`, or `test_util/` directories, and test-harness builds, are
-  exempt from the style lints.
+- Most lints stand down in test-oriented code: under `tests/`, `bin_util/`, or `test_util/`
+  directories, and in test-harness builds. There are two reasons, and each lint's source says
+  which applies by the helper it calls (`in_cross_check_code` or
+  `in_performance_insensitive_code`). A **cross-check** lint rewrites a spelling that such code
+  writes on purpose: property tests check a dedicated function against its spelled-out equivalent,
+  test utilities keep naive reference implementations independent of the code they check, and
+  tests call the by-value, in-place, and rounding variants they are testing. A
+  **performance-only** lint (evaluating at compile time, inlining, avoiding an allocation) has
+  nothing to protect there. Lints that are purely about readability and structure, such as
+  `let_tuple_underscore_to_field`, `collapse_adjacent_ifs`, `duplicate_const`,
+  `factor_out_assignment`, and `assign_then_returned`, apply everywhere, as do `long_lines`,
+  `collapse_adjacent_imports`, `bignum_literal_suffix`, and `fully_qualified_path`. Doctests are
+  linted in full, except the docs of conversions, constants, and comparisons.
 
 ## Lints
 

@@ -121,7 +121,7 @@ impl<'tcx> LateLintPass<'tcx> for AssertOrderingEqualPreferExact {
             let [s1, s2] = pair else {
                 continue;
             };
-            if s1.span.from_expansion() || crate::in_test_code(cx, s1.span) {
+            if s1.span.from_expansion() || crate::in_cross_check_code(cx, s1.span) {
                 continue;
             }
             // s1: `let (_x, o) = <call>;`, with `o` an `Ordering` binding.

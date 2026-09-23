@@ -19,7 +19,6 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_pair_gen_var_32, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_23,
 };
-use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::shl::{
     limbs_add_shl_same_length_in_place_left, limbs_shl, limbs_shl_add_same_length_in_place_left,
     limbs_shl_add_same_length_to_out, limbs_shl_sub_same_length_in_place_left,
@@ -27,6 +26,7 @@ use malachite_nz::natural::arithmetic::shl::{
     limbs_slice_shl_in_place, limbs_sub_shl_same_length_in_place_left, limbs_vec_shl_in_place,
 };
 use malachite_nz::natural::logic::not::limbs_not_in_place;
+use malachite_nz::natural::{LIMB_HIGH_BIT, Natural};
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_gen, natural_signed_pair_gen_var_2, natural_unsigned_pair_gen_var_4,
@@ -481,8 +481,6 @@ fn limbs_shl_with_complement_to_out_properties() {
         });
 }
 
-const HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
-
 #[test]
 fn test_limbs_shl_add_same_length_in_place_left() {
     let test = |xs: &[Limb], ys: &[Limb], bits: u64, out: &[Limb], carry: Limb| {
@@ -500,7 +498,7 @@ fn test_limbs_shl_add_same_length_in_place_left() {
         &[Limb::MAX, 1],
         &[0, 0],
         Limb::WIDTH - 1,
-        &[HIGH_BIT, Limb::MAX],
+        &[LIMB_HIGH_BIT, Limb::MAX],
         0,
     );
 }
@@ -545,7 +543,7 @@ fn test_limbs_shl_add_same_length_to_out() {
         &[Limb::MAX, 1],
         &[0, 0],
         Limb::WIDTH - 1,
-        &[HIGH_BIT, Limb::MAX],
+        &[LIMB_HIGH_BIT, Limb::MAX],
         0,
     );
 }
@@ -578,7 +576,13 @@ fn test_limbs_shl_sub_same_length_in_place_right() {
     };
     test(&[], &[], 1, &[], 0);
     test(&[7], &[5], 1, &[9], 0);
-    test(&[1, 1], &[0, 0], Limb::WIDTH - 1, &[HIGH_BIT, HIGH_BIT], 0);
+    test(
+        &[1, 1],
+        &[0, 0],
+        Limb::WIDTH - 1,
+        &[LIMB_HIGH_BIT, LIMB_HIGH_BIT],
+        0,
+    );
 }
 
 #[test]

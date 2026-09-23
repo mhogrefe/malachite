@@ -101,7 +101,7 @@ impl<'tcx> LateLintPass<'tcx> for RedundantPrecRoundOfExactConstant {
         let Some(ctor) = prec_constructor_for(cx, c) else {
             return;
         };
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         span_lint_and_help(

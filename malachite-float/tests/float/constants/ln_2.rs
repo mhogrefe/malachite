@@ -26,11 +26,11 @@ use std::panic::catch_unwind;
 // a directly computed low-precision `ln(2)`. (~128 MB intermediates, so release-only.)
 #[test]
 fn test_ln_2_prec_high() {
-    let (high, _) = Float::ln_2_prec(1u64 << 27);
+    let high = Float::ln_2_prec(1u64 << 27).0;
     assert!(high.is_valid());
     assert!(high.is_normal());
-    let (high_rounded, _) = Float::from_float_prec_round(high, 100, Nearest);
-    let (low, _) = Float::ln_2_prec(100);
+    let high_rounded = Float::from_float_prec_round(high, 100, Nearest).0;
+    let low = Float::ln_2_prec(100).0;
     assert_eq!(ComparableFloatRef(&high_rounded), ComparableFloatRef(&low));
 }
 

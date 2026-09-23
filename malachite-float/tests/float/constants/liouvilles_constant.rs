@@ -52,12 +52,12 @@ fn test_liouvilles_constant_base_prec_helper(
 // and about a minute and a half, so release-only.)
 #[test]
 fn test_liouvilles_constant_base_prec_high() {
-    let (high, _) = Float::liouvilles_constant_base_prec(3, 678_000_000);
+    let high = Float::liouvilles_constant_base_prec(3, 678_000_000).0;
     assert!(high.is_valid());
     assert!(high.is_normal());
     assert_eq!(high.get_prec(), Some(678_000_000));
-    let (high_rounded, _) = Float::from_float_prec_round(high, 100, Nearest);
-    let (low, _) = Float::liouvilles_constant_base_prec(3, 100);
+    let high_rounded = Float::from_float_prec_round(high, 100, Nearest).0;
+    let low = Float::liouvilles_constant_base_prec(3, 100).0;
     assert_eq!(ComparableFloatRef(&high_rounded), ComparableFloatRef(&low));
 }
 
@@ -458,7 +458,7 @@ where
         assert!(x < T::ONE);
         // Computing at a much higher precision and rounding once must give the same answer, which
         // is what correct rounding means.
-        let (y, _) = Float::liouvilles_constant_base_prec(base, 200);
+        let y = Float::liouvilles_constant_base_prec(base, 200).0;
         assert_eq!(NiceFloat(x), NiceFloat(T::rounding_from(&y, Nearest).0));
     });
 }

@@ -442,7 +442,7 @@ where
         assert!(x < T::ONE);
         // Computing at a much higher precision and rounding once must give the same answer, which
         // is what correct rounding means.
-        let (y, _) = Float::copeland_erdos_constant_base_prec(base, 200);
+        let y = Float::copeland_erdos_constant_base_prec(base, 200).0;
         assert_eq!(NiceFloat(x), NiceFloat(T::rounding_from(&y, Nearest).0));
     });
 }

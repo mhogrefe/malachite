@@ -81,7 +81,7 @@ impl<'tcx> LateLintPass<'tcx> for MissingInlineOnDelegator {
             FnKind::ItemFn(ident, ..) | FnKind::Method(ident, ..) => ident.span,
             FnKind::Closure => return,
         };
-        if span.from_expansion() || crate::in_test_code(cx, span) {
+        if span.from_expansion() || crate::in_performance_insensitive_code(cx, span) {
             return;
         }
         // Only a public function benefits from an explicit `#[inline]`: cross-crate inlining is

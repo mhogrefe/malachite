@@ -833,7 +833,7 @@ fn dot_properties() {
             .map(SignificantBits::significant_bits)
             .max()
             .unwrap_or(1);
-        let (dot_alt, _) = Float::dot_prec_round(&xs, &ys, prec, Nearest);
+        let dot_alt = Float::dot_prec_round(&xs, &ys, prec, Nearest).0;
         assert_eq!(ComparableFloatRef(&dot_alt), ComparableFloatRef(&dot));
 
         if term_gate(&xs, &ys) {
@@ -894,7 +894,7 @@ where
                 .map(|(&x, &y)| Rational::exact_from(x) * Rational::exact_from(y))
                 .sum();
             if exact != 0u32 {
-                let (dot_alt, _) = T::rounding_from(exact, Nearest);
+                let dot_alt = T::rounding_from(exact, Nearest).0;
                 assert_eq!(NiceFloat(dot_alt), NiceFloat(dot));
             }
         }

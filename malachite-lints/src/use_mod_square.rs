@@ -60,7 +60,7 @@ fn inside_own_definition<'tcx>(cx: &LateContext<'tcx>, expr: &Expr<'tcx>) -> boo
 impl<'tcx> LateLintPass<'tcx> for UseModSquare {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
         if expr.span.from_expansion()
-            || crate::in_test_code(cx, expr.span)
+            || crate::in_cross_check_code(cx, expr.span)
             || inside_own_definition(cx, expr)
         {
             return;

@@ -52,7 +52,7 @@ fn is_zero(e: &Expr<'_>) -> bool {
 
 impl<'tcx> LateLintPass<'tcx> for UseSaturatingFrom {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         // `T::exact_from(arg)`, where `exact_from` is the `ExactFrom` trait method.

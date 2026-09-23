@@ -396,7 +396,7 @@ fn log_base_rational_base_round_properties() {
 #[test]
 fn log_base_rational_base_properties() {
     let f = |x: Float, base: Rational, extreme: bool| {
-        let (expected, _) = check(&x, &base, x.significant_bits(), Nearest, extreme);
+        let expected = check(&x, &base, x.significant_bits(), Nearest, extreme).0;
         let log = x.clone().log_base(base.clone());
         assert!(log.is_valid());
         assert_eq!(ComparableFloatRef(&log), ComparableFloatRef(&expected));

@@ -23,47 +23,51 @@ fn test_parse_gmp_conversion_spec() {
     assert_eq!(rest, b" tail");
 
     // the later of the + and space flags wins in `sign`, but both are recorded
-    let (spec, _) = parse_gmp_conversion_spec(b"+ d", &mut || None).unwrap();
+    let spec = parse_gmp_conversion_spec(b"+ d", &mut || None).unwrap().0;
     assert_eq!(spec.sign, b' ');
     assert!(spec.plus);
     assert!(spec.space);
 
     // a `.` with no digits is Some(-1); no `.` is None
-    let (spec, _) = parse_gmp_conversion_spec(b".d", &mut || None).unwrap();
+    let spec = parse_gmp_conversion_spec(b".d", &mut || None).unwrap().0;
     assert_eq!(spec.prec, Some(-1));
-    let (spec, _) = parse_gmp_conversion_spec(b"d", &mut || None).unwrap();
+    let spec = parse_gmp_conversion_spec(b"d", &mut || None).unwrap().0;
     assert_eq!(spec.prec, None);
 
     // doubled and later-overwritten type characters
-    let (spec, _) = parse_gmp_conversion_spec(b"lld", &mut || None).unwrap();
+    let spec = parse_gmp_conversion_spec(b"lld", &mut || None).unwrap().0;
     assert_eq!(spec.type_chr, b'l');
     assert!(spec.type_doubled);
-    let (spec, _) = parse_gmp_conversion_spec(b"hZd", &mut || None).unwrap();
+    let spec = parse_gmp_conversion_spec(b"hZd", &mut || None).unwrap().0;
     assert_eq!(spec.type_chr, b'Z');
     assert!(!spec.type_doubled);
 
     // MPFR's rounding character comes directly after the R; a Z there is a rounding character, not
     // the mpz type
-    let (spec, _) = parse_gmp_conversion_spec(b"RZf", &mut || None).unwrap();
+    let spec = parse_gmp_conversion_spec(b"RZf", &mut || None).unwrap().0;
     assert_eq!(spec.type_chr, b'R');
     assert_eq!(spec.rnd_chr, b'Z');
     assert_eq!(spec.conv, b'f');
     // an F after an R is the conversion; elsewhere it is the mpf type
-    let (spec, _) = parse_gmp_conversion_spec(b"RF", &mut || None).unwrap();
+    let spec = parse_gmp_conversion_spec(b"RF", &mut || None).unwrap().0;
     assert_eq!(spec.conv, b'F');
-    let (spec, _) = parse_gmp_conversion_spec(b"Fe", &mut || None).unwrap();
+    let spec = parse_gmp_conversion_spec(b"Fe", &mut || None).unwrap().0;
     assert_eq!(spec.type_chr, b'F');
     assert_eq!(spec.conv, b'e');
 
     // a `*` consumes from the supplier; a negative width means left justification
     let mut it = [-8i64, 3].into_iter();
-    let (spec, _) = parse_gmp_conversion_spec(b"*.*d", &mut || it.next()).unwrap();
+    let spec = parse_gmp_conversion_spec(b"*.*d", &mut || it.next())
+        .unwrap()
+        .0;
     assert!(spec.left);
     assert_eq!(spec.width, 8);
     assert_eq!(spec.prec, Some(3));
     // a negative `*` precision is treated as 0
     let mut it = [-3i64].into_iter();
-    let (spec, _) = parse_gmp_conversion_spec(b".*d", &mut || it.next()).unwrap();
+    let spec = parse_gmp_conversion_spec(b".*d", &mut || it.next())
+        .unwrap()
+        .0;
     assert_eq!(spec.prec, Some(0));
 
     // failures: no supplier for `*`, width/precision beyond a C int, a `*` rounding character,

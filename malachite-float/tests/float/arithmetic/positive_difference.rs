@@ -209,7 +209,7 @@ fn positive_difference_shorthand_properties() {
         assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&d));
         assert_eq!(o2, o);
         // dim(x, y) or dim(y, x) is zero (or NaN); both are zero only when x == y
-        let (e, _) = y.positive_difference_ref_ref(&x);
+        let e = y.positive_difference_ref_ref(&x).0;
         if !d.is_nan() {
             assert!(d == 0u32 || e == 0u32);
         }

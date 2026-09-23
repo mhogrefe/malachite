@@ -105,7 +105,7 @@ fn diverges(block: &Block<'_>) -> bool {
 
 impl<'tcx> LateLintPass<'tcx> for CollapseAdjacentIfs {
     fn check_block(&mut self, cx: &LateContext<'tcx>, block: &'tcx Block<'tcx>) {
-        if block.span.from_expansion() || crate::in_test_code(cx, block.span) {
+        if block.span.from_expansion() {
             return;
         }
         let mut i = 0;

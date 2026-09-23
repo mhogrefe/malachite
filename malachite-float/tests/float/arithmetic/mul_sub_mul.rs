@@ -680,7 +680,7 @@ fn mul_sub_mul_shorthand_properties() {
             c.significant_bits(),
             d.significant_bits()
         );
-        let (diff, _) = a.mul_sub_mul_prec_ref_ref_ref_ref(&b, &c, &d, prec);
+        let diff = a.mul_sub_mul_prec_ref_ref_ref_ref(&b, &c, &d, prec).0;
         let diff_alt = a.clone().mul_sub_mul(b.clone(), c.clone(), d.clone());
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         let diff_alt = (&a).mul_sub_mul(&b, &c, &d);
@@ -1291,7 +1291,9 @@ fn mul_sub_mul_rational_shorthand_properties() {
             y.significant_bits(),
             z.significant_bits()
         );
-        let (diff, _) = x.mul_sub_mul_rational_prec_ref_ref_ref_ref(&y, &z, &w, prec);
+        let diff = x
+            .mul_sub_mul_rational_prec_ref_ref_ref_ref(&y, &z, &w, prec)
+            .0;
         let diff_alt = x.clone().mul_sub_mul(y.clone(), z.clone(), w.clone());
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         let diff_alt = (&x).mul_sub_mul(&y, &z, &w);

@@ -119,7 +119,7 @@ fn is_widening_product<'tcx>(
 impl<'tcx> LateLintPass<'tcx> for UseMulShrRound {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
         if expr.span.from_expansion()
-            || crate::in_test_code(cx, expr.span)
+            || crate::in_cross_check_code(cx, expr.span)
             || inside_own_definition(cx, expr)
         {
             return;

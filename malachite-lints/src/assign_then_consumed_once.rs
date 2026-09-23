@@ -66,7 +66,7 @@ impl<'tcx> LateLintPass<'tcx> for AssignThenConsumedOnce {
             let Some(s2) = block.stmts.get(i + 1) else {
                 continue;
             };
-            if s1.span.from_expansion() || crate::in_test_code(cx, s1.span) {
+            if s1.span.from_expansion() || crate::in_cross_check_code(cx, s1.span) {
                 continue;
             }
             // s1: `let mut NAME = INIT;` with NAME a by-value mutable binding of a bignum type.

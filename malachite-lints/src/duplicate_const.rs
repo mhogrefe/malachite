@@ -92,7 +92,7 @@ fn collect_const_defids(e: &Expr<'_>, out: &mut Vec<DefId>) {
 
 impl DuplicateConst {
     fn record(&mut self, cx: &LateContext<'_>, init: &Expr<'_>, span: Span) {
-        if span.from_expansion() || crate::in_test_code(cx, span) {
+        if span.from_expansion() {
             return;
         }
         let inner = peel_block(init);

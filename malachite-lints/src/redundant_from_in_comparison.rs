@@ -53,7 +53,7 @@ impl<'tcx> LateLintPass<'tcx> for RedundantFromInComparison {
         // Comparison tests (and demos and test utilities) intentionally compare converted values:
         // `Integer::from(x) == Integer::from(y)` there is testing `Integer`'s own comparison, not
         // comparing against a primitive.
-        if crate::in_test_code(cx, expr.span) {
+        if crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         let ExprKind::Binary(op, lhs, rhs) = expr.kind else {

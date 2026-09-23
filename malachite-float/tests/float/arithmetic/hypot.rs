@@ -21,8 +21,8 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::float::arithmetic::hypot::primitive_float_hypot;
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, exponent_in_gate, parse_hex_string,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::hypot::{
     rug_hypot, rug_hypot_prec, rug_hypot_prec_round, rug_hypot_round,
@@ -1026,13 +1026,6 @@ fn verify_against_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode, h: &F
     }
 }
 
-const EXPONENT_GATE: i64 = 1 << 16;
-
-fn exponent_in_gate(x: &Float) -> bool {
-    x.get_exponent()
-        .is_none_or(|e| i64::from(e).abs() < EXPONENT_GATE)
-}
-
 #[allow(clippy::needless_pass_by_value)]
 fn hypot_prec_round_properties_helper(x: Float, y: Float, prec: u64, rm: RoundingMode) {
     let (hypot, o) = x.clone().hypot_prec_round(y.clone(), prec, rm);
@@ -1296,11 +1289,11 @@ fn hypot_properties_helper(x: Float, y: Float) {
     assert_eq!(ComparableFloatRef(&hypot_alt), ComparableFloatRef(&hypot));
 
     let prec = max(x.significant_bits(), y.significant_bits());
-    let (hypot_alt, _) = x.hypot_prec_round_ref_ref(&y, prec, Nearest);
+    let hypot_alt = x.hypot_prec_round_ref_ref(&y, prec, Nearest).0;
     assert_eq!(ComparableFloatRef(&hypot_alt), ComparableFloatRef(&hypot));
-    let (hypot_alt, _) = x.clone().hypot_prec(y.clone(), prec);
+    let hypot_alt = x.clone().hypot_prec(y.clone(), prec).0;
     assert_eq!(ComparableFloatRef(&hypot_alt), ComparableFloatRef(&hypot));
-    let (hypot_alt, _) = x.clone().hypot_round(y.clone(), Nearest);
+    let hypot_alt = x.clone().hypot_round(y.clone(), Nearest).0;
     assert_eq!(ComparableFloatRef(&hypot_alt), ComparableFloatRef(&hypot));
 
     // symmetry

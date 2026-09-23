@@ -176,6 +176,19 @@ pub fn assert_rounding_ordering_consistent_for_sign(
     }
 }
 
+// The largest exponent magnitude (exclusive) at which property tests cross-check a result against
+// an exact `Rational` computation. A `Float` with a huge exponent converts to a `Rational` with a
+// correspondingly huge numerator or denominator, so without this gate those cross-checks would
+// dominate a test's running time.
+pub const EXPONENT_GATE: i64 = 1 << 16;
+
+// Whether a `Float` is small enough in magnitude, or not finite and nonzero, for an exact
+// `Rational` cross-check to be affordable; see `EXPONENT_GATE`.
+pub fn exponent_in_gate(x: &Float) -> bool {
+    x.get_exponent()
+        .is_none_or(|e| i64::from(e).abs() < EXPONENT_GATE)
+}
+
 pub fn parse_hex_string(s_hex: &str) -> Float {
     let x = Float::from_string_base(16, s_hex).unwrap();
     assert_eq!(format!("{:#x}", ComparableFloatRef(&x)), s_hex);

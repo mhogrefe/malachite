@@ -552,7 +552,7 @@ fn cos_properties() {
         assert!(x_alt.is_valid());
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&c));
 
-        let (c_alt, _) = x.cos_prec_round_ref(x.significant_bits(), Nearest);
+        let c_alt = x.cos_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
 
         assert_eq!(
@@ -11636,7 +11636,9 @@ fn cos_with_period_properties() {
         assert!(c_alt.is_valid());
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         // the same as rounding to the input's precision, to nearest
-        let (c_alt, _) = x.cos_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        let c_alt = x
+            .cos_with_period_prec_round_ref(u, x.significant_bits(), Nearest)
+            .0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         // cos_with_period is even
         assert_eq!(
@@ -13526,7 +13528,7 @@ fn cos_pi_properties() {
         // to nearest
         let c_alt = x.cos_with_period_ref(2);
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
-        let (c_alt, _) = x.cos_pi_prec_round_ref(x.significant_bits(), Nearest);
+        let c_alt = x.cos_pi_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
     });
 }

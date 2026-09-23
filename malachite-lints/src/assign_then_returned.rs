@@ -87,9 +87,6 @@ impl<'tcx> LateLintPass<'tcx> for AssignThenReturned {
         if last.span.from_expansion() || tail.span.from_expansion() {
             return;
         }
-        if crate::in_test_code(cx, last.span) {
-            return;
-        }
         let (StmtKind::Semi(e) | StmtKind::Expr(e)) = last.kind else {
             return;
         };

@@ -22987,10 +22987,7 @@ fn atan2_prec_round_properties() {
         // atan2(y, +infinity) is a zero with the sign of y, and atan2(+-0.0, x) for a
         // positive-signed x is too; both are exact
         for x in [Float::INFINITY, Float::ZERO] {
-            if x == 0u32 && y != 0u32 {
-                continue;
-            }
-            if y.is_infinite() && x == Float::INFINITY {
+            if (x == 0u32 && y != 0u32) || (y.is_infinite() && x == Float::INFINITY) {
                 continue;
             }
             let (t, o) = y.atan2_prec_round_ref_ref(&x, prec, rm);
@@ -23093,7 +23090,7 @@ fn atan2_properties() {
         assert!(t_alt.is_valid());
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
         // the same as rounding to the inputs' precision, to nearest
-        let (t_alt, _) = y.atan2_round_ref_ref(&x, Nearest);
+        let t_alt = y.atan2_round_ref_ref(&x, Nearest).0;
         assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
 
         let rug_t = rug_atan2(&rug::Float::exact_from(&y), &rug::Float::exact_from(&x));
@@ -23388,7 +23385,7 @@ where
             );
         }
         // the same as the `Float` version taken with 64 bits to spare and rounded once
-        let (t_float, _) = Float::atan2_rational_prec_ref(&y, &x, T::MANTISSA_WIDTH + 64);
+        let t_float = Float::atan2_rational_prec_ref(&y, &x, T::MANTISSA_WIDTH + 64).0;
         assert_eq!(
             NiceFloat(T::rounding_from(&t_float, Nearest).0),
             NiceFloat(t)
@@ -56956,8 +56953,8 @@ where
                 NiceFloat(-t)
             );
         }
-        let (t_float, _) =
-            Float::atan2_with_period_rational_prec_ref(&y, &x, 360, T::MANTISSA_WIDTH + 64);
+        let t_float =
+            Float::atan2_with_period_rational_prec_ref(&y, &x, 360, T::MANTISSA_WIDTH + 64).0;
         assert_eq!(
             NiceFloat(T::rounding_from(&t_float, Nearest).0),
             NiceFloat(t)

@@ -1439,12 +1439,10 @@ pub fn log_base_float_base_prec_round_valid(
     prec: u64,
     rm: RoundingMode,
 ) -> bool {
-    if rm != Exact {
-        return true;
-    }
     // Special and degenerate inputs (x or base not finite-positive, or x = 1, or base = 1) yield
     // exact results (0, +-infinity, or NaN) and never panic with Exact.
-    if !x.is_finite()
+    if rm != Exact
+        || !x.is_finite()
         || *x <= 0u32
         || *x == 1u32
         || !base.is_finite()
@@ -1459,10 +1457,8 @@ pub fn log_base_float_base_prec_round_valid(
 }
 
 pub(crate) fn log_base_float_base_round_valid(x: &Float, base: &Float, rm: RoundingMode) -> bool {
-    if rm != Exact {
-        return true;
-    }
-    if !x.is_finite()
+    if rm != Exact
+        || !x.is_finite()
         || *x <= 0u32
         || *x == 1u32
         || !base.is_finite()
@@ -1517,12 +1513,10 @@ pub fn log_base_float_base_1_plus_x_prec_round_valid(
     prec: u64,
     rm: RoundingMode,
 ) -> bool {
-    if rm != Exact {
-        return true;
-    }
     // Special and degenerate inputs (x not finite, x <= -1, x = +-0, or base not finite-positive,
     // or base = 1) yield exact results (0, +-infinity, or NaN) and never panic with Exact.
-    if !x.is_finite()
+    if rm != Exact
+        || !x.is_finite()
         || *x <= -1i32
         || *x == 0u32
         || !base.is_finite()
@@ -1540,10 +1534,8 @@ pub(crate) fn log_base_float_base_1_plus_x_round_valid(
     base: &Float,
     rm: RoundingMode,
 ) -> bool {
-    if rm != Exact {
-        return true;
-    }
-    if !x.is_finite()
+    if rm != Exact
+        || !x.is_finite()
         || *x <= -1i32
         || *x == 0u32
         || !base.is_finite()
@@ -6948,12 +6940,15 @@ pub fn log_base_rational_float_base_prec_round_valid(
     prec: u64,
     rm: RoundingMode,
 ) -> bool {
-    if rm != Exact {
-        return true;
-    }
     // Special and degenerate inputs (x not positive, x = 1, or base not finite-positive, or base =
     // 1) yield exact results (0, +-infinity, or NaN) and never panic with Exact.
-    if *x <= 0u32 || *x == 1u32 || !base.is_finite() || *base <= 0u32 || *base == 1u32 {
+    if rm != Exact
+        || *x <= 0u32
+        || *x == 1u32
+        || !base.is_finite()
+        || *base <= 0u32
+        || *base == 1u32
+    {
         return true;
     }
     log_base_rational_float_base_rational(x, base)

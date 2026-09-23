@@ -232,7 +232,7 @@ fn rem_prec_round_properties_helper(
     if !extreme && x.is_finite() && y.is_finite() && x != 0u32 && y != 0u32 {
         let rx = Rational::exact_from(&x);
         let ry = Rational::exact_from(&y);
-        let (q, _) = Integer::rounding_from(&rx / &ry, Down);
+        let q = Integer::rounding_from(&rx / &ry, Down).0;
         let r_exact = rx - Rational::from(q) * &ry;
         // fmod: the remainder is zero or has the sign of x, and is smaller than y in magnitude
         if r_exact == 0u32 {
@@ -383,7 +383,7 @@ fn ieee_remainder_prec_round_properties_helper(
     if !extreme && x.is_finite() && y.is_finite() && x != 0u32 && y != 0u32 {
         let rx = Rational::exact_from(&x);
         let ry = Rational::exact_from(&y);
-        let (q, _) = Integer::rounding_from(&rx / &ry, Nearest);
+        let q = Integer::rounding_from(&rx / &ry, Nearest).0;
         let r_exact = rx - Rational::from(q) * &ry;
         // remainder: |r| <= |y|/2, and r = 0 takes the sign of x
         assert!((&r_exact).abs() << 1u32 <= ry.abs());
@@ -652,7 +652,7 @@ fn rem_properties_helper(x: Float, y: Float, extreme: bool) {
     x_alt %= &y;
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&rem));
 
-    let (rem_alt, _) = x.rem_round_ref_ref(&y, Nearest);
+    let rem_alt = x.rem_round_ref_ref(&y, Nearest).0;
     assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
 
     let (rem_alt, _, quo) = x.rem_and_quotient_bits_ref_ref(&y);
@@ -682,7 +682,7 @@ fn rem_properties_helper(x: Float, y: Float, extreme: bool) {
     x_alt.ieee_remainder_assign_ref(&y);
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&ieee));
 
-    let (ieee_alt, _) = x.ieee_remainder_round_ref_ref(&y, Nearest);
+    let ieee_alt = x.ieee_remainder_round_ref_ref(&y, Nearest).0;
     assert_eq!(ComparableFloatRef(&ieee_alt), ComparableFloatRef(&ieee));
 
     let (ieee_alt, _, iquo) = x.ieee_remainder_and_quotient_bits_ref_ref(&y);
@@ -701,16 +701,16 @@ fn rem_properties_helper(x: Float, y: Float, extreme: bool) {
     if !extreme && x.is_finite() && y.is_finite() && x != 0u32 && y != 0u32 {
         let rx = Rational::exact_from(&x);
         let ry = Rational::exact_from(&y);
-        let (q, _) = Integer::rounding_from(&rx / &ry, Down);
+        let q = Integer::rounding_from(&rx / &ry, Down).0;
         assert_eq!(quo, expected_quotient_bits(&q));
-        let (q, _) = Integer::rounding_from(&rx / &ry, Nearest);
+        let q = Integer::rounding_from(&rx / &ry, Nearest).0;
         assert_eq!(iquo, expected_quotient_bits(&q));
     }
 
     // quo(-x, y) = -quo(x, y) and quo(x, -y) = -quo(x, y)
-    let (_, _, quo_alt) = (-&x).rem_and_quotient_bits_val_ref(&y);
+    let quo_alt = (-&x).rem_and_quotient_bits_val_ref(&y).2;
     assert_eq!(quo_alt, quo.wrapping_neg());
-    let (_, _, quo_alt) = x.rem_and_quotient_bits_ref_val(-&y);
+    let quo_alt = x.rem_and_quotient_bits_ref_val(-&y).2;
     assert_eq!(quo_alt, quo.wrapping_neg());
 }
 
@@ -775,7 +775,7 @@ fn rem_unsigned_properties() {
         let rem = x.rem_unsigned_ref(u);
         let rem_alt = x.clone().rem_unsigned(u);
         assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
-        let (rem_alt, _) = x.rem_unsigned_round_ref(u, Nearest);
+        let rem_alt = x.rem_unsigned_round_ref(u, Nearest).0;
         assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
     });
 }
@@ -806,7 +806,7 @@ fn test_rem_special_values() {
         assert!(r.is_nan());
         assert_eq!(o, Equal);
         assert_eq!(quo, 0);
-        let (r, _) = a.ieee_remainder_prec_round_ref_ref(&b, 10, Nearest);
+        let r = a.ieee_remainder_prec_round_ref_ref(&b, 10, Nearest).0;
         assert!(r.is_nan());
         let (r, _, quo) = a.ieee_remainder_and_quotient_bits_prec_round_ref_ref(&b, 10, Nearest);
         assert!(r.is_nan());
@@ -888,9 +888,13 @@ fn test_quotient_bits_wrap_corner() {
     assert_eq!(o, Equal);
     assert_eq!(Rational::exact_from(&r), Rational::from_signeds(-1, 2));
     // and the negated variants, exercising the sign flip on the wrapped value
-    let (_, _, quo) = (-&x).rem_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest);
+    let quo = (-&x)
+        .rem_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest)
+        .2;
     assert_eq!(quo, -i64::MAX);
-    let (_, _, quo) = (-&x).ieee_remainder_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest);
+    let quo = (-&x)
+        .ieee_remainder_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest)
+        .2;
     assert_eq!(quo, 0);
 }
 
@@ -1832,7 +1836,7 @@ fn test_rem_unsigned() {
         assert!(rem_alt.is_valid());
         assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
 
-        let (mpfr_rem, _) = mpfr_fmod_ui_oracle(&x, u, x.significant_bits(), Nearest);
+        let mpfr_rem = mpfr_fmod_ui_oracle(&x, u, x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&mpfr_rem), ComparableFloatRef(&rem));
     };
     // - a fractional remainder, both signs
@@ -1938,10 +1942,11 @@ fn test_rem_rational_vs_exact() {
                         };
                         assert_eq!(ComparableFloatRef(&rr), ComparableFloatRef(&r));
                         assert_eq!(oo, o);
-                        let (q, _) = Integer::rounding_from(
+                        let q = Integer::rounding_from(
                             &xr / y,
                             if nearest_quotient { Nearest } else { Down },
-                        );
+                        )
+                        .0;
                         assert_eq!(quo, expected_quotient_bits(&q), "{x} {y} {prec} {rm}");
                         let r_exact = &xr - Rational::from(q) * y;
                         if r_exact == 0u32 {
@@ -1999,10 +2004,11 @@ fn test_rational_rem_float_vs_exact() {
                         };
                         assert_eq!(ComparableFloatRef(&rr), ComparableFloatRef(&r));
                         assert_eq!(oo, o);
-                        let (q, _) = Integer::rounding_from(
+                        let q = Integer::rounding_from(
                             x / &yr,
                             if nearest_quotient { Nearest } else { Down },
-                        );
+                        )
+                        .0;
                         assert_eq!(quo, expected_quotient_bits(&q), "{x} {y} {prec} {rm}");
                         let r_exact = x - Rational::from(q) * &yr;
                         if r_exact == 0u32 {
@@ -2134,7 +2140,7 @@ fn check_mixed_rem_exact(
     prec: u64,
     rm: RoundingMode,
 ) {
-    let (q, _) = Integer::rounding_from(xr / yr, if nearest_quotient { Nearest } else { Down });
+    let q = Integer::rounding_from(xr / yr, if nearest_quotient { Nearest } else { Down }).0;
     assert_eq!(quo, expected_quotient_bits(&q));
     let r_exact = xr - Rational::from(q) * yr;
     if r_exact == 0u32 {
@@ -2520,7 +2526,7 @@ fn rem_rational_operator_properties() {
         let mut x2 = x.clone();
         x2 %= &y;
         assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&rem));
-        let (r2, _) = x.rem_rational_round_ref_ref(&y, Nearest);
+        let r2 = x.rem_rational_round_ref_ref(&y, Nearest).0;
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
 
         let rem = &y % &x;
@@ -2531,7 +2537,7 @@ fn rem_rational_operator_properties() {
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
         let r2 = y.clone() % x.clone();
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
-        let (r2, _) = Float::rational_rem_float_round_ref_ref(&y, &x, Nearest);
+        let r2 = Float::rational_rem_float_round_ref_ref(&y, &x, Nearest).0;
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
 
         let ieee = x.ieee_remainder_rational_ref_ref(&y);
@@ -3400,7 +3406,7 @@ fn primitive_float_rem_properties() {
         if x.is_finite() && y.is_finite() && x != 0.0 && y != 0.0 {
             let xr = Rational::exact_from(x);
             let yr = Rational::exact_from(y);
-            let (q, _) = Integer::rounding_from(&xr / &yr, Down);
+            let q = Integer::rounding_from(&xr / &yr, Down).0;
             assert_eq!(quo, expected_quotient_bits(&q));
             let r_exact = &xr - Rational::from(q) * &yr;
             if r_exact != 0u32 {
@@ -3408,7 +3414,7 @@ fn primitive_float_rem_properties() {
             } else {
                 assert_eq!(r, 0.0);
             }
-            let (q, _) = Integer::rounding_from(&xr / &yr, Nearest);
+            let q = Integer::rounding_from(&xr / &yr, Nearest).0;
             assert_eq!(iquo, expected_quotient_bits(&q));
             let r_exact = xr - Rational::from(q) * yr;
             if r_exact != 0u32 {
@@ -3431,7 +3437,7 @@ fn primitive_float_rem_properties() {
             let rev_ieee = primitive_float_rational_ieee_remainder_float(&y, x);
             if x.is_finite() && x != 0.0 {
                 let xr = Rational::exact_from(x);
-                let (q, _) = Integer::rounding_from(&xr / &y, Down);
+                let q = Integer::rounding_from(&xr / &y, Down).0;
                 assert_eq!(quo, expected_quotient_bits(&q));
                 let r_exact = &xr - Rational::from(q) * &y;
                 if r_exact != 0u32 {
@@ -3440,10 +3446,10 @@ fn primitive_float_rem_properties() {
                         NiceFloat(f64::rounding_from(&r_exact, Nearest).0)
                     );
                 }
-                let (q, _) = Integer::rounding_from(&xr / &y, Nearest);
+                let q = Integer::rounding_from(&xr / &y, Nearest).0;
                 assert_eq!(iquo, expected_quotient_bits(&q));
                 // reversed direction: y is the dividend
-                let (q, _) = Integer::rounding_from(&y / &xr, Down);
+                let q = Integer::rounding_from(&y / &xr, Down).0;
                 let r_exact = &y - Rational::from(q) * &xr;
                 if r_exact != 0u32 {
                     assert_eq!(
@@ -3464,7 +3470,7 @@ fn primitive_float_rem_properties() {
             } else if x.is_finite() && x != 0.0 {
                 let xr = Rational::exact_from(x);
                 let ur = Rational::from(u);
-                let (q, _) = Integer::rounding_from(&xr / &ur, Down);
+                let q = Integer::rounding_from(&xr / &ur, Down).0;
                 let r_exact = xr - Rational::from(q) * ur;
                 if r_exact != 0u32 {
                     assert_eq!(

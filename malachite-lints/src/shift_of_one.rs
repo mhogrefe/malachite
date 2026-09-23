@@ -194,7 +194,7 @@ fn in_mask_or_bit_context<'tcx>(cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) 
 
 impl<'tcx> LateLintPass<'tcx> for ShiftOfOne {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
 

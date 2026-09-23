@@ -119,7 +119,7 @@ fn const_mask_exponent<'tcx>(cx: &LateContext<'tcx>, e: &Expr<'tcx>) -> Option<u
 impl<'tcx> LateLintPass<'tcx> for UseModPowerOf2 {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
         if expr.span.from_expansion()
-            || crate::in_test_code(cx, expr.span)
+            || crate::in_cross_check_code(cx, expr.span)
             || in_exempt_fn(cx, expr)
         {
             return;

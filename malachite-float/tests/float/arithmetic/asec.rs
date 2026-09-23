@@ -515,7 +515,7 @@ fn asec_properties() {
         c_alt.asec_assign();
         assert!(c_alt.is_valid());
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
-        let (c_alt, _) = x.asec_prec_round_ref(x.significant_bits(), Nearest);
+        let c_alt = x.asec_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         let rug_c = rug_asec(&rug::Float::exact_from(&x));
         assert_eq!(
@@ -586,7 +586,7 @@ where
             assert!(c.is_finite());
             assert!(c >= T::ZERO);
             // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let (c_float, _) = Float::asec_prec(Float::from(x), T::MANTISSA_WIDTH + 64);
+            let c_float = Float::asec_prec(Float::from(x), T::MANTISSA_WIDTH + 64).0;
             assert_eq!(
                 NiceFloat(T::rounding_from(&c_float, Nearest).0),
                 NiceFloat(c)
@@ -990,7 +990,7 @@ where
             assert!(c.is_finite());
             assert!(c >= T::ZERO);
             // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let (c_float, _) = Float::asec_rational_prec_ref(&x, T::MANTISSA_WIDTH + 64);
+            let c_float = Float::asec_rational_prec_ref(&x, T::MANTISSA_WIDTH + 64).0;
             assert_eq!(
                 NiceFloat(T::rounding_from(&c_float, Nearest).0),
                 NiceFloat(c)
@@ -1780,7 +1780,9 @@ fn asec_with_period_properties() {
         c_alt.asec_with_period_assign(u);
         assert!(c_alt.is_valid());
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
-        let (c_alt, _) = x.asec_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        let c_alt = x
+            .asec_with_period_prec_round_ref(u, x.significant_bits(), Nearest)
+            .0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
     });
 }
@@ -1855,8 +1857,7 @@ where
             assert!(c.is_finite());
             assert!(c >= T::ZERO);
             // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let (c_float, _) =
-                Float::asec_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64);
+            let c_float = Float::asec_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
             assert_eq!(
                 NiceFloat(T::rounding_from(&c_float, Nearest).0),
                 NiceFloat(c)
@@ -2376,8 +2377,8 @@ where
             assert!(c.is_finite());
             assert!(c >= T::ZERO);
             // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let (c_float, _) =
-                Float::asec_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64);
+            let c_float =
+                Float::asec_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).0;
             assert_eq!(
                 NiceFloat(T::rounding_from(&c_float, Nearest).0),
                 NiceFloat(c)
@@ -2832,7 +2833,7 @@ fn asec_pi_properties() {
         // precision, to nearest
         let c_alt = x.asec_with_period_ref(2);
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
-        let (c_alt, _) = x.asec_pi_prec_round_ref(x.significant_bits(), Nearest);
+        let c_alt = x.asec_pi_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
     });
 }

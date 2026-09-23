@@ -511,7 +511,7 @@ fn root_u_properties() {
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
 
         // The trait rounds to the nearest value at the base's precision.
-        let (p_alt, _) = x.root_u_round_ref(n, Nearest);
+        let p_alt = x.root_u_round_ref(n, Nearest).0;
         assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
 
         if u32::try_from(n).is_err() {
@@ -1023,7 +1023,7 @@ fn root_s_properties() {
         x_alt.root_assign(n);
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
 
-        let (p_alt, _) = x.root_s_round_ref(n, Nearest);
+        let p_alt = x.root_s_round_ref(n, Nearest).0;
         assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
 
         let rug_safe = i32::try_from(n).is_ok()

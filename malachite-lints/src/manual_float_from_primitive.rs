@@ -124,7 +124,7 @@ impl<'tcx> LateLintPass<'tcx> for ManualFloatFromPrimitive {
         if crate::bignum_name(cx, cx.typeck_results().expr_ty(expr).peel_refs()) != Some("Float") {
             return;
         }
-        if !is_min1_significant_bits(cx, prec, x) || crate::in_test_code(cx, expr.span) {
+        if !is_min1_significant_bits(cx, prec, x) || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
         // Inside an `impl Float`, `Self` names the type and clippy's `use_self` prefers it, so

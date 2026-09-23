@@ -48,7 +48,7 @@ declare_lint_pass!(LetTupleUnderscoreToField => [LET_TUPLE_UNDERSCORE_TO_FIELD])
 
 impl<'tcx> LateLintPass<'tcx> for LetTupleUnderscoreToField {
     fn check_stmt(&mut self, cx: &LateContext<'tcx>, stmt: &'tcx Stmt<'tcx>) {
-        if stmt.span.from_expansion() || crate::in_test_code(cx, stmt.span) {
+        if stmt.span.from_expansion() {
             return;
         }
         let StmtKind::Let(local) = stmt.kind else {

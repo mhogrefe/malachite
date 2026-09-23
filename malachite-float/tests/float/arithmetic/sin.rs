@@ -859,7 +859,7 @@ fn sin_properties() {
         assert!(x_alt.is_valid());
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&s));
 
-        let (s_alt, _) = x.sin_prec_round_ref(x.significant_bits(), Nearest);
+        let s_alt = x.sin_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
 
         assert_eq!(
@@ -11516,7 +11516,9 @@ fn sin_with_period_properties() {
         assert!(s_alt.is_valid());
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
         // the same as rounding to the input's precision, to nearest
-        let (s_alt, _) = x.sin_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        let s_alt = x
+            .sin_with_period_prec_round_ref(u, x.significant_bits(), Nearest)
+            .0;
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
         // sin_with_period is odd
         assert_eq!(
@@ -13921,7 +13923,7 @@ fn sin_pi_properties() {
         // to nearest
         let s_alt = x.sin_with_period_ref(2);
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
-        let (s_alt, _) = x.sin_pi_prec_round_ref(x.significant_bits(), Nearest);
+        let s_alt = x.sin_pi_prec_round_ref(x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
     });
 }
