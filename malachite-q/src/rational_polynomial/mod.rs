@@ -712,6 +712,122 @@ impl Polynomial for RationalPolynomial {
         *self = Self::canonicalize(numerator, denominator);
     }
 
+    /// Truncates a [`RationalPolynomial`] to its first `len` coefficients, taking the polynomial by
+    /// reference and returning the result.
+    ///
+    /// The result is the polynomial reduced modulo $x^{\mathrm{len}}$: every term of degree `len`
+    /// or more is dropped, and then any zeros left at the top go too, so the result may have fewer
+    /// than `len` coefficients. A polynomial with at most `len` coefficients is returned unchanged.
+    ///
+    /// $$
+    /// f(p, n) = p \bmod x^n.
+    /// $$
+    ///
+    /// The coefficients that remain may need a smaller denominator than the ones dropped, so a
+    /// truncated result is reduced to lowest terms again.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.len()`, and $m$ is the largest
+    /// number of bits of any coefficient's numerator or denominator.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// assert_eq!(
+    ///     RationalPolynomial::from_str("1/2*x^3+1/3*x^2+1/4*x+1/5")
+    ///         .unwrap()
+    ///         .truncate(2)
+    ///         .to_string(),
+    ///     "1/4*x+1/5"
+    /// );
+    /// // A polynomial with no more than len coefficients is unchanged.
+    /// assert_eq!(
+    ///     RationalPolynomial::from_str("1/2*x^3+1/3*x^2+1/4*x+1/5")
+    ///         .unwrap()
+    ///         .truncate(10)
+    ///         .to_string(),
+    ///     "1/2*x^3+1/3*x^2+1/4*x+1/5"
+    /// );
+    /// // x+1 needs no denominator.
+    /// assert_eq!(
+    ///     RationalPolynomial::from_str("1/2*x^2+x+1")
+    ///         .unwrap()
+    ///         .truncate(2)
+    ///         .to_string(),
+    ///     "x+1"
+    /// );
+    /// // Truncating can uncover zeros, which are dropped too.
+    /// assert_eq!(
+    ///     RationalPolynomial::from_str("1/2*x^3+1/3*x+1/5")
+    ///         .unwrap()
+    ///         .truncate(3)
+    ///         .to_string(),
+    ///     "1/3*x+1/5"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpq_poly_set_trunc` from `fmpq_poly/set_trunc.c`, FLINT 3.6.0.
+    fn truncate(&self, len: u64) -> Self {
+        if len >= self.len() {
+            self.clone()
+        } else {
+            Self::canonicalize(self.numerator.truncate(len), self.denominator.clone())
+        }
+    }
+
+    /// Truncates a [`RationalPolynomial`] to its first `len` coefficients, in place.
+    ///
+    /// See [`truncate`](Self::truncate) for what the result is.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log (nm) \log\log (nm))$
+    ///
+    /// $M(n, m) = O(nm \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.len()`, and $m$ is the largest
+    /// number of bits of any coefficient's numerator or denominator.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// let mut p;
+    /// p = RationalPolynomial::from_str("1/2*x^3+1/3*x^2+1/4*x+1/5").unwrap();
+    /// p.truncate_assign(2);
+    /// assert_eq!(p.to_string(), "1/4*x+1/5");
+    /// // A polynomial with no more than len coefficients is unchanged.
+    /// p = RationalPolynomial::from_str("1/2*x^3+1/3*x^2+1/4*x+1/5").unwrap();
+    /// p.truncate_assign(10);
+    /// assert_eq!(p.to_string(), "1/2*x^3+1/3*x^2+1/4*x+1/5");
+    /// // x+1 needs no denominator.
+    /// p = RationalPolynomial::from_str("1/2*x^2+x+1").unwrap();
+    /// p.truncate_assign(2);
+    /// assert_eq!(p.to_string(), "x+1");
+    /// // Truncating can uncover zeros, which are dropped too.
+    /// p = RationalPolynomial::from_str("1/2*x^3+1/3*x+1/5").unwrap();
+    /// p.truncate_assign(3);
+    /// assert_eq!(p.to_string(), "1/3*x+1/5");
+    /// ```
+    ///
+    /// This is equivalent to `fmpq_poly_truncate` from `fmpq_poly/truncate.c`, FLINT 3.6.0.
+    fn truncate_assign(&mut self, len: u64) {
+        if len < self.len() {
+            self.numerator.truncate_assign(len);
+            let numerator = core::mem::take(&mut self.numerator);
+            let denominator = core::mem::take(&mut self.denominator);
+            *self = Self::canonicalize(numerator, denominator);
+        }
+    }
+
     /// Reverses the coefficients of a [`RationalPolynomial`], considered as having length `len`,
     /// taking the polynomial by reference.
     ///

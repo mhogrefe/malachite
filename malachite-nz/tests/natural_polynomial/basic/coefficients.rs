@@ -128,6 +128,34 @@ fn test_reverse() {
 }
 
 #[test]
+fn test_truncate() {
+    let test = |s, len, out| {
+        let p = NaturalPolynomial::from_str(s).unwrap();
+        let q = p.truncate(len);
+        assert!(q.is_valid());
+        assert_eq!(q.to_string(), out);
+
+        let mut q = p;
+        q.truncate_assign(len);
+        assert!(q.is_valid());
+        assert_eq!(q.to_string(), out);
+    };
+    test("0", 0, "0");
+    test("0", 3, "0");
+    test("0", u64::MAX, "0");
+    test("x^3+2*x^2+3*x+4", 0, "0");
+    test("x^3+2*x^2+3*x+4", 1, "4");
+    test("x^3+2*x^2+3*x+4", 2, "3*x+4");
+    test("x^3+2*x^2+3*x+4", 3, "2*x^2+3*x+4");
+    test("x^3+2*x^2+3*x+4", 4, "x^3+2*x^2+3*x+4");
+    test("x^3+2*x^2+3*x+4", 10, "x^3+2*x^2+3*x+4");
+    test("x^3+2*x^2+3*x+4", u64::MAX, "x^3+2*x^2+3*x+4");
+    test("x^3+3*x+4", 3, "3*x+4");
+    test("x^5+x", 5, "x");
+    test("x^5+x", 1, "0");
+}
+
+#[test]
 fn test_coefficient() {
     let test = |s, i, out| {
         assert_eq!(*NaturalPolynomial::from_str(s).unwrap().coefficient(i), out);
@@ -311,5 +339,46 @@ fn reverse_properties() {
         // Reversing to the polynomial's own length and back gives it back.
         assert_eq!(p.reverse(len).reverse(len), p);
         assert_eq!(p.reverse(0), NaturalPolynomial::ZERO);
+    });
+}
+
+#[test]
+fn truncate_properties() {
+    natural_polynomial_unsigned_pair_gen_var_1().test_properties(|(p, i)| {
+        let len = p.len();
+        for n in [i, i >> 1, len, len + i, u64::MAX] {
+            let q = p.truncate(n);
+            assert!(q.is_valid());
+            let mut q_alt = p.clone();
+            q_alt.truncate_assign(n);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
+
+            // It agrees with keeping the first n coefficients and rebuilding.
+            let mut cs = p.clone().into_coefficients_asc();
+            cs.truncate(usize::try_from(n).unwrap_or(usize::MAX));
+            assert_eq!(NaturalPolynomial::from_coefficients_asc(cs), q);
+
+            // It is zeroing every coefficient from n up.
+            let mut q_alt = p.clone();
+            q_alt.zero_coefficients(n, u64::MAX);
+            assert_eq!(q_alt, q);
+
+            assert!(q.len() <= n);
+            assert!(q.len() <= len);
+            for j in 0..len.min(n) {
+                assert_eq!(q.coefficient(j), p.coefficient(j));
+            }
+            assert_eq!(q.truncate(n), q);
+            if n >= len {
+                assert_eq!(q, p);
+            }
+        }
+
+        // Reversing twice in a window of length i truncates to it.
+        assert_eq!(p.reverse(i).reverse(i), p.truncate(i));
+        // Truncating twice keeps the shorter of the two lengths.
+        assert_eq!(p.truncate(i).truncate(i >> 1), p.truncate(i >> 1));
+        assert_eq!(p.truncate(0), NaturalPolynomial::ZERO);
     });
 }

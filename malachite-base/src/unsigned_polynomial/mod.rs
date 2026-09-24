@@ -510,6 +510,121 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         }
     }
 
+    /// Truncates a [`UnsignedPolynomial`] to its first `len` coefficients, taking the polynomial by
+    /// reference and returning the result.
+    ///
+    /// The result is the polynomial reduced modulo $x^{\mathrm{len}}$: every term of degree `len`
+    /// or more is dropped, and then any zeros left at the top go too, so the result may have fewer
+    /// than `len` coefficients. A polynomial with at most `len` coefficients is returned unchanged.
+    ///
+    /// $$
+    /// f(p, n) = p \bmod x^n.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(len, self.len())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u64>::from_str("x^3+2*x^2+3*x+4")
+    ///         .unwrap()
+    ///         .truncate(2)
+    ///         .to_string(),
+    ///     "3*x+4"
+    /// );
+    /// // A polynomial with no more than len coefficients is unchanged.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u64>::from_str("x^3+2*x^2+3*x+4")
+    ///         .unwrap()
+    ///         .truncate(10)
+    ///         .to_string(),
+    ///     "x^3+2*x^2+3*x+4"
+    /// );
+    /// // Truncating can uncover zeros, which are dropped too.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u64>::from_str("x^3+3*x+4")
+    ///         .unwrap()
+    ///         .truncate(3)
+    ///         .to_string(),
+    ///     "3*x+4"
+    /// );
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u64>::from_str("x^3+2*x^2+3*x+4")
+    ///         .unwrap()
+    ///         .truncate(0)
+    ///         .to_string(),
+    ///     "0"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_set_trunc` from `nmod_poly/set_trunc.c`, FLINT 3.6.0.
+    fn truncate(&self, len: u64) -> Self {
+        let kept = usize::try_from(len).map_or(self.coefficients.len(), |len| {
+            len.min(self.coefficients.len())
+        });
+        // Skip the zeros that truncating leaves at the top rather than copying them and trimming.
+        let kept = self.coefficients[..kept]
+            .iter()
+            .rposition(|c| *c != T::ZERO)
+            .map_or(0, |i| i + 1);
+        Self {
+            coefficients: self.coefficients[..kept].to_vec(),
+        }
+    }
+
+    /// Truncates a [`UnsignedPolynomial`] to its first `len` coefficients, in place.
+    ///
+    /// See [`truncate`](Self::truncate) for what the result is.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// let mut p;
+    /// p = UnsignedPolynomial::<u64>::from_str("x^3+2*x^2+3*x+4").unwrap();
+    /// p.truncate_assign(2);
+    /// assert_eq!(p.to_string(), "3*x+4");
+    /// // A polynomial with no more than len coefficients is unchanged.
+    /// p = UnsignedPolynomial::<u64>::from_str("x^3+2*x^2+3*x+4").unwrap();
+    /// p.truncate_assign(10);
+    /// assert_eq!(p.to_string(), "x^3+2*x^2+3*x+4");
+    /// // Truncating can uncover zeros, which are dropped too.
+    /// p = UnsignedPolynomial::<u64>::from_str("x^3+3*x+4").unwrap();
+    /// p.truncate_assign(3);
+    /// assert_eq!(p.to_string(), "3*x+4");
+    /// p = UnsignedPolynomial::<u64>::from_str("x^3+2*x^2+3*x+4").unwrap();
+    /// p.truncate_assign(0);
+    /// assert_eq!(p.to_string(), "0");
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_truncate` from `nmod_poly.h`, FLINT 3.6.0.
+    fn truncate_assign(&mut self, len: u64) {
+        if let Ok(len) = usize::try_from(len)
+            && len < self.coefficients.len()
+        {
+            self.coefficients.truncate(len);
+            self.trim();
+        }
+    }
+
     /// Reverses the coefficients of a [`UnsignedPolynomial`], considered as having length `len`,
     /// taking the polynomial by reference.
     ///

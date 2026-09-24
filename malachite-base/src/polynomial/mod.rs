@@ -106,6 +106,21 @@ pub trait Polynomial: Sized {
     /// Panics if `start > end`.
     fn zero_coefficients(&mut self, start: u64, end: u64);
 
+    /// Truncates a polynomial to its first `len` coefficients, taking the polynomial by reference
+    /// and returning the result.
+    ///
+    /// The result is the polynomial reduced modulo $x^{\mathrm{len}}$: every term of degree `len`
+    /// or more is dropped. A polynomial with at most `len` coefficients is returned unchanged.
+    ///
+    /// Unlike [`Vec::truncate`], this does not modify the polynomial; see
+    /// [`truncate_assign`](Self::truncate_assign) for that.
+    fn truncate(&self, len: u64) -> Self;
+
+    /// Truncates a polynomial to its first `len` coefficients, in place.
+    ///
+    /// See [`truncate`](Self::truncate).
+    fn truncate_assign(&mut self, len: u64);
+
     /// Reverses the coefficients of a polynomial, considered as having length `len`, taking the
     /// polynomial by reference.
     ///
