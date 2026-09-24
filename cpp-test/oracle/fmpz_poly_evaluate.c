@@ -21,12 +21,19 @@
 
     The `fmpq_poly_evaluate_fmpq` mode is the same again with `p` a rational polynomial, and
     `fmpq_poly_evaluate_fmpz` the same with `x` an integer.
+
+    The `fmpz_mod_poly_evaluate_fmpz` mode diffs `(&(p)).evaluate_mod_power_of_2(x, pow) = r` lines,
+    where `p` is a polynomial with coefficients in [0, 2^pow) and `x` and `r` are in [0, 2^pow),
+    against fmpz_mod_poly_evaluate_fmpz with the modulus 2^pow.
 */
 
+#include <stdlib.h>
 #include <string.h>
 
 #include <flint/fmpq.h>
 #include <flint/fmpq_poly.h>
+#include <flint/fmpz_mod.h>
+#include <flint/fmpz_mod_poly.h>
 #include <flint/fmpz_poly.h>
 
 #include "oracle.h"
@@ -315,4 +322,86 @@ int
 run_fmpq_poly_evaluate_fmpz(const char * arg)
 {
     return run_fmpq_poly_evaluate(arg, 1, "fmpq_poly_evaluate_fmpz");
+}
+
+static int
+check_evaluate_mod_power_of_2_line(char * line, int line_number)
+{
+    char * receiver;
+    char * args;
+    char * expected_str;
+    if (!split_polynomial_scalar_line(line, "evaluate_mod_power_of_2", NULL, NULL, &receiver, &args,
+                                      &expected_str))
+    {
+        if (line[0] == '\0')
+        {
+            return 0;
+        }
+        flint_printf("error in fmpz_mod_poly_evaluate_fmpz test, line %d: unrecognized line\n",
+                     line_number);
+        return 1;
+    }
+    /* The arguments are `x, pow`. */
+    char * pow_str = strstr(args, ", ");
+    if (pow_str == NULL)
+    {
+        flint_printf("error in fmpz_mod_poly_evaluate_fmpz test, line %d: unrecognized line\n",
+                     line_number);
+        return 1;
+    }
+    *pow_str = '\0';
+    pow_str += 2;
+    checked++;
+    int result = 0;
+    fmpz_poly_t p;
+    fmpz_t x, expected, r, modulus;
+    fmpz_poly_init(p);
+    fmpz_init(x);
+    fmpz_init(expected);
+    fmpz_init(r);
+    fmpz_init(modulus);
+    char * end;
+    ulong pow = strtoul(pow_str, &end, 10);
+    if (!fmpz_poly_set_str_malachite(p, receiver) || fmpz_set_str(x, args, 10) != 0
+        || fmpz_set_str(expected, expected_str, 10) != 0 || *end != '\0')
+    {
+        flint_printf("error in fmpz_mod_poly_evaluate_fmpz test, line %d: unreadable input\n",
+                     line_number);
+        result = 1;
+    }
+    else
+    {
+        fmpz_one(modulus);
+        fmpz_mul_2exp(modulus, modulus, pow);
+        fmpz_mod_ctx_t ctx;
+        fmpz_mod_ctx_init(ctx, modulus);
+        fmpz_mod_poly_t q;
+        fmpz_mod_poly_init(q, ctx);
+        fmpz_mod_poly_set_fmpz_poly(q, p, ctx);
+        fmpz_mod_poly_evaluate_fmpz(r, q, x, ctx);
+        if (!fmpz_equal(r, expected))
+        {
+            flint_printf("error in fmpz_mod_poly_evaluate_fmpz test, line %d. FLINT: ",
+                         line_number);
+            fmpz_print(r);
+            flint_printf("\n");
+            result = 1;
+        }
+        fmpz_mod_poly_clear(q, ctx);
+        fmpz_mod_ctx_clear(ctx);
+    }
+    fmpz_poly_clear(p);
+    fmpz_clear(x);
+    fmpz_clear(expected);
+    fmpz_clear(r);
+    fmpz_clear(modulus);
+    return result;
+}
+
+int
+run_fmpz_mod_poly_evaluate_fmpz(const char * arg)
+{
+    checked = 0;
+    int result = for_each_line(arg, check_evaluate_mod_power_of_2_line);
+    return result != 0 ? result : require_some_lines("fmpz_mod_poly_evaluate_fmpz", checked);
 }

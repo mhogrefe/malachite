@@ -131,6 +131,17 @@ pub fn natural_polynomial_natural_pair_gen_var_2() -> Generator<(NaturalPolynomi
     )
 }
 
+// All `(NaturalPolynomial, Natural, u64)` where the polynomial's coefficients and the `Natural` are
+// less than 2 to the power of the `u64`.
+pub fn natural_polynomial_natural_unsigned_triple_gen_var_1()
+-> Generator<(NaturalPolynomial, Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_1,
+        &random_natural_polynomial_natural_unsigned_triple_gen_var_1,
+        &special_random_natural_polynomial_natural_unsigned_triple_gen_var_1,
+    )
+}
+
 pub fn natural_polynomial_gaussian_integer_pair_gen()
 -> Generator<(NaturalPolynomial, GaussianInteger)> {
     Generator::new(

@@ -101,7 +101,7 @@ use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
-    EqModPowerOf2, Parity, PowerOf2, Square,
+    EqModPowerOf2, Height, Parity, PowerOf2, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -319,6 +319,21 @@ pub fn exhaustive_natural_polynomial_natural_pair_gen_var_2() -> It<(NaturalPoly
         exhaustive_natural_polynomials_min_degree(50),
         exhaustive_naturals(),
     ))
+}
+
+pub fn exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_1()
+-> It<(NaturalPolynomial, Natural, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials(),
+            exhaustive_naturals(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, x, mut pow)| {
+            pow += max(p.height_significant_bits(), x.significant_bits());
+            (p, x, pow)
+        }),
+    )
 }
 
 pub fn exhaustive_natural_polynomial_gaussian_integer_pair_gen()

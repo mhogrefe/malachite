@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2IsReduced};
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::polynomial::{Evaluate, Polynomial};
+use malachite_base::polynomial::{Evaluate, EvaluateModPowerOf2, Polynomial};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::evaluate::{
@@ -18,8 +19,9 @@ use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::{
     natural_gen, natural_polynomial_natural_pair_gen, natural_polynomial_natural_pair_gen_var_2,
+    natural_polynomial_natural_unsigned_triple_gen_var_1,
 };
-use malachite_nz::test_util::natural_polynomial::arithmetic::evaluate::evaluate_naive;
+use malachite_nz::test_util::natural_polynomial::arithmetic::evaluate::*;
 
 #[test]
 fn test_evaluate() {
@@ -182,5 +184,124 @@ fn evaluate_properties() {
             NaturalPolynomial::from(x.clone()).evaluate(Natural::from(7u32)),
             x
         );
+    });
+}
+
+#[test]
+fn test_evaluate_mod_power_of_2() {
+    let test = |s, x, pow, out| {
+        let p = NaturalPolynomial::from_str(s).unwrap();
+        let x = Natural::from_str(x).unwrap();
+        let y = (&p).evaluate_mod_power_of_2(&x, pow);
+        assert!(y.is_valid());
+        assert_eq!(y.to_string(), out);
+        assert_eq!((&p).evaluate_mod_power_of_2(x.clone(), pow), y);
+        assert_eq!(p.clone().evaluate_mod_power_of_2(&x, pow), y);
+        assert_eq!(p.clone().evaluate_mod_power_of_2(x.clone(), pow), y);
+        assert_eq!(evaluate_mod_power_of_2_naive(&p, &x, pow), y);
+    };
+    test("0", "0", 0, "0");
+    test("0", "5", 3, "0");
+    test("7", "0", 3, "7");
+    test("7", "5", 3, "7");
+    test("x", "5", 3, "5");
+    test("5*x^2+3*x+7", "6", 4, "13");
+    test("5*x^2+3*x+7", "0", 4, "7");
+    test("5*x^2+3*x+7", "1", 4, "15");
+    test("5*x^2+3*x+7", "15", 4, "9");
+    test("x^2+x+1", "1", 1, "1");
+    test("x^3+1", "1", 2, "2");
+    test("x^100+1", "3", 8, "210");
+    test("255*x^3+255*x+255", "255", 8, "1");
+    test(
+        "18446744073709551615*x^2+1",
+        "18446744073709551615",
+        64,
+        "0",
+    );
+    test(
+        "18446744073709551615*x^2+1",
+        "18446744073709551615",
+        100,
+        "55340232221128654848",
+    );
+    test(
+        "123456789012345678901234567890*x+1",
+        "98765432109876543210",
+        128,
+        "209858559491276873124708178321624481781",
+    );
+}
+
+#[test]
+#[should_panic]
+fn evaluate_mod_power_of_2_fail_1() {
+    // A coefficient is not reduced.
+    (&NaturalPolynomial::from_str("16*x+1").unwrap()).evaluate_mod_power_of_2(&Natural::ONE, 4);
+}
+
+#[test]
+#[should_panic]
+fn evaluate_mod_power_of_2_fail_2() {
+    // The value is not reduced.
+    (&NaturalPolynomial::from_str("x+1").unwrap())
+        .evaluate_mod_power_of_2(&Natural::from(16u32), 4);
+}
+
+#[test]
+#[should_panic]
+fn evaluate_mod_power_of_2_fail_3() {
+    NaturalPolynomial::from_str("16*x+1")
+        .unwrap()
+        .evaluate_mod_power_of_2(Natural::ONE, 4);
+}
+
+#[test]
+#[should_panic]
+fn evaluate_mod_power_of_2_fail_4() {
+    NaturalPolynomial::from_str("x+1")
+        .unwrap()
+        .evaluate_mod_power_of_2(Natural::from(16u32), 4);
+}
+
+#[test]
+fn evaluate_mod_power_of_2_properties() {
+    natural_polynomial_natural_unsigned_triple_gen_var_1().test_properties(|(p, x, pow)| {
+        let y = (&p).evaluate_mod_power_of_2(&x, pow);
+        assert!(y.is_valid());
+        assert!(y.mod_power_of_2_is_reduced(pow));
+        assert_eq!((&p).evaluate_mod_power_of_2(x.clone(), pow), y);
+        assert_eq!(p.clone().evaluate_mod_power_of_2(&x, pow), y);
+        assert_eq!(p.clone().evaluate_mod_power_of_2(x.clone(), pow), y);
+        assert_eq!(evaluate_mod_power_of_2_naive(&p, &x, pow), y);
+        assert_eq!((&p).evaluate(&x).mod_power_of_2(pow), y);
+
+        // Reducing further agrees with evaluating the reduced polynomial at the reduced value.
+        for smaller in [0, pow >> 1, pow.saturating_sub(1)] {
+            assert_eq!(
+                (&y).mod_power_of_2(smaller),
+                (&p).mod_power_of_2(smaller)
+                    .evaluate_mod_power_of_2((&x).mod_power_of_2(smaller), smaller)
+            );
+        }
+
+        // p(0) is the constant term, and p(1) the sum of the coefficients, mod 2^pow.
+        assert_eq!(
+            (&p).evaluate_mod_power_of_2(Natural::ZERO, pow),
+            *p.coefficient(0)
+        );
+        if pow != 0 {
+            assert_eq!(
+                (&p).evaluate_mod_power_of_2(Natural::ONE, pow),
+                p.coefficients_asc()
+                    .iter()
+                    .sum::<Natural>()
+                    .mod_power_of_2(pow)
+            );
+        }
+        // Everything is 0 mod 2^0.
+        if pow == 0 {
+            assert_eq!(y, 0u32);
+        }
     });
 }

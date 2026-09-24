@@ -8,7 +8,7 @@
 
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
-use malachite_base::num::arithmetic::traits::Pow;
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -21,4 +21,10 @@ pub fn evaluate_naive(p: &NaturalPolynomial, x: &Natural) -> Natural {
         sum += c * x.pow(u64::exact_from(i));
     }
     sum
+}
+
+// Evaluates a polynomial at x in full and then reduces the value modulo 2^pow. The modular
+// evaluation never forms the full value, so this checks it independently.
+pub fn evaluate_mod_power_of_2_naive(p: &NaturalPolynomial, x: &Natural, pow: u64) -> Natural {
+    evaluate_naive(p, x).mod_power_of_2(pow)
 }

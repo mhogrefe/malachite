@@ -11,7 +11,9 @@
 /// [`IntegerPolynomial`](crate::integer_polynomial::IntegerPolynomial).
 pub mod balanced_mod;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
-/// polynomial at a value.
+/// polynomial at a value, and of
+/// [`EvaluateModPowerOf2`](malachite_base::polynomial::EvaluateModPowerOf2), which does so modulo a
+/// power of 2.
 pub mod evaluate;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes

@@ -66,6 +66,7 @@ static const oracle_mode modes[] = {
     {"fmpz_poly_evaluate_divconquer_fmpq", run_fmpz_poly_evaluate_divconquer_fmpq},
     {"fmpq_poly_evaluate_fmpq", run_fmpq_poly_evaluate_fmpq},
     {"fmpq_poly_evaluate_fmpz", run_fmpq_poly_evaluate_fmpz},
+    {"fmpz_mod_poly_evaluate_fmpz", run_fmpz_mod_poly_evaluate_fmpz},
 };
 
 int

@@ -219,3 +219,19 @@ pub trait Evaluate<T> {
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     fn evaluate(self, x: T) -> Self::Output;
 }
+
+/// Evaluates a polynomial at a value, modulo $2^k$. The polynomial's coefficients and the value
+/// must already be reduced modulo $2^k$.
+pub trait EvaluateModPowerOf2<T> {
+    /// The type of the polynomial's value.
+    type Output;
+
+    /// Evaluates a polynomial at `x`, modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, x, k) = \sum_{i=0}^{n-1} c_i x^i \bmod 2^k,
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    fn evaluate_mod_power_of_2(self, x: T, pow: u64) -> Self::Output;
+}

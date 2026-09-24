@@ -281,6 +281,42 @@ const RATIONAL_POLYNOMIAL_EVALUATE_INTEGER_UNIT_ROWS: [(&str, &str, &str); 20] =
     ("1/2*x^60+1/3", "-1000000000000", "1500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001/3"),
 ];
 
+// The rows of test_evaluate_mod_power_of_2 in malachite-nz's NaturalPolynomial tests: polynomial,
+// point, power, value.
+const EVALUATE_MOD_POWER_OF_2_UNIT_ROWS: [(&str, &str, u64, &str); 16] = [
+    ("0", "0", 0, "0"),
+    ("0", "5", 3, "0"),
+    ("7", "0", 3, "7"),
+    ("7", "5", 3, "7"),
+    ("x", "5", 3, "5"),
+    ("5*x^2+3*x+7", "6", 4, "13"),
+    ("5*x^2+3*x+7", "0", 4, "7"),
+    ("5*x^2+3*x+7", "1", 4, "15"),
+    ("5*x^2+3*x+7", "15", 4, "9"),
+    ("x^2+x+1", "1", 1, "1"),
+    ("x^3+1", "1", 2, "2"),
+    ("x^100+1", "3", 8, "210"),
+    ("255*x^3+255*x+255", "255", 8, "1"),
+    (
+        "18446744073709551615*x^2+1",
+        "18446744073709551615",
+        64,
+        "0",
+    ),
+    (
+        "18446744073709551615*x^2+1",
+        "18446744073709551615",
+        100,
+        "55340232221128654848",
+    ),
+    (
+        "123456789012345678901234567890*x+1",
+        "98765432109876543210",
+        128,
+        "209858559491276873124708178321624481781",
+    ),
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -894,6 +930,32 @@ fn main() {
             "../malachite-q",
             demo_name,
             "fmpq_poly_evaluate_fmpz",
+        );
+    }
+
+    // Every case from test_evaluate_mod_power_of_2 in malachite-nz's NaturalPolynomial tests, and the
+    // generated cases from evaluate_mod_power_of_2_properties, against evaluation modulo 2^pow.
+    println!("testing NaturalPolynomial evaluate_mod_power_of_2 unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, x, pow, r) in EVALUATE_MOD_POWER_OF_2_UNIT_ROWS {
+            writeln!(
+                output_file,
+                "(&({p})).evaluate_mod_power_of_2({x}, {pow}) = {r}"
+            )
+            .unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_mod_poly_evaluate_fmpz", Some(TEST_OUT));
+    for demo_name in [
+        "demo_natural_polynomial_evaluate_mod_power_of_2",
+        "demo_natural_polynomial_evaluate_mod_power_of_2_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_mod_poly_evaluate_fmpz",
         );
     }
 }

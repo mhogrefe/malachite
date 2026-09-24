@@ -348,6 +348,13 @@ documented by git history.
   `fmpq_poly_evaluate_fmpq` and `fmpq_poly_evaluate_fmpz`, giving a `Rational` in lowest terms: its
   numerator's value divided by its denominator. It is not part of the `Polynomial` trait, since
   `UnsignedPolynomial` does not implement it.
+- A new `EvaluateModPowerOf2` trait, in `malachite_base::polynomial`, whose
+  `evaluate_mod_power_of_2(x, pow)` evaluates a polynomial at `x` modulo $2^{pow}$. It is
+  implemented for `NaturalPolynomial` at a `Natural`, taking the polynomial and the value each by
+  value or by reference, and panics unless every coefficient and `x` are already reduced modulo
+  $2^{pow}$. It uses Horner's rule, reducing after every step; taking the polynomial by value lets
+  the coefficient that is returned outright, or that starts Horner's rule, be moved rather than
+  cloned.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a
