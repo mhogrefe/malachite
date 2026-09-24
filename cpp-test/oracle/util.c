@@ -199,6 +199,110 @@ fmpz_poly_set_str_malachite(fmpz_poly_t poly, const char * s)
     return ok;
 }
 
+int
+fmpq_poly_set_str_malachite(fmpq_poly_t poly, const char * s)
+{
+    fmpq_poly_zero(poly);
+    if (strcmp(s, "0") == 0)
+    {
+        return 1;
+    }
+    size_t n = strlen(s);
+    char * buf = flint_malloc(n + 1);
+    fmpq_t c, old;
+    fmpq_init(c);
+    fmpq_init(old);
+    int ok = 1;
+    int first = 1;
+    const char * p = s;
+    while (ok && *p != '\0')
+    {
+        int negative = 0;
+        if (*p == '-')
+        {
+            negative = 1;
+            p++;
+        }
+        else if (*p == '+')
+        {
+            /* A leading term carries no plus sign. */
+            ok = !first;
+            p++;
+        }
+        else if (!first)
+        {
+            ok = 0;
+        }
+        int has_x;
+        if (isdigit((unsigned char) *p))
+        {
+            /* A coefficient, `a` or `a/b`. */
+            size_t digits = strspn(p, "0123456789");
+            if (p[digits] == '/')
+            {
+                digits += 1 + strspn(p + digits + 1, "0123456789");
+            }
+            memcpy(buf, p, digits);
+            buf[digits] = '\0';
+            ok = ok && fmpq_set_str(c, buf, 10) == 0;
+            p += digits;
+            /* A printed coefficient is never zero, and is in lowest terms. */
+            if (ok)
+            {
+                fmpq_t canonical;
+                fmpq_init(canonical);
+                fmpq_set(canonical, c);
+                fmpq_canonicalise(canonical);
+                ok = !fmpq_is_zero(c) && fmpq_equal(canonical, c);
+                fmpq_clear(canonical);
+            }
+            has_x = *p == '*';
+            if (has_x)
+            {
+                p++;
+                ok = ok && *p == 'x';
+                p++;
+            }
+        }
+        else if (*p == 'x')
+        {
+            fmpq_one(c);
+            has_x = 1;
+            p++;
+        }
+        else
+        {
+            ok = 0;
+            break;
+        }
+        ulong exponent = 0;
+        if (has_x)
+        {
+            exponent = 1;
+            if (*p == '^')
+            {
+                p++;
+                ok = ok && isdigit((unsigned char) *p);
+                char * end;
+                exponent = strtoul(p, &end, 10);
+                p = end;
+            }
+        }
+        if (negative)
+        {
+            fmpq_neg(c, c);
+        }
+        fmpq_poly_get_coeff_fmpq(old, poly, exponent);
+        fmpq_add(old, old, c);
+        fmpq_poly_set_coeff_fmpq(poly, exponent, old);
+        first = 0;
+    }
+    fmpq_clear(c);
+    fmpq_clear(old);
+    flint_free(buf);
+    return ok;
+}
+
 /* Cuts `line` at `needle`, returning the text after it, or NULL if the needle is absent. */
 static char *
 cut_after(char * line, const char * needle)

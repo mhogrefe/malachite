@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::rational_polynomial::RationalPolynomial;
 use alloc::borrow::Cow;
 use alloc::vec;
 use core::cmp::max;
@@ -21,6 +22,7 @@ use malachite_base::polynomial::Evaluate;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::evaluate::divide_and_conquer_blocks;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 // Evaluating `p(x) = c_0 + c_1 x + ... + c_d x^d` at `x = a / b` in lowest terms, with `b > 0`, is
@@ -367,5 +369,246 @@ impl Evaluate<Rational> for &IntegerPolynomial {
             Integer::from_sign_and_abs(sign, numerator),
             Integer::from(denominator),
         )
+    }
+}
+
+// Divides the value of a RationalPolynomial's numerator by its denominator.
+fn divide_by_denominator(value: Rational, denominator: &Natural) -> Rational {
+    if *denominator == 1u32 {
+        value
+    } else {
+        value / Rational::from(denominator)
+    }
+}
+
+impl Evaluate<&Rational> for &RationalPolynomial {
+    type Output = Rational;
+
+    /// Evaluates a [`RationalPolynomial`] at a [`Rational`], taking both by reference.
+    ///
+    /// $$
+    /// f(p, x) = \sum_{i=0}^{n-1} c_i x^i,
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length. The result is in
+    /// lowest terms, and the zero polynomial evaluates to 0 everywhere.
+    ///
+    /// A [`RationalPolynomial`] is an [`IntegerPolynomial`] divided by a positive integer $d$, so
+    /// its value is the value of the [`IntegerPolynomial`] at $x$, divided by $d$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log^2 n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()` times the larger of the
+    /// greatest number of bits of any coefficient's numerator or denominator and the number of bits
+    /// of the numerator or denominator of `x`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_q::Rational;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// let p = RationalPolynomial::from_str("1/2*x^2-1/3*x+2").unwrap();
+    /// assert_eq!(
+    ///     (&p).evaluate(&Rational::from_str("0").unwrap()).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&p).evaluate(&Rational::from_str("3/2").unwrap())
+    ///         .to_string(),
+    ///     "21/8"
+    /// );
+    /// assert_eq!(
+    ///     (&p).evaluate(&Rational::from_str("-3").unwrap())
+    ///         .to_string(),
+    ///     "15/2"
+    /// );
+    ///
+    /// // The value is in lowest terms: (x^2 - 1)/4 vanishes at 1.
+    /// let q = RationalPolynomial::from_str("1/4*x^2-1/4").unwrap();
+    /// assert_eq!(
+    ///     (&q).evaluate(&Rational::from_str("1").unwrap()).to_string(),
+    ///     "0"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpq_poly_evaluate_fmpq` from `fmpq_poly/evaluate.c`, FLINT 3.6.0.
+    #[inline]
+    fn evaluate(self, x: &Rational) -> Rational {
+        divide_by_denominator((&self.numerator).evaluate(x), &self.denominator)
+    }
+}
+
+impl Evaluate<Rational> for &RationalPolynomial {
+    type Output = Rational;
+
+    /// Evaluates a [`RationalPolynomial`] at a [`Rational`], taking the polynomial by reference and
+    /// the value by value.
+    ///
+    /// $$
+    /// f(p, x) = \sum_{i=0}^{n-1} c_i x^i,
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length. The result is in
+    /// lowest terms, and the zero polynomial evaluates to 0 everywhere.
+    ///
+    /// A [`RationalPolynomial`] is an [`IntegerPolynomial`] divided by a positive integer $d$, so
+    /// its value is the value of the [`IntegerPolynomial`] at $x$, divided by $d$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log^2 n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()` times the larger of the
+    /// greatest number of bits of any coefficient's numerator or denominator and the number of bits
+    /// of the numerator or denominator of `x`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_q::Rational;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// let p = RationalPolynomial::from_str("1/2*x^2-1/3*x+2").unwrap();
+    /// assert_eq!(
+    ///     (&p).evaluate(Rational::from_str("0").unwrap()).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&p).evaluate(Rational::from_str("3/2").unwrap())
+    ///         .to_string(),
+    ///     "21/8"
+    /// );
+    /// assert_eq!(
+    ///     (&p).evaluate(Rational::from_str("-3").unwrap()).to_string(),
+    ///     "15/2"
+    /// );
+    ///
+    /// // The value is in lowest terms: (x^2 - 1)/4 vanishes at 1.
+    /// let q = RationalPolynomial::from_str("1/4*x^2-1/4").unwrap();
+    /// assert_eq!(
+    ///     (&q).evaluate(Rational::from_str("1").unwrap()).to_string(),
+    ///     "0"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpq_poly_evaluate_fmpq` from `fmpq_poly/evaluate.c`, FLINT 3.6.0.
+    #[inline]
+    fn evaluate(self, x: Rational) -> Rational {
+        divide_by_denominator((&self.numerator).evaluate(x), &self.denominator)
+    }
+}
+
+// Divides the value of a RationalPolynomial's numerator, at an Integer, by its denominator.
+fn integer_value_over_denominator(value: Integer, denominator: &Natural) -> Rational {
+    if *denominator == 1u32 {
+        Rational::from(value)
+    } else {
+        Rational::from_integers(value, Integer::from(denominator))
+    }
+}
+
+impl Evaluate<&Integer> for &RationalPolynomial {
+    type Output = Rational;
+
+    /// Evaluates a [`RationalPolynomial`] at an [`Integer`], taking both by reference.
+    ///
+    /// $$
+    /// f(p, x) = \sum_{i=0}^{n-1} c_i x^i,
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length. The result is a
+    /// [`Rational`] in lowest terms, and the zero polynomial evaluates to 0 everywhere.
+    ///
+    /// A [`RationalPolynomial`] is an [`IntegerPolynomial`] divided by a positive integer $d$, so
+    /// its value is the value of the [`IntegerPolynomial`] at $x$, an [`Integer`], divided by $d$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log^2 n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()` times the larger of the
+    /// greatest number of bits of any coefficient's numerator or denominator and the number of bits
+    /// of `x`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// let p = RationalPolynomial::from_str("1/2*x^2-1/3*x+2").unwrap();
+    /// assert_eq!((&p).evaluate(&Integer::ZERO).to_string(), "2");
+    /// assert_eq!((&p).evaluate(&Integer::from(3)).to_string(), "11/2");
+    /// assert_eq!((&p).evaluate(&Integer::from(-3)).to_string(), "15/2");
+    ///
+    /// // The value is in lowest terms: (x^2 + x)/2 is an integer at every integer.
+    /// let q = RationalPolynomial::from_str("1/2*x^2+1/2*x").unwrap();
+    /// assert_eq!((&q).evaluate(&Integer::from(4)).to_string(), "10");
+    /// ```
+    ///
+    /// This is equivalent to `fmpq_poly_evaluate_fmpz` from `fmpq_poly/evaluate.c`, FLINT 3.6.0.
+    #[inline]
+    fn evaluate(self, x: &Integer) -> Rational {
+        integer_value_over_denominator((&self.numerator).evaluate(x), &self.denominator)
+    }
+}
+
+impl Evaluate<Integer> for &RationalPolynomial {
+    type Output = Rational;
+
+    /// Evaluates a [`RationalPolynomial`] at an [`Integer`], taking the polynomial by reference and
+    /// the value by value.
+    ///
+    /// $$
+    /// f(p, x) = \sum_{i=0}^{n-1} c_i x^i,
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length. The result is a
+    /// [`Rational`] in lowest terms, and the zero polynomial evaluates to 0 everywhere.
+    ///
+    /// A [`RationalPolynomial`] is an [`IntegerPolynomial`] divided by a positive integer $d$, so
+    /// its value is the value of the [`IntegerPolynomial`] at $x$, an [`Integer`], divided by $d$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log^2 n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()` times the larger of the
+    /// greatest number of bits of any coefficient's numerator or denominator and the number of bits
+    /// of `x`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// let p = RationalPolynomial::from_str("1/2*x^2-1/3*x+2").unwrap();
+    /// assert_eq!((&p).evaluate(Integer::ZERO).to_string(), "2");
+    /// assert_eq!((&p).evaluate(Integer::from(3)).to_string(), "11/2");
+    /// assert_eq!((&p).evaluate(Integer::from(-3)).to_string(), "15/2");
+    ///
+    /// // The value is in lowest terms: (x^2 + x)/2 is an integer at every integer.
+    /// let q = RationalPolynomial::from_str("1/2*x^2+1/2*x").unwrap();
+    /// assert_eq!((&q).evaluate(Integer::from(4)).to_string(), "10");
+    /// ```
+    ///
+    /// This is equivalent to `fmpq_poly_evaluate_fmpz` from `fmpq_poly/evaluate.c`, FLINT 3.6.0.
+    #[inline]
+    fn evaluate(self, x: Integer) -> Rational {
+        integer_value_over_denominator((&self.numerator).evaluate(x), &self.denominator)
     }
 }

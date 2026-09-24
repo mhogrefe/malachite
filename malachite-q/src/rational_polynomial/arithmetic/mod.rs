@@ -6,8 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-/// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate) for polynomials at
-/// [`Rational`](crate::Rational)s.
+/// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate) for
+/// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s and
+/// [`RationalPolynomial`](super::RationalPolynomial)s at [`Rational`](crate::Rational)s, and for
+/// [`RationalPolynomial`](super::RationalPolynomial)s at
+/// [`Integer`](malachite_nz::integer::Integer)s.
 pub mod evaluate;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height), the largest of
 /// the heights of a polynomial's coefficients.

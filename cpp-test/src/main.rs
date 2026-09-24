@@ -224,6 +224,63 @@ const RATIONAL_EVALUATE_UNIT_ROWS: [(&str, &str, &str); 24] = [
     ("984770902183611232881*x^44+328256967394537077627*x^43+109418989131512359209*x^42+36472996377170786403*x^41+12157665459056928801*x^40+4052555153018976267*x^39+1350851717672992089*x^38+450283905890997363*x^37+150094635296999121*x^36+50031545098999707*x^35+16677181699666569*x^34+5559060566555523*x^33+1853020188851841*x^32+617673396283947*x^31+205891132094649*x^30+68630377364883*x^29+22876792454961*x^28+7625597484987*x^27+2541865828329*x^26+847288609443*x^25+282429536481*x^24+94143178827*x^23+31381059609*x^22+10460353203*x^21+3486784401*x^20+1162261467*x^19+387420489*x^18+129140163*x^17+43046721*x^16+14348907*x^15+4782969*x^14+1594323*x^13+531441*x^12+177147*x^11+59049*x^10+19683*x^9+6561*x^8+2187*x^7+729*x^6+243*x^5+81*x^4+27*x^3+9*x^2+3*x+1", "1/3", "45"),
 ];
 
+// The rows of test_evaluate_rational_polynomial in malachite-q's RationalPolynomial tests:
+// polynomial, point, value.
+const RATIONAL_POLYNOMIAL_EVALUATE_UNIT_ROWS: [(&str, &str, &str); 19] = [
+    ("0", "0", "0"),
+    ("0", "1/2", "0"),
+    ("1/2", "0", "1/2"),
+    ("1/2", "-3/7", "1/2"),
+    ("x", "1/2", "1/2"),
+    ("1/2*x", "1/2", "1/4"),
+    ("1/2*x^2-1/3*x+2", "0", "2"),
+    ("1/2*x^2-1/3*x+2", "3/2", "21/8"),
+    ("1/2*x^2-1/3*x+2", "-3", "15/2"),
+    ("1/4*x^2-1/4", "1", "0"),
+    ("1/4*x^2-1/4", "-1", "0"),
+    ("1/4*x^2-1/4", "1/2", "-3/16"),
+    ("x^2+3*x+2", "-2/3", "4/9"),
+    ("1/6*x^3+1/2*x^2+1/3*x", "1", "1"),
+    ("1/6*x^3+1/2*x^2+1/3*x", "2", "4"),
+    ("-1/7*x^5+x", "7", "-2394"),
+    (
+        "1/1000000000000000000000*x+1",
+        "1000000000000000000000",
+        "2",
+    ),
+    (
+        "1/3*x^100",
+        "3",
+        "171792506910670443678820376588540424234035840667",
+    ),
+    ("2/3*x+4/3", "1", "2"),
+];
+
+// The rows of test_evaluate_rational_polynomial_integer in malachite-q's RationalPolynomial tests:
+// polynomial, point, value.
+const RATIONAL_POLYNOMIAL_EVALUATE_INTEGER_UNIT_ROWS: [(&str, &str, &str); 20] = [
+    ("0", "0", "0"),
+    ("0", "5", "0"),
+    ("1/2", "0", "1/2"),
+    ("1/2", "-3", "1/2"),
+    ("x", "7", "7"),
+    ("1/2*x", "3", "3/2"),
+    ("1/2*x", "4", "2"),
+    ("1/2*x^2-1/3*x+2", "0", "2"),
+    ("1/2*x^2-1/3*x+2", "3", "11/2"),
+    ("1/2*x^2-1/3*x+2", "-3", "15/2"),
+    ("1/2*x^2+1/2*x", "4", "10"),
+    ("1/2*x^2+1/2*x", "-5", "10"),
+    ("1/6*x^3+1/2*x^2+1/3*x", "7", "84"),
+    ("1/4*x^2-1/4", "1", "0"),
+    ("1/4*x^2-1/4", "3", "2"),
+    ("-1/7*x^5+x", "7", "-2394"),
+    ("1/1000000000000000000000*x+1", "1000000000000000000000", "2"),
+    ("1/3*x^100", "3", "171792506910670443678820376588540424234035840667"),
+    ("2/3*x+4/3", "1", "2"),
+    ("1/2*x^60+1/3", "-1000000000000", "1500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001/3"),
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -794,5 +851,49 @@ fn main() {
         ),
     ] {
         check_demo_against_flint(&oracle, "../malachite-q", demo_name, flint_mode);
+    }
+
+    // Every case from test_evaluate_rational_polynomial in malachite-q's tests, and the generated
+    // cases from evaluate_rational_polynomial_properties.
+    println!("testing RationalPolynomial evaluate unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, x, r) in RATIONAL_POLYNOMIAL_EVALUATE_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).evaluate({x}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpq_poly_evaluate_fmpq", Some(TEST_OUT));
+    for demo_name in [
+        "demo_rational_polynomial_evaluate",
+        "demo_rational_polynomial_evaluate_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-q",
+            demo_name,
+            "fmpq_poly_evaluate_fmpq",
+        );
+    }
+
+    // Every case from test_evaluate_rational_polynomial_integer in malachite-q's tests, and the
+    // generated cases from evaluate_rational_polynomial_integer_properties.
+    println!("testing RationalPolynomial evaluate at Integer unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, x, r) in RATIONAL_POLYNOMIAL_EVALUATE_INTEGER_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).evaluate({x}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpq_poly_evaluate_fmpz", Some(TEST_OUT));
+    for demo_name in [
+        "demo_rational_polynomial_evaluate_integer",
+        "demo_rational_polynomial_evaluate_integer_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-q",
+            demo_name,
+            "fmpq_poly_evaluate_fmpz",
+        );
     }
 }

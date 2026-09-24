@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{Pow, Reciprocal};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, Pow, Reciprocal};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::conversion::traits::IsInteger;
 use malachite_base::polynomial::{Evaluate, Polynomial};
@@ -15,11 +15,13 @@ use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::integer_polynomial_integer_pair_gen;
 use malachite_q::Rational;
+use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::rational_polynomial::arithmetic::evaluate::{
     evaluate_integer_polynomial_divide_and_conquer, evaluate_integer_polynomial_horner,
 };
 use malachite_q::test_util::generators::{
     integer_polynomial_rational_pair_gen, integer_polynomial_rational_pair_gen_var_1,
+    rational_polynomial_integer_pair_gen, rational_polynomial_rational_pair_gen,
 };
 use malachite_q::test_util::rational_polynomial::arithmetic::evaluate::*;
 
@@ -238,6 +240,171 @@ fn evaluate_integer_polynomial_rational_properties() {
     integer_polynomial_integer_pair_gen().test_properties(|(p, x)| {
         assert_eq!(
             p.evaluate(Rational::from(&x)),
+            Rational::from(p.evaluate(&x))
+        );
+    });
+}
+
+#[test]
+fn test_evaluate_rational_polynomial() {
+    let test = |s, x, out| {
+        let p = RationalPolynomial::from_str(s).unwrap();
+        let x = Rational::from_str(x).unwrap();
+        let y = (&p).evaluate(&x);
+        assert!(y.is_valid());
+        assert_eq!(y.to_string(), out);
+        assert_eq!((&p).evaluate(x.clone()), y);
+        assert_eq!(evaluate_rational_polynomial_naive(&p, &x), y);
+    };
+    test("0", "0", "0");
+    test("0", "1/2", "0");
+    test("1/2", "0", "1/2");
+    test("1/2", "-3/7", "1/2");
+    test("x", "1/2", "1/2");
+    test("1/2*x", "1/2", "1/4");
+    test("1/2*x^2-1/3*x+2", "0", "2");
+    test("1/2*x^2-1/3*x+2", "3/2", "21/8");
+    test("1/2*x^2-1/3*x+2", "-3", "15/2");
+    test("1/4*x^2-1/4", "1", "0");
+    test("1/4*x^2-1/4", "-1", "0");
+    test("1/4*x^2-1/4", "1/2", "-3/16");
+    test("x^2+3*x+2", "-2/3", "4/9");
+    test("1/6*x^3+1/2*x^2+1/3*x", "1", "1");
+    test("1/6*x^3+1/2*x^2+1/3*x", "2", "4");
+    test("-1/7*x^5+x", "7", "-2394");
+    test(
+        "1/1000000000000000000000*x+1",
+        "1000000000000000000000",
+        "2",
+    );
+    test(
+        "1/3*x^100",
+        "3",
+        "171792506910670443678820376588540424234035840667",
+    );
+    test("2/3*x+4/3", "1", "2");
+}
+
+#[test]
+fn evaluate_rational_polynomial_properties() {
+    rational_polynomial_rational_pair_gen().test_properties(|(p, x)| {
+        let y = (&p).evaluate(&x);
+        assert!(y.is_valid());
+        assert_eq!((&p).evaluate(x.clone()), y);
+        assert_eq!(evaluate_rational_polynomial_naive(&p, &x), y);
+        // The value is the numerator's value divided by the denominator.
+        assert_eq!(
+            p.numerator_ref().evaluate(&x) / Rational::from(p.denominator_ref()),
+            y
+        );
+        if let Some(d) = p.degree() {
+            // Reversing the coefficients evaluates at the reciprocal: x^d p(1/x) is the reversal.
+            if x != 0u32 {
+                assert_eq!(p.reverse(d + 1).evaluate((&x).reciprocal()), &y / x.pow(d));
+            }
+        }
+    });
+
+    rational_polynomial_rational_pair_gen().test_properties(|(p, _)| {
+        // p(0) is the constant term, and p(1) the sum of the coefficients.
+        assert_eq!(p.evaluate(Rational::ZERO), p.coefficient(0));
+        assert_eq!(
+            p.evaluate(Rational::ONE),
+            p.to_coefficients_asc().into_iter().sum::<Rational>()
+        );
+    });
+
+    // A polynomial with integer coefficients evaluates as the IntegerPolynomial does.
+    integer_polynomial_rational_pair_gen().test_properties(|(p, x)| {
+        assert_eq!(
+            RationalPolynomial::from(p.clone()).evaluate(&x),
+            p.evaluate(&x)
+        );
+    });
+}
+
+#[test]
+fn test_evaluate_rational_polynomial_integer() {
+    let test = |s, x, out| {
+        let p = RationalPolynomial::from_str(s).unwrap();
+        let x = Integer::from_str(x).unwrap();
+        let y = (&p).evaluate(&x);
+        assert!(y.is_valid());
+        assert_eq!(y.to_string(), out);
+        assert_eq!((&p).evaluate(x.clone()), y);
+        assert_eq!((&p).evaluate(Rational::from(&x)), y);
+    };
+    test("0", "0", "0");
+    test("0", "5", "0");
+    test("1/2", "0", "1/2");
+    test("1/2", "-3", "1/2");
+    test("x", "7", "7");
+    test("1/2*x", "3", "3/2");
+    test("1/2*x", "4", "2");
+    test("1/2*x^2-1/3*x+2", "0", "2");
+    test("1/2*x^2-1/3*x+2", "3", "11/2");
+    test("1/2*x^2-1/3*x+2", "-3", "15/2");
+    test("1/2*x^2+1/2*x", "4", "10");
+    test("1/2*x^2+1/2*x", "-5", "10");
+    test("1/6*x^3+1/2*x^2+1/3*x", "7", "84");
+    test("1/4*x^2-1/4", "1", "0");
+    test("1/4*x^2-1/4", "3", "2");
+    test("-1/7*x^5+x", "7", "-2394");
+    test(
+        "1/1000000000000000000000*x+1",
+        "1000000000000000000000",
+        "2",
+    );
+    test(
+        "1/3*x^100",
+        "3",
+        "171792506910670443678820376588540424234035840667",
+    );
+    test("2/3*x+4/3", "1", "2");
+    test(
+        "1/2*x^60+1/3",
+        "-1000000000000",
+        "15000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        01/3",
+    );
+}
+
+#[test]
+fn evaluate_rational_polynomial_integer_properties() {
+    rational_polynomial_integer_pair_gen().test_properties(|(p, x)| {
+        let y = (&p).evaluate(&x);
+        assert!(y.is_valid());
+        assert_eq!((&p).evaluate(x.clone()), y);
+        // It is the evaluation at the Integer as a Rational.
+        assert_eq!((&p).evaluate(Rational::from(&x)), y);
+        assert_eq!(
+            evaluate_rational_polynomial_naive(&p, &Rational::from(&x)),
+            y
+        );
+        // The value is the numerator's value, an Integer, divided by the denominator.
+        assert_eq!(
+            Rational::from_integers(
+                p.numerator_ref().evaluate(&x),
+                Integer::from(p.denominator_ref())
+            ),
+            y
+        );
+        // The denominator of the value divides the polynomial's denominator.
+        assert!(p.denominator_ref().divisible_by(y.denominator_ref()));
+    });
+
+    // A polynomial with integer coefficients has an integer value, the IntegerPolynomial's.
+    integer_polynomial_rational_pair_gen().test_properties(|(p, _)| {
+        let x = Integer::from(7);
+        assert_eq!(
+            RationalPolynomial::from(p.clone()).evaluate(&x),
             Rational::from(p.evaluate(&x))
         );
     });

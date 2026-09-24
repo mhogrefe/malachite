@@ -344,8 +344,10 @@ documented by git history.
   homogenized polynomial, so that the result needs reducing only when the leading coefficient shares
   a factor with the denominator of the value. This makes it several times as fast as a direct
   translation of FLINT's algorithms, and its choice between Horner's rule and divide and conquer is
-  tuned separately. It is not part of the `Polynomial` trait, since `UnsignedPolynomial` does not
-  implement it.
+  tuned separately. `&RationalPolynomial` evaluates at a `Rational` and at an `Integer` too, like
+  `fmpq_poly_evaluate_fmpq` and `fmpq_poly_evaluate_fmpz`, giving a `Rational` in lowest terms: its
+  numerator's value divided by its denominator. It is not part of the `Polynomial` trait, since
+  `UnsignedPolynomial` does not implement it.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

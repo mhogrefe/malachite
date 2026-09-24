@@ -11,11 +11,14 @@ use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::pair_1_integer_polynomial_bit_bucketer;
+use malachite_q::Rational;
 use malachite_q::rational_polynomial::arithmetic::evaluate::{
     evaluate_integer_polynomial_divide_and_conquer, evaluate_integer_polynomial_horner,
 };
+use malachite_q::test_util::bench::bucketers::pair_1_rational_polynomial_bit_bucketer;
 use malachite_q::test_util::generators::{
     integer_polynomial_rational_pair_gen, integer_polynomial_rational_pair_gen_var_1,
+    rational_polynomial_integer_pair_gen, rational_polynomial_rational_pair_gen,
 };
 use malachite_q::test_util::rational_polynomial::arithmetic::evaluate::*;
 
@@ -32,6 +35,10 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_integer_polynomial_evaluate_rational_divide_and_conquer_long
     );
+    register_demo!(runner, demo_rational_polynomial_evaluate);
+    register_demo!(runner, demo_rational_polynomial_evaluate_ref);
+    register_demo!(runner, demo_rational_polynomial_evaluate_integer);
+    register_demo!(runner, demo_rational_polynomial_evaluate_integer_ref);
 
     register_bench!(
         runner,
@@ -44,6 +51,15 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_integer_polynomial_evaluate_rational_algorithms_long
+    );
+    register_bench!(
+        runner,
+        benchmark_rational_polynomial_evaluate_evaluation_strategy
+    );
+    register_bench!(runner, benchmark_rational_polynomial_evaluate_algorithms);
+    register_bench!(
+        runner,
+        benchmark_rational_polynomial_evaluate_integer_evaluation_strategy
     );
 }
 
@@ -205,6 +221,126 @@ fn benchmark_integer_polynomial_evaluate_rational_algorithms_long(
             ("naive", &mut |(p, x)| {
                 no_out!(evaluate_integer_polynomial_naive(&p, &x));
             }),
+        ],
+    );
+}
+
+fn demo_rational_polynomial_evaluate(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, x) in rational_polynomial_rational_pair_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!("(&({p})).evaluate({x_old}) = {}", (&p).evaluate(x));
+    }
+}
+
+fn demo_rational_polynomial_evaluate_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, x) in rational_polynomial_rational_pair_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("(&({p})).evaluate({x}) = {}", (&p).evaluate(&x));
+    }
+}
+
+fn benchmark_rational_polynomial_evaluate_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "(&RationalPolynomial).evaluate(Rational)",
+        BenchmarkType::EvaluationStrategy,
+        rational_polynomial_rational_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_polynomial_bit_bucketer("p"),
+        &mut [
+            ("(&RationalPolynomial).evaluate(Rational)", &mut |(p, x)| {
+                no_out!((&p).evaluate(x));
+            }),
+            (
+                "(&RationalPolynomial).evaluate(&Rational)",
+                &mut |(p, x)| {
+                    no_out!((&p).evaluate(&x));
+                },
+            ),
+        ],
+    );
+}
+
+fn benchmark_rational_polynomial_evaluate_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "(&RationalPolynomial).evaluate(&Rational)",
+        BenchmarkType::Algorithms,
+        rational_polynomial_rational_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_polynomial_bit_bucketer("p"),
+        &mut [
+            ("default", &mut |(p, x)| no_out!((&p).evaluate(&x))),
+            ("naive", &mut |(p, x)| {
+                no_out!(evaluate_rational_polynomial_naive(&p, &x));
+            }),
+        ],
+    );
+}
+
+fn demo_rational_polynomial_evaluate_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, x) in rational_polynomial_integer_pair_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!("(&({p})).evaluate({x_old}) = {}", (&p).evaluate(x));
+    }
+}
+
+fn demo_rational_polynomial_evaluate_integer_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, x) in rational_polynomial_integer_pair_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("(&({p})).evaluate({x}) = {}", (&p).evaluate(&x));
+    }
+}
+
+fn benchmark_rational_polynomial_evaluate_integer_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "(&RationalPolynomial).evaluate(Integer)",
+        BenchmarkType::EvaluationStrategy,
+        rational_polynomial_integer_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_polynomial_bit_bucketer("p"),
+        &mut [
+            ("(&RationalPolynomial).evaluate(Integer)", &mut |(p, x)| {
+                no_out!((&p).evaluate(x));
+            }),
+            ("(&RationalPolynomial).evaluate(&Integer)", &mut |(p, x)| {
+                no_out!((&p).evaluate(&x));
+            }),
+            (
+                "(&RationalPolynomial).evaluate(Rational::from(&Integer))",
+                &mut |(p, x)| {
+                    no_out!((&p).evaluate(Rational::from(&x)));
+                },
+            ),
         ],
     );
 }

@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::rational_polynomial::RationalPolynomial;
 use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -20,6 +21,17 @@ pub fn evaluate_integer_polynomial_naive(p: &IntegerPolynomial, x: &Rational) ->
     let mut sum = Rational::ZERO;
     for (i, c) in p.coefficients_asc().iter().enumerate() {
         sum += Rational::from(c) * x.pow(u64::exact_from(i));
+    }
+    sum
+}
+
+// Evaluates a rational polynomial at a rational term by term, as the sum of $c_i x^i$ over its
+// `Rational` coefficients, with each power of $x$ computed from scratch. It never separates the
+// numerator from the denominator, as the evaluation does.
+pub fn evaluate_rational_polynomial_naive(p: &RationalPolynomial, x: &Rational) -> Rational {
+    let mut sum = Rational::ZERO;
+    for (i, c) in p.to_coefficients_asc().into_iter().enumerate() {
+        sum += c * x.pow(u64::exact_from(i));
     }
     sum
 }

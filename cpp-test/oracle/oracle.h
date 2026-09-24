@@ -18,6 +18,8 @@
 
 #include <flint/flint.h>
 #include <flint/fmpz.h>
+#include <flint/fmpq.h>
+#include <flint/fmpq_poly.h>
 #include <flint/fmpz_poly.h>
 
 /* util.c */
@@ -44,6 +46,10 @@ int parse_option_ulong(const char * rest, ulong * expected);
    the form `c*x^e`, with a coefficient of 1 and an exponent of 1 left out, and a sign between
    terms. Returns 1 on success and 0 if the text is not in that form. */
 int fmpz_poly_set_str_malachite(fmpz_poly_t poly, const char * s);
+
+/* The same for rational polynomials, whose coefficients may be written `a/b`, such as
+   `1/2*x^2-x+2/3`. The coefficients must be in lowest terms, as Malachite prints them. */
+int fmpq_poly_set_str_malachite(fmpq_poly_t poly, const char * s);
 
 /* Splits, in place, a line in which a polynomial `P` is combined with a scalar `M` to give `R`.
    The shapes recognized are `(P).method(M) = R`, `(&(P)).method(M) = R`,
@@ -131,5 +137,7 @@ int run_fmpz_poly_evaluate_divconquer_fmpz(const char * arg);
 int run_fmpz_poly_evaluate_fmpq(const char * arg);
 int run_fmpz_poly_evaluate_horner_fmpq(const char * arg);
 int run_fmpz_poly_evaluate_divconquer_fmpq(const char * arg);
+int run_fmpq_poly_evaluate_fmpq(const char * arg);
+int run_fmpq_poly_evaluate_fmpz(const char * arg);
 
 #endif
