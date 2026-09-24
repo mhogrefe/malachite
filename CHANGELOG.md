@@ -326,6 +326,11 @@ documented by git history.
   malachite_base::polynomial::Polynomial;`. A coefficient is returned as a `CoefficientOutput`,
   which is a reference where a polynomial holds its coefficients as bignums and a value where a
   coefficient is a primitive or has to be built, as a `RationalPolynomial`'s is.
+- A new `EqTruncated` trait, in `malachite_base::polynomial`, with `eq_truncated(&self, other,
+  len)`, which determines whether two polynomials agree below $x^{len}$, like FLINT's
+  `fmpz_poly_equal_trunc`, without building either truncation. It is implemented for each of
+  `UnsignedPolynomial`, `NaturalPolynomial`, `IntegerPolynomial`, and `RationalPolynomial` against
+  itself and, in both orders, against each of the others.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

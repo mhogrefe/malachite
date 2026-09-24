@@ -10,6 +10,37 @@
 /// [`IntegerPolynomial`](super::IntegerPolynomial), comparing two polynomials by their behavior for
 /// large arguments.
 pub mod cmp;
+/// Implementations of [`EqTruncated`](malachite_base::polynomial::EqTruncated) between
+/// [`IntegerPolynomial`](super::IntegerPolynomial)s, and between them and
+/// [`NaturalPolynomial`](crate::natural_polynomial::NaturalPolynomial)s and
+/// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial)s.
+///
+/// # eq_truncated
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::polynomial::EqTruncated;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+/// use malachite_nz::integer_polynomial::IntegerPolynomial;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+///
+/// let p = IntegerPolynomial::from_str("x^3-2*x^2+3*x+4").unwrap();
+/// let q = IntegerPolynomial::from_str("-5*x^3-2*x^2+3*x+4").unwrap();
+/// assert!(p.eq_truncated(&q, 3));
+/// assert!(!p.eq_truncated(&q, 4));
+/// assert!(p.eq_truncated(&q, 0));
+///
+/// let r = NaturalPolynomial::from_str("7*x^2+3*x+4").unwrap();
+/// assert!(p.eq_truncated(&r, 2));
+/// assert!(!p.eq_truncated(&r, 3));
+/// assert!(r.eq_truncated(&p, 2));
+///
+/// // Only coefficients below x^len count, even when one polynomial is shorter.
+/// let s = UnsignedPolynomial::<u32>::from_str("3*x+4").unwrap();
+/// assert!(p.eq_truncated(&s, 2));
+/// assert!(!p.eq_truncated(&s, 3));
+/// assert!(s.eq_truncated(&p, 2));
+/// ```
+pub mod eq_truncated;
 /// Equality of [`IntegerPolynomial`](super::IntegerPolynomial)s and
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s.
 ///

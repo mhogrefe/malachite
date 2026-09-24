@@ -569,6 +569,7 @@ pub mod integer_polynomial {
     }
     pub mod comparison {
         pub mod cmp;
+        pub mod eq_truncated;
         pub mod partial_eq_gaussian_integer;
         pub mod partial_eq_integer;
         pub mod partial_eq_natural;
@@ -627,6 +628,7 @@ pub mod natural_polynomial {
     }
     pub mod comparison {
         pub mod cmp;
+        pub mod eq_truncated;
         pub mod partial_eq_gaussian_integer;
         pub mod partial_eq_integer;
         pub mod partial_eq_natural;

@@ -10,6 +10,44 @@
 /// [`RationalPolynomial`](super::RationalPolynomial), comparing two polynomials by their behavior
 /// for large arguments.
 pub mod cmp;
+/// Implementations of [`EqTruncated`](malachite_base::polynomial::EqTruncated) between
+/// [`RationalPolynomial`](super::RationalPolynomial)s, and between them and
+/// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s,
+/// [`NaturalPolynomial`](malachite_nz::natural_polynomial::NaturalPolynomial)s, and
+/// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial)s.
+///
+/// # eq_truncated
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::polynomial::EqTruncated;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+/// use malachite_nz::integer_polynomial::IntegerPolynomial;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+/// use malachite_q::rational_polynomial::RationalPolynomial;
+///
+/// let p = RationalPolynomial::from_str("1/2*x^2+1/3*x+1").unwrap();
+/// let q = RationalPolynomial::from_str("1/5*x^2+1/3*x+1").unwrap();
+/// assert!(p.eq_truncated(&q, 2));
+/// assert!(!p.eq_truncated(&q, 3));
+/// assert!(p.eq_truncated(&q, 0));
+///
+/// // The denominators may differ even where the coefficients agree.
+/// let r = RationalPolynomial::from_str("1/2*x+1").unwrap();
+/// assert!(r.eq_truncated(&RationalPolynomial::from_str("1/3*x+1").unwrap(), 1));
+///
+/// // A polynomial with a denominator can still agree with an integer one below some power of x.
+/// let s = IntegerPolynomial::from_str("3*x+1").unwrap();
+/// assert!(r.eq_truncated(&s, 1));
+/// assert!(!r.eq_truncated(&s, 2));
+/// assert!(s.eq_truncated(&r, 1));
+/// let t = NaturalPolynomial::from_str("x^5+1").unwrap();
+/// assert!(r.eq_truncated(&t, 1));
+/// assert!(t.eq_truncated(&r, 1));
+/// let u = UnsignedPolynomial::<u64>::from_str("1").unwrap();
+/// assert!(r.eq_truncated(&u, 1));
+/// assert!(!u.eq_truncated(&r, 2));
+/// ```
+pub mod eq_truncated;
 /// Equality of [`RationalPolynomial`](super::RationalPolynomial)s and
 /// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger)s.
 ///

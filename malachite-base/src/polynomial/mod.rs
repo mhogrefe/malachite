@@ -156,3 +156,47 @@ pub trait Polynomial: Sized {
     /// Returns `None` if the string is not a polynomial in that variable.
     fn from_string_with<S: VarScheme + ?Sized>(var: Var<'_, S>, s: &str) -> Option<Self>;
 }
+
+/// Determines whether two polynomials agree below a given power of the variable.
+///
+/// This is equality of the two polynomials truncated to their first `len` coefficients, decided
+/// without building either truncation.
+pub trait EqTruncated<Rhs: ?Sized = Self> {
+    /// Determines whether two polynomials have the same coefficient of $x^i$ for every $i$ less
+    /// than `len`, taking both by reference.
+    ///
+    /// $$
+    /// f(p, q, n) = (p \bmod x^n = q \bmod x^n).
+    /// $$
+    fn eq_truncated(&self, other: &Rhs, len: u64) -> bool;
+}
+
+// Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending
+// order, agree below index `len`.
+//
+// Only the first `len` coefficients of each count. Where one polynomial has more of those than the
+// other, the extra ones must be zero, since the other polynomial's coefficients there are; where
+// both have them, `eq` decides. Nothing is allocated.
+//
+// This is equivalent to `fmpz_poly_equal_trunc` from `fmpz_poly/equal_trunc.c`, FLINT 3.6.0, with
+// `eq` and the zero tests standing in for `fmpz_equal` and `fmpz_is_zero`.
+#[doc(hidden)]
+pub fn slices_eq_truncated<A, B>(
+    xs: &[A],
+    ys: &[B],
+    len: u64,
+    x_is_zero: impl Fn(&A) -> bool,
+    y_is_zero: impl Fn(&B) -> bool,
+    eq: impl Fn(&A, &B) -> bool,
+) -> bool {
+    let len = usize::try_from(len).unwrap_or(usize::MAX);
+    let xs = &xs[..len.min(xs.len())];
+    let ys = &ys[..len.min(ys.len())];
+    let common = xs.len().min(ys.len());
+    xs[common..].iter().all(x_is_zero)
+        && ys[common..].iter().all(y_is_zero)
+        && xs[..common]
+            .iter()
+            .zip(&ys[..common])
+            .all(|(x, y)| eq(x, y))
+}

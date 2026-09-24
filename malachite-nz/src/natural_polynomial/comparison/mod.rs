@@ -10,6 +10,30 @@
 /// [`NaturalPolynomial`](super::NaturalPolynomial), comparing two polynomials by their behavior for
 /// large arguments.
 pub mod cmp;
+/// Implementations of [`EqTruncated`](malachite_base::polynomial::EqTruncated) between
+/// [`NaturalPolynomial`](super::NaturalPolynomial)s, and between them and
+/// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial)s.
+///
+/// # eq_truncated
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::polynomial::EqTruncated;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+///
+/// let p = NaturalPolynomial::from_str("x^3+2*x^2+3*x+4").unwrap();
+/// let q = NaturalPolynomial::from_str("5*x^3+2*x^2+3*x+4").unwrap();
+/// assert!(p.eq_truncated(&q, 3));
+/// assert!(!p.eq_truncated(&q, 4));
+/// assert!(p.eq_truncated(&q, 0));
+///
+/// // Only coefficients below x^len count, even when one polynomial is shorter.
+/// let r = UnsignedPolynomial::<u8>::from_str("3*x+4").unwrap();
+/// assert!(p.eq_truncated(&r, 2));
+/// assert!(!p.eq_truncated(&r, 3));
+/// assert!(r.eq_truncated(&p, 2));
+/// ```
+pub mod eq_truncated;
 /// Equality of [`NaturalPolynomial`](super::NaturalPolynomial)s and
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s.
 ///
