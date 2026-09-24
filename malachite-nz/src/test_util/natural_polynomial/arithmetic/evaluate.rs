@@ -28,3 +28,8 @@ pub fn evaluate_naive(p: &NaturalPolynomial, x: &Natural) -> Natural {
 pub fn evaluate_mod_power_of_2_naive(p: &NaturalPolynomial, x: &Natural, pow: u64) -> Natural {
     evaluate_naive(p, x).mod_power_of_2(pow)
 }
+
+// Evaluates a polynomial at x in full and then reduces the value modulo m.
+pub fn evaluate_mod_naive(p: &NaturalPolynomial, x: &Natural, m: &Natural) -> Natural {
+    evaluate_naive(p, x) % m
+}

@@ -142,6 +142,17 @@ pub fn natural_polynomial_natural_unsigned_triple_gen_var_1()
     )
 }
 
+// All `(NaturalPolynomial, Natural, Natural)` where the polynomial's coefficients and the first
+// `Natural` are less than the second `Natural`.
+pub fn natural_polynomial_natural_natural_triple_gen_var_1()
+-> Generator<(NaturalPolynomial, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_natural_triple_gen_var_1,
+        &random_natural_polynomial_natural_natural_triple_gen_var_1,
+        &special_random_natural_polynomial_natural_natural_triple_gen_var_1,
+    )
+}
+
 pub fn natural_polynomial_gaussian_integer_pair_gen()
 -> Generator<(NaturalPolynomial, GaussianInteger)> {
     Generator::new(

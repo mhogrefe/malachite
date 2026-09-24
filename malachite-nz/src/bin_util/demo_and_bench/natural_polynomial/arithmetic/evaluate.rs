@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::polynomial::{Evaluate, EvaluateModPowerOf2};
+use malachite_base::polynomial::{Evaluate, EvaluateMod, EvaluateModPowerOf2};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -17,7 +17,8 @@ use malachite_nz::test_util::bench::bucketers::{
     pair_1_natural_polynomial_bit_bucketer, triple_1_natural_polynomial_bit_bucketer,
 };
 use malachite_nz::test_util::generators::{
-    natural_polynomial_natural_pair_gen, natural_polynomial_natural_pair_gen_var_2,
+    natural_polynomial_natural_natural_triple_gen_var_1, natural_polynomial_natural_pair_gen,
+    natural_polynomial_natural_pair_gen_var_2,
     natural_polynomial_natural_unsigned_triple_gen_var_1,
 };
 use malachite_nz::test_util::natural_polynomial::arithmetic::evaluate::*;
@@ -52,6 +53,13 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_natural_polynomial_evaluate_mod_power_of_2_algorithms
     );
+    register_demo!(runner, demo_natural_polynomial_evaluate_mod);
+    register_demo!(runner, demo_natural_polynomial_evaluate_mod_ref);
+    register_bench!(
+        runner,
+        benchmark_natural_polynomial_evaluate_mod_evaluation_strategy
+    );
+    register_bench!(runner, benchmark_natural_polynomial_evaluate_mod_algorithms);
 }
 
 fn demo_natural_polynomial_evaluate(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -291,6 +299,91 @@ fn benchmark_natural_polynomial_evaluate_mod_power_of_2_algorithms(
             }),
             ("evaluate, then reduce", &mut |(p, x, pow)| {
                 no_out!(evaluate_mod_power_of_2_naive(&p, &x, pow));
+            }),
+        ],
+    );
+}
+
+fn demo_natural_polynomial_evaluate_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, x, m) in natural_polynomial_natural_natural_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (p_old, x_old, m_old) = (p.clone(), x.clone(), m.clone());
+        println!(
+            "({p_old}).evaluate_mod({x_old}, {m_old}) = {}",
+            p.evaluate_mod(x, m)
+        );
+    }
+}
+
+fn demo_natural_polynomial_evaluate_mod_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, x, m) in natural_polynomial_natural_natural_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&({p})).evaluate_mod({x}, {m}) = {}",
+            (&p).evaluate_mod(&x, &m)
+        );
+    }
+}
+
+fn benchmark_natural_polynomial_evaluate_mod_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "NaturalPolynomial.evaluate_mod(Natural, Natural)",
+        BenchmarkType::EvaluationStrategy,
+        natural_polynomial_natural_natural_triple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_natural_polynomial_bit_bucketer("p"),
+        &mut [
+            (
+                "NaturalPolynomial.evaluate_mod(Natural, Natural)",
+                &mut |(p, x, m)| no_out!(p.evaluate_mod(x, m)),
+            ),
+            (
+                "NaturalPolynomial.evaluate_mod(&Natural, &Natural)",
+                &mut |(p, x, m)| no_out!(p.evaluate_mod(&x, &m)),
+            ),
+            (
+                "(&NaturalPolynomial).evaluate_mod(Natural, Natural)",
+                &mut |(p, x, m)| no_out!((&p).evaluate_mod(x, m)),
+            ),
+            (
+                "(&NaturalPolynomial).evaluate_mod(&Natural, &Natural)",
+                &mut |(p, x, m)| no_out!((&p).evaluate_mod(&x, &m)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_polynomial_evaluate_mod_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "(&NaturalPolynomial).evaluate_mod(&Natural, &Natural)",
+        BenchmarkType::Algorithms,
+        natural_polynomial_natural_natural_triple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_natural_polynomial_bit_bucketer("p"),
+        &mut [
+            ("default", &mut |(p, x, m)| {
+                no_out!((&p).evaluate_mod(&x, &m));
+            }),
+            ("evaluate, then reduce", &mut |(p, x, m)| {
+                no_out!(evaluate_mod_naive(&p, &x, &m));
             }),
         ],
     );

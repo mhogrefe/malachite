@@ -317,6 +317,37 @@ const EVALUATE_MOD_POWER_OF_2_UNIT_ROWS: [(&str, &str, u64, &str); 16] = [
     ),
 ];
 
+// The rows of test_evaluate_mod in malachite-nz's NaturalPolynomial tests: polynomial, point,
+// modulus, value.
+const EVALUATE_MOD_UNIT_ROWS: [(&str, &str, &str, &str); 16] = [
+    ("0", "0", "1", "0"),
+    ("0", "5", "7", "0"),
+    ("7", "0", "11", "7"),
+    ("7", "5", "11", "7"),
+    ("x", "5", "7", "5"),
+    ("5*x^2+3*x+7", "6", "11", "7"),
+    ("5*x^2+3*x+7", "0", "11", "7"),
+    ("5*x^2+3*x+7", "1", "11", "4"),
+    ("5*x^2+3*x+7", "10", "11", "9"),
+    ("x^2+x+1", "1", "2", "1"),
+    ("x^100+1", "3", "1000000007", "886041712"),
+    ("x^2+1", "2", "5", "0"),
+    ("6*x^3+5*x+4", "6", "7", "0"),
+    (
+        "18446744073709551615*x^2+1",
+        "18446744073709551615",
+        "18446744073709551616",
+        "0",
+    ),
+    (
+        "123456789012345678901234567890*x+1",
+        "98765432109876543210",
+        "1000000000000000000000000000057",
+        "496570641542447803630239294147",
+    ),
+    ("x^5+x^4+x^3+x^2+x+1", "12", "13", "0"),
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -950,6 +981,28 @@ fn main() {
     for demo_name in [
         "demo_natural_polynomial_evaluate_mod_power_of_2",
         "demo_natural_polynomial_evaluate_mod_power_of_2_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_mod_poly_evaluate_fmpz",
+        );
+    }
+
+    // Every case from test_evaluate_mod in malachite-nz's NaturalPolynomial tests, and the generated
+    // cases from evaluate_mod_properties, against evaluation modulo the given modulus.
+    println!("testing NaturalPolynomial evaluate_mod unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, x, m, r) in EVALUATE_MOD_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).evaluate_mod({x}, {m}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_mod_poly_evaluate_fmpz", Some(TEST_OUT));
+    for demo_name in [
+        "demo_natural_polynomial_evaluate_mod",
+        "demo_natural_polynomial_evaluate_mod_ref",
     ] {
         check_demo_against_flint(
             &oracle,

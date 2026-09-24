@@ -24,7 +24,9 @@
 
     The `fmpz_mod_poly_evaluate_fmpz` mode diffs `(&(p)).evaluate_mod_power_of_2(x, pow) = r` lines,
     where `p` is a polynomial with coefficients in [0, 2^pow) and `x` and `r` are in [0, 2^pow),
-    against fmpz_mod_poly_evaluate_fmpz with the modulus 2^pow.
+    against fmpz_mod_poly_evaluate_fmpz with the modulus 2^pow, and `(&(p)).evaluate_mod(x, m) = r`
+    and `(p).evaluate_mod(x, m) = r` lines, with everything in [0, m), against it with the modulus
+    m.
 */
 
 #include <stdlib.h>
@@ -330,8 +332,23 @@ check_evaluate_mod_power_of_2_line(char * line, int line_number)
     char * receiver;
     char * args;
     char * expected_str;
-    if (!split_polynomial_scalar_line(line, "evaluate_mod_power_of_2", NULL, NULL, &receiver, &args,
-                                      &expected_str))
+    /* Whether the second argument is the modulus itself, rather than the power of 2 it is. */
+    int modulus_given = 0;
+    char * copy = strdup(line);
+    int power_of_2_line = split_polynomial_scalar_line(copy, "evaluate_mod_power_of_2", NULL,
+                                                       NULL, &receiver, &args, &expected_str);
+    free(copy);
+    if (!power_of_2_line)
+    {
+        modulus_given = split_polynomial_scalar_line(line, "evaluate_mod", NULL, NULL, &receiver,
+                                                     &args, &expected_str);
+    }
+    else
+    {
+        split_polynomial_scalar_line(line, "evaluate_mod_power_of_2", NULL, NULL, &receiver, &args,
+                                     &expected_str);
+    }
+    if (!power_of_2_line && !modulus_given)
     {
         if (line[0] == '\0')
         {
@@ -360,10 +377,20 @@ check_evaluate_mod_power_of_2_line(char * line, int line_number)
     fmpz_init(expected);
     fmpz_init(r);
     fmpz_init(modulus);
-    char * end;
-    ulong pow = strtoul(pow_str, &end, 10);
+    char * end = "";
+    ulong pow = 0;
+    int modulus_ok;
+    if (modulus_given)
+    {
+        modulus_ok = fmpz_set_str(modulus, pow_str, 10) == 0 && fmpz_sgn(modulus) > 0;
+    }
+    else
+    {
+        pow = strtoul(pow_str, &end, 10);
+        modulus_ok = *end == '\0';
+    }
     if (!fmpz_poly_set_str_malachite(p, receiver) || fmpz_set_str(x, args, 10) != 0
-        || fmpz_set_str(expected, expected_str, 10) != 0 || *end != '\0')
+        || fmpz_set_str(expected, expected_str, 10) != 0 || !modulus_ok)
     {
         flint_printf("error in fmpz_mod_poly_evaluate_fmpz test, line %d: unreadable input\n",
                      line_number);
@@ -371,8 +398,11 @@ check_evaluate_mod_power_of_2_line(char * line, int line_number)
     }
     else
     {
-        fmpz_one(modulus);
-        fmpz_mul_2exp(modulus, modulus, pow);
+        if (!modulus_given)
+        {
+            fmpz_one(modulus);
+            fmpz_mul_2exp(modulus, modulus, pow);
+        }
         fmpz_mod_ctx_t ctx;
         fmpz_mod_ctx_init(ctx, modulus);
         fmpz_mod_poly_t q;

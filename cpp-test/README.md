@@ -61,7 +61,7 @@ shared state: don't run the driver and a manual demo regeneration concurrently.
 | `fmpz_poly_evaluate_divconquer_fmpq` | `fmpz_poly_evaluate_divconquer_fmpq` | `demo_integer_polynomial_evaluate_rational_divide_and_conquer` and `_long` (malachite-q), which check the translation of the non-public divide-and-conquer algorithm, plus unit rows |
 | `fmpq_poly_evaluate_fmpq` | `fmpq_poly_evaluate_fmpq` | `demo_rational_polynomial_evaluate` and `_ref` (malachite-q), plus unit rows; its inputs are read by `fmpq_poly_set_str_malachite` in `oracle/util.c` |
 | `fmpq_poly_evaluate_fmpz` | `fmpq_poly_evaluate_fmpz` | `demo_rational_polynomial_evaluate_integer` and `_ref` (malachite-q), plus unit rows |
-| `fmpz_mod_poly_evaluate_fmpz` | `fmpz_mod_poly_evaluate_fmpz`, with the modulus 2^pow | `demo_natural_polynomial_evaluate_mod_power_of_2` and `_ref` (malachite-nz), plus unit rows |
+| `fmpz_mod_poly_evaluate_fmpz` | `fmpz_mod_poly_evaluate_fmpz`, with the modulus 2^pow or m | `demo_natural_polynomial_evaluate_mod_power_of_2`, `demo_natural_polynomial_evaluate_mod`, and their `_ref` versions (malachite-nz), plus unit rows |
 | `sqrtmod_stress` | `fmpz_sqrtmod` | none — a memory-stress diagnostic, run manually |
 
 The `sqrtmod` modes skip documented divergence windows, noted in comments in

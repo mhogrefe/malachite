@@ -355,6 +355,11 @@ documented by git history.
   $2^{pow}$. It uses Horner's rule, reducing after every step; taking the polynomial by value lets
   the coefficient that is returned outright, or that starts Horner's rule, be moved rather than
   cloned.
+- A new `EvaluateMod` trait, in `malachite_base::polynomial`, whose `evaluate_mod(x, m)` evaluates a
+  polynomial at `x` modulo `m`, like FLINT's `fmpz_mod_poly_evaluate_fmpz`. It is implemented for
+  `NaturalPolynomial` at a `Natural` modulo a `Natural`, taking each of the three by value or by
+  reference, and panics unless every coefficient and `x` are already reduced modulo `m`. It uses
+  Horner's rule with the modular multiplication's precomputed data for `m` computed once.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

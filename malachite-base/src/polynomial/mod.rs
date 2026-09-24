@@ -235,3 +235,19 @@ pub trait EvaluateModPowerOf2<T> {
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     fn evaluate_mod_power_of_2(self, x: T, pow: u64) -> Self::Output;
 }
+
+/// Evaluates a polynomial at a value, modulo $m$. The polynomial's coefficients and the value must
+/// already be reduced modulo $m$.
+pub trait EvaluateMod<T, M = T> {
+    /// The type of the polynomial's value.
+    type Output;
+
+    /// Evaluates a polynomial at `x`, modulo `m`.
+    ///
+    /// $$
+    /// f(p, x, m) = \sum_{i=0}^{n-1} c_i x^i \bmod m,
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    fn evaluate_mod(self, x: T, m: M) -> Self::Output;
+}
