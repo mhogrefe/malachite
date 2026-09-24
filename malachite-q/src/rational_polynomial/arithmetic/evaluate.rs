@@ -130,8 +130,7 @@ fn to_integers(x: &Rational) -> (Integer, Integer) {
 //
 // This is equivalent to `fmpz_poly_evaluate_horner_fmpq` from `fmpz_poly/evaluate_horner_fmpq.c`,
 // FLINT 3.6.0.
-#[doc(hidden)]
-pub fn evaluate_integer_polynomial_horner(f: &[Integer], x: &Rational) -> Rational {
+crate_test_fn! {evaluate_integer_polynomial_horner(f: &[Integer], x: &Rational) -> Rational {
     match f.len() {
         0 => Rational::ZERO,
         1 => Rational::from(&f[0]),
@@ -141,14 +140,16 @@ pub fn evaluate_integer_polynomial_horner(f: &[Integer], x: &Rational) -> Ration
             from_homogeneous(n, b_power, f.last().unwrap(), &b)
         }
     }
-}
+}}
 
 // Evaluates a polynomial at `x` by divide and conquer.
 //
 // This is equivalent to `fmpz_poly_evaluate_divconquer_fmpq` from
 // `fmpz_poly/evaluate_divconquer_fmpq.c`, FLINT 3.6.0.
-#[doc(hidden)]
-pub fn evaluate_integer_polynomial_divide_and_conquer(f: &[Integer], x: &Rational) -> Rational {
+crate_test_fn! {evaluate_integer_polynomial_divide_and_conquer(
+    f: &[Integer],
+    x: &Rational,
+) -> Rational {
     match f.len() {
         0 => Rational::ZERO,
         1 => Rational::from(&f[0]),
@@ -159,7 +160,7 @@ pub fn evaluate_integer_polynomial_divide_and_conquer(f: &[Integer], x: &Rationa
             from_homogeneous(n, b_power, f.last().unwrap(), &b_copy)
         }
     }
-}
+}}
 
 // Whether divide and conquer beats Horner's rule for the homogenized evaluation of a polynomial
 // with `len` coefficients, whose leading coefficient has `leading_bits` bits, at `a / b`.

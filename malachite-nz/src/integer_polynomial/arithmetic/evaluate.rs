@@ -24,8 +24,7 @@ use malachite_base::polynomial::Evaluate;
 //
 // This is equivalent to `_fmpz_poly_evaluate_horner_fmpz` from `fmpz_poly/evaluate_horner_fmpz.c`,
 // FLINT 3.6.0.
-#[doc(hidden)]
-pub fn evaluate_horner<T>(coefficients: &[T], x: &T) -> T
+crate_test_fn! {evaluate_horner<T>(coefficients: &[T], x: &T) -> T
 where
     T: Clone + Zero + PartialEq + for<'a> AddAssign<&'a T> + for<'a> MulAssign<&'a T>,
 {
@@ -41,7 +40,7 @@ where
         value += c;
     }
     value
-}
+}}
 
 // The block structure shared by the divide-and-conquer evaluations, at an integer here and at a
 // rational in malachite-q.
@@ -112,8 +111,7 @@ pub fn divide_and_conquer_blocks<C, T: Clone + Zero>(
 //
 // This is equivalent to `fmpz_poly_evaluate_divconquer_fmpz` and
 // `_fmpz_poly_evaluate_divconquer_fmpz` from `fmpz_poly/evaluate_divconquer_fmpz.c`, FLINT 3.6.0.
-#[doc(hidden)]
-pub fn evaluate_divide_and_conquer<T>(coefficients: &[T], x: &T) -> T
+crate_test_fn! {evaluate_divide_and_conquer<T>(coefficients: &[T], x: &T) -> T
 where
     T: Clone + Zero + for<'a> AddAssign<&'a T> + for<'a> MulAssign<&'a T>,
     for<'a> &'a T: Mul<&'a T, Output = T> + Square<Output = T>,
@@ -149,7 +147,7 @@ where
             upper
         },
     )
-}
+}}
 
 // Divide and conquer only pays once its balanced multiplications are large enough for a
 // subquadratic multiplication algorithm, and when does that depends on the size of `x` as much as
