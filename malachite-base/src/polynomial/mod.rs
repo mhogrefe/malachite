@@ -200,3 +200,22 @@ pub fn slices_eq_truncated<A, B>(
             .zip(&ys[..common])
             .all(|(x, y)| eq(x, y))
 }
+
+/// Evaluates a polynomial at a value.
+///
+/// Evaluation substitutes a value for the variable. It maps out of the polynomial rather than
+/// staying inside it, so the type of the value decides the type of the result, and a polynomial
+/// type may implement this trait for several value types.
+pub trait Evaluate<T> {
+    /// The type of the polynomial's value.
+    type Output;
+
+    /// Evaluates a polynomial at `x`.
+    ///
+    /// $$
+    /// f(p, x) = \sum_{i=0}^{n-1} c_i x^i,
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    fn evaluate(self, x: T) -> Self::Output;
+}

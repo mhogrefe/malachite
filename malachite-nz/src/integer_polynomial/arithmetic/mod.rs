@@ -10,6 +10,9 @@
 /// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
 /// every coefficient of a polynomial to the representative closest to zero.
 pub mod balanced_mod;
+/// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
+/// polynomial at a value.
+pub mod evaluate;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
 /// of a polynomial's coefficients.

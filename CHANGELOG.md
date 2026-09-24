@@ -331,6 +331,16 @@ documented by git history.
   `fmpz_poly_equal_trunc`, without building either truncation. It is implemented for each of
   `UnsignedPolynomial`, `NaturalPolynomial`, `IntegerPolynomial`, and `RationalPolynomial` against
   itself and, in both orders, against each of the others.
+- A new `Evaluate` trait, in `malachite_base::polynomial`, whose `evaluate` substitutes a value for
+  a polynomial's variable; the value's type decides the result's, through an associated `Output`
+  type. It is implemented for `&IntegerPolynomial` at an `Integer` and for `&NaturalPolynomial` at a
+  `Natural`, with the value taken by value or by reference, like FLINT's `fmpz_poly_evaluate_fmpz`:
+  Horner's rule, or divide and conquer, which keeps the operands of each multiplication balanced,
+  for polynomials that are long compared with the size of the value. Where FLINT switches at 50
+  coefficients whatever the value, Malachite's crossover, tuned, depends on both: about 1024
+  coefficients when the value fits in one limb, and otherwise when the length times the value's limb
+  count reaches 256. It is not part of the `Polynomial` trait, since `UnsignedPolynomial` does not
+  implement it.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

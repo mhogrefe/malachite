@@ -58,6 +58,9 @@ static const oracle_mode modes[] = {
     {"fmpz_poly_scalar_mod_fmpz", run_fmpz_poly_scalar_mod_fmpz},
     {"fmpz_poly_get_nmod_poly", run_fmpz_poly_get_nmod_poly},
     {"fmpz_mod_poly_set_fmpz_poly", run_fmpz_mod_poly_set_fmpz_poly},
+    {"fmpz_poly_evaluate_fmpz", run_fmpz_poly_evaluate_fmpz},
+    {"fmpz_poly_evaluate_horner_fmpz", run_fmpz_poly_evaluate_horner_fmpz},
+    {"fmpz_poly_evaluate_divconquer_fmpz", run_fmpz_poly_evaluate_divconquer_fmpz},
 };
 
 int

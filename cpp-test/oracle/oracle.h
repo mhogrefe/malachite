@@ -124,4 +124,9 @@ int run_fmpz_poly_scalar_mod_fmpz(const char * arg);
 int run_fmpz_poly_get_nmod_poly(const char * arg);
 int run_fmpz_mod_poly_set_fmpz_poly(const char * arg);
 
+/* fmpz_poly_evaluate.c */
+int run_fmpz_poly_evaluate_fmpz(const char * arg);
+int run_fmpz_poly_evaluate_horner_fmpz(const char * arg);
+int run_fmpz_poly_evaluate_divconquer_fmpz(const char * arg);
+
 #endif

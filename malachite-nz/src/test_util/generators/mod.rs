@@ -121,6 +121,16 @@ pub fn natural_polynomial_natural_pair_gen_var_1() -> Generator<(NaturalPolynomi
     )
 }
 
+// The `NaturalPolynomial` has degree at least 50: long enough for evaluation to take the
+// divide-and- conquer path when the `Natural` has more than one limb.
+pub fn natural_polynomial_natural_pair_gen_var_2() -> Generator<(NaturalPolynomial, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_pair_gen_var_2,
+        &random_natural_polynomial_natural_pair_gen_var_2,
+        &special_random_natural_polynomial_natural_pair_gen_var_2,
+    )
+}
+
 pub fn natural_polynomial_gaussian_integer_pair_gen()
 -> Generator<(NaturalPolynomial, GaussianInteger)> {
     Generator::new(
@@ -204,6 +214,16 @@ pub fn integer_polynomial_integer_pair_gen_var_1() -> Generator<(IntegerPolynomi
         &exhaustive_integer_polynomial_integer_pair_gen_var_1,
         &random_integer_polynomial_integer_pair_gen_var_1,
         &special_random_integer_polynomial_integer_pair_gen_var_1,
+    )
+}
+
+// The `IntegerPolynomial` has degree at least 50: long enough for evaluation to take the
+// divide-and- conquer path when the `Integer` has more than one limb.
+pub fn integer_polynomial_integer_pair_gen_var_2() -> Generator<(IntegerPolynomial, Integer)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_pair_gen_var_2,
+        &random_integer_polynomial_integer_pair_gen_var_2,
+        &special_random_integer_polynomial_integer_pair_gen_var_2,
     )
 }
 

@@ -18,7 +18,9 @@ use crate::integer::random::{
     striped_random_negative_integers, striped_random_nonzero_integers,
 };
 use crate::integer_polynomial::IntegerPolynomial;
-use crate::integer_polynomial::random::striped_random_integer_polynomials;
+use crate::integer_polynomial::random::{
+    striped_random_integer_polynomials, striped_random_integer_polynomials_min_degree,
+};
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -63,7 +65,9 @@ use crate::natural::random::{
 };
 use crate::natural::{Natural, limb_to_bit_count};
 use crate::natural_polynomial::NaturalPolynomial;
-use crate::natural_polynomial::random::striped_random_natural_polynomials;
+use crate::natural_polynomial::random::{
+    striped_random_natural_polynomials, striped_random_natural_polynomials_min_degree,
+};
 use crate::platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD};
 use crate::test_util::extra_variadic::{
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
@@ -341,6 +345,35 @@ pub fn special_random_natural_polynomial_natural_pair_gen_var_1(
     ))
 }
 
+pub fn special_random_natural_polynomial_natural_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_polynomials_min_degree(
+                seed,
+                50,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 64),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_natural_polynomial_gaussian_integer_pair_gen(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, GaussianInteger)> {
@@ -566,6 +599,35 @@ pub fn special_random_integer_polynomial_integer_pair_gen_var_1(
         },
         &|seed| {
             striped_random_nonzero_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_polynomial_integer_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials_min_degree(
+                seed,
+                50,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 64),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integers(
                 seed,
                 config.get_or("mean_stripe_n", 32),
                 config.get_or("mean_stripe_d", 1),

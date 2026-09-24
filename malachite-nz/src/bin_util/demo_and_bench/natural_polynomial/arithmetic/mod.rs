@@ -10,6 +10,7 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     balanced_mod::register(runner);
+    evaluate::register(runner);
     height::register(runner);
     is_unit::register(runner);
     mod_is_reduced::register(runner);
@@ -18,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod balanced_mod;
+mod evaluate;
 mod height;
 mod is_unit;
 mod mod_is_reduced;

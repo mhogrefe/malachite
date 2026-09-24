@@ -17,7 +17,9 @@ use crate::integer::random::{
     random_nonzero_integers,
 };
 use crate::integer_polynomial::IntegerPolynomial;
-use crate::integer_polynomial::random::random_integer_polynomials;
+use crate::integer_polynomial::random::{
+    random_integer_polynomials, random_integer_polynomials_min_degree,
+};
 use crate::natural::Natural;
 use crate::natural::arithmetic::binomial_coefficient::{
     BIN_GOETGHELUCK_THRESHOLD, BIN_UIUI_RECURSIVE_SMALLDC,
@@ -65,7 +67,9 @@ use crate::natural::random::{
     random_positive_naturals,
 };
 use crate::natural_polynomial::NaturalPolynomial;
-use crate::natural_polynomial::random::random_natural_polynomials;
+use crate::natural_polynomial::random::{
+    random_natural_polynomials, random_natural_polynomials_min_degree,
+};
 use crate::platform::{
     DoubleLimb, Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
@@ -311,6 +315,31 @@ pub fn random_natural_polynomial_natural_pair_gen_var_1(
     ))
 }
 
+pub fn random_natural_polynomial_natural_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials_min_degree(
+                seed,
+                50,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 64),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_natural_polynomial_gaussian_integer_pair_gen(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, GaussianInteger)> {
@@ -474,6 +503,31 @@ pub fn random_integer_polynomial_integer_pair_gen_var_1(
         },
         &|seed| {
             random_nonzero_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_integer_polynomial_integer_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_polynomials_min_degree(
+                seed,
+                50,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 64),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_integers(
                 seed,
                 config.get_or("mean_bits_n", 64),
                 config.get_or("mean_bits_d", 1),

@@ -18,7 +18,9 @@ use crate::integer::exhaustive::{
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer_polynomial::IntegerPolynomial;
-use crate::integer_polynomial::exhaustive::exhaustive_integer_polynomials;
+use crate::integer_polynomial::exhaustive::{
+    exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
+};
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place};
 use crate::natural::arithmetic::binomial_coefficient::{
@@ -74,7 +76,9 @@ use crate::natural::exhaustive::{
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural_polynomial::NaturalPolynomial;
-use crate::natural_polynomial::exhaustive::exhaustive_natural_polynomials;
+use crate::natural_polynomial::exhaustive::{
+    exhaustive_natural_polynomials, exhaustive_natural_polynomials_min_degree,
+};
 use crate::platform::{
     DoubleLimb, Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
@@ -211,6 +215,13 @@ pub fn exhaustive_integer_polynomial_integer_pair_gen_var_1() -> It<(IntegerPoly
     ))
 }
 
+pub fn exhaustive_integer_polynomial_integer_pair_gen_var_2() -> It<(IntegerPolynomial, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials_min_degree(50),
+        exhaustive_integers(),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_natural_pair_gen() -> It<(IntegerPolynomial, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_integer_polynomials(),
@@ -300,6 +311,13 @@ pub fn exhaustive_natural_polynomial_natural_pair_gen_var_1() -> It<(NaturalPoly
     Box::new(exhaustive_pairs(
         exhaustive_natural_polynomials(),
         exhaustive_positive_naturals(),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_natural_pair_gen_var_2() -> It<(NaturalPolynomial, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_polynomials_min_degree(50),
+        exhaustive_naturals(),
     ))
 }
 

@@ -2368,12 +2368,99 @@ fn tune_add() {
     }
 }
 
+// Polynomial evaluation: Horner's rule against divide and conquer. The crossover depends on the
+// size of the point as much as on the length, so no single length threshold fits; this prints a
+// grid instead. For each (coefficient bits, point bits) pair it gives the ratio of the divide-and-
+// conquer time to the Horner time at a range of lengths, and the first length from which divide
+// and conquer wins at every length measured. The `EVALUATE_DIVIDE_AND_CONQUER_*` constants in
+// `integer_polynomial::arithmetic::evaluate` are read off it.
+#[allow(clippy::print_stdout)]
+fn tune_evaluate() {
+    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::logic::traits::BitAccess;
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::evaluate::{
+        evaluate_divide_and_conquer, evaluate_horner,
+    };
+    use malachite_nz::natural::Natural;
+    let random_integer = |seed: &str, bits: u64| -> Integer {
+        let limbs: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(seed))
+            .take(usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap())
+            .collect();
+        let mut n = Natural::from_owned_limbs_asc(limbs).mod_power_of_2(bits);
+        n.set_bit(bits - 1);
+        let negative = random_primitive_ints::<u8>(EXAMPLE_SEED.fork(&format!("{seed}s")))
+            .next()
+            .unwrap()
+            .odd();
+        if negative {
+            -Integer::from(n)
+        } else {
+            Integer::from(n)
+        }
+    };
+    let lens =
+        [2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048];
+    for coefficient_bits in [8u64, 64, 256, 2048] {
+        for point_bits in [8u64, 64, 128, 256, 512, 1024, 2048, 8192] {
+            let mut line = format!("c {coefficient_bits:>5} x {point_bits:>5}:");
+            let mut first_win = None;
+            let mut wins = 0;
+            for &len in &lens {
+                let sets = 4;
+                let inputs: Vec<(Vec<Integer>, Integer)> = (0..sets)
+                    .map(|k| {
+                        let cs = (0..len)
+                            .map(|i| random_integer(&format!("c{k}_{i}"), coefficient_bits))
+                            .collect();
+                        (cs, random_integer(&format!("x{k}"), point_bits))
+                    })
+                    .collect();
+                let (mut i, mut j) = (0usize, 0usize);
+                let (th, td) = interleaved_min_pair(
+                    &mut || {
+                        let (cs, x) = &inputs[i % sets];
+                        i += 1;
+                        black_box(evaluate_horner(black_box(cs), x));
+                    },
+                    &mut || {
+                        let (cs, x) = &inputs[j % sets];
+                        j += 1;
+                        black_box(evaluate_divide_and_conquer(black_box(cs), x));
+                    },
+                );
+                let ratio = td / th;
+                line.push_str(&format!(" {len}:{ratio:.2}"));
+                if ratio < 1.0 {
+                    wins += 1;
+                    first_win.get_or_insert(len);
+                } else {
+                    wins = 0;
+                    first_win = None;
+                }
+                if wins >= 3 && ratio < 0.8 {
+                    break;
+                }
+                // Horner is quadratic in the length; stop before a single call takes too long.
+                if th > 2.0e8 {
+                    break;
+                }
+            }
+            println!(
+                "{line}  => {}",
+                first_win.map_or("none".to_string(), |l| l.to_string())
+            );
+        }
+    }
+}
+
 /// Dispatch a tuning run by key. Keys mirror the bottom-up tuning order; after each level, write
 /// the suggested value into platform_64.rs and rebuild before tuning the next level (perf/tune.sh
 /// automates this).
 pub fn tune(key: &str) {
     match key {
         "add" => tune_add(),
+        "evaluate" => tune_evaluate(),
         "shl" => tune_shl(),
         "shl_alloc" => tune_shl_alloc(),
         "get_str_precompute" => tune_get_str_precompute(),
