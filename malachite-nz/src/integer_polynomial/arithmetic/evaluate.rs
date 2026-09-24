@@ -13,7 +13,7 @@ use alloc::vec::Vec;
 use core::iter::Sum;
 use core::mem::replace;
 use core::ops::{AddAssign, Mul, MulAssign};
-use malachite_base::num::arithmetic::traits::{Parity, Square};
+use malachite_base::num::arithmetic::traits::{Parity, PowerOf2, Square};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -43,15 +43,72 @@ where
     value
 }
 
-// Evaluates a polynomial, given by its coefficients in ascending order, at `x` by divide and
-// conquer.
+// The block structure shared by the divide-and-conquer evaluations, at an integer here and at a
+// rational in malachite-q.
 //
-// Adjacent coefficients are paired into blocks `c_i + c_{i+1} x`, and blocks are merged like the
-// carries of a binary counter: a block covering `2^k` coefficients waits in `partials[k]` until an
-// equal one follows it, and the two are merged as `lower + x^{2^k} upper`. Merging equal halves
-// keeps the operands of each multiplication about the same size, where Horner's rule multiplies an
-// ever larger accumulator by `x`. Whatever blocks remain at the end are merged from the smallest
-// up.
+// Adjacent coefficients are paired into blocks, and blocks are merged like the carries of a binary
+// counter: a block covering `2^k` coefficients waits in `partials[k]` until an equal one follows
+// it, and the two are merged. Merging equal halves keeps the operands of each multiplication about
+// the same size, where Horner's rule multiplies an ever larger accumulator by the same value.
+// Whatever blocks remain at the end are merged from the smallest up.
+//
+// `pair(c_i, c_{i+1})` makes the block of two adjacent coefficients, and `single(c)` the block of
+// the last coefficient when the length is odd. `merge(lower, upper, k, upper_len)` combines a block
+// `lower` of `2^k` coefficients with the block `upper` of `upper_len` coefficients directly above
+// it. There must be at least 2 coefficients.
+//
+// This is the loop structure of `_fmpz_poly_evaluate_divconquer_fmpz` from
+// `fmpz_poly/evaluate_divconquer_fmpz.c`, FLINT 3.6.0, with the arithmetic left to the caller.
+#[doc(hidden)]
+pub fn divide_and_conquer_blocks<C, T: Clone + Zero>(
+    coefficients: &[C],
+    pair: impl Fn(&C, &C) -> T,
+    single: impl Fn(&C) -> T,
+    merge: impl Fn(&T, T, usize, usize) -> T,
+) -> T {
+    let len = coefficients.len();
+    assert!(len >= 2);
+    // 2^{h - 1} < len <= 2^h, and h >= 1.
+    let h = usize::exact_from((len - 1).significant_bits());
+    let mut partials = vec![T::ZERO; h + 1];
+    // Absorbs a block of `block_len` coefficients ending just before coefficient `end` into the
+    // pending blocks, merging it with as many of them as the carries of `end` call for, and returns
+    // where it was left and how many coefficients it then covers.
+    let absorb =
+        |mut block: T, mut block_len: usize, end: usize, partials: &mut [T]| -> (usize, usize) {
+            let carries = usize::exact_from(end.trailing_zeros());
+            let mut k = 1;
+            while k < carries {
+                block = merge(&partials[k], block, k, block_len);
+                block_len += usize::power_of_2(u64::exact_from(k));
+                k += 1;
+            }
+            partials[k] = block;
+            (k, block_len)
+        };
+    let mut k = 1;
+    let mut top_len = 0;
+    for (i, [low, high]) in coefficients.as_chunks::<2>().0.iter().enumerate() {
+        (k, top_len) = absorb(pair(low, high), 2, (i + 1) << 1, &mut partials);
+    }
+    if len.odd() {
+        (k, top_len) = absorb(single(&coefficients[len - 1]), 1, len + 1, &mut partials);
+    }
+    let mut value = replace(&mut partials[k], T::ZERO);
+    while k < h {
+        if (len - 1).get_bit(u64::exact_from(k)) {
+            value = merge(&partials[k], value, k, top_len);
+            top_len += usize::power_of_2(u64::exact_from(k));
+        }
+        k += 1;
+    }
+    value
+}
+
+// Evaluates a polynomial, given by its coefficients in ascending order, at `x` by divide and
+// conquer: a block of coefficients `c_i, ..., c_{i + l - 1}` has the value `c_i + c_{i + 1} x + ...
+// + c_{i + l - 1} x^{l - 1}`, and a block of `2^k` coefficients below one with value `v` merges
+// with it as `lower + x^{2^k} v`.
 //
 // This is equivalent to `fmpz_poly_evaluate_divconquer_fmpz` and
 // `_fmpz_poly_evaluate_divconquer_fmpz` from `fmpz_poly/evaluate_divconquer_fmpz.c`, FLINT 3.6.0.
@@ -61,14 +118,12 @@ where
     T: Clone + Zero + for<'a> AddAssign<&'a T> + for<'a> MulAssign<&'a T>,
     for<'a> &'a T: Mul<&'a T, Output = T> + Square<Output = T>,
 {
-    let len = coefficients.len();
-    match len {
+    match coefficients.len() {
         0 => return T::ZERO,
         1 => return coefficients[0].clone(),
         _ => {}
     }
-    // 2^{h - 1} < len <= 2^h, and h >= 1.
-    let h = usize::exact_from((len - 1).significant_bits());
+    let h = usize::exact_from((coefficients.len() - 1).significant_bits());
     // powers[k - 1] is x^{2^k}, for 1 <= k < h; x itself is borrowed rather than stored.
     let mut powers: Vec<T> = Vec::with_capacity(h - 1);
     for k in 1..h {
@@ -80,41 +135,20 @@ where
         powers.push(square);
     }
     let power = |k: usize| if k == 0 { x } else { &powers[k - 1] };
-    // Merges the block `upper` onto `partials[k]`, the block of equal size below it.
-    let merge = |upper: &mut T, partials: &[T], k: usize| {
-        *upper *= power(k);
-        *upper += &partials[k];
-    };
-    let mut partials = vec![T::ZERO; h + 1];
-    // Absorbs a block ending just before coefficient `end` into the pending blocks, merging it with
-    // as many of them as the carries of `end` call for.
-    let absorb = |mut block: T, end: usize, partials: &mut [T]| -> usize {
-        let carries = usize::exact_from(end.trailing_zeros());
-        let mut k = 1;
-        while k < carries {
-            merge(&mut block, partials, k);
-            k += 1;
-        }
-        partials[k] = block;
-        k
-    };
-    let mut k = 1;
-    for (i, [low, high]) in coefficients.as_chunks::<2>().0.iter().enumerate() {
-        let mut block = high * x;
-        block += low;
-        k = absorb(block, (i + 1) << 1, &mut partials);
-    }
-    if len.odd() {
-        k = absorb(coefficients[len - 1].clone(), len + 1, &mut partials);
-    }
-    let mut value = replace(&mut partials[k], T::ZERO);
-    while k < h {
-        if (len - 1).get_bit(u64::exact_from(k)) {
-            merge(&mut value, &partials, k);
-        }
-        k += 1;
-    }
-    value
+    divide_and_conquer_blocks(
+        coefficients,
+        |low, high| {
+            let mut block = high * x;
+            block += low;
+            block
+        },
+        T::clone,
+        |lower, mut upper, k, _| {
+            upper *= power(k);
+            upper += lower;
+            upper
+        },
+    )
 }
 
 // Divide and conquer only pays once its balanced multiplications are large enough for a

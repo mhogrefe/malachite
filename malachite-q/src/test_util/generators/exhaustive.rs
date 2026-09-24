@@ -61,7 +61,9 @@ use malachite_nz::gaussian_integer::exhaustive::exhaustive_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::integer_polynomial::exhaustive::exhaustive_integer_polynomials;
+use malachite_nz::integer_polynomial::exhaustive::{
+    exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
@@ -998,6 +1000,21 @@ pub fn exhaustive_rational_polynomial_integer_polynomial_pair_gen()
     Box::new(exhaustive_pairs(
         exhaustive_rational_polynomials(),
         exhaustive_integer_polynomials(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_rational_pair_gen() -> It<(IntegerPolynomial, Rational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_rationals(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_rational_pair_gen_var_1() -> It<(IntegerPolynomial, Rational)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials_min_degree(40),
+        exhaustive_rationals(),
     ))
 }
 

@@ -1312,6 +1312,23 @@ pub fn rational_polynomial_integer_polynomial_pair_gen()
     )
 }
 
+pub fn integer_polynomial_rational_pair_gen() -> Generator<(IntegerPolynomial, Rational)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_rational_pair_gen,
+        &random_integer_polynomial_rational_pair_gen,
+        &special_random_integer_polynomial_rational_pair_gen,
+    )
+}
+
+// The `IntegerPolynomial` has degree at least 40, and the `Rational` is small.
+pub fn integer_polynomial_rational_pair_gen_var_1() -> Generator<(IntegerPolynomial, Rational)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_rational_pair_gen_var_1,
+        &random_integer_polynomial_rational_pair_gen_var_1,
+        &special_random_integer_polynomial_rational_pair_gen_var_1,
+    )
+}
+
 pub fn rational_polynomial_natural_polynomial_pair_gen()
 -> Generator<(RationalPolynomial, NaturalPolynomial)> {
     Generator::new(

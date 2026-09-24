@@ -339,7 +339,12 @@ documented by git history.
   for polynomials that are long compared with the size of the value. Where FLINT switches at 50
   coefficients whatever the value, Malachite's crossover, tuned, depends on both: about 1024
   coefficients when the value fits in one limb, and otherwise when the length times the value's limb
-  count reaches 256. It is not part of the `Polynomial` trait, since `UnsignedPolynomial` does not
+  count reaches 256. `&IntegerPolynomial` also evaluates at a `Rational`, like
+  `fmpz_poly_evaluate_fmpq`, giving a result in lowest terms; it works with the numerator of the
+  homogenized polynomial, so that the result needs reducing only when the leading coefficient shares
+  a factor with the denominator of the value. This makes it several times as fast as a direct
+  translation of FLINT's algorithms, and its choice between Horner's rule and divide and conquer is
+  tuned separately. It is not part of the `Polynomial` trait, since `UnsignedPolynomial` does not
   implement it.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with

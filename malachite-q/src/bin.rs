@@ -101,7 +101,12 @@ fn main() {
             &args.out,
         );
     } else {
-        panic!();
+        let codegen_key = args.codegen_key.unwrap();
+        if let Some(tune_key) = codegen_key.strip_prefix("tune_") {
+            crate::bin_util::tune::tune(tune_key);
+        } else {
+            panic!("Invalid codegen key: {codegen_key}");
+        }
     }
 }
 
@@ -111,4 +116,5 @@ fn main() {}
 #[cfg(feature = "bin_build")]
 pub mod bin_util {
     pub mod demo_and_bench;
+    pub mod tune;
 }

@@ -15,10 +15,14 @@
     the two algorithms, which are not public, against the functions they translate; the first
     checks the public evaluation, including its choice between them. Each mode treats any other
     nonempty line as an error, and an input with no lines at all.
+
+    The `_fmpq` modes are the same with `x` and `r` rationals, such as `-2/3`, diffed against
+    fmpz_poly_evaluate_fmpq, fmpz_poly_evaluate_horner_fmpq, and fmpz_poly_evaluate_divconquer_fmpq.
 */
 
 #include <string.h>
 
+#include <flint/fmpq.h>
 #include <flint/fmpz_poly.h>
 
 #include "oracle.h"
@@ -109,4 +113,103 @@ run_fmpz_poly_evaluate_divconquer_fmpz(const char * arg)
 {
     return run_evaluate(arg, "evaluate_divide_and_conquer", "fmpz_poly_evaluate_divconquer_fmpz",
                         fmpz_poly_evaluate_divconquer_fmpz);
+}
+
+typedef void (* rational_evaluator)(fmpq_t, const fmpz_poly_t, const fmpq_t);
+
+static rational_evaluator current_rational_evaluator;
+
+static int
+check_evaluate_fmpq_line(char * line, int line_number)
+{
+    char * receiver;
+    char * point;
+    char * expected_str;
+    if (!split_polynomial_scalar_line(line, current_method, NULL, NULL, &receiver, &point,
+                                      &expected_str))
+    {
+        if (line[0] == '\0')
+        {
+            return 0;
+        }
+        flint_printf("error in %s test, line %d: unrecognized line\n", current_name,
+                     line_number);
+        return 1;
+    }
+    checked++;
+    int result = 0;
+    fmpz_poly_t p;
+    fmpq_t x, expected, r;
+    fmpz_poly_init(p);
+    fmpq_init(x);
+    fmpq_init(expected);
+    fmpq_init(r);
+    if (!fmpz_poly_set_str_malachite(p, receiver) || fmpq_set_str(x, point, 10) != 0
+        || fmpq_set_str(expected, expected_str, 10) != 0)
+    {
+        flint_printf("error in %s test, line %d: unreadable input\n", current_name,
+                     line_number);
+        result = 1;
+    }
+    else
+    {
+        /* Malachite prints rationals in lowest terms, so what was read must already be canonical;
+           otherwise the comparison below would pass for an unreduced result. */
+        fmpq_t canonical;
+        fmpq_init(canonical);
+        fmpq_set(canonical, expected);
+        fmpq_canonicalise(canonical);
+        if (!fmpq_equal(canonical, expected))
+        {
+            flint_printf("error in %s test, line %d: result not in lowest terms\n",
+                         current_name, line_number);
+            result = 1;
+        }
+        fmpq_clear(canonical);
+        current_rational_evaluator(r, p, x);
+        if (result == 0 && !fmpq_equal(r, expected))
+        {
+            flint_printf("error in %s test, line %d. FLINT: ", current_name, line_number);
+            fmpq_print(r);
+            flint_printf("\n");
+            result = 1;
+        }
+    }
+    fmpz_poly_clear(p);
+    fmpq_clear(x);
+    fmpq_clear(expected);
+    fmpq_clear(r);
+    return result;
+}
+
+static int
+run_evaluate_fmpq(const char * arg, const char * method, const char * name, rational_evaluator f)
+{
+    checked = 0;
+    current_method = method;
+    current_name = name;
+    current_rational_evaluator = f;
+    int result = for_each_line(arg, check_evaluate_fmpq_line);
+    return result != 0 ? result : require_some_lines(name, checked);
+}
+
+int
+run_fmpz_poly_evaluate_fmpq(const char * arg)
+{
+    return run_evaluate_fmpq(arg, "evaluate", "fmpz_poly_evaluate_fmpq", fmpz_poly_evaluate_fmpq);
+}
+
+int
+run_fmpz_poly_evaluate_horner_fmpq(const char * arg)
+{
+    return run_evaluate_fmpq(arg, "evaluate_horner", "fmpz_poly_evaluate_horner_fmpq",
+                             fmpz_poly_evaluate_horner_fmpq);
+}
+
+int
+run_fmpz_poly_evaluate_divconquer_fmpq(const char * arg)
+{
+    return run_evaluate_fmpq(arg, "evaluate_divide_and_conquer",
+                             "fmpz_poly_evaluate_divconquer_fmpq",
+                             fmpz_poly_evaluate_divconquer_fmpq);
 }

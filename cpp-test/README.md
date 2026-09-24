@@ -56,6 +56,9 @@ shared state: don't run the driver and a manual demo regeneration concurrently.
 | `fmpz_poly_evaluate_fmpz` | `fmpz_poly_evaluate_fmpz` | `demo_integer_polynomial_evaluate`, `_ref`, and `_long`, and the same three for `natural_polynomial` (malachite-nz), plus unit rows |
 | `fmpz_poly_evaluate_horner_fmpz` | `fmpz_poly_evaluate_horner_fmpz` | `demo_integer_polynomial_evaluate_horner` and `demo_natural_polynomial_evaluate_horner` (malachite-nz), which checks the translation of the non-public Horner algorithm, plus unit rows |
 | `fmpz_poly_evaluate_divconquer_fmpz` | `fmpz_poly_evaluate_divconquer_fmpz` | `demo_integer_polynomial_evaluate_divide_and_conquer` and `_long`, and the same two for `natural_polynomial` (malachite-nz), which check the translation of the non-public divide-and-conquer algorithm, plus unit rows |
+| `fmpz_poly_evaluate_fmpq` | `fmpz_poly_evaluate_fmpq` | `demo_integer_polynomial_evaluate_rational`, `_ref`, and `_long` (malachite-q), plus unit rows |
+| `fmpz_poly_evaluate_horner_fmpq` | `fmpz_poly_evaluate_horner_fmpq` | `demo_integer_polynomial_evaluate_rational_horner` (malachite-q), which checks the translation of the non-public Horner algorithm, plus unit rows |
+| `fmpz_poly_evaluate_divconquer_fmpq` | `fmpz_poly_evaluate_divconquer_fmpq` | `demo_integer_polynomial_evaluate_rational_divide_and_conquer` and `_long` (malachite-q), which check the translation of the non-public divide-and-conquer algorithm, plus unit rows |
 | `sqrtmod_stress` | `fmpz_sqrtmod` | none — a memory-stress diagnostic, run manually |
 
 The `sqrtmod` modes skip documented divergence windows, noted in comments in

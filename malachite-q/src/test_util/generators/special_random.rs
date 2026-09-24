@@ -66,7 +66,9 @@ use malachite_nz::gaussian_integer::random::striped_random_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::striped_random_integers;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::integer_polynomial::random::striped_random_integer_polynomials;
+use malachite_nz::integer_polynomial::random::{
+    striped_random_integer_polynomials, striped_random_integer_polynomials_min_degree,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::random::{
     striped_random_natural_range_to_infinity, striped_random_naturals,
@@ -2521,6 +2523,63 @@ pub fn special_random_rational_polynomial_integer_polynomial_pair_gen(
                 config.get_or("mean_bits_d", 1),
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_polynomial_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_polynomial_rational_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials_min_degree(
+                seed,
+                40,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 64),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 4),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_small_bits_n", 8),
+                config.get_or("mean_small_bits_d", 1),
             )
         },
     ))

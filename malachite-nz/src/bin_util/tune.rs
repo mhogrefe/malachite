@@ -2371,8 +2371,8 @@ fn tune_add() {
 // Polynomial evaluation: Horner's rule against divide and conquer. The crossover depends on the
 // size of the point as much as on the length, so no single length threshold fits; this prints a
 // grid instead. For each (coefficient bits, point bits) pair it gives the ratio of the divide-and-
-// conquer time to the Horner time at a range of lengths, and the first length from which divide
-// and conquer wins at every length measured. The `EVALUATE_DIVIDE_AND_CONQUER_*` constants in
+// conquer time to the Horner time at a range of lengths, and the first length from which divide and
+// conquer wins at every length measured. The `EVALUATE_DIVIDE_AND_CONQUER_*` constants in
 // `integer_polynomial::arithmetic::evaluate` are read off it.
 #[allow(clippy::print_stdout)]
 fn tune_evaluate() {

@@ -61,7 +61,9 @@ use malachite_nz::gaussian_integer::random::random_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::random_integers;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::integer_polynomial::random::random_integer_polynomials;
+use malachite_nz::integer_polynomial::random::{
+    random_integer_polynomials, random_integer_polynomials_min_degree,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::random::{
     random_natural_range_to_infinity, random_naturals, random_positive_naturals,
@@ -2274,6 +2276,55 @@ pub fn random_rational_polynomial_integer_polynomial_pair_gen(
                 config.get_or("mean_bits_d", 1),
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_integer_polynomial_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_integer_polynomial_rational_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_polynomials_min_degree(
+                seed,
+                40,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 64),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_small_bits_n", 8),
+                config.get_or("mean_small_bits_d", 1),
             )
         },
     ))

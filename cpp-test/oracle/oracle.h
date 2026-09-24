@@ -128,5 +128,8 @@ int run_fmpz_mod_poly_set_fmpz_poly(const char * arg);
 int run_fmpz_poly_evaluate_fmpz(const char * arg);
 int run_fmpz_poly_evaluate_horner_fmpz(const char * arg);
 int run_fmpz_poly_evaluate_divconquer_fmpz(const char * arg);
+int run_fmpz_poly_evaluate_fmpq(const char * arg);
+int run_fmpz_poly_evaluate_horner_fmpq(const char * arg);
+int run_fmpz_poly_evaluate_divconquer_fmpq(const char * arg);
 
 #endif
