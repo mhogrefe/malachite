@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2IsReduced, PowerOf2};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::polynomial::{Evaluate, EvaluateMod, EvaluateModPowerOf2, Polynomial};
+use malachite_base::test_util::generators::unsigned_polynomial_unsigned_unsigned_triple_gen_var_1;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::evaluate::{
@@ -305,6 +306,16 @@ fn evaluate_mod_power_of_2_properties() {
             assert_eq!(y, 0u32);
         }
     });
+
+    unsigned_polynomial_unsigned_unsigned_triple_gen_var_1::<u64>().test_properties(
+        |(p, x, pow)| {
+            // The `u64` and `Natural` evaluations agree.
+            assert_eq!(
+                NaturalPolynomial::from(p.clone()).evaluate_mod_power_of_2(Natural::from(x), pow),
+                p.evaluate_mod_power_of_2(x, pow)
+            );
+        },
+    );
 }
 
 #[test]

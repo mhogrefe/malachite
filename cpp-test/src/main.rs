@@ -281,6 +281,30 @@ const RATIONAL_POLYNOMIAL_EVALUATE_INTEGER_UNIT_ROWS: [(&str, &str, &str); 20] =
     ("1/2*x^60+1/3", "-1000000000000", "1500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001/3"),
 ];
 
+// The rows of test_evaluate_mod_power_of_2 in malachite-base's UnsignedPolynomial tests, for
+// every width: polynomial, point, power, value.
+const UNSIGNED_EVALUATE_MOD_POWER_OF_2_UNIT_ROWS: [(&str, &str, u64, &str); 14] = [
+    ("0", "0", 0, "0"),
+    ("0", "5", 3, "0"),
+    ("5*x^2+3*x+7", "5", 3, "3"),
+    ("5*x^2+3*x+7", "6", 4, "13"),
+    ("5*x^2+3*x+7", "6", 8, "205"),
+    ("5*x^2+3*x+7", "0", 4, "7"),
+    ("255*x+255", "255", 8, "0"),
+    ("x^7", "2", 8, "128"),
+    ("x^8", "2", 8, "0"),
+    ("3*x^3+2*x+1", "12345", 20, "232110"),
+    ("3*x^3+2*x+1", "12345", 64, "5644097915566"),
+    (
+        "18446744073709551615*x^2+1",
+        "18446744073709551615",
+        64,
+        "0",
+    ),
+    ("x^2+1", "170141183460469231731687303715884105728", 128, "1"),
+    ("340282366920938463463374607431768211455*x+5", "3", 128, "2"),
+];
+
 // The rows of test_evaluate_mod_power_of_2 in malachite-nz's NaturalPolynomial tests: polynomial,
 // point, power, value.
 const EVALUATE_MOD_POWER_OF_2_UNIT_ROWS: [(&str, &str, u64, &str); 16] = [
@@ -985,6 +1009,32 @@ fn main() {
         check_demo_against_flint(
             &oracle,
             "../malachite-nz",
+            demo_name,
+            "fmpz_mod_poly_evaluate_fmpz",
+        );
+    }
+
+    // Every case from test_evaluate_mod_power_of_2 in malachite-base's UnsignedPolynomial tests,
+    // and the generated cases from the u64 demos, against evaluation modulo 2^pow.
+    println!("testing UnsignedPolynomial evaluate_mod_power_of_2 unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, x, pow, r) in UNSIGNED_EVALUATE_MOD_POWER_OF_2_UNIT_ROWS {
+            writeln!(
+                output_file,
+                "(&({p})).evaluate_mod_power_of_2({x}, {pow}) = {r}"
+            )
+            .unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_mod_poly_evaluate_fmpz", Some(TEST_OUT));
+    for demo_name in [
+        "demo_unsigned_polynomial_evaluate_mod_power_of_2",
+        "demo_unsigned_polynomial_evaluate_mod_power_of_2_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
             demo_name,
             "fmpz_mod_poly_evaluate_fmpz",
         );

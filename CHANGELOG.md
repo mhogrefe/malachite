@@ -355,6 +355,8 @@ documented by git history.
   $2^{pow}$. It uses Horner's rule, reducing after every step; taking the polynomial by value lets
   the coefficient that is returned outright, or that starts Horner's rule, be moved rather than
   cloned.
+  It is also implemented for `UnsignedPolynomial<T>` at a `T`, for `pow` up to the width of `T`,
+  with the same checks; there Horner's rule runs in wrapping arithmetic and reduces once at the end.
 - A new `EvaluateMod` trait, in `malachite_base::polynomial`, whose `evaluate_mod(x, m)` evaluates a
   polynomial at `x` modulo `m`, like FLINT's `fmpz_mod_poly_evaluate_fmpz`. It is implemented for
   `NaturalPolynomial` at a `Natural` modulo a `Natural`, taking each of the three by value or by

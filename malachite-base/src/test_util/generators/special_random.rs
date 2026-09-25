@@ -17,7 +17,7 @@ use crate::foer_sequences::random::random_foer_sequences;
 use crate::iterators::{NonzeroValues, with_special_value};
 use crate::maps::random::{random_b_tree_maps, random_hash_maps};
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, DivRound, ModPowerOf2, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -10075,4 +10075,34 @@ pub fn special_random_unsigned_polynomial_unsigned_pair_gen_var_1(
         },
         &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, T, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, x, pow)| (p.mod_power_of_2(pow), x.mod_power_of_2(pow), pow)),
+    )
 }
