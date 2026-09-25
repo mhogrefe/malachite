@@ -4949,3 +4949,14 @@ pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsign
         &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1,
     )
 }
+
+// All `(UnsignedPolynomial<T>, T, T)` where the last `T` is positive, and the polynomial's
+// coefficients and the first `T` are less than it.
+pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2,
+        &random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2,
+        &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2,
+    )
+}

@@ -6,8 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-/// Implementations of [`EvaluateModPowerOf2`](crate::polynomial::EvaluateModPowerOf2), which
-/// evaluates a polynomial at a value modulo a power of 2.
+/// Implementations of [`EvaluateMod`](crate::polynomial::EvaluateMod) and
+/// [`EvaluateModPowerOf2`](crate::polynomial::EvaluateModPowerOf2), which evaluate a polynomial at
+/// a value modulo a value or a power of 2.
 pub mod evaluate;
 /// An implementation of [`Height`](crate::num::arithmetic::traits::Height), the largest of a
 /// polynomial's coefficients.

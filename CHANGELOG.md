@@ -362,6 +362,10 @@ documented by git history.
   `NaturalPolynomial` at a `Natural` modulo a `Natural`, taking each of the three by value or by
   reference, and panics unless every coefficient and `x` are already reduced modulo `m`. It uses
   Horner's rule with the modular multiplication's precomputed data for `m` computed once.
+  It is also implemented for `UnsignedPolynomial<T>` at a `T` modulo a `T`, like FLINT's
+  `nmod_poly_evaluate_nmod`, with the same checks; for a long enough polynomial and a modulus whose
+  top bit is clear, it multiplies by `x` with Shoup's method, lazily reduced when the modulus is at
+  most a third of `T`'s range.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

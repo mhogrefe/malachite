@@ -346,10 +346,12 @@ pub fn run_benchmark_old<'a, I: Iterator>(
     run_benchmark_internal(options);
 }
 
+// Evaluates an expression in a benchmark and discards its value. The value goes through
+// `black_box`, so that the optimizer cannot delete a computation whose only effect is its result.
 #[macro_export]
 macro_rules! no_out {
     ($e:expr) => {{
-        $e;
+        ::core::hint::black_box($e);
     }};
 }
 

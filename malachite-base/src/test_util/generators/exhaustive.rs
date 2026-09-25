@@ -16,8 +16,8 @@ use crate::iterators::iter_windows;
 use crate::maps::exhaustive::{exhaustive_b_tree_maps, exhaustive_hash_maps};
 use crate::max;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CheckedNeg, CoprimeWith, DivRound, ModPowerOf2IsReduced, Parity,
-    PowerOf2, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, CheckedNeg, CoprimeWith, DivRound, ModIsReduced, ModPowerOf2IsReduced,
+    Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -6486,5 +6486,17 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: Prim
             primitive_int_increasing_inclusive_range(0, T::WIDTH),
         )
         .filter(|(p, x, pow)| p.mod_power_of_2_is_reduced(*pow) && x.significant_bits() <= *pow),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> It<(UnsignedPolynomial<T>, T, T)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(p, x, m)| p.mod_is_reduced(m) && x < m),
     )
 }

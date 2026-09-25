@@ -8599,3 +8599,23 @@ pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: Primitiv
         .map(|(p, x, pow)| (p.mod_power_of_2(pow), x.mod_power_of_2(pow), pow)),
     )
 }
+
+pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, T, T)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_primitive_ints::<T>,
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(p, x, m)| (p % m, x % m, m)),
+    )
+}

@@ -533,3 +533,33 @@ macro_rules! impl_mod_mul {
     };
 }
 apply_to_unsigneds!(impl_mod_mul);
+
+// Returns $\lfloor a 2^W / n \rfloor$, where $W$ is the width of `T`: the data for multiplying by
+// `a` modulo `n` with Shoup's method. `a` must be less than `n`.
+//
+// This is equivalent to `n_mulmod_precomp_shoup` from `ulong_extras.h`, FLINT 3.6.0.
+crate_test_fn! {mod_mul_precompute_shoup<T: PrimitiveUnsigned>(a: T, n: T) -> T {
+    T::xx_div_mod_y_to_qr(a, T::ZERO, n).0
+}}
+
+// Returns $ab \bmod n$ or $ab \bmod n + n$, given `a`'s Shoup data. `a` must be less than `n`, and
+// `n` less than $2^{W-1}$, but `b` may be any value.
+//
+// This is equivalent to the loop body of `_nmod_poly_evaluate_nmod_precomp_lazy` from
+// `nmod_poly/evaluate_nmod.c`, FLINT 3.6.0.
+crate_test_fn! {mod_mul_shoup_lazy<T: PrimitiveUnsigned>(a: T, b: T, a_precomp: T, n: T) -> T {
+    let p_hi = T::x_mul_y_to_zz(a_precomp, b).0;
+    a.wrapping_mul(b).wrapping_sub_mul(p_hi, n)
+}}
+
+// Returns $ab \bmod n$, given `a`'s Shoup data. `a` must be less than `n`, and `n` less than
+// $2^{W-1}$, but `b` may be any value.
+//
+// This is equivalent to `n_mulmod_shoup` from `ulong_extras.h`, FLINT 3.6.0.
+crate_test_fn! {mod_mul_shoup<T: PrimitiveUnsigned>(a: T, b: T, a_precomp: T, n: T) -> T {
+    let mut res = mod_mul_shoup_lazy(a, b, a_precomp, n);
+    if res >= n {
+        res -= n;
+    }
+    res
+}}

@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::mod_mul::{
-    fast_mod_mul, limbs_invert_limb_u32, limbs_invert_limb_u64, mod_preinverted_double,
-    naive_mod_mul, test_invert_u32_table, test_invert_u64_table,
+    fast_mod_mul, limbs_invert_limb_u32, limbs_invert_limb_u64, mod_mul_precompute_shoup,
+    mod_mul_shoup, mod_mul_shoup_lazy, mod_preinverted_double, naive_mod_mul,
+    test_invert_u32_table, test_invert_u64_table,
 };
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -276,4 +277,71 @@ fn mod_mul_properties() {
 
     mod_mul_properties_fast_helper::<u32, u64>();
     mod_mul_properties_fast_helper::<u64, u128>();
+}
+
+#[test]
+fn test_mod_mul_shoup() {
+    let test = |a: u64, b: u64, n: u64, a_precomp: u64, lazy: u64, out: u64| {
+        assert_eq!(mod_mul_precompute_shoup(a, n), a_precomp);
+        assert_eq!(mod_mul_shoup_lazy(a, b, a_precomp, n), lazy);
+        assert_eq!(mod_mul_shoup(a, b, a_precomp, n), out);
+    };
+    test(3, 5, 7, 7905747460161236406, 1, 1);
+    test(6, 6, 7, 15811494920322472813, 1, 1);
+    test(0, 12345, 1000003, 0, 0, 0);
+    // b need not be reduced.
+    test(
+        999999,
+        u64::MAX,
+        1000003,
+        18446670286954617042,
+        597262,
+        597262,
+    );
+    // The lazy result can be the product plus n.
+    test(
+        9223372036854775806,
+        9223372036854775806,
+        9223372036854775807,
+        18446744073709551613,
+        9223372036854775808,
+        1,
+    );
+    test(
+        9223372036854775806,
+        u64::MAX,
+        9223372036854775807,
+        18446744073709551613,
+        9223372036854775806,
+        9223372036854775806,
+    );
+    test(
+        12345678901234567,
+        98765432109876543,
+        4611686018427388039,
+        49382715604938266,
+        1654477811169342546,
+        1654477811169342546,
+    );
+}
+
+fn mod_mul_shoup_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_triple_gen_var_12::<T>().test_properties(|(a, b, n)| {
+        if n.get_highest_bit() {
+            return;
+        }
+        let a_precomp = mod_mul_precompute_shoup(a, n);
+        let product = a.mod_mul(b, n);
+        let lazy = mod_mul_shoup_lazy(a, b, a_precomp, n);
+        assert!(lazy == product || lazy == product + n);
+        assert_eq!(mod_mul_shoup(a, b, a_precomp, n), product);
+        // b need not be reduced.
+        let c = !b;
+        assert_eq!(mod_mul_shoup(a, c, a_precomp, n), a.mod_mul(c % n, n));
+    });
+}
+
+#[test]
+fn mod_mul_shoup_properties() {
+    apply_fn_to_unsigneds!(mod_mul_shoup_properties_helper);
 }

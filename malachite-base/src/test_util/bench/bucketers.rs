@@ -1107,19 +1107,11 @@ pub fn pair_1_unsigned_polynomial_bit_bucketer<T>(
     }
 }
 
-pub fn triple_1_unsigned_polynomial_bit_bucketer<T, U>(
+pub fn triple_1_unsigned_polynomial_len_bucketer<T, U>(
     var_name: &str,
 ) -> Bucketer<'_, (UnsignedPolynomial<u64>, T, U)> {
     Bucketer {
-        bucketing_function: &|(p, _, _)| {
-            usize::exact_from(
-                p.coefficients_asc()
-                    .iter()
-                    .copied()
-                    .map(SignificantBits::significant_bits)
-                    .sum::<u64>(),
-            )
-        },
-        bucketing_label: format!("{var_name}'s total coefficient bits"),
+        bucketing_function: &|(p, _, _)| p.coefficients_asc().len(),
+        bucketing_label: format!("{var_name}.len()"),
     }
 }
