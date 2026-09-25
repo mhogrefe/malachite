@@ -193,6 +193,42 @@ pub fn special_random_integer_polynomial_unsigned_pair_gen_var_1(
     ))
 }
 
+pub fn special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(p, x, m)| (p, x % m, m)),
+    )
+}
+
 pub fn special_random_natural_polynomial_gen(config: &GenConfig) -> It<NaturalPolynomial> {
     Box::new(striped_random_natural_polynomials(
         EXAMPLE_SEED,
@@ -450,6 +486,94 @@ pub fn special_random_natural_polynomial_natural_natural_triple_gen_var_1(
     )
 }
 
+pub fn special_random_natural_polynomial_natural_vec_pair_gen(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Vec<Natural>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_vecs(
+                seed,
+                &|seed_2| {
+                    striped_random_naturals(
+                        seed_2,
+                        config.get_or("mean_stripe_n", 32),
+                        config.get_or("mean_stripe_d", 1),
+                        config.get_or("mean_bits_n", 64),
+                        config.get_or("mean_bits_d", 1),
+                    )
+                },
+                config.get_or("mean_points_n", 8),
+                config.get_or("mean_points_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_natural_polynomial_natural_vec_natural_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Vec<Natural>, Natural)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &|seed_2| {
+                        striped_random_naturals(
+                            seed_2,
+                            config.get_or("mean_stripe_n", 32),
+                            config.get_or("mean_stripe_d", 1),
+                            config.get_or("mean_bits_n", 64),
+                            config.get_or("mean_bits_d", 1),
+                        )
+                    },
+                    config.get_or("mean_points_n", 8),
+                    config.get_or("mean_points_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, xs, m)| {
+            let m = xs.iter().fold(p.height_ref().clone(), |max, x| {
+                if *x > max { x.clone() } else { max }
+            }) + m
+                + Natural::ONE;
+            (p, xs, m)
+        }),
+    )
+}
+
 pub fn special_random_natural_polynomial_gaussian_integer_pair_gen(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, GaussianInteger)> {
@@ -652,6 +776,41 @@ pub fn special_random_integer_polynomial_integer_pair_gen(
                 config.get_or("mean_stripe_d", 1),
                 config.get_or("mean_bits_n", 64),
                 config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_polynomial_integer_vec_pair_gen(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Vec<Integer>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_vecs(
+                seed,
+                &|seed_2| {
+                    striped_random_integers(
+                        seed_2,
+                        config.get_or("mean_stripe_n", 32),
+                        config.get_or("mean_stripe_d", 1),
+                        config.get_or("mean_bits_n", 64),
+                        config.get_or("mean_bits_d", 1),
+                    )
+                },
+                config.get_or("mean_points_n", 8),
+                config.get_or("mean_points_d", 1),
             )
         },
     ))

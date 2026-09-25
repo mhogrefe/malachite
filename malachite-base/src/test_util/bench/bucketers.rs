@@ -1115,3 +1115,12 @@ pub fn triple_1_unsigned_polynomial_len_bucketer<T, U>(
         bucketing_label: format!("{var_name}.len()"),
     }
 }
+
+pub fn quadruple_1_unsigned_polynomial_len_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (UnsignedPolynomial<u64>, T, U, V)> {
+    Bucketer {
+        bucketing_function: &|(p, _, _, _)| p.coefficients_asc().len(),
+        bucketing_label: format!("{var_name}.len()"),
+    }
+}

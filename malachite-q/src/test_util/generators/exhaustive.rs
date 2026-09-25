@@ -1010,6 +1010,14 @@ pub fn exhaustive_integer_polynomial_rational_pair_gen() -> It<(IntegerPolynomia
     ))
 }
 
+pub fn exhaustive_integer_polynomial_rational_vec_pair_gen()
+-> It<(IntegerPolynomial, Vec<Rational>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_vecs(exhaustive_rationals()),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_rational_pair_gen_var_1() -> It<(IntegerPolynomial, Rational)>
 {
     Box::new(exhaustive_pairs(
@@ -1049,10 +1057,26 @@ pub fn exhaustive_rational_polynomial_rational_pair_gen() -> It<(RationalPolynom
     ))
 }
 
+pub fn exhaustive_rational_polynomial_rational_vec_pair_gen()
+-> It<(RationalPolynomial, Vec<Rational>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_vecs(exhaustive_rationals()),
+    ))
+}
+
 pub fn exhaustive_rational_polynomial_integer_pair_gen() -> It<(RationalPolynomial, Integer)> {
     Box::new(exhaustive_pairs(
         exhaustive_rational_polynomials(),
         exhaustive_integers(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_integer_vec_pair_gen()
+-> It<(RationalPolynomial, Vec<Integer>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_vecs(exhaustive_integers()),
     ))
 }
 

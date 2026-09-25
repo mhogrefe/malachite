@@ -6,7 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::polynomial::{Evaluate, EvaluateMod, EvaluateModPowerOf2};
+use malachite_base::polynomial::{
+    Evaluate, EvaluateMany, EvaluateManyMod, EvaluateMod, EvaluateModPowerOf2,
+};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -20,6 +22,8 @@ use malachite_nz::test_util::generators::{
     natural_polynomial_natural_natural_triple_gen_var_1, natural_polynomial_natural_pair_gen,
     natural_polynomial_natural_pair_gen_var_2,
     natural_polynomial_natural_unsigned_triple_gen_var_1,
+    natural_polynomial_natural_vec_natural_triple_gen_var_1,
+    natural_polynomial_natural_vec_pair_gen,
 };
 use malachite_nz::test_util::natural_polynomial::arithmetic::evaluate::*;
 
@@ -60,6 +64,16 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_natural_polynomial_evaluate_mod_evaluation_strategy
     );
     register_bench!(runner, benchmark_natural_polynomial_evaluate_mod_algorithms);
+    register_demo!(runner, demo_natural_polynomial_evaluate_many);
+    register_demo!(runner, demo_natural_polynomial_evaluate_many_mod);
+    register_bench!(
+        runner,
+        benchmark_natural_polynomial_evaluate_many_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_natural_polynomial_evaluate_many_mod_algorithms
+    );
 }
 
 fn demo_natural_polynomial_evaluate(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -384,6 +398,85 @@ fn benchmark_natural_polynomial_evaluate_mod_algorithms(
             }),
             ("evaluate, then reduce", &mut |(p, x, m)| {
                 no_out!(evaluate_mod_naive(&p, &x, &m));
+            }),
+        ],
+    );
+}
+
+fn demo_natural_polynomial_evaluate_many(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, xs) in natural_polynomial_natural_vec_pair_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&({p})).evaluate_many(&{xs:?}) = {:?}",
+            (&p).evaluate_many(&xs)
+        );
+    }
+}
+
+fn demo_natural_polynomial_evaluate_many_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, xs, m) in natural_polynomial_natural_vec_natural_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&({p})).evaluate_many_mod(&{xs:?}, &{m}) = {:?}",
+            (&p).evaluate_many_mod(&xs, &m)
+        );
+    }
+}
+
+fn benchmark_natural_polynomial_evaluate_many_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "(&NaturalPolynomial).evaluate_many(&[Natural])",
+        BenchmarkType::Algorithms,
+        natural_polynomial_natural_vec_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_natural_polynomial_bit_bucketer("p"),
+        &mut [
+            ("default", &mut |(p, xs)| no_out!((&p).evaluate_many(&xs))),
+            ("naive", &mut |(p, xs)| {
+                no_out!(evaluate_many_naive(&p, &xs));
+            }),
+        ],
+    );
+}
+
+fn benchmark_natural_polynomial_evaluate_many_mod_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "(&NaturalPolynomial).evaluate_many_mod(&[Natural], &Natural)",
+        BenchmarkType::Algorithms,
+        natural_polynomial_natural_vec_natural_triple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_natural_polynomial_bit_bucketer("p"),
+        &mut [
+            ("default", &mut |(p, xs, m)| {
+                no_out!((&p).evaluate_many_mod(&xs, &m));
+            }),
+            ("one at a time", &mut |(p, xs, m)| {
+                no_out!(
+                    xs.iter()
+                        .map(|x| (&p).evaluate_mod(x, &m))
+                        .collect::<Vec<_>>()
+                );
+            }),
+            ("naive", &mut |(p, xs, m)| {
+                no_out!(evaluate_many_mod_naive(&p, &xs, &m));
             }),
         ],
     );

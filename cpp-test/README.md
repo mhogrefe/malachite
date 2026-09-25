@@ -62,6 +62,7 @@ shared state: don't run the driver and a manual demo regeneration concurrently.
 | `fmpq_poly_evaluate_fmpq` | `fmpq_poly_evaluate_fmpq` | `demo_rational_polynomial_evaluate` and `_ref` (malachite-q), plus unit rows; its inputs are read by `fmpq_poly_set_str_malachite` in `oracle/util.c` |
 | `fmpq_poly_evaluate_fmpz` | `fmpq_poly_evaluate_fmpz` | `demo_rational_polynomial_evaluate_integer` and `_ref` (malachite-q), plus unit rows |
 | `fmpz_mod_poly_evaluate_fmpz` | `fmpz_mod_poly_evaluate_fmpz`, with the modulus 2^pow or m | `demo_natural_polynomial_evaluate_mod_power_of_2`, `demo_natural_polynomial_evaluate_mod`, and their `_ref` versions (malachite-nz); `demo_unsigned_polynomial_evaluate_mod_power_of_2`, `demo_unsigned_polynomial_evaluate_mod`, and their `_ref` versions (malachite-base); plus unit rows |
+| `fmpz_poly_evaluate_mod` | `fmpz_poly_evaluate_mod` | `demo_integer_polynomial_evaluate_mod_u64` (malachite-nz), plus unit rows |
 | `sqrtmod_stress` | `fmpz_sqrtmod` | none — a memory-stress diagnostic, run manually |
 
 The `sqrtmod` modes skip documented divergence windows, noted in comments in

@@ -140,5 +140,6 @@ int run_fmpz_poly_evaluate_divconquer_fmpq(const char * arg);
 int run_fmpq_poly_evaluate_fmpq(const char * arg);
 int run_fmpq_poly_evaluate_fmpz(const char * arg);
 int run_fmpz_mod_poly_evaluate_fmpz(const char * arg);
+int run_fmpz_poly_evaluate_mod(const char * arg);
 
 #endif

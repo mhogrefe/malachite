@@ -6500,3 +6500,30 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: Prim
         .filter(|(p, x, m)| p.mod_is_reduced(m) && x < m),
     )
 }
+
+pub fn exhaustive_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, Vec<T>, T)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_vecs(exhaustive_unsigneds::<T>()),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(p, xs, m)| p.mod_is_reduced(m) && xs.iter().all(|x| x < m)),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, T, u64, T)> {
+    Box::new(
+        exhaustive_quadruples(
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_unsigneds::<u64>(),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(p, q, _, m)| p.mod_is_reduced(m) && q < m),
+    )
+}

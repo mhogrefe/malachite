@@ -236,8 +236,8 @@ pub trait EvaluateModPowerOf2<T> {
     fn evaluate_mod_power_of_2(self, x: T, pow: u64) -> Self::Output;
 }
 
-/// Evaluates a polynomial at a value, modulo $m$. The polynomial's coefficients and the value must
-/// already be reduced modulo $m$.
+/// Evaluates a polynomial at a value, modulo $m$. The value must already be reduced modulo $m$, and
+/// so must the polynomial's coefficients, unless an implementation says otherwise.
 pub trait EvaluateMod<T, M = T> {
     /// The type of the polynomial's value.
     type Output;
@@ -250,4 +250,53 @@ pub trait EvaluateMod<T, M = T> {
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     fn evaluate_mod(self, x: T, m: M) -> Self::Output;
+}
+
+/// Evaluates a polynomial at each of several values.
+pub trait EvaluateMany<T> {
+    /// The type of the polynomial's values.
+    type Output;
+
+    /// Evaluates a polynomial at each value in `xs`, returning the values in the same order.
+    ///
+    /// $$
+    /// f(p, (x_j)_{j=0}^{k-1}) = \left ( \sum_{i=0}^{n-1} c_i x_j^i \right )_{j=0}^{k-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    fn evaluate_many(self, xs: &[T]) -> Vec<Self::Output>;
+}
+
+/// Evaluates a polynomial at each of several values, modulo $m$. The values must already be reduced
+/// modulo $m$, and so must the polynomial's coefficients, unless an implementation says otherwise.
+pub trait EvaluateManyMod<T, M = T> {
+    /// The type of the polynomial's values.
+    type Output;
+
+    /// Evaluates a polynomial at each value in `xs`, modulo `m`, returning the values in the same
+    /// order.
+    ///
+    /// $$
+    /// f(p, (x_j)_{j=0}^{k-1}, m) = \left ( \sum_{i=0}^{n-1} c_i x_j^i \bmod m
+    /// \right )_{j=0}^{k-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    fn evaluate_many_mod(self, xs: &[T], m: M) -> Vec<Self::Output>;
+}
+
+/// Evaluates a polynomial at the first terms of a geometric progression starting at 1, modulo $m$.
+/// The ratio must already be reduced modulo $m$, and so must the polynomial's coefficients.
+pub trait EvaluateGeometricMod<T, M = T> {
+    /// The type of the polynomial's values.
+    type Output;
+
+    /// Evaluates a polynomial at $1, q, q^2, \ldots, q^{k-1}$, modulo `m`.
+    ///
+    /// $$
+    /// f(p, q, k, m) = \left ( \sum_{i=0}^{n-1} c_i q^{ij} \bmod m \right )_{j=0}^{k-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    fn evaluate_geometric_mod(self, q: T, k: u64, m: M) -> Vec<Self::Output>;
 }

@@ -7,13 +7,20 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::mod_mul::mod_mul_precompute_shoup;
-use malachite_base::polynomial::{EvaluateMod, EvaluateModPowerOf2};
-use malachite_base::test_util::bench::bucketers::triple_1_unsigned_polynomial_len_bucketer;
+use malachite_base::num::arithmetic::traits::ModPow;
+use malachite_base::polynomial::{
+    EvaluateGeometricMod, EvaluateManyMod, EvaluateMod, EvaluateModPowerOf2,
+};
+use malachite_base::test_util::bench::bucketers::{
+    quadruple_1_unsigned_polynomial_len_bucketer, triple_1_unsigned_polynomial_len_bucketer,
+};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_1,
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_2,
+    unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+    unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_base::test_util::runner::Runner;
 use malachite_base::test_util::unsigned_polynomial::arithmetic::evaluate::*;
@@ -42,6 +49,16 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_unsigned_polynomial_evaluate_mod_algorithms
+    );
+    register_demo!(runner, demo_unsigned_polynomial_evaluate_many_mod);
+    register_demo!(runner, demo_unsigned_polynomial_evaluate_geometric_mod);
+    register_bench!(
+        runner,
+        benchmark_unsigned_polynomial_evaluate_many_mod_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_unsigned_polynomial_evaluate_geometric_mod_algorithms
     );
 }
 
@@ -219,6 +236,94 @@ fn benchmark_unsigned_polynomial_evaluate_mod_algorithms(
             }),
             ("naive", &mut |(p, x, m)| {
                 no_out!(evaluate_mod_naive(&p, x, m));
+            }),
+        ],
+    );
+}
+
+fn demo_unsigned_polynomial_evaluate_many_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, xs, m) in unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&({p})).evaluate_many_mod(&{xs:?}, {m}) = {:?}",
+            (&p).evaluate_many_mod(&xs, m)
+        );
+    }
+}
+
+fn demo_unsigned_polynomial_evaluate_geometric_mod(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, q, k, m) in unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&({p})).evaluate_geometric_mod({q}, {k}, {m}) = {:?}",
+            (&p).evaluate_geometric_mod(q, k, m)
+        );
+    }
+}
+
+fn benchmark_unsigned_polynomial_evaluate_many_mod_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "(&UnsignedPolynomial<u64>).evaluate_many_mod(&[u64], u64)",
+        BenchmarkType::Algorithms,
+        unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_unsigned_polynomial_len_bucketer("p"),
+        &mut [
+            ("default", &mut |(p, xs, m)| {
+                no_out!((&p).evaluate_many_mod(&xs, m));
+            }),
+            ("one at a time", &mut |(p, xs, m)| {
+                no_out!(
+                    xs.iter()
+                        .map(|&x| (&p).evaluate_mod(x, m))
+                        .collect::<Vec<_>>()
+                );
+            }),
+            ("naive", &mut |(p, xs, m)| {
+                no_out!(evaluate_many_mod_naive(&p, &xs, m));
+            }),
+        ],
+    );
+}
+
+fn benchmark_unsigned_polynomial_evaluate_geometric_mod_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "(&UnsignedPolynomial<u64>).evaluate_geometric_mod(u64, u64, u64)",
+        BenchmarkType::Algorithms,
+        unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_unsigned_polynomial_len_bucketer("p"),
+        &mut [
+            ("default", &mut |(p, q, k, m)| {
+                no_out!((&p).evaluate_geometric_mod(q, k, m));
+            }),
+            ("one at a time", &mut |(p, q, k, m)| {
+                no_out!(
+                    (0..k)
+                        .map(|j| (&p).evaluate_mod(q.mod_pow(j, m), m))
+                        .collect::<Vec<_>>()
+                );
+            }),
+            ("naive", &mut |(p, q, k, m)| {
+                no_out!(evaluate_geometric_mod_naive(&p, q, k, m));
             }),
         ],
     );

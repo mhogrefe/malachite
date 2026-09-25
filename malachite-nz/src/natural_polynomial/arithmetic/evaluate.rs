@@ -8,14 +8,19 @@
 
 use crate::integer_polynomial::arithmetic::evaluate::evaluate;
 use crate::natural::Natural;
+use crate::natural::arithmetic::mod_mul::ModMulData;
 use crate::natural_polynomial::NaturalPolynomial;
+use alloc::vec;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
     ModAddAssign, ModIsReduced, ModMulPrecomputed, ModMulPrecomputedAssign, ModPowerOf2AddAssign,
     ModPowerOf2IsReduced, ModPowerOf2MulAssign,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::polynomial::{Evaluate, EvaluateMod, EvaluateModPowerOf2};
+use malachite_base::polynomial::{
+    Evaluate, EvaluateMany, EvaluateManyMod, EvaluateMod, EvaluateModPowerOf2,
+};
 
 impl Evaluate<&Natural> for &NaturalPolynomial {
     type Output = Natural;
@@ -378,10 +383,20 @@ fn assert_reduced_mod(p: &NaturalPolynomial, x: &Natural, m: &Natural) {
 // Continues Horner's rule from `value`, the leading coefficient, down through `rest`, modulo m.
 // Every step multiplies by the same x modulo the same m, so the data for that multiplication is
 // computed once.
-fn horner_mod(mut value: Natural, rest: &[Natural], x: &Natural, m: &Natural) -> Natural {
-    let data = <Natural as ModMulPrecomputed<&Natural, &Natural>>::precompute_mod_mul_data(&m);
+#[inline]
+fn precompute_mod_mul_data(m: &Natural) -> ModMulData {
+    <Natural as ModMulPrecomputed<&Natural, &Natural>>::precompute_mod_mul_data(&m)
+}
+
+fn horner_mod(
+    mut value: Natural,
+    rest: &[Natural],
+    x: &Natural,
+    m: &Natural,
+    data: &ModMulData,
+) -> Natural {
     for c in rest.iter().rev() {
-        value.mod_mul_precomputed_assign(x, m, &data);
+        value.mod_mul_precomputed_assign(x, m, data);
         value.mod_add_assign(c, m);
     }
     value
@@ -396,7 +411,7 @@ fn evaluate_mod_ref(p: &NaturalPolynomial, x: &Natural, m: &Natural) -> Natural 
     if rest.is_empty() || *x == 0u32 {
         return p.coefficients[0].clone();
     }
-    horner_mod(leading.clone(), rest, x, m)
+    horner_mod(leading.clone(), rest, x, m, &precompute_mod_mul_data(m))
 }
 
 // The same as `evaluate_mod_ref`, but taking the polynomial by value, so that the coefficient that
@@ -408,7 +423,7 @@ fn evaluate_mod_val(p: NaturalPolynomial, x: &Natural, m: &Natural) -> Natural {
         return coefficients.into_iter().next().unwrap_or(Natural::ZERO);
     }
     let leading = coefficients.pop().unwrap();
-    horner_mod(leading, &coefficients, x, m)
+    horner_mod(leading, &coefficients, x, m, &precompute_mod_mul_data(m))
 }
 
 impl EvaluateMod<&Natural, &Natural> for &NaturalPolynomial {
@@ -838,5 +853,180 @@ impl EvaluateMod<Natural, Natural> for NaturalPolynomial {
     #[inline]
     fn evaluate_mod(self, x: Natural, m: Natural) -> Natural {
         evaluate_mod_val(self, &x, &m)
+    }
+}
+
+fn evaluate_many_mod(p: &NaturalPolynomial, xs: &[Natural], m: &Natural) -> Vec<Natural> {
+    assert!(
+        p.mod_is_reduced(m),
+        "self must be reduced mod m, but {p} has a coefficient >= {m}"
+    );
+    for x in xs {
+        assert!(*x < *m, "x must be reduced mod m, but {x} >= {m}");
+    }
+    let Some((leading, rest)) = p.coefficients.split_last() else {
+        return vec![Natural::ZERO; xs.len()];
+    };
+    let data = precompute_mod_mul_data(m);
+    xs.iter()
+        .map(|x| {
+            if rest.is_empty() || *x == 0u32 {
+                p.coefficients[0].clone()
+            } else {
+                horner_mod(leading.clone(), rest, x, m, &data)
+            }
+        })
+        .collect()
+}
+
+impl EvaluateManyMod<Natural, &Natural> for &NaturalPolynomial {
+    type Output = Natural;
+
+    /// Evaluates a [`NaturalPolynomial`] at each of several [`Natural`]s, modulo a [`Natural`],
+    /// taking the modulus by reference. The coefficients and the values must already be reduced
+    /// modulo `m`.
+    ///
+    /// $$
+    /// f(p, (x_j)_{j=0}^{k-1}, m) = \left ( \sum_{i=0}^{n-1} c_i x_j^i \bmod m
+    /// \right )_{j=0}^{k-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    ///
+    /// The result is the same as calling
+    /// [`evaluate_mod`](malachite_base::polynomial::EvaluateMod::evaluate_mod) at each value, but
+    /// the polynomial is checked, and the data for modular multiplication by `m` computed, once.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, k, b) = O(nkb \log b \log\log b)$
+    ///
+    /// $M(k, b) = O(kb)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.len()`, $k$ is `xs.len()`, and $b$
+    /// is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is 0, or if any coefficient of `self` or any value in `xs` is greater than or
+    /// equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::EvaluateManyMod;
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// let p = NaturalPolynomial::from_str("5*x^2+3*x+7").unwrap();
+    /// let xs = [0u32, 1, 2, 3].map(Natural::from);
+    /// // 7, 15, 33, and 61, mod 13
+    /// assert_eq!(
+    ///     (&p).evaluate_many_mod(&xs, &Natural::from(13u32)),
+    ///     [7u32, 2, 7, 9].map(Natural::from)
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_poly_evaluate_fmpz_vec_iter` from
+    /// `fmpz_mod_poly/evaluate_fmpz_vec.c`, FLINT 3.6.0, except that the values must be reduced.
+    #[inline]
+    fn evaluate_many_mod(self, xs: &[Natural], m: &Natural) -> Vec<Natural> {
+        evaluate_many_mod(self, xs, m)
+    }
+}
+
+impl EvaluateManyMod<Natural, Natural> for &NaturalPolynomial {
+    type Output = Natural;
+
+    /// Evaluates a [`NaturalPolynomial`] at each of several [`Natural`]s, modulo a [`Natural`],
+    /// taking the modulus by value. The coefficients and the values must already be reduced modulo
+    /// `m`.
+    ///
+    /// $$
+    /// f(p, (x_j)_{j=0}^{k-1}, m) = \left ( \sum_{i=0}^{n-1} c_i x_j^i \bmod m
+    /// \right )_{j=0}^{k-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    ///
+    /// The result is the same as calling
+    /// [`evaluate_mod`](malachite_base::polynomial::EvaluateMod::evaluate_mod) at each value, but
+    /// the polynomial is checked, and the data for modular multiplication by `m` computed, once.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, k, b) = O(nkb \log b \log\log b)$
+    ///
+    /// $M(k, b) = O(kb)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.len()`, $k$ is `xs.len()`, and $b$
+    /// is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is 0, or if any coefficient of `self` or any value in `xs` is greater than or
+    /// equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::EvaluateManyMod;
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// let p = NaturalPolynomial::from_str("5*x^2+3*x+7").unwrap();
+    /// let xs = [0u32, 1, 2, 3].map(Natural::from);
+    /// // 7, 15, 33, and 61, mod 13
+    /// assert_eq!(
+    ///     (&p).evaluate_many_mod(&xs, Natural::from(13u32)),
+    ///     [7u32, 2, 7, 9].map(Natural::from)
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_poly_evaluate_fmpz_vec_iter` from
+    /// `fmpz_mod_poly/evaluate_fmpz_vec.c`, FLINT 3.6.0, except that the values must be reduced.
+    #[inline]
+    fn evaluate_many_mod(self, xs: &[Natural], m: Natural) -> Vec<Natural> {
+        evaluate_many_mod(self, xs, &m)
+    }
+}
+
+impl EvaluateMany<Natural> for &NaturalPolynomial {
+    type Output = Natural;
+
+    /// Evaluates a [`NaturalPolynomial`] at each of several [`Natural`]s.
+    ///
+    /// $$
+    /// f(p, (x_j)_{j=0}^{k-1}) = \left ( \sum_{i=0}^{n-1} c_i x_j^i \right )_{j=0}^{k-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    ///
+    /// Each value is found as by [`evaluate`](malachite_base::polynomial::Evaluate::evaluate),
+    /// which chooses between Horner's rule and divide and conquer by the length of the polynomial
+    /// and the size of the value.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, k) = O(kn \log^2 n \log\log n)$
+    ///
+    /// $M(n, k) = O(kn \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $k$ is `xs.len()`, and $n$ is `self.len()`
+    /// times the larger of the greatest number of bits of any coefficient and the greatest number
+    /// of bits of any value in `xs`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::EvaluateMany;
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// let p = NaturalPolynomial::from_str("5*x^2+3*x+7").unwrap();
+    /// let xs = [0u32, 1, 2, 3].map(Natural::from);
+    /// assert_eq!(
+    ///     (&p).evaluate_many(&xs),
+    ///     [7u32, 15, 33, 61].map(Natural::from)
+    /// );
+    /// ```
+    #[inline]
+    fn evaluate_many(self, xs: &[Natural]) -> Vec<Natural> {
+        xs.iter().map(|x| self.evaluate(x)).collect()
     }
 }

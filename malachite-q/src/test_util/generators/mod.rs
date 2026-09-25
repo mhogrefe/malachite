@@ -1320,6 +1320,14 @@ pub fn integer_polynomial_rational_pair_gen() -> Generator<(IntegerPolynomial, R
     )
 }
 
+pub fn integer_polynomial_rational_vec_pair_gen() -> Generator<(IntegerPolynomial, Vec<Rational>)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_rational_vec_pair_gen,
+        &random_integer_polynomial_rational_vec_pair_gen,
+        &special_random_integer_polynomial_rational_vec_pair_gen,
+    )
+}
+
 // The `IntegerPolynomial` has degree at least 40, and the `Rational` is small.
 pub fn integer_polynomial_rational_pair_gen_var_1() -> Generator<(IntegerPolynomial, Rational)> {
     Generator::new(
@@ -1364,11 +1372,28 @@ pub fn rational_polynomial_rational_pair_gen() -> Generator<(RationalPolynomial,
     )
 }
 
+pub fn rational_polynomial_rational_vec_pair_gen() -> Generator<(RationalPolynomial, Vec<Rational>)>
+{
+    Generator::new(
+        &exhaustive_rational_polynomial_rational_vec_pair_gen,
+        &random_rational_polynomial_rational_vec_pair_gen,
+        &special_random_rational_polynomial_rational_vec_pair_gen,
+    )
+}
+
 pub fn rational_polynomial_integer_pair_gen() -> Generator<(RationalPolynomial, Integer)> {
     Generator::new(
         &exhaustive_rational_polynomial_integer_pair_gen,
         &random_rational_polynomial_integer_pair_gen,
         &special_random_rational_polynomial_integer_pair_gen,
+    )
+}
+
+pub fn rational_polynomial_integer_vec_pair_gen() -> Generator<(RationalPolynomial, Vec<Integer>)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_integer_vec_pair_gen,
+        &random_rational_polynomial_integer_vec_pair_gen,
+        &special_random_rational_polynomial_integer_vec_pair_gen,
     )
 }
 

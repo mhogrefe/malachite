@@ -9,7 +9,9 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2IsReduced, PowerOf2};
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::polynomial::{Evaluate, EvaluateMod, EvaluateModPowerOf2, Polynomial};
+use malachite_base::polynomial::{
+    Evaluate, EvaluateMany, EvaluateManyMod, EvaluateMod, EvaluateModPowerOf2, Polynomial,
+};
 use malachite_base::test_util::generators::{
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_1,
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_2,
@@ -25,6 +27,8 @@ use malachite_nz::test_util::generators::{
     natural_gen, natural_polynomial_natural_natural_triple_gen_var_1,
     natural_polynomial_natural_pair_gen, natural_polynomial_natural_pair_gen_var_2,
     natural_polynomial_natural_unsigned_triple_gen_var_1,
+    natural_polynomial_natural_vec_natural_triple_gen_var_1,
+    natural_polynomial_natural_vec_pair_gen,
 };
 use malachite_nz::test_util::natural_polynomial::arithmetic::evaluate::*;
 
@@ -439,5 +443,88 @@ fn evaluate_mod_properties() {
             NaturalPolynomial::from(p.clone()).evaluate_mod(Natural::from(x), Natural::from(m)),
             p.evaluate_mod(x, m)
         );
+    });
+}
+
+#[test]
+fn test_evaluate_many() {
+    let test = |s, xs: &[u32], out: &[u32]| {
+        let p = NaturalPolynomial::from_str(s).unwrap();
+        let xs: Vec<Natural> = xs.iter().map(|&x| Natural::from(x)).collect();
+        let out: Vec<Natural> = out.iter().map(|&y| Natural::from(y)).collect();
+        assert_eq!((&p).evaluate_many(&xs), out);
+        assert_eq!(evaluate_many_naive(&p, &xs), out);
+    };
+    test("5*x^2+3*x+7", &[], &[]);
+    test("0", &[0, 5], &[0, 0]);
+    test("5*x^2+3*x+7", &[0, 1, 2, 3], &[7, 15, 33, 61]);
+}
+
+#[test]
+fn evaluate_many_properties() {
+    natural_polynomial_natural_vec_pair_gen().test_properties(|(p, xs)| {
+        let ys = (&p).evaluate_many(&xs);
+        assert_eq!(ys.len(), xs.len());
+        for (x, y) in xs.iter().zip(&ys) {
+            assert_eq!((&p).evaluate(x), *y);
+        }
+        assert_eq!(evaluate_many_naive(&p, &xs), ys);
+    });
+}
+
+#[test]
+fn test_evaluate_many_mod() {
+    let test = |s, xs: &[u32], m: u32, out: &[u32]| {
+        let p = NaturalPolynomial::from_str(s).unwrap();
+        let xs: Vec<Natural> = xs.iter().map(|&x| Natural::from(x)).collect();
+        let m = Natural::from(m);
+        let out: Vec<Natural> = out.iter().map(|&y| Natural::from(y)).collect();
+        assert_eq!((&p).evaluate_many_mod(&xs, &m), out);
+        assert_eq!((&p).evaluate_many_mod(&xs, m.clone()), out);
+        assert_eq!(evaluate_many_mod_naive(&p, &xs, &m), out);
+    };
+    // - no points
+    test("5*x^2+3*x+7", &[], 13, &[]);
+    // - the zero polynomial
+    test("0", &[0, 5], 13, &[0, 0]);
+    // - a constant polynomial, and x == 0
+    test("9", &[0, 5], 13, &[9, 9]);
+    test("5*x^2+3*x+7", &[0, 1, 2, 3], 13, &[7, 2, 7, 9]);
+}
+
+#[test]
+#[should_panic]
+fn evaluate_many_mod_fail_1() {
+    // A coefficient is not reduced.
+    (&NaturalPolynomial::from_str("5*x+1").unwrap())
+        .evaluate_many_mod(&[Natural::ONE], &Natural::from(5u32));
+}
+
+#[test]
+#[should_panic]
+fn evaluate_many_mod_fail_2() {
+    // A point is not reduced.
+    (&NaturalPolynomial::from_str("x+1").unwrap())
+        .evaluate_many_mod(&[Natural::ONE, Natural::from(5u32)], &Natural::from(5u32));
+}
+
+#[test]
+#[should_panic]
+fn evaluate_many_mod_fail_3() {
+    // m is 0.
+    (&NaturalPolynomial::ZERO).evaluate_many_mod(&[], &Natural::ZERO);
+}
+
+#[test]
+fn evaluate_many_mod_properties() {
+    natural_polynomial_natural_vec_natural_triple_gen_var_1().test_properties(|(p, xs, m)| {
+        let ys = (&p).evaluate_many_mod(&xs, &m);
+        assert_eq!((&p).evaluate_many_mod(&xs, m.clone()), ys);
+        assert_eq!(ys.len(), xs.len());
+        for (x, y) in xs.iter().zip(&ys) {
+            assert!(*y < m);
+            assert_eq!((&p).evaluate_mod(x, &m), *y);
+        }
+        assert_eq!(evaluate_many_mod_naive(&p, &xs, &m), ys);
     });
 }

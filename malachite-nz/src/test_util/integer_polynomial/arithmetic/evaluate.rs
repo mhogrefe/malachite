@@ -8,7 +8,8 @@
 
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
-use malachite_base::num::arithmetic::traits::Pow;
+use alloc::vec::Vec;
+use malachite_base::num::arithmetic::traits::{Mod, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -21,4 +22,15 @@ pub fn evaluate_naive(p: &IntegerPolynomial, x: &Integer) -> Integer {
         sum += c * x.pow(u64::exact_from(i));
     }
     sum
+}
+
+// Evaluates a polynomial at `x` modulo `m` by evaluating it exactly and reducing the value once.
+// The value can be large, but nothing is shared with the word-sized evaluation.
+pub fn evaluate_mod_u64_naive(p: &IntegerPolynomial, x: u64, m: u64) -> u64 {
+    u64::exact_from(&evaluate_naive(p, &Integer::from(x)).mod_op(Integer::from(m)))
+}
+
+// Evaluates a polynomial at each of `xs` with `evaluate_naive`.
+pub fn evaluate_many_naive(p: &IntegerPolynomial, xs: &[Integer]) -> Vec<Integer> {
+    xs.iter().map(|x| evaluate_naive(p, x)).collect()
 }

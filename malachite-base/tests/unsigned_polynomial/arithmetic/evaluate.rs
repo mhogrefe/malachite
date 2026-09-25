@@ -11,16 +11,22 @@ use malachite_base::num::arithmetic::mod_mul::mod_mul_precompute_shoup;
 use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::polynomial::{EvaluateMod, EvaluateModPowerOf2, Polynomial};
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::polynomial::{
+    EvaluateGeometricMod, EvaluateManyMod, EvaluateMod, EvaluateModPowerOf2, Polynomial,
+};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_1,
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_2,
+    unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+    unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_base::test_util::unsigned_polynomial::arithmetic::evaluate::*;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::arithmetic::evaluate::{
-    evaluate_mod_horner, evaluate_mod_shoup, evaluate_mod_shoup_lazy,
+    evaluate_mod_horner, evaluate_mod_horner_block, evaluate_mod_shoup, evaluate_mod_shoup_block,
+    evaluate_mod_shoup_lazy, evaluate_mod_shoup_lazy_block,
 };
 
 #[test]
@@ -402,4 +408,308 @@ fn evaluate_mod_properties_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn evaluate_mod_properties() {
     apply_fn_to_unsigneds!(evaluate_mod_properties_helper);
+}
+
+#[test]
+fn test_evaluate_many_mod() {
+    fn test<T: PrimitiveUnsigned>(s: &str, xs: &[T], m: T, out: &[T]) {
+        let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
+        let ys = (&p).evaluate_many_mod(xs, m);
+        assert_eq!(ys, out);
+        let ys_alt: Vec<T> = xs.iter().map(|&x| (&p).evaluate_mod(x, m)).collect();
+        assert_eq!(ys_alt, out);
+    }
+    // - no points
+    test::<u8>("5*x^2+3*x+7", &[], 13, &[]);
+    // - the zero polynomial
+    test::<u8>("0", &[0, 5, 6], 13, &[0, 0, 0]);
+    // - a constant polynomial
+    test::<u8>("9", &[0, 5, 6], 13, &[9, 9, 9]);
+    // - lazy Shoup blocks, since a u8 polynomial of length 2 or more uses Shoup
+    test::<u8>("5*x^2+3*x+7", &[0, 1, 2, 3, 4, 5], 13, &[7, 2, 7, 9, 8, 4]);
+    // - Shoup blocks, not lazy
+    test::<u8>(
+        "5*x^2+3*x+7",
+        &[0, 1, 2, 3, 4, 5, 6, 7, 8],
+        120,
+        &[7, 15, 33, 61, 99, 27, 85, 33, 111],
+    );
+    // - Horner blocks, since the top bit of m is set
+    test::<u8>(
+        "5*x^2+3*x+7",
+        &[0, 1, 2, 3, 4, 5, 6, 7, 8],
+        251,
+        &[7, 15, 33, 61, 99, 147, 205, 22, 100],
+    );
+    // - Horner blocks, since the polynomial is too short for Shoup in a u64
+    test::<u64>(
+        "3*x+1",
+        &[0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3],
+        7,
+        &[1, 4, 0, 3, 6, 2, 5, 1, 4, 0, 3],
+    );
+    // - lazy Shoup blocks of 8, then of 4, and a point left over
+    test::<u64>(
+        "12*x^11+11*x^10+10*x^9+9*x^8+8*x^7+7*x^6+6*x^5+5*x^4+4*x^3+3*x^2+2*x+1",
+        &[2, 3, 5, 7, 11, 2, 3, 5, 7, 2, 3, 5, 7],
+        1000003,
+        &[
+            45057, 55777, 160935, 12308, 564144, 45057, 55777, 160935, 12308, 45057, 55777, 160935,
+            12308,
+        ],
+    );
+    // - Shoup blocks, not lazy, and points left over
+    test::<u64>(
+        "x^3+6789*x^2+12345",
+        &[
+            4611686018427387904,
+            4611686018427387905,
+            4611686018427387906,
+            4611686018427387907,
+            4611686018427387908,
+            4611686018427387909,
+            4611686018427387904,
+            4611686018427387905,
+            4611686018427387906,
+            4611686018427387907,
+        ],
+        9223372036854775783,
+        &[
+            3458764513821615998,
+            5764607523035486965,
+            8070450532249371591,
+            1152921504608494099,
+            3458764513822406061,
+            5764607523036331700,
+            3458764513821615998,
+            5764607523035486965,
+            8070450532249371591,
+            1152921504608494099,
+        ],
+    );
+    // - Horner blocks, since the top bit of m is set, and points left over
+    test::<u64>(
+        "x^3+x^2+x+1",
+        &[
+            18446744073709551556,
+            18446744073709551555,
+            18446744073709551554,
+            18446744073709551553,
+            18446744073709551552,
+            18446744073709551551,
+            18446744073709551550,
+            18446744073709551556,
+            18446744073709551555,
+            18446744073709551554,
+            18446744073709551553,
+        ],
+        18446744073709551557,
+        &[
+            0,
+            18446744073709551552,
+            18446744073709551537,
+            18446744073709551506,
+            18446744073709551453,
+            18446744073709551372,
+            18446744073709551257,
+            0,
+            18446744073709551552,
+            18446744073709551537,
+            18446744073709551506,
+        ],
+    );
+    // - lazy Shoup blocks in a u128
+    test::<u128>(
+        "4*x^3+3*x^2+2*x+1",
+        &[1267650600228229401496703205376, 3, 5, 7, 9],
+        170141183460469231731687303715884105727,
+        &[2535301228790657981686254403585, 142, 586, 1534, 3178],
+    );
+}
+
+#[test]
+#[should_panic]
+fn evaluate_many_mod_fail_1() {
+    // m is 0.
+    (&UnsignedPolynomial::<u8>::ZERO).evaluate_many_mod(&[], 0);
+}
+
+#[test]
+#[should_panic]
+fn evaluate_many_mod_fail_2() {
+    // A coefficient is not reduced.
+    (&UnsignedPolynomial::<u8>::from_str("5*x+1").unwrap()).evaluate_many_mod(&[1], 5);
+}
+
+#[test]
+#[should_panic]
+fn evaluate_many_mod_fail_3() {
+    // A point is not reduced.
+    (&UnsignedPolynomial::<u8>::from_str("x+1").unwrap()).evaluate_many_mod(&[1, 2, 5, 3], 5);
+}
+
+// Each block kernel that applies agrees with evaluating one point at a time, for a block of `N`
+// points. The points are taken from the front of `xs`, repeated if there are fewer than `N`.
+fn evaluate_mod_blocks_agree<T: PrimitiveUnsigned, const N: usize>(
+    coefficients: &[T],
+    xs: &[T],
+    m: T,
+) {
+    if coefficients.is_empty() || xs.is_empty() {
+        return;
+    }
+    let block: [T; N] = core::array::from_fn(|i| xs[i % xs.len()]);
+    let expected = block.map(|x| evaluate_mod_horner(coefficients, x, m));
+    let mut values = block;
+    evaluate_mod_horner_block(coefficients, &mut values, m);
+    assert_eq!(values, expected);
+    if !m.get_highest_bit() {
+        let mut values = block;
+        evaluate_mod_shoup_block(coefficients, &mut values, m);
+        assert_eq!(values, expected);
+        if m <= T::MAX / T::from(3u8) {
+            let mut values = block;
+            evaluate_mod_shoup_lazy_block(coefficients, &mut values, m);
+            assert_eq!(values, expected);
+        }
+    }
+}
+
+fn evaluate_many_mod_properties_helper<T: PrimitiveUnsigned>() {
+    let test = |(p, xs, m): (UnsignedPolynomial<T>, Vec<T>, T)| {
+        let ys = (&p).evaluate_many_mod(&xs, m);
+        assert_eq!(ys.len(), xs.len());
+        assert!(ys.iter().all(|&y| y < m));
+        let ys_alt: Vec<T> = xs.iter().map(|&x| (&p).evaluate_mod(x, m)).collect();
+        assert_eq!(ys_alt, ys);
+        assert_eq!(evaluate_many_mod_naive(&p, &xs, m), ys);
+
+        let coefficients = p.coefficients_asc();
+        evaluate_mod_blocks_agree::<T, 1>(coefficients, &xs, m);
+        evaluate_mod_blocks_agree::<T, 2>(coefficients, &xs, m);
+        evaluate_mod_blocks_agree::<T, 3>(coefficients, &xs, m);
+        evaluate_mod_blocks_agree::<T, 4>(coefficients, &xs, m);
+        evaluate_mod_blocks_agree::<T, 8>(coefficients, &xs, m);
+
+        // Evaluating at the concatenation of two lists concatenates the values.
+        let (xs_1, xs_2) = xs.split_at(xs.len() >> 1);
+        let mut ys_alt = (&p).evaluate_many_mod(xs_1, m);
+        ys_alt.extend((&p).evaluate_many_mod(xs_2, m));
+        assert_eq!(ys_alt, ys);
+    };
+    unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1::<T>().test_properties(test);
+
+    // Long enough for the dispatch to reach Shoup's method.
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_length_d", 1);
+    unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1::<T>()
+        .test_properties_with_config(&config, test);
+}
+
+#[test]
+fn evaluate_many_mod_properties() {
+    apply_fn_to_unsigneds!(evaluate_many_mod_properties_helper);
+}
+
+#[test]
+fn test_evaluate_geometric_mod() {
+    fn test<T: PrimitiveUnsigned>(s: &str, q: T, k: u64, m: T, out: &[T]) {
+        let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
+        assert_eq!((&p).evaluate_geometric_mod(q, k, m), out);
+        assert_eq!(evaluate_geometric_mod_naive(&p, q, k, m), out);
+    }
+    // - no points
+    test::<u8>("5*x^2+3*x+7", 2, 0, 13, &[]);
+    // - modulo 1, where the first power, 1, is 0
+    test::<u8>("0", 0, 3, 1, &[0, 0, 0]);
+    // - powers by Shoup multiplication
+    test::<u8>("5*x^2+3*x+7", 2, 4, 13, &[2, 7, 8, 0]);
+    // - powers by Horner multiplication, since the top bit of m is set
+    test::<u8>("5*x^2+3*x+7", 2, 5, 251, &[15, 33, 99, 100, 80]);
+    // - powers by Shoup multiplication in a u64
+    test::<u64>(
+        "12*x^11+11*x^10+10*x^9+9*x^8+8*x^7+7*x^6+6*x^5+5*x^4+4*x^3+3*x^2+2*x+1",
+        3,
+        6,
+        1000003,
+        &[78, 55777, 85524, 367025, 953372, 980990],
+    );
+    // - powers by Horner multiplication in a u64
+    test::<u64>(
+        "3*x^2+2*x+1",
+        18446744073709551556,
+        6,
+        18446744073709551557,
+        &[6, 2, 6, 2, 6, 2],
+    );
+    // - q == 0, so every value after the first is the constant term
+    test::<u64>("x+5", 0, 4, 7, &[6, 5, 5, 5]);
+    // - powers in a u128
+    test::<u128>(
+        "4*x^3+3*x^2+2*x+1",
+        1267650600228229401496703205376,
+        5,
+        170141183460469231731687303715884105727,
+        &[
+            10,
+            2535301228790657981686254403585,
+            19807059518032015876968415233,
+            14855280471424704036277854209,
+            576461576938192897,
+        ],
+    );
+}
+
+#[test]
+#[should_panic]
+fn evaluate_geometric_mod_fail_1() {
+    // m is 0.
+    (&UnsignedPolynomial::<u8>::ZERO).evaluate_geometric_mod(0, 1, 0);
+}
+
+#[test]
+#[should_panic]
+fn evaluate_geometric_mod_fail_2() {
+    // A coefficient is not reduced.
+    (&UnsignedPolynomial::<u8>::from_str("5*x+1").unwrap()).evaluate_geometric_mod(1, 3, 5);
+}
+
+#[test]
+#[should_panic]
+fn evaluate_geometric_mod_fail_3() {
+    // q is not reduced.
+    (&UnsignedPolynomial::<u8>::from_str("x+1").unwrap()).evaluate_geometric_mod(5, 3, 5);
+}
+
+fn evaluate_geometric_mod_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1::<T>().test_properties(
+        |(p, q, k, m)| {
+            let ys = (&p).evaluate_geometric_mod(q, k, m);
+            assert_eq!(u64::exact_from(ys.len()), k);
+            assert!(ys.iter().all(|&y| y < m));
+            assert_eq!(evaluate_geometric_mod_naive(&p, q, k, m), ys);
+
+            // It is evaluation at the powers of q.
+            let powers: Vec<T> = (0..k).map(|j| q.mod_pow(j, m)).collect();
+            assert_eq!((&p).evaluate_many_mod(&powers, m), ys);
+
+            // The first value is p(1), and, when q is 0, every later one is p(0).
+            if k != 0 {
+                assert_eq!(ys[0], (&p).evaluate_mod(T::ONE % m, m));
+            }
+            if q == T::ZERO && k > 1 {
+                assert!(ys[1..].iter().all(|&y| y == p.coefficient(0)));
+            }
+            // Fewer points give a prefix.
+            if k != 0 {
+                assert_eq!((&p).evaluate_geometric_mod(q, k - 1, m), ys[..ys.len() - 1]);
+            }
+        },
+    );
+}
+
+#[test]
+fn evaluate_geometric_mod_properties() {
+    apply_fn_to_unsigneds!(evaluate_geometric_mod_properties_helper);
 }

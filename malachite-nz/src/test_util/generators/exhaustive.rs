@@ -208,6 +208,14 @@ pub fn exhaustive_integer_polynomial_integer_pair_gen() -> It<(IntegerPolynomial
     ))
 }
 
+pub fn exhaustive_integer_polynomial_integer_vec_pair_gen() -> It<(IntegerPolynomial, Vec<Integer>)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_vecs(exhaustive_integers()),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_integer_pair_gen_var_1() -> It<(IntegerPolynomial, Integer)> {
     Box::new(exhaustive_pairs(
         exhaustive_integer_polynomials(),
@@ -265,6 +273,18 @@ pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_1() -> It<(IntegerPol
         exhaustive_integer_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+pub fn exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_1()
+-> It<(IntegerPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_integer_polynomials(),
+            exhaustive_unsigneds::<u64>(),
+            exhaustive_positive_primitive_ints::<u64>(),
+        )
+        .filter(|&(_, x, m)| x < m),
+    )
 }
 
 pub fn exhaustive_natural_polynomial_gen() -> It<NaturalPolynomial> {
@@ -345,6 +365,32 @@ pub fn exhaustive_natural_polynomial_natural_natural_triple_gen_var_1()
                 (p, x, m)
             },
         ),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_vec_pair_gen() -> It<(NaturalPolynomial, Vec<Natural>)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_polynomials(),
+        exhaustive_vecs(exhaustive_naturals()),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_natural_vec_natural_triple_gen_var_1()
+-> It<(NaturalPolynomial, Vec<Natural>, Natural)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials(),
+            exhaustive_vecs(exhaustive_naturals()),
+            exhaustive_naturals(),
+        )
+        .map(|(p, xs, m)| {
+            let m = xs.iter().fold(p.height_ref().clone(), |max, x| {
+                if *x > max { x.clone() } else { max }
+            }) + m
+                + Natural::ONE;
+            (p, xs, m)
+        }),
     )
 }
 

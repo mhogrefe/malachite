@@ -61,6 +61,17 @@ pub fn integer_polynomial_unsigned_pair_gen_var_1() -> Generator<(IntegerPolynom
     )
 }
 
+// All `(IntegerPolynomial, u64, u64)` where the last `u64` is positive and the first is less than
+// it. The coefficients are arbitrary.
+pub fn integer_polynomial_unsigned_unsigned_triple_gen_var_1()
+-> Generator<(IntegerPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_1,
+        &random_integer_polynomial_unsigned_unsigned_triple_gen_var_1,
+        &special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_1,
+    )
+}
+
 pub fn natural_polynomial_gen() -> Generator<NaturalPolynomial> {
     Generator::new(
         &exhaustive_natural_polynomial_gen,
@@ -153,6 +164,25 @@ pub fn natural_polynomial_natural_natural_triple_gen_var_1()
     )
 }
 
+pub fn natural_polynomial_natural_vec_pair_gen() -> Generator<(NaturalPolynomial, Vec<Natural>)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_vec_pair_gen,
+        &random_natural_polynomial_natural_vec_pair_gen,
+        &special_random_natural_polynomial_natural_vec_pair_gen,
+    )
+}
+
+// All `(NaturalPolynomial, Vec<Natural>, Natural)` where the last `Natural` is greater than every
+// coefficient and every value in the `Vec`.
+pub fn natural_polynomial_natural_vec_natural_triple_gen_var_1()
+-> Generator<(NaturalPolynomial, Vec<Natural>, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_vec_natural_triple_gen_var_1,
+        &random_natural_polynomial_natural_vec_natural_triple_gen_var_1,
+        &special_random_natural_polynomial_natural_vec_natural_triple_gen_var_1,
+    )
+}
+
 pub fn natural_polynomial_gaussian_integer_pair_gen()
 -> Generator<(NaturalPolynomial, GaussianInteger)> {
     Generator::new(
@@ -227,6 +257,14 @@ pub fn integer_polynomial_integer_pair_gen() -> Generator<(IntegerPolynomial, In
         &exhaustive_integer_polynomial_integer_pair_gen,
         &random_integer_polynomial_integer_pair_gen,
         &special_random_integer_polynomial_integer_pair_gen,
+    )
+}
+
+pub fn integer_polynomial_integer_vec_pair_gen() -> Generator<(IntegerPolynomial, Vec<Integer>)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_vec_pair_gen,
+        &random_integer_polynomial_integer_vec_pair_gen,
+        &special_random_integer_polynomial_integer_vec_pair_gen,
     )
 }
 

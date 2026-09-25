@@ -8,6 +8,7 @@
 
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::natural::Natural;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::iter::Sum;
@@ -18,7 +19,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use malachite_base::polynomial::Evaluate;
+use malachite_base::polynomial::{Evaluate, EvaluateMany, EvaluateMod};
+use malachite_base::unsigned_polynomial::arithmetic::evaluate::evaluate_mod_slice;
 
 // Evaluates a polynomial, given by its coefficients in ascending order, at `x` with Horner's rule.
 //
@@ -310,5 +312,121 @@ impl Evaluate<Integer> for &IntegerPolynomial {
     #[inline]
     fn evaluate(self, x: Integer) -> Integer {
         evaluate_integer(&self.coefficients, &x)
+    }
+}
+
+// Returns `c` modulo `m`, in $[0, m)$, where `m_natural` is `m` as a `Natural`.
+fn integer_mod_u64(c: &Integer, m: u64, m_natural: &Natural) -> u64 {
+    let r = u64::exact_from(&(&c.abs % m_natural));
+    if c.sign || r == 0 { r } else { m - r }
+}
+
+impl EvaluateMod<u64> for &IntegerPolynomial {
+    type Output = u64;
+
+    /// Evaluates an [`IntegerPolynomial`] at a [`u64`], modulo a [`u64`]. The coefficients may be
+    /// any [`Integer`]s, and are reduced as the evaluation goes; `x` must already be reduced modulo
+    /// `m`.
+    ///
+    /// $$
+    /// f(p, x, m) = \left ( \sum_{i=0}^{n-1} c_i x^i \right ) \bmod m,
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$, $n$ is its length, and the result is in $[0,
+    /// m)$. The zero polynomial evaluates to 0 everywhere.
+    ///
+    /// Each coefficient is reduced to a word, and the words are then evaluated as by
+    /// [`UnsignedPolynomial::evaluate_mod`](malachite_base::polynomial::EvaluateMod::evaluate_mod),
+    /// with Horner's rule and, for longer polynomials, Shoup's method.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n + m)$
+    ///
+    /// $M(m) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits of the
+    /// coefficients, and $m$ is `self.len()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is 0, or if `x` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::EvaluateMod;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// let p = IntegerPolynomial::from_str("-5*x^2+3*x-7").unwrap();
+    /// // -5 * 36 + 3 * 6 - 7 = -169, which is 7 mod 11.
+    /// assert_eq!((&p).evaluate_mod(6, 11), 7);
+    /// // The coefficients need not be reduced.
+    /// let p = IntegerPolynomial::from_str("100*x+1").unwrap();
+    /// assert_eq!((&p).evaluate_mod(3, 10), 1);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_evaluate_mod` from `fmpz_poly/evaluate_mod.c`, FLINT 3.6.0,
+    /// except that `x` must be reduced.
+    fn evaluate_mod(self, x: u64, m: u64) -> u64 {
+        assert_ne!(m, 0, "m cannot be 0");
+        assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+        let m_natural = Natural::from(m);
+        match self.coefficients.as_slice() {
+            [] => 0,
+            [c, ..] if x == 0 => integer_mod_u64(c, m, &m_natural),
+            coefficients => {
+                let reduced: Vec<u64> = coefficients
+                    .iter()
+                    .map(|c| integer_mod_u64(c, m, &m_natural))
+                    .collect();
+                evaluate_mod_slice(&reduced, x, m)
+            }
+        }
+    }
+}
+
+impl EvaluateMany<Integer> for &IntegerPolynomial {
+    type Output = Integer;
+
+    /// Evaluates an [`IntegerPolynomial`] at each of several [`Integer`]s.
+    ///
+    /// $$
+    /// f(p, (x_j)_{j=0}^{k-1}) = \left ( \sum_{i=0}^{n-1} c_i x_j^i \right )_{j=0}^{k-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    ///
+    /// Each value is found as by [`evaluate`](malachite_base::polynomial::Evaluate::evaluate),
+    /// which chooses between Horner's rule and divide and conquer by the length of the polynomial
+    /// and the size of the value.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, k) = O(kn \log^2 n \log\log n)$
+    ///
+    /// $M(n, k) = O(kn \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $k$ is `xs.len()`, and $n$ is `self.len()`
+    /// times the larger of the greatest number of bits of any coefficient and the greatest number
+    /// of bits of any value in `xs`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::EvaluateMany;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// let p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();
+    /// let xs = [-1i32, 0, 1, 2, 3].map(Integer::from);
+    /// assert_eq!(
+    ///     (&p).evaluate_many(&xs),
+    ///     [6i32, 2, 0, 0, 2].map(Integer::from)
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_evaluate_fmpz_vec` from `fmpz_poly/evaluate_fmpz_vec.c`,
+    /// FLINT 3.6.0.
+    #[inline]
+    fn evaluate_many(self, xs: &[Integer]) -> Vec<Integer> {
+        xs.iter().map(|x| self.evaluate(x)).collect()
     }
 }

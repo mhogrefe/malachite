@@ -8,6 +8,7 @@
 
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -32,4 +33,14 @@ pub fn evaluate_mod_power_of_2_naive(p: &NaturalPolynomial, x: &Natural, pow: u6
 // Evaluates a polynomial at x in full and then reduces the value modulo m.
 pub fn evaluate_mod_naive(p: &NaturalPolynomial, x: &Natural, m: &Natural) -> Natural {
     evaluate_naive(p, x) % m
+}
+
+// Evaluates a polynomial at each of `xs` with `evaluate_naive`.
+pub fn evaluate_many_naive(p: &NaturalPolynomial, xs: &[Natural]) -> Vec<Natural> {
+    xs.iter().map(|x| evaluate_naive(p, x)).collect()
+}
+
+// Evaluates a polynomial at each of `xs` modulo `m` with `evaluate_mod_naive`.
+pub fn evaluate_many_mod_naive(p: &NaturalPolynomial, xs: &[Natural], m: &Natural) -> Vec<Natural> {
+    xs.iter().map(|x| evaluate_mod_naive(p, x, m)).collect()
 }

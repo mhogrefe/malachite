@@ -2556,6 +2556,41 @@ pub fn special_random_integer_polynomial_rational_pair_gen(
     ))
 }
 
+pub fn special_random_integer_polynomial_rational_vec_pair_gen(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Vec<Rational>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_vecs(
+                seed,
+                &|seed_2| {
+                    striped_random_rationals(
+                        seed_2,
+                        config.get_or("mean_stripe_n", 32),
+                        config.get_or("mean_stripe_d", 1),
+                        config.get_or("mean_bits_n", 64),
+                        config.get_or("mean_bits_d", 1),
+                    )
+                },
+                config.get_or("mean_points_n", 8),
+                config.get_or("mean_points_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_integer_polynomial_rational_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, Rational)> {
@@ -2699,6 +2734,41 @@ pub fn special_random_rational_polynomial_rational_pair_gen(
     ))
 }
 
+pub fn special_random_rational_polynomial_rational_vec_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, Vec<Rational>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_vecs(
+                seed,
+                &|seed_2| {
+                    striped_random_rationals(
+                        seed_2,
+                        config.get_or("mean_stripe_n", 32),
+                        config.get_or("mean_stripe_d", 1),
+                        config.get_or("mean_bits_n", 64),
+                        config.get_or("mean_bits_d", 1),
+                    )
+                },
+                config.get_or("mean_points_n", 8),
+                config.get_or("mean_points_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_rational_polynomial_integer_pair_gen(
     config: &GenConfig,
 ) -> It<(RationalPolynomial, Integer)> {
@@ -2722,6 +2792,41 @@ pub fn special_random_rational_polynomial_integer_pair_gen(
                 config.get_or("mean_stripe_d", 1),
                 config.get_or("mean_bits_n", 64),
                 config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_rational_polynomial_integer_vec_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, Vec<Integer>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_vecs(
+                seed,
+                &|seed_2| {
+                    striped_random_integers(
+                        seed_2,
+                        config.get_or("mean_stripe_n", 32),
+                        config.get_or("mean_stripe_d", 1),
+                        config.get_or("mean_bits_n", 64),
+                        config.get_or("mean_bits_d", 1),
+                    )
+                },
+                config.get_or("mean_points_n", 8),
+                config.get_or("mean_points_d", 1),
             )
         },
     ))

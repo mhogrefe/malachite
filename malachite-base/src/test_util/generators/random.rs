@@ -66,7 +66,7 @@ use crate::slices::slice_test_zero;
 use crate::strings::random::{random_strings, random_strings_using_chars};
 use crate::strings::strings_from_char_vecs;
 use crate::test_util::extra_variadic::{
-    Union3, random_duodecuples_from_single, random_octuples_from_single,
+    Union3, random_duodecuples_from_single, random_octuples_from_single, random_quadruples,
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xxyx,
     random_quadruples_xyxy, random_quadruples_xyyx, random_quadruples_xyyz, random_quadruples_xyzz,
     random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
@@ -8617,5 +8617,61 @@ pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: Primitiv
             &random_positive_unsigneds::<T>,
         )
         .map(|(p, x, m)| (p % m, x % m, m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, Vec<T>, T)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &random_primitive_ints::<T>,
+                    config.get_or("mean_points_n", 8),
+                    config.get_or("mean_points_d", 1),
+                )
+            },
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(p, xs, m)| (p % m, xs.into_iter().map(|x| x % m).collect(), m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, T, u64, T)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_primitive_ints::<T>,
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_points_n", 8),
+                    config.get_or("mean_points_d", 1),
+                )
+            },
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(p, q, k, m)| (p % m, q % m, k, m)),
     )
 }

@@ -69,7 +69,7 @@ use crate::sets::random::{random_b_tree_sets, random_hash_sets};
 use crate::slices::slice_test_zero;
 use crate::strings::random::random_strings_using_chars;
 use crate::test_util::extra_variadic::{
-    Union3, random_duodecuples_from_single, random_octuples_from_single,
+    Union3, random_duodecuples_from_single, random_octuples_from_single, random_quadruples,
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xxyx,
     random_quadruples_xyxy, random_quadruples_xyyx, random_quadruples_xyyz, random_quadruples_xyzz,
     random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
@@ -95,6 +95,7 @@ use crate::unions::Union2;
 use crate::unions::random::random_union2s;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::random::striped_random_unsigned_polynomials;
+use crate::vecs::random::random_vecs;
 use alloc::collections::{BTreeMap, BTreeSet};
 
 #[cfg(not(feature = "std"))]
@@ -10140,5 +10141,91 @@ pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<
             },
         )
         .map(|(p, x, m)| (p % m, x % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, Vec<T>, T)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &|seed_2| {
+                        striped_random_unsigneds::<T>(
+                            seed_2,
+                            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                            config.get_or("mean_stripe_d", 1),
+                        )
+                    },
+                    config.get_or("mean_points_n", 8),
+                    config.get_or("mean_points_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(p, xs, m)| (p % m, xs.into_iter().map(|x| x % m).collect(), m)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, T, u64, T)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_points_n", 8),
+                    config.get_or("mean_points_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(p, q, k, m)| (p % m, q % m, k, m)),
     )
 }

@@ -9,16 +9,21 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Mod;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
-use malachite_base::polynomial::{Evaluate, Polynomial};
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::polynomial::{Evaluate, EvaluateMany, EvaluateMod, Polynomial};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::evaluate::{
     evaluate_divide_and_conquer, evaluate_horner,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
     integer_gen, integer_polynomial_integer_pair_gen, integer_polynomial_integer_pair_gen_var_2,
+    integer_polynomial_integer_vec_pair_gen, integer_polynomial_unsigned_unsigned_triple_gen_var_1,
 };
-use malachite_nz::test_util::integer_polynomial::arithmetic::evaluate::evaluate_naive;
+use malachite_nz::test_util::integer_polynomial::arithmetic::evaluate::{
+    evaluate_many_naive, evaluate_mod_u64_naive, evaluate_naive,
+};
 
 #[test]
 fn test_evaluate() {
@@ -197,5 +202,116 @@ fn evaluate_properties() {
             IntegerPolynomial::from(x.clone()).evaluate(Integer::from(7)),
             x
         );
+    });
+}
+
+#[test]
+fn test_evaluate_mod_u64() {
+    let test = |s, x: u64, m: u64, out: u64| {
+        let p = IntegerPolynomial::from_str(s).unwrap();
+        assert_eq!((&p).evaluate_mod(x, m), out);
+        assert_eq!(evaluate_mod_u64_naive(&p, x, m), out);
+    };
+    // - the zero polynomial
+    test("0", 0, 1, 0);
+    test("0", 3, 7, 0);
+    // - x == 0, so only the constant term is reduced
+    // A negative coefficient is reduced into [0, m).
+    test("-1", 0, 7, 6);
+    test("-7", 0, 7, 0);
+    test("-5*x^2+3*x-7", 0, 11, 4);
+    // Everything is 0 mod 1.
+    test("x^3-1", 0, 1, 0);
+    // - Horner, since the polynomial is short
+    test("-5*x^2+3*x-7", 6, 11, 7);
+    // The coefficients need not be reduced.
+    test("100*x+1", 3, 10, 1);
+    // - lazy Shoup
+    test(
+        "-1000000000000000000000000*x^2+999999999999999999999*x-1",
+        123456789,
+        1000000007,
+        204882185,
+    );
+    // - Shoup, not lazy
+    test(
+        "-340282366920938463463374607431768211456*x^3+12345",
+        9223372036854775782,
+        9223372036854775783,
+        14845,
+    );
+    // - Horner, since the top bit of m is set
+    test(
+        "-x^4+x^3-x^2+x-1",
+        18446744073709551556,
+        18446744073709551557,
+        18446744073709551552,
+    );
+}
+
+#[test]
+#[should_panic]
+fn evaluate_mod_u64_fail_1() {
+    // m is 0.
+    (&IntegerPolynomial::from_str("x+1").unwrap()).evaluate_mod(0, 0);
+}
+
+#[test]
+#[should_panic]
+fn evaluate_mod_u64_fail_2() {
+    // x is not reduced.
+    (&IntegerPolynomial::from_str("x+1").unwrap()).evaluate_mod(7, 7);
+}
+
+#[test]
+fn evaluate_mod_u64_properties() {
+    integer_polynomial_unsigned_unsigned_triple_gen_var_1().test_properties(|(p, x, m)| {
+        let y = (&p).evaluate_mod(x, m);
+        assert!(y < m);
+        assert_eq!(evaluate_mod_u64_naive(&p, x, m), y);
+
+        // Reducing the coefficients first, into a `NaturalPolynomial`, gives the same value.
+        let m_natural = Natural::from(m);
+        assert_eq!(
+            (&p).mod_op(m_natural.clone())
+                .evaluate_mod(Natural::from(x), m_natural),
+            y
+        );
+
+        // p(0) is the constant term mod m.
+        assert_eq!(
+            (&p).evaluate_mod(0, m),
+            u64::exact_from(&p.coefficient(0).mod_op(Integer::from(m)))
+        );
+        // Everything is 0 mod 1.
+        if m == 1 {
+            assert_eq!(y, 0);
+        }
+    });
+}
+
+#[test]
+fn test_evaluate_many() {
+    let test = |s, xs: &[i32], out: &[i32]| {
+        let p = IntegerPolynomial::from_str(s).unwrap();
+        let xs: Vec<Integer> = xs.iter().map(|&x| Integer::from(x)).collect();
+        let out: Vec<Integer> = out.iter().map(|&y| Integer::from(y)).collect();
+        assert_eq!((&p).evaluate_many(&xs), out);
+        assert_eq!(evaluate_many_naive(&p, &xs), out);
+    };
+    test("x^2-3*x+2", &[], &[]);
+    test("0", &[-1, 5], &[0, 0]);
+    test("x^2-3*x+2", &[-1, 0, 1, 2, 3], &[6, 2, 0, 0, 2]);
+}
+
+#[test]
+fn evaluate_many_properties() {
+    integer_polynomial_integer_vec_pair_gen().test_properties(|(p, xs)| {
+        let ys = (&p).evaluate_many(&xs);
+        assert_eq!(ys.len(), xs.len());
+        for (x, y) in xs.iter().zip(&ys) {
+            assert_eq!((&p).evaluate(x), *y);
+        }
+        assert_eq!(evaluate_many_naive(&p, &xs), ys);
     });
 }

@@ -305,6 +305,37 @@ const UNSIGNED_EVALUATE_MOD_POWER_OF_2_UNIT_ROWS: [(&str, &str, u64, &str); 14] 
     ("340282366920938463463374607431768211455*x+5", "3", 128, "2"),
 ];
 
+// The rows of test_evaluate_mod_u64 in malachite-nz's IntegerPolynomial tests: polynomial, point,
+// modulus, value.
+const INTEGER_EVALUATE_MOD_U64_UNIT_ROWS: [(&str, &str, &str, &str); 11] = [
+    ("0", "0", "1", "0"),
+    ("0", "3", "7", "0"),
+    ("-1", "0", "7", "6"),
+    ("-7", "0", "7", "0"),
+    ("-5*x^2+3*x-7", "0", "11", "4"),
+    ("x^3-1", "0", "1", "0"),
+    ("-5*x^2+3*x-7", "6", "11", "7"),
+    ("100*x+1", "3", "10", "1"),
+    (
+        "-1000000000000000000000000*x^2+999999999999999999999*x-1",
+        "123456789",
+        "1000000007",
+        "204882185",
+    ),
+    (
+        "-340282366920938463463374607431768211456*x^3+12345",
+        "9223372036854775782",
+        "9223372036854775783",
+        "14845",
+    ),
+    (
+        "-x^4+x^3-x^2+x-1",
+        "18446744073709551556",
+        "18446744073709551557",
+        "18446744073709551552",
+    ),
+];
+
 // The rows of test_evaluate_mod and test_evaluate_mod_long in malachite-base's UnsignedPolynomial
 // tests, for every width:
 // polynomial, point, modulus, value.
@@ -1090,6 +1121,23 @@ fn main() {
             "fmpz_mod_poly_evaluate_fmpz",
         );
     }
+
+    // Every case from test_evaluate_mod_u64 in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demo, against fmpz_poly_evaluate_mod.
+    println!("testing IntegerPolynomial evaluate_mod unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, x, m, r) in INTEGER_EVALUATE_MOD_U64_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).evaluate_mod({x}, {m}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_evaluate_mod", Some(TEST_OUT));
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_polynomial_evaluate_mod_u64",
+        "fmpz_poly_evaluate_mod",
+    );
 
     // Every case from test_evaluate_mod in malachite-base's UnsignedPolynomial tests, and the
     // generated cases from the u64 demos, against evaluation modulo the given modulus.

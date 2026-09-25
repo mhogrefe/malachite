@@ -8,9 +8,11 @@
 
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 
 // Evaluates an integer polynomial at a rational term by term, as the sum of $c_i x^i$ computed in
@@ -34,4 +36,34 @@ pub fn evaluate_rational_polynomial_naive(p: &RationalPolynomial, x: &Rational) 
         sum += c * x.pow(u64::exact_from(i));
     }
     sum
+}
+
+// Evaluates a polynomial at each of `xs` with `evaluate_integer_polynomial_naive`.
+pub fn evaluate_many_integer_polynomial_naive(
+    p: &IntegerPolynomial,
+    xs: &[Rational],
+) -> Vec<Rational> {
+    xs.iter()
+        .map(|x| evaluate_integer_polynomial_naive(p, x))
+        .collect()
+}
+
+// Evaluates a polynomial at each of `xs` with `evaluate_rational_polynomial_naive`.
+pub fn evaluate_many_rational_polynomial_naive(
+    p: &RationalPolynomial,
+    xs: &[Rational],
+) -> Vec<Rational> {
+    xs.iter()
+        .map(|x| evaluate_rational_polynomial_naive(p, x))
+        .collect()
+}
+
+// Evaluates a polynomial at each of the `Integer`s `xs` with `evaluate_rational_polynomial_naive`.
+pub fn evaluate_many_rational_polynomial_at_integers_naive(
+    p: &RationalPolynomial,
+    xs: &[Integer],
+) -> Vec<Rational> {
+    xs.iter()
+        .map(|x| evaluate_rational_polynomial_naive(p, &Rational::from(x)))
+        .collect()
 }

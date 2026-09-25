@@ -366,6 +366,24 @@ documented by git history.
   `nmod_poly_evaluate_nmod`, with the same checks; for a long enough polynomial and a modulus whose
   top bit is clear, it multiplies by `x` with Shoup's method, lazily reduced when the modulus is at
   most a third of `T`'s range.
+  It is also implemented for `&IntegerPolynomial` at a `u64` modulo a `u64`, like FLINT's
+  `fmpz_poly_evaluate_mod`: the coefficients may be any `Integer`s and are reduced as the evaluation
+  goes, while `x` must be reduced.
+- A new `EvaluateMany` trait, in `malachite_base::polynomial`, whose `evaluate_many(xs)` evaluates a
+  polynomial at each value in a slice, like FLINT's `fmpz_poly_evaluate_fmpz_vec`. It is
+  implemented for `&IntegerPolynomial` at `Integer`s and `Rational`s, `&NaturalPolynomial` at
+  `Natural`s, and `&RationalPolynomial` at `Rational`s and `Integer`s, every combination for which
+  `Evaluate` is implemented.
+- A new `EvaluateManyMod` trait, whose `evaluate_many_mod(xs, m)` evaluates a polynomial at each
+  value in a slice modulo `m`, like FLINT's `nmod_poly_evaluate_nmod_vec_iter` and
+  `fmpz_mod_poly_evaluate_fmpz_vec_iter`. It is implemented for `&UnsignedPolynomial<T>` at `T`s
+  modulo a `T`, which evaluates a block of points in each pass over the coefficients, and for
+  `&NaturalPolynomial` at `Natural`s modulo a `Natural`, taken by value or by reference, which
+  checks the polynomial and precomputes the modular-multiplication data once.
+- A new `EvaluateGeometricMod` trait, whose `evaluate_geometric_mod(q, k, m)` evaluates a
+  polynomial at $1, q, \ldots, q^{k-1}$ modulo `m`, like FLINT's
+  `nmod_poly_evaluate_geometric_nmod_vec_iter` with $q = r^2$. It is implemented for
+  `&UnsignedPolynomial<T>`.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

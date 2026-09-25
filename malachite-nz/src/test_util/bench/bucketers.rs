@@ -91,6 +91,22 @@ pub fn triple_1_natural_polynomial_bit_bucketer<T, U>(
     }
 }
 
+pub fn triple_1_integer_polynomial_bit_bucketer<T, U>(
+    var_name: &str,
+) -> Bucketer<'_, (IntegerPolynomial, T, U)> {
+    Bucketer {
+        bucketing_function: &|(p, _, _)| {
+            usize::exact_from(
+                p.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}.significant_bits()"),
+    }
+}
+
 pub fn natural_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalPolynomial> {
     Bucketer {
         bucketing_function: &|p| {
