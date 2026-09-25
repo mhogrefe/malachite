@@ -10,6 +10,7 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec::Vec;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
@@ -72,5 +73,29 @@ impl<T: PrimitiveUnsigned + for<'a> TryFrom<&'a Integer>> TryFrom<IntegerPolynom
     #[inline]
     fn try_from(p: IntegerPolynomial) -> Result<Self, Self::Error> {
         Self::try_from(&p)
+    }
+}
+
+impl<T: PrimitiveUnsigned + for<'a> ConvertibleFrom<&'a Integer>>
+    ConvertibleFrom<&IntegerPolynomial> for UnsignedPolynomial<T>
+{
+    /// Determines whether an [`IntegerPolynomial`] can be converted to an [`UnsignedPolynomial`]
+    /// (when every coefficient is non-negative and representable as a `T`). Takes the
+    /// [`IntegerPolynomial`] by reference.
+    ///
+    /// Unlike checking whether [`TryFrom`] succeeds, this allocates nothing.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of coefficients.
+    ///
+    /// # Examples
+    /// See [here](super::unsigned_polynomial_from_integer_polynomial#convertible_from).
+    #[inline]
+    fn convertible_from(p: &IntegerPolynomial) -> bool {
+        p.coefficients.iter().all(|c| T::convertible_from(c))
     }
 }

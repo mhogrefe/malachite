@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -14,6 +15,14 @@ use malachite_q::test_util::bench::bucketers::rational_polynomial_bit_bucketer;
 use malachite_q::test_util::generators::rational_polynomial_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(
+        runner,
+        demo_integer_polynomial_convertible_from_rational_polynomial
+    );
+    register_bench!(
+        runner,
+        benchmark_integer_polynomial_convertible_from_rational_polynomial_algorithms
+    );
     register_demo!(runner, demo_integer_polynomial_try_from_rational_polynomial);
     register_demo!(
         runner,
@@ -81,6 +90,45 @@ fn benchmark_integer_polynomial_try_from_rational_polynomial_evaluation_strategy
                     let _ = IntegerPolynomial::try_from(&p);
                 },
             ),
+        ],
+    );
+}
+
+fn demo_integer_polynomial_convertible_from_rational_polynomial(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for p in rational_polynomial_gen().get(gm, config).take(limit) {
+        println!(
+            "IntegerPolynomial::convertible_from(&{}) = {}",
+            p,
+            IntegerPolynomial::convertible_from(&p)
+        );
+    }
+}
+
+fn benchmark_integer_polynomial_convertible_from_rational_polynomial_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "IntegerPolynomial::convertible_from(&RationalPolynomial)",
+        BenchmarkType::Algorithms,
+        rational_polynomial_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &rational_polynomial_bit_bucketer("p"),
+        &mut [
+            ("standard", &mut |p| {
+                no_out!(IntegerPolynomial::convertible_from(&p));
+            }),
+            ("using try_from", &mut |p| {
+                no_out!(IntegerPolynomial::try_from(&p).is_ok());
+            }),
         ],
     );
 }

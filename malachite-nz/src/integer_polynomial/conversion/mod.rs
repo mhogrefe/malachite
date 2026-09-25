@@ -46,6 +46,34 @@ pub mod from_unsigned_polynomial;
 ///     Ok(NaturalPolynomial::ZERO)
 /// );
 /// ```
+///
+/// # convertible_from
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::conversion::traits::ConvertibleFrom;
+/// use malachite_nz::integer_polynomial::IntegerPolynomial;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+///
+/// assert_eq!(
+///     NaturalPolynomial::convertible_from(
+///         &IntegerPolynomial::from_str("3*x^2+1000000000000000000000000").unwrap()
+///     ),
+///     true
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::convertible_from(&IntegerPolynomial::from_str("3*x^2-1").unwrap()),
+///     false
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::convertible_from(&IntegerPolynomial::from_str("-1").unwrap()),
+///     false
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::convertible_from(&IntegerPolynomial::ZERO),
+///     true
+/// );
+/// ```
 pub mod natural_polynomial_from_integer_polynomial;
 /// Implementations of traits for serialization and deserialization using
 /// [serde](https://serde.rs/).
@@ -86,6 +114,44 @@ pub mod string;
 /// assert_eq!(
 ///     UnsignedPolynomial::<u32>::try_from(IntegerPolynomial::ZERO),
 ///     Ok(UnsignedPolynomial::<u32>::ZERO)
+/// );
+/// ```
+///
+/// # convertible_from
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::conversion::traits::ConvertibleFrom;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+/// use malachite_nz::integer_polynomial::IntegerPolynomial;
+///
+/// assert_eq!(
+///     UnsignedPolynomial::<u8>::convertible_from(
+///         &IntegerPolynomial::from_str("3*x^2+255").unwrap()
+///     ),
+///     true
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u8>::convertible_from(
+///         &IntegerPolynomial::from_str("3*x^2+256").unwrap()
+///     ),
+///     false
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u16>::convertible_from(
+///         &IntegerPolynomial::from_str("3*x^2+256").unwrap()
+///     ),
+///     true
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u64>::convertible_from(
+///         &IntegerPolynomial::from_str("3*x^2-1").unwrap()
+///     ),
+///     false
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u32>::convertible_from(&IntegerPolynomial::ZERO),
+///     true
 /// );
 /// ```
 pub mod unsigned_polynomial_from_integer_polynomial;

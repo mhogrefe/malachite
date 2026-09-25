@@ -117,3 +117,34 @@ where
 fn unsigned_polynomial_from_integer_polynomial_properties() {
     apply_fn_to_unsigneds!(unsigned_polynomial_from_integer_polynomial_properties_helper);
 }
+
+#[test]
+fn test_unsigned_polynomial_convertible_from_integer_polynomial() {
+    fn test<T: PrimitiveUnsigned + for<'a> ConvertibleFrom<&'a Integer>>(s: &str, out: bool) {
+        let p = IntegerPolynomial::from_str(s).unwrap();
+        assert_eq!(UnsignedPolynomial::<T>::convertible_from(&p), out);
+    }
+    test::<u8>("3*x^2+255", true);
+    test::<u8>("3*x^2+256", false);
+    test::<u16>("3*x^2+256", true);
+    test::<u64>("3*x^2-1", false);
+    test::<u32>("0", true);
+}
+
+fn unsigned_polynomial_convertible_from_integer_polynomial_properties_helper<
+    T: PrimitiveUnsigned + for<'a> ConvertibleFrom<&'a Integer> + for<'a> TryFrom<&'a Integer>,
+>() {
+    integer_polynomial_gen().test_properties(|p| {
+        assert_eq!(
+            UnsignedPolynomial::<T>::convertible_from(&p),
+            UnsignedPolynomial::<T>::try_from(&p).is_ok()
+        );
+    });
+}
+
+#[test]
+fn unsigned_polynomial_convertible_from_integer_polynomial_properties() {
+    apply_fn_to_unsigneds!(
+        unsigned_polynomial_convertible_from_integer_polynomial_properties_helper
+    );
+}

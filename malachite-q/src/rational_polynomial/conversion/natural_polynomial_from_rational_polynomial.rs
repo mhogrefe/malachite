@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_polynomial::RationalPolynomial;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 
 /// The error returned when a [`RationalPolynomial`] with a coefficient that is negative or not an
@@ -65,5 +66,27 @@ impl TryFrom<&RationalPolynomial> for NaturalPolynomial {
         } else {
             Err(NaturalPolynomialFromRationalPolynomialError)
         }
+    }
+}
+
+impl ConvertibleFrom<&RationalPolynomial> for NaturalPolynomial {
+    /// Determines whether a [`RationalPolynomial`] can be converted to a [`NaturalPolynomial`]
+    /// (when all its coefficients are non-negative integers). Takes the [`RationalPolynomial`] by
+    /// reference.
+    ///
+    /// Unlike checking whether [`TryFrom`] succeeds, this allocates nothing.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of coefficients.
+    ///
+    /// # Examples
+    /// See [here](super::natural_polynomial_from_rational_polynomial#convertible_from).
+    #[inline]
+    fn convertible_from(p: &RationalPolynomial) -> bool {
+        p.denominator == 1u32 && Self::convertible_from(&p.numerator)
     }
 }

@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::integer_polynomial_gen;
@@ -69,4 +70,25 @@ fn integer_polynomial_from_rational_polynomial_properties() {
         Ok(IntegerPolynomial::ZERO)
     );
     assert!(IntegerPolynomial::try_from(RationalPolynomial::one_half()).is_err());
+}
+
+#[test]
+fn test_integer_polynomial_convertible_from_rational_polynomial() {
+    let test = |s, out| {
+        let p = RationalPolynomial::from_str(s).unwrap();
+        assert_eq!(IntegerPolynomial::convertible_from(&p), out);
+    };
+    test("3*x^2-1", true);
+    test("3*x^2+1/2", false);
+    test("0", true);
+}
+
+#[test]
+fn integer_polynomial_convertible_from_rational_polynomial_properties() {
+    rational_polynomial_gen().test_properties(|p| {
+        assert_eq!(
+            IntegerPolynomial::convertible_from(&p),
+            IntegerPolynomial::try_from(&p).is_ok()
+        );
+    });
 }

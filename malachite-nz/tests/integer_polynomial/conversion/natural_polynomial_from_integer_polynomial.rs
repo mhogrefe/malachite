@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::conversion::natural_polynomial_from_integer_polynomial::*;
@@ -72,4 +73,26 @@ fn natural_polynomial_from_integer_polynomial_properties() {
         Ok(NaturalPolynomial::ZERO)
     );
     assert!(NaturalPolynomial::try_from(IntegerPolynomial::negative_one()).is_err());
+}
+
+#[test]
+fn test_natural_polynomial_convertible_from_integer_polynomial() {
+    let test = |s, out| {
+        let p = IntegerPolynomial::from_str(s).unwrap();
+        assert_eq!(NaturalPolynomial::convertible_from(&p), out);
+    };
+    test("3*x^2+1000000000000000000000000", true);
+    test("3*x^2-1", false);
+    test("-1", false);
+    test("0", true);
+}
+
+#[test]
+fn natural_polynomial_convertible_from_integer_polynomial_properties() {
+    integer_polynomial_gen().test_properties(|p| {
+        assert_eq!(
+            NaturalPolynomial::convertible_from(&p),
+            NaturalPolynomial::try_from(&p).is_ok()
+        );
+    });
 }

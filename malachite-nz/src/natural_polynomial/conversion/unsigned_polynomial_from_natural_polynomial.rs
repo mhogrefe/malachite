@@ -10,6 +10,7 @@ use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
@@ -73,5 +74,29 @@ impl<T: PrimitiveUnsigned + for<'a> TryFrom<&'a Natural>> TryFrom<NaturalPolynom
     #[inline]
     fn try_from(p: NaturalPolynomial) -> Result<Self, Self::Error> {
         Self::try_from(&p)
+    }
+}
+
+impl<T: PrimitiveUnsigned + for<'a> ConvertibleFrom<&'a Natural>>
+    ConvertibleFrom<&NaturalPolynomial> for UnsignedPolynomial<T>
+{
+    /// Determines whether a [`NaturalPolynomial`] can be converted to an [`UnsignedPolynomial`]
+    /// (when every coefficient is representable as a `T`). Takes the [`NaturalPolynomial`] by
+    /// reference.
+    ///
+    /// Unlike checking whether [`TryFrom`] succeeds, this allocates nothing.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of coefficients.
+    ///
+    /// # Examples
+    /// See [here](super::unsigned_polynomial_from_natural_polynomial#convertible_from).
+    #[inline]
+    fn convertible_from(p: &NaturalPolynomial) -> bool {
+        p.coefficients.iter().all(|c| T::convertible_from(c))
     }
 }

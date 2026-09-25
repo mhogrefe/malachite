@@ -51,4 +51,36 @@ pub mod string;
 ///     Ok(UnsignedPolynomial::<u32>::ZERO)
 /// );
 /// ```
+///
+/// # convertible_from
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::conversion::traits::ConvertibleFrom;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+///
+/// assert_eq!(
+///     UnsignedPolynomial::<u8>::convertible_from(
+///         &NaturalPolynomial::from_str("3*x^2+255").unwrap()
+///     ),
+///     true
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u8>::convertible_from(
+///         &NaturalPolynomial::from_str("3*x^2+256").unwrap()
+///     ),
+///     false
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u16>::convertible_from(
+///         &NaturalPolynomial::from_str("3*x^2+256").unwrap()
+///     ),
+///     true
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u32>::convertible_from(&NaturalPolynomial::ZERO),
+///     true
+/// );
+/// ```
 pub mod unsigned_polynomial_from_natural_polynomial;

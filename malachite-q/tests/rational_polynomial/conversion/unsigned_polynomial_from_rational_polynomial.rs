@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_nz::integer::Integer;
@@ -93,4 +94,36 @@ where
 #[test]
 fn unsigned_polynomial_from_rational_polynomial_properties() {
     apply_fn_to_unsigneds!(unsigned_polynomial_from_rational_polynomial_properties_helper);
+}
+
+#[test]
+fn test_unsigned_polynomial_convertible_from_rational_polynomial() {
+    fn test<T: PrimitiveUnsigned + for<'a> ConvertibleFrom<&'a Integer>>(s: &str, out: bool) {
+        let p = RationalPolynomial::from_str(s).unwrap();
+        assert_eq!(UnsignedPolynomial::<T>::convertible_from(&p), out);
+    }
+    test::<u8>("3*x^2+255", true);
+    test::<u8>("3*x^2+256", false);
+    test::<u16>("3*x^2+256", true);
+    test::<u64>("3*x^2-1", false);
+    test::<u64>("3*x^2+1/2", false);
+    test::<u32>("0", true);
+}
+
+fn unsigned_polynomial_convertible_from_rational_polynomial_properties_helper<
+    T: PrimitiveUnsigned + for<'a> ConvertibleFrom<&'a Integer> + for<'a> TryFrom<&'a Integer>,
+>() {
+    rational_polynomial_gen().test_properties(|p| {
+        assert_eq!(
+            UnsignedPolynomial::<T>::convertible_from(&p),
+            UnsignedPolynomial::<T>::try_from(&p).is_ok()
+        );
+    });
+}
+
+#[test]
+fn unsigned_polynomial_convertible_from_rational_polynomial_properties() {
+    apply_fn_to_unsigneds!(
+        unsigned_polynomial_convertible_from_rational_polynomial_properties_helper
+    );
 }

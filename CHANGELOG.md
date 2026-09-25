@@ -524,7 +524,9 @@ documented by git history.
   types, each of which loses nothing and cannot fail, since every [`u64`] is a [`Natural`] and
   every [`Natural`] is an [`Integer`]. The coefficients are converted one by one and the leading
   one stays nonzero, so the degree is unchanged and the written form is identical. The narrowing
-  directions are not provided, since they can fail.
+  directions, which can fail, are `TryFrom`: `NaturalPolynomial` and `UnsignedPolynomial<T>` from
+  `IntegerPolynomial`, and `UnsignedPolynomial<T>` from `NaturalPolynomial`. Each has a matching
+  `ConvertibleFrom`, which checks the coefficients without allocating anything.
 - `Serialize` and `Deserialize` for `NaturalPolynomial` and `IntegerPolynomial`, under the
   existing `enable_serde` feature. As for `UnsignedPolynomial`, the encoding is the coefficient list
   and nothing around it, each coefficient written the way a [`Natural`] or an [`Integer`] is, so
@@ -641,7 +643,9 @@ documented by git history.
   `IntegerPolynomial` is already the numerator it needs, so it is moved rather than copied and the
   denominator is 1 — a pair that is canonical whatever the numerator is, since everything is
   coprime with 1, so no content or GCD is computed. The other two convert their coefficients and
-  then take that path.
+  then take that path. The narrowing directions, `IntegerPolynomial`, `NaturalPolynomial`, and
+  `UnsignedPolynomial<T>` from `RationalPolynomial`, are `TryFrom`, each with a matching
+  `ConvertibleFrom`; the `IntegerPolynomial` check only compares the denominator with 1.
 - `Serialize` and `Deserialize` for `RationalPolynomial`, under the existing `enable_serde`
   feature. Unlike the other polynomial types, this one writes both of the parts it is made of
   rather than a coefficient list: `1/2*x+1/3` is `{"n":["0x2","0x3"],"d":"0x6"}`. Writing the

@@ -8,6 +8,7 @@
 
 use crate::rational_polynomial::RationalPolynomial;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_nz::integer::Integer;
 
@@ -70,5 +71,29 @@ impl<T: PrimitiveUnsigned + for<'a> TryFrom<&'a Integer>> TryFrom<RationalPolyno
     #[inline]
     fn try_from(p: RationalPolynomial) -> Result<Self, Self::Error> {
         Self::try_from(&p)
+    }
+}
+
+impl<T: PrimitiveUnsigned + for<'a> ConvertibleFrom<&'a Integer>>
+    ConvertibleFrom<&RationalPolynomial> for UnsignedPolynomial<T>
+{
+    /// Determines whether a [`RationalPolynomial`] can be converted to an [`UnsignedPolynomial`]
+    /// (when all its coefficients are integers representable as a `T`). Takes the
+    /// [`RationalPolynomial`] by reference.
+    ///
+    /// Unlike checking whether [`TryFrom`] succeeds, this allocates nothing.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of coefficients.
+    ///
+    /// # Examples
+    /// See [here](super::unsigned_polynomial_from_rational_polynomial#convertible_from).
+    #[inline]
+    fn convertible_from(p: &RationalPolynomial) -> bool {
+        p.denominator == 1u32 && Self::convertible_from(&p.numerator)
     }
 }

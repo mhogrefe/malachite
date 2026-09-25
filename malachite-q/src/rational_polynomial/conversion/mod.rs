@@ -50,6 +50,28 @@ pub mod from_unsigned_polynomial;
 ///     Ok(IntegerPolynomial::ZERO)
 /// );
 /// ```
+///
+/// # convertible_from
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::conversion::traits::ConvertibleFrom;
+/// use malachite_nz::integer_polynomial::IntegerPolynomial;
+/// use malachite_q::rational_polynomial::RationalPolynomial;
+///
+/// assert_eq!(
+///     IntegerPolynomial::convertible_from(&RationalPolynomial::from_str("3*x^2-1").unwrap()),
+///     true
+/// );
+/// assert_eq!(
+///     IntegerPolynomial::convertible_from(&RationalPolynomial::from_str("3*x^2+1/2").unwrap()),
+///     false
+/// );
+/// assert_eq!(
+///     IntegerPolynomial::convertible_from(&RationalPolynomial::ZERO),
+///     true
+/// );
+/// ```
 pub mod integer_polynomial_from_rational_polynomial;
 /// Implementations of traits for converting a [`RationalPolynomial`](super::RationalPolynomial) to
 /// a [`NaturalPolynomial`](malachite_nz::natural_polynomial::NaturalPolynomial).
@@ -78,6 +100,32 @@ pub mod integer_polynomial_from_rational_polynomial;
 /// assert_eq!(
 ///     NaturalPolynomial::try_from(RationalPolynomial::ZERO),
 ///     Ok(NaturalPolynomial::ZERO)
+/// );
+/// ```
+///
+/// # convertible_from
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::conversion::traits::ConvertibleFrom;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+/// use malachite_q::rational_polynomial::RationalPolynomial;
+///
+/// assert_eq!(
+///     NaturalPolynomial::convertible_from(&RationalPolynomial::from_str("3*x^2+1").unwrap()),
+///     true
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::convertible_from(&RationalPolynomial::from_str("3*x^2-1").unwrap()),
+///     false
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::convertible_from(&RationalPolynomial::from_str("3*x^2+1/2").unwrap()),
+///     false
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::convertible_from(&RationalPolynomial::ZERO),
+///     true
 /// );
 /// ```
 pub mod natural_polynomial_from_rational_polynomial;
@@ -119,6 +167,50 @@ pub mod string;
 /// assert_eq!(
 ///     UnsignedPolynomial::<u32>::try_from(RationalPolynomial::ZERO),
 ///     Ok(UnsignedPolynomial::<u32>::ZERO)
+/// );
+/// ```
+///
+/// # convertible_from
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::conversion::traits::ConvertibleFrom;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+/// use malachite_q::rational_polynomial::RationalPolynomial;
+///
+/// assert_eq!(
+///     UnsignedPolynomial::<u8>::convertible_from(
+///         &RationalPolynomial::from_str("3*x^2+255").unwrap()
+///     ),
+///     true
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u8>::convertible_from(
+///         &RationalPolynomial::from_str("3*x^2+256").unwrap()
+///     ),
+///     false
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u16>::convertible_from(
+///         &RationalPolynomial::from_str("3*x^2+256").unwrap()
+///     ),
+///     true
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u64>::convertible_from(
+///         &RationalPolynomial::from_str("3*x^2-1").unwrap()
+///     ),
+///     false
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u64>::convertible_from(
+///         &RationalPolynomial::from_str("3*x^2+1/2").unwrap()
+///     ),
+///     false
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u32>::convertible_from(&RationalPolynomial::ZERO),
+///     true
 /// );
 /// ```
 pub mod unsigned_polynomial_from_rational_polynomial;

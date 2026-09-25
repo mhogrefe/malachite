@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_polynomial::RationalPolynomial;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 
 /// The error returned when a [`RationalPolynomial`] with a non-integer coefficient is converted to
@@ -60,5 +61,22 @@ impl TryFrom<&RationalPolynomial> for IntegerPolynomial {
         } else {
             Err(IntegerPolynomialFromRationalPolynomialError)
         }
+    }
+}
+
+impl ConvertibleFrom<&RationalPolynomial> for IntegerPolynomial {
+    /// Determines whether a [`RationalPolynomial`] can be converted to an [`IntegerPolynomial`]
+    /// (when all its coefficients are integers). Takes the [`RationalPolynomial`] by reference.
+    ///
+    /// Unlike checking whether [`TryFrom`] succeeds, this allocates nothing.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See [here](super::integer_polynomial_from_rational_polynomial#convertible_from).
+    #[inline]
+    fn convertible_from(p: &RationalPolynomial) -> bool {
+        p.denominator == 1u32
     }
 }

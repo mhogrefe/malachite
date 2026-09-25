@@ -10,6 +10,7 @@ use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::polynomial::Polynomial;
 
 /// The error returned when an [`IntegerPolynomial`] with a negative coefficient is converted to a
@@ -74,5 +75,26 @@ impl TryFrom<&IntegerPolynomial> for NaturalPolynomial {
                 })
                 .collect::<Result<Vec<Natural>, _>>()?,
         ))
+    }
+}
+
+impl ConvertibleFrom<&IntegerPolynomial> for NaturalPolynomial {
+    /// Determines whether an [`IntegerPolynomial`] can be converted to a [`NaturalPolynomial`]
+    /// (when none of its coefficients is negative). Takes the [`IntegerPolynomial`] by reference.
+    ///
+    /// Unlike checking whether [`TryFrom`] succeeds, this allocates nothing.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of coefficients.
+    ///
+    /// # Examples
+    /// See [here](super::natural_polynomial_from_integer_polynomial#convertible_from).
+    #[inline]
+    fn convertible_from(p: &IntegerPolynomial) -> bool {
+        p.coefficients.iter().all(Natural::convertible_from)
     }
 }

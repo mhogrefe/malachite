@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -14,6 +15,14 @@ use malachite_nz::test_util::bench::bucketers::integer_polynomial_bit_bucketer;
 use malachite_nz::test_util::generators::integer_polynomial_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(
+        runner,
+        demo_natural_polynomial_convertible_from_integer_polynomial
+    );
+    register_bench!(
+        runner,
+        benchmark_natural_polynomial_convertible_from_integer_polynomial_algorithms
+    );
     register_demo!(runner, demo_natural_polynomial_try_from_integer_polynomial);
     register_demo!(
         runner,
@@ -78,6 +87,45 @@ fn benchmark_natural_polynomial_try_from_integer_polynomial_evaluation_strategy(
                     let _ = NaturalPolynomial::try_from(&p);
                 },
             ),
+        ],
+    );
+}
+
+fn demo_natural_polynomial_convertible_from_integer_polynomial(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for p in integer_polynomial_gen().get(gm, config).take(limit) {
+        println!(
+            "NaturalPolynomial::convertible_from(&{}) = {}",
+            p,
+            NaturalPolynomial::convertible_from(&p)
+        );
+    }
+}
+
+fn benchmark_natural_polynomial_convertible_from_integer_polynomial_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "NaturalPolynomial::convertible_from(&IntegerPolynomial)",
+        BenchmarkType::Algorithms,
+        integer_polynomial_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &integer_polynomial_bit_bucketer("p"),
+        &mut [
+            ("standard", &mut |p| {
+                no_out!(NaturalPolynomial::convertible_from(&p));
+            }),
+            ("using try_from", &mut |p| {
+                no_out!(NaturalPolynomial::try_from(&p).is_ok());
+            }),
         ],
     );
 }
