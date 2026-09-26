@@ -435,6 +435,12 @@ documented by git history.
   negated; a `NaturalPolynomial` or `UnsignedPolynomial` is already canonical, so theirs is the
   identity; and the units of the polynomials over the rationals are the nonzero constants, so a
   nonzero `RationalPolynomial` becomes its monic multiple, as `make_monic` gives.
+- `Add` and `AddAssign` for `NaturalPolynomial`, and `Add`, `AddAssign`, `Sub`, and `SubAssign` for
+  `IntegerPolynomial`, like FLINT's `fmpz_poly_add` and `fmpz_poly_sub`, taking each operand by
+  value or by reference. Taken by value, the longer operand's storage is reused, and subtracting a
+  longer polynomial negates it in place. An `IntegerPolynomial` result is trimmed when the leading
+  coefficients cancel; natural coefficients never cancel, so a sum of `NaturalPolynomial`s has the
+  larger of the two degrees.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

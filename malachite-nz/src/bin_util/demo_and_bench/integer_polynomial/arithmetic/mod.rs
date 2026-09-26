@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    add::register(runner);
     balanced_mod::register(runner);
     canonicalize_unit::register(runner);
     content::register(runner);
@@ -18,8 +19,10 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_op::register(runner);
     mod_power_of_2::register(runner);
     neg::register(runner);
+    sub::register(runner);
 }
 
+mod add;
 mod balanced_mod;
 mod canonicalize_unit;
 mod content;
@@ -29,3 +32,4 @@ mod is_unit;
 mod mod_op;
 mod mod_power_of_2;
 mod neg;
+mod sub;

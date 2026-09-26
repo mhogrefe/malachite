@@ -6,6 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
+/// two polynomials.
+pub mod add;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod) and
 /// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
 /// every coefficient of a polynomial to the representative closest to zero.
@@ -47,3 +50,6 @@ pub mod mod_power_of_2;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
 pub mod neg;
+/// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
+/// subtracting one polynomial from another.
+pub mod sub;
