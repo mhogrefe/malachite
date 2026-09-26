@@ -410,6 +410,14 @@ documented by git history.
   unchanged, and the coefficients must already be reduced.
 - `Gcd` and `GcdAssign` for `Integer`, with a `Natural` GCD, matching the `Natural` GCD that
   `ExtendedGcd` for `Integer` already returns. $\gcd(x, y) = \gcd(|x|, |y|)$.
+- `Neg` and `NegAssign` for `IntegerPolynomial` and `RationalPolynomial`, like FLINT's
+  `fmpz_poly_neg` and `fmpq_poly_neg`. Negating by value or in place only flips signs, with no
+  allocation. A `RationalPolynomial` negates its numerator and keeps its denominator, which stays
+  canonical because the sign does not change the numerator's content.
+- `ModPowerOf2Neg` and `ModPowerOf2NegAssign` for `UnsignedPolynomial<T>` and `NaturalPolynomial`,
+  which negate a polynomial modulo $2^k$, like FLINT's `nmod_poly_neg` with the modulus $2^k$. As
+  for every modular operation, the coefficients must already be reduced, and this is checked. Each
+  nonzero coefficient $c$ becomes $2^k - c$, which is also nonzero, so the degree never changes.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

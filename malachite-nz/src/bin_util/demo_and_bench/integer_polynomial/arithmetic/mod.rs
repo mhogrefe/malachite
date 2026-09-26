@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     is_unit::register(runner);
     mod_op::register(runner);
     mod_power_of_2::register(runner);
+    neg::register(runner);
 }
 
 mod balanced_mod;
@@ -25,3 +26,4 @@ mod height;
 mod is_unit;
 mod mod_op;
 mod mod_power_of_2;
+mod neg;

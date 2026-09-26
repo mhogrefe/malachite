@@ -562,6 +562,7 @@ pub mod integer_polynomial {
         pub mod is_unit;
         pub mod mod_op;
         pub mod mod_power_of_2;
+        pub mod neg;
     }
     pub mod basic {
         pub mod coefficients;
@@ -624,6 +625,7 @@ pub mod natural_polynomial {
         pub mod mod_is_reduced;
         pub mod mod_op;
         pub mod mod_power_of_2;
+        pub mod mod_power_of_2_neg;
     }
     pub mod basic {
         pub mod coefficients;

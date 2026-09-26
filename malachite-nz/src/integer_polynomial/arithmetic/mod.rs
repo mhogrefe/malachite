@@ -39,3 +39,6 @@ pub mod mod_op;
 /// [`RemPowerOf2Assign`](malachite_base::num::arithmetic::traits::RemPowerOf2Assign), which keep
 /// each remainder's sign.
 pub mod mod_power_of_2;
+/// Implementations of [`Neg`](core::ops::Neg) and
+/// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
+pub mod neg;

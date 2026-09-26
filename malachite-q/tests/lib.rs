@@ -168,6 +168,7 @@ pub mod rational_polynomial {
         pub mod height;
         pub mod is_unit;
         pub mod make_monic;
+        pub mod neg;
     }
     pub mod basic {
         pub mod coefficients;

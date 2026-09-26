@@ -41,3 +41,7 @@ pub mod mod_power_of_2;
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every coefficient of a polynomial is less than a given power of 2.
 pub mod mod_power_of_2_is_reduced;
+/// Implementations of [`ModPowerOf2Neg`](crate::num::arithmetic::traits::ModPowerOf2Neg) and
+/// [`ModPowerOf2NegAssign`](crate::num::arithmetic::traits::ModPowerOf2NegAssign), which negate a
+/// polynomial modulo a power of 2.
+pub mod mod_power_of_2_neg;

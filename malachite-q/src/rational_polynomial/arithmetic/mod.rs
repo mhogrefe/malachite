@@ -27,3 +27,6 @@ pub mod is_unit;
 /// [`MakeMonicAssign`](malachite_base::polynomial::MakeMonicAssign), which divide a polynomial by
 /// its leading coefficient.
 pub mod make_monic;
+/// Implementations of [`Neg`](core::ops::Neg) and
+/// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
+pub mod neg;
