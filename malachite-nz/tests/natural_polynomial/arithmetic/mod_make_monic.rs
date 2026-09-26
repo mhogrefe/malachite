@@ -9,33 +9,33 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, Gcd, ModInverse, ModMul};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{MakeMonicMod, MakeMonicModAssign, Polynomial};
+use malachite_base::polynomial::{ModMakeMonic, ModMakeMonicAssign, Polynomial};
 use malachite_base::test_util::generators::unsigned_polynomial_unsigned_unsigned_triple_gen_var_2;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::natural_polynomial_natural_natural_triple_gen_var_1;
 
 #[test]
-fn test_make_monic_mod() {
+fn test_mod_make_monic() {
     let test = |s, m, out: Result<&str, &str>| {
         let p = NaturalPolynomial::from_str(s).unwrap();
         let m = Natural::from_str(m).unwrap();
-        let q = (&p).make_monic_mod(&m);
+        let q = (&p).mod_make_monic(&m);
         assert_eq!(
             q.as_ref()
                 .map(ToString::to_string)
                 .map_err(ToString::to_string),
             out.map(ToString::to_string).map_err(ToString::to_string)
         );
-        assert_eq!((&p).make_monic_mod(m.clone()), q);
-        assert_eq!(p.clone().make_monic_mod(&m), q);
-        assert_eq!(p.clone().make_monic_mod(m.clone()), q);
+        assert_eq!((&p).mod_make_monic(m.clone()), q);
+        assert_eq!(p.clone().mod_make_monic(&m), q);
+        assert_eq!(p.clone().mod_make_monic(m.clone()), q);
         for by_value in [false, true] {
             let mut r = p.clone();
             let result = if by_value {
-                r.make_monic_mod_assign(m.clone())
+                r.mod_make_monic_assign(m.clone())
             } else {
-                r.make_monic_mod_assign(&m)
+                r.mod_make_monic_assign(&m)
             };
             match &q {
                 Ok(q) => {
@@ -66,27 +66,27 @@ fn test_make_monic_mod() {
 
 #[test]
 #[should_panic]
-fn make_monic_mod_fail_1() {
+fn mod_make_monic_fail_1() {
     // m is 0.
-    let _ = (&NaturalPolynomial::ZERO).make_monic_mod(Natural::ZERO);
+    let _ = (&NaturalPolynomial::ZERO).mod_make_monic(Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
-fn make_monic_mod_fail_2() {
+fn mod_make_monic_fail_2() {
     // A coefficient is not reduced.
-    let _ = (&NaturalPolynomial::from_str("7*x+1").unwrap()).make_monic_mod(Natural::from(7u32));
+    let _ = (&NaturalPolynomial::from_str("7*x+1").unwrap()).mod_make_monic(Natural::from(7u32));
 }
 
 #[test]
-fn make_monic_mod_properties() {
+fn mod_make_monic_properties() {
     natural_polynomial_natural_natural_triple_gen_var_1().test_properties(|(p, _, m)| {
-        let q = (&p).make_monic_mod(&m);
-        assert_eq!((&p).make_monic_mod(m.clone()), q);
-        assert_eq!(p.clone().make_monic_mod(&m), q);
-        assert_eq!(p.clone().make_monic_mod(m.clone()), q);
+        let q = (&p).mod_make_monic(&m);
+        assert_eq!((&p).mod_make_monic(m.clone()), q);
+        assert_eq!(p.clone().mod_make_monic(&m), q);
+        assert_eq!(p.clone().mod_make_monic(m.clone()), q);
         let mut r = p.clone();
-        let result = r.make_monic_mod_assign(&m);
+        let result = r.mod_make_monic_assign(&m);
         let leading = p.leading_coefficient();
         match q {
             Ok(q) => {
@@ -100,7 +100,7 @@ fn make_monic_mod_properties() {
                     for (c, d) in p.coefficients_asc().iter().zip(q.coefficients_asc()) {
                         assert_eq!(c.mod_mul(&inverse, &m), *d);
                     }
-                    assert_eq!((&q).make_monic_mod(&m), Ok(q));
+                    assert_eq!((&q).mod_make_monic(&m), Ok(q));
                 }
             }
             Err(g) => {
@@ -118,8 +118,8 @@ fn make_monic_mod_properties() {
         // The u64 and Natural versions agree.
         let q = NaturalPolynomial::from(p.clone());
         assert_eq!(
-            (&q).make_monic_mod(Natural::from(m)),
-            (&p).make_monic_mod(m)
+            (&q).mod_make_monic(Natural::from(m)),
+            (&p).mod_make_monic(m)
                 .map(NaturalPolynomial::from)
                 .map_err(Natural::from)
         );

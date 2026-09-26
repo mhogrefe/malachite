@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-/// Implementations of [`EvaluateMod`](crate::polynomial::EvaluateMod) and
-/// [`EvaluateModPowerOf2`](crate::polynomial::EvaluateModPowerOf2), which evaluate a polynomial at
+/// Implementations of [`ModEvaluate`](crate::polynomial::ModEvaluate) and
+/// [`ModPowerOf2Evaluate`](crate::polynomial::ModPowerOf2Evaluate), which evaluate a polynomial at
 /// a value modulo a value or a power of 2. Implementations of
 /// [`Content`](crate::polynomial::Content), [`PrimitivePart`](crate::polynomial::PrimitivePart),
 /// [`PrimitivePartAssign`](crate::polynomial::PrimitivePartAssign), and
@@ -21,13 +21,13 @@ pub mod height;
 /// An implementation of [`IsUnit`](crate::num::arithmetic::traits::IsUnit), a trait for determining
 /// whether a number is a unit of its ring.
 pub mod is_unit;
+pub mod mod_is_reduced;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given modulus. Implementations
-/// of [`MakeMonicMod`](crate::polynomial::MakeMonicMod) and
-/// [`MakeMonicModAssign`](crate::polynomial::MakeMonicModAssign), which make a polynomial monic
+/// of [`ModMakeMonic`](crate::polynomial::ModMakeMonic) and
+/// [`ModMakeMonicAssign`](crate::polynomial::ModMakeMonicAssign), which make a polynomial monic
 /// modulo a value.
-pub mod make_monic;
-pub mod mod_is_reduced;
+pub mod mod_make_monic;
 /// Implementations of [`ModNeg`](crate::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](crate::num::arithmetic::traits::ModNegAssign), which negate a polynomial modulo
 /// a number.

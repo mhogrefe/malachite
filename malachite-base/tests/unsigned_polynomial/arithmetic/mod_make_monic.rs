@@ -9,22 +9,22 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::polynomial::{MakeMonicMod, MakeMonicModAssign, Polynomial};
+use malachite_base::polynomial::{ModMakeMonic, ModMakeMonicAssign, Polynomial};
 use malachite_base::test_util::generators::unsigned_polynomial_unsigned_unsigned_triple_gen_var_2;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
 #[test]
-fn test_make_monic_mod() {
+fn test_mod_make_monic() {
     fn test<T: PrimitiveUnsigned>(s: &str, m: T, out: Result<&str, T>) {
         let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
-        let q = (&p).make_monic_mod(m);
+        let q = (&p).mod_make_monic(m);
         assert_eq!(
             q.as_ref().map(ToString::to_string).map_err(|&e| e),
             out.map(ToString::to_string)
         );
-        assert_eq!(p.clone().make_monic_mod(m), q);
+        assert_eq!(p.clone().mod_make_monic(m), q);
         let mut r = p.clone();
-        let result = r.make_monic_mod_assign(m);
+        let result = r.mod_make_monic_assign(m);
         match q {
             Ok(q) => {
                 assert_eq!(result, Ok(()));
@@ -57,32 +57,32 @@ fn test_make_monic_mod() {
 
 #[test]
 #[should_panic]
-fn make_monic_mod_fail_1() {
+fn mod_make_monic_fail_1() {
     // m is 0.
-    let _ = (&UnsignedPolynomial::<u8>::ZERO).make_monic_mod(0);
+    let _ = (&UnsignedPolynomial::<u8>::ZERO).mod_make_monic(0);
 }
 
 #[test]
 #[should_panic]
-fn make_monic_mod_fail_2() {
+fn mod_make_monic_fail_2() {
     // A coefficient is not reduced.
-    let _ = (&UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap()).make_monic_mod(7);
+    let _ = (&UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap()).mod_make_monic(7);
 }
 
 #[test]
 #[should_panic]
-fn make_monic_mod_assign_fail() {
+fn mod_make_monic_assign_fail() {
     // A coefficient is not reduced.
     let mut p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
-    let _ = p.make_monic_mod_assign(7);
+    let _ = p.mod_make_monic_assign(7);
 }
 
-fn make_monic_mod_properties_helper<T: PrimitiveUnsigned>() {
+fn mod_make_monic_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_2::<T>().test_properties(|(p, _, m)| {
-        let q = (&p).make_monic_mod(m);
-        assert_eq!(p.clone().make_monic_mod(m), q);
+        let q = (&p).mod_make_monic(m);
+        assert_eq!(p.clone().mod_make_monic(m), q);
         let mut r = p.clone();
-        let result = r.make_monic_mod_assign(m);
+        let result = r.mod_make_monic_assign(m);
         let leading = p.leading_coefficient();
         match q {
             Ok(q) => {
@@ -98,7 +98,7 @@ fn make_monic_mod_properties_helper<T: PrimitiveUnsigned>() {
                         assert_eq!(c.mod_mul(inverse, m), d);
                     }
                     // Making it monic again changes nothing.
-                    assert_eq!((&q).make_monic_mod(m), Ok(q));
+                    assert_eq!((&q).mod_make_monic(m), Ok(q));
                 }
             }
             Err(g) => {
@@ -114,6 +114,6 @@ fn make_monic_mod_properties_helper<T: PrimitiveUnsigned>() {
 }
 
 #[test]
-fn make_monic_mod_properties() {
-    apply_fn_to_unsigneds!(make_monic_mod_properties_helper);
+fn mod_make_monic_properties() {
+    apply_fn_to_unsigneds!(mod_make_monic_properties_helper);
 }

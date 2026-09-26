@@ -348,8 +348,8 @@ documented by git history.
   `fmpq_poly_evaluate_fmpq` and `fmpq_poly_evaluate_fmpz`, giving a `Rational` in lowest terms: its
   numerator's value divided by its denominator. It is not part of the `Polynomial` trait, since
   `UnsignedPolynomial` does not implement it.
-- A new `EvaluateModPowerOf2` trait, in `malachite_base::polynomial`, whose
-  `evaluate_mod_power_of_2(x, pow)` evaluates a polynomial at `x` modulo $2^{pow}$. It is
+- A new `ModPowerOf2Evaluate` trait, in `malachite_base::polynomial`, whose
+  `mod_power_of_2_evaluate(x, pow)` evaluates a polynomial at `x` modulo $2^{pow}$. It is
   implemented for `NaturalPolynomial` at a `Natural`, taking the polynomial and the value each by
   value or by reference, and panics unless every coefficient and `x` are already reduced modulo
   $2^{pow}$. It uses Horner's rule, reducing after every step; taking the polynomial by value lets
@@ -357,7 +357,7 @@ documented by git history.
   cloned.
   It is also implemented for `UnsignedPolynomial<T>` at a `T`, for `pow` up to the width of `T`,
   with the same checks; there Horner's rule runs in wrapping arithmetic and reduces once at the end.
-- A new `EvaluateMod` trait, in `malachite_base::polynomial`, whose `evaluate_mod(x, m)` evaluates a
+- A new `ModEvaluate` trait, in `malachite_base::polynomial`, whose `mod_evaluate(x, m)` evaluates a
   polynomial at `x` modulo `m`, like FLINT's `fmpz_mod_poly_evaluate_fmpz`. It is implemented for
   `NaturalPolynomial` at a `Natural` modulo a `Natural`, taking each of the three by value or by
   reference, and panics unless every coefficient and `x` are already reduced modulo `m`. It uses
@@ -374,13 +374,13 @@ documented by git history.
   implemented for `&IntegerPolynomial` at `Integer`s and `Rational`s, `&NaturalPolynomial` at
   `Natural`s, and `&RationalPolynomial` at `Rational`s and `Integer`s, every combination for which
   `Evaluate` is implemented.
-- A new `EvaluateManyMod` trait, whose `evaluate_many_mod(xs, m)` evaluates a polynomial at each
+- A new `ModEvaluateMany` trait, whose `mod_evaluate_many(xs, m)` evaluates a polynomial at each
   value in a slice modulo `m`, like FLINT's `nmod_poly_evaluate_nmod_vec_iter` and
   `fmpz_mod_poly_evaluate_fmpz_vec_iter`. It is implemented for `&UnsignedPolynomial<T>` at `T`s
   modulo a `T`, which evaluates a block of points in each pass over the coefficients, and for
   `&NaturalPolynomial` at `Natural`s modulo a `Natural`, taken by value or by reference, which
   checks the polynomial and precomputes the modular-multiplication data once.
-- A new `EvaluateGeometricMod` trait, whose `evaluate_geometric_mod(q, k, m)` evaluates a
+- A new `ModEvaluateGeometric` trait, whose `mod_evaluate_geometric(q, k, m)` evaluates a
   polynomial at $1, q, \ldots, q^{k-1}$ modulo `m`, like FLINT's
   `nmod_poly_evaluate_geometric_nmod_vec_iter` with $q = r^2$. It is implemented for
   `&UnsignedPolynomial<T>`.
@@ -402,7 +402,7 @@ documented by git history.
   `fmpq_poly_make_monic`. For $p = A/d$ the monic multiple is
   $\operatorname{pp}(A)/\operatorname{lc}(\operatorname{pp}(A))$, already in lowest terms; the zero
   polynomial is returned unchanged.
-- New `MakeMonicMod` and `MakeMonicModAssign` traits, implemented for `UnsignedPolynomial<T>` modulo
+- New `ModMakeMonic` and `ModMakeMonicAssign` traits, implemented for `UnsignedPolynomial<T>` modulo
   a `T` and for `NaturalPolynomial` modulo a `Natural`, like FLINT's `nmod_poly_make_monic`,
   `fmpz_mod_poly_make_monic`, and `fmpz_mod_poly_make_monic_f` together. They return a `Result`:
   when the leading coefficient has no inverse modulo `m`, the error is its GCD with `m`, a

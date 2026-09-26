@@ -22,13 +22,13 @@
     The `fmpq_poly_evaluate_fmpq` mode is the same again with `p` a rational polynomial, and
     `fmpq_poly_evaluate_fmpz` the same with `x` an integer.
 
-    The `fmpz_mod_poly_evaluate_fmpz` mode diffs `(&(p)).evaluate_mod_power_of_2(x, pow) = r` lines,
+    The `fmpz_mod_poly_evaluate_fmpz` mode diffs `(&(p)).mod_power_of_2_evaluate(x, pow) = r` lines,
     where `p` is a polynomial with coefficients in [0, 2^pow) and `x` and `r` are in [0, 2^pow),
-    against fmpz_mod_poly_evaluate_fmpz with the modulus 2^pow, and `(&(p)).evaluate_mod(x, m) = r`
-    and `(p).evaluate_mod(x, m) = r` lines, with everything in [0, m), against it with the modulus
+    against fmpz_mod_poly_evaluate_fmpz with the modulus 2^pow, and `(&(p)).mod_evaluate(x, m) = r`
+    and `(p).mod_evaluate(x, m) = r` lines, with everything in [0, m), against it with the modulus
     m.
 
-    The `fmpz_poly_evaluate_mod` mode diffs `(&(p)).evaluate_mod(x, m) = r` lines, where `p` is an
+    The `fmpz_poly_evaluate_mod` mode diffs `(&(p)).mod_evaluate(x, m) = r` lines, where `p` is an
     integer polynomial with arbitrary coefficients and `x`, `m`, and `r` are words with `x` and `r`
     in [0, m), against fmpz_poly_evaluate_mod.
 */
@@ -331,7 +331,7 @@ run_fmpq_poly_evaluate_fmpz(const char * arg)
 }
 
 static int
-check_evaluate_mod_power_of_2_line(char * line, int line_number)
+check_mod_power_of_2_evaluate_line(char * line, int line_number)
 {
     char * receiver;
     char * args;
@@ -339,17 +339,17 @@ check_evaluate_mod_power_of_2_line(char * line, int line_number)
     /* Whether the second argument is the modulus itself, rather than the power of 2 it is. */
     int modulus_given = 0;
     char * copy = strdup(line);
-    int power_of_2_line = split_polynomial_scalar_line(copy, "evaluate_mod_power_of_2", NULL,
+    int power_of_2_line = split_polynomial_scalar_line(copy, "mod_power_of_2_evaluate", NULL,
                                                        NULL, &receiver, &args, &expected_str);
     free(copy);
     if (!power_of_2_line)
     {
-        modulus_given = split_polynomial_scalar_line(line, "evaluate_mod", NULL, NULL, &receiver,
+        modulus_given = split_polynomial_scalar_line(line, "mod_evaluate", NULL, NULL, &receiver,
                                                      &args, &expected_str);
     }
     else
     {
-        split_polynomial_scalar_line(line, "evaluate_mod_power_of_2", NULL, NULL, &receiver, &args,
+        split_polynomial_scalar_line(line, "mod_power_of_2_evaluate", NULL, NULL, &receiver, &args,
                                      &expected_str);
     }
     if (!power_of_2_line && !modulus_given)
@@ -436,7 +436,7 @@ int
 run_fmpz_mod_poly_evaluate_fmpz(const char * arg)
 {
     checked = 0;
-    int result = for_each_line(arg, check_evaluate_mod_power_of_2_line);
+    int result = for_each_line(arg, check_mod_power_of_2_evaluate_line);
     return result != 0 ? result : require_some_lines("fmpz_mod_poly_evaluate_fmpz", checked);
 }
 
@@ -446,7 +446,7 @@ check_fmpz_poly_evaluate_mod_line(char * line, int line_number)
     char * receiver;
     char * args;
     char * expected_str;
-    if (!split_polynomial_scalar_line(line, "evaluate_mod", NULL, NULL, &receiver, &args,
+    if (!split_polynomial_scalar_line(line, "mod_evaluate", NULL, NULL, &receiver, &args,
                                       &expected_str))
     {
         if (line[0] == '\0')

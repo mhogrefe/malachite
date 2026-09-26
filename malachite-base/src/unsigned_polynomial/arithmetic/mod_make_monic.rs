@@ -8,12 +8,12 @@
 
 use crate::num::arithmetic::traits::ModIsReduced;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::polynomial::{MakeMonicMod, MakeMonicModAssign};
+use crate::polynomial::{ModMakeMonic, ModMakeMonicAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 
 // Multiplies every coefficient by the inverse of the leading coefficient, which makes the leading
 // coefficient 1, or returns the GCD of the leading coefficient and m when there is no inverse.
-fn make_monic_mod_in_place<T: PrimitiveUnsigned>(coefficients: &mut [T], m: T) -> Result<(), T> {
+fn mod_make_monic_in_place<T: PrimitiveUnsigned>(coefficients: &mut [T], m: T) -> Result<(), T> {
     let Some(&leading) = coefficients.last() else {
         return Ok(());
     };
@@ -36,7 +36,7 @@ fn assert_reduced<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, m: T) {
     );
 }
 
-impl<T: PrimitiveUnsigned> MakeMonicMod<T> for UnsignedPolynomial<T> {
+impl<T: PrimitiveUnsigned> ModMakeMonic<T> for UnsignedPolynomial<T> {
     type Output = Self;
     type Factor = T;
 
@@ -61,34 +61,34 @@ impl<T: PrimitiveUnsigned> MakeMonicMod<T> for UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MakeMonicMod;
+    /// use malachite_base::polynomial::ModMakeMonic;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// // 3 * 5 = 15, which is 1 mod 7.
     /// let p = UnsignedPolynomial::<u8>::from_str("3*x^2+x+2").unwrap();
     /// assert_eq!(
-    ///     p.clone().make_monic_mod(7).unwrap().to_string(),
+    ///     p.clone().mod_make_monic(7).unwrap().to_string(),
     ///     "x^2+5*x+3"
     /// );
     /// // 2 has no inverse mod 4, and shares the factor 2 with it.
     /// let p = UnsignedPolynomial::<u8>::from_str("2*x+1").unwrap();
-    /// assert_eq!(p.clone().make_monic_mod(4), Err(2));
+    /// assert_eq!(p.clone().mod_make_monic(4), Err(2));
     /// assert_eq!(
-    ///     UnsignedPolynomial::<u8>::ZERO.make_monic_mod(7),
+    ///     UnsignedPolynomial::<u8>::ZERO.mod_make_monic(7),
     ///     Ok(UnsignedPolynomial::ZERO)
     /// );
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_make_monic_f` from `fmpz_mod_poly/make_monic.c`, FLINT
     /// 3.6.0, with the factor returned as the error; `nmod_poly_make_monic` aborts instead.
-    fn make_monic_mod(mut self, m: T) -> Result<Self, T> {
+    fn mod_make_monic(mut self, m: T) -> Result<Self, T> {
         assert_reduced(&self, m);
-        make_monic_mod_in_place(&mut self.coefficients, m)?;
+        mod_make_monic_in_place(&mut self.coefficients, m)?;
         Ok(self)
     }
 }
 
-impl<T: PrimitiveUnsigned> MakeMonicMod<T> for &UnsignedPolynomial<T> {
+impl<T: PrimitiveUnsigned> ModMakeMonic<T> for &UnsignedPolynomial<T> {
     type Output = UnsignedPolynomial<T>;
     type Factor = T;
 
@@ -113,32 +113,32 @@ impl<T: PrimitiveUnsigned> MakeMonicMod<T> for &UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MakeMonicMod;
+    /// use malachite_base::polynomial::ModMakeMonic;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// // 3 * 5 = 15, which is 1 mod 7.
     /// let p = UnsignedPolynomial::<u8>::from_str("3*x^2+x+2").unwrap();
-    /// assert_eq!((&p).make_monic_mod(7).unwrap().to_string(), "x^2+5*x+3");
+    /// assert_eq!((&p).mod_make_monic(7).unwrap().to_string(), "x^2+5*x+3");
     /// // 2 has no inverse mod 4, and shares the factor 2 with it.
     /// let p = UnsignedPolynomial::<u8>::from_str("2*x+1").unwrap();
-    /// assert_eq!((&p).make_monic_mod(4), Err(2));
+    /// assert_eq!((&p).mod_make_monic(4), Err(2));
     /// assert_eq!(
-    ///     (&UnsignedPolynomial::<u8>::ZERO).make_monic_mod(7),
+    ///     (&UnsignedPolynomial::<u8>::ZERO).mod_make_monic(7),
     ///     Ok(UnsignedPolynomial::ZERO)
     /// );
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_make_monic_f` from `fmpz_mod_poly/make_monic.c`, FLINT
     /// 3.6.0, with the factor returned as the error; `nmod_poly_make_monic` aborts instead.
-    fn make_monic_mod(self, m: T) -> Result<UnsignedPolynomial<T>, T> {
+    fn mod_make_monic(self, m: T) -> Result<UnsignedPolynomial<T>, T> {
         assert_reduced(self, m);
         let mut coefficients = self.coefficients.clone();
-        make_monic_mod_in_place(&mut coefficients, m)?;
+        mod_make_monic_in_place(&mut coefficients, m)?;
         Ok(UnsignedPolynomial { coefficients })
     }
 }
 
-impl<T: PrimitiveUnsigned> MakeMonicModAssign<T> for UnsignedPolynomial<T> {
+impl<T: PrimitiveUnsigned> ModMakeMonicAssign<T> for UnsignedPolynomial<T> {
     type Factor = T;
 
     /// Makes an [`UnsignedPolynomial`] monic modulo `m` in place, by multiplying it by the inverse
@@ -161,19 +161,19 @@ impl<T: PrimitiveUnsigned> MakeMonicModAssign<T> for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MakeMonicModAssign;
+    /// use malachite_base::polynomial::ModMakeMonicAssign;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let mut p = UnsignedPolynomial::<u8>::from_str("3*x^2+x+2").unwrap();
-    /// assert_eq!(p.make_monic_mod_assign(7), Ok(()));
+    /// assert_eq!(p.mod_make_monic_assign(7), Ok(()));
     /// assert_eq!(p.to_string(), "x^2+5*x+3");
     ///
     /// let mut p = UnsignedPolynomial::<u8>::from_str("2*x+1").unwrap();
-    /// assert_eq!(p.make_monic_mod_assign(4), Err(2));
+    /// assert_eq!(p.mod_make_monic_assign(4), Err(2));
     /// assert_eq!(p.to_string(), "2*x+1");
     /// ```
-    fn make_monic_mod_assign(&mut self, m: T) -> Result<(), T> {
+    fn mod_make_monic_assign(&mut self, m: T) -> Result<(), T> {
         assert_reduced(self, m);
-        make_monic_mod_in_place(&mut self.coefficients, m)
+        mod_make_monic_in_place(&mut self.coefficients, m)
     }
 }

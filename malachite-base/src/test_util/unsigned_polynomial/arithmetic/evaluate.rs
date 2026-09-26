@@ -14,7 +14,7 @@ use alloc::vec::Vec;
 // Evaluates a polynomial at x modulo 2^pow term by term, as the sum of c_i x^i, with each power of
 // x computed from scratch by mod_power_of_2_pow and every operation reduced. It shares nothing with
 // the wrapping Horner's rule of the real evaluation.
-pub fn evaluate_mod_power_of_2_naive<T: PrimitiveUnsigned>(
+pub fn mod_power_of_2_evaluate_naive<T: PrimitiveUnsigned>(
     p: &UnsignedPolynomial<T>,
     x: T,
     pow: u64,
@@ -30,7 +30,7 @@ pub fn evaluate_mod_power_of_2_naive<T: PrimitiveUnsigned>(
 // Evaluates a polynomial at x modulo m term by term, as the sum of c_i x^i, with each power of x
 // computed from scratch by mod_pow and every operation reduced. It shares nothing with the Horner's
 // rule of the real evaluation.
-pub fn evaluate_mod_naive<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, x: T, m: T) -> T {
+pub fn mod_evaluate_naive<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, x: T, m: T) -> T {
     let mut sum = T::ZERO;
     for (i, &c) in p.coefficients_asc().iter().enumerate() {
         sum.mod_add_assign(c.mod_mul(x.mod_pow(u64::exact_from(i), m), m), m);
@@ -38,24 +38,24 @@ pub fn evaluate_mod_naive<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, x: T,
     sum
 }
 
-// Evaluates a polynomial at each of `xs` modulo `m` with `evaluate_mod_naive`.
-pub fn evaluate_many_mod_naive<T: PrimitiveUnsigned>(
+// Evaluates a polynomial at each of `xs` modulo `m` with `mod_evaluate_naive`.
+pub fn mod_evaluate_many_naive<T: PrimitiveUnsigned>(
     p: &UnsignedPolynomial<T>,
     xs: &[T],
     m: T,
 ) -> Vec<T> {
-    xs.iter().map(|&x| evaluate_mod_naive(p, x, m)).collect()
+    xs.iter().map(|&x| mod_evaluate_naive(p, x, m)).collect()
 }
 
-// Evaluates a polynomial at the first `k` powers of `q` modulo `m` with `evaluate_mod_naive`, each
+// Evaluates a polynomial at the first `k` powers of `q` modulo `m` with `mod_evaluate_naive`, each
 // power computed from scratch by mod_pow.
-pub fn evaluate_geometric_mod_naive<T: PrimitiveUnsigned>(
+pub fn mod_evaluate_geometric_naive<T: PrimitiveUnsigned>(
     p: &UnsignedPolynomial<T>,
     q: T,
     k: u64,
     m: T,
 ) -> Vec<T> {
     (0..k)
-        .map(|j| evaluate_mod_naive(p, q.mod_pow(j, m), m))
+        .map(|j| mod_evaluate_naive(p, q.mod_pow(j, m), m))
         .collect()
 }

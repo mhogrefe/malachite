@@ -13,7 +13,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::{
-    EvaluateGeometricMod, EvaluateManyMod, EvaluateMod, EvaluateModPowerOf2, Polynomial,
+    ModEvaluate, ModEvaluateGeometric, ModEvaluateMany, ModPowerOf2Evaluate, Polynomial,
 };
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -25,16 +25,16 @@ use malachite_base::test_util::generators::{
 use malachite_base::test_util::unsigned_polynomial::arithmetic::evaluate::*;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::arithmetic::evaluate::{
-    evaluate_mod_horner, evaluate_mod_horner_block, evaluate_mod_shoup, evaluate_mod_shoup_block,
-    evaluate_mod_shoup_lazy, evaluate_mod_shoup_lazy_block,
+    mod_evaluate_horner, mod_evaluate_horner_block, mod_evaluate_shoup, mod_evaluate_shoup_block,
+    mod_evaluate_shoup_lazy, mod_evaluate_shoup_lazy_block,
 };
 
 #[test]
-fn test_evaluate_mod_power_of_2() {
+fn test_mod_power_of_2_evaluate() {
     fn test<T: PrimitiveUnsigned>(s: &str, x: T, pow: u64, out: T) {
         let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
-        assert_eq!((&p).evaluate_mod_power_of_2(x, pow), out);
-        assert_eq!(p.evaluate_mod_power_of_2(x, pow), out);
+        assert_eq!((&p).mod_power_of_2_evaluate(x, pow), out);
+        assert_eq!(p.mod_power_of_2_evaluate(x, pow), out);
     }
     test::<u8>("0", 0, 0, 0);
     test::<u8>("0", 5, 3, 0);
@@ -56,59 +56,59 @@ fn test_evaluate_mod_power_of_2() {
 
 #[test]
 #[should_panic]
-fn evaluate_mod_power_of_2_fail_1() {
+fn mod_power_of_2_evaluate_fail_1() {
     // pow is wider than `T`.
     UnsignedPolynomial::<u8>::from_str("x+1")
         .unwrap()
-        .evaluate_mod_power_of_2(1, 9);
+        .mod_power_of_2_evaluate(1, 9);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_power_of_2_fail_2() {
+fn mod_power_of_2_evaluate_fail_2() {
     // A coefficient is not reduced.
     UnsignedPolynomial::<u8>::from_str("4*x+1")
         .unwrap()
-        .evaluate_mod_power_of_2(1, 2);
+        .mod_power_of_2_evaluate(1, 2);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_power_of_2_fail_3() {
+fn mod_power_of_2_evaluate_fail_3() {
     // x is not reduced.
     UnsignedPolynomial::<u8>::from_str("x+1")
         .unwrap()
-        .evaluate_mod_power_of_2(4, 2);
+        .mod_power_of_2_evaluate(4, 2);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_power_of_2_fail_4() {
+fn mod_power_of_2_evaluate_fail_4() {
     // By reference, x is not reduced.
-    (&UnsignedPolynomial::<u64>::from_str("x+1").unwrap()).evaluate_mod_power_of_2(1, 0);
+    (&UnsignedPolynomial::<u64>::from_str("x+1").unwrap()).mod_power_of_2_evaluate(1, 0);
 }
 
-fn evaluate_mod_power_of_2_properties_helper<T: PrimitiveUnsigned>() {
+fn mod_power_of_2_evaluate_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_1::<T>().test_properties(|(p, x, pow)| {
-        let y = (&p).evaluate_mod_power_of_2(x, pow);
+        let y = (&p).mod_power_of_2_evaluate(x, pow);
         assert!(y.mod_power_of_2_is_reduced(pow));
-        assert_eq!(p.clone().evaluate_mod_power_of_2(x, pow), y);
-        assert_eq!(evaluate_mod_power_of_2_naive(&p, x, pow), y);
+        assert_eq!(p.clone().mod_power_of_2_evaluate(x, pow), y);
+        assert_eq!(mod_power_of_2_evaluate_naive(&p, x, pow), y);
 
         // Reducing further agrees with evaluating the reduced polynomial at the reduced value.
         for smaller in [0, pow >> 1, pow.saturating_sub(1)] {
             assert_eq!(
                 y.mod_power_of_2(smaller),
                 (&p).mod_power_of_2(smaller)
-                    .evaluate_mod_power_of_2(x.mod_power_of_2(smaller), smaller)
+                    .mod_power_of_2_evaluate(x.mod_power_of_2(smaller), smaller)
             );
         }
 
         // p(0) is the constant term, and p(1) the sum of the coefficients, mod 2^pow.
-        assert_eq!((&p).evaluate_mod_power_of_2(T::ZERO, pow), p.coefficient(0));
+        assert_eq!((&p).mod_power_of_2_evaluate(T::ZERO, pow), p.coefficient(0));
         if pow != 0 {
             assert_eq!(
-                (&p).evaluate_mod_power_of_2(T::ONE, pow),
+                (&p).mod_power_of_2_evaluate(T::ONE, pow),
                 p.coefficients_asc()
                     .iter()
                     .fold(T::ZERO, |sum, &c| sum.mod_power_of_2_add(c, pow))
@@ -122,16 +122,16 @@ fn evaluate_mod_power_of_2_properties_helper<T: PrimitiveUnsigned>() {
 }
 
 #[test]
-fn evaluate_mod_power_of_2_properties() {
-    apply_fn_to_unsigneds!(evaluate_mod_power_of_2_properties_helper);
+fn mod_power_of_2_evaluate_properties() {
+    apply_fn_to_unsigneds!(mod_power_of_2_evaluate_properties_helper);
 }
 
 #[test]
-fn test_evaluate_mod() {
+fn test_mod_evaluate() {
     fn test<T: PrimitiveUnsigned>(s: &str, x: T, m: T, out: T) {
         let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
-        assert_eq!((&p).evaluate_mod(x, m), out);
-        assert_eq!(p.evaluate_mod(x, m), out);
+        assert_eq!((&p).mod_evaluate(x, m), out);
+        assert_eq!(p.mod_evaluate(x, m), out);
     }
     // - the zero polynomial
     // Modulo 1 the only reduced polynomial is 0.
@@ -172,15 +172,15 @@ fn test_evaluate_mod() {
 }
 
 #[test]
-fn test_evaluate_mod_long() {
+fn test_mod_evaluate_long() {
     // Polynomials long enough for Shoup's method, which needs the top bit of the modulus clear, in
     // its lazy form when the modulus is at most a third of the type's range.
     fn test<T: PrimitiveUnsigned>(s: &str, x: T, m: T, out: T) {
         let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
         assert_eq!(p.len(), 12);
-        assert_eq!((&p).evaluate_mod(x, m), out);
-        assert_eq!(evaluate_mod_horner(p.coefficients_asc(), x, m), out);
-        assert_eq!(p.evaluate_mod(x, m), out);
+        assert_eq!((&p).mod_evaluate(x, m), out);
+        assert_eq!(mod_evaluate_horner(p.coefficients_asc(), x, m), out);
+        assert_eq!(p.mod_evaluate(x, m), out);
     }
     // - lazy Shoup, with the largest lazy modulus
     // - lazy result >= 2 * m
@@ -296,37 +296,37 @@ fn test_evaluate_mod_long() {
 
 #[test]
 #[should_panic]
-fn evaluate_mod_fail_1() {
+fn mod_evaluate_fail_1() {
     // m is 0.
-    UnsignedPolynomial::<u8>::ZERO.evaluate_mod(0, 0);
+    UnsignedPolynomial::<u8>::ZERO.mod_evaluate(0, 0);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_fail_2() {
+fn mod_evaluate_fail_2() {
     // A coefficient is not reduced.
     UnsignedPolynomial::<u8>::from_str("5*x+1")
         .unwrap()
-        .evaluate_mod(1, 5);
+        .mod_evaluate(1, 5);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_fail_3() {
+fn mod_evaluate_fail_3() {
     // x is not reduced.
     UnsignedPolynomial::<u8>::from_str("x+1")
         .unwrap()
-        .evaluate_mod(5, 5);
+        .mod_evaluate(5, 5);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_fail_4() {
+fn mod_evaluate_fail_4() {
     // By reference, a coefficient is not reduced.
-    (&UnsignedPolynomial::<u64>::from_str("x+7").unwrap()).evaluate_mod(1, 7);
+    (&UnsignedPolynomial::<u64>::from_str("x+7").unwrap()).mod_evaluate(1, 7);
 }
 
-fn evaluate_mod_algorithms_agree<T: PrimitiveUnsigned>(
+fn mod_evaluate_algorithms_agree<T: PrimitiveUnsigned>(
     p: &UnsignedPolynomial<T>,
     x: T,
     m: T,
@@ -337,38 +337,38 @@ fn evaluate_mod_algorithms_agree<T: PrimitiveUnsigned>(
     if coefficients.is_empty() {
         return;
     }
-    assert_eq!(evaluate_mod_horner(coefficients, x, m), y);
+    assert_eq!(mod_evaluate_horner(coefficients, x, m), y);
     // Shoup's method needs the top bit of the modulus clear.
     if !m.get_highest_bit() {
         let x_precomp = mod_mul_precompute_shoup(x, m);
-        assert_eq!(evaluate_mod_shoup(coefficients, x, x_precomp, m), y);
+        assert_eq!(mod_evaluate_shoup(coefficients, x, x_precomp, m), y);
         // The lazy form is congruent, and less than 3m - 1, when m is at most a third of the range.
         if m <= T::MAX / T::from(3u8) {
-            let lazy = evaluate_mod_shoup_lazy(coefficients, x, x_precomp, m);
+            let lazy = mod_evaluate_shoup_lazy(coefficients, x, x_precomp, m);
             assert!(lazy < m + m + m - T::ONE);
             assert_eq!(lazy % m, y);
         }
     }
 }
 
-fn evaluate_mod_properties_helper<T: PrimitiveUnsigned>() {
+fn mod_evaluate_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_2::<T>().test_properties(|(p, x, m)| {
-        let y = (&p).evaluate_mod(x, m);
+        let y = (&p).mod_evaluate(x, m);
         assert!(y < m);
-        assert_eq!(p.clone().evaluate_mod(x, m), y);
-        assert_eq!(evaluate_mod_naive(&p, x, m), y);
-        evaluate_mod_algorithms_agree(&p, x, m, y);
+        assert_eq!(p.clone().mod_evaluate(x, m), y);
+        assert_eq!(mod_evaluate_naive(&p, x, m), y);
+        mod_evaluate_algorithms_agree(&p, x, m, y);
 
-        // Modulo a power of 2, this agrees with evaluate_mod_power_of_2.
+        // Modulo a power of 2, this agrees with mod_power_of_2_evaluate.
         if m.is_power_of_2() {
-            assert_eq!((&p).evaluate_mod_power_of_2(x, m.trailing_zeros()), y);
+            assert_eq!((&p).mod_power_of_2_evaluate(x, m.trailing_zeros()), y);
         }
 
         // p(0) is the constant term, and p(1) the sum of the coefficients, mod m.
-        assert_eq!((&p).evaluate_mod(T::ZERO, m), p.coefficient(0));
+        assert_eq!((&p).mod_evaluate(T::ZERO, m), p.coefficient(0));
         if m != T::ONE {
             assert_eq!(
-                (&p).evaluate_mod(T::ONE, m),
+                (&p).mod_evaluate(T::ONE, m),
                 p.coefficients_asc()
                     .iter()
                     .fold(T::ZERO, |sum, &c| sum.mod_add(c, m))
@@ -387,10 +387,10 @@ fn evaluate_mod_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_2::<T>().test_properties_with_config(
         &config,
         |(p, x, m)| {
-            let y = (&p).evaluate_mod(x, m);
+            let y = (&p).mod_evaluate(x, m);
             assert!(y < m);
-            assert_eq!(evaluate_mod_naive(&p, x, m), y);
-            evaluate_mod_algorithms_agree(&p, x, m, y);
+            assert_eq!(mod_evaluate_naive(&p, x, m), y);
+            mod_evaluate_algorithms_agree(&p, x, m, y);
         },
     );
 
@@ -398,25 +398,25 @@ fn evaluate_mod_properties_helper<T: PrimitiveUnsigned>() {
         // Below the width of `T`, evaluation mod 2^pow is evaluation mod the value 2^pow.
         if pow < T::WIDTH {
             assert_eq!(
-                (&p).evaluate_mod(x, T::power_of_2(pow)),
-                p.evaluate_mod_power_of_2(x, pow)
+                (&p).mod_evaluate(x, T::power_of_2(pow)),
+                p.mod_power_of_2_evaluate(x, pow)
             );
         }
     });
 }
 
 #[test]
-fn evaluate_mod_properties() {
-    apply_fn_to_unsigneds!(evaluate_mod_properties_helper);
+fn mod_evaluate_properties() {
+    apply_fn_to_unsigneds!(mod_evaluate_properties_helper);
 }
 
 #[test]
-fn test_evaluate_many_mod() {
+fn test_mod_evaluate_many() {
     fn test<T: PrimitiveUnsigned>(s: &str, xs: &[T], m: T, out: &[T]) {
         let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
-        let ys = (&p).evaluate_many_mod(xs, m);
+        let ys = (&p).mod_evaluate_many(xs, m);
         assert_eq!(ys, out);
-        let ys_alt: Vec<T> = xs.iter().map(|&x| (&p).evaluate_mod(x, m)).collect();
+        let ys_alt: Vec<T> = xs.iter().map(|&x| (&p).mod_evaluate(x, m)).collect();
         assert_eq!(ys_alt, out);
     }
     // - no points
@@ -529,28 +529,28 @@ fn test_evaluate_many_mod() {
 
 #[test]
 #[should_panic]
-fn evaluate_many_mod_fail_1() {
+fn mod_evaluate_many_fail_1() {
     // m is 0.
-    (&UnsignedPolynomial::<u8>::ZERO).evaluate_many_mod(&[], 0);
+    (&UnsignedPolynomial::<u8>::ZERO).mod_evaluate_many(&[], 0);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_many_mod_fail_2() {
+fn mod_evaluate_many_fail_2() {
     // A coefficient is not reduced.
-    (&UnsignedPolynomial::<u8>::from_str("5*x+1").unwrap()).evaluate_many_mod(&[1], 5);
+    (&UnsignedPolynomial::<u8>::from_str("5*x+1").unwrap()).mod_evaluate_many(&[1], 5);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_many_mod_fail_3() {
+fn mod_evaluate_many_fail_3() {
     // A point is not reduced.
-    (&UnsignedPolynomial::<u8>::from_str("x+1").unwrap()).evaluate_many_mod(&[1, 2, 5, 3], 5);
+    (&UnsignedPolynomial::<u8>::from_str("x+1").unwrap()).mod_evaluate_many(&[1, 2, 5, 3], 5);
 }
 
 // Each block kernel that applies agrees with evaluating one point at a time, for a block of `N`
 // points. The points are taken from the front of `xs`, repeated if there are fewer than `N`.
-fn evaluate_mod_blocks_agree<T: PrimitiveUnsigned, const N: usize>(
+fn mod_evaluate_blocks_agree<T: PrimitiveUnsigned, const N: usize>(
     coefficients: &[T],
     xs: &[T],
     m: T,
@@ -559,42 +559,42 @@ fn evaluate_mod_blocks_agree<T: PrimitiveUnsigned, const N: usize>(
         return;
     }
     let block: [T; N] = core::array::from_fn(|i| xs[i % xs.len()]);
-    let expected = block.map(|x| evaluate_mod_horner(coefficients, x, m));
+    let expected = block.map(|x| mod_evaluate_horner(coefficients, x, m));
     let mut values = block;
-    evaluate_mod_horner_block(coefficients, &mut values, m);
+    mod_evaluate_horner_block(coefficients, &mut values, m);
     assert_eq!(values, expected);
     if !m.get_highest_bit() {
         let mut values = block;
-        evaluate_mod_shoup_block(coefficients, &mut values, m);
+        mod_evaluate_shoup_block(coefficients, &mut values, m);
         assert_eq!(values, expected);
         if m <= T::MAX / T::from(3u8) {
             let mut values = block;
-            evaluate_mod_shoup_lazy_block(coefficients, &mut values, m);
+            mod_evaluate_shoup_lazy_block(coefficients, &mut values, m);
             assert_eq!(values, expected);
         }
     }
 }
 
-fn evaluate_many_mod_properties_helper<T: PrimitiveUnsigned>() {
+fn mod_evaluate_many_properties_helper<T: PrimitiveUnsigned>() {
     let test = |(p, xs, m): (UnsignedPolynomial<T>, Vec<T>, T)| {
-        let ys = (&p).evaluate_many_mod(&xs, m);
+        let ys = (&p).mod_evaluate_many(&xs, m);
         assert_eq!(ys.len(), xs.len());
         assert!(ys.iter().all(|&y| y < m));
-        let ys_alt: Vec<T> = xs.iter().map(|&x| (&p).evaluate_mod(x, m)).collect();
+        let ys_alt: Vec<T> = xs.iter().map(|&x| (&p).mod_evaluate(x, m)).collect();
         assert_eq!(ys_alt, ys);
-        assert_eq!(evaluate_many_mod_naive(&p, &xs, m), ys);
+        assert_eq!(mod_evaluate_many_naive(&p, &xs, m), ys);
 
         let coefficients = p.coefficients_asc();
-        evaluate_mod_blocks_agree::<T, 1>(coefficients, &xs, m);
-        evaluate_mod_blocks_agree::<T, 2>(coefficients, &xs, m);
-        evaluate_mod_blocks_agree::<T, 3>(coefficients, &xs, m);
-        evaluate_mod_blocks_agree::<T, 4>(coefficients, &xs, m);
-        evaluate_mod_blocks_agree::<T, 8>(coefficients, &xs, m);
+        mod_evaluate_blocks_agree::<T, 1>(coefficients, &xs, m);
+        mod_evaluate_blocks_agree::<T, 2>(coefficients, &xs, m);
+        mod_evaluate_blocks_agree::<T, 3>(coefficients, &xs, m);
+        mod_evaluate_blocks_agree::<T, 4>(coefficients, &xs, m);
+        mod_evaluate_blocks_agree::<T, 8>(coefficients, &xs, m);
 
         // Evaluating at the concatenation of two lists concatenates the values.
         let (xs_1, xs_2) = xs.split_at(xs.len() >> 1);
-        let mut ys_alt = (&p).evaluate_many_mod(xs_1, m);
-        ys_alt.extend((&p).evaluate_many_mod(xs_2, m));
+        let mut ys_alt = (&p).mod_evaluate_many(xs_1, m);
+        ys_alt.extend((&p).mod_evaluate_many(xs_2, m));
         assert_eq!(ys_alt, ys);
     };
     unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1::<T>().test_properties(test);
@@ -608,16 +608,16 @@ fn evaluate_many_mod_properties_helper<T: PrimitiveUnsigned>() {
 }
 
 #[test]
-fn evaluate_many_mod_properties() {
-    apply_fn_to_unsigneds!(evaluate_many_mod_properties_helper);
+fn mod_evaluate_many_properties() {
+    apply_fn_to_unsigneds!(mod_evaluate_many_properties_helper);
 }
 
 #[test]
-fn test_evaluate_geometric_mod() {
+fn test_mod_evaluate_geometric() {
     fn test<T: PrimitiveUnsigned>(s: &str, q: T, k: u64, m: T, out: &[T]) {
         let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
-        assert_eq!((&p).evaluate_geometric_mod(q, k, m), out);
-        assert_eq!(evaluate_geometric_mod_naive(&p, q, k, m), out);
+        assert_eq!((&p).mod_evaluate_geometric(q, k, m), out);
+        assert_eq!(mod_evaluate_geometric_naive(&p, q, k, m), out);
     }
     // - no points
     test::<u8>("5*x^2+3*x+7", 2, 0, 13, &[]);
@@ -663,53 +663,53 @@ fn test_evaluate_geometric_mod() {
 
 #[test]
 #[should_panic]
-fn evaluate_geometric_mod_fail_1() {
+fn mod_evaluate_geometric_fail_1() {
     // m is 0.
-    (&UnsignedPolynomial::<u8>::ZERO).evaluate_geometric_mod(0, 1, 0);
+    (&UnsignedPolynomial::<u8>::ZERO).mod_evaluate_geometric(0, 1, 0);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_geometric_mod_fail_2() {
+fn mod_evaluate_geometric_fail_2() {
     // A coefficient is not reduced.
-    (&UnsignedPolynomial::<u8>::from_str("5*x+1").unwrap()).evaluate_geometric_mod(1, 3, 5);
+    (&UnsignedPolynomial::<u8>::from_str("5*x+1").unwrap()).mod_evaluate_geometric(1, 3, 5);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_geometric_mod_fail_3() {
+fn mod_evaluate_geometric_fail_3() {
     // q is not reduced.
-    (&UnsignedPolynomial::<u8>::from_str("x+1").unwrap()).evaluate_geometric_mod(5, 3, 5);
+    (&UnsignedPolynomial::<u8>::from_str("x+1").unwrap()).mod_evaluate_geometric(5, 3, 5);
 }
 
-fn evaluate_geometric_mod_properties_helper<T: PrimitiveUnsigned>() {
+fn mod_evaluate_geometric_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1::<T>().test_properties(
         |(p, q, k, m)| {
-            let ys = (&p).evaluate_geometric_mod(q, k, m);
+            let ys = (&p).mod_evaluate_geometric(q, k, m);
             assert_eq!(u64::exact_from(ys.len()), k);
             assert!(ys.iter().all(|&y| y < m));
-            assert_eq!(evaluate_geometric_mod_naive(&p, q, k, m), ys);
+            assert_eq!(mod_evaluate_geometric_naive(&p, q, k, m), ys);
 
             // It is evaluation at the powers of q.
             let powers: Vec<T> = (0..k).map(|j| q.mod_pow(j, m)).collect();
-            assert_eq!((&p).evaluate_many_mod(&powers, m), ys);
+            assert_eq!((&p).mod_evaluate_many(&powers, m), ys);
 
             // The first value is p(1), and, when q is 0, every later one is p(0).
             if k != 0 {
-                assert_eq!(ys[0], (&p).evaluate_mod(T::ONE % m, m));
+                assert_eq!(ys[0], (&p).mod_evaluate(T::ONE % m, m));
             }
             if q == T::ZERO && k > 1 {
                 assert!(ys[1..].iter().all(|&y| y == p.coefficient(0)));
             }
             // Fewer points give a prefix.
             if k != 0 {
-                assert_eq!((&p).evaluate_geometric_mod(q, k - 1, m), ys[..ys.len() - 1]);
+                assert_eq!((&p).mod_evaluate_geometric(q, k - 1, m), ys[..ys.len() - 1]);
             }
         },
     );
 }
 
 #[test]
-fn evaluate_geometric_mod_properties() {
-    apply_fn_to_unsigneds!(evaluate_geometric_mod_properties_helper);
+fn mod_evaluate_geometric_properties() {
+    apply_fn_to_unsigneds!(mod_evaluate_geometric_properties_helper);
 }

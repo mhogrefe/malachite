@@ -19,8 +19,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use malachite_base::polynomial::{Evaluate, EvaluateMany, EvaluateMod};
-use malachite_base::unsigned_polynomial::arithmetic::evaluate::evaluate_mod_slice;
+use malachite_base::polynomial::{Evaluate, EvaluateMany, ModEvaluate};
+use malachite_base::unsigned_polynomial::arithmetic::evaluate::mod_evaluate_slice;
 
 // Evaluates a polynomial, given by its coefficients in ascending order, at `x` with Horner's rule.
 //
@@ -321,7 +321,7 @@ fn integer_mod_u64(c: &Integer, m: u64, m_natural: &Natural) -> u64 {
     if c.sign || r == 0 { r } else { m - r }
 }
 
-impl EvaluateMod<u64> for &IntegerPolynomial {
+impl ModEvaluate<u64> for &IntegerPolynomial {
     type Output = u64;
 
     /// Evaluates an [`IntegerPolynomial`] at a [`u64`], modulo a [`u64`]. The coefficients may be
@@ -336,7 +336,7 @@ impl EvaluateMod<u64> for &IntegerPolynomial {
     /// m)$. The zero polynomial evaluates to 0 everywhere.
     ///
     /// Each coefficient is reduced to a word, and the words are then evaluated as by
-    /// [`UnsignedPolynomial::evaluate_mod`](malachite_base::polynomial::EvaluateMod::evaluate_mod),
+    /// [`UnsignedPolynomial::mod_evaluate`](malachite_base::polynomial::ModEvaluate::mod_evaluate),
     /// with Horner's rule and, for longer polynomials, Shoup's method.
     ///
     /// # Worst-case complexity
@@ -353,20 +353,20 @@ impl EvaluateMod<u64> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateMod;
+    /// use malachite_base::polynomial::ModEvaluate;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("-5*x^2+3*x-7").unwrap();
     /// // -5 * 36 + 3 * 6 - 7 = -169, which is 7 mod 11.
-    /// assert_eq!((&p).evaluate_mod(6, 11), 7);
+    /// assert_eq!((&p).mod_evaluate(6, 11), 7);
     /// // The coefficients need not be reduced.
     /// let p = IntegerPolynomial::from_str("100*x+1").unwrap();
-    /// assert_eq!((&p).evaluate_mod(3, 10), 1);
+    /// assert_eq!((&p).mod_evaluate(3, 10), 1);
     /// ```
     ///
-    /// This is equivalent to `fmpz_poly_evaluate_mod` from `fmpz_poly/evaluate_mod.c`, FLINT 3.6.0,
+    /// This is equivalent to `fmpz_poly_evaluate_mod` from `fmpz_poly/mod_evaluate.c`, FLINT 3.6.0,
     /// except that `x` must be reduced.
-    fn evaluate_mod(self, x: u64, m: u64) -> u64 {
+    fn mod_evaluate(self, x: u64, m: u64) -> u64 {
         assert_ne!(m, 0, "m cannot be 0");
         assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
         let m_natural = Natural::from(m);
@@ -378,7 +378,7 @@ impl EvaluateMod<u64> for &IntegerPolynomial {
                     .iter()
                     .map(|c| integer_mod_u64(c, m, &m_natural))
                     .collect();
-                evaluate_mod_slice(&reduced, x, m)
+                mod_evaluate_slice(&reduced, x, m)
             }
         }
     }

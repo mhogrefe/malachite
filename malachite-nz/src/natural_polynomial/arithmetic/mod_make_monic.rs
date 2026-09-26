@@ -12,7 +12,7 @@ use crate::natural_polynomial::NaturalPolynomial;
 use malachite_base::num::arithmetic::traits::{
     Gcd, ModInverse, ModIsReduced, ModMulPrecomputed, ModMulPrecomputedAssign,
 };
-use malachite_base::polynomial::{MakeMonicMod, MakeMonicModAssign};
+use malachite_base::polynomial::{ModMakeMonic, ModMakeMonicAssign};
 
 fn assert_reduced(p: &NaturalPolynomial, m: &Natural) {
     assert!(
@@ -23,7 +23,7 @@ fn assert_reduced(p: &NaturalPolynomial, m: &Natural) {
 
 // Multiplies every coefficient by the inverse of the leading coefficient, which makes the leading
 // coefficient 1, or returns the GCD of the leading coefficient and m when there is no inverse.
-fn make_monic_mod_in_place(coefficients: &mut [Natural], m: &Natural) -> Result<(), Natural> {
+fn mod_make_monic_in_place(coefficients: &mut [Natural], m: &Natural) -> Result<(), Natural> {
     let Some(leading) = coefficients.last() else {
         return Ok(());
     };
@@ -40,25 +40,25 @@ fn make_monic_mod_in_place(coefficients: &mut [Natural], m: &Natural) -> Result<
     Ok(())
 }
 
-fn make_monic_mod_ref(p: &NaturalPolynomial, m: &Natural) -> Result<NaturalPolynomial, Natural> {
+fn mod_make_monic_ref(p: &NaturalPolynomial, m: &Natural) -> Result<NaturalPolynomial, Natural> {
     assert_reduced(p, m);
     let mut coefficients = p.coefficients.clone();
-    make_monic_mod_in_place(&mut coefficients, m)?;
+    mod_make_monic_in_place(&mut coefficients, m)?;
     Ok(NaturalPolynomial { coefficients })
 }
 
-fn make_monic_mod_val(mut p: NaturalPolynomial, m: &Natural) -> Result<NaturalPolynomial, Natural> {
+fn mod_make_monic_val(mut p: NaturalPolynomial, m: &Natural) -> Result<NaturalPolynomial, Natural> {
     assert_reduced(&p, m);
-    make_monic_mod_in_place(&mut p.coefficients, m)?;
+    mod_make_monic_in_place(&mut p.coefficients, m)?;
     Ok(p)
 }
 
-fn make_monic_mod_assign(p: &mut NaturalPolynomial, m: &Natural) -> Result<(), Natural> {
+fn mod_make_monic_assign(p: &mut NaturalPolynomial, m: &Natural) -> Result<(), Natural> {
     assert_reduced(p, m);
-    make_monic_mod_in_place(&mut p.coefficients, m)
+    mod_make_monic_in_place(&mut p.coefficients, m)
 }
 
-impl MakeMonicMod<&Natural> for &NaturalPolynomial {
+impl ModMakeMonic<&Natural> for &NaturalPolynomial {
     type Output = NaturalPolynomial;
     type Factor = Natural;
 
@@ -84,23 +84,23 @@ impl MakeMonicMod<&Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{Two, Zero};
-    /// use malachite_base::polynomial::MakeMonicMod;
+    /// use malachite_base::polynomial::ModMakeMonic;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// // 3 * 5 = 15, which is 1 mod 7.
     /// let p = NaturalPolynomial::from_str("3*x^2+x+2").unwrap();
     /// assert_eq!(
-    ///     (&p).make_monic_mod(&Natural::from(7u32))
+    ///     (&p).mod_make_monic(&Natural::from(7u32))
     ///         .unwrap()
     ///         .to_string(),
     ///     "x^2+5*x+3"
     /// );
     /// // 2 has no inverse mod 4, and shares the factor 2 with it.
     /// let p = NaturalPolynomial::from_str("2*x+1").unwrap();
-    /// assert_eq!((&p).make_monic_mod(&Natural::from(4u32)), Err(Natural::TWO));
+    /// assert_eq!((&p).mod_make_monic(&Natural::from(4u32)), Err(Natural::TWO));
     /// assert_eq!(
-    ///     (&NaturalPolynomial::ZERO).make_monic_mod(&Natural::from(7u32)),
+    ///     (&NaturalPolynomial::ZERO).mod_make_monic(&Natural::from(7u32)),
     ///     Ok(NaturalPolynomial::ZERO)
     /// );
     /// ```
@@ -108,12 +108,12 @@ impl MakeMonicMod<&Natural> for &NaturalPolynomial {
     /// This is equivalent to `fmpz_mod_poly_make_monic_f` from `fmpz_mod_poly/make_monic.c`, FLINT
     /// 3.6.0, with the factor returned as the error.
     #[inline]
-    fn make_monic_mod(self, m: &Natural) -> Result<NaturalPolynomial, Natural> {
-        make_monic_mod_ref(self, m)
+    fn mod_make_monic(self, m: &Natural) -> Result<NaturalPolynomial, Natural> {
+        mod_make_monic_ref(self, m)
     }
 }
 
-impl MakeMonicMod<Natural> for &NaturalPolynomial {
+impl ModMakeMonic<Natural> for &NaturalPolynomial {
     type Output = NaturalPolynomial;
     type Factor = Natural;
 
@@ -139,23 +139,23 @@ impl MakeMonicMod<Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{Two, Zero};
-    /// use malachite_base::polynomial::MakeMonicMod;
+    /// use malachite_base::polynomial::ModMakeMonic;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// // 3 * 5 = 15, which is 1 mod 7.
     /// let p = NaturalPolynomial::from_str("3*x^2+x+2").unwrap();
     /// assert_eq!(
-    ///     (&p).make_monic_mod(Natural::from(7u32))
+    ///     (&p).mod_make_monic(Natural::from(7u32))
     ///         .unwrap()
     ///         .to_string(),
     ///     "x^2+5*x+3"
     /// );
     /// // 2 has no inverse mod 4, and shares the factor 2 with it.
     /// let p = NaturalPolynomial::from_str("2*x+1").unwrap();
-    /// assert_eq!((&p).make_monic_mod(Natural::from(4u32)), Err(Natural::TWO));
+    /// assert_eq!((&p).mod_make_monic(Natural::from(4u32)), Err(Natural::TWO));
     /// assert_eq!(
-    ///     (&NaturalPolynomial::ZERO).make_monic_mod(Natural::from(7u32)),
+    ///     (&NaturalPolynomial::ZERO).mod_make_monic(Natural::from(7u32)),
     ///     Ok(NaturalPolynomial::ZERO)
     /// );
     /// ```
@@ -163,12 +163,12 @@ impl MakeMonicMod<Natural> for &NaturalPolynomial {
     /// This is equivalent to `fmpz_mod_poly_make_monic_f` from `fmpz_mod_poly/make_monic.c`, FLINT
     /// 3.6.0, with the factor returned as the error.
     #[inline]
-    fn make_monic_mod(self, m: Natural) -> Result<NaturalPolynomial, Natural> {
-        make_monic_mod_ref(self, &m)
+    fn mod_make_monic(self, m: Natural) -> Result<NaturalPolynomial, Natural> {
+        mod_make_monic_ref(self, &m)
     }
 }
 
-impl MakeMonicMod<&Natural> for NaturalPolynomial {
+impl ModMakeMonic<&Natural> for NaturalPolynomial {
     type Output = Self;
     type Factor = Natural;
 
@@ -194,7 +194,7 @@ impl MakeMonicMod<&Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{Two, Zero};
-    /// use malachite_base::polynomial::MakeMonicMod;
+    /// use malachite_base::polynomial::ModMakeMonic;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -202,7 +202,7 @@ impl MakeMonicMod<&Natural> for NaturalPolynomial {
     /// let p = NaturalPolynomial::from_str("3*x^2+x+2").unwrap();
     /// assert_eq!(
     ///     p.clone()
-    ///         .make_monic_mod(&Natural::from(7u32))
+    ///         .mod_make_monic(&Natural::from(7u32))
     ///         .unwrap()
     ///         .to_string(),
     ///     "x^2+5*x+3"
@@ -210,11 +210,11 @@ impl MakeMonicMod<&Natural> for NaturalPolynomial {
     /// // 2 has no inverse mod 4, and shares the factor 2 with it.
     /// let p = NaturalPolynomial::from_str("2*x+1").unwrap();
     /// assert_eq!(
-    ///     p.clone().make_monic_mod(&Natural::from(4u32)),
+    ///     p.clone().mod_make_monic(&Natural::from(4u32)),
     ///     Err(Natural::TWO)
     /// );
     /// assert_eq!(
-    ///     NaturalPolynomial::ZERO.make_monic_mod(&Natural::from(7u32)),
+    ///     NaturalPolynomial::ZERO.mod_make_monic(&Natural::from(7u32)),
     ///     Ok(NaturalPolynomial::ZERO)
     /// );
     /// ```
@@ -222,12 +222,12 @@ impl MakeMonicMod<&Natural> for NaturalPolynomial {
     /// This is equivalent to `fmpz_mod_poly_make_monic_f` from `fmpz_mod_poly/make_monic.c`, FLINT
     /// 3.6.0, with the factor returned as the error.
     #[inline]
-    fn make_monic_mod(self, m: &Natural) -> Result<Self, Natural> {
-        make_monic_mod_val(self, m)
+    fn mod_make_monic(self, m: &Natural) -> Result<Self, Natural> {
+        mod_make_monic_val(self, m)
     }
 }
 
-impl MakeMonicMod<Natural> for NaturalPolynomial {
+impl ModMakeMonic<Natural> for NaturalPolynomial {
     type Output = Self;
     type Factor = Natural;
 
@@ -253,7 +253,7 @@ impl MakeMonicMod<Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{Two, Zero};
-    /// use malachite_base::polynomial::MakeMonicMod;
+    /// use malachite_base::polynomial::ModMakeMonic;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -261,7 +261,7 @@ impl MakeMonicMod<Natural> for NaturalPolynomial {
     /// let p = NaturalPolynomial::from_str("3*x^2+x+2").unwrap();
     /// assert_eq!(
     ///     p.clone()
-    ///         .make_monic_mod(Natural::from(7u32))
+    ///         .mod_make_monic(Natural::from(7u32))
     ///         .unwrap()
     ///         .to_string(),
     ///     "x^2+5*x+3"
@@ -269,11 +269,11 @@ impl MakeMonicMod<Natural> for NaturalPolynomial {
     /// // 2 has no inverse mod 4, and shares the factor 2 with it.
     /// let p = NaturalPolynomial::from_str("2*x+1").unwrap();
     /// assert_eq!(
-    ///     p.clone().make_monic_mod(Natural::from(4u32)),
+    ///     p.clone().mod_make_monic(Natural::from(4u32)),
     ///     Err(Natural::TWO)
     /// );
     /// assert_eq!(
-    ///     NaturalPolynomial::ZERO.make_monic_mod(Natural::from(7u32)),
+    ///     NaturalPolynomial::ZERO.mod_make_monic(Natural::from(7u32)),
     ///     Ok(NaturalPolynomial::ZERO)
     /// );
     /// ```
@@ -281,12 +281,12 @@ impl MakeMonicMod<Natural> for NaturalPolynomial {
     /// This is equivalent to `fmpz_mod_poly_make_monic_f` from `fmpz_mod_poly/make_monic.c`, FLINT
     /// 3.6.0, with the factor returned as the error.
     #[inline]
-    fn make_monic_mod(self, m: Natural) -> Result<Self, Natural> {
-        make_monic_mod_val(self, &m)
+    fn mod_make_monic(self, m: Natural) -> Result<Self, Natural> {
+        mod_make_monic_val(self, &m)
     }
 }
 
-impl MakeMonicModAssign<&Natural> for NaturalPolynomial {
+impl ModMakeMonicAssign<&Natural> for NaturalPolynomial {
     type Factor = Natural;
 
     /// Makes a [`NaturalPolynomial`] monic modulo a [`Natural`] in place, by multiplying it by the
@@ -312,28 +312,28 @@ impl MakeMonicModAssign<&Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Two;
-    /// use malachite_base::polynomial::MakeMonicModAssign;
+    /// use malachite_base::polynomial::ModMakeMonicAssign;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("3*x^2+x+2").unwrap();
-    /// assert_eq!(p.make_monic_mod_assign(&Natural::from(7u32)), Ok(()));
+    /// assert_eq!(p.mod_make_monic_assign(&Natural::from(7u32)), Ok(()));
     /// assert_eq!(p.to_string(), "x^2+5*x+3");
     ///
     /// let mut p = NaturalPolynomial::from_str("2*x+1").unwrap();
     /// assert_eq!(
-    ///     p.make_monic_mod_assign(&Natural::from(4u32)),
+    ///     p.mod_make_monic_assign(&Natural::from(4u32)),
     ///     Err(Natural::TWO)
     /// );
     /// assert_eq!(p.to_string(), "2*x+1");
     /// ```
     #[inline]
-    fn make_monic_mod_assign(&mut self, m: &Natural) -> Result<(), Natural> {
-        make_monic_mod_assign(self, m)
+    fn mod_make_monic_assign(&mut self, m: &Natural) -> Result<(), Natural> {
+        mod_make_monic_assign(self, m)
     }
 }
 
-impl MakeMonicModAssign<Natural> for NaturalPolynomial {
+impl ModMakeMonicAssign<Natural> for NaturalPolynomial {
     type Factor = Natural;
 
     /// Makes a [`NaturalPolynomial`] monic modulo a [`Natural`] in place, by multiplying it by the
@@ -359,23 +359,23 @@ impl MakeMonicModAssign<Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Two;
-    /// use malachite_base::polynomial::MakeMonicModAssign;
+    /// use malachite_base::polynomial::ModMakeMonicAssign;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("3*x^2+x+2").unwrap();
-    /// assert_eq!(p.make_monic_mod_assign(Natural::from(7u32)), Ok(()));
+    /// assert_eq!(p.mod_make_monic_assign(Natural::from(7u32)), Ok(()));
     /// assert_eq!(p.to_string(), "x^2+5*x+3");
     ///
     /// let mut p = NaturalPolynomial::from_str("2*x+1").unwrap();
     /// assert_eq!(
-    ///     p.make_monic_mod_assign(Natural::from(4u32)),
+    ///     p.mod_make_monic_assign(Natural::from(4u32)),
     ///     Err(Natural::TWO)
     /// );
     /// assert_eq!(p.to_string(), "2*x+1");
     /// ```
     #[inline]
-    fn make_monic_mod_assign(&mut self, m: Natural) -> Result<(), Natural> {
-        make_monic_mod_assign(self, &m)
+    fn mod_make_monic_assign(&mut self, m: Natural) -> Result<(), Natural> {
+        mod_make_monic_assign(self, &m)
     }
 }

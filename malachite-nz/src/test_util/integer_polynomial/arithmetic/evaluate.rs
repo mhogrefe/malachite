@@ -26,7 +26,7 @@ pub fn evaluate_naive(p: &IntegerPolynomial, x: &Integer) -> Integer {
 
 // Evaluates a polynomial at `x` modulo `m` by evaluating it exactly and reducing the value once.
 // The value can be large, but nothing is shared with the word-sized evaluation.
-pub fn evaluate_mod_u64_naive(p: &IntegerPolynomial, x: u64, m: u64) -> u64 {
+pub fn mod_evaluate_u64_naive(p: &IntegerPolynomial, x: u64, m: u64) -> u64 {
     u64::exact_from(&evaluate_naive(p, &Integer::from(x)).mod_op(Integer::from(m)))
 }
 

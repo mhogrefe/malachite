@@ -26,12 +26,12 @@ pub fn evaluate_naive(p: &NaturalPolynomial, x: &Natural) -> Natural {
 
 // Evaluates a polynomial at x in full and then reduces the value modulo 2^pow. The modular
 // evaluation never forms the full value, so this checks it independently.
-pub fn evaluate_mod_power_of_2_naive(p: &NaturalPolynomial, x: &Natural, pow: u64) -> Natural {
+pub fn mod_power_of_2_evaluate_naive(p: &NaturalPolynomial, x: &Natural, pow: u64) -> Natural {
     evaluate_naive(p, x).mod_power_of_2(pow)
 }
 
 // Evaluates a polynomial at x in full and then reduces the value modulo m.
-pub fn evaluate_mod_naive(p: &NaturalPolynomial, x: &Natural, m: &Natural) -> Natural {
+pub fn mod_evaluate_naive(p: &NaturalPolynomial, x: &Natural, m: &Natural) -> Natural {
     evaluate_naive(p, x) % m
 }
 
@@ -40,7 +40,7 @@ pub fn evaluate_many_naive(p: &NaturalPolynomial, xs: &[Natural]) -> Vec<Natural
     xs.iter().map(|x| evaluate_naive(p, x)).collect()
 }
 
-// Evaluates a polynomial at each of `xs` modulo `m` with `evaluate_mod_naive`.
-pub fn evaluate_many_mod_naive(p: &NaturalPolynomial, xs: &[Natural], m: &Natural) -> Vec<Natural> {
-    xs.iter().map(|x| evaluate_mod_naive(p, x, m)).collect()
+// Evaluates a polynomial at each of `xs` modulo `m` with `mod_evaluate_naive`.
+pub fn mod_evaluate_many_naive(p: &NaturalPolynomial, xs: &[Natural], m: &Natural) -> Vec<Natural> {
+    xs.iter().map(|x| mod_evaluate_naive(p, x, m)).collect()
 }

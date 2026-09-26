@@ -12,7 +12,7 @@
 pub mod balanced_mod;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
 /// polynomial at a value, and of
-/// [`EvaluateModPowerOf2`](malachite_base::polynomial::EvaluateModPowerOf2), which does so modulo a
+/// [`ModPowerOf2Evaluate`](malachite_base::polynomial::ModPowerOf2Evaluate), which does so modulo a
 /// power of 2. Implementations of [`Content`](malachite_base::polynomial::Content),
 /// [`PrimitivePart`](malachite_base::polynomial::PrimitivePart),
 /// [`PrimitivePartAssign`](malachite_base::polynomial::PrimitivePartAssign), and
@@ -27,13 +27,13 @@ pub mod height;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
+pub mod mod_is_reduced;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every coefficient of a polynomial is less than a given modulus.
-/// Implementations of [`MakeMonicMod`](malachite_base::polynomial::MakeMonicMod) and
-/// [`MakeMonicModAssign`](malachite_base::polynomial::MakeMonicModAssign), which make a polynomial
+/// Implementations of [`ModMakeMonic`](malachite_base::polynomial::ModMakeMonic) and
+/// [`ModMakeMonicAssign`](malachite_base::polynomial::ModMakeMonicAssign), which make a polynomial
 /// monic modulo a value.
-pub mod make_monic;
-pub mod mod_is_reduced;
+pub mod mod_make_monic;
 /// Implementations of [`ModNeg`](malachite_base::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), which negate a
 /// polynomial modulo a number.

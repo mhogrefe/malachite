@@ -13,13 +13,13 @@ use crate::num::arithmetic::traits::{ModIsReduced, ModPowerOf2IsReduced};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
-use crate::polynomial::{EvaluateGeometricMod, EvaluateManyMod, EvaluateMod, EvaluateModPowerOf2};
+use crate::polynomial::{ModEvaluate, ModEvaluateGeometric, ModEvaluateMany, ModPowerOf2Evaluate};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec::Vec;
 
 // Evaluates a polynomial at x modulo 2^pow, after checking that pow fits in `T` and that the
 // coefficients and x are reduced.
-fn evaluate_mod_power_of_2<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, x: T, pow: u64) -> T {
+fn mod_power_of_2_evaluate<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, x: T, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
     assert!(
         p.mod_power_of_2_is_reduced(pow),
@@ -36,7 +36,7 @@ fn evaluate_mod_power_of_2<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, x: T
     value.mod_power_of_2(pow)
 }
 
-impl<T: PrimitiveUnsigned> EvaluateModPowerOf2<T> for &UnsignedPolynomial<T> {
+impl<T: PrimitiveUnsigned> ModPowerOf2Evaluate<T> for &UnsignedPolynomial<T> {
     type Output = T;
 
     /// Evaluates an [`UnsignedPolynomial`] at a value of its coefficient type, modulo $2^k$, taking
@@ -68,26 +68,26 @@ impl<T: PrimitiveUnsigned> EvaluateModPowerOf2<T> for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateModPowerOf2;
+    /// use malachite_base::polynomial::ModPowerOf2Evaluate;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
     /// // 5 * 36 + 3 * 6 + 7 = 205, which is 13 mod 16.
-    /// assert_eq!((&p).evaluate_mod_power_of_2(6, 4), 13);
-    /// assert_eq!((&p).evaluate_mod_power_of_2(0, 4), 7);
+    /// assert_eq!((&p).mod_power_of_2_evaluate(6, 4), 13);
+    /// assert_eq!((&p).mod_power_of_2_evaluate(0, 4), 7);
     /// // All 8 bits of a u8: 205 itself.
-    /// assert_eq!((&p).evaluate_mod_power_of_2(6, 8), 205);
+    /// assert_eq!((&p).mod_power_of_2_evaluate(6, 8), 205);
     /// ```
     ///
     /// This is equivalent to `nmod_poly_evaluate_nmod` from `nmod_poly/evaluate_nmod.c`, FLINT
     /// 3.6.0, with the modulus $2^k$, except that the value must be reduced.
     #[inline]
-    fn evaluate_mod_power_of_2(self, x: T, pow: u64) -> T {
-        evaluate_mod_power_of_2(self, x, pow)
+    fn mod_power_of_2_evaluate(self, x: T, pow: u64) -> T {
+        mod_power_of_2_evaluate(self, x, pow)
     }
 }
 
-impl<T: PrimitiveUnsigned> EvaluateModPowerOf2<T> for UnsignedPolynomial<T> {
+impl<T: PrimitiveUnsigned> ModPowerOf2Evaluate<T> for UnsignedPolynomial<T> {
     type Output = T;
 
     /// Evaluates an [`UnsignedPolynomial`] at a value of its coefficient type, modulo $2^k$, taking
@@ -119,22 +119,22 @@ impl<T: PrimitiveUnsigned> EvaluateModPowerOf2<T> for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateModPowerOf2;
+    /// use malachite_base::polynomial::ModPowerOf2Evaluate;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
     /// // 5 * 36 + 3 * 6 + 7 = 205, which is 13 mod 16.
-    /// assert_eq!(p.clone().evaluate_mod_power_of_2(6, 4), 13);
-    /// assert_eq!(p.clone().evaluate_mod_power_of_2(0, 4), 7);
+    /// assert_eq!(p.clone().mod_power_of_2_evaluate(6, 4), 13);
+    /// assert_eq!(p.clone().mod_power_of_2_evaluate(0, 4), 7);
     /// // All 8 bits of a u8: 205 itself.
-    /// assert_eq!(p.evaluate_mod_power_of_2(6, 8), 205);
+    /// assert_eq!(p.mod_power_of_2_evaluate(6, 8), 205);
     /// ```
     ///
     /// This is equivalent to `nmod_poly_evaluate_nmod` from `nmod_poly/evaluate_nmod.c`, FLINT
     /// 3.6.0, with the modulus $2^k$, except that the value must be reduced.
     #[inline]
-    fn evaluate_mod_power_of_2(self, x: T, pow: u64) -> T {
-        evaluate_mod_power_of_2(&self, x, pow)
+    fn mod_power_of_2_evaluate(self, x: T, pow: u64) -> T {
+        mod_power_of_2_evaluate(&self, x, pow)
     }
 }
 
@@ -142,14 +142,14 @@ impl<T: PrimitiveUnsigned> EvaluateModPowerOf2<T> for UnsignedPolynomial<T> {
 // precomputation is a two-by-one division, which is only paid back from this length on. For
 // narrower types every polynomial of length 2 or more uses it. Tuned on Apple M-series for `u64`
 // and `u128`; FLINT's `FLINT_MULMOD_SHOUP_THRESHOLD` is 10.
-const EVALUATE_MOD_SHOUP_THRESHOLD: usize = 3;
+const MOD_EVALUATE_SHOUP_THRESHOLD: usize = 3;
 
 // Evaluates a polynomial at `x` modulo `m` with Horner's rule, reducing after every step.
 // `coefficients` must be nonempty.
 //
 // This is equivalent to `_nmod_poly_evaluate_nmod_horner` from `nmod_poly/evaluate_nmod.c`, FLINT
 // 3.6.0.
-crate_test_fn! {evaluate_mod_horner<T: PrimitiveUnsigned>(coefficients: &[T], x: T, m: T) -> T {
+crate_test_fn! {mod_evaluate_horner<T: PrimitiveUnsigned>(coefficients: &[T], x: T, m: T) -> T {
     let data = T::precompute_mod_mul_data(&m);
     let (&last, rest) = coefficients.split_last().unwrap();
     let mut value = last;
@@ -166,7 +166,7 @@ crate_test_fn! {evaluate_mod_horner<T: PrimitiveUnsigned>(coefficients: &[T], x:
 //
 // This is equivalent to `_nmod_poly_evaluate_nmod_precomp` from `nmod_poly/evaluate_nmod.c`, FLINT
 // 3.6.0.
-crate_test_fn! {evaluate_mod_shoup<T: PrimitiveUnsigned>(
+crate_test_fn! {mod_evaluate_shoup<T: PrimitiveUnsigned>(
     coefficients: &[T],
     x: T,
     x_precomp: T,
@@ -181,14 +181,14 @@ crate_test_fn! {evaluate_mod_shoup<T: PrimitiveUnsigned>(
     value
 }}
 
-// Evaluates a polynomial at `x` modulo `m` like `evaluate_mod_shoup`, but reduces only partially:
+// Evaluates a polynomial at `x` modulo `m` like `mod_evaluate_shoup`, but reduces only partially:
 // the result is congruent to the polynomial's value and less than $3m - 1$. `coefficients` must be
 // nonempty, `x_precomp` must be `mod_mul_precompute_shoup(x, m)`, and `m` must be at most `T::MAX /
 // 3`, so that $3m - 1$ values fit.
 //
 // This is equivalent to `_nmod_poly_evaluate_nmod_precomp_lazy` from `nmod_poly/evaluate_nmod.c`,
 // FLINT 3.6.0.
-crate_test_fn! {evaluate_mod_shoup_lazy<T: PrimitiveUnsigned>(
+crate_test_fn! {mod_evaluate_shoup_lazy<T: PrimitiveUnsigned>(
     coefficients: &[T],
     x: T,
     x_precomp: T,
@@ -212,7 +212,7 @@ crate_test_fn! {evaluate_mod_shoup_lazy<T: PrimitiveUnsigned>(
 // This is equivalent to `_nmod_poly_evaluate_nmod` from `nmod_poly/evaluate_nmod.c`, FLINT 3.6.0,
 // except that rectangular splitting is not used.
 #[doc(hidden)]
-pub fn evaluate_mod_slice<T: PrimitiveUnsigned>(coefficients: &[T], x: T, m: T) -> T {
+pub fn mod_evaluate_slice<T: PrimitiveUnsigned>(coefficients: &[T], x: T, m: T) -> T {
     let len = coefficients.len();
     if len == 0 {
         return T::ZERO;
@@ -221,14 +221,14 @@ pub fn evaluate_mod_slice<T: PrimitiveUnsigned>(coefficients: &[T], x: T, m: T) 
         return coefficients[0];
     }
     // Shoup's method needs the top bit of m clear
-    if m.get_highest_bit() || (T::WIDTH > u32::WIDTH && len < EVALUATE_MOD_SHOUP_THRESHOLD) {
-        return evaluate_mod_horner(coefficients, x, m);
+    if m.get_highest_bit() || (T::WIDTH > u32::WIDTH && len < MOD_EVALUATE_SHOUP_THRESHOLD) {
+        return mod_evaluate_horner(coefficients, x, m);
     }
     let x_precomp = mod_mul_precompute_shoup(x, m);
     // The lazy loop's values are less than 3m - 1, so it is used when those fit: when m <= (2^W +
     // 1) / 3, which is T::MAX / 3 since every width W is even. FLINT calls this bound LAZY_MAX.
     if m <= T::MAX / T::from(3u8) {
-        let mut value = evaluate_mod_shoup_lazy(coefficients, x, x_precomp, m);
+        let mut value = mod_evaluate_shoup_lazy(coefficients, x, x_precomp, m);
         // correct the excess
         let two_m = m << 1;
         if value >= two_m {
@@ -238,20 +238,20 @@ pub fn evaluate_mod_slice<T: PrimitiveUnsigned>(coefficients: &[T], x: T, m: T) 
         }
         value
     } else {
-        evaluate_mod_shoup(coefficients, x, x_precomp, m)
+        mod_evaluate_shoup(coefficients, x, x_precomp, m)
     }
 }
 
-fn evaluate_mod<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, x: T, m: T) -> T {
+fn mod_evaluate<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, x: T, m: T) -> T {
     assert!(
         p.mod_is_reduced(&m),
         "self must be reduced mod m, but {p} has a coefficient >= {m}"
     );
     assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
-    evaluate_mod_slice(&p.coefficients, x, m)
+    mod_evaluate_slice(&p.coefficients, x, m)
 }
 
-impl<T: PrimitiveUnsigned> EvaluateMod<T> for &UnsignedPolynomial<T> {
+impl<T: PrimitiveUnsigned> ModEvaluate<T> for &UnsignedPolynomial<T> {
     type Output = T;
 
     /// Evaluates an [`UnsignedPolynomial`] at a value of its coefficient type, modulo a value of
@@ -285,26 +285,26 @@ impl<T: PrimitiveUnsigned> EvaluateMod<T> for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateMod;
+    /// use malachite_base::polynomial::ModEvaluate;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
     /// // 5 * 36 + 3 * 6 + 7 = 205, which is 10 mod 13.
-    /// assert_eq!((&p).evaluate_mod(6, 13), 10);
-    /// assert_eq!((&p).evaluate_mod(0, 13), 7);
+    /// assert_eq!((&p).mod_evaluate(6, 13), 10);
+    /// assert_eq!((&p).mod_evaluate(0, 13), 7);
     /// // 205 itself, modulo a larger modulus.
-    /// assert_eq!((&p).evaluate_mod(6, 211), 205);
+    /// assert_eq!((&p).mod_evaluate(6, 211), 205);
     /// ```
     ///
     /// This is equivalent to `nmod_poly_evaluate_nmod` from `nmod_poly/evaluate_nmod.c`, FLINT
     /// 3.6.0, except that the value must be reduced.
     #[inline]
-    fn evaluate_mod(self, x: T, m: T) -> T {
-        evaluate_mod(self, x, m)
+    fn mod_evaluate(self, x: T, m: T) -> T {
+        mod_evaluate(self, x, m)
     }
 }
 
-impl<T: PrimitiveUnsigned> EvaluateMod<T> for UnsignedPolynomial<T> {
+impl<T: PrimitiveUnsigned> ModEvaluate<T> for UnsignedPolynomial<T> {
     type Output = T;
 
     /// Evaluates an [`UnsignedPolynomial`] at a value of its coefficient type, modulo a value of
@@ -338,37 +338,37 @@ impl<T: PrimitiveUnsigned> EvaluateMod<T> for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateMod;
+    /// use malachite_base::polynomial::ModEvaluate;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
     /// // 5 * 36 + 3 * 6 + 7 = 205, which is 10 mod 13.
-    /// assert_eq!(p.clone().evaluate_mod(6, 13), 10);
-    /// assert_eq!(p.clone().evaluate_mod(0, 13), 7);
+    /// assert_eq!(p.clone().mod_evaluate(6, 13), 10);
+    /// assert_eq!(p.clone().mod_evaluate(0, 13), 7);
     /// // 205 itself, modulo a larger modulus.
-    /// assert_eq!(p.evaluate_mod(6, 211), 205);
+    /// assert_eq!(p.mod_evaluate(6, 211), 205);
     /// ```
     ///
     /// This is equivalent to `nmod_poly_evaluate_nmod` from `nmod_poly/evaluate_nmod.c`, FLINT
     /// 3.6.0, except that the value must be reduced.
     #[inline]
-    fn evaluate_mod(self, x: T, m: T) -> T {
-        evaluate_mod(&self, x, m)
+    fn mod_evaluate(self, x: T, m: T) -> T {
+        mod_evaluate(&self, x, m)
     }
 }
 
-// The numbers of points evaluated together by `evaluate_many_mod_in_place`, for types at most 32
+// The numbers of points evaluated together by `mod_evaluate_many_in_place`, for types at most 32
 // bits wide and for wider types. Horner's rule is a chain of dependent multiplications, so running
 // several points through one pass over the coefficients keeps more multiplications in flight. Tuned
 // on Apple M-series: for `u64` a block of 8 is 3.4 to 4.8 times as fast as one point at a time at
 // length 256, and for `u32` a block of 4 is best.
-const EVALUATE_MANY_MOD_NARROW_BLOCK: usize = 4;
-const EVALUATE_MANY_MOD_WIDE_BLOCK: usize = 8;
+const MOD_EVALUATE_MANY_NARROW_BLOCK: usize = 4;
+const MOD_EVALUATE_MANY_WIDE_BLOCK: usize = 8;
 
 // Replaces each of the `N` points in `xs` with the polynomial's value there modulo `m`, with
 // Horner's rule for all of them in one pass over the coefficients. `coefficients` must be nonempty,
 // and the points and coefficients reduced.
-crate_test_fn! {evaluate_mod_horner_block<T: PrimitiveUnsigned, const N: usize>(
+crate_test_fn! {mod_evaluate_horner_block<T: PrimitiveUnsigned, const N: usize>(
     coefficients: &[T],
     xs: &mut [T; N],
     m: T,
@@ -386,9 +386,9 @@ crate_test_fn! {evaluate_mod_horner_block<T: PrimitiveUnsigned, const N: usize>(
     *xs = values;
 }}
 
-// Like `evaluate_mod_horner_block`, multiplying by each point with Shoup's method. The top bit of
+// Like `mod_evaluate_horner_block`, multiplying by each point with Shoup's method. The top bit of
 // `m` must be clear.
-crate_test_fn! {evaluate_mod_shoup_block<T: PrimitiveUnsigned, const N: usize>(
+crate_test_fn! {mod_evaluate_shoup_block<T: PrimitiveUnsigned, const N: usize>(
     coefficients: &[T],
     xs: &mut [T; N],
     m: T,
@@ -406,9 +406,9 @@ crate_test_fn! {evaluate_mod_shoup_block<T: PrimitiveUnsigned, const N: usize>(
     *xs = values;
 }}
 
-// Like `evaluate_mod_shoup_block`, with lazy reduction as in `evaluate_mod_shoup_lazy`. `m` must be
+// Like `mod_evaluate_shoup_block`, with lazy reduction as in `mod_evaluate_shoup_lazy`. `m` must be
 // at most `T::MAX / 3`. The values are fully reduced at the end.
-crate_test_fn! {evaluate_mod_shoup_lazy_block<T: PrimitiveUnsigned, const N: usize>(
+crate_test_fn! {mod_evaluate_shoup_lazy_block<T: PrimitiveUnsigned, const N: usize>(
     coefficients: &[T],
     xs: &mut [T; N],
     m: T,
@@ -437,10 +437,10 @@ crate_test_fn! {evaluate_mod_shoup_lazy_block<T: PrimitiveUnsigned, const N: usi
 
 // Replaces each point in `xs` with the polynomial's value there modulo `m`. The points and the
 // coefficients must be reduced; this is not checked. Blocks of points are evaluated together, with
-// the method `evaluate_mod_slice` would choose for one point. Evaluates the points in `xs` in
-// blocks of `N`, with the method chosen by `evaluate_many_mod_in_place`, and returns the leftover
+// the method `mod_evaluate_slice` would choose for one point. Evaluates the points in `xs` in
+// blocks of `N`, with the method chosen by `mod_evaluate_many_in_place`, and returns the leftover
 // points, fewer than `N` of them.
-fn evaluate_many_mod_blocks<'a, T: PrimitiveUnsigned, const N: usize>(
+fn mod_evaluate_many_blocks<'a, T: PrimitiveUnsigned, const N: usize>(
     coefficients: &[T],
     xs: &'a mut [T],
     m: T,
@@ -450,11 +450,11 @@ fn evaluate_many_mod_blocks<'a, T: PrimitiveUnsigned, const N: usize>(
     let (blocks, remainder) = xs.as_chunks_mut::<N>();
     for block in blocks {
         if !shoup {
-            evaluate_mod_horner_block(coefficients, block, m);
+            mod_evaluate_horner_block(coefficients, block, m);
         } else if lazy {
-            evaluate_mod_shoup_lazy_block(coefficients, block, m);
+            mod_evaluate_shoup_lazy_block(coefficients, block, m);
         } else {
-            evaluate_mod_shoup_block(coefficients, block, m);
+            mod_evaluate_shoup_block(coefficients, block, m);
         }
     }
     remainder
@@ -462,8 +462,8 @@ fn evaluate_many_mod_blocks<'a, T: PrimitiveUnsigned, const N: usize>(
 
 // Replaces each point in `xs` with the polynomial's value there modulo `m`. The points and the
 // coefficients must be reduced; this is not checked. Blocks of points are evaluated together, with
-// the method `evaluate_mod_slice` would choose for one point.
-crate_test_fn! {evaluate_many_mod_in_place<T: PrimitiveUnsigned>(
+// the method `mod_evaluate_slice` would choose for one point.
+crate_test_fn! {mod_evaluate_many_in_place<T: PrimitiveUnsigned>(
     coefficients: &[T],
     xs: &mut [T],
     m: T,
@@ -473,17 +473,17 @@ crate_test_fn! {evaluate_many_mod_in_place<T: PrimitiveUnsigned>(
         0 => xs.fill(T::ZERO),
         1 => xs.fill(coefficients[0]),
         _ => {
-            // As in evaluate_mod_slice: Shoup's method needs the top bit of m clear, and is used
+            // As in mod_evaluate_slice: Shoup's method needs the top bit of m clear, and is used
             // for short polynomials only when T is at most 32 bits wide
             let shoup = !m.get_highest_bit()
-                && (T::WIDTH <= u32::WIDTH || len >= EVALUATE_MOD_SHOUP_THRESHOLD);
+                && (T::WIDTH <= u32::WIDTH || len >= MOD_EVALUATE_SHOUP_THRESHOLD);
             let lazy = m <= T::MAX / T::from(3u8);
             // Wider types take blocks of the wide size first; the leftover points go through blocks
             // of the narrow size, and then one at a time
             let xs = if T::WIDTH <= u32::WIDTH {
                 xs
             } else {
-                evaluate_many_mod_blocks::<T, EVALUATE_MANY_MOD_WIDE_BLOCK>(
+                mod_evaluate_many_blocks::<T, MOD_EVALUATE_MANY_WIDE_BLOCK>(
                     coefficients,
                     xs,
                     m,
@@ -491,7 +491,7 @@ crate_test_fn! {evaluate_many_mod_in_place<T: PrimitiveUnsigned>(
                     lazy,
                 )
             };
-            let remainder = evaluate_many_mod_blocks::<T, EVALUATE_MANY_MOD_NARROW_BLOCK>(
+            let remainder = mod_evaluate_many_blocks::<T, MOD_EVALUATE_MANY_NARROW_BLOCK>(
                 coefficients,
                 xs,
                 m,
@@ -499,13 +499,13 @@ crate_test_fn! {evaluate_many_mod_in_place<T: PrimitiveUnsigned>(
                 lazy,
             );
             for x in remainder {
-                *x = evaluate_mod_slice(coefficients, *x, m);
+                *x = mod_evaluate_slice(coefficients, *x, m);
             }
         }
     }
 }}
 
-impl<T: PrimitiveUnsigned> EvaluateManyMod<T> for &UnsignedPolynomial<T> {
+impl<T: PrimitiveUnsigned> ModEvaluateMany<T> for &UnsignedPolynomial<T> {
     type Output = T;
 
     /// Evaluates an [`UnsignedPolynomial`] at each of several values of its coefficient type,
@@ -520,7 +520,7 @@ impl<T: PrimitiveUnsigned> EvaluateManyMod<T> for &UnsignedPolynomial<T> {
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     ///
     /// The result is the same as calling
-    /// [`evaluate_mod`](crate::polynomial::EvaluateMod::evaluate_mod) at each value, with the same
+    /// [`mod_evaluate`](crate::polynomial::ModEvaluate::mod_evaluate) at each value, with the same
     /// choice between Horner's rule and Shoup's method, but the polynomial is checked once, and
     /// several values are evaluated together in each pass over the coefficients. Horner's rule is a
     /// chain of dependent multiplications, so interleaving independent chains keeps the processor's
@@ -540,20 +540,20 @@ impl<T: PrimitiveUnsigned> EvaluateManyMod<T> for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateManyMod;
+    /// use malachite_base::polynomial::ModEvaluateMany;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
     /// // 7, 15, 33, 61, 99, and 147, mod 13
     /// assert_eq!(
-    ///     (&p).evaluate_many_mod(&[0, 1, 2, 3, 4, 5], 13),
+    ///     (&p).mod_evaluate_many(&[0, 1, 2, 3, 4, 5], 13),
     ///     &[7, 2, 7, 9, 8, 4]
     /// );
     /// ```
     ///
     /// This is equivalent to `nmod_poly_evaluate_nmod_vec_iter` from
     /// `nmod_poly/evaluate_nmod_vec.c`, FLINT 3.6.0, except that the values must be reduced.
-    fn evaluate_many_mod(self, xs: &[T], m: T) -> Vec<T> {
+    fn mod_evaluate_many(self, xs: &[T], m: T) -> Vec<T> {
         assert!(
             self.mod_is_reduced(&m),
             "self must be reduced mod m, but {self} has a coefficient >= {m}"
@@ -562,12 +562,12 @@ impl<T: PrimitiveUnsigned> EvaluateManyMod<T> for &UnsignedPolynomial<T> {
             assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
         }
         let mut values = xs.to_vec();
-        evaluate_many_mod_in_place(&self.coefficients, &mut values, m);
+        mod_evaluate_many_in_place(&self.coefficients, &mut values, m);
         values
     }
 }
 
-impl<T: PrimitiveUnsigned> EvaluateGeometricMod<T> for &UnsignedPolynomial<T> {
+impl<T: PrimitiveUnsigned> ModEvaluateGeometric<T> for &UnsignedPolynomial<T> {
     type Output = T;
 
     /// Evaluates an [`UnsignedPolynomial`] at $1, q, q^2, \ldots, q^{k-1}$, modulo a value of its
@@ -581,7 +581,7 @@ impl<T: PrimitiveUnsigned> EvaluateGeometricMod<T> for &UnsignedPolynomial<T> {
     ///
     /// The powers of `q` are computed with Shoup's method when the top bit of `m` is clear, since
     /// every multiplication is by `q`, and are then evaluated as by
-    /// [`evaluate_many_mod`](crate::polynomial::EvaluateManyMod::evaluate_many_mod), in place.
+    /// [`mod_evaluate_many`](crate::polynomial::ModEvaluateMany::mod_evaluate_many), in place.
     ///
     /// # Worst-case complexity
     /// $T(n, k) = O(nk)$
@@ -596,18 +596,18 @@ impl<T: PrimitiveUnsigned> EvaluateGeometricMod<T> for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateGeometricMod;
+    /// use malachite_base::polynomial::ModEvaluateGeometric;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
     /// // At 1, 2, 4, and 8: 15, 33, 99, and 351, mod 13
-    /// assert_eq!((&p).evaluate_geometric_mod(2, 4, 13), &[2, 7, 8, 0]);
+    /// assert_eq!((&p).mod_evaluate_geometric(2, 4, 13), &[2, 7, 8, 0]);
     /// ```
     ///
     /// This is equivalent to `nmod_poly_evaluate_geometric_nmod_vec_iter` from
     /// `nmod_poly/evaluate_geometric_nmod_vec.c`, FLINT 3.6.0, with `q` in place of FLINT's $r^2$:
     /// FLINT evaluates at the powers of the square of its argument.
-    fn evaluate_geometric_mod(self, q: T, k: u64, m: T) -> Vec<T> {
+    fn mod_evaluate_geometric(self, q: T, k: u64, m: T) -> Vec<T> {
         assert!(
             self.mod_is_reduced(&m),
             "self must be reduced mod m, but {self} has a coefficient >= {m}"
@@ -632,7 +632,7 @@ impl<T: PrimitiveUnsigned> EvaluateGeometricMod<T> for &UnsignedPolynomial<T> {
                 }
             }
         }
-        evaluate_many_mod_in_place(&self.coefficients, &mut values, m);
+        mod_evaluate_many_in_place(&self.coefficients, &mut values, m);
         values
     }
 }

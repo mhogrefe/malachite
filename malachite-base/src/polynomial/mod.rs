@@ -285,26 +285,26 @@ pub trait MakeMonicAssign {
 /// The polynomial's coefficients must already be reduced modulo $m$. If the leading coefficient is
 /// not invertible modulo $m$, its greatest common divisor with $m$, a nontrivial factor of $m$, is
 /// returned as the error. The zero polynomial is left as it is.
-pub trait MakeMonicMod<M> {
+pub trait ModMakeMonic<M> {
     /// The type of the monic polynomial.
     type Output;
     /// The type of the factor of $m$ returned when the leading coefficient is not invertible.
     type Factor;
 
     /// Makes a polynomial monic modulo `m`.
-    fn make_monic_mod(self, m: M) -> Result<Self::Output, Self::Factor>;
+    fn mod_make_monic(self, m: M) -> Result<Self::Output, Self::Factor>;
 }
 
 /// Makes a polynomial monic modulo $m$ in place.
 ///
-/// See [`MakeMonicMod`]. If the leading coefficient is not invertible, the polynomial is left
+/// See [`ModMakeMonic`]. If the leading coefficient is not invertible, the polynomial is left
 /// unchanged.
-pub trait MakeMonicModAssign<M> {
+pub trait ModMakeMonicAssign<M> {
     /// The type of the factor of $m$ returned when the leading coefficient is not invertible.
     type Factor;
 
     /// Makes a polynomial monic modulo `m` in place.
-    fn make_monic_mod_assign(&mut self, m: M) -> Result<(), Self::Factor>;
+    fn mod_make_monic_assign(&mut self, m: M) -> Result<(), Self::Factor>;
 }
 
 /// Evaluates a polynomial at a value.
@@ -328,7 +328,7 @@ pub trait Evaluate<T> {
 
 /// Evaluates a polynomial at a value, modulo $2^k$. The polynomial's coefficients and the value
 /// must already be reduced modulo $2^k$.
-pub trait EvaluateModPowerOf2<T> {
+pub trait ModPowerOf2Evaluate<T> {
     /// The type of the polynomial's value.
     type Output;
 
@@ -339,12 +339,12 @@ pub trait EvaluateModPowerOf2<T> {
     /// $$
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
-    fn evaluate_mod_power_of_2(self, x: T, pow: u64) -> Self::Output;
+    fn mod_power_of_2_evaluate(self, x: T, pow: u64) -> Self::Output;
 }
 
 /// Evaluates a polynomial at a value, modulo $m$. The value must already be reduced modulo $m$, and
 /// so must the polynomial's coefficients, unless an implementation says otherwise.
-pub trait EvaluateMod<T, M = T> {
+pub trait ModEvaluate<T, M = T> {
     /// The type of the polynomial's value.
     type Output;
 
@@ -355,7 +355,7 @@ pub trait EvaluateMod<T, M = T> {
     /// $$
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
-    fn evaluate_mod(self, x: T, m: M) -> Self::Output;
+    fn mod_evaluate(self, x: T, m: M) -> Self::Output;
 }
 
 /// Evaluates a polynomial at each of several values.
@@ -375,7 +375,7 @@ pub trait EvaluateMany<T> {
 
 /// Evaluates a polynomial at each of several values, modulo $m$. The values must already be reduced
 /// modulo $m$, and so must the polynomial's coefficients, unless an implementation says otherwise.
-pub trait EvaluateManyMod<T, M = T> {
+pub trait ModEvaluateMany<T, M = T> {
     /// The type of the polynomial's values.
     type Output;
 
@@ -388,12 +388,12 @@ pub trait EvaluateManyMod<T, M = T> {
     /// $$
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
-    fn evaluate_many_mod(self, xs: &[T], m: M) -> Vec<Self::Output>;
+    fn mod_evaluate_many(self, xs: &[T], m: M) -> Vec<Self::Output>;
 }
 
 /// Evaluates a polynomial at the first terms of a geometric progression starting at 1, modulo $m$.
 /// The ratio must already be reduced modulo $m$, and so must the polynomial's coefficients.
-pub trait EvaluateGeometricMod<T, M = T> {
+pub trait ModEvaluateGeometric<T, M = T> {
     /// The type of the polynomial's values.
     type Output;
 
@@ -404,5 +404,5 @@ pub trait EvaluateGeometricMod<T, M = T> {
     /// $$
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
-    fn evaluate_geometric_mod(self, q: T, k: u64, m: M) -> Vec<Self::Output>;
+    fn mod_evaluate_geometric(self, q: T, k: u64, m: M) -> Vec<Self::Output>;
 }

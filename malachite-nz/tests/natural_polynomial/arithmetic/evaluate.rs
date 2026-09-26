@@ -10,7 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2IsReduced, PowerOf2};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::polynomial::{
-    Evaluate, EvaluateMany, EvaluateManyMod, EvaluateMod, EvaluateModPowerOf2, Polynomial,
+    Evaluate, EvaluateMany, ModEvaluate, ModEvaluateMany, ModPowerOf2Evaluate, Polynomial,
 };
 use malachite_base::test_util::generators::{
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_1,
@@ -197,17 +197,17 @@ fn evaluate_properties() {
 }
 
 #[test]
-fn test_evaluate_mod_power_of_2() {
+fn test_mod_power_of_2_evaluate() {
     let test = |s, x, pow, out| {
         let p = NaturalPolynomial::from_str(s).unwrap();
         let x = Natural::from_str(x).unwrap();
-        let y = (&p).evaluate_mod_power_of_2(&x, pow);
+        let y = (&p).mod_power_of_2_evaluate(&x, pow);
         assert!(y.is_valid());
         assert_eq!(y.to_string(), out);
-        assert_eq!((&p).evaluate_mod_power_of_2(x.clone(), pow), y);
-        assert_eq!(p.clone().evaluate_mod_power_of_2(&x, pow), y);
-        assert_eq!(p.clone().evaluate_mod_power_of_2(x.clone(), pow), y);
-        assert_eq!(evaluate_mod_power_of_2_naive(&p, &x, pow), y);
+        assert_eq!((&p).mod_power_of_2_evaluate(x.clone(), pow), y);
+        assert_eq!(p.clone().mod_power_of_2_evaluate(&x, pow), y);
+        assert_eq!(p.clone().mod_power_of_2_evaluate(x.clone(), pow), y);
+        assert_eq!(mod_power_of_2_evaluate_naive(&p, &x, pow), y);
     };
     test("0", "0", 0, "0");
     test("0", "5", 3, "0");
@@ -244,45 +244,45 @@ fn test_evaluate_mod_power_of_2() {
 
 #[test]
 #[should_panic]
-fn evaluate_mod_power_of_2_fail_1() {
+fn mod_power_of_2_evaluate_fail_1() {
     // A coefficient is not reduced.
-    (&NaturalPolynomial::from_str("16*x+1").unwrap()).evaluate_mod_power_of_2(&Natural::ONE, 4);
+    (&NaturalPolynomial::from_str("16*x+1").unwrap()).mod_power_of_2_evaluate(&Natural::ONE, 4);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_power_of_2_fail_2() {
+fn mod_power_of_2_evaluate_fail_2() {
     // The value is not reduced.
     (&NaturalPolynomial::from_str("x+1").unwrap())
-        .evaluate_mod_power_of_2(&Natural::from(16u32), 4);
+        .mod_power_of_2_evaluate(&Natural::from(16u32), 4);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_power_of_2_fail_3() {
+fn mod_power_of_2_evaluate_fail_3() {
     NaturalPolynomial::from_str("16*x+1")
         .unwrap()
-        .evaluate_mod_power_of_2(Natural::ONE, 4);
+        .mod_power_of_2_evaluate(Natural::ONE, 4);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_power_of_2_fail_4() {
+fn mod_power_of_2_evaluate_fail_4() {
     NaturalPolynomial::from_str("x+1")
         .unwrap()
-        .evaluate_mod_power_of_2(Natural::from(16u32), 4);
+        .mod_power_of_2_evaluate(Natural::from(16u32), 4);
 }
 
 #[test]
-fn evaluate_mod_power_of_2_properties() {
+fn mod_power_of_2_evaluate_properties() {
     natural_polynomial_natural_unsigned_triple_gen_var_1().test_properties(|(p, x, pow)| {
-        let y = (&p).evaluate_mod_power_of_2(&x, pow);
+        let y = (&p).mod_power_of_2_evaluate(&x, pow);
         assert!(y.is_valid());
         assert!(y.mod_power_of_2_is_reduced(pow));
-        assert_eq!((&p).evaluate_mod_power_of_2(x.clone(), pow), y);
-        assert_eq!(p.clone().evaluate_mod_power_of_2(&x, pow), y);
-        assert_eq!(p.clone().evaluate_mod_power_of_2(x.clone(), pow), y);
-        assert_eq!(evaluate_mod_power_of_2_naive(&p, &x, pow), y);
+        assert_eq!((&p).mod_power_of_2_evaluate(x.clone(), pow), y);
+        assert_eq!(p.clone().mod_power_of_2_evaluate(&x, pow), y);
+        assert_eq!(p.clone().mod_power_of_2_evaluate(x.clone(), pow), y);
+        assert_eq!(mod_power_of_2_evaluate_naive(&p, &x, pow), y);
         assert_eq!((&p).evaluate(&x).mod_power_of_2(pow), y);
 
         // Reducing further agrees with evaluating the reduced polynomial at the reduced value.
@@ -290,18 +290,18 @@ fn evaluate_mod_power_of_2_properties() {
             assert_eq!(
                 (&y).mod_power_of_2(smaller),
                 (&p).mod_power_of_2(smaller)
-                    .evaluate_mod_power_of_2((&x).mod_power_of_2(smaller), smaller)
+                    .mod_power_of_2_evaluate((&x).mod_power_of_2(smaller), smaller)
             );
         }
 
         // p(0) is the constant term, and p(1) the sum of the coefficients, mod 2^pow.
         assert_eq!(
-            (&p).evaluate_mod_power_of_2(Natural::ZERO, pow),
+            (&p).mod_power_of_2_evaluate(Natural::ZERO, pow),
             *p.coefficient(0)
         );
         if pow != 0 {
             assert_eq!(
-                (&p).evaluate_mod_power_of_2(Natural::ONE, pow),
+                (&p).mod_power_of_2_evaluate(Natural::ONE, pow),
                 p.coefficients_asc()
                     .iter()
                     .sum::<Natural>()
@@ -318,30 +318,30 @@ fn evaluate_mod_power_of_2_properties() {
         |(p, x, pow)| {
             // The `u64` and `Natural` evaluations agree.
             assert_eq!(
-                NaturalPolynomial::from(p.clone()).evaluate_mod_power_of_2(Natural::from(x), pow),
-                p.evaluate_mod_power_of_2(x, pow)
+                NaturalPolynomial::from(p.clone()).mod_power_of_2_evaluate(Natural::from(x), pow),
+                p.mod_power_of_2_evaluate(x, pow)
             );
         },
     );
 }
 
 #[test]
-fn test_evaluate_mod() {
+fn test_mod_evaluate() {
     let test = |s, x, m, out| {
         let p = NaturalPolynomial::from_str(s).unwrap();
         let x = Natural::from_str(x).unwrap();
         let m = Natural::from_str(m).unwrap();
-        let y = (&p).evaluate_mod(&x, &m);
+        let y = (&p).mod_evaluate(&x, &m);
         assert!(y.is_valid());
         assert_eq!(y.to_string(), out);
-        assert_eq!((&p).evaluate_mod(&x, m.clone()), y);
-        assert_eq!((&p).evaluate_mod(x.clone(), &m), y);
-        assert_eq!((&p).evaluate_mod(x.clone(), m.clone()), y);
-        assert_eq!(p.clone().evaluate_mod(&x, &m), y);
-        assert_eq!(p.clone().evaluate_mod(&x, m.clone()), y);
-        assert_eq!(p.clone().evaluate_mod(x.clone(), &m), y);
-        assert_eq!(p.clone().evaluate_mod(x.clone(), m.clone()), y);
-        assert_eq!(evaluate_mod_naive(&p, &x, &m), y);
+        assert_eq!((&p).mod_evaluate(&x, m.clone()), y);
+        assert_eq!((&p).mod_evaluate(x.clone(), &m), y);
+        assert_eq!((&p).mod_evaluate(x.clone(), m.clone()), y);
+        assert_eq!(p.clone().mod_evaluate(&x, &m), y);
+        assert_eq!(p.clone().mod_evaluate(&x, m.clone()), y);
+        assert_eq!(p.clone().mod_evaluate(x.clone(), &m), y);
+        assert_eq!(p.clone().mod_evaluate(x.clone(), m.clone()), y);
+        assert_eq!(mod_evaluate_naive(&p, &x, &m), y);
     };
     test("0", "0", "1", "0");
     test("0", "5", "7", "0");
@@ -373,75 +373,75 @@ fn test_evaluate_mod() {
 
 #[test]
 #[should_panic]
-fn evaluate_mod_fail_1() {
+fn mod_evaluate_fail_1() {
     // A coefficient is not reduced.
     (&NaturalPolynomial::from_str("11*x+1").unwrap())
-        .evaluate_mod(&Natural::ONE, &Natural::from(11u32));
+        .mod_evaluate(&Natural::ONE, &Natural::from(11u32));
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_fail_2() {
+fn mod_evaluate_fail_2() {
     // The value is not reduced.
     (&NaturalPolynomial::from_str("x+1").unwrap())
-        .evaluate_mod(&Natural::from(11u32), &Natural::from(11u32));
+        .mod_evaluate(&Natural::from(11u32), &Natural::from(11u32));
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_fail_3() {
+fn mod_evaluate_fail_3() {
     // Nothing is reduced mod 0.
-    (&NaturalPolynomial::ZERO).evaluate_mod(&Natural::ZERO, &Natural::ZERO);
+    (&NaturalPolynomial::ZERO).mod_evaluate(&Natural::ZERO, &Natural::ZERO);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_fail_4() {
+fn mod_evaluate_fail_4() {
     NaturalPolynomial::from_str("11*x+1")
         .unwrap()
-        .evaluate_mod(Natural::ONE, Natural::from(11u32));
+        .mod_evaluate(Natural::ONE, Natural::from(11u32));
 }
 
 #[test]
-fn evaluate_mod_properties() {
+fn mod_evaluate_properties() {
     natural_polynomial_natural_natural_triple_gen_var_1().test_properties(|(p, x, m)| {
-        let y = (&p).evaluate_mod(&x, &m);
+        let y = (&p).mod_evaluate(&x, &m);
         assert!(y.is_valid());
         assert!(y < m);
-        assert_eq!((&p).evaluate_mod(x.clone(), m.clone()), y);
-        assert_eq!(p.clone().evaluate_mod(&x, &m), y);
-        assert_eq!(p.clone().evaluate_mod(x.clone(), m.clone()), y);
-        assert_eq!(evaluate_mod_naive(&p, &x, &m), y);
+        assert_eq!((&p).mod_evaluate(x.clone(), m.clone()), y);
+        assert_eq!(p.clone().mod_evaluate(&x, &m), y);
+        assert_eq!(p.clone().mod_evaluate(x.clone(), m.clone()), y);
+        assert_eq!(mod_evaluate_naive(&p, &x, &m), y);
         assert_eq!((&p).evaluate(&x) % &m, y);
 
         // Everything reduced mod m is reduced mod 2m, and the value mod 2m reduces to the value mod
         // m.
         let m_2 = &m << 1u32;
-        assert_eq!((&p).evaluate_mod(&x, &m_2) % &m, y);
+        assert_eq!((&p).mod_evaluate(&x, &m_2) % &m, y);
 
         // p(0) is the constant term, and p(1) the sum of the coefficients, mod m.
-        assert_eq!((&p).evaluate_mod(Natural::ZERO, &m), *p.coefficient(0));
+        assert_eq!((&p).mod_evaluate(Natural::ZERO, &m), *p.coefficient(0));
         if m > 1u32 {
             assert_eq!(
-                (&p).evaluate_mod(Natural::ONE, &m),
+                (&p).mod_evaluate(Natural::ONE, &m),
                 p.coefficients_asc().iter().sum::<Natural>() % &m
             );
         }
     });
 
-    // Modulo a power of 2, evaluate_mod agrees with evaluate_mod_power_of_2.
+    // Modulo a power of 2, mod_evaluate agrees with mod_power_of_2_evaluate.
     natural_polynomial_natural_unsigned_triple_gen_var_1().test_properties(|(p, x, pow)| {
         assert_eq!(
-            (&p).evaluate_mod(&x, Natural::power_of_2(pow)),
-            (&p).evaluate_mod_power_of_2(&x, pow)
+            (&p).mod_evaluate(&x, Natural::power_of_2(pow)),
+            (&p).mod_power_of_2_evaluate(&x, pow)
         );
     });
 
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_2::<u64>().test_properties(|(p, x, m)| {
         // The `u64` and `Natural` evaluations agree.
         assert_eq!(
-            NaturalPolynomial::from(p.clone()).evaluate_mod(Natural::from(x), Natural::from(m)),
-            p.evaluate_mod(x, m)
+            NaturalPolynomial::from(p.clone()).mod_evaluate(Natural::from(x), Natural::from(m)),
+            p.mod_evaluate(x, m)
         );
     });
 }
@@ -473,15 +473,15 @@ fn evaluate_many_properties() {
 }
 
 #[test]
-fn test_evaluate_many_mod() {
+fn test_mod_evaluate_many() {
     let test = |s, xs: &[u32], m: u32, out: &[u32]| {
         let p = NaturalPolynomial::from_str(s).unwrap();
         let xs: Vec<Natural> = xs.iter().map(|&x| Natural::from(x)).collect();
         let m = Natural::from(m);
         let out: Vec<Natural> = out.iter().map(|&y| Natural::from(y)).collect();
-        assert_eq!((&p).evaluate_many_mod(&xs, &m), out);
-        assert_eq!((&p).evaluate_many_mod(&xs, m.clone()), out);
-        assert_eq!(evaluate_many_mod_naive(&p, &xs, &m), out);
+        assert_eq!((&p).mod_evaluate_many(&xs, &m), out);
+        assert_eq!((&p).mod_evaluate_many(&xs, m.clone()), out);
+        assert_eq!(mod_evaluate_many_naive(&p, &xs, &m), out);
     };
     // - no points
     test("5*x^2+3*x+7", &[], 13, &[]);
@@ -494,37 +494,37 @@ fn test_evaluate_many_mod() {
 
 #[test]
 #[should_panic]
-fn evaluate_many_mod_fail_1() {
+fn mod_evaluate_many_fail_1() {
     // A coefficient is not reduced.
     (&NaturalPolynomial::from_str("5*x+1").unwrap())
-        .evaluate_many_mod(&[Natural::ONE], &Natural::from(5u32));
+        .mod_evaluate_many(&[Natural::ONE], &Natural::from(5u32));
 }
 
 #[test]
 #[should_panic]
-fn evaluate_many_mod_fail_2() {
+fn mod_evaluate_many_fail_2() {
     // A point is not reduced.
     (&NaturalPolynomial::from_str("x+1").unwrap())
-        .evaluate_many_mod(&[Natural::ONE, Natural::from(5u32)], &Natural::from(5u32));
+        .mod_evaluate_many(&[Natural::ONE, Natural::from(5u32)], &Natural::from(5u32));
 }
 
 #[test]
 #[should_panic]
-fn evaluate_many_mod_fail_3() {
+fn mod_evaluate_many_fail_3() {
     // m is 0.
-    (&NaturalPolynomial::ZERO).evaluate_many_mod(&[], &Natural::ZERO);
+    (&NaturalPolynomial::ZERO).mod_evaluate_many(&[], &Natural::ZERO);
 }
 
 #[test]
-fn evaluate_many_mod_properties() {
+fn mod_evaluate_many_properties() {
     natural_polynomial_natural_vec_natural_triple_gen_var_1().test_properties(|(p, xs, m)| {
-        let ys = (&p).evaluate_many_mod(&xs, &m);
-        assert_eq!((&p).evaluate_many_mod(&xs, m.clone()), ys);
+        let ys = (&p).mod_evaluate_many(&xs, &m);
+        assert_eq!((&p).mod_evaluate_many(&xs, m.clone()), ys);
         assert_eq!(ys.len(), xs.len());
         for (x, y) in xs.iter().zip(&ys) {
             assert!(*y < m);
-            assert_eq!((&p).evaluate_mod(x, &m), *y);
+            assert_eq!((&p).mod_evaluate(x, &m), *y);
         }
-        assert_eq!(evaluate_many_mod_naive(&p, &xs, &m), ys);
+        assert_eq!(mod_evaluate_many_naive(&p, &xs, &m), ys);
     });
 }

@@ -10,7 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Mod;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{Evaluate, EvaluateMany, EvaluateMod, Polynomial};
+use malachite_base::polynomial::{Evaluate, EvaluateMany, ModEvaluate, Polynomial};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::evaluate::{
@@ -22,7 +22,7 @@ use malachite_nz::test_util::generators::{
     integer_polynomial_integer_vec_pair_gen, integer_polynomial_unsigned_unsigned_triple_gen_var_1,
 };
 use malachite_nz::test_util::integer_polynomial::arithmetic::evaluate::{
-    evaluate_many_naive, evaluate_mod_u64_naive, evaluate_naive,
+    evaluate_many_naive, evaluate_naive, mod_evaluate_u64_naive,
 };
 
 #[test]
@@ -206,11 +206,11 @@ fn evaluate_properties() {
 }
 
 #[test]
-fn test_evaluate_mod_u64() {
+fn test_mod_evaluate_u64() {
     let test = |s, x: u64, m: u64, out: u64| {
         let p = IntegerPolynomial::from_str(s).unwrap();
-        assert_eq!((&p).evaluate_mod(x, m), out);
-        assert_eq!(evaluate_mod_u64_naive(&p, x, m), out);
+        assert_eq!((&p).mod_evaluate(x, m), out);
+        assert_eq!(mod_evaluate_u64_naive(&p, x, m), out);
     };
     // - the zero polynomial
     test("0", 0, 1, 0);
@@ -251,36 +251,36 @@ fn test_evaluate_mod_u64() {
 
 #[test]
 #[should_panic]
-fn evaluate_mod_u64_fail_1() {
+fn mod_evaluate_u64_fail_1() {
     // m is 0.
-    (&IntegerPolynomial::from_str("x+1").unwrap()).evaluate_mod(0, 0);
+    (&IntegerPolynomial::from_str("x+1").unwrap()).mod_evaluate(0, 0);
 }
 
 #[test]
 #[should_panic]
-fn evaluate_mod_u64_fail_2() {
+fn mod_evaluate_u64_fail_2() {
     // x is not reduced.
-    (&IntegerPolynomial::from_str("x+1").unwrap()).evaluate_mod(7, 7);
+    (&IntegerPolynomial::from_str("x+1").unwrap()).mod_evaluate(7, 7);
 }
 
 #[test]
-fn evaluate_mod_u64_properties() {
+fn mod_evaluate_u64_properties() {
     integer_polynomial_unsigned_unsigned_triple_gen_var_1().test_properties(|(p, x, m)| {
-        let y = (&p).evaluate_mod(x, m);
+        let y = (&p).mod_evaluate(x, m);
         assert!(y < m);
-        assert_eq!(evaluate_mod_u64_naive(&p, x, m), y);
+        assert_eq!(mod_evaluate_u64_naive(&p, x, m), y);
 
         // Reducing the coefficients first, into a `NaturalPolynomial`, gives the same value.
         let m_natural = Natural::from(m);
         assert_eq!(
             (&p).mod_op(m_natural.clone())
-                .evaluate_mod(Natural::from(x), m_natural),
+                .mod_evaluate(Natural::from(x), m_natural),
             y
         );
 
         // p(0) is the constant term mod m.
         assert_eq!(
-            (&p).evaluate_mod(0, m),
+            (&p).mod_evaluate(0, m),
             u64::exact_from(&p.coefficient(0).mod_op(Integer::from(m)))
         );
         // Everything is 0 mod 1.
