@@ -102,7 +102,7 @@ use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
-    EqModPowerOf2, Height, HeightRef, Parity, PowerOf2, Square,
+    EqModPowerOf2, Height, HeightRef, ModPowerOf2, Parity, PowerOf2, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -369,6 +369,17 @@ pub fn exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_1()
             pow += max(p.height_significant_bits(), x.significant_bits());
             (p, x, pow)
         }),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_natural_polynomials(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, q, pow)| (p.mod_power_of_2(pow), q.mod_power_of_2(pow), pow)),
     )
 }
 

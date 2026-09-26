@@ -91,8 +91,8 @@ use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2,
-    EqMod, EqModPowerOf2, Height, HeightRef, Parity, PowerOf2, RoundToMultipleOfPowerOf2Assign,
-    Square,
+    EqMod, EqModPowerOf2, Height, HeightRef, ModPowerOf2, Parity, PowerOf2,
+    RoundToMultipleOfPowerOf2Assign, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -451,6 +451,35 @@ pub fn special_random_natural_polynomial_natural_unsigned_triple_gen_var_1(
             pow += max(p.height_significant_bits(), x.significant_bits());
             (p, x, pow)
         }),
+    )
+}
+
+pub fn special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, q, pow)| (p.mod_power_of_2(pow), q.mod_power_of_2(pow), pow)),
     )
 }
 

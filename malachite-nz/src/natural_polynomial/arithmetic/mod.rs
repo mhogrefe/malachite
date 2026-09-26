@@ -55,6 +55,10 @@ pub mod mod_op;
 /// [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign), which reduce
 /// every coefficient of a polynomial modulo a power of 2.
 pub mod mod_power_of_2;
+/// Implementations of [`ModPowerOf2Add`](malachite_base::num::arithmetic::traits::ModPowerOf2Add)
+/// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign), for
+/// adding two polynomials modulo $2^k$.
+pub mod mod_power_of_2_add;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given power of 2.
@@ -63,3 +67,7 @@ pub mod mod_power_of_2_is_reduced;
 /// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign),
 /// which negate a polynomial modulo a power of 2.
 pub mod mod_power_of_2_neg;
+/// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
+/// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
+/// subtracting one polynomial from another modulo $2^k$.
+pub mod mod_power_of_2_sub;

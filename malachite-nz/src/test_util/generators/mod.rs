@@ -153,6 +153,18 @@ pub fn natural_polynomial_natural_unsigned_triple_gen_var_1()
     )
 }
 
+// All `(NaturalPolynomial, NaturalPolynomial, u64)` where the coefficients of both polynomials are
+// less than 2 to the power of the `u64`. The polynomials are reduced from arbitrary ones, so sums
+// often wrap around and leading coefficients often cancel.
+pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1,
+        &random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1,
+        &special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1,
+    )
+}
+
 // All `(NaturalPolynomial, Natural, Natural)` where the polynomial's coefficients and the first
 // `Natural` are less than the second `Natural`.
 pub fn natural_polynomial_natural_natural_triple_gen_var_1()
