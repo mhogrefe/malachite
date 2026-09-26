@@ -102,6 +102,10 @@ pub mod eq_mod_power_of_2;
 /// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
 /// trait for computing the extended GCD of two numbers.
 pub mod extended_gcd;
+/// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
+/// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
+/// (greatest common divisor) of two numbers.
+pub mod gcd;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;

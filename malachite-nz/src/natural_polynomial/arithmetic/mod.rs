@@ -13,7 +13,12 @@ pub mod balanced_mod;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
 /// polynomial at a value, and of
 /// [`EvaluateModPowerOf2`](malachite_base::polynomial::EvaluateModPowerOf2), which does so modulo a
-/// power of 2.
+/// power of 2. Implementations of [`Content`](malachite_base::polynomial::Content),
+/// [`PrimitivePart`](malachite_base::polynomial::PrimitivePart),
+/// [`PrimitivePartAssign`](malachite_base::polynomial::PrimitivePartAssign), and
+/// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart), which compute
+/// the GCD of a polynomial's coefficients and the polynomial divided by it.
+pub mod content;
 pub mod evaluate;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
@@ -24,6 +29,10 @@ pub mod height;
 pub mod is_unit;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every coefficient of a polynomial is less than a given modulus.
+/// Implementations of [`MakeMonicMod`](malachite_base::polynomial::MakeMonicMod) and
+/// [`MakeMonicModAssign`](malachite_base::polynomial::MakeMonicModAssign), which make a polynomial
+/// monic modulo a value.
+pub mod make_monic;
 pub mod mod_is_reduced;
 /// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
 /// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), [`Rem`](core::ops::Rem), and

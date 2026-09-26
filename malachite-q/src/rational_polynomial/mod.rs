@@ -610,6 +610,39 @@ impl Polynomial for RationalPolynomial {
         )
     }
 
+    /// Determines whether a [`RationalPolynomial`] is monic: nonzero, with leading coefficient 1.
+    ///
+    /// The zero polynomial is not monic.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// assert!(
+    ///     RationalPolynomial::from_str("x^2+1/2*x-3")
+    ///         .unwrap()
+    ///         .is_monic()
+    /// );
+    /// assert!(
+    ///     !RationalPolynomial::from_str("1/2*x^2+3")
+    ///         .unwrap()
+    ///         .is_monic()
+    /// );
+    /// assert!(!RationalPolynomial::ZERO.is_monic());
+    /// ```
+    #[inline]
+    fn is_monic(&self) -> bool {
+        // The leading coefficient is 1 exactly when the numerator's leading coefficient equals the
+        // denominator
+        *self.numerator.leading_coefficient() == self.denominator
+    }
+
     /// Mutates one of a [`RationalPolynomial`]'s coefficients using a provided closure, and then
     /// returns whatever the closure returns.
     ///

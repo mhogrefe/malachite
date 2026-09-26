@@ -384,3 +384,24 @@ fn truncate_properties() {
         assert_eq!(p.truncate(0), RationalPolynomial::ZERO);
     });
 }
+
+#[test]
+fn test_is_monic() {
+    let test = |s, out| {
+        assert_eq!(RationalPolynomial::from_str(s).unwrap().is_monic(), out);
+    };
+    test("0", false);
+    test("1", true);
+    test("1/2", false);
+    test("x", true);
+    test("x^2+1/2*x-3", true);
+    test("1/2*x^2+3", false);
+    test("-x^2+1", false);
+}
+
+#[test]
+fn is_monic_properties() {
+    rational_polynomial_gen().test_properties(|p| {
+        assert_eq!(p.is_monic(), p.leading_coefficient() == 1u32);
+    });
+}

@@ -384,6 +384,32 @@ documented by git history.
   polynomial at $1, q, \ldots, q^{k-1}$ modulo `m`, like FLINT's
   `nmod_poly_evaluate_geometric_nmod_vec_iter` with $q = r^2$. It is implemented for
   `&UnsignedPolynomial<T>`.
+- New `Content`, `PrimitivePart`, `PrimitivePartAssign`, and `ContentAndPrimitivePart` traits, in
+  `malachite_base::polynomial`, like FLINT's `fmpz_poly_content`, `fmpz_poly_primitive_part`,
+  `fmpq_poly_content`, and `fmpq_poly_primitive_part`, with FLINT's sign convention: the content
+  is non-negative and the primitive part has a non-negative leading coefficient, so that
+  $p = \operatorname{sgn}(\operatorname{lc}(p)) \operatorname{cont}(p) \operatorname{pp}(p)$.
+  They are implemented for all four polynomial types, taking the polynomial by value or by
+  reference. The content of an `UnsignedPolynomial<T>` is a `T`; that of a `NaturalPolynomial` or
+  an `IntegerPolynomial` is a `Natural`, so its sign is stated by its type; and that of a
+  `RationalPolynomial` $A/d$ is the `Rational` $\operatorname{cont}(A)/d$, already in lowest terms.
+  The primitive part of a `RationalPolynomial` always has denominator 1, so it is an
+  `IntegerPolynomial`, and there is no `PrimitivePartAssign` for it. The GCD of the coefficients
+  stops early once it reaches 1, and `content_and_primitive_part` finds the content only once.
+- `is_monic` on the `Polynomial` trait, for all four polynomial types, like FLINT's
+  `fmpq_poly_is_monic` and `nmod_poly_is_monic`. The zero polynomial is not monic.
+- New `MakeMonic` and `MakeMonicAssign` traits, implemented for `RationalPolynomial`, like FLINT's
+  `fmpq_poly_make_monic`. For $p = A/d$ the monic multiple is
+  $\operatorname{pp}(A)/\operatorname{lc}(\operatorname{pp}(A))$, already in lowest terms; the zero
+  polynomial is returned unchanged.
+- New `MakeMonicMod` and `MakeMonicModAssign` traits, implemented for `UnsignedPolynomial<T>` modulo
+  a `T` and for `NaturalPolynomial` modulo a `Natural`, like FLINT's `nmod_poly_make_monic`,
+  `fmpz_mod_poly_make_monic`, and `fmpz_mod_poly_make_monic_f` together. They return a `Result`:
+  when the leading coefficient has no inverse modulo `m`, the error is its GCD with `m`, a
+  nontrivial factor of `m`, where `nmod_poly_make_monic` aborts. The zero polynomial is returned
+  unchanged, and the coefficients must already be reduced.
+- `Gcd` and `GcdAssign` for `Integer`, with a `Natural` GCD, matching the `Natural` GCD that
+  `ExtendedGcd` for `Integer` already returns. $\gcd(x, y) = \gcd(|x|, |y|)$.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

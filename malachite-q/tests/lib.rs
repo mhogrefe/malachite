@@ -163,9 +163,11 @@ pub mod gaussian_rational {
 
 pub mod rational_polynomial {
     pub mod arithmetic {
+        pub mod content;
         pub mod evaluate;
         pub mod height;
         pub mod is_unit;
+        pub mod make_monic;
     }
     pub mod basic {
         pub mod coefficients;

@@ -25,6 +25,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_into_coefficients_asc);
     register_demo!(runner, demo_integer_polynomial_coefficient);
     register_demo!(runner, demo_integer_polynomial_leading_coefficient);
+    register_demo!(runner, demo_integer_polynomial_is_monic);
 
     register_bench!(runner, benchmark_integer_polynomial_degree);
     register_bench!(runner, benchmark_integer_polynomial_len);
@@ -32,6 +33,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_integer_polynomial_into_coefficients_asc);
     register_bench!(runner, benchmark_integer_polynomial_coefficient);
     register_bench!(runner, benchmark_integer_polynomial_leading_coefficient);
+    register_bench!(runner, benchmark_integer_polynomial_is_monic);
 }
 
 fn demo_integer_polynomial_degree(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -184,5 +186,29 @@ fn benchmark_integer_polynomial_leading_coefficient(
         file_name,
         &integer_polynomial_bit_bucketer("p"),
         &mut [("Malachite", &mut |p| no_out!(p.leading_coefficient()))],
+    );
+}
+
+fn demo_integer_polynomial_is_monic(gm: GenMode, config: &GenConfig, limit: usize) {
+    for p in integer_polynomial_gen().get(gm, config).take(limit) {
+        println!("({p}).is_monic() = {}", p.is_monic());
+    }
+}
+
+fn benchmark_integer_polynomial_is_monic(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "IntegerPolynomial.is_monic()",
+        BenchmarkType::Single,
+        integer_polynomial_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &integer_polynomial_bit_bucketer("p"),
+        &mut [("Malachite", &mut |p| no_out!(p.is_monic()))],
     );
 }

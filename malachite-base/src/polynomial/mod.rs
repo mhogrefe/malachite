@@ -86,6 +86,11 @@ pub trait Polynomial: Sized {
     /// The zero polynomial has no leading coefficient, and gives zero.
     fn leading_coefficient(&self) -> Self::CoefficientOutput<'_>;
 
+    /// Determines whether a polynomial is monic: nonzero, with leading coefficient 1.
+    ///
+    /// The zero polynomial is not monic.
+    fn is_monic(&self) -> bool;
+
     /// Mutates one of a polynomial's coefficients using a provided closure, and then returns
     /// whatever the closure returns.
     ///
@@ -199,6 +204,107 @@ pub fn slices_eq_truncated<A, B>(
             .iter()
             .zip(&ys[..common])
             .all(|(x, y)| eq(x, y))
+}
+
+/// Computes the content of a polynomial.
+///
+/// For a polynomial with integer coefficients, the content is the greatest common divisor of its
+/// coefficients. For a polynomial with rational coefficients, it is the non-negative rational $c$
+/// for which $p/c$ is a primitive polynomial with integer coefficients. Either way it is
+/// non-negative, and the content of the zero polynomial is zero.
+pub trait Content {
+    /// The type of the content.
+    type Output;
+
+    /// Computes the content of a polynomial.
+    fn content(self) -> Self::Output;
+}
+
+/// Computes the primitive part of a polynomial: the polynomial divided by its content, with the
+/// sign chosen so that the leading coefficient is non-negative.
+///
+/// $$
+/// p = \operatorname{sgn}(\operatorname{lc}(p)) \operatorname{cont}(p) \operatorname{pp}(p),
+/// $$
+///
+/// where $\operatorname{lc}(p)$ is the leading coefficient of $p$. The sign matters: without it the
+/// identity fails whenever the leading coefficient is negative. The primitive part of the zero
+/// polynomial is zero.
+pub trait PrimitivePart {
+    /// The type of the primitive part.
+    type Output;
+
+    /// Computes the primitive part of a polynomial.
+    fn primitive_part(self) -> Self::Output;
+}
+
+/// Replaces a polynomial with its primitive part.
+///
+/// See [`PrimitivePart`].
+pub trait PrimitivePartAssign {
+    /// Replaces a polynomial with its primitive part.
+    fn primitive_part_assign(&mut self);
+}
+
+/// Computes the content and the primitive part of a polynomial together.
+///
+/// The primitive part is found by dividing by the content, so computing both at once finds the
+/// content only once. See [`Content`] and [`PrimitivePart`].
+pub trait ContentAndPrimitivePart {
+    /// The type of the content.
+    type Content;
+    /// The type of the primitive part.
+    type PrimitivePart;
+
+    /// Computes the content and the primitive part of a polynomial.
+    fn content_and_primitive_part(self) -> (Self::Content, Self::PrimitivePart);
+}
+
+/// Makes a polynomial monic, by dividing it by its leading coefficient.
+///
+/// The zero polynomial has no leading coefficient, and is left as it is.
+pub trait MakeMonic {
+    /// The type of the monic polynomial.
+    type Output;
+
+    /// Makes a polynomial monic.
+    fn make_monic(self) -> Self::Output;
+}
+
+/// Makes a polynomial monic in place, by dividing it by its leading coefficient.
+///
+/// See [`MakeMonic`].
+pub trait MakeMonicAssign {
+    /// Makes a polynomial monic in place.
+    fn make_monic_assign(&mut self);
+}
+
+/// Makes a polynomial monic modulo $m$, by multiplying it by the inverse of its leading
+/// coefficient.
+///
+/// The polynomial's coefficients must already be reduced modulo $m$. If the leading coefficient is
+/// not invertible modulo $m$, its greatest common divisor with $m$, a nontrivial factor of $m$, is
+/// returned as the error. The zero polynomial is left as it is.
+pub trait MakeMonicMod<M> {
+    /// The type of the monic polynomial.
+    type Output;
+    /// The type of the factor of $m$ returned when the leading coefficient is not invertible.
+    type Factor;
+
+    /// Makes a polynomial monic modulo `m`.
+    fn make_monic_mod(self, m: M) -> Result<Self::Output, Self::Factor>;
+}
+
+/// Makes a polynomial monic modulo $m$ in place.
+///
+/// See [`MakeMonicMod`]. If the leading coefficient is not invertible, the polynomial is left
+/// unchanged.
+pub trait MakeMonicModAssign<M> {
+    /// The type of the factor of $m$ returned when the leading coefficient is not invertible.
+    type Factor;
+
+    /// Makes a polynomial monic modulo `m` in place.
+    fn make_monic_mod_assign(&mut self, m: M) -> Result<(), Self::Factor>;
 }
 
 /// Evaluates a polynomial at a value.

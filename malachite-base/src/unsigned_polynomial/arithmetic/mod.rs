@@ -8,7 +8,12 @@
 
 /// Implementations of [`EvaluateMod`](crate::polynomial::EvaluateMod) and
 /// [`EvaluateModPowerOf2`](crate::polynomial::EvaluateModPowerOf2), which evaluate a polynomial at
-/// a value modulo a value or a power of 2.
+/// a value modulo a value or a power of 2. Implementations of
+/// [`Content`](crate::polynomial::Content), [`PrimitivePart`](crate::polynomial::PrimitivePart),
+/// [`PrimitivePartAssign`](crate::polynomial::PrimitivePartAssign), and
+/// [`ContentAndPrimitivePart`](crate::polynomial::ContentAndPrimitivePart), which compute the GCD
+/// of a polynomial's coefficients and the polynomial divided by it.
+pub mod content;
 pub mod evaluate;
 /// An implementation of [`Height`](crate::num::arithmetic::traits::Height), the largest of a
 /// polynomial's coefficients.
@@ -17,7 +22,11 @@ pub mod height;
 /// whether a number is a unit of its ring.
 pub mod is_unit;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
-/// checks whether every coefficient of a polynomial is less than a given modulus.
+/// checks whether every coefficient of a polynomial is less than a given modulus. Implementations
+/// of [`MakeMonicMod`](crate::polynomial::MakeMonicMod) and
+/// [`MakeMonicModAssign`](crate::polynomial::MakeMonicModAssign), which make a polynomial monic
+/// modulo a value.
+pub mod make_monic;
 pub mod mod_is_reduced;
 /// Implementations of [`Mod`](crate::num::arithmetic::traits::Mod),
 /// [`ModAssign`](crate::num::arithmetic::traits::ModAssign), [`Rem`](core::ops::Rem) and

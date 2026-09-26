@@ -382,3 +382,23 @@ fn truncate_properties() {
         assert_eq!(p.truncate(0), NaturalPolynomial::ZERO);
     });
 }
+
+#[test]
+fn test_is_monic() {
+    let test = |s, out| {
+        assert_eq!(NaturalPolynomial::from_str(s).unwrap().is_monic(), out);
+    };
+    test("0", false);
+    test("1", true);
+    test("2", false);
+    test("x", true);
+    test("x^2+3*x+2", true);
+    test("2*x^2+1", false);
+}
+
+#[test]
+fn is_monic_properties() {
+    natural_polynomial_gen().test_properties(|p| {
+        assert_eq!(p.is_monic(), *p.leading_coefficient() == 1u32);
+    });
+}

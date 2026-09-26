@@ -183,6 +183,7 @@ pub mod integer {
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
         pub mod extended_gcd;
+        pub mod gcd;
         pub mod is_power_of_2;
         pub mod is_unit;
         pub mod kronecker_symbol;
@@ -555,6 +556,7 @@ pub mod natural {
 pub mod integer_polynomial {
     pub mod arithmetic {
         pub mod balanced_mod;
+        pub mod content;
         pub mod evaluate;
         pub mod height;
         pub mod is_unit;
@@ -614,9 +616,11 @@ pub mod integer_polynomial {
 pub mod natural_polynomial {
     pub mod arithmetic {
         pub mod balanced_mod;
+        pub mod content;
         pub mod evaluate;
         pub mod height;
         pub mod is_unit;
+        pub mod make_monic;
         pub mod mod_is_reduced;
         pub mod mod_op;
         pub mod mod_power_of_2;

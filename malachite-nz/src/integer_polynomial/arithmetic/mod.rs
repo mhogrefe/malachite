@@ -11,7 +11,12 @@
 /// every coefficient of a polynomial to the representative closest to zero.
 pub mod balanced_mod;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
-/// polynomial at a value.
+/// polynomial at a value. Implementations of [`Content`](malachite_base::polynomial::Content),
+/// [`PrimitivePart`](malachite_base::polynomial::PrimitivePart),
+/// [`PrimitivePartAssign`](malachite_base::polynomial::PrimitivePartAssign), and
+/// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart), which compute
+/// the GCD of a polynomial's coefficients and the polynomial divided by it.
+pub mod content;
 pub mod evaluate;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes

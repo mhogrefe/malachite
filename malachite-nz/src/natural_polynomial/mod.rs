@@ -388,6 +388,29 @@ impl Polynomial for NaturalPolynomial {
         self.coefficients.last().unwrap_or(&ZERO)
     }
 
+    /// Determines whether a [`NaturalPolynomial`] is monic: nonzero, with leading coefficient 1.
+    ///
+    /// The zero polynomial is not monic.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::polynomial::Polynomial;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// assert!(NaturalPolynomial::from_str("x^2+3*x+2").unwrap().is_monic());
+    /// assert!(!NaturalPolynomial::from_str("2*x^2+3").unwrap().is_monic());
+    /// assert!(!NaturalPolynomial::ZERO.is_monic());
+    /// ```
+    #[inline]
+    fn is_monic(&self) -> bool {
+        self.coefficients.last().is_some_and(|c| *c == 1u32)
+    }
+
     /// Mutates one of a [`NaturalPolynomial`]'s coefficients using a provided closure, and then
     /// returns whatever the closure returns.
     ///

@@ -32,6 +32,7 @@ pub(crate) fn register(runner: &mut Runner) {
     eq_mod::register(runner);
     eq_mod_power_of_2::register(runner);
     extended_gcd::register(runner);
+    gcd::register(runner);
     is_power_of_2::register(runner);
     is_unit::register(runner);
     kronecker_symbol::register(runner);
@@ -85,6 +86,7 @@ mod divisible_by_power_of_2;
 mod eq_mod;
 mod eq_mod_power_of_2;
 mod extended_gcd;
+mod gcd;
 mod is_power_of_2;
 mod is_unit;
 mod kronecker_symbol;

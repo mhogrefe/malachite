@@ -6,6 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`Content`](malachite_base::polynomial::Content),
+/// [`PrimitivePart`](malachite_base::polynomial::PrimitivePart), and
+/// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart) for
+/// [`RationalPolynomial`](super::RationalPolynomial)s.
+pub mod content;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate) for
 /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s and
 /// [`RationalPolynomial`](super::RationalPolynomial)s at [`Rational`](crate::Rational)s, and for
@@ -18,3 +23,7 @@ pub mod height;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
+/// Implementations of [`MakeMonic`](malachite_base::polynomial::MakeMonic) and
+/// [`MakeMonicAssign`](malachite_base::polynomial::MakeMonicAssign), which divide a polynomial by
+/// its leading coefficient.
+pub mod make_monic;
