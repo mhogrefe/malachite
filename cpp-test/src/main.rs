@@ -454,6 +454,96 @@ const MOD_EVALUATE_UNIT_ROWS: [(&str, &str, &str, &str); 16] = [
     ("x^5+x^4+x^3+x^2+x+1", "12", "13", "0"),
 ];
 
+// Every case from test_add and test_add_self in malachite-q's RationalPolynomial tests; a self-sum
+// repeats its operand.
+const RATIONAL_POLYNOMIAL_ADD_UNIT_ROWS: [(&str, &str, &str); 25] = [
+    ("0", "0", "0"),
+    ("0", "1/2*x", "1/2*x"),
+    ("1/2*x", "0", "1/2*x"),
+    ("x+1", "x-1", "2*x"),
+    ("x^2+1", "-x^2+x", "x+1"),
+    ("x", "1/2", "x+1/2"),
+    ("-1/5", "3*x^2", "3*x^2-1/5"),
+    ("1/2*x", "1/2", "1/2*x+1/2"),
+    ("1/4*x+1/4", "1/4*x-3/4", "1/2*x-1/2"),
+    ("1/3*x", "-1/3*x", "0"),
+    (
+        "1/6*x^3+1/6*x^2+1/6*x+1/6",
+        "1/3*x^3+5/6*x^2+5/6*x+1/6",
+        "1/2*x^3+x^2+x+1/3",
+    ),
+    (
+        "1/4*x^4+1/4*x^3+1/4*x^2+1/4*x+1/4",
+        "1/4*x^4+1/4*x^3+1/4*x^2+1/4*x+1/4",
+        "1/2*x^4+1/2*x^3+1/2*x^2+1/2*x+1/2",
+    ),
+    ("1/2*x", "1/3", "1/2*x+1/3"),
+    ("1/2*x^3", "1/3*x", "1/2*x^3+1/3*x"),
+    ("1/3", "1/2*x^2+x", "1/2*x^2+x+1/3"),
+    ("1/6*x", "1/4", "1/6*x+1/4"),
+    ("1/6*x+1/6", "1/10*x+3/10", "4/15*x+7/15"),
+    ("1/6", "1/3", "1/2"),
+    ("1/2*x^2+1/3", "-1/2*x^2+1/5*x", "1/5*x+1/3"),
+    (
+        "1/1000000000000000000000*x",
+        "1/3000000000000000000000",
+        "1/1000000000000000000000*x+1/3000000000000000000000",
+    ),
+    (
+        "1000000000000000000000/7*x^2-1/1000000000000000000000",
+        "-1000000000000000000000/7*x^2+1/1000000000000000000000*x",
+        "1/1000000000000000000000*x-1/1000000000000000000000",
+    ),
+    ("0", "0", "0"),
+    ("x-3", "x-3", "2*x-6"),
+    ("1/2*x+1/4", "1/2*x+1/4", "x+1/2"),
+    ("1/3*x+2/3", "1/3*x+2/3", "2/3*x+4/3"),
+];
+
+// Every case from test_sub and test_sub_self in malachite-q's RationalPolynomial tests.
+const RATIONAL_POLYNOMIAL_SUB_UNIT_ROWS: [(&str, &str, &str); 24] = [
+    ("0", "0", "0"),
+    ("0", "1/2*x", "-1/2*x"),
+    ("1/2*x", "0", "1/2*x"),
+    ("x+1", "-x+1", "2*x"),
+    ("x^2+1", "x^2-x", "x+1"),
+    ("x", "1/2", "x-1/2"),
+    ("-1/5", "-3*x^2", "3*x^2-1/5"),
+    ("1/2*x", "-1/2", "1/2*x+1/2"),
+    ("1/4*x+1/4", "-1/4*x+3/4", "1/2*x-1/2"),
+    ("1/3*x", "1/3*x", "0"),
+    (
+        "1/6*x^3+1/6*x^2+1/6*x+1/6",
+        "-1/3*x^3-5/6*x^2-5/6*x-1/6",
+        "1/2*x^3+x^2+x+1/3",
+    ),
+    (
+        "1/4*x^4+1/4*x^3+1/4*x^2+1/4*x+1/4",
+        "-1/4*x^4-1/4*x^3-1/4*x^2-1/4*x-1/4",
+        "1/2*x^4+1/2*x^3+1/2*x^2+1/2*x+1/2",
+    ),
+    ("1/2*x", "1/3", "1/2*x-1/3"),
+    ("1/2*x^3", "-1/3*x", "1/2*x^3+1/3*x"),
+    ("1/3", "1/2*x^2+x", "-1/2*x^2-x+1/3"),
+    ("1/6*x", "-1/4", "1/6*x+1/4"),
+    ("1/6*x+1/6", "-1/10*x-3/10", "4/15*x+7/15"),
+    ("1/6", "-1/3", "1/2"),
+    ("1/2*x^2+1/3", "1/2*x^2-1/5*x", "1/5*x+1/3"),
+    (
+        "1/1000000000000000000000*x",
+        "1/3000000000000000000000",
+        "1/1000000000000000000000*x-1/3000000000000000000000",
+    ),
+    (
+        "1000000000000000000000/7*x^2-1/1000000000000000000000",
+        "1000000000000000000000/7*x^2-1/1000000000000000000000*x",
+        "1/1000000000000000000000*x-1/1000000000000000000000",
+    ),
+    ("0", "0", "0"),
+    ("x-3", "x-3", "0"),
+    ("1/2*x+1/4", "1/2*x+1/4", "0"),
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -1181,5 +1271,47 @@ fn main() {
             demo_name,
             "fmpz_mod_poly_evaluate_fmpz",
         );
+    }
+
+    // Every case from test_add and test_add_self in malachite-q's RationalPolynomial tests, and the
+    // generated cases from add_properties, against fmpq_poly_add.
+    println!("testing RationalPolynomial + RationalPolynomial unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, q, r) in RATIONAL_POLYNOMIAL_ADD_UNIT_ROWS {
+            writeln!(output_file, "&({p}) + &({q}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpq_poly_add", Some(TEST_OUT));
+    for demo_name in [
+        "demo_rational_polynomial_add",
+        "demo_rational_polynomial_add_val_ref",
+        "demo_rational_polynomial_add_ref_val",
+        "demo_rational_polynomial_add_ref_ref",
+        "demo_rational_polynomial_add_assign",
+        "demo_rational_polynomial_add_assign_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-q", demo_name, "fmpq_poly_add");
+    }
+
+    // Every case from test_sub and test_sub_self in malachite-q's RationalPolynomial tests, and the
+    // generated cases from sub_properties, against fmpq_poly_sub.
+    println!("testing RationalPolynomial - RationalPolynomial unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, q, r) in RATIONAL_POLYNOMIAL_SUB_UNIT_ROWS {
+            writeln!(output_file, "&({p}) - &({q}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpq_poly_sub", Some(TEST_OUT));
+    for demo_name in [
+        "demo_rational_polynomial_sub",
+        "demo_rational_polynomial_sub_val_ref",
+        "demo_rational_polynomial_sub_ref_val",
+        "demo_rational_polynomial_sub_ref_ref",
+        "demo_rational_polynomial_sub_assign",
+        "demo_rational_polynomial_sub_assign_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-q", demo_name, "fmpq_poly_sub");
     }
 }

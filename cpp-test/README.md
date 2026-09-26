@@ -63,6 +63,8 @@ shared state: don't run the driver and a manual demo regeneration concurrently.
 | `fmpq_poly_evaluate_fmpz` | `fmpq_poly_evaluate_fmpz` | `demo_rational_polynomial_evaluate_integer` and `_ref` (malachite-q), plus unit rows |
 | `fmpz_mod_poly_evaluate_fmpz` | `fmpz_mod_poly_evaluate_fmpz`, with the modulus 2^pow or m | `demo_natural_polynomial_mod_power_of_2_evaluate`, `demo_natural_polynomial_mod_evaluate`, and their `_ref` versions (malachite-nz); `demo_unsigned_polynomial_mod_power_of_2_evaluate`, `demo_unsigned_polynomial_mod_evaluate`, and their `_ref` versions (malachite-base); plus unit rows |
 | `fmpz_poly_evaluate_mod` | `fmpz_poly_evaluate_mod` | `demo_integer_polynomial_mod_evaluate_u64` (malachite-nz), plus unit rows |
+| `fmpq_poly_add` | `fmpq_poly_add` | `demo_rational_polynomial_add` and its `_val_ref`, `_ref_val`, `_ref_ref`, `_assign`, and `_assign_ref` versions (malachite-q), plus unit rows; identically written operands take FLINT's aliased path |
+| `fmpq_poly_sub` | `fmpq_poly_sub` | the same six `demo_rational_polynomial_sub` demos (malachite-q), plus unit rows |
 | `sqrtmod_stress` | `fmpz_sqrtmod` | none — a memory-stress diagnostic, run manually |
 
 The `sqrtmod` modes skip documented divergence windows, noted in comments in

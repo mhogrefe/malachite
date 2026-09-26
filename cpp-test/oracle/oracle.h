@@ -142,4 +142,8 @@ int run_fmpq_poly_evaluate_fmpz(const char * arg);
 int run_fmpz_mod_poly_evaluate_fmpz(const char * arg);
 int run_fmpz_poly_evaluate_mod(const char * arg);
 
+/* fmpq_poly_add.c */
+int run_fmpq_poly_add(const char * arg);
+int run_fmpq_poly_sub(const char * arg);
+
 #endif

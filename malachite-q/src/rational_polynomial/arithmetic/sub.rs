@@ -11,22 +11,19 @@ use crate::rational_polynomial::arithmetic::add::add_or_sub_owned_ref;
 use core::mem::take;
 use core::ops::{Sub, SubAssign};
 use core::ptr;
-use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
 
 // Computes $q - p$ reusing the storage of $q$, then negates it to give $p - q$, as FLINT does when
 // the output aliases the second operand.
 fn sub_ref_owned(p: &RationalPolynomial, q: RationalPolynomial) -> RationalPolynomial {
-    let mut difference = add_or_sub_owned_ref(
+    -add_or_sub_owned_ref(
         q.numerator,
         q.denominator,
         &p.numerator,
         &p.denominator,
         true,
-    );
-    difference.neg_assign();
-    difference
+    )
 }
 
 // Subtracts two `RationalPolynomial`s taken by value, reusing the storage of the one with the
