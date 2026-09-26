@@ -18,6 +18,7 @@ use crate::integer::exhaustive::{
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
 };
@@ -125,6 +126,7 @@ use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
 use malachite_base::options::exhaustive::exhaustive_options;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::slices::slice_trailing_zeros;
@@ -228,6 +230,20 @@ pub fn exhaustive_integer_polynomial_integer_pair_gen_var_2() -> It<(IntegerPoly
         exhaustive_integer_polynomials_min_degree(50),
         exhaustive_integers(),
     ))
+}
+
+pub fn exhaustive_integer_polynomial_integer_pair_gen_var_3() -> It<(IntegerPolynomial, Integer)> {
+    Box::new(
+        exhaustive_integer_polynomial_integer_pair_gen_var_1().map(|(p, c)| {
+            (
+                IntegerPolynomial::from_coefficients_asc(integers_mul_scalar(
+                    p.coefficients_asc(),
+                    &c,
+                )),
+                c,
+            )
+        }),
+    )
 }
 
 pub fn exhaustive_integer_polynomial_natural_pair_gen() -> It<(IntegerPolynomial, Natural)> {
@@ -2724,6 +2740,34 @@ pub fn exhaustive_gaussian_integer_vec_gen() -> It<Vec<GaussianInteger>> {
 
 pub fn exhaustive_integer_vec_gen() -> It<Vec<Integer>> {
     Box::new(exhaustive_vecs(exhaustive_integers()))
+}
+
+// -- (Vec<Integer>, Integer) --
+
+pub fn exhaustive_integer_vec_integer_pair_gen() -> It<(Vec<Integer>, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs(exhaustive_integers()),
+        exhaustive_integers(),
+    ))
+}
+
+// -- (Vec<Integer>, Natural) --
+
+pub fn exhaustive_integer_vec_natural_pair_gen() -> It<(Vec<Integer>, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs(exhaustive_integers()),
+        exhaustive_naturals(),
+    ))
+}
+
+// -- (Vec<Integer>, Vec<Integer>, Integer) --
+
+pub fn exhaustive_integer_vec_integer_vec_integer_triple_gen()
+-> It<(Vec<Integer>, Vec<Integer>, Integer)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_vecs(exhaustive_integers()),
+        exhaustive_integers(),
+    ))
 }
 
 // -- Vec<Natural> --

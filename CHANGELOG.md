@@ -441,6 +441,13 @@ documented by git history.
   longer polynomial negates it in place. An `IntegerPolynomial` result is trimmed when the leading
   coefficients cancel; natural coefficients never cancel, so a sum of `NaturalPolynomial`s has the
   larger of the two degrees.
+- `DivExact` and `DivExactAssign` for `IntegerPolynomial` by an `Integer`, like FLINT's
+  `fmpz_poly_scalar_divexact_fmpz`, taking the polynomial and the divisor each by value or by
+  reference. Every coefficient must be divisible by the divisor; it panics on a zero divisor.
+- `Add` and `AddAssign` for `RationalPolynomial`, like FLINT's `fmpq_poly_add`, taking each operand
+  by value or by reference. The sum is kept in lowest terms, dividing out only the factor that the
+  denominators' GCD makes possible, and by value the storage of the operand with the longer
+  numerator is reused.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

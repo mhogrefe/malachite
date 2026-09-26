@@ -13,12 +13,16 @@ pub(crate) fn register(runner: &mut Runner) {
     balanced_mod::register(runner);
     canonicalize_unit::register(runner);
     content::register(runner);
+    content_chained::register(runner);
+    div_exact::register(runner);
     evaluate::register(runner);
     height::register(runner);
     is_unit::register(runner);
     mod_op::register(runner);
     mod_power_of_2::register(runner);
     neg::register(runner);
+    scalar_add_mul::register(runner);
+    scalar_mul::register(runner);
     sub::register(runner);
 }
 
@@ -26,10 +30,14 @@ mod add;
 mod balanced_mod;
 mod canonicalize_unit;
 mod content;
+mod content_chained;
+mod div_exact;
 mod evaluate;
 mod height;
 mod is_unit;
 mod mod_op;
 mod mod_power_of_2;
 mod neg;
+mod scalar_add_mul;
+mod scalar_mul;
 mod sub;

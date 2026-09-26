@@ -18,6 +18,7 @@ use crate::integer::random::{
     striped_random_negative_integers, striped_random_nonzero_integers,
 };
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_polynomial::random::{
     striped_random_integer_polynomials, striped_random_integer_polynomials_min_degree,
 };
@@ -124,6 +125,7 @@ use malachite_base::num::random::{
     random_unsigned_inclusive_range, random_unsigneds_less_than,
 };
 use malachite_base::options::random::{RandomOptions, random_options};
+use malachite_base::polynomial::Polynomial;
 use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;
@@ -871,6 +873,22 @@ pub fn special_random_integer_polynomial_integer_pair_gen_var_2(
             )
         },
     ))
+}
+
+pub fn special_random_integer_polynomial_integer_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Integer)> {
+    Box::new(
+        special_random_integer_polynomial_integer_pair_gen_var_1(config).map(|(p, c)| {
+            (
+                IntegerPolynomial::from_coefficients_asc(integers_mul_scalar(
+                    p.coefficients_asc(),
+                    &c,
+                )),
+                c,
+            )
+        }),
+    )
 }
 
 pub fn special_random_integer_polynomial_natural_pair_gen(
@@ -6009,6 +6027,111 @@ pub fn special_random_integer_vec_gen(config: &GenConfig) -> It<Vec<Integer>> {
         },
         config.get_or("mean_len_n", 4),
         config.get_or("mean_len_d", 1),
+    ))
+}
+
+// -- (Vec<Integer>, Integer) --
+
+pub fn special_random_integer_vec_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_vecs(
+                seed,
+                &|seed_2| {
+                    striped_random_integers(
+                        seed_2,
+                        config.get_or("mean_stripe_n", 32),
+                        config.get_or("mean_stripe_d", 1),
+                        config.get_or("mean_bits_n", 64),
+                        config.get_or("mean_bits_d", 1),
+                    )
+                },
+                config.get_or("mean_len_n", 4),
+                config.get_or("mean_len_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Vec<Integer>, Natural) --
+
+pub fn special_random_integer_vec_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_vecs(
+                seed,
+                &|seed_2| {
+                    striped_random_integers(
+                        seed_2,
+                        config.get_or("mean_stripe_n", 32),
+                        config.get_or("mean_stripe_d", 1),
+                        config.get_or("mean_bits_n", 64),
+                        config.get_or("mean_bits_d", 1),
+                    )
+                },
+                config.get_or("mean_len_n", 4),
+                config.get_or("mean_len_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Vec<Integer>, Vec<Integer>, Integer) --
+
+pub fn special_random_integer_vec_integer_vec_integer_triple_gen(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, Integer)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_vecs(
+                seed,
+                &|seed_2| {
+                    striped_random_integers(
+                        seed_2,
+                        config.get_or("mean_stripe_n", 32),
+                        config.get_or("mean_stripe_d", 1),
+                        config.get_or("mean_bits_n", 64),
+                        config.get_or("mean_bits_d", 1),
+                    )
+                },
+                config.get_or("mean_len_n", 4),
+                config.get_or("mean_len_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
     ))
 }
 

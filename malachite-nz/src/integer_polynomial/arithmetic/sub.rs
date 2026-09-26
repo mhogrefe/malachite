@@ -15,7 +15,7 @@ use core::ops::{Sub, SubAssign};
 use malachite_base::num::arithmetic::traits::NegAssign;
 
 // Subtracts `ys` from `xs`, negating the coefficients of `ys` past the end of `xs`.
-fn sub_assign_ref(xs: &mut Vec<Integer>, ys: &[Integer]) {
+pub(crate) fn sub_assign_ref(xs: &mut Vec<Integer>, ys: &[Integer]) {
     let common = min(xs.len(), ys.len());
     for (x, y) in xs.iter_mut().zip(&ys[..common]) {
         *x -= y;

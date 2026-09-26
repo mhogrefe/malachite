@@ -14,7 +14,7 @@ use core::mem::swap;
 use core::ops::{Add, AddAssign};
 
 // Adds `ys` into `xs`, cloning the coefficients of `ys` past the end of `xs`.
-fn add_assign_ref(xs: &mut Vec<Integer>, ys: &[Integer]) {
+pub(crate) fn add_assign_ref(xs: &mut Vec<Integer>, ys: &[Integer]) {
     let common = min(xs.len(), ys.len());
     for (x, y) in xs.iter_mut().zip(&ys[..common]) {
         *x += y;

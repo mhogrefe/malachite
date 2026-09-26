@@ -287,6 +287,15 @@ pub fn integer_polynomial_integer_pair_gen_var_2() -> Generator<(IntegerPolynomi
     )
 }
 
+// The `Integer` is nonzero and divides every coefficient of the `IntegerPolynomial`.
+pub fn integer_polynomial_integer_pair_gen_var_3() -> Generator<(IntegerPolynomial, Integer)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_pair_gen_var_3,
+        &random_integer_polynomial_integer_pair_gen_var_3,
+        &special_random_integer_polynomial_integer_pair_gen_var_3,
+    )
+}
+
 pub fn integer_polynomial_natural_pair_gen() -> Generator<(IntegerPolynomial, Natural)> {
     Generator::new(
         &exhaustive_integer_polynomial_natural_pair_gen,
@@ -3091,6 +3100,37 @@ pub fn integer_vec_gen_nrm() -> Generator<(Vec<BigInt>, Vec<rug::Integer>, Vec<I
         &|| integer_vec_nrm(exhaustive_integer_vec_gen()),
         &|config| integer_vec_nrm(random_integer_vec_gen(config)),
         &|config| integer_vec_nrm(special_random_integer_vec_gen(config)),
+    )
+}
+
+// -- (Vec<Integer>, Integer) --
+
+pub fn integer_vec_integer_pair_gen() -> Generator<(Vec<Integer>, Integer)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_pair_gen,
+        &random_integer_vec_integer_pair_gen,
+        &special_random_integer_vec_integer_pair_gen,
+    )
+}
+
+// -- (Vec<Integer>, Natural) --
+
+pub fn integer_vec_natural_pair_gen() -> Generator<(Vec<Integer>, Natural)> {
+    Generator::new(
+        &exhaustive_integer_vec_natural_pair_gen,
+        &random_integer_vec_natural_pair_gen,
+        &special_random_integer_vec_natural_pair_gen,
+    )
+}
+
+// -- (Vec<Integer>, Vec<Integer>, Integer) --
+
+pub fn integer_vec_integer_vec_integer_triple_gen()
+-> Generator<(Vec<Integer>, Vec<Integer>, Integer)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_vec_integer_triple_gen,
+        &random_integer_vec_integer_vec_integer_triple_gen,
+        &special_random_integer_vec_integer_vec_integer_triple_gen,
     )
 }
 

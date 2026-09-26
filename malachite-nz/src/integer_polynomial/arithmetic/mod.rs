@@ -18,13 +18,20 @@ pub mod balanced_mod;
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
 /// which bring a polynomial into canonical unit form.
 pub mod canonicalize_unit;
-/// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
-/// polynomial at a value. Implementations of [`Content`](malachite_base::polynomial::Content),
+/// Implementations of [`Content`](malachite_base::polynomial::Content),
 /// [`PrimitivePart`](malachite_base::polynomial::PrimitivePart),
 /// [`PrimitivePartAssign`](malachite_base::polynomial::PrimitivePartAssign), and
 /// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart), which compute
 /// the GCD of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
+#[doc(hidden)]
+pub mod content_chained;
+/// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
+/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), for dividing a
+/// polynomial by an [`Integer`](crate::integer::Integer) that divides every coefficient.
+pub mod div_exact;
+/// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
+/// polynomial at a value.
 pub mod evaluate;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
@@ -50,6 +57,10 @@ pub mod mod_power_of_2;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
 pub mod neg;
+#[doc(hidden)]
+pub mod scalar_add_mul;
+#[doc(hidden)]
+pub mod scalar_mul;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting one polynomial from another.
 pub mod sub;

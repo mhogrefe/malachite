@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    add::register(runner);
     canonicalize_unit::register(runner);
     content::register(runner);
     evaluate::register(runner);
@@ -18,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     neg::register(runner);
 }
 
+mod add;
 mod canonicalize_unit;
 mod content;
 mod evaluate;

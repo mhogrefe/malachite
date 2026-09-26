@@ -6,9 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod add;
-pub mod content_chained;
-pub mod evaluate;
-pub mod scalar_add_mul;
-pub mod scalar_mul;
-pub mod sub;
+use crate::integer::Integer;
+use alloc::vec::Vec;
+
+// Multiplies every element of `xs` by `c`, with none of the special cases for 0 and ±1.
+pub fn integers_mul_scalar_naive(xs: &[Integer], c: &Integer) -> Vec<Integer> {
+    xs.iter().map(|x| x * c).collect()
+}

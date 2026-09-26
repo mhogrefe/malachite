@@ -163,6 +163,7 @@ pub mod gaussian_rational {
 
 pub mod rational_polynomial {
     pub mod arithmetic {
+        pub mod add;
         pub mod canonicalize_unit;
         pub mod content;
         pub mod evaluate;

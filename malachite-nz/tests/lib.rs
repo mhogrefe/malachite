@@ -559,12 +559,16 @@ pub mod integer_polynomial {
         pub mod balanced_mod;
         pub mod canonicalize_unit;
         pub mod content;
+        pub mod content_chained;
+        pub mod div_exact;
         pub mod evaluate;
         pub mod height;
         pub mod is_unit;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod neg;
+        pub mod scalar_add_mul;
+        pub mod scalar_mul;
         pub mod sub;
     }
     pub mod basic {
