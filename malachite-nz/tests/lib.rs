@@ -556,6 +556,7 @@ pub mod natural {
 pub mod integer_polynomial {
     pub mod arithmetic {
         pub mod balanced_mod;
+        pub mod canonicalize_unit;
         pub mod content;
         pub mod evaluate;
         pub mod height;
@@ -617,6 +618,7 @@ pub mod integer_polynomial {
 pub mod natural_polynomial {
     pub mod arithmetic {
         pub mod balanced_mod;
+        pub mod canonicalize_unit;
         pub mod content;
         pub mod evaluate;
         pub mod height;

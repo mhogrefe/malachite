@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    Abs, CanonicalUnitIPow, CanonicalizeUnit, CanonicalizeUnitAssign,
+    CanonicalUnitIPow, CanonicalizeUnit, CanonicalizeUnitAssign,
 };
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_gen;
 use std::str::FromStr;
@@ -32,8 +33,10 @@ fn test_canonicalize_unit() {
         assert_eq!(y.to_string(), out);
     };
     test("0", "0");
-    test("22/7", "22/7");
-    test("-22/7", "22/7");
+    test("1", "1");
+    test("-1", "1");
+    test("22/7", "1");
+    test("-22/7", "1");
 }
 
 #[test]
@@ -46,7 +49,19 @@ fn canonicalize_unit_properties() {
         x_alt.canonicalize_unit_assign();
         assert_eq!(x_alt, y.clone());
 
-        assert_eq!(y, (&x).abs());
+        // Every nonzero rational is a unit, so its canonical associate is 1.
+        assert_eq!(
+            y,
+            if x == 0u32 {
+                Rational::ZERO
+            } else {
+                Rational::ONE
+            }
+        );
+        // x and its canonical associate differ by a unit factor, x itself when x is nonzero.
+        if x != 0u32 {
+            assert_eq!(&y * &x, x);
+        }
         assert!(y >= 0u32);
         assert_eq!((&y).canonicalize_unit(), y.clone());
         assert_eq!(y.canonical_unit_i_pow(), 0);

@@ -6,6 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of
+/// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
+/// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
+/// which bring a polynomial into canonical unit form.
+pub mod canonicalize_unit;
 /// Implementations of [`Content`](malachite_base::polynomial::Content),
 /// [`PrimitivePart`](malachite_base::polynomial::PrimitivePart), and
 /// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart) for

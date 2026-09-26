@@ -10,6 +10,11 @@
 /// reduces every coefficient of a polynomial to the representative closest to zero, producing an
 /// [`IntegerPolynomial`](crate::integer_polynomial::IntegerPolynomial).
 pub mod balanced_mod;
+/// Implementations of
+/// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
+/// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
+/// which bring a polynomial into canonical unit form.
+pub mod canonicalize_unit;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
 /// polynomial at a value, and of
 /// [`ModPowerOf2Evaluate`](malachite_base::polynomial::ModPowerOf2Evaluate), which does so modulo a

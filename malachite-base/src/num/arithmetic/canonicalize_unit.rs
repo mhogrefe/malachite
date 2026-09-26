@@ -78,4 +78,46 @@ macro_rules! impl_canonicalize_unit_abs {
     };
 }
 apply_to_signeds!(impl_canonicalize_unit_abs);
-apply_to_primitive_floats!(impl_canonicalize_unit_abs);
+
+macro_rules! impl_canonicalize_unit_primitive_float {
+    ($t:ident) => {
+        impl CanonicalizeUnit for $t {
+            type Output = $t;
+
+            /// Brings a number into canonical unit form. A finite nonzero float is a unit, since it
+            /// has a multiplicative inverse, so its canonical form is 1. The other values are not
+            /// units, and their canonical form is their absolute value: both zeros become $0.0$,
+            /// both infinities become $\infty$, and NaN stays NaN.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::canonicalize_unit#canonicalize_unit).
+            #[inline]
+            fn canonicalize_unit(self) -> $t {
+                if self.is_finite() && self != 0.0 {
+                    1.0
+                } else {
+                    self.abs()
+                }
+            }
+        }
+
+        impl CanonicalizeUnitAssign for $t {
+            /// Replaces a number with its canonical unit form: 1 for a finite nonzero float, and
+            /// the absolute value otherwise.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::canonicalize_unit#canonicalize_unit_assign).
+            #[inline]
+            fn canonicalize_unit_assign(&mut self) {
+                *self = self.canonicalize_unit();
+            }
+        }
+    };
+}
+apply_to_primitive_floats!(impl_canonicalize_unit_primitive_float);

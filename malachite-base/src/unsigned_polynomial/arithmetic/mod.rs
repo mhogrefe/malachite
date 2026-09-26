@@ -6,6 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`CanonicalizeUnit`](crate::num::arithmetic::traits::CanonicalizeUnit) and
+/// [`CanonicalizeUnitAssign`](crate::num::arithmetic::traits::CanonicalizeUnitAssign), which bring
+/// a polynomial into canonical unit form.
+pub mod canonicalize_unit;
 /// Implementations of [`ModEvaluate`](crate::polynomial::ModEvaluate) and
 /// [`ModPowerOf2Evaluate`](crate::polynomial::ModPowerOf2Evaluate), which evaluate a polynomial at
 /// a value modulo a value or a power of 2. Implementations of

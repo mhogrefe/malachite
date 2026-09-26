@@ -33,8 +33,9 @@ fn test_canonicalize_unit() {
     };
     test("0.0", "0.0");
     test("-0.0", "0.0");
-    test("1.5", "1.5");
-    test("-1.5", "1.5");
+    test("1.5", "1.0");
+    test("-1.5", "1.0");
+    test("-123.0", "1.000");
     test("NaN", "NaN");
     test("Infinity", "Infinity");
     test("-Infinity", "Infinity");
@@ -53,7 +54,14 @@ fn canonicalize_unit_properties() {
         x_alt.canonicalize_unit_assign();
         assert_eq!(ComparableFloat(x_alt), ComparableFloat(y.clone()));
 
-        assert_eq!(ComparableFloat(y.clone()), ComparableFloat((&x).abs()));
+        // A finite nonzero Float is a unit, and its canonical form is 1 with the same precision;
+        // anything else keeps its absolute value.
+        if x.is_finite() && x != 0u32 {
+            assert_eq!(y, 1u32);
+            assert_eq!(y.get_prec(), x.get_prec());
+        } else {
+            assert_eq!(ComparableFloat(y.clone()), ComparableFloat((&x).abs()));
+        }
         assert!(!y.is_sign_negative());
         assert_eq!(
             ComparableFloat((&y).canonicalize_unit()),

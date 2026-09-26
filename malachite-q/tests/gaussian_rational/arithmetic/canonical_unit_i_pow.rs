@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{CanonicalUnitIPow, CanonicalizeUnit, DivI, MulI};
+use malachite_base::num::arithmetic::traits::{CanonicalUnitIPow, DivI, MulI};
 use malachite_q::gaussian_rational::GaussianRational;
 use malachite_q::test_util::generators::gaussian_rational_gen;
 use std::str::FromStr;
@@ -51,7 +51,6 @@ fn canonical_unit_i_pow_properties() {
         for _ in 0..k {
             y = y.mul_i();
         }
-        assert_eq!((&x).canonicalize_unit(), y);
         if x == 0u32 {
             assert_eq!(k, 0);
         } else {

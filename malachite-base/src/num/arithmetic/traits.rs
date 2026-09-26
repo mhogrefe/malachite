@@ -149,23 +149,28 @@ pub trait CanonicalUnitIPow {
     fn canonical_unit_i_pow(&self) -> u64;
 }
 
-/// Brings a number into canonical unit form by multiplying it by a power of $i$.
+/// Brings a number into canonical unit form: replaces it with its canonical associate.
 ///
-/// The canonical associate is the one whose argument lies in $(-\pi/4, \pi/4]$; see
-/// [`CanonicalUnitIPow`]. On the real line that leaves the absolute value, which is what the signed
-/// and floating-point implementations return; an unsigned number is already canonical, so theirs is
-/// the identity.
+/// The associates of a number are the numbers it becomes when multiplied by a unit of its ring, and
+/// the canonical associate is the one chosen to represent them all. Each implementation documents
+/// its choice. An unsigned number is already canonical, so the unsigned implementations are the
+/// identity; the units of the integers are $\pm 1$, so the signed implementations return the
+/// absolute value; the units of the Gaussian integers are the powers of $i$, and the canonical
+/// associate is the one whose argument lies in $(-\pi/4, \pi/4]$ (see [`CanonicalUnitIPow`]). In a
+/// field every nonzero element is a unit, so the canonical associate of a nonzero rational number,
+/// a nonzero Gaussian rational, or a finite nonzero floating-point number is 1; zero, the
+/// infinities, and NaN are not units, and keep their absolute value. For a polynomial over the
+/// integers it is the associate with a positive leading coefficient, and over the rationals it is
+/// the monic one.
 pub trait CanonicalizeUnit {
     type Output;
 
     fn canonicalize_unit(self) -> Self::Output;
 }
 
-/// Replaces a number with its canonical unit form, multiplying it by a power of $i$.
+/// Replaces a number with its canonical unit form: its canonical associate.
 ///
-/// The canonical associate is the one whose argument lies in $(-\pi/4, \pi/4]$; see
-/// [`CanonicalUnitIPow`]. This is the in-place form of [`CanonicalizeUnit`], and the same per-type
-/// behaviour applies.
+/// This is the in-place form of [`CanonicalizeUnit`], and the same per-type behaviour applies.
 pub trait CanonicalizeUnitAssign {
     fn canonicalize_unit_assign(&mut self);
 }

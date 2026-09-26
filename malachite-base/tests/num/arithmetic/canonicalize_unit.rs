@@ -44,9 +44,12 @@ fn test_canonicalize_unit() {
     }
     test_f::<f32>(0.0, 0.0);
     test_f::<f32>(-0.0, 0.0);
-    test_f::<f32>(-1.5, 1.5);
-    test_f::<f32>(1.5, 1.5);
+    test_f::<f32>(-1.5, 1.0);
+    test_f::<f32>(1.5, 1.0);
+    test_f::<f32>(f32::MIN_POSITIVE_SUBNORMAL, 1.0);
+    test_f::<f64>(-1.0e300, 1.0);
     test_f::<f64>(f64::NAN, f64::NAN);
+    test_f::<f64>(f64::INFINITY, f64::INFINITY);
     test_f::<f64>(f64::NEG_INFINITY, f64::INFINITY);
 }
 
@@ -80,7 +83,16 @@ fn canonicalize_unit_properties_helper_signed<T: PrimitiveSigned>() {
 fn canonicalize_unit_properties_helper_primitive_float<T: PrimitiveFloat>() {
     primitive_float_gen::<T>().test_properties(|x| {
         let y = x.canonicalize_unit();
-        assert_eq!(NiceFloat(y), NiceFloat(x.abs()));
+        // A finite nonzero float is a unit, and its canonical form is 1; anything else keeps its
+        // absolute value.
+        assert_eq!(
+            NiceFloat(y),
+            NiceFloat(if x.is_finite() && x != T::ZERO {
+                T::ONE
+            } else {
+                x.abs()
+            })
+        );
         let mut x_alt = x;
         x_alt.canonicalize_unit_assign();
         assert_eq!(NiceFloat(x_alt), NiceFloat(y));

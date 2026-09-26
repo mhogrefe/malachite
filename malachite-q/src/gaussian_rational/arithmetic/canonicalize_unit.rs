@@ -7,31 +7,24 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::gaussian_rational::GaussianRational;
-use malachite_base::num::arithmetic::traits::{
-    CanonicalUnitIPow, CanonicalizeUnit, CanonicalizeUnitAssign, MulIPowAssign,
-};
+use malachite_base::num::arithmetic::traits::{CanonicalizeUnit, CanonicalizeUnitAssign};
+use malachite_base::num::basic::traits::{One, Zero};
 
 impl CanonicalizeUnit for GaussianRational {
     type Output = Self;
 
     /// Brings a [`GaussianRational`] into canonical unit form, taking it by value.
     ///
-    /// The result is the associate $x i^k$ whose argument lies in $(-\pi/4, \pi/4]$, where $k$ is
-    /// given by
-    /// [`canonical_unit_i_pow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow); zero
-    /// is its own canonical form.
+    /// The Gaussian rationals form a field, so every nonzero [`GaussianRational`] is a unit and its
+    /// canonical associate is 1. Zero is its own canonical associate.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(1)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
-    /// bits of the real and imaginary parts.
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CanonicalizeUnit;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
@@ -40,21 +33,11 @@ impl CanonicalizeUnit for GaussianRational {
     ///         .unwrap()
     ///         .canonicalize_unit()
     ///         .to_string(),
-    ///     "2+i"
+    ///     "1"
     /// );
     /// assert_eq!(
-    ///     GaussianRational::from_str("1-i")
-    ///         .unwrap()
-    ///         .canonicalize_unit()
-    ///         .to_string(),
-    ///     "1+i"
-    /// );
-    /// assert_eq!(
-    ///     GaussianRational::from_str("-3")
-    ///         .unwrap()
-    ///         .canonicalize_unit()
-    ///         .to_string(),
-    ///     "3"
+    ///     GaussianRational::ZERO.canonicalize_unit(),
+    ///     GaussianRational::ZERO
     /// );
     /// ```
     #[inline]
@@ -69,49 +52,48 @@ impl CanonicalizeUnit for &GaussianRational {
 
     /// Brings a [`GaussianRational`] into canonical unit form, taking it by reference.
     ///
-    /// The result is the associate $x i^k$ whose argument lies in $(-\pi/4, \pi/4]$, where $k$ is
-    /// given by
-    /// [`canonical_unit_i_pow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow); zero
-    /// is its own canonical form.
+    /// The Gaussian rationals form a field, so every nonzero [`GaussianRational`] is a unit and its
+    /// canonical associate is 1. Zero is its own canonical associate.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
-    /// bits of the real and imaginary parts.
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CanonicalizeUnit;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
-    /// let x = GaussianRational::from_str("-1+2i").unwrap();
-    /// assert_eq!((&x).canonicalize_unit().to_string(), "2+i");
+    /// assert_eq!(
+    ///     (&GaussianRational::from_str("-1+2i").unwrap())
+    ///         .canonicalize_unit()
+    ///         .to_string(),
+    ///     "1"
+    /// );
+    /// assert_eq!(
+    ///     (&GaussianRational::ZERO).canonicalize_unit(),
+    ///     GaussianRational::ZERO
+    /// );
     /// ```
     #[inline]
     fn canonicalize_unit(self) -> GaussianRational {
-        self.clone().canonicalize_unit()
+        if *self == 0u32 {
+            GaussianRational::ZERO
+        } else {
+            GaussianRational::ONE
+        }
     }
 }
 
 impl CanonicalizeUnitAssign for GaussianRational {
-    /// Brings a [`GaussianRational`] into canonical unit form in place.
+    /// Replaces a [`GaussianRational`] with its canonical unit form.
     ///
-    /// The result is the associate $x i^k$ whose argument lies in $(-\pi/4, \pi/4]$, where $k$ is
-    /// given by
-    /// [`canonical_unit_i_pow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow); zero
-    /// is its own canonical form.
+    /// The Gaussian rationals form a field, so every nonzero [`GaussianRational`] is a unit and its
+    /// canonical associate is 1. Zero is its own canonical associate.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(1)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
-    /// bits of the real and imaginary parts.
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -121,10 +103,12 @@ impl CanonicalizeUnitAssign for GaussianRational {
     ///
     /// let mut x = GaussianRational::from_str("-1+2i").unwrap();
     /// x.canonicalize_unit_assign();
-    /// assert_eq!(x.to_string(), "2+i");
+    /// assert_eq!(x.to_string(), "1");
     /// ```
+    #[inline]
     fn canonicalize_unit_assign(&mut self) {
-        let k = self.canonical_unit_i_pow();
-        self.mul_i_pow_assign(k);
+        if *self != 0u32 {
+            *self = Self::ONE;
+        }
     }
 }

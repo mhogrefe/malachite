@@ -377,7 +377,9 @@ pub mod canonical_unit_i_pow;
 ///
 /// assert_eq!(123u32.canonicalize_unit(), 123);
 /// assert_eq!((-123i32).canonicalize_unit(), 123);
-/// assert_eq!((-1.5f64).canonicalize_unit(), 1.5);
+/// assert_eq!((-1.5f64).canonicalize_unit(), 1.0);
+/// assert_eq!((-0.0f64).canonicalize_unit(), 0.0);
+/// assert_eq!(f64::NEG_INFINITY.canonicalize_unit(), f64::INFINITY);
 /// ```
 ///
 /// # canonicalize_unit_assign

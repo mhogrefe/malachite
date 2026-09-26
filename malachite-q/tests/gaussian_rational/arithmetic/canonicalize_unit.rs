@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    AbsSquared, CanonicalUnitIPow, CanonicalizeUnit, CanonicalizeUnitAssign, DivI, MulI,
+    CanonicalUnitIPow, CanonicalizeUnit, CanonicalizeUnitAssign, DivI, MulI,
 };
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_q::gaussian_rational::GaussianRational;
 use malachite_q::test_util::generators::gaussian_rational_gen;
 use std::str::FromStr;
@@ -38,21 +38,11 @@ fn test_canonicalize_unit() {
     test("i", "1");
     test("-1", "1");
     test("-i", "1");
-    test("2+i", "2+i");
-    test("-1+2i", "2+i");
-    test("-2-i", "2+i");
-    test("1-2i", "2+i");
-    test("2-i", "2-i");
-    test("1+2i", "2-i");
-    test("-2+i", "2-i");
-    test("-1-2i", "2-i");
-    test("1+i", "1+i");
-    test("1-i", "1+i");
-    test("-1+i", "1+i");
-    test("-1-i", "1+i");
-    test("3+4i", "4-3i");
-    test("-3", "3");
-    test("-3i", "3");
+    test("2+i", "1");
+    test("-1+2i", "1");
+    test("3+4i", "1");
+    test("-3", "1");
+    test("-3i", "1");
 }
 
 #[test]
@@ -68,17 +58,18 @@ fn canonicalize_unit_properties() {
 
         assert_eq!((&y).canonicalize_unit(), y);
         assert_eq!(y.canonical_unit_i_pow(), 0);
-        assert_eq!((&y).abs_squared(), (&x).abs_squared());
-        // All four associates canonicalize to the same value.
+        // The Gaussian rationals form a field, so every nonzero value's canonical form is 1.
+        assert_eq!(
+            y,
+            if x == 0u32 {
+                GaussianRational::ZERO
+            } else {
+                GaussianRational::ONE
+            }
+        );
+        // All associates canonicalize to the same value, including the powers of i.
         assert_eq!((&x).mul_i().canonicalize_unit(), y);
         assert_eq!((-&x).canonicalize_unit(), y);
         assert_eq!((&x).div_i().canonicalize_unit(), y);
-        if x == 0u32 {
-            assert_eq!(y, GaussianRational::ZERO);
-        } else {
-            assert!(y.real > 0u32);
-            assert!(-&y.real < y.imaginary);
-            assert!(y.imaginary <= y.real);
-        }
     });
 }

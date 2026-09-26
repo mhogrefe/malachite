@@ -15,6 +15,13 @@ documented by git history.
   types also implement. Code that calls them needs
   `use malachite_base::num::arithmetic::traits::Height;`, and nothing else changes — the
   signatures and the results are the same.
+- `canonicalize_unit` and `canonicalize_unit_assign` now return 1 for every unit of a field: a
+  nonzero `Rational` or `GaussianRational`, and a finite nonzero `Float`, `f32`, or `f64` (a `Float`
+  keeping its precision). They used to return the absolute value, or, for a `GaussianRational`,
+  the associate rotated by a power of $i$. `CanonicalizeUnit` now means the canonical associate
+  under the units of the type's ring, and in a field every nonzero element is a unit. Values that
+  are not units are unchanged in behavior: zero stays zero, the infinities become $\infty$, and NaN
+  stays NaN. `CanonicalUnitIPow` is unchanged.
 
 ### malachite-base
 
@@ -422,6 +429,12 @@ documented by git history.
   modulo a `Natural`, like FLINT's `nmod_poly_neg` and `fmpz_mod_poly_neg`. The coefficients must
   already be reduced, and this is checked. Each nonzero coefficient $c$ becomes $m - c$, so the
   degree never changes.
+- `CanonicalizeUnit` and `CanonicalizeUnitAssign` for all four polynomial types, giving the
+  canonical associate under the units of each polynomial ring. The units of the polynomials over
+  the integers are $\pm 1$, so an `IntegerPolynomial` with a negative leading coefficient is
+  negated; a `NaturalPolynomial` or `UnsignedPolynomial` is already canonical, so theirs is the
+  identity; and the units of the polynomials over the rationals are the nonzero constants, so a
+  nonzero `RationalPolynomial` becomes its monic multiple, as `make_monic` gives.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

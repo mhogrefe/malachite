@@ -66,10 +66,8 @@ fn canonical_unit_i_pow_properties_helper_primitive_float<T: PrimitiveFloat>() {
         let k = x.canonical_unit_i_pow();
         assert!(k == 0 || k == 2);
         assert_eq!(k == 2, x.is_sign_negative() && !x.is_nan());
-        assert_eq!(
-            NiceFloat(x.canonicalize_unit()),
-            NiceFloat(if k == 0 { x } else { -x })
-        );
+        // Multiplying by i^k gives the absolute value.
+        assert_eq!(NiceFloat(x.abs()), NiceFloat(if k == 0 { x } else { -x }));
     });
 }
 

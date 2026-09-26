@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{CanonicalUnitIPow, CanonicalizeUnit};
+use malachite_base::num::arithmetic::traits::{Abs, CanonicalUnitIPow};
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_gen;
 use std::str::FromStr;
@@ -30,7 +30,8 @@ fn canonical_unit_i_pow_properties() {
         let k = x.canonical_unit_i_pow();
         assert!(k == 0 || k == 2);
         assert_eq!(k == 2, x < 0u32);
-        let y = (&x).canonicalize_unit();
+        // Multiplying by i^k gives the absolute value, whose power is 0.
+        let y = (&x).abs();
         assert_eq!(y.canonical_unit_i_pow(), 0);
         assert_eq!(y, if k == 0 { x } else { -x });
     });
