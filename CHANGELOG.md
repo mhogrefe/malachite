@@ -418,6 +418,10 @@ documented by git history.
   which negate a polynomial modulo $2^k$, like FLINT's `nmod_poly_neg` with the modulus $2^k$. As
   for every modular operation, the coefficients must already be reduced, and this is checked. Each
   nonzero coefficient $c$ becomes $2^k - c$, which is also nonzero, so the degree never changes.
+- `ModNeg` and `ModNegAssign` for `UnsignedPolynomial<T>` modulo a `T` and `NaturalPolynomial`
+  modulo a `Natural`, like FLINT's `nmod_poly_neg` and `fmpz_mod_poly_neg`. The coefficients must
+  already be reduced, and this is checked. Each nonzero coefficient $c$ becomes $m - c$, so the
+  degree never changes.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

@@ -28,6 +28,10 @@ pub mod is_unit;
 /// modulo a value.
 pub mod make_monic;
 pub mod mod_is_reduced;
+/// Implementations of [`ModNeg`](crate::num::arithmetic::traits::ModNeg) and
+/// [`ModNegAssign`](crate::num::arithmetic::traits::ModNegAssign), which negate a polynomial modulo
+/// a number.
+pub mod mod_neg;
 /// Implementations of [`Mod`](crate::num::arithmetic::traits::Mod),
 /// [`ModAssign`](crate::num::arithmetic::traits::ModAssign), [`Rem`](core::ops::Rem) and
 /// [`RemAssign`](core::ops::RemAssign), which reduce every coefficient of a polynomial modulo a

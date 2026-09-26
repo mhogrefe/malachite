@@ -878,6 +878,7 @@ pub mod unsigned_polynomial {
         pub mod is_unit;
         pub mod make_monic;
         pub mod mod_is_reduced;
+        pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_neg;

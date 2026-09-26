@@ -34,6 +34,10 @@ pub mod is_unit;
 /// monic modulo a value.
 pub mod make_monic;
 pub mod mod_is_reduced;
+/// Implementations of [`ModNeg`](malachite_base::num::arithmetic::traits::ModNeg) and
+/// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), which negate a
+/// polynomial modulo a number.
+pub mod mod_neg;
 /// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
 /// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), [`Rem`](core::ops::Rem), and
 /// [`RemAssign`](core::ops::RemAssign), traits for reducing every coefficient of a polynomial
