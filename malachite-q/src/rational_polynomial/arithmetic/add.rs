@@ -20,23 +20,26 @@ use malachite_nz::integer_polynomial::arithmetic::scalar_add_mul::integers_add_m
 use malachite_nz::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_assign;
 use malachite_nz::natural::Natural;
 
-// Adds $y/b$ to $x/a$, where both pairs are canonical, reusing the storage of $x$, and returns the
-// canonical sum.
+// Adds $y/b$ to $x/a$, or subtracts it when `negate_y` is true, where both pairs are canonical,
+// reusing the storage of $x$, and returns the canonical result.
 //
 // With $g = \gcd(a, b)$, the sum is $(x(b/g) + y(a/g))/(ab/g)$. Any common factor of that numerator
 // and denominator divides $g$: a prime dividing $a/g$ but not $b/g$ divides $y(a/g)$ but not
 // $x(b/g)$, since it does not divide the content of $x$. So only the GCD of the numerator's content
-// and $g$ needs to be divided out, and when $g = 1$ nothing does.
+// and $g$ needs to be divided out, and when $g = 1$ nothing does. Negating $y$ changes none of
+// this.
 //
-// This is equivalent to `_fmpq_poly_add_can` from `fmpq_poly/add.c`, FLINT 3.6.0, where `can` is 1.
-fn add_owned_ref(
+// This is equivalent to `_fmpq_poly_add_can` from `fmpq_poly/add.c`, FLINT 3.6.0, where `can` is 1,
+// and, when `negate_y` is true, to `_fmpq_poly_sub_can` from `fmpq_poly/sub.c`, FLINT 3.6.0.
+pub(crate) fn add_or_sub_owned_ref(
     x: IntegerPolynomial,
     a: Natural,
     y: &IntegerPolynomial,
     b: &Natural,
+    negate_y: bool,
 ) -> RationalPolynomial {
     if a == *b {
-        let mut numerator = x + y;
+        let mut numerator = if negate_y { x - y } else { x + y };
         let mut denominator = a;
         if denominator != 1u32 {
             // A zero sum reduces to 0/1 here, since the content of zero is taken to be 0.
@@ -61,17 +64,21 @@ fn add_owned_ref(
     if g == 1u32 {
         integers_mul_scalar_assign(&mut xs, &Integer::from(b));
         let denominator = &a * b;
-        integers_add_mul_scalar_assign(&mut xs, y.coefficients_asc(), &Integer::from(a));
+        let a = Integer::from(a);
+        let y_multiplier = if negate_y { -a } else { a };
+        integers_add_mul_scalar_assign(&mut xs, y.coefficients_asc(), &y_multiplier);
         return RationalPolynomial {
             numerator: IntegerPolynomial::from_coefficients_asc(xs),
             denominator,
         };
     }
     let a_over_g = Integer::from((&a).div_exact(&g));
+    let y_multiplier = if negate_y { -a_over_g } else { a_over_g };
     let b_over_g = b.div_exact(&g);
     integers_mul_scalar_assign(&mut xs, &Integer::from(&b_over_g));
-    integers_add_mul_scalar_assign(&mut xs, y.coefficients_asc(), &a_over_g);
-    // The sum is not zero, since canonical polynomials with different denominators cannot cancel.
+    integers_add_mul_scalar_assign(&mut xs, y.coefficients_asc(), &y_multiplier);
+    // The result is not zero, since canonical polynomials with different denominators cannot be
+    // equal or opposite.
     let e = integers_content_chained(&xs, &g);
     let mut numerator = IntegerPolynomial::from_coefficients_asc(xs);
     let denominator = if e == 1u32 {
@@ -93,7 +100,13 @@ fn add_owned_owned(mut p: RationalPolynomial, mut q: RationalPolynomial) -> Rati
     if q.numerator.len() > p.numerator.len() {
         swap(&mut p, &mut q);
     }
-    add_owned_ref(p.numerator, p.denominator, &q.numerator, &q.denominator)
+    add_or_sub_owned_ref(
+        p.numerator,
+        p.denominator,
+        &q.numerator,
+        &q.denominator,
+        false,
+    )
 }
 
 impl Add<Self> for RationalPolynomial {
@@ -192,11 +205,12 @@ impl Add<&Self> for RationalPolynomial {
     /// This is equivalent to `fmpq_poly_add` from `fmpq_poly/add.c`, FLINT 3.6.0.
     #[inline]
     fn add(self, other: &Self) -> Self {
-        add_owned_ref(
+        add_or_sub_owned_ref(
             self.numerator,
             self.denominator,
             &other.numerator,
             &other.denominator,
+            false,
         )
     }
 }
@@ -247,11 +261,12 @@ impl Add<RationalPolynomial> for &RationalPolynomial {
     /// This is equivalent to `fmpq_poly_add` from `fmpq_poly/add.c`, FLINT 3.6.0.
     #[inline]
     fn add(self, other: RationalPolynomial) -> RationalPolynomial {
-        add_owned_ref(
+        add_or_sub_owned_ref(
             other.numerator,
             other.denominator,
             &self.numerator,
             &self.denominator,
+            false,
         )
     }
 }
@@ -323,11 +338,12 @@ impl Add<&RationalPolynomial> for &RationalPolynomial {
                 }
             };
         }
-        add_owned_ref(
+        add_or_sub_owned_ref(
             self.numerator.clone(),
             self.denominator.clone(),
             &other.numerator,
             &other.denominator,
+            false,
         )
     }
 }
@@ -415,11 +431,12 @@ impl AddAssign<&Self> for RationalPolynomial {
     /// This is equivalent to `fmpq_poly_add` from `fmpq_poly/add.c`, FLINT 3.6.0.
     fn add_assign(&mut self, other: &Self) {
         let p = take(self);
-        *self = add_owned_ref(
+        *self = add_or_sub_owned_ref(
             p.numerator,
             p.denominator,
             &other.numerator,
             &other.denominator,
+            false,
         );
     }
 }

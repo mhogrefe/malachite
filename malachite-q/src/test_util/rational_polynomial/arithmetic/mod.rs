@@ -9,3 +9,4 @@
 pub mod add;
 pub mod evaluate;
 pub mod height;
+pub mod sub;

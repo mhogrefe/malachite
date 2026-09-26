@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     make_monic::register(runner);
     is_unit::register(runner);
     neg::register(runner);
+    sub::register(runner);
 }
 
 mod add;
@@ -27,3 +28,4 @@ mod height;
 mod is_unit;
 mod make_monic;
 mod neg;
+mod sub;

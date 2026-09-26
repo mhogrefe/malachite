@@ -448,6 +448,10 @@ documented by git history.
   by value or by reference. The sum is kept in lowest terms, dividing out only the factor that the
   denominators' GCD makes possible, and by value the storage of the operand with the longer
   numerator is reused.
+- `Sub` and `SubAssign` for `RationalPolynomial`, like FLINT's `fmpq_poly_sub`, taking each
+  operand by value or by reference, with the same reduction and storage reuse as `Add`. Subtracting
+  a longer polynomial taken by value computes the reversed difference in its storage and negates
+  it.
 - Exhaustive and random `UnsignedPolynomial` generators, in `unsigned_polynomial::exhaustive` and
   `unsigned_polynomial::random`: `exhaustive_unsigned_polynomials` and `random_unsigned_polynomials`, each with
   `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a

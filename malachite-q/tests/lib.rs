@@ -171,6 +171,7 @@ pub mod rational_polynomial {
         pub mod is_unit;
         pub mod make_monic;
         pub mod neg;
+        pub mod sub;
     }
     pub mod basic {
         pub mod coefficients;

@@ -38,3 +38,6 @@ pub mod make_monic;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
 pub mod neg;
+/// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
+/// subtracting one polynomial from another.
+pub mod sub;
