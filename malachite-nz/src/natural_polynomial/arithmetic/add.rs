@@ -15,7 +15,7 @@ use core::ops::{Add, AddAssign};
 
 // Adds `ys` into `xs`, cloning the coefficients of `ys` past the end of `xs`. Natural coefficients
 // cannot cancel, so the result needs no trimming.
-fn add_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural]) {
+pub(crate) fn add_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural]) {
     let common = min(xs.len(), ys.len());
     for (x, y) in xs.iter_mut().zip(&ys[..common]) {
         *x += y;
@@ -26,7 +26,7 @@ fn add_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural]) {
 }
 
 // Adds `ys` into `xs`, reusing whichever of the two is longer.
-fn add_assign_val(xs: &mut Vec<Natural>, mut ys: Vec<Natural>) {
+pub(crate) fn add_assign_val(xs: &mut Vec<Natural>, mut ys: Vec<Natural>) {
     if ys.len() > xs.len() {
         swap(xs, &mut ys);
     }

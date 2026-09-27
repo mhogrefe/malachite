@@ -10,6 +10,7 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
+    add_truncated::register(runner);
     balanced_mod::register(runner);
     canonicalize_unit::register(runner);
     content::register(runner);
@@ -29,6 +30,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod add;
+mod add_truncated;
 mod balanced_mod;
 mod canonicalize_unit;
 mod content;

@@ -6,10 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod add;
-pub mod add_truncated;
-pub mod evaluate;
-pub mod mod_add;
-pub mod mod_power_of_2_add;
-pub mod mod_power_of_2_sub;
-pub mod mod_sub;
+use crate::natural_polynomial::NaturalPolynomial;
+use malachite_base::polynomial::Polynomial;
+
+// Adds the whole polynomials and then truncates the result.
+pub fn add_truncated_naive(
+    p: &NaturalPolynomial,
+    q: &NaturalPolynomial,
+    len: u64,
+) -> NaturalPolynomial {
+    (p + q).truncate(len)
+}

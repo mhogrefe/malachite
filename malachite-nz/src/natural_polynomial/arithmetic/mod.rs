@@ -9,6 +9,10 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// two polynomials.
 pub mod add;
+/// Implementations of [`AddTruncated`](malachite_base::polynomial::AddTruncated) and
+/// [`AddTruncatedAssign`](malachite_base::polynomial::AddTruncatedAssign), for adding two
+/// polynomials and keeping only their low coefficients.
+pub mod add_truncated;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), which
 /// reduces every coefficient of a polynomial to the representative closest to zero, producing an
 /// [`IntegerPolynomial`](crate::integer_polynomial::IntegerPolynomial).

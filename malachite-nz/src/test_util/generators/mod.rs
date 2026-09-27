@@ -165,6 +165,16 @@ pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1()
     )
 }
 
+// All `(NaturalPolynomial, NaturalPolynomial, u64)` where the `u64` is a small length.
+pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_2()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_2,
+        &random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_2,
+        &special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_2,
+    )
+}
+
 // All `(NaturalPolynomial, NaturalPolynomial, Natural)` where the `Natural` is positive and the
 // coefficients of both polynomials are less than it. The random polynomials are reduced from
 // arbitrary ones, so sums often wrap around and leading coefficients often cancel.

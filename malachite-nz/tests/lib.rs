@@ -626,6 +626,7 @@ pub mod integer_polynomial {
 pub mod natural_polynomial {
     pub mod arithmetic {
         pub mod add;
+        pub mod add_truncated;
         pub mod balanced_mod;
         pub mod canonicalize_unit;
         pub mod content;

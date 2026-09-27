@@ -394,6 +394,14 @@ pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_
     )
 }
 
+pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_2()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_natural_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_1()
 -> It<(NaturalPolynomial, NaturalPolynomial, Natural)> {
     Box::new(

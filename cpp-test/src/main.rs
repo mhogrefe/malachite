@@ -590,6 +590,29 @@ const INTEGER_POLYNOMIAL_SUB_TRUNCATED_UNIT_ROWS: [(&str, &str, u64, &str); 14] 
     ),
 ];
 
+// Every case from test_add_truncated in malachite-nz's NaturalPolynomial tests.
+const NATURAL_POLYNOMIAL_ADD_TRUNCATED_UNIT_ROWS: [(&str, &str, u64, &str); 14] = [
+    ("0", "0", 0, "0"),
+    ("0", "0", 5, "0"),
+    ("x^2+1", "0", 0, "0"),
+    ("x^2+1", "0", 2, "1"),
+    ("x^2+1", "0", 3, "x^2+1"),
+    ("0", "x^2+1", 2, "1"),
+    ("x^3+2*x^2+x+5", "4*x^2+x+2", 3, "6*x^2+2*x+7"),
+    ("x^3+2*x^2+x+5", "4*x^2+x+2", 2, "2*x+7"),
+    ("x^3+2*x^2+x+5", "4*x^2+x+2", 1, "7"),
+    ("x^3+2*x^2+x+5", "4*x^2+x+2", 4, "x^3+6*x^2+2*x+7"),
+    ("x^3+2*x^2+x+5", "4*x^2+x+2", 100, "x^3+6*x^2+2*x+7"),
+    ("x^5+x", "x^4+x^3", 4, "x^3+x"),
+    ("x^5+1", "x^6+2", 4, "3"),
+    (
+        "1000000000000000000000*x^2+1",
+        "1000000000000000000000*x^2+3*x",
+        3,
+        "2000000000000000000000*x^2+3*x+1",
+    ),
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -1378,6 +1401,32 @@ fn main() {
         "demo_integer_polynomial_add_truncated_ref_ref",
         "demo_integer_polynomial_add_truncated_assign",
         "demo_integer_polynomial_add_truncated_assign_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_poly_add_series",
+        );
+    }
+
+    // Every case from test_add_truncated in malachite-nz's NaturalPolynomial tests, and the
+    // generated cases from add_truncated_properties, against fmpz_poly_add_series.
+    println!("testing NaturalPolynomial add_truncated unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, q, len, r) in NATURAL_POLYNOMIAL_ADD_TRUNCATED_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).add_truncated(&({q}), {len}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_add_series", Some(TEST_OUT));
+    for demo_name in [
+        "demo_natural_polynomial_add_truncated",
+        "demo_natural_polynomial_add_truncated_val_ref",
+        "demo_natural_polynomial_add_truncated_ref_val",
+        "demo_natural_polynomial_add_truncated_ref_ref",
+        "demo_natural_polynomial_add_truncated_assign",
+        "demo_natural_polynomial_add_truncated_assign_ref",
     ] {
         check_demo_against_flint(
             &oracle,
