@@ -1361,8 +1361,8 @@ fn main() {
         check_demo_against_flint(&oracle, "../malachite-q", demo_name, "fmpq_poly_sub");
     }
 
-    // Every case from test_add_truncated in malachite-nz's IntegerPolynomial tests, and the generated
-    // cases from add_truncated_properties, against fmpz_poly_add_series.
+    // Every case from test_add_truncated in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from add_truncated_properties, against fmpz_poly_add_series.
     println!("testing IntegerPolynomial add_truncated unit tests");
     {
         let mut output_file = File::create(TEST_OUT).unwrap();
@@ -1387,8 +1387,8 @@ fn main() {
         );
     }
 
-    // Every case from test_sub_truncated in malachite-nz's IntegerPolynomial tests, and the generated
-    // cases from sub_truncated_properties, against fmpz_poly_sub_series.
+    // Every case from test_sub_truncated in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from sub_truncated_properties, against fmpz_poly_sub_series.
     println!("testing IntegerPolynomial sub_truncated unit tests");
     {
         let mut output_file = File::create(TEST_OUT).unwrap();
