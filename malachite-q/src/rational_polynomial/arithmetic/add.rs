@@ -11,7 +11,7 @@ use core::mem::{swap, take};
 use core::ops::{Add, AddAssign};
 use core::ptr;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd, Parity};
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
@@ -23,12 +23,6 @@ use malachite_nz::natural::Natural;
 // Adds $y/b$ to $x/a$, or subtracts it when `negate_y` is true, where both pairs are canonical,
 // reusing the storage of $x$, and returns the canonical result.
 //
-// With $g = \gcd(a, b)$, the sum is $(x(b/g) + y(a/g))/(ab/g)$. Any common factor of that numerator
-// and denominator divides $g$: a prime dividing $a/g$ but not $b/g$ divides $y(a/g)$ but not
-// $x(b/g)$, since it does not divide the content of $x$. So only the GCD of the numerator's content
-// and $g$ needs to be divided out, and when $g = 1$ nothing does. Negating $y$ changes none of
-// this.
-//
 // This is equivalent to `_fmpq_poly_add_can` from `fmpq_poly/add.c`, FLINT 3.6.0, where `can` is 1,
 // and, when `negate_y` is true, to `_fmpq_poly_sub_can` from `fmpq_poly/sub.c`, FLINT 3.6.0.
 pub(crate) fn add_or_sub_owned_ref(
@@ -38,8 +32,50 @@ pub(crate) fn add_or_sub_owned_ref(
     b: &Natural,
     negate_y: bool,
 ) -> RationalPolynomial {
+    add_or_sub_coefficients(
+        x.into_coefficients_asc(),
+        a,
+        y.coefficients_asc(),
+        b,
+        negate_y,
+        false,
+    )
+}
+
+// Adds $y/b$ to $x/a$, or subtracts it when `negate_y` is true, where `xs` and `ys` hold the
+// coefficients of $x$ and $y$, reusing the storage of `xs`, and returns the canonical result.
+//
+// When `truncated` is false, both pairs must be canonical. With $g = \gcd(a, b)$, the sum is
+// $(x(b/g) + y(a/g))/(ab/g)$. Any common factor of that numerator and denominator divides $g$: a
+// prime dividing $a/g$ but not $b/g$ divides $y(a/g)$ but not $x(b/g)$, since it does not divide
+// the content of $x$. So only the GCD of the numerator's content and $g$ needs to be divided out,
+// and when $g = 1$ nothing does. Negating $y$ changes none of this.
+//
+// When `truncated` is true, $x$ and $y$ are the low coefficients of canonical numerators over their
+// denominators, and cutting a numerator can leave it sharing a factor with its denominator. The
+// argument above then fails, so the GCD of the numerator's content and the whole denominator is
+// divided out instead. The result can then be zero even with different denominators, and it reduces
+// to 0/1, since the content of zero is taken to be 0.
+//
+// This is equivalent to `_fmpq_poly_add_series_can` from `fmpq_poly/add_series.c`, FLINT 3.6.0,
+// where `can` is 1, and, when `negate_y` is true, to `_fmpq_poly_sub_series_can` from
+// `fmpq_poly/sub_series.c`, FLINT 3.6.0, with the truncation already done.
+pub(crate) fn add_or_sub_coefficients(
+    mut xs: Vec<Integer>,
+    a: Natural,
+    ys: &[Integer],
+    b: &Natural,
+    negate_y: bool,
+    truncated: bool,
+) -> RationalPolynomial {
     if a == *b {
-        let mut numerator = if negate_y { x - y } else { x + y };
+        let sign = if negate_y {
+            Integer::NEGATIVE_ONE
+        } else {
+            Integer::ONE
+        };
+        integers_add_mul_scalar_assign(&mut xs, ys, &sign);
+        let mut numerator = IntegerPolynomial::from_coefficients_asc(xs);
         let mut denominator = a;
         if denominator != 1u32 {
             // A zero sum reduces to 0/1 here, since the content of zero is taken to be 0.
@@ -60,15 +96,22 @@ pub(crate) fn add_or_sub_owned_ref(
     } else {
         Natural::ONE
     };
-    let mut xs = x.into_coefficients_asc();
     if g == 1u32 {
         integers_mul_scalar_assign(&mut xs, &Integer::from(b));
-        let denominator = &a * b;
+        let mut denominator = &a * b;
         let a = Integer::from(a);
         let y_multiplier = if negate_y { -a } else { a };
-        integers_add_mul_scalar_assign(&mut xs, y.coefficients_asc(), &y_multiplier);
+        integers_add_mul_scalar_assign(&mut xs, ys, &y_multiplier);
+        let mut numerator = IntegerPolynomial::from_coefficients_asc(xs);
+        if truncated {
+            let e = integers_content_chained(numerator.coefficients_asc(), &denominator);
+            if e != 1u32 {
+                denominator.div_exact_assign(&e);
+                numerator.div_exact_assign(Integer::from(e));
+            }
+        }
         return RationalPolynomial {
-            numerator: IntegerPolynomial::from_coefficients_asc(xs),
+            numerator,
             denominator,
         };
     }
@@ -76,18 +119,16 @@ pub(crate) fn add_or_sub_owned_ref(
     let y_multiplier = if negate_y { -a_over_g } else { a_over_g };
     let b_over_g = b.div_exact(&g);
     integers_mul_scalar_assign(&mut xs, &Integer::from(&b_over_g));
-    integers_add_mul_scalar_assign(&mut xs, y.coefficients_asc(), &y_multiplier);
-    // The result is not zero, since canonical polynomials with different denominators cannot be
-    // equal or opposite.
-    let e = integers_content_chained(&xs, &g);
+    integers_add_mul_scalar_assign(&mut xs, ys, &y_multiplier);
+    let mut denominator = a * b_over_g;
+    // Without truncation the result is not zero, since canonical polynomials with different
+    // denominators cannot be equal or opposite.
+    let e = integers_content_chained(&xs, if truncated { &denominator } else { &g });
     let mut numerator = IntegerPolynomial::from_coefficients_asc(xs);
-    let denominator = if e == 1u32 {
-        a * b_over_g
-    } else {
-        let denominator = a.div_exact(&e) * b_over_g;
+    if e != 1u32 {
+        denominator.div_exact_assign(&e);
         numerator.div_exact_assign(Integer::from(e));
-        denominator
-    };
+    }
     RationalPolynomial {
         numerator,
         denominator,

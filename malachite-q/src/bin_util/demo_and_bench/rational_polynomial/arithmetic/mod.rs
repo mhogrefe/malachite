@@ -10,6 +10,7 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
+    add_truncated::register(runner);
     canonicalize_unit::register(runner);
     content::register(runner);
     evaluate::register(runner);
@@ -18,9 +19,11 @@ pub(crate) fn register(runner: &mut Runner) {
     is_unit::register(runner);
     neg::register(runner);
     sub::register(runner);
+    sub_truncated::register(runner);
 }
 
 mod add;
+mod add_truncated;
 mod canonicalize_unit;
 mod content;
 mod evaluate;
@@ -29,3 +32,4 @@ mod is_unit;
 mod make_monic;
 mod neg;
 mod sub;
+mod sub_truncated;

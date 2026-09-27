@@ -1285,6 +1285,16 @@ pub fn rational_polynomial_pair_gen() -> Generator<(RationalPolynomial, Rational
     )
 }
 
+// All `(RationalPolynomial, RationalPolynomial, u64)` where the `u64` is a small length.
+pub fn rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1()
+-> Generator<(RationalPolynomial, RationalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1,
+        &random_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1,
+        &special_random_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1,
+    )
+}
+
 pub fn rational_polynomial_triple_gen()
 -> Generator<(RationalPolynomial, RationalPolynomial, RationalPolynomial)> {
     Generator::new(

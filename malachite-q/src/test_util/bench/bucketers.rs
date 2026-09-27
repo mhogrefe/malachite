@@ -555,6 +555,31 @@ pub fn pair_rational_polynomial_max_bit_bucketer<'a>(
     }
 }
 
+pub fn triple_1_2_rational_polynomial_max_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (RationalPolynomial, RationalPolynomial, T)> {
+    Bucketer {
+        bucketing_function: &|(p, q, _)| {
+            usize::exact_from(max(
+                p.numerator_ref()
+                    .coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>()
+                    + p.denominator_ref().significant_bits(),
+                q.numerator_ref()
+                    .coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>()
+                    + q.denominator_ref().significant_bits(),
+            ))
+        },
+        bucketing_label: format!("max({x_name}'s total bits, {y_name}'s total bits)"),
+    }
+}
+
 pub fn rational_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, RationalPolynomial> {
     Bucketer {
         bucketing_function: &|p| {

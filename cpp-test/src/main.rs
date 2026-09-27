@@ -613,6 +613,50 @@ const NATURAL_POLYNOMIAL_ADD_TRUNCATED_UNIT_ROWS: [(&str, &str, u64, &str); 14] 
     ),
 ];
 
+// Every case from test_add_truncated and test_add_truncated_self in malachite-q's
+// RationalPolynomial tests; a self case repeats its operand.
+const RATIONAL_POLYNOMIAL_ADD_TRUNCATED_UNIT_ROWS: [(&str, &str, u64, &str); 18] = [
+    ("0", "0", 0, "0"),
+    ("0", "0", 5, "0"),
+    ("1/2*x^2+1/3", "0", 0, "0"),
+    ("1/2*x^2+1/3", "0", 2, "1/3"),
+    ("0", "1/2*x^2+1/3", 2, "1/3"),
+    ("1/2*x^2+1/3*x+1/4", "1/2*x^2+2/3*x-1/4", 3, "x^2+x"),
+    ("1/2*x^2+1/3*x+1/4", "1/2*x^2+2/3*x-1/4", 2, "x"),
+    ("1/2*x^2+1/3*x+1/4", "1/2*x^2+2/3*x-1/4", 1, "0"),
+    ("1/2*x^2+1/3*x+1/4", "1/2*x^2+2/3*x-1/4", 100, "x^2+x"),
+    ("1/6*x^2+1/6", "1/4*x^2+1/2", 1, "2/3"),
+    ("1/6*x^2+1/6", "1/4*x^2+1/2", 3, "5/12*x^2+2/3"),
+    ("x^2+1/2", "1/3*x^2-1/2", 1, "0"),
+    ("1/1000000000000000000000*x+1", "x-1", 1, "0"),
+    ("0", "0", 3, "0"),
+    ("x-3", "x-3", 5, "2*x-6"),
+    ("1/4*x+1/2", "1/4*x+1/2", 1, "1"),
+    ("1/4*x+1/2", "1/4*x+1/2", 2, "1/2*x+1"),
+    ("1/3*x+2/3", "1/3*x+2/3", 1, "4/3"),
+];
+
+// Every case from test_sub_truncated and test_sub_truncated_self in malachite-q's
+// RationalPolynomial tests; a self case repeats its operand.
+const RATIONAL_POLYNOMIAL_SUB_TRUNCATED_UNIT_ROWS: [(&str, &str, u64, &str); 16] = [
+    ("0", "0", 0, "0"),
+    ("0", "0", 5, "0"),
+    ("1/2*x^2+1/3", "0", 0, "0"),
+    ("1/2*x^2+1/3", "0", 2, "1/3"),
+    ("0", "1/2*x^2+1/3", 2, "-1/3"),
+    ("1/2*x^2+1/3*x+1/4", "1/2*x^2+2/3*x-1/4", 3, "-1/3*x+1/2"),
+    ("1/2*x^2+1/3*x+1/4", "1/2*x^2+2/3*x-1/4", 1, "1/2"),
+    ("1/2*x^2+1/3*x+1/4", "1/2*x^2+2/3*x-1/4", 100, "-1/3*x+1/2"),
+    ("1/6*x^2+1/6", "-1/4*x^2-1/2", 1, "2/3"),
+    ("1/6*x^2+1/6", "-1/4*x^2-1/2", 3, "5/12*x^2+2/3"),
+    ("x^2+1/2", "-1/3*x^2+1/2", 1, "0"),
+    ("1/1000000000000000000000*x+1", "-x+1", 1, "0"),
+    ("0", "0", 3, "0"),
+    ("x-3", "x-3", 5, "0"),
+    ("1/4*x+1/2", "1/4*x+1/2", 1, "0"),
+    ("1/3*x+2/3", "1/3*x+2/3", 1, "0"),
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -1460,5 +1504,49 @@ fn main() {
             demo_name,
             "fmpz_poly_sub_series",
         );
+    }
+
+    // Every case from test_add_truncated and test_add_truncated_self in malachite-q's
+    // RationalPolynomial tests, and the generated cases from add_truncated_properties, against
+    // fmpq_poly_add_series.
+    println!("testing RationalPolynomial add_truncated unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, q, len, r) in RATIONAL_POLYNOMIAL_ADD_TRUNCATED_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).add_truncated(&({q}), {len}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpq_poly_add_series", Some(TEST_OUT));
+    for demo_name in [
+        "demo_rational_polynomial_add_truncated",
+        "demo_rational_polynomial_add_truncated_val_ref",
+        "demo_rational_polynomial_add_truncated_ref_val",
+        "demo_rational_polynomial_add_truncated_ref_ref",
+        "demo_rational_polynomial_add_truncated_assign",
+        "demo_rational_polynomial_add_truncated_assign_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-q", demo_name, "fmpq_poly_add_series");
+    }
+
+    // Every case from test_sub_truncated and test_sub_truncated_self in malachite-q's
+    // RationalPolynomial tests, and the generated cases from sub_truncated_properties, against
+    // fmpq_poly_sub_series.
+    println!("testing RationalPolynomial sub_truncated unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, q, len, r) in RATIONAL_POLYNOMIAL_SUB_TRUNCATED_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).sub_truncated(&({q}), {len}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpq_poly_sub_series", Some(TEST_OUT));
+    for demo_name in [
+        "demo_rational_polynomial_sub_truncated",
+        "demo_rational_polynomial_sub_truncated_val_ref",
+        "demo_rational_polynomial_sub_truncated_ref_val",
+        "demo_rational_polynomial_sub_truncated_ref_ref",
+        "demo_rational_polynomial_sub_truncated_assign",
+        "demo_rational_polynomial_sub_truncated_assign_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-q", demo_name, "fmpq_poly_sub_series");
     }
 }

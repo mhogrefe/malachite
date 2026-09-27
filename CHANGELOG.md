@@ -341,9 +341,12 @@ documented by git history.
 - New `AddTruncated`, `AddTruncatedAssign`, `SubTruncated`, and `SubTruncatedAssign` traits, in
   `malachite_base::polynomial`, which add or subtract two polynomials and keep only the
   coefficients below $x^{len}$, like FLINT's `fmpz_poly_add_series` and `fmpz_poly_sub_series`.
-  They are implemented for `IntegerPolynomial`, and `AddTruncated` and `AddTruncatedAssign` also for
-  `NaturalPolynomial`, taking each operand by value or by reference; only the first `len`
-  coefficients of each operand are read, and the result is trimmed.
+  They are implemented for `IntegerPolynomial` and `RationalPolynomial`, like FLINT's
+  `fmpq_poly_add_series` and `fmpq_poly_sub_series` for the latter, and `AddTruncated` and
+  `AddTruncatedAssign` also for `NaturalPolynomial`, taking each operand by value or by reference;
+  only the first `len` coefficients of each operand are read, and the result is trimmed. A
+  `RationalPolynomial` result is kept in lowest terms, which after a cut can mean dividing out more
+  than the GCD of the two denominators.
 - A new `Evaluate` trait, in `malachite_base::polynomial`, whose `evaluate` substitutes a value for
   a polynomial's variable; the value's type decides the result's, through an associated `Output`
   type. It is implemented for `&IntegerPolynomial` at an `Integer` and for `&NaturalPolynomial` at a

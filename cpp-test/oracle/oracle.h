@@ -150,4 +150,8 @@ int run_fmpq_poly_sub(const char * arg);
 int run_fmpz_poly_add_series(const char * arg);
 int run_fmpz_poly_sub_series(const char * arg);
 
+/* fmpq_poly_add_series.c */
+int run_fmpq_poly_add_series(const char * arg);
+int run_fmpq_poly_sub_series(const char * arg);
+
 #endif

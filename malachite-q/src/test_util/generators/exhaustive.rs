@@ -980,6 +980,14 @@ pub fn exhaustive_rational_polynomial_pair_gen() -> It<(RationalPolynomial, Rati
     ))
 }
 
+pub fn exhaustive_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1()
+-> It<(RationalPolynomial, RationalPolynomial, u64)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_rational_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_rational_polynomial_triple_gen()
 -> It<(RationalPolynomial, RationalPolynomial, RationalPolynomial)> {
     Box::new(exhaustive_triples_from_single(
