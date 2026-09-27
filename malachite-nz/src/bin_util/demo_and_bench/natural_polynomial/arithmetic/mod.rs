@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     evaluate::register(runner);
     height::register(runner);
     is_unit::register(runner);
+    mod_add::register(runner);
     mod_is_reduced::register(runner);
     mod_make_monic::register(runner);
     mod_neg::register(runner);
@@ -24,6 +25,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_add::register(runner);
     mod_power_of_2_neg::register(runner);
     mod_power_of_2_sub::register(runner);
+    mod_sub::register(runner);
 }
 
 mod add;
@@ -33,6 +35,7 @@ mod content;
 mod evaluate;
 mod height;
 mod is_unit;
+mod mod_add;
 mod mod_is_reduced;
 mod mod_make_monic;
 mod mod_neg;
@@ -41,3 +44,4 @@ mod mod_power_of_2;
 mod mod_power_of_2_add;
 mod mod_power_of_2_neg;
 mod mod_power_of_2_sub;
+mod mod_sub;

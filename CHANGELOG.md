@@ -435,6 +435,11 @@ documented by git history.
   modulo a `Natural`, like FLINT's `nmod_poly_neg` and `fmpz_mod_poly_neg`. The coefficients must
   already be reduced, and this is checked. Each nonzero coefficient $c$ becomes $m - c$, so the
   degree never changes.
+- `ModAdd`, `ModAddAssign`, `ModSub`, and `ModSubAssign` for `UnsignedPolynomial<T>` modulo a `T`
+  and `NaturalPolynomial` modulo a `Natural`, like FLINT's `nmod_poly_add` and `nmod_poly_sub`, and
+  `fmpz_mod_poly_add` and `fmpz_mod_poly_sub`, taking each polynomial, and a `Natural` modulus, by
+  value or by reference. Both operands' coefficients must already be reduced, and
+  this is checked. The result is trimmed when the leading coefficients cancel modulo $m$.
 - `CanonicalizeUnit` and `CanonicalizeUnitAssign` for all four polynomial types, giving the
   canonical associate under the units of each polynomial ring. The units of the polynomials over
   the integers are $\pm 1$, so an `IntegerPolynomial` with a negative leading coefficient is

@@ -10,14 +10,15 @@
 /// [`CanonicalizeUnitAssign`](crate::num::arithmetic::traits::CanonicalizeUnitAssign), which bring
 /// a polynomial into canonical unit form.
 pub mod canonicalize_unit;
-/// Implementations of [`ModEvaluate`](crate::polynomial::ModEvaluate) and
-/// [`ModPowerOf2Evaluate`](crate::polynomial::ModPowerOf2Evaluate), which evaluate a polynomial at
-/// a value modulo a value or a power of 2. Implementations of
-/// [`Content`](crate::polynomial::Content), [`PrimitivePart`](crate::polynomial::PrimitivePart),
+/// Implementations of [`Content`](crate::polynomial::Content),
+/// [`PrimitivePart`](crate::polynomial::PrimitivePart),
 /// [`PrimitivePartAssign`](crate::polynomial::PrimitivePartAssign), and
 /// [`ContentAndPrimitivePart`](crate::polynomial::ContentAndPrimitivePart), which compute the GCD
 /// of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
+/// Implementations of [`ModEvaluate`](crate::polynomial::ModEvaluate) and
+/// [`ModPowerOf2Evaluate`](crate::polynomial::ModPowerOf2Evaluate), which evaluate a polynomial at
+/// a value modulo a value or a power of 2.
 pub mod evaluate;
 /// An implementation of [`Height`](crate::num::arithmetic::traits::Height), the largest of a
 /// polynomial's coefficients.
@@ -25,10 +26,14 @@ pub mod height;
 /// An implementation of [`IsUnit`](crate::num::arithmetic::traits::IsUnit), a trait for determining
 /// whether a number is a unit of its ring.
 pub mod is_unit;
-pub mod mod_is_reduced;
+/// Implementations of [`ModAdd`](crate::num::arithmetic::traits::ModAdd) and
+/// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding two polynomials
+/// modulo a value.
+pub mod mod_add;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
-/// checks whether every coefficient of a polynomial is less than a given modulus. Implementations
-/// of [`ModMakeMonic`](crate::polynomial::ModMakeMonic) and
+/// checks whether every coefficient of a polynomial is less than a given modulus.
+pub mod mod_is_reduced;
+/// Implementations of [`ModMakeMonic`](crate::polynomial::ModMakeMonic) and
 /// [`ModMakeMonicAssign`](crate::polynomial::ModMakeMonicAssign), which make a polynomial monic
 /// modulo a value.
 pub mod mod_make_monic;
@@ -61,3 +66,7 @@ pub mod mod_power_of_2_neg;
 /// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
 /// one polynomial from another modulo $2^k$.
 pub mod mod_power_of_2_sub;
+/// Implementations of [`ModSub`](crate::num::arithmetic::traits::ModSub) and
+/// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting one polynomial
+/// from another modulo a value.
+pub mod mod_sub;

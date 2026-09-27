@@ -877,6 +877,7 @@ pub mod unsigned_polynomial {
         pub mod evaluate;
         pub mod height;
         pub mod is_unit;
+        pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_make_monic;
         pub mod mod_neg;
@@ -885,6 +886,7 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_sub;
+        pub mod mod_sub;
     }
     pub mod basic {
         pub mod coefficients;

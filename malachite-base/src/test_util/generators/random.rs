@@ -8621,6 +8621,27 @@ pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<
     )
 }
 
+pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(p, q, m)| (p % m, q % m, m)),
+    )
+}
+
 pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedPolynomial<T>, T, T)> {

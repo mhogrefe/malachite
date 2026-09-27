@@ -6503,6 +6503,18 @@ pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_va
     )
 }
 
+pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(p, q, m)| p.mod_is_reduced(m) && q.mod_is_reduced(m)),
+    )
+}
+
 pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
 -> It<(UnsignedPolynomial<T>, T, T)> {
     Box::new(

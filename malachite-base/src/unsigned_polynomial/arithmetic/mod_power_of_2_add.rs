@@ -83,7 +83,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Add<Self> for UnsignedPolynomial<T> {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
-    /// // Every coefficient wraps around, and the leading ones cancel.
+    /// // The leading coefficients cancel, and so do the linear ones.
     /// assert_eq!(
     ///     UnsignedPolynomial::<u8>::from_str("5*x^2+x+3")
     ///         .unwrap()
@@ -146,7 +146,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Add<&Self> for UnsignedPolynomial<T> {
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
-    /// // Every coefficient wraps around, and the leading ones cancel.
+    /// // The leading coefficients cancel, and so do the linear ones.
     /// assert_eq!(
     ///     UnsignedPolynomial::<u8>::from_str("5*x^2+x+3")
     ///         .unwrap()
@@ -209,7 +209,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Add<UnsignedPolynomial<T>> for &UnsignedPo
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
-    /// // Every coefficient wraps around, and the leading ones cancel.
+    /// // The leading coefficients cancel, and so do the linear ones.
     /// assert_eq!(
     ///     (&UnsignedPolynomial::<u8>::from_str("5*x^2+x+3").unwrap())
     ///         .mod_power_of_2_add(
@@ -274,7 +274,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Add<&UnsignedPolynomial<T>> for &UnsignedP
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
-    /// // Every coefficient wraps around, and the leading ones cancel.
+    /// // The leading coefficients cancel, and so do the linear ones.
     /// assert_eq!(
     ///     (&UnsignedPolynomial::<u8>::from_str("5*x^2+x+3").unwrap())
     ///         .mod_power_of_2_add(
@@ -335,7 +335,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddAssign<Self> for UnsignedPolynomial<T> 
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
-    /// // Every coefficient wraps around, and the leading ones cancel.
+    /// // The leading coefficients cancel, and so do the linear ones.
     /// let mut p = UnsignedPolynomial::<u8>::from_str("5*x^2+x+3").unwrap();
     /// p.mod_power_of_2_add_assign(
     ///     UnsignedPolynomial::<u8>::from_str("3*x^2+7*x+1").unwrap(),
@@ -388,7 +388,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddAssign<&Self> for UnsignedPolynomial<T>
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
-    /// // Every coefficient wraps around, and the leading ones cancel.
+    /// // The leading coefficients cancel, and so do the linear ones.
     /// let mut p = UnsignedPolynomial::<u8>::from_str("5*x^2+x+3").unwrap();
     /// p.mod_power_of_2_add_assign(
     ///     &UnsignedPolynomial::<u8>::from_str("3*x^2+7*x+1").unwrap(),

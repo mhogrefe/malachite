@@ -18,15 +18,16 @@ pub mod balanced_mod;
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
 /// which bring a polynomial into canonical unit form.
 pub mod canonicalize_unit;
-/// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
-/// polynomial at a value, and of
-/// [`ModPowerOf2Evaluate`](malachite_base::polynomial::ModPowerOf2Evaluate), which does so modulo a
-/// power of 2. Implementations of [`Content`](malachite_base::polynomial::Content),
+/// Implementations of [`Content`](malachite_base::polynomial::Content),
 /// [`PrimitivePart`](malachite_base::polynomial::PrimitivePart),
 /// [`PrimitivePartAssign`](malachite_base::polynomial::PrimitivePartAssign), and
 /// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart), which compute
 /// the GCD of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
+/// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
+/// polynomial at a value, and of
+/// [`ModPowerOf2Evaluate`](malachite_base::polynomial::ModPowerOf2Evaluate), which does so modulo a
+/// power of 2.
 pub mod evaluate;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
@@ -35,9 +36,13 @@ pub mod height;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
-pub mod mod_is_reduced;
+/// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
+/// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding two
+/// polynomials modulo a [`Natural`](crate::natural::Natural).
+pub mod mod_add;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every coefficient of a polynomial is less than a given modulus.
+pub mod mod_is_reduced;
 /// Implementations of [`ModMakeMonic`](malachite_base::polynomial::ModMakeMonic) and
 /// [`ModMakeMonicAssign`](malachite_base::polynomial::ModMakeMonicAssign), which make a polynomial
 /// monic modulo a value.
@@ -71,3 +76,7 @@ pub mod mod_power_of_2_neg;
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting one polynomial from another modulo $2^k$.
 pub mod mod_power_of_2_sub;
+/// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
+/// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting one
+/// polynomial from another modulo a [`Natural`](crate::natural::Natural).
+pub mod mod_sub;
