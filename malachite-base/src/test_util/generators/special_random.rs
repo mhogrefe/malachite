@@ -10108,6 +10108,29 @@ pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<
     )
 }
 
+pub fn special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, q, pow)| (p.mod_power_of_2(pow), q.mod_power_of_2(pow), pow)),
+    )
+}
+
 pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<
     T: PrimitiveUnsigned,
 >(

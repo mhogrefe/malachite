@@ -426,8 +426,9 @@ documented by git history.
   for every modular operation, the coefficients must already be reduced, and this is checked. Each
   nonzero coefficient $c$ becomes $2^k - c$, which is also nonzero, so the degree never changes.
 - `ModPowerOf2Add`, `ModPowerOf2AddAssign`, `ModPowerOf2Sub`, and `ModPowerOf2SubAssign` for
-  `NaturalPolynomial`, which add and subtract polynomials modulo $2^k$, like FLINT's
-  `fmpz_mod_poly_add` and `fmpz_mod_poly_sub` with the modulus $2^k$, taking each operand by value
+  `UnsignedPolynomial<T>` and `NaturalPolynomial`, which add and subtract polynomials modulo $2^k$,
+  like FLINT's `nmod_poly_add` and `nmod_poly_sub`, and `fmpz_mod_poly_add` and `fmpz_mod_poly_sub`,
+  with the modulus $2^k$, taking each operand by value
   or by reference. Both operands' coefficients must already be reduced, and this is checked. The
   result is trimmed when the leading coefficients cancel modulo $2^k$.
 - `ModNeg` and `ModNegAssign` for `UnsignedPolynomial<T>` modulo a `T` and `NaturalPolynomial`

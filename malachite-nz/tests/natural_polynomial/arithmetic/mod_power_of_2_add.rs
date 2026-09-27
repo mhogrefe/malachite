@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
+use malachite_base::test_util::generators::*;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::*;
 use malachite_nz::test_util::natural_polynomial::arithmetic::mod_power_of_2_add::*;
@@ -209,6 +210,16 @@ fn mod_power_of_2_add_properties() {
             assert_eq!(
                 (&p).mod_power_of_2_add(&q, pow).mod_power_of_2_add(&r, pow),
                 (&p).mod_power_of_2_add((&q).mod_power_of_2_add(&r, pow), pow)
+            );
+        },
+    );
+
+    unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1::<u64>().test_properties(
+        |(p, q, pow)| {
+            // The u64 and Natural versions agree.
+            assert_eq!(
+                NaturalPolynomial::from((&p).mod_power_of_2_add(&q, pow)),
+                NaturalPolynomial::from(p).mod_power_of_2_add(NaturalPolynomial::from(q), pow)
             );
         },
     );

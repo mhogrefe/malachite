@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
+use malachite_base::test_util::generators::*;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::*;
 use malachite_nz::test_util::natural_polynomial::arithmetic::mod_power_of_2_sub::*;
@@ -200,6 +201,16 @@ fn mod_power_of_2_sub_properties() {
             // Subtracting zero changes nothing, and a polynomial minus itself is zero.
             assert_eq!((&p).mod_power_of_2_sub(&NaturalPolynomial::ZERO, pow), p);
             assert_eq!((&p).mod_power_of_2_sub(&p, pow), NaturalPolynomial::ZERO);
+        },
+    );
+
+    unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1::<u64>().test_properties(
+        |(p, q, pow)| {
+            // The u64 and Natural versions agree.
+            assert_eq!(
+                NaturalPolynomial::from((&p).mod_power_of_2_sub(&q, pow)),
+                NaturalPolynomial::from(p).mod_power_of_2_sub(NaturalPolynomial::from(q), pow)
+            );
         },
     );
 }

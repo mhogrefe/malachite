@@ -1116,6 +1116,18 @@ pub fn triple_1_unsigned_polynomial_len_bucketer<T, U>(
     }
 }
 
+pub fn triple_1_2_unsigned_polynomial_max_len_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (UnsignedPolynomial<u64>, UnsignedPolynomial<u64>, T)> {
+    Bucketer {
+        bucketing_function: &|(p, q, _)| {
+            max(p.coefficients_asc().len(), q.coefficients_asc().len())
+        },
+        bucketing_label: format!("max({x_name}.len(), {y_name}.len())"),
+    }
+}
+
 pub fn quadruple_1_unsigned_polynomial_len_bucketer<T, U, V>(
     var_name: &str,
 ) -> Bucketer<'_, (UnsignedPolynomial<u64>, T, U, V)> {

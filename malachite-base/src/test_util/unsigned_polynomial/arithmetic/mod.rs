@@ -7,3 +7,5 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod evaluate;
+pub mod mod_power_of_2_add;
+pub mod mod_power_of_2_sub;
