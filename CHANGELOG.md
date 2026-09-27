@@ -347,6 +347,14 @@ documented by git history.
   only the first `len` coefficients of each operand are read, and the result is trimmed. A
   `RationalPolynomial` result is kept in lowest terms, which after a cut can mean dividing out more
   than the GCD of the two denominators.
+- New `ModPowerOf2AddTruncated`, `ModPowerOf2AddTruncatedAssign`, `ModPowerOf2SubTruncated`, and
+  `ModPowerOf2SubTruncatedAssign` traits, in `malachite_base::polynomial`, which add or subtract two
+  polynomials modulo $2^k$ and keep only the coefficients below $x^{len}$, taking `(other, len,
+  pow)`, like FLINT's `nmod_poly_add_series` and `nmod_poly_sub_series`, and
+  `fmpz_mod_poly_add_series` and `fmpz_mod_poly_sub_series`, with the modulus $2^k$. They are
+  implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial`, taking each operand by value or
+  by reference. As for every modular operation, both operands must already be reduced, and this is
+  checked for the whole of each, not only the part that is kept.
 - A new `Evaluate` trait, in `malachite_base::polynomial`, whose `evaluate` substitutes a value for
   a polynomial's variable; the value's type decides the result's, through an associated `Output`
   type. It is implemented for `&IntegerPolynomial` at an `Integer` and for `&NaturalPolynomial` at a

@@ -131,6 +131,18 @@ custom_tuples!(
 );
 custom_tuples!(
     (pub(crate)),
+    ExhaustiveQuadruplesXXYZ,
+    (X, X, Y, Z),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xxyz,
+    exhaustive_quadruples_xxyz_custom_output,
+    [X, I, xs, xs_done, [0, output_type_xs_0], [1, output_type_xs_1]],
+    [Y, J, ys, ys_done, [2, output_type_ys_2]],
+    [Z, K, zs, zs_done, [3, output_type_zs_3]]
+);
+custom_tuples!(
+    (pub(crate)),
     ExhaustiveQuadruplesXYYZ,
     (X, Y, Y, Z),
     (None, None, None, None),
@@ -240,6 +252,15 @@ random_custom_tuples!(
     random_quadruples_xyyx,
     [X, I, xs, xs_gen, [x_0, x_0], [x_3, y_1]],
     [Y, J, ys, ys_gen, [y_1, y_2], [y_2, x_3]]
+);
+random_custom_tuples!(
+    (pub(crate)),
+    RandomQuadruplesXXYZ,
+    (X, X, Y, Z),
+    random_quadruples_xxyz,
+    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1]],
+    [Y, J, ys, ys_gen, [y_2, y_2]],
+    [Z, K, zs, zs_gen, [z_3, z_3]]
 );
 random_custom_tuples!(
     (pub(crate)),

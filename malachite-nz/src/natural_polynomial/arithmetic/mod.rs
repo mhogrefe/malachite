@@ -68,6 +68,11 @@ pub mod mod_power_of_2;
 /// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign), for
 /// adding two polynomials modulo $2^k$.
 pub mod mod_power_of_2_add;
+/// Implementations of
+/// [`ModPowerOf2AddTruncated`](malachite_base::polynomial::ModPowerOf2AddTruncated) and
+/// [`ModPowerOf2AddTruncatedAssign`](malachite_base::polynomial::ModPowerOf2AddTruncatedAssign),
+/// for adding two polynomials modulo $2^k$ and keeping only their low coefficients.
+pub mod mod_power_of_2_add_truncated;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given power of 2.
@@ -80,6 +85,12 @@ pub mod mod_power_of_2_neg;
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting one polynomial from another modulo $2^k$.
 pub mod mod_power_of_2_sub;
+/// Implementations of
+/// [`ModPowerOf2SubTruncated`](malachite_base::polynomial::ModPowerOf2SubTruncated) and
+/// [`ModPowerOf2SubTruncatedAssign`](malachite_base::polynomial::ModPowerOf2SubTruncatedAssign),
+/// for subtracting one polynomial from another modulo $2^k$ and keeping only their low
+/// coefficients.
+pub mod mod_power_of_2_sub_truncated;
 /// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting one
 /// polynomial from another modulo a [`Natural`](crate::natural::Natural).

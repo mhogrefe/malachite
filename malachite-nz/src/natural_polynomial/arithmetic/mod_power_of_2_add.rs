@@ -15,7 +15,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2IsReduced,
 };
 
-fn assert_reduced(p: &NaturalPolynomial, q: &NaturalPolynomial, pow: u64) {
+pub(crate) fn assert_reduced(p: &NaturalPolynomial, q: &NaturalPolynomial, pow: u64) {
     assert!(
         p.mod_power_of_2_is_reduced(pow),
         "self must be reduced mod 2^pow, but {p} has a coefficient >= 2^{pow}"
@@ -28,7 +28,7 @@ fn assert_reduced(p: &NaturalPolynomial, q: &NaturalPolynomial, pow: u64) {
 
 // Adds `ys` into `xs` modulo 2^pow, cloning the coefficients of `ys` past the end of `xs`. The
 // caller trims, since leading coefficients can cancel.
-fn add_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural], pow: u64) {
+pub(crate) fn add_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural], pow: u64) {
     let common = min(xs.len(), ys.len());
     for (x, y) in xs.iter_mut().zip(&ys[..common]) {
         x.mod_power_of_2_add_assign(y, pow);
@@ -39,7 +39,7 @@ fn add_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural], pow: u64) {
 }
 
 // Adds `ys` into `xs` modulo 2^pow, reusing whichever of the two is longer. The caller trims.
-fn add_assign_val(xs: &mut Vec<Natural>, mut ys: Vec<Natural>, pow: u64) {
+pub(crate) fn add_assign_val(xs: &mut Vec<Natural>, mut ys: Vec<Natural>, pow: u64) {
     if ys.len() > xs.len() {
         swap(xs, &mut ys);
     }

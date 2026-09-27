@@ -13,7 +13,7 @@ use alloc::vec::Vec;
 use core::cmp::min;
 use core::mem::swap;
 
-fn assert_reduced<T: PrimitiveUnsigned>(
+pub(crate) fn assert_reduced<T: PrimitiveUnsigned>(
     p: &UnsignedPolynomial<T>,
     q: &UnsignedPolynomial<T>,
     pow: u64,
@@ -31,7 +31,7 @@ fn assert_reduced<T: PrimitiveUnsigned>(
 
 // Adds `ys` into `xs` modulo 2^pow, copying the coefficients of `ys` past the end of `xs`. The
 // caller trims, since leading coefficients can cancel.
-fn add_assign_ref<T: PrimitiveUnsigned>(xs: &mut Vec<T>, ys: &[T], pow: u64) {
+pub(crate) fn add_assign_ref<T: PrimitiveUnsigned>(xs: &mut Vec<T>, ys: &[T], pow: u64) {
     let common = min(xs.len(), ys.len());
     for (x, &y) in xs.iter_mut().zip(&ys[..common]) {
         *x = x.wrapping_add(y).mod_power_of_2(pow);
@@ -42,7 +42,7 @@ fn add_assign_ref<T: PrimitiveUnsigned>(xs: &mut Vec<T>, ys: &[T], pow: u64) {
 }
 
 // Adds `ys` into `xs` modulo 2^pow, reusing whichever of the two is longer. The caller trims.
-fn add_assign_val<T: PrimitiveUnsigned>(xs: &mut Vec<T>, mut ys: Vec<T>, pow: u64) {
+pub(crate) fn add_assign_val<T: PrimitiveUnsigned>(xs: &mut Vec<T>, mut ys: Vec<T>, pow: u64) {
     if ys.len() > xs.len() {
         swap(xs, &mut ys);
     }

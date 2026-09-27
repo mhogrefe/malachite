@@ -76,10 +76,10 @@ use crate::platform::{
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
 };
 use crate::test_util::extra_variadic::{
-    random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
-    random_quadruples_xyyx, random_quadruples_xyyz, random_quintuples_xyyyz,
-    random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
-    random_triples_xyx, random_triples_xyy,
+    random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xxyz,
+    random_quadruples_xyxz, random_quadruples_xyyx, random_quadruples_xyyz,
+    random_quintuples_xyyyz, random_sextuples_from_single, random_triples,
+    random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
 };
 use crate::test_util::generators::common::{GMP_FORMAT_COMBO_COUNT, gmp_format_string_from_parts};
 use crate::test_util::generators::exhaustive::{
@@ -445,6 +445,34 @@ pub fn random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_2(
         },
         &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
+}
+
+pub fn random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, q, len, pow)| (p.mod_power_of_2(pow), q.mod_power_of_2(pow), len, pow)),
+    )
 }
 
 pub fn random_natural_polynomial_natural_polynomial_natural_triple_gen_var_1(

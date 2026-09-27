@@ -68,9 +68,10 @@ use crate::strings::strings_from_char_vecs;
 use crate::test_util::extra_variadic::{
     Union3, random_duodecuples_from_single, random_octuples_from_single, random_quadruples,
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xxyx,
-    random_quadruples_xyxy, random_quadruples_xyyx, random_quadruples_xyyz, random_quadruples_xyzz,
-    random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
-    random_triples_xyx, random_triples_xyy, random_union3s,
+    random_quadruples_xxyz, random_quadruples_xyxy, random_quadruples_xyyx, random_quadruples_xyyz,
+    random_quadruples_xyzz, random_sextuples_from_single, random_triples,
+    random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
+    random_union3s,
 };
 use crate::test_util::generators::common::{
     GMP_SPEC_C_TYPE_COUNT, GMP_SPEC_CONV_CHARS, GMP_SPEC_INTEGER_CONV_COUNT, GMP_SPEC_TYPE_STRS,
@@ -8639,6 +8640,28 @@ pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_2<
             &random_positive_unsigneds::<T>,
         )
         .map(|(p, q, m)| (p % m, q % m, m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, q, len, pow)| (p.mod_power_of_2(pow), q.mod_power_of_2(pow), len, pow)),
     )
 }
 

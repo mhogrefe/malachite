@@ -54,6 +54,10 @@ pub mod mod_power_of_2;
 /// [`ModPowerOf2AddAssign`](crate::num::arithmetic::traits::ModPowerOf2AddAssign), for adding two
 /// polynomials modulo $2^k$.
 pub mod mod_power_of_2_add;
+/// Implementations of [`ModPowerOf2AddTruncated`](crate::polynomial::ModPowerOf2AddTruncated) and
+/// [`ModPowerOf2AddTruncatedAssign`](crate::polynomial::ModPowerOf2AddTruncatedAssign), for adding
+/// two polynomials modulo $2^k$ and keeping only their low coefficients.
+pub mod mod_power_of_2_add_truncated;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every coefficient of a polynomial is less than a given power of 2.
@@ -66,6 +70,10 @@ pub mod mod_power_of_2_neg;
 /// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
 /// one polynomial from another modulo $2^k$.
 pub mod mod_power_of_2_sub;
+/// Implementations of [`ModPowerOf2SubTruncated`](crate::polynomial::ModPowerOf2SubTruncated) and
+/// [`ModPowerOf2SubTruncatedAssign`](crate::polynomial::ModPowerOf2SubTruncatedAssign), for
+/// subtracting one polynomial from another modulo $2^k$ and keeping only their low coefficients.
+pub mod mod_power_of_2_sub_truncated;
 /// Implementations of [`ModSub`](crate::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting one polynomial
 /// from another modulo a value.

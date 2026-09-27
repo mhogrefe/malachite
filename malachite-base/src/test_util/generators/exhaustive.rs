@@ -55,7 +55,7 @@ use crate::test_util::extra_variadic::{
     ExhaustiveTriples1Input, ExhaustiveTriplesXXY, Union3, exhaustive_duodecuples_from_single,
     exhaustive_octuples_from_single, exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
     exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xxyx,
-    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz,
+    exhaustive_quadruples_xxyz, exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz,
     exhaustive_quadruples_xyyz_custom_output, exhaustive_quadruples_xyzz,
     exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
     exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
@@ -6512,6 +6512,21 @@ pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_va
             exhaustive_positive_primitive_ints::<T>(),
         )
         .filter(|(p, q, m)| p.mod_is_reduced(m) && q.mod_is_reduced(m)),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 19),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(p, q, _, pow)| {
+            p.mod_power_of_2_is_reduced(*pow) && q.mod_power_of_2_is_reduced(*pow)
+        }),
     )
 }
 

@@ -231,6 +231,58 @@ pub trait SubTruncatedAssign<Rhs = Self> {
     fn sub_truncated_assign(&mut self, other: Rhs, len: u64);
 }
 
+/// Adds two polynomials modulo $2^k$, keeping only the coefficients of $x^i$ for $i$ less than a
+/// given length. The coefficients of both must already be reduced modulo $2^k$.
+pub trait ModPowerOf2AddTruncated<Rhs = Self> {
+    type Output;
+
+    /// Adds two polynomials modulo $2^k$ and truncates the sum to its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, q, n, k) = ((p + q) \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_add_truncated(self, other: Rhs, len: u64, pow: u64) -> Self::Output;
+}
+
+/// Adds a polynomial to another modulo $2^k$ in place, keeping only the coefficients of $x^i$ for
+/// $i$ less than a given length. The coefficients of both must already be reduced modulo $2^k$.
+pub trait ModPowerOf2AddTruncatedAssign<Rhs = Self> {
+    /// Adds a polynomial to `self` modulo $2^k$ and truncates the sum to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// p \gets ((p + q) \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_add_truncated_assign(&mut self, other: Rhs, len: u64, pow: u64);
+}
+
+/// Subtracts one polynomial from another modulo $2^k$, keeping only the coefficients of $x^i$ for
+/// $i$ less than a given length. The coefficients of both must already be reduced modulo $2^k$.
+pub trait ModPowerOf2SubTruncated<Rhs = Self> {
+    type Output;
+
+    /// Subtracts one polynomial from another modulo $2^k$ and truncates the difference to its first
+    /// `len` coefficients.
+    ///
+    /// $$
+    /// f(p, q, n, k) = ((p - q) \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_sub_truncated(self, other: Rhs, len: u64, pow: u64) -> Self::Output;
+}
+
+/// Subtracts a polynomial from another modulo $2^k$ in place, keeping only the coefficients of
+/// $x^i$ for $i$ less than a given length. The coefficients of both must already be reduced modulo
+/// $2^k$.
+pub trait ModPowerOf2SubTruncatedAssign<Rhs = Self> {
+    /// Subtracts a polynomial from `self` modulo $2^k$ and truncates the difference to its first
+    /// `len` coefficients.
+    ///
+    /// $$
+    /// p \gets ((p - q) \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_sub_truncated_assign(&mut self, other: Rhs, len: u64, pow: u64);
+}
+
 // Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending
 // order, agree below index `len`.
 //

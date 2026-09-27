@@ -167,6 +167,29 @@ pub fn triple_1_2_natural_polynomial_max_bit_bucketer<'a, T>(
     }
 }
 
+pub fn quadruple_1_2_natural_polynomial_max_bit_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (NaturalPolynomial, NaturalPolynomial, T, U)> {
+    Bucketer {
+        bucketing_function: &|(p, q, _, _)| {
+            usize::exact_from(max(
+                p.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+                q.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}'s total coefficient bits, {y_name}'s total coefficient bits)"
+        ),
+    }
+}
+
 pub fn triple_1_2_integer_polynomial_max_bit_bucketer<'a, T>(
     x_name: &'a str,
     y_name: &'a str,

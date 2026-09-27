@@ -86,10 +86,10 @@ use crate::platform::{
 };
 use crate::test_util::extra_variadic::{
     exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
-    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xyxz,
-    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz, exhaustive_quintuples_xyyyz,
-    exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
-    exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
+    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xxyz,
+    exhaustive_quadruples_xyxz, exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz,
+    exhaustive_quintuples_xyyyz, exhaustive_sextuples_from_single, exhaustive_triples_from_single,
+    exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
 };
 use crate::test_util::generators::common::{GMP_FORMAT_COMBO_COUNT, gmp_format_string_from_parts};
 use crate::test_util::generators::{factors_of_limb_max, limbs_odd_factorial_valid};
@@ -400,6 +400,21 @@ pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_
         exhaustive_natural_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+pub fn exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_natural_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, q, len, mut pow)| {
+            pow += max(p.height_significant_bits(), q.height_significant_bits());
+            (p, q, len, pow)
+        }),
+    )
 }
 
 pub fn exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_1()
