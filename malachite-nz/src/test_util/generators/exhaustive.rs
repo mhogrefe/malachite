@@ -180,6 +180,14 @@ pub fn exhaustive_integer_polynomial_pair_gen() -> It<(IntegerPolynomial, Intege
     ))
 }
 
+pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1()
+-> It<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_integer_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_triple_gen()
 -> It<(IntegerPolynomial, IntegerPolynomial, IntegerPolynomial)> {
     Box::new(exhaustive_triples_from_single(

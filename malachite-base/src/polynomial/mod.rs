@@ -176,6 +176,61 @@ pub trait EqTruncated<Rhs: ?Sized = Self> {
     fn eq_truncated(&self, other: &Rhs, len: u64) -> bool;
 }
 
+/// Adds two polynomials, keeping only the coefficients of $x^i$ for $i$ less than a given length.
+///
+/// This is the sum of the two polynomials truncated to their first `len` coefficients, which is
+/// also the truncation of their sum.
+pub trait AddTruncated<Rhs = Self> {
+    type Output;
+
+    /// Adds two polynomials and truncates the sum to its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, q, n) = (p + q) \bmod x^n.
+    /// $$
+    fn add_truncated(self, other: Rhs, len: u64) -> Self::Output;
+}
+
+/// Adds a polynomial to another in place, keeping only the coefficients of $x^i$ for $i$ less than
+/// a given length.
+pub trait AddTruncatedAssign<Rhs = Self> {
+    /// Adds a polynomial to `self` and truncates the sum to its first `len` coefficients.
+    ///
+    /// $$
+    /// p \gets (p + q) \bmod x^n.
+    /// $$
+    fn add_truncated_assign(&mut self, other: Rhs, len: u64);
+}
+
+/// Subtracts one polynomial from another, keeping only the coefficients of $x^i$ for $i$ less than
+/// a given length.
+///
+/// This is the difference of the two polynomials truncated to their first `len` coefficients, which
+/// is also the truncation of their difference.
+pub trait SubTruncated<Rhs = Self> {
+    type Output;
+
+    /// Subtracts one polynomial from another and truncates the difference to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p, q, n) = (p - q) \bmod x^n.
+    /// $$
+    fn sub_truncated(self, other: Rhs, len: u64) -> Self::Output;
+}
+
+/// Subtracts a polynomial from another in place, keeping only the coefficients of $x^i$ for $i$
+/// less than a given length.
+pub trait SubTruncatedAssign<Rhs = Self> {
+    /// Subtracts a polynomial from `self` and truncates the difference to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// p \gets (p - q) \bmod x^n.
+    /// $$
+    fn sub_truncated_assign(&mut self, other: Rhs, len: u64);
+}
+
 // Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending
 // order, agree below index `len`.
 //

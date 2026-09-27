@@ -70,6 +70,8 @@ static const oracle_mode modes[] = {
     {"fmpz_poly_evaluate_mod", run_fmpz_poly_evaluate_mod},
     {"fmpq_poly_add", run_fmpq_poly_add},
     {"fmpq_poly_sub", run_fmpq_poly_sub},
+    {"fmpz_poly_add_series", run_fmpz_poly_add_series},
+    {"fmpz_poly_sub_series", run_fmpz_poly_sub_series},
 };
 
 int

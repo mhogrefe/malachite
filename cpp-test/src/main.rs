@@ -544,6 +544,52 @@ const RATIONAL_POLYNOMIAL_SUB_UNIT_ROWS: [(&str, &str, &str); 24] = [
     ("1/2*x+1/4", "1/2*x+1/4", "0"),
 ];
 
+// Every case from test_add_truncated in malachite-nz's IntegerPolynomial tests.
+const INTEGER_POLYNOMIAL_ADD_TRUNCATED_UNIT_ROWS: [(&str, &str, u64, &str); 14] = [
+    ("0", "0", 0, "0"),
+    ("0", "0", 5, "0"),
+    ("x^2+1", "0", 0, "0"),
+    ("x^2+1", "0", 2, "1"),
+    ("x^2+1", "0", 3, "x^2+1"),
+    ("0", "x^2+1", 2, "1"),
+    ("x^3+2*x^2-x+5", "4*x^2+x-2", 3, "6*x^2+3"),
+    ("x^3+2*x^2-x+5", "4*x^2+x-2", 2, "3"),
+    ("x^3+2*x^2-x+5", "4*x^2+x-2", 1, "3"),
+    ("x^3+2*x^2-x+5", "4*x^2+x-2", 4, "x^3+6*x^2+3"),
+    ("x^3+2*x^2-x+5", "4*x^2+x-2", 100, "x^3+6*x^2+3"),
+    ("-x^3+x", "x^3-x", 4, "0"),
+    ("x^5+x", "x^4+x^3", 4, "x^3+x"),
+    (
+        "1000000000000000000000*x^2-1",
+        "-1000000000000000000000*x^2+3*x",
+        3,
+        "3*x-1",
+    ),
+];
+
+// Every case from test_sub_truncated in malachite-nz's IntegerPolynomial tests.
+const INTEGER_POLYNOMIAL_SUB_TRUNCATED_UNIT_ROWS: [(&str, &str, u64, &str); 14] = [
+    ("0", "0", 0, "0"),
+    ("0", "0", 5, "0"),
+    ("x^2+1", "0", 0, "0"),
+    ("x^2+1", "0", 2, "1"),
+    ("0", "x^2+1", 3, "-x^2-1"),
+    ("0", "x^2+1", 2, "-1"),
+    ("x^3+2*x^2-x+5", "4*x^2+x-2", 3, "-2*x^2-2*x+7"),
+    ("x^3+2*x^2-x+5", "2*x^2-x+3", 3, "2"),
+    ("x^3+2*x^2-x+5", "4*x^2+x-2", 1, "7"),
+    ("x^3+2*x^2-x+5", "4*x^2+x-2", 4, "x^3-2*x^2-2*x+7"),
+    ("x^3+2*x^2-x+5", "4*x^2+x-2", 100, "x^3-2*x^2-2*x+7"),
+    ("x^3-x", "x^3-x", 4, "0"),
+    ("x^5+x", "x^4+x^3", 5, "-x^4-x^3+x"),
+    (
+        "1000000000000000000000*x^2-1",
+        "1000000000000000000000*x^2-3*x",
+        3,
+        "3*x-1",
+    ),
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -1313,5 +1359,57 @@ fn main() {
         "demo_rational_polynomial_sub_assign_ref",
     ] {
         check_demo_against_flint(&oracle, "../malachite-q", demo_name, "fmpq_poly_sub");
+    }
+
+    // Every case from test_add_truncated in malachite-nz's IntegerPolynomial tests, and the generated
+    // cases from add_truncated_properties, against fmpz_poly_add_series.
+    println!("testing IntegerPolynomial add_truncated unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, q, len, r) in INTEGER_POLYNOMIAL_ADD_TRUNCATED_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).add_truncated(&({q}), {len}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_add_series", Some(TEST_OUT));
+    for demo_name in [
+        "demo_integer_polynomial_add_truncated",
+        "demo_integer_polynomial_add_truncated_val_ref",
+        "demo_integer_polynomial_add_truncated_ref_val",
+        "demo_integer_polynomial_add_truncated_ref_ref",
+        "demo_integer_polynomial_add_truncated_assign",
+        "demo_integer_polynomial_add_truncated_assign_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_poly_add_series",
+        );
+    }
+
+    // Every case from test_sub_truncated in malachite-nz's IntegerPolynomial tests, and the generated
+    // cases from sub_truncated_properties, against fmpz_poly_sub_series.
+    println!("testing IntegerPolynomial sub_truncated unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, q, len, r) in INTEGER_POLYNOMIAL_SUB_TRUNCATED_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).sub_truncated(&({q}), {len}) = {r}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_sub_series", Some(TEST_OUT));
+    for demo_name in [
+        "demo_integer_polynomial_sub_truncated",
+        "demo_integer_polynomial_sub_truncated_val_ref",
+        "demo_integer_polynomial_sub_truncated_ref_val",
+        "demo_integer_polynomial_sub_truncated_ref_ref",
+        "demo_integer_polynomial_sub_truncated_assign",
+        "demo_integer_polynomial_sub_truncated_assign_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_poly_sub_series",
+        );
     }
 }

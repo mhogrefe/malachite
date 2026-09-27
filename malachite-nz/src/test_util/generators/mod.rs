@@ -240,6 +240,16 @@ pub fn integer_polynomial_pair_gen() -> Generator<(IntegerPolynomial, IntegerPol
     )
 }
 
+// All `(IntegerPolynomial, IntegerPolynomial, u64)` where the `u64` is a small length.
+pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1()
+-> Generator<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1,
+        &random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1,
+        &special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1,
+    )
+}
+
 pub fn integer_polynomial_triple_gen()
 -> Generator<(IntegerPolynomial, IntegerPolynomial, IntegerPolynomial)> {
     Generator::new(

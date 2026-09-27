@@ -27,7 +27,7 @@ pub(crate) fn sub_assign_ref(xs: &mut Vec<Integer>, ys: &[Integer]) {
 
 // Subtracts `ys` from `xs`, reusing whichever of the two is longer: when `ys` is, it is negated in
 // place and `xs` is added to it.
-fn sub_assign_val(xs: &mut Vec<Integer>, mut ys: Vec<Integer>) {
+pub(crate) fn sub_assign_val(xs: &mut Vec<Integer>, mut ys: Vec<Integer>) {
     if ys.len() > xs.len() {
         for y in &mut ys {
             y.neg_assign();
@@ -44,7 +44,7 @@ fn sub_assign_val(xs: &mut Vec<Integer>, mut ys: Vec<Integer>) {
 }
 
 // Replaces `ys` with `xs - ys`, reusing the storage of `ys`.
-fn rsub_assign_ref(ys: &mut Vec<Integer>, xs: &[Integer]) {
+pub(crate) fn rsub_assign_ref(ys: &mut Vec<Integer>, xs: &[Integer]) {
     for y in ys.iter_mut() {
         y.neg_assign();
     }

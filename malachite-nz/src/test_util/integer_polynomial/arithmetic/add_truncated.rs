@@ -6,11 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod add;
-pub mod add_truncated;
-pub mod content_chained;
-pub mod evaluate;
-pub mod scalar_add_mul;
-pub mod scalar_mul;
-pub mod sub;
-pub mod sub_truncated;
+use crate::integer_polynomial::IntegerPolynomial;
+use malachite_base::polynomial::Polynomial;
+
+// Adds the whole polynomials and then truncates the result.
+pub fn add_truncated_naive(
+    p: &IntegerPolynomial,
+    q: &IntegerPolynomial,
+    len: u64,
+) -> IntegerPolynomial {
+    (p + q).truncate(len)
+}

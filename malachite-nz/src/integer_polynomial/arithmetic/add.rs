@@ -25,7 +25,7 @@ pub(crate) fn add_assign_ref(xs: &mut Vec<Integer>, ys: &[Integer]) {
 }
 
 // Adds `ys` into `xs`, reusing whichever of the two is longer.
-fn add_assign_val(xs: &mut Vec<Integer>, mut ys: Vec<Integer>) {
+pub(crate) fn add_assign_val(xs: &mut Vec<Integer>, mut ys: Vec<Integer>) {
     if ys.len() > xs.len() {
         swap(xs, &mut ys);
     }
