@@ -368,6 +368,12 @@ documented by git history.
   `fmpz_poly_deflation`, `fmpz_mod_poly_deflation`, and `nmod_poly_deflation`, except that a
   nonzero constant gives 0 rather than 1, so the result is 0 exactly for the constants. It is
   implemented for all four polynomial types.
+- New `DeflatePowerOfX` and `DeflatePowerOfXAssign` traits, in `malachite_base::polynomial`, which
+  replace a polynomial $p$ with the $q$ such that $q(x^n) = p(x)$, the inverse of
+  `ComposePowerOfX`, like FLINT's `fmpz_poly_deflate`, `fmpz_mod_poly_deflate`, and
+  `nmod_poly_deflate`. Where FLINT silently drops the coefficients at exponents that are not
+  multiples of $n$, these panic, as they do when $n$ is 0. They are implemented for all four
+  polynomial types, taking the polynomial by value or by reference.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

@@ -125,7 +125,7 @@ use malachite_base::num::random::{
     random_unsigned_inclusive_range, random_unsigneds_less_than,
 };
 use malachite_base::options::random::{RandomOptions, random_options};
-use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
 use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;
@@ -175,6 +175,16 @@ pub fn special_random_natural_polynomial_unsigned_pair_gen_var_1(
     ))
 }
 
+pub fn special_random_natural_polynomial_unsigned_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64)> {
+    Box::new(
+        special_random_natural_polynomial_unsigned_pair_gen_var_1(config)
+            .filter(|&(_, k)| k != 0)
+            .map(|(p, k)| (p.compose_power_of_x(k), k)),
+    )
+}
+
 pub fn special_random_integer_polynomial_unsigned_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, u64)> {
@@ -193,6 +203,16 @@ pub fn special_random_integer_polynomial_unsigned_pair_gen_var_1(
         },
         &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
+}
+
+pub fn special_random_integer_polynomial_unsigned_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64)> {
+    Box::new(
+        special_random_integer_polynomial_unsigned_pair_gen_var_1(config)
+            .filter(|&(_, k)| k != 0)
+            .map(|(p, k)| (p.compose_power_of_x(k), k)),
+    )
 }
 
 pub fn special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_1(

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{Gcd, GcdAssign};
+use crate::num::arithmetic::traits::{DivisibleBy, Gcd, GcdAssign};
 use crate::num::conversion::traits::ExactFrom;
 use crate::vars::{Var, VarScheme};
 use alloc::string::String;
@@ -543,6 +543,92 @@ pub fn slice_exponent_gcd<T>(xs: &[T], is_zero: impl Fn(&T) -> bool) -> u64 {
         }
     }
     u64::exact_from(gcd)
+}
+
+/// Deflates a polynomial by $n$, giving the polynomial $q$ with $q(x^n) = p(x)$: the coefficient of
+/// $x^{in}$ moves to $x^i$.
+///
+/// This is the inverse of [`ComposePowerOfX`]. It exists only when every exponent at which $p$ has
+/// a nonzero coefficient is a multiple of $n$, that is, when $n$ divides
+/// [`exponent_gcd`](ExponentGcd::exponent_gcd); implementations panic otherwise, and when $n$ is 0.
+/// A constant polynomial deflates to itself for every positive $n$.
+pub trait DeflatePowerOfX {
+    type Output;
+
+    /// Deflates a polynomial by $n$.
+    ///
+    /// $$
+    /// f(p, n) = q, \quad \text{where} \quad q(x^n) = p(x).
+    /// $$
+    fn deflate_power_of_x(self, n: u64) -> Self::Output;
+}
+
+/// Deflates a polynomial by $n$ in place, replacing $p$ with the polynomial $q$ such that $q(x^n) =
+/// p(x)$.
+///
+/// This is the inverse of [`ComposePowerOfXAssign`]. It exists only when every exponent at which
+/// $p$ has a nonzero coefficient is a multiple of $n$, that is, when $n$ divides
+/// [`exponent_gcd`](ExponentGcd::exponent_gcd); implementations panic otherwise, and when $n$ is 0.
+/// A constant polynomial deflates to itself for every positive $n$.
+pub trait DeflatePowerOfXAssign {
+    /// Deflates a polynomial by $n$ in place.
+    ///
+    /// $$
+    /// p \gets q, \quad \text{where} \quad q(x^n) = p(x).
+    /// $$
+    fn deflate_power_of_x_assign(&mut self, n: u64);
+}
+
+// Checks that the polynomial whose coefficients `xs` holds, in ascending order with a nonzero last
+// element if any, can be deflated by `n`. Returns `n` as a `usize`, or `None` when deflating
+// changes nothing: when `n` is 1 or the polynomial is constant.
+fn deflation_step<T>(xs: &[T], n: u64, is_zero: impl Fn(&T) -> bool) -> Option<usize> {
+    assert_ne!(n, 0, "Cannot deflate a polynomial by 0");
+    if n == 1 || xs.len() <= 1 {
+        return None;
+    }
+    assert!(
+        slice_exponent_gcd(xs, is_zero).divisible_by(n),
+        "Cannot deflate a polynomial by {n}: it has a nonzero coefficient at an exponent that is \
+        not a multiple of {n}"
+    );
+    // n divides the degree, so it fits in a usize.
+    Some(usize::exact_from(n))
+}
+
+// Deflates, by `n`, the polynomial whose coefficients `xs` holds in ascending order with a nonzero
+// last element if any, in place. The coefficient at index `i * n` moves to index `i`, from the
+// bottom up, so each lands on a place whose old value is no longer needed; then the vector is
+// truncated. The leading coefficient stays nonzero.
+//
+// This is equivalent to `fmpz_poly_deflate` from `fmpz_poly/deflate.c`, FLINT 3.6.0, except that it
+// panics when some nonzero coefficient is not at a multiple of `n`.
+#[doc(hidden)]
+pub fn vec_deflate_power_of_x<T>(xs: &mut Vec<T>, n: u64, is_zero: impl Fn(&T) -> bool) {
+    if let Some(n) = deflation_step(xs, n, is_zero) {
+        let new_len = (xs.len() - 1) / n + 1;
+        for i in 1..new_len {
+            xs.swap(i, i * n);
+        }
+        xs.truncate(new_len);
+    }
+}
+
+// Deflates, by `n`, the polynomial whose coefficients `xs` holds in ascending order with a nonzero
+// last element if any, returning the coefficients of the result.
+//
+// This is equivalent to `fmpz_poly_deflate` from `fmpz_poly/deflate.c`, FLINT 3.6.0, except that it
+// panics when some nonzero coefficient is not at a multiple of `n`.
+#[doc(hidden)]
+pub fn slice_deflate_power_of_x<T: Clone>(
+    xs: &[T],
+    n: u64,
+    is_zero: impl Fn(&T) -> bool,
+) -> Vec<T> {
+    match deflation_step(xs, n, is_zero) {
+        None => xs.to_vec(),
+        Some(n) => xs.iter().step_by(n).cloned().collect(),
+    }
 }
 
 // Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending

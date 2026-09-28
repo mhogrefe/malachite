@@ -27,6 +27,9 @@ pub mod compose_power_of_x;
 /// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart) for
 /// [`RationalPolynomial`](super::RationalPolynomial)s.
 pub mod content;
+/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
+/// common divisor of the exponents at which a polynomial has nonzero coefficients.
+pub mod deflate_power_of_x;
 /// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
 /// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
 /// by a power of its variable and discarding the remainder.
@@ -37,8 +40,6 @@ pub mod div_power_of_x;
 /// [`RationalPolynomial`](super::RationalPolynomial)s at
 /// [`Integer`](malachite_nz::integer::Integer)s.
 pub mod evaluate;
-/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
-/// common divisor of the exponents at which a polynomial has nonzero coefficients.
 pub mod exponent_gcd;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height), the largest of
 /// the heights of a polynomial's coefficients.

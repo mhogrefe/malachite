@@ -45,6 +45,7 @@ use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use crate::options::exhaustive::exhaustive_options;
 use crate::orderings::exhaustive::exhaustive_orderings;
+use crate::polynomial::ComposePowerOfX;
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::sets::exhaustive::{exhaustive_b_tree_sets, exhaustive_hash_sets};
@@ -6487,6 +6488,15 @@ pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_2() -> It<(UnsignedP
                     .try_fold(0u64, |s, &c| s.checked_add(c))
                     .is_some()
         }),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_3() -> It<(UnsignedPolynomial<u64>, u64)>
+{
+    Box::new(
+        exhaustive_unsigned_polynomial_unsigned_pair_gen_var_1()
+            .filter(|&(_, k)| k != 0)
+            .map(|(p, k)| (p.compose_power_of_x(k), k)),
     )
 }
 

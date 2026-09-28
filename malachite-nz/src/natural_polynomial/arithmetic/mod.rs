@@ -32,6 +32,9 @@ pub mod compose_power_of_x;
 /// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart), which compute
 /// the GCD of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
+/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
+/// common divisor of the exponents at which a polynomial has nonzero coefficients.
+pub mod deflate_power_of_x;
 /// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
 /// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
 /// by a power of its variable and discarding the remainder.
@@ -41,8 +44,6 @@ pub mod div_power_of_x;
 /// [`ModPowerOf2Evaluate`](malachite_base::polynomial::ModPowerOf2Evaluate), which does so modulo a
 /// power of 2.
 pub mod evaluate;
-/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
-/// common divisor of the exponents at which a polynomial has nonzero coefficients.
 pub mod exponent_gcd;
 /// An implementation of [`FloorL2Norm`](malachite_base::polynomial::FloorL2Norm), the floor of a
 /// polynomial's $L^2$ norm.

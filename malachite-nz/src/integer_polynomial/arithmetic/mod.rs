@@ -34,6 +34,9 @@ pub mod compose_power_of_x;
 pub mod content;
 #[doc(hidden)]
 pub mod content_chained;
+/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
+/// common divisor of the exponents at which a polynomial has nonzero coefficients.
+pub mod deflate_power_of_x;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), for dividing a
 /// polynomial by an [`Integer`](crate::integer::Integer) that divides every coefficient.
@@ -45,8 +48,6 @@ pub mod div_power_of_x;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
 /// polynomial at a value.
 pub mod evaluate;
-/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
-/// common divisor of the exponents at which a polynomial has nonzero coefficients.
 pub mod exponent_gcd;
 /// An implementation of [`FloorL2Norm`](malachite_base::polynomial::FloorL2Norm), the floor of a
 /// polynomial's $L^2$ norm.

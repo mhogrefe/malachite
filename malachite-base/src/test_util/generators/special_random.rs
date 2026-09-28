@@ -62,6 +62,7 @@ use crate::num::random::{
     random_primitive_float_inclusive_range, random_primitive_float_range, random_primitive_floats,
     random_unsigneds_less_than,
 };
+use crate::polynomial::ComposePowerOfX;
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
@@ -10090,6 +10091,16 @@ pub fn special_random_unsigned_polynomial_unsigned_pair_gen_var_2(
                     .try_fold(0u64, |s, &c| s.checked_add(c))
                     .is_some()
         }),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<u64>, u64)> {
+    Box::new(
+        special_random_unsigned_polynomial_unsigned_pair_gen_var_1(config)
+            .filter(|&(_, k)| k != 0)
+            .map(|(p, k)| (p.compose_power_of_x(k), k)),
     )
 }
 

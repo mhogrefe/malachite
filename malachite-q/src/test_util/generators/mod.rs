@@ -1440,3 +1440,13 @@ pub fn rational_polynomial_unsigned_pair_gen_var_1() -> Generator<(RationalPolyn
         &special_random_rational_polynomial_unsigned_pair_gen_var_1,
     )
 }
+
+// All `(RationalPolynomial, u64)` where the `u64` is positive and small, and every exponent at
+// which the polynomial has a nonzero coefficient is a multiple of the `u64`.
+pub fn rational_polynomial_unsigned_pair_gen_var_2() -> Generator<(RationalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_unsigned_pair_gen_var_2,
+        &random_rational_polynomial_unsigned_pair_gen_var_2,
+        &special_random_rational_polynomial_unsigned_pair_gen_var_2,
+    )
+}

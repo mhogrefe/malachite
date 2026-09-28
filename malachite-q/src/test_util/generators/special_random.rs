@@ -49,6 +49,7 @@ use malachite_base::num::random::striped::{
 use malachite_base::num::random::{
     random_finite_primitive_floats, random_nonzero_finite_primitive_floats, random_primitive_floats,
 };
+use malachite_base::polynomial::ComposePowerOfX;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;
@@ -2950,4 +2951,14 @@ pub fn special_random_rational_polynomial_unsigned_pair_gen_var_1(
         },
         &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
+}
+
+pub fn special_random_rational_polynomial_unsigned_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, u64)> {
+    Box::new(
+        special_random_rational_polynomial_unsigned_pair_gen_var_1(config)
+            .filter(|&(_, k)| k != 0)
+            .map(|(p, k)| (p.compose_power_of_x(k), k)),
+    )
 }

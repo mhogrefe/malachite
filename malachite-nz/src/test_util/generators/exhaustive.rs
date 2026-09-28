@@ -126,7 +126,7 @@ use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
 use malachite_base::options::exhaustive::exhaustive_options;
-use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::slices::slice_trailing_zeros;
@@ -172,6 +172,14 @@ pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_1() -> It<(NaturalPol
         exhaustive_natural_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_2() -> It<(NaturalPolynomial, u64)> {
+    Box::new(
+        exhaustive_natural_polynomial_unsigned_pair_gen_var_1()
+            .filter(|&(_, k)| k != 0)
+            .map(|(p, k)| (p.compose_power_of_x(k), k)),
+    )
 }
 
 pub fn exhaustive_integer_polynomial_pair_gen() -> It<(IntegerPolynomial, IntegerPolynomial)> {
@@ -297,6 +305,14 @@ pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_1() -> It<(IntegerPol
         exhaustive_integer_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_2() -> It<(IntegerPolynomial, u64)> {
+    Box::new(
+        exhaustive_integer_polynomial_unsigned_pair_gen_var_1()
+            .filter(|&(_, k)| k != 0)
+            .map(|(p, k)| (p.compose_power_of_x(k), k)),
+    )
 }
 
 pub fn exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_1()

@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content::register(runner);
     div_power_of_x::register(runner);
     evaluate::register(runner);
+    deflate_power_of_x::register(runner);
     exponent_gcd::register(runner);
     height::register(runner);
     is_unit::register(runner);
@@ -37,6 +38,7 @@ pub(crate) fn register(runner: &mut Runner) {
 mod canonicalize_unit;
 mod compose_power_of_x;
 mod content;
+mod deflate_power_of_x;
 mod div_power_of_x;
 mod evaluate;
 mod exponent_gcd;

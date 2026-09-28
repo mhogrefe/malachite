@@ -42,6 +42,7 @@ use malachite_base::num::exhaustive::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::options::exhaustive::exhaustive_options;
+use malachite_base::polynomial::ComposePowerOfX;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};
@@ -1116,4 +1117,12 @@ pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_1() -> It<(RationalP
         exhaustive_rational_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_2() -> It<(RationalPolynomial, u64)> {
+    Box::new(
+        exhaustive_rational_polynomial_unsigned_pair_gen_var_1()
+            .filter(|&(_, k)| k != 0)
+            .map(|(p, k)| (p.compose_power_of_x(k), k)),
+    )
 }
