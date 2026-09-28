@@ -41,7 +41,7 @@ pub mod random;
 /// The field is private, since not every [`Vec`] of `T`s is one:
 /// [`from_coefficients_asc`](UnsignedPolynomial::from_coefficients_asc) is how a [`Vec`] becomes
 /// one.
-#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[derive(Clone, Default, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(
     feature = "serde",

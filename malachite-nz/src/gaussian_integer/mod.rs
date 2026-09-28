@@ -32,7 +32,7 @@ use malachite_base::num::basic::traits::{I, NegativeI, NegativeOne, One, Two, Ze
 ///
 /// The fields are public, since every combination of real and imaginary parts is a valid Gaussian
 /// integer.
-#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[derive(Clone, Default, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct GaussianInteger {
     pub real: Integer,

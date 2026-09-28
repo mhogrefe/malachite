@@ -49,7 +49,7 @@ pub(crate) static ZERO: Integer = Integer::ZERO;
 /// The field is private, since not every [`Vec`] of [`Integer`]s is one:
 /// [`from_coefficients_asc`](IntegerPolynomial::from_coefficients_asc) is how a [`Vec`] becomes
 /// one.
-#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[derive(Clone, Default, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(
     feature = "serde",

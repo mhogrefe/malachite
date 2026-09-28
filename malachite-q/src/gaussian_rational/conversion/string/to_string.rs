@@ -10,7 +10,7 @@ use crate::Rational;
 use crate::gaussian_rational::{
     ComparableGaussianRational, ComparableGaussianRationalRef, GaussianRational,
 };
-use core::fmt::{Display, Formatter, Result, Write};
+use core::fmt::{Debug, Display, Formatter, Result, Write};
 
 // Writes the imaginary term of a nonzero imaginary part, without its sign: the absolute value of
 // the numerator directly followed by 'i', then the denominator if it is not 1. Numerators of 1 are
@@ -94,6 +94,42 @@ impl Display for GaussianRational {
             f.write_char('-')?;
         }
         fmt_unsigned_imaginary_term(&self.imaginary, f)
+    }
+}
+
+impl Debug for GaussianRational {
+    /// Converts a [`GaussianRational`] to a [`String`].
+    ///
+    /// This is the same as the [`Display::fmt`] implementation, so that a collection of
+    /// [`GaussianRational`]s is written the same way its elements are displayed.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the real and imaginary parts.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_q::gaussian_rational::GaussianRational;
+    ///
+    /// let xs = vec![
+    ///     GaussianRational::from_str("1/2-3i/4").unwrap(),
+    ///     GaussianRational::from_str("i").unwrap(),
+    ///     GaussianRational::from_str("-5").unwrap(),
+    /// ];
+    /// assert_eq!(xs[0].to_debug_string(), "1/2-3i/4");
+    /// assert_eq!(xs[1].to_debug_string(), "i");
+    /// assert_eq!(xs[2].to_debug_string(), "-5");
+    /// assert_eq!(xs.to_debug_string(), "[1/2-3i/4, i, -5]");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(self, f)
     }
 }
 

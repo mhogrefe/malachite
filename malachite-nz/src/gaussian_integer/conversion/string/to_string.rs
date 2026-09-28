@@ -9,7 +9,7 @@
 use crate::gaussian_integer::{
     ComparableGaussianInteger, ComparableGaussianIntegerRef, GaussianInteger,
 };
-use core::fmt::{Display, Formatter, Result, Write};
+use core::fmt::{Debug, Display, Formatter, Result, Write};
 
 impl Display for GaussianInteger {
     /// Converts a [`GaussianInteger`] to a [`String`].
@@ -81,6 +81,42 @@ impl Display for GaussianInteger {
             Display::fmt(&self.imaginary, f)?;
             f.write_char('i')
         }
+    }
+}
+
+impl Debug for GaussianInteger {
+    /// Converts a [`GaussianInteger`] to a [`String`].
+    ///
+    /// This is the same as the [`Display::fmt`] implementation, so that a collection of
+    /// [`GaussianInteger`]s is written the same way its elements are displayed.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the real and imaginary parts.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
+    ///
+    /// let xs = vec![
+    ///     GaussianInteger::from_str("2-3i").unwrap(),
+    ///     GaussianInteger::from_str("i").unwrap(),
+    ///     GaussianInteger::from_str("-5").unwrap(),
+    /// ];
+    /// assert_eq!(xs[0].to_debug_string(), "2-3i");
+    /// assert_eq!(xs[1].to_debug_string(), "i");
+    /// assert_eq!(xs[2].to_debug_string(), "-5");
+    /// assert_eq!(xs.to_debug_string(), "[2-3i, i, -5]");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(self, f)
     }
 }
 

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural_polynomial::NaturalPolynomial;
-use core::fmt::{Display, Formatter, Result, Write};
+use core::fmt::{Debug, Display, Formatter, Result, Write};
 use malachite_base::strings::latex::ToLatex;
 use malachite_base::strings::typst::ToTypst;
 use malachite_base::vars::xyz::XyzVars;
@@ -145,5 +145,41 @@ impl Display for NaturalPolynomial {
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
         self.write_with_var(Var::new(&XyzVars, 0), Language::Plain, f)
+    }
+}
+
+impl Debug for NaturalPolynomial {
+    /// Converts a [`NaturalPolynomial`] to a [`String`].
+    ///
+    /// This is the same as the [`Display::fmt`] implementation, so that a collection of
+    /// [`NaturalPolynomial`]s is written the same way its elements are displayed.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the sum of the bits of the
+    /// coefficients.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// let xs = vec![
+    ///     NaturalPolynomial::from_str("x^2+3*x+2").unwrap(),
+    ///     NaturalPolynomial::from_str("0").unwrap(),
+    ///     NaturalPolynomial::from_str("5").unwrap(),
+    /// ];
+    /// assert_eq!(xs[0].to_debug_string(), "x^2+3*x+2");
+    /// assert_eq!(xs[1].to_debug_string(), "0");
+    /// assert_eq!(xs[2].to_debug_string(), "5");
+    /// assert_eq!(xs.to_debug_string(), "[x^2+3*x+2, 0, 5]");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(self, f)
     }
 }

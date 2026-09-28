@@ -57,7 +57,7 @@ pub mod conversion;
 /// Trailing zero coefficients are not held at all, so the zero polynomial has no coefficients and
 /// every other polynomial's leading coefficient is nonzero. The zero polynomial's denominator is 1.
 /// Together these make a polynomial's representation unique, which is what lets [`Eq`] be derived.
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(
     feature = "serde",

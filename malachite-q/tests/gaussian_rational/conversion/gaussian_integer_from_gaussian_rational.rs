@@ -26,11 +26,11 @@ fn test_try_from_gaussian_rational() {
         let og = GaussianInteger::try_from(&x);
         assert_eq!(og.to_debug_string(), out);
     };
-    test("0", "Ok(GaussianInteger { real: 0, imaginary: 0 })");
-    test("123", "Ok(GaussianInteger { real: 123, imaginary: 0 })");
-    test("-123", "Ok(GaussianInteger { real: -123, imaginary: 0 })");
-    test("i", "Ok(GaussianInteger { real: 0, imaginary: 1 })");
-    test("2-3i", "Ok(GaussianInteger { real: 2, imaginary: -3 })");
+    test("0", "Ok(0)");
+    test("123", "Ok(123)");
+    test("-123", "Ok(-123)");
+    test("i", "Ok(i)");
+    test("2-3i", "Ok(2-3i)");
     test("22/7", "Err(GaussianIntegerFromGaussianRationalError)");
     test("i/2", "Err(GaussianIntegerFromGaussianRationalError)");
     test("2/3-5i/6", "Err(GaussianIntegerFromGaussianRationalError)");

@@ -10,6 +10,11 @@ documented by git history.
 
 ### Breaking and behavioral changes
 
+- `Debug` for `GaussianInteger`, `GaussianRational`, `UnsignedPolynomial<T>`, `NaturalPolynomial`,
+  `IntegerPolynomial`, and `RationalPolynomial` is now the same as `Display`, as it already was for
+  `Natural`, `Integer`, and `Rational`, so that a `Vec` of them is written as, for example,
+  `[x^2-3*x+2, 0, -5]` rather than as a list of structs. They used to derive `Debug`, which wrote
+  out the fields, as in `GaussianInteger { real: 2, imaginary: -3 }`. `Float` is unchanged.
 - `Rational::to_height`, `Rational::into_height`, and `Rational::height_significant_bits` are no
   longer inherent methods; they are now the methods of the new `Height` trait, which several other
   types also implement. Code that calls them needs

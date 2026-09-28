@@ -12,7 +12,7 @@ use crate::strings::typst::ToTypst;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::vars::xyz::XyzVars;
 use crate::vars::{Var, VarScheme};
-use core::fmt::{Display, Formatter, Result, Write};
+use core::fmt::{Debug, Display, Formatter, Result, Write};
 
 // The languages a polynomial can be written in.
 //
@@ -167,5 +167,41 @@ impl<T: PrimitiveUnsigned> Display for UnsignedPolynomial<T> {
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
         self.write_with_var(Var::new(&XyzVars, 0), Language::Plain, f)
+    }
+}
+
+impl<T: PrimitiveUnsigned> Debug for UnsignedPolynomial<T> {
+    /// Converts an [`UnsignedPolynomial`] to a [`String`].
+    ///
+    /// This is the same as the [`Display::fmt`] implementation, so that a collection of
+    /// [`UnsignedPolynomial`]s is written the same way its elements are displayed.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the sum of the bits of the
+    /// coefficients.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// let xs = vec![
+    ///     UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap(),
+    ///     UnsignedPolynomial::<u8>::from_str("0").unwrap(),
+    ///     UnsignedPolynomial::<u8>::from_str("5").unwrap(),
+    /// ];
+    /// assert_eq!(xs[0].to_debug_string(), "x^2+3*x+2");
+    /// assert_eq!(xs[1].to_debug_string(), "0");
+    /// assert_eq!(xs[2].to_debug_string(), "5");
+    /// assert_eq!(xs.to_debug_string(), "[x^2+3*x+2, 0, 5]");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(self, f)
     }
 }

@@ -8,7 +8,7 @@
 
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
-use core::fmt::{Display, Formatter, Result, Write};
+use core::fmt::{Debug, Display, Formatter, Result, Write};
 use malachite_base::strings::latex::ToLatex;
 use malachite_base::strings::typst::ToTypst;
 use malachite_base::vars::xyz::XyzVars;
@@ -168,5 +168,41 @@ impl Display for RationalPolynomial {
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
         self.write_with_var(Var::new(&XyzVars, 0), Language::Plain, f)
+    }
+}
+
+impl Debug for RationalPolynomial {
+    /// Converts a [`RationalPolynomial`] to a [`String`].
+    ///
+    /// This is the same as the [`Display::fmt`] implementation, so that a collection of
+    /// [`RationalPolynomial`]s is written the same way its elements are displayed.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the sum of the bits of the
+    /// coefficients.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_q::rational_polynomial::RationalPolynomial;
+    ///
+    /// let xs = vec![
+    ///     RationalPolynomial::from_str("1/2*x^2-1/3").unwrap(),
+    ///     RationalPolynomial::from_str("0").unwrap(),
+    ///     RationalPolynomial::from_str("-5").unwrap(),
+    /// ];
+    /// assert_eq!(xs[0].to_debug_string(), "1/2*x^2-1/3");
+    /// assert_eq!(xs[1].to_debug_string(), "0");
+    /// assert_eq!(xs[2].to_debug_string(), "-5");
+    /// assert_eq!(xs.to_debug_string(), "[1/2*x^2-1/3, 0, -5]");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(self, f)
     }
 }
