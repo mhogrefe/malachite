@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::arithmetic::traits::{Gcd, GcdAssign};
+use crate::num::conversion::traits::ExactFrom;
 use crate::vars::{Var, VarScheme};
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -488,6 +490,59 @@ pub trait ComposePowerOfXAssign {
     /// p \gets p(x^k).
     /// $$
     fn compose_power_of_x_assign(&mut self, k: u64);
+}
+
+/// Computes the greatest common divisor of the exponents at which a polynomial has nonzero
+/// coefficients.
+///
+/// This is the largest $k$ such that $p(x) = q(x^k)$ for some polynomial $q$, when $p$ is not
+/// constant. A constant polynomial, including zero, gives 0: its only exponent with a nonzero
+/// coefficient, if any, is 0, and the GCD of $\\{0\\}$ and of the empty set are both 0.
+pub trait ExponentGcd {
+    /// Computes the greatest common divisor of the exponents at which a polynomial has nonzero
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p) = \gcd \\{i : p_i \neq 0\\}.
+    /// $$
+    fn exponent_gcd(&self) -> u64;
+}
+
+// Computes the GCD of the indices of the elements of `xs` that are not zero, where `xs` holds a
+// polynomial's coefficients in ascending order with a nonzero last element, if any.
+//
+// The index of the last element always takes part, so the search starts from the GCD of it and the
+// first nonzero index after 0. From then on, only the indices that are not multiples of the current
+// GCD can lower it, so each block of `gcd` indices is scanned but for its last one; the search
+// stops as soon as the GCD is 1.
+//
+// This is equivalent to `_fmpz_poly_deflation` from `fmpz_poly/deflation.c`, FLINT 3.6.0, except
+// that a constant gives 0 rather than 1.
+#[doc(hidden)]
+pub fn slice_exponent_gcd<T>(xs: &[T], is_zero: impl Fn(&T) -> bool) -> u64 {
+    let len = xs.len();
+    if len <= 1 {
+        return 0;
+    }
+    let mut i = 1;
+    while is_zero(&xs[i]) {
+        i += 1;
+    }
+    let mut gcd = (len - 1).gcd(i);
+    while gcd > 1 && i + gcd < len {
+        let mut j = 0;
+        while j + 1 < gcd {
+            i += 1;
+            if !is_zero(&xs[i]) {
+                gcd.gcd_assign(i);
+            }
+            j += 1;
+        }
+        if j + 1 == gcd {
+            i += 1;
+        }
+    }
+    u64::exact_from(gcd)
 }
 
 // Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending

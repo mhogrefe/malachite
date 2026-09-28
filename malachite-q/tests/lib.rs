@@ -170,6 +170,7 @@ pub mod rational_polynomial {
         pub mod content;
         pub mod div_power_of_x;
         pub mod evaluate;
+        pub mod exponent_gcd;
         pub mod height;
         pub mod is_unit;
         pub mod l2_norm_squared;

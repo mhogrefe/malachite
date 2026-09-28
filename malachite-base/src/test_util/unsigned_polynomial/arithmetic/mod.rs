@@ -9,6 +9,7 @@
 pub mod compose_power_of_x;
 pub mod div_power_of_x;
 pub mod evaluate;
+pub mod exponent_gcd;
 pub mod mod_add;
 pub mod mod_add_truncated;
 pub mod mod_power_of_2_add;

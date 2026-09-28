@@ -12,6 +12,7 @@ pub mod compose_power_of_x;
 pub mod content_chained;
 pub mod div_power_of_x;
 pub mod evaluate;
+pub mod exponent_gcd;
 pub mod l2_norm_squared;
 pub mod mul_power_of_x;
 pub mod scalar_add_mul;

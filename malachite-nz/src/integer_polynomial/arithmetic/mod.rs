@@ -45,6 +45,9 @@ pub mod div_power_of_x;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
 /// polynomial at a value.
 pub mod evaluate;
+/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
+/// common divisor of the exponents at which a polynomial has nonzero coefficients.
+pub mod exponent_gcd;
 /// An implementation of [`FloorL2Norm`](malachite_base::polynomial::FloorL2Norm), the floor of a
 /// polynomial's $L^2$ norm.
 pub mod floor_l2_norm;

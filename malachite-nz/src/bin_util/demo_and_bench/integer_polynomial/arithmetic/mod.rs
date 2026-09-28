@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     div_exact::register(runner);
     div_power_of_x::register(runner);
     evaluate::register(runner);
+    exponent_gcd::register(runner);
     floor_l2_norm::register(runner);
     height::register(runner);
     is_unit::register(runner);
@@ -43,6 +44,7 @@ mod content_chained;
 mod div_exact;
 mod div_power_of_x;
 mod evaluate;
+mod exponent_gcd;
 mod floor_l2_norm;
 mod height;
 mod is_unit;

@@ -362,6 +362,12 @@ documented by git history.
   all four polynomial types, taking the polynomial by value or by reference. With $k = 0$ the result
   is the constant $p(1)$; for `UnsignedPolynomial<T>` this panics if the sum of the coefficients
   overflows `T`, and it is never reduced modulo anything.
+- A new `ExponentGcd` trait, in `malachite_base::polynomial`, whose `exponent_gcd` gives the
+  greatest common divisor of the exponents at which a polynomial has nonzero coefficients: the
+  largest $k$ such that $p(x) = q(x^k)$, when $p$ is not constant. It is like FLINT's
+  `fmpz_poly_deflation`, `fmpz_mod_poly_deflation`, and `nmod_poly_deflation`, except that a
+  nonzero constant gives 0 rather than 1, so the result is 0 exactly for the constants. It is
+  implemented for all four polynomial types.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

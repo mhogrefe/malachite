@@ -11,6 +11,7 @@ pub mod add_truncated;
 pub mod compose_power_of_x;
 pub mod div_power_of_x;
 pub mod evaluate;
+pub mod exponent_gcd;
 pub mod l2_norm_squared;
 pub mod mod_add;
 pub mod mod_add_truncated;
