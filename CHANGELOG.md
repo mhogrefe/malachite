@@ -349,6 +349,13 @@ documented by git history.
   `nmod_poly_shift_left`. They are implemented for all four polynomial types, taking the polynomial
   by value or by reference. The name avoids "shift", since `<<` throughout Malachite scales by a
   power of 2.
+- New `DivPowerOfX` and `DivPowerOfXAssign` traits, in `malachite_base::polynomial`, which divide a
+  polynomial by $x^n$ and discard the remainder, dropping the lowest $n$ coefficients, like FLINT's
+  `fmpz_poly_shift_right`, `fmpq_poly_shift_right`, `fmpz_mod_poly_shift_right`, and
+  `nmod_poly_shift_right`. They are implemented for all four polynomial types, taking the
+  polynomial by value or by reference. A `RationalPolynomial` result is reduced to lowest terms,
+  since the dropped coefficients can be the ones that kept the numerator coprime to the
+  denominator.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

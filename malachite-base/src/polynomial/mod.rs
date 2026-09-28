@@ -440,6 +440,30 @@ pub trait MulPowerOfXAssign {
     fn mul_power_of_x_assign(&mut self, n: u64);
 }
 
+/// Divides a polynomial by $x^n$, discarding the remainder: every coefficient moves down by $n$
+/// places, and the lowest $n$ are dropped.
+pub trait DivPowerOfX {
+    type Output;
+
+    /// Divides a polynomial by $x^n$, discarding the remainder.
+    ///
+    /// $$
+    /// f(p, n) = \sum_{i \geq n} p_ix^{i-n}.
+    /// $$
+    fn div_power_of_x(self, n: u64) -> Self::Output;
+}
+
+/// Divides a polynomial by $x^n$ in place, discarding the remainder: every coefficient moves down
+/// by $n$ places, and the lowest $n$ are dropped.
+pub trait DivPowerOfXAssign {
+    /// Divides a polynomial by $x^n$ in place, discarding the remainder.
+    ///
+    /// $$
+    /// p \gets \sum_{i \geq n} p_ix^{i-n}.
+    /// $$
+    fn div_power_of_x_assign(&mut self, n: u64);
+}
+
 // Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending
 // order, agree below index `len`.
 //

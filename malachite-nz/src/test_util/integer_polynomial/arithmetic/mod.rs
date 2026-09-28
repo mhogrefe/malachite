@@ -9,6 +9,7 @@
 pub mod add;
 pub mod add_truncated;
 pub mod content_chained;
+pub mod div_power_of_x;
 pub mod evaluate;
 pub mod l2_norm_squared;
 pub mod mul_power_of_x;

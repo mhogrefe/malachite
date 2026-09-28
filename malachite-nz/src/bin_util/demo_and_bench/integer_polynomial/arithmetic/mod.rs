@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content::register(runner);
     content_chained::register(runner);
     div_exact::register(runner);
+    div_power_of_x::register(runner);
     evaluate::register(runner);
     floor_l2_norm::register(runner);
     height::register(runner);
@@ -38,6 +39,7 @@ mod canonicalize_unit;
 mod content;
 mod content_chained;
 mod div_exact;
+mod div_power_of_x;
 mod evaluate;
 mod floor_l2_norm;
 mod height;

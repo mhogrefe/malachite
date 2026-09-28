@@ -23,6 +23,10 @@ pub mod canonicalize_unit;
 /// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart) for
 /// [`RationalPolynomial`](super::RationalPolynomial)s.
 pub mod content;
+/// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
+/// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
+/// by a power of its variable and discarding the remainder.
+pub mod div_power_of_x;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate) for
 /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s and
 /// [`RationalPolynomial`](super::RationalPolynomial)s at [`Rational`](crate::Rational)s, and for

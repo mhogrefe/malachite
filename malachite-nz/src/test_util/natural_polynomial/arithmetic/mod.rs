@@ -8,6 +8,7 @@
 
 pub mod add;
 pub mod add_truncated;
+pub mod div_power_of_x;
 pub mod evaluate;
 pub mod l2_norm_squared;
 pub mod mod_add;

@@ -34,6 +34,10 @@ pub mod content_chained;
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), for dividing a
 /// polynomial by an [`Integer`](crate::integer::Integer) that divides every coefficient.
 pub mod div_exact;
+/// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
+/// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
+/// by a power of its variable and discarding the remainder.
+pub mod div_power_of_x;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
 /// polynomial at a value.
 pub mod evaluate;

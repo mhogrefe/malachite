@@ -874,6 +874,7 @@ pub mod unsigned_polynomial {
     pub mod arithmetic {
         pub mod canonicalize_unit;
         pub mod content;
+        pub mod div_power_of_x;
         pub mod evaluate;
         pub mod height;
         pub mod is_unit;

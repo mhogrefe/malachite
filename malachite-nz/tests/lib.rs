@@ -562,6 +562,7 @@ pub mod integer_polynomial {
         pub mod content;
         pub mod content_chained;
         pub mod div_exact;
+        pub mod div_power_of_x;
         pub mod evaluate;
         pub mod floor_l2_norm;
         pub mod height;
@@ -633,6 +634,7 @@ pub mod natural_polynomial {
         pub mod balanced_mod;
         pub mod canonicalize_unit;
         pub mod content;
+        pub mod div_power_of_x;
         pub mod evaluate;
         pub mod floor_l2_norm;
         pub mod height;

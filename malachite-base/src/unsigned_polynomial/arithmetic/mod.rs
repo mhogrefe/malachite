@@ -16,6 +16,10 @@ pub mod canonicalize_unit;
 /// [`ContentAndPrimitivePart`](crate::polynomial::ContentAndPrimitivePart), which compute the GCD
 /// of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
+/// Implementations of [`DivPowerOfX`](crate::polynomial::DivPowerOfX) and
+/// [`DivPowerOfXAssign`](crate::polynomial::DivPowerOfXAssign), for dividing a polynomial by a
+/// power of its variable and discarding the remainder.
+pub mod div_power_of_x;
 /// Implementations of [`ModEvaluate`](crate::polynomial::ModEvaluate) and
 /// [`ModPowerOf2Evaluate`](crate::polynomial::ModPowerOf2Evaluate), which evaluate a polynomial at
 /// a value modulo a value or a power of 2.

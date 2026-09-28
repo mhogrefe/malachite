@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     canonicalize_unit::register(runner);
     content::register(runner);
+    div_power_of_x::register(runner);
     evaluate::register(runner);
     height::register(runner);
     is_unit::register(runner);
@@ -33,6 +34,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod canonicalize_unit;
 mod content;
+mod div_power_of_x;
 mod evaluate;
 mod height;
 mod is_unit;

@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add_truncated::register(runner);
     canonicalize_unit::register(runner);
     content::register(runner);
+    div_power_of_x::register(runner);
     evaluate::register(runner);
     height::register(runner);
     is_unit::register(runner);
@@ -28,6 +29,7 @@ mod add;
 mod add_truncated;
 mod canonicalize_unit;
 mod content;
+mod div_power_of_x;
 mod evaluate;
 mod height;
 mod is_unit;

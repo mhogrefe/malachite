@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     balanced_mod::register(runner);
     canonicalize_unit::register(runner);
     content::register(runner);
+    div_power_of_x::register(runner);
     evaluate::register(runner);
     floor_l2_norm::register(runner);
     height::register(runner);
@@ -41,6 +42,7 @@ mod add_truncated;
 mod balanced_mod;
 mod canonicalize_unit;
 mod content;
+mod div_power_of_x;
 mod evaluate;
 mod floor_l2_norm;
 mod height;
