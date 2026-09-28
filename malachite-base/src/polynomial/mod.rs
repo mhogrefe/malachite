@@ -390,6 +390,34 @@ pub trait ModSubTruncatedAssign<Rhs = Self, M = Self> {
     fn mod_sub_truncated_assign(&mut self, other: Rhs, len: u64, m: M);
 }
 
+/// Computes the square of a polynomial's $L^2$ norm: the sum of the squares of its coefficients.
+///
+/// This is exact, unlike the norm itself, which is usually irrational.
+pub trait L2NormSquared {
+    type Output;
+
+    /// Computes the sum of the squares of a polynomial's coefficients.
+    ///
+    /// $$
+    /// f(p) = \sum_i p_i^2.
+    /// $$
+    fn l2_norm_squared(self) -> Self::Output;
+}
+
+/// Computes the floor of a polynomial's $L^2$ norm: the floor of the square root of the sum of the
+/// squares of its coefficients.
+pub trait FloorL2Norm {
+    type Output;
+
+    /// Computes the floor of the square root of the sum of the squares of a polynomial's
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p) = \left \lfloor \sqrt{\sum_i p_i^2} \right \rfloor.
+    /// $$
+    fn floor_l2_norm(self) -> Self::Output;
+}
+
 // Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending
 // order, agree below index `len`.
 //

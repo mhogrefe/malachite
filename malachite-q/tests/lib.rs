@@ -170,6 +170,7 @@ pub mod rational_polynomial {
         pub mod evaluate;
         pub mod height;
         pub mod is_unit;
+        pub mod l2_norm_squared;
         pub mod make_monic;
         pub mod neg;
         pub mod sub;

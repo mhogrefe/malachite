@@ -563,8 +563,10 @@ pub mod integer_polynomial {
         pub mod content_chained;
         pub mod div_exact;
         pub mod evaluate;
+        pub mod floor_l2_norm;
         pub mod height;
         pub mod is_unit;
+        pub mod l2_norm_squared;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod neg;
@@ -631,8 +633,10 @@ pub mod natural_polynomial {
         pub mod canonicalize_unit;
         pub mod content;
         pub mod evaluate;
+        pub mod floor_l2_norm;
         pub mod height;
         pub mod is_unit;
+        pub mod l2_norm_squared;
         pub mod mod_add;
         pub mod mod_add_truncated;
         pub mod mod_is_reduced;

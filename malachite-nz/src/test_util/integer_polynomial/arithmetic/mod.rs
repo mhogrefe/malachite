@@ -10,6 +10,7 @@ pub mod add;
 pub mod add_truncated;
 pub mod content_chained;
 pub mod evaluate;
+pub mod l2_norm_squared;
 pub mod scalar_add_mul;
 pub mod scalar_mul;
 pub mod sub;

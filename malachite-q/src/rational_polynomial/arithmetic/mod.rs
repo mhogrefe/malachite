@@ -35,6 +35,9 @@ pub mod height;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
+/// An implementation of [`L2NormSquared`](malachite_base::polynomial::L2NormSquared), the sum of
+/// the squares of a polynomial's coefficients.
+pub mod l2_norm_squared;
 /// Implementations of [`MakeMonic`](malachite_base::polynomial::MakeMonic) and
 /// [`MakeMonicAssign`](malachite_base::polynomial::MakeMonicAssign), which divide a polynomial by
 /// its leading coefficient.

@@ -6,15 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod add;
-pub mod add_truncated;
-pub mod evaluate;
-pub mod l2_norm_squared;
-pub mod mod_add;
-pub mod mod_add_truncated;
-pub mod mod_power_of_2_add;
-pub mod mod_power_of_2_add_truncated;
-pub mod mod_power_of_2_sub;
-pub mod mod_power_of_2_sub_truncated;
-pub mod mod_sub;
-pub mod mod_sub_truncated;
+use crate::natural::Natural;
+use crate::natural_polynomial::NaturalPolynomial;
+use malachite_base::num::arithmetic::traits::Square;
+
+// Sums the squares of the coefficients. Nothing is shared with the implementation.
+pub fn l2_norm_squared_naive(p: &NaturalPolynomial) -> Natural {
+    p.coefficients_asc().iter().map(Square::square).sum()
+}

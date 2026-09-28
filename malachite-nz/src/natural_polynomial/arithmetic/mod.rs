@@ -33,6 +33,9 @@ pub mod content;
 /// [`ModPowerOf2Evaluate`](malachite_base::polynomial::ModPowerOf2Evaluate), which does so modulo a
 /// power of 2.
 pub mod evaluate;
+/// An implementation of [`FloorL2Norm`](malachite_base::polynomial::FloorL2Norm), the floor of a
+/// polynomial's $L^2$ norm.
+pub mod floor_l2_norm;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
 /// of a polynomial's coefficients.
@@ -40,6 +43,9 @@ pub mod height;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
+/// An implementation of [`L2NormSquared`](malachite_base::polynomial::L2NormSquared), the sum of
+/// the squares of a polynomial's coefficients.
+pub mod l2_norm_squared;
 /// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding two
 /// polynomials modulo a [`Natural`](crate::natural::Natural).

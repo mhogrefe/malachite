@@ -343,6 +343,11 @@ documented by git history.
   `fmpz_poly_equal_trunc`, without building either truncation. It is implemented for each of
   `UnsignedPolynomial`, `NaturalPolynomial`, `IntegerPolynomial`, and `RationalPolynomial` against
   itself and, in both orders, against each of the others.
+- New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
+  the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
+  `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a
+  `Natural` result, and `L2NormSquared` also for `&RationalPolynomial`, with an exact `Rational`
+  result.
 - New `AddTruncated`, `AddTruncatedAssign`, `SubTruncated`, and `SubTruncatedAssign` traits, in
   `malachite_base::polynomial`, which add or subtract two polynomials and keep only the
   coefficients below $x^{len}$, like FLINT's `fmpz_poly_add_series` and `fmpz_poly_sub_series`.

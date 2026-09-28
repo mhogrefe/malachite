@@ -10,5 +10,6 @@ pub mod add;
 pub mod add_truncated;
 pub mod evaluate;
 pub mod height;
+pub mod l2_norm_squared;
 pub mod sub;
 pub mod sub_truncated;
