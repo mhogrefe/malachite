@@ -26,7 +26,8 @@ impl AddTruncated<Self> for IntegerPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -80,7 +81,8 @@ impl AddTruncated<&Self> for IntegerPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -133,7 +135,8 @@ impl AddTruncated<IntegerPolynomial> for &IntegerPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -184,7 +187,8 @@ impl AddTruncated<&IntegerPolynomial> for &IntegerPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -232,7 +236,8 @@ impl AddTruncatedAssign<Self> for IntegerPolynomial {
     /// p \gets (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -276,7 +281,8 @@ impl AddTruncatedAssign<&Self> for IntegerPolynomial {
     /// p \gets (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity

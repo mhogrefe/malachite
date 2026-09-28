@@ -417,6 +417,21 @@ pub fn exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1(
     )
 }
 
+pub fn exhaustive_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_1()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64, Natural)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_natural_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+            exhaustive_naturals(),
+        )
+        .map(|(p, q, len, m)| {
+            let m = max(p.height_ref(), q.height_ref()) + m + Natural::ONE;
+            (p, q, len, m)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_1()
 -> It<(NaturalPolynomial, NaturalPolynomial, Natural)> {
     Box::new(

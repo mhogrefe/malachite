@@ -146,9 +146,10 @@ impl AddTruncated<Self> for RationalPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is kept in lowest
-    /// terms: cutting a polynomial can remove the coefficients that kept its numerator coprime to
-    /// its denominator, so when anything is cut, the whole common factor of the new numerator and
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is kept in lowest terms:
+    /// cutting a polynomial can remove the coefficients that kept its numerator coprime to its
+    /// denominator, so when anything is cut, the whole common factor of the new numerator and
     /// denominator is divided out. The sum is also trimmed.
     ///
     /// # Worst-case complexity
@@ -205,9 +206,10 @@ impl AddTruncated<&Self> for RationalPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is kept in lowest
-    /// terms: cutting a polynomial can remove the coefficients that kept its numerator coprime to
-    /// its denominator, so when anything is cut, the whole common factor of the new numerator and
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is kept in lowest terms:
+    /// cutting a polynomial can remove the coefficients that kept its numerator coprime to its
+    /// denominator, so when anything is cut, the whole common factor of the new numerator and
     /// denominator is divided out. The sum is also trimmed.
     ///
     /// # Worst-case complexity
@@ -264,9 +266,10 @@ impl AddTruncated<RationalPolynomial> for &RationalPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is kept in lowest
-    /// terms: cutting a polynomial can remove the coefficients that kept its numerator coprime to
-    /// its denominator, so when anything is cut, the whole common factor of the new numerator and
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is kept in lowest terms:
+    /// cutting a polynomial can remove the coefficients that kept its numerator coprime to its
+    /// denominator, so when anything is cut, the whole common factor of the new numerator and
     /// denominator is divided out. The sum is also trimmed.
     ///
     /// # Worst-case complexity
@@ -321,9 +324,10 @@ impl AddTruncated<&RationalPolynomial> for &RationalPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is kept in lowest
-    /// terms: cutting a polynomial can remove the coefficients that kept its numerator coprime to
-    /// its denominator, so when anything is cut, the whole common factor of the new numerator and
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is kept in lowest terms:
+    /// cutting a polynomial can remove the coefficients that kept its numerator coprime to its
+    /// denominator, so when anything is cut, the whole common factor of the new numerator and
     /// denominator is divided out. The sum is also trimmed.
     ///
     /// # Worst-case complexity
@@ -378,9 +382,10 @@ impl AddTruncatedAssign<Self> for RationalPolynomial {
     /// p \gets (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is kept in lowest
-    /// terms: cutting a polynomial can remove the coefficients that kept its numerator coprime to
-    /// its denominator, so when anything is cut, the whole common factor of the new numerator and
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is kept in lowest terms:
+    /// cutting a polynomial can remove the coefficients that kept its numerator coprime to its
+    /// denominator, so when anything is cut, the whole common factor of the new numerator and
     /// denominator is divided out. The sum is also trimmed.
     ///
     /// # Worst-case complexity
@@ -428,9 +433,10 @@ impl AddTruncatedAssign<&Self> for RationalPolynomial {
     /// p \gets (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is kept in lowest
-    /// terms: cutting a polynomial can remove the coefficients that kept its numerator coprime to
-    /// its denominator, so when anything is cut, the whole common factor of the new numerator and
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is kept in lowest terms:
+    /// cutting a polynomial can remove the coefficients that kept its numerator coprime to its
+    /// denominator, so when anything is cut, the whole common factor of the new numerator and
     /// denominator is divided out. The sum is also trimmed.
     ///
     /// # Worst-case complexity

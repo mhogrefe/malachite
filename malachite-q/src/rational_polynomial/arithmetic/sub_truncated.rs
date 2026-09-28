@@ -49,7 +49,8 @@ impl SubTruncated<Self> for RationalPolynomial {
     /// f(p, q, n) = (p - q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The difference is kept in
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. The difference is kept in
     /// lowest terms: cutting a polynomial can remove the coefficients that kept its numerator
     /// coprime to its denominator, so when anything is cut, the whole common factor of the new
     /// numerator and denominator is divided out. The difference is also trimmed.
@@ -108,7 +109,8 @@ impl SubTruncated<&Self> for RationalPolynomial {
     /// f(p, q, n) = (p - q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The difference is kept in
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. The difference is kept in
     /// lowest terms: cutting a polynomial can remove the coefficients that kept its numerator
     /// coprime to its denominator, so when anything is cut, the whole common factor of the new
     /// numerator and denominator is divided out. The difference is also trimmed.
@@ -167,7 +169,8 @@ impl SubTruncated<RationalPolynomial> for &RationalPolynomial {
     /// f(p, q, n) = (p - q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The difference is kept in
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. The difference is kept in
     /// lowest terms: cutting a polynomial can remove the coefficients that kept its numerator
     /// coprime to its denominator, so when anything is cut, the whole common factor of the new
     /// numerator and denominator is divided out. The difference is also trimmed.
@@ -224,7 +227,8 @@ impl SubTruncated<&RationalPolynomial> for &RationalPolynomial {
     /// f(p, q, n) = (p - q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The difference is kept in
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. The difference is kept in
     /// lowest terms: cutting a polynomial can remove the coefficients that kept its numerator
     /// coprime to its denominator, so when anything is cut, the whole common factor of the new
     /// numerator and denominator is divided out. The difference is also trimmed.
@@ -281,7 +285,8 @@ impl SubTruncatedAssign<Self> for RationalPolynomial {
     /// p \gets (p - q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The difference is kept in
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. The difference is kept in
     /// lowest terms: cutting a polynomial can remove the coefficients that kept its numerator
     /// coprime to its denominator, so when anything is cut, the whole common factor of the new
     /// numerator and denominator is divided out. The difference is also trimmed.
@@ -331,7 +336,8 @@ impl SubTruncatedAssign<&Self> for RationalPolynomial {
     /// p \gets (p - q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The difference is kept in
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. The difference is kept in
     /// lowest terms: cutting a polynomial can remove the coefficients that kept its numerator
     /// coprime to its denominator, so when anything is cut, the whole common factor of the new
     /// numerator and denominator is divided out. The difference is also trimmed.

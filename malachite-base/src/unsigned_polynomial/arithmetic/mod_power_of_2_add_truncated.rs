@@ -29,7 +29,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddTruncated<Self> for UnsignedPolynomial<
     /// f(p, q, n, k) = ((p + q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -98,7 +99,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddTruncated<&Self> for UnsignedPolynomial
     /// f(p, q, n, k) = ((p + q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -172,7 +174,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddTruncated<UnsignedPolynomial<T>>
     /// f(p, q, n, k) = ((p + q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -249,7 +252,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddTruncated<&UnsignedPolynomial<T>>
     /// f(p, q, n, k) = ((p + q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -319,7 +323,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddTruncatedAssign<Self> for UnsignedPolyn
     /// p \gets ((p + q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity
@@ -378,7 +383,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddTruncatedAssign<&Self> for UnsignedPoly
     /// p \gets ((p + q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. The sum is trimmed, so when
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. The sum is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
     /// # Worst-case complexity

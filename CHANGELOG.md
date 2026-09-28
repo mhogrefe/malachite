@@ -355,6 +355,13 @@ documented by git history.
   implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial`, taking each operand by value or
   by reference. As for every modular operation, both operands must already be reduced, and this is
   checked for the whole of each, not only the part that is kept.
+- New `ModAddTruncated`, `ModAddTruncatedAssign`, `ModSubTruncated`, and `ModSubTruncatedAssign`
+  traits, in `malachite_base::polynomial`, which add or subtract two polynomials modulo $m$ and keep
+  only the coefficients below $x^{len}$, taking `(other, len, m)`, like FLINT's
+  `nmod_poly_add_series` and `nmod_poly_sub_series`, and `fmpz_mod_poly_add_series` and
+  `fmpz_mod_poly_sub_series`. They are implemented for `UnsignedPolynomial<T>` modulo a `T` and
+  `NaturalPolynomial` modulo a `Natural`, taking each polynomial, and a `Natural` modulus, by value
+  or by reference. Both operands must already be reduced, and this is checked for the whole of each.
 - A new `Evaluate` trait, in `malachite_base::polynomial`, whose `evaluate` substitutes a value for
   a polynomial's variable; the value's type decides the result's, through an associated `Output`
   type. It is implemented for `&IntegerPolynomial` at an `Integer` and for `&NaturalPolynomial` at a

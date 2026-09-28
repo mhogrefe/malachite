@@ -28,7 +28,7 @@ fn assert_reduced(p: &NaturalPolynomial, q: &NaturalPolynomial, m: &Natural) {
 // Subtracts `ys` from `xs` modulo m, negating the coefficients of `ys` past the end of `xs`. A
 // nonzero reduced coefficient stays nonzero when negated. The caller trims, since leading
 // coefficients can cancel.
-fn sub_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural], m: &Natural) {
+pub(crate) fn sub_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural], m: &Natural) {
     let common = min(xs.len(), ys.len());
     for (x, y) in xs.iter_mut().zip(&ys[..common]) {
         x.mod_sub_assign(y, m);
@@ -39,7 +39,7 @@ fn sub_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural], m: &Natural) {
 }
 
 // Replaces `ys` with `xs - ys` modulo m, reusing the storage of `ys`. The caller trims.
-fn rsub_assign_ref(ys: &mut Vec<Natural>, xs: &[Natural], m: &Natural) {
+pub(crate) fn rsub_assign_ref(ys: &mut Vec<Natural>, xs: &[Natural], m: &Natural) {
     for y in ys.iter_mut() {
         y.mod_neg_assign(m);
     }
@@ -53,7 +53,7 @@ fn rsub_assign_ref(ys: &mut Vec<Natural>, xs: &[Natural], m: &Natural) {
 }
 
 // Subtracts `ys` from `xs` modulo m, reusing whichever of the two is longer. The caller trims.
-fn sub_assign_val(xs: &mut Vec<Natural>, mut ys: Vec<Natural>, m: &Natural) {
+pub(crate) fn sub_assign_val(xs: &mut Vec<Natural>, mut ys: Vec<Natural>, m: &Natural) {
     if ys.len() > xs.len() {
         rsub_assign_ref(&mut ys, xs, m);
         *xs = ys;

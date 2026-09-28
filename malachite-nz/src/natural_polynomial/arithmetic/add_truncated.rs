@@ -26,8 +26,9 @@ impl AddTruncated<Self> for NaturalPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Natural coefficients cannot
-    /// cancel, but the kept part of either operand can end in zeros, so the sum is trimmed.
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. Natural coefficients cannot cancel,
+    /// but the kept part of either operand can end in zeros, so the sum is trimmed.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -80,8 +81,9 @@ impl AddTruncated<&Self> for NaturalPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Natural coefficients cannot
-    /// cancel, but the kept part of either operand can end in zeros, so the sum is trimmed.
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. Natural coefficients cannot cancel,
+    /// but the kept part of either operand can end in zeros, so the sum is trimmed.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -133,8 +135,9 @@ impl AddTruncated<NaturalPolynomial> for &NaturalPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Natural coefficients cannot
-    /// cancel, but the kept part of either operand can end in zeros, so the sum is trimmed.
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. Natural coefficients cannot cancel,
+    /// but the kept part of either operand can end in zeros, so the sum is trimmed.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -184,8 +187,9 @@ impl AddTruncated<&NaturalPolynomial> for &NaturalPolynomial {
     /// f(p, q, n) = (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Natural coefficients cannot
-    /// cancel, but the kept part of either operand can end in zeros, so the sum is trimmed.
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. Natural coefficients cannot cancel,
+    /// but the kept part of either operand can end in zeros, so the sum is trimmed.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -232,8 +236,9 @@ impl AddTruncatedAssign<Self> for NaturalPolynomial {
     /// p \gets (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Natural coefficients cannot
-    /// cancel, but the kept part of either operand can end in zeros, so the sum is trimmed.
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. Natural coefficients cannot cancel,
+    /// but the kept part of either operand can end in zeros, so the sum is trimmed.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -276,8 +281,9 @@ impl AddTruncatedAssign<&Self> for NaturalPolynomial {
     /// p \gets (p + q) \bmod x^n.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Natural coefficients cannot
-    /// cancel, but the kept part of either operand can end in zeros, so the sum is trimmed.
+    /// The polynomials need not already be truncated: this is the sum of their images modulo $x^n$,
+    /// so only the first `len` coefficients of each are read. Natural coefficients cannot cancel,
+    /// but the kept part of either operand can end in zeros, so the sum is trimmed.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

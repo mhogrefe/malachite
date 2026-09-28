@@ -30,7 +30,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SubTruncated<Self> for UnsignedPolynomial<
     /// f(p, q, n, k) = ((p - q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Where the second polynomial
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. Where the second polynomial
     /// has more of those, they are negated modulo $2^k$. The difference is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
@@ -100,7 +101,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SubTruncated<&Self> for UnsignedPolynomial
     /// f(p, q, n, k) = ((p - q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Where the second polynomial
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. Where the second polynomial
     /// has more of those, they are negated modulo $2^k$. The difference is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
@@ -175,7 +177,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SubTruncated<UnsignedPolynomial<T>>
     /// f(p, q, n, k) = ((p - q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Where the second polynomial
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. Where the second polynomial
     /// has more of those, they are negated modulo $2^k$. The difference is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
@@ -253,7 +256,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SubTruncated<&UnsignedPolynomial<T>>
     /// f(p, q, n, k) = ((p - q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Where the second polynomial
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. Where the second polynomial
     /// has more of those, they are negated modulo $2^k$. The difference is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
@@ -324,7 +328,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SubTruncatedAssign<Self> for UnsignedPolyn
     /// p \gets ((p - q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Where the second polynomial
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. Where the second polynomial
     /// has more of those, they are negated modulo $2^k$. The difference is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///
@@ -384,7 +389,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SubTruncatedAssign<&Self> for UnsignedPoly
     /// p \gets ((p - q) \bmod x^n) \bmod 2^k.
     /// $$
     ///
-    /// Only the first `len` coefficients of each polynomial are read. Where the second polynomial
+    /// The polynomials need not already be truncated: this is the difference of their images modulo
+    /// $x^n$, so only the first `len` coefficients of each are read. Where the second polynomial
     /// has more of those, they are negated modulo $2^k$. The difference is trimmed, so when
     /// coefficients cancel modulo $2^k$ at the top of the kept range, the degree is lower still.
     ///

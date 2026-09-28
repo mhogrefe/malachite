@@ -44,6 +44,11 @@ pub mod is_unit;
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding two
 /// polynomials modulo a [`Natural`](crate::natural::Natural).
 pub mod mod_add;
+/// Implementations of [`ModAddTruncated`](malachite_base::polynomial::ModAddTruncated) and
+/// [`ModAddTruncatedAssign`](malachite_base::polynomial::ModAddTruncatedAssign), for adding two
+/// polynomials modulo a [`Natural`](crate::natural::Natural) and keeping only their low
+/// coefficients.
+pub mod mod_add_truncated;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
@@ -95,3 +100,8 @@ pub mod mod_power_of_2_sub_truncated;
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting one
 /// polynomial from another modulo a [`Natural`](crate::natural::Natural).
 pub mod mod_sub;
+/// Implementations of [`ModSubTruncated`](malachite_base::polynomial::ModSubTruncated) and
+/// [`ModSubTruncatedAssign`](malachite_base::polynomial::ModSubTruncatedAssign), for subtracting
+/// one polynomial from another modulo a [`Natural`](crate::natural::Natural) and keeping only their
+/// low coefficients.
+pub mod mod_sub_truncated;

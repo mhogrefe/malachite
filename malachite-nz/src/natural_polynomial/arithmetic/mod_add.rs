@@ -13,7 +13,7 @@ use core::cmp::min;
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{ModAdd, ModAddAssign, ModIsReduced};
 
-fn assert_reduced(p: &NaturalPolynomial, q: &NaturalPolynomial, m: &Natural) {
+pub(crate) fn assert_reduced(p: &NaturalPolynomial, q: &NaturalPolynomial, m: &Natural) {
     assert!(
         p.mod_is_reduced(m),
         "self must be reduced mod m, but {p} has a coefficient >= {m}"
@@ -26,7 +26,7 @@ fn assert_reduced(p: &NaturalPolynomial, q: &NaturalPolynomial, m: &Natural) {
 
 // Adds `ys` into `xs` modulo m, cloning the coefficients of `ys` past the end of `xs`. The caller
 // trims, since leading coefficients can cancel.
-fn add_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural], m: &Natural) {
+pub(crate) fn add_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural], m: &Natural) {
     let common = min(xs.len(), ys.len());
     for (x, y) in xs.iter_mut().zip(&ys[..common]) {
         x.mod_add_assign(y, m);
@@ -37,7 +37,7 @@ fn add_assign_ref(xs: &mut Vec<Natural>, ys: &[Natural], m: &Natural) {
 }
 
 // Adds `ys` into `xs` modulo m, reusing whichever of the two is longer. The caller trims.
-fn add_assign_val(xs: &mut Vec<Natural>, mut ys: Vec<Natural>, m: &Natural) {
+pub(crate) fn add_assign_val(xs: &mut Vec<Natural>, mut ys: Vec<Natural>, m: &Natural) {
     if ys.len() > xs.len() {
         swap(xs, &mut ys);
     }

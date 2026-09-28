@@ -634,6 +634,7 @@ pub mod natural_polynomial {
         pub mod height;
         pub mod is_unit;
         pub mod mod_add;
+        pub mod mod_add_truncated;
         pub mod mod_is_reduced;
         pub mod mod_make_monic;
         pub mod mod_neg;
@@ -645,6 +646,7 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_truncated;
         pub mod mod_sub;
+        pub mod mod_sub_truncated;
     }
     pub mod basic {
         pub mod coefficients;

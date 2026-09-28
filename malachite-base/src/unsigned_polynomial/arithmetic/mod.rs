@@ -30,6 +30,10 @@ pub mod is_unit;
 /// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding two polynomials
 /// modulo a value.
 pub mod mod_add;
+/// Implementations of [`ModAddTruncated`](crate::polynomial::ModAddTruncated) and
+/// [`ModAddTruncatedAssign`](crate::polynomial::ModAddTruncatedAssign), for adding two polynomials
+/// modulo a value and keeping only their low coefficients.
+pub mod mod_add_truncated;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
@@ -78,3 +82,7 @@ pub mod mod_power_of_2_sub_truncated;
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting one polynomial
 /// from another modulo a value.
 pub mod mod_sub;
+/// Implementations of [`ModSubTruncated`](crate::polynomial::ModSubTruncated) and
+/// [`ModSubTruncatedAssign`](crate::polynomial::ModSubTruncatedAssign), for subtracting one
+/// polynomial from another modulo a value and keeping only their low coefficients.
+pub mod mod_sub_truncated;

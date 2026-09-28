@@ -8,8 +8,10 @@
 
 pub mod evaluate;
 pub mod mod_add;
+pub mod mod_add_truncated;
 pub mod mod_power_of_2_add;
 pub mod mod_power_of_2_add_truncated;
 pub mod mod_power_of_2_sub;
 pub mod mod_power_of_2_sub_truncated;
 pub mod mod_sub;
+pub mod mod_sub_truncated;

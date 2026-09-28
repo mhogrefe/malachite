@@ -30,7 +30,7 @@ fn assert_reduced<T: PrimitiveUnsigned>(
 // Subtracts `ys` from `xs` modulo m, negating the coefficients of `ys` past the end of `xs`. A
 // nonzero reduced coefficient stays nonzero when negated. The caller trims, since leading
 // coefficients can cancel.
-fn sub_assign_ref<T: PrimitiveUnsigned>(xs: &mut Vec<T>, ys: &[T], m: T) {
+pub(crate) fn sub_assign_ref<T: PrimitiveUnsigned>(xs: &mut Vec<T>, ys: &[T], m: T) {
     let common = min(xs.len(), ys.len());
     for (x, &y) in xs.iter_mut().zip(&ys[..common]) {
         *x = x.mod_sub(y, m);
@@ -41,7 +41,7 @@ fn sub_assign_ref<T: PrimitiveUnsigned>(xs: &mut Vec<T>, ys: &[T], m: T) {
 }
 
 // Replaces `ys` with `xs - ys` modulo m, reusing the storage of `ys`. The caller trims.
-fn rsub_assign_ref<T: PrimitiveUnsigned>(ys: &mut Vec<T>, xs: &[T], m: T) {
+pub(crate) fn rsub_assign_ref<T: PrimitiveUnsigned>(ys: &mut Vec<T>, xs: &[T], m: T) {
     let common = min(xs.len(), ys.len());
     for (y, &x) in ys.iter_mut().zip(&xs[..common]) {
         *y = x.mod_sub(*y, m);
@@ -55,7 +55,7 @@ fn rsub_assign_ref<T: PrimitiveUnsigned>(ys: &mut Vec<T>, xs: &[T], m: T) {
 }
 
 // Subtracts `ys` from `xs` modulo m, reusing whichever of the two is longer. The caller trims.
-fn sub_assign_val<T: PrimitiveUnsigned>(xs: &mut Vec<T>, mut ys: Vec<T>, m: T) {
+pub(crate) fn sub_assign_val<T: PrimitiveUnsigned>(xs: &mut Vec<T>, mut ys: Vec<T>, m: T) {
     if ys.len() > xs.len() {
         rsub_assign_ref(&mut ys, xs, m);
         *xs = ys;

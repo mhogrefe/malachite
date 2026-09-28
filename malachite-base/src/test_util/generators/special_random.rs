@@ -10185,6 +10185,36 @@ pub fn special_random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_v
     )
 }
 
+pub fn special_random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+            &|seed| {
+                striped_random_positive_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(p, q, len, m)| (p % m, q % m, len, m)),
+    )
+}
+
 pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<
     T: PrimitiveUnsigned,
 >(

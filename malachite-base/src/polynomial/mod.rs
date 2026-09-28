@@ -180,6 +180,10 @@ pub trait EqTruncated<Rhs: ?Sized = Self> {
 ///
 /// This is the sum of the two polynomials truncated to their first `len` coefficients, which is
 /// also the truncation of their sum.
+///
+/// With $n$ equal to `len`, this is addition in the ring of polynomials modulo $x^n$, applied to
+/// the images of the two polynomials there. The polynomials need not already be truncated: they may
+/// have any number of coefficients, and only the first `len` of each are read.
 pub trait AddTruncated<Rhs = Self> {
     type Output;
 
@@ -193,6 +197,10 @@ pub trait AddTruncated<Rhs = Self> {
 
 /// Adds a polynomial to another in place, keeping only the coefficients of $x^i$ for $i$ less than
 /// a given length.
+///
+/// With $n$ equal to `len`, this is addition in the ring of polynomials modulo $x^n$, applied to
+/// the images of the two polynomials there. The polynomials need not already be truncated: they may
+/// have any number of coefficients, and only the first `len` of each are read.
 pub trait AddTruncatedAssign<Rhs = Self> {
     /// Adds a polynomial to `self` and truncates the sum to its first `len` coefficients.
     ///
@@ -207,6 +215,10 @@ pub trait AddTruncatedAssign<Rhs = Self> {
 ///
 /// This is the difference of the two polynomials truncated to their first `len` coefficients, which
 /// is also the truncation of their difference.
+///
+/// With $n$ equal to `len`, this is subtraction in the ring of polynomials modulo $x^n$, applied to
+/// the images of the two polynomials there. The polynomials need not already be truncated: they may
+/// have any number of coefficients, and only the first `len` of each are read.
 pub trait SubTruncated<Rhs = Self> {
     type Output;
 
@@ -221,6 +233,10 @@ pub trait SubTruncated<Rhs = Self> {
 
 /// Subtracts a polynomial from another in place, keeping only the coefficients of $x^i$ for $i$
 /// less than a given length.
+///
+/// With $n$ equal to `len`, this is subtraction in the ring of polynomials modulo $x^n$, applied to
+/// the images of the two polynomials there. The polynomials need not already be truncated: they may
+/// have any number of coefficients, and only the first `len` of each are read.
 pub trait SubTruncatedAssign<Rhs = Self> {
     /// Subtracts a polynomial from `self` and truncates the difference to its first `len`
     /// coefficients.
@@ -233,6 +249,11 @@ pub trait SubTruncatedAssign<Rhs = Self> {
 
 /// Adds two polynomials modulo $2^k$, keeping only the coefficients of $x^i$ for $i$ less than a
 /// given length. The coefficients of both must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is addition in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
 pub trait ModPowerOf2AddTruncated<Rhs = Self> {
     type Output;
 
@@ -246,6 +267,11 @@ pub trait ModPowerOf2AddTruncated<Rhs = Self> {
 
 /// Adds a polynomial to another modulo $2^k$ in place, keeping only the coefficients of $x^i$ for
 /// $i$ less than a given length. The coefficients of both must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is addition in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
 pub trait ModPowerOf2AddTruncatedAssign<Rhs = Self> {
     /// Adds a polynomial to `self` modulo $2^k$ and truncates the sum to its first `len`
     /// coefficients.
@@ -258,6 +284,11 @@ pub trait ModPowerOf2AddTruncatedAssign<Rhs = Self> {
 
 /// Subtracts one polynomial from another modulo $2^k$, keeping only the coefficients of $x^i$ for
 /// $i$ less than a given length. The coefficients of both must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is subtraction in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
 pub trait ModPowerOf2SubTruncated<Rhs = Self> {
     type Output;
 
@@ -273,6 +304,11 @@ pub trait ModPowerOf2SubTruncated<Rhs = Self> {
 /// Subtracts a polynomial from another modulo $2^k$ in place, keeping only the coefficients of
 /// $x^i$ for $i$ less than a given length. The coefficients of both must already be reduced modulo
 /// $2^k$.
+///
+/// With $n$ equal to `len`, this is subtraction in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
 pub trait ModPowerOf2SubTruncatedAssign<Rhs = Self> {
     /// Subtracts a polynomial from `self` modulo $2^k$ and truncates the difference to its first
     /// `len` coefficients.
@@ -281,6 +317,77 @@ pub trait ModPowerOf2SubTruncatedAssign<Rhs = Self> {
     /// p \gets ((p - q) \bmod x^n) \bmod 2^k.
     /// $$
     fn mod_power_of_2_sub_truncated_assign(&mut self, other: Rhs, len: u64, pow: u64);
+}
+
+/// Adds two polynomials modulo $m$, keeping only the coefficients of $x^i$ for $i$ less than a
+/// given length. The coefficients of both must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is addition in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait ModAddTruncated<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Adds two polynomials modulo $m$ and truncates the sum to its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, q, n, m) = ((p + q) \bmod x^n) \bmod m.
+    /// $$
+    fn mod_add_truncated(self, other: Rhs, len: u64, m: M) -> Self::Output;
+}
+
+/// Adds a polynomial to another modulo $m$ in place, keeping only the coefficients of $x^i$ for $i$
+/// less than a given length. The coefficients of both must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is addition in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait ModAddTruncatedAssign<Rhs = Self, M = Self> {
+    /// Adds a polynomial to `self` modulo $m$ and truncates the sum to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// p \gets ((p + q) \bmod x^n) \bmod m.
+    /// $$
+    fn mod_add_truncated_assign(&mut self, other: Rhs, len: u64, m: M);
+}
+
+/// Subtracts one polynomial from another modulo $m$, keeping only the coefficients of $x^i$ for $i$
+/// less than a given length. The coefficients of both must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is subtraction in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait ModSubTruncated<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Subtracts one polynomial from another modulo $m$ and truncates the difference to its first
+    /// `len` coefficients.
+    ///
+    /// $$
+    /// f(p, q, n, m) = ((p - q) \bmod x^n) \bmod m.
+    /// $$
+    fn mod_sub_truncated(self, other: Rhs, len: u64, m: M) -> Self::Output;
+}
+
+/// Subtracts a polynomial from another modulo $m$ in place, keeping only the coefficients of $x^i$
+/// for $i$ less than a given length. The coefficients of both must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is subtraction in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait ModSubTruncatedAssign<Rhs = Self, M = Self> {
+    /// Subtracts a polynomial from `self` modulo $m$ and truncates the difference to its first
+    /// `len` coefficients.
+    ///
+    /// $$
+    /// p \gets ((p - q) \bmod x^n) \bmod m.
+    /// $$
+    fn mod_sub_truncated_assign(&mut self, other: Rhs, len: u64, m: M);
 }
 
 // Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending
