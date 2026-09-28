@@ -418,6 +418,28 @@ pub trait FloorL2Norm {
     fn floor_l2_norm(self) -> Self::Output;
 }
 
+/// Multiplies a polynomial by $x^n$, which moves every coefficient up by $n$ places.
+pub trait MulPowerOfX {
+    type Output;
+
+    /// Multiplies a polynomial by $x^n$.
+    ///
+    /// $$
+    /// f(p, n) = x^np.
+    /// $$
+    fn mul_power_of_x(self, n: u64) -> Self::Output;
+}
+
+/// Multiplies a polynomial by $x^n$ in place, which moves every coefficient up by $n$ places.
+pub trait MulPowerOfXAssign {
+    /// Multiplies a polynomial by $x^n$ in place.
+    ///
+    /// $$
+    /// p \gets x^np.
+    /// $$
+    fn mul_power_of_x_assign(&mut self, n: u64);
+}
+
 // Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending
 // order, agree below index `len`.
 //

@@ -569,6 +569,7 @@ pub mod integer_polynomial {
         pub mod l2_norm_squared;
         pub mod mod_op;
         pub mod mod_power_of_2;
+        pub mod mul_power_of_x;
         pub mod neg;
         pub mod scalar_add_mul;
         pub mod scalar_mul;
@@ -651,6 +652,7 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_sub_truncated;
         pub mod mod_sub;
         pub mod mod_sub_truncated;
+        pub mod mul_power_of_x;
     }
     pub mod basic {
         pub mod coefficients;

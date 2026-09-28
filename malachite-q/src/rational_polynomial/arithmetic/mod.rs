@@ -42,6 +42,10 @@ pub mod l2_norm_squared;
 /// [`MakeMonicAssign`](malachite_base::polynomial::MakeMonicAssign), which divide a polynomial by
 /// its leading coefficient.
 pub mod make_monic;
+/// Implementations of [`MulPowerOfX`](malachite_base::polynomial::MulPowerOfX) and
+/// [`MulPowerOfXAssign`](malachite_base::polynomial::MulPowerOfXAssign), for multiplying a
+/// polynomial by a power of its variable.
+pub mod mul_power_of_x;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
 pub mod neg;

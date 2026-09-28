@@ -86,3 +86,7 @@ pub mod mod_sub;
 /// [`ModSubTruncatedAssign`](crate::polynomial::ModSubTruncatedAssign), for subtracting one
 /// polynomial from another modulo a value and keeping only their low coefficients.
 pub mod mod_sub_truncated;
+/// Implementations of [`MulPowerOfX`](crate::polynomial::MulPowerOfX) and
+/// [`MulPowerOfXAssign`](crate::polynomial::MulPowerOfXAssign), for multiplying a polynomial by a
+/// power of its variable.
+pub mod mul_power_of_x;

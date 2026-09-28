@@ -343,6 +343,12 @@ documented by git history.
   `fmpz_poly_equal_trunc`, without building either truncation. It is implemented for each of
   `UnsignedPolynomial`, `NaturalPolynomial`, `IntegerPolynomial`, and `RationalPolynomial` against
   itself and, in both orders, against each of the others.
+- New `MulPowerOfX` and `MulPowerOfXAssign` traits, in `malachite_base::polynomial`, which multiply
+  a polynomial by $x^n$, moving every coefficient up by $n$ places, like FLINT's
+  `fmpz_poly_shift_left`, `fmpq_poly_shift_left`, `fmpz_mod_poly_shift_left`, and
+  `nmod_poly_shift_left`. They are implemented for all four polynomial types, taking the polynomial
+  by value or by reference. The name avoids "shift", since `<<` throughout Malachite scales by a
+  power of 2.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

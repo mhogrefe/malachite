@@ -23,6 +23,7 @@ pub(crate) fn register(runner: &mut Runner) {
     l2_norm_squared::register(runner);
     mod_op::register(runner);
     mod_power_of_2::register(runner);
+    mul_power_of_x::register(runner);
     neg::register(runner);
     scalar_add_mul::register(runner);
     scalar_mul::register(runner);
@@ -44,6 +45,7 @@ mod is_unit;
 mod l2_norm_squared;
 mod mod_op;
 mod mod_power_of_2;
+mod mul_power_of_x;
 mod neg;
 mod scalar_add_mul;
 mod scalar_mul;

@@ -172,6 +172,7 @@ pub mod rational_polynomial {
         pub mod is_unit;
         pub mod l2_norm_squared;
         pub mod make_monic;
+        pub mod mul_power_of_x;
         pub mod neg;
         pub mod sub;
         pub mod sub_truncated;

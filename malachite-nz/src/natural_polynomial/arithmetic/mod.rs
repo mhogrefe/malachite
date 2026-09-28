@@ -111,3 +111,7 @@ pub mod mod_sub;
 /// one polynomial from another modulo a [`Natural`](crate::natural::Natural) and keeping only their
 /// low coefficients.
 pub mod mod_sub_truncated;
+/// Implementations of [`MulPowerOfX`](malachite_base::polynomial::MulPowerOfX) and
+/// [`MulPowerOfXAssign`](malachite_base::polynomial::MulPowerOfXAssign), for multiplying a
+/// polynomial by a power of its variable.
+pub mod mul_power_of_x;

@@ -19,8 +19,8 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_is_reduced::register(runner);
     mod_make_monic::register(runner);
     mod_neg::register(runner);
-    mod_power_of_2::register(runner);
     mod_op::register(runner);
+    mod_power_of_2::register(runner);
     mod_power_of_2_add::register(runner);
     mod_power_of_2_add_truncated::register(runner);
     mod_power_of_2_neg::register(runner);
@@ -28,6 +28,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_sub_truncated::register(runner);
     mod_sub::register(runner);
     mod_sub_truncated::register(runner);
+    mul_power_of_x::register(runner);
 }
 
 mod canonicalize_unit;
@@ -49,3 +50,4 @@ mod mod_power_of_2_sub;
 mod mod_power_of_2_sub_truncated;
 mod mod_sub;
 mod mod_sub_truncated;
+mod mul_power_of_x;
