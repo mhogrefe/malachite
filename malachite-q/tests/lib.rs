@@ -166,6 +166,7 @@ pub mod rational_polynomial {
         pub mod add;
         pub mod add_truncated;
         pub mod canonicalize_unit;
+        pub mod compose_power_of_x;
         pub mod content;
         pub mod div_power_of_x;
         pub mod evaluate;

@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add_truncated::register(runner);
     balanced_mod::register(runner);
     canonicalize_unit::register(runner);
+    compose_power_of_x::register(runner);
     content::register(runner);
     content_chained::register(runner);
     div_exact::register(runner);
@@ -36,6 +37,7 @@ mod add;
 mod add_truncated;
 mod balanced_mod;
 mod canonicalize_unit;
+mod compose_power_of_x;
 mod content;
 mod content_chained;
 mod div_exact;

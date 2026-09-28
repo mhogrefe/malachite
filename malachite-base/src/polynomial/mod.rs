@@ -464,6 +464,32 @@ pub trait DivPowerOfXAssign {
     fn div_power_of_x_assign(&mut self, n: u64);
 }
 
+/// Composes a polynomial with $x^k$, giving $p(x^k)$: the coefficient of $x^i$ moves to $x^{ik}$.
+///
+/// When $k$ is 0, the result is the constant $p(1)$, the sum of the coefficients.
+pub trait ComposePowerOfX {
+    type Output;
+
+    /// Composes a polynomial with $x^k$.
+    ///
+    /// $$
+    /// f(p, k) = p(x^k).
+    /// $$
+    fn compose_power_of_x(self, k: u64) -> Self::Output;
+}
+
+/// Composes a polynomial with $x^k$ in place, replacing $p$ with $p(x^k)$.
+///
+/// When $k$ is 0, the result is the constant $p(1)$, the sum of the coefficients.
+pub trait ComposePowerOfXAssign {
+    /// Composes a polynomial with $x^k$ in place.
+    ///
+    /// $$
+    /// p \gets p(x^k).
+    /// $$
+    fn compose_power_of_x_assign(&mut self, k: u64);
+}
+
 // Determines whether two coefficient slices, each holding a polynomial's coefficients in ascending
 // order, agree below index `len`.
 //

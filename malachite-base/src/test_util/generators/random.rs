@@ -8581,6 +8581,20 @@ pub fn random_unsigned_polynomial_unsigned_pair_gen_var_1(
     ))
 }
 
+pub fn random_unsigned_polynomial_unsigned_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<u64>, u64)> {
+    Box::new(
+        random_unsigned_polynomial_unsigned_pair_gen_var_1(config).filter(|(p, k)| {
+            *k != 0
+                || p.coefficients_asc()
+                    .iter()
+                    .try_fold(0u64, |s, &c| s.checked_add(c))
+                    .is_some()
+        }),
+    )
+}
+
 pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedPolynomial<T>, T, u64)> {

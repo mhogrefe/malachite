@@ -559,6 +559,7 @@ pub mod integer_polynomial {
         pub mod add_truncated;
         pub mod balanced_mod;
         pub mod canonicalize_unit;
+        pub mod compose_power_of_x;
         pub mod content;
         pub mod content_chained;
         pub mod div_exact;
@@ -633,6 +634,7 @@ pub mod natural_polynomial {
         pub mod add_truncated;
         pub mod balanced_mod;
         pub mod canonicalize_unit;
+        pub mod compose_power_of_x;
         pub mod content;
         pub mod div_power_of_x;
         pub mod evaluate;

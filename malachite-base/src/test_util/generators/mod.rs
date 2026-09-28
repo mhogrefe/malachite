@@ -4939,6 +4939,16 @@ pub fn unsigned_polynomial_unsigned_pair_gen_var_1() -> Generator<(UnsignedPolyn
     )
 }
 
+// All `(UnsignedPolynomial<u64>, u64)` where the `u64` is small, and, when it is 0, the sum of the
+// polynomial's coefficients fits in a `u64`.
+pub fn unsigned_polynomial_unsigned_pair_gen_var_2() -> Generator<(UnsignedPolynomial<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_pair_gen_var_2,
+        &random_unsigned_polynomial_unsigned_pair_gen_var_2,
+        &special_random_unsigned_polynomial_unsigned_pair_gen_var_2,
+    )
+}
+
 // All `(UnsignedPolynomial<T>, T, u64)` where the `u64` is no greater than `T::WIDTH`, and the
 // polynomial's coefficients and the `T` are less than 2 to the power of the `u64`.
 pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()

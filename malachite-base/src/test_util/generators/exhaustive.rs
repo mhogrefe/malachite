@@ -6477,6 +6477,19 @@ pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_1() -> It<(UnsignedP
     ))
 }
 
+pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_2() -> It<(UnsignedPolynomial<u64>, u64)>
+{
+    Box::new(
+        exhaustive_unsigned_polynomial_unsigned_pair_gen_var_1().filter(|(p, k)| {
+            *k != 0
+                || p.coefficients_asc()
+                    .iter()
+                    .try_fold(0u64, |s, &c| s.checked_add(c))
+                    .is_some()
+        }),
+    )
+}
+
 pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(UnsignedPolynomial<T>, T, u64)> {
     Box::new(

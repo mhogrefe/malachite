@@ -873,6 +873,7 @@ pub mod vars {
 pub mod unsigned_polynomial {
     pub mod arithmetic {
         pub mod canonicalize_unit;
+        pub mod compose_power_of_x;
         pub mod content;
         pub mod div_power_of_x;
         pub mod evaluate;

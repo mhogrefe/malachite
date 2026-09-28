@@ -356,6 +356,12 @@ documented by git history.
   polynomial by value or by reference. A `RationalPolynomial` result is reduced to lowest terms,
   since the dropped coefficients can be the ones that kept the numerator coprime to the
   denominator.
+- New `ComposePowerOfX` and `ComposePowerOfXAssign` traits, in `malachite_base::polynomial`, which
+  replace a polynomial $p$ with $p(x^k)$, moving the coefficient of $x^i$ to $x^{ik}$, like FLINT's
+  `fmpz_poly_inflate`, `fmpz_mod_poly_inflate`, and `nmod_poly_inflate`. They are implemented for
+  all four polynomial types, taking the polynomial by value or by reference. With $k = 0$ the result
+  is the constant $p(1)$; for `UnsignedPolynomial<T>` this panics if the sum of the coefficients
+  overflows `T`, and it is never reduced modulo anything.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

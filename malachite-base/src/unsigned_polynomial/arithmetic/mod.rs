@@ -10,6 +10,10 @@
 /// [`CanonicalizeUnitAssign`](crate::num::arithmetic::traits::CanonicalizeUnitAssign), which bring
 /// a polynomial into canonical unit form.
 pub mod canonicalize_unit;
+/// Implementations of [`ComposePowerOfX`](crate::polynomial::ComposePowerOfX) and
+/// [`ComposePowerOfXAssign`](crate::polynomial::ComposePowerOfXAssign), for substituting a power of
+/// the variable into a polynomial.
+pub mod compose_power_of_x;
 /// Implementations of [`Content`](crate::polynomial::Content),
 /// [`PrimitivePart`](crate::polynomial::PrimitivePart),
 /// [`PrimitivePartAssign`](crate::polynomial::PrimitivePartAssign), and
