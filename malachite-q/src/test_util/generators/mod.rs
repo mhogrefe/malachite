@@ -1433,6 +1433,16 @@ pub fn rational_polynomial_signed_pair_gen<T: PrimitiveSigned>()
     )
 }
 
+// All `(RationalPolynomial, T)` where `T` is small and signed.
+pub fn rational_polynomial_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(RationalPolynomial, T)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_signed_pair_gen_var_1,
+        &random_rational_polynomial_signed_pair_gen_var_1,
+        &special_random_rational_polynomial_signed_pair_gen_var_1,
+    )
+}
+
 pub fn rational_polynomial_unsigned_pair_gen_var_1() -> Generator<(RationalPolynomial, u64)> {
     Generator::new(
         &exhaustive_rational_polynomial_unsigned_pair_gen_var_1,
@@ -1448,5 +1458,15 @@ pub fn rational_polynomial_unsigned_pair_gen_var_2() -> Generator<(RationalPolyn
         &exhaustive_rational_polynomial_unsigned_pair_gen_var_2,
         &random_rational_polynomial_unsigned_pair_gen_var_2,
         &special_random_rational_polynomial_unsigned_pair_gen_var_2,
+    )
+}
+
+// All `(RationalPolynomial, T)` where `T` is small and unsigned.
+pub fn rational_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
+-> Generator<(RationalPolynomial, T)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_unsigned_pair_gen_var_3,
+        &random_rational_polynomial_unsigned_pair_gen_var_3,
+        &special_random_rational_polynomial_unsigned_pair_gen_var_3,
     )
 }

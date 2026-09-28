@@ -23,6 +23,8 @@ pub(crate) fn register(runner: &mut Runner) {
     l2_norm_squared::register(runner);
     make_monic::register(runner);
     mul_power_of_x::register(runner);
+    shl::register(runner);
+    shr::register(runner);
     neg::register(runner);
     sub::register(runner);
     sub_truncated::register(runner);
@@ -43,5 +45,7 @@ mod l2_norm_squared;
 mod make_monic;
 mod mul_power_of_x;
 mod neg;
+mod shl;
+mod shr;
 mod sub;
 mod sub_truncated;

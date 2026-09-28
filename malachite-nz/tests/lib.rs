@@ -577,6 +577,7 @@ pub mod integer_polynomial {
         pub mod neg;
         pub mod scalar_add_mul;
         pub mod scalar_mul;
+        pub mod shl;
         pub mod sub;
         pub mod sub_truncated;
     }
@@ -661,6 +662,7 @@ pub mod natural_polynomial {
         pub mod mod_sub;
         pub mod mod_sub_truncated;
         pub mod mul_power_of_x;
+        pub mod shl;
     }
     pub mod basic {
         pub mod coefficients;

@@ -1104,6 +1104,14 @@ pub fn exhaustive_rational_polynomial_signed_pair_gen<T: PrimitiveSigned>()
     ))
 }
 
+pub fn exhaustive_rational_polynomial_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> It<(RationalPolynomial, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_rational_polynomials(),
+        exhaustive_signeds(),
+    ))
+}
+
 pub fn exhaustive_rational_polynomial_unsigned_pair_gen<T: PrimitiveUnsigned>()
 -> It<(RationalPolynomial, T)> {
     Box::new(exhaustive_pairs(
@@ -1125,4 +1133,12 @@ pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_2() -> It<(RationalP
             .filter(|&(_, k)| k != 0)
             .map(|(p, k)| (p.compose_power_of_x(k), k)),
     )
+}
+
+pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
+-> It<(RationalPolynomial, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_rational_polynomials(),
+        exhaustive_unsigneds(),
+    ))
 }

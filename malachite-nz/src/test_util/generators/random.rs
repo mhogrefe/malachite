@@ -186,6 +186,30 @@ pub fn random_natural_polynomial_unsigned_pair_gen_var_2(
     )
 }
 
+pub fn random_natural_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_integer_polynomial_unsigned_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, u64)> {
@@ -212,6 +236,30 @@ pub fn random_integer_polynomial_unsigned_pair_gen_var_2(
             .filter(|&(_, k)| k != 0)
             .map(|(p, k)| (p.compose_power_of_x(k), k)),
     )
+}
+
+pub fn random_integer_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
 }
 
 pub fn random_integer_polynomial_unsigned_unsigned_triple_gen_var_1(

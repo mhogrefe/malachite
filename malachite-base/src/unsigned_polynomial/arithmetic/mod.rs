@@ -20,8 +20,9 @@ pub mod compose_power_of_x;
 /// [`ContentAndPrimitivePart`](crate::polynomial::ContentAndPrimitivePart), which compute the GCD
 /// of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
-/// An implementation of [`ExponentGcd`](crate::polynomial::ExponentGcd), the greatest common
-/// divisor of the exponents at which a polynomial has nonzero coefficients.
+/// Implementations of [`DeflatePowerOfX`](crate::polynomial::DeflatePowerOfX) and
+/// [`DeflatePowerOfXAssign`](crate::polynomial::DeflatePowerOfXAssign), for undoing the
+/// substitution of a power of the variable into a polynomial.
 pub mod deflate_power_of_x;
 /// Implementations of [`DivPowerOfX`](crate::polynomial::DivPowerOfX) and
 /// [`DivPowerOfXAssign`](crate::polynomial::DivPowerOfXAssign), for dividing a polynomial by a
@@ -31,6 +32,8 @@ pub mod div_power_of_x;
 /// [`ModPowerOf2Evaluate`](crate::polynomial::ModPowerOf2Evaluate), which evaluate a polynomial at
 /// a value modulo a value or a power of 2.
 pub mod evaluate;
+/// An implementation of [`ExponentGcd`](crate::polynomial::ExponentGcd), the greatest common
+/// divisor of the exponents at which a polynomial has nonzero coefficients.
 pub mod exponent_gcd;
 /// An implementation of [`Height`](crate::num::arithmetic::traits::Height), the largest of a
 /// polynomial's coefficients.

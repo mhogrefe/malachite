@@ -27,8 +27,9 @@ pub mod compose_power_of_x;
 /// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart) for
 /// [`RationalPolynomial`](super::RationalPolynomial)s.
 pub mod content;
-/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
-/// common divisor of the exponents at which a polynomial has nonzero coefficients.
+/// Implementations of [`DeflatePowerOfX`](malachite_base::polynomial::DeflatePowerOfX) and
+/// [`DeflatePowerOfXAssign`](malachite_base::polynomial::DeflatePowerOfXAssign), for undoing the
+/// substitution of a power of the variable into a polynomial.
 pub mod deflate_power_of_x;
 /// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
 /// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
@@ -40,6 +41,8 @@ pub mod div_power_of_x;
 /// [`RationalPolynomial`](super::RationalPolynomial)s at
 /// [`Integer`](malachite_nz::integer::Integer)s.
 pub mod evaluate;
+/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
+/// common divisor of the exponents at which a polynomial has nonzero coefficients.
 pub mod exponent_gcd;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height), the largest of
 /// the heights of a polynomial's coefficients.
@@ -61,6 +64,224 @@ pub mod mul_power_of_x;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
 pub mod neg;
+/// Left-shifting a [`RationalPolynomial`](super::RationalPolynomial) (multiplying it or dividing it
+/// by a power of 2), keeping it in lowest terms.
+///
+/// # shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_q::rational_polynomial::RationalPolynomial;
+///
+/// assert_eq!((RationalPolynomial::ZERO << 10u8).to_string(), "0");
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << 0u16).to_string(),
+///     "1/3*x^2-3/4*x+5"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << 2u32).to_string(),
+///     "4/3*x^2-3*x+20"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << 100u64).to_string(),
+///     "1267650600228229401496703205376/3*x^2-950737950171172051122527404032*x+\
+///     6338253001141147007483516026880"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << 3i8).to_string(),
+///     "8/3*x^2-6*x+40"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << -2i16).to_string(),
+///     "1/12*x^2-3/16*x+5/4"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << -100i64).to_string(),
+///     "1/3802951800684688204490109616128*x^2-3/5070602400912917605986812821504*x+\
+///     5/1267650600228229401496703205376"
+/// );
+///
+/// assert_eq!((&RationalPolynomial::ZERO << 10u8).to_string(), "0");
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << 0u16).to_string(),
+///     "1/3*x^2-3/4*x+5"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << 2u32).to_string(),
+///     "4/3*x^2-3*x+20"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << 100u64).to_string(),
+///     "1267650600228229401496703205376/3*x^2-950737950171172051122527404032*x+\
+///     6338253001141147007483516026880"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << 3i8).to_string(),
+///     "8/3*x^2-6*x+40"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << -2i16).to_string(),
+///     "1/12*x^2-3/16*x+5/4"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() << -100i64).to_string(),
+///     "1/3802951800684688204490109616128*x^2-3/5070602400912917605986812821504*x+\
+///     5/1267650600228229401496703205376"
+/// );
+/// ```
+///
+/// # shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_q::rational_polynomial::RationalPolynomial;
+///
+/// let mut p = RationalPolynomial::ZERO;
+/// p <<= 10u8;
+/// assert_eq!(p.to_string(), "0");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p <<= 0u16;
+/// assert_eq!(p.to_string(), "1/3*x^2-3/4*x+5");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p <<= 2u32;
+/// assert_eq!(p.to_string(), "4/3*x^2-3*x+20");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p <<= 3i8;
+/// assert_eq!(p.to_string(), "8/3*x^2-6*x+40");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p <<= -2i16;
+/// assert_eq!(p.to_string(), "1/12*x^2-3/16*x+5/4");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p <<= 100u64;
+/// assert_eq!(
+///     p.to_string(),
+///     "1267650600228229401496703205376/3*x^2-950737950171172051122527404032*x+\
+///     6338253001141147007483516026880"
+/// );
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p <<= -100i64;
+/// assert_eq!(
+///     p.to_string(),
+///     "1/3802951800684688204490109616128*x^2-3/5070602400912917605986812821504*x+\
+///     5/1267650600228229401496703205376"
+/// );
+/// ```
+pub mod shl;
+/// Right-shifting a [`RationalPolynomial`](super::RationalPolynomial) (dividing it or multiplying
+/// it by a power of 2), keeping it in lowest terms.
+///
+/// # shr
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_q::rational_polynomial::RationalPolynomial;
+///
+/// assert_eq!((RationalPolynomial::ZERO >> 10u8).to_string(), "0");
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> 0u16).to_string(),
+///     "1/3*x^2-3/4*x+5"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> -2i32).to_string(),
+///     "4/3*x^2-3*x+20"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> -100i64).to_string(),
+///     "1267650600228229401496703205376/3*x^2-950737950171172051122527404032*x+\
+///     6338253001141147007483516026880"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> -3i8).to_string(),
+///     "8/3*x^2-6*x+40"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> 2u16).to_string(),
+///     "1/12*x^2-3/16*x+5/4"
+/// );
+/// assert_eq!(
+///     (RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> 100u64).to_string(),
+///     "1/3802951800684688204490109616128*x^2-3/5070602400912917605986812821504*x+\
+///     5/1267650600228229401496703205376"
+/// );
+///
+/// assert_eq!((&RationalPolynomial::ZERO >> 10u8).to_string(), "0");
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> 0u16).to_string(),
+///     "1/3*x^2-3/4*x+5"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> -2i32).to_string(),
+///     "4/3*x^2-3*x+20"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> -100i64).to_string(),
+///     "1267650600228229401496703205376/3*x^2-950737950171172051122527404032*x+\
+///     6338253001141147007483516026880"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> -3i8).to_string(),
+///     "8/3*x^2-6*x+40"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> 2u16).to_string(),
+///     "1/12*x^2-3/16*x+5/4"
+/// );
+/// assert_eq!(
+///     (&RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap() >> 100u64).to_string(),
+///     "1/3802951800684688204490109616128*x^2-3/5070602400912917605986812821504*x+\
+///     5/1267650600228229401496703205376"
+/// );
+/// ```
+///
+/// # shr_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_q::rational_polynomial::RationalPolynomial;
+///
+/// let mut p = RationalPolynomial::ZERO;
+/// p >>= 10u8;
+/// assert_eq!(p.to_string(), "0");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p >>= 0u16;
+/// assert_eq!(p.to_string(), "1/3*x^2-3/4*x+5");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p >>= -2i32;
+/// assert_eq!(p.to_string(), "4/3*x^2-3*x+20");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p >>= -3i8;
+/// assert_eq!(p.to_string(), "8/3*x^2-6*x+40");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p >>= 2u16;
+/// assert_eq!(p.to_string(), "1/12*x^2-3/16*x+5/4");
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p >>= -100i64;
+/// assert_eq!(
+///     p.to_string(),
+///     "1267650600228229401496703205376/3*x^2-950737950171172051122527404032*x+\
+///     6338253001141147007483516026880"
+/// );
+///
+/// let mut p = RationalPolynomial::from_str("1/3*x^2-3/4*x+5").unwrap();
+/// p >>= 100u64;
+/// assert_eq!(
+///     p.to_string(),
+///     "1/3802951800684688204490109616128*x^2-3/5070602400912917605986812821504*x+\
+///     5/1267650600228229401496703205376"
+/// );
+/// ```
+pub mod shr;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting one polynomial from another.
 pub mod sub;

@@ -34,8 +34,9 @@ pub mod compose_power_of_x;
 pub mod content;
 #[doc(hidden)]
 pub mod content_chained;
-/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
-/// common divisor of the exponents at which a polynomial has nonzero coefficients.
+/// Implementations of [`DeflatePowerOfX`](malachite_base::polynomial::DeflatePowerOfX) and
+/// [`DeflatePowerOfXAssign`](malachite_base::polynomial::DeflatePowerOfXAssign), for undoing the
+/// substitution of a power of the variable into a polynomial.
 pub mod deflate_power_of_x;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), for dividing a
@@ -48,6 +49,8 @@ pub mod div_power_of_x;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
 /// polynomial at a value.
 pub mod evaluate;
+/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
+/// common divisor of the exponents at which a polynomial has nonzero coefficients.
 pub mod exponent_gcd;
 /// An implementation of [`FloorL2Norm`](malachite_base::polynomial::FloorL2Norm), the floor of a
 /// polynomial's $L^2$ norm.
@@ -87,6 +90,73 @@ pub mod neg;
 pub mod scalar_add_mul;
 #[doc(hidden)]
 pub mod scalar_mul;
+/// Left-shifting an [`IntegerPolynomial`](super::IntegerPolynomial) (multiplying it by a power of
+/// 2), by shifting every coefficient.
+///
+/// # shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_nz::integer_polynomial::IntegerPolynomial;
+///
+/// assert_eq!((IntegerPolynomial::ZERO << 10u8).to_string(), "0");
+/// assert_eq!(
+///     (IntegerPolynomial::from_str("x^2-3*x+5").unwrap() << 0u16).to_string(),
+///     "x^2-3*x+5"
+/// );
+/// assert_eq!(
+///     (IntegerPolynomial::from_str("x^2-3*x+5").unwrap() << 2u32).to_string(),
+///     "4*x^2-12*x+20"
+/// );
+/// assert_eq!(
+///     (IntegerPolynomial::from_str("x^2-3*x+5").unwrap() << 100u64).to_string(),
+///     "1267650600228229401496703205376*x^2-3802951800684688204490109616128*x+\
+///     6338253001141147007483516026880"
+/// );
+///
+/// assert_eq!((&IntegerPolynomial::ZERO << 10u8).to_string(), "0");
+/// assert_eq!(
+///     (&IntegerPolynomial::from_str("x^2-3*x+5").unwrap() << 0u16).to_string(),
+///     "x^2-3*x+5"
+/// );
+/// assert_eq!(
+///     (&IntegerPolynomial::from_str("x^2-3*x+5").unwrap() << 2u32).to_string(),
+///     "4*x^2-12*x+20"
+/// );
+/// assert_eq!(
+///     (&IntegerPolynomial::from_str("x^2-3*x+5").unwrap() << 100u64).to_string(),
+///     "1267650600228229401496703205376*x^2-3802951800684688204490109616128*x+\
+///     6338253001141147007483516026880"
+/// );
+/// ```
+///
+/// # shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_nz::integer_polynomial::IntegerPolynomial;
+///
+/// let mut p = IntegerPolynomial::ZERO;
+/// p <<= 10u8;
+/// assert_eq!(p.to_string(), "0");
+///
+/// let mut p = IntegerPolynomial::from_str("x^2-3*x+5").unwrap();
+/// p <<= 0u16;
+/// assert_eq!(p.to_string(), "x^2-3*x+5");
+///
+/// let mut p = IntegerPolynomial::from_str("x^2-3*x+5").unwrap();
+/// p <<= 2u32;
+/// assert_eq!(p.to_string(), "4*x^2-12*x+20");
+///
+/// let mut p = IntegerPolynomial::from_str("x^2-3*x+5").unwrap();
+/// p <<= 100u64;
+/// assert_eq!(
+///     p.to_string(),
+///     "1267650600228229401496703205376*x^2-3802951800684688204490109616128*x+\
+///     6338253001141147007483516026880"
+/// );
+/// ```
+pub mod shl;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting one polynomial from another.
 pub mod sub;

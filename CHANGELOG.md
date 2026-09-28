@@ -374,6 +374,15 @@ documented by git history.
   `nmod_poly_deflate`. Where FLINT silently drops the coefficients at exponents that are not
   multiples of $n$, these panic, as they do when $n$ is 0. They are implemented for all four
   polynomial types, taking the polynomial by value or by reference.
+- `Shl` and `ShlAssign` for `NaturalPolynomial` and `IntegerPolynomial`, with every unsigned
+  primitive integer shift amount, taking the polynomial by value or by reference. Every coefficient
+  is shifted, multiplying the polynomial by a power of 2, like FLINT's `fmpz_poly_scalar_mul_2exp`.
+- `Shl`, `ShlAssign`, `Shr`, and `ShrAssign` for `RationalPolynomial`, with every unsigned and
+  signed primitive integer shift amount, taking the polynomial by value or by reference. `Shl`
+  multiplies by a power of 2 and `Shr` divides by one, and a negative shift does the opposite.
+  Factors of 2 are cancelled against the denominator, or against the numerator's coefficients,
+  before the rest of the shift is applied, so the result stays in lowest terms. `RationalPolynomial`
+  is the only polynomial type with `Shr`.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a
