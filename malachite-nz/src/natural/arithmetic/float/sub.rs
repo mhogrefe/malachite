@@ -25,9 +25,9 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_same_length_with_borrow_in_to_out, sub_with_borrow,
 };
 use crate::natural::{
-    HALF_LIMB_HIGH_BIT, LIMB_HIGH_BIT, LIMB_MAX_HALF, LIMB_MAX_MINUS_1, NOT_LIMB_HIGH_BIT, Natural,
-    THRICE_WIDTH, TWICE_WIDTH, WIDTH_MINUS_1, bit_to_limb_count_ceiling, bit_to_limb_count_floor,
-    limb_to_bit_count,
+    HALF_LIMB_HIGH_BIT, LIMB_HIGH_BIT, LIMB_MAX_HALF, LIMB_MAX_MINUS_1, LIMB_MAX_QUARTER,
+    NOT_LIMB_HIGH_BIT, Natural, THRICE_WIDTH, TWICE_WIDTH, WIDTH_MINUS_1,
+    bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
 };
 use crate::platform::Limb;
 use core::cmp::{
@@ -48,7 +48,6 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 const IWIDTH_M1: isize = WIDTH_MINUS_1 as isize;
-const WIDTH_M2_MASK: Limb = Limb::MAX >> 2;
 const IWIDTH: i32 = Limb::WIDTH as i32;
 const NEG_ONE: Limb = Limb::MAX;
 const WIDTH_P1: u64 = Limb::WIDTH + 1;
@@ -2208,7 +2207,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 // zero, and this is what we want.
                 round_bit_2 = ys[nm1] & HALF_LIMB_HIGH_BIT;
                 // We also need sticky_bit_2
-                sticky_bit_2 = ys[nm1] & WIDTH_M2_MASK;
+                sticky_bit_2 = ys[nm1] & LIMB_MAX_QUARTER;
                 let mut k = nm1;
                 while sticky_bit_2 == 0 && k > 0 {
                     k -= 1;
@@ -2707,7 +2706,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 // zero, and this is what we want.
                 round_bit_2 = ys[nm1] & HALF_LIMB_HIGH_BIT;
                 // We also need sticky_bit_2
-                sticky_bit_2 = ys[nm1] & WIDTH_M2_MASK;
+                sticky_bit_2 = ys[nm1] & LIMB_MAX_QUARTER;
                 let mut k = nm1;
                 while sticky_bit_2 == 0 && k > 0 {
                     k -= 1;
@@ -3142,7 +3141,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 // zero, and this is what we want.
                 round_bit_2 = ys[nm1] & HALF_LIMB_HIGH_BIT;
                 // We also need sticky_bit_2
-                sticky_bit_2 = ys[nm1] & WIDTH_M2_MASK;
+                sticky_bit_2 = ys[nm1] & LIMB_MAX_QUARTER;
                 let mut k = nm1;
                 while sticky_bit_2 == 0 && k > 0 {
                     k -= 1;

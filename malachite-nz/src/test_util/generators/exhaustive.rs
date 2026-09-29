@@ -2966,6 +2966,20 @@ pub fn exhaustive_integer_vec_integer_vec_integer_triple_gen()
     ))
 }
 
+pub fn exhaustive_integer_vec_integer_vec_integer_triple_gen_var_1()
+-> It<(Vec<Integer>, Vec<Integer>, Integer)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_vecs(exhaustive_pairs_from_single(exhaustive_integers())),
+            exhaustive_integers(),
+        )
+        .map(|(pairs, x)| {
+            let (xs, ys) = pairs.into_iter().unzip();
+            (xs, ys, x)
+        }),
+    )
+}
+
 // -- Vec<Natural> --
 
 pub fn exhaustive_natural_vec_gen() -> It<Vec<Natural>> {

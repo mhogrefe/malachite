@@ -584,6 +584,10 @@ pub mod integer_polynomial {
         pub mod shl;
         pub mod sub;
         pub mod sub_truncated;
+        pub mod vec {
+            pub mod dot_general;
+            pub mod max_bits;
+        }
     }
     pub mod basic {
         pub mod coefficients;

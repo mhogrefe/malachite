@@ -25,3 +25,4 @@ pub mod scalar_mul;
 pub mod shl;
 pub mod sub;
 pub mod sub_truncated;
+pub mod vec;

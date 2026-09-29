@@ -178,3 +178,5 @@ pub mod sub;
 /// [`SubTruncatedAssign`](malachite_base::polynomial::SubTruncatedAssign), for subtracting one
 /// polynomial from another and keeping only their low coefficients.
 pub mod sub_truncated;
+#[doc(hidden)]
+pub mod vec;

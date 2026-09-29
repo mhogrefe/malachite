@@ -176,6 +176,7 @@ pub(crate) const NOT_LIMB_HIGH_BIT: Limb = !LIMB_HIGH_BIT;
 #[cfg(feature = "float_helpers")]
 pub(crate) const HALF_LIMB_HIGH_BIT: Limb = LIMB_HIGH_BIT >> 1;
 pub(crate) const LIMB_MAX_HALF: Limb = Limb::MAX >> 1;
+pub(crate) const LIMB_MAX_QUARTER: Limb = Limb::MAX >> 2;
 pub(crate) const LIMB_MAX_MINUS_1: Limb = Limb::MAX - 1;
 pub(crate) const LIMB_MAX_DIV_3: Limb = Limb::MAX / 3;
 // The largest value fitting in the low half of a `Limb` (`GMP_NUMB_HALFMAX`).

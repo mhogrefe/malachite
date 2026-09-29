@@ -3306,6 +3306,16 @@ pub fn integer_vec_integer_vec_integer_triple_gen()
     )
 }
 
+// All `(Vec<Integer>, Vec<Integer>, Integer)` where the two `Vec`s have the same length.
+pub fn integer_vec_integer_vec_integer_triple_gen_var_1()
+-> Generator<(Vec<Integer>, Vec<Integer>, Integer)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_vec_integer_triple_gen_var_1,
+        &random_integer_vec_integer_vec_integer_triple_gen_var_1,
+        &special_random_integer_vec_integer_vec_integer_triple_gen_var_1,
+    )
+}
+
 // -- Vec<Natural> --
 
 pub fn natural_vec_gen() -> Generator<Vec<Natural>> {

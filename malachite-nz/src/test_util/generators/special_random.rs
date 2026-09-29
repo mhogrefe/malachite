@@ -6583,6 +6583,45 @@ pub fn special_random_integer_vec_integer_vec_integer_triple_gen(
     ))
 }
 
+pub fn special_random_integer_vec_integer_vec_integer_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, Integer)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &|seed_2| {
+                        random_pairs_from_single(striped_random_integers(
+                            seed_2,
+                            config.get_or("mean_stripe_n", 32),
+                            config.get_or("mean_stripe_d", 1),
+                            config.get_or("mean_bits_n", 64),
+                            config.get_or("mean_bits_d", 1),
+                        ))
+                    },
+                    config.get_or("mean_len_n", 4),
+                    config.get_or("mean_len_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(pairs, x)| {
+            let (xs, ys) = pairs.into_iter().unzip();
+            (xs, ys, x)
+        }),
+    )
+}
+
 // -- Vec<Natural> --
 
 pub fn special_random_natural_vec_gen(config: &GenConfig) -> It<Vec<Natural>> {

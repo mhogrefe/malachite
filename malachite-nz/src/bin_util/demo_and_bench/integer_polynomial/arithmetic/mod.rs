@@ -38,6 +38,7 @@ pub(crate) fn register(runner: &mut Runner) {
     scalar_mul::register(runner);
     sub::register(runner);
     sub_truncated::register(runner);
+    vec::register(runner);
 }
 
 mod add;
@@ -69,3 +70,4 @@ mod scalar_mul;
 mod shl;
 mod sub;
 mod sub_truncated;
+mod vec;
