@@ -83,8 +83,14 @@ use crate::test_util::generators::exhaustive::{
     map_helper_1, map_helper_2, map_helper_3, mul_shr_round_valid,
     round_to_multiple_integer_filter_map, round_to_multiple_natural_filter_map,
 };
-use crate::test_util::generators::random::random_gmp_format_strings;
-use crate::test_util::generators::{T8, factors_of_limb_max};
+use crate::test_util::generators::random::{
+    integer_vec_pair_len, integer_vec_square_len, random_gmp_format_strings,
+    random_integer_vec_mul_pairs, random_integer_vec_mul_singles, random_with_bounded_unsigned,
+    random_with_bounded_unsigned_pair,
+};
+use crate::test_util::generators::{
+    T8, factors_of_limb_max, integer_vecs_mul_is_tiny_1, integer_vecs_mul_is_tiny_2,
+};
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
 use malachite_base::bools::random::{RandomBools, random_bools};
 use malachite_base::foer_sequences::FoerSequence;
@@ -6619,6 +6625,233 @@ pub fn special_random_integer_vec_integer_vec_integer_triple_gen_var_1(
             let (xs, ys) = pairs.into_iter().unzip();
             (xs, ys, x)
         }),
+    )
+}
+
+// -- Vec<Integer> (polynomial multiplication) --
+
+fn special_random_nonempty_integer_vecs(
+    seed: Seed,
+    config: &GenConfig,
+    mean_bits: u64,
+) -> It<Vec<Integer>> {
+    let mean_stripe_n = config.get_or("mean_stripe_n", 32);
+    let mean_stripe_d = config.get_or("mean_stripe_d", 1);
+    let mean_bits_n = config.get_or("mean_bits_n", mean_bits);
+    let mean_bits_d = config.get_or("mean_bits_d", 1);
+    Box::new(random_vecs_min_length(
+        seed,
+        1,
+        &|seed_2| {
+            striped_random_integers(
+                seed_2,
+                mean_stripe_n,
+                mean_stripe_d,
+                mean_bits_n,
+                mean_bits_d,
+            )
+        },
+        config.get_or("mean_len_n", 4),
+        config.get_or("mean_len_d", 1),
+    ))
+}
+
+pub fn special_random_integer_vec_gen_var_1(config: &GenConfig) -> It<Vec<Integer>> {
+    random_integer_vec_mul_singles(
+        &|seed| special_random_nonempty_integer_vecs(seed, config, 64),
+        |_, _| true,
+    )
+}
+
+pub fn special_random_integer_vec_gen_var_2(config: &GenConfig) -> It<Vec<Integer>> {
+    random_integer_vec_mul_singles(
+        &|seed| special_random_nonempty_integer_vecs(seed, config, 8),
+        integer_vecs_mul_is_tiny_1,
+    )
+}
+
+pub fn special_random_integer_vec_gen_var_3(config: &GenConfig) -> It<Vec<Integer>> {
+    random_integer_vec_mul_singles(
+        &|seed| special_random_nonempty_integer_vecs(seed, config, 24),
+        integer_vecs_mul_is_tiny_2,
+    )
+}
+
+pub fn special_random_integer_vec_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>)> {
+    random_integer_vec_mul_pairs(
+        &|seed| special_random_nonempty_integer_vecs(seed, config, 64),
+        |_, _| true,
+    )
+}
+
+pub fn special_random_integer_vec_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>)> {
+    random_integer_vec_mul_pairs(
+        &|seed| special_random_nonempty_integer_vecs(seed, config, 8),
+        integer_vecs_mul_is_tiny_1,
+    )
+}
+
+pub fn special_random_integer_vec_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>)> {
+    random_integer_vec_mul_pairs(
+        &|seed| special_random_nonempty_integer_vecs(seed, config, 24),
+        integer_vecs_mul_is_tiny_2,
+    )
+}
+
+pub fn special_random_integer_vec_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, u64)> {
+    random_with_bounded_unsigned(
+        special_random_integer_vec_gen_var_1(config),
+        |xs| integer_vec_square_len(xs),
+        1,
+    )
+}
+
+pub fn special_random_integer_vec_unsigned_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, u64)> {
+    random_with_bounded_unsigned(
+        special_random_integer_vec_gen_var_2(config),
+        |xs| integer_vec_square_len(xs),
+        1,
+    )
+}
+
+pub fn special_random_integer_vec_unsigned_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, u64)> {
+    random_with_bounded_unsigned(
+        special_random_integer_vec_gen_var_3(config),
+        |xs| integer_vec_square_len(xs),
+        1,
+    )
+}
+
+pub fn special_random_integer_vec_unsigned_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, u64, u64)> {
+    Box::new(
+        random_with_bounded_unsigned_pair(special_random_integer_vec_gen_var_1(config), |xs| {
+            integer_vec_square_len(xs)
+        })
+        .map(|(xs, (lo, hi))| (xs, lo, hi)),
+    )
+}
+
+pub fn special_random_integer_vec_unsigned_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, u64, u64)> {
+    Box::new(
+        random_with_bounded_unsigned_pair(special_random_integer_vec_gen_var_2(config), |xs| {
+            integer_vec_square_len(xs)
+        })
+        .map(|(xs, (lo, hi))| (xs, lo, hi)),
+    )
+}
+
+pub fn special_random_integer_vec_unsigned_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, u64, u64)> {
+    Box::new(
+        random_with_bounded_unsigned_pair(special_random_integer_vec_gen_var_3(config), |xs| {
+            integer_vec_square_len(xs)
+        })
+        .map(|(xs, (lo, hi))| (xs, lo, hi)),
+    )
+}
+
+pub fn special_random_integer_vec_integer_vec_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    Box::new(
+        random_with_bounded_unsigned(
+            special_random_integer_vec_pair_gen_var_1(config),
+            integer_vec_pair_len,
+            1,
+        )
+        .map(|((xs, ys), n)| (xs, ys, n)),
+    )
+}
+
+pub fn special_random_integer_vec_integer_vec_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    Box::new(
+        random_with_bounded_unsigned(
+            special_random_integer_vec_pair_gen_var_2(config),
+            integer_vec_pair_len,
+            1,
+        )
+        .map(|((xs, ys), n)| (xs, ys, n)),
+    )
+}
+
+pub fn special_random_integer_vec_integer_vec_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    Box::new(
+        random_with_bounded_unsigned(
+            special_random_integer_vec_pair_gen_var_3(config),
+            integer_vec_pair_len,
+            1,
+        )
+        .map(|((xs, ys), n)| (xs, ys, n)),
+    )
+}
+
+pub fn special_random_integer_vec_integer_vec_unsigned_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    Box::new(
+        random_with_bounded_unsigned(
+            special_random_integer_vec_pair_gen_var_1(config),
+            integer_vec_pair_len,
+            0,
+        )
+        .map(|((xs, ys), n)| (xs, ys, n)),
+    )
+}
+
+pub fn special_random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    Box::new(
+        random_with_bounded_unsigned_pair(
+            special_random_integer_vec_pair_gen_var_1(config),
+            integer_vec_pair_len,
+        )
+        .map(|((xs, ys), (lo, hi))| (xs, ys, lo, hi)),
+    )
+}
+
+pub fn special_random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    Box::new(
+        random_with_bounded_unsigned_pair(
+            special_random_integer_vec_pair_gen_var_2(config),
+            integer_vec_pair_len,
+        )
+        .map(|((xs, ys), (lo, hi))| (xs, ys, lo, hi)),
+    )
+}
+
+pub fn special_random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    Box::new(
+        random_with_bounded_unsigned_pair(
+            special_random_integer_vec_pair_gen_var_3(config),
+            integer_vec_pair_len,
+        )
+        .map(|((xs, ys), (lo, hi))| (xs, ys, lo, hi)),
     )
 }
 

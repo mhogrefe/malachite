@@ -38,6 +38,12 @@ pub(crate) fn register(runner: &mut Runner) {
     scalar_mul::register(runner);
     sub::register(runner);
     sub_truncated::register(runner);
+    mul::register(runner);
+    mul_truncated::register(runner);
+    mul_high::register(runner);
+    mul_middle::register(runner);
+    square::register(runner);
+    square_truncated::register(runner);
     vec::register(runner);
 }
 
@@ -62,12 +68,18 @@ mod is_unit;
 mod l2_norm_squared;
 mod mod_op;
 mod mod_power_of_2;
+mod mul;
+mod mul_high;
+mod mul_middle;
 mod mul_power_of_x;
+mod mul_truncated;
 mod neg;
 mod nth_derivative;
 mod scalar_add_mul;
 mod scalar_mul;
 mod shl;
+mod square;
+mod square_truncated;
 mod sub;
 mod sub_truncated;
 mod vec;

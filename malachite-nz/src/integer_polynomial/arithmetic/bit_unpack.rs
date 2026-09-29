@@ -13,10 +13,11 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::bit_pack::field_start;
+use crate::integer_polynomial::arithmetic::vec::SMALL_FMPZ_BITCOUNT_MAX;
+use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::logic::not::limbs_not_in_place;
-use crate::natural::{Natural, WIDTH_MINUS_2};
 use crate::platform::{Limb, SignedLimb};
 use alloc::vec;
 use alloc::vec::Vec;
@@ -28,10 +29,6 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits, WrappingFrom};
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
 use malachite_base::polynomial::{BitUnpack, Polynomial};
-
-// The largest number of bits that FLINT stores in a small `fmpz`: `SMALL_FMPZ_BITCOUNT_MAX` from
-// `flint.h`, FLINT 3.6.0.
-const SMALL_FMPZ_BITCOUNT_MAX: u64 = WIDTH_MINUS_2;
 
 // The limbs of the `bits`-bit field of `arr` that starts at bit `shift` of `arr[0]`, as an unsigned
 // number with `ceil(bits / Limb::WIDTH)` limbs.

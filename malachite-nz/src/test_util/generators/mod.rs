@@ -9,6 +9,8 @@
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+use crate::integer_polynomial::arithmetic::vec::{TinyKernel, tiny_kernel};
 use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
@@ -39,6 +41,7 @@ use malachite_base::test_util::generators::common::Generator;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
 use num::{BigInt, BigUint};
+use std::cmp::min;
 use std::ops::{Shl, Shr};
 
 // -- GaussianInteger --
@@ -3313,6 +3316,231 @@ pub fn integer_vec_integer_vec_integer_triple_gen_var_1()
         &exhaustive_integer_vec_integer_vec_integer_triple_gen_var_1,
         &random_integer_vec_integer_vec_integer_triple_gen_var_1,
         &special_random_integer_vec_integer_vec_integer_triple_gen_var_1,
+    )
+}
+
+// -- Vec<Integer> (polynomial multiplication) --
+
+// The tiny kernel that FLINT's dispatchers would choose for multiplying polynomials with
+// coefficients `xs` and `ys`, both nonempty, if their lengths were short enough.
+fn integer_vecs_mul_tiny_kernel(xs: &[Integer], ys: &[Integer]) -> Option<TinyKernel> {
+    tiny_kernel(
+        vec_max_bits(xs).0,
+        vec_max_bits(ys).0,
+        u64::exact_from(min(xs.len(), ys.len())),
+        true,
+    )
+}
+
+// Whether multiplying polynomials with coefficients `xs` and `ys` satisfies the preconditions of
+// the single-word tiny kernels, such as `mul_to_out_tiny_1`.
+pub(crate) fn integer_vecs_mul_is_tiny_1(xs: &[Integer], ys: &[Integer]) -> bool {
+    integer_vecs_mul_tiny_kernel(xs, ys) == Some(TinyKernel::OneWord)
+}
+
+// Whether multiplying polynomials with coefficients `xs` and `ys` satisfies the preconditions of
+// the double-word tiny kernels, such as `mul_to_out_tiny_2`, which those of the single-word kernels
+// imply.
+pub(crate) fn integer_vecs_mul_is_tiny_2(xs: &[Integer], ys: &[Integer]) -> bool {
+    integer_vecs_mul_tiny_kernel(xs, ys).is_some()
+}
+
+// All nonempty `Vec<Integer>`s.
+pub fn integer_vec_gen_var_1() -> Generator<Vec<Integer>> {
+    Generator::new(
+        &exhaustive_integer_vec_gen_var_1,
+        &random_integer_vec_gen_var_1,
+        &special_random_integer_vec_gen_var_1,
+    )
+}
+
+// All nonempty `Vec<Integer>`s where the `Vec` satisfies the preconditions of
+// `square_to_out_tiny_1`.
+pub fn integer_vec_gen_var_2() -> Generator<Vec<Integer>> {
+    Generator::new(
+        &exhaustive_integer_vec_gen_var_2,
+        &random_integer_vec_gen_var_2,
+        &special_random_integer_vec_gen_var_2,
+    )
+}
+
+// All nonempty `Vec<Integer>`s where the `Vec` satisfies the preconditions of
+// `square_to_out_tiny_2`.
+pub fn integer_vec_gen_var_3() -> Generator<Vec<Integer>> {
+    Generator::new(
+        &exhaustive_integer_vec_gen_var_3,
+        &random_integer_vec_gen_var_3,
+        &special_random_integer_vec_gen_var_3,
+    )
+}
+
+// All pairs of nonempty `Vec<Integer>`s.
+pub fn integer_vec_pair_gen_var_1() -> Generator<(Vec<Integer>, Vec<Integer>)> {
+    Generator::new(
+        &exhaustive_integer_vec_pair_gen_var_1,
+        &random_integer_vec_pair_gen_var_1,
+        &special_random_integer_vec_pair_gen_var_1,
+    )
+}
+
+// All pairs of nonempty `Vec<Integer>`s where the `Vec`s satisfy the preconditions of
+// `mul_to_out_tiny_1`.
+pub fn integer_vec_pair_gen_var_2() -> Generator<(Vec<Integer>, Vec<Integer>)> {
+    Generator::new(
+        &exhaustive_integer_vec_pair_gen_var_2,
+        &random_integer_vec_pair_gen_var_2,
+        &special_random_integer_vec_pair_gen_var_2,
+    )
+}
+
+// All pairs of nonempty `Vec<Integer>`s where the `Vec`s satisfy the preconditions of
+// `mul_to_out_tiny_2`.
+pub fn integer_vec_pair_gen_var_3() -> Generator<(Vec<Integer>, Vec<Integer>)> {
+    Generator::new(
+        &exhaustive_integer_vec_pair_gen_var_3,
+        &random_integer_vec_pair_gen_var_3,
+        &special_random_integer_vec_pair_gen_var_3,
+    )
+}
+
+// All `(Vec<Integer>, u64)` where the `Vec` is nonempty and the `u64` is positive and less than
+// twice the `Vec`'s length.
+pub fn integer_vec_unsigned_pair_gen_var_1() -> Generator<(Vec<Integer>, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_unsigned_pair_gen_var_1,
+        &random_integer_vec_unsigned_pair_gen_var_1,
+        &special_random_integer_vec_unsigned_pair_gen_var_1,
+    )
+}
+
+// All `(Vec<Integer>, u64)` as in `integer_vec_unsigned_pair_gen_var_1`, where the `Vec` satisfies
+// the preconditions of `square_to_out_tiny_1`.
+pub fn integer_vec_unsigned_pair_gen_var_2() -> Generator<(Vec<Integer>, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_unsigned_pair_gen_var_2,
+        &random_integer_vec_unsigned_pair_gen_var_2,
+        &special_random_integer_vec_unsigned_pair_gen_var_2,
+    )
+}
+
+// All `(Vec<Integer>, u64)` as in `integer_vec_unsigned_pair_gen_var_1`, where the `Vec` satisfies
+// the preconditions of `square_to_out_tiny_2`.
+pub fn integer_vec_unsigned_pair_gen_var_3() -> Generator<(Vec<Integer>, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_unsigned_pair_gen_var_3,
+        &random_integer_vec_unsigned_pair_gen_var_3,
+        &special_random_integer_vec_unsigned_pair_gen_var_3,
+    )
+}
+
+// All `(Vec<Integer>, u64, u64)` where the `Vec` is nonempty and the `u64`s satisfy `x < y < 2 *
+// len`, where `len` is the `Vec`'s length.
+pub fn integer_vec_unsigned_unsigned_triple_gen_var_1() -> Generator<(Vec<Integer>, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_unsigned_unsigned_triple_gen_var_1,
+        &random_integer_vec_unsigned_unsigned_triple_gen_var_1,
+        &special_random_integer_vec_unsigned_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(Vec<Integer>, u64, u64)` as in `integer_vec_unsigned_unsigned_triple_gen_var_1`, where the
+// `Vec` satisfies the preconditions of `square_to_out_tiny_1`.
+pub fn integer_vec_unsigned_unsigned_triple_gen_var_2() -> Generator<(Vec<Integer>, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_unsigned_unsigned_triple_gen_var_2,
+        &random_integer_vec_unsigned_unsigned_triple_gen_var_2,
+        &special_random_integer_vec_unsigned_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(Vec<Integer>, u64, u64)` as in `integer_vec_unsigned_unsigned_triple_gen_var_1`, where the
+// `Vec` satisfies the preconditions of `square_to_out_tiny_2`.
+pub fn integer_vec_unsigned_unsigned_triple_gen_var_3() -> Generator<(Vec<Integer>, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_unsigned_unsigned_triple_gen_var_3,
+        &random_integer_vec_unsigned_unsigned_triple_gen_var_3,
+        &special_random_integer_vec_unsigned_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(Vec<Integer>, Vec<Integer>, u64)` where the `Vec`s are nonempty and the `u64` is positive
+// and less than the sum of their lengths.
+pub fn integer_vec_integer_vec_unsigned_triple_gen_var_1()
+-> Generator<(Vec<Integer>, Vec<Integer>, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_1,
+        &random_integer_vec_integer_vec_unsigned_triple_gen_var_1,
+        &special_random_integer_vec_integer_vec_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(Vec<Integer>, Vec<Integer>, u64)` as in
+// `integer_vec_integer_vec_unsigned_triple_gen_var_1`, where the `Vec`s satisfy the preconditions
+// of `mul_to_out_tiny_1`.
+pub fn integer_vec_integer_vec_unsigned_triple_gen_var_2()
+-> Generator<(Vec<Integer>, Vec<Integer>, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_2,
+        &random_integer_vec_integer_vec_unsigned_triple_gen_var_2,
+        &special_random_integer_vec_integer_vec_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(Vec<Integer>, Vec<Integer>, u64)` as in
+// `integer_vec_integer_vec_unsigned_triple_gen_var_1`, where the `Vec`s satisfy the preconditions
+// of `mul_to_out_tiny_2`.
+pub fn integer_vec_integer_vec_unsigned_triple_gen_var_3()
+-> Generator<(Vec<Integer>, Vec<Integer>, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_3,
+        &random_integer_vec_integer_vec_unsigned_triple_gen_var_3,
+        &special_random_integer_vec_integer_vec_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(Vec<Integer>, Vec<Integer>, u64)` where the `Vec`s are nonempty and the `u64` is less than
+// the sum of their lengths.
+pub fn integer_vec_integer_vec_unsigned_triple_gen_var_4()
+-> Generator<(Vec<Integer>, Vec<Integer>, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_4,
+        &random_integer_vec_integer_vec_unsigned_triple_gen_var_4,
+        &special_random_integer_vec_integer_vec_unsigned_triple_gen_var_4,
+    )
+}
+
+// All `(Vec<Integer>, Vec<Integer>, u64, u64)` where the `Vec`s are nonempty and the `u64`s satisfy
+// `x < y < len`, where `len` is the sum of the `Vec`s' lengths.
+pub fn integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1()
+-> Generator<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1,
+        &random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// All `(Vec<Integer>, Vec<Integer>, u64, u64)` as in
+// `integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1`, where the `Vec`s satisfy the
+// preconditions of `mul_to_out_tiny_1`.
+pub fn integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2()
+-> Generator<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2,
+        &random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2,
+        &special_random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2,
+    )
+}
+
+// All `(Vec<Integer>, Vec<Integer>, u64, u64)` as in
+// `integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1`, where the `Vec`s satisfy the
+// preconditions of `mul_to_out_tiny_2`.
+pub fn integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3()
+-> Generator<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3,
+        &random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3,
+        &special_random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3,
     )
 }
 

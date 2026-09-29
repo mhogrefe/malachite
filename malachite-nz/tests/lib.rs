@@ -576,12 +576,18 @@ pub mod integer_polynomial {
         pub mod l2_norm_squared;
         pub mod mod_op;
         pub mod mod_power_of_2;
+        pub mod mul;
+        pub mod mul_high;
+        pub mod mul_middle;
         pub mod mul_power_of_x;
+        pub mod mul_truncated;
         pub mod neg;
         pub mod nth_derivative;
         pub mod scalar_add_mul;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod square;
+        pub mod square_truncated;
         pub mod sub;
         pub mod sub_truncated;
         pub mod vec {

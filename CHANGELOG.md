@@ -413,6 +413,13 @@ documented by git history.
   and lets wider coefficients overlap rather than truncating them. `bit_unpack` is the inverse,
   like FLINT's `fmpz_poly_bit_unpack` (signed fields, for `IntegerPolynomial`) and
   `fmpz_poly_bit_unpack_unsigned` (for `NaturalPolynomial`), except that it panics when $b = 0$.
+- Multiplication of `IntegerPolynomial`s: `Mul` and `MulAssign`, like FLINT's `fmpz_poly_mul`;
+  `Square` and `SquareAssign`, like `fmpz_poly_sqr`; and the new `MulTruncated`,
+  `MulTruncatedAssign`, `SquareTruncated`, and `SquareTruncatedAssign` traits, in
+  `malachite_base::polynomial`, which keep only the coefficients of $x^i$ for $i$ below a given
+  length, like `fmpz_poly_mullow` and `fmpz_poly_sqrlow`. So far these use schoolbook
+  multiplication, or word-sized arithmetic when the coefficients and the product are small enough
+  (FLINT's `tiny` kernels); FLINT's faster algorithms are to follow.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

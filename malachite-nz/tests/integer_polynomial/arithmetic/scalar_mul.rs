@@ -11,7 +11,7 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::scalar_mul::{
-    integers_mul_scalar, integers_mul_scalar_assign,
+    integers_mul_scalar, integers_mul_scalar_assign, integers_mul_scalar_to_out,
 };
 use malachite_nz::test_util::generators::{integer_vec_gen, integer_vec_integer_pair_gen};
 use malachite_nz::test_util::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_naive;
@@ -28,16 +28,23 @@ fn test_integers_mul_scalar() {
         let ys = integers_mul_scalar(&xs, &c);
         assert_eq!(ys.to_debug_string(), out);
         assert_eq!(integers_mul_scalar_naive(&xs, &c), ys);
+        let mut out = vec![Integer::ZERO; xs.len()];
+        integers_mul_scalar_to_out(&mut out, &xs, &c);
+        assert_eq!(out, ys);
         let mut zs = xs;
         integers_mul_scalar_assign(&mut zs, &c);
         assert_eq!(zs, ys);
     };
     test(&[], "5", "[]");
     // Multiplying by 0 gives zeros, which are not trimmed.
+    // - *c == 0
     test(&["1", "-2", "3"], "0", "[0, 0, 0]");
     // Multiplying by 1 changes nothing, and multiplying by -1 negates.
+    // - *c == 1
     test(&["1", "-2", "3"], "1", "[1, -2, 3]");
+    // - *c == -1
     test(&["1", "-2", "3"], "-1", "[-1, 2, -3]");
+    // - *c != 0 && *c != 1 && *c != -1
     test(&["1", "-2", "0", "3"], "4", "[4, -8, 0, 12]");
     // Trailing zeros are kept.
     test(&["-7", "0"], "-3", "[21, 0]");
@@ -58,6 +65,10 @@ fn integers_mul_scalar_properties() {
         let mut zs = xs.clone();
         integers_mul_scalar_assign(&mut zs, &c);
         assert_eq!(zs, ys);
+        // Writing to a shorter output gives a prefix.
+        let mut out = vec![Integer::ZERO; xs.len() >> 1];
+        integers_mul_scalar_to_out(&mut out, &xs, &c);
+        assert_eq!(out, &ys[..xs.len() >> 1]);
         // Negating the scalar negates every product.
         assert_eq!(
             integers_mul_scalar(&xs, &-&c),

@@ -249,6 +249,69 @@ pub trait SubTruncatedAssign<Rhs = Self> {
     fn sub_truncated_assign(&mut self, other: Rhs, len: u64);
 }
 
+/// Multiplies two polynomials, keeping only the coefficients of $x^i$ for $i$ less than a given
+/// length.
+///
+/// With $n$ equal to `len`, this is multiplication in the ring of polynomials modulo $x^n$, applied
+/// to the images of the two polynomials there. The polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait MulTruncated<Rhs = Self> {
+    type Output;
+
+    /// Multiplies two polynomials and truncates the product to its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, q, n) = pq \bmod x^n.
+    /// $$
+    fn mul_truncated(self, other: Rhs, len: u64) -> Self::Output;
+}
+
+/// Multiplies a polynomial by another in place, keeping only the coefficients of $x^i$ for $i$ less
+/// than a given length.
+///
+/// With $n$ equal to `len`, this is multiplication in the ring of polynomials modulo $x^n$, applied
+/// to the images of the two polynomials there. The polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait MulTruncatedAssign<Rhs = Self> {
+    /// Multiplies `self` by a polynomial and truncates the product to its first `len` coefficients.
+    ///
+    /// $$
+    /// p \gets pq \bmod x^n.
+    /// $$
+    fn mul_truncated_assign(&mut self, other: Rhs, len: u64);
+}
+
+/// Squares a polynomial, keeping only the coefficients of $x^i$ for $i$ less than a given length.
+///
+/// With $n$ equal to `len`, this is squaring in the ring of polynomials modulo $x^n$, applied to
+/// the image of the polynomial there. The polynomial need not already be truncated: it may have any
+/// number of coefficients, and only the first `len` are read.
+pub trait SquareTruncated {
+    type Output;
+
+    /// Squares a polynomial and truncates the square to its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, n) = p^2 \bmod x^n.
+    /// $$
+    fn square_truncated(self, len: u64) -> Self::Output;
+}
+
+/// Squares a polynomial in place, keeping only the coefficients of $x^i$ for $i$ less than a given
+/// length.
+///
+/// With $n$ equal to `len`, this is squaring in the ring of polynomials modulo $x^n$, applied to
+/// the image of the polynomial there. The polynomial need not already be truncated: it may have any
+/// number of coefficients, and only the first `len` are read.
+pub trait SquareTruncatedAssign {
+    /// Squares `self` and truncates the square to its first `len` coefficients.
+    ///
+    /// $$
+    /// p \gets p^2 \bmod x^n.
+    /// $$
+    fn square_truncated_assign(&mut self, len: u64);
+}
+
 /// Adds two polynomials modulo $2^k$, keeping only the coefficients of $x^i$ for $i$ less than a
 /// given length. The coefficients of both must already be reduced modulo $2^k$.
 ///

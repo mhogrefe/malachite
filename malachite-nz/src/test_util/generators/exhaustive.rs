@@ -92,7 +92,10 @@ use crate::test_util::extra_variadic::{
     exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
 };
 use crate::test_util::generators::common::{GMP_FORMAT_COMBO_COUNT, gmp_format_string_from_parts};
-use crate::test_util::generators::{factors_of_limb_max, limbs_odd_factorial_valid};
+use crate::test_util::generators::{
+    factors_of_limb_max, integer_vecs_mul_is_tiny_1, integer_vecs_mul_is_tiny_2,
+    limbs_odd_factorial_valid,
+};
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::{ExhaustiveBools, exhaustive_bools};
@@ -2977,6 +2980,218 @@ pub fn exhaustive_integer_vec_integer_vec_integer_triple_gen_var_1()
             let (xs, ys) = pairs.into_iter().unzip();
             (xs, ys, x)
         }),
+    )
+}
+
+// -- Vec<Integer> (polynomial multiplication) --
+
+// Generates, for each `x`, the `u64`s in an inclusive range that depends on `x`.
+struct IntegerVecsRangeGenerator<X>(fn(&X) -> (u64, u64));
+
+impl<X: Clone> ExhaustiveDependentPairsYsGenerator<X, u64, It<u64>>
+    for IntegerVecsRangeGenerator<X>
+{
+    #[inline]
+    fn get_ys(&self, x: &X) -> It<u64> {
+        let (a, b) = (self.0)(x);
+        Box::new(primitive_int_increasing_inclusive_range(a, b))
+    }
+}
+
+// Generates, for each `x`, the pairs of `u64`s `(y, z)` with `y < z <= max`, where `max` depends on
+// `x`.
+struct IntegerVecsOrderedPairGenerator<X>(fn(&X) -> u64);
+
+impl<X: Clone> ExhaustiveDependentPairsYsGenerator<X, (u64, u64), It<(u64, u64)>>
+    for IntegerVecsOrderedPairGenerator<X>
+{
+    #[inline]
+    fn get_ys(&self, x: &X) -> It<(u64, u64)> {
+        Box::new(exhaustive_ordered_unique_pairs(
+            primitive_int_increasing_inclusive_range(0, (self.0)(x)),
+        ))
+    }
+}
+
+fn integer_vec_len(xs: &[Integer]) -> u64 {
+    u64::exact_from(xs.len())
+}
+
+fn integer_vec_pair_len(p: &(Vec<Integer>, Vec<Integer>)) -> u64 {
+    u64::exact_from(p.0.len() + p.1.len())
+}
+
+fn dependent_index_sequence() -> It<usize> {
+    Box::new(bit_distributor_sequence(
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+    ))
+}
+
+pub fn exhaustive_integer_vec_gen_var_1() -> It<Vec<Integer>> {
+    Box::new(exhaustive_vecs_min_length(1, exhaustive_integers()))
+}
+
+pub fn exhaustive_integer_vec_gen_var_2() -> It<Vec<Integer>> {
+    Box::new(exhaustive_integer_vec_gen_var_1().filter(|xs| integer_vecs_mul_is_tiny_1(xs, xs)))
+}
+
+pub fn exhaustive_integer_vec_gen_var_3() -> It<Vec<Integer>> {
+    Box::new(exhaustive_integer_vec_gen_var_1().filter(|xs| integer_vecs_mul_is_tiny_2(xs, xs)))
+}
+
+pub fn exhaustive_integer_vec_pair_gen_var_1() -> It<(Vec<Integer>, Vec<Integer>)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_vecs_min_length(
+        1,
+        exhaustive_integers(),
+    )))
+}
+
+pub fn exhaustive_integer_vec_pair_gen_var_2() -> It<(Vec<Integer>, Vec<Integer>)> {
+    Box::new(
+        exhaustive_integer_vec_pair_gen_var_1()
+            .filter(|(xs, ys)| integer_vecs_mul_is_tiny_1(xs, ys)),
+    )
+}
+
+pub fn exhaustive_integer_vec_pair_gen_var_3() -> It<(Vec<Integer>, Vec<Integer>)> {
+    Box::new(
+        exhaustive_integer_vec_pair_gen_var_1()
+            .filter(|(xs, ys)| integer_vecs_mul_is_tiny_2(xs, ys)),
+    )
+}
+
+fn exhaustive_integer_vec_unsigned_pair_gen_helper(
+    xss: It<Vec<Integer>>,
+) -> It<(Vec<Integer>, u64)> {
+    Box::new(exhaustive_dependent_pairs(
+        dependent_index_sequence(),
+        xss,
+        IntegerVecsRangeGenerator(|xs: &Vec<Integer>| (1, (integer_vec_len(xs) << 1) - 1)),
+    ))
+}
+
+pub fn exhaustive_integer_vec_unsigned_pair_gen_var_1() -> It<(Vec<Integer>, u64)> {
+    exhaustive_integer_vec_unsigned_pair_gen_helper(exhaustive_integer_vec_gen_var_1())
+}
+
+pub fn exhaustive_integer_vec_unsigned_pair_gen_var_2() -> It<(Vec<Integer>, u64)> {
+    exhaustive_integer_vec_unsigned_pair_gen_helper(exhaustive_integer_vec_gen_var_2())
+}
+
+pub fn exhaustive_integer_vec_unsigned_pair_gen_var_3() -> It<(Vec<Integer>, u64)> {
+    exhaustive_integer_vec_unsigned_pair_gen_helper(exhaustive_integer_vec_gen_var_3())
+}
+
+fn exhaustive_integer_vec_unsigned_unsigned_triple_gen_helper(
+    xss: It<Vec<Integer>>,
+) -> It<(Vec<Integer>, u64, u64)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            dependent_index_sequence(),
+            xss,
+            IntegerVecsOrderedPairGenerator(|xs: &Vec<Integer>| (integer_vec_len(xs) << 1) - 1),
+        )
+        .map(|(xs, (lo, hi))| (xs, lo, hi)),
+    )
+}
+
+pub fn exhaustive_integer_vec_unsigned_unsigned_triple_gen_var_1() -> It<(Vec<Integer>, u64, u64)> {
+    exhaustive_integer_vec_unsigned_unsigned_triple_gen_helper(exhaustive_integer_vec_gen_var_1())
+}
+
+pub fn exhaustive_integer_vec_unsigned_unsigned_triple_gen_var_2() -> It<(Vec<Integer>, u64, u64)> {
+    exhaustive_integer_vec_unsigned_unsigned_triple_gen_helper(exhaustive_integer_vec_gen_var_2())
+}
+
+pub fn exhaustive_integer_vec_unsigned_unsigned_triple_gen_var_3() -> It<(Vec<Integer>, u64, u64)> {
+    exhaustive_integer_vec_unsigned_unsigned_triple_gen_helper(exhaustive_integer_vec_gen_var_3())
+}
+
+fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_helper(
+    pairs: It<(Vec<Integer>, Vec<Integer>)>,
+    min: u64,
+) -> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    let range: fn(&(Vec<Integer>, Vec<Integer>)) -> (u64, u64) = if min == 0 {
+        |p| (0, integer_vec_pair_len(p) - 1)
+    } else {
+        |p| (1, integer_vec_pair_len(p) - 1)
+    };
+    Box::new(
+        exhaustive_dependent_pairs(
+            dependent_index_sequence(),
+            pairs,
+            IntegerVecsRangeGenerator(range),
+        )
+        .map(|((xs, ys), n)| (xs, ys, n)),
+    )
+}
+
+pub fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_1()
+-> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    exhaustive_integer_vec_integer_vec_unsigned_triple_gen_helper(
+        exhaustive_integer_vec_pair_gen_var_1(),
+        1,
+    )
+}
+
+pub fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_2()
+-> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    exhaustive_integer_vec_integer_vec_unsigned_triple_gen_helper(
+        exhaustive_integer_vec_pair_gen_var_2(),
+        1,
+    )
+}
+
+pub fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_3()
+-> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    exhaustive_integer_vec_integer_vec_unsigned_triple_gen_helper(
+        exhaustive_integer_vec_pair_gen_var_3(),
+        1,
+    )
+}
+
+pub fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_4()
+-> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    exhaustive_integer_vec_integer_vec_unsigned_triple_gen_helper(
+        exhaustive_integer_vec_pair_gen_var_1(),
+        0,
+    )
+}
+
+fn exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_helper(
+    pairs: It<(Vec<Integer>, Vec<Integer>)>,
+) -> It<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            dependent_index_sequence(),
+            pairs,
+            IntegerVecsOrderedPairGenerator(|p: &(Vec<Integer>, Vec<Integer>)| {
+                integer_vec_pair_len(p) - 1
+            }),
+        )
+        .map(|((xs, ys), (lo, hi))| (xs, ys, lo, hi)),
+    )
+}
+
+pub fn exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1()
+-> It<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_helper(
+        exhaustive_integer_vec_pair_gen_var_1(),
+    )
+}
+
+pub fn exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2()
+-> It<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_helper(
+        exhaustive_integer_vec_pair_gen_var_2(),
+    )
+}
+
+pub fn exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3()
+-> It<(Vec<Integer>, Vec<Integer>, u64, u64)> {
+    exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_helper(
+        exhaustive_integer_vec_pair_gen_var_3(),
     )
 }
 

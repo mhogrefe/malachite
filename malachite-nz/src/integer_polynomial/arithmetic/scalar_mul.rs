@@ -67,3 +67,33 @@ integers_mul_scalar(xs: &[Integer], c: &Integer) -> Vec<Integer> {
     }
 }
 }
+
+// Sets each element of `out` to the element of `xs` at the same index multiplied by `c`. `xs` must
+// be at least as long as `out`.
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the first
+// `out.len()` elements of `xs` and of `c`.
+//
+// This is equivalent to `_fmpz_vec_scalar_mul_fmpz` from `fmpz_vec/scalar_mul_fmpz.c`, FLINT 3.6.0,
+// where the output is separate from the input.
+crate_test_fn! {integers_mul_scalar_to_out(out: &mut [Integer], xs: &[Integer], c: &Integer) {
+    let xs = &xs[..out.len()];
+    if *c == 0u32 {
+        out.fill(Integer::ZERO);
+    } else if *c == 1u32 {
+        out.clone_from_slice(xs);
+    } else if *c == -1i32 {
+        for (o, x) in out.iter_mut().zip(xs) {
+            *o = -x;
+        }
+    } else {
+        for (o, x) in out.iter_mut().zip(xs) {
+            *o = x * c;
+        }
+    }
+}}
