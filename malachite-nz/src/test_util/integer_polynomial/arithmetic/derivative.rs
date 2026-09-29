@@ -1,0 +1,22 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::integer::Integer;
+use crate::integer_polynomial::IntegerPolynomial;
+use alloc::vec::Vec;
+use malachite_base::polynomial::Polynomial;
+
+// Multiplies the coefficient of x^i, read one at a time through `coefficient`, by i for each i from
+// 1, and normalizes the result. Nothing is shared with the implementation.
+pub fn derivative_naive(p: &IntegerPolynomial) -> IntegerPolynomial {
+    IntegerPolynomial::from_coefficients_asc(
+        (1..p.len())
+            .map(|i| p.coefficient(i) * Integer::from(i))
+            .collect::<Vec<Integer>>(),
+    )
+}

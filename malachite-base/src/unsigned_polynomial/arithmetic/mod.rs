@@ -49,6 +49,10 @@ pub mod mod_add;
 /// [`ModAddTruncatedAssign`](crate::polynomial::ModAddTruncatedAssign), for adding two polynomials
 /// modulo a value and keeping only their low coefficients.
 pub mod mod_add_truncated;
+/// Implementations of [`ModDerivative`](crate::polynomial::ModDerivative) and
+/// [`ModDerivativeAssign`](crate::polynomial::ModDerivativeAssign), for differentiating a
+/// polynomial modulo a number.
+pub mod mod_derivative;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
@@ -77,6 +81,10 @@ pub mod mod_power_of_2_add;
 /// [`ModPowerOf2AddTruncatedAssign`](crate::polynomial::ModPowerOf2AddTruncatedAssign), for adding
 /// two polynomials modulo $2^k$ and keeping only their low coefficients.
 pub mod mod_power_of_2_add_truncated;
+/// Implementations of [`ModPowerOf2Derivative`](crate::polynomial::ModPowerOf2Derivative) and
+/// [`ModPowerOf2DerivativeAssign`](crate::polynomial::ModPowerOf2DerivativeAssign), for
+/// differentiating a polynomial modulo a power of 2.
+pub mod mod_power_of_2_derivative;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every coefficient of a polynomial is less than a given power of 2.

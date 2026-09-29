@@ -31,6 +31,10 @@ pub mod content;
 /// [`DeflatePowerOfXAssign`](malachite_base::polynomial::DeflatePowerOfXAssign), for undoing the
 /// substitution of a power of the variable into a polynomial.
 pub mod deflate_power_of_x;
+/// Implementations of [`Derivative`](malachite_base::polynomial::Derivative) and
+/// [`DerivativeAssign`](malachite_base::polynomial::DerivativeAssign), for differentiating a
+/// polynomial.
+pub mod derivative;
 /// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
 /// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
 /// by a power of its variable and discarding the remainder.

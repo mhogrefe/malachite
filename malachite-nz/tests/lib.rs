@@ -563,6 +563,7 @@ pub mod integer_polynomial {
         pub mod content;
         pub mod content_chained;
         pub mod deflate_power_of_x;
+        pub mod derivative;
         pub mod div_exact;
         pub mod div_power_of_x;
         pub mod evaluate;
@@ -640,6 +641,7 @@ pub mod natural_polynomial {
         pub mod compose_power_of_x;
         pub mod content;
         pub mod deflate_power_of_x;
+        pub mod derivative;
         pub mod div_power_of_x;
         pub mod evaluate;
         pub mod exponent_gcd;
@@ -649,6 +651,7 @@ pub mod natural_polynomial {
         pub mod l2_norm_squared;
         pub mod mod_add;
         pub mod mod_add_truncated;
+        pub mod mod_derivative;
         pub mod mod_is_reduced;
         pub mod mod_make_monic;
         pub mod mod_neg;
@@ -656,6 +659,7 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_add_truncated;
+        pub mod mod_power_of_2_derivative;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_sub;

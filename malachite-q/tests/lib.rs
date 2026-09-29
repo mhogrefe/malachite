@@ -169,6 +169,7 @@ pub mod rational_polynomial {
         pub mod compose_power_of_x;
         pub mod content;
         pub mod deflate_power_of_x;
+        pub mod derivative;
         pub mod div_power_of_x;
         pub mod evaluate;
         pub mod exponent_gcd;

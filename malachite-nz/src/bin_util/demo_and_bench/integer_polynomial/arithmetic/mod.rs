@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     compose_power_of_x::register(runner);
     content::register(runner);
     content_chained::register(runner);
+    derivative::register(runner);
     div_exact::register(runner);
     div_power_of_x::register(runner);
     evaluate::register(runner);
@@ -44,6 +45,7 @@ mod compose_power_of_x;
 mod content;
 mod content_chained;
 mod deflate_power_of_x;
+mod derivative;
 mod div_exact;
 mod div_power_of_x;
 mod evaluate;

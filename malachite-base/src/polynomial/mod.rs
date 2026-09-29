@@ -661,6 +661,88 @@ pub fn slices_eq_truncated<A, B>(
             .all(|(x, y)| eq(x, y))
 }
 
+/// Computes the derivative of a polynomial, $\sum_i ia_ix^{i-1}$.
+pub trait Derivative {
+    type Output;
+
+    /// Computes the derivative of a polynomial.
+    ///
+    /// $$
+    /// f(p) = p'.
+    /// $$
+    fn derivative(self) -> Self::Output;
+}
+
+/// Replaces a polynomial with its derivative, $\sum_i ia_ix^{i-1}$.
+pub trait DerivativeAssign {
+    /// Replaces a polynomial with its derivative.
+    ///
+    /// $$
+    /// p \gets p'.
+    /// $$
+    fn derivative_assign(&mut self);
+}
+
+/// Computes the derivative of a polynomial modulo $m$. The coefficients must already be reduced
+/// modulo $m$.
+///
+/// Each coefficient $a_i$ becomes $ia_i \bmod m$, which can be zero even when $a_i$ is not, so the
+/// derivative can lose any number of degrees.
+pub trait ModDerivative<M> {
+    type Output;
+
+    /// Computes the derivative of a polynomial modulo $m$.
+    ///
+    /// $$
+    /// f(p, m) = p' \bmod m.
+    /// $$
+    fn mod_derivative(self, m: M) -> Self::Output;
+}
+
+/// Replaces a polynomial with its derivative modulo $m$. The coefficients must already be reduced
+/// modulo $m$.
+///
+/// Each coefficient $a_i$ becomes $ia_i \bmod m$, which can be zero even when $a_i$ is not, so the
+/// derivative can lose any number of degrees.
+pub trait ModDerivativeAssign<M> {
+    /// Replaces a polynomial with its derivative modulo $m$.
+    ///
+    /// $$
+    /// p \gets p' \bmod m.
+    /// $$
+    fn mod_derivative_assign(&mut self, m: M);
+}
+
+/// Computes the derivative of a polynomial modulo $2^k$. The coefficients must already be reduced
+/// modulo $2^k$.
+///
+/// Each coefficient $a_i$ becomes $ia_i \bmod 2^k$, which can be zero even when $a_i$ is not, so
+/// the derivative can lose any number of degrees.
+pub trait ModPowerOf2Derivative {
+    type Output;
+
+    /// Computes the derivative of a polynomial modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, k) = p' \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_derivative(self, pow: u64) -> Self::Output;
+}
+
+/// Replaces a polynomial with its derivative modulo $2^k$. The coefficients must already be reduced
+/// modulo $2^k$.
+///
+/// Each coefficient $a_i$ becomes $ia_i \bmod 2^k$, which can be zero even when $a_i$ is not, so
+/// the derivative can lose any number of degrees.
+pub trait ModPowerOf2DerivativeAssign {
+    /// Replaces a polynomial with its derivative modulo $2^k$.
+    ///
+    /// $$
+    /// p \gets p' \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_derivative_assign(&mut self, pow: u64);
+}
+
 /// Computes the content of a polynomial.
 ///
 /// For a polynomial with integer coefficients, the content is the greatest common divisor of its

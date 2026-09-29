@@ -392,6 +392,14 @@ documented by git history.
   `UnsignedPolynomial<T>`, with every unsigned primitive integer shift amount and a `T` modulus.
   $2^k \bmod m$ is computed once and every coefficient is multiplied by it; the coefficients must
   already be reduced.
+- New `Derivative`, `DerivativeAssign`, `ModDerivative`, `ModDerivativeAssign`,
+  `ModPowerOf2Derivative`, and `ModPowerOf2DerivativeAssign` traits, in
+  `malachite_base::polynomial`. `Derivative` is implemented for `IntegerPolynomial`,
+  `NaturalPolynomial`, and `RationalPolynomial`, like FLINT's `fmpz_poly_derivative` and
+  `fmpq_poly_derivative`; the rational derivative is brought back to lowest terms. `ModDerivative`
+  and `ModPowerOf2Derivative` are implemented for `NaturalPolynomial` and `UnsignedPolynomial`, like
+  FLINT's `fmpz_mod_poly_derivative` and `nmod_poly_derivative`; the coefficients must already be
+  reduced, and the result is trimmed, since the derivative can lose any number of degrees.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

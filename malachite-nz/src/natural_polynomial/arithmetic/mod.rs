@@ -36,6 +36,10 @@ pub mod content;
 /// [`DeflatePowerOfXAssign`](malachite_base::polynomial::DeflatePowerOfXAssign), for undoing the
 /// substitution of a power of the variable into a polynomial.
 pub mod deflate_power_of_x;
+/// Implementations of [`Derivative`](malachite_base::polynomial::Derivative) and
+/// [`DerivativeAssign`](malachite_base::polynomial::DerivativeAssign), for differentiating a
+/// polynomial.
+pub mod derivative;
 /// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
 /// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
 /// by a power of its variable and discarding the remainder.
@@ -70,6 +74,10 @@ pub mod mod_add;
 /// polynomials modulo a [`Natural`](crate::natural::Natural) and keeping only their low
 /// coefficients.
 pub mod mod_add_truncated;
+/// Implementations of [`ModDerivative`](malachite_base::polynomial::ModDerivative) and
+/// [`ModDerivativeAssign`](malachite_base::polynomial::ModDerivativeAssign), for differentiating a
+/// polynomial modulo a number.
+pub mod mod_derivative;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
@@ -99,6 +107,10 @@ pub mod mod_power_of_2_add;
 /// [`ModPowerOf2AddTruncatedAssign`](malachite_base::polynomial::ModPowerOf2AddTruncatedAssign),
 /// for adding two polynomials modulo $2^k$ and keeping only their low coefficients.
 pub mod mod_power_of_2_add_truncated;
+/// Implementations of [`ModPowerOf2Derivative`](malachite_base::polynomial::ModPowerOf2Derivative)
+/// and [`ModPowerOf2DerivativeAssign`](malachite_base::polynomial::ModPowerOf2DerivativeAssign),
+/// for differentiating a polynomial modulo a power of 2.
+pub mod mod_power_of_2_derivative;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given power of 2.
