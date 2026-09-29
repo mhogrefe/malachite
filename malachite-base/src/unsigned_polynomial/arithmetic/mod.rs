@@ -85,6 +85,82 @@ pub mod mod_power_of_2_is_reduced;
 /// [`ModPowerOf2NegAssign`](crate::num::arithmetic::traits::ModPowerOf2NegAssign), which negate a
 /// polynomial modulo a power of 2.
 pub mod mod_power_of_2_neg;
+/// Implementations of [`ModPowerOf2Shl`](crate::num::arithmetic::traits::ModPowerOf2Shl) and
+/// [`ModPowerOf2ShlAssign`](crate::num::arithmetic::traits::ModPowerOf2ShlAssign), for
+/// left-shifting a polynomial modulo a power of 2.
+///
+/// # mod_power_of_2_shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+///
+/// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+x+3").unwrap();
+/// assert_eq!(
+///     p.clone().mod_power_of_2_shl(1u8, 3).to_string(),
+///     "2*x^2+2*x+6"
+/// );
+/// assert_eq!(
+///     p.clone().mod_power_of_2_shl(2u16, 3).to_string(),
+///     "4*x^2+4*x+4"
+/// );
+/// assert_eq!(p.mod_power_of_2_shl(3u32, 3).to_string(), "0");
+/// assert_eq!(
+///     UnsignedPolynomial::<u8>::from_str("x^2+128*x+1")
+///         .unwrap()
+///         .mod_power_of_2_shl(1u64, 8)
+///         .to_string(),
+///     "2*x^2+2"
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u64>::from_str("x+1")
+///         .unwrap()
+///         .mod_power_of_2_shl(63u128, 64)
+///         .to_string(),
+///     "9223372036854775808*x+9223372036854775808"
+/// );
+///
+/// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+x+3").unwrap();
+/// assert_eq!((&p).mod_power_of_2_shl(1u8, 3).to_string(), "2*x^2+2*x+6");
+/// assert_eq!((&p).mod_power_of_2_shl(2u16, 3).to_string(), "4*x^2+4*x+4");
+/// assert_eq!((&p).mod_power_of_2_shl(3u32, 3).to_string(), "0");
+/// assert_eq!(
+///     (&UnsignedPolynomial::<u8>::from_str("x^2+128*x+1").unwrap())
+///         .mod_power_of_2_shl(1u64, 8)
+///         .to_string(),
+///     "2*x^2+2"
+/// );
+/// assert_eq!(
+///     (&UnsignedPolynomial::<u64>::from_str("x+1").unwrap())
+///         .mod_power_of_2_shl(63u128, 64)
+///         .to_string(),
+///     "9223372036854775808*x+9223372036854775808"
+/// );
+/// ```
+///
+/// # mod_power_of_2_shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+///
+/// let mut p = UnsignedPolynomial::<u8>::from_str("5*x^2+x+3").unwrap();
+/// p.mod_power_of_2_shl_assign(1u8, 3);
+/// assert_eq!(p.to_string(), "2*x^2+2*x+6");
+///
+/// let mut p = UnsignedPolynomial::<u8>::from_str("5*x^2+x+3").unwrap();
+/// p.mod_power_of_2_shl_assign(3u32, 3);
+/// assert_eq!(p.to_string(), "0");
+///
+/// let mut p = UnsignedPolynomial::<u8>::from_str("x^2+128*x+1").unwrap();
+/// p.mod_power_of_2_shl_assign(1u64, 8);
+/// assert_eq!(p.to_string(), "2*x^2+2");
+///
+/// let mut p = UnsignedPolynomial::<u64>::from_str("x+1").unwrap();
+/// p.mod_power_of_2_shl_assign(63u128, 64);
+/// assert_eq!(p.to_string(), "9223372036854775808*x+9223372036854775808");
+/// ```
+pub mod mod_power_of_2_shl;
 /// Implementations of [`ModPowerOf2Sub`](crate::num::arithmetic::traits::ModPowerOf2Sub) and
 /// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
 /// one polynomial from another modulo $2^k$.
@@ -93,6 +169,74 @@ pub mod mod_power_of_2_sub;
 /// [`ModPowerOf2SubTruncatedAssign`](crate::polynomial::ModPowerOf2SubTruncatedAssign), for
 /// subtracting one polynomial from another modulo $2^k$ and keeping only their low coefficients.
 pub mod mod_power_of_2_sub_truncated;
+/// Implementations of [`ModShl`](crate::num::arithmetic::traits::ModShl) and
+/// [`ModShlAssign`](crate::num::arithmetic::traits::ModShlAssign), for left-shifting a polynomial
+/// modulo a number.
+///
+/// # mod_shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModShl;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+///
+/// let p = UnsignedPolynomial::<u8>::from_str("3*x^2+x+7").unwrap();
+/// assert_eq!(p.clone().mod_shl(1u8, 10).to_string(), "6*x^2+2*x+4");
+/// assert_eq!(p.mod_shl(3u16, 10).to_string(), "4*x^2+8*x+6");
+/// assert_eq!(
+///     UnsignedPolynomial::<u8>::from_str("3*x^2+5")
+///         .unwrap()
+///         .mod_shl(2u32, 12)
+///         .to_string(),
+///     "8"
+/// );
+/// assert_eq!(
+///     UnsignedPolynomial::<u64>::from_str("x+1")
+///         .unwrap()
+///         .mod_shl(100u64, 1000000000000000000)
+///         .to_string(),
+///     "229401496703205376*x+229401496703205376"
+/// );
+///
+/// let p = UnsignedPolynomial::<u8>::from_str("3*x^2+x+7").unwrap();
+/// assert_eq!((&p).mod_shl(1u8, 10).to_string(), "6*x^2+2*x+4");
+/// assert_eq!((&p).mod_shl(3u16, 10).to_string(), "4*x^2+8*x+6");
+/// assert_eq!(
+///     (&UnsignedPolynomial::<u8>::from_str("3*x^2+5").unwrap())
+///         .mod_shl(2u32, 12)
+///         .to_string(),
+///     "8"
+/// );
+/// assert_eq!(
+///     (&UnsignedPolynomial::<u64>::from_str("x+1").unwrap())
+///         .mod_shl(100u64, 1000000000000000000)
+///         .to_string(),
+///     "229401496703205376*x+229401496703205376"
+/// );
+/// ```
+///
+/// # mod_shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModShlAssign;
+/// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+///
+/// let mut p = UnsignedPolynomial::<u8>::from_str("3*x^2+x+7").unwrap();
+/// p.mod_shl_assign(1u8, 10);
+/// assert_eq!(p.to_string(), "6*x^2+2*x+4");
+///
+/// let mut p = UnsignedPolynomial::<u8>::from_str("3*x^2+x+7").unwrap();
+/// p.mod_shl_assign(3u16, 10);
+/// assert_eq!(p.to_string(), "4*x^2+8*x+6");
+///
+/// let mut p = UnsignedPolynomial::<u8>::from_str("3*x^2+5").unwrap();
+/// p.mod_shl_assign(2u32, 12);
+/// assert_eq!(p.to_string(), "8");
+///
+/// let mut p = UnsignedPolynomial::<u64>::from_str("x+1").unwrap();
+/// p.mod_shl_assign(100u64, 1000000000000000000);
+/// assert_eq!(p.to_string(), "229401496703205376*x+229401496703205376");
+/// ```
+pub mod mod_shl;
 /// Implementations of [`ModSub`](crate::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting one polynomial
 /// from another modulo a value.

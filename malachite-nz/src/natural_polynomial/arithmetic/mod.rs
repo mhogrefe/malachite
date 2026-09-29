@@ -107,6 +107,85 @@ pub mod mod_power_of_2_is_reduced;
 /// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign),
 /// which negate a polynomial modulo a power of 2.
 pub mod mod_power_of_2_neg;
+/// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
+/// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign), for
+/// left-shifting a polynomial modulo a power of 2.
+///
+/// # mod_power_of_2_shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+///
+/// let p = NaturalPolynomial::from_str("5*x^2+x+3").unwrap();
+/// assert_eq!(
+///     p.clone().mod_power_of_2_shl(1u8, 3).to_string(),
+///     "2*x^2+2*x+6"
+/// );
+/// assert_eq!(
+///     p.clone().mod_power_of_2_shl(2u16, 3).to_string(),
+///     "4*x^2+4*x+4"
+/// );
+/// assert_eq!(p.mod_power_of_2_shl(3u32, 3).to_string(), "0");
+/// assert_eq!(
+///     NaturalPolynomial::from_str("4*x^2+3")
+///         .unwrap()
+///         .mod_power_of_2_shl(1u64, 3)
+///         .to_string(),
+///     "6"
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::from_str("x+1")
+///         .unwrap()
+///         .mod_power_of_2_shl(99u128, 100)
+///         .to_string(),
+///     "633825300114114700748351602688*x+633825300114114700748351602688"
+/// );
+///
+/// let p = NaturalPolynomial::from_str("5*x^2+x+3").unwrap();
+/// assert_eq!((&p).mod_power_of_2_shl(1u8, 3).to_string(), "2*x^2+2*x+6");
+/// assert_eq!((&p).mod_power_of_2_shl(2u16, 3).to_string(), "4*x^2+4*x+4");
+/// assert_eq!((&p).mod_power_of_2_shl(3u32, 3).to_string(), "0");
+/// assert_eq!(
+///     (&NaturalPolynomial::from_str("4*x^2+3").unwrap())
+///         .mod_power_of_2_shl(1u64, 3)
+///         .to_string(),
+///     "6"
+/// );
+/// assert_eq!(
+///     (&NaturalPolynomial::from_str("x+1").unwrap())
+///         .mod_power_of_2_shl(99u128, 100)
+///         .to_string(),
+///     "633825300114114700748351602688*x+633825300114114700748351602688"
+/// );
+/// ```
+///
+/// # mod_power_of_2_shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+///
+/// let mut p = NaturalPolynomial::from_str("5*x^2+x+3").unwrap();
+/// p.mod_power_of_2_shl_assign(1u8, 3);
+/// assert_eq!(p.to_string(), "2*x^2+2*x+6");
+///
+/// let mut p = NaturalPolynomial::from_str("5*x^2+x+3").unwrap();
+/// p.mod_power_of_2_shl_assign(3u32, 3);
+/// assert_eq!(p.to_string(), "0");
+///
+/// let mut p = NaturalPolynomial::from_str("4*x^2+3").unwrap();
+/// p.mod_power_of_2_shl_assign(1u64, 3);
+/// assert_eq!(p.to_string(), "6");
+///
+/// let mut p = NaturalPolynomial::from_str("x+1").unwrap();
+/// p.mod_power_of_2_shl_assign(99u128, 100);
+/// assert_eq!(
+///     p.to_string(),
+///     "633825300114114700748351602688*x+633825300114114700748351602688"
+/// );
+/// ```
+pub mod mod_power_of_2_shl;
 /// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting one polynomial from another modulo $2^k$.
@@ -117,6 +196,137 @@ pub mod mod_power_of_2_sub;
 /// for subtracting one polynomial from another modulo $2^k$ and keeping only their low
 /// coefficients.
 pub mod mod_power_of_2_sub_truncated;
+/// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
+/// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
+/// polynomial modulo a number.
+///
+/// # mod_shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::{ModShl, Pow};
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+///
+/// let p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
+/// assert_eq!(
+///     p.clone().mod_shl(1u8, Natural::from(10u32)).to_string(),
+///     "6*x^2+2*x+4"
+/// );
+/// assert_eq!(
+///     p.mod_shl(3u16, Natural::from(10u32)).to_string(),
+///     "4*x^2+8*x+6"
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::from_str("3*x^2+5")
+///         .unwrap()
+///         .mod_shl(2u32, Natural::from(12u32))
+///         .to_string(),
+///     "8"
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::from_str("x+1")
+///         .unwrap()
+///         .mod_shl(100u64, Natural::from(10u32).pow(30))
+///         .to_string(),
+///     "267650600228229401496703205376*x+267650600228229401496703205376"
+/// );
+///
+/// let p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
+/// assert_eq!(
+///     p.clone().mod_shl(1u8, &Natural::from(10u32)).to_string(),
+///     "6*x^2+2*x+4"
+/// );
+/// assert_eq!(
+///     p.mod_shl(3u16, &Natural::from(10u32)).to_string(),
+///     "4*x^2+8*x+6"
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::from_str("3*x^2+5")
+///         .unwrap()
+///         .mod_shl(2u32, &Natural::from(12u32))
+///         .to_string(),
+///     "8"
+/// );
+/// assert_eq!(
+///     NaturalPolynomial::from_str("x+1")
+///         .unwrap()
+///         .mod_shl(100u64, &Natural::from(10u32).pow(30))
+///         .to_string(),
+///     "267650600228229401496703205376*x+267650600228229401496703205376"
+/// );
+///
+/// let p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
+/// assert_eq!(
+///     (&p).mod_shl(1u8, Natural::from(10u32)).to_string(),
+///     "6*x^2+2*x+4"
+/// );
+/// assert_eq!(
+///     (&p).mod_shl(3u16, Natural::from(10u32)).to_string(),
+///     "4*x^2+8*x+6"
+/// );
+/// assert_eq!(
+///     (&NaturalPolynomial::from_str("3*x^2+5").unwrap())
+///         .mod_shl(2u32, Natural::from(12u32))
+///         .to_string(),
+///     "8"
+/// );
+/// assert_eq!(
+///     (&NaturalPolynomial::from_str("x+1").unwrap())
+///         .mod_shl(100u64, Natural::from(10u32).pow(30))
+///         .to_string(),
+///     "267650600228229401496703205376*x+267650600228229401496703205376"
+/// );
+///
+/// let p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
+/// assert_eq!(
+///     (&p).mod_shl(1u8, &Natural::from(10u32)).to_string(),
+///     "6*x^2+2*x+4"
+/// );
+/// assert_eq!(
+///     (&p).mod_shl(3u16, &Natural::from(10u32)).to_string(),
+///     "4*x^2+8*x+6"
+/// );
+/// assert_eq!(
+///     (&NaturalPolynomial::from_str("3*x^2+5").unwrap())
+///         .mod_shl(2u32, &Natural::from(12u32))
+///         .to_string(),
+///     "8"
+/// );
+/// assert_eq!(
+///     (&NaturalPolynomial::from_str("x+1").unwrap())
+///         .mod_shl(100u64, &Natural::from(10u32).pow(30))
+///         .to_string(),
+///     "267650600228229401496703205376*x+267650600228229401496703205376"
+/// );
+/// ```
+///
+/// # mod_shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::{ModShlAssign, Pow};
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_polynomial::NaturalPolynomial;
+///
+/// let mut p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
+/// p.mod_shl_assign(1u8, Natural::from(10u32));
+/// assert_eq!(p.to_string(), "6*x^2+2*x+4");
+///
+/// let mut p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
+/// p.mod_shl_assign(3u16, &Natural::from(10u32));
+/// assert_eq!(p.to_string(), "4*x^2+8*x+6");
+///
+/// let mut p = NaturalPolynomial::from_str("3*x^2+5").unwrap();
+/// p.mod_shl_assign(2u32, Natural::from(12u32));
+/// assert_eq!(p.to_string(), "8");
+///
+/// let mut p = NaturalPolynomial::from_str("x+1").unwrap();
+/// p.mod_shl_assign(100u64, &Natural::from(10u32).pow(30));
+/// assert_eq!(
+///     p.to_string(),
+///     "267650600228229401496703205376*x+267650600228229401496703205376"
+/// );
+/// ```
+pub mod mod_shl;
 /// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting one
 /// polynomial from another modulo a [`Natural`](crate::natural::Natural).

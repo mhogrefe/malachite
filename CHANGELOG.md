@@ -383,6 +383,15 @@ documented by git history.
   Factors of 2 are cancelled against the denominator, or against the numerator's coefficients,
   before the rest of the shift is applied, so the result stays in lowest terms. `RationalPolynomial`
   is the only polynomial type with `Shr`.
+- `ModPowerOf2Shl` and `ModPowerOf2ShlAssign` for `NaturalPolynomial` and `UnsignedPolynomial`,
+  with every unsigned primitive integer shift amount, taking the polynomial by value or by
+  reference. Every coefficient is shifted and reduced modulo $2^k$; the coefficients must already
+  be reduced.
+- `ModShl` and `ModShlAssign` for `NaturalPolynomial`, with every unsigned primitive integer shift
+  amount, taking the polynomial and the `Natural` modulus by value or by reference, and for
+  `UnsignedPolynomial<T>`, with every unsigned primitive integer shift amount and a `T` modulus.
+  $2^k \bmod m$ is computed once and every coefficient is multiplied by it; the coefficients must
+  already be reduced.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

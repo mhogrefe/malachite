@@ -891,8 +891,10 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_add_truncated;
         pub mod mod_power_of_2_neg;
+        pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_truncated;
+        pub mod mod_shl;
         pub mod mod_sub;
         pub mod mod_sub_truncated;
         pub mod mul_power_of_x;

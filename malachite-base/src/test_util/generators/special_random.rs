@@ -10134,6 +10134,31 @@ pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<
     )
 }
 
+pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_3<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, U, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, U::ZERO, U::exact_from(T::WIDTH + 1)),
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, bits, pow)| (p.mod_power_of_2(pow), bits, pow)),
+    )
+}
+
 pub fn special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<
     T: PrimitiveUnsigned,
 >(
@@ -10273,6 +10298,45 @@ pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<
             },
         )
         .map(|(p, x, m)| (p % m, x % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, U, T)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigned_inclusive_range(
+                    seed,
+                    U::ZERO,
+                    U::saturating_from(u64::MAX),
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(p, bits, m)| (p % m, bits, m)),
     )
 }
 

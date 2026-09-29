@@ -6512,6 +6512,20 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: Prim
     )
 }
 
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_3<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, U, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(U::ZERO, U::exact_from(T::WIDTH + 1)),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(p, _, pow)| p.mod_power_of_2_is_reduced(*pow)),
+    )
+}
+
 pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)> {
@@ -6575,6 +6589,20 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: Prim
             exhaustive_positive_primitive_ints::<T>(),
         )
         .filter(|(p, x, m)| p.mod_is_reduced(m) && x < m),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, U, T)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(U::ZERO, U::saturating_from(u64::MAX)),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(p, _, m)| p.mod_is_reduced(m)),
     )
 }
 

@@ -412,6 +412,24 @@ pub fn exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_1()
     )
 }
 
+pub fn exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(NaturalPolynomial, T, u64)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_natural_polynomials(),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_unsigneds::<u64>(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(p, bits, mut pow)| {
+            pow += p.height_significant_bits();
+            (p, bits, pow)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1()
 -> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
     Box::new(
@@ -485,6 +503,24 @@ pub fn exhaustive_natural_polynomial_natural_natural_triple_gen_var_1()
                 (p, x, m)
             },
         ),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(NaturalPolynomial, T, Natural)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_natural_polynomials(),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_naturals(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::normal(1),
+        )
+        .map(|(p, bits, m)| {
+            let m = p.height_ref() + m + Natural::ONE;
+            (p, bits, m)
+        }),
     )
 }
 

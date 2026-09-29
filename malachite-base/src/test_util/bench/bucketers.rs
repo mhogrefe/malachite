@@ -1107,9 +1107,9 @@ pub fn pair_1_unsigned_polynomial_bit_bucketer<T>(
     }
 }
 
-pub fn triple_1_unsigned_polynomial_len_bucketer<T, U>(
+pub fn triple_1_unsigned_polynomial_len_bucketer<C: PrimitiveUnsigned, T, U>(
     var_name: &str,
-) -> Bucketer<'_, (UnsignedPolynomial<u64>, T, U)> {
+) -> Bucketer<'_, (UnsignedPolynomial<C>, T, U)> {
     Bucketer {
         bucketing_function: &|(p, _, _)| p.coefficients_asc().len(),
         bucketing_label: format!("{var_name}.len()"),

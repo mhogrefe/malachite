@@ -470,6 +470,43 @@ pub fn random_natural_polynomial_natural_unsigned_triple_gen_var_1(
     )
 }
 
+pub fn random_natural_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, T, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, bits, mut pow)| {
+            pow += p.height_significant_bits();
+            (p, bits, pow)
+        }),
+    )
+}
+
 pub fn random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
@@ -624,6 +661,43 @@ pub fn random_natural_polynomial_natural_natural_triple_gen_var_1(
         .map(|(p, x, m)| {
             let m = max(p.height_ref(), &x) + m + Natural::ONE;
             (p, x, m)
+        }),
+    )
+}
+
+pub fn random_natural_polynomial_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, T, Natural)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, bits, m)| {
+            let m = p.height_ref() + m + Natural::ONE;
+            (p, bits, m)
         }),
     )
 }
