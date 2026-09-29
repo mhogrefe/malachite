@@ -29,6 +29,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_op::register(runner);
     mod_power_of_2::register(runner);
     mul_power_of_x::register(runner);
+    nth_derivative::register(runner);
     shl::register(runner);
     neg::register(runner);
     scalar_add_mul::register(runner);
@@ -58,6 +59,7 @@ mod mod_op;
 mod mod_power_of_2;
 mod mul_power_of_x;
 mod neg;
+mod nth_derivative;
 mod scalar_add_mul;
 mod scalar_mul;
 mod shl;

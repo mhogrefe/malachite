@@ -68,6 +68,10 @@ pub mod mul_power_of_x;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
 pub mod neg;
+/// Implementations of [`NthDerivative`](malachite_base::polynomial::NthDerivative) and
+/// [`NthDerivativeAssign`](malachite_base::polynomial::NthDerivativeAssign), for differentiating a
+/// polynomial any number of times.
+pub mod nth_derivative;
 /// Left-shifting a [`RationalPolynomial`](super::RationalPolynomial) (multiplying it or dividing it
 /// by a power of 2), keeping it in lowest terms.
 ///

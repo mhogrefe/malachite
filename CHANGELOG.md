@@ -400,6 +400,12 @@ documented by git history.
   and `ModPowerOf2Derivative` are implemented for `NaturalPolynomial` and `UnsignedPolynomial`, like
   FLINT's `fmpz_mod_poly_derivative` and `nmod_poly_derivative`; the coefficients must already be
   reduced, and the result is trimmed, since the derivative can lose any number of degrees.
+- New `NthDerivative`, `NthDerivativeAssign`, `ModNthDerivative`, `ModNthDerivativeAssign`,
+  `ModPowerOf2NthDerivative`, and `ModPowerOf2NthDerivativeAssign` traits, in
+  `malachite_base::polynomial`, implemented for the same types as the corresponding derivative
+  traits. `NthDerivative` is like FLINT's `fmpz_poly_nth_derivative` and `fmpq_poly_nth_derivative`.
+  FLINT has no modular $n$th derivative; the modular versions multiply each coefficient by its
+  falling factorial modulo $m$ or $2^k$, and return zero at once when the modulus divides $n!$.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

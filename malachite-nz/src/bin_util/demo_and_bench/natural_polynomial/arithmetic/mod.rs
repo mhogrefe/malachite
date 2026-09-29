@@ -30,12 +30,14 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_is_reduced::register(runner);
     mod_make_monic::register(runner);
     mod_neg::register(runner);
+    mod_nth_derivative::register(runner);
     mod_op::register(runner);
     mod_power_of_2::register(runner);
     mod_power_of_2_add::register(runner);
     mod_power_of_2_add_truncated::register(runner);
     mod_power_of_2_derivative::register(runner);
     mod_power_of_2_neg::register(runner);
+    mod_power_of_2_nth_derivative::register(runner);
     mod_power_of_2_shl::register(runner);
     mod_shl::register(runner);
     mod_power_of_2_sub::register(runner);
@@ -43,6 +45,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_sub::register(runner);
     mod_sub_truncated::register(runner);
     mul_power_of_x::register(runner);
+    nth_derivative::register(runner);
     shl::register(runner);
 }
 
@@ -67,12 +70,14 @@ mod mod_derivative;
 mod mod_is_reduced;
 mod mod_make_monic;
 mod mod_neg;
+mod mod_nth_derivative;
 mod mod_op;
 mod mod_power_of_2;
 mod mod_power_of_2_add;
 mod mod_power_of_2_add_truncated;
 mod mod_power_of_2_derivative;
 mod mod_power_of_2_neg;
+mod mod_power_of_2_nth_derivative;
 mod mod_power_of_2_shl;
 mod mod_power_of_2_sub;
 mod mod_power_of_2_sub_truncated;
@@ -80,4 +85,5 @@ mod mod_shl;
 mod mod_sub;
 mod mod_sub_truncated;
 mod mul_power_of_x;
+mod nth_derivative;
 mod shl;

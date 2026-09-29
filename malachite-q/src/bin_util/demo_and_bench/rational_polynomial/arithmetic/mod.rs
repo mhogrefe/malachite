@@ -24,6 +24,7 @@ pub(crate) fn register(runner: &mut Runner) {
     l2_norm_squared::register(runner);
     make_monic::register(runner);
     mul_power_of_x::register(runner);
+    nth_derivative::register(runner);
     shl::register(runner);
     shr::register(runner);
     neg::register(runner);
@@ -47,6 +48,7 @@ mod l2_norm_squared;
 mod make_monic;
 mod mul_power_of_x;
 mod neg;
+mod nth_derivative;
 mod shl;
 mod shr;
 mod sub;

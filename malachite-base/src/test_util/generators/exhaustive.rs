@@ -6606,6 +6606,30 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_4<
     )
 }
 
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>()
+-> It<(UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 7),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(p, _, m)| p.mod_is_reduced(m)),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>()
+-> It<(UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 7),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(p, _, pow)| p.mod_power_of_2_is_reduced(*pow)),
+    )
+}
+
 pub fn exhaustive_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedPolynomial<T>, Vec<T>, T)> {

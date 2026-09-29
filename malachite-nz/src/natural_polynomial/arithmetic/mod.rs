@@ -89,6 +89,10 @@ pub mod mod_make_monic;
 /// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), which negate a
 /// polynomial modulo a number.
 pub mod mod_neg;
+/// Implementations of [`ModNthDerivative`](malachite_base::polynomial::ModNthDerivative) and
+/// [`ModNthDerivativeAssign`](malachite_base::polynomial::ModNthDerivativeAssign), for
+/// differentiating a polynomial any number of times modulo a number.
+pub mod mod_nth_derivative;
 /// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
 /// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), [`Rem`](core::ops::Rem), and
 /// [`RemAssign`](core::ops::RemAssign), traits for reducing every coefficient of a polynomial
@@ -119,6 +123,11 @@ pub mod mod_power_of_2_is_reduced;
 /// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign),
 /// which negate a polynomial modulo a power of 2.
 pub mod mod_power_of_2_neg;
+/// Implementations of
+/// [`ModPowerOf2NthDerivative`](malachite_base::polynomial::ModPowerOf2NthDerivative) and
+/// [`ModPowerOf2NthDerivativeAssign`](malachite_base::polynomial::ModPowerOf2NthDerivativeAssign),
+/// for differentiating a polynomial any number of times modulo a power of 2.
+pub mod mod_power_of_2_nth_derivative;
 /// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
 /// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a polynomial modulo a power of 2.
@@ -352,6 +361,10 @@ pub mod mod_sub_truncated;
 /// [`MulPowerOfXAssign`](malachite_base::polynomial::MulPowerOfXAssign), for multiplying a
 /// polynomial by a power of its variable.
 pub mod mul_power_of_x;
+/// Implementations of [`NthDerivative`](malachite_base::polynomial::NthDerivative) and
+/// [`NthDerivativeAssign`](malachite_base::polynomial::NthDerivativeAssign), for differentiating a
+/// polynomial any number of times.
+pub mod nth_derivative;
 /// Left-shifting a [`NaturalPolynomial`](super::NaturalPolynomial) (multiplying it by a power of
 /// 2), by shifting every coefficient.
 ///

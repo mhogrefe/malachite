@@ -90,6 +90,10 @@ pub mod mul_power_of_x;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
 pub mod neg;
+/// Implementations of [`NthDerivative`](malachite_base::polynomial::NthDerivative) and
+/// [`NthDerivativeAssign`](malachite_base::polynomial::NthDerivativeAssign), for differentiating a
+/// polynomial any number of times.
+pub mod nth_derivative;
 #[doc(hidden)]
 pub mod scalar_add_mul;
 #[doc(hidden)]

@@ -179,6 +179,7 @@ pub mod rational_polynomial {
         pub mod make_monic;
         pub mod mul_power_of_x;
         pub mod neg;
+        pub mod nth_derivative;
         pub mod shl;
         pub mod shr;
         pub mod sub;

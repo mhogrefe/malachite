@@ -17,6 +17,7 @@ pub mod exponent_gcd;
 pub mod height;
 pub mod l2_norm_squared;
 pub mod mul_power_of_x;
+pub mod nth_derivative;
 pub mod shl;
 pub mod shr;
 pub mod sub;

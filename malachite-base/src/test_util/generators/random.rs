@@ -8778,6 +8778,46 @@ pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_4<
     )
 }
 
+pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 7),
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(p, n, m)| (p % m, n, m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 7),
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, n, pow)| (p.mod_power_of_2(pow), n, pow)),
+    )
+}
+
 pub fn random_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedPolynomial<T>, Vec<T>, T)> {

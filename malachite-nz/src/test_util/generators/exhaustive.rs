@@ -524,6 +524,36 @@ pub fn exhaustive_natural_polynomial_unsigned_natural_triple_gen_var_1<T: Primit
     )
 }
 
+pub fn exhaustive_natural_polynomial_unsigned_natural_triple_gen_var_2()
+-> It<(NaturalPolynomial, u64, Natural)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 7),
+            exhaustive_naturals(),
+        )
+        .map(|(p, n, m)| {
+            let m = p.height_ref() + m + Natural::ONE;
+            (p, n, m)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_2()
+-> It<(NaturalPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 7),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, n, mut pow)| {
+            pow += p.height_significant_bits();
+            (p, n, pow)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_natural_vec_pair_gen() -> It<(NaturalPolynomial, Vec<Natural>)>
 {
     Box::new(exhaustive_pairs(

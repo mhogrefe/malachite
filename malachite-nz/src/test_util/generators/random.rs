@@ -702,6 +702,68 @@ pub fn random_natural_polynomial_unsigned_natural_triple_gen_var_1<T: PrimitiveU
     )
 }
 
+pub fn random_natural_polynomial_unsigned_natural_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64, Natural)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 7),
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, n, m)| {
+            let m = p.height_ref() + m + Natural::ONE;
+            (p, n, m)
+        }),
+    )
+}
+
+pub fn random_natural_polynomial_unsigned_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 7),
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, n, mut pow)| {
+            pow += p.height_significant_bits();
+            (p, n, pow)
+        }),
+    )
+}
+
 pub fn random_natural_polynomial_natural_vec_pair_gen(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, Vec<Natural>)> {

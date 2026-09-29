@@ -743,6 +743,98 @@ pub trait ModPowerOf2DerivativeAssign {
     fn mod_power_of_2_derivative_assign(&mut self, pow: u64);
 }
 
+/// Computes the $n$th derivative of a polynomial, $\sum_i i^{\underline n}a_ix^{i-n}$, where
+/// $i^{\underline n} = i(i-1)\cdots(i-n+1)$ is a falling factorial.
+pub trait NthDerivative {
+    type Output;
+
+    /// Computes the $n$th derivative of a polynomial.
+    ///
+    /// $$
+    /// f(p, n) = p^{(n)}.
+    /// $$
+    fn nth_derivative(self, n: u64) -> Self::Output;
+}
+
+/// Replaces a polynomial with its $n$th derivative, $\sum_i i^{\underline n}a_ix^{i-n}$, where
+/// $i^{\underline n} = i(i-1)\cdots(i-n+1)$ is a falling factorial.
+pub trait NthDerivativeAssign {
+    /// Replaces a polynomial with its $n$th derivative.
+    ///
+    /// $$
+    /// p \gets p^{(n)}.
+    /// $$
+    fn nth_derivative_assign(&mut self, n: u64);
+}
+
+/// Computes the $n$th derivative of a polynomial modulo $m$. The coefficients must already be
+/// reduced modulo $m$.
+///
+/// Each coefficient $a_i$ becomes $i^{\underline n}a_i \bmod m$, where $i^{\underline n}$ is a
+/// falling factorial; this can be zero even when $a_i$ is not, so the derivative can lose any
+/// number of degrees. Every $i^{\underline n}$ is a multiple of $n!$, so if $m$ divides $n!$, the
+/// result is zero.
+pub trait ModNthDerivative<M> {
+    type Output;
+
+    /// Computes the $n$th derivative of a polynomial modulo $m$.
+    ///
+    /// $$
+    /// f(p, n, m) = p^{(n)} \bmod m.
+    /// $$
+    fn mod_nth_derivative(self, n: u64, m: M) -> Self::Output;
+}
+
+/// Replaces a polynomial with its $n$th derivative modulo $m$. The coefficients must already be
+/// reduced modulo $m$.
+///
+/// Each coefficient $a_i$ becomes $i^{\underline n}a_i \bmod m$, where $i^{\underline n}$ is a
+/// falling factorial; this can be zero even when $a_i$ is not, so the derivative can lose any
+/// number of degrees. Every $i^{\underline n}$ is a multiple of $n!$, so if $m$ divides $n!$, the
+/// result is zero.
+pub trait ModNthDerivativeAssign<M> {
+    /// Replaces a polynomial with its $n$th derivative modulo $m$.
+    ///
+    /// $$
+    /// p \gets p^{(n)} \bmod m.
+    /// $$
+    fn mod_nth_derivative_assign(&mut self, n: u64, m: M);
+}
+
+/// Computes the $n$th derivative of a polynomial modulo $2^k$. The coefficients must already be
+/// reduced modulo $2^k$.
+///
+/// Each coefficient $a_i$ becomes $i^{\underline n}a_i \bmod 2^k$, where $i^{\underline n}$ is a
+/// falling factorial; this can be zero even when $a_i$ is not, so the derivative can lose any
+/// number of degrees. Every $i^{\underline n}$ is a multiple of $n!$, so if $2^k$ divides $n!$, the
+/// result is zero.
+pub trait ModPowerOf2NthDerivative {
+    type Output;
+
+    /// Computes the $n$th derivative of a polynomial modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, n, k) = p^{(n)} \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_nth_derivative(self, n: u64, pow: u64) -> Self::Output;
+}
+
+/// Replaces a polynomial with its $n$th derivative modulo $2^k$. The coefficients must already be
+/// reduced modulo $2^k$.
+///
+/// Each coefficient $a_i$ becomes $i^{\underline n}a_i \bmod 2^k$, where $i^{\underline n}$ is a
+/// falling factorial; this can be zero even when $a_i$ is not, so the derivative can lose any
+/// number of degrees. Every $i^{\underline n}$ is a multiple of $n!$, so if $2^k$ divides $n!$, the
+/// result is zero.
+pub trait ModPowerOf2NthDerivativeAssign {
+    /// Replaces a polynomial with its $n$th derivative modulo $2^k$.
+    ///
+    /// $$
+    /// p \gets p^{(n)} \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_nth_derivative_assign(&mut self, n: u64, pow: u64);
+}
+
 /// Computes the content of a polynomial.
 ///
 /// For a polynomial with integer coefficients, the content is the greatest common divisor of its

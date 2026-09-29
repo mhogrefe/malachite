@@ -284,6 +284,28 @@ pub fn natural_polynomial_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned
     )
 }
 
+// All `(NaturalPolynomial, u64, Natural)` where the polynomial's coefficients are less than the
+// `Natural`, and the `u64` is at most 7.
+pub fn natural_polynomial_unsigned_natural_triple_gen_var_2()
+-> Generator<(NaturalPolynomial, u64, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_natural_triple_gen_var_2,
+        &random_natural_polynomial_unsigned_natural_triple_gen_var_2,
+        &special_random_natural_polynomial_unsigned_natural_triple_gen_var_2,
+    )
+}
+
+// All `(NaturalPolynomial, u64, u64)` where the polynomial's coefficients are less than 2 to the
+// power of the second `u64`, and the first `u64` is at most 7.
+pub fn natural_polynomial_unsigned_unsigned_triple_gen_var_2()
+-> Generator<(NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_2,
+        &random_natural_polynomial_unsigned_unsigned_triple_gen_var_2,
+        &special_random_natural_polynomial_unsigned_unsigned_triple_gen_var_2,
+    )
+}
+
 pub fn natural_polynomial_natural_vec_pair_gen() -> Generator<(NaturalPolynomial, Vec<Natural>)> {
     Generator::new(
         &exhaustive_natural_polynomial_natural_vec_pair_gen,

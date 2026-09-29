@@ -64,6 +64,10 @@ pub mod mod_make_monic;
 /// [`ModNegAssign`](crate::num::arithmetic::traits::ModNegAssign), which negate a polynomial modulo
 /// a number.
 pub mod mod_neg;
+/// Implementations of [`ModNthDerivative`](crate::polynomial::ModNthDerivative) and
+/// [`ModNthDerivativeAssign`](crate::polynomial::ModNthDerivativeAssign), for differentiating a
+/// polynomial any number of times modulo a number.
+pub mod mod_nth_derivative;
 /// Implementations of [`Mod`](crate::num::arithmetic::traits::Mod),
 /// [`ModAssign`](crate::num::arithmetic::traits::ModAssign), [`Rem`](core::ops::Rem) and
 /// [`RemAssign`](core::ops::RemAssign), which reduce every coefficient of a polynomial modulo a
@@ -93,6 +97,10 @@ pub mod mod_power_of_2_is_reduced;
 /// [`ModPowerOf2NegAssign`](crate::num::arithmetic::traits::ModPowerOf2NegAssign), which negate a
 /// polynomial modulo a power of 2.
 pub mod mod_power_of_2_neg;
+/// Implementations of [`ModPowerOf2NthDerivative`](crate::polynomial::ModPowerOf2NthDerivative) and
+/// [`ModPowerOf2NthDerivativeAssign`](crate::polynomial::ModPowerOf2NthDerivativeAssign), for
+/// differentiating a polynomial any number of times modulo a power of 2.
+pub mod mod_power_of_2_nth_derivative;
 /// Implementations of [`ModPowerOf2Shl`](crate::num::arithmetic::traits::ModPowerOf2Shl) and
 /// [`ModPowerOf2ShlAssign`](crate::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a polynomial modulo a power of 2.
