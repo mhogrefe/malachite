@@ -657,6 +657,93 @@ const RATIONAL_POLYNOMIAL_SUB_TRUNCATED_UNIT_ROWS: [(&str, &str, u64, &str); 16]
     ("1/3*x+2/3", "1/3*x+2/3", 1, "0"),
 ];
 
+// Every case from test_bit_pack in malachite-nz's IntegerPolynomial tests: polynomial, field
+// width, packed value.
+const INTEGER_POLYNOMIAL_BIT_PACK_UNIT_ROWS: [(&str, u64, &str); 13] = [
+    ("0", 0, "0"),
+    ("0", 10, "0"),
+    ("3*x^2-2*x+1", 0, "2"),
+    ("5", 8, "5"),
+    ("-5", 8, "-5"),
+    ("3*x^2+2*x+1", 8, "197121"),
+    ("3*x^2-2*x+1", 8, "196097"),
+    ("-3*x^2+2*x-1", 8, "-196097"),
+    ("-x^2+255*x+255", 8, "-1"),
+    ("x^2-255*x-255", 8, "1"),
+    ("1000*x+1000", 8, "257000"),
+    (
+        "x^3",
+        64,
+        "6277101735386680763835789423207666416102355444464034512896",
+    ),
+    (
+        "-1000000000000000000000*x+1000000000000000000000",
+        70,
+        "-1180591620717411303423000000000000000000000",
+    ),
+];
+
+// Every case from test_bit_pack in malachite-nz's NaturalPolynomial tests: polynomial, field width,
+// packed value.
+const NATURAL_POLYNOMIAL_BIT_PACK_UNIT_ROWS: [(&str, u64, &str); 9] = [
+    ("0", 0, "0"),
+    ("0", 10, "0"),
+    ("3*x^2+2*x+1", 0, "6"),
+    ("5", 8, "5"),
+    ("3*x^2+2*x+1", 8, "197121"),
+    ("255*x+255", 8, "65535"),
+    ("1000*x+1000", 8, "257000"),
+    (
+        "x^3",
+        64,
+        "6277101735386680763835789423207666416102355444464034512896",
+    ),
+    (
+        "1000000000000000000000*x+1000000000000000000000",
+        70,
+        "1180591620717411303425000000000000000000000",
+    ),
+];
+
+// Every case from test_bit_unpack in malachite-nz's NaturalPolynomial tests: packed value, field
+// width, polynomial.
+const NATURAL_POLYNOMIAL_BIT_UNPACK_UNIT_ROWS: [(&str, u64, &str); 8] = [
+    ("0", 1, "0"),
+    ("0", 8, "0"),
+    ("1", 100, "1"),
+    ("197121", 8, "3*x^2+2*x+1"),
+    ("65535", 8, "255*x+255"),
+    ("257000", 8, "3*x^2+235*x+232"),
+    ("5", 1, "x^2+1"),
+    (
+        "6277101735386680763835789423207666416102355444464034512896",
+        64,
+        "x^3",
+    ),
+];
+
+// Every case from test_bit_unpack in malachite-nz's IntegerPolynomial tests: packed value, field
+// width, polynomial.
+const INTEGER_POLYNOMIAL_BIT_UNPACK_UNIT_ROWS: [(&str, u64, &str); 13] = [
+    ("0", 1, "0"),
+    ("0", 8, "0"),
+    ("197121", 8, "3*x^2+2*x+1"),
+    ("196097", 8, "3*x^2-2*x+1"),
+    ("-196097", 8, "-3*x^2+2*x-1"),
+    ("127", 8, "127"),
+    ("128", 8, "x-128"),
+    ("-128", 8, "-x+128"),
+    ("255", 8, "x-1"),
+    ("-1", 8, "-1"),
+    ("1", 1, "x-1"),
+    ("2", 1, "x^2-x"),
+    (
+        "-6277101735386680763835789423207666416102355444464034512896",
+        64,
+        "-x^3",
+    ),
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -1548,5 +1635,94 @@ fn main() {
         "demo_rational_polynomial_sub_truncated_assign_ref",
     ] {
         check_demo_against_flint(&oracle, "../malachite-q", demo_name, "fmpq_poly_sub_series");
+    }
+
+    // Every case from test_bit_pack in malachite-nz's IntegerPolynomial tests, and the generated
+    // cases from bit_pack_properties, against fmpz_poly_bit_pack, or against
+    // fmpz_poly_evaluate_fmpz at 2^b where FLINT's packing does not compute p(2^b).
+    println!("testing IntegerPolynomial bit_pack unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, bits, n) in INTEGER_POLYNOMIAL_BIT_PACK_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).bit_pack({bits}) = {n}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_bit_pack", Some(TEST_OUT));
+    for demo_name in [
+        "demo_integer_polynomial_bit_pack",
+        "demo_integer_polynomial_bit_pack_ref",
+        "demo_integer_polynomial_bit_pack_small_bits",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_bit_pack");
+    }
+
+    // Every case from test_bit_pack in malachite-nz's NaturalPolynomial tests, and the generated
+    // cases from bit_pack_properties, the same way.
+    println!("testing NaturalPolynomial bit_pack unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (p, bits, n) in NATURAL_POLYNOMIAL_BIT_PACK_UNIT_ROWS {
+            writeln!(output_file, "(&({p})).bit_pack({bits}) = {n}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_bit_pack", Some(TEST_OUT));
+    for demo_name in [
+        "demo_natural_polynomial_bit_pack",
+        "demo_natural_polynomial_bit_pack_ref",
+        "demo_natural_polynomial_bit_pack_small_bits",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_bit_pack");
+    }
+
+    // Every case from test_bit_unpack in malachite-nz's NaturalPolynomial tests, and the generated
+    // cases from bit_unpack_properties, against fmpz_poly_bit_unpack_unsigned.
+    println!("testing NaturalPolynomial bit_unpack unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (n, bits, p) in NATURAL_POLYNOMIAL_BIT_UNPACK_UNIT_ROWS {
+            writeln!(
+                output_file,
+                "NaturalPolynomial::bit_unpack(&{n}, {bits}) = {p}"
+            )
+            .unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_bit_unpack_unsigned", Some(TEST_OUT));
+    for demo_name in [
+        "demo_natural_polynomial_bit_unpack",
+        "demo_natural_polynomial_bit_unpack_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_poly_bit_unpack_unsigned",
+        );
+    }
+
+    // Every case from test_bit_unpack in malachite-nz's IntegerPolynomial tests, and the generated
+    // cases from bit_unpack_properties, against fmpz_poly_bit_unpack.
+    println!("testing IntegerPolynomial bit_unpack unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for (n, bits, p) in INTEGER_POLYNOMIAL_BIT_UNPACK_UNIT_ROWS {
+            writeln!(
+                output_file,
+                "IntegerPolynomial::bit_unpack(&{n}, {bits}) = {p}"
+            )
+            .unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_poly_bit_unpack", Some(TEST_OUT));
+    for demo_name in [
+        "demo_integer_polynomial_bit_unpack",
+        "demo_integer_polynomial_bit_unpack_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_poly_bit_unpack",
+        );
     }
 }

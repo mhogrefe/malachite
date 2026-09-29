@@ -190,6 +190,19 @@ pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsigne
     ))
 }
 
+pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_4() -> It<(NaturalPolynomial, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_polynomials(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, k)| {
+            let bits = max(p.height_significant_bits(), 1) + k;
+            (p, bits)
+        }),
+    )
+}
+
 pub fn exhaustive_integer_polynomial_pair_gen() -> It<(IntegerPolynomial, IntegerPolynomial)> {
     Box::new(exhaustive_pairs_from_single(
         exhaustive_integer_polynomials(),
@@ -329,6 +342,19 @@ pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsigne
         exhaustive_integer_polynomials(),
         exhaustive_unsigneds(),
     ))
+}
+
+pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_4() -> It<(IntegerPolynomial, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_integer_polynomials(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, k)| {
+            let bits = p.height_significant_bits() + 1 + k;
+            (p, bits)
+        }),
+    )
 }
 
 pub fn exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_1()

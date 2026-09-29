@@ -211,6 +211,38 @@ pub fn special_random_natural_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUns
     ))
 }
 
+pub fn special_random_natural_polynomial_unsigned_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_small_n", 4),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, k)| {
+            let bits = max(p.height_significant_bits(), 1) + k;
+            (p, bits)
+        }),
+    )
+}
+
 pub fn special_random_integer_polynomial_unsigned_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, u64)> {
@@ -265,6 +297,38 @@ pub fn special_random_integer_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUns
             )
         },
     ))
+}
+
+pub fn special_random_integer_polynomial_unsigned_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_small_n", 4),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, k)| {
+            let bits = p.height_significant_bits() + 1 + k;
+            (p, bits)
+        }),
+    )
 }
 
 pub fn special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_1(

@@ -73,6 +73,16 @@ pub fn natural_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(NaturalPolynomial, u64)` where the `u64` is positive and at least the number of significant
+// bits of the polynomial's height, so that every coefficient fits in a field of that many bits.
+pub fn natural_polynomial_unsigned_pair_gen_var_4() -> Generator<(NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_pair_gen_var_4,
+        &random_natural_polynomial_unsigned_pair_gen_var_4,
+        &special_random_natural_polynomial_unsigned_pair_gen_var_4,
+    )
+}
+
 pub fn integer_polynomial_unsigned_pair_gen_var_1() -> Generator<(IntegerPolynomial, u64)> {
     Generator::new(
         &exhaustive_integer_polynomial_unsigned_pair_gen_var_1,
@@ -98,6 +108,16 @@ pub fn integer_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
         &exhaustive_integer_polynomial_unsigned_pair_gen_var_3,
         &random_integer_polynomial_unsigned_pair_gen_var_3,
         &special_random_integer_polynomial_unsigned_pair_gen_var_3,
+    )
+}
+
+// All `(IntegerPolynomial, u64)` where the `u64` is greater than the number of significant bits of
+// the polynomial's height, so that every coefficient fits in a signed field of that many bits.
+pub fn integer_polynomial_unsigned_pair_gen_var_4() -> Generator<(IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_unsigned_pair_gen_var_4,
+        &random_integer_polynomial_unsigned_pair_gen_var_4,
+        &special_random_integer_polynomial_unsigned_pair_gen_var_4,
     )
 }
 

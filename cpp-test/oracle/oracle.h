@@ -154,4 +154,11 @@ int run_fmpz_poly_sub_series(const char * arg);
 int run_fmpq_poly_add_series(const char * arg);
 int run_fmpq_poly_sub_series(const char * arg);
 
+/* fmpz_poly_bit_pack.c */
+int run_fmpz_poly_bit_pack(const char * arg);
+
+/* fmpz_poly_bit_unpack.c */
+int run_fmpz_poly_bit_unpack(const char * arg);
+int run_fmpz_poly_bit_unpack_unsigned(const char * arg);
+
 #endif

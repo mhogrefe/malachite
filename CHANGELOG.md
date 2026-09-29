@@ -406,6 +406,13 @@ documented by git history.
   traits. `NthDerivative` is like FLINT's `fmpz_poly_nth_derivative` and `fmpq_poly_nth_derivative`.
   FLINT has no modular $n$th derivative; the modular versions multiply each coefficient by its
   falling factorial modulo $m$ or $2^k$, and return zero at once when the modulus divides $n!$.
+- New `BitPack` and `BitUnpack` traits, in `malachite_base::polynomial`, implemented for
+  `IntegerPolynomial` and `NaturalPolynomial`. `bit_pack` places the coefficient of $x^i$ at bit
+  $ib$ of an `Integer` or `Natural`: the value $p(2^b)$. It is like FLINT's `fmpz_poly_bit_pack`
+  when every coefficient fits in its field, except that it returns $p(1)$ rather than 0 for $b = 0$
+  and lets wider coefficients overlap rather than truncating them. `bit_unpack` is the inverse,
+  like FLINT's `fmpz_poly_bit_unpack` (signed fields, for `IntegerPolynomial`) and
+  `fmpz_poly_bit_unpack_unsigned` (for `NaturalPolynomial`), except that it panics when $b = 0$.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

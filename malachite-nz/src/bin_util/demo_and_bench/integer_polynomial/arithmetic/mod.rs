@@ -12,6 +12,8 @@ pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     add_truncated::register(runner);
     balanced_mod::register(runner);
+    bit_pack::register(runner);
+    bit_unpack::register(runner);
     canonicalize_unit::register(runner);
     compose_power_of_x::register(runner);
     content::register(runner);
@@ -41,6 +43,8 @@ pub(crate) fn register(runner: &mut Runner) {
 mod add;
 mod add_truncated;
 mod balanced_mod;
+mod bit_pack;
+mod bit_unpack;
 mod canonicalize_unit;
 mod compose_power_of_x;
 mod content;

@@ -835,6 +835,38 @@ pub trait ModPowerOf2NthDerivativeAssign {
     fn mod_power_of_2_nth_derivative_assign(&mut self, n: u64, pow: u64);
 }
 
+/// Packs the coefficients of a polynomial into a single number, placing the coefficient of $x^i$ at
+/// bit $ib$; that is, evaluates the polynomial at $2^b$.
+///
+/// When every coefficient's absolute value is less than $2^b$, the coefficients occupy disjoint
+/// $b$-bit fields, with a borrow from the next field above each negative one; this is the
+/// representation that Kronecker substitution uses to reduce polynomial multiplication to integer
+/// multiplication. Wider coefficients overlap the fields above them, and the result is still
+/// $p(2^b)$.
+pub trait BitPack {
+    type Output;
+
+    /// Packs the coefficients of a polynomial into fields of `bits` bits.
+    ///
+    /// $$
+    /// f(p, b) = p(2^b) = \sum_i a_i2^{ib}.
+    /// $$
+    fn bit_pack(self, bits: u64) -> Self::Output;
+}
+
+/// Unpacks a polynomial from the fixed-width fields of a single number, reading the coefficient of
+/// $x^i$ from bit $ib$; the result $p$ satisfies $p(2^b) = n$.
+///
+/// This inverts [`BitPack`] on polynomials whose coefficients fit their fields.
+pub trait BitUnpack<T>: Sized {
+    /// Unpacks a polynomial from fields of `bits` bits.
+    ///
+    /// $$
+    /// f(n, b) = p, \quad \text{where} \quad p(2^b) = n.
+    /// $$
+    fn bit_unpack(n: T, bits: u64) -> Self;
+}
+
 /// Computes the content of a polynomial.
 ///
 /// For a polynomial with integer coefficients, the content is the greatest common divisor of its

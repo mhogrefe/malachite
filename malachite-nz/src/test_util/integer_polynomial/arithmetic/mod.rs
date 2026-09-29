@@ -8,6 +8,8 @@
 
 pub mod add;
 pub mod add_truncated;
+pub mod bit_pack;
+pub mod bit_unpack;
 pub mod compose_power_of_x;
 pub mod content_chained;
 pub mod deflate_power_of_x;

@@ -558,6 +558,8 @@ pub mod integer_polynomial {
         pub mod add;
         pub mod add_truncated;
         pub mod balanced_mod;
+        pub mod bit_pack;
+        pub mod bit_unpack;
         pub mod canonicalize_unit;
         pub mod compose_power_of_x;
         pub mod content;
@@ -638,6 +640,8 @@ pub mod natural_polynomial {
         pub mod add;
         pub mod add_truncated;
         pub mod balanced_mod;
+        pub mod bit_pack;
+        pub mod bit_unpack;
         pub mod canonicalize_unit;
         pub mod compose_power_of_x;
         pub mod content;

@@ -17,6 +17,12 @@ pub mod add_truncated;
 /// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
 /// every coefficient of a polynomial to the representative closest to zero.
 pub mod balanced_mod;
+/// Implementations of [`BitPack`](malachite_base::polynomial::BitPack), which packs a polynomial's
+/// coefficients into fixed-width fields of a single integer.
+pub mod bit_pack;
+/// Implementations of [`BitUnpack`](malachite_base::polynomial::BitUnpack), which unpacks a
+/// polynomial from the fixed-width fields of a single number.
+pub mod bit_unpack;
 /// Implementations of
 /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
