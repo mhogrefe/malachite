@@ -42,7 +42,7 @@ use malachite_base::num::logic::traits::LowMask;
 //
 // This is equivalent to `n_revbin` from `ulong_extras/revbin.c`, FLINT 3.6.0, where `b` is
 // positive.
-const fn revbin(n: usize, bits: u64) -> usize {
+pub(crate) const fn revbin(n: usize, bits: u64) -> usize {
     debug_assert!(bits != 0);
     n.reverse_bits() >> (usize::WIDTH - bits)
 }

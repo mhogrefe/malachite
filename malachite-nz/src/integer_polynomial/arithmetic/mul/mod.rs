@@ -17,6 +17,7 @@ use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::mul::classical::mul_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::mul::kronecker::mul_to_out_kronecker;
+use crate::integer_polynomial::arithmetic::mul::schonhage_strassen::*;
 use crate::integer_polynomial::arithmetic::mul::tiny::{mul_to_out_tiny_1, mul_to_out_tiny_2};
 use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use crate::integer_polynomial::arithmetic::scalar_mul::{
@@ -25,7 +26,8 @@ use crate::integer_polynomial::arithmetic::scalar_mul::{
 use crate::integer_polynomial::arithmetic::square::square_to_out;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::integer_polynomial::arithmetic::vec::{
-    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred, tiny_kernel,
+    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
+    schonhage_strassen_preferred, tiny_kernel,
 };
 use alloc::vec;
 use alloc::vec::Vec;
@@ -38,6 +40,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 pub mod classical;
 pub mod karatsuba;
 pub mod kronecker;
+pub mod schonhage_strassen;
 pub mod tiny;
 
 // Sets `out` to the coefficients of the product of the polynomials with coefficients `xs` and `ys`,
@@ -88,11 +91,10 @@ crate_test_fn! {mul_greater_to_out(out: &mut [Integer], xs: &[Integer], ys: &[In
         None if karatsuba_preferred(len2, bits1, bits2) => {
             mul_to_out_karatsuba(out, xs, ys);
         }
-        None => {
-            // Schönhage–Strassen, which FLINT chooses instead for some inputs of medium size,
-            // has not been ported yet, so Kronecker substitution stands in for it.
-            mul_to_out_kronecker(out, xs, ys);
+        None if schonhage_strassen_preferred(len2, bits1, bits2) => {
+            mul_to_out_schonhage_strassen(out, xs, ys);
         }
+        None => mul_to_out_kronecker(out, xs, ys),
     }
 }}
 

@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Square;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::LowMask;
 use malachite_base::polynomial::{BitPack, Evaluate, Polynomial};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
@@ -17,6 +18,7 @@ use malachite_nz::integer_polynomial::arithmetic::mul::classical::mul_to_out_cla
 use malachite_nz::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
 use malachite_nz::integer_polynomial::arithmetic::mul::kronecker::mul_to_out_kronecker;
 use malachite_nz::integer_polynomial::arithmetic::mul::mul_greater_to_out;
+use malachite_nz::integer_polynomial::arithmetic::mul::schonhage_strassen::*;
 use malachite_nz::integer_polynomial::arithmetic::mul::tiny::{
     mul_to_out_tiny_1, mul_to_out_tiny_2,
 };
@@ -783,6 +785,70 @@ fn test_mul_to_out_kronecker() {
 }
 
 #[test]
+fn test_mul_to_out_schonhage_strassen() {
+    let test = |xs: &[&str], ys: &[&str], out: &[&str]| {
+        let xs = parse(xs);
+        let ys = parse(ys);
+        let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+        mul_to_out_schonhage_strassen(&mut result, &xs, &ys);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(integers_mul_naive(&xs, &ys), result);
+    };
+    // Both arguments are the same slice.
+    let test_square = |xs: &[&str], out: &[&str]| {
+        let xs = parse(xs);
+        let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        mul_to_out_schonhage_strassen(&mut result, &xs, &xs);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(integers_mul_naive(&xs, &xs), result);
+    };
+    test(&["3"], &["4"], &["12"]);
+    test(
+        &["1", "2", "3"],
+        &["4", "5", "6"],
+        &["4", "13", "28", "27", "18"],
+    );
+    test(
+        &["1", "-2", "3"],
+        &["4", "5", "-6"],
+        &["4", "-3", "-4", "27", "-18"],
+    );
+    test(&["0", "0", "1"], &["0", "1"], &["0", "0", "0", "1"]);
+    test(
+        &[
+            "-1189622705099215217644861615934",
+            "167804589232078278853584154980",
+            "-867945855396731878320832686",
+            "806358736512700625604185791006",
+            "-1203530013354241971435757793231",
+        ],
+        &[
+            "-109632111915421827856541593741",
+            "16864956392665328332356101086",
+            "1027974083675173273248815447350",
+        ],
+        &[
+            "130420849542564019915297765836538964344364544469505000269094",
+            "-38459706551835424795030320947752535095139193382475754284504",
+            "-1219976138376503143983408787497266494520631119495732681948294",
+            "84081319737993519794215590052736954672122151453146537712558",
+            "144652516200371670458657726973534542506294278765865295317587",
+            "808618402087630699889842747986252853398931897809576973985234",
+            "-1237197662653395943316359429866881120806965512172020066887850",
+        ],
+    );
+    test_square(
+        &["17", "-1", "-19", "-7", "-9", "5", "18"],
+        &[
+            "289", "-34", "-645", "-200", "69", "454", "993", "-100", "-673", "-342", "-299",
+            "180", "324",
+        ],
+    );
+}
+
+#[test]
 fn mul_to_out_kronecker_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_len_n", 32);
@@ -801,4 +867,51 @@ fn mul_to_out_kronecker_properties() {
     };
     integer_vec_pair_gen_var_1().test_properties(test);
     integer_vec_pair_gen_var_1().test_properties_with_config(&config, test);
+}
+
+// FLINT 3.6.0's `_fmpz_poly_mul_SS`, and so its `fmpz_poly_mul`, gets the sign of the middle
+// coefficient wrong: it is negative and within $2^{N - \text{W}}$ of $2^{N-1}$ in absolute value,
+// where $N$ is the number of bits the transform works modulo, and FLINT's `_fmpz_vec_set_fft` reads
+// it as positive.
+#[test]
+fn test_mul_to_out_schonhage_strassen_large_negative_coefficient() {
+    let test = |bits1: u64, bits2: u64| {
+        let xs = vec![-Integer::low_mask(bits1); 16];
+        let ys = vec![Integer::low_mask(bits2); 16];
+        let expected = integers_mul_naive(&xs, &ys);
+        let mut out = vec![Integer::ZERO; 31];
+        mul_to_out_schonhage_strassen(&mut out, &xs, &ys);
+        assert_eq!(out, expected);
+        // The dispatcher chooses Schönhage–Strassen when the coefficients are this large.
+        let product = IntegerPolynomial::from_coefficients_asc(xs)
+            * IntegerPolynomial::from_coefficients_asc(ys);
+        assert_eq!(product, IntegerPolynomial::from_coefficients_asc(expected));
+    };
+    test(727, 100);
+    test(187, 64);
+}
+
+#[test]
+fn mul_to_out_schonhage_strassen_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_len_n", 32);
+    let mut wide_config = GenConfig::new();
+    wide_config.insert("mean_len_n", 20);
+    wide_config.insert("mean_bits_n", 1000);
+    let test = |(xs, ys): (Vec<Integer>, Vec<Integer>)| {
+        let mut out = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+        mul_to_out_schonhage_strassen(&mut out, &xs, &ys);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(integers_mul_naive(&xs, &ys), out);
+        let mut out_alt = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+        mul_to_out_schonhage_strassen(&mut out_alt, &ys, &xs);
+        assert_eq!(out_alt, out);
+        // The same slice as both arguments.
+        let mut out = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        mul_to_out_schonhage_strassen(&mut out, &xs, &xs);
+        assert_eq!(integers_mul_naive(&xs, &xs), out);
+    };
+    integer_vec_pair_gen_var_1().test_properties(test);
+    integer_vec_pair_gen_var_1().test_properties_with_config(&config, test);
+    integer_vec_pair_gen_var_1().test_properties_with_config(&wide_config, test);
 }

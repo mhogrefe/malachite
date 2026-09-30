@@ -17,6 +17,7 @@ use malachite_nz::integer_polynomial::arithmetic::mul::classical::mul_to_out_cla
 use malachite_nz::integer_polynomial::arithmetic::square::classical::square_to_out_classical;
 use malachite_nz::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
 use malachite_nz::integer_polynomial::arithmetic::square::kronecker::square_to_out_kronecker;
+use malachite_nz::integer_polynomial::arithmetic::square::schonhage_strassen::*;
 use malachite_nz::integer_polynomial::arithmetic::square::square_to_out;
 use malachite_nz::integer_polynomial::arithmetic::square::tiny::{
     square_to_out_tiny_1, square_to_out_tiny_2,
@@ -533,6 +534,41 @@ fn test_square_to_out_kronecker() {
 }
 
 #[test]
+fn test_square_to_out_schonhage_strassen() {
+    let test = |xs: &[&str], out: &[&str]| {
+        let xs = parse(xs);
+        let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        square_to_out_schonhage_strassen(&mut result, &xs);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(integers_mul_naive(&xs, &xs), result);
+    };
+    test(&["3"], &["9"]);
+    test(&["1", "2", "3"], &["1", "4", "10", "12", "9"]);
+    test(&["1", "-2", "3"], &["1", "-4", "10", "-12", "9"]);
+    test(
+        &[
+            "127045069494630545379112202255",
+            "8639614695295244635568505446",
+            "531191510928739164466910347515",
+            "784741010512824463010586856737",
+            "1123093540348611836825705550910",
+        ],
+        &[
+            "16140449682895504779053258210494836768807819848636027085025",
+            "2195240898741231317393919544763125977619598147104041961460",
+            "135045167783882097511084974182705446645536863956980164951566",
+            "208573532399448805453187042240657064087616639707806566817250",
+            "581091134980731786257942541995202471076514713515326317858729",
+            "853101717034879681778904311398516399835993788194997908428830",
+            "1808973962804860882952008390185728112267022980998475011264469",
+            "1762675119507190493336990192826453550789672153672859659961340",
+            "1261339100372779003934498233113316595678042798323586601828100",
+        ],
+    );
+}
+
+#[test]
 fn square_to_out_kronecker_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_len_n", 32);
@@ -544,4 +580,22 @@ fn square_to_out_kronecker_properties() {
     };
     integer_vec_gen_var_1().test_properties(test);
     integer_vec_gen_var_1().test_properties_with_config(&config, test);
+}
+
+#[test]
+fn square_to_out_schonhage_strassen_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_len_n", 32);
+    let mut wide_config = GenConfig::new();
+    wide_config.insert("mean_len_n", 20);
+    wide_config.insert("mean_bits_n", 1000);
+    let test = |xs: Vec<Integer>| {
+        let mut out = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        square_to_out_schonhage_strassen(&mut out, &xs);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(integers_mul_naive(&xs, &xs), out);
+    };
+    integer_vec_gen_var_1().test_properties(test);
+    integer_vec_gen_var_1().test_properties_with_config(&config, test);
+    integer_vec_gen_var_1().test_properties_with_config(&wide_config, test);
 }

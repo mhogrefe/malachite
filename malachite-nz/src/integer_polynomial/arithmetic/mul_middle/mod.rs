@@ -18,6 +18,7 @@ use crate::integer::Integer;
 use crate::integer_polynomial::arithmetic::mul_middle::classical::mul_middle_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use crate::integer_polynomial::arithmetic::mul_middle::kronecker::mul_middle_to_out_kronecker;
+use crate::integer_polynomial::arithmetic::mul_middle::schonhage_strassen::*;
 use crate::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
@@ -25,7 +26,8 @@ use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncat
 use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_to_out;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::integer_polynomial::arithmetic::vec::{
-    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred, tiny_kernel,
+    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
+    schonhage_strassen_preferred, tiny_kernel,
 };
 use core::cmp::min;
 use core::mem::swap;
@@ -35,6 +37,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 pub mod classical;
 pub mod fft;
 pub mod kronecker;
+pub mod schonhage_strassen;
 pub mod tiny;
 
 // Narrows the polynomials with coefficients `xs` and `ys` to the coefficients that can contribute
@@ -126,10 +129,9 @@ crate_test_fn! {mul_middle_to_out(
         None if nlo == 0 && karatsuba_preferred(len2, bits1, bits2) => {
             mul_truncated_to_out_karatsuba(out, xs, ys);
         }
-        None => {
-            // Schönhage–Strassen, which FLINT chooses instead for some inputs of medium size,
-            // has not been ported yet, so Kronecker substitution stands in for it.
-            mul_middle_to_out_kronecker(out, xs, ys, nlo, nhi);
+        None if schonhage_strassen_preferred(len2, bits1, bits2) => {
+            mul_middle_to_out_schonhage_strassen(out, xs, ys, nlo, nhi);
         }
+        None => mul_middle_to_out_kronecker(out, xs, ys, nlo, nhi),
     }
 }}

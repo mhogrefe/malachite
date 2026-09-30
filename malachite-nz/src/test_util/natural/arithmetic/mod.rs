@@ -35,6 +35,7 @@ pub mod neg;
 pub mod pow;
 pub mod primorial;
 pub mod root;
+pub mod schonhage_strassen;
 pub mod sqrt;
 pub mod square;
 pub mod sub;

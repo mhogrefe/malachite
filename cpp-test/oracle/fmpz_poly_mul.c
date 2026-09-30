@@ -36,6 +36,18 @@
 
 static long checked;
 
+/* FLINT 3.6.0's fmpz_poly_mul and relatives can get the sign of a coefficient wrong when they
+   choose Schönhage–Strassen (see fmpz_poly_mul_slices.c); Malachite's port fixes that. Replaces
+   `r` by `reference` if they differ, so that the correct product is compared. */
+static void
+use_reference_if_different(fmpz_poly_t r, fmpz_poly_t reference)
+{
+    if (!fmpz_poly_equal(r, reference))
+    {
+        fmpz_poly_swap(r, reference);
+    }
+}
+
 /* Cuts `line` at `needle`, returning the text after it, or NULL if the needle is absent. */
 static char *
 cut(char * line, const char * needle)
@@ -154,6 +166,11 @@ check_mul_line(char * line, int line_number)
     else
     {
         fmpz_poly_mul(r, p, same ? p : q);
+        fmpz_poly_t reference;
+        fmpz_poly_init(reference);
+        fmpz_poly_mul_classical(reference, p, same ? p : q);
+        use_reference_if_different(r, reference);
+        fmpz_poly_clear(reference);
         if (!fmpz_poly_equal(r, expected))
         {
             result = report_mismatch("fmpz_poly_mul", line_number, r);
@@ -227,6 +244,11 @@ check_mullow_line(char * line, int line_number)
     else
     {
         fmpz_poly_mullow(r, p, same ? p : q, (slong) n);
+        fmpz_poly_t reference;
+        fmpz_poly_init(reference);
+        fmpz_poly_mullow_classical(reference, p, same ? p : q, (slong) n);
+        use_reference_if_different(r, reference);
+        fmpz_poly_clear(reference);
         if (!fmpz_poly_equal(r, expected))
         {
             result = report_mismatch("fmpz_poly_mullow", line_number, r);
@@ -282,14 +304,20 @@ check_square_line(char * line, int line_number, int truncated)
     }
     else
     {
+        fmpz_poly_t reference;
+        fmpz_poly_init(reference);
         if (truncated)
         {
             fmpz_poly_sqrlow(r, p, (slong) n);
+            fmpz_poly_sqrlow_classical(reference, p, (slong) n);
         }
         else
         {
             fmpz_poly_sqr(r, p);
+            fmpz_poly_sqr_classical(reference, p);
         }
+        use_reference_if_different(r, reference);
+        fmpz_poly_clear(reference);
         if (!fmpz_poly_equal(r, expected))
         {
             result = report_mismatch(name, line_number, r);

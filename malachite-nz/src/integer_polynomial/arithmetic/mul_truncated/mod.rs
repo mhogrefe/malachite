@@ -18,6 +18,7 @@ use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_ff
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncated_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::mul_truncated::kronecker::mul_truncated_to_out_kronecker;
+use crate::integer_polynomial::arithmetic::mul_truncated::schonhage_strassen::*;
 use crate::integer_polynomial::arithmetic::mul_truncated::tiny::{
     mul_truncated_to_out_tiny_1, mul_truncated_to_out_tiny_2,
 };
@@ -27,7 +28,8 @@ use crate::integer_polynomial::arithmetic::scalar_mul::{
 use crate::integer_polynomial::arithmetic::square_truncated::square_truncated_to_out;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::integer_polynomial::arithmetic::vec::{
-    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred, tiny_kernel,
+    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
+    schonhage_strassen_preferred, tiny_kernel,
 };
 use alloc::vec;
 use core::cmp::min;
@@ -40,6 +42,7 @@ use malachite_base::polynomial::{MulTruncated, MulTruncatedAssign, Polynomial};
 pub mod classical;
 pub mod karatsuba;
 pub mod kronecker;
+pub mod schonhage_strassen;
 pub mod tiny;
 
 // Sets `out` to the first `out.len()` coefficients of the product of the polynomials with
@@ -97,11 +100,10 @@ crate_test_fn! {mul_truncated_to_out(out: &mut [Integer], xs: &[Integer], ys: &[
         None if karatsuba_preferred(len2, bits1, bits2) => {
             mul_truncated_to_out_karatsuba(out, xs, ys);
         }
-        None => {
-            // Schönhage–Strassen, which FLINT chooses instead for some inputs of medium size,
-            // has not been ported yet, so Kronecker substitution stands in for it.
-            mul_truncated_to_out_kronecker(out, xs, ys);
+        None if schonhage_strassen_preferred(len2, bits1, bits2) => {
+            mul_truncated_to_out_schonhage_strassen(out, xs, ys);
         }
+        None => mul_truncated_to_out_kronecker(out, xs, ys),
     }
 }}
 

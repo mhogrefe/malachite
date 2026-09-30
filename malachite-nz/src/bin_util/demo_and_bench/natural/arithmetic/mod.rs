@@ -94,6 +94,7 @@ pub(crate) fn register(runner: &mut Runner) {
     saturating_mul_sub_mul::register(runner);
     saturating_sub::register(runner);
     saturating_sub_mul::register(runner);
+    schonhage_strassen::register(runner);
     shl::register(runner);
     shl_round::register(runner);
     shr::register(runner);
@@ -190,6 +191,7 @@ mod round_to_multiple_of_power_of_2;
 mod saturating_mul_sub_mul;
 mod saturating_sub;
 mod saturating_sub_mul;
+mod schonhage_strassen;
 mod shl;
 mod shl_round;
 mod shr;

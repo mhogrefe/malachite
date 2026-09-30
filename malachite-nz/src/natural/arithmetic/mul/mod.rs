@@ -916,5 +916,8 @@ pub mod product_of_limbs;
 #[cfg(not(feature = "test_build"))]
 /// Code for multiplying several limbs together.
 pub(crate) mod product_of_limbs;
+/// Code for multiplying residues modulo $2^n + 1$ with transforms that need no multiplications.
+/// Derived from William Hart's Schönhage-Strassen implementation for FLINT.
+pub mod schonhage_strassen;
 /// Code for Toom-Cook multiplication.
 pub mod toom;

@@ -17,6 +17,7 @@ use malachite_nz::integer_polynomial::arithmetic::mul_truncated::classical::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::karatsuba::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::mul_truncated_to_out;
+use malachite_nz::integer_polynomial::arithmetic::mul_truncated::schonhage_strassen::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::tiny::{
     mul_truncated_to_out_tiny_1, mul_truncated_to_out_tiny_2,
 };
@@ -747,6 +748,62 @@ fn test_mul_truncated_to_out_kronecker() {
 }
 
 #[test]
+fn test_mul_truncated_to_out_schonhage_strassen() {
+    let test = |xs: &[&str], ys: &[&str], n: usize, out: &[&str]| {
+        let xs = parse(xs);
+        let ys = parse(ys);
+        let mut result = vec![Integer::ZERO; n];
+        mul_truncated_to_out_schonhage_strassen(&mut result, &xs, &ys);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(&integers_mul_naive(&xs, &ys)[..n], result);
+    };
+    // Both arguments are the same slice.
+    let test_square = |xs: &[&str], n: usize, out: &[&str]| {
+        let xs = parse(xs);
+        let mut result = vec![Integer::ZERO; n];
+        mul_truncated_to_out_schonhage_strassen(&mut result, &xs, &xs);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(&integers_mul_naive(&xs, &xs)[..n], result);
+    };
+    test(&["3"], &["4"], 1, &["12"]);
+    test(&["1", "2", "3"], &["4", "5", "6"], 3, &["4", "13", "28"]);
+    test(
+        &["1", "-2", "3"],
+        &["4", "5", "-6"],
+        5,
+        &["4", "-3", "-4", "27", "-18"],
+    );
+    test(
+        &[
+            "-249280210867129111655121130485",
+            "774272247025418148342010903136",
+            "109823698889072694555589859827",
+            "-838450632265568977780093348695",
+            "-425350271670103455527167616781",
+        ],
+        &[
+            "601125560895236399022862340007",
+            "-806766728941798427326353285204",
+            "-1048060506937750767971840644108",
+        ],
+        4,
+        &[
+            "-149848706577585791160335678754689229414827769322918282813395",
+            "666545819089965023668422513634740818970863517732934478405892",
+            "-297378511277876598114991372218805575453317633564910767368575",
+            "-1404100376641923078592484163909680189289370632896284649963261",
+        ],
+    );
+    test_square(
+        &["19", "-5", "-8", "-10", "20", "15", "-8"],
+        9,
+        &["361", "-190", "-279", "-300", "924", "530", "-674", "-560", "228"],
+    );
+}
+
+#[test]
 fn mul_truncated_to_out_kronecker_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_len_n", 32);
@@ -762,4 +819,27 @@ fn mul_truncated_to_out_kronecker_properties() {
     };
     integer_vec_integer_vec_unsigned_triple_gen_var_1().test_properties(test);
     integer_vec_integer_vec_unsigned_triple_gen_var_1().test_properties_with_config(&config, test);
+}
+
+#[test]
+fn mul_truncated_to_out_schonhage_strassen_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_len_n", 32);
+    let mut wide_config = GenConfig::new();
+    wide_config.insert("mean_len_n", 20);
+    wide_config.insert("mean_bits_n", 1000);
+    let test = |(xs, ys, n): (Vec<Integer>, Vec<Integer>, u64)| {
+        let n = usize::exact_from(n);
+        let mut out = vec![Integer::ZERO; n];
+        mul_truncated_to_out_schonhage_strassen(&mut out, &xs, &ys);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(&integers_mul_naive(&xs, &ys)[..n], out);
+        let mut out_alt = vec![Integer::ZERO; n];
+        mul_truncated_to_out_schonhage_strassen(&mut out_alt, &ys, &xs);
+        assert_eq!(out_alt, out);
+    };
+    integer_vec_integer_vec_unsigned_triple_gen_var_1().test_properties(test);
+    integer_vec_integer_vec_unsigned_triple_gen_var_1().test_properties_with_config(&config, test);
+    integer_vec_integer_vec_unsigned_triple_gen_var_1()
+        .test_properties_with_config(&wide_config, test);
 }

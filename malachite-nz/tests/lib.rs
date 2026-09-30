@@ -437,6 +437,34 @@ pub mod natural {
         pub mod sqrt;
         pub mod square;
         pub mod sub;
+        pub mod schonhage_strassen {
+            pub mod add_signed_limb_mod_2expp1;
+            pub mod adjust;
+            pub mod adjust_sqrt2;
+            pub mod butterfly_lsh_b;
+            pub mod butterfly_rsh_b;
+            pub mod combine_bits;
+            pub mod convolution;
+            pub mod div_2expmod_2expp1;
+            pub mod fft_mfa_truncate_sqrt2;
+            pub mod fft_mfa_truncate_sqrt2_inner;
+            pub mod fft_negacyclic;
+            pub mod fft_radix2;
+            pub mod fft_truncate;
+            pub mod fft_truncate_sqrt2;
+            pub mod ifft_mfa_truncate_sqrt2;
+            pub mod ifft_negacyclic;
+            pub mod ifft_radix2;
+            pub mod ifft_truncate;
+            pub mod ifft_truncate_sqrt2;
+            pub mod mul_2expmod_2expp1;
+            pub mod mulmod_2expp1;
+            pub mod mulmod_2expp1_basecase;
+            pub mod negmod_2expp1;
+            pub mod normmod_2expp1;
+            pub mod split_bits;
+            pub mod sum_diff;
+        }
         pub mod sub_mul;
     }
     pub mod basic {

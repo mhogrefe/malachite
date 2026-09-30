@@ -20,6 +20,7 @@
     mulhigh_n (`mul_high_to_out_karatsuba_n`)            xs, ys          -> _fmpz_poly_mulhigh_karatsuba_n
     mulmid (`mul_middle_to_out*`)                        xs, ys, lo, hi  -> _fmpz_poly_mulmid*
     fft (`mul_middle_to_out_fft`)                        xs, ys, lo, hi  -> ..._mul_mid_default_mpn_ctx
+    SS (`*_schonhage_strassen`)                          as above        -> _fmpz_poly_*_SS
     sqr (`square_to_out*`)                               xs              -> _fmpz_poly_sqr*
     sqrlow (`square_truncated_to_out*`)                  xs              -> _fmpz_poly_sqrlow*
 
@@ -63,7 +64,10 @@ typedef enum
     VARIANT_KARATSUBA_N,
     VARIANT_KS,
     /* The small-prime FFT, which may decline: its lines end in `Some([z, ...])` or `None`. */
-    VARIANT_FFT
+    VARIANT_FFT,
+    /* Schönhage–Strassen. FLINT has no squaring functions for it; its squaring dispatchers pass
+       the same vector as both factors, and so do these modes. */
+    VARIANT_SS
 } variant_t;
 
 typedef struct
@@ -304,6 +308,10 @@ check_line(char * line, int line_number)
                 {
                     _fmpz_poly_mul_KS(out, xs, len1, y, len2);
                 }
+                else if (v == VARIANT_SS)
+                {
+                    _fmpz_poly_mul_SS(out, xs, len1, y, len2);
+                }
                 else if (v == VARIANT_KARATSUBA)
                 {
                     _fmpz_poly_mul_karatsuba(out, xs, len1, y, len2);
@@ -325,6 +333,10 @@ check_line(char * line, int line_number)
                 else if (v == VARIANT_KS)
                 {
                     _fmpz_poly_mullow_KS(out, xs, len1, y, len2, out_len);
+                }
+                else if (v == VARIANT_SS)
+                {
+                    _fmpz_poly_mullow_SS(out, xs, len1, y, len2, out_len);
                 }
                 else if (v == VARIANT_KARATSUBA)
                 {
@@ -373,6 +385,10 @@ check_line(char * line, int line_number)
                 {
                     _fmpz_poly_mulmid_KS(out, xs, len1, y, len2, a, b);
                 }
+                else if (v == VARIANT_SS)
+                {
+                    _fmpz_poly_mulmid_SS(out, xs, len1, y, len2, a, b);
+                }
                 else
                 {
                     _fmpz_poly_mulmid(out, xs, len1, y, len2, a, b);
@@ -386,6 +402,10 @@ check_line(char * line, int line_number)
                 else if (v == VARIANT_KS)
                 {
                     _fmpz_poly_sqr_KS(out, xs, len1);
+                }
+                else if (v == VARIANT_SS)
+                {
+                    _fmpz_poly_mul_SS(out, xs, len1, xs, len1);
                 }
                 else if (v == VARIANT_KARATSUBA)
                 {
@@ -405,6 +425,10 @@ check_line(char * line, int line_number)
                 {
                     _fmpz_poly_sqrlow_KS(out, xs, len1, out_len);
                 }
+                else if (v == VARIANT_SS)
+                {
+                    _fmpz_poly_mullow_SS(out, xs, len1, xs, len1, out_len);
+                }
                 else if (v == VARIANT_KARATSUBA)
                 {
                     _fmpz_poly_sqrlow_karatsuba(out, xs, len1, out_len);
@@ -418,6 +442,41 @@ check_line(char * line, int line_number)
                     _fmpz_poly_sqrlow(out, xs, len1, out_len);
                 }
                 break;
+        }
+        /* FLINT 3.6.0's Schönhage–Strassen functions, which its dispatchers call for some
+           inputs of medium size, can get the sign of a coefficient wrong: `_fmpz_vec_set_fft`
+           reads a negative coefficient whose absolute value is just below 2^(N - 1) as positive.
+           Malachite's port fixes that, so where FLINT's result differs from its classical
+           product, the classical product is compared instead. */
+        if (result == 0 && (v == VARIANT_SS || v == VARIANT_DISPATCHER)
+            && current_mode->kind != KIND_MULHIGH)
+        {
+            fmpz * reference = _fmpz_vec_init(out_len);
+            switch (current_mode->kind)
+            {
+                case KIND_MUL:
+                    _fmpz_poly_mul_classical(reference, xs, len1, y, len2);
+                    break;
+                case KIND_MULLOW:
+                    _fmpz_poly_mullow_classical(reference, xs, len1, y, len2, out_len);
+                    break;
+                case KIND_MULMID:
+                    _fmpz_poly_mulmid_classical(reference, xs, len1, y, len2, a, b);
+                    break;
+                case KIND_SQR:
+                    _fmpz_poly_sqr_classical(reference, xs, len1);
+                    break;
+                case KIND_SQRLOW:
+                    _fmpz_poly_sqrlow_classical(reference, xs, len1, out_len);
+                    break;
+                default:
+                    break;
+            }
+            if (!_fmpz_vec_equal(out, reference, out_len))
+            {
+                _fmpz_vec_swap(out, reference, out_len);
+            }
+            _fmpz_vec_clear(reference, out_len);
         }
         /* The mulhigh dispatcher may leave anything in the coefficients below `start`, since
            Kronecker substitution computes the whole product; only the rest are compared. */
@@ -494,6 +553,14 @@ static const slice_mode_t SLICE_MODES[] = {
     {"_fmpz_poly_sqrlow_KS", KIND_SQRLOW, VARIANT_KS, {"square_truncated_to_out_kronecker", NULL}},
     {"_fmpz_poly_mul_mid_default_mpn_ctx", KIND_MULMID, VARIANT_FFT,
      {"mul_middle_to_out_fft", NULL}},
+    {"_fmpz_poly_mul_SS", KIND_MUL, VARIANT_SS, {"mul_to_out_schonhage_strassen", NULL}},
+    {"_fmpz_poly_mullow_SS", KIND_MULLOW, VARIANT_SS,
+     {"mul_truncated_to_out_schonhage_strassen", NULL}},
+    {"_fmpz_poly_mulmid_SS", KIND_MULMID, VARIANT_SS,
+     {"mul_middle_to_out_schonhage_strassen", NULL}},
+    {"_fmpz_poly_sqr_SS", KIND_SQR, VARIANT_SS, {"square_to_out_schonhage_strassen", NULL}},
+    {"_fmpz_poly_sqrlow_SS", KIND_SQRLOW, VARIANT_SS,
+     {"square_truncated_to_out_schonhage_strassen", NULL}},
 };
 
 static int
@@ -653,4 +720,34 @@ int
 run__fmpz_poly_mul_mid_default_mpn_ctx(const char * arg)
 {
     return run(arg, 24);
+}
+
+int
+run__fmpz_poly_mul_SS(const char * arg)
+{
+    return run(arg, 25);
+}
+
+int
+run__fmpz_poly_mullow_SS(const char * arg)
+{
+    return run(arg, 26);
+}
+
+int
+run__fmpz_poly_mulmid_SS(const char * arg)
+{
+    return run(arg, 27);
+}
+
+int
+run__fmpz_poly_sqr_SS(const char * arg)
+{
+    return run(arg, 28);
+}
+
+int
+run__fmpz_poly_sqrlow_SS(const char * arg)
+{
+    return run(arg, 29);
 }

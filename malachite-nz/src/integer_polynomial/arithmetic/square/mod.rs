@@ -18,12 +18,14 @@ use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_ff
 use crate::integer_polynomial::arithmetic::square::classical::square_to_out_classical;
 use crate::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::square::kronecker::square_to_out_kronecker;
+use crate::integer_polynomial::arithmetic::square::schonhage_strassen::*;
 use crate::integer_polynomial::arithmetic::square::tiny::{
     square_to_out_tiny_1, square_to_out_tiny_2,
 };
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::integer_polynomial::arithmetic::vec::{
-    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred, tiny_kernel,
+    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
+    schonhage_strassen_preferred, tiny_kernel,
 };
 use alloc::vec;
 use alloc::vec::Vec;
@@ -34,6 +36,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 pub mod classical;
 pub mod karatsuba;
 pub mod kronecker;
+pub mod schonhage_strassen;
 pub mod tiny;
 
 // Sets `out` to the coefficients of the square of the polynomial with coefficients `xs`, which is
@@ -75,11 +78,10 @@ crate_test_fn! {square_to_out(out: &mut [Integer], xs: &[Integer]) {
         None if karatsuba_preferred(len, bits, bits) => {
             square_to_out_karatsuba(out, xs);
         }
-        None => {
-            // Schönhage–Strassen, which FLINT chooses instead for some inputs of medium size,
-            // has not been ported yet, so Kronecker substitution stands in for it.
-            square_to_out_kronecker(out, xs);
+        None if schonhage_strassen_preferred(len, bits, bits) => {
+            square_to_out_schonhage_strassen(out, xs);
         }
+        None => square_to_out_kronecker(out, xs),
     }
 }}
 

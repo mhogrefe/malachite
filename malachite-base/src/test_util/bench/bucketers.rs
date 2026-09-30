@@ -823,6 +823,13 @@ pub fn triple_2_3_vec_min_len_bucketer<'a, T, U, V>(
     }
 }
 
+pub fn quadruple_1_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<'_, (Vec<T>, U, V, W)> {
+    Bucketer {
+        bucketing_function: &|(xs, _, _, _)| xs.len(),
+        bucketing_label: format!("{xs_name}.len()"),
+    }
+}
+
 pub fn quadruple_2_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<'_, (T, Vec<U>, V, W)> {
     Bucketer {
         bucketing_function: &|(_, xs, _, _)| xs.len(),

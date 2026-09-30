@@ -26,6 +26,7 @@ use crate::test_util::generators::common::{
 };
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
+use crate::test_util::generators::schonhage_strassen::*;
 use crate::test_util::generators::special_random::*;
 use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use malachite_base::foer_sequences::FoerSequence;
@@ -4858,6 +4859,7 @@ pub fn large_type_gen_var_28() -> Generator<(Vec<Limb>, u64, i64, i64, usize, Ro
 pub mod common;
 pub mod exhaustive;
 pub mod random;
+pub mod schonhage_strassen;
 pub mod special_random;
 
 // -- (Natural, Natural, PrimitiveUnsigned, RoundingMode) --
@@ -4892,5 +4894,344 @@ pub fn integer_integer_unsigned_rounding_mode_quadruple_gen_var_1()
         &exhaustive_integer_integer_unsigned_rounding_mode_quadruple_gen_var_1,
         &random_integer_integer_unsigned_rounding_mode_quadruple_gen_var_1,
         &special_random_integer_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+// -- Schönhage–Strassen (see `schonhage_strassen.rs`) --
+
+// `(t, limbs)`: a residue.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_29() -> Generator<(Vec<Limb>, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_29,
+        &random_large_type_gen_var_29,
+        &special_random_large_type_gen_var_29,
+    )
+}
+
+// `(a, limbs)`: a normalized residue.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_30() -> Generator<(Vec<Limb>, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_30,
+        &random_large_type_gen_var_30,
+        &special_random_large_type_gen_var_30,
+    )
+}
+
+// `(t, limbs, d)`: a residue and a shift less than `Limb::WIDTH`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_31() -> Generator<(Vec<Limb>, usize, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_31,
+        &random_large_type_gen_var_31,
+        &special_random_large_type_gen_var_31,
+    )
+}
+
+// `(r, limbs, c)`: a residue and any limb.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_32() -> Generator<(Vec<Limb>, usize, Limb)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_32,
+        &random_large_type_gen_var_32,
+        &special_random_large_type_gen_var_32,
+    )
+}
+
+// `(x, y)`: two slices of the same positive length.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_33() -> Generator<(Vec<Limb>, Vec<Limb>)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_33,
+        &random_large_type_gen_var_33,
+        &special_random_large_type_gen_var_33,
+    )
+}
+
+// `(i1, i, limbs, w)`: a residue and the parameters of `fft_adjust`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_34() -> Generator<(Vec<Limb>, usize, usize, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_34,
+        &random_large_type_gen_var_34,
+        &special_random_large_type_gen_var_34,
+    )
+}
+
+// `(i1, i, limbs, w)`: a residue and the parameters of `fft_adjust_sqrt2`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_35() -> Generator<(Vec<Limb>, usize, usize, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_35,
+        &random_large_type_gen_var_35,
+        &special_random_large_type_gen_var_35,
+    )
+}
+
+// `(i1, i2, limbs, x, y)`: two residues and limb shifts less than `limbs`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_36() -> Generator<(Vec<Limb>, Vec<Limb>, usize, usize, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_36,
+        &random_large_type_gen_var_36,
+        &special_random_large_type_gen_var_36,
+    )
+}
+
+// `(i1, i2, i, limbs, w)`: two residues and the parameters of `fft_butterfly`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_37() -> Generator<(Vec<Limb>, Vec<Limb>, usize, usize, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_37,
+        &random_large_type_gen_var_37,
+        &special_random_large_type_gen_var_37,
+    )
+}
+
+// `(i1, i2, i, limbs, w)`: two residues and the parameters of `fft_butterfly_sqrt2`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_38() -> Generator<(Vec<Limb>, Vec<Limb>, usize, usize, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_38,
+        &random_large_type_gen_var_38,
+        &special_random_large_type_gen_var_38,
+    )
+}
+
+// `(s, t, limbs, b1, b2)`: two residues and shifts less than `2 * limbs * Limb::WIDTH`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_39() -> Generator<(Vec<Limb>, Vec<Limb>, usize, u64, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_39,
+        &random_large_type_gen_var_39,
+        &special_random_large_type_gen_var_39,
+    )
+}
+
+// `(ii, n, w)`: `2 * n` residues, for `fft_radix2`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_40() -> Generator<(Vec<Vec<Limb>>, usize, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_40,
+        &random_large_type_gen_var_40,
+        &special_random_large_type_gen_var_40,
+    )
+}
+
+// `(ii, n, w, trunc)`: `2 * n` residues and an even `trunc` with `2 <= trunc <= 2 * n`, for
+// `fft_truncate`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_41() -> Generator<(Vec<Vec<Limb>>, usize, u64, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_41,
+        &random_large_type_gen_var_41,
+        &special_random_large_type_gen_var_41,
+    )
+}
+
+// `(ii, n, w, trunc)`: `4 * n` residues and an even `trunc` with `2 * n < trunc <= 4 * n`, for
+// `fft_truncate_sqrt2`. `w` is odd for some of the larger `n`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_42() -> Generator<(Vec<Vec<Limb>>, usize, u64, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_42,
+        &random_large_type_gen_var_42,
+        &special_random_large_type_gen_var_42,
+    )
+}
+
+// `(ii, n, w)`: `2 * n` residues, with `n >= 2`, for `fft_negacyclic`. `w` is odd for some of the
+// larger `n`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_43() -> Generator<(Vec<Vec<Limb>>, usize, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_43,
+        &random_large_type_gen_var_43,
+        &special_random_large_type_gen_var_43,
+    )
+}
+
+// `(ii, n1, n2, w, c)`: a matrix of `n1 * n2` residues, the `w` of the whole transform, and a
+// column `c < n1`, for `fft_radix2_twiddle` on that column.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_44() -> Generator<(Vec<Vec<Limb>>, usize, usize, u64, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_44,
+        &random_large_type_gen_var_44,
+        &special_random_large_type_gen_var_44,
+    )
+}
+
+// `(ii, n1, n2, w, c, trunc)`: as for `fft_radix2_twiddle`, and an even `trunc` with `2 <= trunc <=
+// n2`, for `fft_truncate1_twiddle` on column `c`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_45() -> Generator<(Vec<Vec<Limb>>, usize, usize, u64, usize, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_45,
+        &random_large_type_gen_var_45,
+        &special_random_large_type_gen_var_45,
+    )
+}
+
+// `(ii, n, w, n1, trunc)`: `4 * n` residues and the parameters of `fft_mfa_truncate_sqrt2_outer`.
+// `w` is odd for some of the larger `n`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_46() -> Generator<(Vec<Vec<Limb>>, usize, u64, usize, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_46,
+        &random_large_type_gen_var_46,
+        &special_random_large_type_gen_var_46,
+    )
+}
+
+// `(ii, jj, n, w, n1, trunc)`: `4 * n` residues, another `4 * n` residues unless squaring, and the
+// parameters of `fft_mfa_truncate_sqrt2_inner`. `w` is odd for some of the larger `n`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_47() -> Generator<(
+    Vec<Vec<Limb>>,
+    Option<Vec<Vec<Limb>>>,
+    usize,
+    u64,
+    usize,
+    usize,
+)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_47,
+        &random_large_type_gen_var_47,
+        &special_random_large_type_gen_var_47,
+    )
+}
+
+// `(xs, ys, c, b)`: inputs to `flint_mpn_mulmod_2expp1_basecase`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_48() -> Generator<(Vec<Limb>, Option<Vec<Limb>>, Limb, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_48,
+        &random_large_type_gen_var_48,
+        &special_random_large_type_gen_var_48,
+    )
+}
+
+// `(r, i2, n, w)`: normalized residues of `n * w / Limb::WIDTH` limbs, the second one absent when
+// squaring, for `fft_mulmod_2expp1`. The number of limbs is small or one of the smallest that
+// `fft_adjust_limbs` leaves unchanged above `FFT_MULMOD_2EXPP1_CUTOFF`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_49() -> Generator<(Vec<Limb>, Option<Vec<Limb>>, usize, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_49,
+        &random_large_type_gen_var_49,
+        &special_random_large_type_gen_var_49,
+    )
+}
+
+// `(r1, i2, r_limbs, depth, w)`: residues with top limb zero, the second one absent when squaring,
+// for `fft_mulmod_2expp1_negacyclic`, with the `depth` and `w` that `fft_mulmod_2expp1` would
+// choose.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_50() -> Generator<(Vec<Limb>, Option<Vec<Limb>>, usize, u64, u64)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_50,
+        &random_large_type_gen_var_50,
+        &special_random_large_type_gen_var_50,
+    )
+}
+
+// `(limbs, coeff_limbs, output_limbs)`: a nonempty slice to split into coefficients of
+// `coeff_limbs` limbs, with `coeff_limbs <= output_limbs + 1`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_51() -> Generator<(Vec<Limb>, usize, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_51,
+        &random_large_type_gen_var_51,
+        &special_random_large_type_gen_var_51,
+    )
+}
+
+// `(limbs, bits, output_limbs)`: a nonempty slice to split into coefficients of `bits` bits, with
+// `bits / Limb::WIDTH <= output_limbs`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_52() -> Generator<(Vec<Limb>, u64, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_52,
+        &random_large_type_gen_var_52,
+        &special_random_large_type_gen_var_52,
+    )
+}
+
+// `(res, poly, coeff_limbs, output_limbs)`: an accumulator and coefficients of `output_limbs + 1`
+// limbs to add into it every `coeff_limbs` limbs.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_53() -> Generator<(Vec<Limb>, Vec<Vec<Limb>>, u64, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_53,
+        &random_large_type_gen_var_53,
+        &special_random_large_type_gen_var_53,
+    )
+}
+
+// `(res, poly, bits, output_limbs)`: an accumulator and coefficients of `output_limbs + 1` limbs to
+// add into it every `bits` bits.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_54() -> Generator<(Vec<Limb>, Vec<Vec<Limb>>, u64, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_54,
+        &random_large_type_gen_var_54,
+        &special_random_large_type_gen_var_54,
+    )
+}
+
+// `(ii, jj, depth, limbs, trunc)`: inputs to `fft_convolution` that take its truncated
+// square-root-of-2 path (`depth <= 6`): `4 << depth` residues, and the same for `jj` unless
+// squaring, whose product has length `trunc`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_55()
+-> Generator<(Vec<Vec<Limb>>, Option<Vec<Vec<Limb>>>, u64, usize, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_55,
+        &random_large_type_gen_var_55,
+        &special_random_large_type_gen_var_55,
+    )
+}
+
+// `(ii, jj, depth, limbs, trunc)`: inputs to `fft_convolution` that take its matrix Fourier path
+// (`depth == 7`).
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_56()
+-> Generator<(Vec<Vec<Limb>>, Option<Vec<Vec<Limb>>>, u64, usize, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_56,
+        &random_large_type_gen_var_56,
+        &special_random_large_type_gen_var_56,
+    )
+}
+
+// `(xs, limbs)`: coefficients and a number of limbs that holds the absolute value of each.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_57() -> Generator<(Vec<Integer>, usize)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_57,
+        &random_large_type_gen_var_57,
+        &special_random_large_type_gen_var_57,
+    )
+}
+
+// `(coeffs_f, limbs, sign)`: normalized residues to read coefficients from.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_58() -> Generator<(Vec<Vec<Limb>>, usize, bool)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_58,
+        &random_large_type_gen_var_58,
+        &special_random_large_type_gen_var_58,
+    )
+}
+
+// `limbs`: numbers of limbs for `fft_adjust_limbs`, up to $2^{40}$.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_59() -> Generator<usize> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_59,
+        &random_large_type_gen_var_59,
+        &special_random_large_type_gen_var_59,
     )
 }

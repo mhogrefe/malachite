@@ -126,6 +126,14 @@ pub(crate) fn karatsuba_preferred(len2: u64, bits1: u64, bits2: u64) -> bool {
     len2 <= 4 || (len2 <= 8 && (1500..=10000).contains(&(bits1 + bits2)))
 }
 
+// Whether FLINT's multiplication dispatchers choose Schönhage–Strassen multiplication for the
+// same factors, when neither a tiny kernel, classical multiplication, nor Karatsuba multiplication
+// applies. FLINT also chooses it for very long inputs with very large coefficients, but only when
+// it may use at least 4 threads, and Malachite is single-threaded.
+pub(crate) fn schonhage_strassen_preferred(len2: u64, bits1: u64, bits2: u64) -> bool {
+    (8..=75).contains(&len2) && (800..=4000).contains(&(bits1 + bits2))
+}
+
 // Whether FLINT's multiplication dispatchers try the small-prime FFT first, for factors the shorter
 // of which has length `len2`, and whose coefficients have at most `bits1` and `bits2` bits: when
 // the shorter factor has at least `min_len` coefficients, and either the product's coefficients are

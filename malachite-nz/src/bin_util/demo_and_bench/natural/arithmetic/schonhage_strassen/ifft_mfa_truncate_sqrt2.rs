@@ -1,0 +1,93 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::arithmetic::mul::schonhage_strassen::ifft_mfa_truncate_sqrt2::*;
+use malachite_nz::test_util::generators::{
+    large_type_gen_var_39, large_type_gen_var_44, large_type_gen_var_45, large_type_gen_var_46,
+};
+
+pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_limbs_ifft_butterfly_twiddle);
+    register_demo!(runner, demo_ifft_radix2_twiddle);
+    register_demo!(runner, demo_ifft_truncate1_twiddle);
+    register_demo!(runner, demo_ifft_mfa_truncate_sqrt2_outer);
+}
+
+fn demo_limbs_ifft_butterfly_twiddle(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut s, mut t, limbs, b1, b2) in large_type_gen_var_39().get(gm, config).take(limit) {
+        let s_old = s.clone();
+        let t_old = t.clone();
+        let mut u = vec![0; limbs + 1];
+        let mut v = vec![0; limbs + 1];
+        limbs_ifft_butterfly_twiddle(&mut u, &mut v, &mut s, &mut t, limbs, b1, b2);
+        println!(
+            "limbs_ifft_butterfly_twiddle(_, _, {s_old:?}, {t_old:?}, {limbs}, {b1}, {b2}) = \
+            ({u:?}, {v:?}, {s:?}, {t:?})"
+        );
+    }
+}
+
+fn demo_ifft_radix2_twiddle(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut ii, n1, n2, w, c) in large_type_gen_var_44().get(gm, config).take(limit) {
+        let ii_old = ii.clone();
+        let limbs = ii[0].len() - 1;
+        let mut t1 = vec![0; limbs + 1];
+        let mut t2 = vec![0; limbs + 1];
+        let wn1 = w * u64::exact_from(n1);
+        ifft_radix2_twiddle(&mut ii[c..], n1, n2 >> 1, wn1, &mut t1, &mut t2, w, 0, c, 1);
+        println!(
+            "ifft_radix2_twiddle({ii_old:?}, {c}, {n1}, {}, {wn1}, _, _, {w}, 0, {c}, 1) = {ii:?}",
+            n2 >> 1
+        );
+    }
+}
+
+fn demo_ifft_truncate1_twiddle(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut ii, n1, n2, w, c, trunc) in large_type_gen_var_45().get(gm, config).take(limit) {
+        let ii_old = ii.clone();
+        let limbs = ii[0].len() - 1;
+        let mut t1 = vec![0; limbs + 1];
+        let mut t2 = vec![0; limbs + 1];
+        let wn1 = w * u64::exact_from(n1);
+        ifft_truncate1_twiddle(
+            &mut ii[c..],
+            n1,
+            n2 >> 1,
+            wn1,
+            &mut t1,
+            &mut t2,
+            w,
+            0,
+            c,
+            1,
+            trunc,
+        );
+        println!(
+            "ifft_truncate1_twiddle({ii_old:?}, {c}, {n1}, {}, {wn1}, _, _, {w}, 0, {c}, 1, \
+            {trunc}) = {ii:?}",
+            n2 >> 1
+        );
+    }
+}
+
+fn demo_ifft_mfa_truncate_sqrt2_outer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut ii, n, w, n1, trunc) in large_type_gen_var_46().get(gm, config).take(limit) {
+        let ii_old = ii.clone();
+        let limbs = ii[0].len() - 1;
+        let mut t1 = vec![0; limbs + 1];
+        let mut t2 = vec![0; limbs + 1];
+        let mut temp = vec![0; limbs + 1];
+        ifft_mfa_truncate_sqrt2_outer(&mut ii, n, w, &mut t1, &mut t2, &mut temp, n1, trunc);
+        println!(
+            "ifft_mfa_truncate_sqrt2_outer({ii_old:?}, {n}, {w}, _, _, _, {n1}, {trunc}) = {ii:?}"
+        );
+    }
+}

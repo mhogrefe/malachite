@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::num::arithmetic::traits::{Mod, PowerOf2};
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
@@ -17,20 +19,27 @@ use malachite_nz::integer_polynomial::arithmetic::mul_middle::classical::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::mul_middle_to_out;
+use malachite_nz::integer_polynomial::arithmetic::mul_middle::schonhage_strassen::{
+    mul_middle_to_out_schonhage_strassen, vec_get_fft, vec_set_fft,
+};
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
 use malachite_nz::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::mul::schonhage_strassen::normmod_2expp1::*;
+use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1,
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2,
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3,
     integer_vec_unsigned_unsigned_triple_gen_var_1, integer_vec_unsigned_unsigned_triple_gen_var_2,
-    integer_vec_unsigned_unsigned_triple_gen_var_3,
+    integer_vec_unsigned_unsigned_triple_gen_var_3, large_type_gen_var_57, large_type_gen_var_58,
 };
 use malachite_nz::test_util::integer_polynomial::arithmetic::mul::{
     generated_coefficients, integers_mul_naive,
 };
+use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
 
 fn coefficients(p: &str) -> Vec<Integer> {
     IntegerPolynomial::from_str(p)
@@ -630,6 +639,142 @@ fn test_mul_middle_to_out_kronecker() {
 }
 
 #[test]
+fn test_mul_middle_to_out_schonhage_strassen() {
+    let test = |xs: &[&str], ys: &[&str], nlo: usize, nhi: usize, out: &[&str]| {
+        let xs = parse(xs);
+        let ys = parse(ys);
+        let mut result = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_schonhage_strassen(&mut result, &xs, &ys, nlo, nhi);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
+    };
+    // Both arguments are the same slice.
+    let test_square = |xs: &[&str], nlo: usize, nhi: usize, out: &[&str]| {
+        let xs = parse(xs);
+        let mut result = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_schonhage_strassen(&mut result, &xs, &xs, nlo, nhi);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], result);
+    };
+    // - nhi > 2
+    // - xs.len() >= ys.len()
+    // - !square
+    // - limbs <= FFT_MULMOD_2EXPP1_CUTOFF
+    // - !square
+    // - res_bits != 0
+    test(
+        &["1", "2", "3"],
+        &["4", "5", "6"],
+        0,
+        5,
+        &["4", "13", "28", "27", "18"],
+    );
+    test(
+        &["1", "-2", "3"],
+        &["4", "5", "-6"],
+        0,
+        5,
+        &["4", "-3", "-4", "27", "-18"],
+    );
+    // - xs.len() < ys.len()
+    test(
+        &["3"],
+        &[
+            "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1",
+            "1", "1", "1",
+        ],
+        0,
+        20,
+        &[
+            "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3",
+            "3", "3", "3",
+        ],
+    );
+    test(
+        &["1", "2", "3", "4", "5", "6"],
+        &["3"],
+        2,
+        6,
+        &["9", "12", "15", "18"],
+    );
+    test(
+        &["1", "2", "0", "0"],
+        &["3", "0"],
+        0,
+        5,
+        &["3", "6", "0", "0", "0"],
+    );
+    test(&["0", "0"], &["5", "7"], 0, 3, &["0", "0", "0"]);
+    test(&["1", "0", "0"], &["1", "0", "0"], 2, 5, &["0", "0", "0"]);
+    // - nhi <= 2
+    test(&["1", "2", "3", "4"], &["5", "6"], 4, 5, &["24"]);
+    test(&["5", "6"], &["1", "2", "3", "4"], 4, 5, &["24"]);
+    // - square
+    // - square
+    test_square(&["1", "-2", "3"], 0, 5, &["1", "-4", "10", "-12", "9"]);
+    test_square(
+        &[
+            "1177081956389695314697442642252",
+            "780797157184699260681239349366",
+            "-595154718217192200576044492408",
+            "-182494249513761438690895755667",
+            "-942052997583205342725389406559",
+        ],
+        2,
+        7,
+        &[
+            "-791447559479592902668681632442021440344727617258884343443676",
+            "-1359011600633143864688817143866501833720627245321956658510824",
+            "-2148520014665647297360674516384939001172466325327284043737516",
+            "-1253879977569340881831272259252236545363653423778406816830916",
+            "1154638723750178658882415895927897734172734595161513964423033",
+        ],
+    );
+    test(&["3", "-1"], &["2", "2"], 0, 3, &["6", "4", "-2"]);
+    test(
+        &[
+            "-1219809464491112424001080559307",
+            "841051527322013215685593233302",
+            "-699719491634243930371614136486",
+            "-1124264126040579300201032760787",
+            "-616245236613870071598110773797",
+            "304428441122895878829422060984",
+        ],
+        &[
+            "-39596108692041012711732684877",
+            "-497407310794063395325018870327",
+            "-975716784831680884582779126524",
+            "-81585352299193465116417615994",
+        ],
+        1,
+        8,
+        &[
+            "573439777722221257976973109959126635386749168227746557809535",
+            "799549559400729501322001644873734886474392496727868148851336",
+            "-328547432040767729704441807453204433842115173887652932576969",
+            "1197728676429079352423188246209632307987320362400752103357794",
+            "1448520943887611629521790899104048902739782186779076775254123",
+            "541579373508920747537304524486530680068238355901212252097138",
+            "-246759355051910205285956390962732536086211179583218036630398",
+        ],
+    );
+    test(
+        &["16", "-14", "5", "-14", "-2", "4", "-16", "-19", "-20", "-7", "-7", "-17", "10"],
+        &["4", "5", "6", "-16", "16", "20", "-8", "-3", "1"],
+        3,
+        17,
+        &[
+            "-371", "432", "-62", "-160", "-160", "-629", "121", "8", "-489", "-561", "-248",
+            "281", "-475", "-123",
+        ],
+    );
+    // - res_bits == 0
+    test(&["0", "0", "0"], &["0"], 0, 3, &["0", "0", "0"]);
+}
+
+#[test]
 fn mul_middle_to_out_kronecker_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_len_n", 32);
@@ -661,6 +806,72 @@ fn mul_middle_to_out_kronecker_properties() {
     };
     integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties(test);
     integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties_with_config(&config, test);
+}
+
+// Coefficients large enough that the residues have more than `FFT_MULMOD_2EXPP1_CUTOFF` limbs. The
+// inputs are too large to write out, so the result is checked against the naive product.
+#[test]
+fn test_mul_middle_to_out_schonhage_strassen_large() {
+    let test = |bits: u64, len1: usize, len2: usize, nlo: usize, nhi: usize| {
+        let xs: Vec<Integer> = (0..len1)
+            .map(|i| Integer::power_of_2(bits) - Integer::from(i))
+            .collect();
+        let ys: Vec<Integer> = (0..len2)
+            .map(|i| -Integer::power_of_2(bits - 1) + Integer::from(i * i))
+            .collect();
+        let mut out = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_schonhage_strassen(&mut out, &xs, &ys, nlo, nhi);
+        assert_eq!(out, &integers_mul_naive(&xs, &ys)[nlo..nhi]);
+    };
+    // - nhi > 2
+    // - xs.len() >= ys.len()
+    // - !square
+    // - limbs > FFT_MULMOD_2EXPP1_CUTOFF
+    // - !square
+    // - res_bits != 0
+    test(5000, 8, 8, 0, 15);
+    test(5000, 10, 9, 3, 12);
+}
+
+#[test]
+fn mul_middle_to_out_schonhage_strassen_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_len_n", 32);
+    let mut wide_config = GenConfig::new();
+    wide_config.insert("mean_len_n", 20);
+    wide_config.insert("mean_bits_n", 1000);
+    let test = |(xs, ys, nlo, nhi): (Vec<Integer>, Vec<Integer>, u64, u64)| {
+        let nlo = usize::exact_from(nlo);
+        let nhi = usize::exact_from(nhi);
+        let mut out = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_schonhage_strassen(&mut out, &xs, &ys, nlo, nhi);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], out);
+        let mut out_alt = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_schonhage_strassen(&mut out_alt, &ys, &xs, nlo, nhi);
+        assert_eq!(out_alt, out);
+        mul_middle_to_out_classical(&mut out_alt, &xs, &ys, nlo, nhi);
+        assert_eq!(out_alt, out);
+    };
+    integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1().test_properties(test);
+    integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1()
+        .test_properties_with_config(&config, test);
+    integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1()
+        .test_properties_with_config(&wide_config, test);
+
+    // The square path.
+    let test = |(xs, nlo, nhi): (Vec<Integer>, u64, u64)| {
+        let nlo = usize::exact_from(nlo);
+        let nhi = usize::exact_from(nhi);
+        let mut out = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_schonhage_strassen(&mut out, &xs, &xs, nlo, nhi);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], out);
+    };
+    integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties(test);
+    integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties_with_config(&config, test);
+    integer_vec_unsigned_unsigned_triple_gen_var_1()
+        .test_properties_with_config(&wide_config, test);
 }
 
 #[test]
@@ -793,4 +1004,137 @@ fn mul_middle_to_out_fft_properties() {
     integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties(|x| test(x, true));
     integer_vec_unsigned_unsigned_triple_gen_var_1()
         .test_properties_with_config(&config, |x| test(x, false));
+}
+
+#[cfg(not(feature = "32_bit_limbs"))]
+#[test]
+fn test_vec_get_fft() {
+    let test = |xs: &[&str], limbs: usize, out: &[Limb]| {
+        let xs = parse(xs);
+        let mut coeffs_f = vec![vec![0; limbs + 1]; xs.len()];
+        vec_get_fft(&mut coeffs_f, &xs, limbs);
+        assert_eq!(coeffs_f.concat(), out);
+    };
+    // - *x >= 0u32
+    // - *x < 0u32
+    test(
+        &["0", "1", "-1"],
+        1,
+        &[0, 0, 1, 0, 18446744073709551615, 18446744073709551615],
+    );
+    test(
+        &["18446744073709551616", "-18446744073709551616"],
+        2,
+        &[0, 1, 0, 0, 18446744073709551615, 18446744073709551615],
+    );
+    test(
+        &["5", "-5"],
+        3,
+        &[
+            5,
+            0,
+            0,
+            0,
+            18446744073709551611,
+            18446744073709551615,
+            18446744073709551615,
+            18446744073709551615,
+        ],
+    );
+}
+
+#[test]
+fn vec_get_fft_properties() {
+    large_type_gen_var_57().test_properties(|(xs, limbs)| {
+        let mut coeffs_f = vec![vec![0; limbs + 1]; xs.len()];
+        vec_get_fft(&mut coeffs_f, &xs, limbs);
+        for (x, f) in xs.iter().zip(coeffs_f.iter()) {
+            // Each residue is the coefficient in two's complement.
+            let bits = (u64::exact_from(limbs) + 1) << Limb::LOG_WIDTH;
+            let value = Integer::from(Natural::from_limbs_asc(f));
+            let value = if f[limbs] >> (Limb::WIDTH - 1) != 0 {
+                value - Integer::power_of_2(bits)
+            } else {
+                value
+            };
+            assert_eq!(&value, x);
+        }
+    });
+}
+
+#[cfg(not(feature = "32_bit_limbs"))]
+#[test]
+fn test_vec_set_fft() {
+    let test = |coeffs_f: &[&[Limb]], limbs: usize, sign: bool, out: &[&str]| {
+        let coeffs_f: Vec<Vec<Limb>> = coeffs_f.iter().map(|x| x.to_vec()).collect();
+        let mut xs = vec![Integer::ZERO; coeffs_f.len()];
+        vec_set_fft(&mut xs, &coeffs_f, limbs, sign);
+        assert_eq!(xs, parse(out));
+    };
+    // - !(sign && (f[limbs - 1] >= HALF_LIMB || f[limbs] != 0))
+    test(
+        &[&[5, 0], &[18446744073709551615, 0]],
+        1,
+        false,
+        &["5", "18446744073709551615"],
+    );
+    // - sign && (f[limbs - 1] >= HALF_LIMB || f[limbs] != 0)
+    test(
+        &[&[5, 0], &[18446744073709551615, 0]],
+        1,
+        true,
+        &["5", "-2"],
+    );
+    test(&[&[0, 1]], 1, true, &["-1"]);
+    // A top limb of `HALF_LIMB` means a negative coefficient. (FLINT reads it as positive.)
+    test(
+        &[&[0, 9223372036854775808, 0]],
+        2,
+        true,
+        &["-170141183460469231731687303715884105729"],
+    );
+    test(
+        &[&[1, 9223372036854775808, 0]],
+        2,
+        true,
+        &["-170141183460469231731687303715884105728"],
+    );
+    test(
+        &[&[0, 9223372036854775809, 0]],
+        2,
+        true,
+        &["-170141183460469231713240559642174554113"],
+    );
+}
+
+#[test]
+fn vec_set_fft_properties() {
+    large_type_gen_var_58().test_properties(|(coeffs_f, limbs, sign)| {
+        let mut xs = vec![Integer::ZERO; coeffs_f.len()];
+        vec_set_fft(&mut xs, &coeffs_f, limbs, sign);
+        let p = Integer::from(fermat_modulus(limbs));
+        for (x, f) in xs.iter().zip(coeffs_f.iter()) {
+            if sign {
+                let v = residue_mod(f, limbs);
+                assert_eq!(Natural::exact_from(x.mod_op(&p)), v);
+                // Residues from $2^{N-1}$ up, where $N$ is `limbs * Limb::WIDTH`, are negative.
+                assert_eq!(*x >= 0u32, v < Natural::power_of_2(fermat_bits(limbs) - 1));
+            } else if f[limbs] == 0 {
+                assert_eq!(Natural::exact_from(x), residue_mod(f, limbs));
+            }
+        }
+    });
+    // Reading back coefficients that were written with a limb to spare, and then normalized, gives
+    // them back.
+    large_type_gen_var_57().test_properties(|(xs, limbs)| {
+        let limbs = limbs + 1;
+        let mut coeffs_f = vec![vec![0; limbs + 1]; xs.len()];
+        vec_get_fft(&mut coeffs_f, &xs, limbs);
+        for f in &mut coeffs_f {
+            limbs_norm_mod_2expp1(f, limbs);
+        }
+        let mut xs_alt = vec![Integer::ZERO; xs.len()];
+        vec_set_fft(&mut xs_alt, &coeffs_f, limbs, true);
+        assert_eq!(xs_alt, xs);
+    });
 }
