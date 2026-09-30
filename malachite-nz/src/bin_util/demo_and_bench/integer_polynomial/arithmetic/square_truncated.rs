@@ -16,6 +16,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::square_truncated::classical::*;
 use malachite_nz::integer_polynomial::arithmetic::square_truncated::karatsuba::*;
+use malachite_nz::integer_polynomial::arithmetic::square_truncated::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::square_truncated::square_truncated_to_out;
 use malachite_nz::integer_polynomial::arithmetic::square_truncated::tiny::{
     square_truncated_to_out_tiny_1, square_truncated_to_out_tiny_2,
@@ -39,6 +40,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_square_truncated_assign);
     register_demo!(runner, demo_square_truncated_to_out_karatsuba_n);
     register_demo!(runner, demo_square_truncated_to_out_karatsuba);
+    register_demo!(runner, demo_square_truncated_to_out_kronecker);
 
     register_bench!(runner, benchmark_square_truncated_to_out_algorithms);
     register_bench!(runner, benchmark_square_truncated_to_out_tiny_1_algorithms);
@@ -163,6 +165,10 @@ fn benchmark_square_truncated_to_out_algorithms(
             ("Karatsuba", &mut |(xs, n)| {
                 let mut out = vec![Integer::ZERO; usize::exact_from(n)];
                 square_truncated_to_out_karatsuba(&mut out, &xs);
+            }),
+            ("Kronecker", &mut |(xs, n)| {
+                let mut out = vec![Integer::ZERO; usize::exact_from(n)];
+                square_truncated_to_out_kronecker(&mut out, &xs);
             }),
         ],
     );
@@ -312,5 +318,16 @@ fn demo_square_truncated_to_out_karatsuba(gm: GenMode, config: &GenConfig, limit
         let mut out = vec![Integer::ZERO; usize::exact_from(n)];
         square_truncated_to_out_karatsuba(&mut out, &xs);
         println!("square_truncated_to_out_karatsuba(_, {xs:?}) = {out:?}");
+    }
+}
+
+fn demo_square_truncated_to_out_kronecker(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, n) in integer_vec_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut out = vec![Integer::ZERO; usize::exact_from(n)];
+        square_truncated_to_out_kronecker(&mut out, &xs);
+        println!("square_truncated_to_out_kronecker(_, {xs:?}) = {out:?}");
     }
 }

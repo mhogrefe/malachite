@@ -16,6 +16,7 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncated_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
+use crate::integer_polynomial::arithmetic::mul_truncated::kronecker::mul_truncated_to_out_kronecker;
 use crate::integer_polynomial::arithmetic::mul_truncated::tiny::{
     mul_truncated_to_out_tiny_1, mul_truncated_to_out_tiny_2,
 };
@@ -37,6 +38,7 @@ use malachite_base::polynomial::{MulTruncated, MulTruncatedAssign, Polynomial};
 
 pub mod classical;
 pub mod karatsuba;
+pub mod kronecker;
 pub mod tiny;
 
 // Sets `out` to the first `out.len()` coefficients of the product of the polynomials with
@@ -44,16 +46,20 @@ pub mod tiny;
 // ys.len() - 1`.
 //
 // # Worst-case complexity
-// $T(n, m) = O(n^2 m \log m \log\log m)$
+// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
 //
-// $M(n, m) = O(n(m + \log n))$
+// $M(n, m) = O(n(m + \log n) \log (nm))$
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `out.len()`, and $m$ is the largest number of
 // significant bits of any element of `xs` or `ys`.
 //
 // This is equivalent to `_fmpz_poly_mullow` from `fmpz_poly/mullow.c`, FLINT 3.6.0, where `n` is
-// `out.len()`. Only the tiny and classical algorithms have been ported so far, so classical
-// multiplication stands in for the others.
+// `out.len()`. FLINT's first choice for long inputs, which multiplies polynomials directly with its
+// small-prime FFT (`_fmpz_poly_mul_mid_default_mpn_ctx` from `fft_small/fmpz_poly_mul.c`), and
+// Schönhage–Strassen, which it chooses for some inputs of medium size, have not been ported yet;
+// Kronecker substitution stands in for both. (Its single integer multiplication reaches the port of
+// the small-prime FFT's integer multiplication in `natural/arithmetic/mul/fft.rs` when the operands
+// are large.)
 crate_test_fn! {mul_truncated_to_out(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
     let n = out.len();
     let mut xs = &xs[..min(xs.len(), n)];
@@ -88,9 +94,9 @@ crate_test_fn! {mul_truncated_to_out(out: &mut [Integer], xs: &[Integer], ys: &[
             mul_truncated_to_out_karatsuba(out, xs, ys);
         }
         None => {
-        // Schönhage–Strassen and Kronecker substitution, which FLINT chooses for larger inputs,
-        // have not been ported yet, so classical multiplication stands in for them.
-            mul_truncated_to_out_classical(out, xs, ys);
+            // Schönhage–Strassen, which FLINT chooses instead for some inputs of medium size,
+            // has not been ported yet, so Kronecker substitution stands in for it.
+            mul_truncated_to_out_kronecker(out, xs, ys);
         }
     }
 }}
@@ -152,9 +158,9 @@ impl MulTruncated<Self> for IntegerPolynomial {
     /// when the coefficient of $x^{n-1}$ is zero, the degree is lower still.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $m$ is the largest number of
     /// significant bits of any of the first `len` coefficients of either polynomial.
@@ -202,9 +208,9 @@ impl MulTruncated<&Self> for IntegerPolynomial {
     /// when the coefficient of $x^{n-1}$ is zero, the degree is lower still.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $m$ is the largest number of
     /// significant bits of any of the first `len` coefficients of either polynomial.
@@ -252,9 +258,9 @@ impl MulTruncated<IntegerPolynomial> for &IntegerPolynomial {
     /// when the coefficient of $x^{n-1}$ is zero, the degree is lower still.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $m$ is the largest number of
     /// significant bits of any of the first `len` coefficients of either polynomial.
@@ -302,9 +308,9 @@ impl MulTruncated<&IntegerPolynomial> for &IntegerPolynomial {
     /// when the coefficient of $x^{n-1}$ is zero, the degree is lower still.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $m$ is the largest number of
     /// significant bits of any of the first `len` coefficients of either polynomial.
@@ -346,9 +352,9 @@ impl MulTruncatedAssign<Self> for IntegerPolynomial {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $m$ is the largest number of
     /// significant bits of any of the first `len` coefficients of either polynomial.
@@ -380,9 +386,9 @@ impl MulTruncatedAssign<&Self> for IntegerPolynomial {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $m$ is the largest number of
     /// significant bits of any of the first `len` coefficients of either polynomial.

@@ -18,6 +18,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::square_truncated::classical::*;
 use malachite_nz::integer_polynomial::arithmetic::square_truncated::karatsuba::*;
+use malachite_nz::integer_polynomial::arithmetic::square_truncated::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::square_truncated::square_truncated_to_out;
 use malachite_nz::integer_polynomial::arithmetic::square_truncated::tiny::{
     square_truncated_to_out_tiny_1, square_truncated_to_out_tiny_2,
@@ -509,6 +510,54 @@ fn square_truncated_to_out_karatsuba_properties() {
         let mut out_alt = vec![Integer::ZERO; n];
         square_truncated_to_out(&mut out_alt, &xs);
         assert_eq!(out_alt, out);
+    };
+    integer_vec_unsigned_pair_gen_var_1().test_properties(test);
+    integer_vec_unsigned_pair_gen_var_1().test_properties_with_config(&config, test);
+}
+
+#[test]
+fn test_square_truncated_to_out_kronecker() {
+    let test = |xs: &[&str], n: usize, out: &[&str]| {
+        let xs = parse(xs);
+        let mut result = vec![Integer::ZERO; n];
+        square_truncated_to_out_kronecker(&mut result, &xs);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(&integers_mul_naive(&xs, &xs)[..n], result);
+    };
+    test(&["3"], 1, &["9"]);
+    test(&["1", "2", "3"], 3, &["1", "4", "10"]);
+    test(&["1", "-2", "3"], 5, &["1", "-4", "10", "-12", "9"]);
+    test(
+        &[
+            "-671799350756517727438919942920",
+            "-1181875036209060863636840150344",
+            "-322391619931018672584987082004",
+            "4789784227305365630917132762",
+            "-755123903681646289778639808352",
+        ],
+        6,
+        &[
+            "451314367676878735686206236640734168298267001972896058126400",
+            "1587965764001165937622675587699309335709737860972305396728960",
+            "1829993563132169656989716323623191475242468918414434601741696",
+            "755617667090605856218372408828462576838210288399156229728672",
+            "1107198000255700568886643303206473597583929381832238803251440",
+            "1781835809419824154682981492090362467607750075603876755716080",
+        ],
+    );
+}
+
+#[test]
+fn square_truncated_to_out_kronecker_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_len_n", 32);
+    let test = |(xs, n): (Vec<Integer>, u64)| {
+        let n = usize::exact_from(n);
+        let mut out = vec![Integer::ZERO; n];
+        square_truncated_to_out_kronecker(&mut out, &xs);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(&integers_mul_naive(&xs, &xs)[..n], out);
     };
     integer_vec_unsigned_pair_gen_var_1().test_properties(test);
     integer_vec_unsigned_pair_gen_var_1().test_properties_with_config(&config, test);

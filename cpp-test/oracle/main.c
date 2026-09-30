@@ -100,6 +100,11 @@ static const oracle_mode modes[] = {
     {"_fmpz_poly_sqr_karatsuba", run__fmpz_poly_sqr_karatsuba},
     {"_fmpz_poly_sqrlow_karatsuba", run__fmpz_poly_sqrlow_karatsuba},
     {"_fmpz_poly_sqrlow_karatsuba_n", run__fmpz_poly_sqrlow_karatsuba_n},
+    {"_fmpz_poly_mul_KS", run__fmpz_poly_mul_KS},
+    {"_fmpz_poly_mullow_KS", run__fmpz_poly_mullow_KS},
+    {"_fmpz_poly_mulmid_KS", run__fmpz_poly_mulmid_KS},
+    {"_fmpz_poly_sqr_KS", run__fmpz_poly_sqr_KS},
+    {"_fmpz_poly_sqrlow_KS", run__fmpz_poly_sqrlow_KS},
 };
 
 int

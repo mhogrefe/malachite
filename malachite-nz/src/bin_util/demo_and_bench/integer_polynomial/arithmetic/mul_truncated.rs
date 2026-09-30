@@ -16,6 +16,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::classical::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::karatsuba::*;
+use malachite_nz::integer_polynomial::arithmetic::mul_truncated::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::mul_truncated_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::tiny::{
     mul_truncated_to_out_tiny_1, mul_truncated_to_out_tiny_2,
@@ -44,6 +45,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_mul_truncated_assign_ref);
     register_demo!(runner, demo_mul_truncated_to_out_karatsuba_n);
     register_demo!(runner, demo_mul_truncated_to_out_karatsuba);
+    register_demo!(runner, demo_mul_truncated_to_out_kronecker);
 
     register_bench!(runner, benchmark_mul_truncated_to_out_algorithms);
     register_bench!(runner, benchmark_mul_truncated_to_out_tiny_1_algorithms);
@@ -211,6 +213,10 @@ fn benchmark_mul_truncated_to_out_algorithms(
             ("Karatsuba", &mut |(xs, ys, n)| {
                 let mut out = vec![Integer::ZERO; usize::exact_from(n)];
                 mul_truncated_to_out_karatsuba(&mut out, &xs, &ys);
+            }),
+            ("Kronecker", &mut |(xs, ys, n)| {
+                let mut out = vec![Integer::ZERO; usize::exact_from(n)];
+                mul_truncated_to_out_kronecker(&mut out, &xs, &ys);
             }),
         ],
     );
@@ -396,5 +402,16 @@ fn demo_mul_truncated_to_out_karatsuba(gm: GenMode, config: &GenConfig, limit: u
         let mut out = vec![Integer::ZERO; usize::exact_from(n)];
         mul_truncated_to_out_karatsuba(&mut out, &xs, &ys);
         println!("mul_truncated_to_out_karatsuba(_, {xs:?}, {ys:?}) = {out:?}");
+    }
+}
+
+fn demo_mul_truncated_to_out_kronecker(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys, n) in integer_vec_integer_vec_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut out = vec![Integer::ZERO; usize::exact_from(n)];
+        mul_truncated_to_out_kronecker(&mut out, &xs, &ys);
+        println!("mul_truncated_to_out_kronecker(_, {xs:?}, {ys:?}) = {out:?}");
     }
 }

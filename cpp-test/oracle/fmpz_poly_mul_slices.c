@@ -23,8 +23,8 @@
     sqrlow (`square_truncated_to_out*`)                  xs              -> _fmpz_poly_sqrlow*
 
     For the truncated functions, the length is that of the output. Each mode accepts the lines
-    of the Malachite functions that correspond to its FLINT function: the classical and Karatsuba
-    modes those of the corresponding algorithms, and the dispatcher modes those of the Malachite dispatchers and of
+    of the Malachite functions that correspond to its FLINT function: the classical, Karatsuba, and
+    Kronecker-substitution modes those of the corresponding algorithms, and the dispatcher modes those of the Malachite dispatchers and of
     the tiny kernels, which FLINT does not export. When `xs` and `ys` are written identically,
     FLINT is given the same vector for both, so that its squaring paths run too. Every coefficient
     FLINT writes is compared, except that the mulhigh dispatcher defines only the coefficients from
@@ -58,7 +58,8 @@ typedef enum
     VARIANT_KARATSUBA,
     /* The Karatsuba functions whose inputs have exactly the length of the output (mullow and
        sqrlow) or the same length as each other (mulhigh). */
-    VARIANT_KARATSUBA_N
+    VARIANT_KARATSUBA_N,
+    VARIANT_KS
 } variant_t;
 
 typedef struct
@@ -277,6 +278,10 @@ check_line(char * line, int line_number)
                 {
                     _fmpz_poly_mul_classical(out, xs, len1, y, len2);
                 }
+                else if (v == VARIANT_KS)
+                {
+                    _fmpz_poly_mul_KS(out, xs, len1, y, len2);
+                }
                 else if (v == VARIANT_KARATSUBA)
                 {
                     _fmpz_poly_mul_karatsuba(out, xs, len1, y, len2);
@@ -294,6 +299,10 @@ check_line(char * line, int line_number)
                 if (v == VARIANT_CLASSICAL)
                 {
                     _fmpz_poly_mullow_classical(out, xs, len1, y, len2, out_len);
+                }
+                else if (v == VARIANT_KS)
+                {
+                    _fmpz_poly_mullow_KS(out, xs, len1, y, len2, out_len);
                 }
                 else if (v == VARIANT_KARATSUBA)
                 {
@@ -327,6 +336,10 @@ check_line(char * line, int line_number)
                 {
                     _fmpz_poly_mulmid_classical(out, xs, len1, y, len2, a, b);
                 }
+                else if (v == VARIANT_KS)
+                {
+                    _fmpz_poly_mulmid_KS(out, xs, len1, y, len2, a, b);
+                }
                 else
                 {
                     _fmpz_poly_mulmid(out, xs, len1, y, len2, a, b);
@@ -336,6 +349,10 @@ check_line(char * line, int line_number)
                 if (v == VARIANT_CLASSICAL)
                 {
                     _fmpz_poly_sqr_classical(out, xs, len1);
+                }
+                else if (v == VARIANT_KS)
+                {
+                    _fmpz_poly_sqr_KS(out, xs, len1);
                 }
                 else if (v == VARIANT_KARATSUBA)
                 {
@@ -350,6 +367,10 @@ check_line(char * line, int line_number)
                 if (v == VARIANT_CLASSICAL)
                 {
                     _fmpz_poly_sqrlow_classical(out, xs, len1, out_len);
+                }
+                else if (v == VARIANT_KS)
+                {
+                    _fmpz_poly_sqrlow_KS(out, xs, len1, out_len);
                 }
                 else if (v == VARIANT_KARATSUBA)
                 {
@@ -432,6 +453,11 @@ static const slice_mode_t SLICE_MODES[] = {
      {"square_truncated_to_out_karatsuba", NULL}},
     {"_fmpz_poly_sqrlow_karatsuba_n", KIND_SQRLOW, VARIANT_KARATSUBA_N,
      {"square_truncated_to_out_karatsuba_n", NULL}},
+    {"_fmpz_poly_mul_KS", KIND_MUL, VARIANT_KS, {"mul_to_out_kronecker", NULL}},
+    {"_fmpz_poly_mullow_KS", KIND_MULLOW, VARIANT_KS, {"mul_truncated_to_out_kronecker", NULL}},
+    {"_fmpz_poly_mulmid_KS", KIND_MULMID, VARIANT_KS, {"mul_middle_to_out_kronecker", NULL}},
+    {"_fmpz_poly_sqr_KS", KIND_SQR, VARIANT_KS, {"square_to_out_kronecker", NULL}},
+    {"_fmpz_poly_sqrlow_KS", KIND_SQRLOW, VARIANT_KS, {"square_truncated_to_out_kronecker", NULL}},
 };
 
 static int
@@ -555,4 +581,34 @@ int
 run__fmpz_poly_sqrlow_karatsuba_n(const char * arg)
 {
     return run(arg, 18);
+}
+
+int
+run__fmpz_poly_mul_KS(const char * arg)
+{
+    return run(arg, 19);
+}
+
+int
+run__fmpz_poly_mullow_KS(const char * arg)
+{
+    return run(arg, 20);
+}
+
+int
+run__fmpz_poly_mulmid_KS(const char * arg)
+{
+    return run(arg, 21);
+}
+
+int
+run__fmpz_poly_sqr_KS(const char * arg)
+{
+    return run(arg, 22);
+}
+
+int
+run__fmpz_poly_sqrlow_KS(const char * arg)
+{
+    return run(arg, 23);
 }

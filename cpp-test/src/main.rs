@@ -1619,6 +1619,59 @@ const SQUARE_TRUNCATED_TO_OUT_KARATSUBA_UNIT_LINES: [&str; 5] = [
     "square_truncated_to_out_karatsuba(_, [-18, 15, -18, 0, -13, 4, 18, 9, 15, 20, -1, 6, -1, 17, -5, 7, 4, 3, 8, 12]) = [324, -540, 873, -540, 792, -534, -60, 72, -749, -698, -356, -1056, 258, -934, 1533, -188, 869, 108, 366, 212, 361, 142, 654, -104, 1053]",
 ];
 
+// The rows of test_mul_to_out_kronecker in malachite-nz's IntegerPolynomial tests, as the demo prints them.
+const MUL_TO_OUT_KRONECKER_UNIT_LINES: [&str; 6] = [
+    "mul_to_out_kronecker(_, [3], [4]) = [12]",
+    "mul_to_out_kronecker(_, [1, 2, 3], [4, 5, 6]) = [4, 13, 28, 27, 18]",
+    "mul_to_out_kronecker(_, [1, -2, 3], [4, 5, -6]) = [4, -3, -4, 27, -18]",
+    "mul_to_out_kronecker(_, [0, 0, 1], [0, 1]) = [0, 0, 0, 1]",
+    "mul_to_out_kronecker(_, [-1189622705099215217644861615934, 167804589232078278853584154980, -867945855396731878320832686, 806358736512700625604185791006, -1203530013354241971435757793231], [-109632111915421827856541593741, 16864956392665328332356101086, 1027974083675173273248815447350]) = [130420849542564019915297765836538964344364544469505000269094, -38459706551835424795030320947752535095139193382475754284504, -1219976138376503143983408787497266494520631119495732681948294, 84081319737993519794215590052736954672122151453146537712558, 144652516200371670458657726973534542506294278765865295317587, 808618402087630699889842747986252853398931897809576973985234, -1237197662653395943316359429866881120806965512172020066887850]",
+    "mul_to_out_kronecker(_, [17, -1, -19, -7, -9, 5, 18], [17, -1, -19, -7, -9, 5, 18]) = [289, -34, -645, -200, 69, 454, 993, -100, -673, -342, -299, 180, 324]",
+];
+
+// The rows of test_mul_truncated_to_out_kronecker in malachite-nz's IntegerPolynomial tests, as the demo prints them.
+const MUL_TRUNCATED_TO_OUT_KRONECKER_UNIT_LINES: [&str; 5] = [
+    "mul_truncated_to_out_kronecker(_, [3], [4]) = [12]",
+    "mul_truncated_to_out_kronecker(_, [1, 2, 3], [4, 5, 6]) = [4, 13, 28]",
+    "mul_truncated_to_out_kronecker(_, [1, -2, 3], [4, 5, -6]) = [4, -3, -4, 27, -18]",
+    "mul_truncated_to_out_kronecker(_, [-249280210867129111655121130485, 774272247025418148342010903136, 109823698889072694555589859827, -838450632265568977780093348695, -425350271670103455527167616781], [601125560895236399022862340007, -806766728941798427326353285204, -1048060506937750767971840644108]) = [-149848706577585791160335678754689229414827769322918282813395, 666545819089965023668422513634740818970863517732934478405892, -297378511277876598114991372218805575453317633564910767368575, -1404100376641923078592484163909680189289370632896284649963261]",
+    "mul_truncated_to_out_kronecker(_, [19, -5, -8, -10, 20, 15, -8], [19, -5, -8, -10, 20, 15, -8]) = [361, -190, -279, -300, 924, 530, -674, -560, 228]",
+];
+
+// The rows of test_mul_middle_to_out_kronecker in malachite-nz's IntegerPolynomial tests, as the demo prints them.
+const MUL_MIDDLE_TO_OUT_KRONECKER_UNIT_LINES: [&str; 14] = [
+    "mul_middle_to_out_kronecker(_, [1, 2, 3], [4, 5, 6], 0, 5) = [4, 13, 28, 27, 18]",
+    "mul_middle_to_out_kronecker(_, [1, -2, 3], [4, 5, -6], 0, 5) = [4, -3, -4, 27, -18]",
+    "mul_middle_to_out_kronecker(_, [3], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 0, 20) = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]",
+    "mul_middle_to_out_kronecker(_, [1, 2, 3, 4, 5, 6], [3], 2, 6) = [9, 12, 15, 18]",
+    "mul_middle_to_out_kronecker(_, [1, 2, 0, 0], [3, 0], 0, 5) = [3, 6, 0, 0, 0]",
+    "mul_middle_to_out_kronecker(_, [0, 0], [5, 7], 0, 3) = [0, 0, 0]",
+    "mul_middle_to_out_kronecker(_, [1, 0, 0], [1, 0, 0], 2, 5) = [0, 0, 0]",
+    "mul_middle_to_out_kronecker(_, [1, 2, 3, 4], [5, 6], 4, 5) = [24]",
+    "mul_middle_to_out_kronecker(_, [5, 6], [1, 2, 3, 4], 4, 5) = [24]",
+    "mul_middle_to_out_kronecker(_, [3, -1], [2, 2], 0, 3) = [6, 4, -2]",
+    "mul_middle_to_out_kronecker(_, [-1219809464491112424001080559307, 841051527322013215685593233302, -699719491634243930371614136486, -1124264126040579300201032760787, -616245236613870071598110773797, 304428441122895878829422060984], [-39596108692041012711732684877, -497407310794063395325018870327, -975716784831680884582779126524, -81585352299193465116417615994], 1, 8) = [573439777722221257976973109959126635386749168227746557809535, 799549559400729501322001644873734886474392496727868148851336, -328547432040767729704441807453204433842115173887652932576969, 1197728676429079352423188246209632307987320362400752103357794, 1448520943887611629521790899104048902739782186779076775254123, 541579373508920747537304524486530680068238355901212252097138, -246759355051910205285956390962732536086211179583218036630398]",
+    "mul_middle_to_out_kronecker(_, [16, -14, 5, -14, -2, 4, -16, -19, -20, -7, -7, -17, 10], [4, 5, 6, -16, 16, 20, -8, -3, 1], 3, 17) = [-371, 432, -62, -160, -160, -629, 121, 8, -489, -561, -248, 281, -475, -123]",
+    "mul_middle_to_out_kronecker(_, [1, -2, 3], [1, -2, 3], 0, 5) = [1, -4, 10, -12, 9]",
+    "mul_middle_to_out_kronecker(_, [1177081956389695314697442642252, 780797157184699260681239349366, -595154718217192200576044492408, -182494249513761438690895755667, -942052997583205342725389406559], [1177081956389695314697442642252, 780797157184699260681239349366, -595154718217192200576044492408, -182494249513761438690895755667, -942052997583205342725389406559], 2, 7) = [-791447559479592902668681632442021440344727617258884343443676, -1359011600633143864688817143866501833720627245321956658510824, -2148520014665647297360674516384939001172466325327284043737516, -1253879977569340881831272259252236545363653423778406816830916, 1154638723750178658882415895927897734172734595161513964423033]",
+];
+
+// The rows of test_square_to_out_kronecker in malachite-nz's IntegerPolynomial tests, as the demo prints them.
+const SQUARE_TO_OUT_KRONECKER_UNIT_LINES: [&str; 4] = [
+    "square_to_out_kronecker(_, [3]) = [9]",
+    "square_to_out_kronecker(_, [1, 2, 3]) = [1, 4, 10, 12, 9]",
+    "square_to_out_kronecker(_, [1, -2, 3]) = [1, -4, 10, -12, 9]",
+    "square_to_out_kronecker(_, [127045069494630545379112202255, 8639614695295244635568505446, 531191510928739164466910347515, 784741010512824463010586856737, 1123093540348611836825705550910]) = [16140449682895504779053258210494836768807819848636027085025, 2195240898741231317393919544763125977619598147104041961460, 135045167783882097511084974182705446645536863956980164951566, 208573532399448805453187042240657064087616639707806566817250, 581091134980731786257942541995202471076514713515326317858729, 853101717034879681778904311398516399835993788194997908428830, 1808973962804860882952008390185728112267022980998475011264469, 1762675119507190493336990192826453550789672153672859659961340, 1261339100372779003934498233113316595678042798323586601828100]",
+];
+
+// The rows of test_square_truncated_to_out_kronecker in malachite-nz's IntegerPolynomial tests, as the demo prints them.
+const SQUARE_TRUNCATED_TO_OUT_KRONECKER_UNIT_LINES: [&str; 4] = [
+    "square_truncated_to_out_kronecker(_, [3]) = [9]",
+    "square_truncated_to_out_kronecker(_, [1, 2, 3]) = [1, 4, 10]",
+    "square_truncated_to_out_kronecker(_, [1, -2, 3]) = [1, -4, 10, -12, 9]",
+    "square_truncated_to_out_kronecker(_, [-671799350756517727438919942920, -1181875036209060863636840150344, -322391619931018672584987082004, 4789784227305365630917132762, -755123903681646289778639808352]) = [451314367676878735686206236640734168298267001972896058126400, 1587965764001165937622675587699309335709737860972305396728960, 1829993563132169656989716323623191475242468918414434601741696, 755617667090605856218372408828462576838210288399156229728672, 1107198000255700568886643303206473597583929381832238803251440, 1781835809419824154682981492090362467607750075603876755716080]",
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -3054,6 +3107,84 @@ fn main() {
             "../malachite-nz",
             demo_name,
             "_fmpz_poly_sqrlow_karatsuba",
+        );
+    }
+
+    // Every case from test_mul_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
+    // from its demos, against _fmpz_poly_mul_KS.
+    println!("testing mul_to_out_kronecker unit tests");
+    run_unit_lines(
+        &oracle,
+        "_fmpz_poly_mul_KS",
+        &MUL_TO_OUT_KRONECKER_UNIT_LINES,
+    );
+    for demo_name in ["demo_mul_to_out_kronecker"] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_fmpz_poly_mul_KS");
+    }
+
+    // Every case from test_mul_truncated_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
+    // from its demos, against _fmpz_poly_mullow_KS.
+    println!("testing mul_truncated_to_out_kronecker unit tests");
+    run_unit_lines(
+        &oracle,
+        "_fmpz_poly_mullow_KS",
+        &MUL_TRUNCATED_TO_OUT_KRONECKER_UNIT_LINES,
+    );
+    for demo_name in ["demo_mul_truncated_to_out_kronecker"] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "_fmpz_poly_mullow_KS",
+        );
+    }
+
+    // Every case from test_mul_middle_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
+    // from its demos, against _fmpz_poly_mulmid_KS.
+    println!("testing mul_middle_to_out_kronecker unit tests");
+    run_unit_lines(
+        &oracle,
+        "_fmpz_poly_mulmid_KS",
+        &MUL_MIDDLE_TO_OUT_KRONECKER_UNIT_LINES,
+    );
+    for demo_name in [
+        "demo_mul_middle_to_out_kronecker",
+        "demo_mul_middle_to_out_kronecker_square",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "_fmpz_poly_mulmid_KS",
+        );
+    }
+
+    // Every case from test_square_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
+    // from its demos, against _fmpz_poly_sqr_KS.
+    println!("testing square_to_out_kronecker unit tests");
+    run_unit_lines(
+        &oracle,
+        "_fmpz_poly_sqr_KS",
+        &SQUARE_TO_OUT_KRONECKER_UNIT_LINES,
+    );
+    for demo_name in ["demo_square_to_out_kronecker"] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_fmpz_poly_sqr_KS");
+    }
+
+    // Every case from test_square_truncated_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
+    // from its demos, against _fmpz_poly_sqrlow_KS.
+    println!("testing square_truncated_to_out_kronecker unit tests");
+    run_unit_lines(
+        &oracle,
+        "_fmpz_poly_sqrlow_KS",
+        &SQUARE_TRUNCATED_TO_OUT_KRONECKER_UNIT_LINES,
+    );
+    for demo_name in ["demo_square_truncated_to_out_kronecker"] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "_fmpz_poly_sqrlow_KS",
         );
     }
 }

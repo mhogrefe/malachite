@@ -16,6 +16,7 @@
 
 use crate::integer::Integer;
 use crate::integer_polynomial::arithmetic::mul_middle::classical::mul_middle_to_out_classical;
+use crate::integer_polynomial::arithmetic::mul_middle::kronecker::mul_middle_to_out_kronecker;
 use crate::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
@@ -31,34 +32,22 @@ use core::ptr;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 pub mod classical;
+pub mod kronecker;
 pub mod tiny;
 
-// Sets `out` to the coefficients of $x^i$ for `nlo` $\leq i <$ `nhi` of the product of the
-// polynomials with coefficients `xs` and `ys`, both nonempty. `nlo < nhi <= xs.len() + ys.len() -
-// 1` must hold, and `out` must have length `nhi - nlo`.
+// Narrows the polynomials with coefficients `xs` and `ys` to the coefficients that can contribute
+// to the coefficients of $x^i$ for `nlo` $\leq i <$ `nhi` of their product, returning the narrowed
+// slices and the range shifted to match. A coefficient of $x^j$ with $j \geq$ `nhi` contributes
+// only above the range, and dropping low coefficients of a factor shifts the whole product down.
 //
-// # Worst-case complexity
-// $T(n, m) = O(n^2 m \log m \log\log m)$
-//
-// $M(n, m) = O(n(m + \log n))$
-//
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is the
-// largest number of significant bits of any element of `xs` or `ys`.
-//
-// This is equivalent to `_fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0. Only the tiny
-// and classical algorithms have been ported so far, so classical multiplication stands in for the
-// others.
-crate_test_fn! {mul_middle_to_out(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+// This is equivalent to the input truncation at the start of `_fmpz_poly_mulmid` from
+// `fmpz_poly/mulmid.c`, FLINT 3.6.0.
+pub(crate) fn truncate_mul_middle_inputs<'a>(
+    xs: &'a [Integer],
+    ys: &'a [Integer],
     mut nlo: usize,
     mut nhi: usize,
-) {
-    assert_ne!(xs.len(), 0);
-    assert_ne!(ys.len(), 0);
-    assert!(nlo < nhi);
-    assert!(nhi < xs.len() + ys.len());
+) -> (&'a [Integer], &'a [Integer], usize, usize) {
     // Low truncation of inputs
     let mut xs = &xs[..min(xs.len(), nhi)];
     let mut ys = &ys[..min(ys.len(), nhi)];
@@ -76,6 +65,40 @@ crate_test_fn! {mul_middle_to_out(
         nlo -= trunc;
         nhi -= trunc;
     }
+    (xs, ys, nlo, nhi)
+}
+
+// Sets `out` to the coefficients of $x^i$ for `nlo` $\leq i <$ `nhi` of the product of the
+// polynomials with coefficients `xs` and `ys`, both nonempty. `nlo < nhi <= xs.len() + ys.len() -
+// 1` must hold, and `out` must have length `nhi - nlo`.
+//
+// # Worst-case complexity
+// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
+//
+// $M(n, m) = O(n(m + \log n) \log (nm))$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is the
+// largest number of significant bits of any element of `xs` or `ys`.
+//
+// This is equivalent to `_fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0. FLINT's first
+// choice for long inputs, which multiplies polynomials directly with its small-prime FFT
+// (`_fmpz_poly_mul_mid_default_mpn_ctx` from `fft_small/fmpz_poly_mul.c`), and
+// Schönhage–Strassen, which it chooses for some inputs of medium size, have not been ported yet;
+// Kronecker substitution stands in for both. (Its single integer multiplication reaches the port of
+// the small-prime FFT's integer multiplication in `natural/arithmetic/mul/fft.rs` when the operands
+// are large.)
+crate_test_fn! {mul_middle_to_out(
+    out: &mut [Integer],
+    xs: &[Integer],
+    ys: &[Integer],
+    nlo: usize,
+    nhi: usize,
+) {
+    assert_ne!(xs.len(), 0);
+    assert_ne!(ys.len(), 0);
+    assert!(nlo < nhi);
+    assert!(nhi < xs.len() + ys.len());
+    let (mut xs, mut ys, nlo, nhi) = truncate_mul_middle_inputs(xs, ys, nlo, nhi);
     let len = nhi - nlo;
     if xs.len() < ys.len() {
         swap(&mut xs, &mut ys);
@@ -99,9 +122,9 @@ crate_test_fn! {mul_middle_to_out(
             mul_truncated_to_out_karatsuba(out, xs, ys);
         }
         None => {
-        // Schönhage–Strassen and Kronecker substitution, which FLINT chooses for larger inputs,
-        // have not been ported yet, so classical multiplication stands in for them.
-            mul_middle_to_out_classical(out, xs, ys, nlo, nhi);
+            // Schönhage–Strassen, which FLINT chooses instead for some inputs of medium size,
+            // has not been ported yet, so Kronecker substitution stands in for it.
+            mul_middle_to_out_kronecker(out, xs, ys, nlo, nhi);
         }
     }
 }}

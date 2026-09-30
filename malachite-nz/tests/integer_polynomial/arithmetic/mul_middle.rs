@@ -10,9 +10,11 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
+use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::classical::*;
+use malachite_nz::integer_polynomial::arithmetic::mul_middle::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::mul_middle_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
@@ -459,4 +461,172 @@ fn mul_middle_to_out_properties() {
         mul_middle_to_out(&mut out_alt, &xs, &xs_alt, nlo, nhi);
         assert_eq!(out_alt, out);
     });
+}
+
+#[test]
+fn test_mul_middle_to_out_kronecker() {
+    let test = |xs: &[&str], ys: &[&str], nlo: usize, nhi: usize, out: &[&str]| {
+        let xs = parse(xs);
+        let ys = parse(ys);
+        let mut result = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_kronecker(&mut result, &xs, &ys, nlo, nhi);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
+    };
+    // Both arguments are the same slice.
+    let test_square = |xs: &[&str], nlo: usize, nhi: usize, out: &[&str]| {
+        let xs = parse(xs);
+        let mut result = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_kronecker(&mut result, &xs, &xs, nlo, nhi);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], result);
+    };
+    // - !sign, so the unsigned unpacking is used
+    test(
+        &["1", "2", "3"],
+        &["4", "5", "6"],
+        0,
+        5,
+        &["4", "13", "28", "27", "18"],
+    );
+    // - sign
+    test(
+        &["1", "-2", "3"],
+        &["4", "5", "-6"],
+        0,
+        5,
+        &["4", "-3", "-4", "27", "-18"],
+    );
+    test(
+        &["3"],
+        &[
+            "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1",
+            "1", "1", "1",
+        ],
+        0,
+        20,
+        &[
+            "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3", "3",
+            "3", "3", "3",
+        ],
+    );
+    test(
+        &["1", "2", "3", "4", "5", "6"],
+        &["3"],
+        2,
+        6,
+        &["9", "12", "15", "18"],
+    );
+    // - the leading coefficients are zero, and are stripped
+    // - nhi > full_len, so zero_high != 0
+    test(
+        &["1", "2", "0", "0"],
+        &["3", "0"],
+        0,
+        5,
+        &["3", "6", "0", "0", "0"],
+    );
+    // - xs.is_empty() after stripping
+    test(&["0", "0"], &["5", "7"], 0, 3, &["0", "0", "0"]);
+    // - nlo >= min(nhi, full_len) after stripping
+    test(&["1", "0", "0"], &["1", "0", "0"], 2, 5, &["0", "0", "0"]);
+    // - xs.len() > nlo2
+    test(&["1", "2", "3", "4"], &["5", "6"], 4, 5, &["24"]);
+    // - ys.len() > nlo2
+    test(&["5", "6"], &["1", "2", "3", "4"], 4, 5, &["24"]);
+    // - xs and ys are the same slice, so the packed input is squared
+    test_square(&["1", "-2", "3"], 0, 5, &["1", "-4", "10", "-12", "9"]);
+    test_square(
+        &[
+            "1177081956389695314697442642252",
+            "780797157184699260681239349366",
+            "-595154718217192200576044492408",
+            "-182494249513761438690895755667",
+            "-942052997583205342725389406559",
+        ],
+        2,
+        7,
+        &[
+            "-791447559479592902668681632442021440344727617258884343443676",
+            "-1359011600633143864688817143866501833720627245321956658510824",
+            "-2148520014665647297360674516384939001172466325327284043737516",
+            "-1253879977569340881831272259252236545363653423778406816830916",
+            "1154638723750178658882415895927897734172734595161513964423033",
+        ],
+    );
+    // - the leading coefficient of xs is negative
+    test(&["3", "-1"], &["2", "2"], 0, 3, &["6", "4", "-2"]);
+    test(
+        &[
+            "-1219809464491112424001080559307",
+            "841051527322013215685593233302",
+            "-699719491634243930371614136486",
+            "-1124264126040579300201032760787",
+            "-616245236613870071598110773797",
+            "304428441122895878829422060984",
+        ],
+        &[
+            "-39596108692041012711732684877",
+            "-497407310794063395325018870327",
+            "-975716784831680884582779126524",
+            "-81585352299193465116417615994",
+        ],
+        1,
+        8,
+        &[
+            "573439777722221257976973109959126635386749168227746557809535",
+            "799549559400729501322001644873734886474392496727868148851336",
+            "-328547432040767729704441807453204433842115173887652932576969",
+            "1197728676429079352423188246209632307987320362400752103357794",
+            "1448520943887611629521790899104048902739782186779076775254123",
+            "541579373508920747537304524486530680068238355901212252097138",
+            "-246759355051910205285956390962732536086211179583218036630398",
+        ],
+    );
+    test(
+        &["16", "-14", "5", "-14", "-2", "4", "-16", "-19", "-20", "-7", "-7", "-17", "10"],
+        &["4", "5", "6", "-16", "16", "20", "-8", "-3", "1"],
+        3,
+        17,
+        &[
+            "-371", "432", "-62", "-160", "-160", "-629", "121", "8", "-489", "-561", "-248",
+            "281", "-475", "-123",
+        ],
+    );
+}
+
+#[test]
+fn mul_middle_to_out_kronecker_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_len_n", 32);
+    let test = |(xs, ys, nlo, nhi): (Vec<Integer>, Vec<Integer>, u64, u64)| {
+        let nlo = usize::exact_from(nlo);
+        let nhi = usize::exact_from(nhi);
+        let mut out = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_kronecker(&mut out, &xs, &ys, nlo, nhi);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], out);
+        let mut out_alt = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_kronecker(&mut out_alt, &ys, &xs, nlo, nhi);
+        assert_eq!(out_alt, out);
+        mul_middle_to_out_classical(&mut out_alt, &xs, &ys, nlo, nhi);
+        assert_eq!(out_alt, out);
+    };
+    integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1().test_properties(test);
+    integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1()
+        .test_properties_with_config(&config, test);
+
+    // The square path.
+    let test = |(xs, nlo, nhi): (Vec<Integer>, u64, u64)| {
+        let nlo = usize::exact_from(nlo);
+        let nhi = usize::exact_from(nhi);
+        let mut out = vec![Integer::ZERO; nhi - nlo];
+        mul_middle_to_out_kronecker(&mut out, &xs, &xs, nlo, nhi);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], out);
+    };
+    integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties(test);
+    integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties_with_config(&config, test);
 }

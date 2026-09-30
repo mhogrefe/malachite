@@ -14,6 +14,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::classical::*;
+use malachite_nz::integer_polynomial::arithmetic::mul_middle::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::mul_middle_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
@@ -35,6 +36,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_mul_middle_to_out_classical_square);
     register_demo!(runner, demo_mul_middle_to_out_tiny_1_square);
     register_demo!(runner, demo_mul_middle_to_out_tiny_2_square);
+    register_demo!(runner, demo_mul_middle_to_out_kronecker);
+    register_demo!(runner, demo_mul_middle_to_out_kronecker_square);
 
     register_bench!(runner, benchmark_mul_middle_to_out_algorithms);
     register_bench!(runner, benchmark_mul_middle_to_out_tiny_1_algorithms);
@@ -201,6 +204,16 @@ fn benchmark_mul_middle_to_out_algorithms(
                     &integers_mul_naive(&xs, &ys)[usize::exact_from(nlo)..usize::exact_from(nhi)],
                 );
             }),
+            ("Kronecker", &mut |(xs, ys, nlo, nhi)| {
+                let mut out = vec![Integer::ZERO; usize::exact_from(nhi - nlo)];
+                mul_middle_to_out_kronecker(
+                    &mut out,
+                    &xs,
+                    &ys,
+                    usize::exact_from(nlo),
+                    usize::exact_from(nhi),
+                );
+            }),
         ],
     );
 }
@@ -303,4 +316,38 @@ fn benchmark_mul_middle_to_out_tiny_2_algorithms(
             }),
         ],
     );
+}
+
+fn demo_mul_middle_to_out_kronecker(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys, nlo, nhi) in integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut out = vec![Integer::ZERO; usize::exact_from(nhi - nlo)];
+        mul_middle_to_out_kronecker(
+            &mut out,
+            &xs,
+            &ys,
+            usize::exact_from(nlo),
+            usize::exact_from(nhi),
+        );
+        println!("mul_middle_to_out_kronecker(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {out:?}");
+    }
+}
+
+fn demo_mul_middle_to_out_kronecker_square(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, nlo, nhi) in integer_vec_unsigned_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut out = vec![Integer::ZERO; usize::exact_from(nhi - nlo)];
+        mul_middle_to_out_kronecker(
+            &mut out,
+            &xs,
+            &xs,
+            usize::exact_from(nlo),
+            usize::exact_from(nhi),
+        );
+        println!("mul_middle_to_out_kronecker(_, {xs:?}, {xs:?}, {nlo}, {nhi}) = {out:?}");
+    }
 }

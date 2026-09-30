@@ -16,6 +16,7 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::mul::classical::mul_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
+use crate::integer_polynomial::arithmetic::mul::kronecker::mul_to_out_kronecker;
 use crate::integer_polynomial::arithmetic::mul::tiny::{mul_to_out_tiny_1, mul_to_out_tiny_2};
 use crate::integer_polynomial::arithmetic::scalar_mul::{
     integers_mul_scalar_assign, integers_mul_scalar_to_out,
@@ -35,22 +36,27 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 pub mod classical;
 pub mod karatsuba;
+pub mod kronecker;
 pub mod tiny;
 
 // Sets `out` to the coefficients of the product of the polynomials with coefficients `xs` and `ys`,
 // where `xs.len() >= ys.len() >= 1`. `out` must have length `xs.len() + ys.len() - 1`.
 //
 // # Worst-case complexity
-// $T(n, m) = O(n^2 m \log m \log\log m)$
+// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
 //
-// $M(n, m) = O(n(m + \log n))$
+// $M(n, m) = O(n(m + \log n) \log (nm))$
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is the largest number of
 // significant bits of any element of `xs` or `ys`.
 //
-// This is equivalent to `_fmpz_poly_mul` from `fmpz_poly/mul.c`, FLINT 3.6.0. Only the tiny and
-// classical algorithms have been ported so far, so classical multiplication stands in for the
-// others.
+// This is equivalent to `_fmpz_poly_mul` from `fmpz_poly/mul.c`, FLINT 3.6.0. FLINT's first choice
+// for long inputs, which multiplies polynomials directly with its small-prime FFT
+// (`_fmpz_poly_mul_mid_default_mpn_ctx` from `fft_small/fmpz_poly_mul.c`), and
+// Schönhage–Strassen, which it chooses for some inputs of medium size, have not been ported yet;
+// Kronecker substitution stands in for both. (Its single integer multiplication reaches the port of
+// the small-prime FFT's integer multiplication in `natural/arithmetic/mul/fft.rs` when the operands
+// are large.)
 crate_test_fn! {mul_greater_to_out(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
     let len1 = xs.len();
     let len2 = ys.len();
@@ -77,9 +83,9 @@ crate_test_fn! {mul_greater_to_out(out: &mut [Integer], xs: &[Integer], ys: &[In
             mul_to_out_karatsuba(out, xs, ys);
         }
         None => {
-        // Schönhage–Strassen and Kronecker substitution, which FLINT chooses for larger inputs,
-        // have not been ported yet, so classical multiplication stands in for them.
-            mul_to_out_classical(out, xs, ys);
+            // Schönhage–Strassen, which FLINT chooses instead for some inputs of medium size,
+            // has not been ported yet, so Kronecker substitution stands in for it.
+            mul_to_out_kronecker(out, xs, ys);
         }
     }
 }}
@@ -133,9 +139,9 @@ impl Mul<Self> for IntegerPolynomial {
     /// sum of their degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
     /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
@@ -187,9 +193,9 @@ impl Mul<&Self> for IntegerPolynomial {
     /// sum of their degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
     /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
@@ -241,9 +247,9 @@ impl Mul<IntegerPolynomial> for &IntegerPolynomial {
     /// sum of their degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
     /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
@@ -294,9 +300,9 @@ impl Mul<&IntegerPolynomial> for &IntegerPolynomial {
     /// sum of their degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
     /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
@@ -342,9 +348,9 @@ impl MulAssign<Self> for IntegerPolynomial {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
     /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
@@ -375,9 +381,9 @@ impl MulAssign<&Self> for IntegerPolynomial {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^2 m \log m \log\log m)$
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
     ///
-    /// $M(n, m) = O(n(m + \log n))$
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
     /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
