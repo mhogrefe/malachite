@@ -448,8 +448,7 @@ check_line(char * line, int line_number)
            reads a negative coefficient whose absolute value is just below 2^(N - 1) as positive.
            Malachite's port fixes that, so where FLINT's result differs from its classical
            product, the classical product is compared instead. */
-        if (result == 0 && (v == VARIANT_SS || v == VARIANT_DISPATCHER)
-            && current_mode->kind != KIND_MULHIGH)
+        if (result == 0 && (v == VARIANT_SS || v == VARIANT_DISPATCHER))
         {
             fmpz * reference = _fmpz_vec_init(out_len);
             switch (current_mode->kind)
@@ -463,6 +462,9 @@ check_line(char * line, int line_number)
                 case KIND_MULMID:
                     _fmpz_poly_mulmid_classical(reference, xs, len1, y, len2, a, b);
                     break;
+                case KIND_MULHIGH:
+                    _fmpz_poly_mulhigh_classical(reference, xs, len1, y, len2, a);
+                    break;
                 case KIND_SQR:
                     _fmpz_poly_sqr_classical(reference, xs, len1);
                     break;
@@ -472,7 +474,9 @@ check_line(char * line, int line_number)
                 default:
                     break;
             }
-            if (!_fmpz_vec_equal(out, reference, out_len))
+            /* The mulhigh dispatcher defines only the coefficients from `start` on. */
+            slong from = current_mode->kind == KIND_MULHIGH ? a : 0;
+            if (!_fmpz_vec_equal(out + from, reference + from, out_len - from))
             {
                 _fmpz_vec_swap(out, reference, out_len);
             }

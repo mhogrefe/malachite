@@ -18,7 +18,7 @@ use malachite_nz::test_util::generators::large_type_gen_var_48;
 fn test_limbs_mul_mod_2expp1_basecase() {
     let test = |xs: &[Limb], ys: Option<&[Limb]>, c: Limb, b: u64, carry: Limb, out: &[Limb]| {
         let mut xs = xs.to_vec();
-        let mut tp = vec![0; xs.len() << 1];
+        let mut tp = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(xs.len())];
         assert_eq!(
             limbs_mul_mod_2expp1_basecase(&mut xs, ys, c, b, &mut tp),
             carry
@@ -76,7 +76,7 @@ fn limbs_mul_mod_2expp1_basecase_properties() {
         let y = ys
             .as_ref()
             .map_or_else(|| x.clone(), |ys| value(ys, c & 1 != 0));
-        let mut tp = vec![0; xs.len() << 1];
+        let mut tp = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(xs.len())];
         let carry = limbs_mul_mod_2expp1_basecase(&mut xs, ys.as_deref(), c, b, &mut tp);
         assert!(carry < 2);
         let result = value(&xs, carry == 1);

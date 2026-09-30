@@ -74,6 +74,9 @@ crate_test_fn! {fft_naive_convolution_1(r: &mut [Limb], ii: &[Limb], jj: &[Limb]
     }
 }}
 
+// The amount to subtract from half of `depth`, the depth of an outer transform, to get the depth of
+// the inner transform that `fft_mulmod_2expp1` uses; FLINT indexes `mulmod_2expp1_table_n` this way
+// in both `fft_mulmod_2expp1` and `fft_adjust_limbs`.
 fn mulmod_2expp1_table_n(depth: u64) -> u64 {
     if depth < 12 {
         // More than `FFT_MULMOD_2EXPP1_CUTOFF` limbs make the depth at least 13.
@@ -108,7 +111,7 @@ crate_test_fn! {fft_mulmod_2expp1_negacyclic(
     let (ii, t) = residues.split_at_mut(n2);
     let (t1, t2) = t.split_at_mut(1);
     let (t1, t2) = (&mut t1[0], &mut t2[0]);
-    let mut scratch = vec![0; (n2 << 1) + size * 3];
+    let mut scratch = vec![0; (n2 << 1) + size + limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
     let (ii0, scratch) = scratch.split_at_mut(n2);
     let (r, scratch) = scratch.split_at_mut(n2);
     let (s1, tt) = scratch.split_at_mut(size);
@@ -212,7 +215,7 @@ crate_test_fn! {fft_mulmod_2expp1_negacyclic(
 
 // Sets `r[..=limbs]` to `r[..=limbs]` times `i2[..=limbs]` (or `r[..=limbs]` squared, if `i2` is
 // `None`) modulo $2^{nw} + 1$, where `limbs` is `n * w / Limb::WIDTH`. The inputs must be
-// normalized, and `tt` needs `2 * limbs` limbs.
+// normalized, and `tt` needs `limbs_mul_mod_2expp1_basecase_scratch_len(limbs)` limbs.
 //
 // This is fft_mulmod_2expp1 from fft/mulmod_2expp1.c, FLINT 3.6.0, where `r` and `i1` are the same.
 crate_test_fn! {fft_mulmod_2expp1(
@@ -242,10 +245,7 @@ crate_test_fn! {fft_mulmod_2expp1(
         r[limbs] = limbs_mul_mod_2expp1_basecase(r, i2, c, bits, tt);
         return;
     }
-    let mut depth = 1;
-    while u64::power_of_2(depth) < bits {
-        depth += 1;
-    }
+    let depth = bits.ceiling_log_base_2().max(1);
     let off = mulmod_2expp1_table_n(depth);
     let depth1 = (depth >> 1) - off;
     let w1 = bits >> (depth1 << 1);

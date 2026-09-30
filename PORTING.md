@@ -311,6 +311,20 @@ general-case tests — every one of them corresponds to a real bug class found i
   special-value and domain checks, since `Exact` is valid for inputs with exactly representable
   results (specials, domain-boundary values).
 
+### FLINT-specific
+
+- **FLINT can be wrong.** When the oracle disagrees with a faithful port, check both against a
+  naive reference before assuming the port is at fault. FLINT 3.6.0's `_fmpz_vec_set_fft` misreads
+  some negative coefficients as positive, so `_fmpz_poly_mul_SS`, and `fmpz_poly_mul` when it
+  chooses Schönhage–Strassen, can return a coefficient with the wrong sign. FLINT fixed it after
+  3.6.0 (commit 7ad753d51c); Malachite's port uses the fixed test, and the oracle compares against
+  FLINT's classical product there. Patch the oracle's wrapper; never
+  skip the inputs.
+- **Preconditions live in the callers.** FLINT's transform functions assume what their callers
+  guarantee (an even `trunc`; `trunc` a multiple of `2 * n1` for the matrix Fourier transforms; a
+  product no longer than `trunc` for `fft_convolution`; normalized residues for `_fmpz_vec_set_fft`)
+  and loop forever or compute garbage otherwise. Generators and unit rows must satisfy them.
+
 ### Malachite-Float semantics
 
 - **`Float::increment`/`decrement` do not preserve precision** when crossing a power of 2; they

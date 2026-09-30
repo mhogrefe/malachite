@@ -10,7 +10,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::mul::schonhage_strassen::adjust::limbs_fft_adjust;
 use crate::natural::arithmetic::mul::schonhage_strassen::adjust_sqrt2::*;
 use crate::natural::arithmetic::mul::schonhage_strassen::butterfly_lsh_b::limbs_butterfly_lsh_b;
 use crate::natural::arithmetic::mul::schonhage_strassen::fft_radix2::*;
@@ -74,22 +73,39 @@ crate_test_fn! {fft_truncate_sqrt2(
         return;
     }
     let n2 = n << 1;
-    for i in (0..trunc - n2).step_by(2) {
-        limbs_fft_butterfly(t1, t2, &ii[i], &ii[n2 + i], i >> 1, limbs, w);
-        swap(&mut ii[i], t1);
-        swap(&mut ii[n2 + i], t2);
-        let i = i + 1;
-        limbs_fft_butterfly_sqrt2(t1, t2, &ii[i], &ii[n2 + i], i, limbs, w, temp);
+    for i in 0..trunc - n2 {
+        limbs_fft_butterfly_sqrt2_power(t1, t2, &ii[i], &ii[n2 + i], i, limbs, w, temp);
         swap(&mut ii[i], t1);
         swap(&mut ii[n2 + i], t2);
     }
-    for i in (trunc - n2..n2).step_by(2) {
-        let (ii_lo, ii_hi) = ii.split_at_mut(n2);
-        limbs_fft_adjust(&mut ii_hi[i], &ii_lo[i], i >> 1, limbs, w);
-        let i = i + 1;
-        limbs_fft_adjust_sqrt2(&mut ii_hi[i], &ii_lo[i], i, limbs, w, temp);
+    let (ii_lo, ii_hi) = ii.split_at_mut(n2);
+    for i in trunc - n2..n2 {
+        limbs_fft_adjust_sqrt2_power(&mut ii_hi[i], &ii_lo[i], i, limbs, w, temp);
     }
     let (ii_lo, ii_hi) = ii.split_at_mut(n2);
     fft_radix2(ii_lo, n, w, t1, t2);
     fft_truncate1(ii_hi, n, w, t1, t2, trunc - n2);
 }}
+
+// Sets `s[..=limbs]` to $i_1 + i_2$ and `t[..=limbs]` to $\sqrt{2}^{iw}(i_1 - i_2)$ modulo
+// $2^{\text{limbs}\cdot\text{W}} + 1$, where W is `Limb::WIDTH`, using `temp[..=limbs]` as scratch:
+// with `limbs_fft_butterfly` when `w` or `i` is even, and with `limbs_fft_butterfly_sqrt2`
+// otherwise.
+pub(crate) fn limbs_fft_butterfly_sqrt2_power(
+    s: &mut [Limb],
+    t: &mut [Limb],
+    i1: &[Limb],
+    i2: &[Limb],
+    i: usize,
+    limbs: usize,
+    w: u64,
+    temp: &mut [Limb],
+) {
+    if w.even() {
+        limbs_fft_butterfly(s, t, i1, i2, i, limbs, w >> 1);
+    } else if i.odd() {
+        limbs_fft_butterfly_sqrt2(s, t, i1, i2, i, limbs, w, temp);
+    } else {
+        limbs_fft_butterfly(s, t, i1, i2, i >> 1, limbs, w);
+    }
+}

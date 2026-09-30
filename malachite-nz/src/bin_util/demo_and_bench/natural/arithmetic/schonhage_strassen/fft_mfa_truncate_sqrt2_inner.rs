@@ -9,6 +9,7 @@
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_mfa_truncate_sqrt2_inner::*;
+use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1_basecase::*;
 use malachite_nz::test_util::generators::large_type_gen_var_47;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -22,7 +23,7 @@ fn demo_fft_mfa_truncate_sqrt2_inner(gm: GenMode, config: &GenConfig, limit: usi
         let limbs = ii[0].len() - 1;
         let mut t1 = vec![0; limbs + 1];
         let mut t2 = vec![0; limbs + 1];
-        let mut tt = vec![0; (limbs + 1) << 1];
+        let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
         fft_mfa_truncate_sqrt2_inner(
             &mut ii,
             jj.as_deref_mut(),

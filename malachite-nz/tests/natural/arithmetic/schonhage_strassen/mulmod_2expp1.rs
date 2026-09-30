@@ -6,10 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1::*;
+use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1_basecase::*;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     large_type_gen_var_33, large_type_gen_var_49, large_type_gen_var_50, large_type_gen_var_59,
@@ -52,7 +53,7 @@ fn fft_naive_convolution_1_properties() {
 fn test_fft_mulmod_2expp1() {
     let test = |r: &[Limb], i2: Option<&[Limb]>, n: usize, w: u64, out: &[Limb]| {
         let mut r = r.to_vec();
-        let mut tt = vec![0; r.len() << 1];
+        let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(r.len() - 1)];
         fft_mulmod_2expp1(&mut r, i2, n, w, &mut tt);
         assert_eq!(r, out);
     };
@@ -88,7 +89,7 @@ fn fft_mulmod_2expp1_properties() {
     large_type_gen_var_49().test_properties(|(mut r, i2, n, w)| {
         let limbs = r.len() - 1;
         let expected = fermat_mul_naive(&r, i2.as_ref().unwrap_or(&r), limbs);
-        let mut tt = vec![0; r.len() << 1];
+        let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(r.len() - 1)];
         fft_mulmod_2expp1(&mut r, i2.as_deref(), n, w, &mut tt);
         assert_eq!(r, expected);
     });
@@ -152,7 +153,7 @@ fn test_fft_mulmod_2expp1_large() {
         let expected = fermat_mul_naive(&r, i2.as_ref().unwrap_or(&r), limbs);
         let (n, w) = (limbs, Limb::WIDTH);
         let mut out = r.clone();
-        let mut tt = vec![0; (limbs + 1) << 1];
+        let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
         fft_mulmod_2expp1(&mut out, i2.as_deref(), n, w, &mut tt);
         assert_eq!(out, expected);
         let (depth, w) = mulmod_depth_and_w(limbs);
@@ -182,10 +183,7 @@ fn test_fft_mulmod_2expp1_large() {
 // The `depth` and `w` that `fft_mulmod_2expp1` passes to `fft_mulmod_2expp1_negacyclic`.
 fn mulmod_depth_and_w(limbs: usize) -> (u64, u64) {
     let bits = u64::try_from(limbs).unwrap() << Limb::LOG_WIDTH;
-    let mut depth = 1;
-    while (1u64 << depth) < bits {
-        depth += 1;
-    }
+    let depth = bits.ceiling_log_base_2().max(1);
     let off = [4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1]
         [usize::try_from(depth.clamp(12, 30) - 12).unwrap()];
     let depth1 = (depth >> 1) - off;

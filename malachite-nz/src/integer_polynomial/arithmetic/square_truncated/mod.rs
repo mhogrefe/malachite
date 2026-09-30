@@ -55,12 +55,9 @@ pub mod tiny;
 // significant bits of any element of `xs`.
 //
 // This is equivalent to `_fmpz_poly_sqrlow` from `fmpz_poly/sqrlow.c`, FLINT 3.6.0, where `n` is
-// `out.len()`. FLINT's first choice for long inputs, which multiplies polynomials directly with its
-// small-prime FFT (`_fmpz_poly_mul_mid_default_mpn_ctx` from `fft_small/fmpz_poly_mul.c`), and
-// Schönhage–Strassen, which it chooses for some inputs of medium size, have not been ported yet;
-// Kronecker substitution stands in for both. (Its single integer multiplication reaches the port of
-// the small-prime FFT's integer multiplication in `natural/arithmetic/mul/fft.rs` when the operands
-// are large.)
+// `out.len()`. FLINT also chooses Schönhage–Strassen for very long inputs with very large
+// coefficients, but only when it may use at least 4 threads; Malachite is single-threaded, so it
+// chooses as FLINT does with one thread.
 crate_test_fn! {square_truncated_to_out(out: &mut [Integer], xs: &[Integer]) {
     let n = out.len();
     let xs = &xs[..min(xs.len(), n)];

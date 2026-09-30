@@ -91,7 +91,15 @@ use crate::test_util::extra_variadic::{
     exhaustive_quintuples_xyyyz, exhaustive_sextuples_from_single, exhaustive_triples_from_single,
     exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
 };
-use crate::test_util::generators::common::{GMP_FORMAT_COMBO_COUNT, gmp_format_string_from_parts};
+use crate::test_util::generators::common::{
+    GMP_FORMAT_COMBO_COUNT, exhaustive_ss, exhaustive_ss_var_48, exhaustive_ss_var_57,
+    exhaustive_ss_var_59, gmp_format_string_from_parts, ss_spec_var_29, ss_spec_var_30,
+    ss_spec_var_31, ss_spec_var_32, ss_spec_var_33, ss_spec_var_34, ss_spec_var_35, ss_spec_var_36,
+    ss_spec_var_37, ss_spec_var_38, ss_spec_var_39, ss_spec_var_40, ss_spec_var_41, ss_spec_var_42,
+    ss_spec_var_43, ss_spec_var_44, ss_spec_var_45, ss_spec_var_46, ss_spec_var_47, ss_spec_var_49,
+    ss_spec_var_50, ss_spec_var_51, ss_spec_var_52, ss_spec_var_53, ss_spec_var_54, ss_spec_var_55,
+    ss_spec_var_56, ss_spec_var_58,
+};
 use crate::test_util::generators::{
     factors_of_limb_max, integer_vecs_mul_is_tiny_1, integer_vecs_mul_is_tiny_2,
     limbs_odd_factorial_valid,
@@ -5754,4 +5762,170 @@ pub fn exhaustive_natural_natural_unsigned_rounding_mode_quadruple_gen_var_2()
         })
         .filter(|(x, y, bits, rm)| mul_shr_round_valid(x, y, *bits, *rm)),
     )
+}
+
+// -- Schönhage–Strassen (the parts are in `common.rs`) --
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_29() -> It<(Vec<Limb>, usize)> {
+    exhaustive_ss(ss_spec_var_29())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_30() -> It<(Vec<Limb>, usize)> {
+    exhaustive_ss(ss_spec_var_30())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_31() -> It<(Vec<Limb>, usize, u64)> {
+    exhaustive_ss(ss_spec_var_31())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_32() -> It<(Vec<Limb>, usize, Limb)> {
+    exhaustive_ss(ss_spec_var_32())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_33() -> It<(Vec<Limb>, Vec<Limb>)> {
+    exhaustive_ss(ss_spec_var_33())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_34() -> It<(Vec<Limb>, usize, usize, u64)> {
+    exhaustive_ss(ss_spec_var_34())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_35() -> It<(Vec<Limb>, usize, usize, u64)> {
+    exhaustive_ss(ss_spec_var_35())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_36() -> It<(Vec<Limb>, Vec<Limb>, usize, usize, usize)> {
+    exhaustive_ss(ss_spec_var_36())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_37() -> It<(Vec<Limb>, Vec<Limb>, usize, usize, u64)> {
+    exhaustive_ss(ss_spec_var_37())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_38() -> It<(Vec<Limb>, Vec<Limb>, usize, usize, u64)> {
+    exhaustive_ss(ss_spec_var_38())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_39() -> It<(Vec<Limb>, Vec<Limb>, usize, u64, u64)> {
+    exhaustive_ss(ss_spec_var_39())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_40() -> It<(Vec<Vec<Limb>>, usize, u64)> {
+    exhaustive_ss(ss_spec_var_40())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_41() -> It<(Vec<Vec<Limb>>, usize, u64, usize)> {
+    exhaustive_ss(ss_spec_var_41())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_42() -> It<(Vec<Vec<Limb>>, usize, u64, usize)> {
+    exhaustive_ss(ss_spec_var_42())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_43() -> It<(Vec<Vec<Limb>>, usize, u64)> {
+    exhaustive_ss(ss_spec_var_43())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_44() -> It<(Vec<Vec<Limb>>, usize, usize, u64, usize)> {
+    exhaustive_ss(ss_spec_var_44())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_45() -> It<(Vec<Vec<Limb>>, usize, usize, u64, usize, usize)> {
+    exhaustive_ss(ss_spec_var_45())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_46() -> It<(Vec<Vec<Limb>>, usize, u64, usize, usize)> {
+    exhaustive_ss(ss_spec_var_46())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_47() -> It<(
+    Vec<Vec<Limb>>,
+    Option<Vec<Vec<Limb>>>,
+    usize,
+    u64,
+    usize,
+    usize,
+)> {
+    exhaustive_ss(ss_spec_var_47())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_48() -> It<(Vec<Limb>, Option<Vec<Limb>>, Limb, u64)> {
+    exhaustive_ss_var_48()
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_49() -> It<(Vec<Limb>, Option<Vec<Limb>>, usize, u64)> {
+    exhaustive_ss(ss_spec_var_49())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_50() -> It<(Vec<Limb>, Option<Vec<Limb>>, usize, u64, u64)> {
+    exhaustive_ss(ss_spec_var_50())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_51() -> It<(Vec<Limb>, usize, usize)> {
+    exhaustive_ss(ss_spec_var_51())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_52() -> It<(Vec<Limb>, u64, usize)> {
+    exhaustive_ss(ss_spec_var_52())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_53() -> It<(Vec<Limb>, Vec<Vec<Limb>>, u64, usize)> {
+    exhaustive_ss(ss_spec_var_53())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_54() -> It<(Vec<Limb>, Vec<Vec<Limb>>, u64, usize)> {
+    exhaustive_ss(ss_spec_var_54())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_55()
+-> It<(Vec<Vec<Limb>>, Option<Vec<Vec<Limb>>>, u64, usize, usize)> {
+    exhaustive_ss(ss_spec_var_55())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_56()
+-> It<(Vec<Vec<Limb>>, Option<Vec<Vec<Limb>>>, u64, usize, usize)> {
+    exhaustive_ss(ss_spec_var_56())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_57() -> It<(Vec<Integer>, usize)> {
+    exhaustive_ss_var_57()
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_58() -> It<(Vec<Vec<Limb>>, usize, bool)> {
+    exhaustive_ss(ss_spec_var_58())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_59() -> It<usize> {
+    exhaustive_ss_var_59()
 }

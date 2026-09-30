@@ -17,7 +17,7 @@ use crate::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1::fft_mulm
 use crate::natural::arithmetic::mul::schonhage_strassen::normmod_2expp1::limbs_norm_mod_2expp1;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 // Transforms, multiplies, and inverse-transforms row `i` of the matrix of residues, as the inner
@@ -74,10 +74,7 @@ crate_test_fn! {fft_mfa_truncate_sqrt2_inner(
     let n2 = two_n / n1;
     let trunc2 = (trunc - two_n) / n1;
     let limbs = fft_limbs(n, w);
-    let mut depth = 0;
-    while usize::power_of_2(depth) < n2 {
-        depth += 1;
-    }
+    let depth = n2.ceiling_log_base_2();
     // convolutions on relevant rows
     for s in 0..trunc2 {
         let i = revbin(s, depth);

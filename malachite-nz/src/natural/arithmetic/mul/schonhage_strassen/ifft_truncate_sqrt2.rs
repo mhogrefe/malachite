@@ -10,7 +10,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::mul::schonhage_strassen::adjust::limbs_fft_adjust;
 use crate::natural::arithmetic::mul::schonhage_strassen::adjust_sqrt2::*;
 use crate::natural::arithmetic::mul::schonhage_strassen::butterfly_rsh_b::limbs_butterfly_rsh_b;
 use crate::natural::arithmetic::mul::schonhage_strassen::fft_radix2::fft_limbs;
@@ -80,20 +79,13 @@ crate_test_fn! {ifft_truncate_sqrt2(
     }
     let n2 = n << 1;
     ifft_radix2(&mut ii[..n2], n, w, t1, t2);
-    for i in (trunc - n2..n2).step_by(2) {
-        let (ii_lo, ii_hi) = ii.split_at_mut(n2);
-        limbs_fft_adjust(&mut ii_hi[i], &ii_lo[i], i >> 1, limbs, w);
-        let i = i + 1;
-        limbs_fft_adjust_sqrt2(&mut ii_hi[i], &ii_lo[i], i, limbs, w, temp);
+    let (ii_lo, ii_hi) = ii.split_at_mut(n2);
+    for i in trunc - n2..n2 {
+        limbs_fft_adjust_sqrt2_power(&mut ii_hi[i], &ii_lo[i], i, limbs, w, temp);
     }
-    ifft_truncate1(&mut ii[n2..], n, w, t1, t2, trunc - n2);
-    for i in (0..trunc - n2).step_by(2) {
-        let (ii_lo, ii_hi) = ii.split_at_mut(n2);
-        limbs_ifft_butterfly(t1, t2, &mut ii_lo[i], &mut ii_hi[i], i >> 1, limbs, w);
-        swap(&mut ii_lo[i], t1);
-        swap(&mut ii_hi[i], t2);
-        let i = i + 1;
-        limbs_ifft_butterfly_sqrt2(t1, t2, &mut ii_lo[i], &mut ii_hi[i], i, limbs, w, temp);
+    ifft_truncate1(ii_hi, n, w, t1, t2, trunc - n2);
+    for i in 0..trunc - n2 {
+        limbs_ifft_butterfly_sqrt2_power(t1, t2, &mut ii_lo[i], &mut ii_hi[i], i, limbs, w, temp);
         swap(&mut ii_lo[i], t1);
         swap(&mut ii_hi[i], t2);
     }
@@ -101,3 +93,26 @@ crate_test_fn! {ifft_truncate_sqrt2(
         limbs_slice_shl_in_place(&mut x[..=limbs], 1);
     }
 }}
+
+// Sets `s[..=limbs]` to $i_1 + \sqrt{2}^{-iw}i_2$ and `t[..=limbs]` to $i_1 - \sqrt{2}^{-iw}i_2$
+// modulo $2^{\text{limbs}\cdot\text{W}} + 1$, where W is `Limb::WIDTH`, using `temp[..=limbs]` as
+// scratch and overwriting `i1` and `i2`: with `limbs_ifft_butterfly` when `w` or `i` is even, and
+// with `limbs_ifft_butterfly_sqrt2` otherwise.
+pub(crate) fn limbs_ifft_butterfly_sqrt2_power(
+    s: &mut [Limb],
+    t: &mut [Limb],
+    i1: &mut [Limb],
+    i2: &mut [Limb],
+    i: usize,
+    limbs: usize,
+    w: u64,
+    temp: &mut [Limb],
+) {
+    if w.even() {
+        limbs_ifft_butterfly(s, t, i1, i2, i, limbs, w >> 1);
+    } else if i.odd() {
+        limbs_ifft_butterfly_sqrt2(s, t, i1, i2, i, limbs, w, temp);
+    } else {
+        limbs_ifft_butterfly(s, t, i1, i2, i >> 1, limbs, w);
+    }
+}

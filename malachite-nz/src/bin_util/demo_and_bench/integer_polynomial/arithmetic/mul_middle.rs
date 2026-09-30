@@ -18,7 +18,8 @@ use malachite_nz::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::mul_middle_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::schonhage_strassen::{
-    mul_middle_to_out_schonhage_strassen, vec_get_fft, vec_set_fft,
+    integers_from_fermat_residues, integers_to_fermat_residues,
+    mul_middle_to_out_schonhage_strassen,
 };
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
@@ -49,8 +50,8 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_mul_middle_to_out_schonhage_strassen_wide_square
     );
-    register_demo!(runner, demo_vec_get_fft);
-    register_demo!(runner, demo_vec_set_fft);
+    register_demo!(runner, demo_integers_to_fermat_residues);
+    register_demo!(runner, demo_integers_from_fermat_residues);
     register_demo!(runner, demo_mul_middle_to_out_fft);
     register_demo!(runner, demo_mul_middle_to_out_fft_square);
     register_demo!(runner, demo_mul_middle_to_out_fft_long);
@@ -504,18 +505,18 @@ fn demo_mul_middle_to_out_fft_long_square(gm: GenMode, config: &GenConfig, limit
     demo_mul_middle_to_out_fft_square(gm, &long_config(config), limit);
 }
 
-fn demo_vec_get_fft(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_integers_to_fermat_residues(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, limbs) in large_type_gen_var_57().get(gm, config).take(limit) {
         let mut coeffs_f = vec![vec![0; limbs + 1]; xs.len()];
-        vec_get_fft(&mut coeffs_f, &xs, limbs);
-        println!("vec_get_fft(_, {xs:?}, {limbs}) = {coeffs_f:?}");
+        integers_to_fermat_residues(&mut coeffs_f, &xs, limbs);
+        println!("integers_to_fermat_residues(_, {xs:?}, {limbs}) = {coeffs_f:?}");
     }
 }
 
-fn demo_vec_set_fft(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_integers_from_fermat_residues(gm: GenMode, config: &GenConfig, limit: usize) {
     for (coeffs_f, limbs, sign) in large_type_gen_var_58().get(gm, config).take(limit) {
         let mut out = vec![Integer::ZERO; coeffs_f.len()];
-        vec_set_fft(&mut out, &coeffs_f, limbs, sign);
-        println!("vec_set_fft(_, {coeffs_f:?}, {limbs}, {sign}) = {out:?}");
+        integers_from_fermat_residues(&mut out, &coeffs_f, limbs, sign);
+        println!("integers_from_fermat_residues(_, {coeffs_f:?}, {limbs}, {sign}) = {out:?}");
     }
 }

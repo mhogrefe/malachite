@@ -9,6 +9,7 @@
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_mfa_truncate_sqrt2::*;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_mfa_truncate_sqrt2_inner::*;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::ifft_mfa_truncate_sqrt2::*;
+use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1_basecase::*;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::large_type_gen_var_47;
 use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
@@ -28,7 +29,7 @@ fn test_fft_mfa_truncate_sqrt2_inner() {
         let limbs = ii[0].len() - 1;
         let mut t1 = vec![0; limbs + 1];
         let mut t2 = vec![0; limbs + 1];
-        let mut tt = vec![0; (limbs + 1) << 1];
+        let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
         fft_mfa_truncate_sqrt2_inner(
             &mut ii,
             jj.as_deref_mut(),
@@ -118,7 +119,7 @@ fn fft_mfa_truncate_sqrt2_inner_properties() {
         let mut t1 = vec![0; limbs + 1];
         let mut t2 = vec![0; limbs + 1];
         let mut temp = vec![0; limbs + 1];
-        let mut tt = vec![0; (limbs + 1) << 1];
+        let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
         // Squaring is the same as multiplying by a copy.
         if jj.is_none() {
             let mut out = ii.clone();

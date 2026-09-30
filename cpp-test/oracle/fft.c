@@ -1401,7 +1401,7 @@ p_fmpz_vec(const char ** s, fmpz ** v, slong * len)
     }
 }
 
-/* vec_get_fft(_, xs, limbs) = coeffs_f */
+/* integers_to_fermat_residues(_, xs, limbs) = coeffs_f */
 static int
 check_get_fft(const char * s, sb_t * b)
 {
@@ -1424,7 +1424,7 @@ check_get_fft(const char * s, sb_t * b)
     return 1;
 }
 
-/* vec_set_fft(_, coeffs_f, limbs, sign) = xs */
+/* integers_from_fermat_residues(_, coeffs_f, limbs, sign) = xs */
 static int
 check_set_fft(const char * s, sb_t * b)
 {
@@ -1455,15 +1455,17 @@ check_set_fft(const char * s, sb_t * b)
     ulong ** p = residue_pointers(&f);
     fmpz * xs = _fmpz_vec_init(FLINT_MAX(f.len, 1));
     _fmpz_vec_set_fft(xs, f.len, (const nn_ptr *) p, limbs, sign);
-    /* FLINT tests `coeffs_f[i][limbs - 1] > halflimb`, which reads a residue whose top limb is
-       `halflimb`, the representation of a negative coefficient whose absolute value is within
-       2^(N - FLINT_BITS) of 2^(N - 1), as positive. Malachite tests `>=`; subtract p = 2^N + 1
-       from what FLINT computed for those residues. */
+    /* FLINT 3.6.0 tests only `coeffs_f[i][limbs - 1] > halflimb`, which reads a residue whose top
+       limb is `halflimb` and whose lower limbs are not all zero, the representation of a negative
+       coefficient whose absolute value is within 2^(N - FLINT_BITS) of 2^(N - 1), as positive.
+       FLINT fixed this after 3.6.0, in commit 7ad753d51c, and Malachite tests as the fix does;
+       subtract p = 2^N + 1 from what FLINT computed for those residues. */
     if (sign)
     {
         for (slong i = 0; i < f.len; i++)
         {
-            if (p[i][limbs] == 0 && p[i][limbs - 1] == UWORD(1) << (FLINT_BITS - 1))
+            if (p[i][limbs] == 0 && p[i][limbs - 1] == UWORD(1) << (FLINT_BITS - 1)
+                && !flint_mpn_zero_p(p[i], limbs - 1))
             {
                 fmpz_t modulus;
                 fmpz_init(modulus);
@@ -1514,8 +1516,8 @@ SIMPLE_MODE(fft_split_bits, "fft_split_bits", check_split_bits)
 SIMPLE_MODE(fft_combine_limbs, "fft_combine_limbs", check_combine_limbs)
 SIMPLE_MODE(fft_combine_bits, "fft_combine_bits", check_combine_bits)
 SIMPLE_MODE(fft_convolution, "fft_convolution", check_convolution)
-SIMPLE_MODE(_fmpz_vec_get_fft, "vec_get_fft", check_get_fft)
-SIMPLE_MODE(_fmpz_vec_set_fft, "vec_set_fft", check_set_fft)
+SIMPLE_MODE(_fmpz_vec_get_fft, "integers_to_fermat_residues", check_get_fft)
+SIMPLE_MODE(_fmpz_vec_set_fft, "integers_from_fermat_residues", check_set_fft)
 
 static const prefix_check_t mul_2expmod_alternatives[] = {
     {"limbs_mul_2exp_mod_2expp1_in_place", check_mul_2expmod},

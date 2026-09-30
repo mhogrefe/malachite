@@ -9,6 +9,7 @@
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::convolution::fft_convolution;
+use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1_basecase::*;
 use malachite_nz::test_util::generators::{large_type_gen_var_55, large_type_gen_var_56};
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -25,7 +26,7 @@ fn demo_fft_convolution(gm: GenMode, config: &GenConfig, limit: usize) {
         let mut t1 = vec![0; size];
         let mut t2 = vec![0; size];
         let mut s1 = vec![0; size];
-        let mut tt = vec![0; size << 1];
+        let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
         fft_convolution(
             &mut ii,
             jj.as_deref_mut(),
@@ -53,7 +54,7 @@ fn demo_fft_convolution_matrix_fourier(gm: GenMode, config: &GenConfig, limit: u
         let mut t1 = vec![0; size];
         let mut t2 = vec![0; size];
         let mut s1 = vec![0; size];
-        let mut tt = vec![0; size << 1];
+        let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
         fft_convolution(
             &mut ii,
             jj.as_deref_mut(),

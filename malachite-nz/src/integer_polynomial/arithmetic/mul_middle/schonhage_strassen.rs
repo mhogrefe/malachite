@@ -20,6 +20,7 @@ use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::mul::schonhage_strassen::convolution::fft_convolution;
 use crate::natural::arithmetic::mul::schonhage_strassen::limbs_neg_to_out;
 use crate::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1::*;
+use crate::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1_basecase::*;
 use crate::natural::arithmetic::neg::limbs_neg_in_place;
 use crate::natural::{LIMB_HIGH_BIT, Natural};
 use crate::platform::Limb;
@@ -32,12 +33,24 @@ use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::slices::slice_test_zero;
 
 // Writes the coefficients `xs` into the residues `coeffs_f`, each of `limbs + 1` limbs, in two's
 // complement.
 //
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len() * limbs`.
+//
 // This is `_fmpz_vec_get_fft` from `fmpz_vec/get_fft.c`, FLINT 3.6.0, without the threading.
-crate_test_fn! {vec_get_fft(coeffs_f: &mut [Vec<Limb>], xs: &[Integer], limbs: usize) {
+crate_test_fn! {integers_to_fermat_residues(
+    coeffs_f: &mut [Vec<Limb>],
+    xs: &[Integer],
+    limbs: usize,
+) {
     let size_f = limbs + 1;
     for (f, x) in coeffs_f.iter_mut().zip(xs.iter()) {
         let coeff = x.unsigned_abs_ref().as_limbs_asc();
@@ -58,16 +71,34 @@ crate_test_fn! {vec_get_fft(coeffs_f: &mut [Vec<Limb>], xs: &[Integer], limbs: u
 // limbs. If `sign` is set, residues in the upper half of the range stand for negative coefficients.
 //
 // This is `_fmpz_vec_set_fft` from `fmpz_vec/set_fft.c`, FLINT 3.6.0, without the threading, and
-// with a fix to the test for negative coefficients.
-crate_test_fn! {vec_set_fft(out: &mut [Integer], coeffs_f: &[Vec<Limb>], limbs: usize, sign: bool) {
+// with the fix to the test for negative coefficients that FLINT made after 3.6.0, in commit
+// 7ad753d51c.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `out.len() * limbs`.
+crate_test_fn! {integers_from_fermat_residues(
+    out: &mut [Integer],
+    coeffs_f: &[Vec<Limb>],
+    limbs: usize,
+    sign: bool,
+) {
     for (x, f) in out.iter_mut().zip(coeffs_f.iter()) {
-        // FLINT tests `f[limbs - 1] > LIMB_HIGH_BIT` here, which misreads a negative coefficient
-        // whose absolute value is within $2^{N-\text{W}}$ of $2^{N-1}$, where $N$ is `limbs *
-        // Limb::WIDTH`, as positive: its residue is then just above $2^{N-1}$, so its top limb is
-        // `LIMB_HIGH_BIT`. Such coefficients fit the bound that `res_bits` sets, and FLINT 3.6.0's
-        // `_fmpz_poly_mul_SS` returns wrong results for them. Every coefficient is less than
-        // $2^{N-1}$ in absolute value, so a nonnegative one has a top limb below `LIMB_HIGH_BIT`.
-        *x = if sign && (f[limbs - 1] >= LIMB_HIGH_BIT || f[limbs] != 0) {
+        // A residue above $2^{N-1}$, where $N$ is `limbs * Limb::WIDTH`, stands for a negative
+        // coefficient. FLINT 3.6.0 tests only `f[limbs - 1] > LIMB_HIGH_BIT`, which misreads a
+        // negative coefficient whose absolute value is within $2^{N-\text{W}}$ of $2^{N-1}$ as
+        // positive, so its `_fmpz_poly_mul_SS` returns wrong results for such coefficients, which
+        // fit the bound that `res_bits` sets. This is the test after FLINT's fix, in commit
+        // 7ad753d51c.
+        let top = f[limbs - 1];
+        *x = if sign
+            && (f[limbs] != 0
+                || top > LIMB_HIGH_BIT
+                || (top == LIMB_HIGH_BIT && !slice_test_zero(&f[..limbs - 1])))
+        {
             let mut data = f[..limbs].to_vec();
             limbs_neg_in_place(&mut data);
             limbs_slice_add_limb_in_place(&mut data, 1);
@@ -84,7 +115,17 @@ crate_test_fn! {vec_set_fft(out: &mut [Integer], coeffs_f: &[Vec<Limb>], limbs: 
 // that need no multiplications. `out` must have length `nhi - nlo`, and `nhi` must be less than
 // `xs.len() + ys.len()`.
 //
-// This is equivalent to `_fmpz_poly_mulmid_SS` from `fmpz_poly/mulmid_SS.c`, FLINT 3.6.0.
+// # Worst-case complexity
+// $T(n, m) = O(n(m + \log n) \log (nm) \log\log (nm))$
+//
+// $M(n, m) = O(n(m + \log n))$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is the
+// largest number of significant bits of any element of `xs` or `ys`.
+//
+// This is equivalent to `_fmpz_poly_mulmid_SS` from `fmpz_poly/mulmid_SS.c`, FLINT 3.6.0, except
+// that it reads negative coefficients back correctly, as FLINT does after 3.6.0; see
+// `integers_from_fermat_residues`.
 crate_test_fn! {mul_middle_to_out_schonhage_strassen(
     out: &mut [Integer],
     xs: &[Integer],
@@ -140,15 +181,13 @@ crate_test_fn! {mul_middle_to_out_schonhage_strassen(
     let (ii, t) = residues.split_at_mut(n << 2);
     let (t1, t2) = t.split_at_mut(1);
     let (t1, t2) = (&mut t1[0], &mut t2[0]);
-    let mut scratch = vec![0; size * 3];
-    let (s1, tt) = scratch.split_at_mut(size);
     // put coefficients into FFT vecs
-    vec_get_fft(ii, xs, limbs);
+    integers_to_fermat_residues(ii, xs, limbs);
     let mut jj = if square {
         None
     } else {
         let mut jj: Vec<Vec<Limb>> = vec![vec![0; size]; n << 2];
-        vec_get_fft(&mut jj, ys, limbs);
+        integers_to_fermat_residues(&mut jj, ys, limbs);
         Some(jj)
     };
     let sign = negative1 || negative2;
@@ -164,6 +203,8 @@ crate_test_fn! {mul_middle_to_out_schonhage_strassen(
     let res_bits = (((res_bits - 1) >> (loglen - 2)) + 1) << (loglen - 2);
     let limbs = usize::exact_from((res_bits - 1) >> Limb::LOG_WIDTH) + 1;
     let limbs = fft_adjust_limbs(limbs); // round up limbs for Nussbaumer
+    let mut scratch = vec![0; limbs + 1 + limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
+    let (s1, tt) = scratch.split_at_mut(limbs + 1);
     fft_convolution(ii, jj.as_deref_mut(), loglen - 2, limbs, len_out, t1, t2, s1, tt);
-    vec_set_fft(&mut out[..trunc - nlo], &ii[nlo..], limbs, sign); // write res
+    integers_from_fermat_residues(&mut out[..trunc - nlo], &ii[nlo..], limbs, sign); // write res
 }}

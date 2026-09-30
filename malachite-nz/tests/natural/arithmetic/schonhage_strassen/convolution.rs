@@ -8,6 +8,7 @@
 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::convolution::fft_convolution;
+use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1_basecase::*;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{large_type_gen_var_55, large_type_gen_var_56};
 use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
@@ -24,7 +25,7 @@ fn convolution_helper(
     let mut t1 = vec![0; size];
     let mut t2 = vec![0; size];
     let mut s1 = vec![0; size];
-    let mut tt = vec![0; size << 1];
+    let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
     fft_convolution(
         &mut ii,
         jj.as_deref_mut(),

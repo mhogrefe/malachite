@@ -50,7 +50,7 @@ fn demo_fft_mulmod_2expp1_negacyclic(gm: GenMode, config: &GenConfig, limit: usi
 fn demo_fft_mulmod_2expp1(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut r, i2, n, w) in large_type_gen_var_49().get(gm, config).take(limit) {
         let r_old = r.clone();
-        let mut tt = vec![0; r.len() << 1];
+        let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(r.len() - 1)];
         fft_mulmod_2expp1(&mut r, i2.as_deref(), n, w, &mut tt);
         println!("fft_mulmod_2expp1({r_old:?}, {i2:?}, {n}, {w}, _) = {r:?}");
     }
@@ -78,14 +78,14 @@ fn benchmark_fft_mulmod_2expp1_algorithms(
         &quadruple_1_vec_len_bucketer("r"),
         &mut [
             ("default", &mut |(mut r, i2, n, w)| {
-                let mut tt = vec![0; r.len() << 1];
+                let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(r.len() - 1)];
                 fft_mulmod_2expp1(&mut r, i2.as_deref(), n, w, &mut tt);
             }),
             ("basecase", &mut |(mut r, i2, n, w)| {
                 let limbs = r.len() - 1;
                 let i2_top = i2.as_ref().map_or(r[limbs], |i2| i2[limbs]);
                 let c = (r[limbs] << 1) + i2_top;
-                let mut tt = vec![0; r.len() << 1];
+                let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(r.len() - 1)];
                 r[limbs] = limbs_mul_mod_2expp1_basecase(
                     &mut r,
                     i2.as_deref(),

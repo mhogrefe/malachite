@@ -423,8 +423,10 @@ documented by git history.
   substitution, which packs each polynomial into a single `Natural` and multiplies those, and, for
   long polynomials whose product's coefficients fit, a number-theoretic transform modulo up to eight
   word-sized primes (the polynomial counterpart of the small-prime FFT that `Natural` multiplication
-  already uses), choosing among them as FLINT does; Schönhage–Strassen is to follow. When either
-  factor is a constant, the forms that take the other by value multiply its coefficients in place.
+  already uses), and Schönhage–Strassen multiplication, a truncated transform over residues modulo
+  $2^N + 1$ that needs no multiplications, for coefficients of hundreds to thousands of bits,
+  choosing among them as FLINT does. When either factor is a constant, the forms that take the other
+  by value multiply its coefficients in place.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

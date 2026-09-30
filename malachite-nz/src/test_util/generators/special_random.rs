@@ -76,6 +76,14 @@ use crate::test_util::extra_variadic::{
     random_quintuples_xyyyz, random_sextuples_from_single, random_triples,
     random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
 };
+use crate::test_util::generators::common::{
+    random_adjust_limbs, random_basecase, random_get_fft, random_ss, ss_spec_var_29,
+    ss_spec_var_30, ss_spec_var_31, ss_spec_var_32, ss_spec_var_33, ss_spec_var_34, ss_spec_var_35,
+    ss_spec_var_36, ss_spec_var_37, ss_spec_var_38, ss_spec_var_39, ss_spec_var_40, ss_spec_var_41,
+    ss_spec_var_42, ss_spec_var_43, ss_spec_var_44, ss_spec_var_45, ss_spec_var_46, ss_spec_var_47,
+    ss_spec_var_49, ss_spec_var_50, ss_spec_var_51, ss_spec_var_52, ss_spec_var_53, ss_spec_var_54,
+    ss_spec_var_55, ss_spec_var_56, ss_spec_var_58,
+};
 use crate::test_util::generators::exhaustive::{
     filter_helper_1, filter_helper_2, filter_helper_3, filter_helper_4, filter_helper_5,
     filter_helper_6, filter_map_helper_1, filter_map_helper_2, filter_map_helper_3,
@@ -10540,4 +10548,212 @@ pub fn special_random_integer_integer_unsigned_rounding_mode_quadruple_gen_var_1
             mul_shr_round_valid(x.unsigned_abs_ref(), y.unsigned_abs_ref(), *bits, *rm)
         }),
     )
+}
+
+// -- Schönhage–Strassen (the parts are in `common.rs`) --
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_29(config: &GenConfig) -> It<(Vec<Limb>, usize)> {
+    random_ss(config, true, ss_spec_var_29())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_30(config: &GenConfig) -> It<(Vec<Limb>, usize)> {
+    random_ss(config, true, ss_spec_var_30())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_31(config: &GenConfig) -> It<(Vec<Limb>, usize, u64)> {
+    random_ss(config, true, ss_spec_var_31())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_32(config: &GenConfig) -> It<(Vec<Limb>, usize, Limb)> {
+    random_ss(config, true, ss_spec_var_32())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_33(config: &GenConfig) -> It<(Vec<Limb>, Vec<Limb>)> {
+    random_ss(config, true, ss_spec_var_33())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_34(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, usize, usize, u64)> {
+    random_ss(config, true, ss_spec_var_34())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_35(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, usize, usize, u64)> {
+    random_ss(config, true, ss_spec_var_35())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_36(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, usize, usize, usize)> {
+    random_ss(config, true, ss_spec_var_36())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_37(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, usize, usize, u64)> {
+    random_ss(config, true, ss_spec_var_37())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_38(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, usize, usize, u64)> {
+    random_ss(config, true, ss_spec_var_38())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_39(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, usize, u64, u64)> {
+    random_ss(config, true, ss_spec_var_39())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_40(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, usize, u64)> {
+    random_ss(config, true, ss_spec_var_40())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_41(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, usize, u64, usize)> {
+    random_ss(config, true, ss_spec_var_41())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_42(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, usize, u64, usize)> {
+    random_ss(config, true, ss_spec_var_42())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_43(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, usize, u64)> {
+    random_ss(config, true, ss_spec_var_43())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_44(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, usize, usize, u64, usize)> {
+    random_ss(config, true, ss_spec_var_44())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_45(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, usize, usize, u64, usize, usize)> {
+    random_ss(config, true, ss_spec_var_45())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_46(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, usize, u64, usize, usize)> {
+    random_ss(config, true, ss_spec_var_46())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_47(
+    config: &GenConfig,
+) -> It<(
+    Vec<Vec<Limb>>,
+    Option<Vec<Vec<Limb>>>,
+    usize,
+    u64,
+    usize,
+    usize,
+)> {
+    random_ss(config, true, ss_spec_var_47())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_48(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Option<Vec<Limb>>, Limb, u64)> {
+    random_basecase(config, true)
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_49(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Option<Vec<Limb>>, usize, u64)> {
+    random_ss(config, true, ss_spec_var_49())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_50(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Option<Vec<Limb>>, usize, u64, u64)> {
+    random_ss(config, true, ss_spec_var_50())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_51(config: &GenConfig) -> It<(Vec<Limb>, usize, usize)> {
+    random_ss(config, true, ss_spec_var_51())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_52(config: &GenConfig) -> It<(Vec<Limb>, u64, usize)> {
+    random_ss(config, true, ss_spec_var_52())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_53(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Vec<Limb>>, u64, usize)> {
+    random_ss(config, true, ss_spec_var_53())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_54(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Vec<Limb>>, u64, usize)> {
+    random_ss(config, true, ss_spec_var_54())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_55(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, Option<Vec<Vec<Limb>>>, u64, usize, usize)> {
+    random_ss(config, true, ss_spec_var_55())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_56(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, Option<Vec<Vec<Limb>>>, u64, usize, usize)> {
+    random_ss(config, true, ss_spec_var_56())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_57(config: &GenConfig) -> It<(Vec<Integer>, usize)> {
+    random_get_fft(config, true)
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_58(
+    config: &GenConfig,
+) -> It<(Vec<Vec<Limb>>, usize, bool)> {
+    random_ss(config, true, ss_spec_var_58())
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_59(config: &GenConfig) -> It<usize> {
+    random_adjust_limbs(config)
 }

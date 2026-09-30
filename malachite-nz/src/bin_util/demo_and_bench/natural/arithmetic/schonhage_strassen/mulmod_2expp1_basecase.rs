@@ -18,7 +18,7 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_limbs_mul_mod_2expp1_basecase(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut xs, ys, c, b) in large_type_gen_var_48().get(gm, config).take(limit) {
         let xs_old = xs.clone();
-        let mut tp = vec![0; xs.len() << 1];
+        let mut tp = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(xs.len())];
         let carry = limbs_mul_mod_2expp1_basecase(&mut xs, ys.as_deref(), c, b, &mut tp);
         println!(
             "limbs_mul_mod_2expp1_basecase({xs_old:?}, {ys:?}, {c}, {b}, _) = ({carry}, {xs:?})"

@@ -26,7 +26,6 @@ use crate::test_util::generators::common::{
 };
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
-use crate::test_util::generators::schonhage_strassen::*;
 use crate::test_util::generators::special_random::*;
 use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use malachite_base::foer_sequences::FoerSequence;
@@ -4859,7 +4858,6 @@ pub fn large_type_gen_var_28() -> Generator<(Vec<Limb>, u64, i64, i64, usize, Ro
 pub mod common;
 pub mod exhaustive;
 pub mod random;
-pub mod schonhage_strassen;
 pub mod special_random;
 
 // -- (Natural, Natural, PrimitiveUnsigned, RoundingMode) --
@@ -4897,7 +4895,7 @@ pub fn integer_integer_unsigned_rounding_mode_quadruple_gen_var_1()
     )
 }
 
-// -- Schönhage–Strassen (see `schonhage_strassen.rs`) --
+// -- Schönhage–Strassen (the parts are in `common.rs`) --
 
 // `(t, limbs)`: a residue.
 #[allow(clippy::type_complexity)]

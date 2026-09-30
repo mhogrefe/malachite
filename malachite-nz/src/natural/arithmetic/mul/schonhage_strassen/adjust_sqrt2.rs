@@ -11,6 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::HALF_WIDTH;
+use crate::natural::arithmetic::mul::schonhage_strassen::adjust::limbs_fft_adjust;
 use crate::natural::arithmetic::mul::schonhage_strassen::mul_2expmod_2expp1::*;
 use crate::natural::arithmetic::mul::schonhage_strassen::{
     limbs_add_signed_limb_mod_2expp1, limbs_neg_to_out,
@@ -93,3 +94,23 @@ crate_test_fn! {limbs_fft_adjust_sqrt2(
     }
     limbs_mul_sqrt2_and_sub(r, temp, limbs, negate);
 }}
+
+// Sets `r[..=limbs]` to the residue `i1[..=limbs]` times $\sqrt{2}^{iw}$ modulo
+// $2^{\text{limbs}\cdot\text{W}} + 1$, where W is `Limb::WIDTH`, using `temp[..=limbs]` as scratch:
+// by a power of 2 when `w` or `i` is even, and with `limbs_fft_adjust_sqrt2` otherwise.
+pub(crate) fn limbs_fft_adjust_sqrt2_power(
+    r: &mut [Limb],
+    i1: &[Limb],
+    i: usize,
+    limbs: usize,
+    w: u64,
+    temp: &mut [Limb],
+) {
+    if w.even() {
+        limbs_fft_adjust(r, i1, i, limbs, w >> 1);
+    } else if i.odd() {
+        limbs_fft_adjust_sqrt2(r, i1, i, limbs, w, temp);
+    } else {
+        limbs_fft_adjust(r, i1, i >> 1, limbs, w);
+    }
+}

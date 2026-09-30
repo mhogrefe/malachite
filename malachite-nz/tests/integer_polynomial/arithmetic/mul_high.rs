@@ -450,7 +450,14 @@ fn test_mul_high_to_out() {
     // - limbsx > 4 && start < 17 && xs.len() == start + 1 && ys.len() == start + 1
     test_generated(9, 9, 300, 8);
     // - limbsx > 4, but the lengths do not fit
+    // - Schönhage–Strassen
     test_generated(9, 8, 300, 8);
+    // - limbs1 + limbs2 <= 8, so Kronecker substitution
+    test_generated(9, 8, 200, 8);
+    // - (limbs1 + limbs2) / 2048 > len1 + len2, so Kronecker substitution
+    test_generated(7, 6, 1000000, 5);
+    // - (limbs1 + limbs2) * Limb::WIDTH * 4 < len1 + len2, so Kronecker substitution
+    test_generated(1300, 1300, 300, 1290);
 }
 
 #[test]

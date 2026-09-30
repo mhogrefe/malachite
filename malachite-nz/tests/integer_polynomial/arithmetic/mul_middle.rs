@@ -20,7 +20,8 @@ use malachite_nz::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::mul_middle_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::schonhage_strassen::{
-    mul_middle_to_out_schonhage_strassen, vec_get_fft, vec_set_fft,
+    integers_from_fermat_residues, integers_to_fermat_residues,
+    mul_middle_to_out_schonhage_strassen,
 };
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
@@ -1008,11 +1009,11 @@ fn mul_middle_to_out_fft_properties() {
 
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
-fn test_vec_get_fft() {
+fn test_integers_to_fermat_residues() {
     let test = |xs: &[&str], limbs: usize, out: &[Limb]| {
         let xs = parse(xs);
         let mut coeffs_f = vec![vec![0; limbs + 1]; xs.len()];
-        vec_get_fft(&mut coeffs_f, &xs, limbs);
+        integers_to_fermat_residues(&mut coeffs_f, &xs, limbs);
         assert_eq!(coeffs_f.concat(), out);
     };
     // - *x >= 0u32
@@ -1044,10 +1045,10 @@ fn test_vec_get_fft() {
 }
 
 #[test]
-fn vec_get_fft_properties() {
+fn integers_to_fermat_residues_properties() {
     large_type_gen_var_57().test_properties(|(xs, limbs)| {
         let mut coeffs_f = vec![vec![0; limbs + 1]; xs.len()];
-        vec_get_fft(&mut coeffs_f, &xs, limbs);
+        integers_to_fermat_residues(&mut coeffs_f, &xs, limbs);
         for (x, f) in xs.iter().zip(coeffs_f.iter()) {
             // Each residue is the coefficient in two's complement.
             let bits = (u64::exact_from(limbs) + 1) << Limb::LOG_WIDTH;
@@ -1064,11 +1065,11 @@ fn vec_get_fft_properties() {
 
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
-fn test_vec_set_fft() {
+fn test_integers_from_fermat_residues() {
     let test = |coeffs_f: &[&[Limb]], limbs: usize, sign: bool, out: &[&str]| {
         let coeffs_f: Vec<Vec<Limb>> = coeffs_f.iter().map(|x| x.to_vec()).collect();
         let mut xs = vec![Integer::ZERO; coeffs_f.len()];
-        vec_set_fft(&mut xs, &coeffs_f, limbs, sign);
+        integers_from_fermat_residues(&mut xs, &coeffs_f, limbs, sign);
         assert_eq!(xs, parse(out));
     };
     // - !(sign && (f[limbs - 1] >= HALF_LIMB || f[limbs] != 0))
@@ -1086,12 +1087,13 @@ fn test_vec_set_fft() {
         &["5", "-2"],
     );
     test(&[&[0, 1]], 1, true, &["-1"]);
-    // A top limb of `HALF_LIMB` means a negative coefficient. (FLINT reads it as positive.)
+    // $2^{N-1}$ is read as positive, and anything above it as negative. (FLINT 3.6.0 also reads the
+    // next residue as positive.)
     test(
         &[&[0, 9223372036854775808, 0]],
         2,
         true,
-        &["-170141183460469231731687303715884105729"],
+        &["170141183460469231731687303715884105728"],
     );
     test(
         &[&[1, 9223372036854775808, 0]],
@@ -1108,17 +1110,17 @@ fn test_vec_set_fft() {
 }
 
 #[test]
-fn vec_set_fft_properties() {
+fn integers_from_fermat_residues_properties() {
     large_type_gen_var_58().test_properties(|(coeffs_f, limbs, sign)| {
         let mut xs = vec![Integer::ZERO; coeffs_f.len()];
-        vec_set_fft(&mut xs, &coeffs_f, limbs, sign);
+        integers_from_fermat_residues(&mut xs, &coeffs_f, limbs, sign);
         let p = Integer::from(fermat_modulus(limbs));
         for (x, f) in xs.iter().zip(coeffs_f.iter()) {
             if sign {
                 let v = residue_mod(f, limbs);
                 assert_eq!(Natural::exact_from(x.mod_op(&p)), v);
-                // Residues from $2^{N-1}$ up, where $N$ is `limbs * Limb::WIDTH`, are negative.
-                assert_eq!(*x >= 0u32, v < Natural::power_of_2(fermat_bits(limbs) - 1));
+                // Residues above $2^{N-1}$, where $N$ is `limbs * Limb::WIDTH`, are negative.
+                assert_eq!(*x >= 0u32, v <= Natural::power_of_2(fermat_bits(limbs) - 1));
             } else if f[limbs] == 0 {
                 assert_eq!(Natural::exact_from(x), residue_mod(f, limbs));
             }
@@ -1129,12 +1131,12 @@ fn vec_set_fft_properties() {
     large_type_gen_var_57().test_properties(|(xs, limbs)| {
         let limbs = limbs + 1;
         let mut coeffs_f = vec![vec![0; limbs + 1]; xs.len()];
-        vec_get_fft(&mut coeffs_f, &xs, limbs);
+        integers_to_fermat_residues(&mut coeffs_f, &xs, limbs);
         for f in &mut coeffs_f {
             limbs_norm_mod_2expp1(f, limbs);
         }
         let mut xs_alt = vec![Integer::ZERO; xs.len()];
-        vec_set_fft(&mut xs_alt, &coeffs_f, limbs, true);
+        integers_from_fermat_residues(&mut xs_alt, &coeffs_f, limbs, true);
         assert_eq!(xs_alt, xs);
     });
 }

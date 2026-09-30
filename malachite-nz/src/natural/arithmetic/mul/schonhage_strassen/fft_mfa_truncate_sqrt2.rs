@@ -12,8 +12,7 @@
 
 use crate::integer_polynomial::arithmetic::mul::karatsuba::revbin;
 use crate::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
-use crate::natural::arithmetic::mul::schonhage_strassen::adjust::limbs_fft_adjust;
-use crate::natural::arithmetic::mul::schonhage_strassen::adjust_sqrt2::limbs_fft_adjust_sqrt2;
+use crate::natural::arithmetic::mul::schonhage_strassen::adjust_sqrt2::*;
 use crate::natural::arithmetic::mul::schonhage_strassen::butterfly_lsh_b::limbs_butterfly_lsh_b;
 use crate::natural::arithmetic::mul::schonhage_strassen::fft_radix2::*;
 use crate::natural::arithmetic::mul::schonhage_strassen::fft_truncate_sqrt2::*;
@@ -22,7 +21,7 @@ use crate::natural::arithmetic::neg::limbs_neg_in_place;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::{Parity, PowerOf2};
+use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -180,10 +179,7 @@ crate_test_fn! {fft_mfa_truncate_sqrt2_outer(
     let n2 = (n << 1) / n1;
     let trunc2 = (trunc - (n << 1)) / n1;
     let limbs = fft_limbs(n, w);
-    let mut depth = 0;
-    while usize::power_of_2(depth) < n2 {
-        depth += 1;
-    }
+    let depth = n2.ceiling_log_base_2();
     let two_n = n << 1;
     // first half matrix fourier FFT : n2 rows, n1 cols
     //
@@ -191,38 +187,16 @@ crate_test_fn! {fft_mfa_truncate_sqrt2_outer(
     for i in 0..n1 {
         // relevant part of first layer of full sqrt2 FFT
         let mut j = i;
-        if w.odd() {
-            while j < trunc - two_n {
-                if j.odd() {
-                    limbs_fft_butterfly_sqrt2(t1, t2, &ii[j], &ii[two_n + j], j, limbs, w, temp);
-                } else {
-                    limbs_fft_butterfly(t1, t2, &ii[j], &ii[two_n + j], j >> 1, limbs, w);
-                }
-                swap(&mut ii[j], t1);
-                swap(&mut ii[two_n + j], t2);
-                j += n1;
-            }
-            while j < two_n {
-                let (ii_lo, ii_hi) = ii.split_at_mut(two_n);
-                if i.odd() {
-                    limbs_fft_adjust_sqrt2(&mut ii_hi[j], &ii_lo[j], j, limbs, w, temp);
-                } else {
-                    limbs_fft_adjust(&mut ii_hi[j], &ii_lo[j], j >> 1, limbs, w);
-                }
-                j += n1;
-            }
-        } else {
-            while j < trunc - two_n {
-                limbs_fft_butterfly(t1, t2, &ii[j], &ii[two_n + j], j, limbs, w >> 1);
-                swap(&mut ii[j], t1);
-                swap(&mut ii[two_n + j], t2);
-                j += n1;
-            }
-            while j < two_n {
-                let (ii_lo, ii_hi) = ii.split_at_mut(two_n);
-                limbs_fft_adjust(&mut ii_hi[j], &ii_lo[j], j, limbs, w >> 1);
-                j += n1;
-            }
+        while j < trunc - two_n {
+            limbs_fft_butterfly_sqrt2_power(t1, t2, &ii[j], &ii[two_n + j], j, limbs, w, temp);
+            swap(&mut ii[j], t1);
+            swap(&mut ii[two_n + j], t2);
+            j += n1;
+        }
+        let (ii_lo, ii_hi) = ii.split_at_mut(two_n);
+        while j < two_n {
+            limbs_fft_adjust_sqrt2_power(&mut ii_hi[j], &ii_lo[j], j, limbs, w, temp);
+            j += n1;
         }
         // FFT of length n2 on column i, applying z^{r*i} for rows going up in steps of 1 starting
         // at row 0, where z => w bits
