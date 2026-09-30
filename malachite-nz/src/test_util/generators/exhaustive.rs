@@ -3195,6 +3195,35 @@ pub fn exhaustive_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3(
     )
 }
 
+pub fn exhaustive_integer_vec_pair_gen_var_4() -> It<(Vec<Integer>, Vec<Integer>)> {
+    Box::new(
+        exhaustive_vecs_min_length(1, exhaustive_pairs_from_single(exhaustive_integers()))
+            .map(|pairs| pairs.into_iter().unzip()),
+    )
+}
+
+pub fn exhaustive_integer_vec_unsigned_pair_gen_var_4() -> It<(Vec<Integer>, u64)> {
+    Box::new(exhaustive_dependent_pairs(
+        dependent_index_sequence(),
+        exhaustive_integer_vec_gen_var_1(),
+        IntegerVecsRangeGenerator(|xs: &Vec<Integer>| (1, integer_vec_len(xs))),
+    ))
+}
+
+pub fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_5()
+-> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            dependent_index_sequence(),
+            exhaustive_integer_vec_pair_gen_var_1(),
+            IntegerVecsRangeGenerator(|(xs, ys): &(Vec<Integer>, Vec<Integer>)| {
+                (1, integer_vec_len(xs).min(integer_vec_len(ys)))
+            }),
+        )
+        .map(|((xs, ys), n)| (xs, ys, n)),
+    )
+}
+
 // -- Vec<Natural> --
 
 pub fn exhaustive_natural_vec_gen() -> It<Vec<Natural>> {

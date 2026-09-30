@@ -15,6 +15,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::classical::*;
+use malachite_nz::integer_polynomial::arithmetic::mul_truncated::karatsuba::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::mul_truncated_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul_truncated::tiny::{
     mul_truncated_to_out_tiny_1, mul_truncated_to_out_tiny_2,
@@ -25,6 +26,7 @@ use malachite_nz::test_util::generators::{
     integer_vec_integer_vec_unsigned_triple_gen_var_1,
     integer_vec_integer_vec_unsigned_triple_gen_var_2,
     integer_vec_integer_vec_unsigned_triple_gen_var_3,
+    integer_vec_integer_vec_unsigned_triple_gen_var_5,
 };
 use malachite_nz::test_util::integer_polynomial::arithmetic::mul::*;
 use malachite_nz::test_util::integer_polynomial::arithmetic::mul_truncated::*;
@@ -40,6 +42,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_mul_truncated_ref_ref);
     register_demo!(runner, demo_integer_polynomial_mul_truncated_assign);
     register_demo!(runner, demo_integer_polynomial_mul_truncated_assign_ref);
+    register_demo!(runner, demo_mul_truncated_to_out_karatsuba_n);
+    register_demo!(runner, demo_mul_truncated_to_out_karatsuba);
 
     register_bench!(runner, benchmark_mul_truncated_to_out_algorithms);
     register_bench!(runner, benchmark_mul_truncated_to_out_tiny_1_algorithms);
@@ -204,6 +208,10 @@ fn benchmark_mul_truncated_to_out_algorithms(
                 let mut out = vec![Integer::ZERO; usize::exact_from(n)];
                 out.clone_from_slice(&integers_mul_naive(&xs, &ys)[..usize::exact_from(n)]);
             }),
+            ("Karatsuba", &mut |(xs, ys, n)| {
+                let mut out = vec![Integer::ZERO; usize::exact_from(n)];
+                mul_truncated_to_out_karatsuba(&mut out, &xs, &ys);
+            }),
         ],
     );
 }
@@ -367,4 +375,26 @@ fn benchmark_integer_polynomial_mul_truncated_assign_evaluation_strategy(
             ),
         ],
     );
+}
+
+fn demo_mul_truncated_to_out_karatsuba_n(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys, n) in integer_vec_integer_vec_unsigned_triple_gen_var_5()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut out = vec![Integer::ZERO; usize::exact_from(n)];
+        mul_truncated_to_out_karatsuba_n(&mut out, &xs, &ys);
+        println!("mul_truncated_to_out_karatsuba_n(_, {xs:?}, {ys:?}) = {out:?}");
+    }
+}
+
+fn demo_mul_truncated_to_out_karatsuba(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys, n) in integer_vec_integer_vec_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut out = vec![Integer::ZERO; usize::exact_from(n)];
+        mul_truncated_to_out_karatsuba(&mut out, &xs, &ys);
+        println!("mul_truncated_to_out_karatsuba(_, {xs:?}, {ys:?}) = {out:?}");
+    }
 }

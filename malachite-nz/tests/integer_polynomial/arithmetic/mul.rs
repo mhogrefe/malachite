@@ -10,9 +10,11 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Square;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::{BitPack, Evaluate, Polynomial};
+use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::mul::classical::mul_to_out_classical;
+use malachite_nz::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
 use malachite_nz::integer_polynomial::arithmetic::mul::mul_greater_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul::tiny::{
     mul_to_out_tiny_1, mul_to_out_tiny_2,
@@ -22,6 +24,7 @@ use malachite_nz::test_util::generators::{
     integer_polynomial_triple_gen, integer_vec_pair_gen_var_1, integer_vec_pair_gen_var_2,
     integer_vec_pair_gen_var_3,
 };
+use malachite_nz::test_util::integer_polynomial::arithmetic::mul::generated_coefficients;
 use malachite_nz::test_util::integer_polynomial::arithmetic::mul::*;
 use malachite_nz::test_util::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_naive;
 
@@ -357,6 +360,20 @@ fn test_mul_greater_to_out() {
             "156797324626531188719",
         ],
     );
+    // Generated coefficients of `bits1` and `bits2` bits.
+    let test_generated = |len1: usize, len2: usize, bits1: u64, bits2: u64| {
+        let xs = generated_coefficients(len1, bits1);
+        let ys = generated_coefficients(len2, bits2);
+        let mut result = vec![Integer::ZERO; len1 + len2 - 1];
+        mul_greater_to_out(&mut result, &xs, &ys);
+        assert_eq!(integers_mul_naive(&xs, &ys), result);
+    };
+    // - karatsuba_preferred(len2, bits1, bits2), with len2 <= 4
+    test_generated(4, 3, 6000, 5500);
+    // - karatsuba_preferred(len2, bits1, bits2), with 1500 <= bits1 + bits2 <= 10000
+    test_generated(8, 7, 1000, 900);
+    // - !karatsuba_preferred(len2, bits1, bits2)
+    test_generated(8, 7, 100, 90);
 }
 
 #[test]
@@ -382,6 +399,8 @@ fn test_mul() {
     };
     test("0", "x+1", "0");
     test("1", "x^2-3*x+5", "x^2-3*x+5");
+    // A constant on the right, which the forms taking the left by value multiply in place.
+    test("x^2-3*x+5", "-2", "-2*x^2+6*x-10");
     test("x+1", "x-1", "x^2-1");
     test("2*x^2+3", "-x+4", "-2*x^3+8*x^2-3*x+12");
     test("x^3-x", "x^3-x", "x^6-2*x^4+x^2");
@@ -521,4 +540,138 @@ fn mul_properties() {
         assert_eq!(&(&p * &q) * &r, &p * &(&q * &r));
         assert_eq!(&p * &(&q + &r), &p * &q + &p * &r);
     });
+}
+
+#[test]
+fn test_mul_to_out_karatsuba() {
+    let test = |xs: &[&str], ys: &[&str], out: &[&str]| {
+        let xs = parse(xs);
+        let ys = parse(ys);
+        let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+        mul_to_out_karatsuba(&mut result, &xs, &ys);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(integers_mul_naive(&xs, &ys), result);
+    };
+    // Both arguments are the same slice.
+    let test_square = |xs: &[&str], out: &[&str]| {
+        let xs = parse(xs);
+        let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        mul_to_out_karatsuba(&mut result, &xs, &xs);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(integers_mul_naive(&xs, &xs), result);
+    };
+    // - len1 == 1
+    test(&["3"], &["4"], &["12"]);
+    // - len1 != 1
+    // - length == 1
+    // - length != 1
+    test(&["0", "-11"], &["5"], &["0", "-55"]);
+    test(&["-17", "-16"], &["14", "-14"], &["-238", "14", "224"]);
+    test(
+        &["3", "17", "-17"],
+        &["12", "-7"],
+        &["36", "183", "-323", "119"],
+    );
+    test(
+        &["-18", "-15", "7", "6"],
+        &["-16", "-5", "-15", "15"],
+        &["288", "330", "233", "-176", "-360", "15", "90"],
+    );
+    test(
+        &["7", "-17", "16", "-13", "-6"],
+        &["20", "20", "17"],
+        &["140", "-200", "99", "-229", "-108", "-341", "-102"],
+    );
+    test(
+        &["-17", "16", "17", "5", "-17", "-6", "-18", "15"],
+        &["-12", "-2", "6", "-11", "14", "-13", "16", "-1"],
+        &[
+            "204", "-158", "-338", "189", "-118", "394", "-171", "129", "-119", "488", "-616",
+            "365", "-477", "258", "-15",
+        ],
+    );
+    test(
+        &["15", "-9", "-14", "17", "16", "20", "-8", "3", "-14"],
+        &["15", "-16", "16", "-17"],
+        &["225", "-375", "174", "80", "-103", "554", "-473", "221", "-726", "408", "-275", "238"],
+    );
+    test(
+        &["19", "-7", "11", "14", "7", "0", "9", "17", "9", "3", "-1", "-5", "-9"],
+        &["-5", "-15", "16", "-1", "13", "11", "1", "8", "-2", "18", "-16", "-13", "12"],
+        &[
+            "-95", "-250", "354", "-366", "185", "226", "138", "221", "6", "648", "-129", "490",
+            "795", "-42", "-154", "213", "79", "-345", "-250", "-41", "13", "-33", "197", "57",
+            "-108",
+        ],
+    );
+    test(
+        &[
+            "6", "-10", "1", "-11", "11", "6", "-18", "-16", "15", "16", "0", "1", "2", "18", "11",
+            "17", "9",
+        ],
+        &["-16", "-15", "-3", "10", "-16"],
+        &[
+            "-96", "70", "116", "251", "-210", "-58", "39", "794", "-62", "-709", "-157", "342",
+            "-127", "-577", "-442", "-487", "-284", "-364", "-33", "-182", "-144",
+        ],
+    );
+    test(
+        &[
+            "-816811248518200125486424474127",
+            "1139759822064785633541069947055",
+            "432720081885913666037498687239",
+            "-39114388956741277085988108600",
+            "-881757175632785598351569251009",
+        ],
+        &[
+            "-1102603777473801234131256647504",
+            "510957267290233123464183609831",
+            "540279011431855596052708421977",
+        ],
+        &[
+            "900619168099259289203421384436147279967673856455806207129008",
+            "-1674059128656283204360955756113748270772674809024022800243257",
+            "-336056206702588670577199074735911825850554110838960453192830",
+            "880017453494224838365999717907126698677540159027016534008744",
+            "1186032589442308647552238191783856588823534944868022310736439",
+            "-471672920273191530875583221259852279310841536826031461771679",
+            "-476394895173826472909078396243987393842648244046320205024793",
+        ],
+    );
+    // - xs and ys are the same slice
+    test_square(
+        &["15", "-3", "6", "2", "4", "-6", "-11", "-15", "-9"],
+        &[
+            "225", "-90", "189", "24", "144", "-180", "-242", "-440", "-320", "-218", "-220",
+            "-24", "229", "438", "423", "270", "81",
+        ],
+    );
+}
+
+#[test]
+fn mul_to_out_karatsuba_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_len_n", 32);
+    let test = |(xs, ys): (Vec<Integer>, Vec<Integer>)| {
+        let (xs, ys) = if xs.len() >= ys.len() {
+            (xs, ys)
+        } else {
+            (ys, xs)
+        };
+        let mut out = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+        mul_to_out_karatsuba(&mut out, &xs, &ys);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(integers_mul_naive(&xs, &ys), out);
+        let mut out_alt = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+        mul_to_out_classical(&mut out_alt, &xs, &ys);
+        assert_eq!(out_alt, out);
+        // The same slice as both arguments.
+        let mut out = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        mul_to_out_karatsuba(&mut out, &xs, &xs);
+        assert_eq!(integers_mul_naive(&xs, &xs), out);
+    };
+    integer_vec_pair_gen_var_1().test_properties(test);
+    integer_vec_pair_gen_var_1().test_properties_with_config(&config, test);
 }

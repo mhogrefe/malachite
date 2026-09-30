@@ -14,6 +14,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::mul::classical::mul_to_out_classical;
+use malachite_nz::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
 use malachite_nz::integer_polynomial::arithmetic::mul::mul_greater_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul::tiny::{
     mul_to_out_tiny_1, mul_to_out_tiny_2,
@@ -36,6 +37,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_mul_ref_ref);
     register_demo!(runner, demo_integer_polynomial_mul_assign);
     register_demo!(runner, demo_integer_polynomial_mul_assign_ref);
+    register_demo!(runner, demo_mul_to_out_karatsuba);
 
     register_bench!(runner, benchmark_mul_to_out_algorithms);
     register_bench!(runner, benchmark_mul_to_out_tiny_1_algorithms);
@@ -155,6 +157,14 @@ fn benchmark_mul_to_out_algorithms(gm: GenMode, config: &GenConfig, limit: usize
             ("naive", &mut |(xs, ys)| {
                 let mut out = vec![Integer::ZERO; xs.len() + ys.len() - 1];
                 out.clone_from_slice(&integers_mul_naive(&xs, &ys));
+            }),
+            ("Karatsuba", &mut |(xs, ys)| {
+                let mut out = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+                if xs.len() >= ys.len() {
+                    mul_to_out_karatsuba(&mut out, &xs, &ys);
+                } else {
+                    mul_to_out_karatsuba(&mut out, &ys, &xs);
+                }
             }),
         ],
     );
@@ -307,4 +317,17 @@ fn benchmark_integer_polynomial_mul_assign_evaluation_strategy(
             ),
         ],
     );
+}
+
+fn demo_mul_to_out_karatsuba(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys) in integer_vec_pair_gen_var_1().get(gm, config).take(limit) {
+        let (xs, ys) = if xs.len() >= ys.len() {
+            (xs, ys)
+        } else {
+            (ys, xs)
+        };
+        let mut out = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+        mul_to_out_karatsuba(&mut out, &xs, &ys);
+        println!("mul_to_out_karatsuba(_, {xs:?}, {ys:?}) = {out:?}");
+    }
 }

@@ -179,5 +179,13 @@ int run__fmpz_poly_sqr_classical(const char * arg);
 int run__fmpz_poly_sqr(const char * arg);
 int run__fmpz_poly_sqrlow_classical(const char * arg);
 int run__fmpz_poly_sqrlow(const char * arg);
+int run__fmpz_poly_mul_karatsuba(const char * arg);
+int run__fmpz_poly_mullow_karatsuba(const char * arg);
+int run__fmpz_poly_mullow_karatsuba_n(const char * arg);
+int run__fmpz_poly_mulhigh_karatsuba_n(const char * arg);
+int run__fmpz_poly_mulhigh(const char * arg);
+int run__fmpz_poly_sqr_karatsuba(const char * arg);
+int run__fmpz_poly_sqrlow_karatsuba(const char * arg);
+int run__fmpz_poly_sqrlow_karatsuba_n(const char * arg);
 
 #endif

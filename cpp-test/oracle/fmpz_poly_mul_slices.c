@@ -16,18 +16,20 @@
 
     mul (`mul_to_out_*`, `mul_greater_to_out`)           xs, ys          -> _fmpz_poly_mul*
     mullow (`mul_truncated_to_out*`)                     xs, ys          -> _fmpz_poly_mullow*
-    mulhigh (`mul_high_to_out_classical`)                xs, ys, start   -> _fmpz_poly_mulhigh_*
+    mulhigh (`mul_high_to_out*`)                         xs, ys, start   -> _fmpz_poly_mulhigh*
+    mulhigh_n (`mul_high_to_out_karatsuba_n`)            xs, ys          -> _fmpz_poly_mulhigh_karatsuba_n
     mulmid (`mul_middle_to_out*`)                        xs, ys, lo, hi  -> _fmpz_poly_mulmid*
     sqr (`square_to_out*`)                               xs              -> _fmpz_poly_sqr*
     sqrlow (`square_truncated_to_out*`)                  xs              -> _fmpz_poly_sqrlow*
 
     For the truncated functions, the length is that of the output. Each mode accepts the lines
-    of the Malachite functions that correspond to its FLINT function: the classical modes those of
-    the classical algorithms, and the dispatcher modes those of the Malachite dispatchers and of
+    of the Malachite functions that correspond to its FLINT function: the classical and Karatsuba
+    modes those of the corresponding algorithms, and the dispatcher modes those of the Malachite dispatchers and of
     the tiny kernels, which FLINT does not export. When `xs` and `ys` are written identically,
     FLINT is given the same vector for both, so that its squaring paths run too. Every coefficient
-    FLINT writes is compared: mulhigh sets the coefficients below `start` to zero, as Malachite
-    does. Each mode treats any other nonempty line as an error, and an input with no lines at all.
+    FLINT writes is compared, except that the mulhigh dispatcher defines only the coefficients from
+    `start` on: its classical and Karatsuba algorithms set the ones below to zero, as Malachite's
+    do, but Kronecker substitution leaves them holding coefficients of the whole product. Each mode treats any other nonempty line as an error, and an input with no lines at all.
 */
 
 #include <stdlib.h>
@@ -48,12 +50,22 @@ typedef enum
     KIND_SQRLOW
 } kind_t;
 
+/* The FLINT function a mode calls for its kind of product. */
+typedef enum
+{
+    VARIANT_DISPATCHER,
+    VARIANT_CLASSICAL,
+    VARIANT_KARATSUBA,
+    /* The Karatsuba functions whose inputs have exactly the length of the output (mullow and
+       sqrlow) or the same length as each other (mulhigh). */
+    VARIANT_KARATSUBA_N
+} variant_t;
+
 typedef struct
 {
     const char * name;
     kind_t kind;
-    /* Whether the mode calls the classical algorithm rather than the dispatcher. */
-    int classical;
+    variant_t variant;
     /* The Malachite functions whose lines the mode accepts, terminated by NULL. */
     const char * functions[4];
 } slice_mode_t;
@@ -185,7 +197,7 @@ check_line(char * line, int line_number)
             same = len1 == len2 && _fmpz_vec_equal(xs, ys, len1);
         }
     }
-    if (ok && current_mode->kind == KIND_MULHIGH)
+    if (ok && current_mode->kind == KIND_MULHIGH && current_mode->variant != VARIANT_KARATSUBA_N)
     {
         ok = parse_index(&s, &a);
     }
@@ -206,14 +218,29 @@ check_line(char * line, int line_number)
         {
             case KIND_MUL:
                 out_len = len1 + len2 - 1;
+                if (current_mode->variant == VARIANT_KARATSUBA)
+                {
+                    ok = len1 >= len2;
+                }
                 break;
             case KIND_MULLOW:
                 out_len = expected_len;
                 ok = out_len > 0 && out_len <= len1 + len2 - 1;
+                if (current_mode->variant == VARIANT_KARATSUBA_N)
+                {
+                    ok = ok && len1 >= out_len && len2 >= out_len;
+                }
                 break;
             case KIND_MULHIGH:
                 out_len = len1 + len2 - 1;
-                ok = a <= out_len;
+                if (current_mode->variant == VARIANT_KARATSUBA_N)
+                {
+                    ok = len1 == len2;
+                }
+                else
+                {
+                    ok = a <= out_len;
+                }
                 break;
             case KIND_MULMID:
                 out_len = b - a;
@@ -225,6 +252,10 @@ check_line(char * line, int line_number)
             case KIND_SQRLOW:
                 out_len = expected_len;
                 ok = out_len > 0 && out_len <= 2 * len1 - 1;
+                if (current_mode->variant == VARIANT_KARATSUBA_N)
+                {
+                    ok = ok && len1 >= out_len;
+                }
                 break;
         }
     }
@@ -238,12 +269,17 @@ check_line(char * line, int line_number)
     {
         const fmpz * y = same ? xs : ys;
         out = _fmpz_vec_init(out_len);
+        variant_t v = current_mode->variant;
         switch (current_mode->kind)
         {
             case KIND_MUL:
-                if (current_mode->classical)
+                if (v == VARIANT_CLASSICAL)
                 {
                     _fmpz_poly_mul_classical(out, xs, len1, y, len2);
+                }
+                else if (v == VARIANT_KARATSUBA)
+                {
+                    _fmpz_poly_mul_karatsuba(out, xs, len1, y, len2);
                 }
                 else if (len1 >= len2)
                 {
@@ -255,9 +291,17 @@ check_line(char * line, int line_number)
                 }
                 break;
             case KIND_MULLOW:
-                if (current_mode->classical)
+                if (v == VARIANT_CLASSICAL)
                 {
                     _fmpz_poly_mullow_classical(out, xs, len1, y, len2, out_len);
+                }
+                else if (v == VARIANT_KARATSUBA)
+                {
+                    _fmpz_poly_mullow_karatsuba(out, xs, len1, y, len2, out_len);
+                }
+                else if (v == VARIANT_KARATSUBA_N)
+                {
+                    _fmpz_poly_mullow_karatsuba_n(out, xs, y, out_len);
                 }
                 else
                 {
@@ -265,10 +309,21 @@ check_line(char * line, int line_number)
                 }
                 break;
             case KIND_MULHIGH:
-                _fmpz_poly_mulhigh_classical(out, xs, len1, y, len2, a);
+                if (v == VARIANT_CLASSICAL)
+                {
+                    _fmpz_poly_mulhigh_classical(out, xs, len1, y, len2, a);
+                }
+                else if (v == VARIANT_KARATSUBA_N)
+                {
+                    _fmpz_poly_mulhigh_karatsuba_n(out, xs, y, len1);
+                }
+                else
+                {
+                    _fmpz_poly_mulhigh(out, xs, len1, y, len2, a);
+                }
                 break;
             case KIND_MULMID:
-                if (current_mode->classical)
+                if (v == VARIANT_CLASSICAL)
                 {
                     _fmpz_poly_mulmid_classical(out, xs, len1, y, len2, a, b);
                 }
@@ -278,9 +333,13 @@ check_line(char * line, int line_number)
                 }
                 break;
             case KIND_SQR:
-                if (current_mode->classical)
+                if (v == VARIANT_CLASSICAL)
                 {
                     _fmpz_poly_sqr_classical(out, xs, len1);
+                }
+                else if (v == VARIANT_KARATSUBA)
+                {
+                    _fmpz_poly_sqr_karatsuba(out, xs, len1);
                 }
                 else
                 {
@@ -288,9 +347,17 @@ check_line(char * line, int line_number)
                 }
                 break;
             case KIND_SQRLOW:
-                if (current_mode->classical)
+                if (v == VARIANT_CLASSICAL)
                 {
                     _fmpz_poly_sqrlow_classical(out, xs, len1, out_len);
+                }
+                else if (v == VARIANT_KARATSUBA)
+                {
+                    _fmpz_poly_sqrlow_karatsuba(out, xs, len1, out_len);
+                }
+                else if (v == VARIANT_KARATSUBA_N)
+                {
+                    _fmpz_poly_sqrlow_karatsuba_n(out, xs, out_len);
                 }
                 else
                 {
@@ -298,7 +365,11 @@ check_line(char * line, int line_number)
                 }
                 break;
         }
-        if (expected_len != out_len || !_fmpz_vec_equal(out, expected, out_len))
+        /* The mulhigh dispatcher may leave anything in the coefficients below `start`, since
+           Kronecker substitution computes the whole product; only the rest are compared. */
+        slong skip = current_mode->kind == KIND_MULHIGH && v == VARIANT_DISPATCHER ? a : 0;
+        if (expected_len != out_len
+            || !_fmpz_vec_equal(out + skip, expected + skip, out_len - skip))
         {
             flint_printf("error in %s test, line %d. FLINT: ", mode, line_number);
             _fmpz_vec_print(out, out_len);
@@ -326,24 +397,41 @@ check_line(char * line, int line_number)
 }
 
 static const slice_mode_t SLICE_MODES[] = {
-    {"_fmpz_poly_mul_classical", KIND_MUL, 1, {"mul_to_out_classical", NULL}},
-    {"_fmpz_poly_mul", KIND_MUL, 0,
+    {"_fmpz_poly_mul_classical", KIND_MUL, VARIANT_CLASSICAL, {"mul_to_out_classical", NULL}},
+    {"_fmpz_poly_mul", KIND_MUL, VARIANT_DISPATCHER,
      {"mul_greater_to_out", "mul_to_out_tiny_1", "mul_to_out_tiny_2", NULL}},
-    {"_fmpz_poly_mullow_classical", KIND_MULLOW, 1, {"mul_truncated_to_out_classical", NULL}},
-    {"_fmpz_poly_mullow", KIND_MULLOW, 0,
+    {"_fmpz_poly_mullow_classical", KIND_MULLOW, VARIANT_CLASSICAL,
+     {"mul_truncated_to_out_classical", NULL}},
+    {"_fmpz_poly_mullow", KIND_MULLOW, VARIANT_DISPATCHER,
      {"mul_truncated_to_out", "mul_truncated_to_out_tiny_1", "mul_truncated_to_out_tiny_2",
       NULL}},
-    {"_fmpz_poly_mulhigh_classical", KIND_MULHIGH, 1, {"mul_high_to_out_classical", NULL}},
-    {"_fmpz_poly_mulmid_classical", KIND_MULMID, 1, {"mul_middle_to_out_classical", NULL}},
-    {"_fmpz_poly_mulmid", KIND_MULMID, 0,
+    {"_fmpz_poly_mulhigh_classical", KIND_MULHIGH, VARIANT_CLASSICAL,
+     {"mul_high_to_out_classical", NULL}},
+    {"_fmpz_poly_mulmid_classical", KIND_MULMID, VARIANT_CLASSICAL,
+     {"mul_middle_to_out_classical", NULL}},
+    {"_fmpz_poly_mulmid", KIND_MULMID, VARIANT_DISPATCHER,
      {"mul_middle_to_out", "mul_middle_to_out_tiny_1", "mul_middle_to_out_tiny_2", NULL}},
-    {"_fmpz_poly_sqr_classical", KIND_SQR, 1, {"square_to_out_classical", NULL}},
-    {"_fmpz_poly_sqr", KIND_SQR, 0,
+    {"_fmpz_poly_sqr_classical", KIND_SQR, VARIANT_CLASSICAL, {"square_to_out_classical", NULL}},
+    {"_fmpz_poly_sqr", KIND_SQR, VARIANT_DISPATCHER,
      {"square_to_out", "square_to_out_tiny_1", "square_to_out_tiny_2", NULL}},
-    {"_fmpz_poly_sqrlow_classical", KIND_SQRLOW, 1, {"square_truncated_to_out_classical", NULL}},
-    {"_fmpz_poly_sqrlow", KIND_SQRLOW, 0,
+    {"_fmpz_poly_sqrlow_classical", KIND_SQRLOW, VARIANT_CLASSICAL,
+     {"square_truncated_to_out_classical", NULL}},
+    {"_fmpz_poly_sqrlow", KIND_SQRLOW, VARIANT_DISPATCHER,
      {"square_truncated_to_out", "square_truncated_to_out_tiny_1",
       "square_truncated_to_out_tiny_2", NULL}},
+    {"_fmpz_poly_mul_karatsuba", KIND_MUL, VARIANT_KARATSUBA, {"mul_to_out_karatsuba", NULL}},
+    {"_fmpz_poly_mullow_karatsuba", KIND_MULLOW, VARIANT_KARATSUBA,
+     {"mul_truncated_to_out_karatsuba", NULL}},
+    {"_fmpz_poly_mullow_karatsuba_n", KIND_MULLOW, VARIANT_KARATSUBA_N,
+     {"mul_truncated_to_out_karatsuba_n", NULL}},
+    {"_fmpz_poly_mulhigh_karatsuba_n", KIND_MULHIGH, VARIANT_KARATSUBA_N,
+     {"mul_high_to_out_karatsuba_n", NULL}},
+    {"_fmpz_poly_mulhigh", KIND_MULHIGH, VARIANT_DISPATCHER, {"mul_high_to_out", NULL}},
+    {"_fmpz_poly_sqr_karatsuba", KIND_SQR, VARIANT_KARATSUBA, {"square_to_out_karatsuba", NULL}},
+    {"_fmpz_poly_sqrlow_karatsuba", KIND_SQRLOW, VARIANT_KARATSUBA,
+     {"square_truncated_to_out_karatsuba", NULL}},
+    {"_fmpz_poly_sqrlow_karatsuba_n", KIND_SQRLOW, VARIANT_KARATSUBA_N,
+     {"square_truncated_to_out_karatsuba_n", NULL}},
 };
 
 static int
@@ -419,4 +507,52 @@ int
 run__fmpz_poly_sqrlow(const char * arg)
 {
     return run(arg, 10);
+}
+
+int
+run__fmpz_poly_mul_karatsuba(const char * arg)
+{
+    return run(arg, 11);
+}
+
+int
+run__fmpz_poly_mullow_karatsuba(const char * arg)
+{
+    return run(arg, 12);
+}
+
+int
+run__fmpz_poly_mullow_karatsuba_n(const char * arg)
+{
+    return run(arg, 13);
+}
+
+int
+run__fmpz_poly_mulhigh_karatsuba_n(const char * arg)
+{
+    return run(arg, 14);
+}
+
+int
+run__fmpz_poly_mulhigh(const char * arg)
+{
+    return run(arg, 15);
+}
+
+int
+run__fmpz_poly_sqr_karatsuba(const char * arg)
+{
+    return run(arg, 16);
+}
+
+int
+run__fmpz_poly_sqrlow_karatsuba(const char * arg)
+{
+    return run(arg, 17);
+}
+
+int
+run__fmpz_poly_sqrlow_karatsuba_n(const char * arg)
+{
+    return run(arg, 18);
 }

@@ -229,6 +229,7 @@ pub mod natural;
 pub mod gaussian_integer;
 /// [`Integer`](integer::Integer), a type representing integers with arbitrarily large absolute
 /// values.
+#[macro_use]
 pub mod integer;
 /// [`IntegerPolynomial`](integer_polynomial::IntegerPolynomial), a type representing polynomials in
 /// one variable whose coefficients are [`Integer`](integer::Integer)s.

@@ -24,7 +24,9 @@ use malachite_nz::test_util::generators::{
     integer_vec_unsigned_unsigned_triple_gen_var_1, integer_vec_unsigned_unsigned_triple_gen_var_2,
     integer_vec_unsigned_unsigned_triple_gen_var_3,
 };
-use malachite_nz::test_util::integer_polynomial::arithmetic::mul::integers_mul_naive;
+use malachite_nz::test_util::integer_polynomial::arithmetic::mul::{
+    generated_coefficients, integers_mul_naive,
+};
 
 fn coefficients(p: &str) -> Vec<Integer> {
     IntegerPolynomial::from_str(p)
@@ -290,6 +292,25 @@ fn test_mul_middle_to_out() {
     );
     // - len2 >= 50 && 4 * len2 >= 3 * len && len < 150 + bits1 + bits2
     test_poly("x^59+1", "-x^59+2*x^30+1", 0, 60, "2*x^30+1");
+    // Generated coefficients of `bits1` and `bits2` bits.
+    let test_generated =
+        |len1: usize, len2: usize, bits1: u64, bits2: u64, nlo: usize, nhi: usize| {
+            let xs = generated_coefficients(len1, bits1);
+            let ys = generated_coefficients(len2, bits2);
+            let mut result = vec![Integer::ZERO; nhi - nlo];
+            mul_middle_to_out(&mut result, &xs, &ys, nlo, nhi);
+            assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
+        };
+    // - nhi <= 8
+    test_generated(8, 7, 100, 90, 2, 8);
+    // - nhi > 8 && !classical_preferred(len2, bits1, bits2) && len <= 3
+    test_generated(12, 12, 100, 90, 9, 12);
+    // - nlo == 0 && karatsuba_preferred(len2, bits1, bits2)
+    test_generated(8, 7, 1000, 900, 0, 12);
+    // - nlo != 0, so Karatsuba is not used
+    test_generated(8, 7, 1000, 900, 2, 12);
+    // - !karatsuba_preferred(len2, bits1, bits2)
+    test_generated(8, 7, 100, 90, 0, 12);
 }
 
 #[test]

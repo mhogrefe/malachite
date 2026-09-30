@@ -19,9 +19,12 @@ use crate::integer_polynomial::arithmetic::mul_middle::classical::mul_middle_to_
 use crate::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
+use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_to_out;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
-use crate::integer_polynomial::arithmetic::vec::{TinyKernel, tiny_kernel};
+use crate::integer_polynomial::arithmetic::vec::{
+    TinyKernel, classical_preferred, karatsuba_preferred, tiny_kernel,
+};
 use core::cmp::min;
 use core::mem::swap;
 use core::ptr;
@@ -89,6 +92,16 @@ crate_test_fn! {mul_middle_to_out(
     match tiny_kernel(bits1, bits2, len2, short_enough) {
         Some(TinyKernel::OneWord) => mul_middle_to_out_tiny_1(out, xs, ys, nlo, nhi),
         Some(TinyKernel::TwoWord) => mul_middle_to_out_tiny_2(out, xs, ys, nlo, nhi),
-        None => mul_middle_to_out_classical(out, xs, ys, nlo, nhi),
+        None if nhi <= 8 || classical_preferred(len2, bits1, bits2) || len <= 3 => {
+            mul_middle_to_out_classical(out, xs, ys, nlo, nhi);
+        }
+        None if nlo == 0 && karatsuba_preferred(len2, bits1, bits2) => {
+            mul_truncated_to_out_karatsuba(out, xs, ys);
+        }
+        None => {
+        // Schönhage–Strassen and Kronecker substitution, which FLINT chooses for larger inputs,
+        // have not been ported yet, so classical multiplication stands in for them.
+            mul_middle_to_out_classical(out, xs, ys, nlo, nhi);
+        }
     }
 }}

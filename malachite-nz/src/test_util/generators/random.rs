@@ -6028,6 +6028,42 @@ pub fn random_integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3(
     )
 }
 
+pub fn random_integer_vec_pair_gen_var_4(config: &GenConfig) -> It<(Vec<Integer>, Vec<Integer>)> {
+    Box::new(
+        random_integer_vec_mul_pairs(
+            &|seed| random_nonempty_integer_vecs(seed, config, 64),
+            |_, _| true,
+        )
+        .map(|(mut xs, mut ys)| {
+            let len = xs.len().min(ys.len());
+            xs.truncate(len);
+            ys.truncate(len);
+            (xs, ys)
+        }),
+    )
+}
+
+pub fn random_integer_vec_unsigned_pair_gen_var_4(config: &GenConfig) -> It<(Vec<Integer>, u64)> {
+    random_with_bounded_unsigned(
+        random_integer_vec_gen_var_1(config),
+        |xs| u64::exact_from(xs.len()) + 1,
+        1,
+    )
+}
+
+pub fn random_integer_vec_integer_vec_unsigned_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Vec<Integer>, Vec<Integer>, u64)> {
+    Box::new(
+        random_with_bounded_unsigned(
+            random_integer_vec_pair_gen_var_1(config),
+            |(xs, ys)| u64::exact_from(xs.len().min(ys.len())) + 1,
+            1,
+        )
+        .map(|((xs, ys), n)| (xs, ys, n)),
+    )
+}
+
 // -- Vec<Natural> --
 
 pub fn random_natural_vec_gen(config: &GenConfig) -> It<Vec<Natural>> {

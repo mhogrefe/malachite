@@ -15,6 +15,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::mul::classical::mul_to_out_classical;
 use malachite_nz::integer_polynomial::arithmetic::square::classical::square_to_out_classical;
+use malachite_nz::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
 use malachite_nz::integer_polynomial::arithmetic::square::square_to_out;
 use malachite_nz::integer_polynomial::arithmetic::square::tiny::{
     square_to_out_tiny_1, square_to_out_tiny_2,
@@ -34,6 +35,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_square);
     register_demo!(runner, demo_integer_polynomial_square_ref);
     register_demo!(runner, demo_integer_polynomial_square_assign);
+    register_demo!(runner, demo_square_to_out_karatsuba);
 
     register_bench!(runner, benchmark_square_to_out_algorithms);
     register_bench!(runner, benchmark_square_to_out_tiny_1_algorithms);
@@ -128,6 +130,10 @@ fn benchmark_square_to_out_algorithms(
             ("naive", &mut |xs| {
                 let mut out = vec![Integer::ZERO; (xs.len() << 1) - 1];
                 out.clone_from_slice(&integers_mul_naive(&xs, &xs));
+            }),
+            ("Karatsuba", &mut |xs| {
+                let mut out = vec![Integer::ZERO; (xs.len() << 1) - 1];
+                square_to_out_karatsuba(&mut out, &xs);
             }),
         ],
     );
@@ -250,4 +256,12 @@ fn benchmark_integer_polynomial_square_algorithms(
             }),
         ],
     );
+}
+
+fn demo_square_to_out_karatsuba(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in integer_vec_gen_var_1().get(gm, config).take(limit) {
+        let mut out = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        square_to_out_karatsuba(&mut out, &xs);
+        println!("square_to_out_karatsuba(_, {xs:?}) = {out:?}");
+    }
 }

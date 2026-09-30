@@ -10,10 +10,12 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
+use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::mul::classical::mul_to_out_classical;
 use malachite_nz::integer_polynomial::arithmetic::square::classical::square_to_out_classical;
+use malachite_nz::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
 use malachite_nz::integer_polynomial::arithmetic::square::square_to_out;
 use malachite_nz::integer_polynomial::arithmetic::square::tiny::{
     square_to_out_tiny_1, square_to_out_tiny_2,
@@ -22,7 +24,9 @@ use malachite_nz::test_util::generators::{
     integer_polynomial_gen, integer_polynomial_pair_gen, integer_vec_gen_var_1,
     integer_vec_gen_var_2, integer_vec_gen_var_3,
 };
-use malachite_nz::test_util::integer_polynomial::arithmetic::mul::integers_mul_naive;
+use malachite_nz::test_util::integer_polynomial::arithmetic::mul::{
+    generated_coefficients, integers_mul_naive,
+};
 use malachite_nz::test_util::integer_polynomial::arithmetic::square::*;
 
 fn coefficients(p: &str) -> Vec<Integer> {
@@ -231,6 +235,19 @@ fn test_square_to_out() {
     );
     // - bits <= SMALL_FMPZ_BITCOUNT_MAX && len >= 50 + 3 * bits
     test_poly("-x^53+1", "x^106-2*x^53+1");
+    // Generated coefficients of `bits` bits.
+    let test_generated = |len: usize, bits: u64| {
+        let xs = generated_coefficients(len, bits);
+        let mut result = vec![Integer::ZERO; (len << 1) - 1];
+        square_to_out(&mut result, &xs);
+        assert_eq!(integers_mul_naive(&xs, &xs), result);
+    };
+    // - karatsuba_preferred(len, bits, bits), with len <= 4
+    test_generated(4, 6000);
+    // - karatsuba_preferred(len, bits, bits), with 1500 <= 2 * bits <= 10000
+    test_generated(8, 1000);
+    // - !karatsuba_preferred(len, bits, bits)
+    test_generated(8, 100);
 }
 
 #[test]
@@ -352,4 +369,107 @@ fn square_properties() {
             (&p).square() + &pq + &pq + (&q).square()
         );
     });
+}
+
+#[test]
+fn test_square_to_out_karatsuba() {
+    let test = |xs: &[&str], out: &[&str]| {
+        let xs = parse(xs);
+        let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        square_to_out_karatsuba(&mut result, &xs);
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(integers_mul_naive(&xs, &xs), result);
+    };
+    // - len == 1
+    test(&["3"], &["9"]);
+    // - len != 1
+    // - length == 1
+    // - length != 1
+    test(&["18", "20"], &["324", "720", "400"]);
+    test(&["-16", "-19", "-6"], &["256", "608", "553", "228", "36"]);
+    test(
+        &["-14", "10", "9", "4"],
+        &["196", "-280", "-152", "68", "161", "72", "16"],
+    );
+    test(
+        &["-4", "7", "11", "-12", "11"],
+        &["16", "-56", "-39", "250", "-135", "-110", "386", "-264", "121"],
+    );
+    test(
+        &["-9", "-20", "-1", "-11", "18", "-5", "0", "0"],
+        &[
+            "81", "360", "418", "238", "117", "-608", "285", "-386", "434", "-180", "25", "0", "0",
+            "0", "0",
+        ],
+    );
+    test(
+        &["9", "3", "18", "-15", "12", "-8", "5", "-10", "-5"],
+        &[
+            "81", "54", "333", "-162", "450", "-612", "699", "-798", "414", "-732", "304", "-170",
+            "65", "-20", "50", "100", "25",
+        ],
+    );
+    test(
+        &[
+            "6", "-16", "-18", "10", "15", "14", "0", "-10", "7", "-14", "-16", "-4", "19", "-15",
+            "-7", "-14",
+        ],
+        &[
+            "36", "-192", "40", "696", "184", "-672", "-888", "-324", "909", "388", "0", "808",
+            "582", "-1188", "-1140", "268", "1187", "570", "-858", "-604", "542", "-474", "10",
+            "328", "1097", "-66", "71", "-322", "469", "196", "196",
+        ],
+    );
+    test(
+        &[
+            "6", "11", "8", "-9", "-6", "-12", "6", "9", "19", "-5", "14", "-13", "-2", "-2", "-3",
+            "16", "-3",
+        ],
+        &[
+            "36", "132", "217", "68", "-206", "-420", "-207", "156", "774", "538", "272", "-522",
+            "-404", "-816", "383", "232", "1079", "222", "47", "-760", "-170", "-210", "271",
+            "580", "-302", "564", "-484", "26", "-43", "-84", "274", "-96", "9",
+        ],
+    );
+    test(
+        &[
+            "258310355284319173799020452054",
+            "257122348541910768367567340522",
+            "-784958425684266716367207977583",
+            "-348292516565995701349735129537",
+            "-810613512178953392276046349563",
+            "-78511595705566051977176049842",
+        ],
+        &[
+            "66724239647111198515500735834416036254592545484578512818916",
+            "132834730406799033316097861767697402990017136724349984664376",
+            "-339413877524137726321283258023180133880172803927991613378480",
+            "-583595835233463118928586260725076730951280986582926982474648",
+            "18272421716249642790821340754935930929471994913162981420457",
+            "89375874578704985817421055627147998507207269406470310003434",
+            "1353529318061468950182850923063224018068802820198225824931779",
+            "687917917364417692551055303261861681444296417199314830068434",
+            "711784268622905461871975788913747701600996862500949667057277",
+            "127285120683325863451419478557924483626528662432552485838092",
+            "6164070660234257734985444240448931172471260268814868224964",
+        ],
+    );
+}
+
+#[test]
+fn square_to_out_karatsuba_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_len_n", 32);
+    let test = |xs: Vec<Integer>| {
+        let mut out = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        square_to_out_karatsuba(&mut out, &xs);
+        assert!(out.iter().all(Integer::is_valid));
+        assert_eq!(integers_mul_naive(&xs, &xs), out);
+        let mut out_alt = vec![Integer::ZERO; (xs.len() << 1) - 1];
+        square_to_out_classical(&mut out_alt, &xs);
+        assert_eq!(out_alt, out);
+    };
+    integer_vec_gen_var_1().test_properties(test);
+    integer_vec_gen_var_1().test_properties_with_config(&config, test);
 }

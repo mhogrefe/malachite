@@ -8,9 +8,11 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::arithmetic::add::add_assign_ref;
 use crate::integer_polynomial::arithmetic::sub::sub_assign_ref;
+use crate::natural::Natural;
 use alloc::vec::Vec;
 use core::cmp::min;
 use malachite_base::num::arithmetic::traits::AddMulAssign;
+use malachite_base::num::basic::traits::{One, Zero};
 
 // Adds `ys` multiplied by `c` into `xs`. Where `ys` is longer than `xs`, `xs` is extended by the
 // products of the remaining elements of `ys` and `c`, so that the elements of `xs` and `ys` at the
@@ -31,15 +33,16 @@ use malachite_base::num::arithmetic::traits::AddMulAssign;
 // 3.6.0, extended to vectors of different lengths.
 #[doc(hidden)]
 pub fn integers_add_mul_scalar_assign(xs: &mut Vec<Integer>, ys: &[Integer], c: &Integer) {
-    if *c == 1u32 {
-        add_assign_ref(xs, ys);
-    } else if *c == -1i32 {
-        sub_assign_ref(xs, ys);
-    } else if *c != 0u32 {
-        let common = min(xs.len(), ys.len());
-        for (x, y) in xs.iter_mut().zip(&ys[..common]) {
-            x.add_mul_assign(y, c);
+    match *c {
+        integer_zero!() => {}
+        integer_one!() => add_assign_ref(xs, ys),
+        integer_negative_one!() => sub_assign_ref(xs, ys),
+        _ => {
+            let common = min(xs.len(), ys.len());
+            for (x, y) in xs.iter_mut().zip(&ys[..common]) {
+                x.add_mul_assign(y, c);
+            }
+            xs.extend(ys[common..].iter().map(|y| y * c));
         }
-        xs.extend(ys[common..].iter().map(|y| y * c));
     }
 }

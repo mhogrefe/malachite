@@ -6,9 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 use crate::integer::Integer;
+use crate::natural::Natural;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::NegAssign;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 
 // Multiplies every element of `xs` by `c`, in place.
 //
@@ -27,15 +28,18 @@ use malachite_base::num::basic::traits::Zero;
 // where `poly1 == poly2`.
 #[doc(hidden)]
 pub fn integers_mul_scalar_assign(xs: &mut [Integer], c: &Integer) {
-    if *c == 0u32 {
-        xs.fill(Integer::ZERO);
-    } else if *c == -1i32 {
-        for x in xs {
-            x.neg_assign();
+    match *c {
+        integer_zero!() => xs.fill(Integer::ZERO),
+        integer_one!() => {}
+        integer_negative_one!() => {
+            for x in xs {
+                x.neg_assign();
+            }
         }
-    } else if *c != 1u32 {
-        for x in xs {
-            *x *= c;
+        _ => {
+            for x in xs {
+                *x *= c;
+            }
         }
     }
 }
@@ -56,14 +60,11 @@ pub fn integers_mul_scalar_assign(xs: &mut [Integer], c: &Integer) {
 // This is equivalent to `_fmpz_vec_scalar_mul_fmpz` from `fmpz_vec/scalar_mul_fmpz.c`, FLINT 3.6.0.
 crate_test_fn! {
 integers_mul_scalar(xs: &[Integer], c: &Integer) -> Vec<Integer> {
-    if *c == 0u32 {
-        alloc::vec![Integer::ZERO; xs.len()]
-    } else if *c == 1u32 {
-        xs.to_vec()
-    } else if *c == -1i32 {
-        xs.iter().map(|x| -x).collect()
-    } else {
-        xs.iter().map(|x| x * c).collect()
+    match *c {
+        integer_zero!() => alloc::vec![Integer::ZERO; xs.len()],
+        integer_one!() => xs.to_vec(),
+        integer_negative_one!() => xs.iter().map(|x| -x).collect(),
+        _ => xs.iter().map(|x| x * c).collect(),
     }
 }
 }
@@ -83,17 +84,18 @@ integers_mul_scalar(xs: &[Integer], c: &Integer) -> Vec<Integer> {
 // where the output is separate from the input.
 crate_test_fn! {integers_mul_scalar_to_out(out: &mut [Integer], xs: &[Integer], c: &Integer) {
     let xs = &xs[..out.len()];
-    if *c == 0u32 {
-        out.fill(Integer::ZERO);
-    } else if *c == 1u32 {
-        out.clone_from_slice(xs);
-    } else if *c == -1i32 {
-        for (o, x) in out.iter_mut().zip(xs) {
-            *o = -x;
+    match *c {
+        integer_zero!() => out.fill(Integer::ZERO),
+        integer_one!() => out.clone_from_slice(xs),
+        integer_negative_one!() => {
+            for (o, x) in out.iter_mut().zip(xs) {
+                *o = -x;
+            }
         }
-    } else {
-        for (o, x) in out.iter_mut().zip(xs) {
-            *o = x * c;
+        _ => {
+            for (o, x) in out.iter_mut().zip(xs) {
+                *o = x * c;
+            }
         }
     }
 }}

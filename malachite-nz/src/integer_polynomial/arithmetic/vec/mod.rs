@@ -11,11 +11,14 @@ use crate::natural::InnerNatural::Small;
 use crate::natural::{LIMB_MAX_QUARTER, Natural, TWICE_WIDTH, WIDTH_MINUS_2};
 use crate::platform::{Limb, SignedLimb};
 use alloc::vec::Vec;
+use core::borrow::Borrow;
+use core::cmp::min;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 pub mod dot_general;
 pub mod max_bits;
+pub mod max_limbs;
 
 // The largest absolute value of a small FLINT `fmpz`, which is stored in a single word with two
 // bits to spare; larger values are stored as GMP integers. Some of FLINT's algorithms take a fast
@@ -78,4 +81,47 @@ pub(crate) fn tiny_kernel(
     } else {
         None
     }
+}
+
+// Sets each element of `out` to the sum of the elements of `xs` and `ys` at the same index.
+//
+// This is equivalent to `_fmpz_vec_add` from `fmpz_vec/add.c`, FLINT 3.6.0, with the output
+// separate from the inputs.
+pub(crate) fn vec_add<T: Borrow<Integer>>(out: &mut [Integer], xs: &[T], ys: &[T]) {
+    for ((o, x), y) in out.iter_mut().zip(xs).zip(ys) {
+        *o = x.borrow() + y.borrow();
+    }
+}
+
+// Adds each element of `ys` to the element of `xs` at the same index.
+//
+// This is equivalent to `_fmpz_vec_add` from `fmpz_vec/add.c`, FLINT 3.6.0, with the output the
+// same as the first input.
+pub(crate) fn vec_add_assign(xs: &mut [Integer], ys: &[Integer]) {
+    for (x, y) in xs.iter_mut().zip(ys) {
+        *x += y;
+    }
+}
+
+// Subtracts each element of `ys` from the element of `xs` at the same index.
+//
+// This is equivalent to `_fmpz_vec_sub` from `fmpz_vec/sub.c`, FLINT 3.6.0, with the output the
+// same as the first input.
+pub(crate) fn vec_sub_assign(xs: &mut [Integer], ys: &[Integer]) {
+    for (x, y) in xs.iter_mut().zip(ys) {
+        *x -= y;
+    }
+}
+
+// Whether FLINT's multiplication dispatchers choose classical multiplication for factors the
+// shorter of which has length `len2`, and whose coefficients have at most `bits1` and `bits2` bits,
+// when no tiny kernel applies.
+pub(crate) fn classical_preferred(len2: u64, bits1: u64, bits2: u64) -> bool {
+    len2 <= 6 && min(bits1, bits2) <= 5000
+}
+
+// Whether FLINT's multiplication dispatchers choose Karatsuba multiplication for the same factors,
+// when neither a tiny kernel nor classical multiplication applies.
+pub(crate) fn karatsuba_preferred(len2: u64, bits1: u64, bits2: u64) -> bool {
+    len2 <= 4 || (len2 <= 8 && (1500..=10000).contains(&(bits1 + bits2)))
 }

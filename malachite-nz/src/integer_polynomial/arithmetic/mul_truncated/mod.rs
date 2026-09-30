@@ -15,22 +15,28 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncated_to_out_classical;
+use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::mul_truncated::tiny::{
     mul_truncated_to_out_tiny_1, mul_truncated_to_out_tiny_2,
 };
-use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_to_out;
+use crate::integer_polynomial::arithmetic::scalar_mul::{
+    integers_mul_scalar_assign, integers_mul_scalar_to_out,
+};
 use crate::integer_polynomial::arithmetic::square_truncated::square_truncated_to_out;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
-use crate::integer_polynomial::arithmetic::vec::{TinyKernel, tiny_kernel};
+use crate::integer_polynomial::arithmetic::vec::{
+    TinyKernel, classical_preferred, karatsuba_preferred, tiny_kernel,
+};
 use alloc::vec;
 use core::cmp::min;
-use core::mem::swap;
+use core::mem::{swap, take};
 use core::ptr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{MulTruncated, MulTruncatedAssign};
+use malachite_base::polynomial::{MulTruncated, MulTruncatedAssign, Polynomial};
 
 pub mod classical;
+pub mod karatsuba;
 pub mod tiny;
 
 // Sets `out` to the first `out.len()` coefficients of the product of the polynomials with
@@ -75,7 +81,17 @@ crate_test_fn! {mul_truncated_to_out(out: &mut [Integer], xs: &[Integer], ys: &[
     match tiny_kernel(bits1, bits2, len2, short_enough) {
         Some(TinyKernel::OneWord) => mul_truncated_to_out_tiny_1(out, xs, ys),
         Some(TinyKernel::TwoWord) => mul_truncated_to_out_tiny_2(out, xs, ys),
-        None => mul_truncated_to_out_classical(out, xs, ys),
+        None if classical_preferred(len2, bits1, bits2) => {
+            mul_truncated_to_out_classical(out, xs, ys);
+        }
+        None if karatsuba_preferred(len2, bits1, bits2) => {
+            mul_truncated_to_out_karatsuba(out, xs, ys);
+        }
+        None => {
+        // Schönhage–Strassen and Kronecker substitution, which FLINT chooses for larger inputs,
+        // have not been ported yet, so classical multiplication stands in for them.
+            mul_truncated_to_out_classical(out, xs, ys);
+        }
     }
 }}
 
@@ -92,6 +108,33 @@ fn mul_truncated_ref_ref(xs: &[Integer], ys: &[Integer], len: u64) -> IntegerPol
     let mut p = IntegerPolynomial { coefficients: out };
     p.trim();
     p
+}
+
+// Multiplies `p` by the polynomial with coefficients `ys`, keeping only the coefficients of $x^i$
+// for $i$ less than `len`. When `ys` is a constant, the product is a scalar multiple of the
+// truncation of `p`, computed in place in its `Vec`.
+fn mul_truncated_val_ref(mut p: IntegerPolynomial, ys: &[Integer], len: u64) -> IntegerPolynomial {
+    if let [c] = ys {
+        p.truncate_assign(len);
+        integers_mul_scalar_assign(&mut p.coefficients, c);
+        p
+    } else {
+        mul_truncated_ref_ref(&p.coefficients, ys, len)
+    }
+}
+
+// Multiplies `p` by `q`, keeping only the coefficients of $x^i$ for $i$ less than `len`. When
+// either is a constant, the product is computed in place in the other's `Vec`.
+fn mul_truncated_val_val(
+    p: IntegerPolynomial,
+    q: IntegerPolynomial,
+    len: u64,
+) -> IntegerPolynomial {
+    if p.coefficients.len() == 1 {
+        mul_truncated_val_ref(q, &p.coefficients, len)
+    } else {
+        mul_truncated_val_ref(p, &q.coefficients, len)
+    }
 }
 
 impl MulTruncated<Self> for IntegerPolynomial {
@@ -140,7 +183,7 @@ impl MulTruncated<Self> for IntegerPolynomial {
     /// This is equivalent to `fmpz_poly_mullow` from `fmpz_poly/mullow.c`, FLINT 3.6.0.
     #[inline]
     fn mul_truncated(self, other: Self, len: u64) -> Self {
-        mul_truncated_ref_ref(&self.coefficients, &other.coefficients, len)
+        mul_truncated_val_val(self, other, len)
     }
 }
 
@@ -190,7 +233,7 @@ impl MulTruncated<&Self> for IntegerPolynomial {
     /// This is equivalent to `fmpz_poly_mullow` from `fmpz_poly/mullow.c`, FLINT 3.6.0.
     #[inline]
     fn mul_truncated(self, other: &Self, len: u64) -> Self {
-        mul_truncated_ref_ref(&self.coefficients, &other.coefficients, len)
+        mul_truncated_val_ref(self, &other.coefficients, len)
     }
 }
 
@@ -240,7 +283,7 @@ impl MulTruncated<IntegerPolynomial> for &IntegerPolynomial {
     /// This is equivalent to `fmpz_poly_mullow` from `fmpz_poly/mullow.c`, FLINT 3.6.0.
     #[inline]
     fn mul_truncated(self, other: IntegerPolynomial, len: u64) -> IntegerPolynomial {
-        mul_truncated_ref_ref(&self.coefficients, &other.coefficients, len)
+        mul_truncated_val_ref(other, &self.coefficients, len)
     }
 }
 
@@ -324,7 +367,7 @@ impl MulTruncatedAssign<Self> for IntegerPolynomial {
     /// This is equivalent to `fmpz_poly_mullow` from `fmpz_poly/mullow.c`, FLINT 3.6.0.
     #[inline]
     fn mul_truncated_assign(&mut self, other: Self, len: u64) {
-        *self = mul_truncated_ref_ref(&self.coefficients, &other.coefficients, len);
+        *self = mul_truncated_val_val(take(self), other, len);
     }
 }
 
@@ -358,6 +401,6 @@ impl MulTruncatedAssign<&Self> for IntegerPolynomial {
     /// This is equivalent to `fmpz_poly_mullow` from `fmpz_poly/mullow.c`, FLINT 3.6.0.
     #[inline]
     fn mul_truncated_assign(&mut self, other: &Self, len: u64) {
-        *self = mul_truncated_ref_ref(&self.coefficients, &other.coefficients, len);
+        *self = mul_truncated_val_ref(take(self), &other.coefficients, len);
     }
 }

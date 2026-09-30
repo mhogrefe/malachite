@@ -17,19 +17,23 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::square_truncated::classical::*;
+use crate::integer_polynomial::arithmetic::square_truncated::karatsuba::*;
 use crate::integer_polynomial::arithmetic::square_truncated::tiny::{
     square_truncated_to_out_tiny_1, square_truncated_to_out_tiny_2,
 };
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
-use crate::integer_polynomial::arithmetic::vec::{TinyKernel, tiny_kernel};
+use crate::integer_polynomial::arithmetic::vec::{
+    TinyKernel, classical_preferred, karatsuba_preferred, tiny_kernel,
+};
 use alloc::vec;
 use core::cmp::min;
-use malachite_base::num::arithmetic::traits::Square;
+use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::{SquareTruncated, SquareTruncatedAssign};
 
 pub mod classical;
+pub mod karatsuba;
 pub mod tiny;
 
 // Sets `out` to the first `out.len()` coefficients of the square of the polynomial with
@@ -61,7 +65,17 @@ crate_test_fn! {square_truncated_to_out(out: &mut [Integer], xs: &[Integer]) {
     match tiny_kernel(bits, bits, len, short_enough) {
         Some(TinyKernel::OneWord) => square_truncated_to_out_tiny_1(out, xs),
         Some(TinyKernel::TwoWord) => square_truncated_to_out_tiny_2(out, xs),
-        None => square_truncated_to_out_classical(out, xs),
+        None if classical_preferred(len, bits, bits) => {
+            square_truncated_to_out_classical(out, xs);
+        }
+        None if karatsuba_preferred(len, bits, bits) => {
+            square_truncated_to_out_karatsuba(out, xs);
+        }
+        None => {
+        // Schönhage–Strassen and Kronecker substitution, which FLINT chooses for larger inputs,
+        // have not been ported yet, so classical multiplication stands in for them.
+            square_truncated_to_out_classical(out, xs);
+        }
     }
 }}
 
@@ -124,8 +138,9 @@ impl SquareTruncated for IntegerPolynomial {
     ///
     /// This is equivalent to `fmpz_poly_sqrlow` from `fmpz_poly/sqrlow.c`, FLINT 3.6.0.
     #[inline]
-    fn square_truncated(self, len: u64) -> Self {
-        square_truncated_ref(&self.coefficients, len)
+    fn square_truncated(mut self, len: u64) -> Self {
+        self.square_truncated_assign(len);
+        self
     }
 }
 
@@ -208,6 +223,13 @@ impl SquareTruncatedAssign for IntegerPolynomial {
     /// This is equivalent to `fmpz_poly_sqrlow` from `fmpz_poly/sqrlow.c`, FLINT 3.6.0.
     #[inline]
     fn square_truncated_assign(&mut self, len: u64) {
-        *self = square_truncated_ref(&self.coefficients, len);
+        // The square of a constant is computed in place.
+        if len != 0
+            && let [c] = self.coefficients.as_mut_slice()
+        {
+            c.square_assign();
+        } else {
+            *self = square_truncated_ref(&self.coefficients, len);
+        }
     }
 }

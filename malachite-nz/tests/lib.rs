@@ -593,6 +593,7 @@ pub mod integer_polynomial {
         pub mod vec {
             pub mod dot_general;
             pub mod max_bits;
+            pub mod max_limbs;
         }
     }
     pub mod basic {

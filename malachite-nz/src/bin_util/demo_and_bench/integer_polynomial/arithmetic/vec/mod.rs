@@ -11,7 +11,9 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     dot_general::register(runner);
     max_bits::register(runner);
+    max_limbs::register(runner);
 }
 
 mod dot_general;
 mod max_bits;
+mod max_limbs;

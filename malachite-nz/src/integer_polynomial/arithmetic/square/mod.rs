@@ -15,11 +15,14 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::square::classical::square_to_out_classical;
+use crate::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::square::tiny::{
     square_to_out_tiny_1, square_to_out_tiny_2,
 };
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
-use crate::integer_polynomial::arithmetic::vec::{TinyKernel, tiny_kernel};
+use crate::integer_polynomial::arithmetic::vec::{
+    TinyKernel, classical_preferred, karatsuba_preferred, tiny_kernel,
+};
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
@@ -27,6 +30,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 pub mod classical;
+pub mod karatsuba;
 pub mod tiny;
 
 // Sets `out` to the coefficients of the square of the polynomial with coefficients `xs`, which is
@@ -52,7 +56,17 @@ crate_test_fn! {square_to_out(out: &mut [Integer], xs: &[Integer]) {
     match tiny_kernel(bits, bits, len, len < 50 + 3 * bits) {
         Some(TinyKernel::OneWord) => square_to_out_tiny_1(out, xs),
         Some(TinyKernel::TwoWord) => square_to_out_tiny_2(out, xs),
-        None => square_to_out_classical(out, xs),
+        None if classical_preferred(len, bits, bits) => {
+            square_to_out_classical(out, xs);
+        }
+        None if karatsuba_preferred(len, bits, bits) => {
+            square_to_out_karatsuba(out, xs);
+        }
+        None => {
+        // Schönhage–Strassen and Kronecker substitution, which FLINT chooses for larger inputs,
+        // have not been ported yet, so classical multiplication stands in for them.
+            square_to_out_classical(out, xs);
+        }
     }
 }}
 
@@ -108,8 +122,9 @@ impl Square for IntegerPolynomial {
     ///
     /// This is equivalent to `fmpz_poly_sqr` from `fmpz_poly/sqr.c`, FLINT 3.6.0.
     #[inline]
-    fn square(self) -> Self {
-        (&self).square()
+    fn square(mut self) -> Self {
+        self.square_assign();
+        self
     }
 }
 
@@ -191,6 +206,11 @@ impl SquareAssign for IntegerPolynomial {
     /// This is equivalent to `fmpz_poly_sqr` from `fmpz_poly/sqr.c`, FLINT 3.6.0.
     #[inline]
     fn square_assign(&mut self) {
-        self.coefficients = square_ref(&self.coefficients);
+        // The square of a constant is computed in place.
+        if let [c] = self.coefficients.as_mut_slice() {
+            c.square_assign();
+        } else {
+            self.coefficients = square_ref(&self.coefficients);
+        }
     }
 }

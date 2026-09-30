@@ -8,7 +8,9 @@
 
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, NegAssign};
+use malachite_base::num::basic::traits::One;
 use malachite_base::polynomial::Polynomial;
 
 impl DivExact<Integer> for IntegerPolynomial {
@@ -212,12 +214,10 @@ impl<'a> DivExact<&'a Integer> for &IntegerPolynomial {
         assert_ne!(*c, 0u32, "division by zero");
         // Only a coefficient that is not divisible by `c` can come out as zero, so trimming is what
         // keeps even a meaningless result a valid polynomial.
-        IntegerPolynomial::from_coefficients_asc(if *c == 1u32 {
-            self.coefficients.clone()
-        } else if *c == -1i32 {
-            self.coefficients.iter().map(|x| -x).collect()
-        } else {
-            self.coefficients.iter().map(|x| x.div_exact(c)).collect()
+        IntegerPolynomial::from_coefficients_asc(match *c {
+            integer_one!() => self.coefficients.clone(),
+            integer_negative_one!() => self.coefficients.iter().map(|x| -x).collect(),
+            _ => self.coefficients.iter().map(|x| x.div_exact(c)).collect(),
         })
     }
 }
@@ -312,15 +312,17 @@ impl<'a> DivExactAssign<&'a Integer> for IntegerPolynomial {
     /// `fmpz_poly/scalar_divexact_fmpz.c`, FLINT 3.6.0.
     fn div_exact_assign(&mut self, c: &'a Integer) {
         assert_ne!(*c, 0u32, "division by zero");
-        if *c == -1i32 {
-            self.neg_assign();
-        } else if *c != 1u32 {
-            for x in &mut self.coefficients {
-                x.div_exact_assign(c);
+        match *c {
+            integer_one!() => {}
+            integer_negative_one!() => self.neg_assign(),
+            _ => {
+                for x in &mut self.coefficients {
+                    x.div_exact_assign(c);
+                }
+                // Only a coefficient that is not divisible by `c` can come out as zero, so trimming
+                // is what keeps even a meaningless result a valid polynomial.
+                self.trim();
             }
-            // Only a coefficient that is not divisible by `c` can come out as zero, so trimming is
-            // what keeps even a meaningless result a valid polynomial.
-            self.trim();
         }
     }
 }

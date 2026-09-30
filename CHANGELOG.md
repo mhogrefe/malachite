@@ -418,8 +418,11 @@ documented by git history.
   `MulTruncatedAssign`, `SquareTruncated`, and `SquareTruncatedAssign` traits, in
   `malachite_base::polynomial`, which keep only the coefficients of $x^i$ for $i$ below a given
   length, like `fmpz_poly_mullow` and `fmpz_poly_sqrlow`. So far these use schoolbook
-  multiplication, or word-sized arithmetic when the coefficients and the product are small enough
-  (FLINT's `tiny` kernels); FLINT's faster algorithms are to follow.
+  multiplication, word-sized arithmetic when the coefficients and the product are small enough
+  (FLINT's `tiny` kernels), and Karatsuba multiplication for short polynomials with large
+  coefficients, choosing among them as FLINT does; FLINT's Kronecker-substitution and FFT
+  algorithms are to follow. When either factor is a constant, the forms that take the other by
+  value multiply its coefficients in place.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a
