@@ -14,11 +14,13 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::classical::*;
+use malachite_nz::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::mul_middle_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
+use malachite_nz::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use malachite_nz::test_util::generators::{
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1,
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2,
@@ -156,6 +158,7 @@ fn test_mul_middle_to_out_tiny_2() {
     };
     // - xs and ys are the same slice
     // - i even
+    #[cfg(not(feature = "32_bit_limbs"))]
     test_square(
         &["2305843009213693952", "-2305843009213693951", "7"],
         0,
@@ -168,7 +171,15 @@ fn test_mul_middle_to_out_tiny_2() {
             "49",
         ],
     );
+    #[cfg(feature = "32_bit_limbs")]
+    test_square(
+        &["536870912", "-536870911", "0"],
+        0,
+        5,
+        &["288230376151711744", "-576460751229681664", "288230375077969921", "0", "0"],
+    );
     // - xs and ys are different slices
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(
         &["2305843009213693952", "-2305843009213693951"],
         &["2305843009213693951", "1152921504606846976"],
@@ -176,12 +187,29 @@ fn test_mul_middle_to_out_tiny_2() {
         3,
         &["-2658455991569831741195928102133301249", "-2658455991569831744654692615953842176"],
     );
+    #[cfg(feature = "32_bit_limbs")]
+    test(
+        &["536870912", "-536870911"],
+        &["536870911", "268435456"],
+        1,
+        3,
+        &["-144115187002114049", "-144115187807420416"],
+    );
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(
         &["-1099511627776", "5", "1125899906842624"],
         &["3", "-35184372088832", "1048576", "1"],
         2,
         5,
         &["-1149719726746763264", "-39614081257132169896278360064", "1180591620717411303429"],
+    );
+    #[cfg(feature = "32_bit_limbs")]
+    test(
+        &["-256", "0", "262144"],
+        &["0", "-8192", "0", "0"],
+        2,
+        5,
+        &["0", "-2147483648", "0"],
     );
 }
 
@@ -313,6 +341,10 @@ fn test_mul_middle_to_out() {
     test_generated(8, 7, 1000, 900, 2, 12);
     // - !karatsuba_preferred(len2, bits1, bits2)
     test_generated(8, 7, 100, 90, 0, 12);
+    // - fft_preferred(len2, bits1, bits2, 100, 200), and the FFT computes the product
+    test_generated(120, 110, 20, 20, 30, 150);
+    // - fft_preferred(len2, bits1, bits2, 100, 200), but the FFT declines
+    test_generated(120, 110, 250, 250, 30, 150);
 }
 
 #[test]
@@ -629,4 +661,136 @@ fn mul_middle_to_out_kronecker_properties() {
     };
     integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties(test);
     integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties_with_config(&config, test);
+}
+
+#[test]
+fn test_mul_middle_to_out_fft() {
+    let test = |xs: &[&str], ys: &[&str], nlo: usize, nhi: usize, out: &[&str]| {
+        let xs = parse(xs);
+        let ys = parse(ys);
+        let mut result = vec![Integer::ZERO; nhi - nlo];
+        assert!(mul_middle_to_out_fft(&mut result, &xs, &ys, nlo, nhi));
+        assert!(result.iter().all(Integer::is_valid));
+        assert_eq!(result, parse(out));
+        assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
+    };
+    // - np == 1, and the coefficients are nonnegative
+    test(
+        &["1", "2", "3"],
+        &["4", "5", "6"],
+        0,
+        5,
+        &["4", "13", "28", "27", "18"],
+    );
+    // - np == 1, and some coefficients are negative
+    test(
+        &["1", "-2", "3"],
+        &["4", "5", "-6"],
+        0,
+        5,
+        &["4", "-3", "-4", "27", "-18"],
+    );
+    test(&["7"], &["3", "-2"], 1, 2, &["-14"]);
+    // Generated coefficients of `bits` bits. If `fits`, the product is computed, and the entries of
+    // the result past the product's length are zero; otherwise the function declines.
+    let test_generated =
+        |len1: usize, len2: usize, bits: u64, nlo: usize, nhi: usize, square: bool, fits: bool| {
+            let xs = generated_coefficients(len1, bits);
+            let ys = if square {
+                xs.clone()
+            } else {
+                generated_coefficients(len2, bits)
+            };
+            let ys: &[Integer] = if square { &xs } else { &ys };
+            let full = integers_mul_naive(&xs, ys);
+            let mut result = vec![Integer::ZERO; nhi - nlo];
+            assert_eq!(mul_middle_to_out_fft(&mut result, &xs, ys, nlo, nhi), fits);
+            if fits {
+                for (i, r) in (nlo..nhi).zip(&result) {
+                    assert_eq!(*r, full.get(i).cloned().unwrap_or_default());
+                }
+            }
+        };
+    // - np == 2
+    test_generated(20, 15, 30, 0, 34, false, true);
+    // - np == 3
+    // - the coefficients have fewer bits than the prime, and some are negative
+    test_generated(300, 200, 40, 0, 499, false, true);
+    // - the coefficients have more bits than the prime, but at most 62
+    test_generated(40, 30, 55, 10, 60, false, true);
+    // - the coefficients have more than 62 bits
+    // - np == 4
+    test_generated(30, 30, 80, 0, 59, false, true);
+    // - np == 5
+    test_generated(30, 30, 100, 3, 50, false, true);
+    // - np == 6
+    test_generated(30, 20, 130, 0, 49, false, true);
+    // - np == 7
+    test_generated(30, 20, 160, 0, 49, false, true);
+    // - np == 8
+    test_generated(30, 20, 185, 0, 49, false, true);
+    // - np > MPN_CTX_NCRTS, so the function declines
+    test_generated(30, 20, 250, 0, 49, false, false);
+    // - xs and ys are the same slice
+    test_generated(300, 300, 20, 100, 400, true, true);
+    // - a power of two between zh and zn allows wraparound
+    test_generated(256, 256, 20, 255, 256, false, true);
+    // - zl >= zh
+    test_generated(5, 5, 20, 3, 3, false, true);
+    // - zh > zn, but zl < zn
+    test_generated(5, 5, 20, 7, 12, false, true);
+    // - zl >= zn
+    test_generated(5, 5, 20, 9, 12, false, true);
+}
+
+#[test]
+fn mul_middle_to_out_fft_properties() {
+    // With long inputs, the reference is Kronecker substitution, which is much faster than the
+    // naive product and is tested against it.
+    let mut config = GenConfig::new();
+    config.insert("mean_len_n", 300);
+    config.insert("mean_bits_n", 16);
+    let test = |(xs, ys, nlo, nhi): (Vec<Integer>, Vec<Integer>, u64, u64), naive: bool| {
+        let nlo = usize::exact_from(nlo);
+        let nhi = usize::exact_from(nhi);
+        let mut out = vec![Integer::ZERO; nhi - nlo];
+        if mul_middle_to_out_fft(&mut out, &xs, &ys, nlo, nhi) {
+            assert!(out.iter().all(Integer::is_valid));
+            if naive {
+                assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], out);
+            } else {
+                let mut out_alt = vec![Integer::ZERO; nhi - nlo];
+                mul_middle_to_out_kronecker(&mut out_alt, &xs, &ys, nlo, nhi);
+                assert_eq!(out_alt, out);
+            }
+        } else {
+            // Only a product with coefficients too large for eight primes is declined.
+            assert!(vec_max_bits(&xs).0 + vec_max_bits(&ys).0 > 300);
+        }
+    };
+    integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1()
+        .test_properties(|x| test(x, true));
+    integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1()
+        .test_properties_with_config(&config, |x| test(x, false));
+
+    // The square path.
+    let test = |(xs, nlo, nhi): (Vec<Integer>, u64, u64), naive: bool| {
+        let nlo = usize::exact_from(nlo);
+        let nhi = usize::exact_from(nhi);
+        let mut out = vec![Integer::ZERO; nhi - nlo];
+        if mul_middle_to_out_fft(&mut out, &xs, &xs, nlo, nhi) {
+            if naive {
+                assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], out);
+            } else {
+                let mut out_alt = vec![Integer::ZERO; nhi - nlo];
+                mul_middle_to_out_kronecker(&mut out_alt, &xs, &xs, nlo, nhi);
+                assert_eq!(out_alt, out);
+            }
+        } else {
+            assert!(vec_max_bits(&xs).0 << 1 > 300);
+        }
+    };
+    integer_vec_unsigned_unsigned_triple_gen_var_1().test_properties(|x| test(x, true));
+    integer_vec_unsigned_unsigned_triple_gen_var_1()
+        .test_properties_with_config(&config, |x| test(x, false));
 }

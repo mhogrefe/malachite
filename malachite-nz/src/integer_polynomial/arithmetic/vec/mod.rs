@@ -125,3 +125,18 @@ pub(crate) fn classical_preferred(len2: u64, bits1: u64, bits2: u64) -> bool {
 pub(crate) fn karatsuba_preferred(len2: u64, bits1: u64, bits2: u64) -> bool {
     len2 <= 4 || (len2 <= 8 && (1500..=10000).contains(&(bits1 + bits2)))
 }
+
+// Whether FLINT's multiplication dispatchers try the small-prime FFT first, for factors the shorter
+// of which has length `len2`, and whose coefficients have at most `bits1` and `bits2` bits: when
+// the shorter factor has at least `min_len` coefficients, and either the product's coefficients are
+// small or large enough, or it has at least `always_len`.
+pub(crate) const fn fft_preferred(
+    len2: u64,
+    bits1: u64,
+    bits2: u64,
+    min_len: u64,
+    always_len: u64,
+) -> bool {
+    let bits = bits1 + bits2;
+    len2 >= min_len && (bits <= 40 || bits >= 128 || len2 >= always_len)
+}

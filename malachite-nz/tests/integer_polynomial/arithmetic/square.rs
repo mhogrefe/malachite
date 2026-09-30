@@ -127,6 +127,7 @@ fn test_square_to_out_tiny_2() {
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
     };
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(
         &["2305843009213693952", "-2305843009213693951", "7"],
         &[
@@ -137,10 +138,22 @@ fn test_square_to_out_tiny_2() {
             "49",
         ],
     );
+    #[cfg(feature = "32_bit_limbs")]
+    test(
+        &["536870912", "-536870911", "0"],
+        &["288230376151711744", "-576460751229681664", "288230375077969921", "0", "0"],
+    );
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(
         &["0", "1099511627776", "0", "5"],
         &["0", "0", "1208925819614629174706176", "0", "10995116277760", "0", "25"],
     );
+    #[cfg(feature = "32_bit_limbs")]
+    test(
+        &["0", "256", "0", "0"],
+        &["0", "0", "65536", "0", "0", "0", "0"],
+    );
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(
         &["-1099511627776", "5", "1125899906842624", "1"],
         &[
@@ -152,6 +165,11 @@ fn test_square_to_out_tiny_2() {
             "2251799813685248",
             "1",
         ],
+    );
+    #[cfg(feature = "32_bit_limbs")]
+    test(
+        &["-256", "0", "262144", "0"],
+        &["65536", "0", "-134217728", "0", "68719476736", "0", "0"],
     );
 }
 
@@ -249,6 +267,10 @@ fn test_square_to_out() {
     test_generated(8, 1000);
     // - !karatsuba_preferred(len, bits, bits)
     test_generated(8, 100);
+    // - fft_preferred(len, bits, bits, 80, 160), and the FFT computes the square
+    test_generated(100, 20);
+    // - fft_preferred(len, bits, bits, 80, 160), but the FFT declines
+    test_generated(170, 250);
 }
 
 #[test]

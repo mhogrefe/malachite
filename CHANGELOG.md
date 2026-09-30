@@ -417,13 +417,14 @@ documented by git history.
   `Square` and `SquareAssign`, like `fmpz_poly_sqr`; and the new `MulTruncated`,
   `MulTruncatedAssign`, `SquareTruncated`, and `SquareTruncatedAssign` traits, in
   `malachite_base::polynomial`, which keep only the coefficients of $x^i$ for $i$ below a given
-  length, like `fmpz_poly_mullow` and `fmpz_poly_sqrlow`. They use schoolbook
-  multiplication, word-sized arithmetic when the coefficients and the product are small enough
-  (FLINT's `tiny` kernels), Karatsuba multiplication for short polynomials with large coefficients,
-  and Kronecker substitution, which packs each polynomial into a single `Natural` and multiplies
-  those, for everything larger, choosing among them as FLINT does; FLINT's polynomial
-  multiplication by its small-prime FFT and Schönhage–Strassen are to follow. When either factor is a constant, the forms that take the other by
-  value multiply its coefficients in place.
+  length, like `fmpz_poly_mullow` and `fmpz_poly_sqrlow`. They use schoolbook multiplication,
+  word-sized arithmetic when the coefficients and the product are small enough (FLINT's `tiny`
+  kernels), Karatsuba multiplication for short polynomials with large coefficients, Kronecker
+  substitution, which packs each polynomial into a single `Natural` and multiplies those, and, for
+  long polynomials whose product's coefficients fit, a number-theoretic transform modulo up to eight
+  word-sized primes (the polynomial counterpart of the small-prime FFT that `Natural` multiplication
+  already uses), choosing among them as FLINT does; Schönhage–Strassen is to follow. When either
+  factor is a constant, the forms that take the other by value multiply its coefficients in place.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

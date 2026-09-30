@@ -10,6 +10,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+#[cfg(not(feature = "32_bit_limbs"))]
+use crate::natural::InnerNatural::Small;
+use crate::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use crate::natural::arithmetic::add::add_with_carry_limb;
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -28,13 +33,15 @@ use malachite_base::fail_on_untested_path;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, DivRound, DivisibleByPowerOf2, ModInverse, ModPow, OverflowingAddAssign,
-    OverflowingSubAssign, Parity, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2,
-    WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
+    CeilingLogBase2, DivRound, DivisibleByPowerOf2, FloorLogBase2, Mod, ModInverse, ModPow,
+    OverflowingAddAssign, OverflowingSubAssign, Parity, PowerOf2, RoundToMultiple,
+    RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
+use malachite_base::num::basic::traits::{One, Zero};
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::conversion::traits::JoinHalves;
+use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf, WrappingFrom};
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_test_zero;
@@ -5172,6 +5179,354 @@ fn mpn_ctx_mpn_mul(r: &mut Context, z: &mut [Limb], a: &[Limb], b: &[Limb], test
         p.bits as usize,
         end_easy.round_to_multiple(BLK_SZ, Ceiling).0,
     );
+}
+
+// The `Natural` whose 64-bit words, least significant first, are `xs`.
+fn natural_from_u64s(xs: &[u64]) -> Natural {
+    #[cfg(not(feature = "32_bit_limbs"))]
+    {
+        Natural::from_limbs_asc(xs)
+    }
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        let mut limbs = Vec::with_capacity(xs.len() << 1);
+        for &x in xs {
+            let (hi, lo) = x.split_in_half();
+            limbs.push(lo);
+            limbs.push(hi);
+        }
+        Natural::from_owned_limbs_asc(limbs)
+    }
+}
+
+// Returns `x` modulo the prime of `mod_data`, reducing the 64-bit words of `x` from the most
+// significant down.
+//
+// This is fmpz_get_nmod from fmpz/get.c, FLINT 3.6.0, for a nonnegative `fmpz`, using NMOD_RED2 for
+// every word.
+fn natural_mod_prime(x: &Natural, mod_data: &ModData) -> u64 {
+    let mut r = 0;
+    #[cfg(not(feature = "32_bit_limbs"))]
+    for word in x.limbs().rev() {
+        r = nmod_red2!(r, word, mod_data);
+    }
+    #[cfg(feature = "32_bit_limbs")]
+    for pair in x.to_limbs_asc().chunks(2).rev() {
+        let word = if let &[lo, hi] = pair {
+            u64::join_halves(hi, lo)
+        } else {
+            u64::from(pair[0])
+        };
+        r = nmod_red2!(r, word, mod_data);
+    }
+    r
+}
+
+// The value of `x`, which must fit in an `i64`. With 64-bit limbs, any such `x` is stored in a
+// single limb, which is read directly.
+#[inline]
+fn integer_to_i64(x: &Integer) -> i64 {
+    #[cfg(not(feature = "32_bit_limbs"))]
+    if let Natural(Small(small)) = x.abs {
+        let value = i64::wrapping_from(small);
+        return if x.sign { value } else { -value };
+    }
+    i64::exact_from(x)
+}
+
+// Reduces the coefficients `a` modulo the prime of `fft` into the first `atrunc` entries of `abuf`,
+// zero-padding past `a.len()`. `abits` is the largest number of significant bits of any element of
+// `a`, and `negative` is whether any of them is negative.
+//
+// This is _mod from fft_small/fmpz_poly_mul.c, FLINT 3.6.0, where `abits` is negated when
+// `negative` is true.
+fn integers_to_fft(
+    abuf: &mut [f64],
+    atrunc: usize,
+    a: &[Integer],
+    abits: u64,
+    negative: bool,
+    fft: &FFTContext,
+) {
+    let p = fft.mod_data.n;
+    assert!(atrunc >= a.len());
+    if abits < p.significant_bits() {
+        if negative {
+            for (x, c) in abuf.iter_mut().zip(a) {
+                let c = integer_to_i64(c);
+                *x = if c >= 0 {
+                    c as f64
+                } else {
+                    (c + i64::wrapping_from(p)) as f64
+                };
+            }
+        } else {
+            for (x, c) in abuf.iter_mut().zip(a) {
+                *x = integer_to_i64(c) as f64;
+            }
+        }
+    } else if abits <= const { u64::WIDTH - 2 } {
+        for (x, c) in abuf.iter_mut().zip(a) {
+            *x = integer_to_i64(c).mod_op(i64::wrapping_from(p)) as f64;
+        }
+    } else {
+        for (x, c) in abuf.iter_mut().zip(a) {
+            let r = natural_mod_prime(c.unsigned_abs_ref(), &fft.mod_data);
+            *x = (if *c < 0u32 && r != 0 { p - r } else { r }) as f64;
+        }
+    }
+    abuf[a.len()..atrunc].fill(0.0);
+}
+
+// Reconstructs the coefficients of $x^i$ for `zi_start` $\leq i <$ `zi_stop` from their residues
+// modulo `np` primes, as integers in the symmetric range around zero, and writes them to `z[i -
+// zl]`. The residues modulo the `l`th prime are at `d[l * dstride..]`.
+//
+// These are _crt_2 through _crt_8 from fft_small/fmpz_poly_mul.c, FLINT 3.6.0.
+macro_rules! fmpz_poly_crt {
+    ($f: ident, $np: expr, $n: expr, $m: expr) => {
+        fn $f(
+            z: &mut [Integer],
+            zl: usize,
+            zi_start: usize,
+            zi_stop: usize,
+            rffts: &[FFTContext],
+            d: &[f64],
+            dstride: usize,
+            rcrts: &mut [CRTData],
+        ) {
+            let rcrt = &mut rcrts[const { $np - 1 }];
+            assert_eq!($n, rcrt.coeff_len);
+            if const { $n != $m } {
+                for l in 0..$np {
+                    assert_eq!(rcrt.co_prime(l)[$m], 0);
+                }
+            }
+            let mut m_half = [0; $n];
+            m_half.copy_from_slice(&rcrt.prod_primes_ref()[..$n]);
+            limbs_slice_shr_in_place_u64(&mut m_half, 1);
+            let mut xs = [0; $np << LG_BLK_SZ];
+            let start = zi_start.round_to_multiple_of_power_of_2(LG_BLK_SZ, Floor).0;
+            for i in (start..zi_stop).step_by(BLK_SZ) {
+                convert_block!(xs, rffts, d, dstride, $np, i >> LG_BLK_SZ);
+                let j_start = zi_start.saturating_sub(i);
+                let j_stop = min(BLK_SZ, zi_stop - i);
+                for j in j_start..j_stop {
+                    let mut r = [0; $n + 1];
+                    let mut t = [0; $n + 1];
+                    big_mul!($n, $m, r, t, rcrt.co_prime(0), xs[j]);
+                    let mut m = BLK_SZ;
+                    for l in 1..$np {
+                        big_add_mul!($n, $m, r, t, rcrt.co_prime(l), xs[m + j]);
+                        m += BLK_SZ;
+                    }
+                    reduce_big_sum!($n, r, t, rcrt.prod_primes_ref());
+                    z[i + j - zl] = if r[..$n].iter().rev().cmp(m_half.iter().rev()) == Greater {
+                        let mut s = [0; $n];
+                        s.copy_from_slice(&rcrt.prod_primes_ref()[..$n]);
+                        multi_sub::<{ $n }>(&mut s, &r);
+                        // This is fmpz_neg_ui_array from fft_small/fmpz_poly_mul.c, FLINT 3.6.0.
+                        -Integer::from(natural_from_u64s(&s))
+                    } else {
+                        Integer::from(natural_from_u64s(&r[..$n]))
+                    };
+                }
+            }
+        }
+    };
+}
+fmpz_poly_crt!(fmpz_poly_crt_2, 2, 2, 1);
+fmpz_poly_crt!(fmpz_poly_crt_3, 3, 3, 2);
+fmpz_poly_crt!(fmpz_poly_crt_4, 4, 4, 3);
+fmpz_poly_crt!(fmpz_poly_crt_5, 5, 4, 4);
+fmpz_poly_crt!(fmpz_poly_crt_6, 6, 5, 4);
+fmpz_poly_crt!(fmpz_poly_crt_7, 7, 6, 5);
+fmpz_poly_crt!(fmpz_poly_crt_8, 8, 7, 6);
+
+// The single-prime case of `fmpz_poly_crt!`: the residue itself, in the symmetric range.
+//
+// This is _crt_1 from fft_small/fmpz_poly_mul.c, FLINT 3.6.0.
+fn fmpz_poly_crt_1(
+    z: &mut [Integer],
+    zl: usize,
+    zi_start: usize,
+    zi_stop: usize,
+    rffts: &[FFTContext],
+    d: &[f64],
+    dstride: usize,
+    _rcrts: &mut [CRTData],
+) {
+    let mut xs = [0; BLK_SZ];
+    let p = rffts[0].mod_data.n;
+    let start = zi_start.round_to_multiple_of_power_of_2(LG_BLK_SZ, Floor).0;
+    for i in (start..zi_stop).step_by(BLK_SZ) {
+        convert_block!(xs, rffts, d, dstride, 1, i >> LG_BLK_SZ);
+        let j_start = zi_start.saturating_sub(i);
+        let j_stop = min(BLK_SZ, zi_stop - i);
+        for j in j_start..j_stop {
+            let x = xs[j];
+            z[i + j - zl] = if x <= p >> 1 {
+                Integer::from(x)
+            } else {
+                -Integer::from(p - x)
+            };
+        }
+    }
+}
+
+// Shifts the 64-bit words `xs` right by `bits` bits, where `0 < bits < 64`.
+fn limbs_slice_shr_in_place_u64(xs: &mut [u64], bits: u64) {
+    let mut high = 0;
+    for x in xs.iter_mut().rev() {
+        let new_high = *x << (u64::WIDTH - bits);
+        *x = (*x >> bits) | high;
+        high = new_high;
+    }
+}
+
+// Sets `z` to the coefficients of $x^i$ for `zl` $\leq i <$ `zh` of the product of the polynomials
+// with coefficients `a` and `b`, both nonempty, using the small-prime FFT: the coefficients are
+// reduced modulo up to eight word-sized primes, multiplied by a number-theoretic transform modulo
+// each, and reconstructed by the Chinese remainder theorem. `z` must have length `zh - zl`. Returns
+// `false` if the coefficients of the product are too large for eight primes, in which case the
+// entries of `z` for coefficients of the product are left unchanged (the entries for $x^i$ with $i$
+// at least the product's length are zeroed first).
+//
+// # Worst-case complexity
+// $T(n, m) = O(n(m + \log n))$
+//
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `a.len() + b.len()`, and $m$ is the largest
+// number of significant bits of any element of `a` or `b`.
+//
+// This is _fmpz_poly_mul_mid_mpn_ctx from fft_small/fmpz_poly_mul.c, FLINT 3.6.0, with one thread.
+fn fmpz_poly_mul_mid_mpn_ctx(
+    r: &mut Context,
+    z: &mut [Integer],
+    zl: usize,
+    mut zh: usize,
+    a: &[Integer],
+    b: &[Integer],
+) -> bool {
+    let an = a.len();
+    let bn = b.len();
+    assert_ne!(an, 0);
+    assert_ne!(bn, 0);
+    let zn = an + bn - 1;
+    if zl >= zh {
+        return true;
+    }
+    if zh > zn {
+        if zl >= zn {
+            z[..zh - zl].fill(Integer::ZERO);
+            return true;
+        }
+        z[zn - zl..zh - zl].fill(Integer::ZERO);
+        zh = zn;
+    }
+    let squaring = core::ptr::eq(a, b);
+    let (bits1, negative1) = vec_max_bits(a);
+    let (bits2, negative2) = if squaring {
+        (bits1, negative1)
+    } else {
+        vec_max_bits(b)
+    };
+    // This should be `+ sign` rather than `+ 1`, but the CRT code does not distinguish the signed
+    // and unsigned cases.
+    let modbits = bits1 + bits2 + 1;
+    // The product of the primes must be at least bn * 2^modbits.
+    let mut np = 1;
+    loop {
+        if np > MPN_CTX_NCRTS {
+            return false;
+        }
+        let crt = &r.crts[np - 1];
+        if flint_mpn_cmp_ui_2exp(
+            &crt.prod_primes_ref()[..crt.coeff_len],
+            u64::exact_from(bn),
+            modbits,
+        ) != Less
+        {
+            break;
+        }
+        np += 1;
+    }
+    let atrunc = an.round_to_multiple(BLK_SZ, Ceiling).0;
+    let btrunc = bn.round_to_multiple(BLK_SZ, Ceiling).0;
+    let mut ztrunc = zn.round_to_multiple(BLK_SZ, Ceiling).0;
+    // If there is a power of two 2^d between zh and zn with good wraparound, that is, with max(an,
+    // bn, zh) <= 2^d <= zn and zn - 2^d <= zl, then d is used as the depth; otherwise the depth is
+    // the usual one, with no wraparound.
+    let mut depth = u64::exact_from(zn).floor_log_base_2();
+    let i = usize::power_of_2(depth);
+    if atrunc <= i && btrunc <= i && zh <= i && i <= zn && zn <= zl + i {
+        ztrunc = i;
+    } else {
+        depth = max(LG_BLK_SZ, u64::exact_from(ztrunc).ceiling_log_base_2());
+    }
+    let stride = usize::power_of_2(depth)
+        .round_to_multiple_of_power_of_2(7, Ceiling)
+        .0;
+    mpn_ctx_fit_buffer(r, ((np + 1) * stride) << 3);
+    let (abufs, bbuf) = r.buffer.split_at_mut(np * stride);
+    for l in 0..np {
+        let q = &mut r.ffts[l];
+        if !squaring {
+            integers_to_fft(bbuf, btrunc, b, bits2, negative2, q);
+            sd_fft_trunc(q, bbuf, depth, btrunc, ztrunc);
+        }
+        let abuf = &mut abufs[stride * l..];
+        integers_to_fft(abuf, atrunc, a, bits1, negative1, q);
+        sd_fft_trunc(q, abuf, depth, atrunc, ztrunc);
+        let cop = if np == 1 {
+            1
+        } else {
+            r.crts[np - 1].co_prime_red(l)
+        };
+        let m = nmod_red2!(cop >> (u64::WIDTH - depth), cop << depth, &q.mod_data)
+            .mod_inverse(q.mod_data.n)
+            .unwrap();
+        if squaring {
+            sd_fft_ctx_point_sqr(q, abuf, m, depth);
+        } else {
+            sd_fft_ctx_point_mul(q, abuf, bbuf, m, depth);
+        }
+        sd_ifft_trunc(q, abuf, depth, ztrunc);
+    }
+    let crt = match np {
+        1 => fmpz_poly_crt_1,
+        2 => fmpz_poly_crt_2,
+        3 => fmpz_poly_crt_3,
+        4 => fmpz_poly_crt_4,
+        5 => fmpz_poly_crt_5,
+        6 => fmpz_poly_crt_6,
+        7 => fmpz_poly_crt_7,
+        8 => fmpz_poly_crt_8,
+        _ => unreachable!(),
+    };
+    crt(z, zl, zl, zh, &r.ffts, abufs, stride, &mut r.crts);
+    true
+}
+
+// # Worst-case complexity
+// $T(n, m) = O(n(m + \log n))$
+//
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `a.len() + b.len()`, and $m$ is the largest
+// number of significant bits of any element of `a` or `b`.
+//
+// This is _fmpz_poly_mul_mid_default_mpn_ctx from fft_small/default_ctx.c, FLINT 3.6.0.
+pub(crate) fn fmpz_poly_mul_mid_default_mpn_ctx(
+    z: &mut [Integer],
+    zl: usize,
+    zh: usize,
+    a: &[Integer],
+    b: &[Integer],
+) -> bool {
+    let mut context = CONTEXT.deserialize();
+    fmpz_poly_mul_mid_mpn_ctx(&mut context, z, zl, zh, a, b)
 }
 
 // This is mpn_mul_default_mpn_ctx from fft_small/default_ctx.c, FLINT 3.3.0-dev.

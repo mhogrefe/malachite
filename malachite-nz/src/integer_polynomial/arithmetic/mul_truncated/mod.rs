@@ -14,6 +14,7 @@
 
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncated_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::mul_truncated::kronecker::mul_truncated_to_out_kronecker;
@@ -26,7 +27,7 @@ use crate::integer_polynomial::arithmetic::scalar_mul::{
 use crate::integer_polynomial::arithmetic::square_truncated::square_truncated_to_out;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::integer_polynomial::arithmetic::vec::{
-    TinyKernel, classical_preferred, karatsuba_preferred, tiny_kernel,
+    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred, tiny_kernel,
 };
 use alloc::vec;
 use core::cmp::min;
@@ -82,6 +83,9 @@ crate_test_fn! {mul_truncated_to_out(out: &mut [Integer], xs: &[Integer], ys: &[
     let bits1 = vec_max_bits(xs).0;
     let bits2 = vec_max_bits(ys).0;
     let len2 = u64::exact_from(ys.len());
+    if fft_preferred(len2, bits1, bits2, 100, 200) && mul_middle_to_out_fft(out, xs, ys, 0, n) {
+        return;
+    }
     let n = u64::exact_from(n);
     let short_enough = len2 < 50 || (len2 << 2 >= 3 * n && n < 150 + bits1 + bits2);
     match tiny_kernel(bits1, bits2, len2, short_enough) {

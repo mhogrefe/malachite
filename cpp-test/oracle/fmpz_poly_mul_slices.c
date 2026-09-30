@@ -19,6 +19,7 @@
     mulhigh (`mul_high_to_out*`)                         xs, ys, start   -> _fmpz_poly_mulhigh*
     mulhigh_n (`mul_high_to_out_karatsuba_n`)            xs, ys          -> _fmpz_poly_mulhigh_karatsuba_n
     mulmid (`mul_middle_to_out*`)                        xs, ys, lo, hi  -> _fmpz_poly_mulmid*
+    fft (`mul_middle_to_out_fft`)                        xs, ys, lo, hi  -> ..._mul_mid_default_mpn_ctx
     sqr (`square_to_out*`)                               xs              -> _fmpz_poly_sqr*
     sqrlow (`square_truncated_to_out*`)                  xs              -> _fmpz_poly_sqrlow*
 
@@ -36,6 +37,7 @@
 #include <string.h>
 
 #include <flint/fmpz_poly.h>
+#include <flint/fft_small.h>
 #include <flint/fmpz_vec.h>
 
 #include "oracle.h"
@@ -59,7 +61,9 @@ typedef enum
     /* The Karatsuba functions whose inputs have exactly the length of the output (mullow and
        sqrlow) or the same length as each other (mulhigh). */
     VARIANT_KARATSUBA_N,
-    VARIANT_KS
+    VARIANT_KS,
+    /* The small-prime FFT, which may decline: its lines end in `Some([z, ...])` or `None`. */
+    VARIANT_FFT
 } variant_t;
 
 typedef struct
@@ -211,7 +215,25 @@ check_line(char * line, int line_number)
         ok = strncmp(s, ") = ", 4) == 0;
         s += 4;
     }
-    ok = ok && parse_vec(&s, &expected, &expected_len) && *s == '\0';
+    int expect_some = 1;
+    if (ok && current_mode->variant == VARIANT_FFT)
+    {
+        if (strcmp(s, "None") == 0)
+        {
+            expect_some = 0;
+            expected_len = b - a;
+        }
+        else
+        {
+            ok = strncmp(s, "Some(", 5) == 0;
+            s += 5;
+            ok = ok && parse_vec(&s, &expected, &expected_len) && strcmp(s, ")") == 0;
+        }
+    }
+    else
+    {
+        ok = ok && parse_vec(&s, &expected, &expected_len) && *s == '\0';
+    }
     if (ok)
     {
         /* The length of the output, and a check of the inputs against FLINT's preconditions. */
@@ -336,6 +358,17 @@ check_line(char * line, int line_number)
                 {
                     _fmpz_poly_mulmid_classical(out, xs, len1, y, len2, a, b);
                 }
+                else if (v == VARIANT_FFT)
+                {
+                    int computed = _fmpz_poly_mul_mid_default_mpn_ctx(out, a, b, xs, len1, y,
+                                                                      len2);
+                    if (computed != expect_some)
+                    {
+                        flint_printf("error in %s test, line %d: FLINT %s\n", mode, line_number,
+                                     computed ? "computed the product" : "declined");
+                        result = 1;
+                    }
+                }
                 else if (v == VARIANT_KS)
                 {
                     _fmpz_poly_mulmid_KS(out, xs, len1, y, len2, a, b);
@@ -389,8 +422,9 @@ check_line(char * line, int line_number)
         /* The mulhigh dispatcher may leave anything in the coefficients below `start`, since
            Kronecker substitution computes the whole product; only the rest are compared. */
         slong skip = current_mode->kind == KIND_MULHIGH && v == VARIANT_DISPATCHER ? a : 0;
-        if (expected_len != out_len
-            || !_fmpz_vec_equal(out + skip, expected + skip, out_len - skip))
+        if (result == 0 && expect_some
+            && (expected_len != out_len
+                || !_fmpz_vec_equal(out + skip, expected + skip, out_len - skip)))
         {
             flint_printf("error in %s test, line %d. FLINT: ", mode, line_number);
             _fmpz_vec_print(out, out_len);
@@ -458,6 +492,8 @@ static const slice_mode_t SLICE_MODES[] = {
     {"_fmpz_poly_mulmid_KS", KIND_MULMID, VARIANT_KS, {"mul_middle_to_out_kronecker", NULL}},
     {"_fmpz_poly_sqr_KS", KIND_SQR, VARIANT_KS, {"square_to_out_kronecker", NULL}},
     {"_fmpz_poly_sqrlow_KS", KIND_SQRLOW, VARIANT_KS, {"square_truncated_to_out_kronecker", NULL}},
+    {"_fmpz_poly_mul_mid_default_mpn_ctx", KIND_MULMID, VARIANT_FFT,
+     {"mul_middle_to_out_fft", NULL}},
 };
 
 static int
@@ -611,4 +647,10 @@ int
 run__fmpz_poly_sqrlow_KS(const char * arg)
 {
     return run(arg, 23);
+}
+
+int
+run__fmpz_poly_mul_mid_default_mpn_ctx(const char * arg)
+{
+    return run(arg, 24);
 }

@@ -117,15 +117,19 @@ fn test_square_truncated_to_out_tiny_2() {
     };
     // - x == 0
     // - y == 0
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(
         &["0", "1099511627776", "0", "5"],
         5,
         &["0", "0", "1208925819614629174706176", "0", "10995116277760"],
     );
+    #[cfg(feature = "32_bit_limbs")]
+    test(&["0", "256", "0", "0"], 5, &["0", "0", "65536", "0", "0"]);
     // - x != 0
     // - y != 0
     // - 2 * i < n
     // - 2 * i >= n
+    #[cfg(not(feature = "32_bit_limbs"))]
     test(
         &["2305843009213693952", "-2305843009213693951", "7"],
         3,
@@ -134,6 +138,12 @@ fn test_square_truncated_to_out_tiny_2() {
             "-10633823966279326978618770463815368704",
             "5316911983139663519285344351685705729",
         ],
+    );
+    #[cfg(feature = "32_bit_limbs")]
+    test(
+        &["536870912", "-536870911", "0"],
+        3,
+        &["288230376151711744", "-576460751229681664", "288230375077969921"],
     );
 }
 
@@ -232,6 +242,10 @@ fn test_square_truncated_to_out() {
     test_generated(8, 1000, 12);
     // - !karatsuba_preferred(len, bits, bits)
     test_generated(8, 100, 12);
+    // - fft_preferred(len, bits, bits, 100, 240), and the FFT computes the square
+    test_generated(120, 20, 150);
+    // - fft_preferred(len, bits, bits, 100, 240), but the FFT declines
+    test_generated(250, 250, 300);
 }
 
 #[test]

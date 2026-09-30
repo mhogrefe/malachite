@@ -14,6 +14,7 @@
 
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use crate::integer_polynomial::arithmetic::square::classical::square_to_out_classical;
 use crate::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::square::kronecker::square_to_out_kronecker;
@@ -22,7 +23,7 @@ use crate::integer_polynomial::arithmetic::square::tiny::{
 };
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::integer_polynomial::arithmetic::vec::{
-    TinyKernel, classical_preferred, karatsuba_preferred, tiny_kernel,
+    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred, tiny_kernel,
 };
 use alloc::vec;
 use alloc::vec::Vec;
@@ -60,6 +61,11 @@ crate_test_fn! {square_to_out(out: &mut [Integer], xs: &[Integer]) {
     }
     let bits = vec_max_bits(xs).0;
     let len = u64::exact_from(xs.len());
+    if fft_preferred(len, bits, bits, 80, 160)
+        && mul_middle_to_out_fft(out, xs, xs, 0, (xs.len() << 1) - 1)
+    {
+        return;
+    }
     match tiny_kernel(bits, bits, len, len < 50 + 3 * bits) {
         Some(TinyKernel::OneWord) => square_to_out_tiny_1(out, xs),
         Some(TinyKernel::TwoWord) => square_to_out_tiny_2(out, xs),

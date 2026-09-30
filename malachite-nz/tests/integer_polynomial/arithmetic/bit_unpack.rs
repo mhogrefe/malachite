@@ -100,6 +100,8 @@ fn limbs_and_fields(n: &Natural, bits: u64) -> (Vec<Limb>, usize) {
     (xs, nhi)
 }
 
+// The expected limbs are written for 64-bit limbs.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_unpack_coefficients() {
     let test = |xs: &[Limb], nlo, nhi, bits, negate, out: &[&str], borrow_out| {
@@ -187,6 +189,121 @@ fn test_limbs_unpack_coefficients() {
     );
 }
 
+// The same cases as the 64-bit version, with each limb split in two; the fields, and so the
+// results, are the same.
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_unpack_coefficients_32() {
+    let test = |xs: &[Limb], nlo, nhi, bits, negate, out: &[&str], borrow_out| {
+        let mut unpacked = vec![Integer::ZERO; nhi - nlo];
+        let borrow = limbs_unpack_coefficients(&mut unpacked, nlo, nhi, xs, bits, negate);
+        let out: Vec<Integer> = out.iter().map(|x| Integer::from_str(x).unwrap()).collect();
+        assert_eq!(unpacked, out);
+        assert_eq!(borrow, borrow_out);
+    };
+    test(&[0x1, 0x0, 0x0, 0x0], 0, 1, 1, true, &["1"], true);
+    test(&[0x2, 0x0, 0x0, 0x0], 0, 1, 64, true, &["-2"], false);
+    test(
+        &[0x0, 0x0, 0x2, 0x0, 0x0, 0x0],
+        0,
+        8,
+        9,
+        true,
+        &["0", "0", "0", "0", "0", "0", "0", "-4"],
+        false,
+    );
+    test(&[0x3, 0x0, 0x0, 0x0], 0, 2, 1, false, &["-1", "0"], true);
+    test(&[0x2, 0x0, 0x0, 0x0], 1, 2, 1, false, &["-1"], true);
+    test(&[0x2, 0x0, 0x0, 0x0], 0, 1, 63, false, &["2"], false);
+    test(
+        &[0x0, 0x0, 0x20, 0x0, 0x0, 0x0],
+        0,
+        2,
+        63,
+        false,
+        &["0", "64"],
+        false,
+    );
+    test(
+        &[0x0, 0x0, 0x100, 0x0, 0x0, 0x0],
+        0,
+        1,
+        73,
+        false,
+        &["-4722366482869645213696"],
+        true,
+    );
+    test(
+        &[0x0, 0x0, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0],
+        0,
+        2,
+        68,
+        false,
+        &["-18446744073709551616", "2"],
+        false,
+    );
+    test(
+        &[0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0x0, 0x0],
+        0,
+        2,
+        63,
+        false,
+        &["-1", "0"],
+        true,
+    );
+    // More examples, with fields of 8 bits that are easy to read in hexadecimal.
+    test(
+        &[0x30201, 0x0, 0x0, 0x0],
+        0,
+        3,
+        8,
+        false,
+        &["1", "2", "3"],
+        false,
+    );
+    test(
+        &[0x2fe01, 0x0, 0x0, 0x0],
+        0,
+        3,
+        8,
+        false,
+        &["1", "-2", "3"],
+        false,
+    );
+    test(
+        &[0x2fe01, 0x0, 0x0, 0x0],
+        0,
+        3,
+        8,
+        true,
+        &["-1", "2", "-3"],
+        false,
+    );
+    // The borrow into the first field unpacked comes from the field below it.
+    test(&[0x2fe01, 0x0, 0x0, 0x0], 2, 3, 8, false, &["3"], false);
+    test(&[0x2fe01, 0x0, 0x0, 0x0], 1, 2, 8, false, &["-2"], true);
+    test(
+        &[0xfd01ff, 0x0, 0x0, 0x0],
+        0,
+        3,
+        8,
+        false,
+        &["-1", "2", "-3"],
+        true,
+    );
+    test(
+        &[0x1, 0x0, 0xffff0000, 0xffffff, 0x0, 0x0],
+        0,
+        3,
+        40,
+        false,
+        &["1", "0", "-1"],
+        true,
+    );
+}
+
+// The expected limbs are written for 64-bit limbs.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_unpack_coefficients_unsigned() {
     let test = |xs: &[Limb], nlo, nhi, bits, out: &[&str]| {
@@ -217,6 +334,40 @@ fn test_limbs_unpack_coefficients_unsigned() {
     test(&[0x2fe01, 0], 0, 3, 8, &["1", "254", "2"]);
     test(&[0x2fe01, 0], 1, 3, 8, &["254", "2"]);
     test(&[u64::MAX, 1, 0], 0, 2, 65, &["36893488147419103231", "0"]);
+}
+
+// The same cases as the 64-bit version, with each limb split in two; the fields, and so the
+// results, are the same.
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_unpack_coefficients_unsigned_32() {
+    let test = |xs: &[Limb], nlo, nhi, bits, out: &[&str]| {
+        let mut unpacked = vec![Integer::ZERO; nhi - nlo];
+        limbs_unpack_coefficients_unsigned(&mut unpacked, nlo, nhi, xs, bits);
+        let out: Vec<Integer> = out.iter().map(|x| Integer::from_str(x).unwrap()).collect();
+        assert_eq!(unpacked, out);
+    };
+    test(&[0x2, 0x0, 0x0, 0x0], 1, 2, 1, &["1"]);
+    test(
+        &[0x0, 0x0, 0x2, 0x0, 0x0, 0x0],
+        0,
+        8,
+        9,
+        &["0", "0", "0", "0", "0", "0", "0", "4"],
+    );
+    test(&[0x2, 0x0, 0x0, 0x0], 0, 1, 63, &["2"]);
+    test(&[0x0, 0x0, 0x20, 0x0, 0x0, 0x0], 0, 2, 63, &["0", "64"]);
+    // More examples, with fields of 8 bits that are easy to read in hexadecimal.
+    test(&[0x30201, 0x0, 0x0, 0x0], 0, 3, 8, &["1", "2", "3"]);
+    test(&[0x2fe01, 0x0, 0x0, 0x0], 0, 3, 8, &["1", "254", "2"]);
+    test(&[0x2fe01, 0x0, 0x0, 0x0], 1, 3, 8, &["254", "2"]);
+    test(
+        &[0xffffffff, 0xffffffff, 0x1, 0x0, 0x0, 0x0],
+        0,
+        2,
+        65,
+        &["36893488147419103231", "0"],
+    );
 }
 
 #[test]

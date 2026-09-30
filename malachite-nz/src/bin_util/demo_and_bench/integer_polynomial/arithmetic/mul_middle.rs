@@ -14,6 +14,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::classical::*;
+use malachite_nz::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::kronecker::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::mul_middle_to_out;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::tiny::{
@@ -38,6 +39,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_mul_middle_to_out_tiny_2_square);
     register_demo!(runner, demo_mul_middle_to_out_kronecker);
     register_demo!(runner, demo_mul_middle_to_out_kronecker_square);
+    register_demo!(runner, demo_mul_middle_to_out_fft);
+    register_demo!(runner, demo_mul_middle_to_out_fft_square);
+    register_demo!(runner, demo_mul_middle_to_out_fft_long);
+    register_demo!(runner, demo_mul_middle_to_out_fft_long_square);
 
     register_bench!(runner, benchmark_mul_middle_to_out_algorithms);
     register_bench!(runner, benchmark_mul_middle_to_out_tiny_1_algorithms);
@@ -214,6 +219,16 @@ fn benchmark_mul_middle_to_out_algorithms(
                     usize::exact_from(nhi),
                 );
             }),
+            ("FFT", &mut |(xs, ys, nlo, nhi)| {
+                let mut out = vec![Integer::ZERO; usize::exact_from(nhi - nlo)];
+                mul_middle_to_out_fft(
+                    &mut out,
+                    &xs,
+                    &ys,
+                    usize::exact_from(nlo),
+                    usize::exact_from(nhi),
+                );
+            }),
         ],
     );
 }
@@ -350,4 +365,61 @@ fn demo_mul_middle_to_out_kronecker_square(gm: GenMode, config: &GenConfig, limi
         );
         println!("mul_middle_to_out_kronecker(_, {xs:?}, {xs:?}, {nlo}, {nhi}) = {out:?}");
     }
+}
+
+// The coefficients from `mul_middle_to_out_fft`, or `None` if it declines.
+fn fft_middle(xs: &[Integer], ys: &[Integer], nlo: u64, nhi: u64) -> Option<Vec<Integer>> {
+    let mut out = vec![Integer::ZERO; usize::exact_from(nhi - nlo)];
+    if mul_middle_to_out_fft(
+        &mut out,
+        xs,
+        ys,
+        usize::exact_from(nlo),
+        usize::exact_from(nhi),
+    ) {
+        Some(out)
+    } else {
+        None
+    }
+}
+
+// The configuration with long polynomials, unless the caller chose a length, and with coefficients
+// small enough that most products fit in the small-prime FFT, unless the caller chose a size.
+fn long_config(config: &GenConfig) -> GenConfig {
+    let mut config = config.clone();
+    if config.get_or("mean_len_n", 0) == 0 {
+        config.insert("mean_len_n", 300);
+    }
+    if config.get_or("mean_bits_n", 0) == 0 {
+        config.insert("mean_bits_n", 16);
+    }
+    config
+}
+
+fn demo_mul_middle_to_out_fft(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, ys, nlo, nhi) in integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let out = fft_middle(&xs, &ys, nlo, nhi);
+        println!("mul_middle_to_out_fft(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {out:?}");
+    }
+}
+
+fn demo_mul_middle_to_out_fft_square(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, nlo, nhi) in integer_vec_unsigned_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let out = fft_middle(&xs, &xs, nlo, nhi);
+        println!("mul_middle_to_out_fft(_, {xs:?}, {xs:?}, {nlo}, {nhi}) = {out:?}");
+    }
+}
+
+fn demo_mul_middle_to_out_fft_long(gm: GenMode, config: &GenConfig, limit: usize) {
+    demo_mul_middle_to_out_fft(gm, &long_config(config), limit);
+}
+
+fn demo_mul_middle_to_out_fft_long_square(gm: GenMode, config: &GenConfig, limit: usize) {
+    demo_mul_middle_to_out_fft_square(gm, &long_config(config), limit);
 }

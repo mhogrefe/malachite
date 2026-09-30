@@ -113,6 +113,8 @@ fn pack(xs: &[Integer], bits: u64, negate: bool) -> Vec<Limb> {
     out
 }
 
+// The expected limbs are written for 64-bit limbs.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_pack_coefficients() {
     let test = |s, bits, negate, out: &[Limb]| {
@@ -218,6 +220,99 @@ fn test_limbs_pack_coefficients() {
     test("x^2-1", 40, false, &[u64::MAX, 0xffff, 0]);
     test("-x^2+1", 40, false, &[1, 0xffffffffff0000, 0]);
     test("-18446744073709551616*x+1", 70, false, &[1, 0, 0xfc0, 0]);
+}
+
+// The same cases as the 64-bit version, with the expected limbs split in two.
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_pack_coefficients_32() {
+    let test = |s, bits, negate, out: &[Limb]| {
+        let p = IntegerPolynomial::from_str(s).unwrap();
+        assert_eq!(pack(p.coefficients_asc(), bits, negate), out);
+    };
+    test("x", 2, true, &[0xc, 0x0]);
+    test("x^2+1", 2, true, &[0x2f, 0x0]);
+    test(
+        "18238344937144572188124859526*x^2+1",
+        97,
+        true,
+        &[
+            0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0x419acde7,
+            0x525276d6, 0x144660ef, 0x7, 0x0,
+        ],
+    );
+    test(
+        "x^2+1",
+        32,
+        true,
+        &[0xffffffff, 0xffffffff, 0xfffffffe, 0x0],
+    );
+    test("1", 2, true, &[0x3, 0x0]);
+    test("x", 32, true, &[0x0, 0xffffffff, 0x0]);
+    test("653838635", 64, true, &[0xd90736d5, 0xffffffff, 0x0]);
+    test(
+        "5546202786897723575",
+        70,
+        true,
+        &[0x4aadff49, 0xb307edf3, 0x3f, 0x0],
+    );
+    test(
+        "8634607594055949012*x",
+        68,
+        true,
+        &[0x0, 0x0, 0xd67a52c0, 0x82bb6242, 0xf8, 0x0],
+    );
+    test(
+        "-4*x-4343195683468647380487427071193215737625973",
+        160,
+        false,
+        &[
+            0xb75e828b, 0x2b3303ce, 0xe886a7f0, 0x7eb9e32e, 0xffffce24, 0xfffffffb, 0xffffffff,
+            0xffffffff, 0xffffffff, 0xffffffff, 0x0,
+        ],
+    );
+    test("1", 2, false, &[0x1, 0x0]);
+    test("x", 33, false, &[0x0, 0x2, 0x0, 0x0]);
+    test(
+        "8634607594055949012*x",
+        68,
+        false,
+        &[0x0, 0x0, 0x2985ad40, 0x7d449dbd, 0x7, 0x0],
+    );
+    test(
+        "5546202786897723575",
+        70,
+        false,
+        &[0xb55200b7, 0x4cf8120c, 0x0, 0x0],
+    );
+    test(
+        "-6820794238993809956*x+5",
+        68,
+        true,
+        &[0xfffffffb, 0xffffffff, 0x541c223f, 0xea85438e, 0x5, 0x0],
+    );
+    // More examples, with fields of 8 bits that are easy to read in hexadecimal.
+    test("0", 8, false, &[0x0]);
+    test("3*x^2+2*x+1", 8, false, &[0x30201, 0x0]);
+    // A negative coefficient borrows from the field above.
+    test("3*x^2-2*x+1", 8, false, &[0x2fe01, 0x0]);
+    // A negative leading coefficient borrows past the last field, whose bits are all set.
+    test("-3*x^2+2*x-1", 8, false, &[0xfd01ff, 0x0]);
+    test("-3*x^2+2*x-1", 8, true, &[0x2fe01, 0x0]);
+    // Fields that cross limbs.
+    test(
+        "x^2-1",
+        40,
+        false,
+        &[0xffffffff, 0xffffffff, 0xffff, 0x0, 0x0],
+    );
+    test("-x^2+1", 40, false, &[0x1, 0x0, 0xffff0000, 0xffffff, 0x0]);
+    test(
+        "-18446744073709551616*x+1",
+        70,
+        false,
+        &[0x1, 0x0, 0x0, 0x0, 0xfc0, 0x0],
+    );
 }
 
 #[test]

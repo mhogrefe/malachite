@@ -105,6 +105,7 @@ static const oracle_mode modes[] = {
     {"_fmpz_poly_mulmid_KS", run__fmpz_poly_mulmid_KS},
     {"_fmpz_poly_sqr_KS", run__fmpz_poly_sqr_KS},
     {"_fmpz_poly_sqrlow_KS", run__fmpz_poly_sqrlow_KS},
+    {"_fmpz_poly_mul_mid_default_mpn_ctx", run__fmpz_poly_mul_mid_default_mpn_ctx},
 };
 
 int

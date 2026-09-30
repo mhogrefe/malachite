@@ -192,5 +192,6 @@ int run__fmpz_poly_mullow_KS(const char * arg);
 int run__fmpz_poly_mulmid_KS(const char * arg);
 int run__fmpz_poly_sqr_KS(const char * arg);
 int run__fmpz_poly_sqrlow_KS(const char * arg);
+int run__fmpz_poly_mul_mid_default_mpn_ctx(const char * arg);
 
 #endif

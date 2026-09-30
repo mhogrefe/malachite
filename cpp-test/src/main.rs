@@ -1672,6 +1672,14 @@ const SQUARE_TRUNCATED_TO_OUT_KRONECKER_UNIT_LINES: [&str; 4] = [
     "square_truncated_to_out_kronecker(_, [-671799350756517727438919942920, -1181875036209060863636840150344, -322391619931018672584987082004, 4789784227305365630917132762, -755123903681646289778639808352]) = [451314367676878735686206236640734168298267001972896058126400, 1587965764001165937622675587699309335709737860972305396728960, 1829993563132169656989716323623191475242468918414434601741696, 755617667090605856218372408828462576838210288399156229728672, 1107198000255700568886643303206473597583929381832238803251440, 1781835809419824154682981492090362467607750075603876755716080]",
 ];
 
+// The literal rows of test_mul_middle_to_out_fft in malachite-nz's IntegerPolynomial tests, as the
+// demo prints them.
+const MUL_MIDDLE_TO_OUT_FFT_UNIT_LINES: [&str; 3] = [
+    "mul_middle_to_out_fft(_, [1, 2, 3], [4, 5, 6], 0, 5) = Some([4, 13, 28, 27, 18])",
+    "mul_middle_to_out_fft(_, [1, -2, 3], [4, 5, -6], 0, 5) = Some([4, -3, -4, 27, -18])",
+    "mul_middle_to_out_fft(_, [7], [3, -2], 1, 2) = Some([-14])",
+];
+
 fn main() {
     let oracle = build_oracle();
 
@@ -3185,6 +3193,29 @@ fn main() {
             "../malachite-nz",
             demo_name,
             "_fmpz_poly_sqrlow_KS",
+        );
+    }
+
+    // Every literal case from test_mul_middle_to_out_fft in malachite-nz's IntegerPolynomial tests,
+    // and the generated cases from its demos, against _fmpz_poly_mul_mid_default_mpn_ctx, including
+    // whether it declines.
+    println!("testing mul_middle_to_out_fft unit tests");
+    run_unit_lines(
+        &oracle,
+        "_fmpz_poly_mul_mid_default_mpn_ctx",
+        &MUL_MIDDLE_TO_OUT_FFT_UNIT_LINES,
+    );
+    for demo_name in [
+        "demo_mul_middle_to_out_fft",
+        "demo_mul_middle_to_out_fft_square",
+        "demo_mul_middle_to_out_fft_long",
+        "demo_mul_middle_to_out_fft_long_square",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "_fmpz_poly_mul_mid_default_mpn_ctx",
         );
     }
 }
