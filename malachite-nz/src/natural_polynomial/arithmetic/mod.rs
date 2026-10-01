@@ -125,6 +125,16 @@ pub mod mod_power_of_2_derivative;
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given power of 2.
 pub mod mod_power_of_2_is_reduced;
+/// Implementations of [`ModPowerOf2Mul`](malachite_base::num::arithmetic::traits::ModPowerOf2Mul)
+/// and [`ModPowerOf2MulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign), for
+/// multiplying two polynomials modulo $2^k$.
+pub mod mod_power_of_2_mul;
+/// Implementations of
+/// [`ModPowerOf2MulTruncated`](malachite_base::polynomial::ModPowerOf2MulTruncated) and
+/// [`ModPowerOf2MulTruncatedAssign`](malachite_base::polynomial::ModPowerOf2MulTruncatedAssign),
+/// for multiplying two polynomials modulo $2^k$ and keeping only the low coefficients of the
+/// product.
+pub mod mod_power_of_2_mul_truncated;
 /// Implementations of [`ModPowerOf2Neg`](malachite_base::num::arithmetic::traits::ModPowerOf2Neg)
 /// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign),
 /// which negate a polynomial modulo a power of 2.
@@ -213,6 +223,17 @@ pub mod mod_power_of_2_nth_derivative;
 /// );
 /// ```
 pub mod mod_power_of_2_shl;
+/// Implementations of
+/// [`ModPowerOf2Square`](malachite_base::num::arithmetic::traits::ModPowerOf2Square) and
+/// [`ModPowerOf2SquareAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign),
+/// for squaring a polynomial modulo $2^k$.
+pub mod mod_power_of_2_square;
+/// Implementations of
+/// [`ModPowerOf2SquareTruncated`](malachite_base::polynomial::ModPowerOf2SquareTruncated) and
+/// [`ModPowerOf2SquareTruncatedAssign`](
+/// malachite_base::polynomial::ModPowerOf2SquareTruncatedAssign),
+/// for squaring a polynomial modulo $2^k$ and keeping only the low coefficients of the square.
+pub mod mod_power_of_2_square_truncated;
 /// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting one polynomial from another modulo $2^k$.

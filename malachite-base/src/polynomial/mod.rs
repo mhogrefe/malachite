@@ -384,6 +384,76 @@ pub trait ModPowerOf2SubTruncatedAssign<Rhs = Self> {
     fn mod_power_of_2_sub_truncated_assign(&mut self, other: Rhs, len: u64, pow: u64);
 }
 
+/// Multiplies two polynomials modulo $2^k$, keeping only the coefficients of $x^i$ for $i$ less
+/// than a given length. The coefficients of both must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is multiplication in the ring of polynomials with coefficients
+/// modulo $2^k$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait ModPowerOf2MulTruncated<Rhs = Self> {
+    type Output;
+
+    /// Multiplies two polynomials modulo $2^k$ and truncates the product to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p, q, n, k) = (pq \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_mul_truncated(self, other: Rhs, len: u64, pow: u64) -> Self::Output;
+}
+
+/// Multiplies a polynomial by another modulo $2^k$ in place, keeping only the coefficients of $x^i$
+/// for $i$ less than a given length. The coefficients of both must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is multiplication in the ring of polynomials with coefficients
+/// modulo $2^k$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait ModPowerOf2MulTruncatedAssign<Rhs = Self> {
+    /// Multiplies `self` by a polynomial modulo $2^k$ and truncates the product to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// p \gets (pq \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_mul_truncated_assign(&mut self, other: Rhs, len: u64, pow: u64);
+}
+
+/// Squares a polynomial modulo $2^k$, keeping only the coefficients of $x^i$ for $i$ less than a
+/// given length. The coefficients must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is squaring in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$, applied to the image of the polynomial there. Unlike the
+/// coefficients, which must already be reduced, the polynomial need not already be truncated: it
+/// may have any number of coefficients, and only the first `len` are read.
+pub trait ModPowerOf2SquareTruncated {
+    type Output;
+
+    /// Squares a polynomial modulo $2^k$ and truncates the square to its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, n, k) = (p^2 \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_square_truncated(self, len: u64, pow: u64) -> Self::Output;
+}
+
+/// Squares a polynomial modulo $2^k$ in place, keeping only the coefficients of $x^i$ for $i$ less
+/// than a given length. The coefficients must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is squaring in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$, applied to the image of the polynomial there. Unlike the
+/// coefficients, which must already be reduced, the polynomial need not already be truncated: it
+/// may have any number of coefficients, and only the first `len` are read.
+pub trait ModPowerOf2SquareTruncatedAssign {
+    /// Squares `self` modulo $2^k$ and truncates the square to its first `len` coefficients.
+    ///
+    /// $$
+    /// p \gets (p^2 \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_square_truncated_assign(&mut self, len: u64, pow: u64);
+}
+
 /// Adds two polynomials modulo $m$, keeping only the coefficients of $x^i$ for $i$ less than a
 /// given length. The coefficients of both must already be reduced modulo $m$.
 ///

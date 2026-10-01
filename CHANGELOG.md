@@ -434,6 +434,13 @@ documented by git history.
   value or by reference. The algorithms and the choice among them are shared with
   `IntegerPolynomial`, through code that is generic over the coefficient type, so with natural
   coefficients they take the paths for non-negative coefficients.
+- Multiplication, squaring, and truncated multiplication and squaring of `NaturalPolynomial`s
+  modulo $2^k$: `ModPowerOf2Mul`, `ModPowerOf2MulAssign`, `ModPowerOf2Square`, and
+  `ModPowerOf2SquareAssign`, and the new `ModPowerOf2MulTruncated`,
+  `ModPowerOf2MulTruncatedAssign`, `ModPowerOf2SquareTruncated`, and
+  `ModPowerOf2SquareTruncatedAssign` traits, in `malachite_base::polynomial`, like FLINT's
+  `fmpz_mod_poly_mul`, `fmpz_mod_poly_sqr`, and `fmpz_mod_poly_mullow` with the modulus $2^k$.
+  Every coefficient of the inputs must already be reduced modulo $2^k$.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a
