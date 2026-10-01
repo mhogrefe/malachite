@@ -12,7 +12,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncated_to_out_classical;
 
 // Sets `out` to the coefficients of the product of the polynomials with coefficients `xs` and `ys`,
@@ -22,7 +22,7 @@ use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncat
 // This is equivalent to `_fmpz_poly_mul_classical` from `fmpz_poly/mul_classical.c`, FLINT 3.6.0.
 crate_test_fn! {
 #[inline]
-mul_to_out_classical(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
+mul_to_out_classical<C: PolynomialCoefficient>(out: &mut [C], xs: &[C], ys: &[C]) {
     assert_eq!(out.len(), xs.len() + ys.len() - 1);
     mul_truncated_to_out_classical(out, xs, ys);
 }}

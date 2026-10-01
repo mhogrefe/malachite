@@ -713,9 +713,13 @@ pub mod natural_polynomial {
         pub mod mod_shl;
         pub mod mod_sub;
         pub mod mod_sub_truncated;
+        pub mod mul;
         pub mod mul_power_of_x;
+        pub mod mul_truncated;
         pub mod nth_derivative;
         pub mod shl;
+        pub mod square;
+        pub mod square_truncated;
     }
     pub mod basic {
         pub mod coefficients;

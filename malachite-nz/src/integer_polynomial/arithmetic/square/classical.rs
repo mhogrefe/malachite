@@ -14,7 +14,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::square_truncated::classical::*;
 
 // Sets `out` to the coefficients of the square of the polynomial with coefficients `xs`, which is
@@ -24,7 +24,7 @@ use crate::integer_polynomial::arithmetic::square_truncated::classical::*;
 // This is equivalent to `_fmpz_poly_sqr_classical` from `fmpz_poly/sqr_classical.c`, FLINT 3.6.0.
 crate_test_fn! {
 #[inline]
-square_to_out_classical(out: &mut [Integer], xs: &[Integer]) {
+square_to_out_classical<C: PolynomialCoefficient>(out: &mut [C], xs: &[C]) {
     assert_eq!(out.len(), (xs.len() << 1) - 1);
     square_truncated_to_out_classical(out, xs);
 }}

@@ -10,7 +10,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 #[cfg(not(feature = "32_bit_limbs"))]
 use crate::natural::InnerNatural::Small;
@@ -39,7 +39,7 @@ use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::One;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf, WrappingFrom};
@@ -5233,15 +5233,20 @@ fn natural_mod_prime(x: &Natural, mod_data: &ModData) -> u64 {
 }
 
 // The value of `x`, which must fit in an `i64`. With 64-bit limbs, any such `x` is stored in a
-// single limb, which is read directly.
+// single limb, which is read directly. The value of a coefficient whose absolute value is less than
+// $2^{63}$, as an `i64`.
 #[inline]
-fn integer_to_i64(x: &Integer) -> i64 {
+fn coefficient_to_i64<C: PolynomialCoefficient>(x: &C) -> i64 {
+    let abs = x.unsigned_abs_ref();
     #[cfg(not(feature = "32_bit_limbs"))]
-    if let Natural(Small(small)) = x.abs {
-        let value = i64::wrapping_from(small);
-        return if x.sign { value } else { -value };
-    }
-    i64::exact_from(x)
+    let value = if let Natural(Small(small)) = *abs {
+        i64::wrapping_from(small)
+    } else {
+        i64::exact_from(abs)
+    };
+    #[cfg(feature = "32_bit_limbs")]
+    let value = i64::exact_from(abs);
+    if x.is_negative() { -value } else { value }
 }
 
 // Reduces the coefficients `a` modulo the prime of `fft` into the first `atrunc` entries of `abuf`,
@@ -5250,10 +5255,10 @@ fn integer_to_i64(x: &Integer) -> i64 {
 //
 // This is _mod from fft_small/fmpz_poly_mul.c, FLINT 3.6.0, where `abits` is negated when
 // `negative` is true.
-fn integers_to_fft(
+fn coefficients_to_fft<C: PolynomialCoefficient>(
     abuf: &mut [f64],
     atrunc: usize,
-    a: &[Integer],
+    a: &[C],
     abits: u64,
     negative: bool,
     fft: &FFTContext,
@@ -5263,7 +5268,7 @@ fn integers_to_fft(
     if abits < p.significant_bits() {
         if negative {
             for (x, c) in abuf.iter_mut().zip(a) {
-                let c = integer_to_i64(c);
+                let c = coefficient_to_i64(c);
                 *x = if c >= 0 {
                     c as f64
                 } else {
@@ -5272,17 +5277,17 @@ fn integers_to_fft(
             }
         } else {
             for (x, c) in abuf.iter_mut().zip(a) {
-                *x = integer_to_i64(c) as f64;
+                *x = coefficient_to_i64(c) as f64;
             }
         }
     } else if abits <= const { u64::WIDTH - 2 } {
         for (x, c) in abuf.iter_mut().zip(a) {
-            *x = integer_to_i64(c).mod_op(i64::wrapping_from(p)) as f64;
+            *x = coefficient_to_i64(c).mod_op(i64::wrapping_from(p)) as f64;
         }
     } else {
         for (x, c) in abuf.iter_mut().zip(a) {
             let r = natural_mod_prime(c.unsigned_abs_ref(), &fft.mod_data);
-            *x = (if *c < 0u32 && r != 0 { p - r } else { r }) as f64;
+            *x = (if c.is_negative() && r != 0 { p - r } else { r }) as f64;
         }
     }
     abuf[a.len()..atrunc].fill(0.0);
@@ -5295,8 +5300,8 @@ fn integers_to_fft(
 // These are _crt_2 through _crt_8 from fft_small/fmpz_poly_mul.c, FLINT 3.6.0.
 macro_rules! fmpz_poly_crt {
     ($f: ident, $np: expr, $n: expr, $m: expr) => {
-        fn $f(
-            z: &mut [Integer],
+        fn $f<C: PolynomialCoefficient>(
+            z: &mut [C],
             zl: usize,
             zi_start: usize,
             zi_stop: usize,
@@ -5336,9 +5341,9 @@ macro_rules! fmpz_poly_crt {
                         s.copy_from_slice(&rcrt.prod_primes_ref()[..$n]);
                         multi_sub::<{ $n }>(&mut s, &r);
                         // This is fmpz_neg_ui_array from fft_small/fmpz_poly_mul.c, FLINT 3.6.0.
-                        -Integer::from(natural_from_u64s(&s))
+                        C::from_sign_and_abs(false, natural_from_u64s(&s))
                     } else {
-                        Integer::from(natural_from_u64s(&r[..$n]))
+                        C::from_sign_and_abs(true, natural_from_u64s(&r[..$n]))
                     };
                 }
             }
@@ -5356,8 +5361,8 @@ fmpz_poly_crt!(fmpz_poly_crt_8, 8, 7, 6);
 // The single-prime case of `fmpz_poly_crt!`: the residue itself, in the symmetric range.
 //
 // This is _crt_1 from fft_small/fmpz_poly_mul.c, FLINT 3.6.0.
-fn fmpz_poly_crt_1(
-    z: &mut [Integer],
+fn fmpz_poly_crt_1<C: PolynomialCoefficient>(
+    z: &mut [C],
     zl: usize,
     zi_start: usize,
     zi_stop: usize,
@@ -5376,9 +5381,9 @@ fn fmpz_poly_crt_1(
         for j in j_start..j_stop {
             let x = xs[j];
             z[i + j - zl] = if x <= p >> 1 {
-                Integer::from(x)
+                C::from_sign_and_abs(true, Natural::from(x))
             } else {
-                -Integer::from(p - x)
+                C::from_sign_and_abs(false, Natural::from(p - x))
             };
         }
     }
@@ -5411,13 +5416,13 @@ fn limbs_slice_shr_in_place_u64(xs: &mut [u64], bits: u64) {
 // number of significant bits of any element of `a` or `b`.
 //
 // This is _fmpz_poly_mul_mid_mpn_ctx from fft_small/fmpz_poly_mul.c, FLINT 3.6.0, with one thread.
-fn fmpz_poly_mul_mid_mpn_ctx(
+fn fmpz_poly_mul_mid_mpn_ctx<C: PolynomialCoefficient>(
     r: &mut Context,
-    z: &mut [Integer],
+    z: &mut [C],
     zl: usize,
     mut zh: usize,
-    a: &[Integer],
-    b: &[Integer],
+    a: &[C],
+    b: &[C],
 ) -> bool {
     let an = a.len();
     let bn = b.len();
@@ -5429,10 +5434,10 @@ fn fmpz_poly_mul_mid_mpn_ctx(
     }
     if zh > zn {
         if zl >= zn {
-            z[..zh - zl].fill(Integer::ZERO);
+            z[..zh - zl].fill(C::ZERO);
             return true;
         }
-        z[zn - zl..zh - zl].fill(Integer::ZERO);
+        z[zn - zl..zh - zl].fill(C::ZERO);
         zh = zn;
     }
     let squaring = core::ptr::eq(a, b);
@@ -5483,11 +5488,11 @@ fn fmpz_poly_mul_mid_mpn_ctx(
     for l in 0..np {
         let q = &mut r.ffts[l];
         if !squaring {
-            integers_to_fft(bbuf, btrunc, b, bits2, negative2, q);
+            coefficients_to_fft(bbuf, btrunc, b, bits2, negative2, q);
             sd_fft_trunc(q, bbuf, depth, btrunc, ztrunc);
         }
         let abuf = &mut abufs[stride * l..];
-        integers_to_fft(abuf, atrunc, a, bits1, negative1, q);
+        coefficients_to_fft(abuf, atrunc, a, bits1, negative1, q);
         sd_fft_trunc(q, abuf, depth, atrunc, ztrunc);
         let cop = if np == 1 {
             1
@@ -5505,14 +5510,14 @@ fn fmpz_poly_mul_mid_mpn_ctx(
         sd_ifft_trunc(q, abuf, depth, ztrunc);
     }
     let crt = match np {
-        1 => fmpz_poly_crt_1,
-        2 => fmpz_poly_crt_2,
-        3 => fmpz_poly_crt_3,
-        4 => fmpz_poly_crt_4,
-        5 => fmpz_poly_crt_5,
-        6 => fmpz_poly_crt_6,
-        7 => fmpz_poly_crt_7,
-        8 => fmpz_poly_crt_8,
+        1 => fmpz_poly_crt_1::<C>,
+        2 => fmpz_poly_crt_2::<C>,
+        3 => fmpz_poly_crt_3::<C>,
+        4 => fmpz_poly_crt_4::<C>,
+        5 => fmpz_poly_crt_5::<C>,
+        6 => fmpz_poly_crt_6::<C>,
+        7 => fmpz_poly_crt_7::<C>,
+        8 => fmpz_poly_crt_8::<C>,
         _ => unreachable!(),
     };
     crt(z, zl, zl, zh, &r.ffts, abufs, stride, &mut r.crts);
@@ -5528,12 +5533,12 @@ fn fmpz_poly_mul_mid_mpn_ctx(
 // number of significant bits of any element of `a` or `b`.
 //
 // This is _fmpz_poly_mul_mid_default_mpn_ctx from fft_small/default_ctx.c, FLINT 3.6.0.
-pub(crate) fn fmpz_poly_mul_mid_default_mpn_ctx(
-    z: &mut [Integer],
+pub(crate) fn fmpz_poly_mul_mid_default_mpn_ctx<C: PolynomialCoefficient>(
+    z: &mut [C],
     zl: usize,
     zh: usize,
-    a: &[Integer],
-    b: &[Integer],
+    a: &[C],
+    b: &[C],
 ) -> bool {
     let mut context = default_context();
     fmpz_poly_mul_mid_mpn_ctx(&mut context, z, zl, zh, a, b)

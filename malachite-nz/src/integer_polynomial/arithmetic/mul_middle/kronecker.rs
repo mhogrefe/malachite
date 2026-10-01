@@ -14,11 +14,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
 use crate::integer_polynomial::arithmetic::bit_pack::limbs_pack_coefficients;
 use crate::integer_polynomial::arithmetic::bit_unpack::{
     limbs_unpack_coefficients, limbs_unpack_coefficients_unsigned,
 };
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_middle::truncate_mul_middle_inputs;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::natural::arithmetic::mul::limbs_mul;
@@ -28,7 +28,6 @@ use alloc::vec;
 use core::cmp::min;
 use core::ptr;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::slices::slice_trailing_zeros;
@@ -51,10 +50,10 @@ use malachite_base::slices::slice_trailing_zeros;
 // largest number of significant bits of any element of `xs` or `ys`.
 //
 // This is equivalent to `_fmpz_poly_mulmid_KS` from `fmpz_poly/mulmid_KS.c`, FLINT 3.6.0.
-crate_test_fn! {mul_middle_to_out_kronecker(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+crate_test_fn! {mul_middle_to_out_kronecker<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
     nlo: usize,
     nhi: usize,
 ) {
@@ -67,16 +66,16 @@ crate_test_fn! {mul_middle_to_out_kronecker(
     let xs = &xs[..xs.len() - slice_trailing_zeros(xs)];
     let ys = &ys[..ys.len() - slice_trailing_zeros(ys)];
     if xs.is_empty() || ys.is_empty() {
-        out.fill(Integer::ZERO);
+        out.fill(C::ZERO);
         return;
     }
     let len1 = xs.len();
     let len2 = ys.len();
-    let negate1 = xs[len1 - 1] < 0u32;
-    let negate2 = ys[len2 - 1] < 0u32;
+    let negate1 = xs[len1 - 1].is_negative();
+    let negate2 = ys[len2 - 1].is_negative();
     let full_len = len1 + len2 - 1;
     if nlo >= min(nhi, full_len) {
-        out.fill(Integer::ZERO);
+        out.fill(C::ZERO);
         return;
     }
     let mut zero_high = 0;
@@ -119,6 +118,6 @@ crate_test_fn! {mul_middle_to_out_kronecker(
         limbs_unpack_coefficients_unsigned(out, nlo, nhi, &product, bits);
     }
     if zero_high != 0 {
-        out_zero.fill(Integer::ZERO);
+        out_zero.fill(C::ZERO);
     }
 }}

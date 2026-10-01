@@ -14,7 +14,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_middle::classical::mul_middle_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use crate::integer_polynomial::arithmetic::mul_middle::kronecker::mul_middle_to_out_kronecker;
@@ -23,7 +23,6 @@ use crate::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
 use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
-use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_to_out;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::integer_polynomial::arithmetic::vec::{
     TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
@@ -47,12 +46,12 @@ pub mod tiny;
 //
 // This is equivalent to the input truncation at the start of `_fmpz_poly_mulmid` from
 // `fmpz_poly/mulmid.c`, FLINT 3.6.0.
-pub(crate) fn truncate_mul_middle_inputs<'a>(
-    xs: &'a [Integer],
-    ys: &'a [Integer],
+pub(crate) fn truncate_mul_middle_inputs<'a, C: PolynomialCoefficient>(
+    xs: &'a [C],
+    ys: &'a [C],
     mut nlo: usize,
     mut nhi: usize,
-) -> (&'a [Integer], &'a [Integer], usize, usize) {
+) -> (&'a [C], &'a [C], usize, usize) {
     // Low truncation of inputs
     let mut xs = &xs[..min(xs.len(), nhi)];
     let mut ys = &ys[..min(ys.len(), nhi)];
@@ -88,10 +87,10 @@ pub(crate) fn truncate_mul_middle_inputs<'a>(
 // This is equivalent to `_fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0, except that it
 // chooses Schönhage–Strassen in a measured window (see `schonhage_strassen_preferred`) rather
 // than FLINT's.
-crate_test_fn! {mul_middle_to_out(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+crate_test_fn! {mul_middle_to_out<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
     nlo: usize,
     nhi: usize,
 ) {
@@ -105,7 +104,7 @@ crate_test_fn! {mul_middle_to_out(
         swap(&mut xs, &mut ys);
     }
     if ys.len() == 1 {
-        integers_mul_scalar_to_out(out, &xs[nlo..nhi], &ys[0]);
+        C::vec_mul_scalar_to_out(out, &xs[nlo..nhi], &ys[0]);
         return;
     }
     let bits1 = vec_max_bits(xs).0;

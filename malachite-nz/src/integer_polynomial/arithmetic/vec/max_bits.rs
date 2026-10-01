@@ -10,7 +10,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::platform::Limb;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -29,15 +29,15 @@ use malachite_base::num::logic::traits::SignificantBits;
 //
 // This is equivalent to `_fmpz_vec_max_bits` from `fmpz_vec/max_bits.c`, FLINT 3.6.0, which returns
 // the two results combined, as a count that is negated when some element is negative.
-crate_test_fn! {vec_max_bits(xs: &[Integer]) -> (u64, bool) {
+crate_test_fn! {vec_max_bits<C: PolynomialCoefficient>(xs: &[C]) -> (u64, bool) {
     let mut negative = false;
     let mut max_limbs = 0;
     let mut max_limb: Limb = 0;
     for x in xs {
-        if !x.sign {
+        if x.is_negative() {
             negative = true;
         }
-        let limbs = x.abs.as_limbs_asc();
+        let limbs = x.unsigned_abs_ref().as_limbs_asc();
         let len = limbs.len();
         if len == 0 {
             continue;

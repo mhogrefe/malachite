@@ -14,7 +14,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_middle::kronecker::mul_middle_to_out_kronecker;
 
 // Sets `out` to the coefficients of the product of the polynomials with coefficients `xs` and `ys`,
@@ -23,6 +23,6 @@ use crate::integer_polynomial::arithmetic::mul_middle::kronecker::mul_middle_to_
 // This is equivalent to `_fmpz_poly_mul_KS` from `fmpz_poly/mul_KS.c`, FLINT 3.6.0.
 crate_test_fn! {
 #[inline]
-mul_to_out_kronecker(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
+mul_to_out_kronecker<C: PolynomialCoefficient>(out: &mut [C], xs: &[C], ys: &[C]) {
     mul_middle_to_out_kronecker(out, xs, ys, 0, xs.len() + ys.len() - 1);
 }}

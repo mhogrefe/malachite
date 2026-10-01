@@ -12,7 +12,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::natural::arithmetic::mul::fft::fmpz_poly_mul_mid_default_mpn_ctx;
 
 // Sets `out` to the coefficients of $x^i$ for `nlo` $\leq i <$ `nhi` of the product of the
@@ -35,10 +35,10 @@ use crate::natural::arithmetic::mul::fft::fmpz_poly_mul_mid_default_mpn_ctx;
 // 3.6.0.
 crate_test_fn! {
 #[inline]
-mul_middle_to_out_fft(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+mul_middle_to_out_fft<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
     nlo: usize,
     nhi: usize,
 ) -> bool {

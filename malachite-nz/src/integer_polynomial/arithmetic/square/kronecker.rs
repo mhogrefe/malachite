@@ -12,7 +12,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul::kronecker::mul_to_out_kronecker;
 
 // Sets `out` to the coefficients of the square of the polynomial with coefficients `xs`, which is
@@ -21,6 +21,6 @@ use crate::integer_polynomial::arithmetic::mul::kronecker::mul_to_out_kronecker;
 // This is equivalent to `_fmpz_poly_sqr_KS` from `fmpz_poly/sqr_KS.c`, FLINT 3.6.0.
 crate_test_fn! {
 #[inline]
-square_to_out_kronecker(out: &mut [Integer], xs: &[Integer]) {
+square_to_out_kronecker<C: PolynomialCoefficient>(out: &mut [C], xs: &[C]) {
     mul_to_out_kronecker(out, xs, xs);
 }}

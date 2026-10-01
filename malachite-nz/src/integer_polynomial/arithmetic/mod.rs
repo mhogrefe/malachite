@@ -28,6 +28,8 @@ pub mod bit_unpack;
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
 /// which bring a polynomial into canonical unit form.
 pub mod canonicalize_unit;
+#[doc(hidden)]
+pub mod coefficient;
 /// Implementations of [`ComposePowerOfX`](malachite_base::polynomial::ComposePowerOfX) and
 /// [`ComposePowerOfXAssign`](malachite_base::polynomial::ComposePowerOfXAssign), for substituting a
 /// power of the variable into a polynomial.

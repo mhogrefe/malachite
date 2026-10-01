@@ -12,17 +12,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul::classical::mul_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::mul::kronecker::mul_to_out_kronecker;
 use crate::integer_polynomial::arithmetic::mul::schonhage_strassen::*;
 use crate::integer_polynomial::arithmetic::mul::tiny::{mul_to_out_tiny_1, mul_to_out_tiny_2};
 use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
-use crate::integer_polynomial::arithmetic::scalar_mul::{
-    integers_mul_scalar_assign, integers_mul_scalar_to_out,
-};
 use crate::integer_polynomial::arithmetic::square::square_to_out;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::integer_polynomial::arithmetic::vec::{
@@ -34,7 +31,6 @@ use alloc::vec::Vec;
 use core::mem::take;
 use core::ops::{Mul, MulAssign};
 use core::ptr;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 pub mod classical;
@@ -57,11 +53,11 @@ pub mod tiny;
 // This is equivalent to `_fmpz_poly_mul` from `fmpz_poly/mul.c`, FLINT 3.6.0, except that it
 // chooses Schönhage–Strassen in a measured window (see `schonhage_strassen_preferred`) rather
 // than FLINT's.
-crate_test_fn! {mul_greater_to_out(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
+crate_test_fn! {mul_greater_to_out<C: PolynomialCoefficient>(out: &mut [C], xs: &[C], ys: &[C]) {
     let len1 = xs.len();
     let len2 = ys.len();
     if len2 == 1 {
-        integers_mul_scalar_to_out(out, xs, &ys[0]);
+        C::vec_mul_scalar_to_out(out, xs, &ys[0]);
         return;
     }
     if ptr::eq(xs, ys) {
@@ -95,11 +91,11 @@ crate_test_fn! {mul_greater_to_out(out: &mut [Integer], xs: &[Integer], ys: &[In
 }}
 
 // This is equivalent to `fmpz_poly_mul` from `fmpz_poly/mul.c`, FLINT 3.6.0.
-fn mul_ref_ref(xs: &[Integer], ys: &[Integer]) -> Vec<Integer> {
+pub(crate) fn mul_ref_ref<C: PolynomialCoefficient>(xs: &[C], ys: &[C]) -> Vec<C> {
     if xs.is_empty() || ys.is_empty() {
         return Vec::new();
     }
-    let mut out = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+    let mut out = vec![C::ZERO; xs.len() + ys.len() - 1];
     if xs.len() >= ys.len() {
         mul_greater_to_out(&mut out, xs, ys);
     } else {
@@ -110,9 +106,9 @@ fn mul_ref_ref(xs: &[Integer], ys: &[Integer]) -> Vec<Integer> {
 
 // Multiplies the polynomial with coefficients `xs` by the one with coefficients `ys`. When `ys` is
 // a constant, the product is a scalar multiple of `xs`, computed in place in its `Vec`.
-fn mul_val_ref(mut xs: Vec<Integer>, ys: &[Integer]) -> Vec<Integer> {
+pub(crate) fn mul_val_ref<C: PolynomialCoefficient>(mut xs: Vec<C>, ys: &[C]) -> Vec<C> {
     if let [c] = ys {
-        integers_mul_scalar_assign(&mut xs, c);
+        C::vec_mul_scalar_assign(&mut xs, c);
         xs
     } else {
         mul_ref_ref(&xs, ys)
@@ -121,9 +117,9 @@ fn mul_val_ref(mut xs: Vec<Integer>, ys: &[Integer]) -> Vec<Integer> {
 
 // Multiplies the polynomial with coefficients `xs` by the one with coefficients `ys`. When either
 // is a constant, the product is computed in place in the other's `Vec`.
-fn mul_val_val(xs: Vec<Integer>, mut ys: Vec<Integer>) -> Vec<Integer> {
+pub(crate) fn mul_val_val<C: PolynomialCoefficient>(xs: Vec<C>, mut ys: Vec<C>) -> Vec<C> {
     if let [c] = xs.as_slice() {
-        integers_mul_scalar_assign(&mut ys, c);
+        C::vec_mul_scalar_assign(&mut ys, c);
         ys
     } else {
         mul_val_ref(xs, &ys)

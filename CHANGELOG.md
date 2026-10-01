@@ -428,6 +428,12 @@ documented by git history.
   choosing among them as FLINT does, except that Schönhage–Strassen is used over a wider, measured
   range of lengths. When either factor is a constant, the forms that take the other
   by value multiply its coefficients in place.
+- The same multiplication, squaring, and truncated multiplication and squaring for
+  `NaturalPolynomial`s: `Mul`, `MulAssign`, `Square`, `SquareAssign`, `MulTruncated`,
+  `MulTruncatedAssign`, `SquareTruncated`, and `SquareTruncatedAssign`, taking each operand by
+  value or by reference. The algorithms and the choice among them are shared with
+  `IntegerPolynomial`, through code that is generic over the coefficient type, so with natural
+  coefficients they take the paths for non-negative coefficients.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::natural::InnerNatural::Small;
 use crate::natural::{LIMB_MAX_QUARTER, Natural, TWICE_WIDTH, WIDTH_MINUS_2};
 use crate::platform::{Limb, SignedLimb};
@@ -32,11 +32,11 @@ pub(crate) const SMALL_FMPZ_BITCOUNT_MAX: u64 = WIDTH_MINUS_2;
 
 // The value of `x` as a signed word, if FLINT would store `x` as a small `fmpz`; that is, if
 // `COEFF_IS_MPZ` from `flint.h`, FLINT 3.6.0, would be false.
-pub(crate) fn small_value(x: &Integer) -> Option<SignedLimb> {
-    match x.abs {
+pub(crate) fn small_value<C: PolynomialCoefficient>(x: &C) -> Option<SignedLimb> {
+    match *x.unsigned_abs_ref() {
         Natural(Small(small)) if small <= COEFF_MAX => {
             let value = SignedLimb::wrapping_from(small);
-            Some(if x.sign { value } else { -value })
+            Some(if x.is_negative() { -value } else { value })
         }
         _ => None,
     }
@@ -44,7 +44,7 @@ pub(crate) fn small_value(x: &Integer) -> Option<SignedLimb> {
 
 // The values of the elements of `xs`, each of which FLINT must store as a small `fmpz`, as signed
 // words or as a wider signed type.
-pub(crate) fn small_values<T: From<SignedLimb>>(xs: &[Integer]) -> Vec<T> {
+pub(crate) fn small_values<T: From<SignedLimb>, C: PolynomialCoefficient>(xs: &[C]) -> Vec<T> {
     xs.iter()
         .map(|x| T::from(small_value(x).unwrap()))
         .collect()
@@ -87,9 +87,9 @@ pub(crate) fn tiny_kernel(
 //
 // This is equivalent to `_fmpz_vec_add` from `fmpz_vec/add.c`, FLINT 3.6.0, with the output
 // separate from the inputs.
-pub(crate) fn vec_add<T: Borrow<Integer>>(out: &mut [Integer], xs: &[T], ys: &[T]) {
+pub(crate) fn vec_add<C: PolynomialCoefficient, T: Borrow<C>>(out: &mut [C], xs: &[T], ys: &[T]) {
     for ((o, x), y) in out.iter_mut().zip(xs).zip(ys) {
-        *o = x.borrow() + y.borrow();
+        *o = x.borrow().add_ref(y.borrow());
     }
 }
 
@@ -97,7 +97,7 @@ pub(crate) fn vec_add<T: Borrow<Integer>>(out: &mut [Integer], xs: &[T], ys: &[T
 //
 // This is equivalent to `_fmpz_vec_add` from `fmpz_vec/add.c`, FLINT 3.6.0, with the output the
 // same as the first input.
-pub(crate) fn vec_add_assign(xs: &mut [Integer], ys: &[Integer]) {
+pub(crate) fn vec_add_assign<C: PolynomialCoefficient>(xs: &mut [C], ys: &[C]) {
     for (x, y) in xs.iter_mut().zip(ys) {
         *x += y;
     }
@@ -107,7 +107,7 @@ pub(crate) fn vec_add_assign(xs: &mut [Integer], ys: &[Integer]) {
 //
 // This is equivalent to `_fmpz_vec_sub` from `fmpz_vec/sub.c`, FLINT 3.6.0, with the output the
 // same as the first input.
-pub(crate) fn vec_sub_assign(xs: &mut [Integer], ys: &[Integer]) {
+pub(crate) fn vec_sub_assign<C: PolynomialCoefficient>(xs: &mut [C], ys: &[C]) {
     for (x, y) in xs.iter_mut().zip(ys) {
         *x -= y;
     }

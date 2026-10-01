@@ -14,7 +14,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_middle::kronecker::mul_middle_to_out_kronecker;
 
 // Sets `out` to the first `out.len()` coefficients of the product of the polynomials with
@@ -25,7 +25,7 @@ use crate::integer_polynomial::arithmetic::mul_middle::kronecker::mul_middle_to_
 // is `out.len()`.
 crate_test_fn! {
 #[inline]
-mul_truncated_to_out_kronecker(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
+mul_truncated_to_out_kronecker<C: PolynomialCoefficient>(out: &mut [C], xs: &[C], ys: &[C]) {
     let n = out.len();
     mul_middle_to_out_kronecker(out, xs, ys, 0, n);
 }}

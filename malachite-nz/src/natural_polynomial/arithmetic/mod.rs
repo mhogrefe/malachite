@@ -363,10 +363,17 @@ pub mod mod_sub;
 /// one polynomial from another modulo a [`Natural`](crate::natural::Natural) and keeping only their
 /// low coefficients.
 pub mod mod_sub_truncated;
+/// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
+/// multiplying two polynomials.
+pub mod mul;
 /// Implementations of [`MulPowerOfX`](malachite_base::polynomial::MulPowerOfX) and
 /// [`MulPowerOfXAssign`](malachite_base::polynomial::MulPowerOfXAssign), for multiplying a
 /// polynomial by a power of its variable.
 pub mod mul_power_of_x;
+/// Implementations of [`MulTruncated`](malachite_base::polynomial::MulTruncated) and
+/// [`MulTruncatedAssign`](malachite_base::polynomial::MulTruncatedAssign), for multiplying two
+/// polynomials and keeping only the low coefficients of the product.
+pub mod mul_truncated;
 /// Implementations of [`NthDerivative`](malachite_base::polynomial::NthDerivative) and
 /// [`NthDerivativeAssign`](malachite_base::polynomial::NthDerivativeAssign), for differentiating a
 /// polynomial any number of times.
@@ -438,3 +445,11 @@ pub mod nth_derivative;
 /// );
 /// ```
 pub mod shl;
+/// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
+/// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a
+/// polynomial.
+pub mod square;
+/// Implementations of [`SquareTruncated`](malachite_base::polynomial::SquareTruncated) and
+/// [`SquareTruncatedAssign`](malachite_base::polynomial::SquareTruncatedAssign), for squaring a
+/// polynomial and keeping only the low coefficients of the square.
+pub mod square_truncated;

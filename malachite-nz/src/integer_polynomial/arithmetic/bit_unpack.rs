@@ -13,6 +13,7 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::bit_pack::field_start;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::vec::SMALL_FMPZ_BITCOUNT_MAX;
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
@@ -68,13 +69,13 @@ fn limbs_extract_field(arr: &[Limb], shift: u64, bits: u64) -> Vec<Limb> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 //
 // This is equivalent to `fmpz_bit_unpack` from `fmpz/bit_unpack.c`, FLINT 3.6.0.
-crate_test_fn! {limbs_unpack_field(
+crate_test_fn! {limbs_unpack_field<C: PolynomialCoefficient>(
     arr: &[Limb],
     shift: u64,
     bits: u64,
     negate: bool,
     borrow: bool,
-) -> (Integer, bool) {
+) -> (C, bool) {
     let limbs = usize::exact_from((shift + bits) >> Limb::LOG_WIDTH);
     let rem_bits = (shift + bits) & Limb::WIDTH_MASK;
     // Determine whether the field is positive or negative.
@@ -83,7 +84,8 @@ crate_test_fn! {limbs_unpack_field(
     } else {
         arr[limbs - 1].get_highest_bit()
     };
-    let (mut value, negative) = if bits <= SMALL_FMPZ_BITCOUNT_MAX {
+    // The value is built from its sign (`true` for non-negative) and absolute value.
+    let (value_sign, abs, negative) = if bits <= SMALL_FMPZ_BITCOUNT_MAX {
         // The field fits in a small coefficient.
         let mask = Limb::low_mask(bits);
         let mut c = if limbs + usize::from(rem_bits != 0) > 1 {
@@ -100,7 +102,12 @@ crate_test_fn! {limbs_unpack_field(
         let c = SignedLimb::wrapping_from(c);
         // Determine whether we need to return a borrow, and deal with the borrow; since the field
         // has at most `SMALL_FMPZ_BITCOUNT_MAX` bits, adding it cannot overflow.
-        (Integer::from(c + SignedLimb::from(borrow)), c < 0)
+        let value = c + SignedLimb::from(borrow);
+        (
+            value >= 0,
+            Natural::from(Limb::wrapping_from(value.unsigned_abs())),
+            c < 0,
+        )
     } else {
         // A large coefficient.
         let mut p = limbs_extract_field(arr, shift, bits);
@@ -116,20 +123,17 @@ crate_test_fn! {limbs_unpack_field(
             if !borrow {
                 limbs_slice_add_limb_in_place(&mut p, 1);
             }
-            (-Integer::from(Natural::from_owned_limbs_asc(p)), true)
+            (false, Natural::from_owned_limbs_asc(p), true)
         } else {
             // Deal with the borrow.
             if borrow {
                 limbs_slice_add_limb_in_place(&mut p, 1);
             }
-            (Integer::from(Natural::from_owned_limbs_asc(p)), false)
+            (true, Natural::from_owned_limbs_asc(p), false)
         }
     };
     // Negate if required.
-    if negate {
-        value.neg_assign();
-    }
-    (value, negative)
+    (C::from_sign_and_abs(value_sign != negate, abs), negative)
 }}
 
 // Unpacks the `bits`-bit field of `arr` that starts at bit `shift` of `arr[0]`, as an unsigned
@@ -143,22 +147,29 @@ crate_test_fn! {limbs_unpack_field(
 // where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 //
 // This is equivalent to `fmpz_bit_unpack_unsigned` from `fmpz/bit_unpack.c`, FLINT 3.6.0.
-crate_test_fn! {limbs_unpack_field_unsigned(arr: &[Limb], shift: u64, bits: u64) -> Integer {
+crate_test_fn! {limbs_unpack_field_unsigned<C: PolynomialCoefficient>(
+    arr: &[Limb],
+    shift: u64,
+    bits: u64,
+) -> C {
     let limbs = usize::exact_from((shift + bits) >> Limb::LOG_WIDTH);
     let rem_bits = (shift + bits) & Limb::WIDTH_MASK;
     if bits <= SMALL_FMPZ_BITCOUNT_MAX {
         // The field fits in a small coefficient.
         let mask = Limb::low_mask(bits);
-        Integer::from(if limbs + usize::from(rem_bits != 0) > 1 {
+        C::from_sign_and_abs(true, Natural::from(if limbs + usize::from(rem_bits != 0) > 1 {
             // The field crosses a limb boundary.
             ((arr[0] >> shift).wrapping_add(arr[1] << (Limb::WIDTH - shift))) & mask
         } else {
             // The field is in the first limb only; mask it.
             (arr[0] >> shift) & mask
-        })
+        }))
     } else {
         // A large coefficient.
-        Integer::from(Natural::from_owned_limbs_asc(limbs_extract_field(arr, shift, bits)))
+        C::from_sign_and_abs(
+            true,
+            Natural::from_owned_limbs_asc(limbs_extract_field(arr, shift, bits)),
+        )
     }
 }}
 
@@ -177,8 +188,8 @@ crate_test_fn! {limbs_unpack_field_unsigned(arr: &[Limb], shift: u64, bits: u64)
 //
 // This is equivalent to `_fmpz_poly_bit_unpack` from `fmpz_poly/bit_unpack.c`, FLINT 3.6.0, where
 // `negate` being true corresponds to a `negate` of -1.
-crate_test_fn! {limbs_unpack_coefficients(
-    out: &mut [Integer],
+crate_test_fn! {limbs_unpack_coefficients<C: PolynomialCoefficient>(
+    out: &mut [C],
     nlo: usize,
     nhi: usize,
     xs: &[Limb],
@@ -213,8 +224,8 @@ crate_test_fn! {limbs_unpack_coefficients(
 //
 // This is equivalent to `_fmpz_poly_bit_unpack_unsigned` from `fmpz_poly/bit_unpack.c`, FLINT
 // 3.6.0.
-crate_test_fn! {limbs_unpack_coefficients_unsigned(
-    out: &mut [Integer],
+crate_test_fn! {limbs_unpack_coefficients_unsigned<C: PolynomialCoefficient>(
+    out: &mut [C],
     nlo: usize,
     nhi: usize,
     xs: &[Limb],

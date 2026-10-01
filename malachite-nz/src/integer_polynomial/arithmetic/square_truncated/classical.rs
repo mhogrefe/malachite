@@ -12,10 +12,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::vec::dot_general::vec_dot_general;
 use core::cmp::min;
-use malachite_base::num::arithmetic::traits::{AddMulAssign, Parity};
+use malachite_base::num::arithmetic::traits::Parity;
 
 // The coefficient of $x^i$ in the square of the polynomial with coefficients `xs`, which is
 // nonempty, where `i < 2 * xs.len() - 1`: twice the dot product of the coefficients of $x^j$ and
@@ -29,7 +29,7 @@ use malachite_base::num::arithmetic::traits::{AddMulAssign, Parity};
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is the largest number of
 // significant bits of any element of `xs`.
-pub(crate) fn square_coefficient(xs: &[Integer], i: usize) -> Integer {
+pub(crate) fn square_coefficient<C: PolynomialCoefficient>(xs: &[C], i: usize) -> C {
     let start = (i + 1).saturating_sub(xs.len());
     let stop = min(xs.len(), (i + 1) >> 1);
     let mut c = vec_dot_general(
@@ -39,7 +39,7 @@ pub(crate) fn square_coefficient(xs: &[Integer], i: usize) -> Integer {
         &xs[i + 1 - stop..=i - start],
         true,
     );
-    c <<= 1u32;
+    c.double_assign();
     if i.even() {
         c.add_mul_assign(&xs[i >> 1], &xs[i >> 1]);
     }
@@ -60,7 +60,10 @@ pub(crate) fn square_coefficient(xs: &[Integer], i: usize) -> Integer {
 //
 // This is equivalent to `_fmpz_poly_sqrlow_classical` from `fmpz_poly/sqrlow_classical.c`, FLINT
 // 3.6.0, where `n` is `out.len()`.
-crate_test_fn! {square_truncated_to_out_classical(out: &mut [Integer], xs: &[Integer]) {
+crate_test_fn! {square_truncated_to_out_classical<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+) {
     let xs = &xs[..min(xs.len(), out.len())];
     for (i, o) in out.iter_mut().enumerate() {
         *o = square_coefficient(xs, i);

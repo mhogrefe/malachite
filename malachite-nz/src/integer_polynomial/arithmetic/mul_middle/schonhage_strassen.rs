@@ -12,7 +12,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_middle::classical::mul_middle_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_middle::truncate_mul_middle_inputs;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
@@ -31,7 +31,6 @@ use core::mem::swap;
 use core::ptr;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::slice_test_zero;
 
@@ -46,9 +45,9 @@ use malachite_base::slices::slice_test_zero;
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len() * limbs`.
 //
 // This is `_fmpz_vec_get_fft` from `fmpz_vec/get_fft.c`, FLINT 3.6.0, without the threading.
-crate_test_fn! {integers_to_fermat_residues(
+crate_test_fn! {integers_to_fermat_residues<C: PolynomialCoefficient>(
     coeffs_f: &mut [Vec<Limb>],
-    xs: &[Integer],
+    xs: &[C],
     limbs: usize,
 ) {
     let size_f = limbs + 1;
@@ -56,7 +55,7 @@ crate_test_fn! {integers_to_fermat_residues(
         let coeff = x.unsigned_abs_ref().as_limbs_asc();
         let size_j = coeff.len();
         let f = &mut f[..size_f];
-        if *x < 0u32 {
+        if x.is_negative() {
             // write out FFT coefficient, ensuring sign is correct
             limbs_neg_to_out(f, coeff);
             f[size_j..].fill(Limb::MAX);
@@ -80,8 +79,8 @@ crate_test_fn! {integers_to_fermat_residues(
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `out.len() * limbs`.
-crate_test_fn! {integers_from_fermat_residues(
-    out: &mut [Integer],
+crate_test_fn! {integers_from_fermat_residues<C: PolynomialCoefficient>(
+    out: &mut [C],
     coeffs_f: &[Vec<Limb>],
     limbs: usize,
     sign: bool,
@@ -102,9 +101,9 @@ crate_test_fn! {integers_from_fermat_residues(
             let mut data = f[..limbs].to_vec();
             limbs_neg_in_place(&mut data);
             limbs_slice_add_limb_in_place(&mut data, 1);
-            -Integer::from(Natural::from_owned_limbs_asc(data))
+            C::from_sign_and_abs(false, Natural::from_owned_limbs_asc(data))
         } else {
-            Integer::from(Natural::from_limbs_asc(&f[..limbs]))
+            C::from_sign_and_abs(true, Natural::from_limbs_asc(&f[..limbs]))
         };
     }
 }}
@@ -126,10 +125,10 @@ crate_test_fn! {integers_from_fermat_residues(
 // This is equivalent to `_fmpz_poly_mulmid_SS` from `fmpz_poly/mulmid_SS.c`, FLINT 3.6.0, except
 // that it reads negative coefficients back correctly, as FLINT does after 3.6.0; see
 // `integers_from_fermat_residues`.
-crate_test_fn! {mul_middle_to_out_schonhage_strassen(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+crate_test_fn! {mul_middle_to_out_schonhage_strassen<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
     nlo: usize,
     nhi: usize,
 ) {
@@ -196,7 +195,7 @@ crate_test_fn! {mul_middle_to_out_schonhage_strassen(
     if res_bits == 0 {
         // Every coefficient is zero and `ys` has length 1. FLINT's signed arithmetic goes on to use
         // residues of one limb, even when that makes $w = 0$; the product is zero either way.
-        out[..trunc - nlo].fill(Integer::ZERO);
+        out[..trunc - nlo].fill(C::ZERO);
         return;
     }
     // round up res bits for sqrt2

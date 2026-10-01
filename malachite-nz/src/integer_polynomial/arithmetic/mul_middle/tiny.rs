@@ -14,7 +14,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::vec::small_values;
 use crate::platform::{SignedDoubleLimb, SignedLimb};
 use alloc::vec::Vec;
@@ -22,6 +22,7 @@ use core::cmp::min;
 use core::ptr;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 // Sets `out` to the coefficients of $x^i$ for `nlo` $\leq i <$ `nhi` of the product of the
 // polynomials with coefficients `xs` and `ys`, both nonempty, using arithmetic in `T`. Every
@@ -38,15 +39,16 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 //
 // This is equivalent to `_fmpz_poly_mulmid_tiny1` from `fmpz_poly/mulmid.c`, FLINT 3.6.0, when `T`
 // is `SignedLimb`, and to `_fmpz_poly_mulmid_tiny2` when `T` is `SignedDoubleLimb`.
-pub(crate) fn mul_middle_to_out_tiny<T: PrimitiveSigned + From<SignedLimb>>(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+pub(crate) fn mul_middle_to_out_tiny<
+    T: PrimitiveSigned + From<SignedLimb>,
+    C: PolynomialCoefficient + ExactFrom<T>,
+>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
     nlo: usize,
     nhi: usize,
-) where
-    Integer: From<T>,
-{
+) {
     let len1 = xs.len();
     let len2 = ys.len();
     if ptr::eq(xs, ys) {
@@ -65,7 +67,7 @@ pub(crate) fn mul_middle_to_out_tiny<T: PrimitiveSigned + From<SignedLimb>>(
             if i.even() {
                 s += xs[i >> 1] * xs[i >> 1];
             }
-            *o = Integer::from(s);
+            *o = C::exact_from(s);
         }
     } else {
         let xs: Vec<T> = small_values(xs);
@@ -81,7 +83,7 @@ pub(crate) fn mul_middle_to_out_tiny<T: PrimitiveSigned + From<SignedLimb>>(
             {
                 s += x * y;
             }
-            *o = Integer::from(s);
+            *o = C::exact_from(s);
         }
     }
 }
@@ -92,14 +94,14 @@ pub(crate) fn mul_middle_to_out_tiny<T: PrimitiveSigned + From<SignedLimb>>(
 // This is equivalent to `_fmpz_poly_mulmid_tiny1` from `fmpz_poly/mulmid.c`, FLINT 3.6.0.
 crate_test_fn! {
 #[inline]
-mul_middle_to_out_tiny_1(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+mul_middle_to_out_tiny_1<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
     nlo: usize,
     nhi: usize,
 ) {
-    mul_middle_to_out_tiny::<SignedLimb>(out, xs, ys, nlo, nhi);
+    mul_middle_to_out_tiny::<SignedLimb, C>(out, xs, ys, nlo, nhi);
 }}
 
 // `mul_middle_to_out_tiny` with double-word arithmetic: every coefficient of the product, and every
@@ -108,12 +110,12 @@ mul_middle_to_out_tiny_1(
 // This is equivalent to `_fmpz_poly_mulmid_tiny2` from `fmpz_poly/mulmid.c`, FLINT 3.6.0.
 crate_test_fn! {
 #[inline]
-mul_middle_to_out_tiny_2(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+mul_middle_to_out_tiny_2<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
     nlo: usize,
     nhi: usize,
 ) {
-    mul_middle_to_out_tiny::<SignedDoubleLimb>(out, xs, ys, nlo, nhi);
+    mul_middle_to_out_tiny::<SignedDoubleLimb, C>(out, xs, ys, nlo, nhi);
 }}

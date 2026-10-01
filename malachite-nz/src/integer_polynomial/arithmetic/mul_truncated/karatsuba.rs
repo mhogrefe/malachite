@@ -10,7 +10,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncated_to_out_classical;
 use crate::integer_polynomial::arithmetic::vec::{vec_add, vec_add_assign, vec_sub_assign};
@@ -19,7 +19,6 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Parity, PowerOf2};
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 // Multiplication using truncated Karatsuba. Below length 7, classical truncated multiplication is
@@ -29,11 +28,11 @@ use malachite_base::num::conversion::traits::ExactFrom;
 //
 // This is equivalent to `_fmpz_poly_mullow_kara_recursive` from `fmpz_poly/mullow_karatsuba_n.c`,
 // FLINT 3.6.0.
-fn mul_truncated_karatsuba_recursive(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
-    temp: &mut [Integer],
+fn mul_truncated_karatsuba_recursive<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
+    temp: &mut [C],
     len: usize,
 ) {
     let m1 = len >> 1;
@@ -57,7 +56,7 @@ fn mul_truncated_karatsuba_recursive(
         temp[(m2 << 1) + m1] = ys[two_m1].clone();
     }
     mul_to_out_karatsuba(&mut out[..two_m1 - 1], &xs[..m1], &ys[..m1]);
-    out[two_m1 - 1] = Integer::ZERO;
+    out[two_m1 - 1] = C::ZERO;
     {
         let (low, rest) = temp.split_at_mut(m2);
         let (sums_1, rest) = rest.split_at_mut(m2);
@@ -83,9 +82,9 @@ fn mul_truncated_karatsuba_recursive(
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `m2`, and $m$ is the largest number of
 // significant bits of any element of `out` or `temp`.
-pub(crate) fn combine_truncated_karatsuba(
-    out: &mut [Integer],
-    temp: &mut [Integer],
+pub(crate) fn combine_truncated_karatsuba<C: PolynomialCoefficient>(
+    out: &mut [C],
+    temp: &mut [C],
     m1: usize,
     m2: usize,
 ) {
@@ -112,21 +111,21 @@ pub(crate) fn combine_truncated_karatsuba(
 //
 // This is equivalent to `_fmpz_poly_mullow_karatsuba_n` from `fmpz_poly/mullow_karatsuba_n.c`,
 // FLINT 3.6.0, where `n` is `out.len()`.
-crate_test_fn! {mul_truncated_to_out_karatsuba_n(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+crate_test_fn! {mul_truncated_to_out_karatsuba_n<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
 ) {
     let n = out.len();
     assert_ne!(n, 0);
     assert!(xs.len() >= n);
     assert!(ys.len() >= n);
     if n == 1 {
-        out[0] = &xs[0] * &ys[0];
+        out[0] = xs[0].mul_ref(&ys[0]);
         return;
     }
     let len = usize::power_of_2(u64::exact_from(n).ceiling_log_base_2());
-    let mut temp = vec![Integer::ZERO; 3 * len];
+    let mut temp = vec![C::ZERO; 3 * len];
     mul_truncated_karatsuba_recursive(out, xs, ys, &mut temp, n);
 }}
 
@@ -139,13 +138,13 @@ crate_test_fn! {mul_truncated_to_out_karatsuba_n(
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `n`, and $m$ is the largest number of
 // significant bits of any element of `xs`.
-pub(crate) fn padded(xs: &[Integer], n: usize) -> Cow<'_, [Integer]> {
+pub(crate) fn padded<C: PolynomialCoefficient>(xs: &[C], n: usize) -> Cow<'_, [C]> {
     if xs.len() >= n {
         Cow::Borrowed(&xs[..n])
     } else {
         let mut padded = Vec::with_capacity(n);
         padded.extend_from_slice(xs);
-        padded.resize(n, Integer::ZERO);
+        padded.resize(n, C::ZERO);
         Cow::Owned(padded)
     }
 }
@@ -164,10 +163,10 @@ pub(crate) fn padded(xs: &[Integer], n: usize) -> Cow<'_, [Integer]> {
 //
 // This is equivalent to `_fmpz_poly_mullow_karatsuba` from `fmpz_poly/mullow_karatsuba_n.c`, FLINT
 // 3.6.0, where `n` is `out.len()`.
-crate_test_fn! {mul_truncated_to_out_karatsuba(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+crate_test_fn! {mul_truncated_to_out_karatsuba<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
 ) {
     let n = out.len();
     mul_truncated_to_out_karatsuba_n(out, &padded(xs, n), &padded(ys, n));

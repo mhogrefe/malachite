@@ -12,8 +12,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use crate::integer_polynomial::arithmetic::square::classical::square_to_out_classical;
 use crate::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
@@ -30,7 +30,6 @@ use crate::integer_polynomial::arithmetic::vec::{
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 pub mod classical;
@@ -53,9 +52,9 @@ pub mod tiny;
 // This is equivalent to `_fmpz_poly_sqr` from `fmpz_poly/sqr.c`, FLINT 3.6.0, except that it
 // chooses Schönhage–Strassen in a measured window (see `schonhage_strassen_preferred`) rather
 // than FLINT's.
-crate_test_fn! {square_to_out(out: &mut [Integer], xs: &[Integer]) {
+crate_test_fn! {square_to_out<C: PolynomialCoefficient>(out: &mut [C], xs: &[C]) {
     if xs.len() == 1 {
-        out[0] = (&xs[0]).square();
+        out[0] = xs[0].square_ref();
         return;
     }
     let bits = vec_max_bits(xs).0;
@@ -82,11 +81,11 @@ crate_test_fn! {square_to_out(out: &mut [Integer], xs: &[Integer]) {
 }}
 
 // This is equivalent to `fmpz_poly_sqr` from `fmpz_poly/sqr.c`, FLINT 3.6.0.
-fn square_ref(xs: &[Integer]) -> Vec<Integer> {
+pub(crate) fn square_ref<C: PolynomialCoefficient>(xs: &[C]) -> Vec<C> {
     if xs.is_empty() {
         return Vec::new();
     }
-    let mut out = vec![Integer::ZERO; (xs.len() << 1) - 1];
+    let mut out = vec![C::ZERO; (xs.len() << 1) - 1];
     square_to_out(&mut out, xs);
     out
 }

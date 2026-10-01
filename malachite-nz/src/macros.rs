@@ -118,3 +118,19 @@ macro_rules! crate_test_const {
         pub(crate) const $name $( $body )*
     };
 }
+
+#[cfg(feature = "test_build")]
+macro_rules! crate_test_trait {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub trait $name $( $body )*
+    };
+}
+
+#[cfg(not(feature = "test_build"))]
+macro_rules! crate_test_trait {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub(crate) trait $name $( $body )*
+    };
+}

@@ -12,7 +12,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::{
     combine_truncated_karatsuba, padded,
 };
@@ -20,18 +20,17 @@ use crate::integer_polynomial::arithmetic::square::karatsuba::square_to_out_kara
 use crate::integer_polynomial::arithmetic::square_truncated::classical::*;
 use crate::integer_polynomial::arithmetic::vec::vec_add;
 use alloc::vec;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Parity, PowerOf2, Square};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Parity, PowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;
 
 // Squaring using truncated Karatsuba; see `mul_truncated/karatsuba.rs`.
 //
 // This is equivalent to `_fmpz_poly_sqrlow_kara_recursive` from `fmpz_poly/sqrlow_karatsuba_n.c`,
 // FLINT 3.6.0.
-fn square_truncated_karatsuba_recursive(
-    out: &mut [Integer],
-    xs: &[Integer],
-    temp: &mut [Integer],
+fn square_truncated_karatsuba_recursive<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    temp: &mut [C],
     len: usize,
 ) {
     let m1 = len >> 1;
@@ -56,7 +55,7 @@ fn square_truncated_karatsuba_recursive(
         square_truncated_karatsuba_recursive(high, &xs[m1..], rest, m2);
     }
     square_to_out_karatsuba(&mut out[..two_m1 - 1], &xs[..m1]);
-    out[two_m1 - 1] = Integer::ZERO;
+    out[two_m1 - 1] = C::ZERO;
     combine_truncated_karatsuba(out, temp, m1, m2);
 }
 
@@ -73,18 +72,21 @@ fn square_truncated_karatsuba_recursive(
 //
 // This is equivalent to `_fmpz_poly_sqrlow_karatsuba_n` from `fmpz_poly/sqrlow_karatsuba_n.c`,
 // FLINT 3.6.0, where `n` is `out.len()`.
-crate_test_fn! {square_truncated_to_out_karatsuba_n(out: &mut [Integer], xs: &[Integer]) {
+crate_test_fn! {square_truncated_to_out_karatsuba_n<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+) {
     let n = out.len();
     assert_ne!(n, 0);
     assert!(xs.len() >= n);
     if n == 1 {
-        out[0] = (&xs[0]).square();
+        out[0] = xs[0].square_ref();
         return;
     }
     // The temporary space is almost 2 * len, but the recursion may need 4 * ceil(len / 2), which
     // exceeds 2 * len by at most 2.
     let len = usize::power_of_2(u64::exact_from(n).ceiling_log_base_2());
-    let mut temp = vec![Integer::ZERO; (len << 1) + 2];
+    let mut temp = vec![C::ZERO; (len << 1) + 2];
     square_truncated_karatsuba_recursive(out, xs, &mut temp, n);
 }}
 
@@ -102,7 +104,10 @@ crate_test_fn! {square_truncated_to_out_karatsuba_n(out: &mut [Integer], xs: &[I
 //
 // This is equivalent to `_fmpz_poly_sqrlow_karatsuba` from `fmpz_poly/sqrlow_karatsuba_n.c`, FLINT
 // 3.6.0, where `n` is `out.len()`.
-crate_test_fn! {square_truncated_to_out_karatsuba(out: &mut [Integer], xs: &[Integer]) {
+crate_test_fn! {square_truncated_to_out_karatsuba<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+) {
     let n = out.len();
     square_truncated_to_out_karatsuba_n(out, &padded(xs, n));
 }}

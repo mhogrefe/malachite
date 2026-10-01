@@ -12,16 +12,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
-use crate::integer_polynomial::ZERO;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul::karatsuba::{
     add_shifted_rev, revbin_in, revbin_out,
 };
 use crate::integer_polynomial::arithmetic::vec::{vec_add, vec_sub_assign};
 use alloc::vec;
 use core::borrow::Borrow;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2, Square};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;
 
 // Karatsuba squaring of a polynomial in bit-reversed order: `xs` has length $2^b$, `out` has length
@@ -29,17 +27,17 @@ use malachite_base::num::conversion::traits::ExactFrom;
 //
 // This is equivalent to `_fmpz_poly_sqr_kara_recursive` from `fmpz_poly/sqr_karatsuba.c`, FLINT
 // 3.6.0.
-fn square_karatsuba_recursive<T: Borrow<Integer>>(
-    out: &mut [Integer],
+fn square_karatsuba_recursive<C: PolynomialCoefficient, T: Borrow<C>>(
+    out: &mut [C],
     xs: &[T],
-    temp: &mut [Integer],
+    temp: &mut [C],
     bits: u64,
 ) {
     let length = usize::power_of_2(bits);
     let m = length >> 1;
     if length == 1 {
-        out[0] = xs[0].borrow().square();
-        out[1] = Integer::ZERO;
+        out[0] = xs[0].borrow().square_ref();
+        out[1] = C::ZERO;
         return;
     }
     let (sums, temp) = temp.split_at_mut(length);
@@ -65,17 +63,18 @@ fn square_karatsuba_recursive<T: Borrow<Integer>>(
 // significant bits of any element of `xs`.
 //
 // This is equivalent to `_fmpz_poly_sqr_karatsuba` from `fmpz_poly/sqr_karatsuba.c`, FLINT 3.6.0.
-crate_test_fn! {square_to_out_karatsuba(out: &mut [Integer], xs: &[Integer]) {
+crate_test_fn! {square_to_out_karatsuba<C: PolynomialCoefficient>(out: &mut [C], xs: &[C]) {
     let len = xs.len();
     assert_ne!(len, 0);
     if len == 1 {
-        out[0] = (&xs[0]).square();
+        out[0] = xs[0].square_ref();
         return;
     }
     let loglen = u64::exact_from(len).ceiling_log_base_2();
     let length = usize::power_of_2(loglen);
-    let mut rev = vec![&ZERO; length];
-    let mut scratch = vec![Integer::ZERO; length << 2];
+    let zero = C::ZERO;
+    let mut rev = vec![&zero; length];
+    let mut scratch = vec![C::ZERO; length << 2];
     let (rev_out, temp) = scratch.split_at_mut(length << 1);
     revbin_in(&mut rev, xs, loglen);
     square_karatsuba_recursive(rev_out, &rev, temp, loglen);

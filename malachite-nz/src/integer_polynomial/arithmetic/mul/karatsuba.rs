@@ -10,15 +10,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
-use crate::integer_polynomial::ZERO;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::vec::{vec_add, vec_sub_assign};
 use alloc::vec;
 use core::borrow::Borrow;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 
@@ -52,7 +50,7 @@ pub(crate) const fn revbin(n: usize, bits: u64) -> usize {
 //
 // This is equivalent to `revbin1` from `fmpz_poly/mul_karatsuba.c`, FLINT 3.6.0, which copies the
 // `fmpz`s shallowly.
-pub(crate) fn revbin_in<'a>(out: &mut [&'a Integer], xs: &'a [Integer], bits: u64) {
+pub(crate) fn revbin_in<'a, C: PolynomialCoefficient>(out: &mut [&'a C], xs: &'a [C], bits: u64) {
     for (i, x) in xs.iter().enumerate() {
         out[revbin(i, bits)] = x;
     }
@@ -62,7 +60,7 @@ pub(crate) fn revbin_in<'a>(out: &mut [&'a Integer], xs: &'a [Integer], bits: u6
 // order, into `out`.
 //
 // This is equivalent to `revbin2` from `fmpz_poly/mul_karatsuba.c`, FLINT 3.6.0.
-pub(crate) fn revbin_out(out: &mut [Integer], xs: &mut [Integer], bits: u64) {
+pub(crate) fn revbin_out<C: PolynomialCoefficient>(out: &mut [C], xs: &mut [C], bits: u64) {
     for (i, o) in out.iter_mut().enumerate() {
         *o = take(&mut xs[revbin(i, bits)]);
     }
@@ -71,7 +69,7 @@ pub(crate) fn revbin_out(out: &mut [Integer], xs: &mut [Integer], bits: u64) {
 // Adds $x$ times `ys` to `xs`, where both are in bit-reversed order with $2^b$ coefficients.
 //
 // This is equivalent to `_fmpz_vec_add_rev` from `fmpz_poly/mul_karatsuba.c`, FLINT 3.6.0.
-pub(crate) fn add_shifted_rev(xs: &mut [Integer], ys: &[Integer], bits: u64) {
+pub(crate) fn add_shifted_rev<C: PolynomialCoefficient>(xs: &mut [C], ys: &[C], bits: u64) {
     for (i, y) in ys[..usize::low_mask(bits)].iter().enumerate() {
         xs[revbin(revbin(i, bits) + 1, bits)] += y;
     }
@@ -84,18 +82,18 @@ pub(crate) fn add_shifted_rev(xs: &mut [Integer], ys: &[Integer], bits: u64) {
 //
 // This is equivalent to `_fmpz_poly_mul_kara_recursive` from `fmpz_poly/mul_karatsuba.c`, FLINT
 // 3.6.0.
-fn mul_karatsuba_recursive<T: Borrow<Integer>>(
-    out: &mut [Integer],
+fn mul_karatsuba_recursive<C: PolynomialCoefficient, T: Borrow<C>>(
+    out: &mut [C],
     xs: &[T],
     ys: &[T],
-    temp: &mut [Integer],
+    temp: &mut [C],
     bits: u64,
 ) {
     let length = usize::power_of_2(bits);
     let m = length >> 1;
     if length == 1 {
-        out[0] = xs[0].borrow() * ys[0].borrow();
-        out[1] = Integer::ZERO;
+        out[0] = xs[0].borrow().mul_ref(ys[0].borrow());
+        out[1] = C::ZERO;
         return;
     }
     let (sums, temp) = temp.split_at_mut(length);
@@ -122,19 +120,20 @@ fn mul_karatsuba_recursive<T: Borrow<Integer>>(
 // significant bits of any element of `xs` or `ys`.
 //
 // This is equivalent to `_fmpz_poly_mul_karatsuba` from `fmpz_poly/mul_karatsuba.c`, FLINT 3.6.0.
-crate_test_fn! {mul_to_out_karatsuba(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
+crate_test_fn! {mul_to_out_karatsuba<C: PolynomialCoefficient>(out: &mut [C], xs: &[C], ys: &[C]) {
     let len1 = xs.len();
     assert!(len1 >= ys.len());
     assert_ne!(ys.len(), 0);
     if len1 == 1 {
-        out[0] = &xs[0] * &ys[0];
+        out[0] = xs[0].mul_ref(&ys[0]);
         return;
     }
     let loglen = u64::exact_from(len1).ceiling_log_base_2();
     let length = usize::power_of_2(loglen);
-    let mut revs = vec![&ZERO; length << 1];
+    let zero = C::ZERO;
+    let mut revs = vec![&zero; length << 1];
     let (rev1, rev2) = revs.split_at_mut(length);
-    let mut scratch = vec![Integer::ZERO; length << 2];
+    let mut scratch = vec![C::ZERO; length << 2];
     let (rev_out, temp) = scratch.split_at_mut(length << 1);
     revbin_in(rev1, xs, loglen);
     revbin_in(rev2, ys, loglen);

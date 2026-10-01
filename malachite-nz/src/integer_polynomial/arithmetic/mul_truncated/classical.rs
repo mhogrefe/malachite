@@ -12,8 +12,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
-use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_to_out;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::vec::dot_general::vec_dot_general;
 use core::cmp::min;
 
@@ -28,7 +27,7 @@ use core::cmp::min;
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `min(xs.len(), ys.len())`, and $m$ is the
 // largest number of significant bits of any element of `xs` or `ys`.
-pub(crate) fn product_coefficient(xs: &[Integer], ys: &[Integer], i: usize) -> Integer {
+pub(crate) fn product_coefficient<C: PolynomialCoefficient>(xs: &[C], ys: &[C], i: usize) -> C {
     let top1 = min(xs.len() - 1, i);
     let top2 = min(ys.len() - 1, i);
     let n = top1 + top2 + 1 - i;
@@ -55,18 +54,18 @@ pub(crate) fn product_coefficient(xs: &[Integer], ys: &[Integer], i: usize) -> I
 //
 // This is equivalent to `_fmpz_poly_mullow_classical` from `fmpz_poly/mullow_classical.c`, FLINT
 // 3.6.0, where `n` is `out.len()`.
-crate_test_fn! {mul_truncated_to_out_classical(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+crate_test_fn! {mul_truncated_to_out_classical<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
 ) {
     let n = out.len();
     let xs = &xs[..min(xs.len(), n)];
     let ys = &ys[..min(ys.len(), n)];
     if xs.len() == 1 {
-        integers_mul_scalar_to_out(out, ys, &xs[0]);
+        C::vec_mul_scalar_to_out(out, ys, &xs[0]);
     } else if ys.len() == 1 {
-        integers_mul_scalar_to_out(out, xs, &ys[0]);
+        C::vec_mul_scalar_to_out(out, xs, &ys[0]);
     } else {
         for (i, o) in out.iter_mut().enumerate() {
             *o = product_coefficient(xs, ys, i);

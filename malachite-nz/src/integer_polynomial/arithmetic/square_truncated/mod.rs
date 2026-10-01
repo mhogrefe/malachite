@@ -14,8 +14,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::coefficient::{
+    PolynomialCoefficient, trim_coefficients,
+};
 use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use crate::integer_polynomial::arithmetic::square_truncated::classical::*;
 use crate::integer_polynomial::arithmetic::square_truncated::karatsuba::*;
@@ -30,9 +32,9 @@ use crate::integer_polynomial::arithmetic::vec::{
     schonhage_strassen_preferred, tiny_kernel,
 };
 use alloc::vec;
+use alloc::vec::Vec;
 use core::cmp::min;
-use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::arithmetic::traits::SquareAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::{SquareTruncated, SquareTruncatedAssign};
 
@@ -57,11 +59,11 @@ pub mod tiny;
 // This is equivalent to `_fmpz_poly_sqrlow` from `fmpz_poly/sqrlow.c`, FLINT 3.6.0, where `n` is
 // `out.len()`, except that it chooses Schönhage–Strassen in a measured window (see
 // `schonhage_strassen_preferred`) rather than FLINT's.
-crate_test_fn! {square_truncated_to_out(out: &mut [Integer], xs: &[Integer]) {
+crate_test_fn! {square_truncated_to_out<C: PolynomialCoefficient>(out: &mut [C], xs: &[C]) {
     let n = out.len();
     let xs = &xs[..min(xs.len(), n)];
     if xs.len() == 1 {
-        out[0] = (&xs[0]).square();
+        out[0] = xs[0].square_ref();
         return;
     }
     let bits = vec_max_bits(xs).0;
@@ -87,19 +89,21 @@ crate_test_fn! {square_truncated_to_out(out: &mut [Integer], xs: &[Integer]) {
     }
 }}
 
+// The coefficients of the square of the polynomial with coefficients `xs`, keeping only the
+// coefficients of $x^i$ for $i$ less than `len`, without zeros at the end.
+//
 // This is equivalent to `fmpz_poly_sqrlow` from `fmpz_poly/sqrlow.c`, FLINT 3.6.0.
-fn square_truncated_ref(xs: &[Integer], len: u64) -> IntegerPolynomial {
+pub(crate) fn square_truncated_ref<C: PolynomialCoefficient>(xs: &[C], len: u64) -> Vec<C> {
     if xs.is_empty() || len == 0 {
-        return IntegerPolynomial::ZERO;
+        return Vec::new();
     }
     let n = usize::try_from(len)
         .unwrap_or(usize::MAX)
         .min((xs.len() << 1) - 1);
-    let mut out = vec![Integer::ZERO; n];
+    let mut out = vec![C::ZERO; n];
     square_truncated_to_out(&mut out, xs);
-    let mut p = IntegerPolynomial { coefficients: out };
-    p.trim();
-    p
+    trim_coefficients(&mut out);
+    out
 }
 
 impl SquareTruncated for IntegerPolynomial {
@@ -197,7 +201,9 @@ impl SquareTruncated for &IntegerPolynomial {
     /// This is equivalent to `fmpz_poly_sqrlow` from `fmpz_poly/sqrlow.c`, FLINT 3.6.0.
     #[inline]
     fn square_truncated(self, len: u64) -> IntegerPolynomial {
-        square_truncated_ref(&self.coefficients, len)
+        IntegerPolynomial {
+            coefficients: square_truncated_ref(&self.coefficients, len),
+        }
     }
 }
 
@@ -237,7 +243,7 @@ impl SquareTruncatedAssign for IntegerPolynomial {
         {
             c.square_assign();
         } else {
-            *self = square_truncated_ref(&self.coefficients, len);
+            self.coefficients = square_truncated_ref(&self.coefficients, len);
         }
     }
 }

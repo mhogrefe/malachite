@@ -12,7 +12,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_truncated::tiny::mul_truncated_to_out_tiny;
 use crate::platform::{SignedDoubleLimb, SignedLimb};
 
@@ -25,9 +25,9 @@ use crate::platform::{SignedDoubleLimb, SignedLimb};
 // This is equivalent to `_fmpz_poly_mul_tiny1` from `fmpz_poly/mul.c`, FLINT 3.6.0.
 crate_test_fn! {
 #[inline]
-mul_to_out_tiny_1(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
+mul_to_out_tiny_1<C: PolynomialCoefficient>(out: &mut [C], xs: &[C], ys: &[C]) {
     assert_eq!(out.len(), xs.len() + ys.len() - 1);
-    mul_truncated_to_out_tiny::<SignedLimb>(out, xs, ys);
+    mul_truncated_to_out_tiny::<SignedLimb, C>(out, xs, ys);
 }}
 
 // Sets `out` to the coefficients of the product of the polynomials with coefficients `xs` and `ys`,
@@ -38,7 +38,7 @@ mul_to_out_tiny_1(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
 // This is equivalent to `_fmpz_poly_mul_tiny2` from `fmpz_poly/mul.c`, FLINT 3.6.0.
 crate_test_fn! {
 #[inline]
-mul_to_out_tiny_2(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
+mul_to_out_tiny_2<C: PolynomialCoefficient>(out: &mut [C], xs: &[C], ys: &[C]) {
     assert_eq!(out.len(), xs.len() + ys.len() - 1);
-    mul_truncated_to_out_tiny::<SignedDoubleLimb>(out, xs, ys);
+    mul_truncated_to_out_tiny::<SignedDoubleLimb, C>(out, xs, ys);
 }}

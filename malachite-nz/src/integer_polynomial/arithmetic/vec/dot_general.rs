@@ -10,7 +10,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::vec::small_value;
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
@@ -30,11 +30,8 @@ use alloc::vec::Vec;
 use core::cmp::Ordering::*;
 use core::mem::swap;
 use core::ptr;
-use malachite_base::num::arithmetic::traits::{
-    AddMulAssign, SubMulAssign, WrappingAddAssign, XXXAddYYYToZZZ, XXXSubYYYToZZZ,
-};
+use malachite_base::num::arithmetic::traits::{WrappingAddAssign, XXXAddYYYToZZZ, XXXSubYYYToZZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 
 // Sets `(s, sn)` to `(s, sn) + (b, bn)`, where `s` has room for one more limb than the longer of
@@ -102,20 +99,20 @@ const fn mpn_norm(xs: &[Limb], xn: &mut usize) {
 // The `Integer` whose two's complement representation is the three limbs `(x2, x1, x0)`.
 //
 // This is equivalent to `fmpz_set_signed_uiuiui` from `fmpz.h`, FLINT 3.6.0.
-fn integer_from_signed_triple(x2: Limb, x1: Limb, x0: Limb) -> Integer {
+fn coefficient_from_signed_triple<C: PolynomialCoefficient>(x2: Limb, x1: Limb, x0: Limb) -> C {
     if x2.get_highest_bit() {
         let (y2, y1, y0) = Limb::xxx_sub_yyy_to_zzz(0, 0, 0, x2, x1, x0);
-        -Integer::from(Natural::from_owned_limbs_asc(vec![y0, y1, y2]))
+        C::from_sign_and_abs(false, Natural::from_owned_limbs_asc(vec![y0, y1, y2]))
     } else {
-        Integer::from(Natural::from_owned_limbs_asc(vec![x0, x1, x2]))
+        C::from_sign_and_abs(true, Natural::from_owned_limbs_asc(vec![x0, x1, x2]))
     }
 }
 
 // The `Integer` with absolute value `(xs, xn)`, negated if `negative`.
 //
 // This is equivalent to `_fmpz_set_mpn` from `fmpz_vec/dot.c`, FLINT 3.6.0.
-fn integer_from_limbs(xs: &[Limb], xn: usize, negative: bool) -> Integer {
-    Integer::from_sign_and_abs(!negative, Natural::from_limbs_asc(&xs[..xn]))
+fn coefficient_from_limbs<C: PolynomialCoefficient>(xs: &[Limb], xn: usize, negative: bool) -> C {
+    C::from_sign_and_abs(!negative, Natural::from_limbs_asc(&xs[..xn]))
 }
 
 // Returns `initial` plus, or if `subtract` minus, the dot product of `xs` and `ys`, which must have
@@ -133,13 +130,13 @@ fn integer_from_limbs(xs: &[Limb], xn: usize, negative: bool) -> Integer {
 //
 // This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, where `initial`
 // being `None` corresponds to a null `initial`.
-crate_test_fn! {vec_dot_general(
-    initial: Option<&Integer>,
+crate_test_fn! {vec_dot_general<C: PolynomialCoefficient>(
+    initial: Option<&C>,
     subtract: bool,
-    xs: &[Integer],
-    ys: &[Integer],
+    xs: &[C],
+    ys: &[C],
     reverse: bool,
-) -> Integer {
+) -> C {
     let len = xs.len();
     assert_eq!(ys.len(), len);
     if len <= 1 {
@@ -154,10 +151,10 @@ crate_test_fn! {vec_dot_general(
             }
             result
         } else if len == 1 {
-            let product = &xs[0] * &ys[0];
-            if subtract { -product } else { product }
+            let product = xs[0].mul_ref(&ys[0]);
+            if subtract { product.negate() } else { product }
         } else {
-            Integer::ZERO
+            C::ZERO
         };
     }
     let mut s0: Limb = 0;
@@ -171,9 +168,9 @@ crate_test_fn! {vec_dot_general(
     // Scratch space for the products, reused and grown as needed.
     let mut scratch: Vec<Limb> = Vec::new();
     if let Some(initial) = initial {
-        let ap = initial.abs.as_limbs_asc();
+        let ap = initial.unsigned_abs_ref().as_limbs_asc();
         let an = ap.len();
-        let aneg = !initial.sign;
+        let aneg = initial.is_negative();
         if an <= 2 {
             s0 = ap.first().copied().unwrap_or(0);
             if an == 2 {
@@ -192,11 +189,11 @@ crate_test_fn! {vec_dot_general(
     }
     for i in 0..len {
         let ca = &xs[i];
-        if *ca == 0u32 {
+        if ca.is_zero() {
             continue;
         }
         let cb = if reverse { &ys[len - 1 - i] } else { &ys[i] };
-        if *cb == 0u32 {
+        if cb.is_zero() {
             continue;
         }
         if let (Some(a), Some(b)) = (small_value(ca), small_value(cb)) {
@@ -206,10 +203,10 @@ crate_test_fn! {vec_dot_general(
             (s2, s1, s0) = Limb::xxx_add_yyy_to_zzz(s2, s1, s0, extension, hi, lo);
             continue;
         }
-        let mut ap = ca.abs.as_limbs_asc();
-        let mut aneg = !ca.sign;
-        let mut bp = cb.abs.as_limbs_asc();
-        let mut bneg = !cb.sign;
+        let mut ap = ca.unsigned_abs_ref().as_limbs_asc();
+        let mut aneg = ca.is_negative();
+        let mut bp = cb.unsigned_abs_ref().as_limbs_asc();
+        let mut bneg = cb.is_negative();
         if ap.len() < bp.len() {
             swap(&mut ap, &mut bp);
             swap(&mut aneg, &mut bneg);
@@ -255,7 +252,7 @@ crate_test_fn! {vec_dot_general(
         if subtract {
             (s2, s1, s0) = Limb::xxx_sub_yyy_to_zzz(0, 0, 0, s2, s1, s0);
         }
-        return integer_from_signed_triple(s2, s1, s0);
+        return coefficient_from_signed_triple(s2, s1, s0);
     }
     // Add the small terms to the large ones.
     if s2.get_highest_bit() {
@@ -270,9 +267,9 @@ crate_test_fn! {vec_dot_general(
     mpn_norm(&pos, &mut posn);
     mpn_norm(&neg, &mut negn);
     if negn == 0 {
-        integer_from_limbs(&pos, posn, subtract)
+        coefficient_from_limbs(&pos, posn, subtract)
     } else if posn == 0 {
-        integer_from_limbs(&neg, negn, !subtract)
+        coefficient_from_limbs(&neg, negn, !subtract)
     } else {
         // Do the subtraction.
         let mut tneg = false;
@@ -294,6 +291,6 @@ crate_test_fn! {vec_dot_general(
             limbs_sub_greater_to_out(&mut t[..tn], &pos[..posn], &neg[..negn]);
         }
         mpn_norm(&t, &mut tn);
-        integer_from_limbs(&t, tn, tneg ^ subtract)
+        coefficient_from_limbs(&t, tn, tneg ^ subtract)
     }
 }}

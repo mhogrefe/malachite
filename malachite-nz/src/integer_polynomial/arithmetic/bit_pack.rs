@@ -12,6 +12,7 @@
 
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::vec::small_value;
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
@@ -51,18 +52,18 @@ pub(crate) fn field_start(i: usize, bits: u64) -> (usize, u64) {
 // where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 //
 // This is equivalent to `fmpz_bit_pack` from `fmpz/bit_pack.c`, FLINT 3.6.0.
-crate_test_fn! {limbs_pack_field(
+crate_test_fn! {limbs_pack_field<C: PolynomialCoefficient>(
     arr: &mut [Limb],
     shift: u64,
     bits: u64,
-    x: &Integer,
+    x: &C,
     negate: bool,
     borrow: bool,
 ) -> bool {
     let save = arr[0];
     let limbs = usize::exact_from((shift + bits) >> Limb::LOG_WIDTH);
     let rem_bits = (shift + bits) & Limb::WIDTH_MASK;
-    if *x == 0u32 {
+    if x.is_zero() {
         // Special case: store -borrow.
         if borrow {
             // Store -1 shifted, and add save back in.
@@ -85,7 +86,7 @@ crate_test_fn! {limbs_pack_field(
     }
     // Let |x| = b. If x is negative and negate is false, or x is positive and negate is true, we
     // want -b - borrow; otherwise, we want b - borrow.
-    if !x.sign ^ negate {
+    if x.is_negative() ^ negate {
         // -b - borrow = !b + 1 - borrow
         let size = if let Some(c) = small_value(x) {
             let c_bits = Limb::wrapping_from(c);
@@ -108,7 +109,7 @@ crate_test_fn! {limbs_pack_field(
             }
             2
         } else {
-            let xs = x.abs.as_limbs_asc();
+            let xs = x.unsigned_abs_ref().as_limbs_asc();
             let mut s = xs.len();
             // Complement the coefficient into arr.
             limbs_not_to_out(&mut arr[..s], xs);
@@ -154,7 +155,7 @@ crate_test_fn! {limbs_pack_field(
                 arr[1] = d >> (Limb::WIDTH - shift);
             }
         } else {
-            let xs = x.abs.as_limbs_asc();
+            let xs = x.unsigned_abs_ref().as_limbs_asc();
             let mut s = xs.len();
             // Shift into place.
             if shift != 0 {
@@ -193,7 +194,12 @@ crate_test_fn! {limbs_pack_field(
 //
 // This is equivalent to `_fmpz_poly_bit_pack` from `fmpz_poly/bit_pack.c`, FLINT 3.6.0, where
 // `negate` being true corresponds to a `negate` of -1.
-crate_test_fn! {limbs_pack_coefficients(out: &mut [Limb], xs: &[Integer], bits: u64, negate: bool) {
+crate_test_fn! {limbs_pack_coefficients<C: PolynomialCoefficient>(
+    out: &mut [Limb],
+    xs: &[C],
+    bits: u64,
+    negate: bool,
+) {
     let mut borrow = false;
     for (i, x) in xs.iter().enumerate() {
         let (limbs, shift) = field_start(i, bits);

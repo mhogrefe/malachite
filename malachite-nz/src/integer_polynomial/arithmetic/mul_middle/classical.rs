@@ -12,9 +12,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::product_coefficient;
-use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_to_out;
 use crate::integer_polynomial::arithmetic::square_truncated::classical::square_coefficient;
 use core::ptr;
 
@@ -32,10 +31,10 @@ use core::ptr;
 //
 // This is equivalent to `_fmpz_poly_mulmid_classical` from `fmpz_poly/mulmid_classical.c`, FLINT
 // 3.6.0.
-crate_test_fn! {mul_middle_to_out_classical(
-    out: &mut [Integer],
-    xs: &[Integer],
-    ys: &[Integer],
+crate_test_fn! {mul_middle_to_out_classical<C: PolynomialCoefficient>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
     nlo: usize,
     nhi: usize,
 ) {
@@ -44,9 +43,9 @@ crate_test_fn! {mul_middle_to_out_classical(
     assert!(nlo < nhi);
     assert!(nhi < xs.len() + ys.len());
     if xs.len() == 1 {
-        integers_mul_scalar_to_out(out, &ys[nlo..nhi], &xs[0]);
+        C::vec_mul_scalar_to_out(out, &ys[nlo..nhi], &xs[0]);
     } else if ys.len() == 1 {
-        integers_mul_scalar_to_out(out, &xs[nlo..nhi], &ys[0]);
+        C::vec_mul_scalar_to_out(out, &xs[nlo..nhi], &ys[0]);
     } else if ptr::eq(xs, ys) {
         for (o, i) in out.iter_mut().zip(nlo..nhi) {
             *o = square_coefficient(xs, i);
