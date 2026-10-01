@@ -17,8 +17,11 @@ use core::fmt::Debug;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
+// There is deliberately no test for `x == 0`: masking 0 gives 0 anyway, and when `pow` is a
+// constant the test is all that is left after inlining, a branch that can stop LLVM from compiling
+// the caller's loop branch-free (it made hexadecimal formatting of `Natural`s about 20% slower).
 fn mod_power_of_2_unsigned<T: PrimitiveUnsigned>(x: T, pow: u64) -> T {
-    if x == T::ZERO || pow >= T::WIDTH {
+    if pow >= T::WIDTH {
         x
     } else {
         x & T::low_mask(pow)
@@ -26,7 +29,7 @@ fn mod_power_of_2_unsigned<T: PrimitiveUnsigned>(x: T, pow: u64) -> T {
 }
 
 fn mod_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(x: &mut T, pow: u64) {
-    if *x != T::ZERO && pow < T::WIDTH {
+    if pow < T::WIDTH {
         *x &= T::low_mask(pow);
     }
 }

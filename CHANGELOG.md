@@ -819,6 +819,10 @@ documented by git history.
   precomputed tables, about 300 KB, on every call: they are converted at compile time and
   borrowed. This cut its fixed cost per call by about three quarters, and on 64-bit the FFT now
   takes over `Natural` multiplication and squaring from 389 limbs, down from 450 and 424.
+- Performance: `mod_power_of_2` on primitive unsigned integers no longer tests for zero first. With
+  a constant power the test was all that was left after inlining, and it stopped loops that use it
+  from compiling branch-free; hexadecimal formatting of `Natural`s, for example, had become about
+  20% slower.
 
 ### malachite-q
 
