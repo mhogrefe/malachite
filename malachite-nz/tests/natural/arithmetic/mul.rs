@@ -22,6 +22,7 @@ use malachite_base::test_util::generators::{
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::context::CONTEXT;
+use malachite_nz::natural::arithmetic::mul::fft::default_context;
 use malachite_nz::natural::arithmetic::mul::limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
     limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
@@ -11553,7 +11554,7 @@ fn limbs_mul_low_same_length_properties() {
 fn test_mul_context() {
     let context = initialize_context();
     assert_eq!(context.clone().serialize(), CONTEXT);
-    assert_eq!(context, CONTEXT.deserialize());
+    assert_eq!(context, default_context());
 }
 
 #[test]

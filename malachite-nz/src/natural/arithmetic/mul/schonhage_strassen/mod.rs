@@ -10,11 +10,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::add::{
-    limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
-};
+use crate::natural::arithmetic::add::{add_with_carry, limbs_slice_add_limb_in_place};
 use crate::natural::arithmetic::neg::limbs_neg_in_place;
-use crate::natural::arithmetic::sub::{limbs_sub_limb_in_place, limbs_sub_same_length_to_out};
+use crate::natural::arithmetic::sub::{limbs_sub_limb_in_place, sub_with_carry};
 use crate::platform::{Limb, SignedLimb};
 use malachite_base::num::conversion::traits::WrappingFrom;
 
@@ -76,12 +74,30 @@ crate_test_fn! {limbs_sum_diff(
     y: &[Limb],
     n: usize,
 ) -> Limb {
-    if n == 0 {
-        return 0;
+    let (s, d, x, y) = (&mut s[..n], &mut d[..n], &x[..n], &y[..n]);
+    // One pass over the inputs. Within each 4-limb block the sum's carry chain and then the
+    // difference's run over the same loaded limbs, so that LLVM keeps each chain in the flags for
+    // the length of a block. The difference is computed in carry form (see `sub_with_carry`): its
+    // carry is the negated borrow.
+    let mut carry = false;
+    let mut diff_carry = true;
+    let (s_blocks, s_rem) = s.as_chunks_mut::<4>();
+    let (d_blocks, d_rem) = d.as_chunks_mut::<4>();
+    let (x_blocks, x_rem) = x.as_chunks::<4>();
+    let (y_blocks, y_rem) = y.as_chunks::<4>();
+    for (((s, d), x), y) in s_blocks.iter_mut().zip(d_blocks).zip(x_blocks).zip(y_blocks) {
+        for i in 0..4 {
+            (s[i], carry) = add_with_carry(x[i], y[i], carry);
+        }
+        for i in 0..4 {
+            (d[i], diff_carry) = sub_with_carry(x[i], y[i], diff_carry);
+        }
     }
-    let carry = limbs_add_same_length_to_out(&mut s[..n], &x[..n], &y[..n]);
-    let borrow = limbs_sub_same_length_to_out(&mut d[..n], &x[..n], &y[..n]);
-    (Limb::from(carry) << 1) | Limb::from(borrow)
+    for (((s, d), &x), &y) in s_rem.iter_mut().zip(d_rem).zip(x_rem).zip(y_rem) {
+        (*s, carry) = add_with_carry(x, y, carry);
+        (*d, diff_carry) = sub_with_carry(x, y, diff_carry);
+    }
+    (Limb::from(carry) << 1) | Limb::from(!diff_carry)
 }}
 
 // Sets the first `xs.len()` limbs of `out` to the negation of `xs` modulo $2^{\text{W}\cdot n}$,

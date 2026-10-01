@@ -126,12 +126,36 @@ pub(crate) fn karatsuba_preferred(len2: u64, bits1: u64, bits2: u64) -> bool {
     len2 <= 4 || (len2 <= 8 && (1500..=10000).contains(&(bits1 + bits2)))
 }
 
-// Whether FLINT's multiplication dispatchers choose Schönhage–Strassen multiplication for the
-// same factors, when neither a tiny kernel, classical multiplication, nor Karatsuba multiplication
-// applies. FLINT also chooses it for very long inputs with very large coefficients, but only when
-// it may use at least 4 threads, and Malachite is single-threaded.
-pub(crate) fn schonhage_strassen_preferred(len2: u64, bits1: u64, bits2: u64) -> bool {
-    (8..=75).contains(&len2) && (800..=4000).contains(&(bits1 + bits2))
+// Whether the multiplication dispatchers choose Schönhage–Strassen multiplication over Kronecker
+// substitution, for factors of lengths `len1 >= len2`, whose coefficients have at most `bits1` and
+// `bits2` bits, when neither a tiny kernel, classical multiplication, nor Karatsuba multiplication
+// applies. `max_len` bounds `len1 + len2`: once the transform is long enough, its coefficients must
+// grow with the length, and Schönhage–Strassen falls behind. That happens once a product has
+// more than 4096 coefficients, so products use 4097; a middle product of factors of lengths $2n -
+// 1$ and $n$ uses a transform as long as the first factor, and uses 3071, so that $n \leq 1024$.
+//
+// The window was measured (see `tune_poly_mul_grid` in bin_util/tune.rs, on factors of equal length
+// and coefficient size, and on the middle product of factors of lengths $2n - 1$ and $n$) and is
+// wider than FLINT's single-threaded one, which takes `len2` from 8 to 75 and `bits1 + bits2` from
+// 800 to 4000: Schönhage–Strassen is also faster than Kronecker substitution for longer factors
+// with coefficients of several hundred to a few thousand bits. FLINT also chooses it for very long
+// inputs with very large coefficients, but only when it may use at least 4 threads, and Malachite
+// is single-threaded.
+pub(crate) fn schonhage_strassen_preferred(
+    len1: u64,
+    len2: u64,
+    bits1: u64,
+    bits2: u64,
+    max_len: u64,
+) -> bool {
+    let bits = bits1 + bits2;
+    len1 + len2 <= max_len
+        && match len2 {
+            0..=7 => false,
+            8..=15 => (1000..=4000).contains(&bits),
+            16..=100 => (800..=4000).contains(&bits),
+            _ => (1000..=5000).contains(&bits),
+        }
 }
 
 // Whether FLINT's multiplication dispatchers try the small-prime FFT first, for factors the shorter

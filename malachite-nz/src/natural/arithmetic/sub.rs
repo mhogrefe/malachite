@@ -13,11 +13,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
+use crate::natural::arithmetic::add::add_with_carry;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::fmt::Display;
 use core::ops::{Sub, SubAssign};
-use malachite_base::num::arithmetic::traits::{CheckedSub, OverflowingSubAssign};
+use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
@@ -107,15 +108,16 @@ crate_test_fn! {limbs_sub_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut 
     y != T::ZERO
 }}
 
-// A subtract-with-borrow with a `bool` borrow. Written with `overflowing_sub` so that LLVM
-// recognizes the subtract-with-borrow idiom; in the unrolled kernels below this compiles to
-// flag-chained subtracts rather than rematerializing the borrow in a register every limb (see the
-// analogous `add_with_carry` in add.rs and perf/README.md).
+// A subtract-with-borrow in carry form: returns $x - y - (1 - c)$, where $c$ is `carry`, and the
+// carry out, which is `false` exactly when the subtraction borrowed. It is computed as $x + \lnot y
+// + c$, so that LLVM recognizes the add-with-carry idiom; in the unrolled kernels below, whose
+// loop-carried value is this carry rather than a borrow, it compiles to flag-chained adds (`adcs`
+// on aarch64). Neither `x.overflowing_sub(y)` followed by subtracting the borrow nor
+// `borrowing_sub` chains the borrow in flags: they rematerialize it in a register every limb, which
+// measured 1.3-1.5x slower on aarch64 (see the analogous `add_with_carry` in add.rs).
 #[inline]
-pub(crate) fn sub_with_borrow(x: Limb, y: Limb, borrow: bool) -> (Limb, bool) {
-    let (mut diff, borrow_1) = x.overflowing_sub(y);
-    let borrow_2 = diff.overflowing_sub_assign(Limb::from(borrow));
-    (diff, borrow_1 | borrow_2)
+pub(crate) fn sub_with_carry(x: Limb, y: Limb, carry: bool) -> (Limb, bool) {
+    add_with_carry(x, !y, carry)
 }
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
@@ -375,11 +377,11 @@ crate_test_fn! {limbs_sub_same_length_in_place_with_overlap(
     } else {
         // The ranges overlap. Each read at i + right_start happens before the write at that index,
         // so reading and writing in ascending order is correct.
-        let mut borrow = false;
+        let mut carry = true;
         for i in 0..len {
-            (xs[i], borrow) = sub_with_borrow(xs[i], xs[i + right_start], borrow);
+            (xs[i], carry) = sub_with_carry(xs[i], xs[i + right_start], carry);
         }
-        borrow
+        !carry
     }
 }}
 
@@ -414,11 +416,11 @@ crate_test_fn! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &
     } else {
         // The ranges overlap. Each read at i + right_start happens before the write at that index,
         // so reading and writing in ascending order is correct.
-        let mut borrow = false;
+        let mut carry = true;
         for i in 0..ys_len {
-            (xs[i], borrow) = sub_with_borrow(xs[i + right_start], ys[i], borrow);
+            (xs[i], carry) = sub_with_carry(xs[i + right_start], ys[i], carry);
         }
-        borrow
+        !carry
     }
 }}
 
@@ -448,20 +450,20 @@ crate_test_fn! {limbs_sub_same_length_with_borrow_in_to_out(
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
-    let mut borrow = borrow_in;
-    // 4x-unrolled so that LLVM chains the borrows in flags within each block.
+    let mut carry = !borrow_in;
+    // 4x-unrolled so that LLVM chains the carries (negated borrows) in flags within each block.
     let (out_blocks, out_rem) = out[..len].as_chunks_mut::<4>();
     let (xs_blocks, xs_rem) = xs.as_chunks::<4>();
     let (ys_blocks, ys_rem) = ys.as_chunks::<4>();
     for ((o, x), y) in out_blocks.iter_mut().zip(xs_blocks).zip(ys_blocks) {
         for i in 0..4 {
-            (o[i], borrow) = sub_with_borrow(x[i], y[i], borrow);
+            (o[i], carry) = sub_with_carry(x[i], y[i], carry);
         }
     }
     for ((o, &x), &y) in out_rem.iter_mut().zip(xs_rem.iter()).zip(ys_rem.iter()) {
-        (*o, borrow) = sub_with_borrow(x, y, borrow);
+        (*o, carry) = sub_with_carry(x, y, carry);
     }
-    borrow
+    !carry
 }}
 
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -486,19 +488,19 @@ crate_test_fn! {limbs_sub_same_length_with_borrow_in_in_place_left(
     borrow_in: bool,
 ) -> bool {
     assert_eq!(xs.len(), ys.len());
-    let mut borrow = borrow_in;
-    // 4x-unrolled so that LLVM chains the borrows in flags within each block.
+    let mut carry = !borrow_in;
+    // 4x-unrolled so that LLVM chains the carries (negated borrows) in flags within each block.
     let (xs_blocks, xs_rem) = xs.as_chunks_mut::<4>();
     let (ys_blocks, ys_rem) = ys.as_chunks::<4>();
     for (x, y) in xs_blocks.iter_mut().zip(ys_blocks) {
         for i in 0..4 {
-            (x[i], borrow) = sub_with_borrow(x[i], y[i], borrow);
+            (x[i], carry) = sub_with_carry(x[i], y[i], carry);
         }
     }
     for (x, &y) in xs_rem.iter_mut().zip(ys_rem.iter()) {
-        (*x, borrow) = sub_with_borrow(*x, y, borrow);
+        (*x, carry) = sub_with_carry(*x, y, carry);
     }
-    borrow
+    !carry
 }}
 
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -523,19 +525,19 @@ crate_test_fn! {limbs_sub_same_length_with_borrow_in_in_place_right(
     borrow_in: bool,
 ) -> bool {
     assert_eq!(xs.len(), ys.len());
-    let mut borrow = borrow_in;
-    // 4x-unrolled so that LLVM chains the borrows in flags within each block.
+    let mut carry = !borrow_in;
+    // 4x-unrolled so that LLVM chains the carries (negated borrows) in flags within each block.
     let (xs_blocks, xs_rem) = xs.as_chunks::<4>();
     let (ys_blocks, ys_rem) = ys.as_chunks_mut::<4>();
     for (x, y) in xs_blocks.iter().zip(ys_blocks) {
         for i in 0..4 {
-            (y[i], borrow) = sub_with_borrow(x[i], y[i], borrow);
+            (y[i], carry) = sub_with_carry(x[i], y[i], carry);
         }
     }
     for (&x, y) in xs_rem.iter().zip(ys_rem.iter_mut()) {
-        (*y, borrow) = sub_with_borrow(x, *y, borrow);
+        (*y, carry) = sub_with_carry(x, *y, carry);
     }
-    borrow
+    !carry
 }}
 
 fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {

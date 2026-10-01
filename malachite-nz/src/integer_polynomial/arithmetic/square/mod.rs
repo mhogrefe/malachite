@@ -50,9 +50,9 @@ pub mod tiny;
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is the largest number of
 // significant bits of any element of `xs`.
 //
-// This is equivalent to `_fmpz_poly_sqr` from `fmpz_poly/sqr.c`, FLINT 3.6.0. FLINT also chooses
-// Schönhage–Strassen for very long inputs with very large coefficients, but only when it may use
-// at least 4 threads; Malachite is single-threaded, so it chooses as FLINT does with one thread.
+// This is equivalent to `_fmpz_poly_sqr` from `fmpz_poly/sqr.c`, FLINT 3.6.0, except that it
+// chooses Schönhage–Strassen in a measured window (see `schonhage_strassen_preferred`) rather
+// than FLINT's.
 crate_test_fn! {square_to_out(out: &mut [Integer], xs: &[Integer]) {
     if xs.len() == 1 {
         out[0] = (&xs[0]).square();
@@ -74,7 +74,7 @@ crate_test_fn! {square_to_out(out: &mut [Integer], xs: &[Integer]) {
         None if karatsuba_preferred(len, bits, bits) => {
             square_to_out_karatsuba(out, xs);
         }
-        None if schonhage_strassen_preferred(len, bits, bits) => {
+        None if schonhage_strassen_preferred(len, len, bits, bits, 4097) => {
             square_to_out_schonhage_strassen(out, xs);
         }
         None => square_to_out_kronecker(out, xs),

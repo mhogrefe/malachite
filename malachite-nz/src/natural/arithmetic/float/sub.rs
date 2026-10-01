@@ -22,7 +22,7 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
     limbs_sub_same_length_with_borrow_in_in_place_left,
-    limbs_sub_same_length_with_borrow_in_to_out, sub_with_borrow,
+    limbs_sub_same_length_with_borrow_in_to_out, sub_with_carry,
 };
 use crate::natural::{
     HALF_LIMB_HIGH_BIT, LIMB_HIGH_BIT, LIMB_MAX_HALF, LIMB_MAX_MINUS_1, LIMB_MAX_QUARTER,
@@ -1871,12 +1871,12 @@ fn limbs_sub_shl1_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb])
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
-    let mut borrow = false;
+    let mut carry = true;
     let mut remaining_xs_bits = 0;
     for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
         let shifted_x = (x << 1) | remaining_xs_bits;
         remaining_xs_bits = x >> WIDTH_MINUS_1;
-        (*out, borrow) = sub_with_borrow(shifted_x, y, borrow);
+        (*out, carry) = sub_with_carry(shifted_x, y, carry);
     }
 }
 
@@ -1893,14 +1893,14 @@ fn limbs_sub_shr_same_length_to_out_and_ys0(
     assert_eq!(len, ys.len());
     assert!(bits < Limb::WIDTH);
     assert!(out.len() >= len);
-    let mut borrow = false;
+    let mut carry = true;
     let comp_bits = Limb::WIDTH - bits;
     for i in 0..len {
         let mut shifted_y = (ys[i] >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits);
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        (out[i], borrow) = sub_with_borrow(xs[i], shifted_y, borrow);
+        (out[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -1921,7 +1921,7 @@ fn limbs_sub_shr_greater_to_out_and_ys0(
     assert!(bits < Limb::WIDTH);
     assert!(out.len() >= xs_len);
     let comp_bits = Limb::WIDTH - bits;
-    let mut borrow = false;
+    let mut carry = true;
     for i in 0..xs_len {
         let mut shifted_y = if let Some(y) = ys.get(i) {
             (y >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits)
@@ -1931,7 +1931,7 @@ fn limbs_sub_shr_greater_to_out_and_ys0(
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        (out[i], borrow) = sub_with_borrow(xs[i], shifted_y, borrow);
+        (out[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -1945,13 +1945,13 @@ fn limbs_sub_greater_to_out_different_ys0(out: &mut [Limb], xs: &[Limb], ys: &[L
     assert!(out.len() >= xs_len);
     // Peel off the least-significant limb (the one that uses ys0); the rest is a plain subtraction,
     // handled by the unrolled kernel.
-    let borrow_0;
-    (out[0], borrow_0) = sub_with_borrow(xs[0], ys0, false);
+    let carry_0;
+    (out[0], carry_0) = sub_with_carry(xs[0], ys0, true);
     let borrow = limbs_sub_same_length_with_borrow_in_to_out(
         &mut out[1..ys_len],
         &xs[1..ys_len],
         &ys[1..],
-        borrow_0,
+        !carry_0,
     );
     if borrow {
         limbs_sub_limb_to_out(&mut out[ys_len..], &xs[ys_len..], 1);
@@ -2370,12 +2370,12 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
 fn limbs_sub_shl1_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
-    let mut borrow = false;
+    let mut carry = true;
     let mut remaining_xs_bits = 0;
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         let shifted_x = (*x << 1) | remaining_xs_bits;
         remaining_xs_bits = *x >> WIDTH_MINUS_1;
-        (*x, borrow) = sub_with_borrow(shifted_x, y, borrow);
+        (*x, carry) = sub_with_carry(shifted_x, y, carry);
     }
 }
 
@@ -2390,14 +2390,14 @@ fn limbs_sub_shr_same_length_in_place_left_and_ys0(
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(bits < Limb::WIDTH);
-    let mut borrow = false;
+    let mut carry = true;
     let comp_bits = Limb::WIDTH - bits;
     for i in 0..len {
         let mut shifted_y = (ys[i] >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits);
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        (xs[i], borrow) = sub_with_borrow(xs[i], shifted_y, borrow);
+        (xs[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -2416,7 +2416,7 @@ fn limbs_sub_shr_greater_in_place_left_and_ys0(
     assert!(xs_len >= ys_len);
     assert!(bits < Limb::WIDTH);
     let comp_bits = Limb::WIDTH - bits;
-    let mut borrow = false;
+    let mut carry = true;
     for (i, x) in xs.iter_mut().enumerate() {
         let mut shifted_y = if let Some(y) = ys.get(i) {
             (y >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits)
@@ -2426,7 +2426,7 @@ fn limbs_sub_shr_greater_in_place_left_and_ys0(
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        (*x, borrow) = sub_with_borrow(*x, shifted_y, borrow);
+        (*x, carry) = sub_with_carry(*x, shifted_y, carry);
     }
 }
 
@@ -2440,10 +2440,10 @@ fn limbs_sub_greater_in_place_left_different_ys0(xs: &mut [Limb], ys: &[Limb], y
     assert!(xs_len >= ys_len);
     // Peel off the least-significant limb (the one that uses ys0); the rest is a plain subtraction,
     // handled by the unrolled kernel.
-    let borrow_0;
-    (xs[0], borrow_0) = sub_with_borrow(xs[0], ys0, false);
+    let carry_0;
+    (xs[0], carry_0) = sub_with_carry(xs[0], ys0, true);
     let borrow =
-        limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs[1..ys_len], &ys[1..], borrow_0);
+        limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs[1..ys_len], &ys[1..], !carry_0);
     if borrow {
         limbs_sub_limb_in_place(&mut xs[ys_len..], 1);
     }
@@ -2864,12 +2864,12 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
 fn limbs_sub_shl1_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
-    let mut borrow = false;
+    let mut carry = true;
     let mut remaining_xs_bits = 0;
     for (&x, y) in xs.iter().zip(ys.iter_mut()) {
         let shifted_x = (x << 1) | remaining_xs_bits;
         remaining_xs_bits = x >> WIDTH_MINUS_1;
-        (*y, borrow) = sub_with_borrow(shifted_x, *y, borrow);
+        (*y, carry) = sub_with_carry(shifted_x, *y, carry);
     }
 }
 
@@ -2884,14 +2884,14 @@ fn limbs_sub_shr_same_length_in_place_right_and_ys0(
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(bits < Limb::WIDTH);
-    let mut borrow = false;
+    let mut carry = true;
     let comp_bits = Limb::WIDTH - bits;
     for i in 0..len {
         let mut shifted_y = (ys[i] >> bits) | (ys.get(i + 1).unwrap_or(&0) << comp_bits);
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        (ys[i], borrow) = sub_with_borrow(xs[i], shifted_y, borrow);
+        (ys[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -2906,7 +2906,7 @@ fn limbs_sub_shr_greater_in_place_right_and_ys0(
     assert_ne!(n, 0);
     assert!(bits < Limb::WIDTH);
     let comp_bits = Limb::WIDTH - bits;
-    let mut borrow = false;
+    let mut carry = true;
     for i in 0..n {
         let mut shifted_y = if let Some(y) = ys.get(i + m) {
             (y >> bits) | (ys.get(i + m + 1).unwrap_or(&0) << comp_bits)
@@ -2916,7 +2916,7 @@ fn limbs_sub_shr_greater_in_place_right_and_ys0(
         if i == 0 {
             shifted_y &= ys0_and;
         }
-        (ys[i], borrow) = sub_with_borrow(xs[i], shifted_y, borrow);
+        (ys[i], carry) = sub_with_carry(xs[i], shifted_y, carry);
     }
 }
 
@@ -2931,11 +2931,11 @@ fn limbs_sub_greater_in_place_right_different_ys0(
     }
     // The reads (at i + m) and writes (at i) may overlap, so the unrolled kernel can't be used;
     // each read happens before the write at the same index, so ascending order is correct.
-    let mut borrow;
-    (ys[0], borrow) = sub_with_borrow(xs[0], ys0, false);
+    let mut carry;
+    (ys[0], carry) = sub_with_carry(xs[0], ys0, true);
     for i in 1..xs.len() {
         let y = ys.get(i + m).copied().unwrap_or(0);
-        (ys[i], borrow) = sub_with_borrow(xs[i], y, borrow);
+        (ys[i], carry) = sub_with_carry(xs[i], y, carry);
     }
 }
 

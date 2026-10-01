@@ -355,6 +355,17 @@ fn test_mul_middle_to_out() {
     test_generated(120, 110, 20, 20, 30, 150);
     // - fft_preferred(len2, bits1, bits2, 100, 200), but the FFT declines
     test_generated(120, 110, 250, 250, 30, 150);
+    // - schonhage_strassen_preferred(len1, len2, bits1, bits2, 3071), with 16 <= len2 <= 100
+    test_generated(39, 20, 600, 500, 19, 39);
+    // - schonhage_strassen_preferred(len1, len2, bits1, bits2, 3071), with len2 > 100
+    test_generated(299, 150, 600, 500, 149, 299);
+    // - schonhage_strassen_preferred(len1, len2, bits1, bits2, 3071), with 8 <= len2 < 16
+    test_generated(23, 12, 600, 500, 11, 23);
+    // - !schonhage_strassen_preferred(len1, len2, bits1, bits2, 3071), with 8 <= len2 < 16 and
+    //   bits1 + bits2 < 1000
+    test_generated(23, 12, 500, 400, 11, 23);
+    // - !schonhage_strassen_preferred(len1, len2, bits1, bits2, 3071), with len1 + len2 > 3071
+    test_generated(2049, 1025, 600, 500, 1024, 2049);
 }
 
 #[test]

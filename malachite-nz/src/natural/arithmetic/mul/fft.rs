@@ -25,6 +25,7 @@ use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::platform::Limb;
+use alloc::borrow::Cow;
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use core::cmp::{max, min};
@@ -72,20 +73,6 @@ pub(crate) struct SerializedFFTContext {
     pub(crate) w2tab_offsets: [usize; SD_FFT_CTX_W2TAB_SIZE],
 }
 
-impl SerializedFFTContext {
-    fn deserialize(self) -> FFTContext {
-        FFTContext {
-            p: f64::from_bits(self.p),
-            pinv: f64::from_bits(self.pinv),
-            mod_data: self.mod_data,
-            primitive_root: self.primitive_root,
-            w2tab_depth: self.w2tab_depth,
-            w2tab_backing: self.w2tab_backing.into_iter().map(f64::from_bits).collect(),
-            w2tab_offsets: self.w2tab_offsets,
-        }
-    }
-}
-
 // This is sd_fft_ctx_struct from fft_small.h, FLINT 3.3.0-dev.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct FFTContext {
@@ -94,7 +81,7 @@ pub(crate) struct FFTContext {
     pub(crate) mod_data: ModData,
     pub(crate) primitive_root: u64,
     pub(crate) w2tab_depth: u64,
-    pub(crate) w2tab_backing: Vec<f64>,
+    pub(crate) w2tab_backing: Cow<'static, [f64]>,
     pub(crate) w2tab_offsets: [usize; SD_FFT_CTX_W2TAB_SIZE],
 }
 
@@ -106,7 +93,7 @@ impl Default for FFTContext {
             mod_data: ModData::default(),
             primitive_root: 0,
             w2tab_depth: 0,
-            w2tab_backing: Vec::new(),
+            w2tab_backing: Cow::Borrowed(&[]),
             w2tab_offsets: [0; SD_FFT_CTX_W2TAB_SIZE],
         }
     }
@@ -123,17 +110,6 @@ pub(crate) struct SerializedCRTData {
     pub(crate) prime: u64,
     pub(crate) coeff_len: usize,
     pub(crate) nprimes: usize,
-}
-
-impl SerializedCRTData {
-    fn deserialize(self, data: &[u64]) -> CRTData {
-        CRTData {
-            prime: self.prime,
-            coeff_len: self.coeff_len,
-            nprimes: self.nprimes,
-            data: data.to_vec(),
-        }
-    }
 }
 
 // This is crt_data_struct from fft_small.h, FLINT 3.3.0-dev.
@@ -203,57 +179,91 @@ crate_test_struct! {
     pub(crate) buffer_alloc: usize,
 }}
 
-impl SerializedContext {
-    private_test_fn! {deserialize(self) -> Context {
-        let [f0, f1, f2, f3, f4, f5, f6, f7] = self.ffts;
-        let [c0, c1, c2, c3, c4, c5, c6, c7] = self.crts;
-        Context {
-            ffts: [
-                f0.deserialize(),
-                f1.deserialize(),
-                f2.deserialize(),
-                f3.deserialize(),
-                f4.deserialize(),
-                f5.deserialize(),
-                f6.deserialize(),
-                f7.deserialize(),
-            ],
-            crts: [
-                c0.deserialize(&self.crts_data_0),
-                c1.deserialize(&self.crts_data_1),
-                c2.deserialize(&self.crts_data_2),
-                c3.deserialize(&self.crts_data_3),
-                c4.deserialize(&self.crts_data_4),
-                c5.deserialize(&self.crts_data_5),
-                c6.deserialize(&self.crts_data_6),
-                c7.deserialize(&self.crts_data_7),
-            ],
-            vec_two_pow_tab_backing: self
-                .vec_two_pow_tab_backing
-                .into_iter()
-                .map(|[u0, u1, u2, u3]| {
-                    f64x4::from([
-                        f64::from_bits(u0),
-                        f64::from_bits(u1),
-                        f64::from_bits(u2),
-                        f64::from_bits(u3),
-                    ])
-                })
-                .collect(),
-            vec_two_pow_tab_offsets: self.vec_two_pow_tab_offsets,
-            slow_two_pow_backing: self
-                .slow_two_pow_backing
-                .into_iter()
-                .map(f64::from_bits)
-                .collect(),
-            slow_two_pow_offsets: self.slow_two_pow_offsets,
-            profiles: self.profiles,
-            profiles_size: self.profiles_size,
-            buffer: Vec::new(),
-            buffer_alloc: self.buffer_alloc,
-        }
-    }}
+// `CONTEXT`, which is a `const`, as a `static`, so that reading its fields at run time doesn't copy
+// all of it.
+static SERIALIZED_CONTEXT: SerializedContext = CONTEXT;
+
+const fn f64s_from_bits<const N: usize>(xs: [u64; N]) -> [f64; N] {
+    let mut out = [0.0; N];
+    let mut i = 0;
+    while i < N {
+        out[i] = f64::from_bits(xs[i]);
+        i += 1;
+    }
+    out
 }
+
+// The tables of `CONTEXT`, converted to floats at compile time. A default context borrows them, so
+// that it costs almost nothing to create; only a transform deeper than the tables cover copies the
+// one it extends (see `sd_fft_ctx_fit_depth_with_lock`).
+static W2TABS: [[f64; 4096]; MPN_CTX_NCRTS] = {
+    let mut tabs = [[0.0; 4096]; MPN_CTX_NCRTS];
+    let mut i = 0;
+    while i < MPN_CTX_NCRTS {
+        tabs[i] = f64s_from_bits(CONTEXT.ffts[i].w2tab_backing);
+        i += 1;
+    }
+    tabs
+};
+
+static VEC_TWO_POW_TAB: [f64x4; 768] = {
+    let bits = CONTEXT.vec_two_pow_tab_backing;
+    let mut tab = [f64x4::ZERO; 768];
+    let mut i = 0;
+    while i < 768 {
+        tab[i] = f64x4::new(f64s_from_bits(bits[i]));
+        i += 1;
+    }
+    tab
+};
+
+static SLOW_TWO_POW: [f64; 1 << 11] = f64s_from_bits(CONTEXT.slow_two_pow_backing);
+
+// The default context, FLINT's `default_mpn_ctx`, whose tables are borrowed from the statics above.
+crate_test_fn! {default_context() -> Context {
+    let s = &SERIALIZED_CONTEXT;
+    let crts_data: [&[u64]; MPN_CTX_NCRTS] = [
+        &s.crts_data_0,
+        &s.crts_data_1,
+        &s.crts_data_2,
+        &s.crts_data_3,
+        &s.crts_data_4,
+        &s.crts_data_5,
+        &s.crts_data_6,
+        &s.crts_data_7,
+    ];
+    Context {
+        ffts: core::array::from_fn(|i| {
+            let f = &s.ffts[i];
+            FFTContext {
+                p: f64::from_bits(f.p),
+                pinv: f64::from_bits(f.pinv),
+                mod_data: f.mod_data.clone(),
+                primitive_root: f.primitive_root,
+                w2tab_depth: f.w2tab_depth,
+                w2tab_backing: Cow::Borrowed(&W2TABS[i]),
+                w2tab_offsets: f.w2tab_offsets,
+            }
+        }),
+        crts: core::array::from_fn(|i| {
+            let c = &s.crts[i];
+            CRTData {
+                prime: c.prime,
+                coeff_len: c.coeff_len,
+                nprimes: c.nprimes,
+                data: crts_data[i].to_vec(),
+            }
+        }),
+        vec_two_pow_tab_backing: Cow::Borrowed(&VEC_TWO_POW_TAB),
+        vec_two_pow_tab_offsets: s.vec_two_pow_tab_offsets,
+        slow_two_pow_backing: Cow::Borrowed(&SLOW_TWO_POW),
+        slow_two_pow_offsets: s.slow_two_pow_offsets,
+        profiles: s.profiles.clone(),
+        profiles_size: s.profiles_size,
+        buffer: Vec::new(),
+        buffer_alloc: s.buffer_alloc,
+    }
+}}
 
 // This is mpn_ctx_struct from fft_small.h, FLINT 3.3.0-dev.
 crate_test_struct! {
@@ -261,9 +271,9 @@ crate_test_struct! {
 Context {
     pub(crate) ffts: [FFTContext; MPN_CTX_NCRTS],
     pub(crate) crts: [CRTData; MPN_CTX_NCRTS],
-    pub(crate) vec_two_pow_tab_backing: Vec<f64x4>,
+    pub(crate) vec_two_pow_tab_backing: Cow<'static, [f64x4]>,
     pub(crate) vec_two_pow_tab_offsets: [usize; MPN_CTX_NCRTS.div_ceil(VEC_SZ)],
-    pub(crate) slow_two_pow_backing: Vec<f64>,
+    pub(crate) slow_two_pow_backing: Cow<'static, [f64]>,
     pub(crate) slow_two_pow_offsets: [usize; MPN_CTX_NCRTS],
     pub(crate) profiles: [ProfileEntry; MAX_NPROFILES],
     pub(crate) profiles_size: usize,
@@ -1283,7 +1293,7 @@ macro_rules! write_f64x8 {
 macro_rules! write_f64x8_w2tab {
     ($q: expr, $i: expr, $j: expr, $f: expr) => {
         let start = $q.w2tab_offsets[$i] + $j;
-        $q.w2tab_backing[start..start + 8].copy_from_slice(&$f.to_array());
+        $q.w2tab_backing.to_mut()[start..start + 8].copy_from_slice(&$f.to_array());
     };
 }
 
@@ -2486,7 +2496,7 @@ fn sd_fft_ctx_fit_depth_with_lock(q: &mut FFTContext, depth: u64) {
         let ninv = f64x8::splat(q.pinv);
         let big_n = usize::power_of_2(k - 1);
         let old_len = q.w2tab_backing.len();
-        q.w2tab_backing.resize(
+        q.w2tab_backing.to_mut().resize(
             old_len + big_n.round_to_multiple_of_power_of_2(12, Ceiling).0,
             0.0,
         );
@@ -5056,7 +5066,7 @@ fn mpn_ctx_mpn_mul(r: &mut Context, z: &mut [Limb], a: &[Limb], b: &[Limb], test
         .0;
     assert_ne!(an, 0);
     assert_ne!(bn, 0);
-    let coeff_len = CONTEXT.crts[p.np - 1].coeff_len;
+    let coeff_len = r.crts[p.np - 1].coeff_len;
     assert_ne!(
         flint_mpn_cmp_ui_2exp(
             &r.crts[p.np - 1].prod_primes_ref()[..coeff_len],
@@ -5525,18 +5535,18 @@ pub(crate) fn fmpz_poly_mul_mid_default_mpn_ctx(
     a: &[Integer],
     b: &[Integer],
 ) -> bool {
-    let mut context = CONTEXT.deserialize();
+    let mut context = default_context();
     fmpz_poly_mul_mid_mpn_ctx(&mut context, z, zl, zh, a, b)
 }
 
 // This is mpn_mul_default_mpn_ctx from fft_small/default_ctx.c, FLINT 3.3.0-dev.
 pub(crate) fn mpn_mul_default_mpn_ctx(r1: &mut [Limb], i1: &[Limb], i2: &[Limb], test_slow: bool) {
-    let mut context = CONTEXT.deserialize();
+    let mut context = default_context();
     mpn_ctx_mpn_mul(&mut context, r1, i1, i2, test_slow);
 }
 
-// Tuner entry points (see bin_util/tune.rs and PORTING.md's note on `_for_tuning` wrappers). The
-// context deserialization is part of every production call, so it is correct for the threshold
+// Tuner entry points (see bin_util/tune.rs and PORTING.md's note on `_for_tuning` wrappers).
+// Creating the default context is part of every production call, so it is correct for the threshold
 // measurements to include it.
 #[cfg(feature = "test_build")]
 pub fn mpn_mul_fft_for_tuning(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
@@ -5549,6 +5559,6 @@ pub fn mpn_square_fft_for_tuning(out: &mut [Limb], xs: &[Limb]) {
 }
 
 pub(crate) fn mpn_square_default_mpn_ctx(r1: &mut [Limb], i1: &[Limb]) {
-    let mut context = CONTEXT.deserialize();
+    let mut context = default_context();
     mpn_ctx_mpn_mul(&mut context, r1, i1, i1, false);
 }

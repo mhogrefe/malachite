@@ -55,9 +55,8 @@ pub mod tiny;
 // significant bits of any element of `xs`.
 //
 // This is equivalent to `_fmpz_poly_sqrlow` from `fmpz_poly/sqrlow.c`, FLINT 3.6.0, where `n` is
-// `out.len()`. FLINT also chooses Schönhage–Strassen for very long inputs with very large
-// coefficients, but only when it may use at least 4 threads; Malachite is single-threaded, so it
-// chooses as FLINT does with one thread.
+// `out.len()`, except that it chooses Schönhage–Strassen in a measured window (see
+// `schonhage_strassen_preferred`) rather than FLINT's.
 crate_test_fn! {square_truncated_to_out(out: &mut [Integer], xs: &[Integer]) {
     let n = out.len();
     let xs = &xs[..min(xs.len(), n)];
@@ -81,7 +80,7 @@ crate_test_fn! {square_truncated_to_out(out: &mut [Integer], xs: &[Integer]) {
         None if karatsuba_preferred(len, bits, bits) => {
             square_truncated_to_out_karatsuba(out, xs);
         }
-        None if schonhage_strassen_preferred(len, bits, bits) => {
+        None if schonhage_strassen_preferred(len, len, bits, bits, 4097) => {
             square_truncated_to_out_schonhage_strassen(out, xs);
         }
         None => square_truncated_to_out_kronecker(out, xs),

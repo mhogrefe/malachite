@@ -34,6 +34,7 @@ use crate::platform::{
     MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD,
     MUL_TOOM42_TO_TOOM53_THRESHOLD, MUL_TOOM42_TO_TOOM63_THRESHOLD, MUL_TOOM44_THRESHOLD,
 };
+use alloc::borrow::Cow;
 use libm::scalbn;
 use malachite_base::num::arithmetic::traits::{
     DivRound, ModPow, PowerOf2, XMulYToZZ, XXDivModYToQR,
@@ -221,8 +222,9 @@ fn sd_fft_ctx_init_prime(pp: u64) -> FFTContext {
     //
     //  Q->w2tab[j] is itself a table of length 2 ^ (j - 1) containing 2 ^ (j + 1) st roots of
     //  unity.
-    q.w2tab_backing = vec![0.0; 1 << 12];
-    q.w2tab_backing[0] = 1.0;
+    let w2tab_backing = q.w2tab_backing.to_mut();
+    *w2tab_backing = vec![0.0; 1 << 12];
+    w2tab_backing[0] = 1.0;
     let mut l = 1;
     for k in 1..SD_FFT_CTX_W2TAB_INIT {
         let w = f64_reduce_0n_to_pmhn!(
@@ -231,7 +233,7 @@ fn sd_fft_ctx_init_prime(pp: u64) -> FFTContext {
             n
         );
         q.w2tab_offsets[k as usize] = l;
-        let (w_lo, w_hi) = q.w2tab_backing.split_at_mut(l);
+        let (w_lo, w_hi) = q.w2tab_backing.to_mut().split_at_mut(l);
         for (hi, &lo) in w_hi.iter_mut().zip(w_lo.iter()) {
             *hi = f64_reduce_pm1n_to_pmhn!(f64_mulmod!(lo, w, n, ninv), n);
         }
@@ -342,12 +344,12 @@ pub fn initialize_context() -> Context {
     {
         let len = MPN_CTX_TWO_POWER_TAB_SIZE;
         let x = vec![0.0; len * MPN_CTX_NCRTS];
-        r.slow_two_pow_backing = x;
+        r.slow_two_pow_backing = Cow::Owned(x);
         let mut offset = 0;
         for i in 0..MPN_CTX_NCRTS {
             r.slow_two_pow_offsets[i] = offset;
             fill_slow_two_pow_tab(
-                &mut r.slow_two_pow_backing[offset..offset + len],
+                &mut r.slow_two_pow_backing.to_mut()[offset..offset + len],
                 r.ffts[i].p,
                 r.ffts[i].pinv,
             );
@@ -359,12 +361,12 @@ pub fn initialize_context() -> Context {
         let len = MPN_CTX_TWO_POWER_TAB_SIZE;
         let max_nvs = MPN_CTX_NCRTS.div_round(VEC_SZ, Ceiling).0;
         let x = vec![f64x4::ZERO; max_nvs * (max_nvs + 1) / 2 * len];
-        r.vec_two_pow_tab_backing = x;
+        r.vec_two_pow_tab_backing = Cow::Owned(x);
         let mut offset = 0;
         for nvs in 1..=max_nvs {
             r.vec_two_pow_tab_offsets[nvs - 1] = offset;
             fill_vec_two_pow_tab(
-                &mut r.vec_two_pow_tab_backing[offset..],
+                &mut r.vec_two_pow_tab_backing.to_mut()[offset..],
                 &mut r.ffts,
                 len,
                 nvs,
@@ -395,7 +397,10 @@ pub fn initialize_context() -> Context {
 impl FFTContext {
     fn serialize(self) -> SerializedFFTContext {
         let mut w2tab_backing = [0; 4096];
-        for (o, x) in w2tab_backing.iter_mut().zip(self.w2tab_backing) {
+        for (o, x) in w2tab_backing
+            .iter_mut()
+            .zip(self.w2tab_backing.iter().copied())
+        {
             *o = x.to_bits();
         }
         SerializedFFTContext {
@@ -431,7 +436,7 @@ impl Context {
         let mut vec_two_pow_tab_backing = [[0; 4]; 768];
         for (o, f) in vec_two_pow_tab_backing
             .iter_mut()
-            .zip(self.vec_two_pow_tab_backing)
+            .zip(self.vec_two_pow_tab_backing.iter().copied())
         {
             let [f0, f1, f2, f3] = f.to_array();
             *o = [f0.to_bits(), f1.to_bits(), f2.to_bits(), f3.to_bits()];
@@ -439,7 +444,7 @@ impl Context {
         let mut slow_two_pow_backing = [0; 1 << 11];
         for (o, x) in slow_two_pow_backing
             .iter_mut()
-            .zip(self.slow_two_pow_backing)
+            .zip(self.slow_two_pow_backing.iter().copied())
         {
             *o = x.to_bits();
         }

@@ -425,7 +425,8 @@ documented by git history.
   word-sized primes (the polynomial counterpart of the small-prime FFT that `Natural` multiplication
   already uses), and Schönhage–Strassen multiplication, a truncated transform over residues modulo
   $2^N + 1$ that needs no multiplications, for coefficients of hundreds to thousands of bits,
-  choosing among them as FLINT does. When either factor is a constant, the forms that take the other
+  choosing among them as FLINT does, except that Schönhage–Strassen is used over a wider, measured
+  range of lengths. When either factor is a constant, the forms that take the other
   by value multiply its coefficients in place.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
@@ -809,6 +810,15 @@ documented by git history.
   is no power wide enough to leave every polynomial alone: a [`Natural`] coefficient can exceed
   any $2^k$, so a $k$ past 64 is as meaningful as a small one, and there is no width short circuit
   to take.
+- Performance: the multi-limb subtraction kernels behind `Natural`, `Integer`, and `Float`
+  subtraction now compile to a chain of add-with-carry instructions, as the addition kernels do,
+  rather than recomputing the borrow for every limb (25–35% faster kernels on aarch64), and the
+  sum-and-difference step of Schönhage–Strassen polynomial multiplication makes one pass instead of
+  two; together these make that multiplication about 13% faster. The small-prime FFT, used for
+  large `Natural` multiplication and for polynomial multiplication, no longer rebuilds its
+  precomputed tables, about 300 KB, on every call: they are converted at compile time and
+  borrowed. This cut its fixed cost per call by about three quarters, and on 64-bit the FFT now
+  takes over `Natural` multiplication and squaring from 389 limbs, down from 450 and 424.
 
 ### malachite-q
 

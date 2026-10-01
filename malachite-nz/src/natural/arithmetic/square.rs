@@ -83,13 +83,13 @@ use malachite_base::rounding_modes::RoundingMode::*;
 const TWICE_SQR_TOOM6_THRESHOLD: usize = SQR_TOOM6_THRESHOLD << 1;
 const SQR_TOOM8_THRESHOLD_TIMES_15_OVER_8: usize = (SQR_TOOM8_THRESHOLD * 15) >> 3;
 
-// Measured directly 2026-07 on 64-bit (FFT square vs toom6 head-to-head; the old derived heuristic
-// said 11700, 27x too high; re-measured over the full size range after the small-transform fixes:
-// 429, within plateau noise of the applied value). 32-bit keeps the original derivation,
-// SQR_TOOM3_THRESHOLD * 3 * 10: the 64-bit value shrinks SQR_TOOM8_MAX below platform_32's Toom
-// thresholds, turning off every recursion gate in limbs_square_to_out_toom_8 and breaking it.
+// Measured directly on 64-bit (FFT square vs toom6 head-to-head; the old derived heuristic said
+// 11700, 27x too high). It was 424 in 2026-07, and 389 in 2026-10, after the FFT's default context
+// stopped being rebuilt on every call. 32-bit keeps the original derivation, SQR_TOOM3_THRESHOLD *
+// 3 * 10: the 64-bit value shrinks SQR_TOOM8_MAX below platform_32's Toom thresholds, turning off
+// every recursion gate in limbs_square_to_out_toom_8 and breaking it.
 #[cfg(not(feature = "32_bit_limbs"))]
-pub(crate) const SQR_FFT_THRESHOLD: usize = 424;
+pub(crate) const SQR_FFT_THRESHOLD: usize = 389;
 #[cfg(feature = "32_bit_limbs")]
 pub(crate) const SQR_FFT_THRESHOLD: usize = crate::platform::SQR_TOOM3_THRESHOLD * 30;
 

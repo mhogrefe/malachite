@@ -58,9 +58,8 @@ pub mod tiny;
 // significant bits of any element of `xs` or `ys`.
 //
 // This is equivalent to `_fmpz_poly_mullow` from `fmpz_poly/mullow.c`, FLINT 3.6.0, where `n` is
-// `out.len()`. FLINT also chooses Schönhage–Strassen for very long inputs with very large
-// coefficients, but only when it may use at least 4 threads; Malachite is single-threaded, so it
-// chooses as FLINT does with one thread.
+// `out.len()`, except that it chooses Schönhage–Strassen in a measured window (see
+// `schonhage_strassen_preferred`) rather than FLINT's.
 crate_test_fn! {mul_truncated_to_out(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
     let n = out.len();
     let mut xs = &xs[..min(xs.len(), n)];
@@ -82,6 +81,7 @@ crate_test_fn! {mul_truncated_to_out(out: &mut [Integer], xs: &[Integer], ys: &[
     }
     let bits1 = vec_max_bits(xs).0;
     let bits2 = vec_max_bits(ys).0;
+    let len1 = u64::exact_from(xs.len());
     let len2 = u64::exact_from(ys.len());
     if fft_preferred(len2, bits1, bits2, 100, 200) && mul_middle_to_out_fft(out, xs, ys, 0, n) {
         return;
@@ -97,7 +97,7 @@ crate_test_fn! {mul_truncated_to_out(out: &mut [Integer], xs: &[Integer], ys: &[
         None if karatsuba_preferred(len2, bits1, bits2) => {
             mul_truncated_to_out_karatsuba(out, xs, ys);
         }
-        None if schonhage_strassen_preferred(len2, bits1, bits2) => {
+        None if schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097) => {
             mul_truncated_to_out_schonhage_strassen(out, xs, ys);
         }
         None => mul_truncated_to_out_kronecker(out, xs, ys),

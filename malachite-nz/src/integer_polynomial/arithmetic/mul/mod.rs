@@ -54,9 +54,9 @@ pub mod tiny;
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is the largest number of
 // significant bits of any element of `xs` or `ys`.
 //
-// This is equivalent to `_fmpz_poly_mul` from `fmpz_poly/mul.c`, FLINT 3.6.0. FLINT also chooses
-// Schönhage–Strassen for very long inputs with very large coefficients, but only when it may use
-// at least 4 threads; Malachite is single-threaded, so it chooses as FLINT does with one thread.
+// This is equivalent to `_fmpz_poly_mul` from `fmpz_poly/mul.c`, FLINT 3.6.0, except that it
+// chooses Schönhage–Strassen in a measured window (see `schonhage_strassen_preferred`) rather
+// than FLINT's.
 crate_test_fn! {mul_greater_to_out(out: &mut [Integer], xs: &[Integer], ys: &[Integer]) {
     let len1 = xs.len();
     let len2 = ys.len();
@@ -87,7 +87,7 @@ crate_test_fn! {mul_greater_to_out(out: &mut [Integer], xs: &[Integer], ys: &[In
         None if karatsuba_preferred(len2, bits1, bits2) => {
             mul_to_out_karatsuba(out, xs, ys);
         }
-        None if schonhage_strassen_preferred(len2, bits1, bits2) => {
+        None if schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097) => {
             mul_to_out_schonhage_strassen(out, xs, ys);
         }
         None => mul_to_out_kronecker(out, xs, ys),

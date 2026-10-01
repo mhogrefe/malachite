@@ -643,6 +643,253 @@ fn tune_mul_fft_probe() {
     }
 }
 
+// The Malachite side of the polynomial-multiplication shootout; the C side is
+// perf/scratch/poly_mul_flint.c (make poly-mul-flint). The grid of lengths and coefficient sizes,
+// the dense inputs (every coefficient has exactly `bits` bits and a random sign), and the timing (a
+// batch calibrated to at least 20 ms, best of 5) mirror the C harness, so the tables compare line
+// for line. There is one more column, the small-prime FFT kernel, which FLINT's harness reaches
+// only through its dispatcher; `-` means the kernel declined.
+fn tune_poly_mul_grid() {
+    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::basic::traits::Zero;
+    use malachite_base::num::logic::traits::BitAccess;
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::mul::classical::mul_to_out_classical;
+    use malachite_nz::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
+    use malachite_nz::integer_polynomial::arithmetic::mul::kronecker::mul_to_out_kronecker;
+    use malachite_nz::integer_polynomial::arithmetic::mul::mul_greater_to_out;
+    use malachite_nz::integer_polynomial::arithmetic::mul::schonhage_strassen::*;
+    use malachite_nz::integer_polynomial::arithmetic::mul_middle::classical::*;
+    use malachite_nz::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
+    use malachite_nz::integer_polynomial::arithmetic::mul_middle::kronecker::*;
+    use malachite_nz::integer_polynomial::arithmetic::mul_middle::mul_middle_to_out;
+    use malachite_nz::integer_polynomial::arithmetic::mul_middle::schonhage_strassen::*;
+    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::classical::*;
+    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::karatsuba::*;
+    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::kronecker::*;
+    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::mul_truncated_to_out;
+    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::schonhage_strassen::*;
+    use malachite_nz::integer_polynomial::arithmetic::square::classical::square_to_out_classical;
+    use malachite_nz::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
+    use malachite_nz::integer_polynomial::arithmetic::square::kronecker::square_to_out_kronecker;
+    use malachite_nz::integer_polynomial::arithmetic::square::schonhage_strassen::*;
+    use malachite_nz::integer_polynomial::arithmetic::square::square_to_out;
+    use malachite_nz::integer_polynomial::arithmetic::square_truncated::classical::*;
+    use malachite_nz::integer_polynomial::arithmetic::square_truncated::karatsuba::*;
+    use malachite_nz::integer_polynomial::arithmetic::square_truncated::kronecker::*;
+    use malachite_nz::integer_polynomial::arithmetic::square_truncated::schonhage_strassen::*;
+    use malachite_nz::integer_polynomial::arithmetic::square_truncated::square_truncated_to_out;
+    use malachite_nz::natural::Natural;
+    use std::time::Instant;
+    fn dense(seed: &str, n: usize, bits: u64) -> Vec<Integer> {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+        let mut signs = random_primitive_ints::<u8>(EXAMPLE_SEED.fork(&format!("{seed}s")));
+        let limb_count = usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap();
+        (0..n)
+            .map(|_| {
+                let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                let mut x = Natural::from_owned_limbs_asc(xs).mod_power_of_2(bits);
+                x.set_bit(bits - 1);
+                if signs.next().unwrap().odd() {
+                    -Integer::from(x)
+                } else {
+                    Integer::from(x)
+                }
+            })
+            .collect()
+    }
+    // Seconds per call: iterations are doubled (or multiplied by 10) until a batch takes at least
+    // 20 ms, and the best of 5 batches is kept.
+    fn time_one(f: &mut dyn FnMut()) -> f64 {
+        let mut iters = 1u64;
+        loop {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            let t = t0.elapsed().as_secs_f64();
+            if t >= 0.02 {
+                break;
+            }
+            iters *= if t < 0.002 { 10 } else { 2 };
+        }
+        let mut best = f64::INFINITY;
+        for _ in 0..5 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best
+    }
+    // POLY_GRID_LENS and POLY_GRID_BITS (comma-separated) replace the default grid, for zooming in
+    // on a crossover; the C harness has no such override, so the joined comparison needs the
+    // defaults.
+    let grid = |var: &str, default: &[u64]| -> Vec<u64> {
+        std::env::var(var).map_or_else(
+            |_| default.to_vec(),
+            |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+        )
+    };
+    // POLY_GRID_OP chooses the operation: mul (the default, and the only one the C harness
+    // measures), square, mul_truncated, square_truncated, or mul_middle.
+    let op = std::env::var("POLY_GRID_OP").unwrap_or_else(|_| "mul".to_string());
+    let lens: Vec<usize> = grid(
+        "POLY_GRID_LENS",
+        &[8, 16, 32, 48, 64, 75, 100, 200, 500, 1000, 2000, 5000, 10000],
+    )
+    .into_iter()
+    .map(|n| usize::try_from(n).unwrap())
+    .collect();
+    let bitss = grid(
+        "POLY_GRID_BITS",
+        &[10, 64, 200, 500, 800, 1500, 2000, 4000, 8000, 20000],
+    );
+    println!(
+        "{:>6} {:>6} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}  {:<10} {:>8} {:>8}",
+        "len",
+        "bits",
+        "classical",
+        "karatsuba",
+        "KS",
+        "SS",
+        "fft",
+        "dispatcher",
+        "winner",
+        "SS/best",
+        "disp/best"
+    );
+    for &n in &lens {
+        for &bits in &bitss {
+            if n as f64 * bits as f64 > 4.1e7 {
+                continue;
+            }
+            // The shapes: full products of two length-n factors, products truncated to n
+            // coefficients, and the middle product of a length-(2n - 1) factor and a length-n one
+            // (the coefficients from n - 1 up to 2n - 1), as Newton iterations use it.
+            let (xs_len, out_len, nlo) = match op.as_str() {
+                "mul" | "square" => (n, (n << 1) - 1, 0),
+                "mul_truncated" | "square_truncated" => (n, n, 0),
+                "mul_middle" => ((n << 1) - 1, n, n - 1),
+                _ => panic!("unknown POLY_GRID_OP {op}"),
+            };
+            let nhi = nlo + out_len;
+            let xs = dense(&format!("a{n}_{bits}"), xs_len, bits);
+            let ys = dense(&format!("b{n}_{bits}"), n, bits);
+            let mut out = vec![Integer::ZERO; out_len];
+            type Kernel<'a> = &'a dyn Fn(&mut [Integer], &[Integer], &[Integer]);
+            let (classical, karatsuba, kronecker, ss, dispatcher): (
+                Kernel,
+                Option<Kernel>,
+                Kernel,
+                Kernel,
+                Kernel,
+            ) = match op.as_str() {
+                "mul" => (
+                    &mul_to_out_classical,
+                    Some(&mul_to_out_karatsuba),
+                    &mul_to_out_kronecker,
+                    &mul_to_out_schonhage_strassen,
+                    &mul_greater_to_out,
+                ),
+                "square" => (
+                    &|o, x, _| square_to_out_classical(o, x),
+                    Some(&|o, x, _| square_to_out_karatsuba(o, x)),
+                    &|o, x, _| square_to_out_kronecker(o, x),
+                    &|o, x, _| square_to_out_schonhage_strassen(o, x),
+                    &|o, x, _| square_to_out(o, x),
+                ),
+                "mul_truncated" => (
+                    &mul_truncated_to_out_classical,
+                    Some(&mul_truncated_to_out_karatsuba),
+                    &mul_truncated_to_out_kronecker,
+                    &mul_truncated_to_out_schonhage_strassen,
+                    &mul_truncated_to_out,
+                ),
+                "square_truncated" => (
+                    &|o, x, _| square_truncated_to_out_classical(o, x),
+                    Some(&|o, x, _| square_truncated_to_out_karatsuba(o, x)),
+                    &|o, x, _| square_truncated_to_out_kronecker(o, x),
+                    &|o, x, _| square_truncated_to_out_schonhage_strassen(o, x),
+                    &|o, x, _| square_truncated_to_out(o, x),
+                ),
+                _ => (
+                    &|o, x, y| mul_middle_to_out_classical(o, x, y, nlo, nhi),
+                    None,
+                    &|o, x, y| mul_middle_to_out_kronecker(o, x, y, nlo, nhi),
+                    &|o, x, y| mul_middle_to_out_schonhage_strassen(o, x, y, nlo, nhi),
+                    &|o, x, y| mul_middle_to_out(o, x, y, nlo, nhi),
+                ),
+            };
+            let squaring = op.starts_with("square");
+            let fft: Kernel = &|o, x, y| {
+                mul_middle_to_out_fft(o, x, if squaring { x } else { y }, nlo, nhi);
+            };
+            let mut run = |f: Kernel| -> f64 {
+                time_one(&mut || f(black_box(&mut out), black_box(&xs), black_box(&ys)))
+            };
+            let tc = if n <= 200 { run(classical) } else { -1.0 };
+            let tk = match karatsuba {
+                Some(f) if n <= 2000 => run(f),
+                _ => -1.0,
+            };
+            let tks = run(kronecker);
+            let tss = run(ss);
+            let fft_accepts = {
+                let mut scratch = vec![Integer::ZERO; out_len];
+                mul_middle_to_out_fft(
+                    &mut scratch,
+                    &xs,
+                    if squaring { &xs } else { &ys },
+                    nlo,
+                    nhi,
+                )
+            };
+            let tfft = if fft_accepts { run(fft) } else { -1.0 };
+            let td = run(dispatcher);
+            let names = ["classical", "karatsuba", "KS", "SS", "fft"];
+            let ts = [tc, tk, tks, tss, tfft];
+            let mut winner = 0;
+            let mut best = f64::INFINITY;
+            let mut best_non_ss = f64::INFINITY;
+            for (k, &t) in ts.iter().enumerate() {
+                if t < 0.0 {
+                    continue;
+                }
+                if t < best {
+                    best = t;
+                    winner = k;
+                }
+                if k != 3 && t < best_non_ss {
+                    best_non_ss = t;
+                }
+            }
+            let ns = |t: f64| {
+                if t < 0.0 {
+                    "-".to_string()
+                } else {
+                    format!("{:.0}", t * 1e9)
+                }
+            };
+            println!(
+                "{:>6} {:>6} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}  {:<10} {:>8.2} {:>8.2}",
+                n,
+                bits,
+                ns(tc),
+                ns(tk),
+                ns(tks),
+                ns(tss),
+                ns(tfft),
+                ns(td),
+                names[winner],
+                tss / best_non_ss,
+                td / best
+            );
+        }
+    }
+}
+
 // The Malachite side of the small-kernel gap analysis; the C side is perf/scratch/small_gmp.c (make
 // small-gmp / small-gmp-noasm). Sizes, seeds, and the best-of-batches loop mirror the C harness
 // exactly, so the tables compare directly.
@@ -2493,6 +2740,7 @@ pub fn tune(key: &str) {
         "invert_probe" => tune_invert_probe(),
         "mul_fft_probe" => tune_mul_fft_probe(),
         "small_kernel_probe" => tune_small_kernel_probe(),
+        "poly_mul_grid" => tune_poly_mul_grid(),
         "gcd_probe" => tune_gcd_probe(),
         "xgcd_probe" => tune_xgcd_probe(),
         "mul_fft" => tune_mul_fft(),

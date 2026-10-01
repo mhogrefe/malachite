@@ -307,6 +307,17 @@ fn test_mul_truncated_to_out() {
     test_generated(120, 110, 20, 20, 150);
     // - fft_preferred(len2, bits1, bits2, 100, 200), but the FFT declines
     test_generated(120, 110, 250, 250, 150);
+    // - schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with 16 <= len2 <= 100
+    test_generated(30, 30, 500, 400, 40);
+    // - schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with len2 > 100
+    test_generated(150, 120, 600, 500, 200);
+    // - schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with 8 <= len2 < 16
+    test_generated(12, 10, 600, 500, 15);
+    // - !schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with 8 <= len2 < 16 and
+    //   bits1 + bits2 < 1000
+    test_generated(12, 10, 500, 400, 15);
+    // - !schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with len1 + len2 > 4097
+    test_generated(2100, 2000, 600, 500, 2500);
 }
 
 #[test]

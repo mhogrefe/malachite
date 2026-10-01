@@ -418,6 +418,19 @@ fn test_mul_greater_to_out() {
     test_generated(100, 90, 20, 20);
     // - fft_preferred(len2, bits1, bits2, 80, 100), but the FFT declines
     test_generated(100, 90, 250, 250);
+    // - schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with 16 <= len2 <= 100
+    test_generated(20, 16, 500, 400);
+    // - schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with len2 > 100
+    test_generated(150, 120, 600, 500);
+    // - schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with 8 <= len2 < 16
+    test_generated(12, 10, 600, 500);
+    // - !schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with 8 <= len2 < 16 and
+    //   bits1 + bits2 < 1000
+    test_generated(12, 10, 500, 400);
+    // - !schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with len2 < 8
+    test_generated(8, 7, 500, 400);
+    // - !schonhage_strassen_preferred(len1, len2, bits1, bits2, 4097), with len1 + len2 > 4097
+    test_generated(2100, 2049, 600, 500);
 }
 
 #[test]

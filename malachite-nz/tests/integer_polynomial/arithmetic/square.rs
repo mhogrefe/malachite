@@ -272,6 +272,17 @@ fn test_square_to_out() {
     test_generated(100, 20);
     // - fft_preferred(len, bits, bits, 80, 160), but the FFT declines
     test_generated(170, 250);
+    // - schonhage_strassen_preferred(len, len, bits, bits, 4097), with 16 <= len <= 100
+    test_generated(20, 450);
+    // - schonhage_strassen_preferred(len, len, bits, bits, 4097), with len > 100
+    test_generated(150, 600);
+    // - schonhage_strassen_preferred(len, len, bits, bits, 4097), with 8 <= len < 16
+    test_generated(10, 550);
+    // - !schonhage_strassen_preferred(len, len, bits, bits, 4097), with 8 <= len < 16 and 2 * bits
+    //   < 1000
+    test_generated(10, 450);
+    // - !schonhage_strassen_preferred(len, len, bits, bits, 4097), with 2 * len > 4097
+    test_generated(2049, 600);
 }
 
 #[test]
