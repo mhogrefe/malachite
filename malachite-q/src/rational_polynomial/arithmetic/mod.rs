@@ -61,10 +61,17 @@ pub mod l2_norm_squared;
 /// [`MakeMonicAssign`](malachite_base::polynomial::MakeMonicAssign), which divide a polynomial by
 /// its leading coefficient.
 pub mod make_monic;
+/// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
+/// multiplying two polynomials.
+pub mod mul;
 /// Implementations of [`MulPowerOfX`](malachite_base::polynomial::MulPowerOfX) and
 /// [`MulPowerOfXAssign`](malachite_base::polynomial::MulPowerOfXAssign), for multiplying a
 /// polynomial by a power of its variable.
 pub mod mul_power_of_x;
+/// Implementations of [`MulTruncated`](malachite_base::polynomial::MulTruncated) and
+/// [`MulTruncatedAssign`](malachite_base::polynomial::MulTruncatedAssign), for multiplying two
+/// polynomials and keeping the low coefficients of the product.
+pub mod mul_truncated;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
 pub mod neg;
@@ -290,6 +297,14 @@ pub mod shl;
 /// );
 /// ```
 pub mod shr;
+/// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
+/// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a
+/// polynomial.
+pub mod square;
+/// Implementations of [`SquareTruncated`](malachite_base::polynomial::SquareTruncated) and
+/// [`SquareTruncatedAssign`](malachite_base::polynomial::SquareTruncatedAssign), for squaring a
+/// polynomial and keeping the low coefficients of the square.
+pub mod square_truncated;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting one polynomial from another.
 pub mod sub;

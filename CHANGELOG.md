@@ -446,6 +446,14 @@ documented by git history.
   width this is word arithmetic, through kernels in malachite-base that will also serve
   `UnsignedPolynomial`. With 32- to 64-bit coefficients this is several times faster than the
   full product.
+- Multiplication, squaring, and truncated multiplication and squaring of `RationalPolynomial`s:
+  `Mul`, `MulAssign`, `Square`, `SquareAssign`, `MulTruncated`, `MulTruncatedAssign`,
+  `SquareTruncated`, and `SquareTruncatedAssign`, taking each polynomial by value or by reference,
+  like FLINT's `fmpq_poly_mul` and `fmpq_poly_mullow`. The numerators are multiplied as
+  `IntegerPolynomial`s. A product divides the GCD of each numerator's content and the other
+  denominator out of both before multiplying, as a TODO in FLINT's `_fmpq_poly_mul` suggests, so
+  that the multiplication works on smaller numbers; a square needs no GCD, and a truncated product
+  is reduced after truncation.
 - Multiplication, squaring, and truncated multiplication and squaring of `UnsignedPolynomial<T>`s
   modulo a `T`: `ModMul`, `ModMulAssign`, `ModSquare`, `ModSquareAssign`, `ModMulTruncated`,
   `ModMulTruncatedAssign`, `ModSquareTruncated`, and `ModSquareTruncatedAssign`, taking each
