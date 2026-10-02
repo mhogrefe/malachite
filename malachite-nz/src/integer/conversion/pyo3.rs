@@ -137,10 +137,11 @@ impl<'py> IntoPyObject<'py> for &Integer {
             let bytes_obj = PyBytes::new(py, &bytes);
             let kwargs = PyDict::new(py);
             kwargs.set_item(intern!(py, "signed"), true).unwrap();
-            py.get_type::<PyInt>()
+            Ok(py
+                .get_type::<PyInt>()
                 .call_method("from_bytes", (bytes_obj, "little"), Some(&kwargs))
                 .expect("int.from_bytes() failed during into_pyobject()")
-                .cast_into_unchecked()
+                .cast_into_unchecked())
         }
     }
 }

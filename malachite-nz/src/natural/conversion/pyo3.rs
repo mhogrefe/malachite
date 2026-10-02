@@ -138,10 +138,11 @@ impl<'py> IntoPyObject<'py> for &Natural {
         #[cfg(Py_LIMITED_API)]
         unsafe {
             let bytes_obj = PyBytes::new(py, &bytes);
-            py.get_type::<PyInt>()
+            Ok(py
+                .get_type::<PyInt>()
                 .call_method("from_bytes", (bytes_obj, "little"), None)
                 .expect("int.from_bytes() failed during into_pyobject()")
-                .cast_into_unchecked()
+                .cast_into_unchecked())
         }
     }
 }
