@@ -11,9 +11,14 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
+use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_mul::{
+    mod_power_of_2_mul_low_classical, mod_power_of_2_mul_low_karatsuba,
+};
 use malachite_nz::test_util::generators::*;
 use malachite_nz::test_util::natural_polynomial::arithmetic::mod_power_of_2_mul::*;
+use malachite_nz::test_util::natural_polynomial::arithmetic::mul::naturals_mul_naive;
 
 #[test]
 fn test_mod_power_of_2_mul() {
@@ -93,4 +98,75 @@ fn mod_power_of_2_mul_properties() {
             }
         },
     );
+}
+
+// The kernels that multiply with low halves of products, at lengths around the Karatsuba threshold
+// and with coefficients of one, two, and many limbs.
+#[test]
+fn test_mod_power_of_2_mul_low_algorithms() {
+    for &(n, m) in &[(1, 1), (3, 2), (8, 8), (9, 8), (20, 7), (33, 33), (70, 41)] {
+        for pow in [1, 31, 32, 33, 63, 64, 65, 100, 128, 129, 300, 1000] {
+            let xs = natural_mod_power_of_2_generated_coefficients(n, pow);
+            let ys = natural_mod_power_of_2_generated_coefficients(m, pow);
+            let expected: Vec<_> = naturals_mul_naive(&xs, &ys)
+                .into_iter()
+                .map(|x| x.mod_power_of_2(pow))
+                .collect();
+            assert_eq!(mod_power_of_2_mul_low_classical(&xs, &ys, pow), expected);
+            assert_eq!(mod_power_of_2_mul_low_karatsuba(&xs, &ys, pow), expected);
+            assert_eq!(mod_power_of_2_mul_low_karatsuba(&ys, &xs, pow), expected);
+        }
+    }
+}
+
+#[test]
+fn mod_power_of_2_mul_low_properties() {
+    natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1().test_properties(
+        |(p, q, pow)| {
+            let xs = p.coefficients_asc();
+            let ys = q.coefficients_asc();
+            if xs.is_empty() || ys.is_empty() {
+                return;
+            }
+            let r = (&p).mod_power_of_2_mul(&q, pow);
+            assert_eq!(
+                NaturalPolynomial::from_coefficients_asc(mod_power_of_2_mul_low_classical(
+                    xs, ys, pow
+                )),
+                r
+            );
+            assert_eq!(
+                NaturalPolynomial::from_coefficients_asc(mod_power_of_2_mul_low_karatsuba(
+                    xs, ys, pow
+                )),
+                r
+            );
+        },
+    );
+}
+
+// The dispatcher's choice between the low-half kernels and the full product.
+#[test]
+fn test_mod_power_of_2_mul_dispatch() {
+    let test = |len1: usize, len2: usize, pow: u64| {
+        let p = NaturalPolynomial::from_coefficients_asc(
+            natural_mod_power_of_2_generated_coefficients(len1, pow),
+        );
+        let q = NaturalPolynomial::from_coefficients_asc(
+            natural_mod_power_of_2_generated_coefficients(len2, pow),
+        );
+        let r = (&p).mod_power_of_2_mul(&q, pow);
+        assert_eq!(mod_power_of_2_mul_naive(&p, &q, pow), r);
+        assert_eq!(p.clone().mod_power_of_2_mul(q.clone(), pow), r);
+    };
+    // - low-half kernels, with word arithmetic
+    test(10, 9, 64);
+    // - low-half kernels, with slots
+    test(10, 9, 1000);
+    // - full product, too long for the window
+    test(3000, 2100, 64);
+    // - full product, coefficients too large for the window
+    test(10, 9, 30000);
+    // - full product, a constant factor
+    test(10, 1, 64);
 }

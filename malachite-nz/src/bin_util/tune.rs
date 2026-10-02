@@ -643,6 +643,267 @@ fn tune_mul_fft_probe() {
     }
 }
 
+// The kernels for multiplying `NaturalPolynomial`s modulo $2^k$, timed over a grid of lengths and
+// powers: the full product reduced afterwards (as FLINT does), and the products with low halves of
+// coefficient products, by schoolbook and by Karatsuba multiplication. POLY_GRID_OP chooses the
+// operation (mul, square, mul_truncated, or square_truncated), and POLY_GRID_LENS and
+// POLY_GRID_POWS (comma-separated) replace the default grid. A batch is calibrated to at least 20
+// ms, and the best of 5 is kept; `-` means the kernel was skipped as too slow there.
+fn tune_poly_mod_power_of_2_mul_grid() {
+    use malachite_base::num::arithmetic::traits::ModPowerOf2;
+    use malachite_base::num::basic::traits::Zero;
+    use malachite_base::num::conversion::traits::ExactFrom;
+    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
+        mod_power_of_2_mul_to_out_classical as word_mul_classical,
+        mod_power_of_2_mul_to_out_karatsuba as word_mul_karatsuba,
+    };
+    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::{
+        mod_power_of_2_mul_truncated_to_out_classical as word_mul_truncated_classical,
+        mod_power_of_2_mul_truncated_to_out_karatsuba as word_mul_truncated_karatsuba,
+    };
+    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_square::{
+        mod_power_of_2_square_to_out_classical as word_square_classical,
+        mod_power_of_2_square_to_out_karatsuba as word_square_karatsuba,
+    };
+    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_square_truncated::{
+        mod_power_of_2_square_truncated_to_out_classical as word_square_truncated_classical,
+        mod_power_of_2_square_truncated_to_out_karatsuba as word_square_truncated_karatsuba,
+    };
+    use malachite_nz::natural::Natural;
+    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_mul::*;
+    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_mul_truncated::*;
+    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_square::*;
+    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_square_truncated::*;
+    use std::time::Instant;
+    fn reduced(seed: &str, n: usize, pow: u64) -> Vec<Natural> {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+        let limb_count = usize::try_from(pow.div_ceil(Limb::WIDTH)).unwrap();
+        (0..n)
+            .map(|_| {
+                let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                Natural::from_owned_limbs_asc(xs).mod_power_of_2(pow)
+            })
+            .collect()
+    }
+    fn time_one(f: &mut dyn FnMut()) -> f64 {
+        let mut iters = 1u64;
+        loop {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            let t = t0.elapsed().as_secs_f64();
+            if t >= 0.02 {
+                break;
+            }
+            iters *= if t < 0.002 { 10 } else { 2 };
+        }
+        let mut best = f64::INFINITY;
+        for _ in 0..5 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best
+    }
+    let grid = |var: &str, default: &[u64]| -> Vec<u64> {
+        std::env::var(var).map_or_else(
+            |_| default.to_vec(),
+            |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+        )
+    };
+    let op = std::env::var("POLY_GRID_OP").unwrap_or_else(|_| "mul".to_string());
+    let lens = grid(
+        "POLY_GRID_LENS",
+        &[2, 4, 8, 12, 16, 24, 32, 48, 64, 100, 150, 200, 300, 500, 1000, 2000, 4000],
+    );
+    let pows = grid(
+        "POLY_GRID_POWS",
+        &[8, 16, 32, 48, 64, 96, 128, 200, 300, 500, 1000, 2000, 5000, 10000, 20000],
+    );
+    println!(
+        "{:>6} {:>6} {:>12} {:>12} {:>12}  {:<10}",
+        "len", "pow", "full", "classical", "karatsuba", "winner"
+    );
+    for &n in &lens {
+        for &pow in &pows {
+            if n as f64 * pow as f64 > 4.1e7 {
+                continue;
+            }
+            let n = usize::try_from(n).unwrap();
+            let xs = reduced(&format!("a{n}_{pow}"), n, pow);
+            let ys = reduced(&format!("b{n}_{pow}"), n, pow);
+            // Rough costs, in limb operations, of the quadratic and the Karatsuba kernels, to skip
+            // the cells where they would take seconds.
+            let k = pow.div_ceil(Limb::WIDTH) as f64;
+            let nf = n as f64;
+            let classical_ok = nf * nf * k * k <= 2.0e9;
+            let karatsuba_ok = nf.powf(1.585) * k.powf(1.585) <= 2.0e9;
+            // For words, the low-half kernels are malachite-base's word kernels; the conversions to
+            // and from limbs are timed with them, since a dispatcher would pay for them too.
+            let word = pow <= Limb::WIDTH;
+            let to_limbs =
+                |xs: &[Natural]| -> Vec<Limb> { xs.iter().map(Limb::exact_from).collect() };
+            let from_limbs =
+                |xs: Vec<Limb>| -> Vec<Natural> { xs.into_iter().map(Natural::from).collect() };
+            let word_mul = |classical: bool| -> Vec<Natural> {
+                let (a, b) = (to_limbs(&xs), to_limbs(&ys));
+                let mut out = vec![0; (n << 1) - 1];
+                if classical {
+                    word_mul_classical(&mut out, &a, &b, pow);
+                } else {
+                    word_mul_karatsuba(&mut out, &a, &b, pow);
+                }
+                from_limbs(out)
+            };
+            let word_square = |classical: bool| -> Vec<Natural> {
+                let a = to_limbs(&xs);
+                let mut out = vec![0; (n << 1) - 1];
+                if classical {
+                    word_square_classical(&mut out, &a, pow);
+                } else {
+                    word_square_karatsuba(&mut out, &a, pow);
+                }
+                from_limbs(out)
+            };
+            let word_mul_truncated = |classical: bool| -> Vec<Natural> {
+                let (a, b) = (to_limbs(&xs), to_limbs(&ys));
+                let mut out = vec![0; n];
+                if classical {
+                    word_mul_truncated_classical(&mut out, &a, &b, pow);
+                } else {
+                    word_mul_truncated_karatsuba(&mut out, &a, &b, pow);
+                }
+                from_limbs(out)
+            };
+            let word_square_truncated = |classical: bool| -> Vec<Natural> {
+                let a = to_limbs(&xs);
+                let mut out = vec![0; n];
+                if classical {
+                    word_square_truncated_classical(&mut out, &a, pow);
+                } else {
+                    word_square_truncated_karatsuba(&mut out, &a, pow);
+                }
+                from_limbs(out)
+            };
+            let (full, classical, karatsuba): (Box<dyn Fn()>, Box<dyn Fn()>, Box<dyn Fn()>) =
+                match op.as_str() {
+                    "mul" if word => (
+                        Box::new(|| drop(black_box(mod_power_of_2_mul_full(&xs, &ys, pow)))),
+                        Box::new(|| drop(black_box(word_mul(true)))),
+                        Box::new(|| drop(black_box(word_mul(false)))),
+                    ),
+                    "square" if word => (
+                        Box::new(|| drop(black_box(mod_power_of_2_square_full(&xs, pow)))),
+                        Box::new(|| drop(black_box(word_square(true)))),
+                        Box::new(|| drop(black_box(word_square(false)))),
+                    ),
+                    "mul_truncated" if word => (
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_mul_truncated_full(
+                                &xs, &ys, n, pow,
+                            )));
+                        }),
+                        Box::new(|| drop(black_box(word_mul_truncated(true)))),
+                        Box::new(|| drop(black_box(word_mul_truncated(false)))),
+                    ),
+                    "square_truncated" if word => (
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_square_truncated_full(&xs, n, pow)));
+                        }),
+                        Box::new(|| drop(black_box(word_square_truncated(true)))),
+                        Box::new(|| drop(black_box(word_square_truncated(false)))),
+                    ),
+                    "mul" => (
+                        Box::new(|| drop(black_box(mod_power_of_2_mul_full(&xs, &ys, pow)))),
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_mul_low_classical(&xs, &ys, pow)));
+                        }),
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_mul_low_karatsuba(&xs, &ys, pow)));
+                        }),
+                    ),
+                    "square" => (
+                        Box::new(|| drop(black_box(mod_power_of_2_square_full(&xs, pow)))),
+                        Box::new(|| drop(black_box(mod_power_of_2_square_low_classical(&xs, pow)))),
+                        Box::new(|| drop(black_box(mod_power_of_2_square_low_karatsuba(&xs, pow)))),
+                    ),
+                    "mul_truncated" => (
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_mul_truncated_full(
+                                &xs, &ys, n, pow,
+                            )));
+                        }),
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_mul_truncated_low_classical(
+                                &xs, &ys, n, pow,
+                            )));
+                        }),
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_mul_truncated_low_karatsuba(
+                                &xs, &ys, n, pow,
+                            )));
+                        }),
+                    ),
+                    "square_truncated" => (
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_square_truncated_full(&xs, n, pow)));
+                        }),
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_square_truncated_low_classical(
+                                &xs, n, pow,
+                            )));
+                        }),
+                        Box::new(|| {
+                            drop(black_box(mod_power_of_2_square_truncated_low_karatsuba(
+                                &xs, n, pow,
+                            )));
+                        }),
+                    ),
+                    _ => panic!("unknown POLY_GRID_OP {op}"),
+                };
+            let t_full = time_one(&mut || full());
+            let t_classical = if classical_ok {
+                time_one(&mut || classical())
+            } else {
+                -1.0
+            };
+            let t_karatsuba = if karatsuba_ok {
+                time_one(&mut || karatsuba())
+            } else {
+                -1.0
+            };
+            let names = ["full", "classical", "karatsuba"];
+            let ts = [t_full, t_classical, t_karatsuba];
+            let mut winner = 0;
+            for k in 1..3 {
+                if ts[k] >= 0.0 && ts[k] < ts[winner] {
+                    winner = k;
+                }
+            }
+            let ns = |t: f64| {
+                if t < 0.0 {
+                    "-".to_string()
+                } else {
+                    format!("{:.0}", t * 1e9)
+                }
+            };
+            println!(
+                "{:>6} {:>6} {:>12} {:>12} {:>12}  {:<10}",
+                n,
+                pow,
+                ns(t_full),
+                ns(t_classical),
+                ns(t_karatsuba),
+                names[winner]
+            );
+            let _ = Natural::ZERO;
+        }
+    }
+}
+
 // The Malachite side of the polynomial-multiplication shootout; the C side is
 // perf/scratch/poly_mul_flint.c (make poly-mul-flint). The grid of lengths and coefficient sizes,
 // the dense inputs (every coefficient has exactly `bits` bits and a random sign), and the timing (a
@@ -2741,6 +3002,7 @@ pub fn tune(key: &str) {
         "mul_fft_probe" => tune_mul_fft_probe(),
         "small_kernel_probe" => tune_small_kernel_probe(),
         "poly_mul_grid" => tune_poly_mul_grid(),
+        "poly_mod_power_of_2_mul_grid" => tune_poly_mod_power_of_2_mul_grid(),
         "gcd_probe" => tune_gcd_probe(),
         "xgcd_probe" => tune_xgcd_probe(),
         "mul_fft" => tune_mul_fft(),

@@ -231,8 +231,8 @@ pub mod mod_power_of_2_square;
 /// Implementations of
 /// [`ModPowerOf2SquareTruncated`](malachite_base::polynomial::ModPowerOf2SquareTruncated) and
 /// [`ModPowerOf2SquareTruncatedAssign`](
-/// malachite_base::polynomial::ModPowerOf2SquareTruncatedAssign),
-/// for squaring a polynomial modulo $2^k$ and keeping only the low coefficients of the square.
+/// malachite_base::polynomial::ModPowerOf2SquareTruncatedAssign), for squaring a polynomial modulo
+/// $2^k$ and keeping only the low coefficients of the square.
 pub mod mod_power_of_2_square_truncated;
 /// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for

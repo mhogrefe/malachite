@@ -440,7 +440,12 @@ documented by git history.
   `ModPowerOf2MulTruncatedAssign`, `ModPowerOf2SquareTruncated`, and
   `ModPowerOf2SquareTruncatedAssign` traits, in `malachite_base::polynomial`, like FLINT's
   `fmpz_mod_poly_mul`, `fmpz_mod_poly_sqr`, and `fmpz_mod_poly_mullow` with the modulus $2^k$.
-  Every coefficient of the inputs must already be reduced modulo $2^k$.
+  Every coefficient of the inputs must already be reduced modulo $2^k$. For short polynomials,
+  where it measured faster, the coefficient products are computed modulo $2^k$ too, with low-half
+  multiplication, by schoolbook or Karatsuba multiplication; for $k$ no greater than the word
+  width this is word arithmetic, through kernels in malachite-base that will also serve
+  `UnsignedPolynomial`. With 32- to 64-bit coefficients this is several times faster than the
+  full product.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

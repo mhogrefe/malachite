@@ -93,6 +93,10 @@ pub mod mod_power_of_2_derivative;
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every coefficient of a polynomial is less than a given power of 2.
 pub mod mod_power_of_2_is_reduced;
+#[doc(hidden)]
+pub mod mod_power_of_2_mul;
+#[doc(hidden)]
+pub mod mod_power_of_2_mul_truncated;
 /// Implementations of [`ModPowerOf2Neg`](crate::num::arithmetic::traits::ModPowerOf2Neg) and
 /// [`ModPowerOf2NegAssign`](crate::num::arithmetic::traits::ModPowerOf2NegAssign), which negate a
 /// polynomial modulo a power of 2.
@@ -177,6 +181,10 @@ pub mod mod_power_of_2_nth_derivative;
 /// assert_eq!(p.to_string(), "9223372036854775808*x+9223372036854775808");
 /// ```
 pub mod mod_power_of_2_shl;
+#[doc(hidden)]
+pub mod mod_power_of_2_square;
+#[doc(hidden)]
+pub mod mod_power_of_2_square_truncated;
 /// Implementations of [`ModPowerOf2Sub`](crate::num::arithmetic::traits::ModPowerOf2Sub) and
 /// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
 /// one polynomial from another modulo $2^k$.
