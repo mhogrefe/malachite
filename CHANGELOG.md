@@ -446,6 +446,14 @@ documented by git history.
   width this is word arithmetic, through kernels in malachite-base that will also serve
   `UnsignedPolynomial`. With 32- to 64-bit coefficients this is several times faster than the
   full product.
+- Multiplication, squaring, and truncated multiplication and squaring of `UnsignedPolynomial<T>`s
+  modulo $2^k$, for $k$ no greater than the width of `T`: `ModPowerOf2Mul`, `ModPowerOf2MulAssign`,
+  `ModPowerOf2Square`, `ModPowerOf2SquareAssign`, `ModPowerOf2MulTruncated`,
+  `ModPowerOf2MulTruncatedAssign`, `ModPowerOf2SquareTruncated`, and
+  `ModPowerOf2SquareTruncatedAssign`, taking each polynomial by value or by reference, like FLINT's
+  `nmod_poly_mul` and `nmod_poly_mullow` with the modulus $2^k$. Every coefficient of the inputs
+  must already be reduced modulo $2^k$. These use the word kernels above, by schoolbook or
+  Karatsuba multiplication.
 - Multiplication, squaring, and truncated multiplication and squaring of `NaturalPolynomial`s
   modulo a `Natural`: `ModMul`, `ModMulAssign`, `ModSquare`, and `ModSquareAssign`, and the new
   `ModMulTruncated`, `ModMulTruncatedAssign`, `ModSquareTruncated`, and `ModSquareTruncatedAssign`

@@ -5,10 +5,14 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::polynomial::{ModPowerOf2MulTruncated, ModPowerOf2MulTruncatedAssign};
+use crate::unsigned_polynomial::UnsignedPolynomial;
+use crate::unsigned_polynomial::arithmetic::mod_power_of_2_add::assert_reduced;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
-    MOD_POWER_OF_2_MUL_KARATSUBA_THRESHOLD, add_wrapping_assign, mask_coefficients,
-    mul_karatsuba_wrapping,
+    MOD_POWER_OF_2_MUL_KARATSUBA_THRESHOLD, add_wrapping_assign, from_coefficients_trimmed,
+    mask_coefficients, mul_karatsuba_wrapping,
 };
 use alloc::vec;
 use core::cmp::min;
@@ -134,4 +138,384 @@ pub fn mod_power_of_2_mul_truncated_to_out<T: PrimitiveUnsigned>(
     assert!(pow <= T::WIDTH);
     mul_truncated_karatsuba_wrapping(out, xs, ys);
     mask_coefficients(out, pow);
+}
+
+// The number of coefficients of a truncated product worth computing: `len`, but no more than the
+// whole product of factors of lengths `len1` and `len2`, which must be positive.
+pub(crate) fn truncated_len(len1: usize, len2: usize, len: u64) -> usize {
+    min(usize::try_from(len).unwrap_or(usize::MAX), len1 + len2 - 1)
+}
+
+// The product of the polynomials with coefficients `xs` and `ys`, both reduced modulo $2^k$, where
+// $k$ is `pow`, truncated to `len` coefficients and reduced modulo $2^k$.
+fn mod_power_of_2_mul_truncated_helper<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    len: u64,
+    pow: u64,
+) -> UnsignedPolynomial<T> {
+    if len == 0 || xs.is_empty() || ys.is_empty() {
+        return UnsignedPolynomial::ZERO;
+    }
+    let mut out = vec![T::ZERO; truncated_len(xs.len(), ys.len(), len)];
+    mod_power_of_2_mul_truncated_to_out(&mut out, xs, ys, pow);
+    from_coefficients_trimmed(out)
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2MulTruncated<Self> for UnsignedPolynomial<T> {
+    type Output = Self;
+
+    /// Multiplies two [`UnsignedPolynomial`]s modulo $2^k$, keeping only the coefficients of $x^i$
+    /// for $i$ less than `len`, taking both by value. The coefficients of both must already be
+    /// reduced modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, q, n, k) = (pq \bmod x^n) \bmod 2^k.
+    /// $$
+    ///
+    /// The polynomials need not already be truncated: this is the product of their images modulo
+    /// $x^n$, so only their first `len` coefficients are read.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::ModPowerOf2MulTruncated;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The product is 2*x^3+11*x^2+19*x+10; its low two coefficients, modulo 16.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("x^2+3*x+2")
+    ///         .unwrap()
+    ///         .mod_power_of_2_mul_truncated(
+    ///             UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(),
+    ///             2,
+    ///             4
+    ///         )
+    ///         .to_string(),
+    ///     "3*x+10"
+    /// );
+    /// // The linear coefficient of the product, 16, vanishes modulo 16.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("x+15")
+    ///         .unwrap()
+    ///         .mod_power_of_2_mul_truncated(
+    ///             UnsignedPolynomial::<u8>::from_str("x+1").unwrap(),
+    ///             2,
+    ///             4
+    ///         )
+    ///         .to_string(),
+    ///     "15"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mullow` from `nmod_poly/mullow.c`, FLINT 3.6.0, with the
+    /// modulus $2^k$.
+    fn mod_power_of_2_mul_truncated(self, other: Self, len: u64, pow: u64) -> Self {
+        assert_reduced(&self, &other, pow);
+        mod_power_of_2_mul_truncated_helper(&self.coefficients, &other.coefficients, len, pow)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2MulTruncated<&Self> for UnsignedPolynomial<T> {
+    type Output = Self;
+
+    /// Multiplies two [`UnsignedPolynomial`]s modulo $2^k$, keeping only the coefficients of $x^i$
+    /// for $i$ less than `len`, taking the first by value and the second by reference. The
+    /// coefficients of both must already be reduced modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, q, n, k) = (pq \bmod x^n) \bmod 2^k.
+    /// $$
+    ///
+    /// The polynomials need not already be truncated: this is the product of their images modulo
+    /// $x^n$, so only their first `len` coefficients are read.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::ModPowerOf2MulTruncated;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The product is 2*x^3+11*x^2+19*x+10; its low two coefficients, modulo 16.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("x^2+3*x+2")
+    ///         .unwrap()
+    ///         .mod_power_of_2_mul_truncated(
+    ///             &UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(),
+    ///             2,
+    ///             4
+    ///         )
+    ///         .to_string(),
+    ///     "3*x+10"
+    /// );
+    /// // The linear coefficient of the product, 16, vanishes modulo 16.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("x+15")
+    ///         .unwrap()
+    ///         .mod_power_of_2_mul_truncated(
+    ///             &UnsignedPolynomial::<u8>::from_str("x+1").unwrap(),
+    ///             2,
+    ///             4
+    ///         )
+    ///         .to_string(),
+    ///     "15"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mullow` from `nmod_poly/mullow.c`, FLINT 3.6.0, with the
+    /// modulus $2^k$.
+    fn mod_power_of_2_mul_truncated(self, other: &Self, len: u64, pow: u64) -> Self {
+        assert_reduced(&self, other, pow);
+        mod_power_of_2_mul_truncated_helper(&self.coefficients, &other.coefficients, len, pow)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2MulTruncated<UnsignedPolynomial<T>>
+    for &UnsignedPolynomial<T>
+{
+    type Output = UnsignedPolynomial<T>;
+
+    /// Multiplies two [`UnsignedPolynomial`]s modulo $2^k$, keeping only the coefficients of $x^i$
+    /// for $i$ less than `len`, taking the first by reference and the second by value. The
+    /// coefficients of both must already be reduced modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, q, n, k) = (pq \bmod x^n) \bmod 2^k.
+    /// $$
+    ///
+    /// The polynomials need not already be truncated: this is the product of their images modulo
+    /// $x^n$, so only their first `len` coefficients are read.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::ModPowerOf2MulTruncated;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The product is 2*x^3+11*x^2+19*x+10; its low two coefficients, modulo 16.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap())
+    ///         .mod_power_of_2_mul_truncated(
+    ///             UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(),
+    ///             2,
+    ///             4
+    ///         )
+    ///         .to_string(),
+    ///     "3*x+10"
+    /// );
+    /// // The linear coefficient of the product, 16, vanishes modulo 16.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("x+15").unwrap())
+    ///         .mod_power_of_2_mul_truncated(
+    ///             UnsignedPolynomial::<u8>::from_str("x+1").unwrap(),
+    ///             2,
+    ///             4
+    ///         )
+    ///         .to_string(),
+    ///     "15"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mullow` from `nmod_poly/mullow.c`, FLINT 3.6.0, with the
+    /// modulus $2^k$.
+    fn mod_power_of_2_mul_truncated(
+        self,
+        other: UnsignedPolynomial<T>,
+        len: u64,
+        pow: u64,
+    ) -> UnsignedPolynomial<T> {
+        assert_reduced(self, &other, pow);
+        mod_power_of_2_mul_truncated_helper(&self.coefficients, &other.coefficients, len, pow)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2MulTruncated<&UnsignedPolynomial<T>>
+    for &UnsignedPolynomial<T>
+{
+    type Output = UnsignedPolynomial<T>;
+
+    /// Multiplies two [`UnsignedPolynomial`]s modulo $2^k$, keeping only the coefficients of $x^i$
+    /// for $i$ less than `len`, taking both by reference. The coefficients of both must already be
+    /// reduced modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, q, n, k) = (pq \bmod x^n) \bmod 2^k.
+    /// $$
+    ///
+    /// The polynomials need not already be truncated: this is the product of their images modulo
+    /// $x^n$, so only their first `len` coefficients are read.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::ModPowerOf2MulTruncated;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The product is 2*x^3+11*x^2+19*x+10; its low two coefficients, modulo 16.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap())
+    ///         .mod_power_of_2_mul_truncated(
+    ///             &UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(),
+    ///             2,
+    ///             4
+    ///         )
+    ///         .to_string(),
+    ///     "3*x+10"
+    /// );
+    /// // The linear coefficient of the product, 16, vanishes modulo 16.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("x+15").unwrap())
+    ///         .mod_power_of_2_mul_truncated(
+    ///             &UnsignedPolynomial::<u8>::from_str("x+1").unwrap(),
+    ///             2,
+    ///             4
+    ///         )
+    ///         .to_string(),
+    ///     "15"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mullow` from `nmod_poly/mullow.c`, FLINT 3.6.0, with the
+    /// modulus $2^k$.
+    fn mod_power_of_2_mul_truncated(
+        self,
+        other: &UnsignedPolynomial<T>,
+        len: u64,
+        pow: u64,
+    ) -> UnsignedPolynomial<T> {
+        assert_reduced(self, other, pow);
+        mod_power_of_2_mul_truncated_helper(&self.coefficients, &other.coefficients, len, pow)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2MulTruncatedAssign<Self> for UnsignedPolynomial<T> {
+    /// Multiplies an [`UnsignedPolynomial`] by another [`UnsignedPolynomial`] modulo $2^k$ in
+    /// place, keeping only the coefficients of $x^i$ for $i$ less than `len`, taking the right-hand
+    /// side by value. The coefficients of both must already be reduced modulo $2^k$.
+    ///
+    /// $$
+    /// p \gets (pq \bmod x^n) \bmod 2^k.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::ModPowerOf2MulTruncatedAssign;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// let mut p = UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap();
+    /// p.mod_power_of_2_mul_truncated_assign(
+    ///     UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(),
+    ///     2,
+    ///     4,
+    /// );
+    /// assert_eq!(p.to_string(), "3*x+10");
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mullow` from `nmod_poly/mullow.c`, FLINT 3.6.0, with the
+    /// modulus $2^k$.
+    fn mod_power_of_2_mul_truncated_assign(&mut self, other: Self, len: u64, pow: u64) {
+        assert_reduced(self, &other, pow);
+        *self =
+            mod_power_of_2_mul_truncated_helper(&self.coefficients, &other.coefficients, len, pow);
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2MulTruncatedAssign<&Self> for UnsignedPolynomial<T> {
+    /// Multiplies an [`UnsignedPolynomial`] by another [`UnsignedPolynomial`] modulo $2^k$ in
+    /// place, keeping only the coefficients of $x^i$ for $i$ less than `len`, taking the right-hand
+    /// side by reference. The coefficients of both must already be reduced modulo $2^k$.
+    ///
+    /// $$
+    /// p \gets (pq \bmod x^n) \bmod 2^k.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::ModPowerOf2MulTruncatedAssign;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// let mut p = UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap();
+    /// p.mod_power_of_2_mul_truncated_assign(
+    ///     &UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(),
+    ///     2,
+    ///     4,
+    /// );
+    /// assert_eq!(p.to_string(), "3*x+10");
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mullow` from `nmod_poly/mullow.c`, FLINT 3.6.0, with the
+    /// modulus $2^k$.
+    fn mod_power_of_2_mul_truncated_assign(&mut self, other: &Self, len: u64, pow: u64) {
+        assert_reduced(self, other, pow);
+        *self =
+            mod_power_of_2_mul_truncated_helper(&self.coefficients, &other.coefficients, len, pow);
+    }
 }

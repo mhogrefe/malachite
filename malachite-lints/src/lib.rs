@@ -78,6 +78,7 @@ mod use_saturating_from;
 mod use_sign;
 mod use_slice_test_zero;
 mod use_split_in_half;
+mod use_split_into_chunks;
 mod use_square;
 mod use_to_string_variant;
 mod use_trailing_zeros;
@@ -605,6 +606,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_round_variant::USE_ROUND_VARIANT,
         use_saturating_from::USE_SATURATING_FROM,
         use_split_in_half::USE_SPLIT_IN_HALF,
+        use_split_into_chunks::USE_SPLIT_INTO_CHUNKS,
         use_square::USE_SQUARE,
         use_to_string_variant::USE_TO_STRING_VARIANT,
         use_trailing_zeros::USE_TRAILING_ZEROS,
@@ -685,6 +687,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_round_variant::UseRoundVariant));
     lint_store.register_late_pass(|_| Box::new(use_saturating_from::UseSaturatingFrom));
     lint_store.register_late_pass(|_| Box::new(use_split_in_half::UseSplitInHalf));
+    lint_store.register_late_pass(|_| Box::new(use_split_into_chunks::UseSplitIntoChunks));
     lint_store.register_late_pass(|_| Box::new(use_square::UseSquare));
     lint_store.register_late_pass(|_| Box::new(use_to_string_variant::UseToStringVariant));
     lint_store.register_late_pass(|_| Box::new(use_trailing_zeros::UseTrailingZeros));

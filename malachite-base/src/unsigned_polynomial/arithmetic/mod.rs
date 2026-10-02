@@ -97,9 +97,13 @@ pub mod mod_power_of_2_derivative;
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every coefficient of a polynomial is less than a given power of 2.
 pub mod mod_power_of_2_is_reduced;
-#[doc(hidden)]
+/// Implementations of [`ModPowerOf2Mul`](crate::num::arithmetic::traits::ModPowerOf2Mul) and
+/// [`ModPowerOf2MulAssign`](crate::num::arithmetic::traits::ModPowerOf2MulAssign), for multiplying
+/// two polynomials modulo $2^k$.
 pub mod mod_power_of_2_mul;
-#[doc(hidden)]
+/// Implementations of [`ModPowerOf2MulTruncated`](crate::polynomial::ModPowerOf2MulTruncated) and
+/// [`ModPowerOf2MulTruncatedAssign`](crate::polynomial::ModPowerOf2MulTruncatedAssign), for
+/// multiplying two polynomials modulo $2^k$ and keeping the low coefficients of the product.
 pub mod mod_power_of_2_mul_truncated;
 /// Implementations of [`ModPowerOf2Neg`](crate::num::arithmetic::traits::ModPowerOf2Neg) and
 /// [`ModPowerOf2NegAssign`](crate::num::arithmetic::traits::ModPowerOf2NegAssign), which negate a
@@ -185,9 +189,13 @@ pub mod mod_power_of_2_nth_derivative;
 /// assert_eq!(p.to_string(), "9223372036854775808*x+9223372036854775808");
 /// ```
 pub mod mod_power_of_2_shl;
-#[doc(hidden)]
+/// Implementations of [`ModPowerOf2Square`](crate::num::arithmetic::traits::ModPowerOf2Square) and
+/// [`ModPowerOf2SquareAssign`](crate::num::arithmetic::traits::ModPowerOf2SquareAssign), for
+/// squaring a polynomial modulo $2^k$.
 pub mod mod_power_of_2_square;
-#[doc(hidden)]
+/// Implementations of [`ModPowerOf2SquareTruncated`](crate::polynomial::ModPowerOf2SquareTruncated)
+/// and [`ModPowerOf2SquareTruncatedAssign`](crate::polynomial::ModPowerOf2SquareTruncatedAssign),
+/// for squaring a polynomial modulo $2^k$ and keeping the low coefficients of the square.
 pub mod mod_power_of_2_square_truncated;
 /// Implementations of [`ModPowerOf2Sub`](crate::num::arithmetic::traits::ModPowerOf2Sub) and
 /// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting

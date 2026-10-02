@@ -5,8 +5,13 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+use crate::num::arithmetic::traits::{ModPowerOf2Mul, ModPowerOf2MulAssign};
+use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::unsigned_polynomial::UnsignedPolynomial;
+use crate::unsigned_polynomial::arithmetic::mod_power_of_2_add::assert_reduced;
 use alloc::vec;
+use alloc::vec::Vec;
 
 // Multiplication of polynomials whose coefficients are words reduced modulo $2^k$, for $k$ no
 // greater than the word width W. Arithmetic modulo $2^\text{W}$ is wrapping arithmetic, and $2^k$
@@ -93,8 +98,7 @@ fn mul_karatsuba_balanced_wrapping<T: PrimitiveUnsigned>(
     let two_h = h << 1;
     let (x0, x1) = xs.split_at(h);
     let (y0, y1) = ys.split_at(h);
-    let (x_sum, scratch) = scratch.split_at_mut(c);
-    let (y_sum, scratch) = scratch.split_at_mut(c);
+    split_into_chunks_mut!(scratch, c, [x_sum, y_sum], scratch);
     let (middle, scratch) = scratch.split_at_mut((c << 1) - 1);
     {
         let (low, high) = out.split_at_mut(two_h);
@@ -204,4 +208,324 @@ pub fn mod_power_of_2_mul_to_out<T: PrimitiveUnsigned>(
     assert!(pow <= T::WIDTH);
     mul_karatsuba_wrapping(out, xs, ys);
     mask_coefficients(out, pow);
+}
+
+// The polynomial whose coefficients are `xs`, trimmed.
+pub(crate) fn from_coefficients_trimmed<T: PrimitiveUnsigned>(xs: Vec<T>) -> UnsignedPolynomial<T> {
+    let mut p = UnsignedPolynomial { coefficients: xs };
+    p.trim();
+    p
+}
+
+// The product of the polynomials with coefficients `xs` and `ys`, both reduced modulo $2^k$, where
+// $k$ is `pow`, modulo $2^k$.
+fn mod_power_of_2_mul_helper<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    pow: u64,
+) -> UnsignedPolynomial<T> {
+    if xs.is_empty() || ys.is_empty() {
+        return UnsignedPolynomial::ZERO;
+    }
+    let mut out = vec![T::ZERO; xs.len() + ys.len() - 1];
+    mod_power_of_2_mul_to_out(&mut out, xs, ys, pow);
+    from_coefficients_trimmed(out)
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2Mul<Self> for UnsignedPolynomial<T> {
+    type Output = Self;
+
+    /// Multiplies two [`UnsignedPolynomial`]s modulo $2^k$, taking both by value. The coefficients
+    /// of both must already be reduced modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, q, k) = pq \bmod 2^k.
+    /// $$
+    ///
+    /// The leading coefficient of the product can vanish modulo $2^k$, and then the degree of the
+    /// product is lower than the sum of the degrees.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the length of the longer polynomial.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The coefficients wrap around modulo 16.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("x^2+3*x+2")
+    ///         .unwrap()
+    ///         .mod_power_of_2_mul(UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(), 4)
+    ///         .to_string(),
+    ///     "2*x^3+11*x^2+3*x+10"
+    /// );
+    /// // The leading coefficient vanishes modulo 16, so the degree drops.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("8*x+1")
+    ///         .unwrap()
+    ///         .mod_power_of_2_mul(UnsignedPolynomial::<u8>::from_str("2*x+1").unwrap(), 4)
+    ///         .to_string(),
+    ///     "10*x+1"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mul` from `nmod_poly/mul.c`, FLINT 3.6.0, with the modulus
+    /// $2^k$.
+    fn mod_power_of_2_mul(self, other: Self, pow: u64) -> Self {
+        assert_reduced(&self, &other, pow);
+        mod_power_of_2_mul_helper(&self.coefficients, &other.coefficients, pow)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2Mul<&Self> for UnsignedPolynomial<T> {
+    type Output = Self;
+
+    /// Multiplies two [`UnsignedPolynomial`]s modulo $2^k$, taking the first by value and the
+    /// second by reference. The coefficients of both must already be reduced modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, q, k) = pq \bmod 2^k.
+    /// $$
+    ///
+    /// The leading coefficient of the product can vanish modulo $2^k$, and then the degree of the
+    /// product is lower than the sum of the degrees.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the length of the longer polynomial.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The coefficients wrap around modulo 16.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("x^2+3*x+2")
+    ///         .unwrap()
+    ///         .mod_power_of_2_mul(&UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(), 4)
+    ///         .to_string(),
+    ///     "2*x^3+11*x^2+3*x+10"
+    /// );
+    /// // The leading coefficient vanishes modulo 16, so the degree drops.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("8*x+1")
+    ///         .unwrap()
+    ///         .mod_power_of_2_mul(&UnsignedPolynomial::<u8>::from_str("2*x+1").unwrap(), 4)
+    ///         .to_string(),
+    ///     "10*x+1"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mul` from `nmod_poly/mul.c`, FLINT 3.6.0, with the modulus
+    /// $2^k$.
+    fn mod_power_of_2_mul(self, other: &Self, pow: u64) -> Self {
+        assert_reduced(&self, other, pow);
+        mod_power_of_2_mul_helper(&self.coefficients, &other.coefficients, pow)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2Mul<UnsignedPolynomial<T>> for &UnsignedPolynomial<T> {
+    type Output = UnsignedPolynomial<T>;
+
+    /// Multiplies two [`UnsignedPolynomial`]s modulo $2^k$, taking the first by reference and the
+    /// second by value. The coefficients of both must already be reduced modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, q, k) = pq \bmod 2^k.
+    /// $$
+    ///
+    /// The leading coefficient of the product can vanish modulo $2^k$, and then the degree of the
+    /// product is lower than the sum of the degrees.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the length of the longer polynomial.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The coefficients wrap around modulo 16.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap())
+    ///         .mod_power_of_2_mul(UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(), 4)
+    ///         .to_string(),
+    ///     "2*x^3+11*x^2+3*x+10"
+    /// );
+    /// // The leading coefficient vanishes modulo 16, so the degree drops.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("8*x+1").unwrap())
+    ///         .mod_power_of_2_mul(UnsignedPolynomial::<u8>::from_str("2*x+1").unwrap(), 4)
+    ///         .to_string(),
+    ///     "10*x+1"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mul` from `nmod_poly/mul.c`, FLINT 3.6.0, with the modulus
+    /// $2^k$.
+    fn mod_power_of_2_mul(self, other: UnsignedPolynomial<T>, pow: u64) -> UnsignedPolynomial<T> {
+        assert_reduced(self, &other, pow);
+        mod_power_of_2_mul_helper(&self.coefficients, &other.coefficients, pow)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2Mul<&UnsignedPolynomial<T>> for &UnsignedPolynomial<T> {
+    type Output = UnsignedPolynomial<T>;
+
+    /// Multiplies two [`UnsignedPolynomial`]s modulo $2^k$, taking both by reference. The
+    /// coefficients of both must already be reduced modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, q, k) = pq \bmod 2^k.
+    /// $$
+    ///
+    /// The leading coefficient of the product can vanish modulo $2^k$, and then the degree of the
+    /// product is lower than the sum of the degrees.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the length of the longer polynomial.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The coefficients wrap around modulo 16.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap())
+    ///         .mod_power_of_2_mul(&UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(), 4)
+    ///         .to_string(),
+    ///     "2*x^3+11*x^2+3*x+10"
+    /// );
+    /// // The leading coefficient vanishes modulo 16, so the degree drops.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("8*x+1").unwrap())
+    ///         .mod_power_of_2_mul(&UnsignedPolynomial::<u8>::from_str("2*x+1").unwrap(), 4)
+    ///         .to_string(),
+    ///     "10*x+1"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mul` from `nmod_poly/mul.c`, FLINT 3.6.0, with the modulus
+    /// $2^k$.
+    fn mod_power_of_2_mul(self, other: &UnsignedPolynomial<T>, pow: u64) -> UnsignedPolynomial<T> {
+        assert_reduced(self, other, pow);
+        mod_power_of_2_mul_helper(&self.coefficients, &other.coefficients, pow)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2MulAssign<Self> for UnsignedPolynomial<T> {
+    /// Multiplies an [`UnsignedPolynomial`] by another [`UnsignedPolynomial`] modulo $2^k$ in
+    /// place, taking the right-hand side by value. The coefficients of both must already be reduced
+    /// modulo $2^k$.
+    ///
+    /// $$
+    /// p \gets pq \bmod 2^k.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the length of the longer polynomial.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// let mut p = UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap();
+    /// p.mod_power_of_2_mul_assign(UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(), 4);
+    /// assert_eq!(p.to_string(), "2*x^3+11*x^2+3*x+10");
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mul` from `nmod_poly/mul.c`, FLINT 3.6.0, with the modulus
+    /// $2^k$.
+    fn mod_power_of_2_mul_assign(&mut self, other: Self, pow: u64) {
+        assert_reduced(self, &other, pow);
+        *self = mod_power_of_2_mul_helper(&self.coefficients, &other.coefficients, pow);
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModPowerOf2MulAssign<&Self> for UnsignedPolynomial<T> {
+    /// Multiplies an [`UnsignedPolynomial`] by another [`UnsignedPolynomial`] modulo $2^k$ in
+    /// place, taking the right-hand side by reference. The coefficients of both must already be
+    /// reduced modulo $2^k$.
+    ///
+    /// $$
+    /// p \gets pq \bmod 2^k.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the length of the longer polynomial.
+    ///
+    /// # Panics
+    /// Panics if `pow` is greater than `T::WIDTH`, or if any coefficient of `self` or `other` is
+    /// greater than or equal to $2^k$.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// let mut p = UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap();
+    /// p.mod_power_of_2_mul_assign(&UnsignedPolynomial::<u8>::from_str("2*x+5").unwrap(), 4);
+    /// assert_eq!(p.to_string(), "2*x^3+11*x^2+3*x+10");
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mul` from `nmod_poly/mul.c`, FLINT 3.6.0, with the modulus
+    /// $2^k$.
+    fn mod_power_of_2_mul_assign(&mut self, other: &Self, pow: u64) {
+        assert_reduced(self, other, pow);
+        *self = mod_power_of_2_mul_helper(&self.coefficients, &other.coefficients, pow);
+    }
 }

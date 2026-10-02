@@ -1,0 +1,19 @@
+error: 2 equal-length chunks are split off one after another
+  --> $DIR/use_split_into_chunks.rs:9:9
+   |
+LL | /         let (x_sum, scratch) = scratch.split_at_mut(c);
+LL | |         let (y_sum, scratch) = scratch.split_at_mut(c);
+   | |_______________________________________________________^ help: use malachite-base's `split_into_chunks_mut!`: `split_into_chunks_mut!(scratch, c, [x_sum, y_sum], scratch);`
+   |
+   = note: `#[deny(use_split_into_chunks)]` on by default
+
+error: 3 equal-length chunks are split off one after another
+  --> $DIR/use_split_into_chunks.rs:19:9
+   |
+LL | /         let (a, rest) = xs.split_at(4);
+LL | |         let (b, rest) = rest.split_at(4);
+LL | |         let (d, rest) = rest.split_at(4);
+   | |_________________________________________^ help: use malachite-base's `split_into_chunks!`: `split_into_chunks!(xs, 4, [a, b, d], rest);`
+
+error: aborting due to 2 previous errors
+

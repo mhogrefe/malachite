@@ -251,8 +251,7 @@ fn mod_mul_karatsuba_balanced<T: PrimitiveUnsigned>(
     let two_h = h << 1;
     let (x0, x1) = xs.split_at(h);
     let (y0, y1) = ys.split_at(h);
-    let (x_sum, scratch) = scratch.split_at_mut(c);
-    let (y_sum, scratch) = scratch.split_at_mut(c);
+    split_into_chunks_mut!(scratch, c, [x_sum, y_sum], scratch);
     let (middle, scratch) = scratch.split_at_mut((c << 1) - 1);
     {
         let (low, high) = out.split_at_mut(two_h);

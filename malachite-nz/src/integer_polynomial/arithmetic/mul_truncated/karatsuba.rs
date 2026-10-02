@@ -20,6 +20,7 @@ use alloc::vec::Vec;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Parity, PowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::split_into_chunks_mut;
 
 // Multiplication using truncated Karatsuba. Below length 7, classical truncated multiplication is
 // always theoretically faster, so it is the basecase. Above that, the ordinary (left/right)
@@ -58,9 +59,7 @@ fn mul_truncated_karatsuba_recursive<C: PolynomialCoefficient>(
     mul_to_out_karatsuba(&mut out[..two_m1 - 1], &xs[..m1], &ys[..m1]);
     out[two_m1 - 1] = C::ZERO;
     {
-        let (low, rest) = temp.split_at_mut(m2);
-        let (sums_1, rest) = rest.split_at_mut(m2);
-        let (sums_2, rest) = rest.split_at_mut(m2);
+        split_into_chunks_mut!(temp, m2, [low, sums_1, sums_2], rest);
         mul_truncated_karatsuba_recursive(low, sums_1, sums_2, rest, m2);
     }
     {

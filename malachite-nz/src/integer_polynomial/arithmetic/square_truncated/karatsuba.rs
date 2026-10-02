@@ -22,6 +22,7 @@ use crate::integer_polynomial::arithmetic::vec::vec_add;
 use alloc::vec;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Parity, PowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::split_into_chunks_mut;
 
 // Squaring using truncated Karatsuba; see `mul_truncated/karatsuba.rs`.
 //
@@ -46,8 +47,7 @@ fn square_truncated_karatsuba_recursive<C: PolynomialCoefficient>(
         temp[m2 + m1] = xs[two_m1].clone();
     }
     {
-        let (low, rest) = temp.split_at_mut(m2);
-        let (sums, rest) = rest.split_at_mut(m2);
+        split_into_chunks_mut!(temp, m2, [low, sums], rest);
         square_truncated_karatsuba_recursive(low, sums, rest, m2);
     }
     {

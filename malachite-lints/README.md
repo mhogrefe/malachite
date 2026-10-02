@@ -59,9 +59,9 @@ your project. Notes:
   **performance-only** lint (evaluating at compile time, inlining, avoiding an allocation) has
   nothing to protect there. Lints that are purely about readability and structure, such as
   `let_tuple_underscore_to_field`, `collapse_adjacent_ifs`, `duplicate_const`,
-  `factor_out_assignment`, and `assign_then_returned`, apply everywhere, as do `long_lines`,
-  `collapse_adjacent_imports`, `bignum_literal_suffix`, `fully_qualified_path`, and
-  `redundant_crate_prefix`. Doctests are linted in full, except the docs of conversions,
+  `factor_out_assignment`, `assign_then_returned`, and `use_split_into_chunks`, apply everywhere,
+  as do `long_lines`, `collapse_adjacent_imports`, `bignum_literal_suffix`, `fully_qualified_path`,
+  and `redundant_crate_prefix`. Doctests are linted in full, except the docs of conversions,
   constants, and comparisons.
 
 ## Lints
@@ -550,6 +550,24 @@ Occasionally separate allocations are genuinely right: if two of the buffers eac
 a swapped buffer must be surrendered to `from_owned_limbs_asc` without a copy, or a buffer needs
 `Vec` operations like `remove`, merging would cost more than the saved allocation. Such sites
 carry an `allow` with a comment saying why.
+
+### `use_split_into_chunks`
+
+Flags two or more consecutive `let` statements that each split a chunk of the same length off the
+front of a slice with `split_at` (or `split_at_mut`), each splitting the remainder left by the one
+before:
+
+```rust,ignore
+let (x_sum, scratch) = scratch.split_at_mut(c);
+let (y_sum, scratch) = scratch.split_at_mut(c);
+```
+
+malachite-base's `split_into_chunks!` and `split_into_chunks_mut!` macros express this directly —
+`split_into_chunks_mut!(scratch, c, [x_sum, y_sum], scratch);` — so that the reader sees uniform
+chunks followed by whatever is left. The suggestion names the final remainder `_unused` when the
+chain discarded it with `_`. A chain is not flagged if an intermediate remainder is used anywhere
+else, if a chunk is bound `mut` or by reference, or if the lengths differ (the macros take one
+length). It applies everywhere, since it is about readability.
 
 ## Tests
 

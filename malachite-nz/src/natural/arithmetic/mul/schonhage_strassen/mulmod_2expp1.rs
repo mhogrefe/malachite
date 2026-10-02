@@ -37,6 +37,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::split_into_chunks_mut;
 
 // The amount subtracted from half the depth of the outer transform to get the depth of the inner
 // transform, indexed by the outer depth minus 12.
@@ -112,8 +113,7 @@ crate_test_fn! {fft_mulmod_2expp1_negacyclic(
     let (t1, t2) = t.split_at_mut(1);
     let (t1, t2) = (&mut t1[0], &mut t2[0]);
     let mut scratch = vec![0; (n2 << 1) + size + limbs_mul_mod_2expp1_basecase_scratch_len(limbs)];
-    let (ii0, scratch) = scratch.split_at_mut(n2);
-    let (r, scratch) = scratch.split_at_mut(n2);
+    split_into_chunks_mut!(scratch, n2, [ii0, r], scratch);
     let (s1, tt) = scratch.split_at_mut(size);
     let j = fft_split_bits(ii, &r1[..r_limbs], r_limbs, bits1, limbs);
     for x in &mut ii[j..] {

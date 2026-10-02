@@ -6,7 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 use crate::num::arithmetic::traits::ModPowerOf2;
+use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::polynomial::Polynomial;
+use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -43,4 +46,18 @@ pub fn mod_power_of_2_generated_coefficients<T: PrimitiveUnsigned>(
             T::wrapping_from(x.mod_power_of_2(pow))
         })
         .collect()
+}
+
+// Multiplies two polynomials modulo $2^k$ by schoolbook multiplication, as polynomials.
+pub fn mod_power_of_2_mul_polynomial_naive<T: PrimitiveUnsigned>(
+    p: &UnsignedPolynomial<T>,
+    q: &UnsignedPolynomial<T>,
+    pow: u64,
+) -> UnsignedPolynomial<T> {
+    let xs = p.coefficients_asc();
+    let ys = q.coefficients_asc();
+    if xs.is_empty() || ys.is_empty() {
+        return UnsignedPolynomial::ZERO;
+    }
+    UnsignedPolynomial::from_coefficients_asc(mod_power_of_2_mul_naive(xs, ys, pow))
 }
