@@ -941,8 +941,8 @@ pub trait ModDerivativeAssign<M> {
 /// Computes the integral modulo $m$ of a polynomial whose constant term is zero. The coefficients
 /// must already be reduced modulo $m$.
 ///
-/// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to the
-/// degree plus 1 must be a unit modulo $m$.
+/// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which that
+/// coefficient is nonzero must be a unit modulo $m$.
 pub trait ModIntegral<M> {
     type Output;
 
@@ -957,8 +957,8 @@ pub trait ModIntegral<M> {
 /// Replaces a polynomial with its integral modulo $m$ whose constant term is zero. The coefficients
 /// must already be reduced modulo $m$.
 ///
-/// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to the
-/// degree plus 1 must be a unit modulo $m$.
+/// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which that
+/// coefficient is nonzero must be a unit modulo $m$.
 pub trait ModIntegralAssign<M> {
     /// Replaces a polynomial with its integral modulo $m$ whose constant term is zero.
     ///
@@ -996,6 +996,36 @@ pub trait ModPowerOf2DerivativeAssign {
     /// p \gets p' \bmod 2^k.
     /// $$
     fn mod_power_of_2_derivative_assign(&mut self, pow: u64);
+}
+
+/// Computes the integral modulo $2^k$ of a polynomial whose constant term is zero. The coefficients
+/// must already be reduced modulo $2^k$.
+///
+/// The coefficient of $x^{i-1}$ is divided by $i$ and moved to $x^i$. Only odd numbers are units
+/// modulo $2^k$, so every nonzero coefficient must belong to an even power of $x$.
+pub trait ModPowerOf2Integral {
+    type Output;
+
+    /// Computes the integral modulo $2^k$ of a polynomial whose constant term is zero.
+    ///
+    /// $$
+    /// f(p, k) = \int_0^x p(t)\,dt \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_integral(self, pow: u64) -> Self::Output;
+}
+
+/// Replaces a polynomial with its integral modulo $2^k$ whose constant term is zero. The
+/// coefficients must already be reduced modulo $2^k$.
+///
+/// The coefficient of $x^{i-1}$ is divided by $i$ and moved to $x^i$. Only odd numbers are units
+/// modulo $2^k$, so every nonzero coefficient must belong to an even power of $x$.
+pub trait ModPowerOf2IntegralAssign {
+    /// Replaces a polynomial with its integral modulo $2^k$ whose constant term is zero.
+    ///
+    /// $$
+    /// p \gets \int_0^x p(t)\,dt \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_integral_assign(&mut self, pow: u64);
 }
 
 /// Computes the $n$th derivative of a polynomial, $\sum_i i^{\underline n}a_ix^{i-n}$, where

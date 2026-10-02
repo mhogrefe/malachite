@@ -13,10 +13,10 @@ use malachite_base::num::arithmetic::traits::{Gcd, ModInverse, ModMul};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
 
-// Whether the integral modulo `m` of `p` is defined: whether every k from 2 to the length of `p` is
-// a unit modulo `m`, checked one at a time with a GCD.
+// Whether the integral modulo `m` of `p` is defined: whether every k for which the coefficient of
+// x^(k-1) is nonzero is a unit modulo `m`, checked one at a time with a GCD.
 pub fn mod_integral_is_defined(p: &NaturalPolynomial, m: &Natural) -> bool {
-    (2..=p.len()).all(|k| (Natural::from(k) % m).gcd(m) == 1u32)
+    (2..=p.len()).all(|k| *p.coefficient(k - 1) == 0u32 || (Natural::from(k) % m).gcd(m) == 1u32)
 }
 
 // Integrates a polynomial modulo `m` coefficient by coefficient, inverting each index separately.
@@ -28,6 +28,12 @@ pub fn mod_integral_naive(p: &NaturalPolynomial, m: &Natural) -> Option<NaturalP
     let mut coefficients = Vec::with_capacity(usize::try_from(p.len()).unwrap() + 1);
     coefficients.push(Natural::ZERO);
     for i in 0..p.len() {
+        let c = p.coefficient(i);
+        // A zero coefficient stays zero, whether or not its index is a unit.
+        if *c == 0u32 {
+            coefficients.push(Natural::ZERO);
+            continue;
+        }
         let k = Natural::from(i + 1) % m;
         let inverse = if *m == 1u32 {
             Natural::ZERO
@@ -36,7 +42,7 @@ pub fn mod_integral_naive(p: &NaturalPolynomial, m: &Natural) -> Option<NaturalP
         } else {
             k.mod_inverse(m)?
         };
-        coefficients.push(p.coefficient(i).mod_mul(inverse, m));
+        coefficients.push(c.mod_mul(inverse, m));
     }
     Some(NaturalPolynomial::from_coefficients_asc(coefficients))
 }

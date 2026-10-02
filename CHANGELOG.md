@@ -449,8 +449,15 @@ documented by git history.
 - New `ModIntegral` and `ModIntegralAssign` traits, in `malachite_base::polynomial`, implemented for
   `UnsignedPolynomial<T>` with a `T` modulus, like FLINT's `nmod_poly_integral`, and for
   `NaturalPolynomial` with a `Natural` modulus taken by value or by reference, which FLINT lacks: the
-  integral modulo `m` whose constant term is zero. Every index from 1 to the degree plus 1 must be a unit modulo
-  `m`, and all the divisions share one modular inversion.
+  integral modulo `m` whose constant term is zero. An index needs to be a unit modulo `m` only where
+  the coefficient it divides is nonzero, unlike in FLINT, which needs every index up to the degree
+  plus 1 to be a unit (so FLINT cannot integrate $x^2$ modulo 8, but Malachite gives $3x^3$); all
+  the divisions share one modular inversion.
+- New `ModPowerOf2Integral` and `ModPowerOf2IntegralAssign` traits, in `malachite_base::polynomial`,
+  implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial`: the integral modulo $2^k$ whose
+  constant term is zero, defined when every nonzero coefficient belongs to an even power of $x$.
+  FLINT has no counterpart, and its `nmod_poly_integral` cannot integrate anything of degree 1 or
+  more modulo $2^k$.
 - New `Integral` and `IntegralAssign` traits, in `malachite_base::polynomial`, implemented for
   `RationalPolynomial`, like FLINT's `fmpq_poly_integral`: the integral whose constant term is
   zero. The result is built in lowest terms coefficient by coefficient, each divisor first

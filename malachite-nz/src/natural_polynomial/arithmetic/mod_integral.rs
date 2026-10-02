@@ -8,12 +8,11 @@
 
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
-use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    ModAddAssign, ModInverse, ModIsReduced, ModMulPrecomputed, ModMulPrecomputedAssign,
+    ModInverse, ModIsReduced, ModMulPrecomputed, ModMulPrecomputedAssign,
 };
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::polynomial::{ModIntegral, ModIntegralAssign};
 
 fn assert_reduced(p: &NaturalPolynomial, m: &Natural) {
@@ -29,27 +28,30 @@ fn index_mod(k: usize, m: &Natural) -> Natural {
 }
 
 // The coefficients of the integral modulo `m` of the polynomial with coefficients `xs`, which is
-// nonempty and reduced modulo `m`. The coefficient of $x^{k-1}$, divided by $k$, goes to $x^k$.
-// Going down from the top, the coefficient of $x^k$ is first multiplied by the product of the
-// larger indices, and that product is extended by $k$; once it is $2 \cdot 3 \cdots n$, it is
-// inverted, and going up, multiplying by the inverse with the smaller indices put back divides each
-// coefficient by its own index. The result is not trimmed.
+// nonempty and reduced modulo `m`. The coefficient of $x^{k-1}$, divided by $k$, goes to $x^k$; a
+// zero coefficient stays zero, so its $k$ need not be a unit. All the divisions share one
+// inversion. Going down from the top, each nonzero coefficient is first multiplied by the product
+// of the larger indices with nonzero coefficients, and then its own index joins the product. Once
+// the product has every such index, it is inverted, and going up, each nonzero coefficient is
+// multiplied by the inverse, and then its own index is multiplied back into the inverse, dividing
+// each coefficient by its own index. The result is not trimmed.
 //
 // This is `_nmod_poly_integral` from `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any
-// size.
+// size, except that FLINT inverts the product of every index, needing all of them to be units.
 fn mod_integral_coefficients(xs: Vec<Natural>, m: &Natural) -> Vec<Natural> {
     let n = xs.len();
-    let mut out = vec![Natural::ZERO; n + 1];
-    for (o, x) in out[1..].iter_mut().zip(xs) {
-        *o = x;
-    }
+    let mut out = Vec::with_capacity(n + 1);
+    out.push(Natural::ZERO);
+    out.extend(xs);
     if n >= 2 {
         let data = <Natural as ModMulPrecomputed<&Natural, &Natural>>::precompute_mod_mul_data(&m);
-        // The product of the indices from k + 1 to n.
-        let mut product = index_mod(n, m);
-        for k in (2..n).rev() {
-            out[k].mod_mul_precomputed_assign(&product, m, &data);
-            product.mod_mul_precomputed_assign(index_mod(k, m), m, &data);
+        // The product of the indices above k whose coefficients are nonzero.
+        let mut product = Natural::ONE % m;
+        for (k, c) in out.iter_mut().enumerate().skip(2).rev() {
+            if *c != 0u32 {
+                c.mod_mul_precomputed_assign(&product, m, &data);
+                product.mod_mul_precomputed_assign(index_mod(k, m), m, &data);
+            }
         }
         let inverse = if product == 0u32 {
             None
@@ -58,21 +60,14 @@ fn mod_integral_coefficients(xs: Vec<Natural>, m: &Natural) -> Vec<Natural> {
         };
         let Some(mut inverse) = inverse else {
             panic!(
-                "The integral of a polynomial of degree {} is only defined modulo m if every k \
-                from 1 to {} is a unit modulo m, but m is {m}",
-                n - 1,
-                n
+                "The integral modulo m is only defined if every k for which the coefficient of \
+                x^(k-1) is nonzero is a unit modulo m, but m is {m}"
             );
         };
-        // Now `inverse` is 1/(2 * 3 * ... * n), and each step up removes one more index from it.
-        out[2].mod_mul_precomputed_assign(&inverse, m, &data);
-        if n >= 3 {
-            let doubled = inverse.clone();
-            inverse.mod_add_assign(doubled, m);
-            out[3].mod_mul_precomputed_assign(&inverse, m, &data);
-            for (k, c) in out.iter_mut().enumerate().skip(4) {
-                inverse.mod_mul_precomputed_assign(index_mod(k - 1, m), m, &data);
+        for (k, c) in out.iter_mut().enumerate().skip(2) {
+            if *c != 0u32 {
                 c.mod_mul_precomputed_assign(&inverse, m, &data);
+                inverse.mod_mul_precomputed_assign(index_mod(k, m), m, &data);
             }
         }
     }
@@ -114,10 +109,9 @@ impl ModIntegral<Natural> for NaturalPolynomial {
     /// f(p, m) = \int_0^x p(t)\,dt \bmod m = \sum_{i=0}^{n-1} \frac{a_i}{i+1}x^{i+1} \bmod m.
     /// $$
     ///
-    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to
-    /// the degree plus 1 must be a unit modulo $m$; equivalently, the smallest prime factor of $m$
-    /// must exceed the degree plus 1. The divisions share a single modular inversion. The integral
-    /// of zero is zero, for every $m$.
+    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which
+    /// that coefficient is nonzero must be a unit modulo $m$; a zero coefficient stays zero. The
+    /// divisions share a single modular inversion. The integral of zero is zero, for every $m$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O((n + \log m) m \log m \log\log m)$
@@ -128,8 +122,8 @@ impl ModIntegral<Natural> for NaturalPolynomial {
     /// `m.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if the polynomial
-    /// is nonzero and some $k$ from 2 to its degree plus 1 is not a unit modulo $m$.
+    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if, for some $k$,
+    /// the coefficient of $x^{k-1}$ is nonzero and $k$ is not a unit modulo $m$.
     ///
     /// # Examples
     /// ```
@@ -156,7 +150,10 @@ impl ModIntegral<Natural> for NaturalPolynomial {
     /// ```
     ///
     /// FLINT has no `fmpz_mod_poly` integral; this is `nmod_poly_integral` from
-    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size.
+    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size, except that FLINT needs
+    /// every $k$ from 1 to the degree plus 1 to be a unit modulo $m$, even when the coefficient of
+    /// $x^{k-1}$ is zero, and aborts otherwise; so, for example, FLINT cannot integrate $x^2$
+    /// modulo 8, whose integral is $3x^3$.
     #[inline]
     fn mod_integral(self, m: Natural) -> Self {
         mod_integral_owned(self, &m)
@@ -174,10 +171,9 @@ impl ModIntegral<&Natural> for NaturalPolynomial {
     /// f(p, m) = \int_0^x p(t)\,dt \bmod m = \sum_{i=0}^{n-1} \frac{a_i}{i+1}x^{i+1} \bmod m.
     /// $$
     ///
-    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to
-    /// the degree plus 1 must be a unit modulo $m$; equivalently, the smallest prime factor of $m$
-    /// must exceed the degree plus 1. The divisions share a single modular inversion. The integral
-    /// of zero is zero, for every $m$.
+    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which
+    /// that coefficient is nonzero must be a unit modulo $m$; a zero coefficient stays zero. The
+    /// divisions share a single modular inversion. The integral of zero is zero, for every $m$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O((n + \log m) m \log m \log\log m)$
@@ -188,8 +184,8 @@ impl ModIntegral<&Natural> for NaturalPolynomial {
     /// `m.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if the polynomial
-    /// is nonzero and some $k$ from 2 to its degree plus 1 is not a unit modulo $m$.
+    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if, for some $k$,
+    /// the coefficient of $x^{k-1}$ is nonzero and $k$ is not a unit modulo $m$.
     ///
     /// # Examples
     /// ```
@@ -216,7 +212,10 @@ impl ModIntegral<&Natural> for NaturalPolynomial {
     /// ```
     ///
     /// FLINT has no `fmpz_mod_poly` integral; this is `nmod_poly_integral` from
-    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size.
+    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size, except that FLINT needs
+    /// every $k$ from 1 to the degree plus 1 to be a unit modulo $m$, even when the coefficient of
+    /// $x^{k-1}$ is zero, and aborts otherwise; so, for example, FLINT cannot integrate $x^2$
+    /// modulo 8, whose integral is $3x^3$.
     #[inline]
     fn mod_integral(self, m: &Natural) -> Self {
         mod_integral_owned(self, m)
@@ -234,10 +233,9 @@ impl ModIntegral<Natural> for &NaturalPolynomial {
     /// f(p, m) = \int_0^x p(t)\,dt \bmod m = \sum_{i=0}^{n-1} \frac{a_i}{i+1}x^{i+1} \bmod m.
     /// $$
     ///
-    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to
-    /// the degree plus 1 must be a unit modulo $m$; equivalently, the smallest prime factor of $m$
-    /// must exceed the degree plus 1. The divisions share a single modular inversion. The integral
-    /// of zero is zero, for every $m$.
+    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which
+    /// that coefficient is nonzero must be a unit modulo $m$; a zero coefficient stays zero. The
+    /// divisions share a single modular inversion. The integral of zero is zero, for every $m$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O((n + \log m) m \log m \log\log m)$
@@ -248,8 +246,8 @@ impl ModIntegral<Natural> for &NaturalPolynomial {
     /// `m.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if the polynomial
-    /// is nonzero and some $k$ from 2 to its degree plus 1 is not a unit modulo $m$.
+    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if, for some $k$,
+    /// the coefficient of $x^{k-1}$ is nonzero and $k$ is not a unit modulo $m$.
     ///
     /// # Examples
     /// ```
@@ -274,7 +272,10 @@ impl ModIntegral<Natural> for &NaturalPolynomial {
     /// ```
     ///
     /// FLINT has no `fmpz_mod_poly` integral; this is `nmod_poly_integral` from
-    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size.
+    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size, except that FLINT needs
+    /// every $k$ from 1 to the degree plus 1 to be a unit modulo $m$, even when the coefficient of
+    /// $x^{k-1}$ is zero, and aborts otherwise; so, for example, FLINT cannot integrate $x^2$
+    /// modulo 8, whose integral is $3x^3$.
     #[inline]
     fn mod_integral(self, m: Natural) -> NaturalPolynomial {
         mod_integral_ref(self, &m)
@@ -292,10 +293,9 @@ impl ModIntegral<&Natural> for &NaturalPolynomial {
     /// f(p, m) = \int_0^x p(t)\,dt \bmod m = \sum_{i=0}^{n-1} \frac{a_i}{i+1}x^{i+1} \bmod m.
     /// $$
     ///
-    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to
-    /// the degree plus 1 must be a unit modulo $m$; equivalently, the smallest prime factor of $m$
-    /// must exceed the degree plus 1. The divisions share a single modular inversion. The integral
-    /// of zero is zero, for every $m$.
+    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which
+    /// that coefficient is nonzero must be a unit modulo $m$; a zero coefficient stays zero. The
+    /// divisions share a single modular inversion. The integral of zero is zero, for every $m$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O((n + \log m) m \log m \log\log m)$
@@ -306,8 +306,8 @@ impl ModIntegral<&Natural> for &NaturalPolynomial {
     /// `m.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if the polynomial
-    /// is nonzero and some $k$ from 2 to its degree plus 1 is not a unit modulo $m$.
+    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if, for some $k$,
+    /// the coefficient of $x^{k-1}$ is nonzero and $k$ is not a unit modulo $m$.
     ///
     /// # Examples
     /// ```
@@ -332,7 +332,10 @@ impl ModIntegral<&Natural> for &NaturalPolynomial {
     /// ```
     ///
     /// FLINT has no `fmpz_mod_poly` integral; this is `nmod_poly_integral` from
-    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size.
+    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size, except that FLINT needs
+    /// every $k$ from 1 to the degree plus 1 to be a unit modulo $m$, even when the coefficient of
+    /// $x^{k-1}$ is zero, and aborts otherwise; so, for example, FLINT cannot integrate $x^2$
+    /// modulo 8, whose integral is $3x^3$.
     #[inline]
     fn mod_integral(self, m: &Natural) -> NaturalPolynomial {
         mod_integral_ref(self, m)
@@ -347,10 +350,9 @@ impl ModIntegralAssign<Natural> for NaturalPolynomial {
     /// p \gets \int_0^x p(t)\,dt \bmod m = \sum_{i=0}^{n-1} \frac{a_i}{i+1}x^{i+1} \bmod m.
     /// $$
     ///
-    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to
-    /// the degree plus 1 must be a unit modulo $m$; equivalently, the smallest prime factor of $m$
-    /// must exceed the degree plus 1. The divisions share a single modular inversion. The integral
-    /// of zero is zero, for every $m$.
+    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which
+    /// that coefficient is nonzero must be a unit modulo $m$; a zero coefficient stays zero. The
+    /// divisions share a single modular inversion. The integral of zero is zero, for every $m$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O((n + \log m) m \log m \log\log m)$
@@ -361,8 +363,8 @@ impl ModIntegralAssign<Natural> for NaturalPolynomial {
     /// `m.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if the polynomial
-    /// is nonzero and some $k$ from 2 to its degree plus 1 is not a unit modulo $m$.
+    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if, for some $k$,
+    /// the coefficient of $x^{k-1}$ is nonzero and $k$ is not a unit modulo $m$.
     ///
     /// # Examples
     /// ```
@@ -377,7 +379,10 @@ impl ModIntegralAssign<Natural> for NaturalPolynomial {
     /// ```
     ///
     /// FLINT has no `fmpz_mod_poly` integral; this is `nmod_poly_integral` from
-    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size.
+    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size, except that FLINT needs
+    /// every $k$ from 1 to the degree plus 1 to be a unit modulo $m$, even when the coefficient of
+    /// $x^{k-1}$ is zero, and aborts otherwise; so, for example, FLINT cannot integrate $x^2$
+    /// modulo 8, whose integral is $3x^3$.
     #[inline]
     fn mod_integral_assign(&mut self, m: Natural) {
         *self = mod_integral_owned(core::mem::take(self), &m);
@@ -392,10 +397,9 @@ impl ModIntegralAssign<&Natural> for NaturalPolynomial {
     /// p \gets \int_0^x p(t)\,dt \bmod m = \sum_{i=0}^{n-1} \frac{a_i}{i+1}x^{i+1} \bmod m.
     /// $$
     ///
-    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to
-    /// the degree plus 1 must be a unit modulo $m$; equivalently, the smallest prime factor of $m$
-    /// must exceed the degree plus 1. The divisions share a single modular inversion. The integral
-    /// of zero is zero, for every $m$.
+    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which
+    /// that coefficient is nonzero must be a unit modulo $m$; a zero coefficient stays zero. The
+    /// divisions share a single modular inversion. The integral of zero is zero, for every $m$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O((n + \log m) m \log m \log\log m)$
@@ -406,8 +410,8 @@ impl ModIntegralAssign<&Natural> for NaturalPolynomial {
     /// `m.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if the polynomial
-    /// is nonzero and some $k$ from 2 to its degree plus 1 is not a unit modulo $m$.
+    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if, for some $k$,
+    /// the coefficient of $x^{k-1}$ is nonzero and $k$ is not a unit modulo $m$.
     ///
     /// # Examples
     /// ```
@@ -422,7 +426,10 @@ impl ModIntegralAssign<&Natural> for NaturalPolynomial {
     /// ```
     ///
     /// FLINT has no `fmpz_mod_poly` integral; this is `nmod_poly_integral` from
-    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size.
+    /// `nmod_poly/integral.c`, FLINT 3.6.0, with a modulus of any size, except that FLINT needs
+    /// every $k$ from 1 to the degree plus 1 to be a unit modulo $m$, even when the coefficient of
+    /// $x^{k-1}$ is zero, and aborts otherwise; so, for example, FLINT cannot integrate $x^2$
+    /// modulo 8, whose integral is $3x^3$.
     #[inline]
     fn mod_integral_assign(&mut self, m: &Natural) {
         *self = mod_integral_owned(core::mem::take(self), m);

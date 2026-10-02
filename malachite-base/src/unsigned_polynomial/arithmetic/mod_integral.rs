@@ -31,25 +31,29 @@ fn index_mod<T: PrimitiveUnsigned>(k: usize, m: T) -> T {
 }
 
 // The coefficients of the integral modulo `m` of the polynomial with coefficients `xs`, which is
-// nonempty and reduced modulo `m`. The coefficient of $x^{k-1}$, divided by $k$, goes to $x^k$.
-// Going down from the top, the coefficient of $x^k$ is first multiplied by the product of the
-// larger indices, and that product is extended by $k$; once it is $2 \cdot 3 \cdots n$, it is
-// inverted, and going up, multiplying by the inverse with the smaller indices put back divides each
-// coefficient by its own index. The result is not trimmed.
+// nonempty and reduced modulo `m`. The coefficient of $x^{k-1}$, divided by $k$, goes to $x^k$; a
+// zero coefficient stays zero, so its $k$ need not be a unit. All the divisions share one
+// inversion. Going down from the top, each nonzero coefficient is first multiplied by the product
+// of the larger indices with nonzero coefficients, and then its own index joins the product. Once
+// the product has every such index, it is inverted, and going up, each nonzero coefficient is
+// multiplied by the inverse, and then its own index is multiplied back into the inverse, dividing
+// each coefficient by its own index. The result is not trimmed.
 //
-// This is equivalent to `_nmod_poly_integral` from `nmod_poly/integral.c`, FLINT 3.6.0.
+// This is `_nmod_poly_integral` from `nmod_poly/integral.c`, FLINT 3.6.0, except that FLINT inverts
+// the product of every index, needing all of them to be units.
 fn mod_integral_coefficients<T: PrimitiveUnsigned>(xs: &[T], m: T) -> Vec<T> {
     let n = xs.len();
     let mut out = vec![T::ZERO; n + 1];
-    out[1] = xs[0];
+    out[1..].copy_from_slice(xs);
     if n >= 2 {
         let data = T::precompute_mod_mul_data(&m);
-        out[n] = xs[n - 1];
-        // The product of the indices from k + 1 to n.
-        let mut product = index_mod(n, m);
-        for k in (2..n).rev() {
-            out[k] = xs[k - 1].mod_mul_precomputed(product, m, &data);
-            product.mod_mul_precomputed_assign(index_mod(k, m), m, &data);
+        // The product of the indices above k whose coefficients are nonzero.
+        let mut product = T::ONE % m;
+        for (k, c) in out.iter_mut().enumerate().skip(2).rev() {
+            if *c != T::ZERO {
+                c.mod_mul_precomputed_assign(product, m, &data);
+                product.mod_mul_precomputed_assign(index_mod(k, m), m, &data);
+            }
         }
         let inverse = if product == T::ZERO {
             None
@@ -58,20 +62,14 @@ fn mod_integral_coefficients<T: PrimitiveUnsigned>(xs: &[T], m: T) -> Vec<T> {
         };
         let Some(mut inverse) = inverse else {
             panic!(
-                "The integral of a polynomial of degree {} is only defined modulo m if every k \
-                from 1 to {} is a unit modulo m, but m is {m}",
-                n - 1,
-                n
+                "The integral modulo m is only defined if every k for which the coefficient of \
+                x^(k-1) is nonzero is a unit modulo m, but m is {m}"
             );
         };
-        // Now `inverse` is 1/(2 * 3 * ... * n), and each step up removes one more index from it.
-        out[2].mod_mul_precomputed_assign(inverse, m, &data);
-        if n >= 3 {
-            inverse.mod_add_assign(inverse, m);
-            out[3].mod_mul_precomputed_assign(inverse, m, &data);
-            for (k, c) in out.iter_mut().enumerate().skip(4) {
-                inverse.mod_mul_precomputed_assign(index_mod(k - 1, m), m, &data);
+        for (k, c) in out.iter_mut().enumerate().skip(2) {
+            if *c != T::ZERO {
                 c.mod_mul_precomputed_assign(inverse, m, &data);
+                inverse.mod_mul_precomputed_assign(index_mod(k, m), m, &data);
             }
         }
     }
@@ -103,10 +101,9 @@ impl<T: PrimitiveUnsigned> ModIntegral<T> for UnsignedPolynomial<T> {
     /// f(p, m) = \int_0^x p(t)\,dt \bmod m = \sum_{i=0}^{n-1} \frac{a_i}{i+1}x^{i+1} \bmod m.
     /// $$
     ///
-    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to
-    /// the degree plus 1 must be a unit modulo $m$; equivalently, the smallest prime factor of $m$
-    /// must exceed the degree plus 1. The divisions share a single modular inversion. The integral
-    /// of zero is zero, for every $m$.
+    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which
+    /// that coefficient is nonzero must be a unit modulo $m$; a zero coefficient stays zero. The
+    /// divisions share a single modular inversion. The integral of zero is zero, for every $m$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -116,8 +113,8 @@ impl<T: PrimitiveUnsigned> ModIntegral<T> for UnsignedPolynomial<T> {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()`.
     ///
     /// # Panics
-    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if the polynomial
-    /// is nonzero and some $k$ from 2 to its degree plus 1 is not a unit modulo $m$.
+    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if, for some $k$,
+    /// the coefficient of $x^{k-1}$ is nonzero and $k$ is not a unit modulo $m$.
     ///
     /// # Examples
     /// ```
@@ -142,7 +139,10 @@ impl<T: PrimitiveUnsigned> ModIntegral<T> for UnsignedPolynomial<T> {
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_integral` from `nmod_poly/integral.c`, FLINT 3.6.0.
+    /// This is equivalent to `nmod_poly_integral` from `nmod_poly/integral.c`, FLINT 3.6.0, except
+    /// that FLINT needs every $k$ from 1 to the degree plus 1 to be a unit modulo $m$, even when
+    /// the coefficient of $x^{k-1}$ is zero, and aborts otherwise; so, for example, FLINT cannot
+    /// integrate $x^2$ modulo 8, whose integral is $3x^3$.
     #[inline]
     fn mod_integral(self, m: T) -> Self {
         mod_integral_ref(&self, m)
@@ -159,10 +159,9 @@ impl<T: PrimitiveUnsigned> ModIntegral<T> for &UnsignedPolynomial<T> {
     /// f(p, m) = \int_0^x p(t)\,dt \bmod m = \sum_{i=0}^{n-1} \frac{a_i}{i+1}x^{i+1} \bmod m.
     /// $$
     ///
-    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to
-    /// the degree plus 1 must be a unit modulo $m$; equivalently, the smallest prime factor of $m$
-    /// must exceed the degree plus 1. The divisions share a single modular inversion. The integral
-    /// of zero is zero, for every $m$.
+    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which
+    /// that coefficient is nonzero must be a unit modulo $m$; a zero coefficient stays zero. The
+    /// divisions share a single modular inversion. The integral of zero is zero, for every $m$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -172,8 +171,8 @@ impl<T: PrimitiveUnsigned> ModIntegral<T> for &UnsignedPolynomial<T> {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()`.
     ///
     /// # Panics
-    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if the polynomial
-    /// is nonzero and some $k$ from 2 to its degree plus 1 is not a unit modulo $m$.
+    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if, for some $k$,
+    /// the coefficient of $x^{k-1}$ is nonzero and $k$ is not a unit modulo $m$.
     ///
     /// # Examples
     /// ```
@@ -196,7 +195,10 @@ impl<T: PrimitiveUnsigned> ModIntegral<T> for &UnsignedPolynomial<T> {
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_integral` from `nmod_poly/integral.c`, FLINT 3.6.0.
+    /// This is equivalent to `nmod_poly_integral` from `nmod_poly/integral.c`, FLINT 3.6.0, except
+    /// that FLINT needs every $k$ from 1 to the degree plus 1 to be a unit modulo $m$, even when
+    /// the coefficient of $x^{k-1}$ is zero, and aborts otherwise; so, for example, FLINT cannot
+    /// integrate $x^2$ modulo 8, whose integral is $3x^3$.
     #[inline]
     fn mod_integral(self, m: T) -> UnsignedPolynomial<T> {
         mod_integral_ref(self, m)
@@ -211,10 +213,9 @@ impl<T: PrimitiveUnsigned> ModIntegralAssign<T> for UnsignedPolynomial<T> {
     /// p \gets \int_0^x p(t)\,dt \bmod m = \sum_{i=0}^{n-1} \frac{a_i}{i+1}x^{i+1} \bmod m.
     /// $$
     ///
-    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to
-    /// the degree plus 1 must be a unit modulo $m$; equivalently, the smallest prime factor of $m$
-    /// must exceed the degree plus 1. The divisions share a single modular inversion. The integral
-    /// of zero is zero, for every $m$.
+    /// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ for which
+    /// that coefficient is nonzero must be a unit modulo $m$; a zero coefficient stays zero. The
+    /// divisions share a single modular inversion. The integral of zero is zero, for every $m$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -224,8 +225,8 @@ impl<T: PrimitiveUnsigned> ModIntegralAssign<T> for UnsignedPolynomial<T> {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()`.
     ///
     /// # Panics
-    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if the polynomial
-    /// is nonzero and some $k$ from 2 to its degree plus 1 is not a unit modulo $m$.
+    /// Panics if `m` is 0, if any coefficient is greater than or equal to `m`, or if, for some $k$,
+    /// the coefficient of $x^{k-1}$ is nonzero and $k$ is not a unit modulo $m$.
     ///
     /// # Examples
     /// ```
@@ -238,7 +239,10 @@ impl<T: PrimitiveUnsigned> ModIntegralAssign<T> for UnsignedPolynomial<T> {
     /// assert_eq!(p.to_string(), "x^3+2*x^2+5*x");
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_integral` from `nmod_poly/integral.c`, FLINT 3.6.0.
+    /// This is equivalent to `nmod_poly_integral` from `nmod_poly/integral.c`, FLINT 3.6.0, except
+    /// that FLINT needs every $k$ from 1 to the degree plus 1 to be a unit modulo $m$, even when
+    /// the coefficient of $x^{k-1}$ is zero, and aborts otherwise; so, for example, FLINT cannot
+    /// integrate $x^2$ modulo 8, whose integral is $3x^3$.
     #[inline]
     fn mod_integral_assign(&mut self, m: T) {
         *self = mod_integral_ref(self, m);

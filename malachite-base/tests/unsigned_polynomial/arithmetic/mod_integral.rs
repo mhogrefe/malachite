@@ -41,6 +41,12 @@ fn test_mod_integral() {
     test::<u8>("x^2", 7, "5*x^3");
     // The loop past x^3.
     test::<u8>("x^4+x^3+x^2+x+1", 7, "3*x^5+2*x^4+5*x^3+4*x^2+x");
+    // - c == T::ZERO: indices whose coefficients are zero need not be units. Here 2 is not a unit
+    //   modulo 4 or 8, but the coefficient of x is zero; FLINT cannot integrate these.
+    test::<u8>("x^2", 4, "3*x^3");
+    test::<u8>("x^2", 8, "3*x^3");
+    test::<u8>("x^4+1", 16, "13*x^5+x");
+    test::<u8>("5*x^4+1", 6, "x^5+x");
     // A composite modulus whose prime factors exceed the degree plus 1.
     test::<u8>("x^3+x^2+x+1", 35, "9*x^4+12*x^3+18*x^2+x");
     // A 64-bit prime.
@@ -70,8 +76,8 @@ fn mod_integral_fail_2() {
 #[test]
 #[should_panic]
 fn mod_integral_fail_3() {
-    // 2 is not a unit modulo 4, although 3 is.
-    let _ = (&UnsignedPolynomial::<u8>::from_str("x^2").unwrap()).mod_integral(4);
+    // The coefficient of x is nonzero, and 2 is not a unit modulo 4.
+    let _ = (&UnsignedPolynomial::<u8>::from_str("x^2+x").unwrap()).mod_integral(4);
 }
 
 #[test]

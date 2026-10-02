@@ -134,6 +134,10 @@ pub mod mod_power_of_2_add_truncated;
 /// and [`ModPowerOf2DerivativeAssign`](malachite_base::polynomial::ModPowerOf2DerivativeAssign),
 /// for differentiating a polynomial modulo a power of 2.
 pub mod mod_power_of_2_derivative;
+/// Implementations of [`ModPowerOf2Integral`](malachite_base::polynomial::ModPowerOf2Integral) and
+/// [`ModPowerOf2IntegralAssign`](malachite_base::polynomial::ModPowerOf2IntegralAssign), for
+/// integrating a polynomial modulo $2^k$.
+pub mod mod_power_of_2_integral;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given power of 2.

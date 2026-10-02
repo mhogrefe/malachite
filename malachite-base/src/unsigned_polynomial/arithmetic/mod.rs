@@ -103,6 +103,10 @@ pub mod mod_power_of_2_add_truncated;
 /// [`ModPowerOf2DerivativeAssign`](crate::polynomial::ModPowerOf2DerivativeAssign), for
 /// differentiating a polynomial modulo a power of 2.
 pub mod mod_power_of_2_derivative;
+/// Implementations of [`ModPowerOf2Integral`](crate::polynomial::ModPowerOf2Integral) and
+/// [`ModPowerOf2IntegralAssign`](crate::polynomial::ModPowerOf2IntegralAssign), for integrating a
+/// polynomial modulo $2^k$.
+pub mod mod_power_of_2_integral;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every coefficient of a polynomial is less than a given power of 2.
