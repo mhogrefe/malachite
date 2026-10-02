@@ -807,6 +807,211 @@ fn tune_poly_mod_mul_grid() {
     }
 }
 
+// Geometric evaluation of `UnsignedPolynomial<u64>`s modulo a word, timed over a grid of polynomial
+// lengths and numbers of points: evaluating at each power of the ratio, several points at a time,
+// and Bluestein's trick, with a middle product and with a truncated product. POLY_GRID_LENS,
+// POLY_GRID_POINTS, and POLY_GRID_BITS (comma-separated) replace the default grid. The modulus has
+// exactly the given number of bits and is odd, and the ratio is a unit. A batch is calibrated to at
+// least 20 ms, and the best of 5 is kept.
+fn tune_poly_mod_evaluate_geometric_grid() {
+    use malachite_base::num::arithmetic::traits::ModInverse;
+    use malachite_base::unsigned_polynomial::arithmetic::evaluate::{
+        mod_evaluate_geometric_fast, mod_evaluate_geometric_fast_truncated,
+        mod_evaluate_geometric_iter,
+    };
+    use std::time::Instant;
+    fn time_one(f: &mut dyn FnMut()) -> f64 {
+        let mut iters = 1u64;
+        loop {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            let t = t0.elapsed().as_secs_f64();
+            if t >= 0.02 {
+                break;
+            }
+            iters *= if t < 0.002 { 10 } else { 2 };
+        }
+        let mut best = f64::INFINITY;
+        for _ in 0..5 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best
+    }
+    let grid = |var: &str, default: &[u64]| -> Vec<u64> {
+        std::env::var(var).map_or_else(
+            |_| default.to_vec(),
+            |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+        )
+    };
+    let lens = grid(
+        "POLY_GRID_LENS",
+        &[8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096],
+    );
+    let points = grid(
+        "POLY_GRID_POINTS",
+        &[8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096],
+    );
+    let all_bits = grid("POLY_GRID_BITS", &[20, 40, 63, 64]);
+    println!(
+        "{:>6} {:>6} {:>5} {:>12} {:>12} {:>12} {:>8}",
+        "len", "points", "bits", "iter", "fast", "truncated", "iter/fast"
+    );
+    for &bits in &all_bits {
+        let top: u64 = 1 << (bits - 1);
+        let noise = random_primitive_ints::<u64>(EXAMPLE_SEED.fork(&format!("m{bits}")))
+            .next()
+            .unwrap();
+        let m = top | ((top - 1) & noise) | 1;
+        let mut q = random_primitive_ints::<u64>(EXAMPLE_SEED.fork(&format!("q{bits}")))
+            .next()
+            .unwrap()
+            % m;
+        let q_inverse = loop {
+            if q != 0
+                && let Some(q_inverse) = q.mod_inverse(m)
+            {
+                break q_inverse;
+            }
+            q = (q + 1) % m;
+        };
+        for &n in &lens {
+            let n = usize::try_from(n).unwrap();
+            let coefficients: Vec<u64> =
+                random_primitive_ints::<u64>(EXAMPLE_SEED.fork(&format!("c{n}_{bits}")))
+                    .take(n)
+                    .map(|c| c % m)
+                    .collect();
+            for &k in &points {
+                let k = usize::try_from(k).unwrap();
+                let t_iter = time_one(&mut || {
+                    drop(black_box(mod_evaluate_geometric_iter(
+                        &coefficients,
+                        q,
+                        k,
+                        m,
+                    )));
+                });
+                let t_fast = time_one(&mut || {
+                    drop(black_box(mod_evaluate_geometric_fast(
+                        &coefficients,
+                        q,
+                        q_inverse,
+                        k,
+                        m,
+                    )));
+                });
+                let t_truncated = time_one(&mut || {
+                    drop(black_box(mod_evaluate_geometric_fast_truncated(
+                        &coefficients,
+                        q,
+                        q_inverse,
+                        k,
+                        m,
+                    )));
+                });
+                println!(
+                    "{:>6} {:>6} {:>5} {:>12.0} {:>12.0} {:>12.0} {:>8.2}",
+                    n,
+                    k,
+                    bits,
+                    t_iter * 1e9,
+                    t_fast * 1e9,
+                    t_truncated * 1e9,
+                    t_iter / t_fast
+                );
+            }
+        }
+    }
+}
+
+// Middle products of `u64` coefficients modulo a word, timed over a grid of lengths and modulus
+// sizes: classical and Karatsuba. The polynomial and the number of outputs both have the given
+// length. POLY_GRID_LENS and POLY_GRID_BITS (comma-separated) replace the default grid. A batch is
+// calibrated to at least 20 ms, and the best of 5 is kept.
+fn tune_poly_mod_mul_middle_grid() {
+    use malachite_base::unsigned_polynomial::arithmetic::mod_mul_middle::{
+        mod_mul_middle_to_out_classical, mod_mul_middle_to_out_karatsuba,
+    };
+    use std::time::Instant;
+    fn time_one(f: &mut dyn FnMut()) -> f64 {
+        let mut iters = 1u64;
+        loop {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            let t = t0.elapsed().as_secs_f64();
+            if t >= 0.02 {
+                break;
+            }
+            iters *= if t < 0.002 { 10 } else { 2 };
+        }
+        let mut best = f64::INFINITY;
+        for _ in 0..5 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best
+    }
+    let grid = |var: &str, default: &[u64]| -> Vec<u64> {
+        std::env::var(var).map_or_else(
+            |_| default.to_vec(),
+            |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+        )
+    };
+    let lens = grid(
+        "POLY_GRID_LENS",
+        &[8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 512, 1024],
+    );
+    let all_bits = grid("POLY_GRID_BITS", &[20, 40, 62, 63, 64]);
+    println!(
+        "{:>6} {:>5} {:>12} {:>12} {:>8}",
+        "len", "bits", "classical", "karatsuba", "cl/kar"
+    );
+    for &bits in &all_bits {
+        let top: u64 = 1 << (bits - 1);
+        let noise = random_primitive_ints::<u64>(EXAMPLE_SEED.fork(&format!("m{bits}")))
+            .next()
+            .unwrap();
+        let m = top | ((top - 1) & noise) | 1;
+        for &n in &lens {
+            let n = usize::try_from(n).unwrap();
+            let xs: Vec<u64> = random_primitive_ints::<u64>(EXAMPLE_SEED.fork(&format!("x{n}")))
+                .take(n)
+                .map(|c| c % m)
+                .collect();
+            let ys: Vec<u64> = random_primitive_ints::<u64>(EXAMPLE_SEED.fork(&format!("y{n}")))
+                .take((n << 1) - 1)
+                .map(|c| c % m)
+                .collect();
+            let mut out = vec![0; n];
+            let t_classical = time_one(&mut || {
+                mod_mul_middle_to_out_classical(black_box(&mut out), &xs, &ys, m);
+            });
+            let t_karatsuba = time_one(&mut || {
+                mod_mul_middle_to_out_karatsuba(black_box(&mut out), &xs, &ys, m);
+            });
+            println!(
+                "{:>6} {:>5} {:>12.0} {:>12.0} {:>8.2}",
+                n,
+                bits,
+                t_classical * 1e9,
+                t_karatsuba * 1e9,
+                t_classical / t_karatsuba
+            );
+        }
+    }
+}
+
 // The Malachite side of the FFT-region mul comparison; the C sides are perf/scratch/{mul_gmp.c,
 // mul_flint.c} (make mul-gmp / mul-gmp-noasm / mul-flint). Inputs use the same LCG so all four
 // harnesses multiply identical operands. Times go through the full dispatch, so sizes >=
@@ -3203,6 +3408,8 @@ pub fn tune(key: &str) {
         "poly_mul_grid" => tune_poly_mul_grid(),
         "poly_mod_power_of_2_mul_grid" => tune_poly_mod_power_of_2_mul_grid(),
         "poly_mod_mul_grid" => tune_poly_mod_mul_grid(),
+        "poly_mod_evaluate_geometric_grid" => tune_poly_mod_evaluate_geometric_grid(),
+        "poly_mod_mul_middle_grid" => tune_poly_mod_mul_middle_grid(),
         "gcd_probe" => tune_gcd_probe(),
         "xgcd_probe" => tune_xgcd_probe(),
         "mul_fft" => tune_mul_fft(),

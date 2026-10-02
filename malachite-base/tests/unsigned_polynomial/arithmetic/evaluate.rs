@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::LowMask;
 use malachite_base::polynomial::{
     ModEvaluate, ModEvaluateGeometric, ModEvaluateMany, ModPowerOf2Evaluate, Polynomial,
 };
@@ -23,11 +24,9 @@ use malachite_base::test_util::generators::{
     unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_base::test_util::unsigned_polynomial::arithmetic::evaluate::*;
+use malachite_base::test_util::unsigned_polynomial::arithmetic::mod_mul::*;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
-use malachite_base::unsigned_polynomial::arithmetic::evaluate::{
-    mod_evaluate_horner, mod_evaluate_horner_block, mod_evaluate_shoup, mod_evaluate_shoup_block,
-    mod_evaluate_shoup_lazy, mod_evaluate_shoup_lazy_block,
-};
+use malachite_base::unsigned_polynomial::arithmetic::evaluate::*;
 
 #[test]
 fn test_mod_power_of_2_evaluate() {
@@ -661,6 +660,92 @@ fn test_mod_evaluate_geometric() {
     );
 }
 
+// Bluestein's trick against evaluation at each power, at lengths and numbers of points on both
+// sides of the threshold, for every modulus of the test set and several ratios that are units.
+fn mod_evaluate_geometric_algorithms_helper<T: PrimitiveUnsigned>() {
+    for &(n, k) in &[(1, 1), (1, 5), (5, 1), (3, 7), (64, 64), (65, 100), (200, 70), (130, 300)] {
+        for m in test_moduli::<T>() {
+            let coefficients = mod_generated_coefficients::<T>(n, m, 8);
+            // The same polynomial with its first coefficients zero, to skip them.
+            let mut shifted = coefficients.clone();
+            for c in shifted.iter_mut().take(n >> 1) {
+                *c = T::ZERO;
+            }
+            for q in
+                [T::ONE % m, T::TWO % m, m - T::ONE, mod_generated_coefficients::<T>(1, m, 9)[0]]
+            {
+                if q == T::ZERO {
+                    continue;
+                }
+                let Some(q_inverse) = q.mod_inverse(m) else {
+                    continue;
+                };
+                for cs in [&coefficients, &shifted] {
+                    let expected = mod_evaluate_geometric_iter(cs, q, k, m);
+                    assert_eq!(
+                        mod_evaluate_geometric_fast(cs, q, q_inverse, k, m),
+                        expected
+                    );
+                    assert_eq!(
+                        mod_evaluate_geometric_fast_truncated(cs, q, q_inverse, k, m),
+                        expected
+                    );
+                    // The public function, which uses Bluestein's trick at some of these sizes,
+                    // with moduli whose top bit is set.
+                    assert_eq!(
+                        (&UnsignedPolynomial::from_coefficients_asc(cs.clone()))
+                            .mod_evaluate_geometric(q, u64::exact_from(k), m),
+                        expected
+                    );
+                }
+            }
+        }
+    }
+}
+
+// The public function on either side of the boundaries where it switches to Bluestein's trick, with
+// `u64` moduli of 20, 40, 62, 63, and 64 bits.
+#[test]
+fn test_mod_evaluate_geometric_dispatch() {
+    for &(bits, n, k) in &[
+        // - mod_evaluate_geometric_fast_preferred with bits == width
+        (64, 32, 32),
+        (64, 31, 32),
+        (64, 32, 31),
+        (64, 4096, 32),
+        // - bits == width - 1
+        (63, 256, 256),
+        (63, 255, 256),
+        // - bits + 8 > width
+        (62, 512, 1024),
+        (62, 512, 1023),
+        // - bits << 4 > width * 5
+        (40, 256, 256),
+        (40, 255, 4096),
+        // - otherwise
+        (20, 128, 128),
+        (20, 4096, 127),
+    ] {
+        let m = u64::low_mask(bits) - 58;
+        let coefficients = mod_generated_coefficients::<u64>(n, m, 10);
+        let q = 3;
+        let expected = mod_evaluate_geometric_iter(&coefficients, q, k, m);
+        assert_eq!(
+            (&UnsignedPolynomial::from_coefficients_asc(coefficients)).mod_evaluate_geometric(
+                q,
+                u64::exact_from(k),
+                m
+            ),
+            expected
+        );
+    }
+}
+
+#[test]
+fn test_mod_evaluate_geometric_algorithms() {
+    apply_fn_to_unsigneds!(mod_evaluate_geometric_algorithms_helper);
+}
+
 #[test]
 #[should_panic]
 fn mod_evaluate_geometric_fail_1() {
@@ -689,6 +774,29 @@ fn mod_evaluate_geometric_properties_helper<T: PrimitiveUnsigned>() {
             assert_eq!(u64::exact_from(ys.len()), k);
             assert!(ys.iter().all(|&y| y < m));
             assert_eq!(mod_evaluate_geometric_naive(&p, q, k, m), ys);
+            let k_usize = usize::exact_from(k);
+            assert_eq!(
+                mod_evaluate_geometric_iter(p.coefficients_asc(), q, k_usize, m),
+                ys
+            );
+            if q != T::ZERO
+                && let Some(q_inverse) = q.mod_inverse(m)
+            {
+                assert_eq!(
+                    mod_evaluate_geometric_fast(p.coefficients_asc(), q, q_inverse, k_usize, m),
+                    ys
+                );
+                assert_eq!(
+                    mod_evaluate_geometric_fast_truncated(
+                        p.coefficients_asc(),
+                        q,
+                        q_inverse,
+                        k_usize,
+                        m
+                    ),
+                    ys
+                );
+            }
 
             // It is evaluation at the powers of q.
             let powers: Vec<T> = (0..k).map(|j| q.mod_pow(j, m)).collect();

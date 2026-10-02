@@ -561,8 +561,12 @@ documented by git history.
   checks the polynomial and precomputes the modular-multiplication data once.
 - A new `ModEvaluateGeometric` trait, whose `mod_evaluate_geometric(q, k, m)` evaluates a
   polynomial at $1, q, \ldots, q^{k-1}$ modulo `m`, like FLINT's
-  `nmod_poly_evaluate_geometric_nmod_vec_iter` with $q = r^2$. It is implemented for
-  `&UnsignedPolynomial<T>`.
+  `nmod_poly_evaluate_geometric_nmod_vec_iter` and `nmod_poly_evaluate_geometric_nmod_vec_fast`
+  with $q = r^2$. It is implemented for `&UnsignedPolynomial<T>`. Long polynomials evaluated at many
+  points use Bluestein's trick, which turns the evaluation into one middle product (the coefficients
+  of a product from the middle on, like FLINT's `_nmod_poly_mulmid`, computed by a Karatsuba-style
+  algorithm), when `q` is a unit; it is up to 11.7 times as fast as evaluating at each power for
+  64-bit moduli with the top bit set, and up to 6.9 times as fast for smaller moduli.
 - New `Content`, `PrimitivePart`, `PrimitivePartAssign`, and `ContentAndPrimitivePart` traits, in
   `malachite_base::polynomial`, like FLINT's `fmpz_poly_content`, `fmpz_poly_primitive_part`,
   `fmpq_poly_content`, and `fmpq_poly_primitive_part`, with FLINT's sign convention: the content

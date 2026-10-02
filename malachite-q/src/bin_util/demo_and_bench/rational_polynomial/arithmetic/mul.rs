@@ -165,4 +165,3 @@ fn benchmark_rational_polynomial_mul_assign_evaluation_strategy(
         ],
     );
 }
-

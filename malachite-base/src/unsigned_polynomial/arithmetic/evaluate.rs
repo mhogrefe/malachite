@@ -15,7 +15,12 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
 use crate::polynomial::{ModEvaluate, ModEvaluateGeometric, ModEvaluateMany, ModPowerOf2Evaluate};
 use crate::unsigned_polynomial::UnsignedPolynomial;
+use crate::unsigned_polynomial::arithmetic::mod_mul::ModData;
+use crate::unsigned_polynomial::arithmetic::mod_mul_middle::mod_mul_middle_karatsuba;
+use crate::unsigned_polynomial::arithmetic::mod_mul_truncated::mod_mul_truncated_to_out;
+use alloc::vec;
 use alloc::vec::Vec;
+use core::cmp::max;
 
 // Evaluates a polynomial at x modulo 2^pow, after checking that pow fits in `T` and that the
 // coefficients and x are reduced.
@@ -567,6 +572,203 @@ impl<T: PrimitiveUnsigned> ModEvaluateMany<T> for &UnsignedPolynomial<T> {
     }
 }
 
+// Whether geometric evaluation of a polynomial of length `n` at `k` points modulo `m` uses
+// Bluestein's trick rather than evaluating at each power of q: when the polynomial and the number
+// of points are both long enough. Evaluating at each power is fast with Shoup's multiplication, and
+// fastest with its lazy form, which needs the top two bits of `m` clear; when the top bit is set,
+// Shoup's multiplication is unavailable and Bluestein's trick wins much sooner. The middle product
+// accumulates in three words once `m` has more than about W - 8 bits, where W is `T::WIDTH`, which
+// slows it. Measured on an Apple M-series machine, 2026-10, for `u64` with moduli of 20, 30, 40,
+// 50, 62, 63, and 64 bits; the boundaries for other types are scaled by their width without being
+// measured.
+fn mod_evaluate_geometric_fast_preferred<T: PrimitiveUnsigned>(n: usize, k: usize, m: T) -> bool {
+    let bits = m.significant_bits();
+    let width = T::WIDTH;
+    let (min_n, min_k) = if bits == width {
+        (32, 32)
+    } else if bits == width - 1 {
+        (256, 256)
+    } else if bits + 8 > width {
+        (512, 1024)
+    } else if bits << 4 > width * 5 {
+        (256, 256)
+    } else {
+        (128, 128)
+    };
+    n >= min_n && k >= min_k
+}
+
+// Evaluates the polynomial with the given coefficients, reduced modulo `m`, at $1, q, q^2, \ldots,
+// q^{k-1}$ modulo `m`, generating the powers of q and then evaluating at them all, several points
+// at a time.
+//
+// This is equivalent to `_nmod_poly_evaluate_geometric_nmod_vec_iter` from
+// `nmod_poly/evaluate_geometric_nmod_vec.c`, FLINT 3.6.0, with the ratio q in place of FLINT's
+// $r^2$.
+crate_test_fn! {mod_evaluate_geometric_iter<T: PrimitiveUnsigned>(
+    coefficients: &[T],
+    q: T,
+    k: usize,
+    m: T,
+) -> Vec<T> {
+    let mut values = Vec::with_capacity(k);
+    if k != 0 {
+        let mut power = T::ONE % m;
+        values.push(power);
+        if m.get_highest_bit() {
+            let data = T::precompute_mod_mul_data(&m);
+            for _ in 1..k {
+                power.mod_mul_precomputed_assign(q, m, &data);
+                values.push(power);
+            }
+        } else {
+            let q_precomp = mod_mul_precompute_shoup(q, m);
+            for _ in 1..k {
+                power = mod_mul_shoup(q, power, q_precomp, m);
+                values.push(power);
+            }
+        }
+    }
+    mod_evaluate_many_in_place(coefficients, &mut values, m);
+    values
+}}
+
+// Evaluates the polynomial with the given coefficients, reduced modulo `m`, at $1, q, q^2, \ldots,
+// q^{k-1}$ modulo `m` with Bluestein's trick, where `q_inverse` is the inverse of q modulo `m`.
+//
+// With $\binom{t}{2} = t(t-1)/2$, every product $ij$ is $\binom{i+j}{2} - \binom{i}{2} -
+// \binom{j}{2}$, so
+// $$
+// \sum_i c_i q^{ij} = q^{-\binom{j}{2}} \sum_i \left ( c_i q^{-\binom{i}{2}} \right )
+// q^{\binom{i+j}{2}}.
+// $$
+// The sum is coefficient $n - 1 + j$ of the product of the reverse of $(c_i q^{-\binom{i}{2}})_i$
+// and $(q^{\binom{t}{2}})_t$, so all $k$ values are one middle product, the $k$ coefficients of
+// that product from coefficient $n - 1$ on. Leading zero coefficients of the polynomial are
+// skipped, shortening $n$.
+//
+// This is equivalent to `_nmod_poly_evaluate_geometric_nmod_vec_fast` from
+// `nmod_poly/evaluate_geometric_nmod_vec.c`, FLINT 3.6.0, with exponents $\binom{t}{2}$ in place of
+// FLINT's $t^2/2$, so that no square root of q is needed.
+crate_test_fn! {mod_evaluate_geometric_fast<T: PrimitiveUnsigned>(
+    coefficients: &[T],
+    q: T,
+    q_inverse: T,
+    k: usize,
+    m: T,
+) -> Vec<T> {
+    if k == 0 {
+        return Vec::new();
+    }
+    let Some(start) = coefficients.iter().position(|&c| c != T::ZERO) else {
+        return vec![T::ZERO; k];
+    };
+    let n = coefficients.len();
+    let a_len = n - start;
+    let data = T::precompute_mod_mul_data(&m);
+    // binomial_powers[t] = q^C(t, 2), for t < n + k - 1.
+    let b_len = n + k - 1;
+    let mut binomial_powers = Vec::with_capacity(b_len);
+    let mut power = T::ONE % m;
+    let mut step = T::ONE % m;
+    for _ in 0..b_len {
+        binomial_powers.push(power);
+        power.mod_mul_precomputed_assign(step, m, &data);
+        step.mod_mul_precomputed_assign(q, m, &data);
+    }
+    // inverse_powers[t] = q^-C(t, 2), for t < max(n, k).
+    let w_len = max(n, k);
+    let mut inverse_powers = Vec::with_capacity(w_len);
+    let mut power = T::ONE % m;
+    let mut step = T::ONE % m;
+    for _ in 0..w_len {
+        inverse_powers.push(power);
+        power.mod_mul_precomputed_assign(step, m, &data);
+        step.mod_mul_precomputed_assign(q_inverse, m, &data);
+    }
+    // The scaled coefficients, from the first nonzero one on, reversed.
+    let scaled: Vec<T> = coefficients[start..]
+        .iter()
+        .zip(&inverse_powers[start..])
+        .rev()
+        .map(|(&c, &w)| c.mod_mul_precomputed(w, m, &data))
+        .collect();
+    let mut product = vec![T::ZERO; k];
+    mod_mul_middle_karatsuba(
+        &mut product,
+        &scaled,
+        &binomial_powers[start..start + a_len + k - 1],
+        &ModData::new(m, a_len),
+    );
+    product
+        .iter()
+        .zip(&inverse_powers)
+        .map(|(&z, &w)| z.mod_mul_precomputed(w, m, &data))
+        .collect()
+}}
+
+// Evaluates like `mod_evaluate_geometric_fast`, but computes the sums with a truncated product of
+// length $n + k - 1$ and keeps its last $k$ coefficients, discarding the first $n - 1$, rather than
+// with a middle product. It is kept to measure what the middle product saves.
+crate_test_fn! {
+#[allow(dead_code)]
+mod_evaluate_geometric_fast_truncated<T: PrimitiveUnsigned>(
+    coefficients: &[T],
+    q: T,
+    q_inverse: T,
+    k: usize,
+    m: T,
+) -> Vec<T> {
+    if k == 0 {
+        return Vec::new();
+    }
+    let Some(start) = coefficients.iter().position(|&c| c != T::ZERO) else {
+        return vec![T::ZERO; k];
+    };
+    let n = coefficients.len();
+    let a_len = n - start;
+    let data = T::precompute_mod_mul_data(&m);
+    // binomial_powers[t] = q^C(t, 2), for t < n + k - 1.
+    let b_len = n + k - 1;
+    let mut binomial_powers = Vec::with_capacity(b_len);
+    let mut power = T::ONE % m;
+    let mut step = T::ONE % m;
+    for _ in 0..b_len {
+        binomial_powers.push(power);
+        power.mod_mul_precomputed_assign(step, m, &data);
+        step.mod_mul_precomputed_assign(q, m, &data);
+    }
+    // inverse_powers[t] = q^-C(t, 2), for t < max(n, k).
+    let w_len = max(n, k);
+    let mut inverse_powers = Vec::with_capacity(w_len);
+    let mut power = T::ONE % m;
+    let mut step = T::ONE % m;
+    for _ in 0..w_len {
+        inverse_powers.push(power);
+        power.mod_mul_precomputed_assign(step, m, &data);
+        step.mod_mul_precomputed_assign(q_inverse, m, &data);
+    }
+    // The scaled coefficients, from the first nonzero one on, reversed.
+    let scaled: Vec<T> = coefficients[start..]
+        .iter()
+        .zip(&inverse_powers[start..])
+        .rev()
+        .map(|(&c, &w)| c.mod_mul_precomputed(w, m, &data))
+        .collect();
+    let mut product = vec![T::ZERO; a_len + k - 1];
+    mod_mul_truncated_to_out(
+        &mut product,
+        &scaled,
+        &binomial_powers[start..start + a_len + k - 1],
+        m,
+    );
+    product[a_len - 1..]
+        .iter()
+        .zip(&inverse_powers)
+        .map(|(&z, &w)| z.mod_mul_precomputed(w, m, &data))
+        .collect()
+}}
+
 impl<T: PrimitiveUnsigned> ModEvaluateGeometric<T> for &UnsignedPolynomial<T> {
     type Output = T;
 
@@ -614,25 +816,14 @@ impl<T: PrimitiveUnsigned> ModEvaluateGeometric<T> for &UnsignedPolynomial<T> {
         );
         assert!(q < m, "q must be reduced mod m, but {q} >= {m}");
         let k = usize::exact_from(k);
-        let mut values = Vec::with_capacity(k);
-        if k != 0 {
-            let mut power = T::ONE % m;
-            values.push(power);
-            if m.get_highest_bit() {
-                let data = T::precompute_mod_mul_data(&m);
-                for _ in 1..k {
-                    power.mod_mul_precomputed_assign(q, m, &data);
-                    values.push(power);
-                }
-            } else {
-                let q_precomp = mod_mul_precompute_shoup(q, m);
-                for _ in 1..k {
-                    power = mod_mul_shoup(q, power, q_precomp, m);
-                    values.push(power);
-                }
-            }
+        let n = self.coefficients.len();
+        if mod_evaluate_geometric_fast_preferred(n, k, m)
+            && q != T::ZERO
+            && let Some(q_inverse) = q.mod_inverse(m)
+        {
+            mod_evaluate_geometric_fast(&self.coefficients, q, q_inverse, k, m)
+        } else {
+            mod_evaluate_geometric_iter(&self.coefficients, q, k, m)
         }
-        mod_evaluate_many_in_place(&self.coefficients, &mut values, m);
-        values
     }
 }

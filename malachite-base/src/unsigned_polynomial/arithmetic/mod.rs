@@ -64,6 +64,8 @@ pub mod mod_make_monic;
 /// [`ModMulAssign`](crate::num::arithmetic::traits::ModMulAssign), for multiplying two polynomials
 /// modulo a value.
 pub mod mod_mul;
+#[doc(hidden)]
+pub mod mod_mul_middle;
 /// Implementations of [`ModMulTruncated`](crate::polynomial::ModMulTruncated) and
 /// [`ModMulTruncatedAssign`](crate::polynomial::ModMulTruncatedAssign), for multiplying two
 /// polynomials modulo a value and keeping the low coefficients of the product.

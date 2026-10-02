@@ -887,6 +887,7 @@ pub mod unsigned_polynomial {
         pub mod mod_is_reduced;
         pub mod mod_make_monic;
         pub mod mod_mul;
+        pub mod mod_mul_middle;
         pub mod mod_mul_truncated;
         pub mod mod_neg;
         pub mod mod_nth_derivative;
