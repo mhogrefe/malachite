@@ -81,12 +81,10 @@ pub(crate) fn square_slots_karatsuba(out: &mut [Limb], xs: &[Limb], slot_len: us
     let split = h * slot_len;
     let low_len = ((h << 1) - 1) * slot_len;
     let (x0, x1) = xs.split_at(split);
-    {
-        let (low, high) = out.split_at_mut(split << 1);
-        square_slots_karatsuba(&mut low[..low_len], x0, slot_len);
-        low[low_len..].fill(0);
-        square_slots_karatsuba(high, x1, slot_len);
-    }
+    let (low, high) = out.split_at_mut(split << 1);
+    square_slots_karatsuba(&mut low[..low_len], x0, slot_len);
+    low[low_len..].fill(0);
+    square_slots_karatsuba(high, x1, slot_len);
     let mut sum = x1.to_vec();
     slots_add_assign(&mut sum, x0, slot_len);
     let mut middle = vec![0; (((n - h) << 1) - 1) * slot_len];

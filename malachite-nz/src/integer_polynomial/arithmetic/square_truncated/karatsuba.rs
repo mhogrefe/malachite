@@ -46,14 +46,10 @@ fn square_truncated_karatsuba_recursive<C: PolynomialCoefficient>(
     if odd {
         temp[m2 + m1] = xs[two_m1].clone();
     }
-    {
-        split_into_chunks_mut!(temp, m2, [low, sums], rest);
-        square_truncated_karatsuba_recursive(low, sums, rest, m2);
-    }
-    {
-        let (high, rest) = temp[m2..].split_at_mut(m2);
-        square_truncated_karatsuba_recursive(high, &xs[m1..], rest, m2);
-    }
+    split_into_chunks_mut!(temp, m2, [low, sums], rest);
+    square_truncated_karatsuba_recursive(low, sums, rest, m2);
+    let (high, rest) = temp[m2..].split_at_mut(m2);
+    square_truncated_karatsuba_recursive(high, &xs[m1..], rest, m2);
     square_to_out_karatsuba(&mut out[..two_m1 - 1], &xs[..m1]);
     out[two_m1 - 1] = C::ZERO;
     combine_truncated_karatsuba(out, temp, m1, m2);

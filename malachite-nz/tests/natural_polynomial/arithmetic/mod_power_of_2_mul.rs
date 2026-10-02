@@ -13,9 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
-use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_mul::{
-    mod_power_of_2_mul_low_classical, mod_power_of_2_mul_low_karatsuba,
-};
+use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_mul::*;
 use malachite_nz::test_util::generators::*;
 use malachite_nz::test_util::natural_polynomial::arithmetic::mod_power_of_2_mul::*;
 use malachite_nz::test_util::natural_polynomial::arithmetic::mul::naturals_mul_naive;
@@ -169,4 +167,36 @@ fn test_mod_power_of_2_mul_dispatch() {
     test(10, 9, 30000);
     // - full product, a constant factor
     test(10, 1, 64);
+}
+
+// The dispatcher at the edges of the low-half kernels' windows, against the full product, which
+// shares nothing with the low-half kernels. Each length is the largest in a window, or one past it,
+// for the largest power the window covers. The edges are those measured in 2026-10; if they move,
+// these still check agreement, only less sharply.
+#[test]
+fn test_mod_power_of_2_mul_window_edges() {
+    for &(pow, edge) in &[
+        (16, 150),
+        (32, 500),
+        (48, 1000),
+        (64, 2000),
+        (96, 24),
+        (128, 64),
+        (300, 100),
+        (500, 48),
+        (2000, 32),
+        (5000, 8),
+    ] {
+        for n in [edge, edge + 1] {
+            let xs = natural_mod_power_of_2_generated_coefficients(n, pow);
+            let mut ys = natural_mod_power_of_2_generated_coefficients(n, pow);
+            ys.reverse();
+            let p = NaturalPolynomial::from_coefficients_asc(xs.clone());
+            let q = NaturalPolynomial::from_coefficients_asc(ys.clone());
+            assert_eq!(
+                (&p).mod_power_of_2_mul(&q, pow),
+                NaturalPolynomial::from_coefficients_asc(mod_power_of_2_mul_full(&xs, &ys, pow))
+            );
+        }
+    }
 }

@@ -362,3 +362,31 @@ fn mod_mul_truncated_public_properties_helper<T: PrimitiveUnsigned>() {
 fn mod_mul_truncated_public_properties() {
     apply_fn_to_unsigneds!(mod_mul_truncated_public_properties_helper);
 }
+
+// Long polynomials, past the Karatsuba threshold several times over and some unbalanced, against
+// the schoolbook reference. The moduli give one-, two-, and three-word accumulation, and with `u8`
+// the sums are long enough to be reduced partway through.
+fn mod_mul_truncated_long_helper<T: PrimitiveUnsigned>() {
+    for &(n, k, len) in
+        &[(1000, 999, 1000), (2047, 1500, 1800), (2000, 37, 1500), (1500, 1500, 2999)]
+    {
+        for m in long_test_moduli::<T>() {
+            let xs = mod_generated_coefficients::<T>(n, m, 5);
+            let ys = mod_generated_coefficients::<T>(k, m, 6);
+            let expected = mod_mul_truncated_naive(&xs, &ys, len, m);
+            let mut out = vec![T::ZERO; len];
+            mod_mul_truncated_to_out(&mut out, &xs, &ys, m);
+            assert_eq!(out, expected);
+            mod_mul_truncated_to_out_classical(&mut out, &xs, &ys, m);
+            assert_eq!(out, expected);
+            mod_mul_truncated_to_out_karatsuba(&mut out, &xs, &ys, m);
+            assert_eq!(out, expected);
+        }
+    }
+}
+
+#[test]
+fn test_mod_mul_truncated_long() {
+    mod_mul_truncated_long_helper::<u8>();
+    mod_mul_truncated_long_helper::<u64>();
+}

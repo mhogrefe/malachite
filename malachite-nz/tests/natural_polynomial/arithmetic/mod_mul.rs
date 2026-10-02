@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, Mod, ModIsReduced, ModMul, ModMulAssign, ModPowerOf2Mul,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::natural::Natural;
@@ -178,4 +178,26 @@ fn test_mod_mul_dispatch() {
     test(10, 9, Natural::from(Limb::MAX) * Natural::from(3u32));
     // - full product, a constant factor
     test(10, 1, Natural::from(Limb::MAX >> 1));
+}
+
+// The dispatcher at the edges of the word kernels' windows, against the full product, which shares
+// nothing with the word kernels. Each length is the largest in a window, or one past it, for the
+// largest modulus the window covers. The edges are those measured in 2026-10; if they move, these
+// still check agreement, only less sharply.
+#[test]
+fn test_mod_mul_window_edges() {
+    for &(bits, edge) in &[(26, 80), (31, 96), (40, 192), (60, 320), (64, 160)] {
+        let m = (Natural::ONE << bits) - Natural::from(59u32);
+        for n in [edge, edge + 1] {
+            let xs = natural_mod_generated_coefficients(n, &m);
+            let mut ys = natural_mod_generated_coefficients(n, &m);
+            ys.reverse();
+            let p = NaturalPolynomial::from_coefficients_asc(xs.clone());
+            let q = NaturalPolynomial::from_coefficients_asc(ys.clone());
+            assert_eq!(
+                (&p).mod_mul(&q, &m),
+                NaturalPolynomial::from_coefficients_asc(mod_mul_full(&xs, &ys, &m))
+            );
+        }
+    }
 }

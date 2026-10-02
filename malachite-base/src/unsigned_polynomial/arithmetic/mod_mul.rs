@@ -258,12 +258,10 @@ fn mod_mul_karatsuba_balanced<T: PrimitiveUnsigned>(
     let (y0, y1) = ys.split_at(h);
     split_into_chunks_mut!(scratch, c, [x_sum, y_sum], scratch);
     let (middle, scratch) = scratch.split_at_mut((c << 1) - 1);
-    {
-        let (low, high) = out.split_at_mut(two_h);
-        mod_mul_karatsuba_balanced(&mut low[..two_h - 1], x0, y0, d, scratch);
-        low[two_h - 1] = T::ZERO;
-        mod_mul_karatsuba_balanced(high, x1, y1, d, scratch);
-    }
+    let (low, high) = out.split_at_mut(two_h);
+    mod_mul_karatsuba_balanced(&mut low[..two_h - 1], x0, y0, d, scratch);
+    low[two_h - 1] = T::ZERO;
+    mod_mul_karatsuba_balanced(high, x1, y1, d, scratch);
     x_sum.copy_from_slice(x1);
     mod_add_assign_slice(x_sum, x0, m);
     y_sum.copy_from_slice(y1);

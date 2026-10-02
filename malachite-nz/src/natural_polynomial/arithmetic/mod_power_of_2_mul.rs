@@ -153,12 +153,10 @@ pub(crate) fn mul_slots_karatsuba(out: &mut [Limb], xs: &[Limb], ys: &[Limb], sl
     let low_len = ((h << 1) - 1) * slot_len;
     let (x0, x1) = xs.split_at(split);
     let (y0, y1) = ys.split_at(split);
-    {
-        let (low, high) = out.split_at_mut(split << 1);
-        mul_slots_karatsuba(&mut low[..low_len], x0, y0, slot_len);
-        low[low_len..].fill(0);
-        mul_slots_karatsuba(high, x1, y1, slot_len);
-    }
+    let (low, high) = out.split_at_mut(split << 1);
+    mul_slots_karatsuba(&mut low[..low_len], x0, y0, slot_len);
+    low[low_len..].fill(0);
+    mul_slots_karatsuba(high, x1, y1, slot_len);
     let mut x_sum = x1.to_vec();
     slots_add_assign(&mut x_sum, x0, slot_len);
     let mut y_sum = y1.to_vec();

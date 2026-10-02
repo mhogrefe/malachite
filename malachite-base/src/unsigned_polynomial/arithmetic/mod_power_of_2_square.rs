@@ -59,12 +59,10 @@ fn square_karatsuba_scratch_wrapping<T: PrimitiveUnsigned>(
     let (x0, x1) = xs.split_at(h);
     let (sum, scratch) = scratch.split_at_mut(c);
     let (middle, scratch) = scratch.split_at_mut((c << 1) - 1);
-    {
-        let (low, high) = out.split_at_mut(two_h);
-        square_karatsuba_scratch_wrapping(&mut low[..two_h - 1], x0, scratch);
-        low[two_h - 1] = T::ZERO;
-        square_karatsuba_scratch_wrapping(high, x1, scratch);
-    }
+    let (low, high) = out.split_at_mut(two_h);
+    square_karatsuba_scratch_wrapping(&mut low[..two_h - 1], x0, scratch);
+    low[two_h - 1] = T::ZERO;
+    square_karatsuba_scratch_wrapping(high, x1, scratch);
     sum.copy_from_slice(x1);
     add_wrapping_assign(sum, x0);
     square_karatsuba_scratch_wrapping(middle, sum, scratch);

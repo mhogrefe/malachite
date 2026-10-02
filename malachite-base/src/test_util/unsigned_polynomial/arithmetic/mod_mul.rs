@@ -63,3 +63,9 @@ pub fn mod_mul_polynomial_naive<T: PrimitiveUnsigned>(
     }
     UnsignedPolynomial::from_coefficients_asc(mod_mul_naive(xs, ys, m))
 }
+
+// Moduli for exercising the multiplication algorithms on long polynomials: with 64-bit words, the
+// sums of products are accumulated in one, two, and three words respectively.
+pub fn long_test_moduli<T: PrimitiveUnsigned>() -> Vec<T> {
+    vec![T::exact_from(7), T::low_mask(T::WIDTH >> 1), T::MAX]
+}

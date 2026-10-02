@@ -58,14 +58,10 @@ fn mul_truncated_karatsuba_recursive<C: PolynomialCoefficient>(
     }
     mul_to_out_karatsuba(&mut out[..two_m1 - 1], &xs[..m1], &ys[..m1]);
     out[two_m1 - 1] = C::ZERO;
-    {
-        split_into_chunks_mut!(temp, m2, [low, sums_1, sums_2], rest);
-        mul_truncated_karatsuba_recursive(low, sums_1, sums_2, rest, m2);
-    }
-    {
-        let (high, rest) = temp[m2..].split_at_mut(m2);
-        mul_truncated_karatsuba_recursive(high, &xs[m1..], &ys[m1..], rest, m2);
-    }
+    split_into_chunks_mut!(temp, m2, [low, sums_1, sums_2], rest);
+    mul_truncated_karatsuba_recursive(low, sums_1, sums_2, rest, m2);
+    let (high, rest) = temp[m2..].split_at_mut(m2);
+    mul_truncated_karatsuba_recursive(high, &xs[m1..], &ys[m1..], rest, m2);
     combine_truncated_karatsuba(out, temp, m1, m2);
 }
 

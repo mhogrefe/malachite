@@ -75,12 +75,10 @@ fn mod_square_karatsuba_scratch<T: PrimitiveUnsigned>(
     let (x0, x1) = xs.split_at(h);
     let (sum, scratch) = scratch.split_at_mut(c);
     let (middle, scratch) = scratch.split_at_mut((c << 1) - 1);
-    {
-        let (low, high) = out.split_at_mut(two_h);
-        mod_square_karatsuba_scratch(&mut low[..two_h - 1], x0, d, scratch);
-        low[two_h - 1] = T::ZERO;
-        mod_square_karatsuba_scratch(high, x1, d, scratch);
-    }
+    let (low, high) = out.split_at_mut(two_h);
+    mod_square_karatsuba_scratch(&mut low[..two_h - 1], x0, d, scratch);
+    low[two_h - 1] = T::ZERO;
+    mod_square_karatsuba_scratch(high, x1, d, scratch);
     sum.copy_from_slice(x1);
     mod_add_assign_slice(sum, x0, m);
     mod_square_karatsuba_scratch(middle, sum, d, scratch);

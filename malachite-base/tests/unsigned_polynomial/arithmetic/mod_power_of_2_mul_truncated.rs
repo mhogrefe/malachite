@@ -364,3 +364,30 @@ fn mod_power_of_2_mul_truncated_public_properties_helper<T: PrimitiveUnsigned>()
 fn mod_power_of_2_mul_truncated_public_properties() {
     apply_fn_to_unsigneds!(mod_power_of_2_mul_truncated_public_properties_helper);
 }
+
+// Long polynomials, past the Karatsuba threshold several times over and some unbalanced, against
+// the schoolbook reference.
+fn mod_power_of_2_mul_truncated_long_helper<T: PrimitiveUnsigned>() {
+    for &(n, k, len) in
+        &[(1000, 999, 1000), (2047, 1500, 1800), (2000, 37, 1500), (1500, 1500, 2999)]
+    {
+        for pow in [T::WIDTH >> 1, T::WIDTH - 1, T::WIDTH] {
+            let xs = mod_power_of_2_generated_coefficients::<T>(n, pow, 5);
+            let ys = mod_power_of_2_generated_coefficients::<T>(k, pow, 6);
+            let expected = mod_power_of_2_mul_truncated_naive(&xs, &ys, len, pow);
+            let mut out = vec![T::ZERO; len];
+            mod_power_of_2_mul_truncated_to_out(&mut out, &xs, &ys, pow);
+            assert_eq!(out, expected);
+            mod_power_of_2_mul_truncated_to_out_classical(&mut out, &xs, &ys, pow);
+            assert_eq!(out, expected);
+            mod_power_of_2_mul_truncated_to_out_karatsuba(&mut out, &xs, &ys, pow);
+            assert_eq!(out, expected);
+        }
+    }
+}
+
+#[test]
+fn test_mod_power_of_2_mul_truncated_long() {
+    mod_power_of_2_mul_truncated_long_helper::<u8>();
+    mod_power_of_2_mul_truncated_long_helper::<u64>();
+}

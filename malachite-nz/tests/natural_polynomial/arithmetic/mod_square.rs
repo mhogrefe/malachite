@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{
     Square,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::natural::Natural;
@@ -152,4 +152,23 @@ fn test_mod_square_dispatch() {
     test(10, Natural::from(Limb::MAX) * Natural::from(3u32));
     // - full square, a constant
     test(1, Natural::from(Limb::MAX >> 1));
+}
+
+// The dispatcher at the edges of the word kernels' windows, against the full product, which shares
+// nothing with the word kernels. Each length is the largest in a window, or one past it, for the
+// largest modulus the window covers. The edges are those measured in 2026-10; if they move, these
+// still check agreement, only less sharply.
+#[test]
+fn test_mod_square_window_edges() {
+    for &(bits, edge) in &[(20, 80), (28, 160), (40, 320), (60, 384), (64, 192)] {
+        let m = (Natural::ONE << bits) - Natural::from(59u32);
+        for n in [edge, edge + 1] {
+            let xs = natural_mod_generated_coefficients(n, &m);
+            let p = NaturalPolynomial::from_coefficients_asc(xs.clone());
+            assert_eq!(
+                (&p).mod_square(&m),
+                NaturalPolynomial::from_coefficients_asc(mod_square_full(&xs, &m))
+            );
+        }
+    }
 }

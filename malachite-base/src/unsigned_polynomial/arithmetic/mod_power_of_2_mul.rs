@@ -100,12 +100,10 @@ fn mul_karatsuba_balanced_wrapping<T: PrimitiveUnsigned>(
     let (y0, y1) = ys.split_at(h);
     split_into_chunks_mut!(scratch, c, [x_sum, y_sum], scratch);
     let (middle, scratch) = scratch.split_at_mut((c << 1) - 1);
-    {
-        let (low, high) = out.split_at_mut(two_h);
-        mul_karatsuba_balanced_wrapping(&mut low[..two_h - 1], x0, y0, scratch);
-        low[two_h - 1] = T::ZERO;
-        mul_karatsuba_balanced_wrapping(high, x1, y1, scratch);
-    }
+    let (low, high) = out.split_at_mut(two_h);
+    mul_karatsuba_balanced_wrapping(&mut low[..two_h - 1], x0, y0, scratch);
+    low[two_h - 1] = T::ZERO;
+    mul_karatsuba_balanced_wrapping(high, x1, y1, scratch);
     x_sum.copy_from_slice(x1);
     add_wrapping_assign(x_sum, x0);
     y_sum.copy_from_slice(y1);

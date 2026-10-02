@@ -11,15 +11,14 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2IsReduced, ModPowerOf2Square,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::{
     ModPowerOf2MulTruncated, ModPowerOf2SquareTruncated, ModPowerOf2SquareTruncatedAssign,
     Polynomial, SquareTruncated,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
-use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_square_truncated::{
-    mod_power_of_2_square_truncated_low_classical, mod_power_of_2_square_truncated_low_karatsuba,
-};
+use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_square_truncated::*;
 use malachite_nz::test_util::generators::natural_polynomial_unsigned_unsigned_triple_gen_var_1;
 use malachite_nz::test_util::natural_polynomial::arithmetic::mod_power_of_2_mul::*;
 use malachite_nz::test_util::natural_polynomial::arithmetic::mod_power_of_2_square_truncated::*;
@@ -154,4 +153,37 @@ fn test_mod_power_of_2_square_truncated_dispatch() {
     test(2100, 2500, 64);
     // - full truncated square, coefficients too large for the window
     test(10, 12, 30000);
+}
+
+// The dispatcher at the edges of the low-half kernels' windows, against the full product, which
+// shares nothing with the low-half kernels. Each length is the largest in a window, or one past it,
+// for the largest power the window covers. The edges are those measured in 2026-10; if they move,
+// these still check agreement, only less sharply.
+#[test]
+fn test_mod_power_of_2_square_truncated_window_edges() {
+    for &(pow, edge) in &[
+        (16, 200),
+        (32, 1000),
+        (64, 2000),
+        (96, 64),
+        (128, 100),
+        (200, 150),
+        (300, 200),
+        (500, 100),
+        (2000, 64),
+        (5000, 16),
+        (10000, 8),
+        (20000, 4),
+    ] {
+        for n in [edge, edge + 1] {
+            let xs = natural_mod_power_of_2_generated_coefficients(n, pow);
+            let p = NaturalPolynomial::from_coefficients_asc(xs.clone());
+            assert_eq!(
+                (&p).mod_power_of_2_square_truncated(u64::exact_from(n), pow),
+                NaturalPolynomial::from_coefficients_asc(mod_power_of_2_square_truncated_full(
+                    &xs, n, pow
+                ))
+            );
+        }
+    }
 }
