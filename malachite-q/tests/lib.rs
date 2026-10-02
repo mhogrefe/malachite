@@ -174,6 +174,7 @@ pub mod rational_polynomial {
         pub mod evaluate;
         pub mod exponent_gcd;
         pub mod height;
+        pub mod integral;
         pub mod is_unit;
         pub mod l2_norm_squared;
         pub mod make_monic;

@@ -51,6 +51,9 @@ pub mod exponent_gcd;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height), the largest of
 /// the heights of a polynomial's coefficients.
 pub mod height;
+/// Implementations of [`Integral`](malachite_base::polynomial::Integral) and
+/// [`IntegralAssign`](malachite_base::polynomial::IntegralAssign), for integrating a polynomial.
+pub mod integral;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;

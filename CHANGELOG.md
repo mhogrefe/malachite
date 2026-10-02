@@ -446,6 +446,10 @@ documented by git history.
   width this is word arithmetic, through kernels in malachite-base that will also serve
   `UnsignedPolynomial`. With 32- to 64-bit coefficients this is several times faster than the
   full product.
+- New `Integral` and `IntegralAssign` traits, in `malachite_base::polynomial`, implemented for
+  `RationalPolynomial`, like FLINT's `fmpq_poly_integral`: the integral whose constant term is
+  zero. The result is built in lowest terms coefficient by coefficient, each divisor first
+  cancelling what it shares with its coefficient, so no GCD of the whole polynomial is needed.
 - Multiplication, squaring, and truncated multiplication and squaring of `RationalPolynomial`s:
   `Mul`, `MulAssign`, `Square`, `SquareAssign`, `MulTruncated`, `MulTruncatedAssign`,
   `SquareTruncated`, and `SquareTruncatedAssign`, taking each polynomial by value or by reference,

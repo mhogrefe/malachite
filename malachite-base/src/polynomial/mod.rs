@@ -886,6 +886,28 @@ pub trait DerivativeAssign {
     fn derivative_assign(&mut self);
 }
 
+/// Computes the integral of a polynomial whose constant term is zero, $\sum_i a_ix^{i+1}/(i+1)$.
+pub trait Integral {
+    type Output;
+
+    /// Computes the integral of a polynomial whose constant term is zero.
+    ///
+    /// $$
+    /// f(p) = \int_0^x p(t)\,dt.
+    /// $$
+    fn integral(self) -> Self::Output;
+}
+
+/// Replaces a polynomial with its integral whose constant term is zero, $\sum_i a_ix^{i+1}/(i+1)$.
+pub trait IntegralAssign {
+    /// Replaces a polynomial with its integral whose constant term is zero.
+    ///
+    /// $$
+    /// p \gets \int_0^x p(t)\,dt.
+    /// $$
+    fn integral_assign(&mut self);
+}
+
 /// Computes the derivative of a polynomial modulo $m$. The coefficients must already be reduced
 /// modulo $m$.
 ///

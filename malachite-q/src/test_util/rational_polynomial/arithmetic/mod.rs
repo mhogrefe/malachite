@@ -15,6 +15,7 @@ pub mod div_power_of_x;
 pub mod evaluate;
 pub mod exponent_gcd;
 pub mod height;
+pub mod integral;
 pub mod l2_norm_squared;
 pub mod mul;
 pub mod mul_power_of_x;
