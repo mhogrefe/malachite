@@ -938,6 +938,36 @@ pub trait ModDerivativeAssign<M> {
     fn mod_derivative_assign(&mut self, m: M);
 }
 
+/// Computes the integral modulo $m$ of a polynomial whose constant term is zero. The coefficients
+/// must already be reduced modulo $m$.
+///
+/// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to the
+/// degree plus 1 must be a unit modulo $m$.
+pub trait ModIntegral<M> {
+    type Output;
+
+    /// Computes the integral modulo $m$ of a polynomial whose constant term is zero.
+    ///
+    /// $$
+    /// f(p, m) = \int_0^x p(t)\,dt \bmod m.
+    /// $$
+    fn mod_integral(self, m: M) -> Self::Output;
+}
+
+/// Replaces a polynomial with its integral modulo $m$ whose constant term is zero. The coefficients
+/// must already be reduced modulo $m$.
+///
+/// The coefficient of $x^{k-1}$ is divided by $k$ and moved to $x^k$, so every $k$ from 1 to the
+/// degree plus 1 must be a unit modulo $m$.
+pub trait ModIntegralAssign<M> {
+    /// Replaces a polynomial with its integral modulo $m$ whose constant term is zero.
+    ///
+    /// $$
+    /// p \gets \int_0^x p(t)\,dt \bmod m.
+    /// $$
+    fn mod_integral_assign(&mut self, m: M);
+}
+
 /// Computes the derivative of a polynomial modulo $2^k$. The coefficients must already be reduced
 /// modulo $2^k$.
 ///

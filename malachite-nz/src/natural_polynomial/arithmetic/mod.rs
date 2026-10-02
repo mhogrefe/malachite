@@ -84,6 +84,10 @@ pub mod mod_add_truncated;
 /// [`ModDerivativeAssign`](malachite_base::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.
 pub mod mod_derivative;
+/// Implementations of [`ModIntegral`](malachite_base::polynomial::ModIntegral) and
+/// [`ModIntegralAssign`](malachite_base::polynomial::ModIntegralAssign), for integrating a
+/// polynomial modulo a value.
+pub mod mod_integral;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;

@@ -14,6 +14,7 @@ pub mod exponent_gcd;
 pub mod mod_add;
 pub mod mod_add_truncated;
 pub mod mod_derivative;
+pub mod mod_integral;
 pub mod mod_mul;
 pub mod mod_mul_middle;
 pub mod mod_mul_truncated;

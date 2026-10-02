@@ -446,6 +446,11 @@ documented by git history.
   width this is word arithmetic, through kernels in malachite-base that will also serve
   `UnsignedPolynomial`. With 32- to 64-bit coefficients this is several times faster than the
   full product.
+- New `ModIntegral` and `ModIntegralAssign` traits, in `malachite_base::polynomial`, implemented for
+  `UnsignedPolynomial<T>` with a `T` modulus, like FLINT's `nmod_poly_integral`, and for
+  `NaturalPolynomial` with a `Natural` modulus taken by value or by reference, which FLINT lacks: the
+  integral modulo `m` whose constant term is zero. Every index from 1 to the degree plus 1 must be a unit modulo
+  `m`, and all the divisions share one modular inversion.
 - New `Integral` and `IntegralAssign` traits, in `malachite_base::polynomial`, implemented for
   `RationalPolynomial`, like FLINT's `fmpq_poly_integral`: the integral whose constant term is
   zero. The result is built in lowest terms coefficient by coefficient, each divisor first

@@ -29,6 +29,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_add::register(runner);
     mod_add_truncated::register(runner);
     mod_derivative::register(runner);
+    mod_integral::register(runner);
     mod_is_reduced::register(runner);
     mod_make_monic::register(runner);
     mod_mul::register(runner);
@@ -83,6 +84,7 @@ mod l2_norm_squared;
 mod mod_add;
 mod mod_add_truncated;
 mod mod_derivative;
+mod mod_integral;
 mod mod_is_reduced;
 mod mod_make_monic;
 mod mod_mul;

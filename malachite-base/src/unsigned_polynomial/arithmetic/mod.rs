@@ -53,6 +53,10 @@ pub mod mod_add_truncated;
 /// [`ModDerivativeAssign`](crate::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.
 pub mod mod_derivative;
+/// Implementations of [`ModIntegral`](crate::polynomial::ModIntegral) and
+/// [`ModIntegralAssign`](crate::polynomial::ModIntegralAssign), for integrating a polynomial modulo
+/// a value.
+pub mod mod_integral;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
