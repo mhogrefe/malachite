@@ -91,6 +91,15 @@ pub mod mod_is_reduced;
 /// [`ModMakeMonicAssign`](malachite_base::polynomial::ModMakeMonicAssign), which make a polynomial
 /// monic modulo a value.
 pub mod mod_make_monic;
+/// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) and
+/// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign), for multiplying two
+/// polynomials modulo a [`Natural`](crate::natural::Natural).
+pub mod mod_mul;
+/// Implementations of [`ModMulTruncated`](malachite_base::polynomial::ModMulTruncated) and
+/// [`ModMulTruncatedAssign`](malachite_base::polynomial::ModMulTruncatedAssign), for multiplying
+/// two polynomials modulo a [`Natural`](crate::natural::Natural) and keeping only the low
+/// coefficients of the product.
+pub mod mod_mul_truncated;
 /// Implementations of [`ModNeg`](malachite_base::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), which negate a
 /// polynomial modulo a number.
@@ -375,6 +384,15 @@ pub mod mod_power_of_2_sub_truncated;
 /// );
 /// ```
 pub mod mod_shl;
+/// Implementations of [`ModSquare`](malachite_base::num::arithmetic::traits::ModSquare) and
+/// [`ModSquareAssign`](malachite_base::num::arithmetic::traits::ModSquareAssign), for squaring a
+/// polynomial modulo a [`Natural`](crate::natural::Natural).
+pub mod mod_square;
+/// Implementations of [`ModSquareTruncated`](malachite_base::polynomial::ModSquareTruncated) and
+/// [`ModSquareTruncatedAssign`](malachite_base::polynomial::ModSquareTruncatedAssign), for squaring
+/// a polynomial modulo a [`Natural`](crate::natural::Natural) and keeping only the low coefficients
+/// of the square.
+pub mod mod_square_truncated;
 /// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting one
 /// polynomial from another modulo a [`Natural`](crate::natural::Natural).

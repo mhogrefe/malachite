@@ -525,6 +525,76 @@ pub trait ModSubTruncatedAssign<Rhs = Self, M = Self> {
     fn mod_sub_truncated_assign(&mut self, other: Rhs, len: u64, m: M);
 }
 
+/// Multiplies two polynomials modulo $m$, keeping only the coefficients of $x^i$ for $i$ less than
+/// a given length. The coefficients of both must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is multiplication in the ring of polynomials with coefficients
+/// modulo $m$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait ModMulTruncated<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Multiplies two polynomials modulo $m$ and truncates the product to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p, q, n, m) = (pq \bmod x^n) \bmod m.
+    /// $$
+    fn mod_mul_truncated(self, other: Rhs, len: u64, m: M) -> Self::Output;
+}
+
+/// Multiplies a polynomial by another modulo $m$ in place, keeping only the coefficients of $x^i$
+/// for $i$ less than a given length. The coefficients of both must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is multiplication in the ring of polynomials with coefficients
+/// modulo $m$, taken modulo $x^n$, applied to the images of the two polynomials there. Unlike the
+/// coefficients, which must already be reduced, the polynomials need not already be truncated: they
+/// may have any number of coefficients, and only the first `len` of each are read.
+pub trait ModMulTruncatedAssign<Rhs = Self, M = Self> {
+    /// Multiplies `self` by a polynomial modulo $m$ and truncates the product to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// p \gets (pq \bmod x^n) \bmod m.
+    /// $$
+    fn mod_mul_truncated_assign(&mut self, other: Rhs, len: u64, m: M);
+}
+
+/// Squares a polynomial modulo $m$, keeping only the coefficients of $x^i$ for $i$ less than a
+/// given length. The coefficients must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is squaring in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$, applied to the image of the polynomial there. Unlike the coefficients,
+/// which must already be reduced, the polynomial need not already be truncated: it may have any
+/// number of coefficients, and only the first `len` are read.
+pub trait ModSquareTruncated<M = Self> {
+    type Output;
+
+    /// Squares a polynomial modulo $m$ and truncates the square to its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, n, m) = (p^2 \bmod x^n) \bmod m.
+    /// $$
+    fn mod_square_truncated(self, len: u64, m: M) -> Self::Output;
+}
+
+/// Squares a polynomial modulo $m$ in place, keeping only the coefficients of $x^i$ for $i$ less
+/// than a given length. The coefficients must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is squaring in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$, applied to the image of the polynomial there. Unlike the coefficients,
+/// which must already be reduced, the polynomial need not already be truncated: it may have any
+/// number of coefficients, and only the first `len` are read.
+pub trait ModSquareTruncatedAssign<M = Self> {
+    /// Squares `self` modulo $m$ and truncates the square to its first `len` coefficients.
+    ///
+    /// $$
+    /// p \gets (p^2 \bmod x^n) \bmod m.
+    /// $$
+    fn mod_square_truncated_assign(&mut self, len: u64, m: M);
+}
+
 /// Computes the square of a polynomial's $L^2$ norm: the sum of the squares of its coefficients.
 ///
 /// This is exact, unlike the norm itself, which is usually irrational.

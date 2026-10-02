@@ -698,6 +698,8 @@ pub mod natural_polynomial {
         pub mod mod_derivative;
         pub mod mod_is_reduced;
         pub mod mod_make_monic;
+        pub mod mod_mul;
+        pub mod mod_mul_truncated;
         pub mod mod_neg;
         pub mod mod_nth_derivative;
         pub mod mod_op;
@@ -715,6 +717,8 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_truncated;
         pub mod mod_shl;
+        pub mod mod_square;
+        pub mod mod_square_truncated;
         pub mod mod_sub;
         pub mod mod_sub_truncated;
         pub mod mul;
