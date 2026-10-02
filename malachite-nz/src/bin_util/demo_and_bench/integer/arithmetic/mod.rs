@@ -32,6 +32,7 @@ pub(crate) fn register(runner: &mut Runner) {
     eq_mod::register(runner);
     eq_mod_power_of_2::register(runner);
     extended_gcd::register(runner);
+    falling_factorial::register(runner);
     gcd::register(runner);
     is_power_of_2::register(runner);
     is_unit::register(runner);
@@ -86,6 +87,7 @@ mod divisible_by_power_of_2;
 mod eq_mod;
 mod eq_mod_power_of_2;
 mod extended_gcd;
+mod falling_factorial;
 mod gcd;
 mod is_power_of_2;
 mod is_unit;

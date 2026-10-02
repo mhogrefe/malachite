@@ -1289,6 +1289,29 @@ pub mod extended_gcd;
 /// assert_eq!(u32::checked_subfactorial(100), None);
 /// ```
 pub mod factorial;
+/// [`FallingFactorial`](traits::FallingFactorial) and
+/// [`CheckedFallingFactorial`](traits::CheckedFallingFactorial), traits for computing the falling
+/// factorial of a number.
+///
+/// # falling_factorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::FallingFactorial;
+///
+/// assert_eq!(3u8.falling_factorial(0), 1);
+/// assert_eq!(6u16.falling_factorial(4), 360);
+/// assert_eq!(6u32.falling_factorial(6), 720);
+/// assert_eq!(3u64.falling_factorial(5), 0);
+/// ```
+///
+/// # checked_falling_factorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedFallingFactorial;
+///
+/// assert_eq!(6u16.checked_falling_factorial(4), Some(360));
+/// assert_eq!(6u8.checked_falling_factorial(4), None);
+/// assert_eq!(3u8.checked_falling_factorial(300), Some(0));
+/// ```
+pub mod falling_factorial;
 /// Traits for computing Fibonacci and Lucas numbers, either alone or paired with their
 /// predecessors. Each function has a trait whose implementations panic if the result cannot be
 /// represented, and a checked trait whose implementations return `None` in that case. The traits

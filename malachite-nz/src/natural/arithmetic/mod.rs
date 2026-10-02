@@ -121,6 +121,10 @@ pub mod eq_mod_power_of_2;
 /// [`Multifactorial`](malachite_base::num::arithmetic::traits::Multifactorial), and
 /// [`Subfactorial`](malachite_base::num::arithmetic::traits::Subfactorial).
 pub mod factorial;
+/// Implementations of
+/// [`FallingFactorial`](malachite_base::num::arithmetic::traits::FallingFactorial), a trait for
+/// computing the falling factorial of a number.
+pub mod falling_factorial;
 /// [`Fibonacci`](malachite_base::num::arithmetic::traits::Fibonacci) and
 /// [`LucasNumber`](malachite_base::num::arithmetic::traits::LucasNumber), traits for computing
 /// Fibonacci and Lucas numbers.

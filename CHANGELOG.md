@@ -609,6 +609,12 @@ documented by git history.
   unchanged, and the coefficients must already be reduced.
 - `Gcd` and `GcdAssign` for `Integer`, with a `Natural` GCD, matching the `Natural` GCD that
   `ExtendedGcd` for `Integer` already returns. $\gcd(x, y) = \gcd(|x|, |y|)$.
+- New `FallingFactorial` and `CheckedFallingFactorial` traits, computing the product
+  $x(x-1)\cdots(x-n+1)$ of the $n$ consecutive numbers counting down from $x$, or 1 when $n$ is 0.
+  Both are implemented for the primitive unsigned integers, where a zero factor gives an exact zero
+  even when the partial products before it would overflow, and `FallingFactorial` is implemented for
+  `Natural` and `Integer`. FLINT has no `fmpz` falling factorial; like its generic `gr_falling_ui`,
+  this computes the rising factorial of $x - n + 1$.
 - `Neg` and `NegAssign` for `IntegerPolynomial` and `RationalPolynomial`, like FLINT's
   `fmpz_poly_neg` and `fmpq_poly_neg`. Negating by value or in place only flips signs, with no
   allocation. A `RationalPolynomial` negates its numerator and keeps its denominator, which stays

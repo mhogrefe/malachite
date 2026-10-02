@@ -290,6 +290,7 @@ pub mod num {
         pub mod eq_mod_power_of_2;
         pub mod extended_gcd;
         pub mod factorial;
+        pub mod falling_factorial;
         pub mod fibonacci;
         pub mod floor;
         pub mod gcd;

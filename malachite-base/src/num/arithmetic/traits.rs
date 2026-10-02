@@ -807,6 +807,20 @@ pub trait CheckedRisingFactorial: Sized {
     fn checked_rising_factorial(self, n: u64) -> Option<Self>;
 }
 
+/// Computes the falling factorial of a number: the product of the `n` consecutive numbers counting
+/// down from `self`, or 1 when `n` is 0.
+pub trait FallingFactorial {
+    type Output;
+
+    fn falling_factorial(self, n: u64) -> Self::Output;
+}
+
+/// Computes the falling factorial of a number, returning `None` if the result cannot be
+/// represented.
+pub trait CheckedFallingFactorial: Sized {
+    fn checked_falling_factorial(self, n: u64) -> Option<Self>;
+}
+
 /// Computes the $n$th Fibonacci number, either alone or paired with its predecessor:
 /// `fibonacci_pair(n)` returns $(F(n), F(n-1))$.
 pub trait Fibonacci: Sized {

@@ -183,6 +183,7 @@ pub mod integer {
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
         pub mod extended_gcd;
+        pub mod falling_factorial;
         pub mod gcd;
         pub mod is_power_of_2;
         pub mod is_unit;
@@ -368,6 +369,7 @@ pub mod natural {
         pub mod extended_gcd;
         pub mod extended_gcd_partial;
         pub mod factorial;
+        pub mod falling_factorial;
         pub mod fibonacci;
         #[cfg(feature = "float_helpers")]
         pub mod float {

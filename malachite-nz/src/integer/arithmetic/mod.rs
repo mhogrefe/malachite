@@ -102,6 +102,10 @@ pub mod eq_mod_power_of_2;
 /// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
 /// trait for computing the extended GCD of two numbers.
 pub mod extended_gcd;
+/// Implementations of
+/// [`FallingFactorial`](malachite_base::num::arithmetic::traits::FallingFactorial), a trait for
+/// computing the falling factorial of a number.
+pub mod falling_factorial;
 /// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
 /// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
 /// (greatest common divisor) of two numbers.

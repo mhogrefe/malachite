@@ -18,6 +18,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonical_unit_i_pow::register(runner);
     canonicalize_unit::register(runner);
     conjugate::register(runner);
+    falling_factorial::register(runner);
     is_unit::register(runner);
     landau_function::register(runner);
     binomial_coefficient::register(runner);
@@ -135,6 +136,7 @@ mod eq_mod_power_of_2;
 mod extended_gcd;
 mod extended_gcd_partial;
 mod factorial;
+mod falling_factorial;
 mod fibonacci;
 #[cfg(feature = "float_helpers")]
 mod float;
