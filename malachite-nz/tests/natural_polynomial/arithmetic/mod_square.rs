@@ -10,10 +10,18 @@ use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, Mod, ModIsReduced, ModMul, ModPowerOf2Square, ModSquare, ModSquareAssign,
     Square,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
+use malachite_nz::natural_polynomial::arithmetic::mod_square::{mod_square_full, mod_square_word};
+use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::*;
+use malachite_nz::test_util::natural_polynomial::arithmetic::mod_mul::{
+    natural_mod_generated_coefficients, natural_test_moduli,
+};
 use malachite_nz::test_util::natural_polynomial::arithmetic::mod_square::mod_square_naive;
 
 // Checks every form of `mod_square` and `mod_square_assign` against `r`.
@@ -84,4 +92,64 @@ fn mod_square_properties() {
             }
         },
     );
+}
+
+// The word kernels agree with the full square, for polynomials of various lengths, including some
+// past the Karatsuba threshold, and moduli of various sizes up to a limb.
+#[test]
+fn test_mod_square_word_algorithms() {
+    for n in [1, 2, 3, 8, 9, 20, 300] {
+        for m in natural_test_moduli() {
+            if m.significant_bits() > Limb::WIDTH {
+                continue;
+            }
+            let xs = natural_mod_generated_coefficients(n, &m);
+            let out: Vec<Natural> = mod_square_word(&xs, &m)
+                .into_iter()
+                .map(Natural::from)
+                .collect();
+            assert_eq!(out, mod_square_full(&xs, &m));
+        }
+    }
+}
+
+#[test]
+fn mod_square_word_properties() {
+    natural_polynomial_natural_polynomial_natural_triple_gen_var_1().test_properties(
+        |(p, _, m)| {
+            let xs = p.coefficients_asc();
+            if xs.is_empty() || m.significant_bits() > Limb::WIDTH {
+                return;
+            }
+            assert_eq!(
+                NaturalPolynomial::from_coefficients_asc(
+                    mod_square_word(xs, &m)
+                        .into_iter()
+                        .map(Natural::from)
+                        .collect()
+                ),
+                (&p).mod_square(&m)
+            );
+        },
+    );
+}
+
+// The dispatcher's choice between the word kernels and the full square.
+#[test]
+fn test_mod_square_dispatch() {
+    let test = |len: usize, m: Natural| {
+        let p =
+            NaturalPolynomial::from_coefficients_asc(natural_mod_generated_coefficients(len, &m));
+        let r = (&p).mod_square(&m);
+        assert_eq!(mod_square_naive(&p, &m), r);
+        check_forms(&p, &m, &r);
+    };
+    // - word kernels
+    test(10, Natural::from(Limb::MAX >> 1));
+    // - full square, too long for the window
+    test(3000, Natural::from(Limb::MAX >> 1));
+    // - full square, a modulus too large for a limb
+    test(10, Natural::from(Limb::MAX) * Natural::from(3u32));
+    // - full square, a constant
+    test(1, Natural::from(Limb::MAX >> 1));
 }

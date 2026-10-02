@@ -196,7 +196,7 @@ crate_test_fn! {limbs_invert_limb_u64(x: u64) -> u64 {
 }}
 
 // This is equivalent to `n_ll_mod_preinv` from `ulong_extras/ll_mod_preinv.c`, FLINT 2.7.1.
-private_test_fn! {mod_preinverted_double<
+crate_test_fn! {mod_preinverted_double<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(

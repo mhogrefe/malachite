@@ -6,10 +6,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::polynomial::{ModMulTruncated, ModMulTruncatedAssign};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::polynomial::{ModMulTruncated, ModMulTruncatedAssign, Polynomial};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural_polynomial::NaturalPolynomial;
+use malachite_nz::natural_polynomial::arithmetic::mod_mul_truncated::{
+    mod_mul_truncated_full, mod_mul_truncated_word,
+};
+use malachite_nz::platform::Limb;
 use malachite_nz::test_util::bench::bucketers::quadruple_1_2_natural_polynomial_max_bit_bucketer;
 use malachite_nz::test_util::generators::*;
 use malachite_nz::test_util::natural_polynomial::arithmetic::mod_mul_truncated::*;
@@ -29,6 +36,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_natural_polynomial_mod_mul_truncated_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_natural_polynomial_mod_mul_truncated_word_algorithms
     );
     register_bench!(
         runner,
@@ -218,6 +229,55 @@ fn benchmark_natural_polynomial_mod_mul_truncated_assign_evaluation_strategy(
                 "mod_mul_truncated_assign(&NaturalPolynomial, u64, &Natural)",
                 &mut |(mut p, q, len, m)| p.mod_mul_truncated_assign(&q, len, &m),
             ),
+        ],
+    );
+}
+
+// The word kernels against the full truncated product, for moduli that fit in a limb. Both kernels
+// compute no more coefficients than the whole product has.
+fn benchmark_natural_polynomial_mod_mul_truncated_word_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    let out_len = |p: &NaturalPolynomial, q: &NaturalPolynomial, len: u64| {
+        usize::try_from(len)
+            .unwrap_or(usize::MAX)
+            .min(p.coefficients_asc().len() + q.coefficients_asc().len() - 1)
+    };
+    run_benchmark(
+        "NaturalPolynomial.mod_mul_truncated(NaturalPolynomial, u64, &Natural) with a word modulus",
+        BenchmarkType::Algorithms,
+        natural_polynomial_pair_unsigned_natural_quadruple_gen_var_1()
+            .get(gm, config)
+            .filter(|(p, q, len, m)| {
+                *len != 0 && p.len() > 1 && q.len() > 1 && m.significant_bits() <= Limb::WIDTH
+            }),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_natural_polynomial_max_bit_bucketer("p", "q"),
+        &mut [
+            ("default", &mut |(p, q, len, m)| {
+                no_out!(p.mod_mul_truncated(q, len, &m));
+            }),
+            ("full", &mut |(p, q, len, m)| {
+                no_out!(mod_mul_truncated_full(
+                    p.coefficients_asc(),
+                    q.coefficients_asc(),
+                    out_len(&p, &q, len),
+                    &m
+                ));
+            }),
+            ("word", &mut |(p, q, len, m)| {
+                no_out!(mod_mul_truncated_word(
+                    p.coefficients_asc(),
+                    q.coefficients_asc(),
+                    out_len(&p, &q, len),
+                    &m
+                ));
+            }),
         ],
     );
 }

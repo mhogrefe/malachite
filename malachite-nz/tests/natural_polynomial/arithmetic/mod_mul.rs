@@ -9,11 +9,18 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase2, Mod, ModIsReduced, ModMul, ModMulAssign, ModPowerOf2Mul,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
+use malachite_nz::natural_polynomial::arithmetic::mod_mul::{mod_mul_full, mod_mul_word};
+use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::*;
-use malachite_nz::test_util::natural_polynomial::arithmetic::mod_mul::mod_mul_naive;
+use malachite_nz::test_util::natural_polynomial::arithmetic::mod_mul::{
+    mod_mul_naive, natural_mod_generated_coefficients, natural_test_moduli,
+};
 
 // Checks every form of `mod_mul` and `mod_mul_assign` against `r`.
 fn check_forms(p: &NaturalPolynomial, q: &NaturalPolynomial, m: &Natural, r: &NaturalPolynomial) {
@@ -107,4 +114,68 @@ fn mod_mul_properties() {
             }
         },
     );
+}
+
+// The word kernels agree with the full product, for factors of various lengths, including some past
+// the Karatsuba threshold, and moduli of various sizes up to a limb.
+#[test]
+fn test_mod_mul_word_algorithms() {
+    for &(n, k) in &[(1, 1), (3, 2), (8, 8), (9, 8), (20, 7), (90, 85), (200, 81)] {
+        for m in natural_test_moduli() {
+            if m.significant_bits() > Limb::WIDTH {
+                continue;
+            }
+            let xs = natural_mod_generated_coefficients(n, &m);
+            let ys = natural_mod_generated_coefficients(k, &m);
+            let expected = mod_mul_full(&xs, &ys, &m);
+            let to_naturals =
+                |out: Vec<Limb>| -> Vec<Natural> { out.into_iter().map(Natural::from).collect() };
+            assert_eq!(to_naturals(mod_mul_word(&xs, &ys, &m)), expected);
+            assert_eq!(to_naturals(mod_mul_word(&ys, &xs, &m)), expected);
+        }
+    }
+}
+
+#[test]
+fn mod_mul_word_properties() {
+    natural_polynomial_natural_polynomial_natural_triple_gen_var_1().test_properties(
+        |(p, q, m)| {
+            let xs = p.coefficients_asc();
+            let ys = q.coefficients_asc();
+            if xs.is_empty() || ys.is_empty() || m.significant_bits() > Limb::WIDTH {
+                return;
+            }
+            assert_eq!(
+                NaturalPolynomial::from_coefficients_asc(
+                    mod_mul_word(xs, ys, &m)
+                        .into_iter()
+                        .map(Natural::from)
+                        .collect()
+                ),
+                (&p).mod_mul(&q, &m)
+            );
+        },
+    );
+}
+
+// The dispatcher's choice between the word kernels and the full product.
+#[test]
+fn test_mod_mul_dispatch() {
+    let test = |len1: usize, len2: usize, m: Natural| {
+        let p =
+            NaturalPolynomial::from_coefficients_asc(natural_mod_generated_coefficients(len1, &m));
+        let q =
+            NaturalPolynomial::from_coefficients_asc(natural_mod_generated_coefficients(len2, &m));
+        let r = (&p).mod_mul(&q, &m);
+        assert_eq!(mod_mul_naive(&p, &q, &m), r);
+        check_forms(&p, &q, &m, &r);
+    };
+    // - word kernels
+    test(10, 9, Natural::from(Limb::MAX >> 1));
+    // - full product, too long for the window
+    test(3000, 2100, Natural::from(Limb::MAX >> 1));
+    // - full product, a modulus too large for a limb
+    test(10, 9, Natural::from(Limb::MAX) * Natural::from(3u32));
+    // - full product, a constant factor
+    test(10, 1, Natural::from(Limb::MAX >> 1));
 }

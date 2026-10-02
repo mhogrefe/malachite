@@ -7,13 +7,22 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{CheckedLogBase2, Mod, ModIsReduced, ModMul};
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::polynomial::{
     ModMulTruncated, ModMulTruncatedAssign, ModPowerOf2MulTruncated, MulTruncated, Polynomial,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
+use malachite_nz::natural_polynomial::arithmetic::mod_mul_truncated::{
+    mod_mul_truncated_full, mod_mul_truncated_word,
+};
+use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::*;
+use malachite_nz::test_util::natural_polynomial::arithmetic::mod_mul::{
+    natural_mod_generated_coefficients, natural_test_moduli,
+};
 use malachite_nz::test_util::natural_polynomial::arithmetic::mod_mul_truncated::*;
 
 // Checks every form of `mod_mul_truncated` and `mod_mul_truncated_assign` against `r`.
@@ -110,4 +119,95 @@ fn mod_mul_truncated_properties() {
             assert!(r.len() <= len);
         },
     );
+}
+
+// The word kernels agree with the full truncated product, for factors and truncation lengths of
+// various sizes, including some past the Karatsuba threshold, and moduli of various sizes up to a
+// limb.
+#[test]
+fn test_mod_mul_truncated_word_algorithms() {
+    for &(n, k, len) in &[
+        (1, 1, 1),
+        (3, 2, 2),
+        (8, 8, 8),
+        (9, 8, 16),
+        (20, 7, 30),
+        (90, 85, 90),
+        (200, 81, 250),
+        (200, 190, 199),
+    ] {
+        for m in natural_test_moduli() {
+            if m.significant_bits() > Limb::WIDTH {
+                continue;
+            }
+            let xs = natural_mod_generated_coefficients(n, &m);
+            let ys = natural_mod_generated_coefficients(k, &m);
+            // The full product's coefficients may be trimmed, so the results are compared as
+            // polynomials.
+            let expected =
+                NaturalPolynomial::from_coefficients_asc(mod_mul_truncated_full(&xs, &ys, len, &m));
+            let to_polynomial = |out: Vec<Limb>| {
+                NaturalPolynomial::from_coefficients_asc(
+                    out.into_iter().map(Natural::from).collect(),
+                )
+            };
+            assert_eq!(
+                to_polynomial(mod_mul_truncated_word(&xs, &ys, len, &m)),
+                expected
+            );
+            assert_eq!(
+                to_polynomial(mod_mul_truncated_word(&ys, &xs, len, &m)),
+                expected
+            );
+        }
+    }
+}
+
+#[test]
+fn mod_mul_truncated_word_properties() {
+    natural_polynomial_pair_unsigned_natural_quadruple_gen_var_1().test_properties(
+        |(p, q, len, m)| {
+            let xs = p.coefficients_asc();
+            let ys = q.coefficients_asc();
+            if xs.is_empty() || ys.is_empty() || len == 0 || m.significant_bits() > Limb::WIDTH {
+                return;
+            }
+            let out_len = usize::try_from(len).unwrap().min(xs.len() + ys.len() - 1);
+            assert_eq!(
+                NaturalPolynomial::from_coefficients_asc(
+                    mod_mul_truncated_word(xs, ys, out_len, &m)
+                        .into_iter()
+                        .map(Natural::from)
+                        .collect()
+                ),
+                (&p).mod_mul_truncated(&q, len, &m)
+            );
+        },
+    );
+}
+
+// The dispatcher's choice between the word kernels and the full truncated product.
+#[test]
+fn test_mod_mul_truncated_dispatch() {
+    let test = |len1: usize, len2: usize, len: u64, m: Natural| {
+        let p =
+            NaturalPolynomial::from_coefficients_asc(natural_mod_generated_coefficients(len1, &m));
+        let q =
+            NaturalPolynomial::from_coefficients_asc(natural_mod_generated_coefficients(len2, &m));
+        let r = (&p).mod_mul_truncated(&q, len, &m);
+        assert_eq!(mod_mul_truncated_naive(&p, &q, len, &m), r);
+        check_forms(&p, &q, len, &m, &r);
+    };
+    // - word kernels
+    test(10, 9, 12, Natural::from(Limb::MAX >> 1));
+    // - word kernels, a length past the end of the product
+    test(10, 9, 100, Natural::from(Limb::MAX >> 1));
+    // - full product, too long for the window
+    test(3000, 2100, 2500, Natural::from(Limb::MAX >> 1));
+    // - full product, a modulus too large for a limb
+    test(10, 9, 12, Natural::from(Limb::MAX) * Natural::from(3u32));
+    // - full product, a constant factor
+    test(10, 1, 12, Natural::from(Limb::MAX >> 1));
+    // - full product, a length of zero
+    test(10, 9, 0, Natural::from(Limb::MAX >> 1));
 }

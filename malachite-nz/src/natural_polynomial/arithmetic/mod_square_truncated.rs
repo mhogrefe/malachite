@@ -9,10 +9,64 @@
 use crate::integer_polynomial::arithmetic::square_truncated::square_truncated_ref;
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
-use crate::natural_polynomial::arithmetic::mod_mul::mod_reduce_coefficients;
+use crate::natural_polynomial::arithmetic::mod_mul::{
+    limbs_to_polynomial, mod_reduce_coefficients, naturals_to_limbs, word_preferred,
+};
+use crate::natural_polynomial::arithmetic::mod_power_of_2_mul_truncated::truncated_len;
 use crate::natural_polynomial::arithmetic::mod_square::assert_reduced;
-use malachite_base::num::arithmetic::traits::ModSquareAssign;
+use crate::platform::Limb;
+use alloc::vec;
+use alloc::vec::Vec;
+use core::cmp::min;
+use malachite_base::num::arithmetic::traits::{ModAssign, ModSquareAssign};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::{ModSquareTruncated, ModSquareTruncatedAssign};
+use malachite_base::unsigned_polynomial::arithmetic::mod_square_truncated::*;
+
+// For each modulus size, the lengths for which the word kernels beat the full truncated square, as
+// with `MUL_WORD_WINDOWS`.
+pub(crate) const SQUARE_TRUNCATED_WORD_WINDOWS: [(u64, usize); 6] =
+    [(20, 160), (28, 192), (32, 384), (40, 320), (60, 384), (64, 320)];
+
+// The first `len` coefficients of the square of the polynomial with coefficients `xs`, nonempty and
+// reduced modulo `m`, which must fit in a limb, modulo `m`, computed by the word kernels. `len`
+// must be positive. The result is not trimmed.
+crate_test_fn! {mod_square_truncated_word(xs: &[Natural], len: usize, m: &Natural) -> Vec<Limb> {
+    let mut out = vec![0; len];
+    mod_square_truncated_to_out(&mut out, &naturals_to_limbs(xs), Limb::exact_from(m));
+    out
+}}
+
+// The square of the polynomial with coefficients `xs`, truncated to `len` coefficients and reduced
+// modulo `m`, as a polynomial. The word kernels are used in their window; otherwise the full
+// truncated square is computed and reduced afterwards.
+fn mod_square_truncated_ref(xs: &[Natural], len: u64, m: &Natural) -> NaturalPolynomial {
+    let n = xs.len();
+    if len != 0
+        && n > 1
+        && word_preferred(
+            &SQUARE_TRUNCATED_WORD_WINDOWS,
+            min(n, usize::try_from(len).unwrap_or(usize::MAX)),
+            m,
+        )
+    {
+        let len = truncated_len(n, n, len);
+        limbs_to_polynomial(mod_square_truncated_word(xs, len, m))
+    } else {
+        mod_reduce_coefficients(square_truncated_ref(xs, len), m)
+    }
+}
+
+// The first `len` coefficients of the square of the polynomial with coefficients `xs`, reduced
+// modulo `m`, modulo `m`: the truncated integer square, with its coefficients reduced afterwards.
+// The result is not trimmed.
+crate_test_fn! {mod_square_truncated_full(xs: &[Natural], len: usize, m: &Natural) -> Vec<Natural> {
+    let mut out = square_truncated_ref(xs, u64::exact_from(len));
+    for x in &mut out {
+        x.mod_assign(m);
+    }
+    out
+}}
 
 impl ModSquareTruncated<Natural> for NaturalPolynomial {
     type Output = Self;
@@ -180,7 +234,7 @@ impl ModSquareTruncated<Natural> for &NaturalPolynomial {
     /// with both polynomials the same.
     fn mod_square_truncated(self, len: u64, m: Natural) -> NaturalPolynomial {
         assert_reduced(self, &m);
-        mod_reduce_coefficients(square_truncated_ref(&self.coefficients, len), &m)
+        mod_square_truncated_ref(&self.coefficients, len, &m)
     }
 }
 
@@ -236,7 +290,7 @@ impl ModSquareTruncated<&Natural> for &NaturalPolynomial {
     /// with both polynomials the same.
     fn mod_square_truncated(self, len: u64, m: &Natural) -> NaturalPolynomial {
         assert_reduced(self, m);
-        mod_reduce_coefficients(square_truncated_ref(&self.coefficients, len), m)
+        mod_square_truncated_ref(&self.coefficients, len, m)
     }
 }
 
@@ -283,7 +337,7 @@ impl ModSquareTruncatedAssign<Natural> for NaturalPolynomial {
             c.mod_square_assign(&m);
             self.trim();
         } else {
-            *self = mod_reduce_coefficients(square_truncated_ref(&self.coefficients, len), &m);
+            *self = mod_square_truncated_ref(&self.coefficients, len, &m);
         }
     }
 }
@@ -331,7 +385,7 @@ impl ModSquareTruncatedAssign<&Natural> for NaturalPolynomial {
             c.mod_square_assign(m);
             self.trim();
         } else {
-            *self = mod_reduce_coefficients(square_truncated_ref(&self.coefficients, len), m);
+            *self = mod_square_truncated_ref(&self.coefficients, len, m);
         }
     }
 }

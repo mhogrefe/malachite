@@ -10,9 +10,17 @@ use crate::integer_polynomial::arithmetic::mul::{mul_ref_ref, mul_val_ref, mul_v
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::arithmetic::mod_add::assert_reduced;
+use crate::natural_polynomial::arithmetic::mod_power_of_2_mul::low_preferred;
+use crate::platform::Limb;
+use alloc::vec;
 use alloc::vec::Vec;
+use core::cmp::min;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{ModAssign, ModMul, ModMulAssign};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::unsigned_polynomial::arithmetic::mod_mul::mod_mul_to_out;
 
 // The polynomial whose coefficients are `xs`, each reduced modulo `m`, and trimmed.
 pub(crate) fn mod_reduce_coefficients(mut xs: Vec<Natural>, m: &Natural) -> NaturalPolynomial {
@@ -24,22 +32,104 @@ pub(crate) fn mod_reduce_coefficients(mut xs: Vec<Natural>, m: &Natural) -> Natu
     p
 }
 
+// # Multiplication modulo a word
+//
+// When $m$ fits in a limb, the coefficients are converted to limbs and multiplied by
+// malachite-base's word kernels, which accumulate each coefficient of the product exactly in at
+// most three limbs and reduce it once. Since the full product is computed by Kronecker
+// substitution, whose cost grows almost linearly, the word kernels only win for short factors.
+
+// For each operation, the lengths and moduli for which the word kernels beat the full product. Each
+// pair `(max_bits, max_len)` covers the moduli with up to `max_bits` bits not covered by an earlier
+// pair, and the word kernels are used when the shorter factor has at most `max_len` coefficients
+// and $m$ fits in a limb. Measured on an Apple M-series machine, 2026-10, with 64-bit limbs, on
+// factors of equal length. The word kernels gain the most for moduli of more than 32 bits, whose
+// products no longer fit in a limb: two to eight times at short lengths. For smaller moduli the
+// gain is at most about 40%, and for moduli of 32 bits, whose products just fit in a limb, the full
+// product is up to 5% faster for lengths 3 to 12.
+pub(crate) const MUL_WORD_WINDOWS: [(u64, usize); 5] =
+    [(26, 80), (31, 96), (40, 192), (60, 320), (64, 160)];
+
+// Whether the word kernels are used for a product, according to `windows`, when the length that
+// decides it is `len`: when $m$ fits in a limb and `len` is in the window.
+pub(crate) fn word_preferred(windows: &[(u64, usize)], len: usize, m: &Natural) -> bool {
+    let bits = m.significant_bits();
+    bits <= Limb::WIDTH && low_preferred(windows, len, bits)
+}
+
+// Whether the word kernels are used to multiply factors of lengths `len1` and `len2` modulo `m`:
+// when neither is a constant and the shorter is in the window.
+fn mul_word_preferred(len1: usize, len2: usize, m: &Natural) -> bool {
+    len1 > 1 && len2 > 1 && word_preferred(&MUL_WORD_WINDOWS, min(len1, len2), m)
+}
+
+// The coefficients `xs`, which fit in limbs, as limbs.
+pub(crate) fn naturals_to_limbs(xs: &[Natural]) -> Vec<Limb> {
+    xs.iter().map(Limb::exact_from).collect()
+}
+
+// The polynomial whose coefficients are `xs`, trimmed.
+pub(crate) fn limbs_to_polynomial(xs: Vec<Limb>) -> NaturalPolynomial {
+    let mut p = NaturalPolynomial {
+        coefficients: xs.into_iter().map(Natural::from).collect(),
+    };
+    p.trim();
+    p
+}
+
+// The coefficients of the product of the polynomials with coefficients `xs` and `ys`, both nonempty
+// and reduced modulo `m`, which must fit in a limb, modulo `m`, computed by the word kernels. The
+// result is not trimmed.
+crate_test_fn! {mod_mul_word(xs: &[Natural], ys: &[Natural], m: &Natural) -> Vec<Limb> {
+    let mut out = vec![0; xs.len() + ys.len() - 1];
+    mod_mul_to_out(
+        &mut out,
+        &naturals_to_limbs(xs),
+        &naturals_to_limbs(ys),
+        Limb::exact_from(m),
+    );
+    out
+}}
+
 // The product of the polynomials with coefficients `xs` and `ys`, reduced modulo `m`, as a
-// polynomial. As in FLINT, the product is computed in full, in place when either factor is a
-// constant, and reduced afterwards.
+// polynomial. The word kernels are used in their window; otherwise, as in FLINT, the product is
+// computed in full, in place when either factor is a constant, and reduced afterwards.
 fn mod_mul_val_val(xs: Vec<Natural>, ys: Vec<Natural>, m: &Natural) -> NaturalPolynomial {
-    mod_reduce_coefficients(mul_val_val(xs, ys), m)
+    if mul_word_preferred(xs.len(), ys.len(), m) {
+        limbs_to_polynomial(mod_mul_word(&xs, &ys, m))
+    } else {
+        mod_reduce_coefficients(mul_val_val(xs, ys), m)
+    }
 }
 
 // As `mod_mul_val_val`, taking the second factor by reference.
 fn mod_mul_val_ref(xs: Vec<Natural>, ys: &[Natural], m: &Natural) -> NaturalPolynomial {
-    mod_reduce_coefficients(mul_val_ref(xs, ys), m)
+    if mul_word_preferred(xs.len(), ys.len(), m) {
+        limbs_to_polynomial(mod_mul_word(&xs, ys, m))
+    } else {
+        mod_reduce_coefficients(mul_val_ref(xs, ys), m)
+    }
 }
 
 // As `mod_mul_val_val`, taking both factors by reference.
 fn mod_mul_ref_ref(xs: &[Natural], ys: &[Natural], m: &Natural) -> NaturalPolynomial {
-    mod_reduce_coefficients(mul_ref_ref(xs, ys), m)
+    if mul_word_preferred(xs.len(), ys.len(), m) {
+        limbs_to_polynomial(mod_mul_word(xs, ys, m))
+    } else {
+        mod_reduce_coefficients(mul_ref_ref(xs, ys), m)
+    }
 }
+
+// The coefficients of the product of the polynomials with coefficients `xs` and `ys`, both nonempty
+// and reduced modulo `m`, modulo `m`: the full product, computed as an integer product, with its
+// coefficients reduced afterwards. The result is not trimmed.
+crate_test_fn! {mod_mul_full(xs: &[Natural], ys: &[Natural], m: &Natural) -> Vec<Natural> {
+    let mut out = mul_ref_ref(xs, ys);
+    for x in &mut out {
+        x.mod_assign(m);
+    }
+    out
+}}
 
 impl ModMul<Self, Natural> for NaturalPolynomial {
     type Output = Self;

@@ -451,8 +451,14 @@ documented by git history.
   `ModMulTruncated`, `ModMulTruncatedAssign`, `ModSquareTruncated`, and `ModSquareTruncatedAssign`
   traits, in `malachite_base::polynomial`, taking each polynomial and the modulus by value or by
   reference, like FLINT's `fmpz_mod_poly_mul`, `fmpz_mod_poly_sqr`, and `fmpz_mod_poly_mullow`.
-  As in FLINT, the product is computed exactly and its coefficients are then reduced. Every
-  coefficient of the inputs must already be reduced modulo the modulus.
+  Every coefficient of the inputs must already be reduced modulo the modulus. When the modulus fits
+  in a word and the polynomials are short enough, the product is computed by word kernels in
+  malachite-base that will also serve `UnsignedPolynomial`: as in FLINT's `_nmod_poly_mul`, each
+  coefficient is accumulated exactly in one, two, or three words, depending on how large it can
+  get, and reduced once, by schoolbook or Karatsuba multiplication. With moduli of 33 to 64 bits
+  this is two to eight times faster than the full product for short polynomials. Otherwise, as in
+  FLINT's `fmpz_mod_poly` functions, the product is computed exactly and its coefficients are then
+  reduced.
 - New `L2NormSquared` and `FloorL2Norm` traits, in `malachite_base::polynomial`: the exact sum of
   the squares of a polynomial's coefficients, and the floor of its square root, like FLINT's
   `fmpz_poly_2norm`. Both are implemented for `&IntegerPolynomial` and `&NaturalPolynomial`, with a

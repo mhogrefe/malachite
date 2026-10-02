@@ -180,7 +180,7 @@ pub(crate) const MUL_TRUNCATED_LOW_WINDOWS: [(u64, usize); 13] = [
 
 // The number of coefficients of a truncated product worth computing: `len`, but no more than the
 // whole product of factors of lengths `len1` and `len2`.
-fn truncated_len(len1: usize, len2: usize, len: u64) -> usize {
+pub(crate) fn truncated_len(len1: usize, len2: usize, len: u64) -> usize {
     min(usize::try_from(len).unwrap_or(usize::MAX), len1 + len2 - 1)
 }
 

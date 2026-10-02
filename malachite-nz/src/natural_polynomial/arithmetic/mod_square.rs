@@ -9,8 +9,17 @@
 use crate::integer_polynomial::arithmetic::square::square_ref;
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
-use crate::natural_polynomial::arithmetic::mod_mul::mod_reduce_coefficients;
-use malachite_base::num::arithmetic::traits::{ModIsReduced, ModSquare, ModSquareAssign};
+use crate::natural_polynomial::arithmetic::mod_mul::{
+    limbs_to_polynomial, mod_reduce_coefficients, naturals_to_limbs, word_preferred,
+};
+use crate::platform::Limb;
+use alloc::vec;
+use alloc::vec::Vec;
+use malachite_base::num::arithmetic::traits::{
+    ModAssign, ModIsReduced, ModSquare, ModSquareAssign,
+};
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::unsigned_polynomial::arithmetic::mod_square::mod_square_to_out;
 
 pub(crate) fn assert_reduced(p: &NaturalPolynomial, m: &Natural) {
     assert!(
@@ -18,6 +27,41 @@ pub(crate) fn assert_reduced(p: &NaturalPolynomial, m: &Natural) {
         "self must be reduced mod m, but {p} has a coefficient >= {m}"
     );
 }
+
+// The coefficients of the square of the polynomial with coefficients `xs`, nonempty and reduced
+// modulo `m`, modulo `m`: the full square, computed as an integer square, with its coefficients
+// reduced afterwards. The result is not trimmed. For each modulus size, the lengths for which the
+// word kernels beat the full square, as with `MUL_WORD_WINDOWS`.
+pub(crate) const SQUARE_WORD_WINDOWS: [(u64, usize); 5] =
+    [(20, 80), (28, 160), (40, 320), (60, 384), (64, 192)];
+
+// The coefficients of the square of the polynomial with coefficients `xs`, nonempty and reduced
+// modulo `m`, which must fit in a limb, modulo `m`, computed by the word kernels. The result is not
+// trimmed.
+crate_test_fn! {mod_square_word(xs: &[Natural], m: &Natural) -> Vec<Limb> {
+    let mut out = vec![0; (xs.len() << 1) - 1];
+    mod_square_to_out(&mut out, &naturals_to_limbs(xs), Limb::exact_from(m));
+    out
+}}
+
+// The square of the polynomial with coefficients `xs`, reduced modulo `m`, as a polynomial. The
+// word kernels are used in their window; otherwise the square is computed in full and reduced
+// afterwards.
+fn mod_square_ref(xs: &[Natural], m: &Natural) -> NaturalPolynomial {
+    if xs.len() > 1 && word_preferred(&SQUARE_WORD_WINDOWS, xs.len(), m) {
+        limbs_to_polynomial(mod_square_word(xs, m))
+    } else {
+        mod_reduce_coefficients(square_ref(xs), m)
+    }
+}
+
+crate_test_fn! {mod_square_full(xs: &[Natural], m: &Natural) -> Vec<Natural> {
+    let mut out = square_ref(xs);
+    for x in &mut out {
+        x.mod_assign(m);
+    }
+    out
+}}
 
 impl ModSquare<Natural> for NaturalPolynomial {
     type Output = Self;
@@ -179,7 +223,7 @@ impl ModSquare<Natural> for &NaturalPolynomial {
     /// This is equivalent to `fmpz_mod_poly_sqr` from `fmpz_mod_poly/sqr.c`, FLINT 3.6.0.
     fn mod_square(self, m: Natural) -> NaturalPolynomial {
         assert_reduced(self, &m);
-        mod_reduce_coefficients(square_ref(&self.coefficients), &m)
+        mod_square_ref(&self.coefficients, &m)
     }
 }
 
@@ -233,7 +277,7 @@ impl ModSquare<&Natural> for &NaturalPolynomial {
     /// This is equivalent to `fmpz_mod_poly_sqr` from `fmpz_mod_poly/sqr.c`, FLINT 3.6.0.
     fn mod_square(self, m: &Natural) -> NaturalPolynomial {
         assert_reduced(self, m);
-        mod_reduce_coefficients(square_ref(&self.coefficients), m)
+        mod_square_ref(&self.coefficients, m)
     }
 }
 
@@ -276,7 +320,7 @@ impl ModSquareAssign<Natural> for NaturalPolynomial {
             c.mod_square_assign(&m);
             self.trim();
         } else {
-            *self = mod_reduce_coefficients(square_ref(&self.coefficients), &m);
+            *self = mod_square_ref(&self.coefficients, &m);
         }
     }
 }
@@ -320,7 +364,7 @@ impl ModSquareAssign<&Natural> for NaturalPolynomial {
             c.mod_square_assign(m);
             self.trim();
         } else {
-            *self = mod_reduce_coefficients(square_ref(&self.coefficients), m);
+            *self = mod_square_ref(&self.coefficients, m);
         }
     }
 }

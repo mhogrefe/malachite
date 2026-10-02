@@ -60,6 +60,10 @@ pub mod mod_is_reduced;
 /// [`ModMakeMonicAssign`](crate::polynomial::ModMakeMonicAssign), which make a polynomial monic
 /// modulo a value.
 pub mod mod_make_monic;
+#[doc(hidden)]
+pub mod mod_mul;
+#[doc(hidden)]
+pub mod mod_mul_truncated;
 /// Implementations of [`ModNeg`](crate::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](crate::num::arithmetic::traits::ModNegAssign), which negate a polynomial modulo
 /// a number.
@@ -261,6 +265,10 @@ pub mod mod_power_of_2_sub_truncated;
 /// assert_eq!(p.to_string(), "229401496703205376*x+229401496703205376");
 /// ```
 pub mod mod_shl;
+#[doc(hidden)]
+pub mod mod_square;
+#[doc(hidden)]
+pub mod mod_square_truncated;
 /// Implementations of [`ModSub`](crate::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting one polynomial
 /// from another modulo a value.
