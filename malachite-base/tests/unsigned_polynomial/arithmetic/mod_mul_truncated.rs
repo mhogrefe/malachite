@@ -5,10 +5,14 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+use core::str::FromStr;
+use malachite_base::num::arithmetic::traits::{ModIsReduced, ModMul};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::polynomial::{ModMulTruncated, ModMulTruncatedAssign, Polynomial};
 use malachite_base::test_util::generators::*;
 use malachite_base::test_util::unsigned_polynomial::arithmetic::mod_mul::*;
 use malachite_base::test_util::unsigned_polynomial::arithmetic::mod_mul_truncated::*;
+use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::arithmetic::mod_mul_truncated::*;
 
 #[test]
@@ -117,4 +121,244 @@ fn mod_mul_truncated_properties_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn mod_mul_truncated_properties() {
     apply_fn_to_unsigneds!(mod_mul_truncated_properties_helper);
+}
+
+#[test]
+fn test_mod_mul_truncated() {
+    fn test<T: PrimitiveUnsigned>(s: &str, t: &str, len: u64, m: T, out: &str) {
+        let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
+        let q = UnsignedPolynomial::<T>::from_str(t).unwrap();
+        // All four combinations of value and reference, and in place with both.
+        let r = (&p).mod_mul_truncated(&q, len, m);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!((&p).mod_mul_truncated(q.clone(), len, m), r);
+        assert_eq!(p.clone().mod_mul_truncated(&q, len, m), r);
+        assert_eq!(p.clone().mod_mul_truncated(q.clone(), len, m), r);
+        let mut s = p.clone();
+        s.mod_mul_truncated_assign(&q, len, m);
+        assert!(s.is_valid());
+        assert_eq!(s, r);
+        let mut s = p.clone();
+        s.mod_mul_truncated_assign(q.clone(), len, m);
+        assert!(s.is_valid());
+        assert_eq!(s, r);
+        assert_eq!(mod_mul_truncated_polynomial_naive(&p, &q, len, m), r);
+    }
+    test::<u8>("0", "x", 3, 7, "0");
+    test::<u8>("x^2+3*x+2", "2*x+5", 0, 7, "0");
+    // The product is 2*x^3+11*x^2+19*x+10; its low two coefficients, modulo 7.
+    test::<u8>("x^2+3*x+2", "2*x+5", 2, 7, "5*x+3");
+    // A length past the end of the product keeps all of it.
+    test::<u8>("x^2+3*x+2", "2*x+5", 10, 7, "2*x^3+4*x^2+5*x+3");
+    // The linear coefficient of the product, 7, vanishes modulo 7.
+    test::<u8>("x+6", "x+1", 2, 7, "6");
+    // Near the top of the type: (x - 1)(-x - 1) = 1 - x^2 modulo 2^64 - 1.
+    test::<u64>(
+        "x+18446744073709551614",
+        "18446744073709551614*x+18446744073709551614",
+        2,
+        u64::MAX,
+        "1",
+    );
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_val_val_self_fail() {
+    // A coefficient of self is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let _ = p.mod_mul_truncated(q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_val_val_other_fail() {
+    // A coefficient of other is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let _ = p.mod_mul_truncated(q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_val_val_zero_fail() {
+    // The modulus is 0.
+    let p = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let _ = p.mod_mul_truncated(q, 2, 0);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_val_ref_self_fail() {
+    // A coefficient of self is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let _ = p.mod_mul_truncated(&q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_val_ref_other_fail() {
+    // A coefficient of other is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let _ = p.mod_mul_truncated(&q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_val_ref_zero_fail() {
+    // The modulus is 0.
+    let p = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let _ = p.mod_mul_truncated(&q, 2, 0);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_ref_val_self_fail() {
+    // A coefficient of self is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let _ = (&p).mod_mul_truncated(q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_ref_val_other_fail() {
+    // A coefficient of other is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let _ = (&p).mod_mul_truncated(q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_ref_val_zero_fail() {
+    // The modulus is 0.
+    let p = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let _ = (&p).mod_mul_truncated(q, 2, 0);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_ref_ref_self_fail() {
+    // A coefficient of self is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let _ = (&p).mod_mul_truncated(&q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_ref_ref_other_fail() {
+    // A coefficient of other is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let _ = (&p).mod_mul_truncated(&q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_ref_ref_zero_fail() {
+    // The modulus is 0.
+    let p = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let _ = (&p).mod_mul_truncated(&q, 2, 0);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_assign_self_fail() {
+    // A coefficient of self is not reduced.
+    let mut p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    p.mod_mul_truncated_assign(q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_assign_other_fail() {
+    // A coefficient of other is not reduced.
+    let mut p = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    p.mod_mul_truncated_assign(q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_assign_zero_fail() {
+    // The modulus is 0.
+    let mut p = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    p.mod_mul_truncated_assign(q, 2, 0);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_assign_ref_self_fail() {
+    // A coefficient of self is not reduced.
+    let mut p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    p.mod_mul_truncated_assign(&q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_assign_ref_other_fail() {
+    // A coefficient of other is not reduced.
+    let mut p = UnsignedPolynomial::<u8>::from_str("x").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    p.mod_mul_truncated_assign(&q, 2, 7);
+}
+
+#[test]
+#[should_panic]
+fn mod_mul_truncated_assign_ref_zero_fail() {
+    // The modulus is 0.
+    let mut p = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let q = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    p.mod_mul_truncated_assign(&q, 2, 0);
+}
+
+fn mod_mul_truncated_public_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2::<T>().test_properties(
+        |(p, q, len, m)| {
+            let r = (&p).mod_mul_truncated(&q, len, m);
+            assert!(r.is_valid());
+            // The forms agree.
+            assert_eq!((&p).mod_mul_truncated(q.clone(), len, m), r);
+            assert_eq!(p.clone().mod_mul_truncated(&q, len, m), r);
+            assert_eq!(p.clone().mod_mul_truncated(q.clone(), len, m), r);
+            let mut s = p.clone();
+            s.mod_mul_truncated_assign(&q, len, m);
+            assert!(s.is_valid());
+            assert_eq!(s, r);
+            let mut s = p.clone();
+            s.mod_mul_truncated_assign(q.clone(), len, m);
+            assert!(s.is_valid());
+            assert_eq!(s, r);
+
+            // The result is reduced, and is the truncation of the whole product.
+            assert!(r.mod_is_reduced(&m));
+            assert_eq!(mod_mul_truncated_polynomial_naive(&p, &q, len, m), r);
+            assert_eq!((&p).mod_mul(&q, m).truncate(len), r);
+            // Only the first `len` coefficients of each factor matter.
+            assert_eq!(
+                p.truncate(len).mod_mul_truncated(q.truncate(len), len, m),
+                r
+            );
+            // Multiplication is commutative.
+            assert_eq!((&q).mod_mul_truncated(&p, len, m), r);
+        },
+    );
+}
+
+#[test]
+fn mod_mul_truncated_public_properties() {
+    apply_fn_to_unsigneds!(mod_mul_truncated_public_properties_helper);
 }

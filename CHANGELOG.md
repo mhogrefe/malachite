@@ -447,6 +447,12 @@ documented by git history.
   `UnsignedPolynomial`. With 32- to 64-bit coefficients this is several times faster than the
   full product.
 - Multiplication, squaring, and truncated multiplication and squaring of `UnsignedPolynomial<T>`s
+  modulo a `T`: `ModMul`, `ModMulAssign`, `ModSquare`, `ModSquareAssign`, `ModMulTruncated`,
+  `ModMulTruncatedAssign`, `ModSquareTruncated`, and `ModSquareTruncatedAssign`, taking each
+  polynomial by value or by reference, like FLINT's `nmod_poly_mul` and `nmod_poly_mullow`. Every
+  coefficient of the inputs must already be reduced modulo the modulus. These use the word kernels
+  that `NaturalPolynomial` uses for word-sized moduli, by schoolbook or Karatsuba multiplication.
+- Multiplication, squaring, and truncated multiplication and squaring of `UnsignedPolynomial<T>`s
   modulo $2^k$, for $k$ no greater than the width of `T`: `ModPowerOf2Mul`, `ModPowerOf2MulAssign`,
   `ModPowerOf2Square`, `ModPowerOf2SquareAssign`, `ModPowerOf2MulTruncated`,
   `ModPowerOf2MulTruncatedAssign`, `ModPowerOf2SquareTruncated`, and

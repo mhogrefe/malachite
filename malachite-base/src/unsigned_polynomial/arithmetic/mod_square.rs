@@ -5,12 +5,15 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
-use crate::num::arithmetic::traits::Parity;
+use crate::num::arithmetic::traits::{ModIsReduced, ModSquare, ModSquareAssign, Parity};
+use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_mul::{
     MOD_SQUARE_KARATSUBA_THRESHOLD, ModData, accumulate, column_sum, mod_add_assign_slice,
     mod_karatsuba_scratch_len, mod_sub_assign_slice,
 };
+use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::from_coefficients_trimmed;
 use alloc::vec;
 
 // Doubles the three-word accumulator `(a2, a1, a0)`, which must be less than $2^{3\text{W} - 1}$;
@@ -130,4 +133,166 @@ mod_square_to_out_karatsuba<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], m: T)
 pub fn mod_square_to_out<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], m: T) {
     assert_lengths(out, xs);
     mod_square_karatsuba(out, xs, &ModData::new(m, xs.len()));
+}
+
+fn assert_reduced<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, m: T) {
+    assert!(
+        p.mod_is_reduced(&m),
+        "self must be reduced mod m, but {p} has a coefficient >= {m}"
+    );
+}
+
+// The square of the polynomial with coefficients `xs`, reduced modulo `m`, modulo `m`.
+fn mod_square_helper<T: PrimitiveUnsigned>(xs: &[T], m: T) -> UnsignedPolynomial<T> {
+    if xs.is_empty() {
+        return UnsignedPolynomial::ZERO;
+    }
+    let mut out = vec![T::ZERO; (xs.len() << 1) - 1];
+    mod_square_to_out(&mut out, xs, m);
+    from_coefficients_trimmed(out)
+}
+
+impl<T: PrimitiveUnsigned> ModSquare<T> for UnsignedPolynomial<T> {
+    type Output = Self;
+
+    /// Squares an [`UnsignedPolynomial`] modulo $m$, taking it by value. Its coefficients must
+    /// already be reduced modulo $m$.
+    ///
+    /// $$
+    /// f(p, m) = p^2 \bmod m.
+    /// $$
+    ///
+    /// When $m$ is not prime, the leading coefficient of the square can vanish modulo $m$, and then
+    /// the degree of the square is lower than twice the degree.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is 0, or if any coefficient of `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModSquare;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The square is x^4+6*x^3+13*x^2+12*x+4; its coefficients modulo 7.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("x^2+3*x+2")
+    ///         .unwrap()
+    ///         .mod_square(7)
+    ///         .to_string(),
+    ///     "x^4+6*x^3+6*x^2+5*x+4"
+    /// );
+    /// // The square is 4*x^2+4*x+1, which is 1 modulo 4.
+    /// assert_eq!(
+    ///     UnsignedPolynomial::<u8>::from_str("2*x+1")
+    ///         .unwrap()
+    ///         .mod_square(4)
+    ///         .to_string(),
+    ///     "1"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mul` from `nmod_poly/mul.c`, FLINT 3.6.0, with both factors
+    /// equal.
+    fn mod_square(self, m: T) -> Self {
+        assert_reduced(&self, m);
+        mod_square_helper(&self.coefficients, m)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModSquare<T> for &UnsignedPolynomial<T> {
+    type Output = UnsignedPolynomial<T>;
+
+    /// Squares an [`UnsignedPolynomial`] modulo $m$, taking it by reference. Its coefficients must
+    /// already be reduced modulo $m$.
+    ///
+    /// $$
+    /// f(p, m) = p^2 \bmod m.
+    /// $$
+    ///
+    /// When $m$ is not prime, the leading coefficient of the square can vanish modulo $m$, and then
+    /// the degree of the square is lower than twice the degree.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is 0, or if any coefficient of `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModSquare;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// // The square is x^4+6*x^3+13*x^2+12*x+4; its coefficients modulo 7.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap())
+    ///         .mod_square(7)
+    ///         .to_string(),
+    ///     "x^4+6*x^3+6*x^2+5*x+4"
+    /// );
+    /// // The square is 4*x^2+4*x+1, which is 1 modulo 4.
+    /// assert_eq!(
+    ///     (&UnsignedPolynomial::<u8>::from_str("2*x+1").unwrap())
+    ///         .mod_square(4)
+    ///         .to_string(),
+    ///     "1"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mul` from `nmod_poly/mul.c`, FLINT 3.6.0, with both factors
+    /// equal.
+    fn mod_square(self, m: T) -> UnsignedPolynomial<T> {
+        assert_reduced(self, m);
+        mod_square_helper(&self.coefficients, m)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModSquareAssign<T> for UnsignedPolynomial<T> {
+    /// Squares an [`UnsignedPolynomial`] modulo $m$ in place. Its coefficients must already be
+    /// reduced modulo $m$.
+    ///
+    /// $$
+    /// p \gets p^2 \bmod m.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{\log_2 3})$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.len()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is 0, or if any coefficient of `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModSquareAssign;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    ///
+    /// let mut p = UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap();
+    /// p.mod_square_assign(7);
+    /// assert_eq!(p.to_string(), "x^4+6*x^3+6*x^2+5*x+4");
+    /// ```
+    ///
+    /// This is equivalent to `nmod_poly_mul` from `nmod_poly/mul.c`, FLINT 3.6.0, with both factors
+    /// equal.
+    fn mod_square_assign(&mut self, m: T) {
+        assert_reduced(self, m);
+        *self = mod_square_helper(&self.coefficients, m);
+    }
 }

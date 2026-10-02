@@ -60,9 +60,13 @@ pub mod mod_is_reduced;
 /// [`ModMakeMonicAssign`](crate::polynomial::ModMakeMonicAssign), which make a polynomial monic
 /// modulo a value.
 pub mod mod_make_monic;
-#[doc(hidden)]
+/// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) and
+/// [`ModMulAssign`](crate::num::arithmetic::traits::ModMulAssign), for multiplying two polynomials
+/// modulo a value.
 pub mod mod_mul;
-#[doc(hidden)]
+/// Implementations of [`ModMulTruncated`](crate::polynomial::ModMulTruncated) and
+/// [`ModMulTruncatedAssign`](crate::polynomial::ModMulTruncatedAssign), for multiplying two
+/// polynomials modulo a value and keeping the low coefficients of the product.
 pub mod mod_mul_truncated;
 /// Implementations of [`ModNeg`](crate::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](crate::num::arithmetic::traits::ModNegAssign), which negate a polynomial modulo
@@ -273,9 +277,13 @@ pub mod mod_power_of_2_sub_truncated;
 /// assert_eq!(p.to_string(), "229401496703205376*x+229401496703205376");
 /// ```
 pub mod mod_shl;
-#[doc(hidden)]
+/// Implementations of [`ModSquare`](crate::num::arithmetic::traits::ModSquare) and
+/// [`ModSquareAssign`](crate::num::arithmetic::traits::ModSquareAssign), for squaring a polynomial
+/// modulo a value.
 pub mod mod_square;
-#[doc(hidden)]
+/// Implementations of [`ModSquareTruncated`](crate::polynomial::ModSquareTruncated) and
+/// [`ModSquareTruncatedAssign`](crate::polynomial::ModSquareTruncatedAssign), for squaring a
+/// polynomial modulo a value and keeping the low coefficients of the square.
 pub mod mod_square_truncated;
 /// Implementations of [`ModSub`](crate::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting one polynomial

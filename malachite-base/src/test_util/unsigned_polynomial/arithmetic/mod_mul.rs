@@ -5,8 +5,11 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::polynomial::Polynomial;
 use crate::test_util::unsigned_polynomial::arithmetic::mod_power_of_2_mul::*;
+use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -45,4 +48,18 @@ pub fn test_moduli<T: PrimitiveUnsigned>() -> Vec<T> {
         T::MAX - T::ONE,
         T::MAX,
     ]
+}
+
+// Multiplies two polynomials modulo `m` by schoolbook multiplication, as polynomials.
+pub fn mod_mul_polynomial_naive<T: PrimitiveUnsigned>(
+    p: &UnsignedPolynomial<T>,
+    q: &UnsignedPolynomial<T>,
+    m: T,
+) -> UnsignedPolynomial<T> {
+    let xs = p.coefficients_asc();
+    let ys = q.coefficients_asc();
+    if xs.is_empty() || ys.is_empty() {
+        return UnsignedPolynomial::ZERO;
+    }
+    UnsignedPolynomial::from_coefficients_asc(mod_mul_naive(xs, ys, m))
 }

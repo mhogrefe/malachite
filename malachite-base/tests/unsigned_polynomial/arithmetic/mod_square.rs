@@ -5,10 +5,13 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+use core::str::FromStr;
+use malachite_base::num::arithmetic::traits::{ModIsReduced, ModMul, ModSquare, ModSquareAssign};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::*;
 use malachite_base::test_util::unsigned_polynomial::arithmetic::mod_mul::*;
 use malachite_base::test_util::unsigned_polynomial::arithmetic::mod_square::*;
+use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::arithmetic::mod_square::*;
 
 #[test]
@@ -90,4 +93,105 @@ fn mod_square_properties_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn mod_square_properties() {
     apply_fn_to_unsigneds!(mod_square_properties_helper);
+}
+
+#[test]
+fn test_mod_square() {
+    fn test<T: PrimitiveUnsigned>(s: &str, m: T, out: &str) {
+        let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
+        let r = (&p).mod_square(m);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(p.clone().mod_square(m), r);
+        let mut s = p.clone();
+        s.mod_square_assign(m);
+        assert!(s.is_valid());
+        assert_eq!(s, r);
+        assert_eq!(mod_square_polynomial_naive(&p, m), r);
+    }
+    test::<u8>("0", 1, "0");
+    test::<u8>("0", 7, "0");
+    test::<u8>("x+1", 7, "x^2+2*x+1");
+    // The square is x^4+6*x^3+13*x^2+12*x+4; its coefficients modulo 7.
+    test::<u8>("x^2+3*x+2", 7, "x^4+6*x^3+6*x^2+5*x+4");
+    // The square is 4*x^2+4*x+1, which is 1 modulo 4.
+    test::<u8>("2*x+1", 4, "1");
+    // Near the top of the type: (x - 1)^2 = x^2 - 2x + 1 modulo 2^64 - 1.
+    test::<u64>(
+        "x+18446744073709551614",
+        u64::MAX,
+        "x^2+18446744073709551613*x+1",
+    );
+}
+
+#[test]
+#[should_panic]
+fn mod_square_val_self_fail() {
+    // A coefficient of self is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let _ = p.mod_square(7);
+}
+
+#[test]
+#[should_panic]
+fn mod_square_val_zero_fail() {
+    // The modulus is 0.
+    let p = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let _ = p.mod_square(0);
+}
+
+#[test]
+#[should_panic]
+fn mod_square_ref_self_fail() {
+    // A coefficient of self is not reduced.
+    let p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    let _ = (&p).mod_square(7);
+}
+
+#[test]
+#[should_panic]
+fn mod_square_ref_zero_fail() {
+    // The modulus is 0.
+    let p = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    let _ = (&p).mod_square(0);
+}
+
+#[test]
+#[should_panic]
+fn mod_square_assign_self_fail() {
+    // A coefficient of self is not reduced.
+    let mut p = UnsignedPolynomial::<u8>::from_str("7*x+1").unwrap();
+    p.mod_square_assign(7);
+}
+
+#[test]
+#[should_panic]
+fn mod_square_assign_zero_fail() {
+    // The modulus is 0.
+    let mut p = UnsignedPolynomial::<u8>::from_str("0").unwrap();
+    p.mod_square_assign(0);
+}
+
+fn mod_square_public_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_polynomial_unsigned_unsigned_triple_gen_var_2::<T>().test_properties(|(p, _, m)| {
+        let r = (&p).mod_square(m);
+        assert!(r.is_valid());
+        // The forms agree.
+        assert_eq!(p.clone().mod_square(m), r);
+        let mut s = p.clone();
+        s.mod_square_assign(m);
+        assert!(s.is_valid());
+        assert_eq!(s, r);
+
+        // The result is reduced, is the schoolbook square, and is the product of the polynomial
+        // with itself.
+        assert!(r.mod_is_reduced(&m));
+        assert_eq!(mod_square_polynomial_naive(&p, m), r);
+        assert_eq!((&p).mod_mul(&p, m), r);
+    });
+}
+
+#[test]
+fn mod_square_public_properties() {
+    apply_fn_to_unsigneds!(mod_square_public_properties_helper);
 }

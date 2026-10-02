@@ -6,7 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::test_util::unsigned_polynomial::arithmetic::mod_mul::mod_mul_naive;
+use crate::polynomial::Polynomial;
+use crate::test_util::unsigned_polynomial::arithmetic::mod_mul::*;
+use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec::Vec;
 
 // Multiplies the whole polynomials by schoolbook multiplication and then keeps the first `len`
@@ -20,4 +22,15 @@ pub fn mod_mul_truncated_naive<T: PrimitiveUnsigned>(
     let mut out = mod_mul_naive(xs, ys, m);
     out.resize(len, T::ZERO);
     out
+}
+
+// Multiplies two polynomials modulo `m` by schoolbook multiplication and keeps the first `len`
+// coefficients of the product, as a polynomial.
+pub fn mod_mul_truncated_polynomial_naive<T: PrimitiveUnsigned>(
+    p: &UnsignedPolynomial<T>,
+    q: &UnsignedPolynomial<T>,
+    len: u64,
+    m: T,
+) -> UnsignedPolynomial<T> {
+    mod_mul_polynomial_naive(p, q, m).truncate(len)
 }
