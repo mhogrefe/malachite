@@ -14,7 +14,7 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cos::round_bracket;
-use crate::float::arithmetic::cosh::{half_exp, quarter_reciprocal};
+use crate::float::arithmetic::cosh::{hyperbolic_approx, hyperbolic_can_round};
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
 use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
 use crate::float::conversion::string::set_str::overflow;
@@ -31,7 +31,6 @@ use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, Exact, Floor, Nearest};
 use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
@@ -55,31 +54,11 @@ fn sinh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
     }
     let mut increment = Limb::WIDTH;
     let sinh_abs = loop {
-        // sinh(|x|) = h - 1 / (4 h), where h = exp(|x|) / 2.
-        let Some((h, near_overflow)) = half_exp(&x_abs, working_prec) else {
+        let Some(approx) = hyperbolic_approx(&x_abs, working_prec) else {
             return overflow(positive, prec, rm);
         };
-        let sinh_abs = h
-            .sub_prec_ref_val(quarter_reciprocal(&h, working_prec), working_prec)
-            .0;
-        // The difference is not zero: that would need exp(|x|) to round down to exactly 1, so |x| <
-        // 2^(1 - working_prec), but working_prec exceeds -2 EXP(x).
-        debug_assert_ne!(sinh_abs, 0u32);
-        // The subtraction cancels about EXP(h) - EXP(sinh_abs) bits of h's error, which is below 1
-        // ulp of h, or 8 ulps near the overflow threshold (cf. sinh.c, whose estimate is err = Nt -
-        // ceil(log_2(1 + 2^d)) with d = EXP(exp(x)) - EXP(sinh(x)) + 2).
-        let d =
-            i64::from(h.get_exponent().unwrap()) - i64::from(sinh_abs.get_exponent().unwrap()) + 3;
-        let loss = u64::exact_from(max(d, 0)) + if near_overflow { 4 } else { 1 };
-        if loss < working_prec
-            && float_can_round(
-                sinh_abs.significand_ref().unwrap(),
-                working_prec - loss,
-                prec,
-                rm,
-            )
-        {
-            break sinh_abs;
+        if hyperbolic_can_round(&approx.sinh, approx.sinh_bits, prec, rm) {
+            break approx.sinh;
         }
         working_prec += increment;
         increment = working_prec >> 1;

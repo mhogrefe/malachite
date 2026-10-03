@@ -1141,6 +1141,19 @@ pub trait SinhAssign {
     fn sinh_assign(&mut self);
 }
 
+/// Computes $\sinh(x)$ and $\cosh(x)$, the hyperbolic sine and cosine of a number, together.
+pub trait SinhCosh {
+    type Output;
+
+    fn sinh_cosh(self) -> (Self::Output, Self::Output);
+}
+
+/// Replaces a number with its hyperbolic sine, $\sinh(x)$, and writes its hyperbolic cosine,
+/// $\cosh(x)$, to a second number.
+pub trait SinhCoshAssign {
+    fn sinh_cosh_assign(&mut self, cosh: &mut Self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

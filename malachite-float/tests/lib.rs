@@ -136,6 +136,7 @@ pub mod float {
         pub mod sin;
         pub mod sin_cos;
         pub mod sinh;
+        pub mod sinh_cosh;
         pub mod sqrt;
         pub mod square;
         pub mod sub;

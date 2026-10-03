@@ -1027,6 +1027,11 @@ documented by git history.
   Since $\sinh$ is increasing, $x$ is bracketed between two `Float`s; a small $x$ is instead
   bracketed by partial sums of the series, all of whose terms share its sign, which also handles
   inputs too small to be `Float`s, whose hyperbolic sines underflow.
+- `SinhCosh` and `SinhCoshAssign` (new traits in malachite-base) for `Float`, with the usual
+  `sinh_cosh_prec_round`, `sinh_cosh_prec`, `sinh_cosh_round`, and `_ref`/`_assign` variants, and
+  `primitive_float_sinh_cosh`: a port of `mpfr_sinh_cosh`, computing both values from one
+  exponential. It also takes the small-input shortcuts of `sinh` and `cosh`, and raises its working
+  precision for the cancellation at small $|x|$, neither of which `mpfr_sinh_cosh` does.
 
 ### Documentation
 

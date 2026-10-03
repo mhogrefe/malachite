@@ -14,10 +14,12 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cos::round_bracket;
-use crate::float::arithmetic::exp::{exp_overflow, one_neighbor};
+use crate::float::arithmetic::exp::one_neighbor;
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
+use crate::float::conversion::string::set_str::overflow;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
+use core::cmp::max;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     Abs, AddMul, CeilingLogBase2, Cosh, CoshAssign, Reciprocal, Square,
@@ -70,12 +72,11 @@ fn half_exp_near_overflow(x: &Float, working_prec: u64) -> Option<Float> {
     Some(h)
 }
 
-// Approximates exp(x) / 2 for a positive finite x at precision `working_prec`, the common core of
-// `cosh` and `sinh`, which are h + 1 / (4 h) and h - 1 / (4 h) for h = exp(x) / 2. Returns `None`
-// if exp(x) / 2 is so large that cosh(x) and sinh(x) overflow at any precision below
-// `working_prec`. Otherwise returns h and whether it was computed near the overflow threshold:
-// usually |h - exp(x) / 2| < 1 ulp(h), but near the threshold the bound is 8 ulps.
-pub(crate) fn half_exp(x: &Float, working_prec: u64) -> Option<(Float, bool)> {
+// Approximates exp(x) / 2 for a positive finite x at precision `working_prec`. Returns `None` if
+// exp(x) / 2 is so large that cosh(x) and sinh(x) overflow at any precision below `working_prec`.
+// Otherwise returns h and whether it was computed near the overflow threshold: usually |h - exp(x)
+// / 2| < 1 ulp(h), but near the threshold the bound is 8 ulps.
+fn half_exp(x: &Float, working_prec: u64) -> Option<(Float, bool)> {
     let exp_x = x.exp_prec_round_ref(working_prec, Floor).0;
     if exp_x.get_exponent() == Some(Float::MAX_EXPONENT) {
         // exp(x) is in the top binade, or overflowed and saturated.
@@ -86,13 +87,60 @@ pub(crate) fn half_exp(x: &Float, working_prec: u64) -> Option<(Float, bool)> {
     }
 }
 
-// The reciprocal of 4h, rounded up: given h ~ exp(x) / 2, an upper bound for exp(-x) / 2. This may
-// underflow, in which case it rounds up to the smallest positive Float, still an upper bound.
-pub(crate) fn quarter_reciprocal(h: &Float, working_prec: u64) -> Float {
-    h.reciprocal_round_ref(Ceiling)
+// Approximations of sinh(x) and cosh(x) for a positive finite x, computed together at precision
+// `working_prec`: the core of `sinh`, `cosh`, and `sinh_cosh`, whose Ziv loops differ only in which
+// of the two they need to round. With h = exp(x) / 2, cosh(x) = h + 1 / (4 h) and sinh(x) = h - 1 /
+// (4 h); away from the overflow threshold the values are those of MPFR's (e + 1 / e) / 2 and (e - 1
+// / e) / 2, where e = exp(x) rounded down. Returns `None` if both overflow at any precision below
+// `working_prec`; otherwise the two approximations, each with the number of its bits that are
+// correct (its error is below 2^(EXP - bits)), which for sinh(x) may be zero after heavy
+// cancellation.
+pub(crate) struct HyperbolicApprox {
+    pub sinh: Float,
+    pub sinh_bits: u64,
+    pub cosh: Float,
+    pub cosh_bits: u64,
+}
+
+pub(crate) fn hyperbolic_approx(x: &Float, working_prec: u64) -> Option<HyperbolicApprox> {
+    let (h, near_overflow) = half_exp(x, working_prec)?;
+    // exp(-x) / 2 = 1 / (4 h), rounded up. This may underflow, in which case it rounds up to the
+    // smallest positive Float, still an upper bound.
+    let exp_neg_x_half = h
+        .reciprocal_round_ref(Ceiling)
         .0
         .shr_prec_round(2u32, working_prec, Ceiling)
-        .0
+        .0;
+    let exp_h = i64::from(h.get_exponent().unwrap());
+    let sinh = h.sub_prec_ref_ref(&exp_neg_x_half, working_prec).0;
+    // h is not the largest finite Float, so adding a value this small rounds up to at most it.
+    let cosh = h.add_round(exp_neg_x_half, Ceiling).0;
+    // The difference is not zero: that would need exp(x) to round down to exactly 1, so x < 2^(1 -
+    // working_prec), but callers that need sinh(x) raise working_prec above -2 EXP(x).
+    let sinh_bits = if sinh == 0u32 {
+        0
+    } else {
+        // The subtraction cancels about EXP(h) - EXP(sinh) bits of h's error, which is below 1 ulp
+        // of h, or 8 ulps near the overflow threshold (cf. sinh.c, whose estimate is err = Nt -
+        // ceil(log_2(1 + 2^d)) with d = EXP(exp(x)) - EXP(sinh(x)) + 2).
+        let d = exp_h - i64::from(sinh.get_exponent().unwrap()) + 3;
+        let loss = u64::exact_from(max(d, 0)) + if near_overflow { 4 } else { 1 };
+        working_prec.saturating_sub(loss)
+    };
+    // Away from the threshold, the error of h and the two roundings stay below 8 ulps; near it, h's
+    // error is below 8 ulps, and the two roundings add at most 2 more.
+    let cosh_bits = working_prec - if near_overflow { 4 } else { 3 };
+    Some(HyperbolicApprox {
+        sinh,
+        sinh_bits,
+        cosh,
+        cosh_bits,
+    })
+}
+
+// Whether an approximation with the given number of correct bits can be rounded to `prec` bits.
+pub(crate) fn hyperbolic_can_round(f: &Float, bits: u64, prec: u64, rm: RoundingMode) -> bool {
+    bits != 0 && float_can_round(f.significand_ref().unwrap(), bits, prec, rm)
 }
 
 // This is mpfr_cosh from cosh.c, MPFR 4.2.2, where the input is finite and nonzero.
@@ -109,18 +157,11 @@ fn cosh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
     let mut working_prec = prec + 3 + prec.ceiling_log_base_2();
     let mut increment = Limb::WIDTH;
     loop {
-        // cosh(x) = h + 1 / (4 h), where h = exp(x) / 2.
-        let Some((h, near_overflow)) = half_exp(&x, working_prec) else {
-            return exp_overflow(prec, rm);
+        let Some(approx) = hyperbolic_approx(&x, working_prec) else {
+            return overflow(true, prec, rm);
         };
-        // Away from the threshold, the error of h and the two roundings below stay below 8 ulps;
-        // near it, h's error is below 8 ulps, and the two roundings add at most 2 more.
-        let err = working_prec - if near_overflow { 4 } else { 3 };
-        // h is not the largest finite Float, so adding a value this small rounds up to at most it.
-        let exp_neg_x_half = quarter_reciprocal(&h, working_prec);
-        let cosh_x = h.add_round(exp_neg_x_half, Ceiling).0;
-        if float_can_round(cosh_x.significand_ref().unwrap(), err, prec, rm) {
-            return Float::from_float_prec_round(cosh_x, prec, rm);
+        if hyperbolic_can_round(&approx.cosh, approx.cosh_bits, prec, rm) {
+            return Float::from_float_prec_round(approx.cosh, prec, rm);
         }
         working_prec += increment;
         increment = working_prec >> 1;
@@ -171,7 +212,7 @@ fn cosh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Or
     // |x| >= 2^(MAX_EXPONENT - 1), so cosh(x) > e^|x| / 2 overflows. Smaller x that still overflow
     // are caught by `cosh_prec_round_normal_ref` in the loop below.
     if exp_x >= Float::MAX_EXPONENT_I64 {
-        return exp_overflow(prec, rm);
+        return overflow(true, prec, rm);
     }
     // cosh is even and increasing on [0, infinity), so bracket |x| between the Floats x_lo <= |x|
     // <= x_hi, take the hyperbolic cosine of both, and increase the working precision until the two
