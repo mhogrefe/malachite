@@ -11,23 +11,29 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     from_coefficients_asc::register(runner);
     from_integer_polynomial::register(runner);
+    from_numerator_and_denominator::register(runner);
     from_natural_polynomial::register(runner);
     from_rational::register(runner);
     from_unsigned_polynomial::register(runner);
     integer_polynomial_from_rational_polynomial::register(runner);
+    mutate_numerator_or_denominator::register(runner);
     natural_polynomial_from_rational_polynomial::register(runner);
     serde::register(runner);
     string::register(runner);
+    to_numerator_or_denominator::register(runner);
     unsigned_polynomial_from_rational_polynomial::register(runner);
 }
 
 mod from_coefficients_asc;
 mod from_integer_polynomial;
 mod from_natural_polynomial;
+mod from_numerator_and_denominator;
 mod from_rational;
 mod from_unsigned_polynomial;
 mod integer_polynomial_from_rational_polynomial;
+mod mutate_numerator_or_denominator;
 mod natural_polynomial_from_rational_polynomial;
 mod serde;
 mod string;
+mod to_numerator_or_denominator;
 mod unsigned_polynomial_from_rational_polynomial;

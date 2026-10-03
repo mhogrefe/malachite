@@ -6478,6 +6478,17 @@ pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_1() -> It<(UnsignedP
     ))
 }
 
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_9()
+-> It<(UnsignedPolynomial<u64>, u64, u64)> {
+    Box::new(
+        exhaustive_triples_xyy(
+            exhaustive_unsigned_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+        )
+        .map(|(p, start, len)| (p, start, start + len)),
+    )
+}
+
 pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_2() -> It<(UnsignedPolynomial<u64>, u64)>
 {
     Box::new(
@@ -6600,6 +6611,14 @@ pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_va
         )
         .filter(|(p, q, m)| p.mod_is_reduced(m) && q.mod_is_reduced(m)),
     )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_3()
+-> It<(UnsignedPolynomial<u64>, UnsignedPolynomial<u64>, u64)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_unsigned_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
 }
 
 pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1<

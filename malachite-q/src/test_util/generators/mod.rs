@@ -1313,12 +1313,32 @@ pub fn rational_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(RationalPolynomial, UnsignedPolynomial<T>, u64)` where the `u64` is a small length.
+pub fn rational_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(RationalPolynomial, UnsignedPolynomial<T>, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1,
+        &random_rational_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1,
+        &special_random_rational_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1,
+    )
+}
+
 pub fn rational_polynomial_integer_polynomial_pair_gen()
 -> Generator<(RationalPolynomial, IntegerPolynomial)> {
     Generator::new(
         &exhaustive_rational_polynomial_integer_polynomial_pair_gen,
         &random_rational_polynomial_integer_polynomial_pair_gen,
         &special_random_rational_polynomial_integer_polynomial_pair_gen,
+    )
+}
+
+// All `(RationalPolynomial, IntegerPolynomial, u64)` where the `u64` is a small length.
+pub fn rational_polynomial_integer_polynomial_unsigned_triple_gen_var_1()
+-> Generator<(RationalPolynomial, IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_integer_polynomial_unsigned_triple_gen_var_1,
+        &random_rational_polynomial_integer_polynomial_unsigned_triple_gen_var_1,
+        &special_random_rational_polynomial_integer_polynomial_unsigned_triple_gen_var_1,
     )
 }
 
@@ -1353,6 +1373,16 @@ pub fn rational_polynomial_natural_polynomial_pair_gen()
         &exhaustive_rational_polynomial_natural_polynomial_pair_gen,
         &random_rational_polynomial_natural_polynomial_pair_gen,
         &special_random_rational_polynomial_natural_polynomial_pair_gen,
+    )
+}
+
+// All `(RationalPolynomial, NaturalPolynomial, u64)` where the `u64` is a small length.
+pub fn rational_polynomial_natural_polynomial_unsigned_triple_gen_var_1()
+-> Generator<(RationalPolynomial, NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_natural_polynomial_unsigned_triple_gen_var_1,
+        &random_rational_polynomial_natural_polynomial_unsigned_triple_gen_var_1,
+        &special_random_rational_polynomial_natural_polynomial_unsigned_triple_gen_var_1,
     )
 }
 
@@ -1415,6 +1445,25 @@ pub fn rational_polynomial_natural_pair_gen() -> Generator<(RationalPolynomial, 
     )
 }
 
+// All `(RationalPolynomial, Natural)` where the `Natural` is positive.
+pub fn rational_polynomial_natural_pair_gen_var_1() -> Generator<(RationalPolynomial, Natural)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_natural_pair_gen_var_1,
+        &random_rational_polynomial_natural_pair_gen_var_1,
+        &special_random_rational_polynomial_natural_pair_gen_var_1,
+    )
+}
+
+// All `(RationalPolynomial, IntegerPolynomial, Natural)` where the `Natural` is positive.
+pub fn rational_polynomial_integer_polynomial_natural_triple_gen_var_1()
+-> Generator<(RationalPolynomial, IntegerPolynomial, Natural)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_integer_polynomial_natural_triple_gen_var_1,
+        &random_rational_polynomial_integer_polynomial_natural_triple_gen_var_1,
+        &special_random_rational_polynomial_integer_polynomial_natural_triple_gen_var_1,
+    )
+}
+
 pub fn rational_polynomial_unsigned_pair_gen<T: PrimitiveUnsigned>()
 -> Generator<(RationalPolynomial, T)> {
     Generator::new(
@@ -1448,6 +1497,17 @@ pub fn rational_polynomial_unsigned_pair_gen_var_1() -> Generator<(RationalPolyn
         &exhaustive_rational_polynomial_unsigned_pair_gen_var_1,
         &random_rational_polynomial_unsigned_pair_gen_var_1,
         &special_random_rational_polynomial_unsigned_pair_gen_var_1,
+    )
+}
+
+// All `(RationalPolynomial, u64, u64)` where both `u64`s are small and the first is no greater than
+// the second.
+pub fn rational_polynomial_unsigned_unsigned_triple_gen_var_2()
+-> Generator<(RationalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_unsigned_unsigned_triple_gen_var_2,
+        &random_rational_polynomial_unsigned_unsigned_triple_gen_var_2,
+        &special_random_rational_polynomial_unsigned_unsigned_triple_gen_var_2,
     )
 }
 

@@ -73,6 +73,9 @@ pub mod from_unsigned_polynomial;
 /// );
 /// ```
 pub mod integer_polynomial_from_rational_polynomial;
+/// Functions for mutating a [`RationalPolynomial`](super::RationalPolynomial)'s numerator and/or
+/// denominator in place.
+pub mod mutate_numerator_and_denominator;
 /// Implementations of traits for converting a [`RationalPolynomial`](super::RationalPolynomial) to
 /// a [`NaturalPolynomial`](malachite_nz::natural_polynomial::NaturalPolynomial).
 ///

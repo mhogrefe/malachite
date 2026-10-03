@@ -1004,11 +1004,30 @@ pub fn exhaustive_rational_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveU
     ))
 }
 
+pub fn exhaustive_rational_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(RationalPolynomial, UnsignedPolynomial<T>, u64)> {
+    Box::new(exhaustive_triples(
+        exhaustive_rational_polynomials(),
+        exhaustive_unsigned_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_rational_polynomial_integer_polynomial_pair_gen()
 -> It<(RationalPolynomial, IntegerPolynomial)> {
     Box::new(exhaustive_pairs(
         exhaustive_rational_polynomials(),
         exhaustive_integer_polynomials(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_integer_polynomial_unsigned_triple_gen_var_1()
+-> It<(RationalPolynomial, IntegerPolynomial, u64)> {
+    Box::new(exhaustive_triples(
+        exhaustive_rational_polynomials(),
+        exhaustive_integer_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
     ))
 }
 
@@ -1040,6 +1059,15 @@ pub fn exhaustive_rational_polynomial_natural_polynomial_pair_gen()
     Box::new(exhaustive_pairs(
         exhaustive_rational_polynomials(),
         exhaustive_natural_polynomials(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_natural_polynomial_unsigned_triple_gen_var_1()
+-> It<(RationalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(exhaustive_triples(
+        exhaustive_rational_polynomials(),
+        exhaustive_natural_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
     ))
 }
 
@@ -1096,6 +1124,23 @@ pub fn exhaustive_rational_polynomial_natural_pair_gen() -> It<(RationalPolynomi
     ))
 }
 
+pub fn exhaustive_rational_polynomial_natural_pair_gen_var_1() -> It<(RationalPolynomial, Natural)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_positive_naturals(),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_integer_polynomial_natural_triple_gen_var_1()
+-> It<(RationalPolynomial, IntegerPolynomial, Natural)> {
+    Box::new(exhaustive_triples(
+        exhaustive_rational_polynomials(),
+        exhaustive_integer_polynomials(),
+        exhaustive_positive_naturals(),
+    ))
+}
+
 pub fn exhaustive_rational_polynomial_signed_pair_gen<T: PrimitiveSigned>()
 -> It<(RationalPolynomial, T)> {
     Box::new(exhaustive_pairs(
@@ -1125,6 +1170,17 @@ pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_1() -> It<(RationalP
         exhaustive_rational_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+pub fn exhaustive_rational_polynomial_unsigned_unsigned_triple_gen_var_2()
+-> It<(RationalPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_triples_xyy(
+            exhaustive_rational_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+        )
+        .map(|(p, start, len)| (p, start, start + len)),
+    )
 }
 
 pub fn exhaustive_rational_polynomial_unsigned_unsigned_triple_gen_var_1()

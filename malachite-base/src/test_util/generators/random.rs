@@ -8582,6 +8582,25 @@ pub fn random_unsigned_polynomial_unsigned_pair_gen_var_1(
     ))
 }
 
+pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_9(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<u64>, u64, u64)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+        )
+        .map(|(p, start, len)| (p, start, start + len)),
+    )
+}
+
 pub fn random_unsigned_polynomial_unsigned_pair_gen_var_2(
     config: &GenConfig,
 ) -> It<(UnsignedPolynomial<u64>, u64)> {
@@ -8797,6 +8816,22 @@ pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_2<
         )
         .map(|(p, q, m)| (p % m, q % m, m)),
     )
+}
+
+pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<u64>, UnsignedPolynomial<u64>, u64)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_unsigned_polynomials(
+                seed,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
 }
 
 pub fn random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1<

@@ -189,6 +189,29 @@ pub fn special_random_natural_polynomial_unsigned_pair_gen_var_1(
     ))
 }
 
+pub fn special_random_natural_polynomial_unsigned_unsigned_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64, u64)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+        )
+        .map(|(p, start, len)| (p, start, start + len)),
+    )
+}
+
 pub fn special_random_natural_polynomial_unsigned_pair_gen_var_2(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, u64)> {
@@ -338,6 +361,29 @@ pub fn special_random_integer_polynomial_unsigned_pair_gen_var_1(
         },
         &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
+}
+
+pub fn special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64, u64)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+        )
+        .map(|(p, start, len)| (p, start, start + len)),
+    )
 }
 
 pub fn special_random_integer_polynomial_unsigned_pair_gen_var_2(
@@ -601,6 +647,37 @@ pub fn special_random_natural_polynomial_unsigned_polynomial_pair_gen<T: Primiti
                 config.get_or("mean_length_d", 1),
             )
         },
+    ))
+}
+
+pub fn special_random_natural_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, UnsignedPolynomial<T>, u64)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_polynomials(
+                seed,
+                config.get_or("mean_unsigned_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_unsigned_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
 }
 
@@ -1718,6 +1795,37 @@ pub fn special_random_integer_polynomial_natural_polynomial_pair_gen(
     ))
 }
 
+pub fn special_random_integer_polynomial_natural_polynomial_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, NaturalPolynomial, u64)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_natural_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
+}
+
 pub fn special_random_integer_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, UnsignedPolynomial<T>)> {
@@ -1743,6 +1851,37 @@ pub fn special_random_integer_polynomial_unsigned_polynomial_pair_gen<T: Primiti
                 config.get_or("mean_length_d", 1),
             )
         },
+    ))
+}
+
+pub fn special_random_integer_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, UnsignedPolynomial<T>, u64)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_polynomials(
+                seed,
+                config.get_or("mean_unsigned_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_unsigned_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
 }
 

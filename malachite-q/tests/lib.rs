@@ -220,6 +220,7 @@ pub mod rational_polynomial {
         pub mod from_rational;
         pub mod from_unsigned_polynomial;
         pub mod integer_polynomial_from_rational_polynomial;
+        pub mod mutate_numerator_or_denominator;
         pub mod natural_polynomial_from_rational_polynomial;
         pub mod serde;
         pub mod string {

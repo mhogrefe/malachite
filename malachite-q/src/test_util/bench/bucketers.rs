@@ -613,3 +613,21 @@ pub fn pair_1_rational_polynomial_bit_bucketer<T>(
         bucketing_label: format!("{var_name}'s total stored bits"),
     }
 }
+
+pub fn triple_1_rational_polynomial_bit_bucketer<T, U>(
+    var_name: &str,
+) -> Bucketer<'_, (RationalPolynomial, T, U)> {
+    Bucketer {
+        bucketing_function: &|(p, _, _)| {
+            usize::exact_from(
+                p.numerator_ref()
+                    .coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>()
+                    + p.denominator_ref().significant_bits(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total stored bits"),
+    }
+}

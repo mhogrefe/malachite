@@ -56,6 +56,17 @@ pub fn natural_polynomial_unsigned_pair_gen_var_1() -> Generator<(NaturalPolynom
     )
 }
 
+// All `(NaturalPolynomial, u64, u64)` where both `u64`s are small and the first is no greater than
+// the second.
+pub fn natural_polynomial_unsigned_unsigned_triple_gen_var_5()
+-> Generator<(NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_5,
+        &random_natural_polynomial_unsigned_unsigned_triple_gen_var_5,
+        &special_random_natural_polynomial_unsigned_unsigned_triple_gen_var_5,
+    )
+}
+
 // All `(NaturalPolynomial, u64)` where the `u64` is positive and small, and every exponent at which
 // the polynomial has a nonzero coefficient is a multiple of the `u64`.
 pub fn natural_polynomial_unsigned_pair_gen_var_2() -> Generator<(NaturalPolynomial, u64)> {
@@ -119,6 +130,17 @@ pub fn integer_polynomial_unsigned_pair_gen_var_1() -> Generator<(IntegerPolynom
         &exhaustive_integer_polynomial_unsigned_pair_gen_var_1,
         &random_integer_polynomial_unsigned_pair_gen_var_1,
         &special_random_integer_polynomial_unsigned_pair_gen_var_1,
+    )
+}
+
+// All `(IntegerPolynomial, u64, u64)` where both `u64`s are small and the first is no greater than
+// the second.
+pub fn integer_polynomial_unsigned_unsigned_triple_gen_var_3()
+-> Generator<(IntegerPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_3,
+        &random_integer_polynomial_unsigned_unsigned_triple_gen_var_3,
+        &special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_3,
     )
 }
 
@@ -231,6 +253,16 @@ pub fn natural_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
         &exhaustive_natural_polynomial_unsigned_polynomial_pair_gen,
         &random_natural_polynomial_unsigned_polynomial_pair_gen,
         &special_random_natural_polynomial_unsigned_polynomial_pair_gen,
+    )
+}
+
+// All `(NaturalPolynomial, UnsignedPolynomial<T>, u64)` where the `u64` is a small length.
+pub fn natural_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(NaturalPolynomial, UnsignedPolynomial<T>, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1,
+        &random_natural_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1,
+        &special_random_natural_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1,
     )
 }
 
@@ -597,12 +629,32 @@ pub fn integer_polynomial_natural_polynomial_pair_gen()
     )
 }
 
+// All `(IntegerPolynomial, NaturalPolynomial, u64)` where the `u64` is a small length.
+pub fn integer_polynomial_natural_polynomial_unsigned_triple_gen_var_1()
+-> Generator<(IntegerPolynomial, NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_natural_polynomial_unsigned_triple_gen_var_1,
+        &random_integer_polynomial_natural_polynomial_unsigned_triple_gen_var_1,
+        &special_random_integer_polynomial_natural_polynomial_unsigned_triple_gen_var_1,
+    )
+}
+
 pub fn integer_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
 -> Generator<(IntegerPolynomial, UnsignedPolynomial<T>)> {
     Generator::new(
         &exhaustive_integer_polynomial_unsigned_polynomial_pair_gen,
         &random_integer_polynomial_unsigned_polynomial_pair_gen,
         &special_random_integer_polynomial_unsigned_polynomial_pair_gen,
+    )
+}
+
+// All `(IntegerPolynomial, UnsignedPolynomial<T>, u64)` where the `u64` is a small length.
+pub fn integer_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(IntegerPolynomial, UnsignedPolynomial<T>, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1,
+        &random_integer_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1,
+        &special_random_integer_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1,
     )
 }
 

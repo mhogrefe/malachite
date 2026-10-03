@@ -185,6 +185,17 @@ pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_1() -> It<(NaturalPol
     ))
 }
 
+pub fn exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_5()
+-> It<(NaturalPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_triples_xyy(
+            exhaustive_natural_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+        )
+        .map(|(p, start, len)| (p, start, start + len)),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_2() -> It<(NaturalPolynomial, u64)> {
     Box::new(
         exhaustive_natural_polynomial_unsigned_pair_gen_var_1()
@@ -335,11 +346,30 @@ pub fn exhaustive_integer_polynomial_natural_polynomial_pair_gen()
     ))
 }
 
+pub fn exhaustive_integer_polynomial_natural_polynomial_unsigned_triple_gen_var_1()
+-> It<(IntegerPolynomial, NaturalPolynomial, u64)> {
+    Box::new(exhaustive_triples(
+        exhaustive_integer_polynomials(),
+        exhaustive_natural_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUnsigned>()
 -> It<(IntegerPolynomial, UnsignedPolynomial<T>)> {
     Box::new(exhaustive_pairs(
         exhaustive_integer_polynomials(),
         exhaustive_unsigned_polynomials(),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(IntegerPolynomial, UnsignedPolynomial<T>, u64)> {
+    Box::new(exhaustive_triples(
+        exhaustive_integer_polynomials(),
+        exhaustive_unsigned_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
     ))
 }
 
@@ -356,6 +386,17 @@ pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_1() -> It<(IntegerPol
         exhaustive_integer_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+pub fn exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_3()
+-> It<(IntegerPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_triples_xyy(
+            exhaustive_integer_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+        )
+        .map(|(p, start, len)| (p, start, start + len)),
+    )
 }
 
 pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_2() -> It<(IntegerPolynomial, u64)> {
@@ -448,6 +489,16 @@ pub fn exhaustive_natural_polynomial_unsigned_polynomial_pair_gen<T: PrimitiveUn
     Box::new(exhaustive_pairs(
         exhaustive_natural_polynomials(),
         exhaustive_unsigned_polynomials(),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(NaturalPolynomial, UnsignedPolynomial<T>, u64)> {
+    Box::new(exhaustive_triples(
+        exhaustive_natural_polynomials(),
+        exhaustive_unsigned_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
     ))
 }
 

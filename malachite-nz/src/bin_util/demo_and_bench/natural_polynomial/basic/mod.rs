@@ -11,7 +11,13 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     coefficients::register(runner);
     mutate_coefficient::register(runner);
+    reverse::register(runner);
+    truncate::register(runner);
+    zero_coefficients::register(runner);
 }
 
 mod coefficients;
 mod mutate_coefficient;
+mod reverse;
+mod truncate;
+mod zero_coefficients;

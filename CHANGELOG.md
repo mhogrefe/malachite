@@ -945,6 +945,10 @@ documented by git history.
   `mutate_coefficient` materializes the coefficient, runs the closure on it, and rebuilds.
   `degree`, `Zero`, `one`, `two`, `negative_one`, and `From` behave as they do for the other
   polynomial types.
+- `mutate_numerator`, `mutate_denominator`, and `mutate_numerator_and_denominator` for
+  `RationalPolynomial`, as for `Rational`: each passes the numerator, the denominator, or both to a
+  closure and reduces the polynomial when the closure returns, the counterpart of writing through
+  FLINT's `fmpq_poly_numref` and `fmpq_poly_denref`.
 - `Display`, `FromStr`, `ToLatex`, and `ToTypst` for `RationalPolynomial`, with the same
   `_with` variants, writing each coefficient as a [`Rational`] does: `1/2*x+1/3` in plain text,
   `\frac{1}{2}x+\frac{1}{3}` in LaTeX, and `frac(1, 2)x+frac(1, 3)` in Typst. Exhaustive, random,
