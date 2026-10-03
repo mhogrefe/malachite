@@ -446,12 +446,13 @@ documented by git history.
   width this is word arithmetic, through kernels in malachite-base that will also serve
   `UnsignedPolynomial`. With 32- to 64-bit coefficients this is several times faster than the
   full product.
-- `Pow` and `PowAssign` for `IntegerPolynomial` and `NaturalPolynomial`, with a `u64` exponent, like
-  FLINT's `fmpz_poly_pow`. The power is computed by the binomial theorem, J. C. P. Miller's
-  multinomial recurrence, an addition chain, or binary exponentiation, chosen by criteria measured
-  for Malachite's multiplication, after removing any factor of $x^k$. New `PowTruncated` and
-  `PowTruncatedAssign` traits, in `malachite_base::polynomial`, implemented for both types like
-  FLINT's `fmpz_poly_pow_trunc`, raise a polynomial to a power modulo $x^n$.
+- `Pow` and `PowAssign` for `IntegerPolynomial`, `NaturalPolynomial`, and `RationalPolynomial`, with
+  a `u64` exponent, like FLINT's `fmpz_poly_pow` and `fmpq_poly_pow`. The power is computed by the
+  binomial theorem, J. C. P. Miller's multinomial recurrence, an addition chain, or binary
+  exponentiation, chosen by criteria measured for Malachite's multiplication, after removing any
+  factor of $x^k$. New `PowTruncated` and `PowTruncatedAssign` traits, in
+  `malachite_base::polynomial`, implemented for all three like FLINT's `fmpz_poly_pow_trunc` and
+  `fmpq_poly_pow_trunc`, raise a polynomial to a power modulo $x^n$.
 - `ModPow` and `ModPowAssign` for `NaturalPolynomial` with a `Natural` modulus and for
   `UnsignedPolynomial<T>` with a `T` modulus, like FLINT's `fmpz_mod_poly_pow` and `nmod_poly_pow`,
   and new `ModPowTruncated` and `ModPowTruncatedAssign` traits, in `malachite_base::polynomial`,

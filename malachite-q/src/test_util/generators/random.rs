@@ -2624,6 +2624,31 @@ pub fn random_rational_polynomial_unsigned_pair_gen_var_1(
     ))
 }
 
+pub fn random_rational_polynomial_unsigned_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, u64, u64)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 8),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_rational_polynomial_unsigned_pair_gen_var_2(
     config: &GenConfig,
 ) -> It<(RationalPolynomial, u64)> {

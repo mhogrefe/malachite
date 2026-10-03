@@ -1451,6 +1451,16 @@ pub fn rational_polynomial_unsigned_pair_gen_var_1() -> Generator<(RationalPolyn
     )
 }
 
+// All `(RationalPolynomial, u64, u64)` where the first `u64` is at most 19 and the second is small.
+pub fn rational_polynomial_unsigned_unsigned_triple_gen_var_1()
+-> Generator<(RationalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_unsigned_unsigned_triple_gen_var_1,
+        &random_rational_polynomial_unsigned_unsigned_triple_gen_var_1,
+        &special_random_rational_polynomial_unsigned_unsigned_triple_gen_var_1,
+    )
+}
+
 // All `(RationalPolynomial, u64)` where the `u64` is positive and small, and every exponent at
 // which the polynomial has a nonzero coefficient is a multiple of the `u64`.
 pub fn rational_polynomial_unsigned_pair_gen_var_2() -> Generator<(RationalPolynomial, u64)> {

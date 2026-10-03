@@ -183,6 +183,8 @@ pub mod rational_polynomial {
         pub mod mul_truncated;
         pub mod neg;
         pub mod nth_derivative;
+        pub mod pow;
+        pub mod pow_truncated;
         pub mod shl;
         pub mod shr;
         pub mod square;

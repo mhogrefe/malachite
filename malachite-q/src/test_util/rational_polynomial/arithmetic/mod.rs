@@ -21,6 +21,8 @@ pub mod mul;
 pub mod mul_power_of_x;
 pub mod mul_truncated;
 pub mod nth_derivative;
+pub mod pow;
+pub mod pow_truncated;
 pub mod shl;
 pub mod shr;
 pub mod square;

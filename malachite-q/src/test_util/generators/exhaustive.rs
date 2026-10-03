@@ -1127,6 +1127,15 @@ pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_1() -> It<(RationalP
     ))
 }
 
+pub fn exhaustive_rational_polynomial_unsigned_unsigned_triple_gen_var_1()
+-> It<(RationalPolynomial, u64, u64)> {
+    Box::new(exhaustive_triples(
+        exhaustive_rational_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+        exhaustive_unsigneds::<u64>(),
+    ))
+}
+
 pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_2() -> It<(RationalPolynomial, u64)> {
     Box::new(
         exhaustive_rational_polynomial_unsigned_pair_gen_var_1()

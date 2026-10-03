@@ -82,6 +82,14 @@ pub mod neg;
 /// [`NthDerivativeAssign`](malachite_base::polynomial::NthDerivativeAssign), for differentiating a
 /// polynomial any number of times.
 pub mod nth_derivative;
+/// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
+/// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a polynomial to a
+/// power.
+pub mod pow;
+/// Implementations of [`PowTruncated`](malachite_base::polynomial::PowTruncated) and
+/// [`PowTruncatedAssign`](malachite_base::polynomial::PowTruncatedAssign), for raising a polynomial
+/// to a power and keeping only the low coefficients of the power.
+pub mod pow_truncated;
 /// Left-shifting a [`RationalPolynomial`](super::RationalPolynomial) (multiplying it or dividing it
 /// by a power of 2), keeping it in lowest terms.
 ///
