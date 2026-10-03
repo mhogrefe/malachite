@@ -103,7 +103,7 @@ fn assert_reduced<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, m: T) {
 
 // The square of the polynomial with coefficients `xs`, reduced modulo `m`, truncated to `len`
 // coefficients and reduced modulo `m`.
-fn mod_square_truncated_helper<T: PrimitiveUnsigned>(
+pub(crate) fn mod_square_truncated_helper<T: PrimitiveUnsigned>(
     xs: &[T],
     len: u64,
     m: T,

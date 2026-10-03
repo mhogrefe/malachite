@@ -8652,6 +8652,60 @@ pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_7<T: Primitiv
     )
 }
 
+pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_8<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 8),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(p, e, m)| (p % m, e, m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_3<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, u64, T)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 8),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(p, e, len, m)| (p % m, e, len, m)),
+    )
+}
+
 pub fn random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_2<
     T: PrimitiveUnsigned,
 >(

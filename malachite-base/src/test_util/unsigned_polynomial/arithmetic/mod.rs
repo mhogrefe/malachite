@@ -19,6 +19,8 @@ pub mod mod_mul;
 pub mod mod_mul_middle;
 pub mod mod_mul_truncated;
 pub mod mod_nth_derivative;
+pub mod mod_pow;
+pub mod mod_pow_truncated;
 pub mod mod_power_of_2_add;
 pub mod mod_power_of_2_add_truncated;
 pub mod mod_power_of_2_derivative;

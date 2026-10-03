@@ -141,7 +141,7 @@ fn assert_reduced<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, m: T) {
 }
 
 // The square of the polynomial with coefficients `xs`, reduced modulo `m`, modulo `m`.
-fn mod_square_helper<T: PrimitiveUnsigned>(xs: &[T], m: T) -> UnsignedPolynomial<T> {
+pub(crate) fn mod_square_helper<T: PrimitiveUnsigned>(xs: &[T], m: T) -> UnsignedPolynomial<T> {
     if xs.is_empty() {
         return UnsignedPolynomial::ZERO;
     }

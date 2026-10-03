@@ -87,6 +87,14 @@ pub mod mod_nth_derivative;
 /// [`RemAssign`](core::ops::RemAssign), which reduce every coefficient of a polynomial modulo a
 /// number.
 pub mod mod_op;
+/// Implementations of [`ModPow`](crate::num::arithmetic::traits::ModPow) and
+/// [`ModPowAssign`](crate::num::arithmetic::traits::ModPowAssign), for raising a polynomial to a
+/// power modulo a number.
+pub mod mod_pow;
+/// Implementations of [`ModPowTruncated`](crate::polynomial::ModPowTruncated) and
+/// [`ModPowTruncatedAssign`](crate::polynomial::ModPowTruncatedAssign), for raising a polynomial to
+/// a power modulo a number and keeping only the low coefficients.
+pub mod mod_pow_truncated;
 /// Implementations of [`ModPowerOf2`](crate::num::arithmetic::traits::ModPowerOf2) and
 /// [`ModPowerOf2Assign`](crate::num::arithmetic::traits::ModPowerOf2Assign), which reduce every
 /// coefficient of a polynomial modulo a power of 2.

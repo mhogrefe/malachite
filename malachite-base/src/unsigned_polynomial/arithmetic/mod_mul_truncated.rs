@@ -145,7 +145,7 @@ pub fn mod_mul_truncated_to_out<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], y
 
 // The product of the polynomials with coefficients `xs` and `ys`, both reduced modulo `m`,
 // truncated to `len` coefficients and reduced modulo `m`.
-fn mod_mul_truncated_helper<T: PrimitiveUnsigned>(
+pub(crate) fn mod_mul_truncated_helper<T: PrimitiveUnsigned>(
     xs: &[T],
     ys: &[T],
     len: u64,

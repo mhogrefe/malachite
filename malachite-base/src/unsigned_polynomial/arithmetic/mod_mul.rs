@@ -351,7 +351,11 @@ pub fn mod_mul_to_out<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T], m
 
 // The product of the polynomials with coefficients `xs` and `ys`, both reduced modulo `m`, modulo
 // `m`.
-fn mod_mul_helper<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], m: T) -> UnsignedPolynomial<T> {
+pub(crate) fn mod_mul_helper<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    m: T,
+) -> UnsignedPolynomial<T> {
     if xs.is_empty() || ys.is_empty() {
         return UnsignedPolynomial::ZERO;
     }
