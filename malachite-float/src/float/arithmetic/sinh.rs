@@ -13,21 +13,27 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::float::arithmetic::cos::round_bracket;
 use crate::float::arithmetic::cosh::{half_exp, quarter_reciprocal};
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
+use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
 use crate::float::conversion::string::set_str::overflow;
-use crate::{Float, emulate_float_to_float_fn};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{Abs, CeilingLogBase2, Sinh, SinhAssign};
+use malachite_base::num::arithmetic::traits::{
+    Abs, CeilingLogBase2, FloorLogBase2, PowerOf2, Sinh, SinhAssign, Square,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::NaN as NaNTrait;
+use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Exact, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, Exact, Floor, Nearest};
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // This is mpfr_sinh from sinh.c, MPFR 4.2.2, where the input is finite and nonzero.
 fn sinh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
@@ -79,6 +85,117 @@ fn sinh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
         increment = working_prec >> 1;
     };
     Float::from_float_prec_round(if positive { sinh_abs } else { -sinh_abs }, prec, rm)
+}
+
+// A bound for sinh(t), for a nonzero `Rational` t with |t| < 1/2, from the partial sum S_k of its
+// series, t + t^3/3! + ... + t^(2k-1)/(2k-1)!, with k chosen from the bit length of t alone so that
+// the first omitted term t^(2k+1)/(2k+1)! is below |t| 2^-(w+4). Every term has the sign of t, so
+// S_k is a bound on the side toward zero, and the remainder, less than twice the first omitted
+// term, is below |t| 2^-(w+3) <= |S_k| 2^-(w+3), so S_k moved away from zero by |S_k| 2^-(w+3) is a
+// bound on the other side. The move is a multiplication by 2^(w+3) + 1 followed by a shift, which
+// only reduces a small integer against the denominator, rather than an addition, which would take a
+// GCD of two denominators, ruinous when t has a 2^30-bit one.
+fn sinh_bound(t: &Rational, w: u64, away_from_zero: bool) -> Rational {
+    // |t| < 2^(log + 1), with log < 0
+    let log = t.floor_log_base_2_abs();
+    assert!(log < -1);
+    // |t|^(2k) / (2k + 1)! < 2^(2k (log + 1) - log_factorial), where log_factorial <= log2((2k +
+    // 1)!)
+    let mut k = 1u64;
+    let mut log_factorial = 2u64; // floor(log2(2)) + floor(log2(3))
+    let target = -i128::from(w) - 4;
+    while i128::from(k << 1) * i128::from(log + 1) - i128::from(log_factorial) > target {
+        k += 1;
+        let two_k = k << 1;
+        log_factorial += two_k.floor_log_base_2() + (two_k + 1).floor_log_base_2();
+    }
+    let mut s = t.clone();
+    if k > 1 {
+        let t_squared = t.square();
+        let mut term = t.clone();
+        for j in 1..k {
+            term *= &t_squared;
+            term /= Rational::from((j << 1) * ((j << 1) + 1));
+            s += &term;
+        }
+    }
+    if away_from_zero {
+        let shift = w + 3;
+        s *= Rational::from(Natural::power_of_2(shift) + Natural::ONE);
+        s >>= shift;
+    }
+    s
+}
+
+// Brackets sinh(x) for a nonzero `Rational` x, small enough that its series converges in a few
+// terms, between bounds from that series, tightening the bracket until both ends round the same
+// way. This also covers inputs so small that their hyperbolic sines underflow, since everything is
+// done in `Rational` arithmetic.
+fn sinh_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let mut w = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let toward_zero = sinh_bound(x, w, false);
+        let away_from_zero = sinh_bound(x, w, true);
+        let (lo, hi) = if *x > 0u32 {
+            (toward_zero, away_from_zero)
+        } else {
+            (away_from_zero, toward_zero)
+        };
+        if let Some(result) = round_bracket(&lo, &hi, prec, rm) {
+            return result;
+        }
+        w += increment;
+        increment = w >> 1;
+    }
+}
+
+// Computes sinh(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
+// sinh(x) is transcendental for every nonzero rational x, so the result is never exact.
+fn sinh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact sinh");
+    let positive = *x > 0u32;
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    if exp_x < const { UNDERFLOW_EXPONENT - 1 } {
+        // |x| < 2^(MIN_EXPONENT - 3), so |sinh(x)| < |x| (1 + x^2) is below 2^(MIN_EXPONENT - 2),
+        // half the smallest positive Float, and the result is zero or that Float, by the rounding
+        // mode alone, with no 2^30-bit arithmetic needed.
+        return underflowed(positive, prec, rm);
+    }
+    // With |x| < 2^exp_x, the kth term of the series is below |x| 2^(2k exp_x), so when -exp_x is
+    // at least a sixteenth of the working precision, about 8 terms suffice, which is cheaper than a
+    // `Float` hyperbolic sine at that precision. This also covers every x too small to be a
+    // `Float`.
+    if exp_x < -1 && u64::exact_from(-exp_x) << 4 >= prec + 10 {
+        return sinh_rational_series(x, prec, rm);
+    }
+    // |x| >= 2^(MAX_EXPONENT - 1), so |sinh(x)| > e^|x| / 4 overflows. Smaller x that still
+    // overflow are caught by `sinh_prec_round_normal_ref` in the loop below.
+    if exp_x >= Float::MAX_EXPONENT_I64 {
+        return overflow(positive, prec, rm);
+    }
+    // sinh is increasing, so bracket x between the Floats x_lo <= x <= x_hi, take the hyperbolic
+    // sine of both, and increase the working precision until the two round to the same result,
+    // which the exact sinh(x), lying between them, must then share.
+    let mut working_prec = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let (x_lo, x_o) = Float::from_rational_prec_round_ref(x, working_prec, Floor);
+        if x_o == Equal {
+            // x is exactly representable at `working_prec`, so sinh(x) is simply sinh(x_lo).
+            return sinh_prec_round_normal_ref(&x_lo, prec, rm);
+        }
+        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
+        // The hyperbolic sine of a finite nonzero Float is never exact, so both orderings are
+        // `Less` or `Greater`, never `Equal`. (x is far from zero here, so neither bound is zero.)
+        let (s_lo, o_lo) = sinh_prec_round_normal_ref(&x_lo, prec, rm);
+        let (s_hi, o_hi) = sinh_prec_round_normal_ref(&x_hi, prec, rm);
+        if o_lo == o_hi && s_lo == s_hi {
+            return (s_lo, o_lo);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
 }
 
 impl Float {
@@ -761,6 +878,329 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\sinh x$, the hyperbolic sine of a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded hyperbolic sine is less than, equal to, or greater than the exact
+    /// hyperbolic sine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \sinh x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\sinh x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\sinh x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows or underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0.0$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires an input of magnitude below $2^{-2^{30}}$, too small to be a [`Float`].
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sinh_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sinh_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.625");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sinh_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.656");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::sinh_rational_prec_round(Rational::from_signeds(-3i8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "-0.63665390");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sinh_rational_prec_round(Rational::from_signeds(-3i8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "-0.63665295");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn sinh_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::sinh_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\sinh x$, the hyperbolic sine of a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded hyperbolic sine is less than, equal to, or greater than the
+    /// exact hyperbolic sine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \sinh x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\sinh x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\sinh x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows or underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0.0$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires an input of magnitude below $2^{-2^{30}}$, too small to be a [`Float`].
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sinh_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::sinh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.625");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::sinh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.656");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::sinh_rational_prec_round_ref(&Rational::from_signeds(-3i8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "-0.63665390");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::sinh_rational_prec_round_ref(&Rational::from_signeds(-3i8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "-0.63665295");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn sinh_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // sinh(0) = 0, exactly
+            return (Self::ZERO, Equal);
+        }
+        sinh_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\sinh x$, the hyperbolic sine of a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded hyperbolic sine is less than, equal to, or greater than the exact hyperbolic sine.
+    ///
+    /// If the hyperbolic sine is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \sinh x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\sinh x|\rfloor-p}$ (unless the result overflows
+    /// or underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0.0$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sinh_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sinh_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.625");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sinh_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.63665390");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::sinh_rational_prec(Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn sinh_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::sinh_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\sinh x$, the hyperbolic sine of a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded hyperbolic sine is less than, equal to, or greater than the exact hyperbolic sine.
+    ///
+    /// If the hyperbolic sine is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \sinh x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\sinh x|\rfloor-p}$ (unless the result overflows
+    /// or underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0.0$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sinh_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sinh_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.625");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sinh_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.63665390");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::sinh_rational_prec_ref(&Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn sinh_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::sinh_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
 impl Sinh for Float {
     type Output = Self;
 
@@ -996,4 +1436,62 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::sinh_prec, x)
+}
+
+/// Computes $\sinh x$, the hyperbolic sine of a [`Rational`], returning the result as a primitive
+/// float. The result is correctly rounded.
+///
+/// $$
+/// f(x) = \sinh x+\varepsilon.
+/// $$
+/// - If $\sinh x$ is infinite or zero, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\sinh x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |\sinh
+///   x|\rfloor-p}$, where $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and
+///   53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=0.0$
+///
+/// Overflow and underflow are possible: an `x` of large magnitude gives $\infty$ or $-\infty$, and
+/// an `x` of small enough magnitude gives `0.0` or `-0.0`.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeInfinity, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sinh::primitive_float_sinh_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_sinh_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sinh_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.3395405572561501)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sinh_rational::<f64>(&Rational::from(
+///         -10000
+///     ))),
+///     NiceFloat(f64::NEGATIVE_INFINITY)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sinh_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::sinh_rational_prec_ref, x)
 }

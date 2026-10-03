@@ -1022,6 +1022,11 @@ documented by git history.
   working precision raised by the cancellation for small $|x|$. It shares the near-overflow
   handling of `cosh`, so the result is finite and correctly rounded right up to the point where it
   overflows, with one exponential where MPFR's overflow branch computes three.
+- `sinh_rational_prec_round` and `sinh_rational_prec` (with `_ref` variants), the correctly
+  rounded hyperbolic sine of a `Rational` as a `Float`, and `primitive_float_sinh_rational`.
+  Since $\sinh$ is increasing, $x$ is bracketed between two `Float`s; a small $x$ is instead
+  bracketed by partial sums of the series, all of whose terms share its sign, which also handles
+  inputs too small to be `Float`s, whose hyperbolic sines underflow.
 
 ### Documentation
 
