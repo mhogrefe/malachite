@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{Cosh, CoshAssign};
+use malachite_base::num::arithmetic::traits::{Cosh, CoshAssign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
@@ -20,20 +20,27 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
     primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::float::arithmetic::cosh::primitive_float_cosh;
+use malachite_float::float::arithmetic::cosh::{
+    primitive_float_cosh, primitive_float_cosh_rational,
+};
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::cosh::{
-    rug_cosh, rug_cosh_prec, rug_cosh_prec_round, rug_cosh_round,
+    rug_cosh, rug_cosh_prec, rug_cosh_prec_round, rug_cosh_rational_prec,
+    rug_cosh_rational_prec_round, rug_cosh_round,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
     float_unsigned_rounding_mode_triple_gen_var_36,
+    rational_unsigned_rounding_mode_triple_gen_var_10,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
+use std::str::FromStr;
 
 #[test]
 fn test_cosh_prec_round() {
@@ -2104,4 +2111,1003 @@ where
 #[test]
 fn primitive_float_cosh_properties() {
     apply_fn_to_primitive_floats!(primitive_float_cosh_properties_helper);
+}
+
+#[test]
+fn test_cosh_rational_prec_round() {
+    let test = |s, prec, rm, out: &str, out_hex: &str, out_o| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (c, o) = Float::cosh_rational_prec_round(x.clone(), prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, out_o);
+
+        let (c, o) = Float::cosh_rational_prec_round_ref(&x, prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, out_o);
+
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_c, rug_o) = rug_cosh_rational_prec_round(&x, prec, rug_rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_c)),
+                ComparableFloatRef(&c)
+            );
+            assert_eq!(rug_o, o);
+        }
+    };
+    test("0", 1, Down, "1.0", "0x1.0#1", Equal);
+    test("0", 10, Down, "1.0000", "0x1.000#10", Equal);
+    test("0", 1, Up, "1.0", "0x1.0#1", Equal);
+    test("0", 10, Up, "1.0000", "0x1.000#10", Equal);
+    test("0", 1, Floor, "1.0", "0x1.0#1", Equal);
+    test("0", 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("0", 1, Ceiling, "1.0", "0x1.0#1", Equal);
+    test("0", 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("0", 1, Nearest, "1.0", "0x1.0#1", Equal);
+    test("0", 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test("0", 1, Exact, "1.0", "0x1.0#1", Equal);
+    // - the first bracket of |x| rounds the same way at both ends
+    test("0", 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test("3/5", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("3/5", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("3/5", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("3/5", 10, Floor, "1.1836", "0x1.2f0#10", Less);
+    test("3/5", 10, Ceiling, "1.1855", "0x1.2f8#10", Greater);
+    test("3/5", 10, Nearest, "1.1855", "0x1.2f8#10", Greater);
+    test(
+        "3/5",
+        100,
+        Floor,
+        "1.1854652182422677037519132926962",
+        "0x1.2f7aa606e56308c3949cf77fa#100",
+        Less,
+    );
+    test(
+        "3/5",
+        100,
+        Ceiling,
+        "1.1854652182422677037519132926978",
+        "0x1.2f7aa606e56308c3949cf77fc#100",
+        Greater,
+    );
+    test(
+        "3/5",
+        100,
+        Nearest,
+        "1.1854652182422677037519132926978",
+        "0x1.2f7aa606e56308c3949cf77fc#100",
+        Greater,
+    );
+    test("-3/5", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("-3/5", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("-3/5", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("-3/5", 10, Floor, "1.1836", "0x1.2f0#10", Less);
+    test("-3/5", 10, Ceiling, "1.1855", "0x1.2f8#10", Greater);
+    test("-3/5", 10, Nearest, "1.1855", "0x1.2f8#10", Greater);
+    test(
+        "-3/5",
+        100,
+        Floor,
+        "1.1854652182422677037519132926962",
+        "0x1.2f7aa606e56308c3949cf77fa#100",
+        Less,
+    );
+    test(
+        "-3/5",
+        100,
+        Ceiling,
+        "1.1854652182422677037519132926978",
+        "0x1.2f7aa606e56308c3949cf77fc#100",
+        Greater,
+    );
+    test(
+        "-3/5",
+        100,
+        Nearest,
+        "1.1854652182422677037519132926978",
+        "0x1.2f7aa606e56308c3949cf77fc#100",
+        Greater,
+    );
+    test("1/3", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("1/3", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("1/3", 10, Floor, "1.0547", "0x1.0e0#10", Less);
+    test("1/3", 10, Ceiling, "1.0566", "0x1.0e8#10", Greater);
+    test("1/3", 10, Nearest, "1.0566", "0x1.0e8#10", Greater);
+    test(
+        "1/3",
+        100,
+        Floor,
+        "1.0560718678299393895268647082638",
+        "0x1.0e5ab9d68e232bca22825de22#100",
+        Less,
+    );
+    test(
+        "1/3",
+        100,
+        Ceiling,
+        "1.0560718678299393895268647082654",
+        "0x1.0e5ab9d68e232bca22825de24#100",
+        Greater,
+    );
+    test(
+        "1/3",
+        100,
+        Nearest,
+        "1.0560718678299393895268647082638",
+        "0x1.0e5ab9d68e232bca22825de22#100",
+        Less,
+    );
+    test("22/7", 1, Floor, "8.0", "0x8.0#1", Less);
+    test("22/7", 1, Ceiling, "16.0", "0x1.0E+1#1", Greater);
+    test("22/7", 1, Nearest, "8.0", "0x8.0#1", Less);
+    test("22/7", 10, Floor, "11.594", "0xb.98#10", Less);
+    test("22/7", 10, Ceiling, "11.609", "0xb.9c#10", Greater);
+    test("22/7", 10, Nearest, "11.609", "0xb.9c#10", Greater);
+    test(
+        "22/7",
+        100,
+        Floor,
+        "11.606565803761966414401052945140",
+        "0xb.9b47e5820793d583f2840c92#100",
+        Less,
+    );
+    test(
+        "22/7",
+        100,
+        Ceiling,
+        "11.606565803761966414401052945153",
+        "0xb.9b47e5820793d583f2840c93#100",
+        Greater,
+    );
+    test(
+        "22/7",
+        100,
+        Nearest,
+        "11.606565803761966414401052945153",
+        "0xb.9b47e5820793d583f2840c93#100",
+        Greater,
+    );
+    test("-22/7", 1, Floor, "8.0", "0x8.0#1", Less);
+    test("-22/7", 1, Ceiling, "16.0", "0x1.0E+1#1", Greater);
+    test("-22/7", 1, Nearest, "8.0", "0x8.0#1", Less);
+    test("-22/7", 10, Floor, "11.594", "0xb.98#10", Less);
+    test("-22/7", 10, Ceiling, "11.609", "0xb.9c#10", Greater);
+    test("-22/7", 10, Nearest, "11.609", "0xb.9c#10", Greater);
+    test(
+        "-22/7",
+        100,
+        Floor,
+        "11.606565803761966414401052945140",
+        "0xb.9b47e5820793d583f2840c92#100",
+        Less,
+    );
+    test(
+        "-22/7",
+        100,
+        Ceiling,
+        "11.606565803761966414401052945153",
+        "0xb.9b47e5820793d583f2840c93#100",
+        Greater,
+    );
+    test(
+        "-22/7",
+        100,
+        Nearest,
+        "11.606565803761966414401052945153",
+        "0xb.9b47e5820793d583f2840c93#100",
+        Greater,
+    );
+    test("100", 1, Floor, "1.1e43", "0x8.0E+35#1", Less);
+    test("100", 1, Ceiling, "2.2e43", "0x1.0E+36#1", Greater);
+    test("100", 1, Nearest, "1.1e43", "0x8.0E+35#1", Less);
+    test("100", 10, Floor, "1.3437e43", "0x9.a4E+35#10", Less);
+    test("100", 10, Ceiling, "1.3459e43", "0x9.a8E+35#10", Greater);
+    test("100", 10, Nearest, "1.3437e43", "0x9.a4E+35#10", Less);
+    test(
+        "100",
+        100,
+        Floor,
+        "1.3440585709080677242063127757898e43",
+        "0x9.a4a54d8b8dfa566112849991E+35#100",
+        Less,
+    );
+    test(
+        "100",
+        100,
+        Ceiling,
+        "1.3440585709080677242063127757915e43",
+        "0x9.a4a54d8b8dfa566112849992E+35#100",
+        Greater,
+    );
+    test(
+        "100",
+        100,
+        Nearest,
+        "1.3440585709080677242063127757898e43",
+        "0x9.a4a54d8b8dfa566112849991E+35#100",
+        Less,
+    );
+    test("-100", 1, Floor, "1.1e43", "0x8.0E+35#1", Less);
+    test("-100", 1, Ceiling, "2.2e43", "0x1.0E+36#1", Greater);
+    test("-100", 1, Nearest, "1.1e43", "0x8.0E+35#1", Less);
+    test("-100", 10, Floor, "1.3437e43", "0x9.a4E+35#10", Less);
+    test("-100", 10, Ceiling, "1.3459e43", "0x9.a8E+35#10", Greater);
+    test("-100", 10, Nearest, "1.3437e43", "0x9.a4E+35#10", Less);
+    test(
+        "-100",
+        100,
+        Floor,
+        "1.3440585709080677242063127757898e43",
+        "0x9.a4a54d8b8dfa566112849991E+35#100",
+        Less,
+    );
+    test(
+        "-100",
+        100,
+        Ceiling,
+        "1.3440585709080677242063127757915e43",
+        "0x9.a4a54d8b8dfa566112849992E+35#100",
+        Greater,
+    );
+    test(
+        "-100",
+        100,
+        Nearest,
+        "1.3440585709080677242063127757898e43",
+        "0x9.a4a54d8b8dfa566112849991E+35#100",
+        Less,
+    );
+    test("1/1000000", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("1/1000000", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("1/1000000", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("1/1000000", 10, Floor, "1.0000", "0x1.000#10", Less);
+    test("1/1000000", 10, Ceiling, "1.0020", "0x1.008#10", Greater);
+    test("1/1000000", 10, Nearest, "1.0000", "0x1.000#10", Less);
+    test(
+        "1/1000000",
+        100,
+        Floor,
+        "1.0000000000005000000000000416655",
+        "0x1.00000000008cbccc096f5d6de#100",
+        Less,
+    );
+    test(
+        "1/1000000",
+        100,
+        Ceiling,
+        "1.0000000000005000000000000416670",
+        "0x1.00000000008cbccc096f5d6e0#100",
+        Greater,
+    );
+    test(
+        "1/1000000",
+        100,
+        Nearest,
+        "1.0000000000005000000000000416670",
+        "0x1.00000000008cbccc096f5d6e0#100",
+        Greater,
+    );
+    test("-1/1000000", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("-1/1000000", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("-1/1000000", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("-1/1000000", 10, Floor, "1.0000", "0x1.000#10", Less);
+    test("-1/1000000", 10, Ceiling, "1.0020", "0x1.008#10", Greater);
+    test("-1/1000000", 10, Nearest, "1.0000", "0x1.000#10", Less);
+    test(
+        "-1/1000000",
+        100,
+        Floor,
+        "1.0000000000005000000000000416655",
+        "0x1.00000000008cbccc096f5d6de#100",
+        Less,
+    );
+    test(
+        "-1/1000000",
+        100,
+        Ceiling,
+        "1.0000000000005000000000000416670",
+        "0x1.00000000008cbccc096f5d6e0#100",
+        Greater,
+    );
+    test(
+        "-1/1000000",
+        100,
+        Nearest,
+        "1.0000000000005000000000000416670",
+        "0x1.00000000008cbccc096f5d6e0#100",
+        Greater,
+    );
+    test("1/100000000000000000000", 1, Floor, "1.0", "0x1.0#1", Less);
+    test(
+        "1/100000000000000000000",
+        1,
+        Ceiling,
+        "2.0",
+        "0x2.0#1",
+        Greater,
+    );
+    test(
+        "1/100000000000000000000",
+        1,
+        Nearest,
+        "1.0",
+        "0x1.0#1",
+        Less,
+    );
+    test(
+        "1/100000000000000000000",
+        10,
+        Floor,
+        "1.0000",
+        "0x1.000#10",
+        Less,
+    );
+    test(
+        "1/100000000000000000000",
+        10,
+        Ceiling,
+        "1.0020",
+        "0x1.008#10",
+        Greater,
+    );
+    test(
+        "1/100000000000000000000",
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Less,
+    );
+    test(
+        "1/100000000000000000000",
+        100,
+        Floor,
+        "1.0000000000000000000000000000000",
+        "0x1.0000000000000000000000000#100",
+        Less,
+    );
+    test(
+        "1/100000000000000000000",
+        100,
+        Ceiling,
+        "1.0000000000000000000000000000016",
+        "0x1.0000000000000000000000002#100",
+        Greater,
+    );
+    test(
+        "1/100000000000000000000",
+        100,
+        Nearest,
+        "1.0000000000000000000000000000000",
+        "0x1.0000000000000000000000000#100",
+        Less,
+    );
+    // - the bracket ends round differently, so the working precision grows
+    test(
+        "1488522235/2",
+        1,
+        Floor,
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test("1488522235/2", 1, Ceiling, "Infinity", "Infinity", Greater);
+    test(
+        "1488522235/2",
+        1,
+        Nearest,
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test(
+        "1488522235/2",
+        10,
+        Floor,
+        "1.3301e323228496",
+        "0x5.12E+268435455#10",
+        Less,
+    );
+    test(
+        "1488522235/2",
+        10,
+        Ceiling,
+        "1.3321e323228496",
+        "0x5.14E+268435455#10",
+        Greater,
+    );
+    test(
+        "1488522235/2",
+        10,
+        Nearest,
+        "1.3321e323228496",
+        "0x5.14E+268435455#10",
+        Greater,
+    );
+    // - |x| is exactly representable at the working precision
+    test(
+        "1488522235/2",
+        100,
+        Floor,
+        "1.3315814500369112065268344141958e323228496",
+        "0x5.137d0b40cdfb4457d4a570f10E+268435455#100",
+        Less,
+    );
+    test(
+        "1488522235/2",
+        100,
+        Ceiling,
+        "1.3315814500369112065268344141975e323228496",
+        "0x5.137d0b40cdfb4457d4a570f18E+268435455#100",
+        Greater,
+    );
+    test(
+        "1488522235/2",
+        100,
+        Nearest,
+        "1.3315814500369112065268344141975e323228496",
+        "0x5.137d0b40cdfb4457d4a570f18E+268435455#100",
+        Greater,
+    );
+    test(
+        "7442611177/10",
+        1,
+        Floor,
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test("7442611177/10", 1, Ceiling, "Infinity", "Infinity", Greater);
+    test("7442611177/10", 1, Nearest, "Infinity", "Infinity", Greater);
+    test(
+        "7442611177/10",
+        10,
+        Floor,
+        "1.6252e323228496",
+        "0x6.32E+268435455#10",
+        Less,
+    );
+    test(
+        "7442611177/10",
+        10,
+        Ceiling,
+        "1.6272e323228496",
+        "0x6.34E+268435455#10",
+        Greater,
+    );
+    test(
+        "7442611177/10",
+        10,
+        Nearest,
+        "1.6272e323228496",
+        "0x6.34E+268435455#10",
+        Greater,
+    );
+    test(
+        "7442611177/10",
+        100,
+        Floor,
+        "1.6263972557900017291577754485045e323228496",
+        "0x6.3332e349c3b727aba6fa728b0E+268435455#100",
+        Less,
+    );
+    test(
+        "7442611177/10",
+        100,
+        Ceiling,
+        "1.6263972557900017291577754485062e323228496",
+        "0x6.3332e349c3b727aba6fa728b8E+268435455#100",
+        Greater,
+    );
+    test(
+        "7442611177/10",
+        100,
+        Nearest,
+        "1.6263972557900017291577754485062e323228496",
+        "0x6.3332e349c3b727aba6fa728b8E+268435455#100",
+        Greater,
+    );
+    test(
+        "-7442611177/10",
+        1,
+        Floor,
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test(
+        "-7442611177/10",
+        1,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test(
+        "-7442611177/10",
+        1,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test(
+        "-7442611177/10",
+        10,
+        Floor,
+        "1.6252e323228496",
+        "0x6.32E+268435455#10",
+        Less,
+    );
+    test(
+        "-7442611177/10",
+        10,
+        Ceiling,
+        "1.6272e323228496",
+        "0x6.34E+268435455#10",
+        Greater,
+    );
+    test(
+        "-7442611177/10",
+        10,
+        Nearest,
+        "1.6272e323228496",
+        "0x6.34E+268435455#10",
+        Greater,
+    );
+    test(
+        "-7442611177/10",
+        100,
+        Floor,
+        "1.6263972557900017291577754485045e323228496",
+        "0x6.3332e349c3b727aba6fa728b0E+268435455#100",
+        Less,
+    );
+    test(
+        "-7442611177/10",
+        100,
+        Ceiling,
+        "1.6263972557900017291577754485062e323228496",
+        "0x6.3332e349c3b727aba6fa728b8E+268435455#100",
+        Greater,
+    );
+    test(
+        "-7442611177/10",
+        100,
+        Nearest,
+        "1.6263972557900017291577754485062e323228496",
+        "0x6.3332e349c3b727aba6fa728b8E+268435455#100",
+        Greater,
+    );
+    test(
+        "744261118",
+        1,
+        Floor,
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test("744261118", 1, Ceiling, "Infinity", "Infinity", Greater);
+    test("744261118", 1, Nearest, "Infinity", "Infinity", Greater);
+    test(
+        "744261118",
+        10,
+        Floor,
+        "2.0965e323228496",
+        "0x7.feE+268435455#10",
+        Less,
+    );
+    test("744261118", 10, Ceiling, "Infinity", "Infinity", Greater);
+    test("744261118", 10, Nearest, "Infinity", "Infinity", Greater);
+    test(
+        "744261118",
+        100,
+        Floor,
+        "2.0985787164673876924043581168822e323228496",
+        "0x7.ffffffffffffffffffffffff8E+268435455#100",
+        Less,
+    );
+    test("744261118", 100, Ceiling, "Infinity", "Infinity", Greater);
+    test("744261118", 100, Nearest, "Infinity", "Infinity", Greater);
+    test(
+        "10000000000",
+        1,
+        Floor,
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Less,
+    );
+    test("10000000000", 1, Ceiling, "Infinity", "Infinity", Greater);
+    test("10000000000", 1, Nearest, "Infinity", "Infinity", Greater);
+    test(
+        "10000000000",
+        10,
+        Floor,
+        "2.0965e323228496",
+        "0x7.feE+268435455#10",
+        Less,
+    );
+    test("10000000000", 10, Ceiling, "Infinity", "Infinity", Greater);
+    test("10000000000", 10, Nearest, "Infinity", "Infinity", Greater);
+    test(
+        "10000000000",
+        100,
+        Floor,
+        "2.0985787164673876924043581168822e323228496",
+        "0x7.ffffffffffffffffffffffff8E+268435455#100",
+        Less,
+    );
+    test("10000000000", 100, Ceiling, "Infinity", "Infinity", Greater);
+    test("10000000000", 100, Nearest, "Infinity", "Infinity", Greater);
+    // - tiny x: cosh(x) rounds to 1 or its successor
+    test(
+        "1/1180591620717411303424",
+        10,
+        Down,
+        "1.0000",
+        "0x1.000#10",
+        Less,
+    );
+    test(
+        "1/1180591620717411303424",
+        200,
+        Down,
+        "1.0000000000000000000000000000000000000000003587324068671531702",
+        "0x1.00000000000000000000000000000000000800000000000000#200",
+        Less,
+    );
+    test(
+        "-1/1180591620717411303424",
+        200,
+        Down,
+        "1.0000000000000000000000000000000000000000003587324068671531702",
+        "0x1.00000000000000000000000000000000000800000000000000#200",
+        Less,
+    );
+    test(
+        "1/1180591620717411303424",
+        10,
+        Up,
+        "1.0020",
+        "0x1.008#10",
+        Greater,
+    );
+    test(
+        "1/1180591620717411303424",
+        200,
+        Up,
+        "1.0000000000000000000000000000000000000000003587324068671531714",
+        "0x1.00000000000000000000000000000000000800000000000002#200",
+        Greater,
+    );
+    test(
+        "-1/1180591620717411303424",
+        200,
+        Up,
+        "1.0000000000000000000000000000000000000000003587324068671531714",
+        "0x1.00000000000000000000000000000000000800000000000002#200",
+        Greater,
+    );
+    test(
+        "1/1180591620717411303424",
+        10,
+        Floor,
+        "1.0000",
+        "0x1.000#10",
+        Less,
+    );
+    test(
+        "1/1180591620717411303424",
+        200,
+        Floor,
+        "1.0000000000000000000000000000000000000000003587324068671531702",
+        "0x1.00000000000000000000000000000000000800000000000000#200",
+        Less,
+    );
+    test(
+        "-1/1180591620717411303424",
+        200,
+        Floor,
+        "1.0000000000000000000000000000000000000000003587324068671531702",
+        "0x1.00000000000000000000000000000000000800000000000000#200",
+        Less,
+    );
+    test(
+        "1/1180591620717411303424",
+        10,
+        Ceiling,
+        "1.0020",
+        "0x1.008#10",
+        Greater,
+    );
+    test(
+        "1/1180591620717411303424",
+        200,
+        Ceiling,
+        "1.0000000000000000000000000000000000000000003587324068671531714",
+        "0x1.00000000000000000000000000000000000800000000000002#200",
+        Greater,
+    );
+    test(
+        "-1/1180591620717411303424",
+        200,
+        Ceiling,
+        "1.0000000000000000000000000000000000000000003587324068671531714",
+        "0x1.00000000000000000000000000000000000800000000000002#200",
+        Greater,
+    );
+    test(
+        "1/1180591620717411303424",
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Less,
+    );
+    test(
+        "1/1180591620717411303424",
+        200,
+        Nearest,
+        "1.0000000000000000000000000000000000000000003587324068671531702",
+        "0x1.00000000000000000000000000000000000800000000000000#200",
+        Less,
+    );
+    test(
+        "-1/1180591620717411303424",
+        200,
+        Nearest,
+        "1.0000000000000000000000000000000000000000003587324068671531702",
+        "0x1.00000000000000000000000000000000000800000000000000#200",
+        Less,
+    );
+}
+
+#[test]
+fn test_cosh_rational_extreme() {
+    // |x| = 2^(-2^30 - 10) is too small to be a `Float`; cosh(x) is within 2^(-2^31) of 1
+    let x = Rational::power_of_2(-(1i64 << 30) - 10);
+    for (rm, out, o_out) in [
+        (Floor, "1.0000", Less),
+        (Down, "1.0000", Less),
+        (Nearest, "1.0000", Less),
+        (Ceiling, "1.0020", Greater),
+        (Up, "1.0020", Greater),
+    ] {
+        let (c, o) = Float::cosh_rational_prec_round_ref(&x, 10, rm);
+        assert_eq!(c.to_string(), out);
+        assert_eq!(c.get_prec(), Some(10));
+        assert_eq!(o, o_out);
+        let (c_neg, o_neg) = Float::cosh_rational_prec_round(-&x, 10, rm);
+        assert_eq!(ComparableFloat(c_neg), ComparableFloat(c));
+        assert_eq!(o_neg, o);
+    }
+
+    // |x| = 2^(2^30) is too large to be a `Float`, and cosh(x) overflows
+    let x = Rational::power_of_2(1i64 << 30);
+    let (c, o) = Float::cosh_rational_prec_round_ref(&x, 10, Nearest);
+    assert_eq!(ComparableFloat(c), ComparableFloat(Float::INFINITY));
+    assert_eq!(o, Greater);
+    let (c, o) = Float::cosh_rational_prec_round(-x, 10, Floor);
+    assert_eq!(
+        ComparableFloat(c),
+        ComparableFloat(Float::max_finite_value_with_prec(10))
+    );
+    assert_eq!(o, Less);
+}
+
+#[test]
+#[should_panic]
+fn cosh_rational_prec_fail() {
+    Float::cosh_rational_prec(Rational::ONE, 0);
+}
+
+#[test]
+#[should_panic]
+fn cosh_rational_prec_ref_fail() {
+    Float::cosh_rational_prec_ref(&Rational::ONE, 0);
+}
+
+#[test]
+#[should_panic]
+fn cosh_rational_prec_round_fail_1() {
+    Float::cosh_rational_prec_round(Rational::ONE, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn cosh_rational_prec_round_fail_2() {
+    Float::cosh_rational_prec_round(Rational::ONE, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn cosh_rational_prec_round_ref_fail() {
+    Float::cosh_rational_prec_round_ref(&Rational::ONE, 10, Exact);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn cosh_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
+    let (c, o) = Float::cosh_rational_prec_round(x.clone(), prec, rm);
+    assert!(c.is_valid());
+    assert_rounding_ordering_consistent(&c, rm, o);
+
+    let (c_alt, o_alt) = Float::cosh_rational_prec_round_ref(&x, prec, rm);
+    assert!(c_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+    assert_eq!(o_alt, o);
+
+    // cosh x >= 1, and cosh is even
+    assert!(c >= 1u32);
+    let (c_neg, o_neg) = Float::cosh_rational_prec_round(-&x, prec, rm);
+    assert_eq!(ComparableFloatRef(&c_neg), ComparableFloatRef(&c));
+    assert_eq!(o_neg, o);
+
+    if let Ok(rrm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_c, rug_o) = rug_cosh_rational_prec_round(&x, prec, rrm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_c)),
+            ComparableFloatRef(&c)
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    if c.is_normal() {
+        assert_eq!(c.get_prec(), Some(prec));
+    }
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo) = Float::cosh_rational_prec_round_ref(&x, prec, rm);
+            assert_eq!(ComparableFloatRef(&s), ComparableFloatRef(&c));
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(Float::cosh_rational_prec_round_ref(&x, prec, Exact));
+    }
+}
+
+#[test]
+fn cosh_rational_prec_round_properties() {
+    rational_unsigned_rounding_mode_triple_gen_var_10().test_properties(|(x, prec, rm)| {
+        cosh_rational_prec_round_properties_helper(x, prec, rm);
+    });
+
+    unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
+        let (c, o) = Float::cosh_rational_prec_round(Rational::ZERO, prec, rm);
+        assert_eq!(ComparableFloat(c), ComparableFloat(Float::one_prec(prec)));
+        assert_eq!(o, Equal);
+    });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn cosh_rational_prec_properties_helper(x: Rational, prec: u64) {
+    let (c, o) = Float::cosh_rational_prec(x.clone(), prec);
+    assert!(c.is_valid());
+
+    let (c_alt, o_alt) = Float::cosh_rational_prec_ref(&x, prec);
+    assert!(c_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+    assert_eq!(o_alt, o);
+
+    let (c_alt, o_alt) = Float::cosh_rational_prec_round_ref(&x, prec, Nearest);
+    assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+    assert_eq!(o_alt, o);
+
+    assert!(c >= 1u32);
+
+    let (rug_c, rug_o) = rug_cosh_rational_prec(&x, prec);
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_c)),
+        ComparableFloatRef(&c)
+    );
+    assert_eq!(rug_o, o);
+
+    // the hyperbolic cosine of an exactly representable rational is the Float hyperbolic cosine
+    if let Ok(f) = Float::try_from(&x) {
+        let (c_alt, o_alt) = f.cosh_prec(prec);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+    }
+}
+
+#[test]
+fn cosh_rational_prec_properties() {
+    rational_unsigned_pair_gen_var_3().test_properties(|(x, prec)| {
+        cosh_rational_prec_properties_helper(x, prec);
+    });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_cosh_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let x = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_cosh_rational::<T>(&x)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 1.0);
+    test::<f32>("1", 1.5430807);
+    test::<f32>("-1", 1.5430807);
+    test::<f32>("1/3", 1.0560719);
+    test::<f32>("-1/3", 1.0560719);
+    test::<f32>("22/7", 11.606565);
+    test::<f32>("1/100000000000000000000", 1.0);
+    test::<f32>("89", 2.2448064e38);
+    test::<f32>("90", f32::INFINITY);
+    test::<f32>("710", f32::INFINITY);
+    test::<f32>("7101/10", f32::INFINITY);
+    test::<f32>("711", f32::INFINITY);
+    test::<f32>("10000", f32::INFINITY);
+
+    test::<f64>("0", 1.0);
+    test::<f64>("1", 1.5430806348152437);
+    test::<f64>("-1", 1.5430806348152437);
+    test::<f64>("1/3", 1.0560718678299394);
+    test::<f64>("-1/3", 1.0560718678299394);
+    test::<f64>("22/7", 11.606565803761967);
+    test::<f64>("1/100000000000000000000", 1.0);
+    test::<f64>("89", 2.2448064095871728e38);
+    test::<f64>("90", 6.102016471589204e38);
+    test::<f64>("710", 1.1169973830808555e308);
+    test::<f64>("7101/10", 1.234473023347565e308);
+    test::<f64>("711", f64::INFINITY);
+    test::<f64>("10000", f64::INFINITY);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_cosh_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_gen().test_properties(|x| {
+        let c = primitive_float_cosh_rational::<T>(&x);
+        // the hyperbolic cosine of a rational is never NaN, and is at least 1
+        assert!(c >= T::ONE);
+        // cosh is even
+        assert_eq!(
+            NiceFloat(primitive_float_cosh_rational::<T>(&-&x)),
+            NiceFloat(c)
+        );
+        // the result is the correctly rounded hyperbolic cosine, as computed by MPFR at the same
+        // precision. MPFR's exponent range is wider than T's, so a result beyond T's largest finite
+        // value overflows to infinity.
+        let rug_c = <Float as From<&rug::Float>>::from(
+            &rug_cosh_rational_prec(&x, T::MANTISSA_WIDTH + 1).0,
+        );
+        let expected = if rug_c > T::MAX_FINITE {
+            T::INFINITY
+        } else {
+            T::exact_from(&rug_c)
+        };
+        assert_eq!(NiceFloat(expected), NiceFloat(c));
+    });
+
+    primitive_float_gen::<T>().test_properties(|x| {
+        // The hyperbolic cosine of a finite primitive float, taken through the `Rational` path,
+        // matches the direct primitive-float hyperbolic cosine.
+        if x.is_finite() {
+            assert_eq!(
+                NiceFloat(primitive_float_cosh_rational::<T>(&Rational::exact_from(x))),
+                NiceFloat(primitive_float_cosh(x))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_cosh_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_cosh_rational_properties_helper);
 }

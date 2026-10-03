@@ -849,6 +849,10 @@ pub mod sin;
 /// [`SinCosAssign`](malachite_base::num::arithmetic::traits::SinCosAssign), traits for computing
 /// the sine and cosine of [`Float`](super::Float)s together.
 pub mod sin_cos;
+/// Implementations of [`Sinh`](malachite_base::num::arithmetic::traits::Sinh) and
+/// [`SinhAssign`](malachite_base::num::arithmetic::traits::SinhAssign), traits for computing the
+/// hyperbolic sine of [`Float`](super::Float)s.
+pub mod sinh;
 /// [`Sqrt`](malachite_base::num::arithmetic::traits::Sqrt) and
 /// [`SqrtAssign`](malachite_base::num::arithmetic::traits::SqrtAssign), traits for computing the
 /// square root of [`Float`](super::Float)s.

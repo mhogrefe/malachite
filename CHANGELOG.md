@@ -1012,6 +1012,16 @@ documented by git history.
   interval of width $\log 2$ just below the overflow threshold, which MPFR's wider intermediate
   exponent range covers), $e^x/2$ is computed as $e^{x/2} \cdot e^{x/2}/2$, so the result is
   finite and correctly rounded right up to the point where it overflows.
+- `cosh_rational_prec_round` and `cosh_rational_prec` (with `_ref` variants), the correctly
+  rounded hyperbolic cosine of a `Rational` as a `Float`, and `primitive_float_cosh_rational`.
+  Since $\cosh$ is even and increasing in $|x|$, $|x|$ is bracketed between two `Float`s whose
+  hyperbolic cosines are compared, as for `exp_rational_prec_round`.
+- `Sinh` and `SinhAssign` (new traits in malachite-base) for `Float`, with the usual
+  `sinh_prec_round`, `sinh_prec`, `sinh_round`, and `_ref`/`_assign` variants, and
+  `primitive_float_sinh`: a port of `mpfr_sinh`, computing $\sinh x = (e^x - e^{-x})/2$ with the
+  working precision raised by the cancellation for small $|x|$. It shares the near-overflow
+  handling of `cosh`, so the result is finite and correctly rounded right up to the point where it
+  overflows, with one exponential where MPFR's overflow branch computes three.
 
 ### Documentation
 

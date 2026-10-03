@@ -1129,6 +1129,18 @@ pub trait CoshAssign {
     fn cosh_assign(&mut self);
 }
 
+/// Computes $\sinh(x)$, the hyperbolic sine of a number.
+pub trait Sinh {
+    type Output;
+
+    fn sinh(self) -> Self::Output;
+}
+
+/// Replaces a number with its hyperbolic sine, $\sinh(x)$.
+pub trait SinhAssign {
+    fn sinh_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

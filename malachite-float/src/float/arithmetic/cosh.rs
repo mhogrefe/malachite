@@ -13,19 +13,24 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::exp::exp_overflow;
+use crate::float::arithmetic::cos::round_bracket;
+use crate::float::arithmetic::exp::{exp_overflow, one_neighbor};
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
-use crate::{Float, emulate_float_to_float_fn};
-use core::cmp::Ordering::{self, Equal};
-use malachite_base::num::arithmetic::traits::{Abs, CeilingLogBase2, Cosh, CoshAssign};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
+use core::cmp::Ordering::{self, Equal, Greater, Less};
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    Abs, AddMul, CeilingLogBase2, Cosh, CoshAssign, Reciprocal, Square,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity as InfinityTrait, NaN as NaNTrait, One};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::{CountOnes, SignificantBits};
-use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Exact, Floor, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Exact, Floor, Nearest, Up};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // Whether `x` is the largest finite `Float` of its precision, the value at which `Floor` and `Down`
 // rounding saturate on overflow. Unlike a comparison with `Float::max_finite_value_with_prec`, this
@@ -38,29 +43,56 @@ pub(crate) fn is_max_finite(x: &Float) -> bool {
 // Computes an approximation h of exp(x) / 2 for a positive x so large that exp(x), rounded down to
 // precision `working_prec`, reached the top binade of finite Floats: x is at least about
 // (MAX_EXPONENT - 1) * log(2). MPFR declares overflow when exp(x) overflows, since it runs with an
-// extended exponent range in which that implies that cosh(x) > exp(x) / 2 overflows the ordinary
-// range too. Malachite has no extended range, so exp(x) can overflow while cosh(x) ~ exp(x) / 2 is
-// still finite (a window of width log(2) in x). Instead, write exp(x) / 2 = u * (u / 2) with u =
-// exp(x / 2), which does not overflow when cosh(x) doesn't.
+// extended exponent range in which that implies that cosh(x) and sinh(x), both about exp(x) / 2,
+// overflow the ordinary range too. Malachite has no extended range, so exp(x) can overflow while
+// exp(x) / 2 is still finite (a window of width log(2) in x). Instead, write exp(x) / 2 = u * (u /
+// 2) with u = exp(x / 2), which does not overflow when exp(x) / 2 doesn't.
 //
-// Returns `None` if cosh(x) overflows; otherwise h with |h - exp(x) / 2| < 8 ulp(h): u has an error
-// below 1 ulp, so u * (u / 2), rounded once more, has a relative error below 2^(3 - working_prec).
+// Returns `None` if cosh(x) and sinh(x) overflow; otherwise h with |h - exp(x) / 2| < 8 ulp(h): u
+// has an error below 1 ulp, so u * (u / 2), rounded once more, has a relative error below 2^(3 -
+// working_prec).
 fn half_exp_near_overflow(x: &Float, working_prec: u64) -> Option<Float> {
     // x is large, so halving it is exact.
     let u = (x >> 1u32).exp_prec_round(working_prec, Floor).0;
     if u.get_exponent() == Some(Float::MAX_EXPONENT) {
-        // exp(x / 2) >= 2^(MAX_EXPONENT - 1), so cosh(x) > exp(x) / 2 overflows.
+        // exp(x / 2) >= 2^(MAX_EXPONENT - 1), so exp(x) / 2 is far beyond the largest finite Float,
+        // and so are cosh(x) and sinh(x), which differ from it by less than 1.
         return None;
     }
     let h = (&u >> 1u32).mul_prec_round(u, working_prec, Floor).0; // <= exp(x) / 2
     if is_max_finite(&h) {
-        // cosh(x) > exp(x) / 2 >= the largest finite Float at precision `working_prec`, which
-        // exceeds the midpoint between the largest finite Float at any lower precision and
-        // 2^MAX_EXPONENT, so cosh(x) overflows (or, with Floor or Down, saturates) at the output
-        // precision.
+        // exp(x) / 2 >= the largest finite Float at precision `working_prec`, which exceeds the
+        // midpoint between the largest finite Float at any lower precision and 2^MAX_EXPONENT by
+        // far more than exp(-x) / 2, so cosh(x) and sinh(x), which are exp(x) / 2 +/- exp(-x) / 2,
+        // overflow (or, with Floor or Down, saturate) at any lower output precision.
         return None;
     }
     Some(h)
+}
+
+// Approximates exp(x) / 2 for a positive finite x at precision `working_prec`, the common core of
+// `cosh` and `sinh`, which are h + 1 / (4 h) and h - 1 / (4 h) for h = exp(x) / 2. Returns `None`
+// if exp(x) / 2 is so large that cosh(x) and sinh(x) overflow at any precision below
+// `working_prec`. Otherwise returns h and whether it was computed near the overflow threshold:
+// usually |h - exp(x) / 2| < 1 ulp(h), but near the threshold the bound is 8 ulps.
+pub(crate) fn half_exp(x: &Float, working_prec: u64) -> Option<(Float, bool)> {
+    let exp_x = x.exp_prec_round_ref(working_prec, Floor).0;
+    if exp_x.get_exponent() == Some(Float::MAX_EXPONENT) {
+        // exp(x) is in the top binade, or overflowed and saturated.
+        half_exp_near_overflow(x, working_prec).map(|h| (h, true))
+    } else {
+        // Halving is exact.
+        Some((exp_x >> 1u32, false))
+    }
+}
+
+// The reciprocal of 4h, rounded up: given h ~ exp(x) / 2, an upper bound for exp(-x) / 2. This may
+// underflow, in which case it rounds up to the smallest positive Float, still an upper bound.
+pub(crate) fn quarter_reciprocal(h: &Float, working_prec: u64) -> Float {
+    h.reciprocal_round_ref(Ceiling)
+        .0
+        .shr_prec_round(2u32, working_prec, Ceiling)
+        .0
 }
 
 // This is mpfr_cosh from cosh.c, MPFR 4.2.2, where the input is finite and nonzero.
@@ -78,29 +110,88 @@ fn cosh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
     let mut increment = Limb::WIDTH;
     loop {
         // cosh(x) = h + 1 / (4 h), where h = exp(x) / 2.
-        let exp_x = x.exp_prec_round_ref(working_prec, Floor).0;
-        let (h, err) = if exp_x.get_exponent() == Some(Float::MAX_EXPONENT) {
-            // exp(x) is in the top binade, or overflowed and saturated.
-            match half_exp_near_overflow(&x, working_prec) {
-                None => return exp_overflow(prec, rm),
-                // h has an error below 8 ulps, and the two roundings below add at most 2 more.
-                Some(h) => (h, working_prec - 4),
-            }
-        } else {
-            // Halving is exact. The error of exp(x) and the two roundings below stay below 8 ulps.
-            (exp_x >> 1u32, working_prec - 3)
+        let Some((h, near_overflow)) = half_exp(&x, working_prec) else {
+            return exp_overflow(prec, rm);
         };
-        // exp(-x) / 2 = 1 / (4 h), rounded up. This may underflow, in which case it rounds up to
-        // the smallest positive Float, still an upper bound.
-        let exp_neg_x_half = h
-            .reciprocal_round_ref(Ceiling)
-            .0
-            .shr_prec_round(2u32, working_prec, Ceiling)
-            .0;
+        // Away from the threshold, the error of h and the two roundings below stay below 8 ulps;
+        // near it, h's error is below 8 ulps, and the two roundings add at most 2 more.
+        let err = working_prec - if near_overflow { 4 } else { 3 };
         // h is not the largest finite Float, so adding a value this small rounds up to at most it.
+        let exp_neg_x_half = quarter_reciprocal(&h, working_prec);
         let cosh_x = h.add_round(exp_neg_x_half, Ceiling).0;
         if float_can_round(cosh_x.significand_ref().unwrap(), err, prec, rm) {
             return Float::from_float_prec_round(cosh_x, prec, rm);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// Sums the series cosh(x) = 1 + x^2/2! + x^4/4! + ... in `Rational` arithmetic for a nonzero |x| <
+// 1 too small to be a `Float`. Every term is positive and each is less than x^2 times the one
+// before, so cosh(x) lies strictly between a partial sum S and S + t / (1 - x^2), where t is the
+// next term; the bracket is tightened until both ends round the same way. Only reachable for a
+// precision beyond 2^31 bits: any smaller precision takes the tiny path.
+fn cosh_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    fail_on_untested_path("cosh_rational_series");
+    let x_squared = x.square();
+    let tail_factor = (Rational::ONE - &x_squared).reciprocal();
+    let mut s = Rational::ONE;
+    let mut term = Rational::ONE;
+    let mut k = 1u64;
+    loop {
+        term *= &x_squared;
+        term /= Rational::from((k << 1) * ((k << 1) - 1));
+        let hi = (&s).add_mul(&term, &tail_factor);
+        if let Some(result) = round_bracket(&s, &hi, prec, rm) {
+            return result;
+        }
+        s += &term;
+        k += 1;
+    }
+}
+
+// Computes cosh(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
+// cosh(x) is transcendental for every nonzero rational x, so the result is never exact.
+fn cosh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact cosh");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // 0 < cosh(x) - 1 < x^2 < 2^(2 exp_x) for |x| < 1: when that is at most 2^-prec, half an ulp of
+    // 1, cosh(x) rounds to 1, or to its successor for rounding away from zero.
+    if -(exp_x << 1) >= i64::exact_from(prec) {
+        return match rm {
+            Ceiling | Up => (one_neighbor(prec, true), Greater),
+            _ => (Float::one_prec(prec), Less),
+        };
+    }
+    // x is too small to be a `Float` but `prec` is so large that cosh(x) does not round to 1.
+    if exp_x <= Float::MIN_EXPONENT_I64 {
+        return cosh_rational_series(x, prec, rm);
+    }
+    // |x| >= 2^(MAX_EXPONENT - 1), so cosh(x) > e^|x| / 2 overflows. Smaller x that still overflow
+    // are caught by `cosh_prec_round_normal_ref` in the loop below.
+    if exp_x >= Float::MAX_EXPONENT_I64 {
+        return exp_overflow(prec, rm);
+    }
+    // cosh is even and increasing on [0, infinity), so bracket |x| between the Floats x_lo <= |x|
+    // <= x_hi, take the hyperbolic cosine of both, and increase the working precision until the two
+    // round to the same result, which the exact cosh(x), lying between them, must then share.
+    let x_abs = x.abs();
+    let mut working_prec = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let (x_lo, x_o) = Float::from_rational_prec_round_ref(&x_abs, working_prec, Floor);
+        if x_o == Equal {
+            // |x| is exactly representable at `working_prec`, so cosh(x) is simply cosh(x_lo).
+            return cosh_prec_round_normal_ref(&x_lo, prec, rm);
+        }
+        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
+        // The hyperbolic cosine of a finite nonzero Float is never exact, so both orderings are
+        // `Less` or `Greater`, never `Equal`.
+        let (c_lo, o_lo) = cosh_prec_round_normal_ref(&x_lo, prec, rm);
+        let (c_hi, o_hi) = cosh_prec_round_normal_ref(&x_hi, prec, rm);
+        if o_lo == o_hi && c_lo == c_hi {
+            return (c_lo, o_lo);
         }
         working_prec += increment;
         increment = working_prec >> 1;
@@ -753,6 +844,285 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\cosh x$, the hyperbolic cosine of a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded hyperbolic cosine is less than, equal to, or greater than the exact
+    /// hyperbolic cosine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \cosh x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 \cosh x\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 \cosh x\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=1$.
+    ///
+    /// Overflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::cosh_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cosh_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "1.12");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cosh_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::cosh_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "1.1854649");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cosh_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "1.1854668");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn cosh_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::cosh_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\cosh x$, the hyperbolic cosine of a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded hyperbolic cosine is less than, equal to, or greater than the
+    /// exact hyperbolic cosine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \cosh x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 \cosh x\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 \cosh x\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=1$.
+    ///
+    /// Overflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::cosh_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::cosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "1.12");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::cosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::cosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "1.1854649");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::cosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "1.1854668");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn cosh_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // cosh(0) = 1, exactly
+            return (Self::one_prec(prec), Equal);
+        }
+        cosh_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\cosh x$, the hyperbolic cosine of a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded hyperbolic cosine is less than, equal to, or greater than the exact hyperbolic
+    /// cosine.
+    ///
+    /// If the hyperbolic cosine is equidistant from two [`Float`]s with the specified precision,
+    /// the [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \cosh x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 \cosh x\rfloor-p}$ (unless the result overflows;
+    /// see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=1$.
+    ///
+    /// Overflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cosh_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cosh_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::cosh_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "1.1854649");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cosh_rational_prec(Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn cosh_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::cosh_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\cosh x$, the hyperbolic cosine of a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded hyperbolic cosine is less than, equal to, or greater than the exact hyperbolic
+    /// cosine.
+    ///
+    /// If the hyperbolic cosine is equidistant from two [`Float`]s with the specified precision,
+    /// the [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \cosh x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 \cosh x\rfloor-p}$ (unless the result overflows;
+    /// see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=1$.
+    ///
+    /// Overflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cosh_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cosh_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::cosh_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "1.1854649");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cosh_rational_prec_ref(&Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn cosh_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::cosh_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
 impl Cosh for Float {
     type Output = Self;
 
@@ -984,4 +1354,65 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::cosh_prec, x)
+}
+
+/// Computes $\cosh x$, the hyperbolic cosine of a [`Rational`], returning the result as a primitive
+/// float. The result is correctly rounded.
+///
+/// $$
+/// f(x) = \cosh x+\varepsilon.
+/// $$
+/// - If $\cosh x$ is infinite, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\cosh x$ is finite, then $|\varepsilon| < 2^{\lfloor\log_2 \cosh x\rfloor-p}$, where $p$
+///   is the precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(0)=1$
+///
+/// Overflow is possible: an `x` of large magnitude gives $\infty$. Since $\cosh x\geq 1$, the
+/// result never underflows.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cosh::primitive_float_cosh_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_cosh_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cosh_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(1.0560718678299394)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cosh_rational::<f64>(
+///         &Rational::from_signeds(-1i8, 3)
+///     )),
+///     NiceFloat(1.0560718678299394)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cosh_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cosh_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::cosh_rational_prec_ref, x)
 }
