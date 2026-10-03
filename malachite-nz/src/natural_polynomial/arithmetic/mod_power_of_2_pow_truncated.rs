@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::pow::binexp::binexp_start;
+use crate::integer_polynomial::arithmetic::pow::binexp::pow_binexp_trimmed;
 use crate::integer_polynomial::arithmetic::pow_truncated::pow_truncated_ref;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::natural::Natural;
@@ -39,24 +39,12 @@ crate_test_fn! {mod_power_of_2_pow_truncated_binexp(
     len: u64,
     pow: u64,
 ) -> Vec<Natural> {
-    let mut bit = binexp_start(e).0;
-    let mut r = mod_power_of_2_square_truncated_ref(xs, len, pow).into_coefficients_asc();
-    loop {
-        if r.is_empty() {
-            return r;
-        }
-        if bit & e != 0 {
-            r = mod_power_of_2_mul_truncated_ref_ref(&r, xs, len, pow).into_coefficients_asc();
-            if r.is_empty() {
-                return r;
-            }
-        }
-        bit >>= 1;
-        if bit == 0 {
-            return r;
-        }
-        r = mod_power_of_2_square_truncated_ref(&r, len, pow).into_coefficients_asc();
-    }
+    pow_binexp_trimmed(
+        xs,
+        e,
+        |r| mod_power_of_2_square_truncated_ref(r, len, pow).into_coefficients_asc(),
+        |r, xs| mod_power_of_2_mul_truncated_ref_ref(r, xs, len, pow).into_coefficients_asc(),
+    )
 }}
 
 // The `e`th power modulo $2^k$, where $k$ is `pow`, of the polynomial with coefficients `xs`, which

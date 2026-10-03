@@ -14,6 +14,7 @@ use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul::mul_greater_to_out;
 use crate::integer_polynomial::arithmetic::square::square_to_out;
 use alloc::vec;
+use alloc::vec::Vec;
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{FloorLogBase2, Parity, PowerOf2};
 
@@ -64,3 +65,35 @@ crate_test_fn! {pow_to_out_binexp<C: PolynomialCoefficient>(out: &mut [C], xs: &
         }
     }
 }}
+
+// The `e`th power of the polynomial with coefficients `xs`, which has length at least 2, where `e`
+// is at least 3, by left-to-right binary exponentiation with the given squaring and multiplication,
+// each of which returns its result without zeros at the end. Used for powers in rings with zero
+// divisors, such as polynomials modulo $m$, where a power can lose its leading coefficients or
+// vanish: the intermediate powers keep only the length they need, and a power that vanishes ends
+// the computation.
+pub(crate) fn pow_binexp_trimmed<C: PolynomialCoefficient>(
+    xs: &[C],
+    e: u64,
+    square: impl Fn(&[C]) -> Vec<C>,
+    mul: impl Fn(&[C], &[C]) -> Vec<C>,
+) -> Vec<C> {
+    let mut bit = binexp_start(e).0;
+    let mut r = square(xs);
+    loop {
+        if r.is_empty() {
+            return r;
+        }
+        if bit & e != 0 {
+            r = mul(&r, xs);
+            if r.is_empty() {
+                return r;
+            }
+        }
+        bit >>= 1;
+        if bit == 0 {
+            return r;
+        }
+        r = square(&r);
+    }
+}

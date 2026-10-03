@@ -117,6 +117,14 @@ pub mod mod_nth_derivative;
 /// [`RemAssign`](core::ops::RemAssign), traits for reducing every coefficient of a polynomial
 /// modulo a number.
 pub mod mod_op;
+/// Implementations of [`ModPow`](malachite_base::num::arithmetic::traits::ModPow) and
+/// [`ModPowAssign`](malachite_base::num::arithmetic::traits::ModPowAssign), for raising a
+/// polynomial to a power modulo a number.
+pub mod mod_pow;
+/// Implementations of [`ModPowTruncated`](malachite_base::polynomial::ModPowTruncated) and
+/// [`ModPowTruncatedAssign`](malachite_base::polynomial::ModPowTruncatedAssign), for raising a
+/// polynomial to a power modulo a number and keeping only the low coefficients.
+pub mod mod_pow_truncated;
 /// Implementations of [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2) and
 /// [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign), which reduce
 /// every coefficient of a polynomial modulo a power of 2.

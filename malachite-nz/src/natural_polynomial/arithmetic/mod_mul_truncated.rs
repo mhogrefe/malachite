@@ -98,7 +98,7 @@ fn mod_mul_truncated_val_ref(
 }
 
 // As `mod_mul_truncated_val_val`, taking both factors by reference.
-fn mod_mul_truncated_ref_ref(
+pub(crate) fn mod_mul_truncated_ref_ref(
     xs: &[Natural],
     ys: &[Natural],
     len: u64,

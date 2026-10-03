@@ -47,7 +47,7 @@ crate_test_fn! {mod_square_word(xs: &[Natural], m: &Natural) -> Vec<Limb> {
 // The square of the polynomial with coefficients `xs`, reduced modulo `m`, as a polynomial. The
 // word kernels are used in their window; otherwise the square is computed in full and reduced
 // afterwards.
-fn mod_square_ref(xs: &[Natural], m: &Natural) -> NaturalPolynomial {
+pub(crate) fn mod_square_ref(xs: &[Natural], m: &Natural) -> NaturalPolynomial {
     if xs.len() > 1 && word_preferred(&SQUARE_WORD_WINDOWS, xs.len(), m) {
         limbs_to_polynomial(mod_square_word(xs, m))
     } else {

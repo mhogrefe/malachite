@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::pow::binexp::binexp_start;
+use crate::integer_polynomial::arithmetic::pow::binexp::pow_binexp_trimmed;
 use crate::integer_polynomial::arithmetic::pow::pow_ref;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::natural::Natural;
@@ -43,24 +43,12 @@ pub(crate) fn power_needs_no_reduction(len: usize, bits: u64, e: u64, pow: u64) 
 // This is equivalent to `_fmpz_mod_poly_pow` from `fmpz_mod_poly/pow.c`, FLINT 3.6.0, with the
 // modulus $2^k$, except that the intermediate powers are trimmed.
 crate_test_fn! {mod_power_of_2_pow_binexp(xs: &[Natural], e: u64, pow: u64) -> Vec<Natural> {
-    let mut bit = binexp_start(e).0;
-    let mut r = mod_power_of_2_square_ref(xs, pow).into_coefficients_asc();
-    loop {
-        if r.is_empty() {
-            return r;
-        }
-        if bit & e != 0 {
-            r = mod_power_of_2_mul_ref_ref(&r, xs, pow).into_coefficients_asc();
-            if r.is_empty() {
-                return r;
-            }
-        }
-        bit >>= 1;
-        if bit == 0 {
-            return r;
-        }
-        r = mod_power_of_2_square_ref(&r, pow).into_coefficients_asc();
-    }
+    pow_binexp_trimmed(
+        xs,
+        e,
+        |r| mod_power_of_2_square_ref(r, pow).into_coefficients_asc(),
+        |r, xs| mod_power_of_2_mul_ref_ref(r, xs, pow).into_coefficients_asc(),
+    )
 }}
 
 // The coefficients, without zeros at the end, of the `e`th power modulo $2^k$, where $k$ is `pow`,

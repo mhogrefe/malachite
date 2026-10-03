@@ -40,7 +40,7 @@ crate_test_fn! {mod_square_truncated_word(xs: &[Natural], len: usize, m: &Natura
 // The square of the polynomial with coefficients `xs`, truncated to `len` coefficients and reduced
 // modulo `m`, as a polynomial. The word kernels are used in their window; otherwise the full
 // truncated square is computed and reduced afterwards.
-fn mod_square_truncated_ref(xs: &[Natural], len: u64, m: &Natural) -> NaturalPolynomial {
+pub(crate) fn mod_square_truncated_ref(xs: &[Natural], len: u64, m: &Natural) -> NaturalPolynomial {
     let n = xs.len();
     if len != 0
         && n > 1

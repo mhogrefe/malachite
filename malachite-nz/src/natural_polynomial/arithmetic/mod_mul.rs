@@ -112,7 +112,7 @@ fn mod_mul_val_ref(xs: Vec<Natural>, ys: &[Natural], m: &Natural) -> NaturalPoly
 }
 
 // As `mod_mul_val_val`, taking both factors by reference.
-fn mod_mul_ref_ref(xs: &[Natural], ys: &[Natural], m: &Natural) -> NaturalPolynomial {
+pub(crate) fn mod_mul_ref_ref(xs: &[Natural], ys: &[Natural], m: &Natural) -> NaturalPolynomial {
     if mul_word_preferred(xs.len(), ys.len(), m) {
         limbs_to_polynomial(mod_mul_word(xs, ys, m))
     } else {

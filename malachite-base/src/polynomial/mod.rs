@@ -664,6 +664,42 @@ pub trait ModSquareTruncatedAssign<M = Self> {
     fn mod_square_truncated_assign(&mut self, len: u64, m: M);
 }
 
+/// Raises a polynomial to a power modulo $m$, keeping only the coefficients of $x^i$ for $i$ less
+/// than a given length. The coefficients must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is powering in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$, applied to the image of the polynomial there. Unlike the coefficients,
+/// which must already be reduced, the polynomial need not already be truncated: it may have any
+/// number of coefficients, and only the first `len` are read.
+pub trait ModPowTruncated<M = Self> {
+    type Output;
+
+    /// Raises a polynomial to the power `exp` modulo $m$ and truncates the power to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p, e, n, m) = (p^e \bmod x^n) \bmod m.
+    /// $$
+    fn mod_pow_truncated(self, exp: u64, len: u64, m: M) -> Self::Output;
+}
+
+/// Raises a polynomial to a power modulo $m$ in place, keeping only the coefficients of $x^i$ for
+/// $i$ less than a given length. The coefficients must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is powering in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$, applied to the image of the polynomial there. Unlike the coefficients,
+/// which must already be reduced, the polynomial need not already be truncated: it may have any
+/// number of coefficients, and only the first `len` are read.
+pub trait ModPowTruncatedAssign<M = Self> {
+    /// Raises `self` to the power `exp` modulo $m$ and truncates the power to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// p \gets (p^e \bmod x^n) \bmod m.
+    /// $$
+    fn mod_pow_truncated_assign(&mut self, exp: u64, len: u64, m: M);
+}
+
 /// Computes the square of a polynomial's $L^2$ norm: the sum of the squares of its coefficients.
 ///
 /// This is exact, unlike the norm itself, which is usually irrational.
