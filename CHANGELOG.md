@@ -1003,6 +1003,16 @@ documented by git history.
   while its height is 3 — so every coefficient has to be reduced before its height is known, and
   the answer is not among the values the polynomial holds.
 
+### malachite-float
+
+- The first hyperbolic function: `Cosh` and `CoshAssign` (new traits in malachite-base) for
+  `Float`, with the usual `cosh_prec_round`, `cosh_prec`, `cosh_round`, and `_ref`/`_assign`
+  variants, and `primitive_float_cosh`: a port of `mpfr_cosh`, computing
+  $\cosh x = (e^x + e^{-x})/2$. Where $e^x$ overflows but $\cosh x \approx e^x/2$ does not (an
+  interval of width $\log 2$ just below the overflow threshold, which MPFR's wider intermediate
+  exponent range covers), $e^x/2$ is computed as $e^{x/2} \cdot e^{x/2}/2$, so the result is
+  finite and correctly rounded right up to the point where it overflows.
+
 ### Documentation
 
 - Fixed ten `Float` logarithm doc comments whose set braces did not render. Rustdoc runs doc

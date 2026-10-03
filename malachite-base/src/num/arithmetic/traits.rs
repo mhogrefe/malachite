@@ -1117,6 +1117,18 @@ pub trait AcotAssign {
     fn acot_assign(&mut self);
 }
 
+/// Computes $\cosh(x)$, the hyperbolic cosine of a number.
+pub trait Cosh {
+    type Output;
+
+    fn cosh(self) -> Self::Output;
+}
+
+/// Replaces a number with its hyperbolic cosine, $\cosh(x)$.
+pub trait CoshAssign {
+    fn cosh_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

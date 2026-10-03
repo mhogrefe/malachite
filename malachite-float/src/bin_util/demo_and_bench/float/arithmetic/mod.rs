@@ -21,6 +21,7 @@ pub(crate) fn register(runner: &mut Runner) {
     compound::register(runner);
     conjugate::register(runner);
     cos::register(runner);
+    cosh::register(runner);
     csc::register(runner);
     atan::register(runner);
     atan2::register(runner);
@@ -102,6 +103,7 @@ mod cbrt;
 mod compound;
 mod conjugate;
 mod cos;
+mod cosh;
 mod cot;
 mod csc;
 mod div;

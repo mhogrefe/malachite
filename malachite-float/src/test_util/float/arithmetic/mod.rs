@@ -18,6 +18,7 @@ pub mod atan;
 pub mod atan2;
 pub mod compound;
 pub mod cos;
+pub mod cosh;
 pub mod cot;
 pub mod csc;
 pub mod div;

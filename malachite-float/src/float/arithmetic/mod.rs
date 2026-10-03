@@ -194,6 +194,10 @@ pub mod conjugate;
 /// [`CosAssign`](malachite_base::num::arithmetic::traits::CosAssign), traits for computing the
 /// cosine of [`Float`](super::Float)s.
 pub mod cos;
+/// Implementations of [`Cosh`](malachite_base::num::arithmetic::traits::Cosh) and
+/// [`CoshAssign`](malachite_base::num::arithmetic::traits::CoshAssign), traits for computing the
+/// hyperbolic cosine of [`Float`](super::Float)s.
+pub mod cosh;
 /// Implementations of [`Cot`](malachite_base::num::arithmetic::traits::Cot) and
 /// [`CotAssign`](malachite_base::num::arithmetic::traits::CotAssign), traits for computing the
 /// cotangent of [`Float`](super::Float)s.
