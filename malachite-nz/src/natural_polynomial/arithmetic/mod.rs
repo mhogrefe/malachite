@@ -161,6 +161,15 @@ pub mod mod_power_of_2_neg;
 /// [`ModPowerOf2NthDerivativeAssign`](malachite_base::polynomial::ModPowerOf2NthDerivativeAssign),
 /// for differentiating a polynomial any number of times modulo a power of 2.
 pub mod mod_power_of_2_nth_derivative;
+/// Implementations of [`ModPowerOf2Pow`](malachite_base::num::arithmetic::traits::ModPowerOf2Pow)
+/// and [`ModPowerOf2PowAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign), for
+/// raising a polynomial to a power modulo a power of 2.
+pub mod mod_power_of_2_pow;
+/// Implementations of
+/// [`ModPowerOf2PowTruncated`](malachite_base::polynomial::ModPowerOf2PowTruncated) and
+/// [`ModPowerOf2PowTruncatedAssign`](malachite_base::polynomial::ModPowerOf2PowTruncatedAssign),
+/// for raising a polynomial to a power modulo a power of 2 and keeping only the low coefficients.
+pub mod mod_power_of_2_pow_truncated;
 /// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
 /// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a polynomial modulo a power of 2.

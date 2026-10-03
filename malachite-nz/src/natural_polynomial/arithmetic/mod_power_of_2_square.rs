@@ -155,7 +155,7 @@ pub(crate) const SQUARE_LOW_WINDOWS: [(u64, usize); 11] = [
 // The square of the polynomial with coefficients `xs`, which has more than one coefficient, reduced
 // modulo $2^k$, where $k$ is `pow`, as a polynomial. The low-half kernels are used in their window,
 // and the full square otherwise.
-fn mod_power_of_2_square_ref(xs: &[Natural], pow: u64) -> NaturalPolynomial {
+pub(crate) fn mod_power_of_2_square_ref(xs: &[Natural], pow: u64) -> NaturalPolynomial {
     if xs.len() > 1 && low_preferred(&SQUARE_LOW_WINDOWS, xs.len(), pow) {
         reduce_coefficients(mod_power_of_2_square_low_karatsuba(xs, pow), pow)
     } else {

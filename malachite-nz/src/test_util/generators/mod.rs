@@ -283,6 +283,28 @@ pub fn natural_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigne
     )
 }
 
+// All `(NaturalPolynomial, u64, u64)` where the polynomial's coefficients are less than 2 to the
+// power of the last `u64`, and the first `u64` is small.
+pub fn natural_polynomial_unsigned_unsigned_triple_gen_var_4()
+-> Generator<(NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_4,
+        &random_natural_polynomial_unsigned_unsigned_triple_gen_var_4,
+        &special_random_natural_polynomial_unsigned_unsigned_triple_gen_var_4,
+    )
+}
+
+// All `(NaturalPolynomial, u64, u64, u64)` where the polynomial's coefficients are less than 2 to
+// the power of the last `u64`, and the other `u64`s are small.
+pub fn natural_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalPolynomial, u64, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+        &random_natural_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_natural_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // All `(NaturalPolynomial, NaturalPolynomial, u64)` where the coefficients of both polynomials are
 // less than 2 to the power of the `u64`. The random polynomials are reduced from arbitrary ones, so
 // sums often wrap around and leading coefficients often cancel.

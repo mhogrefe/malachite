@@ -452,6 +452,13 @@ documented by git history.
   for Malachite's multiplication, after removing any factor of $x^k$. New `PowTruncated` and
   `PowTruncatedAssign` traits, in `malachite_base::polynomial`, implemented for both types like
   FLINT's `fmpz_poly_pow_trunc`, raise a polynomial to a power modulo $x^n$.
+- `ModPowerOf2Pow` and `ModPowerOf2PowAssign` for `NaturalPolynomial`, like FLINT's
+  `fmpz_mod_poly_pow` with the modulus $2^k$, and new `ModPowerOf2PowTruncated` and
+  `ModPowerOf2PowTruncatedAssign` traits, in `malachite_base::polynomial`, implemented for
+  `NaturalPolynomial` like `fmpz_mod_poly_pow_trunc`. The coefficients must already be reduced
+  modulo $2^k$. The power is computed by binary exponentiation, trimming after each step since
+  leading coefficients can vanish modulo $2^k$; when no coefficient of the power over the integers
+  can reach $2^k$, it is computed as by `Pow` instead.
 - New `ModIntegral` and `ModIntegralAssign` traits, in `malachite_base::polynomial`, implemented for
   `UnsignedPolynomial<T>` with a `T` modulus, like FLINT's `nmod_poly_integral`, and for
   `NaturalPolynomial` with a `Natural` modulus taken by value or by reference, which FLINT lacks: the

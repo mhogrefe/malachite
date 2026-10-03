@@ -487,6 +487,42 @@ pub trait ModPowerOf2SquareTruncatedAssign {
     fn mod_power_of_2_square_truncated_assign(&mut self, len: u64, pow: u64);
 }
 
+/// Raises a polynomial to a power modulo $2^k$, keeping only the coefficients of $x^i$ for $i$ less
+/// than a given length. The coefficients must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is powering in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$, applied to the image of the polynomial there. Unlike the
+/// coefficients, which must already be reduced, the polynomial need not already be truncated: it
+/// may have any number of coefficients, and only the first `len` are read.
+pub trait ModPowerOf2PowTruncated {
+    type Output;
+
+    /// Raises a polynomial to the power `exp` modulo $2^k$ and truncates the power to its first
+    /// `len` coefficients.
+    ///
+    /// $$
+    /// f(p, e, n, k) = (p^e \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_pow_truncated(self, exp: u64, len: u64, pow: u64) -> Self::Output;
+}
+
+/// Raises a polynomial to a power modulo $2^k$ in place, keeping only the coefficients of $x^i$ for
+/// $i$ less than a given length. The coefficients must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is powering in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$, applied to the image of the polynomial there. Unlike the
+/// coefficients, which must already be reduced, the polynomial need not already be truncated: it
+/// may have any number of coefficients, and only the first `len` are read.
+pub trait ModPowerOf2PowTruncatedAssign {
+    /// Raises `self` to the power `exp` modulo $2^k$ and truncates the power to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// p \gets (p^e \bmod x^n) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_pow_truncated_assign(&mut self, exp: u64, len: u64, pow: u64);
+}
+
 /// Adds two polynomials modulo $m$, keeping only the coefficients of $x^i$ for $i$ less than a
 /// given length. The coefficients of both must already be reduced modulo $m$.
 ///

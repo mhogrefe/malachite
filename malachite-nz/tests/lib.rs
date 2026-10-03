@@ -717,6 +717,8 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_mul_truncated;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_nth_derivative;
+        pub mod mod_power_of_2_pow;
+        pub mod mod_power_of_2_pow_truncated;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_square;
         pub mod mod_power_of_2_square_truncated;

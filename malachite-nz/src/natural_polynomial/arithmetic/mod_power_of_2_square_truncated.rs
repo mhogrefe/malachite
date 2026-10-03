@@ -162,7 +162,11 @@ pub(crate) const SQUARE_TRUNCATED_LOW_WINDOWS: [(u64, usize); 13] = [
 // The square of the polynomial with coefficients `xs`, truncated to `len` coefficients and reduced
 // modulo $2^k$, where $k$ is `pow`, as a polynomial. The low-half kernels are used in their window
 // when the polynomial is not a constant, and the full truncated square otherwise.
-fn mod_power_of_2_square_truncated_ref(xs: &[Natural], len: u64, pow: u64) -> NaturalPolynomial {
+pub(crate) fn mod_power_of_2_square_truncated_ref(
+    xs: &[Natural],
+    len: u64,
+    pow: u64,
+) -> NaturalPolynomial {
     let n = xs.len();
     let len_usize = usize::try_from(len).unwrap_or(usize::MAX);
     if len != 0 && n > 1 && low_preferred(&SQUARE_TRUNCATED_LOW_WINDOWS, min(n, len_usize), pow) {
