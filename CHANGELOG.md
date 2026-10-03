@@ -458,13 +458,14 @@ documented by git history.
   The coefficients must already be reduced modulo $m$. As with the power-of-2 versions, the power is
   computed by binary exponentiation with each step trimmed, or as by `Pow` when no coefficient of
   the power over the integers can reach $m$.
-- `ModPowerOf2Pow` and `ModPowerOf2PowAssign` for `NaturalPolynomial`, like FLINT's
-  `fmpz_mod_poly_pow` with the modulus $2^k$, and new `ModPowerOf2PowTruncated` and
-  `ModPowerOf2PowTruncatedAssign` traits, in `malachite_base::polynomial`, implemented for
-  `NaturalPolynomial` like `fmpz_mod_poly_pow_trunc`. The coefficients must already be reduced
-  modulo $2^k$. The power is computed by binary exponentiation, trimming after each step since
-  leading coefficients can vanish modulo $2^k$; when no coefficient of the power over the integers
-  can reach $2^k$, it is computed as by `Pow` instead.
+- `ModPowerOf2Pow` and `ModPowerOf2PowAssign` for `NaturalPolynomial` and `UnsignedPolynomial<T>`,
+  like FLINT's `fmpz_mod_poly_pow` and `nmod_poly_pow` with the modulus $2^k$, and new
+  `ModPowerOf2PowTruncated` and `ModPowerOf2PowTruncatedAssign` traits, in
+  `malachite_base::polynomial`, implemented for both types like `fmpz_mod_poly_pow_trunc` and
+  `nmod_poly_pow_trunc`. The coefficients must already be reduced modulo $2^k$. The power is
+  computed by binary exponentiation, trimming after each step since leading coefficients can vanish
+  modulo $2^k$; for `NaturalPolynomial`, when no coefficient of the power over the integers can
+  reach $2^k$, it is computed as by `Pow` instead.
 - New `ModIntegral` and `ModIntegralAssign` traits, in `malachite_base::polynomial`, implemented for
   `UnsignedPolynomial<T>` with a `T` modulus, like FLINT's `nmod_poly_integral`, and for
   `NaturalPolynomial` with a `Natural` modulus taken by value or by reference, which FLINT lacks: the

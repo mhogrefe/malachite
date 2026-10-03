@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::pow::binexp::pow_binexp_trimmed;
 use crate::integer_polynomial::arithmetic::pow_truncated::pow_truncated_ref;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::natural::Natural;
@@ -20,7 +19,9 @@ use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{ModPow, ModPowAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
-use malachite_base::polynomial::{ModPowTruncated, ModPowTruncatedAssign, Polynomial};
+use malachite_base::polynomial::{
+    ModPowTruncated, ModPowTruncatedAssign, Polynomial, pow_binexp_trimmed,
+};
 
 // The coefficients, without zeros at the end, of the `e`th power modulo `m` of the polynomial with
 // coefficients `xs`, which has length at least 2, a nonzero first element, and coefficients reduced

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{DivisibleBy, Gcd, GcdAssign};
+use crate::num::arithmetic::traits::{DivisibleBy, FloorLogBase2, Gcd, GcdAssign, PowerOf2};
 use crate::num::conversion::traits::ExactFrom;
 use crate::vars::{Var, VarScheme};
 use alloc::string::String;
@@ -1456,4 +1456,42 @@ pub trait ModEvaluateGeometric<T, M = T> {
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     fn mod_evaluate_geometric(self, q: T, k: u64, m: M) -> Vec<Self::Output>;
+}
+
+/// Raises the polynomial with coefficients `xs`, which has length at least 2, to the power `e`,
+/// which is at least 3, by left-to-right binary exponentiation with the given squaring and
+/// multiplication, each of which returns its result without zeros at the end.
+///
+/// This is for powers in rings with zero divisors, such as polynomials modulo $m$, where a power
+/// can lose its leading coefficients or vanish: the intermediate powers keep only the length they
+/// need, and a power that vanishes ends the computation.
+///
+/// This is not part of the public API; it is public so that `malachite-nz` can raise its
+/// polynomials to powers modulo a number in the same way.
+#[doc(hidden)]
+pub fn pow_binexp_trimmed<T>(
+    xs: &[T],
+    e: u64,
+    square: impl Fn(&[T]) -> Vec<T>,
+    mul: impl Fn(&[T], &[T]) -> Vec<T>,
+) -> Vec<T> {
+    // The bit of e one place below its most significant bit
+    let mut bit = u64::power_of_2(e.floor_log_base_2()) >> 1;
+    let mut r = square(xs);
+    loop {
+        if r.is_empty() {
+            return r;
+        }
+        if bit & e != 0 {
+            r = mul(&r, xs);
+            if r.is_empty() {
+                return r;
+            }
+        }
+        bit >>= 1;
+        if bit == 0 {
+            return r;
+        }
+        r = square(&r);
+    }
 }

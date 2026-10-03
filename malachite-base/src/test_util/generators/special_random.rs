@@ -10134,6 +10134,66 @@ pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<
     )
 }
 
+pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_7<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 8),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, e, pow)| (p.mod_power_of_2(pow), e, pow)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, u64, u64)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 8),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, e, len, pow)| (p.mod_power_of_2(pow), e, len, pow)),
+    )
+}
+
 pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_3<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,

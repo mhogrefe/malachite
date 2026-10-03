@@ -148,7 +148,7 @@ pub(crate) fn truncated_len(len1: usize, len2: usize, len: u64) -> usize {
 
 // The product of the polynomials with coefficients `xs` and `ys`, both reduced modulo $2^k$, where
 // $k$ is `pow`, truncated to `len` coefficients and reduced modulo $2^k$.
-fn mod_power_of_2_mul_truncated_helper<T: PrimitiveUnsigned>(
+pub(crate) fn mod_power_of_2_mul_truncated_helper<T: PrimitiveUnsigned>(
     xs: &[T],
     ys: &[T],
     len: u64,

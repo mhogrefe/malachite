@@ -144,7 +144,10 @@ fn assert_reduced<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, pow: u64) {
 
 // The square of the polynomial with coefficients `xs`, reduced modulo $2^k$, where $k$ is `pow`,
 // modulo $2^k$.
-fn mod_power_of_2_square_helper<T: PrimitiveUnsigned>(xs: &[T], pow: u64) -> UnsignedPolynomial<T> {
+pub(crate) fn mod_power_of_2_square_helper<T: PrimitiveUnsigned>(
+    xs: &[T],
+    pow: u64,
+) -> UnsignedPolynomial<T> {
     if xs.is_empty() {
         return UnsignedPolynomial::ZERO;
     }

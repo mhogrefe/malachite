@@ -217,7 +217,7 @@ pub(crate) fn from_coefficients_trimmed<T: PrimitiveUnsigned>(xs: Vec<T>) -> Uns
 
 // The product of the polynomials with coefficients `xs` and `ys`, both reduced modulo $2^k$, where
 // $k$ is `pow`, modulo $2^k$.
-fn mod_power_of_2_mul_helper<T: PrimitiveUnsigned>(
+pub(crate) fn mod_power_of_2_mul_helper<T: PrimitiveUnsigned>(
     xs: &[T],
     ys: &[T],
     pow: u64,

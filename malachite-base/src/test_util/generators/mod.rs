@@ -4970,6 +4970,28 @@ pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsign
     )
 }
 
+// All `(UnsignedPolynomial<T>, u64, u64)` where the last `u64` is no greater than `T::WIDTH`, the
+// polynomial's coefficients are less than 2 to the power of it, and the first `u64` is small.
+pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_7<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_7,
+        &random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_7,
+        &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_7,
+    )
+}
+
+// All `(UnsignedPolynomial<T>, u64, u64, u64)` where the last `u64` is no greater than `T::WIDTH`,
+// the polynomial's coefficients are less than 2 to the power of it, and the other `u64`s are small.
+pub fn unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, u64, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_2,
+        &random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_2,
+        &special_random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_2,
+    )
+}
+
 // All `(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)` where the `u64` is no greater than
 // `T::WIDTH`, and the coefficients of both polynomials are less than 2 to the power of the `u64`.
 pub fn unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()

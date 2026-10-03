@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::pow::binexp::pow_binexp_trimmed;
 use crate::integer_polynomial::arithmetic::pow_truncated::pow_truncated_ref;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::natural::Natural;
@@ -21,7 +20,7 @@ use malachite_base::num::arithmetic::traits::{ModPowerOf2Pow, ModPowerOf2PowAssi
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::polynomial::{
-    ModPowerOf2PowTruncated, ModPowerOf2PowTruncatedAssign, Polynomial,
+    ModPowerOf2PowTruncated, ModPowerOf2PowTruncatedAssign, Polynomial, pow_binexp_trimmed,
 };
 
 // The coefficients, without zeros at the end, of the `e`th power modulo $2^k$, where $k$ is `pow`,

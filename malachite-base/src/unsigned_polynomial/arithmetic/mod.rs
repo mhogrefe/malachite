@@ -127,6 +127,14 @@ pub mod mod_power_of_2_neg;
 /// [`ModPowerOf2NthDerivativeAssign`](crate::polynomial::ModPowerOf2NthDerivativeAssign), for
 /// differentiating a polynomial any number of times modulo a power of 2.
 pub mod mod_power_of_2_nth_derivative;
+/// Implementations of [`ModPowerOf2Pow`](crate::num::arithmetic::traits::ModPowerOf2Pow) and
+/// [`ModPowerOf2PowAssign`](crate::num::arithmetic::traits::ModPowerOf2PowAssign), for raising a
+/// polynomial to a power modulo a power of 2.
+pub mod mod_power_of_2_pow;
+/// Implementations of [`ModPowerOf2PowTruncated`](crate::polynomial::ModPowerOf2PowTruncated) and
+/// [`ModPowerOf2PowTruncatedAssign`](crate::polynomial::ModPowerOf2PowTruncatedAssign), for raising
+/// a polynomial to a power modulo a power of 2 and keeping only the low coefficients.
+pub mod mod_power_of_2_pow_truncated;
 /// Implementations of [`ModPowerOf2Shl`](crate::num::arithmetic::traits::ModPowerOf2Shl) and
 /// [`ModPowerOf2ShlAssign`](crate::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a polynomial modulo a power of 2.
