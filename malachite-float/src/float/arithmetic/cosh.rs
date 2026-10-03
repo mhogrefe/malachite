@@ -194,7 +194,7 @@ fn cosh_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Or
 
 // Computes cosh(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
 // cosh(x) is transcendental for every nonzero rational x, so the result is never exact.
-fn cosh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn cosh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact cosh");
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
     // 0 < cosh(x) - 1 < x^2 < 2^(2 exp_x) for |x| < 1: when that is at most 2^-prec, half an ulp of

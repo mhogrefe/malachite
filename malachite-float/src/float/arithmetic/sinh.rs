@@ -131,7 +131,7 @@ fn sinh_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Or
 
 // Computes sinh(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
 // sinh(x) is transcendental for every nonzero rational x, so the result is never exact.
-fn sinh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn sinh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact sinh");
     let positive = *x > 0u32;
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x

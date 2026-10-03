@@ -1032,6 +1032,11 @@ documented by git history.
   `primitive_float_sinh_cosh`: a port of `mpfr_sinh_cosh`, computing both values from one
   exponential. It also takes the small-input shortcuts of `sinh` and `cosh`, and raises its working
   precision for the cancellation at small $|x|$, neither of which `mpfr_sinh_cosh` does.
+- `sinh_cosh_rational_prec_round` and `sinh_cosh_rational_prec` (with `_ref` variants), the
+  correctly rounded hyperbolic sine and cosine of a `Rational` as `Float`s, together, and
+  `primitive_float_sinh_cosh_rational`. The input is bracketed between two `Float`s whose
+  hyperbolic sines and cosines are computed together; a small input takes the separate series and
+  underflow paths of `sinh_rational_prec_round` and `cosh_rational_prec_round`.
 
 ### Documentation
 
