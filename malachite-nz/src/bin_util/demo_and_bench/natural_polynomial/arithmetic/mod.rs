@@ -60,6 +60,8 @@ pub(crate) fn register(runner: &mut Runner) {
     mul_power_of_x::register(runner);
     mul_truncated::register(runner);
     nth_derivative::register(runner);
+    pow::register(runner);
+    pow_truncated::register(runner);
     shl::register(runner);
     square::register(runner);
     square_truncated::register(runner);
@@ -116,6 +118,8 @@ mod mul;
 mod mul_power_of_x;
 mod mul_truncated;
 mod nth_derivative;
+mod pow;
+mod pow_truncated;
 mod shl;
 mod square;
 mod square_truncated;

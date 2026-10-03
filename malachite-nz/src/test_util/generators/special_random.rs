@@ -257,6 +257,69 @@ pub fn special_random_natural_polynomial_unsigned_pair_gen_var_4(
     )
 }
 
+pub fn special_random_natural_polynomial_unsigned_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigned_inclusive_range(
+                seed,
+                0,
+                148,
+                config.get_or("mean_small_n", 8),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_natural_polynomial_unsigned_pair_gen_var_6(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64)> {
+    Box::new(
+        special_random_natural_polynomial_unsigned_pair_gen_var_5(config)
+            .filter(|(p, _)| p.len() == 2),
+    )
+}
+
+pub fn special_random_natural_polynomial_unsigned_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64, u64)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 8),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_integer_polynomial_unsigned_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, u64)> {
@@ -345,6 +408,43 @@ pub fn special_random_integer_polynomial_unsigned_pair_gen_var_4(
     )
 }
 
+pub fn special_random_integer_polynomial_unsigned_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigned_inclusive_range(
+                seed,
+                0,
+                148,
+                config.get_or("mean_small_n", 8),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_polynomial_unsigned_pair_gen_var_6(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64)> {
+    Box::new(
+        special_random_integer_polynomial_unsigned_pair_gen_var_5(config)
+            .filter(|(p, _)| p.len() == 2),
+    )
+}
+
 pub fn special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, u64, u64)> {
@@ -379,6 +479,32 @@ pub fn special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_1(
         )
         .map(|(p, x, m)| (p, x % m, m)),
     )
+}
+
+pub fn special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64, u64)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 8),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
 }
 
 pub fn special_random_natural_polynomial_gen(config: &GenConfig) -> It<NaturalPolynomial> {

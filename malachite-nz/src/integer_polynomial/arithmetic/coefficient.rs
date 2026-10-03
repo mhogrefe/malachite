@@ -15,9 +15,11 @@ use crate::natural::Natural;
 use crate::platform::{SignedDoubleLimb, SignedLimb};
 use alloc::vec::Vec;
 use core::fmt::Debug;
-use core::ops::{AddAssign, SubAssign};
-use malachite_base::num::arithmetic::traits::{AddMulAssign, Square, SubMulAssign};
-use malachite_base::num::basic::traits::Zero;
+use core::ops::{AddAssign, MulAssign, SubAssign};
+use malachite_base::num::arithmetic::traits::{
+    AddMulAssign, DivExactAssign, Pow, Square, SubMulAssign,
+};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 
 crate_test_trait! {
@@ -31,9 +33,13 @@ PolynomialCoefficient:
     + Debug
     + Default
     + Zero
+    + One
     + Eq
+    + From<u64>
     + for<'a> AddAssign<&'a Self>
     + for<'a> SubAssign<&'a Self>
+    + for<'a> MulAssign<&'a Self>
+    + for<'a> DivExactAssign<&'a Self>
     + for<'a> AddMulAssign<&'a Self, &'a Self>
     + for<'a> SubMulAssign<&'a Self, &'a Self>
     + ExactFrom<SignedLimb>
@@ -68,6 +74,9 @@ PolynomialCoefficient:
 
     // The square of a coefficient.
     fn square_ref(&self) -> Self;
+
+    // The coefficient raised to the power `e`.
+    fn pow_ref(&self, e: u64) -> Self;
 
     // Sets `out` to the first `out.len()` elements of `xs`, each multiplied by `c`.
     fn vec_mul_scalar_to_out(out: &mut [Self], xs: &[Self], c: &Self);
@@ -120,6 +129,11 @@ impl PolynomialCoefficient for Integer {
     #[inline]
     fn square_ref(&self) -> Self {
         self.square()
+    }
+
+    #[inline]
+    fn pow_ref(&self, e: u64) -> Self {
+        self.pow(e)
     }
 
     #[inline]
@@ -182,6 +196,11 @@ impl PolynomialCoefficient for Natural {
     #[inline]
     fn square_ref(&self) -> Self {
         self.square()
+    }
+
+    #[inline]
+    fn pow_ref(&self, e: u64) -> Self {
+        self.pow(e)
     }
 
     fn vec_mul_scalar_to_out(out: &mut [Self], xs: &[Self], c: &Self) {

@@ -1012,6 +1012,342 @@ fn tune_poly_mod_mul_middle_grid() {
     }
 }
 
+// Times the IntegerPolynomial powering kernels over a grid of lengths, coefficient sizes, and
+// exponents, through `pow_ref_with_kernel`, for choosing between them in `pow_to_out`. Coefficients
+// are random with exactly `bits` bits and random signs. "default" is the current dispatch; the last
+// columns compare binary exponentiation with the multinomial recurrence and with addition chains,
+// and a ratio above 1 means binary exponentiation is slower. Grids are overridable through
+// POW_GRID_LENS, POW_GRID_BITS, and POW_GRID_EXPS; configurations whose power would have more than
+// POW_GRID_MAX_BITS bits in total (default 2^27) are skipped.
+fn tune_poly_pow_grid() {
+    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::logic::traits::BitAccess;
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::pow::binexp::pow_to_out_binexp;
+    use malachite_nz::integer_polynomial::arithmetic::pow::binomial::pow_to_out_binomial;
+    use malachite_nz::integer_polynomial::arithmetic::pow::multinomial::pow_to_out_multinomial;
+    use malachite_nz::integer_polynomial::arithmetic::pow::{
+        pow_ref_with_kernel, pow_to_out, pow_to_out_addchains_e,
+    };
+    use malachite_nz::natural::Natural;
+    use malachite_nz::test_util::integer_polynomial::arithmetic::pow::*;
+    use std::time::Instant;
+    fn dense(seed: &str, n: usize, bits: u64) -> Vec<Integer> {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+        let mut signs = random_primitive_ints::<u8>(EXAMPLE_SEED.fork(&format!("{seed}s")));
+        let limb_count = usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap();
+        (0..n)
+            .map(|_| {
+                let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                let mut x = Natural::from_owned_limbs_asc(xs).mod_power_of_2(bits);
+                x.set_bit(bits - 1);
+                if signs.next().unwrap().odd() {
+                    -Integer::from(x)
+                } else {
+                    Integer::from(x)
+                }
+            })
+            .collect()
+    }
+    // Seconds per call: iterations are doubled (or multiplied by 10) until a batch takes at least
+    // 20 ms, and the best of 3 batches is kept.
+    fn time_one(f: &mut dyn FnMut()) -> f64 {
+        let mut iters = 1u64;
+        loop {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            let t = t0.elapsed().as_secs_f64();
+            if t >= 0.02 {
+                break;
+            }
+            iters *= if t < 0.002 { 10 } else { 2 };
+        }
+        let mut best = f64::INFINITY;
+        for _ in 0..3 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best
+    }
+    let grid = |var: &str, default: &[u64]| -> Vec<u64> {
+        std::env::var(var).map_or_else(
+            |_| default.to_vec(),
+            |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+        )
+    };
+    let lens = grid("POW_GRID_LENS", &[2, 3, 4, 6, 8, 16, 32, 64]);
+    let all_bits = grid("POW_GRID_BITS", &[8, 32, 64, 256, 1024, 4096]);
+    let exps = grid("POW_GRID_EXPS", &[5, 8, 16, 32, 64, 148]);
+    let max_bits: u64 = std::env::var("POW_GRID_MAX_BITS").map_or(1 << 27, |v| v.parse().unwrap());
+    println!(
+        "{:>4} {:>5} {:>4} {:>12} {:>12} {:>12} {:>12} {:>12} {:>8} {:>8}",
+        "len",
+        "bits",
+        "e",
+        "default",
+        "binexp",
+        "multinom",
+        "multi FLINT",
+        "addchains",
+        "bin/mul",
+        "bin/add"
+    );
+    for &len in &lens {
+        for &bits in &all_bits {
+            for &e in &exps {
+                if e.saturating_mul(e).saturating_mul(len).saturating_mul(bits) > max_bits {
+                    continue;
+                }
+                let n = usize::try_from(len).unwrap();
+                let xs = dense(&format!("p{len}_{bits}"), n, bits);
+                let t_default = time_one(&mut || {
+                    black_box(pow_ref_with_kernel(&xs, e, pow_to_out));
+                });
+                // For length 2, the binomial kernel stands in the multinomial column.
+                let t_binexp = time_one(&mut || {
+                    black_box(pow_ref_with_kernel(&xs, e, pow_to_out_binexp));
+                });
+                let t_multi = if len == 2 {
+                    time_one(&mut || {
+                        black_box(pow_ref_with_kernel(&xs, e, pow_to_out_binomial));
+                    })
+                } else {
+                    time_one(&mut || {
+                        black_box(pow_ref_with_kernel(&xs, e, pow_to_out_multinomial));
+                    })
+                };
+                let t_flint = time_one(&mut || {
+                    black_box(pow_ref_with_kernel(&xs, e, pow_to_out_multinomial_flint));
+                });
+                let t_add = time_one(&mut || {
+                    black_box(pow_ref_with_kernel(&xs, e, pow_to_out_addchains_e));
+                });
+                println!(
+                    concat!(
+                        "{:>4} {:>5} {:>4} {:>12.0} {:>12.0} {:>12.0} {:>12.0} {:>12.0} ",
+                        "{:>8.2} {:>8.2}"
+                    ),
+                    len,
+                    bits,
+                    e,
+                    t_default * 1e9,
+                    t_binexp * 1e9,
+                    t_multi * 1e9,
+                    t_flint * 1e9,
+                    t_add * 1e9,
+                    t_binexp / t_multi,
+                    t_binexp / t_add
+                );
+            }
+        }
+    }
+}
+
+// Times the forms of the IntegerPolynomial multinomial powering kernel: the default choice between
+// the two below, the precomputed multiples, the sum split by sign, and FLINT's single signed sum.
+// Grids are overridable through POW_GRID_LENS, POW_GRID_BITS, and POW_GRID_EXPS.
+fn tune_poly_pow_multinomial_grid() {
+    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::logic::traits::BitAccess;
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::pow::multinomial::*;
+    use malachite_nz::integer_polynomial::arithmetic::pow::pow_ref_with_kernel;
+    use malachite_nz::natural::Natural;
+    use malachite_nz::test_util::integer_polynomial::arithmetic::pow::pow_to_out_multinomial_flint;
+    use std::time::Instant;
+    fn dense(seed: &str, n: usize, bits: u64) -> Vec<Integer> {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+        let mut signs = random_primitive_ints::<u8>(EXAMPLE_SEED.fork(&format!("{seed}s")));
+        let limb_count = usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap();
+        (0..n)
+            .map(|_| {
+                let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                let mut x = Natural::from_owned_limbs_asc(xs).mod_power_of_2(bits);
+                x.set_bit(bits - 1);
+                if signs.next().unwrap().odd() {
+                    -Integer::from(x)
+                } else {
+                    Integer::from(x)
+                }
+            })
+            .collect()
+    }
+    // Seconds per call: iterations are doubled (or multiplied by 10) until a batch takes at least
+    // 20 ms, and the best of 3 batches is kept.
+    fn time_one(f: &mut dyn FnMut()) -> f64 {
+        let mut iters = 1u64;
+        loop {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            let t = t0.elapsed().as_secs_f64();
+            if t >= 0.02 {
+                break;
+            }
+            iters *= if t < 0.002 { 10 } else { 2 };
+        }
+        let mut best = f64::INFINITY;
+        for _ in 0..3 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best
+    }
+    let grid = |var: &str, default: &[u64]| -> Vec<u64> {
+        std::env::var(var).map_or_else(
+            |_| default.to_vec(),
+            |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+        )
+    };
+    let lens = grid("POW_GRID_LENS", &[3, 4, 8, 16]);
+    let all_bits = grid("POW_GRID_BITS", &[8, 32, 64, 256, 1024]);
+    let exps = grid("POW_GRID_EXPS", &[16, 64, 148]);
+    println!(
+        "{:>4} {:>5} {:>4} {:>12} {:>12} {:>12} {:>12}",
+        "len", "bits", "e", "default", "multiples", "split", "FLINT"
+    );
+    for &len in &lens {
+        for &bits in &all_bits {
+            for &e in &exps {
+                let n = usize::try_from(len).unwrap();
+                let xs = dense(&format!("p{len}_{bits}"), n, bits);
+                let t = [
+                    time_one(&mut || {
+                        black_box(pow_ref_with_kernel(&xs, e, pow_to_out_multinomial));
+                    }),
+                    time_one(&mut || {
+                        black_box(pow_ref_with_kernel(
+                            &xs,
+                            e,
+                            pow_to_out_multinomial_multiples,
+                        ));
+                    }),
+                    time_one(&mut || {
+                        black_box(pow_ref_with_kernel(&xs, e, pow_to_out_multinomial_split));
+                    }),
+                    time_one(&mut || {
+                        black_box(pow_ref_with_kernel(&xs, e, pow_to_out_multinomial_flint));
+                    }),
+                ];
+                println!(
+                    "{:>4} {:>5} {:>4} {:>12.0} {:>12.0} {:>12.0} {:>12.0}",
+                    len,
+                    bits,
+                    e,
+                    t[0] * 1e9,
+                    t[1] * 1e9,
+                    t[2] * 1e9,
+                    t[3] * 1e9
+                );
+            }
+        }
+    }
+}
+
+// Times binary exponentiation against addition chains for IntegerPolynomial powering, over
+// exponents that are not powers of 2. A ratio above 1 means binary exponentiation is slower.
+fn tune_poly_pow_chain_grid() {
+    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::logic::traits::BitAccess;
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::pow::binexp::pow_to_out_binexp;
+    use malachite_nz::integer_polynomial::arithmetic::pow::{
+        pow_ref_with_kernel, pow_to_out_addchains_e,
+    };
+    use malachite_nz::natural::Natural;
+    use std::time::Instant;
+    fn dense(seed: &str, n: usize, bits: u64) -> Vec<Integer> {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+        let mut signs = random_primitive_ints::<u8>(EXAMPLE_SEED.fork(&format!("{seed}s")));
+        let limb_count = usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap();
+        (0..n)
+            .map(|_| {
+                let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                let mut x = Natural::from_owned_limbs_asc(xs).mod_power_of_2(bits);
+                x.set_bit(bits - 1);
+                if signs.next().unwrap().odd() {
+                    -Integer::from(x)
+                } else {
+                    Integer::from(x)
+                }
+            })
+            .collect()
+    }
+    // Seconds per call: iterations are doubled (or multiplied by 10) until a batch takes at least
+    // 20 ms, and the best of 3 batches is kept.
+    fn time_one(f: &mut dyn FnMut()) -> f64 {
+        let mut iters = 1u64;
+        loop {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            let t = t0.elapsed().as_secs_f64();
+            if t >= 0.02 {
+                break;
+            }
+            iters *= if t < 0.002 { 10 } else { 2 };
+        }
+        let mut best = f64::INFINITY;
+        for _ in 0..3 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best
+    }
+    let grid = |var: &str, default: &[u64]| -> Vec<u64> {
+        std::env::var(var).map_or_else(
+            |_| default.to_vec(),
+            |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+        )
+    };
+    let lens = grid("POW_GRID_LENS", &[3, 8, 32]);
+    let all_bits = grid("POW_GRID_BITS", &[64, 1024, 4096]);
+    let exps = grid(
+        "POW_GRID_EXPS",
+        &[5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 23, 27, 31, 47, 63, 100, 127],
+    );
+    println!(
+        "{:>4} {:>5} {:>4} {:>12} {:>12} {:>8}",
+        "len", "bits", "e", "binexp", "addchains", "bin/add"
+    );
+    for &len in &lens {
+        for &bits in &all_bits {
+            for &e in &exps {
+                let n = usize::try_from(len).unwrap();
+                let xs = dense(&format!("p{len}_{bits}"), n, bits);
+                let t_binexp = time_one(&mut || {
+                    black_box(pow_ref_with_kernel(&xs, e, pow_to_out_binexp));
+                });
+                let t_add = time_one(&mut || {
+                    black_box(pow_ref_with_kernel(&xs, e, pow_to_out_addchains_e));
+                });
+                println!(
+                    "{:>4} {:>5} {:>4} {:>12.0} {:>12.0} {:>8.2}",
+                    len,
+                    bits,
+                    e,
+                    t_binexp * 1e9,
+                    t_add * 1e9,
+                    t_binexp / t_add
+                );
+            }
+        }
+    }
+}
+
 // The Malachite side of the FFT-region mul comparison; the C sides are perf/scratch/{mul_gmp.c,
 // mul_flint.c} (make mul-gmp / mul-gmp-noasm / mul-flint). Inputs use the same LCG so all four
 // harnesses multiply identical operands. Times go through the full dispatch, so sizes >=
@@ -3410,6 +3746,9 @@ pub fn tune(key: &str) {
         "poly_mod_mul_grid" => tune_poly_mod_mul_grid(),
         "poly_mod_evaluate_geometric_grid" => tune_poly_mod_evaluate_geometric_grid(),
         "poly_mod_mul_middle_grid" => tune_poly_mod_mul_middle_grid(),
+        "poly_pow_grid" => tune_poly_pow_grid(),
+        "poly_pow_multinomial_grid" => tune_poly_pow_multinomial_grid(),
+        "poly_pow_chain_grid" => tune_poly_pow_chain_grid(),
         "gcd_probe" => tune_gcd_probe(),
         "xgcd_probe" => tune_xgcd_probe(),
         "mul_fft" => tune_mul_fft(),

@@ -214,6 +214,25 @@ pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_4() -> It<(NaturalPol
     )
 }
 
+pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_5() -> It<(NaturalPolynomial, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 148),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_6() -> It<(NaturalPolynomial, u64)> {
+    Box::new(exhaustive_natural_polynomial_unsigned_pair_gen_var_5().filter(|(p, _)| p.len() == 2))
+}
+
+pub fn exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_3()
+-> It<(NaturalPolynomial, u64, u64)> {
+    Box::new(exhaustive_triples_xyy(
+        exhaustive_natural_polynomials(),
+        exhaustive_unsigneds::<u64>(),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_pair_gen() -> It<(IntegerPolynomial, IntegerPolynomial)> {
     Box::new(exhaustive_pairs_from_single(
         exhaustive_integer_polynomials(),
@@ -368,6 +387,17 @@ pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_4() -> It<(IntegerPol
     )
 }
 
+pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_5() -> It<(IntegerPolynomial, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integer_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 148),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_6() -> It<(IntegerPolynomial, u64)> {
+    Box::new(exhaustive_integer_polynomial_unsigned_pair_gen_var_5().filter(|(p, _)| p.len() == 2))
+}
+
 pub fn exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_1()
 -> It<(IntegerPolynomial, u64, u64)> {
     Box::new(
@@ -378,6 +408,14 @@ pub fn exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_1()
         )
         .filter(|&(_, x, m)| x < m),
     )
+}
+
+pub fn exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_2()
+-> It<(IntegerPolynomial, u64, u64)> {
+    Box::new(exhaustive_triples_xyy(
+        exhaustive_integer_polynomials(),
+        exhaustive_unsigneds::<u64>(),
+    ))
 }
 
 pub fn exhaustive_natural_polynomial_gen() -> It<NaturalPolynomial> {

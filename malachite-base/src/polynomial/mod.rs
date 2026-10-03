@@ -312,6 +312,39 @@ pub trait SquareTruncatedAssign {
     fn square_truncated_assign(&mut self, len: u64);
 }
 
+/// Raises a polynomial to a power, keeping only the coefficients of $x^i$ for $i$ less than a given
+/// length.
+///
+/// With $n$ equal to `len`, this is powering in the ring of polynomials modulo $x^n$, applied to
+/// the image of the polynomial there. The polynomial need not already be truncated: it may have any
+/// number of coefficients, and only the first `len` are read.
+pub trait PowTruncated {
+    type Output;
+
+    /// Raises a polynomial to the power `exp` and truncates the power to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p, e, n) = p^e \bmod x^n.
+    /// $$
+    fn pow_truncated(self, exp: u64, len: u64) -> Self::Output;
+}
+
+/// Raises a polynomial to a power in place, keeping only the coefficients of $x^i$ for $i$ less
+/// than a given length.
+///
+/// With $n$ equal to `len`, this is powering in the ring of polynomials modulo $x^n$, applied to
+/// the image of the polynomial there. The polynomial need not already be truncated: it may have any
+/// number of coefficients, and only the first `len` are read.
+pub trait PowTruncatedAssign {
+    /// Raises `self` to the power `exp` and truncates the power to its first `len` coefficients.
+    ///
+    /// $$
+    /// p \gets p^e \bmod x^n.
+    /// $$
+    fn pow_truncated_assign(&mut self, exp: u64, len: u64);
+}
+
 /// Adds two polynomials modulo $2^k$, keeping only the coefficients of $x^i$ for $i$ less than a
 /// given length. The coefficients of both must already be reduced modulo $2^k$.
 ///
