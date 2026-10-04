@@ -1,0 +1,7 @@
+trailing_zeros(0) = None
+trailing_zeros(123) = Some(0)
+trailing_zeros(1000000000000) = Some(12)
+trailing_zeros(4294967295) = Some(0)
+trailing_zeros(4294967296) = Some(32)
+trailing_zeros(18446744073709551615) = Some(0)
+trailing_zeros(18446744073709551616) = Some(64)

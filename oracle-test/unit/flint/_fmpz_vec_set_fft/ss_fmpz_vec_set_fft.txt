@@ -1,0 +1,6 @@
+integers_from_fermat_residues(_, [[5, 0], [18446744073709551615, 0]], 1, false) = [5, 18446744073709551615]
+integers_from_fermat_residues(_, [[5, 0], [18446744073709551615, 0]], 1, true) = [5, -2]
+integers_from_fermat_residues(_, [[0, 1]], 1, true) = [-1]
+integers_from_fermat_residues(_, [[0, 9223372036854775808, 0]], 2, true) = [170141183460469231731687303715884105728]
+integers_from_fermat_residues(_, [[1, 9223372036854775808, 0]], 2, true) = [-170141183460469231731687303715884105728]
+integers_from_fermat_residues(_, [[0, 9223372036854775809, 0]], 2, true) = [-170141183460469231713240559642174554113]

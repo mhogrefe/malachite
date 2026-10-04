@@ -1,0 +1,9 @@
+0.to_string_base(62) = 0
+10.to_string_base(62) = A
+35.to_string_base(62) = Z
+36.to_string_base(62) = a
+61.to_string_base(62) = z
+62.to_string_base(62) = 10
+1000.to_string_base(62) = G8
+1000.to_string_base(37) = R1
+1000.to_string_base(61) = GO

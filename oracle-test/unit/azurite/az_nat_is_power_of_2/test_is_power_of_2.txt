@@ -1,0 +1,13 @@
+0 is not a power of 2
+1 is a power of 2
+2 is a power of 2
+3 is not a power of 2
+4 is a power of 2
+5 is not a power of 2
+6 is not a power of 2
+7 is not a power of 2
+8 is a power of 2
+1024 is a power of 2
+1025 is not a power of 2
+1000000000000 is not a power of 2
+1099511627776 is a power of 2

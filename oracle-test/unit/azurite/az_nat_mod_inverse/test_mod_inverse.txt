@@ -1,0 +1,7 @@
+1⁻¹ ≡ 1 mod 6
+8 is not invertible mod 12
+42 is not invertible mod 56
+3⁻¹ ≡ 2 mod 5
+3⁻¹ ≡ 7 mod 10
+12345678987654321⁻¹ ≡ 1777777788 mod 98765432123456789
+12345678987654321 is not invertible mod 98765432123456827

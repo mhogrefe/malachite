@@ -1,0 +1,14 @@
+0 is not coprime with 0
+0 is not coprime with 6
+6 is not coprime with 0
+1 is coprime with 6
+6 is coprime with 1
+8 is not coprime with 12
+54 is not coprime with 24
+42 is not coprime with 56
+48 is not coprime with 18
+3 is coprime with 5
+12 is not coprime with 60
+12 is not coprime with 90
+12345678987654321 is coprime with 98765432123456789
+12345678987654321 is not coprime with 98765432123456827

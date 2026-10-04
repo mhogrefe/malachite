@@ -353,9 +353,11 @@ cd .. &&
 echo "Step 166. Running additional-lints" &&
 bash additional-lints.sh &&
 echo "Step 167. Testing against FLINT" &&
-cd cpp-test &&
-cargo run --release &&
+cd oracle-test &&
+cargo run --release -- flint &&
+echo "Step 168. Testing against Azurite" &&
+cargo run --release -- azurite &&
 cd .. &&
-echo "Step 168. Checking links" &&
+echo "Step 169. Checking links" &&
 cd ../check-malachite-links &&
 cargo run --release

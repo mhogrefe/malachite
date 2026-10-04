@@ -1,0 +1,6 @@
+limbs_neg_mod_2expp1_to_out(_, [0, 0], 1) = [0, 0]
+limbs_neg_mod_2expp1_to_out(_, [1, 0], 1) = [0, 1]
+limbs_neg_mod_2expp1_to_out(_, [2, 0], 1) = [18446744073709551615, 0]
+limbs_neg_mod_2expp1_to_out(_, [0, 1], 1) = [1, 0]
+limbs_neg_mod_2expp1_to_out(_, [18446744073709551615, 0], 1) = [2, 0]
+limbs_neg_mod_2expp1_to_out(_, [3, 4, 0], 2) = [18446744073709551614, 18446744073709551611, 0]

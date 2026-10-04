@@ -1,0 +1,7 @@
+fft_adjust_limbs(0) = 0
+fft_adjust_limbs(1) = 1
+fft_adjust_limbs(128) = 128
+fft_adjust_limbs(129) = 144
+fft_adjust_limbs(1000) = 1024
+fft_adjust_limbs(1048576) = 1048576
+fft_adjust_limbs(1048577) = 1114112

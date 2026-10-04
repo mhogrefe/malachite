@@ -1,0 +1,7 @@
+cmp_normalized(1, 4) = Equal
+cmp_normalized(5, 6) = Less
+cmp_normalized(3, 17) = Greater
+cmp_normalized(9, 36) = Equal
+cmp_normalized(117886223846050103296, 409) = Equal
+cmp_normalized(117886223846050103295, 409) = Less
+cmp_normalized(117886223846050103297, 409) = Greater

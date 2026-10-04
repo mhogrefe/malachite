@@ -1,0 +1,8 @@
+primitive_root_prime(2) = 1
+primitive_root_prime(3) = 2
+primitive_root_prime(5) = 2
+primitive_root_prime(7) = 3
+primitive_root_prime(11) = 2
+primitive_root_prime(191) = 19
+primitive_root_prime(9223372036854775807) = 2
+primitive_root_prime(8760810010780182161) = 3

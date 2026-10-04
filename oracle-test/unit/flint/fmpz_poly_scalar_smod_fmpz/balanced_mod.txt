@@ -1,0 +1,15 @@
+(0).balanced_mod(1) = 0
+(0).balanced_mod(-7) = 0
+(x^2+27*x-23).balanced_mod(1) = 0
+(x^2+27*x-23).balanced_mod(-1) = 0
+(x^2+27*x-23).balanced_mod(10) = x^2-3*x-3
+(x^2+27*x-23).balanced_mod(-10) = x^2-3*x-3
+(5*x-5).balanced_mod(10) = 5*x+5
+(x^2+x+1).balanced_mod(2) = x^2+x+1
+(-x^2-x-1).balanced_mod(2) = x^2+x+1
+(2*x-2).balanced_mod(5) = 2*x-2
+(3*x-3).balanced_mod(5) = -2*x+2
+(10*x^2+7*x+5).balanced_mod(-10) = -3*x+5
+(-6*x^2-3*x-9).balanced_mod(3) = 0
+(x^3-6*x^2+2).balanced_mod(3) = x^3-1
+(1000000000000000000000000*x+1).balanced_mod(1234567890987) = 530068894399*x+1

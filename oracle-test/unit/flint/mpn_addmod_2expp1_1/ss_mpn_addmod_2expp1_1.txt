@@ -1,0 +1,6 @@
+limbs_add_signed_limb_mod_2expp1([1, 0], 1, 1) = [2, 0]
+limbs_add_signed_limb_mod_2expp1([18446744073709551615, 0], 1, 1) = [0, 1]
+limbs_add_signed_limb_mod_2expp1([0, 0], 1, 18446744073709551615) = [18446744073709551615, 18446744073709551615]
+limbs_add_signed_limb_mod_2expp1([5, 7, 0], 2, 3) = [8, 7, 0]
+limbs_add_signed_limb_mod_2expp1([0, 0, 1], 2, 18446744073709551615) = [18446744073709551615, 18446744073709551615, 0]
+limbs_add_signed_limb_mod_2expp1([18446744073709551615, 18446744073709551615, 2], 2, 1) = [0, 0, 3]

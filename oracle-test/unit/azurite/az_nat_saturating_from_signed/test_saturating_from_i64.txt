@@ -1,0 +1,5 @@
+Natural::saturating_from(0) = 0
+Natural::saturating_from(123) = 123
+Natural::saturating_from(-123) = 0
+Natural::saturating_from(9223372036854775807) = 9223372036854775807
+Natural::saturating_from(-9223372036854775808) = 0

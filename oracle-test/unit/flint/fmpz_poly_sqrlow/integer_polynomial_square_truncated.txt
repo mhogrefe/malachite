@@ -1,0 +1,8 @@
+(&(0)).square_truncated(3) = 0
+(&(x+1)).square_truncated(0) = 0
+(&(x+1)).square_truncated(1) = 1
+(&(x+1)).square_truncated(2) = 2*x+1
+(&(x+1)).square_truncated(100) = x^2+2*x+1
+(&(x^2+x-1)).square_truncated(3) = -x^2-2*x+1
+(&(x^3-x)).square_truncated(4) = x^2
+(&(x^3-x)).square_truncated(5) = -2*x^4+x^2

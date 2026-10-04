@@ -1,0 +1,7 @@
+significant_bits(0) = 0
+significant_bits(100) = 7
+significant_bits(1000000000000) = 40
+significant_bits(4294967295) = 32
+significant_bits(4294967296) = 33
+significant_bits(18446744073709551615) = 64
+significant_bits(18446744073709551616) = 65

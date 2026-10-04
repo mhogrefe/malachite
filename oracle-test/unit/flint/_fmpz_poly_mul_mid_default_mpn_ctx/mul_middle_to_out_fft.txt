@@ -1,0 +1,3 @@
+mul_middle_to_out_fft(_, [1, 2, 3], [4, 5, 6], 0, 5) = Some([4, 13, 28, 27, 18])
+mul_middle_to_out_fft(_, [1, -2, 3], [4, 5, -6], 0, 5) = Some([4, -3, -4, 27, -18])
+mul_middle_to_out_fft(_, [7], [3, -2], 1, 2) = Some([-14])

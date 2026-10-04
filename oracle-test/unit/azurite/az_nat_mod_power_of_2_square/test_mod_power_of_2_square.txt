@@ -1,0 +1,8 @@
+0.square() ≡ 0 mod 2^0
+0.square() ≡ 0 mod 2^2
+1.square() ≡ 1 mod 2^2
+2.square() ≡ 0 mod 2^2
+2.square() ≡ 4 mod 2^3
+5.square() ≡ 1 mod 2^3
+100.square() ≡ 16 mod 2^8
+12345678987654321.square() ≡ 16556040056090124897 mod 2^64
