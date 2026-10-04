@@ -80,6 +80,7 @@ pub(crate) fn register(runner: &mut Runner) {
     sec::register(runner);
     sech::register(runner);
     csch::register(runner);
+    coth::register(runner);
     tan::register(runner);
     tanh::register(runner);
     sqrt::register(runner);
@@ -110,6 +111,7 @@ mod conjugate;
 mod cos;
 mod cosh;
 mod cot;
+mod coth;
 mod csc;
 mod csch;
 mod div;

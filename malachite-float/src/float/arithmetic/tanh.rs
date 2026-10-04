@@ -37,21 +37,27 @@ use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
+// A lower bound on 2|x| log_2(e) for a finite |x| = `x_abs`, used to bound exp(-2|x|) from above: f
+// + 7 floor(f / 16), where f = floor(2|x|), saturating. Since log_2(e) = 1.4426... > 1 + 7/16, this
+// is at most 2|x| (1 + 7/16) <= 2|x| log_2(e). An |x| of 2^62 or more gives far more bits than any
+// precision.
+pub(crate) fn two_x_log_2_e_lower_bound(x_abs: &Float) -> u64 {
+    let f = if x_abs.get_exponent().unwrap() > 62 {
+        u64::MAX
+    } else {
+        u64::rounding_from(&(x_abs << 1u32), Floor).0
+    };
+    f.saturating_add((f >> 4) * 7)
+}
+
 // Computes tanh(x) for a finite nonzero x with |x| = `x_abs` so large that tanh(x) is close to ±1:
 // MPFR's `set_one` label, which sets the result to ±1 or its neighbor toward zero. That is correct
 // only when 1 - tanh(|x|) is below half an ulp of the output, which MPFR takes for granted; here it
 // is checked, using 0 < 1 - tanh(|x|) = 2 / (exp(2|x|) + 1) < 2 exp(-2|x|) = 2^(1 - 2|x| log_2(e)),
 // and when it fails (at a precision beyond about 2.9|x| bits), the result is computed from expm1.
 fn tanh_near_one(x_abs: &Float, positive: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    // f = floor(2|x|), saturating; an |x| of 2^62 or more gives far more bits than any precision
-    let f = if x_abs.get_exponent().unwrap() > 62 {
-        u64::MAX
-    } else {
-        u64::rounding_from(&(x_abs << 1u32), Floor).0
-    };
-    // err = f + 7 floor(f / 16) <= 2|x| (1 + 7/16) <= 2|x| log_2(e), since log_2(e) = 1.4426... >
-    // 1.4375, so 1 - tanh(|x|) < 2^(1 - err)
-    let err = f.saturating_add((f >> 4) * 7);
+    // 1 - tanh(|x|) < 2^(1 - err)
+    let err = two_x_log_2_e_lower_bound(x_abs);
     let one = if positive {
         Float::ONE
     } else {

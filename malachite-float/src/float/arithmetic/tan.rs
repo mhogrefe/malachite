@@ -1055,7 +1055,7 @@ pub(crate) fn round_bracket_signed(
 // Returns `None` if the bracket does not decide the rounding, so that the working precision must
 // grow. This serves the reciprocal functions built on MPFR's gen_inverse.h template: the secant,
 // cosecant, and hyperbolic cosecant.
-pub(crate) fn reciprocal_of_down_bracket(
+fn reciprocal_of_down_bracket(
     d: &Float,
     m: u64,
     prec: u64,
@@ -1073,6 +1073,42 @@ pub(crate) fn reciprocal_of_down_bracket(
     let lo = Rational::exact_from(d).abs();
     let hi = &lo + Rational::power_of_2(exp_d - i64::exact_from(m));
     round_bracket_signed_by(negative, hi.reciprocal(), lo.reciprocal(), prec, rm)
+}
+
+// The Ziv loop of MPFR's gen_inverse.h, for a reciprocal function 1/d(x) whose denominator
+// `denominator(m)` returns d(x) rounded toward zero at precision m. That has an error below 1 ulp,
+// of a known sign, and its reciprocal, rounded to nearest, has an error below c_w + 2 c_u k_u = 1/2
+// + 2 < 4 ulps (see algorithms.tex), where c_w = 1/2 and c_u = 1 since d(x) was rounded toward
+// zero. A reciprocal whose exponent is below MAX_SETTLED_EXPONENT can be rounded to any precision
+// without leaving the exponent range, so the `Float` reciprocal settles it; the rest, which
+// overflowed or lie near the top of the range, go to `reciprocal_of_down_bracket`. This serves the
+// secant, cosecant, and hyperbolic cosecant and cotangent, whose magnitudes are bounded below well
+// above the bottom of the range, so that only the top end is in play.
+pub(crate) fn reciprocal_ziv_loop<D: FnMut(u64) -> Float>(
+    prec: u64,
+    rm: RoundingMode,
+    mut denominator: D,
+) -> (Float, Ordering) {
+    let mut m = prec + prec.ceiling_log_base_2() + 3;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let d = denominator(m);
+        let r = (&d).reciprocal();
+        match r.get_exponent().map(i64::from) {
+            Some(e) if e < MAX_SETTLED_EXPONENT => {
+                if float_can_round(r.significand_ref().unwrap(), m - 2, prec, rm) {
+                    return Float::from_float_prec_round(r, prec, rm);
+                }
+            }
+            _ => {
+                if let Some(result) = reciprocal_of_down_bracket(&d, m, prec, rm) {
+                    return result;
+                }
+            }
+        }
+        m += increment;
+        increment = m >> 1;
+    }
 }
 
 // `round_bracket` for a bracket [lo, hi] of the magnitude of the tangent, negated if `negative`.

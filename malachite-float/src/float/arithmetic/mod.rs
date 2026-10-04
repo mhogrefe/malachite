@@ -202,6 +202,10 @@ pub mod cosh;
 /// [`CotAssign`](malachite_base::num::arithmetic::traits::CotAssign), traits for computing the
 /// cotangent of [`Float`](super::Float)s.
 pub mod cot;
+/// Implementations of [`Coth`](malachite_base::num::arithmetic::traits::Coth) and
+/// [`CothAssign`](malachite_base::num::arithmetic::traits::CothAssign), traits for computing the
+/// hyperbolic cotangent of [`Float`](super::Float)s.
+pub mod coth;
 /// Implementations of [`Csc`](malachite_base::num::arithmetic::traits::Csc) and
 /// [`CscAssign`](malachite_base::num::arithmetic::traits::CscAssign), traits for computing the
 /// cosecant of [`Float`](super::Float)s.

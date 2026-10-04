@@ -1071,6 +1071,12 @@ documented by git history.
   $\sinh x$ (which also handles inputs too small to be `Float`s, whose hyperbolic cosecants
   overflow), and otherwise $x$ is bracketed between two `Float`s, $\operatorname{csch}$ being
   decreasing on each side of 0.
+- `Coth` and `CothAssign` (new traits in malachite-base) for `Float`, with the usual
+  `coth_prec_round`, `coth_prec`, `coth_round`, and `_ref`/`_assign` variants, and
+  `primitive_float_coth`: a port of `mpfr_coth`, computing $1/\tanh x$. Where the result is close
+  to $\pm1$, it is rounded from $\pm1$ using a bound on $|\coth x| - 1$ derived from $x$, rather
+  than from the computed reciprocal; a reciprocal at the top of the exponent range is decided from
+  an exact bracket.
 
 ### Documentation
 

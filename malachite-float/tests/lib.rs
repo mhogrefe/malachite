@@ -84,6 +84,7 @@ pub mod float {
         pub mod cos;
         pub mod cosh;
         pub mod cot;
+        pub mod coth;
         pub mod csc;
         pub mod csch;
         pub mod div;

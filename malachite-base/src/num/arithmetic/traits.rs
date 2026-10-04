@@ -1190,6 +1190,18 @@ pub trait CschAssign {
     fn csch_assign(&mut self);
 }
 
+/// Computes $\coth(x)$, the hyperbolic cotangent of a number.
+pub trait Coth {
+    type Output;
+
+    fn coth(self) -> Self::Output;
+}
+
+/// Replaces a number with its hyperbolic cotangent, $\coth(x)$.
+pub trait CothAssign {
+    fn coth_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

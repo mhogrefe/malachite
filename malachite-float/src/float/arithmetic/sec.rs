@@ -24,11 +24,11 @@ use crate::float::arithmetic::cos::{
     cos_rational_helper, cos_turns_helper, phi_minus_1_prec_round, signed_constant,
 };
 use crate::float::arithmetic::round_near_x::{float_round_near_x, round_from_below};
-use crate::float::arithmetic::tan::{MAX_SETTLED_EXPONENT, reciprocal_of_down_bracket};
+use crate::float::arithmetic::tan::reciprocal_ziv_loop;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::{max, min};
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Mod, Reciprocal, Sec, SecAssign};
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Mod, Sec, SecAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity as InfinityTrait, NaN as NaNTrait, One};
@@ -37,8 +37,6 @@ use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::arithmetic::float::round::float_can_round;
-use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
 // This is mpfr_sec from sec.c, MPFR 4.2.2, with the bracket path for results near the top of the
@@ -60,34 +58,7 @@ fn sec_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
             return float_round_near_x(&Float::ONE, min(err, prec + 2), true, prec, rm).unwrap();
         }
     }
-    // Compute initial precision
-    let mut m = prec + prec.ceiling_log_base_2() + 3;
-    let mut increment = Limb::WIDTH;
-    loop {
-        // err < 1 ulp, and of a known sign: rounding toward zero puts the cosine below the true one
-        // in magnitude
-        let c = x.cos_prec_round_ref(m, Down).0;
-        // err < 1/2 + 2 < 4 ulps in all, as in algorithms.tex
-        let r = (&c).reciprocal();
-        // A reciprocal whose exponent is below MAX_SETTLED_EXPONENT can be rounded to any precision
-        // without leaving the exponent range, so the `Float` reciprocal settles it; the rest go to
-        // the bracket. The secant's magnitude is at least 1, so only the top of the range is in
-        // play.
-        match r.get_exponent().map(i64::from) {
-            Some(e) if e < MAX_SETTLED_EXPONENT => {
-                if float_can_round(r.significand_ref().unwrap(), m - 2, prec, rm) {
-                    return Float::from_float_prec_round(r, prec, rm);
-                }
-            }
-            _ => {
-                if let Some(result) = reciprocal_of_down_bracket(&c, m, prec, rm) {
-                    return result;
-                }
-            }
-        }
-        m += increment;
-        increment = m >> 1;
-    }
+    reciprocal_ziv_loop(prec, rm, |m| x.cos_prec_round_ref(m, Down).0)
 }
 
 // Computes sec(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
@@ -110,29 +81,7 @@ pub(crate) fn sec_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
     if -(exp_x << 1) > i64::exact_from(prec) + 1 {
         return round_from_below(Float::one_prec(prec), Equal, false, rm);
     }
-    let mut m = prec + prec.ceiling_log_base_2() + 3;
-    let mut increment = Limb::WIDTH;
-    loop {
-        // err < 1 ulp, and of a known sign: rounding toward zero puts the cosine below the true one
-        // in magnitude
-        let c = cos_rational_helper(x, m, Down).0;
-        // err < 1/2 + 2 < 4 ulps in all, as in algorithms.tex
-        let r = (&c).reciprocal();
-        match r.get_exponent().map(i64::from) {
-            Some(e) if e < MAX_SETTLED_EXPONENT => {
-                if float_can_round(r.significand_ref().unwrap(), m - 2, prec, rm) {
-                    return Float::from_float_prec_round(r, prec, rm);
-                }
-            }
-            _ => {
-                if let Some(result) = reciprocal_of_down_bracket(&c, m, prec, rm) {
-                    return result;
-                }
-            }
-        }
-        m += increment;
-        increment = m >> 1;
-    }
+    reciprocal_ziv_loop(prec, rm, |m| cos_rational_helper(x, m, Down).0)
 }
 
 // The exact and closed-form values of sec(2 pi q) at the eighths and twelfths of a turn, where the
@@ -265,29 +214,9 @@ fn sec_with_period_prec_round_normal_ref(
             return float_round_near_x(&Float::ONE, min(err, prec + 2), true, prec, rm).unwrap();
         }
     }
-    let mut m = prec + prec.ceiling_log_base_2() + 3;
-    let mut increment = Limb::WIDTH;
-    loop {
-        // err < 1 ulp, and of a known sign: rounding toward zero puts the cosine below the true one
-        // in magnitude
-        let c = xp.cos_with_period_prec_round_ref(u, m, Down).0;
-        // err < 1/2 + 2 < 4 ulps in all, as in algorithms.tex
-        let r = (&c).reciprocal();
-        match r.get_exponent().map(i64::from) {
-            Some(e) if e < MAX_SETTLED_EXPONENT => {
-                if float_can_round(r.significand_ref().unwrap(), m - 2, prec, rm) {
-                    return Float::from_float_prec_round(r, prec, rm);
-                }
-            }
-            _ => {
-                if let Some(result) = reciprocal_of_down_bracket(&c, m, prec, rm) {
-                    return result;
-                }
-            }
-        }
-        m += increment;
-        increment = m >> 1;
-    }
+    reciprocal_ziv_loop(prec, rm, |m| {
+        xp.cos_with_period_prec_round_ref(u, m, Down).0
+    })
 }
 
 // Computes sec(2 pi q) for a nonzero fraction of a turn q with |q| < 1, rounded to precision `prec`
@@ -317,29 +246,7 @@ fn sec_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Orderi
     }
     // Only the exact cases can be rounded exactly
     assert_ne!(rm, Exact, "Inexact sec_with_period");
-    let mut m = prec + prec.ceiling_log_base_2() + 3;
-    let mut increment = Limb::WIDTH;
-    loop {
-        // err < 1 ulp, and of a known sign: rounding toward zero puts the cosine below the true one
-        // in magnitude
-        let c = cos_turns_helper(q, m, Down).0;
-        // err < 1/2 + 2 < 4 ulps in all, as in algorithms.tex
-        let r = (&c).reciprocal();
-        match r.get_exponent().map(i64::from) {
-            Some(e) if e < MAX_SETTLED_EXPONENT => {
-                if float_can_round(r.significand_ref().unwrap(), m - 2, prec, rm) {
-                    return Float::from_float_prec_round(r, prec, rm);
-                }
-            }
-            _ => {
-                if let Some(result) = reciprocal_of_down_bracket(&c, m, prec, rm) {
-                    return result;
-                }
-            }
-        }
-        m += increment;
-        increment = m >> 1;
-    }
+    reciprocal_ziv_loop(prec, rm, |m| cos_turns_helper(q, m, Down).0)
 }
 
 impl Float {

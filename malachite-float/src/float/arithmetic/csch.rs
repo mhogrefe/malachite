@@ -23,14 +23,12 @@ use crate::float::arithmetic::sech::{
 };
 use crate::float::arithmetic::sin::underflowed;
 use crate::float::arithmetic::sinh::sinh_bound;
-use crate::float::arithmetic::tan::{MAX_SETTLED_EXPONENT, reciprocal_of_down_bracket};
+use crate::float::arithmetic::tan::reciprocal_ziv_loop;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
-use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{Abs, CeilingLogBase2, Csch, CschAssign, Reciprocal};
+use malachite_base::num::arithmetic::traits::{Abs, Csch, CschAssign, Reciprocal};
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
 };
@@ -38,8 +36,6 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float::round::float_can_round;
-use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
 // This is mpfr_csch from csch.c (an instantiation of gen_inverse.h), MPFR 4.2.2, where the input is
@@ -59,38 +55,10 @@ fn csch_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
         return result;
     }
     // |x| < 2^29, so sinh(x) < exp(2^29) < 2^(2^30 - 1) cannot overflow, and |csch(x)| > 2^(-2^30)
-    // is well above the bottom of the exponent range.
-    let mut working_prec = prec + prec.ceiling_log_base_2() + 3;
-    let mut increment = Limb::WIDTH;
-    loop {
-        // the sinh has an error below 1 ulp, and rounding toward zero fixes its sign
-        let s = x.sinh_prec_round_ref(working_prec, Down).0;
-        // the error is less than c_w + 2*c_u*k_u (see algorithms.tex), where c_w = 1/2, c_u = 1
-        // since the sinh was rounded toward zero, thus 1/2 + 2 < 4
-        let r = (&s).reciprocal();
-        // A reciprocal whose exponent is below MAX_SETTLED_EXPONENT can be rounded to any precision
-        // without leaving the exponent range, so the `Float` reciprocal settles it; the rest go to
-        // the bracket. Since |sinh(x)| >= |x|, which is at least the smallest positive `Float`,
-        // these are only reached for an x near the bottom of the exponent range that is not tiny,
-        // which requires a precision of about 2^29 bits.
-        match r.get_exponent().map(i64::from) {
-            Some(e) if e < MAX_SETTLED_EXPONENT => {
-                if float_can_round(r.significand_ref().unwrap(), working_prec - 2, prec, rm) {
-                    return Float::from_float_prec_round(r, prec, rm);
-                }
-            }
-            _ => {
-                fail_on_untested_path(
-                    "csch_prec_round_normal_ref, result near the top of the range",
-                );
-                if let Some(result) = reciprocal_of_down_bracket(&s, working_prec, prec, rm) {
-                    return result;
-                }
-            }
-        }
-        working_prec += increment;
-        increment = working_prec >> 1;
-    }
+    // is well above the bottom of the exponent range. The loop's bracket path, for a reciprocal
+    // near the top of the exponent range, is reached only for an x near the bottom of the range
+    // that is not tiny, which requires a precision of about 2^29 bits, since |sinh(x)| >= |x|.
+    reciprocal_ziv_loop(prec, rm, |m| x.sinh_prec_round_ref(m, Down).0)
 }
 
 // Computes csch(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
