@@ -1077,6 +1077,12 @@ documented by git history.
   to $\pm1$, it is rounded from $\pm1$ using a bound on $|\coth x| - 1$ derived from $x$, rather
   than from the computed reciprocal; a reciprocal at the top of the exponent range is decided from
   an exact bracket.
+- `coth_rational_prec_round` and `coth_rational_prec` (with `_ref` variants), the correctly rounded
+  hyperbolic cotangent of a `Rational` as a `Float`, and `primitive_float_coth_rational`. A tiny $x$
+  is rounded from $1/x$ directly, a small one is bracketed by quotients of series bounds on
+  $\cosh x$ and $\sinh x$ (which also handles inputs too small to be `Float`s, whose hyperbolic
+  cotangents overflow), a large one is rounded from $\pm1$, and otherwise $x$ is bracketed between
+  two `Float`s, $\coth$ being decreasing on each side of 0.
 
 ### Documentation
 

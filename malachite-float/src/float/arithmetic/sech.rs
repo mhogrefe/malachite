@@ -169,7 +169,7 @@ fn sech_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Or
     // A small x is handled by bracketing sech(x) = 1 / cosh(x) with series bounds on cosh(x). This
     // also covers every remaining x too small to be a `Float`.
     if exp_x < -1 && u64::exact_from(-exp_x) << 4 >= prec + 10 {
-        return reciprocal_hyperbolic_series(x, false, cosh_bound, prec, rm);
+        return hyperbolic_series_quotient(x, false, None, cosh_bound, prec, rm);
     }
     let x_abs = x.abs();
     if x_abs >= RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD {
@@ -181,15 +181,20 @@ fn sech_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Or
     monotone_rational_via_floats(&x_abs, prec, rm, sech_prec_round_normal_ref)
 }
 
-// Computes 1/g(x) for a nonzero `Rational` x, small enough that the series of g converges in a few
-// terms, where g is cosh or sinh and `bound(t, w, away)` bounds g(t) for |t| < 1/2 from below, or
-// from above if `away`, to within a relative 2^-(w+3). 1/g(x) is bracketed by the reciprocals of
-// the bounds on g(|x|), negated if `negative`, and the bracket is tightened until both ends round
-// the same way. This serves sech and csch, and covers every x too small to be a `Float`.
-pub(crate) fn reciprocal_hyperbolic_series(
+// A bound on a hyperbolic function g for |t| < 1/2, from below, or from above if `away`, to within
+// a relative 2^-(w+3): `cosh_bound` or `sinh_bound`.
+pub(crate) type HyperbolicBound = fn(&Rational, u64, bool) -> Rational;
+
+// Computes f(x)/g(x), or 1/g(x) if `numerator` is `None`, for a nonzero `Rational` x small enough
+// that the series of f and g converge in a few terms, where `numerator` and `denominator` bound f
+// and g. The quotient at |x| is bracketed by quotients of the bounds, negated if `negative`, and
+// the bracket is tightened until both ends round the same way. This serves sech (1/cosh), csch
+// (1/sinh), and coth (cosh/sinh), and covers every x too small to be a `Float`.
+pub(crate) fn hyperbolic_series_quotient(
     x: &Rational,
     negative: bool,
-    bound: fn(&Rational, u64, bool) -> Rational,
+    numerator: Option<HyperbolicBound>,
+    denominator: HyperbolicBound,
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
@@ -197,8 +202,15 @@ pub(crate) fn reciprocal_hyperbolic_series(
     let mut w = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
-        let lo = bound(&ax, w, true).reciprocal();
-        let hi = bound(&ax, w, false).reciprocal();
+        let d_lo = denominator(&ax, w, false);
+        let d_hi = denominator(&ax, w, true);
+        let (lo, hi) = match numerator {
+            None => (d_hi.reciprocal(), d_lo.reciprocal()),
+            Some(numerator) => (
+                numerator(&ax, w, false) / d_hi,
+                numerator(&ax, w, true) / d_lo,
+            ),
+        };
         if let Some(result) = round_bracket_signed_by(negative, lo, hi, prec, rm) {
             return result;
         }

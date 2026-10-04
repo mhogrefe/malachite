@@ -15,8 +15,9 @@
 use crate::Float;
 use core::cmp::Ordering::{self, *};
 use core::cmp::{max, min};
-use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::arithmetic::traits::{Abs, PowerOf2, Reciprocal};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_q::Rational;
@@ -305,4 +306,33 @@ pub(crate) fn round_rational_leading_term(
         round_from_above(t, o, tie, rm_abs)
     };
     if positive { (t, o) } else { (-t, o.reverse()) }
+}
+
+// The tiny-input shortcut for a function of a nonzero `Rational` x whose value is 1/x plus a
+// correction of x's sign or the opposite one (1/x lies short of the function's value, away from
+// zero, if `beyond`) and of magnitude below |x|/2; `exp_x` is the MPFR-style exponent of x. Once
+// the correction is below the distance from 1/|x| to the nearest (prec + 1)-bit dyadic, the
+// reciprocal's own rounding is the answer, nudged by `round_rational_leading_term`. For a numerator
+// of n bits -- 1/x has x's numerator for its denominator -- that distance is at least 2^(-n) when
+// the dyadics around 1/|x| are integers, which is when 1/|x| has more than prec bits before the
+// point, and 2^(-n) times their spacing 2^(-EXP(x) - prec) otherwise; the two conditions below
+// cover the two cases, and 1/|x| lands on a dyadic only in the exact and tie cases the nudge
+// handles. A bracket from series bounds would say the same, but forming it exactly builds a dense
+// `Rational` of about 2 |EXP(x)| bits: 27 seconds for the cotangent of x = 2^-536870908.
+//
+// Returns `None` when the conditions fail, and also for inputs at the bottom of the exponent range,
+// whose reciprocals reach the top: there the nudge and the tie test would be working with `Float`s
+// that overflow, so such inputs are left to the caller's exact paths.
+pub(crate) fn round_rational_reciprocal_leading_term(
+    x: &Rational,
+    exp_x: i64,
+    beyond: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    let n = i64::exact_from(x.numerator_ref().significant_bits());
+    (exp_x > LEADING_TERM_MIN_EXPONENT
+        && -exp_x > n + 2
+        && -(exp_x << 1) > i64::exact_from(prec) + n + 4)
+        .then(|| round_rational_leading_term(x.abs().reciprocal(), *x > 0u32, beyond, prec, rm))
 }

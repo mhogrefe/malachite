@@ -15,11 +15,11 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cosh::monotone_rational_via_floats;
 use crate::float::arithmetic::round_near_x::{
-    LEADING_TERM_MIN_EXPONENT, round_near_reciprocal, round_rational_leading_term,
+    round_near_reciprocal, round_rational_reciprocal_leading_term,
 };
 use crate::float::arithmetic::sech::{
-    RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD, reciprocal_hyperbolic_large,
-    reciprocal_hyperbolic_series,
+    RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD, hyperbolic_series_quotient,
+    reciprocal_hyperbolic_large,
 };
 use crate::float::arithmetic::sin::underflowed;
 use crate::float::arithmetic::sinh::sinh_bound;
@@ -27,7 +27,7 @@ use crate::float::arithmetic::tan::reciprocal_ziv_loop;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{Abs, Csch, CschAssign, Reciprocal};
+use malachite_base::num::arithmetic::traits::{Csch, CschAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
@@ -66,23 +66,13 @@ fn csch_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
 fn csch_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact csch");
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
-    // csch(x) = 1/x - x/6 + ..., so 1/|x| exceeds |csch x| by less than |x|/6. As for the
-    // cotangent, once that is below the distance from 1/|x| to the nearest (prec + 1)-bit dyadic,
-    // the reciprocal's own rounding is the answer, nudged toward zero; a numerator of n bits keeps
-    // that distance at least 2^(-n) times the dyadics' spacing. Forming the bracket below exactly
-    // would build a dense `Rational` of about 2 |EXP(x)| bits.
-    //
-    // Inputs at the bottom of the exponent range, whose reciprocals reach the top, are left to the
-    // series below: there the nudge and the tie test would be working with `Float`s that overflow.
-    let n = i64::exact_from(x.numerator_ref().significant_bits());
-    if exp_x > LEADING_TERM_MIN_EXPONENT
-        && -exp_x > n + 2
-        && -(exp_x << 1) > i64::exact_from(prec) + n + 4
-    {
-        return round_rational_leading_term(x.abs().reciprocal(), *x > 0u32, false, prec, rm);
+    // csch(x) = 1/x - x/6 + ..., so 1/|x| exceeds |csch x| by less than |x|/6: for a tiny x the
+    // reciprocal's own rounding, nudged toward zero, is the answer.
+    if let Some(result) = round_rational_reciprocal_leading_term(x, exp_x, false, prec, rm) {
+        return result;
     }
     if exp_x < -1 && u64::exact_from(-exp_x) << 4 >= prec + 10 {
-        return reciprocal_hyperbolic_series(x, *x < 0u32, sinh_bound, prec, rm);
+        return hyperbolic_series_quotient(x, *x < 0u32, None, sinh_bound, prec, rm);
     }
     if x.ge_abs(&RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD) {
         return underflowed(*x > 0u32, prec, rm);

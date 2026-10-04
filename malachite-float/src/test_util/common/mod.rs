@@ -17,6 +17,7 @@ use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 use rug::float::{Round, Special};
 use std::cmp::Ordering;
 
@@ -305,4 +306,31 @@ pub fn test_constant<F: Fn(u64, RoundingMode) -> (Float, Ordering)>(f: F, limit:
             bit_index -= 1;
         }
     }
+}
+
+// Computes a function of a `Rational` x with rug, at precision `prec` and with rounding mode `rm`,
+// where `f(rx, c, rm)` assigns the function of the rug input `rx` to `c`, rounded with `rm`, and
+// returns the ternary value. The input is rounded to prec + 128 + `exponent_multiplier` |log_2 |x||
+// bits, which must keep its rounding error well below 2^-prec relative to the result: a large x
+// needs its exponent's worth of extra bits, and a tiny x whose function lies within about x^2
+// (relatively) of 1/x needs twice that many, so that rounding x cannot move 1/x across the gap.
+pub fn rug_rational_fn_prec_round<F: Fn(&rug::Float, &mut rug::Float, Round) -> Ordering>(
+    x: &Rational,
+    prec: u64,
+    rm: Round,
+    exponent_multiplier: u64,
+    f: F,
+) -> (rug::Float, Ordering) {
+    let exponent_bits = if *x == 0u32 {
+        0
+    } else {
+        x.floor_log_base_2_abs().unsigned_abs()
+    };
+    let rx = rug::Float::with_val(
+        u32::exact_from(prec + 128 + exponent_multiplier * exponent_bits),
+        rug::Rational::exact_from(x),
+    );
+    let mut c = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = f(&rx, &mut c, rm);
+    (c, o)
 }

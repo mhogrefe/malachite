@@ -6,9 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::test_util::common::rug_float_significant_bits;
+use crate::test_util::common::{rug_float_significant_bits, rug_rational_fn_prec_round};
 use core::cmp::Ordering;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
 
@@ -28,4 +29,14 @@ pub fn rug_coth_round(x: &rug::Float, rm: Round) -> (rug::Float, Ordering) {
 
 pub fn rug_coth(x: &rug::Float) -> rug::Float {
     rug_coth_prec_round(x, rug_float_significant_bits(x), Round::Nearest).0
+}
+
+pub fn rug_coth_rational_prec_round(x: &Rational, prec: u64, rm: Round) -> (rug::Float, Ordering) {
+    rug_rational_fn_prec_round(x, prec, rm, 2, |rx, c, rm| {
+        c.assign_round(rx.coth_ref(), rm)
+    })
+}
+
+pub fn rug_coth_rational_prec(x: &Rational, prec: u64) -> (rug::Float, Ordering) {
+    rug_coth_rational_prec_round(x, prec, Round::Nearest)
 }
