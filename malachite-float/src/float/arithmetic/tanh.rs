@@ -164,7 +164,7 @@ fn tanh_prec_round_normal_ref(xt: &Float, prec: u64, rm: RoundingMode) -> (Float
 // bound, and the remainder, less than twice the first omitted term, is below 2^-(w+3) <= C_k
 // 2^-(w+3), so C_k (1 + 2^-(w+3)) is an upper bound. As in `sinh_bound`, the scaling is a
 // multiplication and a shift, and for a tiny t, where one term suffices, t is not even squared.
-fn cosh_bound(t: &Rational, w: u64, upper: bool) -> Rational {
+pub(crate) fn cosh_bound(t: &Rational, w: u64, upper: bool) -> Rational {
     // |t| < 2^(log + 1), with log < 0
     let log = t.floor_log_base_2_abs();
     assert!(log < -1);

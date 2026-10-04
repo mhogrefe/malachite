@@ -91,8 +91,8 @@ fn test_cosh_prec_round() {
     test("-0.0", "-0x0.0", 1, Nearest, "1.0", "0x1.0#1", Equal);
     test("0.0", "0x0.0", 10, Nearest, "1.0000", "0x1.000#10", Equal);
     test("1.0", "0x1.0#1", 1, Floor, "1.0", "0x1.0#1", Less);
-    // - general path; the first Ziv iteration cannot round, so the loop retries
     test("1.0", "0x1.0#1", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    // - general path; the first Ziv iteration cannot round, so the loop retries
     test("1.0", "0x1.0#1", 1, Nearest, "2.0", "0x2.0#1", Greater);
     test("1.0", "0x1.0#1", 10, Floor, "1.5430", "0x1.8b0#10", Less);
     test(
@@ -2150,8 +2150,8 @@ fn test_cosh_rational_prec_round() {
     test("0", 1, Nearest, "1.0", "0x1.0#1", Equal);
     test("0", 10, Nearest, "1.0000", "0x1.000#10", Equal);
     test("0", 1, Exact, "1.0", "0x1.0#1", Equal);
-    // - the first bracket of |x| rounds the same way at both ends
     test("0", 10, Exact, "1.0000", "0x1.000#10", Equal);
+    // - the first bracket of |x| rounds the same way at both ends
     test("3/5", 1, Floor, "1.0", "0x1.0#1", Less);
     test("3/5", 1, Ceiling, "2.0", "0x2.0#1", Greater);
     test("3/5", 1, Nearest, "1.0", "0x1.0#1", Less);

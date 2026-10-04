@@ -90,8 +90,8 @@ fn test_sinh_prec_round() {
     );
     test("0.0", "0x0.0", 1, Nearest, "0.0", "0x0.0", Equal);
     test("-0.0", "-0x0.0", 1, Nearest, "-0.0", "-0x0.0", Equal);
-    // - general path; the first Ziv iteration cannot round, so the loop retries
     test("0.0", "0x0.0", 10, Nearest, "0.0", "0x0.0", Equal);
+    // - general path; the first Ziv iteration cannot round, so the loop retries
     test("1.0", "0x1.0#1", 1, Floor, "1.0", "0x1.0#1", Less);
     test("1.0", "0x1.0#1", 1, Ceiling, "2.0", "0x2.0#1", Greater);
     test("1.0", "0x1.0#1", 1, Nearest, "1.0", "0x1.0#1", Less);

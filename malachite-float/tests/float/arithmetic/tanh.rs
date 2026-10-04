@@ -97,7 +97,6 @@ fn test_tanh_prec_round() {
         "0x1.000#10",
         Equal,
     );
-    // - max(3, k + 1) exceeds half the working precision, so the loop retries
     test(
         "-Infinity",
         "-Infinity",
@@ -107,6 +106,7 @@ fn test_tanh_prec_round() {
         "-0x1.000#10",
         Equal,
     );
+    // - max(3, k + 1) exceeds half the working precision, so the loop retries
     test("1.0", "0x1.0#1", 1, Floor, "0.50", "0x0.8#1", Less);
     test("1.0", "0x1.0#1", 1, Ceiling, "1.0", "0x1.0#1", Greater);
     test("1.0", "0x1.0#1", 1, Nearest, "1.0", "0x1.0#1", Greater);
@@ -2288,8 +2288,8 @@ fn test_tanh_rational_prec_round() {
     test("0", 1, Nearest, "0.0", "0x0.0", Equal);
     test("0", 10, Nearest, "0.0", "0x0.0", Equal);
     test("0", 1, Exact, "0.0", "0x0.0", Equal);
-    // - the first bracket of x rounds the same way at both ends
     test("0", 10, Exact, "0.0", "0x0.0", Equal);
+    // - the first bracket of x rounds the same way at both ends
     test("3/5", 1, Floor, "0.50", "0x0.8#1", Less);
     test("3/5", 1, Ceiling, "1.0", "0x1.0#1", Greater);
     test("3/5", 1, Nearest, "0.50", "0x0.8#1", Less);
@@ -2432,7 +2432,6 @@ fn test_tanh_rational_prec_round() {
         "-0x0.ff0c4d7f329dea0cf862f9f9c#100",
         Greater,
     );
-    // - x is exactly representable at the working precision
     test(
         "-22/7",
         100,
@@ -2441,6 +2440,7 @@ fn test_tanh_rational_prec_round() {
         "-0x0.ff0c4d7f329dea0cf862f9f9c#100",
         Greater,
     );
+    // - x is exactly representable at the working precision
     test("100", 1, Floor, "0.50", "0x0.8#1", Less);
     test("100", 1, Ceiling, "1.0", "0x1.0#1", Greater);
     test("100", 1, Nearest, "1.0", "0x1.0#1", Greater);
@@ -2493,7 +2493,6 @@ fn test_tanh_rational_prec_round() {
         "-0x0.fffffffffffffffffffffffff#100",
         Greater,
     );
-    // - small x: bracketed by the series of sinh and cosh
     test(
         "-100",
         100,
@@ -2502,6 +2501,7 @@ fn test_tanh_rational_prec_round() {
         "-0x1.0000000000000000000000000#100",
         Less,
     );
+    // - small x: bracketed by the series of sinh and cosh
     test("1/1000", 1, Floor, "0.00098", "0x0.004#1", Less);
     test("1/1000", 1, Ceiling, "0.0020", "0x0.008#1", Greater);
     test("1/1000", 1, Nearest, "0.00098", "0x0.004#1", Less);
@@ -2647,7 +2647,6 @@ fn test_tanh_rational_prec_round() {
         "0x2.f394219248446baa23d2ec72cE-17#100",
         Greater,
     );
-    // - the first series bracket straddles a rounding boundary, so the series is refined
     test(
         "1/100000000000000000000",
         100,
@@ -2656,6 +2655,7 @@ fn test_tanh_rational_prec_round() {
         "0x2.f394219248446baa23d2ec728E-17#100",
         Less,
     );
+    // - the first series bracket straddles a rounding boundary, so the series is refined
     test(
         "-108086391056891904/45671926166590716193865151022383844364247891967",
         1,

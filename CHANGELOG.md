@@ -1055,6 +1055,10 @@ documented by git history.
   but $\operatorname{sech} x$ is still representable, or must be rounded with the underflow rules
   (inputs of magnitude near $7.4\times10^8$), it is computed instead as $2e^{-|x|}/(1+e^{-2|x|})$,
   from $e^{-|x|/2}$ scaled into range by an exact power of 2.
+- `sech_rational_prec_round` and `sech_rational_prec` (with `_ref` variants), the correctly rounded
+  hyperbolic secant of a `Rational` as a `Float`, and `primitive_float_sech_rational`. Since
+  $\operatorname{sech}$ is even and decreasing in $|x|$, $|x|$ is bracketed between two `Float`s;
+  a small $x$ is instead bracketed by the reciprocals of series bounds on $\cosh x$.
 
 ### Documentation
 

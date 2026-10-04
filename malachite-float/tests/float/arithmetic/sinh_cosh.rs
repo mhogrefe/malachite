@@ -3007,7 +3007,6 @@ fn test_sinh_cosh_rational_prec_round() {
     test(
         "0", 1, Exact, "0.0", "0x0.0", Equal, "1.0", "0x1.0#1", Equal,
     );
-    // - the first bracket of x rounds the same way at both ends
     test(
         "0",
         10,
@@ -3019,6 +3018,7 @@ fn test_sinh_cosh_rational_prec_round() {
         "0x1.000#10",
         Equal,
     );
+    // - the first bracket of x rounds the same way at both ends
     test(
         "3/5", 1, Floor, "0.50", "0x0.8#1", Less, "1.0", "0x1.0#1", Less,
     );
@@ -3316,7 +3316,6 @@ fn test_sinh_cosh_rational_prec_round() {
         "0xb.9b47e5820793d583f2840c93#100",
         Greater,
     );
-    // - x is exactly representable at the working precision
     test(
         "22/7",
         100,
@@ -3328,6 +3327,7 @@ fn test_sinh_cosh_rational_prec_round() {
         "0xb.9b47e5820793d583f2840c93#100",
         Greater,
     );
+    // - x is exactly representable at the working precision
     test(
         "-100",
         1,
@@ -3515,7 +3515,6 @@ fn test_sinh_cosh_rational_prec_round() {
         "0x1.000008637bdc155d234906bc0#100",
         Greater,
     );
-    // - small x: the two results come from the separate Rational paths
     test(
         "1/1000",
         100,
@@ -3527,6 +3526,7 @@ fn test_sinh_cosh_rational_prec_round() {
         "0x1.000008637bdc155d234906bc0#100",
         Greater,
     );
+    // - small x: the two results come from the separate Rational paths
     test(
         "-1/1000000",
         1,
@@ -4011,7 +4011,6 @@ fn test_sinh_cosh_rational_prec_round() {
         "0x6.3332e349c3b727aba6fa728b8E+268435455#100",
         Greater,
     );
-    // - the bracket ends round differently, so the working precision grows
     test(
         "7442611177/10",
         100,
@@ -4023,6 +4022,7 @@ fn test_sinh_cosh_rational_prec_round() {
         "0x6.3332e349c3b727aba6fa728b8E+268435455#100",
         Greater,
     );
+    // - the bracket ends round differently, so the working precision grows
     test(
         "-7442611177/10",
         1,

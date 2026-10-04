@@ -13,15 +13,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::cos::round_scaled_bracket;
+use crate::float::arithmetic::cos::{cos_rational_tiny, round_bracket, round_scaled_bracket};
 use crate::float::arithmetic::exp::one_neighbor;
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
 use crate::float::arithmetic::sin::underflowed;
-use crate::{Float, emulate_float_to_float_fn, floor_and_ceiling};
+use crate::float::arithmetic::tanh::cosh_bound;
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, Equal};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, ReciprocalAssign, Sech, SechAssign,
+    Abs, CeilingLogBase2, Reciprocal, ReciprocalAssign, Sech, SechAssign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -31,6 +32,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // Beyond this |x|, sech(x) < 2 exp(-|x|) < 2^(MIN_EXPONENT - 2) = 2^(-2^30 - 2), half the smallest
 // positive Float, since (2^30 + 2) log(2) = 744261119.35...
@@ -130,6 +132,66 @@ fn sech_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
         }
         working_prec += increment;
         increment = working_prec >> 1;
+    }
+}
+
+// Computes sech(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
+// sech(x) is transcendental for every nonzero rational x, so the result is never exact.
+fn sech_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact sech");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // 0 < 1 - sech(x) < x^2/2 < 2^(2 exp_x - 1): when that is at most 2^(-prec - 1), half an ulp
+    // below 1, sech(x) rounds to 1, or to its predecessor for rounding toward zero, as cos(x) does.
+    if 1 - (exp_x << 1) > i64::exact_from(prec) {
+        return cos_rational_tiny(prec, rm);
+    }
+    // A small x is handled by bracketing sech(x) = 1 / cosh(x) with series bounds on cosh(x). This
+    // also covers every remaining x too small to be a `Float`.
+    if exp_x < -1 && u64::exact_from(-exp_x) << 4 >= prec + 10 {
+        return sech_rational_series(x, prec, rm);
+    }
+    let x_abs = x.abs();
+    if x_abs >= SECH_UNDERFLOW_THRESHOLD {
+        return underflowed(true, prec, rm);
+    }
+    // sech is even and decreasing on [0, infinity), so bracket |x| between the Floats x_lo <= |x|
+    // <= x_hi, take the hyperbolic secant of both, and increase the working precision until the two
+    // round to the same result, which the exact sech(x), lying between them, must then share.
+    let mut working_prec = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let (x_lo, x_o) = Float::from_rational_prec_round_ref(&x_abs, working_prec, Floor);
+        if x_o == Equal {
+            // |x| is exactly representable at `working_prec`, so sech(x) is simply sech(x_lo).
+            return sech_prec_round_normal_ref(&x_lo, prec, rm);
+        }
+        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
+        // The hyperbolic secant of a finite nonzero Float is never exact, so both orderings are
+        // `Less` or `Greater`, never `Equal`.
+        let (s_lo, o_lo) = sech_prec_round_normal_ref(&x_lo, prec, rm);
+        let (s_hi, o_hi) = sech_prec_round_normal_ref(&x_hi, prec, rm);
+        if o_lo == o_hi && s_lo == s_hi {
+            return (s_lo, o_lo);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// Brackets sech(x) = 1 / cosh(x) for a nonzero `Rational` x, small enough that the series of
+// cosh(x) converges in a few terms, by the reciprocals of bounds on cosh(x), tightening the bracket
+// until both ends round the same way.
+fn sech_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let mut w = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let lo = cosh_bound(x, w, true).reciprocal();
+        let hi = cosh_bound(x, w, false).reciprocal();
+        if let Some(result) = round_bracket(&lo, &hi, prec, rm) {
+            return result;
+        }
+        w += increment;
+        increment = w >> 1;
     }
 }
 
@@ -814,6 +876,303 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\operatorname{sech} x$, the hyperbolic secant of a [`Rational`], rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded hyperbolic secant is less than, equal to, or greater than the
+    /// exact hyperbolic secant.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \operatorname{sech} x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 \operatorname{sech}
+    ///   x\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 \operatorname{sech}
+    ///   x\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $\operatorname{sech} x\leq 1$, the result never overflows.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// Underflow happens for inputs of magnitude above about $7.4\times10^8$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sech_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sech_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.812");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sech_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.844");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::sech_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.84355068");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sech_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.84355164");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn sech_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::sech_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\operatorname{sech} x$, the hyperbolic secant of a [`Rational`], rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded hyperbolic secant is less than, equal to, or
+    /// greater than the exact hyperbolic secant.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \operatorname{sech} x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 \operatorname{sech}
+    ///   x\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 \operatorname{sech}
+    ///   x\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $\operatorname{sech} x\leq 1$, the result never overflows.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// Underflow happens for inputs of magnitude above about $7.4\times10^8$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sech_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::sech_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.812");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::sech_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.844");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::sech_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.84355068");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::sech_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.84355164");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn sech_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // sech(0) = 1, exactly
+            return (Self::one_prec(prec), Equal);
+        }
+        sech_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\operatorname{sech} x$, the hyperbolic secant of a [`Rational`], rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded hyperbolic secant is less than, equal to, or greater than the exact
+    /// hyperbolic cosine.
+    ///
+    /// If the hyperbolic secant is equidistant from two [`Float`]s with the specified precision,
+    /// the [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \operatorname{sech} x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 \operatorname{sech} x\rfloor-p}$ (unless the
+    /// result underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $\operatorname{sech} x\leq 1$, the result never overflows.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sech_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sech_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.844");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::sech_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.84355068");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sech_rational_prec(Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn sech_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::sech_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{sech} x$, the hyperbolic secant of a [`Rational`], rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded hyperbolic secant is less than, equal to, or greater than the
+    /// exact hyperbolic cosine.
+    ///
+    /// If the hyperbolic secant is equidistant from two [`Float`]s with the specified precision,
+    /// the [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \operatorname{sech} x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 \operatorname{sech} x\rfloor-p}$ (unless the
+    /// result underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $\operatorname{sech} x\leq 1$, the result never overflows.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sech_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sech_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.844");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::sech_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.84355068");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sech_rational_prec_ref(&Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn sech_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::sech_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
 impl Sech for Float {
     type Output = Self;
 
@@ -1047,4 +1406,66 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::sech_prec, x)
+}
+
+/// Computes $\operatorname{sech} x$, the hyperbolic secant of a [`Rational`], returning the result
+/// as a primitive float. The result is correctly rounded.
+///
+/// $$
+/// f(x) = \operatorname{sech} x+\varepsilon.
+/// $$
+/// - If $\operatorname{sech} x$ is zero, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\operatorname{sech} x$ is nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   \operatorname{sech} x\rfloor-p}$, where $p$ is the precision of the output (typically 24 if
+///   `T` is a [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=1$
+///
+/// Overflow is not possible, since the result lies in $(0, 1]$. An `x` of large magnitude gives a
+/// subnormal result, or underflows to `0.0`.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sech::primitive_float_sech_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_sech_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sech_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.9469052537634979)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sech_rational::<f64>(
+///         &Rational::from_signeds(-1i8, 3)
+///     )),
+///     NiceFloat(0.9469052537634979)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sech_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(0.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sech_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::sech_rational_prec_ref, x)
 }
