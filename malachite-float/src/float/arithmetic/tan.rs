@@ -25,7 +25,7 @@ use crate::float::arithmetic::cos::{
     trig_rational_near_zero_bracket, trig_turns_near_zero_bracket,
 };
 use crate::float::arithmetic::round_near_x::{
-    LEADING_TERM_MIN_EXPONENT, float_round_near_x, round_from_below, value_is_tie,
+    LEADING_TERM_MIN_EXPONENT, float_round_near_x, round_rational_leading_term,
 };
 use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
 use crate::float::arithmetic::sin_cos::{
@@ -986,14 +986,7 @@ pub(crate) fn tan_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
     if exp_x > LEADING_TERM_MIN_EXPONENT
         && -(exp_x << 1) > i64::exact_from(prec + x.denominator_ref().significant_bits()) + 4
     {
-        let positive = *x > 0u32;
-        let ax = x.abs();
-        let rm_abs = if positive { rm } else { -rm };
-        let (wide, o_wide) = Float::from_rational_prec_ref(&ax, prec + 1);
-        let tie = rm_abs == Nearest && value_is_tie(&wide, o_wide, prec);
-        let (t, o) = Float::from_rational_prec_round(ax, prec, rm_abs);
-        let (t, o) = round_from_below(t, o, tie, rm_abs);
-        return if positive { (t, o) } else { (-t, o.reverse()) };
+        return round_rational_leading_term(x.abs(), *x > 0u32, true, prec, rm);
     }
     // For |x| <= 1/2, |x| + |x|^3/3 <= |tan x| <= |x| + |x|^3/3 + |x|^5 (the remaining terms of the
     // series sum to less than |x|^5 there), a bracket of relative width below x^4, which decides

@@ -13,24 +13,34 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::round_near_x::round_near_reciprocal;
-use crate::float::arithmetic::sech::reciprocal_hyperbolic_large;
+use crate::float::arithmetic::cosh::monotone_rational_via_floats;
+use crate::float::arithmetic::round_near_x::{
+    LEADING_TERM_MIN_EXPONENT, round_near_reciprocal, round_rational_leading_term,
+};
+use crate::float::arithmetic::sech::{
+    RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD, reciprocal_hyperbolic_large,
+    reciprocal_hyperbolic_series,
+};
+use crate::float::arithmetic::sin::underflowed;
+use crate::float::arithmetic::sinh::sinh_bound;
 use crate::float::arithmetic::tan::{MAX_SETTLED_EXPONENT, reciprocal_of_down_bracket};
-use crate::{Float, emulate_float_to_float_fn};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Csch, CschAssign, Reciprocal};
+use malachite_base::num::arithmetic::traits::{Abs, CeilingLogBase2, Csch, CschAssign, Reciprocal};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
 };
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // This is mpfr_csch from csch.c (an instantiation of gen_inverse.h), MPFR 4.2.2, where the input is
 // finite and nonzero, with the scaled path for large inputs and the bracket path for results near
@@ -81,6 +91,39 @@ fn csch_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
         working_prec += increment;
         increment = working_prec >> 1;
     }
+}
+
+// Computes csch(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
+// csch(x) is transcendental for every nonzero rational x, so the result is never exact.
+fn csch_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact csch");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // csch(x) = 1/x - x/6 + ..., so 1/|x| exceeds |csch x| by less than |x|/6. As for the
+    // cotangent, once that is below the distance from 1/|x| to the nearest (prec + 1)-bit dyadic,
+    // the reciprocal's own rounding is the answer, nudged toward zero; a numerator of n bits keeps
+    // that distance at least 2^(-n) times the dyadics' spacing. Forming the bracket below exactly
+    // would build a dense `Rational` of about 2 |EXP(x)| bits.
+    //
+    // Inputs at the bottom of the exponent range, whose reciprocals reach the top, are left to the
+    // series below: there the nudge and the tie test would be working with `Float`s that overflow.
+    let n = i64::exact_from(x.numerator_ref().significant_bits());
+    if exp_x > LEADING_TERM_MIN_EXPONENT
+        && -exp_x > n + 2
+        && -(exp_x << 1) > i64::exact_from(prec) + n + 4
+    {
+        return round_rational_leading_term(x.abs().reciprocal(), *x > 0u32, false, prec, rm);
+    }
+    if exp_x < -1 && u64::exact_from(-exp_x) << 4 >= prec + 10 {
+        return reciprocal_hyperbolic_series(x, *x < 0u32, sinh_bound, prec, rm);
+    }
+    if x.ge_abs(&RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD) {
+        return underflowed(*x > 0u32, prec, rm);
+    }
+    // csch is decreasing on each side of 0, so bracket x between the Floats x_lo <= x <= x_hi, of
+    // the same sign as x, take the hyperbolic cosecant of both, and increase the working precision
+    // until the two round to the same result, which the exact csch(x), lying between them, must
+    // then share.
+    monotone_rational_via_floats(x, prec, rm, csch_prec_round_normal_ref)
 }
 
 impl Float {
@@ -819,6 +862,337 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\operatorname{csch} x$, the hyperbolic cosecant of a [`Rational`], rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded hyperbolic cosecant is less than, equal to, or greater than
+    /// the exact hyperbolic cosecant.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \operatorname{csch} x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{csch}
+    ///   x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{csch}
+    ///   x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows or underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=\infty$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Overflow happens only for inputs of magnitude at most about $2^{-2^{30}+1}$, and underflow
+    /// for inputs of magnitude above about $7.4\times10^8$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::csch_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::csch_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "1.56");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::csch_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "1.62");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::csch_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "1.5707111");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::csch_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "1.5707130");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn csch_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::csch_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\operatorname{csch} x$, the hyperbolic cosecant of a [`Rational`], rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded hyperbolic cosecant is less than, equal to, or
+    /// greater than the exact hyperbolic cosecant.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \operatorname{csch} x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{csch}
+    ///   x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{csch}
+    ///   x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows or underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=\infty$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Overflow happens only for inputs of magnitude at most about $2^{-2^{30}+1}$, and underflow
+    /// for inputs of magnitude above about $7.4\times10^8$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::csch_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::csch_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "1.56");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::csch_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "1.62");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::csch_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "1.5707111");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::csch_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "1.5707130");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn csch_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // csch(0) = infinity, exactly
+            return (Self::INFINITY, Equal);
+        }
+        csch_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\operatorname{csch} x$, the hyperbolic cosecant of a [`Rational`], rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded hyperbolic cosecant is less than, equal to, or greater than the exact
+    /// hyperbolic cosecant.
+    ///
+    /// If the hyperbolic cosecant is equidistant from two [`Float`]s with the specified precision,
+    /// the [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \operatorname{csch} x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{csch} x|\rfloor-p}$ (unless the
+    /// result overflows or underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=\infty$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csch_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::csch_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "1.56");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::csch_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "1.5707130");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::csch_rational_prec(Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "Infinity");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn csch_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::csch_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{csch} x$, the hyperbolic cosecant of a [`Rational`], rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded hyperbolic cosecant is less than, equal to, or greater than
+    /// the exact hyperbolic cosine.
+    ///
+    /// If the hyperbolic cosecant is equidistant from two [`Float`]s with the specified precision,
+    /// the [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \operatorname{csch} x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{csch} x|\rfloor-p}$ (unless the
+    /// result overflows or underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=\infty$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csch_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::csch_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "1.56");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::csch_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "1.5707130");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::csch_rational_prec_ref(&Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "Infinity");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn csch_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::csch_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
 impl Csch for Float {
     type Output = Self;
 
@@ -1066,4 +1440,67 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::csch_prec, x)
+}
+
+/// Computes $\operatorname{csch} x$, the hyperbolic cosecant of a [`Rational`], returning the
+/// result as a primitive float. The result is correctly rounded.
+///
+/// $$
+/// f(x) = \operatorname{csch} x+\varepsilon.
+/// $$
+/// - If $\operatorname{csch} x$ is zero, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\operatorname{csch} x$ is nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   |\operatorname{csch} x|\rfloor-p}$, where $p$ is the precision of the output (typically 24 if
+///   `T` is a [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=\infty$
+///
+/// An `x` of magnitude below the reciprocal of the largest finite value gives a result that
+/// overflows to $\pm\infty$. An `x` of large magnitude gives a subnormal result, or underflows to
+/// $\pm0.0$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::csch::primitive_float_csch_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_csch_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csch_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(2.9451562666948146)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csch_rational::<f64>(
+///         &Rational::from_signeds(-1i8, 3)
+///     )),
+///     NiceFloat(-2.9451562666948146)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csch_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(0.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_csch_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::csch_rational_prec_ref, x)
 }

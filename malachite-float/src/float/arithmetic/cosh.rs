@@ -218,21 +218,36 @@ pub(crate) fn cosh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
     // <= x_hi, take the hyperbolic cosine of both, and increase the working precision until the two
     // round to the same result, which the exact cosh(x), lying between them, must then share.
     let x_abs = x.abs();
+    monotone_rational_via_floats(&x_abs, prec, rm, cosh_prec_round_normal_ref)
+}
+
+// Computes f(x) for a `Rational` x, rounded to precision `prec` with rounding mode `rm`, where `f`
+// computes f for a finite nonzero `Float`, f is monotonic on an interval containing x and the
+// `Float`s next to it, and f of a finite nonzero `Float` is never exact. x is bracketed between the
+// `Float`s x_lo <= x <= x_hi, f is taken at both, and the working precision is increased until the
+// two round to the same result, which the exact f(x), lying between them, must then share. An x
+// that is exactly representable at the working precision is passed to `f` directly.
+pub(crate) fn monotone_rational_via_floats<
+    F: Fn(&Float, u64, RoundingMode) -> (Float, Ordering),
+>(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+    f: F,
+) -> (Float, Ordering) {
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
-        let (x_lo, x_o) = Float::from_rational_prec_round_ref(&x_abs, working_prec, Floor);
+        let (x_lo, x_o) = Float::from_rational_prec_round_ref(x, working_prec, Floor);
         if x_o == Equal {
-            // |x| is exactly representable at `working_prec`, so cosh(x) is simply cosh(x_lo).
-            return cosh_prec_round_normal_ref(&x_lo, prec, rm);
+            return f(&x_lo, prec, rm);
         }
         let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
-        // The hyperbolic cosine of a finite nonzero Float is never exact, so both orderings are
-        // `Less` or `Greater`, never `Equal`.
-        let (c_lo, o_lo) = cosh_prec_round_normal_ref(&x_lo, prec, rm);
-        let (c_hi, o_hi) = cosh_prec_round_normal_ref(&x_hi, prec, rm);
-        if o_lo == o_hi && c_lo == c_hi {
-            return (c_lo, o_lo);
+        // Both orderings are `Less` or `Greater`, never `Equal`.
+        let (y_lo, o_lo) = f(&x_lo, prec, rm);
+        let (y_hi, o_hi) = f(&x_hi, prec, rm);
+        if o_lo == o_hi && y_lo == y_hi {
+            return (y_lo, o_lo);
         }
         working_prec += increment;
         increment = working_prec >> 1;

@@ -14,10 +14,11 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cos::round_bracket;
+use crate::float::arithmetic::cosh::monotone_rational_via_floats;
 use crate::float::arithmetic::round_near_x::{float_round_near_x, small_input_shortcut};
 use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
 use crate::float::arithmetic::sinh::sinh_bound;
-use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::{max, min};
 use malachite_base::num::arithmetic::traits::{
@@ -249,25 +250,7 @@ fn tanh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Or
     // tanh is increasing, so bracket x between the Floats x_lo <= x <= x_hi, take the hyperbolic
     // tangent of both, and increase the working precision until the two round to the same result,
     // which the exact tanh(x), lying between them, must then share.
-    let mut working_prec = prec + 10;
-    let mut increment = Limb::WIDTH;
-    loop {
-        let (x_lo, x_o) = Float::from_rational_prec_round_ref(x, working_prec, Floor);
-        if x_o == Equal {
-            // x is exactly representable at `working_prec`, so tanh(x) is simply tanh(x_lo).
-            return tanh_prec_round_normal_ref(&x_lo, prec, rm);
-        }
-        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
-        // The hyperbolic tangent of a finite nonzero Float is never exact, so both orderings are
-        // `Less` or `Greater`, never `Equal`. (x is far from zero here, so neither bound is zero.)
-        let (t_lo, o_lo) = tanh_prec_round_normal_ref(&x_lo, prec, rm);
-        let (t_hi, o_hi) = tanh_prec_round_normal_ref(&x_hi, prec, rm);
-        if o_lo == o_hi && t_lo == t_hi {
-            return (t_lo, o_lo);
-        }
-        working_prec += increment;
-        increment = working_prec >> 1;
-    }
+    monotone_rational_via_floats(x, prec, rm, tanh_prec_round_normal_ref)
 }
 
 impl Float {

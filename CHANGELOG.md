@@ -1065,6 +1065,12 @@ documented by git history.
   $\sinh x$ overflows but $\operatorname{csch} x$ is still representable, or must be rounded with
   the underflow rules, it is computed instead as $2e^{-|x|}/(1-e^{-2|x|})$ by the same exact
   scaling; a reciprocal at the top of the exponent range is decided from an exact bracket.
+- `csch_rational_prec_round` and `csch_rational_prec` (with `_ref` variants), the correctly rounded
+  hyperbolic cosecant of a `Rational` as a `Float`, and `primitive_float_csch_rational`. A tiny $x$
+  is rounded from $1/x$ directly, a small one is bracketed by the reciprocals of series bounds on
+  $\sinh x$ (which also handles inputs too small to be `Float`s, whose hyperbolic cosecants
+  overflow), and otherwise $x$ is bracketed between two `Float`s, $\operatorname{csch}$ being
+  decreasing on each side of 0.
 
 ### Documentation
 

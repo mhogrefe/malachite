@@ -19,6 +19,7 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
+use malachite_q::Rational;
 
 // Steps `y` to the next `prec`-precision value away from zero, like `mpfr_nexttoinf` (note that
 // `Float::increment` is not suitable: it does not preserve precision when crossing a power of 2).
@@ -277,4 +278,31 @@ pub(crate) fn round_near_reciprocal(
         round_from_above(r, o, false, rm_abs)
     };
     if negative { (-r, o.reverse()) } else { (r, o) }
+}
+
+// Rounds a function of a nonzero `Rational` x from its leading term, whose magnitude is `term_abs`:
+// the function's magnitude lies strictly beyond the term (away from zero) if `beyond`, or strictly
+// short of it otherwise, and nearer to it than the distance from the term to any (prec + 1)-bit
+// dyadic other than the term itself, which the caller guarantees. The function has the sign of x,
+// given by `positive`. The term's own rounding is then the answer, but for a term that is exactly
+// representable or exactly halfway between two `prec`-bit `Float`s; `round_from_below` and
+// `round_from_above` move those. The work is done on the magnitude, with the reflected rounding
+// mode for a negative x.
+pub(crate) fn round_rational_leading_term(
+    term_abs: Rational,
+    positive: bool,
+    beyond: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let rm_abs = if positive { rm } else { -rm };
+    let (wide, o_wide) = Float::from_rational_prec_ref(&term_abs, prec + 1);
+    let tie = rm_abs == Nearest && value_is_tie(&wide, o_wide, prec);
+    let (t, o) = Float::from_rational_prec_round(term_abs, prec, rm_abs);
+    let (t, o) = if beyond {
+        round_from_below(t, o, tie, rm_abs)
+    } else {
+        round_from_above(t, o, tie, rm_abs)
+    };
+    if positive { (t, o) } else { (-t, o.reverse()) }
 }

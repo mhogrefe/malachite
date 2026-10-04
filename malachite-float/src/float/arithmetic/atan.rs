@@ -23,7 +23,7 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::round_near_x::{
-    LEADING_TERM_MIN_EXPONENT, round_from_above, small_input_shortcut, value_is_tie,
+    LEADING_TERM_MIN_EXPONENT, round_rational_leading_term, small_input_shortcut,
 };
 use crate::float::arithmetic::sin::{
     SCALE, SCALED_INPUT_EXPONENT, UNDERFLOW_EXPONENT, scaled_underflow, underflowed,
@@ -386,14 +386,7 @@ pub(crate) fn atan_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
     if exp_x > LEADING_TERM_MIN_EXPONENT
         && -(exp_x << 1) > i64::exact_from(prec + x.denominator_ref().significant_bits()) + 4
     {
-        let positive = *x > 0u32;
-        let ax = x.abs();
-        let rm_abs = if positive { rm } else { -rm };
-        let (wide, o_wide) = Float::from_rational_prec_ref(&ax, prec + 1);
-        let tie = rm_abs == Nearest && value_is_tie(&wide, o_wide, prec);
-        let (t, o) = Float::from_rational_prec_round(ax, prec, rm_abs);
-        let (t, o) = round_from_above(t, o, tie, rm_abs);
-        return if positive { (t, o) } else { (-t, o.reverse()) };
+        return round_rational_leading_term(x.abs(), *x > 0u32, false, prec, rm);
     }
     // For |x| <= 1/2, |x| - |x|^3/3 <= |atan x| <= |x| - |x|^3/3 + |x|^5/5, a bracket of relative
     // width below x^4, which decides the rounding once x^4 is below 2^-(prec + 3); a handful of

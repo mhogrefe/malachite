@@ -14,11 +14,13 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cos::round_bracket;
-use crate::float::arithmetic::cosh::{hyperbolic_approx, hyperbolic_can_round};
+use crate::float::arithmetic::cosh::{
+    hyperbolic_approx, hyperbolic_can_round, monotone_rational_via_floats,
+};
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
 use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
 use crate::float::conversion::string::set_str::overflow;
-use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
@@ -156,25 +158,7 @@ pub(crate) fn sinh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
     // sinh is increasing, so bracket x between the Floats x_lo <= x <= x_hi, take the hyperbolic
     // sine of both, and increase the working precision until the two round to the same result,
     // which the exact sinh(x), lying between them, must then share.
-    let mut working_prec = prec + 10;
-    let mut increment = Limb::WIDTH;
-    loop {
-        let (x_lo, x_o) = Float::from_rational_prec_round_ref(x, working_prec, Floor);
-        if x_o == Equal {
-            // x is exactly representable at `working_prec`, so sinh(x) is simply sinh(x_lo).
-            return sinh_prec_round_normal_ref(&x_lo, prec, rm);
-        }
-        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
-        // The hyperbolic sine of a finite nonzero Float is never exact, so both orderings are
-        // `Less` or `Greater`, never `Equal`. (x is far from zero here, so neither bound is zero.)
-        let (s_lo, o_lo) = sinh_prec_round_normal_ref(&x_lo, prec, rm);
-        let (s_hi, o_hi) = sinh_prec_round_normal_ref(&x_hi, prec, rm);
-        if o_lo == o_hi && s_lo == s_hi {
-            return (s_lo, o_lo);
-        }
-        working_prec += increment;
-        increment = working_prec >> 1;
-    }
+    monotone_rational_via_floats(x, prec, rm, sinh_prec_round_normal_ref)
 }
 
 impl Float {

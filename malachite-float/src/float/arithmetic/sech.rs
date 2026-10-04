@@ -13,10 +13,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::cos::{cos_rational_tiny, round_bracket, round_scaled_bracket};
+use crate::float::arithmetic::cos::{cos_rational_tiny, round_scaled_bracket};
+use crate::float::arithmetic::cosh::monotone_rational_via_floats;
 use crate::float::arithmetic::exp::one_neighbor;
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
 use crate::float::arithmetic::sin::underflowed;
+use crate::float::arithmetic::tan::round_bracket_signed_by;
 use crate::float::arithmetic::tanh::cosh_bound;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, Equal};
@@ -167,7 +169,7 @@ fn sech_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Or
     // A small x is handled by bracketing sech(x) = 1 / cosh(x) with series bounds on cosh(x). This
     // also covers every remaining x too small to be a `Float`.
     if exp_x < -1 && u64::exact_from(-exp_x) << 4 >= prec + 10 {
-        return sech_rational_series(x, prec, rm);
+        return reciprocal_hyperbolic_series(x, false, cosh_bound, prec, rm);
     }
     let x_abs = x.abs();
     if x_abs >= RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD {
@@ -176,37 +178,28 @@ fn sech_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Or
     // sech is even and decreasing on [0, infinity), so bracket |x| between the Floats x_lo <= |x|
     // <= x_hi, take the hyperbolic secant of both, and increase the working precision until the two
     // round to the same result, which the exact sech(x), lying between them, must then share.
-    let mut working_prec = prec + 10;
-    let mut increment = Limb::WIDTH;
-    loop {
-        let (x_lo, x_o) = Float::from_rational_prec_round_ref(&x_abs, working_prec, Floor);
-        if x_o == Equal {
-            // |x| is exactly representable at `working_prec`, so sech(x) is simply sech(x_lo).
-            return sech_prec_round_normal_ref(&x_lo, prec, rm);
-        }
-        let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
-        // The hyperbolic secant of a finite nonzero Float is never exact, so both orderings are
-        // `Less` or `Greater`, never `Equal`.
-        let (s_lo, o_lo) = sech_prec_round_normal_ref(&x_lo, prec, rm);
-        let (s_hi, o_hi) = sech_prec_round_normal_ref(&x_hi, prec, rm);
-        if o_lo == o_hi && s_lo == s_hi {
-            return (s_lo, o_lo);
-        }
-        working_prec += increment;
-        increment = working_prec >> 1;
-    }
+    monotone_rational_via_floats(&x_abs, prec, rm, sech_prec_round_normal_ref)
 }
 
-// Brackets sech(x) = 1 / cosh(x) for a nonzero `Rational` x, small enough that the series of
-// cosh(x) converges in a few terms, by the reciprocals of bounds on cosh(x), tightening the bracket
-// until both ends round the same way.
-fn sech_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+// Computes 1/g(x) for a nonzero `Rational` x, small enough that the series of g converges in a few
+// terms, where g is cosh or sinh and `bound(t, w, away)` bounds g(t) for |t| < 1/2 from below, or
+// from above if `away`, to within a relative 2^-(w+3). 1/g(x) is bracketed by the reciprocals of
+// the bounds on g(|x|), negated if `negative`, and the bracket is tightened until both ends round
+// the same way. This serves sech and csch, and covers every x too small to be a `Float`.
+pub(crate) fn reciprocal_hyperbolic_series(
+    x: &Rational,
+    negative: bool,
+    bound: fn(&Rational, u64, bool) -> Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let ax = x.abs();
     let mut w = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
-        let lo = cosh_bound(x, w, true).reciprocal();
-        let hi = cosh_bound(x, w, false).reciprocal();
-        if let Some(result) = round_bracket(&lo, &hi, prec, rm) {
+        let lo = bound(&ax, w, true).reciprocal();
+        let hi = bound(&ax, w, false).reciprocal();
+        if let Some(result) = round_bracket_signed_by(negative, lo, hi, prec, rm) {
             return result;
         }
         w += increment;
@@ -1066,7 +1059,7 @@ impl Float {
     /// result to the nearest value of the specified precision and returning the result as a
     /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
     /// whether the rounded hyperbolic secant is less than, equal to, or greater than the exact
-    /// hyperbolic cosine.
+    /// hyperbolic secant.
     ///
     /// If the hyperbolic secant is equidistant from two [`Float`]s with the specified precision,
     /// the [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a

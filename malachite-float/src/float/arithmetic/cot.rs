@@ -28,7 +28,7 @@ use crate::float::arithmetic::cos::{
     trig_rational_near_zero_bracket, trig_turns_near_zero_bracket,
 };
 use crate::float::arithmetic::round_near_x::{
-    LEADING_TERM_MIN_EXPONENT, round_from_above, round_near_reciprocal, value_is_tie,
+    LEADING_TERM_MIN_EXPONENT, round_near_reciprocal, round_rational_leading_term,
 };
 use crate::float::arithmetic::sin_cos::{
     sin_cos_rational_helper, sin_cos_turns_helper, sin_cos_with_period_prec_round_normal_ref,
@@ -249,14 +249,7 @@ pub(crate) fn cot_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
         && -exp_x > n + 2
         && -(exp_x << 1) > i64::exact_from(prec) + n + 4
     {
-        let positive = *x > 0u32;
-        let recip = x.abs().reciprocal();
-        let rm_abs = if positive { rm } else { -rm };
-        let (wide, o_wide) = Float::from_rational_prec_ref(&recip, prec + 1);
-        let tie = rm_abs == Nearest && value_is_tie(&wide, o_wide, prec);
-        let (t, o) = Float::from_rational_prec_round(recip, prec, rm_abs);
-        let (t, o) = round_from_above(t, o, tie, rm_abs);
-        return if positive { (t, o) } else { (-t, o.reverse()) };
+        return round_rational_leading_term(x.abs().reciprocal(), *x > 0u32, false, prec, rm);
     }
     // For |x| <= 1/2, |x| + |x|^3/3 <= |tan x| <= |x| + |x|^3/3 + |x|^5, so the cotangent lies
     // between the reciprocals of those, a bracket of relative width below x^4, which decides the

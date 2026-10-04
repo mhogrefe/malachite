@@ -15,9 +15,7 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::atan::{arc_with_period_scale, scaled_unsigned};
-use crate::float::arithmetic::round_near_x::{
-    round_from_below, small_input_shortcut, value_is_tie,
-};
+use crate::float::arithmetic::round_near_x::{round_rational_leading_term, small_input_shortcut};
 use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
 use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
@@ -203,15 +201,7 @@ pub(crate) fn asin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
     // 2 |EXP(x)| bits whose square root the loop then takes over and over, at a precision of the
     // same order: 22 minutes for x = 2^-536870908, against milliseconds here.
     if -(exp_x << 1) > i64::exact_from(prec + x.denominator_ref().significant_bits()) + 4 {
-        let ax = x.abs();
-        // the arcsine is odd, so the sign is stripped and restored, the rounding mode reflected
-        // along with it
-        let rm_abs = if positive { rm } else { -rm };
-        let (wide, o_wide) = Float::from_rational_prec_ref(&ax, prec + 1);
-        let tie = rm_abs == Nearest && value_is_tie(&wide, o_wide, prec);
-        let (t, o) = Float::from_rational_prec_round(ax, prec, rm_abs);
-        let (t, o) = round_from_below(t, o, tie, rm_abs);
-        return if positive { (t, o) } else { (-t, o.reverse()) };
+        return round_rational_leading_term(x.abs(), positive, true, prec, rm);
     }
     let x2 = (&x.abs()).square();
     let r = (&x2 / (Rational::ONE - &x2)).abs();
