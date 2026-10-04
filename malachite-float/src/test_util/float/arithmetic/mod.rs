@@ -59,6 +59,7 @@ pub mod reciprocal_sqrt;
 pub mod rem;
 pub mod root;
 pub mod sec;
+pub mod sech;
 pub mod shl;
 pub mod shl_round;
 pub mod shr;

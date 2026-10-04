@@ -1166,6 +1166,18 @@ pub trait TanhAssign {
     fn tanh_assign(&mut self);
 }
 
+/// Computes $\operatorname{sech}(x)$, the hyperbolic secant of a number.
+pub trait Sech {
+    type Output;
+
+    fn sech(self) -> Self::Output;
+}
+
+/// Replaces a number with its hyperbolic secant, $\operatorname{sech}(x)$.
+pub trait SechAssign {
+    fn sech_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

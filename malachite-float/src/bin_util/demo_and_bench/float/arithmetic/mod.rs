@@ -78,6 +78,7 @@ pub(crate) fn register(runner: &mut Runner) {
     sinh::register(runner);
     sinh_cosh::register(runner);
     sec::register(runner);
+    sech::register(runner);
     tan::register(runner);
     tanh::register(runner);
     sqrt::register(runner);
@@ -147,6 +148,7 @@ mod reciprocal;
 mod reciprocal_sqrt;
 mod root;
 mod sec;
+mod sech;
 mod shl;
 mod shl_round;
 mod shr;

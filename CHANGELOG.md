@@ -1049,6 +1049,12 @@ documented by git history.
   $\tanh$ is increasing, $x$ is bracketed between two `Float`s; a small $x$ is instead bracketed
   by series bounds on $\sinh x$ and $\cosh x$, which also handles inputs too small to be `Float`s,
   whose hyperbolic tangents underflow.
+- `Sech` and `SechAssign` (new traits in malachite-base) for `Float`, with the usual
+  `sech_prec_round`, `sech_prec`, `sech_round`, and `_ref`/`_assign` variants, and
+  `primitive_float_sech`: a port of `mpfr_sech`, computing $1/\cosh x$. Where $\cosh x$ overflows
+  but $\operatorname{sech} x$ is still representable, or must be rounded with the underflow rules
+  (inputs of magnitude near $7.4\times10^8$), it is computed instead as $2e^{-|x|}/(1+e^{-2|x|})$,
+  from $e^{-|x|/2}$ scaled into range by an exact power of 2.
 
 ### Documentation
 

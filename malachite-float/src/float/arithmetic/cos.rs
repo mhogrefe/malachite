@@ -229,6 +229,57 @@ pub(crate) fn round_bracket(
     (o_lo == o_hi && ComparableFloatRef(&f_lo) == ComparableFloatRef(&f_hi)).then_some((f_lo, o_lo))
 }
 
+// `round_bracket` for the open bracket (2^k lo, 2^k hi) of nonzero Floats of the same sign, scaled
+// by a power of 2 so large that its ends would not fit in `Rational`s of reasonable size: each end
+// is shifted with the rounding mode, which performs any underflow or overflow rounding. As in
+// `round_bracket`, an end that is exactly representable after the shift is not itself a candidate,
+// since the value is strictly inside the bracket.
+pub(crate) fn round_scaled_bracket(
+    lo: &Float,
+    hi: &Float,
+    k: i64,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    let (mut f_lo, mut o_lo) = lo.shl_prec_round_ref(k, prec, rm);
+    let (mut f_hi, mut o_hi) = hi.shl_prec_round_ref(k, prec, rm);
+    if o_lo == Equal {
+        // an end with all-zero bits below the output precision; not reached by any test
+        fail_on_untested_path("round_scaled_bracket, exact lower end");
+        // values just above lo
+        let up = match rm {
+            Ceiling => true,
+            Up => f_lo > 0u32,
+            Down => f_lo < 0u32,
+            _ => false,
+        };
+        o_lo = if up {
+            f_lo.increment();
+            Greater
+        } else {
+            Less
+        };
+    }
+    if o_hi == Equal {
+        // an end with all-zero bits below the output precision; not reached by any test
+        fail_on_untested_path("round_scaled_bracket, exact upper end");
+        // values just below hi
+        let down = match rm {
+            Floor => true,
+            Down => f_hi > 0u32,
+            Up => f_hi < 0u32,
+            _ => false,
+        };
+        o_hi = if down {
+            f_hi.decrement();
+            Less
+        } else {
+            Greater
+        };
+    }
+    (o_lo == o_hi && ComparableFloatRef(&f_lo) == ComparableFloatRef(&f_hi)).then_some((f_lo, o_lo))
+}
+
 // cos(x) for a nonzero x so small that 1 - x^2/2 <= cos(x) < 1 lies within half an ulp of 1 at
 // precision `prec`: the result is 1, or its predecessor for rounding toward zero.
 pub(crate) fn cos_rational_tiny(prec: u64, rm: RoundingMode) -> (Float, Ordering) {

@@ -374,6 +374,10 @@ pub mod round_to_integer;
 /// [`SecAssign`](malachite_base::num::arithmetic::traits::SecAssign), traits for computing the
 /// secant of [`Float`](super::Float)s.
 pub mod sec;
+/// Implementations of [`Sech`](malachite_base::num::arithmetic::traits::Sech) and
+/// [`SechAssign`](malachite_base::num::arithmetic::traits::SechAssign), traits for computing the
+/// hyperbolic secant of [`Float`](super::Float)s.
+pub mod sech;
 /// Left-shifting a [`Float`](super::Float) (multiplying it by a power of 2).
 ///
 /// # shl
