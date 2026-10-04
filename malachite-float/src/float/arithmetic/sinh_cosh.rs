@@ -1006,11 +1006,9 @@ where
 ///
 /// The results are those of
 /// [`primitive_float_sinh_rational`](crate::float::arithmetic::sinh::primitive_float_sinh_rational)
-/// and
-/// [`primitive_float_cosh_rational`](
-/// crate::float::arithmetic::cosh::primitive_float_cosh_rational),
-/// but they share their exponentials, so this is faster than the two calls when both values are
-/// needed.
+/// and [`primitive_float_cosh_rational`](
+/// crate::float::arithmetic::cosh::primitive_float_cosh_rational), but they share their
+/// exponentials, so this is faster than the two calls when both values are needed.
 ///
 /// $$
 /// f(x) = (\sinh x+\varepsilon_s, \cosh x+\varepsilon_c).

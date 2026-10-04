@@ -73,3 +73,4 @@ pub mod sub;
 pub mod sub_mul;
 pub mod sum;
 pub mod tan;
+pub mod tanh;

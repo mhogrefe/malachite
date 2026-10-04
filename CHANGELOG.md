@@ -1037,6 +1037,18 @@ documented by git history.
   `primitive_float_sinh_cosh_rational`. The input is bracketed between two `Float`s whose
   hyperbolic sines and cosines are computed together; a small input takes the separate series and
   underflow paths of `sinh_rational_prec_round` and `cosh_rational_prec_round`.
+- `Tanh` and `TanhAssign` (new traits in malachite-base) for `Float`, with the usual
+  `tanh_prec_round`, `tanh_prec`, `tanh_round`, and `_ref`/`_assign` variants, and
+  `primitive_float_tanh`: a port of `mpfr_tanh`, computing $\tanh x = (e^{2x}-1)/(e^{2x}+1)$. Where
+  MPFR rounds a result close to $\pm1$ from $\pm1$ directly, the closeness is checked first, and
+  when the output precision is too high for it to be certain the result is computed from
+  $-\operatorname{expm1}(-2x)/(2+\operatorname{expm1}(-2x))$; and a precise input does not raise
+  the working precision, since doubling a `Float` is exact.
+- `tanh_rational_prec_round` and `tanh_rational_prec` (with `_ref` variants), the correctly rounded
+  hyperbolic tangent of a `Rational` as a `Float`, and `primitive_float_tanh_rational`. Since
+  $\tanh$ is increasing, $x$ is bracketed between two `Float`s; a small $x$ is instead bracketed
+  by series bounds on $\sinh x$ and $\cosh x$, which also handles inputs too small to be `Float`s,
+  whose hyperbolic tangents underflow.
 
 ### Documentation
 

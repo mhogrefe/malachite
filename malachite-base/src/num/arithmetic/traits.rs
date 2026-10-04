@@ -1154,6 +1154,18 @@ pub trait SinhCoshAssign {
     fn sinh_cosh_assign(&mut self, cosh: &mut Self);
 }
 
+/// Computes $\tanh(x)$, the hyperbolic tangent of a number.
+pub trait Tanh {
+    type Output;
+
+    fn tanh(self) -> Self::Output;
+}
+
+/// Replaces a number with its hyperbolic tangent, $\tanh(x)$.
+pub trait TanhAssign {
+    fn tanh_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

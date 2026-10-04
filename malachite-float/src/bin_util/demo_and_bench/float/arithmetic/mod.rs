@@ -79,6 +79,7 @@ pub(crate) fn register(runner: &mut Runner) {
     sinh_cosh::register(runner);
     sec::register(runner);
     tan::register(runner);
+    tanh::register(runner);
     sqrt::register(runner);
     square::register(runner);
     sub::register(runner);
@@ -161,3 +162,4 @@ mod sub;
 mod sub_mul;
 mod sum;
 mod tan;
+mod tanh;

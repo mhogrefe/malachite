@@ -74,7 +74,7 @@ fn sinh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
 // bound on the other side. The move is a multiplication by 2^(w+3) + 1 followed by a shift, which
 // only reduces a small integer against the denominator, rather than an addition, which would take a
 // GCD of two denominators, ruinous when t has a 2^30-bit one.
-fn sinh_bound(t: &Rational, w: u64, away_from_zero: bool) -> Rational {
+pub(crate) fn sinh_bound(t: &Rational, w: u64, away_from_zero: bool) -> Rational {
     // |t| < 2^(log + 1), with log < 0
     let log = t.floor_log_base_2_abs();
     assert!(log < -1);

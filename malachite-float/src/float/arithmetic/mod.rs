@@ -879,3 +879,7 @@ pub mod sub_mul;
 /// built on them.
 pub mod sum;
 pub mod tan;
+/// Implementations of [`Tanh`](malachite_base::num::arithmetic::traits::Tanh) and
+/// [`TanhAssign`](malachite_base::num::arithmetic::traits::TanhAssign), traits for computing the
+/// hyperbolic tangent of [`Float`](super::Float)s.
+pub mod tanh;
