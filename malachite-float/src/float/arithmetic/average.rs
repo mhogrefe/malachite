@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::{Average, AverageAssign};
 use malachite_base::num::basic::traits::{NegativeZero, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Floor, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 // Computes $(x+y)/2$, rounded to the given precision with the given rounding mode. Exactly one
 // rounding is performed, so the result is the correctly-rounded average; neither the intermediate

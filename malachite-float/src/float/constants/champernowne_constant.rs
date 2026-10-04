@@ -10,7 +10,7 @@ use crate::{Float, emulate_constant_to_float_fn};
 use core::cmp::Ordering;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, RoundingFrom};
-use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 // The digits of the Champernowne constant in the given base: the base-`base` representations of 1,
 // 2, 3, ... run together. A `u64` counter is inexhaustible here, since the digits contributed by

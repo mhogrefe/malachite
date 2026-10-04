@@ -50,7 +50,7 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Down, Exact, Nearest, Up};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::{fail_on_untested_path, split_into_chunks_mut};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;

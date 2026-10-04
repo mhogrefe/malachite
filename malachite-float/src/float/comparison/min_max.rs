@@ -19,7 +19,7 @@ use core::cmp::Ordering::{Equal, Greater, Less};
 use core::cmp::{Ordering, max};
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
 
 // Which operand mpfr_min/mpfr_max selects: one NaN gives the other; both NaN gives the first, whose

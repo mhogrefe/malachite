@@ -20,7 +20,7 @@ use malachite_base::num::arithmetic::traits::{MulSubMul, MulSubMulAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
 
 // This is mpfr_fms from fmma.c, MPFR 4.2.2: mul_sub_mul computes a * b - c * d, which is mpfr_fmms

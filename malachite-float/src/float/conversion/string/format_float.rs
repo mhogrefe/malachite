@@ -67,9 +67,7 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::string::to_string::digit_to_display_byte_lower;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};
-use malachite_base::rounding_modes::RoundingMode::{
-    self, Ceiling, Down, Exact, Floor, Nearest, Up,
-};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::strings::gmp_format::{GmpConversionSpec, GmpFormatArg};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

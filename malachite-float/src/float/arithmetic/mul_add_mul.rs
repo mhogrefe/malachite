@@ -24,7 +24,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{NegativeZero, One, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Floor, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 

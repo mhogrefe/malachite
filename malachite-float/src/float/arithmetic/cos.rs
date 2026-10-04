@@ -37,9 +37,7 @@ use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{
-    self, Ceiling, Down, Exact, Floor, Nearest, Up,
-};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;

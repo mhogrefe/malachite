@@ -18,7 +18,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
 
 // This is mpfr_dim from dim.c, MPFR 4.2.2, with the result's precision passed explicitly. The

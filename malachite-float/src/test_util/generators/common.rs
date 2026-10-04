@@ -16,7 +16,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::It;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

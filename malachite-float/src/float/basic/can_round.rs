@@ -12,7 +12,7 @@
 
 use crate::Float;
 use crate::InnerFloat::Finite;
-use malachite_base::rounding_modes::RoundingMode::{self, Exact};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round_raw;
 
 impl Float {

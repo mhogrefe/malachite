@@ -11,7 +11,7 @@ use core::cmp::Ordering;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, RoundingFrom};
 use malachite_base::num::factorization::traits::Primes;
-use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 // The digits of the Copeland–Erdős constant in the given base: the base-`base` representations
 // of the primes run together.

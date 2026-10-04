@@ -12,7 +12,7 @@ use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{Abs, PowerOf2, Reciprocal};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Down};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;

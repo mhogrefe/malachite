@@ -10,9 +10,7 @@ use malachite_base::gmp_format;
 use malachite_base::num::arithmetic::traits::{Abs, Pow, PowerOf2};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode::{
-    self, Ceiling, Down, Exact, Floor, Nearest, Up,
-};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::Float;
 use malachite_float::float::conversion::string::format_float::PrintfArg::{Float as F, Int, Str};
 use malachite_float::float::conversion::string::format_float::{

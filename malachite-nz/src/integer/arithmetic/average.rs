@@ -11,7 +11,7 @@ use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     Average, AverageAssign, AverageRound, AverageRoundAssign, ShrRound, ShrRoundAssign,
 };
-use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 impl Average<Self> for Integer {
     type Output = Self;

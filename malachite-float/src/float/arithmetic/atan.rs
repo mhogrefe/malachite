@@ -45,7 +45,7 @@ use malachite_base::num::basic::traits::{
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact, Floor, Nearest, Up};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::split_into_chunks_mut;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

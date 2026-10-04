@@ -31,7 +31,7 @@ use malachite_base::num::basic::traits::{
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Exact, Floor, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 

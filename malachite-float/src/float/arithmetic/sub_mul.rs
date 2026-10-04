@@ -20,7 +20,7 @@ use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
 
 // This is mpfr_fms from fms.c, MPFR 4.2.2, up to a sign convention: mpfr_fms computes x * y - z by

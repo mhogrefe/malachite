@@ -11,7 +11,7 @@ use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::SaturatingMulAssign;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
-use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 // The digits of Liouville's constant in the given base: 1 at every position that is a factorial, 0
 // everywhere else. The positions are 1-indexed, so both 1! and 2! contribute a 1, making the

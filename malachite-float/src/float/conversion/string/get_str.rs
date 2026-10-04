@@ -23,7 +23,7 @@ use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, NegAssign, Sign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
-use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Exact, Floor};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float::get_str::{limbs_get_str, limbs_get_str_power_of_2};
 
