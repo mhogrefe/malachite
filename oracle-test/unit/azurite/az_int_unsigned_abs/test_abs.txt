@@ -1,0 +1,8 @@
+unsigned_abs(0) = 0
+unsigned_abs(123) = 123
+unsigned_abs(-123) = 123
+unsigned_abs(1000000000000) = 1000000000000
+unsigned_abs(-1000000000000) = 1000000000000
+unsigned_abs(3000000000) = 3000000000
+unsigned_abs(-3000000000) = 3000000000
+unsigned_abs(-2147483648) = 2147483648

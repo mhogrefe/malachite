@@ -1,0 +1,5 @@
+Integer::from(0) = 0
+Integer::from(123) = 123
+Integer::from(-123) = -123
+Integer::from(-2147483648) = -2147483648
+Integer::from(2147483647) = 2147483647

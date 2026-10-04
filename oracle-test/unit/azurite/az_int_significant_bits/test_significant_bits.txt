@@ -1,0 +1,5 @@
+significant_bits(0) = 0
+significant_bits(100) = 7
+significant_bits(-100) = 7
+significant_bits(1000000000000) = 40
+significant_bits(-1000000000000) = 40

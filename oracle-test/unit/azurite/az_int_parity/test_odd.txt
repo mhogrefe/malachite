@@ -1,0 +1,13 @@
+0 is not odd
+1 is odd
+2 is not odd
+3 is odd
+123 is odd
+1000000000000 is not odd
+1000000000001 is odd
+-1 is odd
+-2 is not odd
+-3 is odd
+-123 is odd
+-1000000000000 is not odd
+-1000000000001 is odd

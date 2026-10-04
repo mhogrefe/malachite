@@ -1,0 +1,6 @@
+Integer::low_mask(0) = 0
+Integer::low_mask(1) = 1
+Integer::low_mask(2) = 3
+Integer::low_mask(3) = 7
+Integer::low_mask(32) = 4294967295
+Integer::low_mask(100) = 1267650600228229401496703205375

@@ -1,0 +1,6 @@
+Integer::from_sign_and_abs(true, 0) = 0
+Integer::from_sign_and_abs(false, 0) = 0
+Integer::from_sign_and_abs(true, 123) = 123
+Integer::from_sign_and_abs(false, 123) = -123
+Integer::from_sign_and_abs(true, 1000000000000) = 1000000000000
+Integer::from_sign_and_abs(false, 1000000000000) = -1000000000000

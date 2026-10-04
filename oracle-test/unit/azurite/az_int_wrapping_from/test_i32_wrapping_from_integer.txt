@@ -1,0 +1,9 @@
+i32::wrapping_from(&0) = 0
+i32::wrapping_from(&123) = 123
+i32::wrapping_from(&1000000000000) = -727379968
+i32::wrapping_from(&2147483648) = -2147483648
+i32::wrapping_from(&2147483649) = -2147483647
+i32::wrapping_from(&-123) = -123
+i32::wrapping_from(&-1000000000000) = 727379968
+i32::wrapping_from(&-2147483649) = 2147483647
+i32::wrapping_from(&-2147483650) = 2147483646

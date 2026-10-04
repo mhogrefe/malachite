@@ -1,0 +1,12 @@
+(0).mod_euclidean(1) = 0
+(0).mod_euclidean(123) = 0
+(23).mod_euclidean(1) = 0
+(23).mod_euclidean(10) = 3
+(23).mod_euclidean(-10) = 3
+(-23).mod_euclidean(10) = 7
+(-23).mod_euclidean(-10) = 7
+(-50).mod_euclidean(-23) = 19
+(50).mod_euclidean(-23) = 4
+(123).mod_euclidean(-1) = 0
+(1000000000000).mod_euclidean(3) = 1
+(-1000000000000).mod_euclidean(3) = 2

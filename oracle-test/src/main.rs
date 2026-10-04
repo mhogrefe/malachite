@@ -441,6 +441,142 @@ const AZURITE_NATURAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ("demo_natural_from_str_targeted", "az_nat_from_str"),
 ];
 
+// The Integer demos checked against Azurite, with the oracle mode that reads each one. The modes
+// follow the rows of the "Malachite for Azurite Users: Integers" mapping page; `extended_gcd` is a
+// Natural demo whose Bézout coefficients are Integers.
+const AZURITE_INTEGER_STAGES: &[(&str, &str)] = &[
+    ("demo_integer_add", "az_int_add"),
+    ("demo_integer_add_val_ref", "az_int_add"),
+    ("demo_integer_add_ref_val", "az_int_add"),
+    ("demo_integer_add_ref_ref", "az_int_add"),
+    ("demo_integer_sub", "az_int_sub"),
+    ("demo_integer_sub_val_ref", "az_int_sub"),
+    ("demo_integer_sub_ref_val", "az_int_sub"),
+    ("demo_integer_sub_ref_ref", "az_int_sub"),
+    ("demo_integer_mul", "az_int_mul"),
+    ("demo_integer_mul_val_ref", "az_int_mul"),
+    ("demo_integer_mul_ref_val", "az_int_mul"),
+    ("demo_integer_mul_ref_ref", "az_int_mul"),
+    ("demo_integer_neg", "az_int_neg"),
+    ("demo_integer_neg_ref", "az_int_neg"),
+    ("demo_integer_div_euclidean", "az_int_div_euclidean"),
+    ("demo_integer_mod_euclidean", "az_int_mod_euclidean"),
+    ("demo_integer_div_mod_euclidean", "az_int_div_mod_euclidean"),
+    ("demo_integer_div_mod", "az_int_div_mod"),
+    ("demo_integer_div_mod_val_ref", "az_int_div_mod"),
+    ("demo_integer_div_mod_ref_val", "az_int_div_mod"),
+    ("demo_integer_div_mod_ref_ref", "az_int_div_mod"),
+    ("demo_integer_mod", "az_int_mod"),
+    ("demo_integer_mod_val_ref", "az_int_mod"),
+    ("demo_integer_mod_ref_val", "az_int_mod"),
+    ("demo_integer_mod_ref_ref", "az_int_mod"),
+    ("demo_integer_div_exact", "az_int_div_exact"),
+    ("demo_integer_div_exact_val_ref", "az_int_div_exact"),
+    ("demo_integer_div_exact_ref_val", "az_int_div_exact"),
+    ("demo_integer_div_exact_ref_ref", "az_int_div_exact"),
+    ("demo_integer_div_round", "az_int_div_round"),
+    ("demo_integer_div_round_val_ref", "az_int_div_round"),
+    ("demo_integer_div_round_ref_val", "az_int_div_round"),
+    ("demo_integer_div_round_ref_ref", "az_int_div_round"),
+    ("demo_integer_shl_unsigned_u8", "az_int_shl"),
+    ("demo_integer_shl_unsigned_u64", "az_int_shl"),
+    ("demo_integer_shl_unsigned_ref_u64", "az_int_shl"),
+    ("demo_integer_shl_signed_i8", "az_int_shl"),
+    ("demo_integer_shl_signed_i64", "az_int_shl"),
+    ("demo_integer_shl_signed_ref_i64", "az_int_shl"),
+    ("demo_integer_shr_unsigned_u8", "az_int_shr"),
+    ("demo_integer_shr_unsigned_u64", "az_int_shr"),
+    ("demo_integer_shr_unsigned_ref_u64", "az_int_shr"),
+    ("demo_integer_shr_signed_i8", "az_int_shr"),
+    ("demo_integer_shr_signed_i64", "az_int_shr"),
+    ("demo_integer_shr_signed_ref_i64", "az_int_shr"),
+    ("demo_integer_shr_round_unsigned_u8", "az_int_shr_round"),
+    ("demo_integer_shr_round_unsigned_u64", "az_int_shr_round"),
+    (
+        "demo_integer_shr_round_ref_unsigned_u64",
+        "az_int_shr_round",
+    ),
+    ("demo_integer_shr_round_signed_i8", "az_int_shr_round"),
+    ("demo_integer_shr_round_signed_i64", "az_int_shr_round"),
+    ("demo_integer_shr_round_ref_signed_i64", "az_int_shr_round"),
+    ("demo_integer_pow", "az_int_pow"),
+    ("demo_integer_pow_ref", "az_int_pow"),
+    ("demo_integer_gcd", "az_int_gcd"),
+    ("demo_integer_gcd_val_ref", "az_int_gcd"),
+    ("demo_integer_gcd_ref_val", "az_int_gcd"),
+    ("demo_integer_gcd_ref_ref", "az_int_gcd"),
+    ("demo_natural_extended_gcd", "az_int_extended_gcd"),
+    ("demo_natural_extended_gcd_val_ref", "az_int_extended_gcd"),
+    ("demo_natural_extended_gcd_ref_val", "az_int_extended_gcd"),
+    ("demo_natural_extended_gcd_ref_ref", "az_int_extended_gcd"),
+    ("demo_integer_is_power_of_2", "az_int_is_power_of_2"),
+    ("demo_integer_even", "az_int_parity"),
+    ("demo_integer_odd", "az_int_parity"),
+    ("demo_integer_sign", "az_int_sign"),
+    ("demo_integer_significant_bits", "az_int_significant_bits"),
+    ("demo_integer_trailing_zeros", "az_int_trailing_zeros"),
+    ("demo_integer_from_string_base", "az_int_from_string_base"),
+    ("demo_integer_from_str", "az_int_from_str"),
+    ("demo_integer_to_string", "az_int_to_string"),
+    ("demo_integer_cmp", "az_int_cmp"),
+    ("demo_integer_partial_cmp_natural", "az_int_cmp_natural"),
+    ("demo_integer_partial_cmp_unsigned_u8", "az_int_cmp_unsigned"),
+    ("demo_integer_partial_cmp_unsigned_u64", "az_int_cmp_unsigned"),
+    ("demo_integer_partial_cmp_signed_i8", "az_int_cmp_signed"),
+    ("demo_integer_partial_cmp_signed_i64", "az_int_cmp_signed"),
+    ("demo_integer_eq", "az_int_eq"),
+    ("demo_integer_partial_eq_natural", "az_int_eq_natural"),
+    ("demo_integer_partial_eq_unsigned_u8", "az_int_eq_unsigned"),
+    ("demo_integer_partial_eq_unsigned_u64", "az_int_eq_unsigned"),
+    ("demo_integer_partial_eq_signed_i8", "az_int_eq_signed"),
+    ("demo_integer_partial_eq_signed_i64", "az_int_eq_signed"),
+    ("demo_integer_from_natural", "az_int_from_natural"),
+    ("demo_integer_from_natural_ref", "az_int_from_natural"),
+    ("demo_integer_from_unsigned_u8", "az_int_from_unsigned"),
+    ("demo_integer_from_unsigned_u64", "az_int_from_unsigned"),
+    ("demo_integer_from_signed_i8", "az_int_from_signed"),
+    ("demo_integer_from_signed_i64", "az_int_from_signed"),
+    ("demo_from_sign_and_abs", "az_int_from_sign_and_abs"),
+    ("demo_from_sign_and_abs_ref", "az_int_from_sign_and_abs"),
+    ("demo_integer_unsigned_abs", "az_int_unsigned_abs"),
+    ("demo_integer_unsigned_abs_ref", "az_int_unsigned_abs"),
+    (
+        "demo_primitive_int_wrapping_from_integer_u8",
+        "az_int_wrapping_from",
+    ),
+    (
+        "demo_primitive_int_wrapping_from_integer_u64",
+        "az_int_wrapping_from",
+    ),
+    (
+        "demo_primitive_int_wrapping_from_integer_usize",
+        "az_int_wrapping_from",
+    ),
+    (
+        "demo_primitive_int_wrapping_from_integer_i8",
+        "az_int_wrapping_from",
+    ),
+    (
+        "demo_primitive_int_wrapping_from_integer_i64",
+        "az_int_wrapping_from",
+    ),
+    (
+        "demo_primitive_int_wrapping_from_integer_isize",
+        "az_int_wrapping_from",
+    ),
+];
+
+// The Integer demos whose generators have no `special_random` mode.
+const AZURITE_INTEGER_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
+    ("demo_integer_power_of_2", "az_int_power_of_2"),
+    ("demo_integer_low_mask", "az_int_low_mask"),
+    (
+        "demo_integer_from_string_base_targeted",
+        "az_int_from_string_base",
+    ),
+    ("demo_integer_from_str_targeted", "az_int_from_str"),
+];
+
 fn test_azurite_units(oracle: &Path) {
     run_unit_files("azurite", |mode, file| {
         run_azurite_oracle(oracle, mode, file)
@@ -454,6 +590,12 @@ fn test_against_azurite() {
         check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
     }
     for (demo, mode) in AZURITE_NATURAL_STAGES_NO_SPECIAL {
+        check_demo_against_azurite_in_modes(&oracle, "../malachite-nz", demo, mode, &MODES[..2]);
+    }
+    for (demo, mode) in AZURITE_INTEGER_STAGES {
+        check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
+    }
+    for (demo, mode) in AZURITE_INTEGER_STAGES_NO_SPECIAL {
         check_demo_against_azurite_in_modes(&oracle, "../malachite-nz", demo, mode, &MODES[..2]);
     }
 }

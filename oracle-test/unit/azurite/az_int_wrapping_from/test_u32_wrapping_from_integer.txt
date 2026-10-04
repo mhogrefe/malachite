@@ -1,0 +1,9 @@
+u32::wrapping_from(&0) = 0
+u32::wrapping_from(&123) = 123
+u32::wrapping_from(&1000000000000) = 3567587328
+u32::wrapping_from(&4294967296) = 0
+u32::wrapping_from(&4294967297) = 1
+u32::wrapping_from(&-123) = 4294967173
+u32::wrapping_from(&-1000000000000) = 727379968
+u32::wrapping_from(&-4294967296) = 0
+u32::wrapping_from(&-4294967297) = 4294967295

@@ -117,12 +117,25 @@ the `Natural` demos listed in `AZURITE_NATURAL_STAGES` in `src/main.rs`: the ope
 `Azurite/Oracle/AzNat.lean` in the Azurite repository, with the line parsers in
 `Azurite/Oracle/Parse.lean` and the mode table in `Azurite/Oracle/Main.lean`.
 
+The `az_int_*` modes do the same for the `Integer` demos listed in `AZURITE_INTEGER_STAGES`,
+following the "Malachite for Azurite Users: Integers" page: `+`, `-`, `*`, negation, the
+Euclidean family (`div_euclidean`, `mod_euclidean`, `div_mod_euclidean`, Azurite's `/` and `%`),
+the floor family (`div_mod`, `mod_op`), `div_exact`, `div_round`, `<<` and `>>` with unsigned and
+signed amounts, `shr_round`, `pow`, `gcd`, `Natural::extended_gcd` (whose Bézout coefficients are
+`Integer`s), `power_of_2`, `low_mask`, `is_power_of_2`, `even`/`odd`, `sign`, `significant_bits`,
+`trailing_zeros`, `from_string_base`, `from_str`, `to_string`, `cmp` and `eq` against `Integer`,
+`Natural`, and the machine integers, `Integer::from` from each of those, `from_sign_and_abs`,
+`unsigned_abs`, and `wrapping_from`. They live in `Azurite/Oracle/AzInt.lean`. Malachite's
+truncating `/` and `%` have no Azurite counterpart and are not checked.
+
 Where the two libraries' conventions differ, the oracle applies the adjustment the mapping page
 "Malachite for Azurite Users: Naturals" documents rather than skipping the line: Malachite's
 `Exact` rounding mode (which Azurite lacks) is checked as an exact division or shift, a negative
 `shr_round` amount as a left shift, `multi_crt`'s `None` as a violated precondition of Garner's
 algorithm, and Malachite's base-62 digit rule for `from_string_base` and `to_string_base` is
-evaluated with Azurite's arithmetic since `AzNat`'s own string functions stop at base 36.
+evaluated with Azurite's arithmetic since `AzNat`'s own string functions stop at base 36. For
+`extended_gcd`, whose Bézout pair Azurite normalizes differently, the oracle checks the GCD, the
+identity `s·x + t·y = g` in Azurite arithmetic, and the pair Malachite's documentation specifies.
 
 ## Adding an oracle
 
@@ -146,7 +159,8 @@ For an Azurite oracle, step 2 is a `check*` function in `Azurite/Oracle/AzNat.le
 file for another type) and a row in the `modes` table of `Azurite/Oracle/Main.lean`, written
 against the parsers in `Azurite/Oracle/Parse.lean`; the strictness rule is built into the runner,
 which errors on any unrecognized nonempty line and on an input in which nothing was checked. Step 3
-is a row in `AZURITE_NATURAL_STAGES`, and the unit rows a file under `unit/azurite/<mode>/`. Azurite
+is a row in `AZURITE_NATURAL_STAGES` or `AZURITE_INTEGER_STAGES`, and the unit rows a file under
+`unit/azurite/<mode>/`. Azurite
 is Apache-licensed and must not derive code from
 Malachite or the LGPL libraries Malachite ports, so an oracle implements Malachite's *documented*
 behavior, never a translation of its code.

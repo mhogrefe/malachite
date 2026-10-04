@@ -1,0 +1,13 @@
+0 is even
+1 is not even
+2 is even
+3 is not even
+123 is not even
+1000000000000 is even
+1000000000001 is not even
+-1 is not even
+-2 is even
+-3 is not even
+-123 is not even
+-1000000000000 is even
+-1000000000001 is not even

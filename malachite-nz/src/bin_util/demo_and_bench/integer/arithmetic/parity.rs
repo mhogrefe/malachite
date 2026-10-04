@@ -33,7 +33,7 @@ fn demo_integer_even(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_integer_odd(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in integer_gen().get(gm, config).take(limit) {
-        if n.even() {
+        if n.odd() {
             println!("{n} is odd");
         } else {
             println!("{n} is not odd");
