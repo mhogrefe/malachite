@@ -206,6 +206,10 @@ pub mod cot;
 /// [`CscAssign`](malachite_base::num::arithmetic::traits::CscAssign), traits for computing the
 /// cosecant of [`Float`](super::Float)s.
 pub mod csc;
+/// Implementations of [`Csch`](malachite_base::num::arithmetic::traits::Csch) and
+/// [`CschAssign`](malachite_base::num::arithmetic::traits::CschAssign), traits for computing the
+/// hyperbolic cosecant of [`Float`](super::Float)s.
+pub mod csch;
 /// Division of [`Float`](super::Float)s, of [`Float`](super::Float)s by
 /// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
 /// [`Float`](super::Float)s.

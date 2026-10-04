@@ -252,3 +252,29 @@ pub(crate) fn round_from_below(
     }
     (t, o)
 }
+
+// Rounds a function of a tiny nonzero x whose true value lies strictly beyond 1/x (away from zero)
+// if `beyond`, or strictly short of it (toward zero) otherwise, and nearer to 1/x than precision
+// `prec` can resolve. This holds for MPFR's ACTION_TINY inputs of the reciprocal functions, whose
+// expansions are 1/x plus a correction of order x. Rounding 1/x settles the result, except when 1/x
+// is exact (x a power of 2), where the true value lies one step beyond it or short of it. The
+// general Ziv loops could not settle that case at any working precision, since the reciprocal is
+// then exactly representable. The work is done on |1/x|, with the reflected rounding mode for a
+// negative x.
+pub(crate) fn round_near_reciprocal(
+    x: &Float,
+    beyond: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let negative = x.is_sign_negative();
+    let rm_abs = if negative { -rm } else { rm };
+    let (r, o) = x.reciprocal_prec_round_ref(prec, rm);
+    let (r, o) = if negative { (-r, o.reverse()) } else { (r, o) };
+    let (r, o) = if beyond {
+        round_from_below(r, o, false, rm_abs)
+    } else {
+        round_from_above(r, o, false, rm_abs)
+    };
+    if negative { (-r, o.reverse()) } else { (r, o) }
+}

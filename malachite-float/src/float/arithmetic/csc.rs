@@ -23,16 +23,17 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cos::{phi_minus_1_prec_round, signed_constant, sin_bound};
+use crate::float::arithmetic::round_near_x::round_near_reciprocal;
 use crate::float::arithmetic::sec::doubled;
 use crate::float::arithmetic::sin::{sin_rational_helper, sin_turns_helper};
 use crate::float::arithmetic::tan::{
-    MAX_SETTLED_EXPONENT, round_bracket_signed, round_bracket_signed_by,
+    MAX_SETTLED_EXPONENT, reciprocal_of_down_bracket, round_bracket_signed,
 };
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
-use core::cmp::Ordering::{self, Equal, Greater, Less};
+use core::cmp::Ordering::{self, Equal};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, Csc, CscAssign, Mod, PowerOf2, Reciprocal,
+    Abs, CeilingLogBase2, Csc, CscAssign, Mod, Reciprocal,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -48,80 +49,17 @@ use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
-// csc x for a tiny x, where csc x = 1/x + x/6 + ... and |csc x - 1/x| <= 0.2 for |x| <= 1, with the
-// correction sharing the sign of 1/x, so that |csc x| > |1/x|. MPFR's condition, EXP(x) <= -2
-// max(PREC(x), prec), makes rounding 1/x settle the cosecant, except when 1/x is exact (x a power
-// of 2), where the true value lies one step beyond it, away from zero. The general loop could not
-// settle that case at any working precision, since the reciprocal is then exactly representable.
-//
-// This is ACTION_TINY from csc.c, MPFR 4.2.2.
-fn csc_tiny(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    let (r, o) = x.reciprocal_prec_round_ref(prec, rm);
-    if o != Equal {
-        return (r, o);
-    }
-    assert_ne!(rm, Exact, "Inexact csc");
-    let negative = x.is_sign_negative();
-    // 1/x is exact, so the cosecant is one step beyond it, away from zero
-    let away = match rm {
-        Ceiling => !negative,
-        Floor => negative,
-        Up => true,
-        _ => false,
-    };
-    let mut r = r;
-    if away {
-        if negative {
-            r.decrement();
-        } else {
-            r.increment();
-        }
-        (r, if negative { Less } else { Greater })
-    } else {
-        (r, if negative { Greater } else { Less })
-    }
-}
-
-// As in mpfr_overflow, with the overflow's sign: the toward-zero modes give the largest finite
-// value, and the other modes an infinity.
-fn csc_overflow(negative: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    match (negative, rm) {
-        (_, Exact) => panic!("Inexact csc"),
-        (false, Floor | Down) => (Float::max_finite_value_with_prec(prec), Less),
-        (false, _) => (Float::INFINITY, Greater),
-        (true, Ceiling | Down) => (-Float::max_finite_value_with_prec(prec), Greater),
-        (true, _) => (Float::NEGATIVE_INFINITY, Less),
-    }
-}
-
-// Decides csc(x) = 1/c from the sine rounded toward zero at precision m, by a `Rational` bracket,
-// for the cases the `Float` reciprocal cannot settle: it overflowed, or lies within two bits of the
-// top of the exponent range, where rounding it to `prec` could still cross the end. Returns `None`
-// if the bracket does not decide the rounding, so that the working precision must grow.
-fn csc_bracket(c: &Float, m: u64, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
-    let negative = c.is_sign_negative();
-    // A sine that underflowed toward zero is below the smallest positive `Float`, so the cosecant
-    // is above 2^(2^30), beyond the largest finite one.
-    if *c == 0u32 {
-        return Some(csc_overflow(negative, prec, rm));
-    }
-    // Rounding toward zero puts the sine's magnitude in [|c|, |c| + ulp), so the cosecant's lies in
-    // (1/(|c| + ulp), 1/|c|].
-    let exp_c = i64::from(c.get_exponent().unwrap());
-    let lo = Rational::exact_from(c).abs();
-    let hi = &lo + Rational::power_of_2(exp_c - i64::exact_from(m));
-    round_bracket_signed_by(negative, hi.reciprocal(), lo.reciprocal(), prec, rm)
-}
-
 // This is mpfr_csc from csc.c, MPFR 4.2.2, with the bracket path for results near the top of the
 // exponent range.
 fn csc_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact csc");
     let exp_x = i64::from(x.get_exponent().unwrap());
-    // ACTION_TINY from csc.c: EXP(x) <= -2 max(PREC(x), PREC(y))
+    // ACTION_TINY from csc.c: EXP(x) <= -2 max(PREC(x), PREC(y)). There csc x = 1/x + x/6 + ...,
+    // and |csc x - 1/x| <= 0.2 for |x| <= 1, with the correction sharing the sign of 1/x, so that
+    // the cosecant lies just beyond 1/x.
     let n = i64::exact_from(max(x.get_prec().unwrap(), prec));
     if exp_x <= -(n << 1) {
-        return csc_tiny(x, prec, rm);
+        return round_near_reciprocal(x, true, prec, rm);
     }
     // Compute initial precision
     let mut m = prec + prec.ceiling_log_base_2() + 3;
@@ -143,7 +81,7 @@ fn csc_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
                 }
             }
             _ => {
-                if let Some(result) = csc_bracket(&c, m, prec, rm) {
+                if let Some(result) = reciprocal_of_down_bracket(&c, m, prec, rm) {
                     return result;
                 }
             }
@@ -211,7 +149,7 @@ pub(crate) fn csc_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
                 }
             }
             _ => {
-                if let Some(result) = csc_bracket(&s, m, prec, rm) {
+                if let Some(result) = reciprocal_of_down_bracket(&s, m, prec, rm) {
                     return result;
                 }
             }
@@ -329,7 +267,7 @@ fn csc_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Orderi
                 }
             }
             _ => {
-                if let Some(result) = csc_bracket(&s, m, prec, rm) {
+                if let Some(result) = reciprocal_of_down_bracket(&s, m, prec, rm) {
                     return result;
                 }
             }
@@ -404,7 +342,7 @@ fn csc_with_period_prec_round_normal_ref(
                 }
             }
             _ => {
-                if let Some(result) = csc_bracket(&s, m, prec, rm) {
+                if let Some(result) = reciprocal_of_down_bracket(&s, m, prec, rm) {
                     return result;
                 }
             }

@@ -1059,6 +1059,12 @@ documented by git history.
   hyperbolic secant of a `Rational` as a `Float`, and `primitive_float_sech_rational`. Since
   $\operatorname{sech}$ is even and decreasing in $|x|$, $|x|$ is bracketed between two `Float`s;
   a small $x$ is instead bracketed by the reciprocals of series bounds on $\cosh x$.
+- `Csch` and `CschAssign` (new traits in malachite-base) for `Float`, with the usual
+  `csch_prec_round`, `csch_prec`, `csch_round`, and `_ref`/`_assign` variants, and
+  `primitive_float_csch`: a port of `mpfr_csch`, computing $1/\sinh x$. As with `sech`, where
+  $\sinh x$ overflows but $\operatorname{csch} x$ is still representable, or must be rounded with
+  the underflow rules, it is computed instead as $2e^{-|x|}/(1-e^{-2|x|})$ by the same exact
+  scaling; a reciprocal at the top of the exponent range is decided from an exact bracket.
 
 ### Documentation
 

@@ -24,18 +24,14 @@ use crate::float::arithmetic::cos::{
     cos_rational_helper, cos_turns_helper, phi_minus_1_prec_round, signed_constant,
 };
 use crate::float::arithmetic::round_near_x::{float_round_near_x, round_from_below};
-use crate::float::arithmetic::tan::{MAX_SETTLED_EXPONENT, round_bracket_signed_by};
+use crate::float::arithmetic::tan::{MAX_SETTLED_EXPONENT, reciprocal_of_down_bracket};
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
-use core::cmp::Ordering::{self, Equal, Greater, Less};
+use core::cmp::Ordering::{self, Equal};
 use core::cmp::{max, min};
-use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, Mod, PowerOf2, Reciprocal, Sec, SecAssign,
-};
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Mod, Reciprocal, Sec, SecAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{
-    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, One,
-};
+use malachite_base::num::basic::traits::{Infinity as InfinityTrait, NaN as NaNTrait, One};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
@@ -44,37 +40,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-
-// As in mpfr_overflow, with the overflow's sign: the toward-zero modes give the largest finite
-// value, and the other modes an infinity.
-fn sec_overflow(negative: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    match (negative, rm) {
-        (_, Exact) => panic!("Inexact sec"),
-        (false, Floor | Down) => (Float::max_finite_value_with_prec(prec), Less),
-        (false, _) => (Float::INFINITY, Greater),
-        (true, Ceiling | Down) => (-Float::max_finite_value_with_prec(prec), Greater),
-        (true, _) => (Float::NEGATIVE_INFINITY, Less),
-    }
-}
-
-// Decides sec(x) = 1/c from the cosine rounded toward zero at precision m, by a `Rational` bracket,
-// for the cases the `Float` reciprocal cannot settle: it overflowed, or lies within two bits of the
-// top of the exponent range, where rounding it to `prec` could still cross the end. Returns `None`
-// if the bracket does not decide the rounding, so that the working precision must grow.
-fn sec_bracket(c: &Float, m: u64, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
-    let negative = c.is_sign_negative();
-    // A cosine that underflowed toward zero is below the smallest positive `Float`, so the secant
-    // is above 2^(2^30), beyond the largest finite one.
-    if *c == 0u32 {
-        return Some(sec_overflow(negative, prec, rm));
-    }
-    // Rounding toward zero puts the cosine's magnitude in [|c|, |c| + ulp), so the secant's lies in
-    // (1/(|c| + ulp), 1/|c|].
-    let exp_c = i64::from(c.get_exponent().unwrap());
-    let lo = Rational::exact_from(c).abs();
-    let hi = &lo + Rational::power_of_2(exp_c - i64::exact_from(m));
-    round_bracket_signed_by(negative, hi.reciprocal(), lo.reciprocal(), prec, rm)
-}
 
 // This is mpfr_sec from sec.c, MPFR 4.2.2, with the bracket path for results near the top of the
 // exponent range.
@@ -115,7 +80,7 @@ fn sec_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
                 }
             }
             _ => {
-                if let Some(result) = sec_bracket(&c, m, prec, rm) {
+                if let Some(result) = reciprocal_of_down_bracket(&c, m, prec, rm) {
                     return result;
                 }
             }
@@ -160,7 +125,7 @@ pub(crate) fn sec_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
                 }
             }
             _ => {
-                if let Some(result) = sec_bracket(&c, m, prec, rm) {
+                if let Some(result) = reciprocal_of_down_bracket(&c, m, prec, rm) {
                     return result;
                 }
             }
@@ -315,7 +280,7 @@ fn sec_with_period_prec_round_normal_ref(
                 }
             }
             _ => {
-                if let Some(result) = sec_bracket(&c, m, prec, rm) {
+                if let Some(result) = reciprocal_of_down_bracket(&c, m, prec, rm) {
                     return result;
                 }
             }
@@ -367,7 +332,7 @@ fn sec_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Orderi
                 }
             }
             _ => {
-                if let Some(result) = sec_bracket(&c, m, prec, rm) {
+                if let Some(result) = reciprocal_of_down_bracket(&c, m, prec, rm) {
                     return result;
                 }
             }

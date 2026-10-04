@@ -28,7 +28,7 @@ use crate::float::arithmetic::cos::{
     trig_rational_near_zero_bracket, trig_turns_near_zero_bracket,
 };
 use crate::float::arithmetic::round_near_x::{
-    LEADING_TERM_MIN_EXPONENT, round_from_above, value_is_tie,
+    LEADING_TERM_MIN_EXPONENT, round_from_above, round_near_reciprocal, value_is_tie,
 };
 use crate::float::arithmetic::sin_cos::{
     sin_cos_rational_helper, sin_cos_turns_helper, sin_cos_with_period_prec_round_normal_ref,
@@ -37,8 +37,9 @@ use crate::float::arithmetic::tan::{
     MAX_CANCEL, MAX_SETTLED_EXPONENT, MIN_SETTLED_EXPONENT, nearest_bracket, round_bracket_signed,
     round_bracket_signed_by,
 };
+use crate::float::conversion::string::set_str::overflow;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
-use core::cmp::Ordering::{self, Equal, Greater, Less};
+use core::cmp::Ordering::{self, Equal};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
     Abs, AddMul, CeilingLogBase2, Cot, CotAssign, IsPowerOf2, Mod, Parity, Pow, Reciprocal, Square,
@@ -57,52 +58,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-
-// cot x for a tiny x, where cot x = 1/x - x/3 - ... and |cot x - 1/x| <= 0.36 for |x| <= 1, with
-// the correction opposing the sign of 1/x, so that |cot x| < |1/x|. MPFR's condition, EXP(x) + 1 <=
-// -2 max(PREC(x), prec), makes rounding 1/x settle the cotangent, except when 1/x is exact (x a
-// power of 2), where the true value lies one step short of it, toward zero. The general loop could
-// not settle that case at any working precision, since the quotient is then exactly representable.
-//
-// This is ACTION_TINY from cot.c, MPFR 4.2.2.
-fn cot_tiny(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    let (r, o) = x.reciprocal_prec_round_ref(prec, rm);
-    if o != Equal {
-        return (r, o);
-    }
-    assert_ne!(rm, Exact, "Inexact cot");
-    let negative = x.is_sign_negative();
-    // 1/x is exact, so the cotangent is one step short of it, toward zero
-    let toward = match rm {
-        Floor => !negative,
-        Ceiling => negative,
-        Down => true,
-        _ => false,
-    };
-    let mut r = r;
-    if toward {
-        if negative {
-            r.increment();
-        } else {
-            r.decrement();
-        }
-        (r, if negative { Greater } else { Less })
-    } else {
-        (r, if negative { Less } else { Greater })
-    }
-}
-
-// As in mpfr_overflow, with the overflow's sign: the toward-zero modes give the largest finite
-// value, and the other modes an infinity.
-fn cot_overflow(negative: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    match (negative, rm) {
-        (_, Exact) => panic!("Inexact cot"),
-        (false, Floor | Down) => (Float::max_finite_value_with_prec(prec), Less),
-        (false, _) => (Float::INFINITY, Greater),
-        (true, Ceiling | Down) => (-Float::max_finite_value_with_prec(prec), Greater),
-        (true, _) => (Float::NEGATIVE_INFINITY, Less),
-    }
-}
 
 // Decides cot(x) = c/s from the sine and cosine rounded to nearest at precision m, by a `Rational`
 // bracket, for the cases the `Float` quotient cannot settle: it overflowed, underflowed, or lies
@@ -124,7 +79,7 @@ fn cot_bracket(
         || (s.get_exponent() == Some(Float::MIN_EXPONENT)
             && s.significand_ref().unwrap().is_power_of_2())
     {
-        return Some(cot_overflow(negative, prec, rm));
+        return Some(overflow(!negative, prec, rm));
     }
     let (s_lo, s_hi) = nearest_bracket(s, m);
     let (c_lo, c_hi) = if *c == 0u32 {
@@ -145,10 +100,12 @@ fn cot_bracket(
 fn cot_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact cot");
     let exp_x = i64::from(x.get_exponent().unwrap());
-    // ACTION_TINY from cot.c: EXP(x) + 1 <= -2 max(PREC(x), PREC(y))
+    // ACTION_TINY from cot.c: EXP(x) + 1 <= -2 max(PREC(x), PREC(y)). There cot x = 1/x - x/3 -
+    // ..., and |cot x - 1/x| <= 0.36 for |x| <= 1, with the correction opposing the sign of 1/x, so
+    // that the cotangent lies just short of 1/x.
     let n = i64::exact_from(max(x.get_prec().unwrap(), prec));
     if exp_x < -(n << 1) {
-        return cot_tiny(x, prec, rm);
+        return round_near_reciprocal(x, false, prec, rm);
     }
     // Compute initial precision
     let mut m = prec + prec.ceiling_log_base_2() + 13;
@@ -242,7 +199,7 @@ fn cot_rational_bracket(
         || (s.get_exponent() == Some(Float::MIN_EXPONENT)
             && s.significand_ref().unwrap().is_power_of_2())
     {
-        return Some(cot_overflow(negative, prec, rm));
+        return Some(overflow(!negative, prec, rm));
     }
     let (s_lo, s_hi) = nearest_bracket(s, m);
     let (c_lo, c_hi) = if *c == 0u32 {
@@ -417,7 +374,7 @@ fn cot_turns_bracket<F: Fn() -> Rational>(
         || (s.get_exponent() == Some(Float::MIN_EXPONENT)
             && s.significand_ref().unwrap().is_power_of_2())
     {
-        return Some(cot_overflow(negative, prec, rm));
+        return Some(overflow(!negative, prec, rm));
     }
     let (s_lo, s_hi) = nearest_bracket(s, m);
     let (c_lo, c_hi) = if *c == 0u32 {

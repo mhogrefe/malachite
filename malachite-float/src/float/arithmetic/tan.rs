@@ -31,11 +31,13 @@ use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underfl
 use crate::float::arithmetic::sin_cos::{
     sin_cos_rational_helper, sin_cos_turns_helper, sin_cos_with_period_prec_round_normal_ref,
 };
+use crate::float::conversion::string::set_str::overflow;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
-use core::cmp::Ordering::{self, Equal, Greater, Less};
+use core::cmp::Ordering::{self, Equal};
 use core::cmp::{max, min};
 use malachite_base::num::arithmetic::traits::{
-    Abs, AddMul, CeilingLogBase2, IsPowerOf2, Mod, Parity, Pow, PowerOf2, Square, Tan, TanAssign,
+    Abs, AddMul, CeilingLogBase2, IsPowerOf2, Mod, Parity, Pow, PowerOf2, Reciprocal, Square, Tan,
+    TanAssign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -60,18 +62,6 @@ pub(crate) const MAX_SETTLED_EXPONENT: i64 = Float::MAX_EXPONENT_I64 - 1;
 // The cancellation the exact bracket of an underflowed sine or cosine must allow for: the value can
 // be as small as the bottom of the exponent range, plus a margin.
 pub(crate) const MAX_CANCEL: u64 = Float::MAX_EXPONENT as u64 + 2;
-
-// As in mpfr_overflow, with the overflow's sign: the toward-zero modes give the largest finite
-// value, and the other modes an infinity.
-fn tan_overflow(negative: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    match (negative, rm) {
-        (_, Exact) => panic!("Inexact tan"),
-        (false, Floor | Down) => (Float::max_finite_value_with_prec(prec), Less),
-        (false, _) => (Float::INFINITY, Greater),
-        (true, Ceiling | Down) => (-Float::max_finite_value_with_prec(prec), Greater),
-        (true, _) => (Float::NEGATIVE_INFINITY, Less),
-    }
-}
 
 // A bracket for the magnitude of the true value of a sine or cosine v that `sin_cos` rounded to
 // nearest at precision m: within half an ulp of v, or, if v underflowed, within the rounding rule's
@@ -115,7 +105,7 @@ fn tan_bracket(
         || (c.get_exponent() == Some(Float::MIN_EXPONENT)
             && c.significand_ref().unwrap().is_power_of_2())
     {
-        return Some(tan_overflow(negative, prec, rm));
+        return Some(overflow(!negative, prec, rm));
     }
     let (c_lo, c_hi) = nearest_bracket(c, m);
     let (s_lo, s_hi) = if *s == 0u32 {
@@ -1066,6 +1056,32 @@ pub(crate) fn round_bracket_signed(
     round_bracket_signed_by(*x < 0u32, lo, hi, prec, rm)
 }
 
+// Decides 1/d, from the denominator d rounded toward zero at precision m to `d`, by a `Rational`
+// bracket, for the cases the `Float` reciprocal cannot settle: it overflowed, or lies within two
+// bits of the top of the exponent range, where rounding it to `prec` could still cross the end.
+// Returns `None` if the bracket does not decide the rounding, so that the working precision must
+// grow. This serves the reciprocal functions built on MPFR's gen_inverse.h template: the secant,
+// cosecant, and hyperbolic cosecant.
+pub(crate) fn reciprocal_of_down_bracket(
+    d: &Float,
+    m: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    let negative = d.is_sign_negative();
+    // A denominator that underflowed toward zero is below the smallest positive `Float`, so its
+    // reciprocal is above 2^(2^30), beyond the largest finite one.
+    if *d == 0u32 {
+        return Some(overflow(!negative, prec, rm));
+    }
+    // Rounding toward zero puts the denominator's magnitude in [|d|, |d| + ulp), so the
+    // reciprocal's lies in (1/(|d| + ulp), 1/|d|].
+    let exp_d = i64::from(d.get_exponent().unwrap());
+    let lo = Rational::exact_from(d).abs();
+    let hi = &lo + Rational::power_of_2(exp_d - i64::exact_from(m));
+    round_bracket_signed_by(negative, hi.reciprocal(), lo.reciprocal(), prec, rm)
+}
+
 // `round_bracket` for a bracket [lo, hi] of the magnitude of the tangent, negated if `negative`.
 pub(crate) fn round_bracket_signed_by(
     negative: bool,
@@ -1138,7 +1154,7 @@ fn tan_rational_bracket(
         || (c.get_exponent() == Some(Float::MIN_EXPONENT)
             && c.significand_ref().unwrap().is_power_of_2())
     {
-        return Some(tan_overflow(negative, prec, rm));
+        return Some(overflow(!negative, prec, rm));
     }
     let (c_lo, c_hi) = nearest_bracket(c, m);
     let (s_lo, s_hi) = if *s == 0u32 {
@@ -1595,7 +1611,7 @@ fn tan_turns_bracket<F: Fn() -> Rational>(
         || (c.get_exponent() == Some(Float::MIN_EXPONENT)
             && c.significand_ref().unwrap().is_power_of_2())
     {
-        return Some(tan_overflow(negative, prec, rm));
+        return Some(overflow(!negative, prec, rm));
     }
     let (c_lo, c_hi) = nearest_bracket(c, m);
     let (s_lo, s_hi) = if *s == 0u32 {

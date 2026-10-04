@@ -34,23 +34,24 @@ use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
-// Beyond this |x|, sech(x) < 2 exp(-|x|) < 2^(MIN_EXPONENT - 2) = 2^(-2^30 - 2), half the smallest
-// positive Float, since (2^30 + 2) log(2) = 744261119.35...
-const SECH_UNDERFLOW_THRESHOLD: u32 = 744261120;
+// Beyond this |x|, sech(x) < 2 exp(-|x|) < 2^(MIN_EXPONENT - 2) = 2^(-2^30 - 1), half the smallest
+// positive Float, since (2^30 + 2) log(2) = 744261119.35... |csch(x)| = 2 exp(-|x|) / (1 -
+// exp(-2|x|)) exceeds 2 exp(-|x|) only by a negligible factor, so the same threshold serves it.
+pub(crate) const RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD: u32 = 744261120;
 
 // Computes sech(x) (if `plus`) or csch(x) (if not) for a finite x with 2^29 <= |x| = `x_abs` <
-// `SECH_UNDERFLOW_THRESHOLD`, the result being negative if `negative`. MPFR computes 1 / cosh(x) or
-// 1 / sinh(x) in its extended exponent range, and declares underflow when the denominator overflows
-// that range. In Malachite's exponent range, cosh(x) and sinh(x) overflow at 2^(2^30 - 1), while
-// their reciprocals stay representable down to 2^(-2^30 - 1), so for x in a window of width about 2
-// log(2) the denominator overflows but the result does not; and a result near the bottom of the
-// range must be rounded with the underflow rules. So the result 2 exp(-|x|) / (1 ± exp(-2|x|)) is
-// computed from a = exp(-|x|/2), which is representable, scaled by an exact power of 2 into [1/2,
-// 1]: with A = a 2^S, it is 2^(1 - 2S) A^2 / (1 ± a^4). A^2 is bracketed with directed roundings,
-// and the factor is absorbed by nudging one end by an ulp: for sech, 1 - 2^(-4S) < 1 / (1 + a^4) <
-// 1 moves the lower end down, and for csch, 1 < 1 / (1 - a^4) < 1 + 2^(1 - 4S) moves the upper end
-// up. The bracket is then rounded with the final scaling by 2^(1 - 2S).
-pub(crate) fn reciprocal_hyperbolic_scaled(
+// `RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD`, the result being negative if `negative`. MPFR
+// computes 1 / cosh(x) or 1 / sinh(x) in its extended exponent range, and declares underflow when
+// the denominator overflows that range. In Malachite's exponent range, cosh(x) and sinh(x) overflow
+// at 2^(2^30 - 1), while their reciprocals stay representable down to 2^(-2^30 - 1), so for x in a
+// window of width about 2 log(2) the denominator overflows but the result does not; and a result
+// near the bottom of the range must be rounded with the underflow rules. So the result 2 exp(-|x|)
+// / (1 ± exp(-2|x|)) is computed from a = exp(-|x|/2), which is representable, scaled by an exact
+// power of 2 into [1/2, 1]: with A = a 2^S, it is 2^(1 - 2S) A^2 / (1 ± a^4). A^2 is bracketed
+// with directed roundings, and the factor is absorbed by nudging one end by an ulp: for sech, 1 -
+// 2^(-4S) < 1 / (1 + a^4) < 1 moves the lower end down, and for csch, 1 < 1 / (1 - a^4) < 1 + 2^(1
+// - 4S) moves the upper end up. The bracket is then rounded with the final scaling by 2^(1 - 2S).
+fn reciprocal_hyperbolic_scaled(
     x_abs: &Float,
     negative: bool,
     plus: bool,
@@ -93,6 +94,28 @@ pub(crate) fn reciprocal_hyperbolic_scaled(
     }
 }
 
+// Computes sech(x) (if `plus`) or csch(x) (if not) for a finite x whose exponent exceeds 29, so
+// that |x| >= 2^29, returning `None` for any smaller x: past
+// `RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD` the result underflows, and below it the scaled path
+// computes it.
+pub(crate) fn reciprocal_hyperbolic_large(
+    x: &Float,
+    plus: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    if x.get_exponent().unwrap() <= 29 {
+        return None;
+    }
+    let negative = !plus && x.is_sign_negative();
+    let x_abs = x.abs();
+    Some(if x_abs >= RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD {
+        underflowed(!negative, prec, rm)
+    } else {
+        reciprocal_hyperbolic_scaled(&x_abs, negative, plus, prec, rm)
+    })
+}
+
 // This is mpfr_sech from sech.c (an instantiation of gen_inverse.h), MPFR 4.2.2, where the input is
 // finite and nonzero, with the scaled path for large inputs.
 fn sech_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
@@ -105,12 +128,8 @@ fn sech_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
     if let Some(result) = small_input_shortcut(&Float::ONE, -(exp_x << 1), 1, false, prec, rm) {
         return result;
     }
-    let x_abs = x.abs();
-    if x_abs >= SECH_UNDERFLOW_THRESHOLD {
-        return underflowed(true, prec, rm);
-    }
-    if exp_x > 29 {
-        return reciprocal_hyperbolic_scaled(&x_abs, false, true, prec, rm);
+    if let Some(result) = reciprocal_hyperbolic_large(x, true, prec, rm) {
+        return result;
     }
     // |x| < 2^29, so cosh(x) < exp(2^29) < 2^(2^30 - 1) cannot overflow, and sech(x) > 2^(-2^30) is
     // well above the bottom of the exponent range.
@@ -151,7 +170,7 @@ fn sech_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Or
         return sech_rational_series(x, prec, rm);
     }
     let x_abs = x.abs();
-    if x_abs >= SECH_UNDERFLOW_THRESHOLD {
+    if x_abs >= RECIPROCAL_HYPERBOLIC_UNDERFLOW_THRESHOLD {
         return underflowed(true, prec, rm);
     }
     // sech is even and decreasing on [0, infinity), so bracket |x| between the Floats x_lo <= |x|
@@ -300,7 +319,7 @@ impl Float {
     /// Computes $\operatorname{sech} x$, the hyperbolic secant of a [`Float`], rounding the result
     /// to the specified precision and with the specified rounding mode. The [`Float`] is taken by
     /// reference. An [`Ordering`] is also returned, indicating whether the rounded hyperbolic
-    /// cosine is less than, equal to, or greater than the exact hyperbolic secant. Although `NaN`s
+    /// secant is less than, equal to, or greater than the exact hyperbolic secant. Although `NaN`s
     /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
     /// `Equal`.
     ///

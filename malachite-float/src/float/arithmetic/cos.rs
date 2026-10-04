@@ -242,9 +242,7 @@ pub(crate) fn round_scaled_bracket(
     let (mut f_lo, mut o_lo) = lo.shl_prec_round_ref(k, prec, rm);
     let (mut f_hi, mut o_hi) = hi.shl_prec_round_ref(k, prec, rm);
     if o_lo == Equal {
-        // an end with all-zero bits below the output precision; not reached by any test
-        fail_on_untested_path("round_scaled_bracket, exact lower end");
-        // values just above lo
+        // an end with all-zero bits below the output precision values just above lo
         let up = match rm {
             Ceiling => true,
             Up => f_lo > 0u32,
