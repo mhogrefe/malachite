@@ -1,0 +1,5 @@
+0 is reduced mod 2^5
+100 is not reduced mod 2^5
+100 is reduced mod 2^8
+1000000000000 is not reduced mod 2^39
+1000000000000 is reduced mod 2^40

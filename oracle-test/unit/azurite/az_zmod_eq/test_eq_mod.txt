@@ -1,0 +1,27 @@
+0 is equal to 0 mod 0
+0 is not equal to 1 mod 0
+57 is equal to 57 mod 0
+57 is not equal to 58 mod 0
+1000000000000 is not equal to 57 mod 0
+0 is equal to 256 mod 256
+0 is not equal to 256 mod 512
+13 is equal to 23 mod 10
+13 is not equal to 24 mod 10
+13 is equal to 21 mod 1
+13 is equal to 21 mod 2
+13 is equal to 21 mod 4
+13 is equal to 21 mod 8
+13 is not equal to 21 mod 16
+13 is not equal to 21 mod 3
+1000000000001 is equal to 1 mod 4096
+1000000000001 is not equal to 1 mod 8192
+12345678987654321 is equal to 321 mod 1000
+12345678987654321 is not equal to 322 mod 1000
+1234 is equal to 1234 mod 1000000000000
+1234 is not equal to 1235 mod 1000000000000
+1000000001234 is equal to 1000000002234 mod 1000
+1000000001234 is not equal to 1000000002235 mod 1000
+1000000001234 is equal to 1234 mod 1000000000000
+1000000001234 is not equal to 1235 mod 1000000000000
+1000000001234 is equal to 5000000001234 mod 1000000000000
+1000000001234 is not equal to 5000000001235 mod 1000000000000

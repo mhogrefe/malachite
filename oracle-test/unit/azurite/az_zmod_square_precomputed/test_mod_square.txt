@@ -1,0 +1,7 @@
+0.mod_square_precomputed(1, &data) = 0
+1.mod_square_precomputed(10, &data) = 1
+2.mod_square_precomputed(10, &data) = 4
+100.mod_square_precomputed(497, &data) = 60
+200.mod_square_precomputed(497, &data) = 240
+300.mod_square_precomputed(497, &data) = 43
+1234567890.mod_square_precomputed(123456789876, &data) = 100296296172

@@ -1,0 +1,6 @@
+0.mod_power_of_2_shr(-10, 0) = 0
+0.mod_power_of_2_shr(-10, 8) = 0
+123.mod_power_of_2_shr(-5, 8) = 96
+123.mod_power_of_2_shr(-100, 80) = 0
+123.mod_power_of_2_shr(2, 8) = 30
+123.mod_power_of_2_shr(10, 8) = 0

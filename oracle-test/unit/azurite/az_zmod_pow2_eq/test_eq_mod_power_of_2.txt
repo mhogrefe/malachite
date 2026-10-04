@@ -1,0 +1,13 @@
+0 is equal to 256 mod 2^8
+0 is not equal to 256 mod 2^9
+13 is equal to 21 mod 2^0
+13 is equal to 21 mod 2^1
+13 is equal to 21 mod 2^2
+13 is equal to 21 mod 2^3
+13 is not equal to 21 mod 2^4
+13 is not equal to 21 mod 2^100
+1000000000001 is equal to 1 mod 2^12
+1000000000001 is not equal to 1 mod 2^13
+4294967295 is equal to 4294967295 mod 2^32
+281474976710672 is equal to 844424930131984 mod 2^49
+281474976710672 is not equal to 844424930131984 mod 2^50

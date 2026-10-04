@@ -1,0 +1,7 @@
+0.square() ≡ 0 mod 1
+1.square() ≡ 1 mod 10
+2.square() ≡ 4 mod 10
+100.square() ≡ 60 mod 497
+200.square() ≡ 240 mod 497
+300.square() ≡ 43 mod 497
+1234567890.square() ≡ 100296296172 mod 123456789876

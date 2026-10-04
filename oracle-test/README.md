@@ -49,9 +49,9 @@ from this directory, or `cargo run --release` for both. `build.sh` runs them as 
 FLINT, the driver compiles the oracle sources in `oracle/` on demand (into `target/`); for Azurite,
 it builds `lake exe oracle` in the Azurite checkout. It then runs each registered Malachite demo in
 all three generator modes (`exhaustive`, `random`, `special_random`) at 10000 lines each, checking
-every run against the oracle, after the unit-row files described below. Any disagreement fails the run with the offending line reported. The
-demo output lands in `test-out.txt`, which is shared state: don't run the driver and a manual demo
-regeneration concurrently.
+every run against the oracle, after the unit-row files described below. Any disagreement fails the
+run with the offending line reported. The demo output lands in `test-out.txt`, which is shared
+state: don't run the driver and a manual demo regeneration concurrently.
 
 ## Unit rows
 
@@ -128,6 +128,24 @@ signed amounts, `shr_round`, `pow`, `gcd`, `Natural::extended_gcd` (whose Bézou
 `unsigned_abs`, and `wrapping_from`. They live in `Azurite/Oracle/AzInt.lean`. Malachite's
 truncating `/` and `%` have no Azurite counterpart and are not checked.
 
+The `az_zmod_pow2_*` modes check the `mod_power_of_2_*` demos listed in
+`AZURITE_MOD_POWER_OF_2_STAGES` against Azurite's `AzZModPow2 k` residue type, following the
+"Malachite for Azurite Users: Integers Modulo a Power of 2" page: `mod_power_of_2_add`, `_sub`,
+`_mul`, `_square`, `_neg`, `_pow`, `_inverse` (including the "not invertible" lines), `_shl` and
+`_shr` (spelled as shifts of the representative followed by reduction, since the type has no
+shifts), `_is_reduced`, `eq_mod_power_of_2`, and `Integer::mod_power_of_2`. Each check first
+requires the printed inputs to be reduced, the precondition Malachite asserts and the type's
+invariant. They live in `Azurite/Oracle/AzZModPow2.lean`.
+
+The `az_zmod_*` modes do the same for the general-modulus `mod_*` demos listed in
+`AZURITE_MOD_STAGES` against `AzZMod m`, following the "Malachite for Azurite Users: Integers
+Modulo a Natural" page: `mod_add`, `_sub`, `_mul`, `_square`, `_neg`, `_pow`, their
+`_precomputed` variants (checked against the plain operations, since the precomputed data changes
+nothing but speed), `_inverse`, `_shl`, `_shr`, `_is_reduced`, `eq_mod`, and `mod_div`, whose
+quotient is not unique when the divisor is not a unit: the check is Malachite's documented
+existence condition (`gcd(y, m)` divides `x`) and `q·y ≡ x` for the printed `q`. `mod_sqrt` has
+no Azurite counterpart and is not checked. They live in `Azurite/Oracle/AzZMod.lean`.
+
 Where the two libraries' conventions differ, the oracle applies the adjustment the mapping page
 "Malachite for Azurite Users: Naturals" documents rather than skipping the line: Malachite's
 `Exact` rounding mode (which Azurite lacks) is checked as an exact division or shift, a negative
@@ -159,7 +177,7 @@ For an Azurite oracle, step 2 is a `check*` function in `Azurite/Oracle/AzNat.le
 file for another type) and a row in the `modes` table of `Azurite/Oracle/Main.lean`, written
 against the parsers in `Azurite/Oracle/Parse.lean`; the strictness rule is built into the runner,
 which errors on any unrecognized nonempty line and on an input in which nothing was checked. Step 3
-is a row in `AZURITE_NATURAL_STAGES` or `AZURITE_INTEGER_STAGES`, and the unit rows a file under
+is a row in one of the `AZURITE_*_STAGES` tables, and the unit rows a file under
 `unit/azurite/<mode>/`. Azurite
 is Apache-licensed and must not derive code from
 Malachite or the LGPL libraries Malachite ports, so an oracle implements Malachite's *documented*

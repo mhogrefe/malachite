@@ -577,6 +577,158 @@ const AZURITE_INTEGER_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ("demo_integer_from_str_targeted", "az_int_from_str"),
 ];
 
+// The `mod_power_of_2_*` demos checked against Azurite's `AzZModPow2` type, with the oracle mode
+// that reads each one. The modes follow the rows of the "Malachite for Azurite Users: Integers
+// Modulo a Power of 2" mapping page.
+const AZURITE_MOD_POWER_OF_2_STAGES: &[(&str, &str)] = &[
+    ("demo_natural_mod_power_of_2_add", "az_zmod_pow2_add"),
+    ("demo_natural_mod_power_of_2_add_val_ref", "az_zmod_pow2_add"),
+    ("demo_natural_mod_power_of_2_add_ref_val", "az_zmod_pow2_add"),
+    ("demo_natural_mod_power_of_2_add_ref_ref", "az_zmod_pow2_add"),
+    ("demo_natural_mod_power_of_2_sub", "az_zmod_pow2_sub"),
+    ("demo_natural_mod_power_of_2_sub_val_ref", "az_zmod_pow2_sub"),
+    ("demo_natural_mod_power_of_2_sub_ref_val", "az_zmod_pow2_sub"),
+    ("demo_natural_mod_power_of_2_sub_ref_ref", "az_zmod_pow2_sub"),
+    ("demo_natural_mod_power_of_2_mul", "az_zmod_pow2_mul"),
+    ("demo_natural_mod_power_of_2_mul_val_ref", "az_zmod_pow2_mul"),
+    ("demo_natural_mod_power_of_2_mul_ref_val", "az_zmod_pow2_mul"),
+    ("demo_natural_mod_power_of_2_mul_ref_ref", "az_zmod_pow2_mul"),
+    ("demo_natural_mod_power_of_2_square", "az_zmod_pow2_square"),
+    ("demo_natural_mod_power_of_2_square_ref", "az_zmod_pow2_square"),
+    ("demo_natural_mod_power_of_2_neg", "az_zmod_pow2_neg"),
+    ("demo_natural_mod_power_of_2_neg_ref", "az_zmod_pow2_neg"),
+    ("demo_natural_mod_power_of_2_pow", "az_zmod_pow2_pow"),
+    ("demo_natural_mod_power_of_2_pow_val_ref", "az_zmod_pow2_pow"),
+    ("demo_natural_mod_power_of_2_pow_ref_val", "az_zmod_pow2_pow"),
+    ("demo_natural_mod_power_of_2_pow_ref_ref", "az_zmod_pow2_pow"),
+    ("demo_natural_mod_power_of_2_inverse", "az_zmod_pow2_inverse"),
+    ("demo_natural_mod_power_of_2_inverse_ref", "az_zmod_pow2_inverse"),
+    ("demo_natural_mod_power_of_2_shl_unsigned_u8", "az_zmod_pow2_shl"),
+    ("demo_natural_mod_power_of_2_shl_unsigned_u64", "az_zmod_pow2_shl"),
+    (
+        "demo_natural_mod_power_of_2_shl_unsigned_ref_u64",
+        "az_zmod_pow2_shl",
+    ),
+    ("demo_natural_mod_power_of_2_shl_signed_i8", "az_zmod_pow2_shl"),
+    ("demo_natural_mod_power_of_2_shl_signed_i64", "az_zmod_pow2_shl"),
+    (
+        "demo_natural_mod_power_of_2_shl_signed_ref_i64",
+        "az_zmod_pow2_shl",
+    ),
+    ("demo_natural_mod_power_of_2_shr_i8", "az_zmod_pow2_shr"),
+    ("demo_natural_mod_power_of_2_shr_i64", "az_zmod_pow2_shr"),
+    ("demo_natural_mod_power_of_2_shr_ref_i64", "az_zmod_pow2_shr"),
+    (
+        "demo_natural_mod_power_of_2_is_reduced",
+        "az_zmod_pow2_is_reduced",
+    ),
+    ("demo_natural_eq_mod_power_of_2", "az_zmod_pow2_eq"),
+    ("demo_integer_mod_power_of_2", "az_zmod_pow2_of_int"),
+    ("demo_integer_mod_power_of_2_ref", "az_zmod_pow2_of_int"),
+];
+
+// The `mod_*` demos checked against Azurite's `AzZMod` type, with the oracle mode that reads each
+// one. The modes follow the rows of the "Malachite for Azurite Users: Integers Modulo a Natural"
+// mapping page.
+const AZURITE_MOD_STAGES: &[(&str, &str)] = &[
+    ("demo_natural_mod_add", "az_zmod_add"),
+    ("demo_natural_mod_add_val_val_ref", "az_zmod_add"),
+    ("demo_natural_mod_add_val_ref_val", "az_zmod_add"),
+    ("demo_natural_mod_add_val_ref_ref", "az_zmod_add"),
+    ("demo_natural_mod_add_ref_val_val", "az_zmod_add"),
+    ("demo_natural_mod_add_ref_val_ref", "az_zmod_add"),
+    ("demo_natural_mod_add_ref_ref_val", "az_zmod_add"),
+    ("demo_natural_mod_add_ref_ref_ref", "az_zmod_add"),
+    ("demo_natural_mod_sub", "az_zmod_sub"),
+    ("demo_natural_mod_sub_val_val_ref", "az_zmod_sub"),
+    ("demo_natural_mod_sub_val_ref_val", "az_zmod_sub"),
+    ("demo_natural_mod_sub_val_ref_ref", "az_zmod_sub"),
+    ("demo_natural_mod_sub_ref_val_val", "az_zmod_sub"),
+    ("demo_natural_mod_sub_ref_val_ref", "az_zmod_sub"),
+    ("demo_natural_mod_sub_ref_ref_val", "az_zmod_sub"),
+    ("demo_natural_mod_sub_ref_ref_ref", "az_zmod_sub"),
+    ("demo_natural_mod_mul", "az_zmod_mul"),
+    ("demo_natural_mod_mul_val_val_ref", "az_zmod_mul"),
+    ("demo_natural_mod_mul_val_ref_val", "az_zmod_mul"),
+    ("demo_natural_mod_mul_val_ref_ref", "az_zmod_mul"),
+    ("demo_natural_mod_mul_ref_val_val", "az_zmod_mul"),
+    ("demo_natural_mod_mul_ref_val_ref", "az_zmod_mul"),
+    ("demo_natural_mod_mul_ref_ref_val", "az_zmod_mul"),
+    ("demo_natural_mod_mul_ref_ref_ref", "az_zmod_mul"),
+    ("demo_natural_mod_mul_precomputed", "az_zmod_mul_precomputed"),
+    ("demo_natural_mod_mul_precomputed_val_val_ref", "az_zmod_mul_precomputed"),
+    ("demo_natural_mod_mul_precomputed_val_ref_val", "az_zmod_mul_precomputed"),
+    ("demo_natural_mod_mul_precomputed_val_ref_ref", "az_zmod_mul_precomputed"),
+    ("demo_natural_mod_mul_precomputed_ref_val_val", "az_zmod_mul_precomputed"),
+    ("demo_natural_mod_mul_precomputed_ref_val_ref", "az_zmod_mul_precomputed"),
+    ("demo_natural_mod_mul_precomputed_ref_ref_val", "az_zmod_mul_precomputed"),
+    ("demo_natural_mod_mul_precomputed_ref_ref_ref", "az_zmod_mul_precomputed"),
+    ("demo_natural_mod_square", "az_zmod_square"),
+    ("demo_natural_mod_square_val_ref", "az_zmod_square"),
+    ("demo_natural_mod_square_ref_val", "az_zmod_square"),
+    ("demo_natural_mod_square_ref_ref", "az_zmod_square"),
+    ("demo_natural_mod_square_precomputed", "az_zmod_square_precomputed"),
+    ("demo_natural_mod_square_precomputed_val_ref", "az_zmod_square_precomputed"),
+    ("demo_natural_mod_square_precomputed_ref_val", "az_zmod_square_precomputed"),
+    ("demo_natural_mod_square_precomputed_ref_ref", "az_zmod_square_precomputed"),
+    ("demo_natural_mod_neg", "az_zmod_neg"),
+    ("demo_natural_mod_neg_val_ref", "az_zmod_neg"),
+    ("demo_natural_mod_neg_ref_val", "az_zmod_neg"),
+    ("demo_natural_mod_neg_ref_ref", "az_zmod_neg"),
+    ("demo_natural_mod_pow", "az_zmod_pow"),
+    ("demo_natural_mod_pow_val_val_ref", "az_zmod_pow"),
+    ("demo_natural_mod_pow_val_ref_val", "az_zmod_pow"),
+    ("demo_natural_mod_pow_val_ref_ref", "az_zmod_pow"),
+    ("demo_natural_mod_pow_ref_val_val", "az_zmod_pow"),
+    ("demo_natural_mod_pow_ref_val_ref", "az_zmod_pow"),
+    ("demo_natural_mod_pow_ref_ref_val", "az_zmod_pow"),
+    ("demo_natural_mod_pow_ref_ref_ref", "az_zmod_pow"),
+    ("demo_natural_mod_pow_precomputed", "az_zmod_pow_precomputed"),
+    ("demo_natural_mod_pow_precomputed_val_val_ref", "az_zmod_pow_precomputed"),
+    ("demo_natural_mod_pow_precomputed_val_ref_val", "az_zmod_pow_precomputed"),
+    ("demo_natural_mod_pow_precomputed_val_ref_ref", "az_zmod_pow_precomputed"),
+    ("demo_natural_mod_pow_precomputed_ref_val_val", "az_zmod_pow_precomputed"),
+    ("demo_natural_mod_pow_precomputed_ref_val_ref", "az_zmod_pow_precomputed"),
+    ("demo_natural_mod_pow_precomputed_ref_ref_val", "az_zmod_pow_precomputed"),
+    ("demo_natural_mod_pow_precomputed_ref_ref_ref", "az_zmod_pow_precomputed"),
+    ("demo_natural_mod_inverse", "az_zmod_inverse"),
+    ("demo_natural_mod_inverse_val_ref", "az_zmod_inverse"),
+    ("demo_natural_mod_inverse_ref_val", "az_zmod_inverse"),
+    ("demo_natural_mod_inverse_ref_ref", "az_zmod_inverse"),
+    ("demo_natural_mod_shl_unsigned_u8", "az_zmod_shl"),
+    ("demo_natural_mod_shl_unsigned_u64", "az_zmod_shl"),
+    ("demo_natural_mod_shl_unsigned_val_ref_u64", "az_zmod_shl"),
+    ("demo_natural_mod_shl_unsigned_ref_val_u64", "az_zmod_shl"),
+    ("demo_natural_mod_shl_unsigned_ref_ref_u64", "az_zmod_shl"),
+    ("demo_natural_mod_shl_signed_i8", "az_zmod_shl"),
+    ("demo_natural_mod_shl_signed_i64", "az_zmod_shl"),
+    ("demo_natural_mod_shl_signed_val_ref_i64", "az_zmod_shl"),
+    ("demo_natural_mod_shl_signed_ref_val_i64", "az_zmod_shl"),
+    ("demo_natural_mod_shl_signed_ref_ref_i64", "az_zmod_shl"),
+    ("demo_natural_mod_shr_i8", "az_zmod_shr"),
+    ("demo_natural_mod_shr_i64", "az_zmod_shr"),
+    ("demo_natural_mod_shr_val_ref_i64", "az_zmod_shr"),
+    ("demo_natural_mod_shr_ref_val_i64", "az_zmod_shr"),
+    ("demo_natural_mod_shr_ref_ref_i64", "az_zmod_shr"),
+    ("demo_natural_mod_div", "az_zmod_div"),
+    ("demo_natural_mod_div_val_val_ref", "az_zmod_div"),
+    ("demo_natural_mod_div_val_ref_val", "az_zmod_div"),
+    ("demo_natural_mod_div_val_ref_ref", "az_zmod_div"),
+    ("demo_natural_mod_div_ref_val_val", "az_zmod_div"),
+    ("demo_natural_mod_div_ref_val_ref", "az_zmod_div"),
+    ("demo_natural_mod_div_ref_ref_val", "az_zmod_div"),
+    ("demo_natural_mod_div_ref_ref_ref", "az_zmod_div"),
+    ("demo_natural_mod_is_reduced", "az_zmod_is_reduced"),
+    ("demo_natural_eq_mod", "az_zmod_eq"),
+    ("demo_natural_eq_mod_val_val_ref", "az_zmod_eq"),
+    ("demo_natural_eq_mod_val_ref_val", "az_zmod_eq"),
+    ("demo_natural_eq_mod_val_ref_ref", "az_zmod_eq"),
+    ("demo_natural_eq_mod_ref_val_val", "az_zmod_eq"),
+    ("demo_natural_eq_mod_ref_val_ref", "az_zmod_eq"),
+    ("demo_natural_eq_mod_ref_ref_val", "az_zmod_eq"),
+    ("demo_natural_eq_mod_ref_ref_ref", "az_zmod_eq"),
+];
+
 fn test_azurite_units(oracle: &Path) {
     run_unit_files("azurite", |mode, file| {
         run_azurite_oracle(oracle, mode, file)
@@ -597,6 +749,12 @@ fn test_against_azurite() {
     }
     for (demo, mode) in AZURITE_INTEGER_STAGES_NO_SPECIAL {
         check_demo_against_azurite_in_modes(&oracle, "../malachite-nz", demo, mode, &MODES[..2]);
+    }
+    for (demo, mode) in AZURITE_MOD_POWER_OF_2_STAGES {
+        check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
+    }
+    for (demo, mode) in AZURITE_MOD_STAGES {
+        check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
     }
 }
 

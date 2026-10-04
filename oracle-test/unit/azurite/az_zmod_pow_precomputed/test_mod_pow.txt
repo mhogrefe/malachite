@@ -1,0 +1,10 @@
+0.mod_pow_precomputed(0, 1, &data) = 0
+0.mod_pow_precomputed(0, 10, &data) = 1
+0.mod_pow_precomputed(1, 10, &data) = 0
+2.mod_pow_precomputed(10, 10, &data) = 4
+4.mod_pow_precomputed(13, 497, &data) = 445
+10.mod_pow_precomputed(1000, 30, &data) = 10
+2.mod_pow_precomputed(340, 341, &data) = 1
+5.mod_pow_precomputed(216, 217, &data) = 1
+2.mod_pow_precomputed(1000000, 1000000000, &data) = 747109376
+1234567890.mod_pow_precomputed(1000000000, 12345678987654321, &data) = 10973935643347062
