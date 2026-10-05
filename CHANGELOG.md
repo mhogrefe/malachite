@@ -1090,6 +1090,12 @@ documented by git history.
   overflow (inputs of magnitude above $2^{2^{29}}$, which MPFR's wider intermediate exponent range
   covers), it is computed instead as $\ln|x| + \ln 2$, which differs from the true value by less
   than $2^{-2^{30}}$, so the result is correctly rounded across the whole exponent range.
+- `asinh_rational_prec_round` and `asinh_rational_prec` (with `_ref` variants), the correctly
+  rounded inverse hyperbolic sine of a `Rational` as a `Float`, and
+  `primitive_float_asinh_rational`. Since $\operatorname{asinh}$ is increasing, $x$ is bracketed
+  between two `Float`s; a small $x$ is instead bracketed by partial sums of its alternating series,
+  a tiny one is rounded from $x$ itself, and an $x$ too large to be a `Float` is rounded from
+  $\ln 2|x|$, from which the result differs by less than $1/(4x^2)$.
 
 ### Documentation
 

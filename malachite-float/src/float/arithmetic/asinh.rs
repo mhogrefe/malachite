@@ -13,20 +13,28 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::round_near_x::small_input_shortcut;
-use crate::{Float, emulate_float_to_float_fn};
+use crate::float::arithmetic::cosh::monotone_rational_via_floats;
+use crate::float::arithmetic::round_near_x::{
+    LEADING_TERM_MIN_EXPONENT, round_rational_leading_term, small_input_shortcut,
+};
+use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
+use crate::float::arithmetic::tan::round_bracket_signed_by;
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{Abs, Asinh, AsinhAssign, CeilingLogBase2};
+use malachite_base::num::arithmetic::traits::{
+    Abs, Asinh, AsinhAssign, CeilingLogBase2, Parity, Square,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NaN as NaNTrait, One};
+use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // The largest working precision at which `asinh_abs_large` may use ln 2 in place of ln(1 + sqrt(1 +
 // (1/|x|)^2)). The two differ by less than (1/|x|)^2 / 4 < 2^(-2^30), and the result's exponent is
@@ -129,6 +137,102 @@ fn asinh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float
         increment = working_prec >> 1;
     };
     Float::from_float_prec_round(if *x < 0u32 { -asinh_abs } else { asinh_abs }, prec, rm)
+}
+
+// Computes asinh(x) for a nonzero `Rational` x with |x| < 1/2 from the series x - x^3/6 + 3 x^5/40
+// - ..., whose kth term is p_k x^(2k+1) / (2k+1) with p_k = (2k)! / (4^k (k!)^2). The terms
+// alternate in sign and decrease in magnitude, so successive partial sums bracket asinh(x).
+fn asinh_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let negative = *x < 0u32;
+    let ax = x.abs();
+    let x2 = (&ax).square();
+    // hi and lo are the partial sums with an odd and an even number of terms
+    let mut power = ax.clone();
+    let mut p = Rational::ONE;
+    let mut hi = ax;
+    let mut lo = Rational::ZERO;
+    let mut k = 1u64;
+    loop {
+        power *= &x2;
+        p *= Rational::from_unsigneds((k << 1) - 1, k << 1);
+        let t = &p * &power / Rational::from((k << 1) + 1);
+        if k.odd() {
+            lo = &hi - t;
+        } else {
+            hi = &lo + t;
+        }
+        if let Some(result) = round_bracket_signed_by(negative, lo.clone(), hi.clone(), prec, rm) {
+            return result;
+        }
+        k += 1;
+    }
+}
+
+// Computes asinh(x) for a `Rational` x too large to be a `Float`. asinh(|x|) = ln(2|x|) + c with 0
+// < c < 1/(4x^2) < 2^(-2 EXP(x)), and the result exceeds 2^29, so c is below an ulp of the result
+// at any working precision below 2 EXP(x), more than 2^31 bits. ln(2|x|) rounded down and rounded
+// up, the latter moved up one more ulp, therefore bracket asinh(|x|).
+fn asinh_rational_huge(x: &Rational, exp_x: i64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let rm_abs = if positive { rm } else { -rm };
+    let two_x_abs = x.abs() << 1u32;
+    let mut working_prec = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        assert!(
+            working_prec < u64::exact_from(exp_x) << 1,
+            "asinh_rational_huge needs a working precision below 2 EXP(x)"
+        );
+        let lo = Float::ln_rational_prec_round_ref(&two_x_abs, working_prec, Floor).0;
+        let mut hi = Float::ln_rational_prec_round_ref(&two_x_abs, working_prec, Ceiling).0;
+        hi.increment();
+        let (y_lo, o_lo) = Float::from_float_prec_round(lo, prec, rm_abs);
+        let (y_hi, o_hi) = Float::from_float_prec_round(hi, prec, rm_abs);
+        if o_lo == o_hi && o_lo != Equal && y_lo == y_hi {
+            return if positive {
+                (y_lo, o_lo)
+            } else {
+                (-y_lo, o_lo.reverse())
+            };
+        }
+        fail_on_untested_path("asinh_rational_huge, retry");
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+// Computes asinh(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode
+// `rm`. (x = 0 is handled by the caller.) The result is never exactly representable, so `rm` must
+// not be `Exact`.
+fn asinh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact asinh");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    if exp_x < UNDERFLOW_EXPONENT {
+        // |asinh x| < |x| < 2^(MIN_EXPONENT - 2), below half the smallest positive `Float`, so the
+        // result is zero or that `Float` by the rounding mode alone
+        return underflowed(*x > 0u32, prec, rm);
+    }
+    // asinh(x) = x(1 - x^2/6 + ...), so |x| exceeds |asinh x| by less than 2^(3 EXP(x) - 2), and
+    // once that is below the distance from x to the nearest (prec + 1)-bit dyadic other than x
+    // itself, x's own rounding, nudged toward zero, is the answer; as for `atan_rational`.
+    if exp_x > LEADING_TERM_MIN_EXPONENT
+        && -(exp_x << 1) > i64::exact_from(prec + x.denominator_ref().significant_bits()) + 4
+    {
+        return round_rational_leading_term(x.abs(), *x > 0u32, false, prec, rm);
+    }
+    // For |x| <= 1/2 the partial sums of the series bracket asinh x within a relative width below
+    // x^4, which decides the rounding once x^4 is below 2^-(prec + 3); a handful of terms is
+    // cheaper than a `Float` inverse hyperbolic sine at the working precision.
+    if exp_x < 0 && -(exp_x << 2) > i64::exact_from(prec) + 3 {
+        return asinh_series(x, prec, rm);
+    }
+    if exp_x > Float::MAX_EXPONENT_I64 {
+        return asinh_rational_huge(x, exp_x, prec, rm);
+    }
+    // asinh is increasing, so bracket x between the Floats x_lo <= x <= x_hi, take the inverse
+    // hyperbolic sine of both, and increase the working precision until the two round to the same
+    // result, which the exact asinh(x), lying between them, must then share.
+    monotone_rational_via_floats(x, prec, rm, asinh_prec_round_normal_ref)
 }
 
 impl Float {
@@ -853,6 +957,332 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
+    /// the result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded inverse hyperbolic sine is less than, equal to, or greater
+    /// than the exact inverse hyperbolic sine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \operatorname{aasinh} x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{aasinh}
+    ///   x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{aasinh}
+    ///   x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows or underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0.0$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\operatorname{asinh} x| < \ln(2|x|+1)$, the result never overflows.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires an input of magnitude at most $2^{-2^{30}}$, the smallest positive
+    /// [`Float`]: since $|\operatorname{asinh} x| < |x|$ for nonzero $x$, no larger input can reach
+    /// it.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::asinh_rational_prec`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the logarithm is computed at a working precision of about $n$, and
+    /// the input is handled with `Rational` arithmetic.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::asinh_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::asinh_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.594");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::asinh_rational_prec_round(Rational::from_signeds(-3i8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "-0.56882572");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::asinh_rational_prec_round(Rational::from_signeds(-3i8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "-0.56882477");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn asinh_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::asinh_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
+    /// the result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded inverse hyperbolic sine is less than, equal to, or
+    /// greater than the exact inverse hyperbolic sine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \operatorname{aasinh} x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{aasinh}
+    ///   x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{aasinh}
+    ///   x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows or underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0.0$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\operatorname{asinh} x| < \ln(2|x|+1)$, the result never overflows.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires an input of magnitude at most $2^{-2^{30}}$, the smallest positive
+    /// [`Float`]: since $|\operatorname{asinh} x| < |x|$ for nonzero $x$, no larger input can reach
+    /// it.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::asinh_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the logarithm is computed at a working precision of about $n$, and
+    /// the input is handled with `Rational` arithmetic.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::asinh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::asinh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.594");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::asinh_rational_prec_round_ref(&Rational::from_signeds(-3i8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "-0.56882572");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::asinh_rational_prec_round_ref(&Rational::from_signeds(-3i8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "-0.56882477");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn asinh_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // asinh(0) = 0, exactly
+            return (Self::ZERO, Equal);
+        }
+        asinh_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
+    /// the result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded inverse hyperbolic sine is less than, equal to, or greater than the
+    /// exact inverse hyperbolic sine.
+    ///
+    /// If the inverse hyperbolic sine is equidistant from two [`Float`]s with the specified
+    /// precision, the [`Float`] with fewer 1s in its binary expansion is chosen. See
+    /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \operatorname{aasinh} x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{aasinh} x|\rfloor-p}$ (unless the
+    /// result overflows or underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0.0$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\operatorname{asinh} x| < \ln(2|x|+1)$, the result never overflows.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::asinh_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the logarithm is computed at a working precision of about $n$, and
+    /// the input is handled with `Rational` arithmetic.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::asinh_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::asinh_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.56882477");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::asinh_rational_prec(Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn asinh_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::asinh_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
+    /// the result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded inverse hyperbolic sine is less than, equal to, or greater
+    /// than the exact inverse hyperbolic sine.
+    ///
+    /// If the inverse hyperbolic sine is equidistant from two [`Float`]s with the specified
+    /// precision, the [`Float`] with fewer 1s in its binary expansion is chosen. See
+    /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \operatorname{aasinh} x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{aasinh} x|\rfloor-p}$ (unless the
+    /// result overflows or underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0.0$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\operatorname{asinh} x| < \ln(2|x|+1)$, the result never overflows.
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::asinh_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the logarithm is computed at a working precision of about $n$, and
+    /// the input is handled with `Rational` arithmetic.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::asinh_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::asinh_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.56882477");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::asinh_rational_prec_ref(&Rational::ZERO, 10);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn asinh_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::asinh_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
 impl Asinh for Float {
     type Output = Self;
 
@@ -1110,4 +1540,62 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::asinh_prec, x)
+}
+
+/// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], returning the
+/// result as a primitive float. The result is correctly rounded.
+///
+/// $$
+/// f(x) = \operatorname{aasinh} x+\varepsilon.
+/// $$
+/// - If $\operatorname{aasinh} x$ is infinite or zero, $\varepsilon$ may be ignored or assumed to
+///   be 0.
+/// - If $\operatorname{aasinh} x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   |\operatorname{aasinh} x|\rfloor-p}$, where $p$ is the precision of the output (typically 24
+///   if `T` is a [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(0)=0.0$
+///
+/// Overflow is not possible. Underflow is: an `x` of small enough magnitude gives `0.0` or `-0.0`.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::asinh::primitive_float_asinh_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_asinh_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asinh_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.32745015023725843)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asinh_rational::<f64>(
+///         &Rational::from_unsigneds(22u8, 7)
+///     )),
+///     NiceFloat(1.86267921113461)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_asinh_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::asinh_rational_prec_ref, x)
 }
