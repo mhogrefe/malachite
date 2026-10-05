@@ -1,0 +1,9 @@
+ceiling_log_base_2(1) = 0
+ceiling_log_base_2(100) = 7
+ceiling_log_base_2(1000000000000) = 40
+ceiling_log_base_2(4294967295) = 32
+ceiling_log_base_2(4294967296) = 32
+ceiling_log_base_2(4294967297) = 33
+ceiling_log_base_2(18446744073709551615) = 64
+ceiling_log_base_2(18446744073709551616) = 64
+ceiling_log_base_2(18446744073709551617) = 65

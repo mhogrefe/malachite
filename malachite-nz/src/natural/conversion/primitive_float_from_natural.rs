@@ -35,8 +35,10 @@ macro_rules! float_impls {
             ///   maximum finite float, then $\infty$ is returned.
             /// - If the rounding mode is `Nearest`, then the nearest float is returned. If the
             ///   [`Natural`] is exactly between two floats, the float with the zero
-            ///   least-significant bit in its representation is selected. If the [`Natural`] is
-            ///   greater than the maximum finite float, then $\infty$ is returned.
+            ///   least-significant bit in its representation is selected. If the [`Natural`] is at
+            ///   least halfway between the maximum finite float and the next power of 2, then
+            ///   $\infty$ is returned; a [`Natural`] above the maximum finite float but below that
+            ///   midpoint rounds to the maximum finite float.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

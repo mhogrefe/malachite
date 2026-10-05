@@ -1,0 +1,16 @@
+3 is convertible to an f32
+123 is convertible to an f32
+0 is convertible to an f32
+1000000000 is convertible to an f32
+16777216 is convertible to an f32
+16777218 is convertible to an f32
+16777217 is not convertible to an f32
+33554432 is convertible to an f32
+33554436 is convertible to an f32
+33554433 is not convertible to an f32
+33554434 is not convertible to an f32
+33554435 is not convertible to an f32
+340282346638528859811704183484516925439 is not convertible to an f32
+340282346638528859811704183484516925440 is convertible to an f32
+340282346638528859811704183484516925441 is not convertible to an f32
+10000000000000000000000000000000000000000000000000000 is not convertible to an f32

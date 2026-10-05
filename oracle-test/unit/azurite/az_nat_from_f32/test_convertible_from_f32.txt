@@ -1,0 +1,24 @@
+NaN is not convertible to a Natural
+Infinity is not convertible to a Natural
+-Infinity is not convertible to a Natural
+0.0 is convertible to a Natural
+-0.0 is convertible to a Natural
+123.0 is convertible to a Natural
+1.0e9 is convertible to a Natural
+4294967295.0 is convertible to a Natural
+4294967296.0 is convertible to a Natural
+18446744073709551615.0 is convertible to a Natural
+18446744073709551616.0 is convertible to a Natural
+1.0e20 is convertible to a Natural
+1.23e20 is convertible to a Natural
+123.1 is not convertible to a Natural
+123.5 is not convertible to a Natural
+124.5 is not convertible to a Natural
+-0.99 is not convertible to a Natural
+-0.499 is not convertible to a Natural
+-0.5 is not convertible to a Natural
+-123.0 is not convertible to a Natural
+1.0e-45 is not convertible to a Natural
+1.1754942e-38 is not convertible to a Natural
+1.1754944e-38 is not convertible to a Natural
+3.4028235e38 is convertible to a Natural

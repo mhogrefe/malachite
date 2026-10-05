@@ -1,0 +1,13 @@
+(NaN).reciprocal_sqrt() = NaN
+(Infinity).reciprocal_sqrt() = 0x0.0
+(-Infinity).reciprocal_sqrt() = NaN
+(0x0.0).reciprocal_sqrt() = Infinity
+(-0x0.0).reciprocal_sqrt() = Infinity
+(0x1.0#1).reciprocal_sqrt() = 0x1.0#1
+(-0x1.0#1).reciprocal_sqrt() = NaN
+(0x1.0000000000000000000000000#100).reciprocal_sqrt() = 0x1.0000000000000000000000000#100
+(-0x1.0000000000000000000000000#100).reciprocal_sqrt() = NaN
+(0x7b.0#7).reciprocal_sqrt() = 0x0.170#7
+(-0x7b.0#7).reciprocal_sqrt() = NaN
+(0x3.243f6a8885a30#53).reciprocal_sqrt() = 0x0.906eba8214db68#53
+(-0x3.243f6a8885a30#53).reciprocal_sqrt() = NaN

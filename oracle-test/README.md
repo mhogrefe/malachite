@@ -173,7 +173,7 @@ exponent range from the "Overflow and underflow" rules of its operations (`clamp
 value. Azurite also has no `-0.0`, so a zero result is compared regardless of its sign, and the
 sign of a zero input is read from the line where a check needs it (`sign`, `ComparableFloat`'s
 equality and order). Covered: `+ - * /` with their `_prec`, `_round`, and `_prec_round` forms,
-`square`, `sqrt`, negation, `abs`, `<<`/`>>`, `power_of_2`, `set_prec(_round)`, the
+`square`, `sqrt`, `reciprocal_sqrt`, negation, `abs`, `<<`/`>>`, `power_of_2`, `set_prec(_round)`, the
 classification predicates, `sign`, `is_power_of_2`, `get_exponent`, `get_prec`, `to_significand`,
 `ulp`, the precision constants, `Float` and `ComparableFloat` comparison and equality, comparison
 with `Natural` and `Integer`, `Float::try_from` and `from_*_prec(_round)` from `Natural`,

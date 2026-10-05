@@ -1,0 +1,9 @@
+checked_log_base_2(1) = Some(0)
+checked_log_base_2(100) = None
+checked_log_base_2(1000000000000) = None
+checked_log_base_2(4294967295) = None
+checked_log_base_2(4294967296) = Some(32)
+checked_log_base_2(4294967297) = None
+checked_log_base_2(18446744073709551615) = None
+checked_log_base_2(18446744073709551616) = Some(64)
+checked_log_base_2(18446744073709551617) = None

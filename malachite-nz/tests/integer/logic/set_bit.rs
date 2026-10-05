@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, NotAssign};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_vec_unsigned_pair_gen_var_20;
@@ -16,6 +17,7 @@ use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
+use rug;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -40,6 +42,10 @@ fn test_set_bit() {
         n.set_bit(index);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
+
+        let mut n = rug::Integer::from_str(u).unwrap();
+        n.set_bit(u32::exact_from(index), true);
+        assert_eq!(n.to_string(), out);
     };
     test("0", 10, "1024");
     test("100", 0, "101");
@@ -85,6 +91,10 @@ fn set_bit_properties() {
         mut_n.set_bit(index);
         assert!(mut_n.is_valid());
         let result = mut_n;
+
+        let mut rug_n = rug::Integer::from(&n);
+        rug_n.set_bit(u32::exact_from(index), true);
+        assert_eq!(Integer::from(&rug_n), result);
 
         let mut mut_n = n.clone();
         mut_n.assign_bit(index, true);

@@ -1,0 +1,6 @@
+0.mod_euclidean(1) = 0
+0.mod_euclidean(123) = 0
+23.mod_euclidean(1) = 0
+23.mod_euclidean(10) = 3
+456.mod_euclidean(123) = 87
+1000000000000.mod_euclidean(3) = 1

@@ -1,0 +1,14 @@
+0.ceiling_sqrt() = 0
+1.ceiling_sqrt() = 1
+2.ceiling_sqrt() = 2
+3.ceiling_sqrt() = 2
+4.ceiling_sqrt() = 2
+5.ceiling_sqrt() = 3
+10.ceiling_sqrt() = 4
+100.ceiling_sqrt() = 10
+1000000000.ceiling_sqrt() = 31623
+152415765279683.ceiling_sqrt() = 12345678
+152415765279684.ceiling_sqrt() = 12345678
+152415765279685.ceiling_sqrt() = 12345679
+10000000000000000000000000000000000000000.ceiling_sqrt() = 100000000000000000000
+100000000000000000000000000000000000000000.ceiling_sqrt() = 316227766016837933200

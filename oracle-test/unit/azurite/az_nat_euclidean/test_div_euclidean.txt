@@ -1,0 +1,6 @@
+0.div_euclidean(1) = 0
+0.div_euclidean(123) = 0
+23.div_euclidean(1) = 23
+23.div_euclidean(10) = 2
+456.div_euclidean(123) = 3
+1000000000000.div_euclidean(3) = 333333333333

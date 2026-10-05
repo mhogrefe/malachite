@@ -1,0 +1,7 @@
+0.get_bit(0) = false
+0.get_bit(100) = false
+123.get_bit(2) = false
+123.get_bit(3) = true
+123.get_bit(100) = false
+1000000000000.get_bit(12) = true
+1000000000000.get_bit(100) = false

@@ -1,0 +1,23 @@
+0 is a perfect square
+1 is a perfect square
+4 is a perfect square
+9 is a perfect square
+16 is a perfect square
+25 is a perfect square
+36 is a perfect square
+49 is a perfect square
+64 is a perfect square
+81 is a perfect square
+100 is a perfect square
+2 is not a perfect square
+3 is not a perfect square
+5 is not a perfect square
+6 is not a perfect square
+7 is not a perfect square
+8 is not a perfect square
+10 is not a perfect square
+11 is not a perfect square
+12 is not a perfect square
+13 is not a perfect square
+14 is not a perfect square
+15 is not a perfect square

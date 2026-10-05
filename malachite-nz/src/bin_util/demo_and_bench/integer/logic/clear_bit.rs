@@ -6,18 +6,24 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::test_util::bench::bucketers::pair_2_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_vec_unsigned_pair_gen_var_20;
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::integer::Integer;
 use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
 };
-use malachite_nz::test_util::bench::bucketers::pair_integer_bit_u64_max_bucketer;
+use malachite_nz::test_util::bench::bucketers::{
+    pair_2_pair_integer_bit_u64_max_bucketer, pair_integer_bit_u64_max_bucketer,
+};
 use malachite_nz::test_util::generators::{
-    integer_unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_21,
+    integer_unsigned_pair_gen_var_2, integer_unsigned_pair_gen_var_2_rm,
+    unsigned_vec_unsigned_pair_gen_var_21,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -27,7 +33,8 @@ pub(crate) fn register(runner: &mut Runner) {
 
     register_bench!(runner, benchmark_limbs_slice_clear_bit_neg);
     register_bench!(runner, benchmark_limbs_vec_clear_bit_neg);
-    register_bench!(runner, benchmark_integer_clear_bit);
+    register_bench!(runner, benchmark_integer_clear_bit_library_comparison);
+    register_bench!(runner, benchmark_integer_clear_bit_algorithms);
 }
 
 fn demo_limbs_slice_clear_bit_neg(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -103,15 +110,48 @@ fn benchmark_limbs_vec_clear_bit_neg(
     );
 }
 
-fn benchmark_integer_clear_bit(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+fn benchmark_integer_clear_bit_library_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Integer.clear_bit(u64)",
-        BenchmarkType::Single,
+        BenchmarkType::LibraryComparison,
+        integer_unsigned_pair_gen_var_2_rm().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_pair_integer_bit_u64_max_bucketer("x", "index"),
+        &mut [
+            ("Malachite", &mut |(_, (mut n, index))| n.clear_bit(index)),
+            ("rug", &mut |((mut n, index), _)| {
+                no_out!(n.set_bit(u32::exact_from(index), false));
+            }),
+        ],
+    );
+}
+
+fn benchmark_integer_clear_bit_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer.clear_bit(u64)",
+        BenchmarkType::Algorithms,
         integer_unsigned_pair_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_integer_bit_u64_max_bucketer("x", "index"),
-        &mut [("Malachite", &mut |(mut n, index)| n.clear_bit(index))],
+        &mut [
+            ("default", &mut |(mut n, index)| n.clear_bit(index)),
+            ("using bitwise and", &mut |(mut n, index)| {
+                n &= !Integer::power_of_2(index);
+            }),
+        ],
     );
 }

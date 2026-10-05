@@ -1,0 +1,7 @@
+floor_log_base_2(1) = 0
+floor_log_base_2(100) = 6
+floor_log_base_2(1000000000000) = 39
+floor_log_base_2(4294967295) = 31
+floor_log_base_2(4294967296) = 32
+floor_log_base_2(18446744073709551615) = 63
+floor_log_base_2(18446744073709551616) = 64

@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     arithmetic::register(runner);
     comparison::register(runner);
     conversion::register(runner);
+    exhaustive::register(runner);
     factorization::register(runner);
     logic::register(runner);
 }
@@ -19,5 +20,6 @@ pub(crate) fn register(runner: &mut Runner) {
 mod arithmetic;
 mod comparison;
 mod conversion;
+mod exhaustive;
 mod factorization;
 mod logic;

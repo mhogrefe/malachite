@@ -1,0 +1,14 @@
+0.checked_sqrt() = Some(0)
+1.checked_sqrt() = Some(1)
+2.checked_sqrt() = None
+3.checked_sqrt() = None
+4.checked_sqrt() = Some(2)
+5.checked_sqrt() = None
+10.checked_sqrt() = None
+100.checked_sqrt() = Some(10)
+1000000000.checked_sqrt() = None
+152415765279683.checked_sqrt() = None
+152415765279684.checked_sqrt() = Some(12345678)
+152415765279685.checked_sqrt() = None
+10000000000000000000000000000000000000000.checked_sqrt() = Some(100000000000000000000)
+100000000000000000000000000000000000000000.checked_sqrt() = None

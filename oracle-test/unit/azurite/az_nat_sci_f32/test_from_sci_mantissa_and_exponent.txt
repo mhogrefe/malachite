@@ -1,0 +1,7 @@
+Natural::from_sci_mantissa_and_exponent(1.5, 1) = Some(3)
+Natural::from_sci_mantissa_and_exponent(1.51, 1) = Some(3)
+Natural::from_sci_mantissa_and_exponent(1.921875, 6) = Some(123)
+Natural::from_sci_mantissa_and_exponent(1.670478, 172) = Some(10000000254586612611935772707803116801852191350456320)
+Natural::from_sci_mantissa_and_exponent(2.0, 1) = None
+Natural::from_sci_mantissa_and_exponent(10.0, 1) = None
+Natural::from_sci_mantissa_and_exponent(0.5, 1) = None
