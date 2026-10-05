@@ -1110,9 +1110,23 @@ documented by git history.
   rounded from $\ln 2x$, from which the result differs by less than $1/x^2$.
 - `Atanh` and `AtanhAssign` (new traits in malachite-base) for `Float`, with the usual
   `atanh_prec_round`, `atanh_prec`, `atanh_round`, and `_ref`/`_assign` variants, and
-  `primitive_float_atanh`: a port of `mpfr_atanh`, computing
-  $\operatorname{atanh} x = \frac{1}{2}\ln\frac{1+x}{1-x}$ for $|x|<1$ (and $\pm\infty$ at $\pm1$,
-  NaN beyond), with a Taylor series for small $x$.
+  `primitive_float_atanh`: a port of `mpfr_atanh` (with $\pm\infty$ at $\pm1$ and NaN beyond), using
+  its Taylor series for small $x$, but computing $\operatorname{atanh} x$ elsewhere as
+  $\frac{1}{2}\ln(1 + \frac{2x}{1-x})$ rather than MPFR's $\frac{1}{2}\ln\frac{1+x}{1-x}$, which
+  avoids the precision lost to the logarithm of a quotient near 1.
+- `atanh_rational_prec_round` and `atanh_rational_prec` (with `_ref` variants), the correctly
+  rounded inverse hyperbolic tangent of a `Rational` as a `Float`, and
+  `primitive_float_atanh_rational`. For $x = n/d$, $\operatorname{atanh} x$ is half the
+  logarithm of the exact `Rational` $(d+n)/(d-n)$; a small $x$ is instead bracketed by partial sums
+  of its series and their remainder bounds, and a tiny one is rounded from $x$ itself.
+- `Asech` and `AsechAssign` (new traits in malachite-base) for `Float`, with the usual
+  `asech_prec_round`, `asech_prec`, `asech_round`, and `_ref`/`_assign` variants, the `Rational`
+  forms `asech_rational_prec_round` and `asech_rational_prec` (with `_ref` variants), and
+  `primitive_float_asech` and `primitive_float_asech_rational`: the inverse hyperbolic secant,
+  which MPFR does not provide. For $\frac{1}{2} \leq x < 1$ it is computed as $\ln(1+u)$ with
+  $u = (t + \sqrt{t(1+x)})/x$ and the exact $t = 1-x$, avoiding the ill-conditioned $1/x$; below
+  $\frac{1}{2}$ as $\ln(1+\sqrt{1-x^2}) - \ln x$, which also covers inputs whose reciprocal
+  would overflow. The `Rational` form is $\operatorname{acosh}(1/x)$, the reciprocal being exact.
 
 ### Documentation
 

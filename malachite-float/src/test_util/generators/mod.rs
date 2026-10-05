@@ -5896,6 +5896,16 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_36() -> Generator<(Float, u64
     )
 }
 
+// All `(Float, u64, RoundingMode)` where the `Float` is in (0, 1], that are valid inputs to
+// `Float.asech_prec_round`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_54() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_54,
+        &random_float_unsigned_rounding_mode_triple_gen_var_54,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_54,
+    )
+}
+
 // All `(Float, u64, RoundingMode)` that are valid inputs to `Float.acos_prec_round`.
 pub fn float_unsigned_rounding_mode_triple_gen_var_42() -> Generator<(Float, u64, RoundingMode)> {
     Generator::new(
@@ -6592,6 +6602,15 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_14() -> GT3 {
     )
 }
 
+// All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::atanh_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_16() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_16,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_16,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_16,
+    )
+}
+
 // All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::acosh_rational_prec_round`,
 // where the `Rational` is at least 1.
 pub fn rational_unsigned_rounding_mode_triple_gen_var_15() -> GT3 {
@@ -6599,6 +6618,16 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_15() -> GT3 {
         &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_15,
         &random_rational_unsigned_rounding_mode_triple_gen_var_15,
         &special_random_rational_unsigned_rounding_mode_triple_gen_var_15,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::asech_rational_prec_round`,
+// where the `Rational` is in (0, 1].
+pub fn rational_unsigned_rounding_mode_triple_gen_var_17() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_17,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_17,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_17,
     )
 }
 

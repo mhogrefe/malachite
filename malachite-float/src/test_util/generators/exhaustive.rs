@@ -50,6 +50,7 @@ use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
 use malachite_base::num::conversion::string::options::{SciSizeOptions, ToSciOptions};
@@ -6667,11 +6668,31 @@ pub fn acot_rational_prec_round_valid(_x: &Rational, _prec: u64, rm: RoundingMod
     rm != Exact
 }
 
+// Whether `(x, prec, rm)` is a valid input to `Float::atanh_rational_prec_round`.
+pub fn atanh_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
+    // the inverse hyperbolic tangent of a rational is transcendental except at x = 0, where it is
+    // zero, and at x = +/-1, where it is infinite; it is NaN beyond
+    rm != Exact || *x == 0u32 || x.ge_abs(&1u32)
+}
+
 // Whether `(x, prec, rm)` is a valid input to `Float::acosh_rational_prec_round`.
 pub fn acosh_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
     // the inverse hyperbolic cosine of a rational is transcendental except at x = 1, where it is
     // zero, and is NaN below 1
     rm != Exact || *x <= 1u32
+}
+
+// Whether `(x, prec, rm)` is a valid input to `Float::asech_rational_prec_round`.
+pub fn asech_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
+    // the inverse hyperbolic secant of a rational is transcendental except at x = 1, where it is
+    // zero; it is infinite at 0 and NaN outside [0, 1]
+    rm != Exact || *x <= 0u32 || *x >= 1u32
+}
+
+// Whether `(x, prec, rm)` is a valid input to `Float::asech_prec_round` with x in (0, 1]: the
+// inverse hyperbolic secant of such an x is transcendental except at x = 1, where it is zero.
+pub fn asech_prec_round_valid(x: &Float, _prec: u64, rm: RoundingMode) -> bool {
+    *x > 0u32 && *x <= 1u32 && (rm != Exact || *x == 1u32)
 }
 
 // Whether `(x, prec, rm)` is a valid input to `Float::acsc_rational_prec_round`.
@@ -7157,6 +7178,18 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_36() -> It<(Float,
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref x, p), rm)| exp_prec_round_valid(x, p, rm)),
+    ))
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.exp_prec_round`.
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_54() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| asech_prec_round_valid(x, p, rm)),
     ))
 }
 
@@ -8235,6 +8268,17 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_14()
     ))
 }
 
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_16()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_rationals(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| atanh_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
 pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_15()
 -> It<(Rational, u64, RoundingMode)> {
     reshape_2_1_to_3(Box::new(
@@ -8246,6 +8290,20 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_15()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref n, prec), rm)| acosh_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_17()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_non_negative_rationals().map(|r| (r + Rational::ONE).reciprocal()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| asech_rational_prec_round_valid(n, prec, rm)),
     ))
 }
 

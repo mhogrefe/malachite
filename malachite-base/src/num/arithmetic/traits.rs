@@ -1238,6 +1238,18 @@ pub trait AtanhAssign {
     fn atanh_assign(&mut self);
 }
 
+/// Computes $\operatorname{asech}(x)$, the inverse hyperbolic secant of a number.
+pub trait Asech {
+    type Output;
+
+    fn asech(self) -> Self::Output;
+}
+
+/// Replaces a number with its inverse hyperbolic secant, $\operatorname{asech}(x)$.
+pub trait AsechAssign {
+    fn asech_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

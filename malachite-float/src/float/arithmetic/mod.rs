@@ -38,6 +38,10 @@ pub mod agm;
 /// [`AsecAssign`](malachite_base::num::arithmetic::traits::AsecAssign), traits for computing the
 /// arcsecant of [`Float`](super::Float)s.
 pub mod asec;
+/// Implementations of [`Asech`](malachite_base::num::arithmetic::traits::Asech) and
+/// [`AsechAssign`](malachite_base::num::arithmetic::traits::AsechAssign), traits for computing the
+/// inverse hyperbolic secant of [`Float`](super::Float)s.
+pub mod asech;
 /// Implementations of [`Asin`](malachite_base::num::arithmetic::traits::Asin) and
 /// [`AsinAssign`](malachite_base::num::arithmetic::traits::AsinAssign), traits for computing the
 /// arcsine of [`Float`](super::Float)s.
