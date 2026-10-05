@@ -1,0 +1,5 @@
+Rational::from(0) = 0
+Rational::from(123) = 123
+Rational::from(-123) = -123
+Rational::from(-9223372036854775808) = -9223372036854775808
+Rational::from(9223372036854775807) = 9223372036854775807

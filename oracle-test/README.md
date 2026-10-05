@@ -146,6 +146,22 @@ quotient is not unique when the divisor is not a unit: the check is Malachite's 
 existence condition (`gcd(y, m)` divides `x`) and `q·y ≡ x` for the printed `q`. `mod_sqrt` has
 no Azurite counterpart and is not checked. They live in `Azurite/Oracle/AzZMod.lean`.
 
+The `az_rat_*` modes check the `Rational` demos of `malachite-q` listed in
+`AZURITE_RATIONAL_STAGES` against `AzRat`, following the "Malachite for Azurite Users: Rationals"
+page: the four field operations, negation, `abs`, `reciprocal`, `pow` with `u64` and `i64`
+exponents, `<<` and `>>`, `floor` and `ceiling`, `Integer::rounding_from`, the base-2 and `u64`-base
+logarithms (`ceiling_log_base` and `checked_log_base` derived from Azurite's floor and a power
+comparison), `cmp` and `eq` against `Rational`, `Natural`, `Integer`, and the machine integers,
+`sign`, the `from_naturals`/`from_integers`/`from_sign_and_naturals` constructors, `Rational::from`,
+`to_string`, `from_str` (Malachite's grammar, with its `+` signs and nonzero denominator),
+`from_sci_string` in any base, `to_sci`, `to_sci_with_options` (the `ToSciOptions` `Debug` text is
+parsed into Azurite's `SciOptions`; `Exact` is Azurite's `toSciExact` predicate), `fmt_sci_valid`,
+and `length_after_point_in_small_base`. They live in `Azurite/Oracle/AzRat.lean`. These stages
+are not part of `-- azurite`: every `AzRat` operation reduces through Azurite's GCD, which makes
+the 10000-line runs on the demos' large operands take hours, so they run only on request, with
+`cargo run --release -- azurite-rationals`, until Azurite's GCD is faster. The Rational unit rows
+(`unit/azurite/az_rat_*/`) are small and run with the others.
+
 Where the two libraries' conventions differ, the oracle applies the adjustment the mapping page
 "Malachite for Azurite Users: Naturals" documents rather than skipping the line: Malachite's
 `Exact` rounding mode (which Azurite lacks) is checked as an exact division or shift, a negative

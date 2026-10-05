@@ -16,11 +16,11 @@ use malachite_q::test_util::rational::arithmetic::sign::num_sign;
 use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_integer_sign);
-    register_bench!(runner, benchmark_integer_sign_library_comparison);
+    register_demo!(runner, demo_rational_sign);
+    register_bench!(runner, benchmark_rational_sign_library_comparison);
 }
 
-fn demo_integer_sign(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_rational_sign(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in rational_gen().get(gm, config).take(limit) {
         match x.sign() {
             Less => println!("{x} is negative"),
@@ -30,7 +30,7 @@ fn demo_integer_sign(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
-fn benchmark_integer_sign_library_comparison(
+fn benchmark_rational_sign_library_comparison(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

@@ -1,0 +1,4 @@
+Rational::from_naturals(0, 1) = 0
+Rational::from_naturals(0, 5) = 0
+Rational::from_naturals(3, 6) = 1/2
+Rational::from_naturals(100, 101) = 100/101

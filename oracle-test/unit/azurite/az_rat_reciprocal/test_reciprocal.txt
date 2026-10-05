@@ -1,0 +1,5 @@
+reciprocal(1) = 1
+reciprocal(-1) = -1
+reciprocal(123) = 1/123
+reciprocal(22/7) = 7/22
+reciprocal(-22/7) = -7/22

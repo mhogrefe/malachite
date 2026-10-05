@@ -13,7 +13,7 @@
 // `../../flint-3.6.0`. The Azurite oracle is the `oracle` executable of the Azurite repository
 // (formally verified Lean arithmetic), located through `MALACHITE_AZURITE_DIR`, defaulting to
 // `../../../azurite`. `cargo run --release -- flint` or `-- azurite` runs one backend; with no
-// argument both run. See README.md.
+// argument both run. `-- azurite-rationals` runs the slow Rational stages. See README.md.
 
 use std::env;
 use std::fs::{self, File};
@@ -729,6 +729,104 @@ const AZURITE_MOD_STAGES: &[(&str, &str)] = &[
     ("demo_natural_eq_mod_ref_ref_ref", "az_zmod_eq"),
 ];
 
+// The Rational demos (in malachite-q) checked against Azurite's `AzRat`, with the oracle mode that
+// reads each one. The modes follow the rows of the "Malachite for Azurite Users: Rationals"
+// mapping page; `rounding_from` is an Integer demo whose input is a Rational.
+const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
+    ("demo_rational_add", "az_rat_add"),
+    ("demo_rational_add_val_ref", "az_rat_add"),
+    ("demo_rational_add_ref_val", "az_rat_add"),
+    ("demo_rational_add_ref_ref", "az_rat_add"),
+    ("demo_rational_sub", "az_rat_sub"),
+    ("demo_rational_sub_val_ref", "az_rat_sub"),
+    ("demo_rational_sub_ref_val", "az_rat_sub"),
+    ("demo_rational_sub_ref_ref", "az_rat_sub"),
+    ("demo_rational_mul", "az_rat_mul"),
+    ("demo_rational_mul_val_ref", "az_rat_mul"),
+    ("demo_rational_mul_ref_val", "az_rat_mul"),
+    ("demo_rational_mul_ref_ref", "az_rat_mul"),
+    ("demo_rational_div", "az_rat_div"),
+    ("demo_rational_div_val_ref", "az_rat_div"),
+    ("demo_rational_div_ref_val", "az_rat_div"),
+    ("demo_rational_div_ref_ref", "az_rat_div"),
+    ("demo_rational_neg", "az_rat_neg"),
+    ("demo_rational_neg_ref", "az_rat_neg"),
+    ("demo_rational_abs", "az_rat_abs"),
+    ("demo_rational_abs_ref", "az_rat_abs"),
+    ("demo_rational_reciprocal", "az_rat_reciprocal"),
+    ("demo_rational_reciprocal_ref", "az_rat_reciprocal"),
+    ("demo_rational_pow_u64", "az_rat_pow"),
+    ("demo_rational_pow_u64_ref", "az_rat_pow"),
+    ("demo_rational_pow_i64", "az_rat_pow"),
+    ("demo_rational_pow_i64_ref", "az_rat_pow"),
+    ("demo_rational_shl_unsigned_u8", "az_rat_shl"),
+    ("demo_rational_shl_unsigned_u64", "az_rat_shl"),
+    ("demo_rational_shl_unsigned_ref_u64", "az_rat_shl"),
+    ("demo_rational_shl_signed_i8", "az_rat_shl"),
+    ("demo_rational_shl_signed_i64", "az_rat_shl"),
+    ("demo_rational_shl_signed_ref_i64", "az_rat_shl"),
+    ("demo_rational_shr_unsigned_u8", "az_rat_shr"),
+    ("demo_rational_shr_unsigned_u64", "az_rat_shr"),
+    ("demo_rational_shr_unsigned_ref_u64", "az_rat_shr"),
+    ("demo_rational_shr_signed_i8", "az_rat_shr"),
+    ("demo_rational_shr_signed_i64", "az_rat_shr"),
+    ("demo_rational_shr_signed_ref_i64", "az_rat_shr"),
+    ("demo_rational_floor", "az_rat_floor"),
+    ("demo_rational_floor_ref", "az_rat_floor"),
+    ("demo_rational_ceiling", "az_rat_ceiling"),
+    ("demo_rational_ceiling_ref", "az_rat_ceiling"),
+    ("demo_integer_rounding_from_rational", "az_rat_rounding_from"),
+    ("demo_integer_rounding_from_rational_ref", "az_rat_rounding_from"),
+    ("demo_rational_floor_log_base_2", "az_rat_floor_log_base_2"),
+    ("demo_rational_floor_log_base_2_abs", "az_rat_floor_log_base_2"),
+    ("demo_rational_ceiling_log_base_2", "az_rat_ceiling_log_base_2"),
+    ("demo_rational_ceiling_log_base_2_abs", "az_rat_ceiling_log_base_2"),
+    ("demo_rational_floor_log_base_u64", "az_rat_floor_log_base"),
+    ("demo_rational_ceiling_log_base_u64", "az_rat_ceiling_log_base"),
+    ("demo_rational_checked_log_base_u64", "az_rat_checked_log_base"),
+    ("demo_rational_cmp", "az_rat_cmp"),
+    ("demo_rational_partial_cmp_natural", "az_rat_cmp_integer"),
+    ("demo_rational_partial_cmp_integer", "az_rat_cmp_integer"),
+    ("demo_rational_partial_cmp_unsigned_u8", "az_rat_cmp_unsigned"),
+    ("demo_rational_partial_cmp_unsigned_u64", "az_rat_cmp_unsigned"),
+    ("demo_rational_partial_cmp_signed_i8", "az_rat_cmp_signed"),
+    ("demo_rational_partial_cmp_signed_i64", "az_rat_cmp_signed"),
+    ("demo_rational_eq", "az_rat_eq"),
+    ("demo_rational_partial_eq_natural", "az_rat_eq_integer"),
+    ("demo_rational_partial_eq_integer", "az_rat_eq_integer"),
+    ("demo_rational_sign", "az_rat_sign"),
+    ("demo_from_naturals", "az_rat_from_naturals"),
+    ("demo_from_naturals_ref", "az_rat_from_naturals"),
+    ("demo_from_integers", "az_rat_from_integers"),
+    ("demo_from_integers_ref", "az_rat_from_integers"),
+    ("demo_from_sign_and_naturals", "az_rat_from_sign_and_naturals"),
+    ("demo_from_sign_and_naturals_ref", "az_rat_from_sign_and_naturals"),
+    ("demo_rational_from_natural", "az_rat_from_integer"),
+    ("demo_rational_from_natural_ref", "az_rat_from_integer"),
+    ("demo_rational_from_integer", "az_rat_from_integer"),
+    ("demo_rational_from_integer_ref", "az_rat_from_integer"),
+    ("demo_rational_from_unsigned_u8", "az_rat_from_integer"),
+    ("demo_rational_from_unsigned_u64", "az_rat_from_integer"),
+    ("demo_rational_from_signed_i8", "az_rat_from_integer"),
+    ("demo_rational_from_signed_i64", "az_rat_from_integer"),
+    ("demo_rational_to_string", "az_rat_to_string"),
+    ("demo_rational_to_debug_string", "az_rat_to_string"),
+    ("demo_rational_from_str", "az_rat_from_str"),
+    ("demo_rational_from_sci_string", "az_rat_from_sci_string"),
+    ("demo_rational_from_sci_string_with_options", "az_rat_from_sci_string"),
+    ("demo_rational_to_sci", "az_rat_to_sci"),
+    ("demo_rational_to_sci_with_options", "az_rat_to_sci_with_options"),
+    ("demo_rational_fmt_sci_valid", "az_rat_fmt_sci_valid"),
+    ("demo_length_after_point_in_small_base", "az_rat_length_after_point"),
+];
+
+// The Rational demos whose generators have no `special_random` mode.
+const AZURITE_RATIONAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
+    ("demo_rational_from_str_targeted", "az_rat_from_str"),
+    ("demo_rational_from_sci_string_targeted", "az_rat_from_sci_string"),
+    ("demo_rational_from_sci_string_targeted_with_options", "az_rat_from_sci_string"),
+];
+
 fn test_azurite_units(oracle: &Path) {
     run_unit_files("azurite", |mode, file| {
         run_azurite_oracle(oracle, mode, file)
@@ -758,6 +856,20 @@ fn test_against_azurite() {
     }
 }
 
+// The Rational stages, run only on request (`-- azurite-rationals`): every `AzRat` operation
+// reduces through Azurite's GCD, which is slow enough on the demos' large operands that these
+// stages take hours. The Rational unit rows still run with the others. Fold these back into
+// `test_against_azurite` once Azurite's GCD is faster.
+fn test_against_azurite_rationals() {
+    let oracle = build_azurite_oracle();
+    for (demo, mode) in AZURITE_RATIONAL_STAGES {
+        check_demo_against_azurite(&oracle, "../malachite-q", demo, mode);
+    }
+    for (demo, mode) in AZURITE_RATIONAL_STAGES_NO_SPECIAL {
+        check_demo_against_azurite_in_modes(&oracle, "../malachite-q", demo, mode, &MODES[..2]);
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
     let (flint, azurite) = match args.iter().map(String::as_str).collect::<Vec<_>>()[..] {
@@ -770,7 +882,11 @@ fn main() {
             test_azurite_units(&build_azurite_oracle());
             return;
         }
-        _ => panic!("usage: cargo run --release [-- flint | azurite | units]"),
+        ["azurite-rationals"] => {
+            test_against_azurite_rationals();
+            return;
+        }
+        _ => panic!("usage: cargo run --release [-- flint | azurite | azurite-rationals | units]"),
     };
     if flint {
         test_against_flint();
