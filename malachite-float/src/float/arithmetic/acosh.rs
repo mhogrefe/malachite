@@ -13,11 +13,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::asinh::{ln_of_large_sum, round_with_error, square_may_overflow};
-use crate::{Float, emulate_float_to_float_fn};
+use crate::float::arithmetic::asinh::{
+    ln_of_large_rational_sum, ln_of_large_sum, round_with_error, square_may_overflow,
+};
+use crate::float::arithmetic::cosh::{monotone_rational_via_floats, same_rounding};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{Acosh, AcoshAssign, CeilingLogBase2};
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{Acosh, AcoshAssign, CeilingLogBase2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
@@ -27,6 +31,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // This is mpfr_acosh from acosh.c, MPFR 4.2.2, where the input is finite and greater than 1.
 //
@@ -82,6 +87,61 @@ fn acosh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float
         working_prec += increment;
         increment = working_prec >> 1;
     }
+}
+
+// Computes acosh(1 + t) for a positive `Rational` t below 2^-(prec + 3), if the bracket sqrt(2t -
+// t^2/3) < acosh(1 + t) < sqrt(2t) decides the rounding. The series acosh(1 + t) = sqrt(2t) (1 -
+// t/12 + 3t^2/160 - ...), whose terms alternate in sign and decrease in magnitude for t < 2, gives
+// sqrt(2t) (1 - t/12) < acosh(1 + t), and 2t - t^2/3 = 2t (1 - t/6) < 2t (1 - t/12)^2. Both ends
+// are square roots of `Rational`s, so they are rounded directly, underflow included.
+fn acosh_rational_near_one(t: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
+    let two_t = t << 1u32;
+    let lower = &two_t - t.square() / Rational::from(3u32);
+    let (y, o) = Float::sqrt_rational_prec_round(two_t, prec, rm);
+    let hi = if o == Equal {
+        // sqrt(2t) = y is exactly representable, and acosh(1 + t) lies just below it, so it rounds
+        // like any number in the half-ulp below y, such as y minus a quarter-ulp. (The predecessor
+        // of the smallest positive `Float` is not available, so that case falls back.)
+        if y.get_exponent().unwrap() <= Float::MIN_EXPONENT {
+            fail_on_untested_path(
+                "acosh_rational_near_one, exact sqrt(2t) at the bottom of the range",
+            );
+            return None;
+        }
+        let mut z = y;
+        z.set_prec(prec + 2);
+        z.decrement();
+        Float::from_float_prec_round(z, prec, rm)
+    } else {
+        (y, o)
+    };
+    same_rounding(Float::sqrt_rational_prec_round(lower, prec, rm), hi)
+}
+
+// Computes acosh(x) for a `Rational` x greater than 1, rounded to precision `prec` with rounding
+// mode `rm`. The result is never exactly representable, so `rm` must not be `Exact`.
+fn acosh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact acosh");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    if exp_x > Float::MAX_EXPONENT_I64 {
+        // acosh(x) = ln(2x) + c with -1/x^2 < c < 0, since 1 - u/2 <= (1 + sqrt(1 - u)) / 2 < 1 for
+        // u = 1/x^2
+        return ln_of_large_rational_sum(x, exp_x, prec, rm, false);
+    }
+    // x < 2 is necessary for x - 1 < 2^-(prec + 3)
+    if exp_x == 1 {
+        let t = x - Rational::ONE;
+        if -(t.floor_log_base_2_abs() + 1) > i64::exact_from(prec) + 3
+            && let Some(result) = acosh_rational_near_one(&t, prec, rm)
+        {
+            return result;
+        }
+    }
+    // acosh is increasing, so bracket x between the Floats x_lo <= x <= x_hi, take the inverse
+    // hyperbolic cosine of both, and increase the working precision until the two round to the same
+    // result, which the exact acosh(x), lying between them, must then share. x_lo may be 1, whose
+    // exact result 0 never matches.
+    monotone_rational_via_floats(x, prec, rm, Float::acosh_prec_round_ref)
 }
 
 impl Float {
@@ -764,6 +824,331 @@ impl Float {
         let prec = self.significant_bits();
         self.acosh_prec_round_assign(prec, rm)
     }
+
+    /// Computes $\operatorname{acosh} x$, the inverse hyperbolic cosine of a [`Rational`], rounding
+    /// the result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded inverse hyperbolic cosine is less than, equal to, or greater
+    /// than the exact inverse hyperbolic cosine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \operatorname{acosh} x+\varepsilon.
+    /// $$
+    /// - If $\operatorname{acosh} x$ is zero or NaN, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\operatorname{acosh} x$ is nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 \operatorname{acosh} x\rfloor-p+1}$.
+    /// - If $\operatorname{acosh} x$ is nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 \operatorname{acosh} x\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows; see below.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(1,p,m)=0.0$
+    /// - $f(x,p,m)=\text{NaN}$ if $x<1$
+    ///
+    /// Overflow and underflow:
+    /// - Since $\operatorname{acosh} x < \ln 2x$, the result never overflows.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// Underflow requires an $x$ within $2^{-2^{31}}$ of 1: since $\operatorname{acosh}(1+t) >
+    /// \sqrt t$, no other input can reach it.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::acosh_rational_prec`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the logarithm is computed at a working precision of about $n$, and
+    /// the input is handled with `Rational` arithmetic.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every input greater than 1).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_round(Rational::from_unsigneds(3u8, 2), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.938");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_round(Rational::from_unsigneds(3u8, 2), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.969");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_round(Rational::from_unsigneds(3u8, 2), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.96242332");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_round(Rational::from_unsigneds(3u8, 2), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.96242428");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn acosh_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::acosh_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\operatorname{acosh} x$, the inverse hyperbolic cosine of a [`Rational`], rounding
+    /// the result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded inverse hyperbolic cosine is less than, equal to,
+    /// or greater than the exact inverse hyperbolic cosine. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \operatorname{acosh} x+\varepsilon.
+    /// $$
+    /// - If $\operatorname{acosh} x$ is zero or NaN, $\varepsilon$ may be ignored or assumed to be
+    ///   0.
+    /// - If $\operatorname{acosh} x$ is nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 \operatorname{acosh} x\rfloor-p+1}$.
+    /// - If $\operatorname{acosh} x$ is nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 \operatorname{acosh} x\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows; see below.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(1,p,m)=0.0$
+    /// - $f(x,p,m)=\text{NaN}$ if $x<1$
+    ///
+    /// Overflow and underflow:
+    /// - Since $\operatorname{acosh} x < \ln 2x$, the result never overflows.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// Underflow requires an $x$ within $2^{-2^{31}}$ of 1: since $\operatorname{acosh}(1+t) >
+    /// \sqrt t$, no other input can reach it.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::acosh_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the logarithm is computed at a working precision of about $n$, and
+    /// the input is handled with `Rational` arithmetic.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every input greater than 1).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.938");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.969");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.96242332");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.96242428");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn acosh_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match x.partial_cmp(&1u32).unwrap() {
+            Less => (Self::NAN, Equal),
+            // acosh(1) = 0, exactly
+            Equal => (Self::ZERO, Equal),
+            Greater => acosh_rational_helper(x, prec, rm),
+        }
+    }
+
+    /// Computes $\operatorname{acosh} x$, the inverse hyperbolic cosine of a [`Rational`], rounding
+    /// the result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded inverse hyperbolic cosine is less than, equal to, or greater than the
+    /// exact inverse hyperbolic cosine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the inverse hyperbolic cosine is equidistant from two [`Float`]s with the specified
+    /// precision, the [`Float`] with fewer 1s in its binary expansion is chosen. See
+    /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \operatorname{acosh} x+\varepsilon,
+    /// $$
+    /// where, if $\operatorname{acosh} x$ is nonzero, $|\varepsilon| \leq 2^{\lfloor\log_2
+    /// \operatorname{acosh} x\rfloor-p}$ (unless the result underflows; see below).
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(1,p)=0.0$
+    /// - $f(x,p)=\text{NaN}$ if $x<1$
+    ///
+    /// Overflow and underflow:
+    /// - Since $\operatorname{acosh} x < \ln 2x$, the result never overflows.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// Underflow requires an $x$ within $2^{-2^{31}}$ of 1: since $\operatorname{acosh}(1+t) >
+    /// \sqrt t$, no other input can reach it.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::acosh_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the logarithm is computed at a working precision of about $n$, and
+    /// the input is handled with `Rational` arithmetic.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::acosh_rational_prec(Rational::from_unsigneds(3u8, 2), 5);
+    /// assert_eq!(c.to_string(), "0.969");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec(Rational::from_unsigneds(3u8, 2), 20);
+    /// assert_eq!(c.to_string(), "0.96242332");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec(Rational::ONE, 10);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec(Rational::from_unsigneds(1u8, 2), 10);
+    /// assert!(c.is_nan());
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn acosh_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::acosh_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{acosh} x$, the inverse hyperbolic cosine of a [`Rational`], rounding
+    /// the result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded inverse hyperbolic cosine is less than, equal to, or greater
+    /// than the exact inverse hyperbolic cosine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the inverse hyperbolic cosine is equidistant from two [`Float`]s with the specified
+    /// precision, the [`Float`] with fewer 1s in its binary expansion is chosen. See
+    /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \operatorname{acosh} x+\varepsilon,
+    /// $$
+    /// where, if $\operatorname{acosh} x$ is nonzero, $|\varepsilon| \leq 2^{\lfloor\log_2
+    /// \operatorname{acosh} x\rfloor-p}$ (unless the result underflows; see below).
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(1,p)=0.0$
+    /// - $f(x,p)=\text{NaN}$ if $x<1$
+    ///
+    /// Overflow and underflow:
+    /// - Since $\operatorname{acosh} x < \ln 2x$, the result never overflows.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// Underflow requires an $x$ within $2^{-2^{31}}$ of 1: since $\operatorname{acosh}(1+t) >
+    /// \sqrt t$, no other input can reach it.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::acosh_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the logarithm is computed at a working precision of about $n$, and
+    /// the input is handled with `Rational` arithmetic.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_ref(&Rational::from_unsigneds(3u8, 2), 5);
+    /// assert_eq!(c.to_string(), "0.969");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_ref(&Rational::from_unsigneds(3u8, 2), 20);
+    /// assert_eq!(c.to_string(), "0.96242332");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_ref(&Rational::ONE, 10);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) = Float::acosh_rational_prec_ref(&Rational::from_unsigneds(1u8, 2), 10);
+    /// assert!(c.is_nan());
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn acosh_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::acosh_rational_prec_round_ref(x, prec, Nearest)
+    }
 }
 
 impl Acosh for Float {
@@ -1041,4 +1426,63 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::acosh_prec, x)
+}
+
+/// Computes $\operatorname{acosh} x$, the inverse hyperbolic cosine of a [`Rational`], returning
+/// the result as a primitive float. The result is correctly rounded.
+///
+/// $$
+/// f(x) = \operatorname{acosh} x+\varepsilon.
+/// $$
+/// - If $\operatorname{acosh} x$ is zero or NaN, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $\operatorname{acosh} x$ is nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   \operatorname{acosh} x\rfloor-p}$, where $p$ is the precision of the output (typically 24 if
+///   `T` is a [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(1)=0.0$
+/// - $f(x)=\text{NaN}$ if $x<1$
+///
+/// Overflow is not possible. Underflow is: an `x` close enough to 1 gives `0.0`.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::One;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::acosh::primitive_float_acosh_rational;
+/// use malachite_q::Rational;
+///
+/// assert!(primitive_float_acosh_rational::<f64>(&Rational::from_unsigneds(1u8, 2)).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_acosh_rational::<f64>(&Rational::ONE)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acosh_rational::<f64>(
+///         &Rational::from_unsigneds(3u8, 2)
+///     )),
+///     NiceFloat(0.9624236501192069)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acosh_rational::<f64>(
+///         &Rational::from_unsigneds(22u8, 7)
+///     )),
+///     NiceFloat(1.8119507608214136)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_acosh_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::acosh_rational_prec_ref, x)
 }

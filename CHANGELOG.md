@@ -1102,6 +1102,12 @@ documented by git history.
   $\operatorname{acosh} x = \ln(\sqrt{x^2-1}+x)$ for $x \geq 1$ (and NaN below 1). Where $x^2$
   would overflow, it is computed instead as $\ln x + \ln 2$, as for `asinh`, so the result is
   correctly rounded across the whole exponent range.
+- `acosh_rational_prec_round` and `acosh_rational_prec` (with `_ref` variants), the correctly
+  rounded inverse hyperbolic cosine of a `Rational` as a `Float` (NaN below 1), and
+  `primitive_float_acosh_rational`. Since $\operatorname{acosh}$ is increasing, $x$ is bracketed
+  between two `Float`s; an $x = 1 + t$ very close to 1 is instead decided by the bracket
+  $\sqrt{2t - t^2/3} < \operatorname{acosh} x < \sqrt{2t}$, and an $x$ too large to be a `Float` is
+  rounded from $\ln 2x$, from which the result differs by less than $1/x^2$.
 
 ### Documentation
 

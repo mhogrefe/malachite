@@ -178,33 +178,53 @@ fn asinh_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) 
     })
 }
 
-// Computes asinh(x) for a `Rational` x too large to be a `Float`. asinh(|x|) = ln(2|x|) + c with 0
-// < c < 1/(4x^2) < 2^(-2 EXP(x)), and the result exceeds 2^29, so c is below an ulp of the result
-// at any working precision below 2 EXP(x), more than 2^31 bits. ln(2|x|) rounded down and rounded
-// up, the latter moved up one more ulp, therefore bracket asinh(|x|).
-fn asinh_rational_huge(x: &Rational, exp_x: i64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    let positive = *x > 0u32;
-    let rm_abs = if positive { rm } else { -rm };
-    let two_x_abs = x.abs() << 1u32;
+// Computes ln(2x) + c for a positive `Rational` x too large to be a `Float`, where c is unknown but
+// positive if `plus` is true and negative otherwise, and |c| < 2^(2 - 2 EXP(x)). The result exceeds
+// 2^29, so |c| is below an ulp of the result at any working precision below 2 EXP(x), more than
+// 2^31 bits. ln(2x) rounded down and rounded up, with the bound on c's side moved one more ulp,
+// therefore bracket ln(2x) + c.
+pub(crate) fn ln_of_large_rational_sum(
+    x: &Rational,
+    exp_x: i64,
+    prec: u64,
+    rm: RoundingMode,
+    plus: bool,
+) -> (Float, Ordering) {
+    let two_x = x << 1u32;
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
         assert!(
             working_prec < u64::exact_from(exp_x) << 1,
-            "asinh_rational_huge needs a working precision below 2 EXP(x)"
+            "ln_of_large_rational_sum needs a working precision below 2 EXP(x)"
         );
-        let lo = Float::ln_rational_prec_round_ref(&two_x_abs, working_prec, Floor).0;
-        let mut hi = Float::ln_rational_prec_round_ref(&two_x_abs, working_prec, Ceiling).0;
-        hi.increment();
-        if let Some((y, o)) = same_rounding(
-            Float::from_float_prec_round(lo, prec, rm_abs),
-            Float::from_float_prec_round(hi, prec, rm_abs),
-        ) {
-            return if positive { (y, o) } else { (-y, o.reverse()) };
+        let mut lo = Float::ln_rational_prec_round_ref(&two_x, working_prec, Floor).0;
+        let mut hi = Float::ln_rational_prec_round_ref(&two_x, working_prec, Ceiling).0;
+        if plus {
+            hi.increment();
+        } else {
+            lo.decrement();
         }
-        fail_on_untested_path("asinh_rational_huge, retry");
+        if let Some(result) = same_rounding(
+            Float::from_float_prec_round(lo, prec, rm),
+            Float::from_float_prec_round(hi, prec, rm),
+        ) {
+            return result;
+        }
+        fail_on_untested_path("ln_of_large_rational_sum, retry");
         working_prec += increment;
         increment = working_prec >> 1;
+    }
+}
+
+// Computes asinh(x) for a `Rational` x too large to be a `Float`. asinh(|x|) = ln(2|x|) + c with 0
+// < c < 1/(4x^2) < 2^(-2 EXP(x)).
+fn asinh_rational_huge(x: &Rational, exp_x: i64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    if *x > 0u32 {
+        ln_of_large_rational_sum(x, exp_x, prec, rm, true)
+    } else {
+        let (y, o) = ln_of_large_rational_sum(&-x, exp_x, prec, -rm, true);
+        (-y, o.reverse())
     }
 }
 
@@ -965,7 +985,7 @@ impl Float {
 }
 
 impl Float {
-    /// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
+    /// Computes $\operatorname{asinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
     /// the result to the specified precision and with the specified rounding mode and returning the
     /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
     /// indicating whether the rounded inverse hyperbolic sine is less than, equal to, or greater
@@ -974,11 +994,11 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,p,m) = \operatorname{aasinh} x+\varepsilon.
+    /// f(x,p,m) = \operatorname{asinh} x+\varepsilon.
     /// $$
-    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{aasinh}
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{asinh}
     ///   x|\rfloor-p+1}$.
-    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{aasinh}
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{asinh}
     ///   x|\rfloor-p}$.
     ///
     /// These bounds do not apply when the result overflows or underflows; see below.
@@ -1052,7 +1072,7 @@ impl Float {
         Self::asinh_rational_prec_round_ref(&x, prec, rm)
     }
 
-    /// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
+    /// Computes $\operatorname{asinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
     /// the result to the specified precision and with the specified rounding mode and returning the
     /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
     /// returned, indicating whether the rounded inverse hyperbolic sine is less than, equal to, or
@@ -1061,11 +1081,11 @@ impl Float {
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
-    /// f(x,p,m) = \operatorname{aasinh} x+\varepsilon.
+    /// f(x,p,m) = \operatorname{asinh} x+\varepsilon.
     /// $$
-    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{aasinh}
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{asinh}
     ///   x|\rfloor-p+1}$.
-    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{aasinh}
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{asinh}
     ///   x|\rfloor-p}$.
     ///
     /// These bounds do not apply when the result overflows or underflows; see below.
@@ -1150,7 +1170,7 @@ impl Float {
         asinh_rational_helper(x, prec, rm)
     }
 
-    /// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
+    /// Computes $\operatorname{asinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
     /// the result to the nearest value of the specified precision and returning the result as a
     /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
     /// whether the rounded inverse hyperbolic sine is less than, equal to, or greater than the
@@ -1161,9 +1181,9 @@ impl Float {
     /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,p) = \operatorname{aasinh} x+\varepsilon,
+    /// f(x,p) = \operatorname{asinh} x+\varepsilon,
     /// $$
-    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{aasinh} x|\rfloor-p}$ (unless the
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{asinh} x|\rfloor-p}$ (unless the
     /// result overflows or underflows; see below).
     ///
     /// The output has precision `prec`.
@@ -1173,8 +1193,6 @@ impl Float {
     ///
     /// Overflow and underflow:
     /// - Since $|\operatorname{asinh} x| < \ln(2|x|+1)$, the result never overflows.
-    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
-    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
     /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
     /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
@@ -1220,7 +1238,7 @@ impl Float {
         Self::asinh_rational_prec_round_ref(&x, prec, Nearest)
     }
 
-    /// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
+    /// Computes $\operatorname{asinh} x$, the inverse hyperbolic sine of a [`Rational`], rounding
     /// the result to the nearest value of the specified precision and returning the result as a
     /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
     /// indicating whether the rounded inverse hyperbolic sine is less than, equal to, or greater
@@ -1231,9 +1249,9 @@ impl Float {
     /// [`RoundingMode`] for a description of the `Nearest` rounding mode.
     ///
     /// $$
-    /// f(x,p) = \operatorname{aasinh} x+\varepsilon,
+    /// f(x,p) = \operatorname{asinh} x+\varepsilon,
     /// $$
-    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{aasinh} x|\rfloor-p}$ (unless the
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\operatorname{asinh} x|\rfloor-p}$ (unless the
     /// result overflows or underflows; see below).
     ///
     /// The output has precision `prec`.
@@ -1243,8 +1261,6 @@ impl Float {
     ///
     /// Overflow and underflow:
     /// - Since $|\operatorname{asinh} x| < \ln(2|x|+1)$, the result never overflows.
-    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
-    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
     /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
     /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
@@ -1549,17 +1565,17 @@ where
     emulate_float_to_float_fn(Float::asinh_prec, x)
 }
 
-/// Computes $\operatorname{aasinh} x$, the inverse hyperbolic sine of a [`Rational`], returning the
+/// Computes $\operatorname{asinh} x$, the inverse hyperbolic sine of a [`Rational`], returning the
 /// result as a primitive float. The result is correctly rounded.
 ///
 /// $$
-/// f(x) = \operatorname{aasinh} x+\varepsilon.
+/// f(x) = \operatorname{asinh} x+\varepsilon.
 /// $$
-/// - If $\operatorname{aasinh} x$ is infinite or zero, $\varepsilon$ may be ignored or assumed to
-///   be 0.
-/// - If $\operatorname{aasinh} x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-///   |\operatorname{aasinh} x|\rfloor-p}$, where $p$ is the precision of the output (typically 24
-///   if `T` is a [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
+/// - If $\operatorname{asinh} x$ is infinite or zero, $\varepsilon$ may be ignored or assumed to be
+///   0.
+/// - If $\operatorname{asinh} x$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+///   |\operatorname{asinh} x|\rfloor-p}$, where $p$ is the precision of the output (typically 24 if
+///   `T` is a [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
 ///
 /// Special cases:
 /// - $f(0)=0.0$

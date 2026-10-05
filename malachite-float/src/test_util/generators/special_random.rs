@@ -26,8 +26,8 @@ use crate::test_util::generators::common::{
 use crate::test_util::generators::exhaustive::{
     acos_prec_round_valid, acos_rational_prec_round_valid, acos_round_valid,
     acos_with_period_prec_round_valid, acos_with_period_rational_prec_round_valid,
-    acos_with_period_round_valid, acot_prec_round_valid, acot_rational_prec_round_valid,
-    acot_round_valid, acot_with_period_prec_round_valid,
+    acos_with_period_round_valid, acosh_rational_prec_round_valid, acot_prec_round_valid,
+    acot_rational_prec_round_valid, acot_round_valid, acot_with_period_prec_round_valid,
     acot_with_period_rational_prec_round_valid, acot_with_period_round_valid,
     acsc_prec_round_valid, acsc_rational_prec_round_valid, acsc_round_valid,
     acsc_with_period_prec_round_valid, acsc_with_period_rational_prec_round_valid,
@@ -99,7 +99,7 @@ use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
+use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
@@ -14334,6 +14334,35 @@ pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_14(
             &random_rounding_modes,
         )
         .filter(|&(ref n, prec, rm)| acot_rational_prec_round_valid(n, prec, rm)),
+    )
+}
+
+pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_15(
+    config: &GenConfig,
+) -> It<(Rational, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_non_negative_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+                .map(|r| r + Rational::ONE)
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, prec, rm)| acosh_rational_prec_round_valid(n, prec, rm)),
     )
 }
 

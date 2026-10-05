@@ -46,7 +46,9 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
+use malachite_base::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
+};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
@@ -6665,6 +6667,13 @@ pub fn acot_rational_prec_round_valid(_x: &Rational, _prec: u64, rm: RoundingMod
     rm != Exact
 }
 
+// Whether `(x, prec, rm)` is a valid input to `Float::acosh_rational_prec_round`.
+pub fn acosh_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
+    // the inverse hyperbolic cosine of a rational is transcendental except at x = 1, where it is
+    // zero, and is NaN below 1
+    rm != Exact || *x <= 1u32
+}
+
 // Whether `(x, prec, rm)` is a valid input to `Float::acsc_rational_prec_round`.
 pub fn acsc_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
     // the arccosecant of a rational is transcendental for |x| >= 1 -- pi/2 included, unlike the
@@ -8223,6 +8232,20 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_14()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref n, prec), rm)| acot_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_15()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_non_negative_rationals().map(|r| r + Rational::ONE),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| acosh_rational_prec_round_valid(n, prec, rm)),
     ))
 }
 

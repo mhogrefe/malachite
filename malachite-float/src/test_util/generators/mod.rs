@@ -6592,6 +6592,16 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_14() -> GT3 {
     )
 }
 
+// All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::acosh_rational_prec_round`,
+// where the `Rational` is at least 1.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_15() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_15,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_15,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_15,
+    )
+}
+
 // All `(Float, u64, u64, RoundingMode)` that are valid inputs to
 // `Float::acot_with_period_prec_round`.
 pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_29()
