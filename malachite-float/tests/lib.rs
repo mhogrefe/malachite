@@ -73,6 +73,7 @@ pub mod float {
         pub mod agm;
         pub mod asec;
         pub mod asin;
+        pub mod asinh;
         pub mod atan;
         pub mod atan2;
         pub mod average;

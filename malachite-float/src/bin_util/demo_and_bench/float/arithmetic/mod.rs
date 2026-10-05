@@ -30,6 +30,7 @@ pub(crate) fn register(runner: &mut Runner) {
     acsc::register(runner);
     asec::register(runner);
     asin::register(runner);
+    asinh::register(runner);
     cot::register(runner);
     div::register(runner);
     dot::register(runner);
@@ -100,6 +101,7 @@ mod add_mul;
 mod agm;
 mod asec;
 mod asin;
+mod asinh;
 mod atan;
 mod atan2;
 mod average;

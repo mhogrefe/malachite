@@ -122,7 +122,10 @@ fn demo_float_from_rational_prec_ref_debug(gm: GenMode, config: &GenConfig, limi
         println!(
             "Float::from_rational_prec_ref(&{}, {}) = ({:#x}, {:?})",
             n,
-            p, ComparableFloat(f), o);
+            p,
+            ComparableFloat(f),
+            o
+        );
     }
 }
 
@@ -151,7 +154,10 @@ fn demo_float_from_rational_prec_round_debug(gm: GenMode, config: &GenConfig, li
             "Float::from_rational_prec_round({}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm, ComparableFloat(f), o);
+            rm,
+            ComparableFloat(f),
+            o
+        );
     }
 }
 
@@ -180,7 +186,10 @@ fn demo_float_from_rational_prec_round_ref_debug(gm: GenMode, config: &GenConfig
             "Float::from_rational_prec_round_ref(&{}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm, ComparableFloat(f), o);
+            rm,
+            ComparableFloat(f),
+            o
+        );
     }
 }
 

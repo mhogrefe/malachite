@@ -100,8 +100,8 @@ pub const fn sparse_bits() -> SparseBits {
     }
 }
 
-// A non-dyadic `Rational` in (0, 1) built from any `Rational`: if |q| = n / d, then (3n + 1) / (3(n +
-// d)) has a numerator not divisible by 3 and a denominator divisible by 3, so its reduced
+// A non-dyadic `Rational` in (0, 1) built from any `Rational`: if |q| = n / d, then (3n + 1) / (3(n
+// + d)) has a numerator not divisible by 3 and a denominator divisible by 3, so its reduced
 // denominator keeps a factor of 3.
 pub fn non_dyadic_fraction(q: &Rational) -> Rational {
     let (n, d) = q.numerator_and_denominator_ref();

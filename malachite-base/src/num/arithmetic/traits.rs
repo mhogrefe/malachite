@@ -1202,6 +1202,18 @@ pub trait CothAssign {
     fn coth_assign(&mut self);
 }
 
+/// Computes $\operatorname{asinh}(x)$, the inverse hyperbolic sine of a number.
+pub trait Asinh {
+    type Output;
+
+    fn asinh(self) -> Self::Output;
+}
+
+/// Replaces a number with its inverse hyperbolic sine, $\operatorname{asinh}(x)$.
+pub trait AsinhAssign {
+    fn asinh_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

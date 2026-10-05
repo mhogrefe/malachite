@@ -1083,6 +1083,13 @@ documented by git history.
   $\cosh x$ and $\sinh x$ (which also handles inputs too small to be `Float`s, whose hyperbolic
   cotangents overflow), a large one is rounded from $\pm1$, and otherwise $x$ is bracketed between
   two `Float`s, $\coth$ being decreasing on each side of 0.
+- `Asinh` and `AsinhAssign` (new traits in malachite-base) for `Float`, with the usual
+  `asinh_prec_round`, `asinh_prec`, `asinh_round`, and `_ref`/`_assign` variants, and
+  `primitive_float_asinh`: a port of `mpfr_asinh`, computing
+  $\operatorname{asinh} x = \ln(\sqrt{x^2+1}+|x|)$ with the sign of $x$. Where $x^2$ would
+  overflow (inputs of magnitude above $2^{2^{29}}$, which MPFR's wider intermediate exponent range
+  covers), it is computed instead as $\ln|x| + \ln 2$, which differs from the true value by less
+  than $2^{-2^{30}}$, so the result is correctly rounded across the whole exponent range.
 
 ### Documentation
 

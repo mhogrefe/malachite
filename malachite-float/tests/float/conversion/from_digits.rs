@@ -407,8 +407,7 @@ fn non_dyadic_from_power_of_2_digits_prec_round_properties() {
                 assert_eq!(ComparableFloat(f_alt), ComparableFloat(f.clone()));
                 assert_eq!(o_alt, o);
                 if log_base < 64 {
-                    // Through the general function, which defers to this one for power-of-2
-                    // bases.
+                    // Through the general function, which defers to this one for power-of-2 bases.
                     let (f_alt, o_alt) = Float::non_dyadic_from_digits_prec_round(
                         digits.clone(),
                         1 << log_base,
