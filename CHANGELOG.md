@@ -1108,6 +1108,11 @@ documented by git history.
   between two `Float`s; an $x = 1 + t$ very close to 1 is instead decided by the bracket
   $\sqrt{2t - t^2/3} < \operatorname{acosh} x < \sqrt{2t}$, and an $x$ too large to be a `Float` is
   rounded from $\ln 2x$, from which the result differs by less than $1/x^2$.
+- `Atanh` and `AtanhAssign` (new traits in malachite-base) for `Float`, with the usual
+  `atanh_prec_round`, `atanh_prec`, `atanh_round`, and `_ref`/`_assign` variants, and
+  `primitive_float_atanh`: a port of `mpfr_atanh`, computing
+  $\operatorname{atanh} x = \frac{1}{2}\ln\frac{1+x}{1-x}$ for $|x|<1$ (and $\pm\infty$ at $\pm1$,
+  NaN beyond), with a Taylor series for small $x$.
 
 ### Documentation
 

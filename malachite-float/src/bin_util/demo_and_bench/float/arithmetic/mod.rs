@@ -25,6 +25,7 @@ pub(crate) fn register(runner: &mut Runner) {
     csc::register(runner);
     atan::register(runner);
     atan2::register(runner);
+    atanh::register(runner);
     acos::register(runner);
     acosh::register(runner);
     acot::register(runner);
@@ -106,6 +107,7 @@ mod asin;
 mod asinh;
 mod atan;
 mod atan2;
+mod atanh;
 mod average;
 mod canonical_unit_i_pow;
 mod canonicalize_unit;

@@ -54,6 +54,10 @@ pub mod atan;
 /// [`Atan2Assign`](malachite_base::num::arithmetic::traits::Atan2Assign), traits for computing the
 /// angle of a point given by two [`Float`](super::Float) coordinates.
 pub mod atan2;
+/// Implementations of [`Atanh`](malachite_base::num::arithmetic::traits::Atanh) and
+/// [`AtanhAssign`](malachite_base::num::arithmetic::traits::AtanhAssign), traits for computing the
+/// inverse hyperbolic tangent of [`Float`](super::Float)s.
+pub mod atanh;
 /// [`Average`](malachite_base::num::arithmetic::traits::Average) and
 /// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign), traits for computing
 /// the average (arithmetic mean) of two numbers, and the associated precision- and

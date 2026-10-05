@@ -1226,6 +1226,18 @@ pub trait AcoshAssign {
     fn acosh_assign(&mut self);
 }
 
+/// Computes $\operatorname{atanh}(x)$, the inverse hyperbolic tangent of a number.
+pub trait Atanh {
+    type Output;
+
+    fn atanh(self) -> Self::Output;
+}
+
+/// Replaces a number with its inverse hyperbolic tangent, $\operatorname{atanh}(x)$.
+pub trait AtanhAssign {
+    fn atanh_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

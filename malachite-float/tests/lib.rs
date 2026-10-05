@@ -77,6 +77,7 @@ pub mod float {
         pub mod asinh;
         pub mod atan;
         pub mod atan2;
+        pub mod atanh;
         pub mod average;
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_unit;
