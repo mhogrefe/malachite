@@ -114,7 +114,7 @@ fn demo_from_integers(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_from_integers_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, d) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
-            "Rational::from_naturals_ref({}, {}) = {}",
+            "Rational::from_integers_ref({}, {}) = {}",
             n,
             d,
             Rational::from_integers_ref(&n, &d)

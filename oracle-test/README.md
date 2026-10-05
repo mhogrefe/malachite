@@ -156,11 +156,8 @@ comparison), `cmp` and `eq` against `Rational`, `Natural`, `Integer`, and the ma
 `to_string`, `from_str` (Malachite's grammar, with its `+` signs and nonzero denominator),
 `from_sci_string` in any base, `to_sci`, `to_sci_with_options` (the `ToSciOptions` `Debug` text is
 parsed into Azurite's `SciOptions`; `Exact` is Azurite's `toSciExact` predicate), `fmt_sci_valid`,
-and `length_after_point_in_small_base`. They live in `Azurite/Oracle/AzRat.lean`. These stages
-are not part of `-- azurite`: every `AzRat` operation reduces through Azurite's GCD, which makes
-the 10000-line runs on the demos' large operands take hours, so they run only on request, with
-`cargo run --release -- azurite-rationals`, until Azurite's GCD is faster. The Rational unit rows
-(`unit/azurite/az_rat_*/`) are small and run with the others.
+and `length_after_point_in_small_base`. They live in `Azurite/Oracle/AzRat.lean`, and they run
+with the other Azurite stages.
 
 The `az_float_*` modes check the `Float` demos of `malachite-float` listed in
 `AZURITE_FLOAT_STAGES` against `AzFloat`, following the "Malachite for Azurite Users: Floats"

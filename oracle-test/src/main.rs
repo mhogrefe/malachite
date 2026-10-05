@@ -13,7 +13,7 @@
 // `../../flint-3.6.0`. The Azurite oracle is the `oracle` executable of the Azurite repository
 // (formally verified Lean arithmetic), located through `MALACHITE_AZURITE_DIR`, defaulting to
 // `../../../azurite`. `cargo run --release -- flint` or `-- azurite` runs one backend; with no
-// argument both run. `-- azurite-rationals` runs the slow Rational stages. See README.md.
+// argument both run. See README.md.
 
 use std::env;
 use std::fs::{self, File};
@@ -984,7 +984,7 @@ const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
 const AZURITE_RATIONAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ("demo_rational_from_str_targeted", "az_rat_from_str"),
     ("demo_rational_from_sci_string_targeted", "az_rat_from_sci_string"),
-    ("demo_rational_from_sci_string_targeted_with_options", "az_rat_from_sci_string"),
+    ("demo_rational_from_sci_string_with_options_targeted", "az_rat_from_sci_string"),
 ];
 
 // The Float demos (in malachite-float) checked against Azurite's `AzFloat`, with the oracle mode
@@ -1156,25 +1156,17 @@ fn test_against_azurite() {
     for (demo, mode) in AZURITE_MOD_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
     }
-    for (demo, mode) in AZURITE_FLOAT_STAGES {
-        check_demo_against_azurite(&oracle, "../malachite-float", demo, mode);
-    }
-    for (demo, mode) in AZURITE_FLOAT_STAGES_NO_SPECIAL {
-        check_demo_against_azurite_in_modes(&oracle, "../malachite-float", demo, mode, &MODES[..2]);
-    }
-}
-
-// The Rational stages, run only on request (`-- azurite-rationals`): every `AzRat` operation
-// reduces through Azurite's GCD, which is slow enough on the demos' large operands that these
-// stages take hours. The Rational unit rows still run with the others. Fold these back into
-// `test_against_azurite` once Azurite's GCD is faster.
-fn test_against_azurite_rationals() {
-    let oracle = build_azurite_oracle();
     for (demo, mode) in AZURITE_RATIONAL_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-q", demo, mode);
     }
     for (demo, mode) in AZURITE_RATIONAL_STAGES_NO_SPECIAL {
         check_demo_against_azurite_in_modes(&oracle, "../malachite-q", demo, mode, &MODES[..2]);
+    }
+    for (demo, mode) in AZURITE_FLOAT_STAGES {
+        check_demo_against_azurite(&oracle, "../malachite-float", demo, mode);
+    }
+    for (demo, mode) in AZURITE_FLOAT_STAGES_NO_SPECIAL {
+        check_demo_against_azurite_in_modes(&oracle, "../malachite-float", demo, mode, &MODES[..2]);
     }
 }
 
@@ -1190,11 +1182,7 @@ fn main() {
             test_azurite_units(&build_azurite_oracle());
             return;
         }
-        ["azurite-rationals"] => {
-            test_against_azurite_rationals();
-            return;
-        }
-        _ => panic!("usage: cargo run --release [-- flint | azurite | azurite-rationals | units]"),
+        _ => panic!("usage: cargo run --release [-- flint | azurite | units]"),
     };
     if flint {
         test_against_flint();
