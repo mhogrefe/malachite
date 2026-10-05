@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::bucketers::{pair_1_bucketer, unsigned_direct_bucketer};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -14,7 +13,6 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_base::test_util::runner::Runner;
-use malachite_float::test_util::float::constants::prime_constant::prime_constant_prec_round_naive;
 use malachite_float::{ComparableFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -23,8 +21,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_prime_constant_prec);
     register_demo!(runner, demo_float_prime_constant_prec_debug);
 
-    register_bench!(runner, benchmark_float_prime_constant_prec_round_algorithms);
-    register_bench!(runner, benchmark_float_prime_constant_prec_algorithms);
+    register_bench!(runner, benchmark_float_prime_constant_prec_round);
+    register_bench!(runner, benchmark_float_prime_constant_prec);
 }
 
 fn demo_float_prime_constant_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -79,7 +77,7 @@ fn demo_float_prime_constant_prec_debug(gm: GenMode, config: &GenConfig, limit: 
     }
 }
 
-fn benchmark_float_prime_constant_prec_round_algorithms(
+fn benchmark_float_prime_constant_prec_round(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -87,24 +85,19 @@ fn benchmark_float_prime_constant_prec_round_algorithms(
 ) {
     run_benchmark(
         "Float::prime_constant_prec_round(u64, RoundingMode)",
-        BenchmarkType::Algorithms,
+        BenchmarkType::Single,
         unsigned_rounding_mode_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_bucketer("prec"),
-        &mut [
-            ("default", &mut |(p, rm)| {
-                no_out!(Float::prime_constant_prec_round(p, rm));
-            }),
-            ("naive", &mut |(p, rm)| {
-                no_out!(prime_constant_prec_round_naive(p, rm));
-            }),
-        ],
+        &mut [("Malachite", &mut |(p, rm)| {
+            no_out!(Float::prime_constant_prec_round(p, rm));
+        })],
     );
 }
 
-fn benchmark_float_prime_constant_prec_algorithms(
+fn benchmark_float_prime_constant_prec(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -112,17 +105,12 @@ fn benchmark_float_prime_constant_prec_algorithms(
 ) {
     run_benchmark(
         "Float::prime_constant_prec(u64)",
-        BenchmarkType::Algorithms,
+        BenchmarkType::Single,
         unsigned_gen_var_11().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &unsigned_direct_bucketer(),
-        &mut [
-            ("default", &mut |p| no_out!(Float::prime_constant_prec(p))),
-            ("naive", &mut |p| {
-                no_out!(prime_constant_prec_round_naive(p, Nearest));
-            }),
-        ],
+        &mut [("Malachite", &mut |p| no_out!(Float::prime_constant_prec(p)))],
     );
 }

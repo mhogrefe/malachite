@@ -239,6 +239,8 @@ pub mod float {
     }
     pub mod conversion {
         pub mod clone;
+        pub mod from_bits;
+        pub mod from_digits;
         pub mod from_gaussian_integer;
         pub mod from_gaussian_rational;
         pub mod from_integer;

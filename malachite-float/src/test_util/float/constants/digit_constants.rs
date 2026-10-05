@@ -7,51 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
-use malachite_base::num::arithmetic::traits::Pow;
-use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{Digits, ExactFrom};
+use crate::test_util::float::conversion::from_digits::non_dyadic_from_digits_prec_round_naive;
+use malachite_base::num::conversion::traits::Digits;
 use malachite_base::num::factorization::traits::Primes;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_nz::natural::Natural;
-use malachite_q::Rational;
-use std::cmp::Ordering::{self, *};
-
-// Computes a constant from its digits the slow, obvious way: take a prefix, bracket the constant
-// between the two values that prefix allows, and round both ends as `Rational`s. This shares no
-// machinery with `Float::non_dyadic_from_digits_prec_round`, which works in `Natural`s.
-pub fn digit_constant_prec_round_naive<I: Iterator<Item = u64>>(
-    mut digits: I,
-    base: u64,
-    prec: u64,
-    rm: RoundingMode,
-) -> (Float, Ordering) {
-    let mut ds: Vec<u64> = Vec::new();
-    let mut count = prec + 64;
-    loop {
-        while u64::exact_from(ds.len()) < count {
-            ds.push(digits.next().unwrap());
-        }
-        let mut num = Natural::ZERO;
-        for &d in &ds {
-            num = num * Natural::from(base) + Natural::from(d);
-        }
-        let den = Natural::from(base).pow(count);
-        let lo = Rational::from_naturals(num.clone(), den.clone());
-        let hi = Rational::from_naturals(num + Natural::ONE, den);
-        let f_lo = Float::from_rational_prec_round(lo.clone(), prec, rm).0;
-        let f_hi = Float::from_rational_prec_round(hi.clone(), prec, rm).0;
-        if f_lo == f_hi {
-            let q = Rational::exact_from(&f_lo);
-            if q <= lo {
-                return (f_lo, Less);
-            }
-            if q >= hi {
-                return (f_lo, Greater);
-            }
-        }
-        count *= 2;
-    }
-}
+use std::cmp::Ordering;
 
 pub fn liouvilles_digits_naive() -> impl Iterator<Item = u64> {
     let mut position = 0u64;
@@ -74,7 +34,7 @@ pub fn liouvilles_constant_base_prec_round_naive(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    digit_constant_prec_round_naive(liouvilles_digits_naive(), base, prec, rm)
+    non_dyadic_from_digits_prec_round_naive(liouvilles_digits_naive(), base, prec, rm)
 }
 
 pub fn champernowne_constant_base_prec_round_naive(
@@ -82,7 +42,7 @@ pub fn champernowne_constant_base_prec_round_naive(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    digit_constant_prec_round_naive(
+    non_dyadic_from_digits_prec_round_naive(
         (1u64..).flat_map(move |n| n.to_digits_desc(&base)),
         base,
         prec,
@@ -95,7 +55,7 @@ pub fn copeland_erdos_constant_base_prec_round_naive(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    digit_constant_prec_round_naive(
+    non_dyadic_from_digits_prec_round_naive(
         u64::primes().flat_map(move |p| p.to_digits_desc(&base)),
         base,
         prec,

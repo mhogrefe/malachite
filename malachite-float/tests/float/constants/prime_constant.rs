@@ -14,7 +14,6 @@ use malachite_base::test_util::generators::{
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, test_constant, to_hex_string,
 };
-use malachite_float::test_util::float::constants::prime_constant::prime_constant_prec_round_naive;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
@@ -25,10 +24,6 @@ fn test_prime_constant_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: O
     assert_eq!(x.to_string(), out);
     assert_eq!(to_hex_string(&x), out_hex);
     assert_eq!(o, out_o);
-
-    let (x_alt, o_alt) = prime_constant_prec_round_naive(prec, Nearest);
-    assert_eq!(x, x_alt);
-    assert_eq!(o, o_alt);
 }
 
 #[test]
@@ -156,10 +151,6 @@ fn test_prime_constant_prec_round_helper(
     assert_eq!(x.to_string(), out);
     assert_eq!(to_hex_string(&x), out_hex);
     assert_eq!(o, out_o);
-
-    let (x_alt, o_alt) = prime_constant_prec_round_naive(prec, rm);
-    assert_eq!(x, x_alt);
-    assert_eq!(o, o_alt);
 }
 
 #[test]
@@ -304,10 +295,6 @@ fn prime_constant_prec_properties() {
         let (pc_alt, o_alt) = Float::prime_constant_prec_round(prec, Nearest);
         assert_eq!(ComparableFloatRef(&pc_alt), ComparableFloatRef(&pc));
         assert_eq!(o_alt, o);
-
-        let (pc_alt, o_alt) = prime_constant_prec_round_naive(prec, Nearest);
-        assert_eq!(pc, pc_alt);
-        assert_eq!(o, o_alt);
     });
 }
 
@@ -337,10 +324,6 @@ fn prime_constant_prec_round_properties() {
             assert_eq!(ComparableFloat(pc_alt), ComparableFloat(next_lower));
             assert_eq!(o_alt, Less);
         }
-
-        let (pc_alt, o_alt) = prime_constant_prec_round_naive(prec, rm);
-        assert_eq!(pc, pc_alt);
-        assert_eq!(o, o_alt);
     });
 
     unsigned_gen_var_11().test_properties(|prec| {

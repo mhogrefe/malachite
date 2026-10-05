@@ -16,6 +16,7 @@ pub mod asec;
 pub mod asin;
 pub mod atan;
 pub mod atan2;
+pub mod cbrt;
 pub mod compound;
 pub mod cos;
 pub mod cosh;

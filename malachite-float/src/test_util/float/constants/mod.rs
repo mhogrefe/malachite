@@ -23,7 +23,6 @@ pub mod one_over_sqrt_pi;
 pub mod one_over_sqrt_tau;
 pub mod pi;
 pub mod pi_over_3;
-pub mod prime_constant;
 pub mod prouhet_thue_morse_constant;
 pub mod sqrt_2;
 pub mod sqrt_2_over_2;

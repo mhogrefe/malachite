@@ -10,6 +10,7 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{Cbrt, Root};
 use malachite_base::num::basic::traits::{NaN as NanTrait, Two};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
@@ -17,7 +18,11 @@ use malachite_float::float::arithmetic::cbrt::{
     primitive_float_cbrt, primitive_float_cbrt_rational,
 };
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
+};
+use malachite_float::test_util::float::arithmetic::cbrt::{
+    rug_cbrt, rug_cbrt_prec, rug_cbrt_prec_round,
 };
 use malachite_float::test_util::generators::{float_gen, float_unsigned_pair_gen_var_1};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
@@ -52,6 +57,15 @@ fn test_cbrt_prec_round() {
         let (root, root_o) = x.root_u_prec_round_ref(3, prec, rm);
         assert_eq!(ComparableFloatRef(&root), ComparableFloatRef(&cbrt));
         assert_eq!(root_o, o_out);
+
+        if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_cbrt, rug_o) = rug_cbrt_prec_round(&rug::Float::exact_from(&x), prec, rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_cbrt)),
+                ComparableFloatRef(&cbrt)
+            );
+            assert_eq!(rug_o, o);
+        }
     };
     // Specials
     test("NaN", "NaN", 5, Floor, "NaN", "NaN", Equal);
@@ -171,6 +185,11 @@ fn test_cbrt() {
         // At the precision of the input and rounding to nearest, cbrt agrees with cbrt_prec.
         let cbrt_prec = x.cbrt_prec_ref(x.significant_bits()).0;
         assert_eq!(ComparableFloatRef(&cbrt_prec), ComparableFloatRef(&cbrt));
+
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_cbrt(&rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&cbrt)
+        );
     };
     test("NaN", "NaN", "NaN");
     test("Infinity", "Infinity", "Infinity");
@@ -240,6 +259,15 @@ fn cbrt_prec_round_properties_helper(x: &Float, prec: u64, rm: RoundingMode) {
     assert!(c.is_valid());
     assert_rounding_ordering_consistent(&c, rm, o);
 
+    if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_c, rug_o) = rug_cbrt_prec_round(&rug::Float::exact_from(x), prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_c)),
+            ComparableFloatRef(&c)
+        );
+        assert_eq!(rug_o, o);
+    }
+
     // cbrt is exactly root_u(., 3).
     let (r, ro) = x.root_u_prec_round_ref(3, prec, rm);
     assert_eq!(ComparableFloatRef(&c), ComparableFloatRef(&r));
@@ -289,6 +317,13 @@ fn cbrt_prec_properties() {
         let (r, ro) = x.root_u_prec_ref(3, prec);
         assert_eq!(ComparableFloatRef(&r), ComparableFloatRef(&c));
         assert_eq!(ro, o);
+
+        let (rug_c, rug_o) = rug_cbrt_prec(&rug::Float::exact_from(&x), prec);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_c)),
+            ComparableFloatRef(&c)
+        );
+        assert_eq!(rug_o, o);
     });
 }
 
@@ -305,6 +340,10 @@ fn cbrt_properties() {
         assert_eq!(ComparableFloatRef(&c_prec), ComparableFloatRef(&c));
         let root = (&x).root(3u64);
         assert_eq!(ComparableFloatRef(&root), ComparableFloatRef(&c));
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_cbrt(&rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&c)
+        );
 
         // cbrt is an odd function: cbrt(-x) == -cbrt(x).
         if !x.is_nan() {
