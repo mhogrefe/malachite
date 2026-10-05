@@ -184,12 +184,10 @@ fn demo_float_from_unsigned_prec_round_debug<T: PrimitiveUnsigned>(
     {
         let (f, o) = Float::from_unsigned_prec_round(n, p, rm);
         println!(
-            "Float::from_unsigned_prec_round({}, {}, {:?}) = {:x?}",
+            "Float::from_unsigned_prec_round({}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 
@@ -334,12 +332,10 @@ fn demo_float_from_signed_prec_round_debug<T: PrimitiveSigned>(
     {
         let (f, o) = Float::from_signed_prec_round(n, p, rm);
         println!(
-            "Float::from_signed_prec_round({}, {}, {:?}) = {:x?}",
+            "Float::from_signed_prec_round({}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 

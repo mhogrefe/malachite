@@ -216,7 +216,7 @@ fn demo_float_is_positive_zero(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_is_positive_zero_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
-        if x.is_finite() {
+        if x.is_positive_zero() {
             println!("{:#x} is positive zero", ComparableFloat(x));
         } else {
             println!("{:#x} is not positive zero", ComparableFloat(x));
@@ -236,7 +236,7 @@ fn demo_float_is_positive_zero_extreme(gm: GenMode, config: &GenConfig, limit: u
 
 fn demo_float_is_positive_zero_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen_var_12().get(gm, config).take(limit) {
-        if x.is_finite() {
+        if x.is_positive_zero() {
             println!("{:#x} is positive zero", ComparableFloat(x));
         } else {
             println!("{:#x} is not positive zero", ComparableFloat(x));
@@ -256,7 +256,7 @@ fn demo_float_is_negative_zero(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_is_negative_zero_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
-        if x.is_finite() {
+        if x.is_negative_zero() {
             println!("{:#x} is negative zero", ComparableFloat(x));
         } else {
             println!("{:#x} is not negative zero", ComparableFloat(x));
@@ -276,7 +276,7 @@ fn demo_float_is_negative_zero_extreme(gm: GenMode, config: &GenConfig, limit: u
 
 fn demo_float_is_negative_zero_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen_var_12().get(gm, config).take(limit) {
-        if x.is_finite() {
+        if x.is_negative_zero() {
             println!("{:#x} is negative zero", ComparableFloat(x));
         } else {
             println!("{:#x} is not negative zero", ComparableFloat(x));
@@ -296,7 +296,7 @@ fn demo_float_is_zero(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_is_zero_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
-        if x.is_finite() {
+        if x.is_zero() {
             println!("{:#x} is zero", ComparableFloat(x));
         } else {
             println!("{:#x} is not zero", ComparableFloat(x));
@@ -316,7 +316,7 @@ fn demo_float_is_zero_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_float_is_zero_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen_var_12().get(gm, config).take(limit) {
-        if x.is_finite() {
+        if x.is_zero() {
             println!("{:#x} is zero", ComparableFloat(x));
         } else {
             println!("{:#x} is not zero", ComparableFloat(x));

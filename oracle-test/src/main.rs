@@ -827,6 +827,140 @@ const AZURITE_RATIONAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ("demo_rational_from_sci_string_targeted_with_options", "az_rat_from_sci_string"),
 ];
 
+// The Float demos (in malachite-float) checked against Azurite's `AzFloat`, with the oracle mode
+// that reads each one. Only the `_debug` demos are listed, which print every value in the exact
+// hexadecimal format with its precision; the `_extreme` ones exercise the exponent-range emulation
+// in Azurite's `MalachiteFloat` module. The modes follow the rows of the "Malachite for Azurite
+// Users: Floats" mapping page.
+const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
+    ("demo_float_add_debug", "az_float_add"),
+    ("demo_float_add_extreme_debug", "az_float_add"),
+    ("demo_float_add_prec_debug", "az_float_add"),
+    ("demo_float_add_prec_extreme_debug", "az_float_add"),
+    ("demo_float_add_round_debug", "az_float_add"),
+    ("demo_float_add_round_extreme_debug", "az_float_add"),
+    ("demo_float_add_prec_round_debug", "az_float_add"),
+    ("demo_float_add_prec_round_extreme_debug", "az_float_add"),
+    ("demo_float_sub_debug", "az_float_sub"),
+    ("demo_float_sub_extreme_debug", "az_float_sub"),
+    ("demo_float_sub_prec_debug", "az_float_sub"),
+    ("demo_float_sub_prec_extreme_debug", "az_float_sub"),
+    ("demo_float_sub_round_debug", "az_float_sub"),
+    ("demo_float_sub_round_extreme_debug", "az_float_sub"),
+    ("demo_float_sub_prec_round_debug", "az_float_sub"),
+    ("demo_float_sub_prec_round_extreme_debug", "az_float_sub"),
+    ("demo_float_mul_debug", "az_float_mul"),
+    ("demo_float_mul_extreme_debug", "az_float_mul"),
+    ("demo_float_mul_prec_debug", "az_float_mul"),
+    ("demo_float_mul_prec_extreme_debug", "az_float_mul"),
+    ("demo_float_mul_round_debug", "az_float_mul"),
+    ("demo_float_mul_round_extreme_debug", "az_float_mul"),
+    ("demo_float_mul_prec_round_debug", "az_float_mul"),
+    ("demo_float_mul_prec_round_extreme_debug", "az_float_mul"),
+    ("demo_float_div_debug", "az_float_div"),
+    ("demo_float_div_extreme_debug", "az_float_div"),
+    ("demo_float_div_prec_debug", "az_float_div"),
+    ("demo_float_div_prec_extreme_debug", "az_float_div"),
+    ("demo_float_div_round_debug", "az_float_div"),
+    ("demo_float_div_round_extreme_debug", "az_float_div"),
+    ("demo_float_div_prec_round_debug", "az_float_div"),
+    ("demo_float_div_prec_round_extreme_debug", "az_float_div"),
+    ("demo_float_square_debug", "az_float_square"),
+    ("demo_float_square_extreme_debug", "az_float_square"),
+    ("demo_float_square_prec_debug", "az_float_square"),
+    ("demo_float_square_prec_extreme_debug", "az_float_square"),
+    ("demo_float_square_round_debug", "az_float_square"),
+    ("demo_float_square_round_extreme_debug", "az_float_square"),
+    ("demo_float_square_prec_round_debug", "az_float_square"),
+    ("demo_float_square_prec_round_extreme_debug", "az_float_square"),
+    ("demo_float_sqrt_debug", "az_float_sqrt"),
+    ("demo_float_sqrt_extreme_debug", "az_float_sqrt"),
+    ("demo_float_sqrt_prec_debug", "az_float_sqrt"),
+    ("demo_float_sqrt_prec_extreme_debug", "az_float_sqrt"),
+    ("demo_float_sqrt_round_debug", "az_float_sqrt"),
+    ("demo_float_sqrt_round_extreme_debug", "az_float_sqrt"),
+    ("demo_float_sqrt_prec_round_debug", "az_float_sqrt"),
+    ("demo_float_sqrt_prec_round_extreme_debug", "az_float_sqrt"),
+    ("demo_float_neg_debug", "az_float_neg"),
+    ("demo_float_neg_extreme_debug", "az_float_neg"),
+    ("demo_float_abs_debug", "az_float_abs"),
+    ("demo_float_abs_extreme_debug", "az_float_abs"),
+    ("demo_float_shl_unsigned_debug_u8", "az_float_shl"),
+    ("demo_float_shr_unsigned_debug_u8", "az_float_shr"),
+    ("demo_float_shl_unsigned_debug_u64", "az_float_shl"),
+    ("demo_float_shr_unsigned_debug_u64", "az_float_shr"),
+    ("demo_float_shl_unsigned_extreme_debug_u8", "az_float_shl"),
+    ("demo_float_shr_unsigned_extreme_debug_u8", "az_float_shr"),
+    ("demo_float_shl_unsigned_extreme_debug_u64", "az_float_shl"),
+    ("demo_float_shr_unsigned_extreme_debug_u64", "az_float_shr"),
+    ("demo_float_shl_signed_debug_i8", "az_float_shl"),
+    ("demo_float_shr_signed_debug_i8", "az_float_shr"),
+    ("demo_float_shl_signed_debug_i64", "az_float_shl"),
+    ("demo_float_shr_signed_debug_i64", "az_float_shr"),
+    ("demo_float_shl_signed_extreme_debug_i8", "az_float_shl"),
+    ("demo_float_shr_signed_extreme_debug_i8", "az_float_shr"),
+    ("demo_float_shl_signed_extreme_debug_i64", "az_float_shl"),
+    ("demo_float_shr_signed_extreme_debug_i64", "az_float_shr"),
+    ("demo_float_set_prec_round_debug", "az_float_set_prec"),
+    ("demo_float_set_prec_round_extreme_debug", "az_float_set_prec"),
+    ("demo_float_set_prec_debug", "az_float_set_prec"),
+    ("demo_float_set_prec_extreme_debug", "az_float_set_prec"),
+    ("demo_float_is_nan_debug", "az_float_is_nan"),
+    ("demo_float_is_nan_extreme_debug", "az_float_is_nan"),
+    ("demo_float_is_finite_debug", "az_float_is_finite"),
+    ("demo_float_is_finite_extreme_debug", "az_float_is_finite"),
+    ("demo_float_is_infinite_debug", "az_float_is_infinite"),
+    ("demo_float_is_infinite_extreme_debug", "az_float_is_infinite"),
+    ("demo_float_is_zero_debug", "az_float_is_zero"),
+    ("demo_float_is_zero_extreme_debug", "az_float_is_zero"),
+    ("demo_float_is_normal_debug", "az_float_is_normal"),
+    ("demo_float_is_normal_extreme_debug", "az_float_is_normal"),
+    ("demo_float_is_power_of_2_debug", "az_float_is_power_of_2"),
+    ("demo_float_sign_debug", "az_float_sign"),
+    ("demo_float_sign_extreme_debug", "az_float_sign"),
+    ("demo_float_get_exponent_debug", "az_float_get_exponent"),
+    ("demo_float_get_exponent_extreme_debug", "az_float_get_exponent"),
+    ("demo_float_get_prec_debug", "az_float_get_prec"),
+    ("demo_float_to_significand_debug", "az_float_to_significand"),
+    ("demo_float_to_significand_extreme_debug", "az_float_to_significand"),
+    ("demo_float_ulp_debug", "az_float_ulp"),
+    ("demo_float_ulp_extreme_debug", "az_float_ulp"),
+    ("demo_float_partial_cmp_debug", "az_float_partial_cmp"),
+    ("demo_float_partial_cmp_extreme_debug", "az_float_partial_cmp"),
+    ("demo_comparable_float_partial_cmp_debug", "az_float_comparable_partial_cmp"),
+    ("demo_comparable_float_partial_cmp_extreme_debug", "az_float_comparable_partial_cmp"),
+    ("demo_float_eq_debug", "az_float_eq"),
+    ("demo_float_eq_extreme_debug", "az_float_eq"),
+    ("demo_comparable_float_eq_debug", "az_float_comparable_eq"),
+    ("demo_comparable_float_eq_extreme_debug", "az_float_comparable_eq"),
+    ("demo_float_partial_cmp_natural_debug", "az_float_partial_cmp_integer"),
+    ("demo_float_partial_cmp_integer_debug", "az_float_partial_cmp_integer"),
+    ("demo_float_partial_eq_natural_debug", "az_float_partial_eq_integer"),
+    ("demo_float_partial_eq_integer_debug", "az_float_partial_eq_integer"),
+    ("demo_float_try_from_natural_debug", "az_float_from_natural"),
+    ("demo_float_from_natural_prec_debug", "az_float_from_natural"),
+    ("demo_float_from_natural_prec_round_debug", "az_float_from_natural"),
+    ("demo_float_try_from_integer_debug", "az_float_from_integer"),
+    ("demo_float_from_integer_prec_debug", "az_float_from_integer"),
+    ("demo_float_from_integer_prec_round_debug", "az_float_from_integer"),
+    ("demo_float_from_unsigned_debug_u8", "az_float_from_unsigned"),
+    ("demo_float_from_unsigned_debug_u64", "az_float_from_unsigned"),
+    ("demo_float_from_rational_prec_debug", "az_float_from_rational"),
+    ("demo_float_from_rational_prec_round_debug", "az_float_from_rational"),
+];
+
+// The Float demos whose generators have no `special_random` mode.
+const AZURITE_FLOAT_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
+    ("demo_float_power_of_2_prec_round_debug", "az_float_power_of_2"),
+    ("demo_float_power_of_2_prec_debug", "az_float_power_of_2"),
+    ("demo_float_power_of_2_u64_debug", "az_float_power_of_2"),
+    ("demo_float_power_of_2_i64_debug", "az_float_power_of_2"),
+    ("demo_float_min_positive_value_prec_debug", "az_float_constant"),
+    ("demo_float_max_finite_value_with_prec_debug", "az_float_constant"),
+    ("demo_float_one_prec_debug", "az_float_constant"),
+    ("demo_float_two_prec_debug", "az_float_constant"),
+];
+
 fn test_azurite_units(oracle: &Path) {
     run_unit_files("azurite", |mode, file| {
         run_azurite_oracle(oracle, mode, file)
@@ -853,6 +987,12 @@ fn test_against_azurite() {
     }
     for (demo, mode) in AZURITE_MOD_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
+    }
+    for (demo, mode) in AZURITE_FLOAT_STAGES {
+        check_demo_against_azurite(&oracle, "../malachite-float", demo, mode);
+    }
+    for (demo, mode) in AZURITE_FLOAT_STAGES_NO_SPECIAL {
+        check_demo_against_azurite_in_modes(&oracle, "../malachite-float", demo, mode, &MODES[..2]);
     }
 }
 

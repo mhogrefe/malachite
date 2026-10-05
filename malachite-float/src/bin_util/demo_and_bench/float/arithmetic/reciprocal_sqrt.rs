@@ -642,11 +642,9 @@ fn demo_float_reciprocal_sqrt_rational_prec_ref_debug(
     {
         let (f, o) = Float::reciprocal_sqrt_rational_prec_ref(&n, p);
         println!(
-            "Float::reciprocal_sqrt_rational_prec_ref(&{}, {}) = {:x?}",
+            "Float::reciprocal_sqrt_rational_prec_ref(&{}, {}) = ({:#x}, {:?})",
             n,
-            p,
-            (ComparableFloat(f), o)
-        );
+            p, ComparableFloat(f), o);
     }
 }
 
@@ -676,12 +674,10 @@ fn demo_float_reciprocal_sqrt_rational_prec_round_debug(
     {
         let (f, o) = Float::reciprocal_sqrt_rational_prec_round(n.clone(), p, rm);
         println!(
-            "Float::reciprocal_sqrt_rational_prec_round({}, {}, {:?}) = {:x?}",
+            "Float::reciprocal_sqrt_rational_prec_round({}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 
@@ -715,12 +711,10 @@ fn demo_float_reciprocal_sqrt_rational_prec_round_ref_debug(
     {
         let (f, o) = Float::reciprocal_sqrt_rational_prec_round_ref(&n, p, rm);
         println!(
-            "Float::reciprocal_sqrt_rational_prec_round_ref(&{}, {}, {:?}) = {:x?}",
+            "Float::reciprocal_sqrt_rational_prec_round_ref(&{}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 

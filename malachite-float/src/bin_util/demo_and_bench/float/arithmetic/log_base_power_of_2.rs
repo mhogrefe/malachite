@@ -937,12 +937,10 @@ fn demo_float_log_base_power_of_2_rational_prec_ref_debug(
     {
         let (f, o) = Float::log_base_power_of_2_rational_prec_ref(&n, pow, p);
         println!(
-            "Float::log_base_power_of_2_rational_prec_ref(&{}, {}, {}) = {:x?}",
+            "Float::log_base_power_of_2_rational_prec_ref(&{}, {}, {}) = ({:#x}, {:?})",
             n,
             pow,
-            p,
-            (ComparableFloat(f), o)
-        );
+            p, ComparableFloat(f), o);
     }
 }
 
@@ -977,13 +975,11 @@ fn demo_float_log_base_power_of_2_rational_prec_round_debug(
     {
         let (f, o) = Float::log_base_power_of_2_rational_prec_round(n.clone(), pow, p, rm);
         println!(
-            "Float::log_base_power_of_2_rational_prec_round({}, {}, {}, {:?}) = {:x?}",
+            "Float::log_base_power_of_2_rational_prec_round({}, {}, {}, {:?}) = ({:#x}, {:?})",
             n,
             pow,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 
@@ -1018,13 +1014,11 @@ fn demo_float_log_base_power_of_2_rational_prec_round_ref_debug(
     {
         let (f, o) = Float::log_base_power_of_2_rational_prec_round_ref(&n, pow, p, rm);
         println!(
-            "Float::log_base_power_of_2_rational_prec_round_ref(&{}, {}, {}, {:?}) = {:x?}",
+            "Float::log_base_power_of_2_rational_prec_round_ref(&{}, {}, {}, {:?}) = ({:#x}, {:?})",
             n,
             pow,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 

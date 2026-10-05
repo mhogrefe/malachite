@@ -162,6 +162,24 @@ the 10000-line runs on the demos' large operands take hours, so they run only on
 `cargo run --release -- azurite-rationals`, until Azurite's GCD is faster. The Rational unit rows
 (`unit/azurite/az_rat_*/`) are small and run with the others.
 
+The `az_float_*` modes check the `Float` demos of `malachite-float` listed in
+`AZURITE_FLOAT_STAGES` against `AzFloat`, following the "Malachite for Azurite Users: Floats"
+page. Only the `_debug` demos are used, since they print every value in the exact hexadecimal
+format with its precision (`0x1.8#2`), which both libraries read and write; the `_extreme` ones
+drive the exponent-range emulation. `AzFloat` has an unbounded exponent and no overflow or
+underflow, so Azurite's `Azurite/Oracle/MalachiteFloat.lean` implements Malachite's documented
+exponent range from the "Overflow and underflow" rules of its operations (`clamp`), using the
+`Ordering` of Azurite's rounded result to settle the `Nearest` tie at half the smallest positive
+value. Azurite also has no `-0.0`, so a zero result is compared regardless of its sign, and the
+sign of a zero input is read from the line where a check needs it (`sign`, `ComparableFloat`'s
+equality and order). Covered: `+ - * /` with their `_prec`, `_round`, and `_prec_round` forms,
+`square`, `sqrt`, negation, `abs`, `<<`/`>>`, `power_of_2`, `set_prec(_round)`, the
+classification predicates, `sign`, `is_power_of_2`, `get_exponent`, `get_prec`, `to_significand`,
+`ulp`, the precision constants, `Float` and `ComparableFloat` comparison and equality, comparison
+with `Natural` and `Integer`, `Float::try_from` and `from_*_prec(_round)` from `Natural`,
+`Integer`, and `Rational`, and `Float::from` for unsigned machine integers. They live in
+`Azurite/Oracle/AzFloat.lean`.
+
 Where the two libraries' conventions differ, the oracle applies the adjustment the mapping page
 "Malachite for Azurite Users: Naturals" documents rather than skipping the line: Malachite's
 `Exact` rounding mode (which Azurite lacks) is checked as an exact division or shift, a negative

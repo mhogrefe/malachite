@@ -591,11 +591,9 @@ fn demo_float_log_base_2_rational_prec_ref_debug(gm: GenMode, config: &GenConfig
     {
         let (f, o) = Float::log_base_2_rational_prec_ref(&n, p);
         println!(
-            "Float::log_base_2_rational_prec_ref(&{}, {}) = {:x?}",
+            "Float::log_base_2_rational_prec_ref(&{}, {}) = ({:#x}, {:?})",
             n,
-            p,
-            (ComparableFloat(f), o)
-        );
+            p, ComparableFloat(f), o);
     }
 }
 
@@ -621,12 +619,10 @@ fn demo_float_log_base_2_rational_prec_round_debug(gm: GenMode, config: &GenConf
     {
         let (f, o) = Float::log_base_2_rational_prec_round(n.clone(), p, rm);
         println!(
-            "Float::log_base_2_rational_prec_round({}, {}, {:?}) = {:x?}",
+            "Float::log_base_2_rational_prec_round({}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 
@@ -656,12 +652,10 @@ fn demo_float_log_base_2_rational_prec_round_ref_debug(
     {
         let (f, o) = Float::log_base_2_rational_prec_round_ref(&n, p, rm);
         println!(
-            "Float::log_base_2_rational_prec_round_ref(&{}, {}, {:?}) = {:x?}",
+            "Float::log_base_2_rational_prec_round_ref(&{}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 

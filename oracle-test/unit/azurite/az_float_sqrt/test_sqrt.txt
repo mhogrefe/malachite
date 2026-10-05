@@ -1,0 +1,17 @@
+(NaN).sqrt() = NaN
+(Infinity).sqrt() = Infinity
+(-Infinity).sqrt() = NaN
+(0x0.0).sqrt() = 0x0.0
+(-0x0.0).sqrt() = -0x0.0
+(0x1.0#1).sqrt() = 0x1.0#1
+(-0x1.0#1).sqrt() = NaN
+(0x1.0000000000000000000000000#100).sqrt() = 0x1.0000000000000000000000000#100
+(-0x1.0000000000000000000000000#100).sqrt() = NaN
+(0x7b.0#7).sqrt() = 0xb.2#7
+(-0x7b.0#7).sqrt() = NaN
+(0x3.243f6a8885a30#53).sqrt() = 0x1.c5bf891b4ef6a#53
+(-0x3.243f6a8885a30#53).sqrt() = NaN
+(0xe9aa5b5.167e3053b9874c7a7e9ad42ec#126).sqrt() = 0x3d24.fc90f48e1283b9ddd9ddcd80c651#126
+(0x200f.fffe00000000000000fc000ffffffffe7fffffffe0000#191).sqrt() = 0x5a.991762310f07e6c407b327fcf04aa587cf47462012c4a5#191
+(0xff.ffff003ff00000000003ffffffffc#122).sqrt() = 0xf.fffff801ff7e00ff9f10dd9f7ca998#122
+(0x0.eae69a7ac5e74e0580d8afa7065e9b0#121).sqrt() = 0x0.f5393c70394ab5224b7b609430e0038#121

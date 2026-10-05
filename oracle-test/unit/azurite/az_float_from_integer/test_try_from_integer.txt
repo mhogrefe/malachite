@@ -1,0 +1,7 @@
+Float::try_from(0) = Ok("0x0.0")
+Float::try_from(1) = Ok("0x1.0#1")
+Float::try_from(123) = Ok("0x7b.0#7")
+Float::try_from(1000000000000) = Ok("0xe.8d4a51E+9#28")
+Float::try_from(-1) = Ok("-0x1.0#1")
+Float::try_from(-123) = Ok("-0x7b.0#7")
+Float::try_from(-1000000000000) = Ok("-0xe.8d4a51E+9#28")

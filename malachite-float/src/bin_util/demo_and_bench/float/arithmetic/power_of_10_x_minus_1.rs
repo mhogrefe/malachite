@@ -777,11 +777,9 @@ fn demo_float_power_of_10_x_minus_1_rational_prec_ref_debug(
     {
         let (f, o) = Float::power_of_10_x_minus_1_rational_prec_ref(&n, p);
         println!(
-            "Float::power_of_10_x_minus_1_rational_prec_ref(&{}, {}) = {:x?}",
+            "Float::power_of_10_x_minus_1_rational_prec_ref(&{}, {}) = ({:#x}, {:?})",
             n,
-            p,
-            (ComparableFloat(f), o)
-        );
+            p, ComparableFloat(f), o);
     }
 }
 
@@ -815,12 +813,10 @@ fn demo_float_power_of_10_x_minus_1_rational_prec_round_debug(
     {
         let (f, o) = Float::power_of_10_x_minus_1_rational_prec_round(n.clone(), p, rm);
         println!(
-            "Float::power_of_10_x_minus_1_rational_prec_round({}, {}, {:?}) = {:x?}",
+            "Float::power_of_10_x_minus_1_rational_prec_round({}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 
@@ -854,12 +850,10 @@ fn demo_float_power_of_10_x_minus_1_rational_prec_round_ref_debug(
     {
         let (f, o) = Float::power_of_10_x_minus_1_rational_prec_round_ref(&n, p, rm);
         println!(
-            "Float::power_of_10_x_minus_1_rational_prec_round_ref(&{}, {}, {:?}) = {:x?}",
+            "Float::power_of_10_x_minus_1_rational_prec_round_ref(&{}, {}, {:?}) = ({:#x}, {:?})",
             n,
             p,
-            rm,
-            (ComparableFloat(f), o)
-        );
+            rm, ComparableFloat(f), o);
     }
 }
 
