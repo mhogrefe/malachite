@@ -16,6 +16,10 @@ pub mod abs_squared;
 /// [`AcosAssign`](malachite_base::num::arithmetic::traits::AcosAssign), traits for computing the
 /// arccosine of [`Float`](super::Float)s.
 pub mod acos;
+/// Implementations of [`Acosh`](malachite_base::num::arithmetic::traits::Acosh) and
+/// [`AcoshAssign`](malachite_base::num::arithmetic::traits::AcoshAssign), traits for computing the
+/// inverse hyperbolic cosine of [`Float`](super::Float)s.
+pub mod acosh;
 pub mod acot;
 pub mod acsc;
 /// Addition of [`Float`](super::Float)s, and of [`Float`](super::Float)s with

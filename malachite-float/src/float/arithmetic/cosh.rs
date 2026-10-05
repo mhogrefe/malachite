@@ -221,6 +221,16 @@ pub(crate) fn cosh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
     monotone_rational_via_floats(&x_abs, prec, rm, cosh_prec_round_normal_ref)
 }
 
+// Given the roundings of the two ends of a bracket known to contain a value strictly inside it, the
+// rounding of the value, if the ends round to the same `Float` on the same side. An end whose
+// rounding is exact settles nothing, since the value lies beyond it.
+pub(crate) fn same_rounding(
+    (y_lo, o_lo): (Float, Ordering),
+    (y_hi, o_hi): (Float, Ordering),
+) -> Option<(Float, Ordering)> {
+    (o_lo == o_hi && o_lo != Equal && y_lo == y_hi).then_some((y_lo, o_lo))
+}
+
 // Computes f(x) for a `Rational` x, rounded to precision `prec` with rounding mode `rm`, where `f`
 // computes f for a finite nonzero `Float`, f is monotonic on an interval containing x and the
 // `Float`s next to it, and f of a finite nonzero `Float` is never exact. x is bracketed between the
@@ -244,10 +254,8 @@ pub(crate) fn monotone_rational_via_floats<
         }
         let (x_lo, x_hi) = floor_and_ceiling((x_lo, x_o));
         // Both orderings are `Less` or `Greater`, never `Equal`.
-        let (y_lo, o_lo) = f(&x_lo, prec, rm);
-        let (y_hi, o_hi) = f(&x_hi, prec, rm);
-        if o_lo == o_hi && y_lo == y_hi {
-            return (y_lo, o_lo);
+        if let Some(result) = same_rounding(f(&x_lo, prec, rm), f(&x_hi, prec, rm)) {
+            return result;
         }
         working_prec += increment;
         increment = working_prec >> 1;

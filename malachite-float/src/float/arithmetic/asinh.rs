@@ -13,19 +13,17 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::cosh::monotone_rational_via_floats;
+use crate::float::arithmetic::atan::alternating_odd_series;
+use crate::float::arithmetic::cosh::{monotone_rational_via_floats, same_rounding};
 use crate::float::arithmetic::round_near_x::{
     LEADING_TERM_MIN_EXPONENT, round_rational_leading_term, small_input_shortcut,
 };
 use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
-use crate::float::arithmetic::tan::round_bracket_signed_by;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    Abs, Asinh, AsinhAssign, CeilingLogBase2, Parity, Square,
-};
+use malachite_base::num::arithmetic::traits::{Abs, Asinh, AsinhAssign, CeilingLogBase2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait};
@@ -36,11 +34,11 @@ use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
-// The largest working precision at which `asinh_abs_large` may use ln 2 in place of ln(1 + sqrt(1 +
-// (1/|x|)^2)). The two differ by less than (1/|x|)^2 / 4 < 2^(-2^30), and the result's exponent is
-// at least 29, so the difference stays below one ulp of the result as long as the working precision
-// is at most 2^30 + 29.
-const LN_2_SHORTCUT_MAX_PREC: u64 = (1 << 30) + 29;
+// The largest working precision at which `ln_of_large_sum` may use ln 2 in place of ln(1 + sqrt(1
+// ± (1/x)^2)). The two differ by less than (1/x)^2 / 2 < 2^(-2^30), and the result's exponent is
+// at least 29, so the difference stays below half an ulp of the result as long as the working
+// precision is at most 2^30 + 28.
+const LN_2_SHORTCUT_MAX_PREC: u64 = (1 << 30) + 28;
 
 // asinh(|x|) = ln(sqrt(x^2 + 1) + |x|), evaluated at a working precision of `wp`. x^2 must not
 // overflow.
@@ -63,22 +61,33 @@ fn asinh_abs_general(x_abs: &Float, wp: u64) -> Float {
         .0
 }
 
-// asinh(|x|) = ln(|x|) + ln(1 + sqrt(1 + (1/|x|)^2)), evaluated at a working precision of `wp`, for
-// an x whose square would overflow. The identity is exact and cannot overflow, and the second
-// logarithm is ln 2 to within the result's ulp at any practical precision.
-fn asinh_abs_large(x_abs: &Float, wp: u64) -> Float {
+// ln(x) + ln(1 + sqrt(1 + (1/x)^2)) if `plus`, which is asinh(x), or ln(x) + ln(1 + sqrt(1 -
+// (1/x)^2)) otherwise, which is acosh(x), evaluated at a working precision of `wp` for a positive x
+// whose square would overflow. Both identities are exact and cannot overflow, and at any practical
+// precision the second logarithm is ln 2 to within half an ulp of the result. The error is at most
+// half an ulp each from ln(x), ln 2, the addition, and the replacement of the second logarithm by
+// ln 2, so below 2 ulps of the result.
+pub(crate) fn ln_of_large_sum(x: &Float, wp: u64, plus: bool) -> Float {
+    let ln_x = x.ln_prec_round_ref(wp, Nearest).0;
     let correction = if wp <= LN_2_SHORTCUT_MAX_PREC {
-        Float::ln_2_prec(wp).0
+        // ln 2 is needed only to the result's ulp, and the result has the exponent of ln(x) or one
+        // more, so wp - EXP(ln(x)) bits suffice, as in MPFR's overflow branch
+        let exp_ln_x = u64::from(ln_x.get_exponent().unwrap().unsigned_abs());
+        Float::ln_2_prec(wp.saturating_sub(exp_ln_x).max(1)).0
     } else {
-        fail_on_untested_path("asinh_abs_large, full correction");
-        let reciprocal_squared = x_abs
+        fail_on_untested_path("ln_of_large_sum, full correction");
+        let reciprocal_squared = x
             .reciprocal_prec_round_ref(wp, Floor)
             .0
             .square_prec_round(wp, Floor)
             .0;
-        Float::ONE
-            .add_prec_round(reciprocal_squared, wp, Floor)
-            .0
+        let one = Float::ONE;
+        let inner = if plus {
+            one.add_prec_round(reciprocal_squared, wp, Floor).0
+        } else {
+            one.sub_prec_round(reciprocal_squared, wp, Floor).0
+        };
+        inner
             .sqrt_prec_round(wp, Nearest)
             .0
             .add_prec_round(Float::ONE, wp, Nearest)
@@ -86,18 +95,42 @@ fn asinh_abs_large(x_abs: &Float, wp: u64) -> Float {
             .ln_prec_round(wp, Nearest)
             .0
     };
-    x_abs
-        .ln_prec_round_ref(wp, Nearest)
-        .0
-        .add_prec_round(correction, wp, Nearest)
-        .0
+    ln_x.add_prec_round(correction, wp, Nearest).0
+}
+
+// Whether x^2 can overflow: x < 2^EXP(x), so x^2 < 2^(2 EXP(x)), which is in range as long as
+// EXP(x) is at most MAX_EXPONENT / 2.
+pub(crate) const fn square_may_overflow(x: &Float) -> bool {
+    x.get_exponent().unwrap() > Float::MAX_EXPONENT >> 1
+}
+
+// The end of a Ziv loop iteration: rounds an approximation t, whose error is below 2^(EXP(t) - wp +
+// err), to precision `prec` with rounding mode `rm`, if that error allows it. Like MPFR's, `err` is
+// signed, and a nonpositive wp - err means that t cannot be rounded yet. The test does not depend
+// on the sign of t, so a caller may negate t first.
+pub(crate) fn round_with_error(
+    t: Float,
+    wp: u64,
+    err: i64,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    let bits = i64::exact_from(wp) - err;
+    (bits > 0
+        && float_can_round(
+            t.significand_ref().unwrap(),
+            u64::exact_from(bits),
+            prec,
+            rm,
+        ))
+    .then(|| Float::from_float_prec_round(t, prec, rm))
 }
 
 // This is mpfr_asinh from asinh.c, MPFR 4.2.2, where the input is finite and nonzero.
 //
 // MPFR computes x^2 in an extended exponent range, so it never overflows. Here it overflows once
 // EXP(x) exceeds MAX_EXPONENT / 2, and with `Floor` it would saturate to the largest finite `Float`
-// and silently give a wrong result, so those inputs go through `asinh_abs_large`.
+// and silently give a wrong result, so those inputs go through `ln_of_large_sum`.
 fn asinh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact asinh");
     let exp_x = i64::from(x.get_exponent().unwrap());
@@ -105,67 +138,44 @@ fn asinh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float
     if let Some(result) = small_input_shortcut(x, -(exp_x << 1), 2, false, prec, rm) {
         return result;
     }
+    let negative = *x < 0u32;
     let x_abs = x.abs();
-    let large = exp_x > i64::from(Float::MAX_EXPONENT >> 1);
+    let large = square_may_overflow(x);
     // the optimal number of bits: see algorithms.tex
     let mut working_prec = prec + 4 + prec.ceiling_log_base_2();
     let mut increment = Limb::WIDTH;
-    let asinh_abs = loop {
+    loop {
         let t = if large {
-            asinh_abs_large(&x_abs, working_prec)
+            ln_of_large_sum(&x_abs, working_prec, true)
         } else {
             asinh_abs_general(&x_abs, working_prec)
         };
         if t.is_normal() {
-            // error estimate: see algorithms.tex. In the large case the error is below 4 ulps of t:
-            // half an ulp each from ln(|x|) and the final addition, at most one from replacing the
-            // second logarithm by ln 2, and far less from the rounding of ln 2, since t > 2^28.
+            // error estimate: see algorithms.tex. In the large case the error is below 2 ulps of t,
+            // as `ln_of_large_sum` explains, which an err of 2 covers with room to spare.
             let err = if large {
-                i64::exact_from(working_prec) - 2
+                2
             } else {
-                let exp_t = i64::from(t.get_exponent().unwrap());
-                i64::exact_from(working_prec) - (max(4 - exp_t, 0) + 1)
+                max(4 - i64::from(t.get_exponent().unwrap()), 0) + 1
             };
-            // MPFR's err is signed, and a nonpositive one means that t cannot be rounded yet
-            if err > 0
-                && float_can_round(t.significand_ref().unwrap(), u64::exact_from(err), prec, rm)
+            if let Some(result) =
+                round_with_error(if negative { -t } else { t }, working_prec, err, prec, rm)
             {
-                break t;
+                return result;
             }
         }
         working_prec += increment;
         increment = working_prec >> 1;
-    };
-    Float::from_float_prec_round(if *x < 0u32 { -asinh_abs } else { asinh_abs }, prec, rm)
+    }
 }
 
 // Computes asinh(x) for a nonzero `Rational` x with |x| < 1/2 from the series x - x^3/6 + 3 x^5/40
-// - ..., whose kth term is p_k x^(2k+1) / (2k+1) with p_k = (2k)! / (4^k (k!)^2). The terms
-// alternate in sign and decrease in magnitude, so successive partial sums bracket asinh(x).
+// - ..., whose kth term is c_k x^(2k+1) / (2k+1) with c_k = (2k)! / (4^k (k!)^2) = c_(k-1) (2k - 1)
+// / (2k). The terms alternate in sign and decrease in magnitude.
 fn asinh_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    let negative = *x < 0u32;
-    let ax = x.abs();
-    let x2 = (&ax).square();
-    // hi and lo are the partial sums with an odd and an even number of terms
-    let mut power = ax.clone();
-    let mut p = Rational::ONE;
-    let mut hi = ax;
-    let mut lo = Rational::ZERO;
-    let mut k = 1u64;
-    loop {
-        power *= &x2;
-        p *= Rational::from_unsigneds((k << 1) - 1, k << 1);
-        let t = &p * &power / Rational::from((k << 1) + 1);
-        if k.odd() {
-            lo = &hi - t;
-        } else {
-            hi = &lo + t;
-        }
-        if let Some(result) = round_bracket_signed_by(negative, lo.clone(), hi.clone(), prec, rm) {
-            return result;
-        }
-        k += 1;
-    }
+    alternating_odd_series(x, prec, rm, |k| {
+        Some(Rational::from_unsigneds((k << 1) - 1, k << 1))
+    })
 }
 
 // Computes asinh(x) for a `Rational` x too large to be a `Float`. asinh(|x|) = ln(2|x|) + c with 0
@@ -186,14 +196,11 @@ fn asinh_rational_huge(x: &Rational, exp_x: i64, prec: u64, rm: RoundingMode) ->
         let lo = Float::ln_rational_prec_round_ref(&two_x_abs, working_prec, Floor).0;
         let mut hi = Float::ln_rational_prec_round_ref(&two_x_abs, working_prec, Ceiling).0;
         hi.increment();
-        let (y_lo, o_lo) = Float::from_float_prec_round(lo, prec, rm_abs);
-        let (y_hi, o_hi) = Float::from_float_prec_round(hi, prec, rm_abs);
-        if o_lo == o_hi && o_lo != Equal && y_lo == y_hi {
-            return if positive {
-                (y_lo, o_lo)
-            } else {
-                (-y_lo, o_lo.reverse())
-            };
+        if let Some((y, o)) = same_rounding(
+            Float::from_float_prec_round(lo, prec, rm_abs),
+            Float::from_float_prec_round(hi, prec, rm_abs),
+        ) {
+            return if positive { (y, o) } else { (-y, o.reverse()) };
         }
         fail_on_untested_path("asinh_rational_huge, retry");
         working_prec += increment;

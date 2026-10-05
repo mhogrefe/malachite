@@ -1214,6 +1214,18 @@ pub trait AsinhAssign {
     fn asinh_assign(&mut self);
 }
 
+/// Computes $\operatorname{acosh}(x)$, the inverse hyperbolic cosine of a number.
+pub trait Acosh {
+    type Output;
+
+    fn acosh(self) -> Self::Output;
+}
+
+/// Replaces a number with its inverse hyperbolic cosine, $\operatorname{acosh}(x)$.
+pub trait AcoshAssign {
+    fn acosh_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

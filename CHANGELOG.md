@@ -1096,6 +1096,12 @@ documented by git history.
   between two `Float`s; a small $x$ is instead bracketed by partial sums of its alternating series,
   a tiny one is rounded from $x$ itself, and an $x$ too large to be a `Float` is rounded from
   $\ln 2|x|$, from which the result differs by less than $1/(4x^2)$.
+- `Acosh` and `AcoshAssign` (new traits in malachite-base) for `Float`, with the usual
+  `acosh_prec_round`, `acosh_prec`, `acosh_round`, and `_ref`/`_assign` variants, and
+  `primitive_float_acosh`: a port of `mpfr_acosh`, computing
+  $\operatorname{acosh} x = \ln(\sqrt{x^2-1}+x)$ for $x \geq 1$ (and NaN below 1). Where $x^2$
+  would overflow, it is computed instead as $\ln x + \ln 2$, as for `asinh`, so the result is
+  correctly rounded across the whole exponent range.
 
 ### Documentation
 

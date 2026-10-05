@@ -269,24 +269,32 @@ fn atan_aux(mut p: Integer, mut r: u64, m: usize, precy: u64) -> Float {
     .0
 }
 
-// atan x for a tiny nonzero `Rational` x, bracketed by consecutive partial sums of its alternating
-// series: x - x^3/3 < atan x < x - x^3/3 + x^5/5 < x, and so on, a bracket that narrows without
-// bound; the arctangent is transcendental, so it eventually rounds unambiguously. This is the
-// fallback for the tiny inputs that MPFR's small-input shortcut declines, which are those at the
-// very bottom of the exponent range whose result underflows; the general algorithm would otherwise
-// work at a precision of about 2^30 bits for them.
-fn atan_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+// Rounds the sum of an alternating series x - c_1 x^3/3 + c_2 x^5/5 - ... for a nonzero `Rational`
+// x with |x| <= 1/2, whose terms decrease in magnitude, so that successive partial sums bracket the
+// sum. The coefficients start at c_0 = 1 and c_k is c_(k-1) times `ratio(k)`, or c_(k-1) itself if
+// `ratio(k)` is `None`. With all coefficients 1 this is the arctangent; with ratio (2k - 1)/(2k) it
+// is the inverse hyperbolic sine.
+pub(crate) fn alternating_odd_series<F: Fn(u64) -> Option<Rational>>(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+    ratio: F,
+) -> (Float, Ordering) {
     let negative = *x < 0u32;
     let ax = x.abs();
     let x2 = (&ax).square();
     // hi and lo are the partial sums with an odd and an even number of terms
-    let mut term = ax.clone();
+    let mut power = ax.clone();
+    let mut coefficient = Rational::ONE;
     let mut hi = ax;
     let mut lo = Rational::ZERO;
     let mut k = 1u64;
     loop {
-        term *= &x2;
-        let t = &term / Rational::from((k << 1) + 1);
+        power *= &x2;
+        if let Some(r) = ratio(k) {
+            coefficient *= r;
+        }
+        let t = &coefficient * &power / Rational::from((k << 1) + 1);
         if k.odd() {
             lo = &hi - t;
         } else {
@@ -297,6 +305,16 @@ fn atan_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
         }
         k += 1;
     }
+}
+
+// atan x for a tiny nonzero `Rational` x, bracketed by consecutive partial sums of its alternating
+// series: x - x^3/3 < atan x < x - x^3/3 + x^5/5 < x, and so on, a bracket that narrows without
+// bound; the arctangent is transcendental, so it eventually rounds unambiguously. This is the
+// fallback for the tiny inputs that MPFR's small-input shortcut declines, which are those at the
+// very bottom of the exponent range whose result underflows; the general algorithm would otherwise
+// work at a precision of about 2^30 bits for them.
+fn atan_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    alternating_odd_series(x, prec, rm, |_| None)
 }
 
 // One step of `atan_rational_huge`: pi to w bits gives pi/2 to within 2^(1 - w), and [lo, hi]
