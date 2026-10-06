@@ -250,6 +250,11 @@ pub(crate) fn sin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
 // smallest positive `Float`, so the rounding mode alone decides the result.
 pub(crate) const UNDERFLOW_EXPONENT: i64 = Float::MIN_EXPONENT_I64 - 1;
 
+// An x with an exponent below this has |x| < 2^(MIN_EXPONENT - 3), so a function value of magnitude
+// below |x| (1 + x^2) is below 2^(MIN_EXPONENT - 2), half the smallest positive `Float`, and
+// underflows by the rounding mode alone.
+pub(crate) const TINY_UNDERFLOW_EXPONENT: i64 = UNDERFLOW_EXPONENT - 1;
+
 pub(crate) fn underflowed(positive: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let away = match rm {
         Ceiling => positive,

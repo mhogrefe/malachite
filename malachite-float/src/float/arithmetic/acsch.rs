@@ -28,6 +28,28 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
+// A positive `Float` x with an exponent of at least this has 2/x <= 2^(MAX_EXPONENT - 1), which
+// cannot overflow even when rounded up; for a smaller exponent, 1/x or 2/x might overflow.
+pub(crate) const RECIPROCAL_SAFE_EXPONENT: i64 = 3 - Float::MAX_EXPONENT_I64;
+
+// For a function f(x) = g(1/x), where g has a correctly rounded `Float` implementation: if x =
+// ±2^k, then 1/x = ±2^-k exactly, and g rounds f(x) = g(±2^-k) correctly. A Ziv loop for f could
+// not: for the inverse hyperbolic cosecant and cotangent, f(x) lies just short of or just beyond
+// 2^-k in magnitude, an exactly representable value, so the loop's approximations would land on
+// 2^-k at every working precision, and the rounding test would never pass. Returns `None` when x is
+// not a power of 2. 1/x must not overflow.
+pub(crate) fn via_exact_reciprocal<G: Fn(Float, u64, RoundingMode) -> (Float, Ordering)>(
+    x: &Float,
+    prec: u64,
+    rm: RoundingMode,
+    g: G,
+) -> Option<(Float, Ordering)> {
+    x.significand_ref()
+        .unwrap()
+        .is_power_of_2()
+        .then(|| g(x.reciprocal_prec_ref(1).0, prec, rm))
+}
+
 // Computes acsch(x) = asinh(1/x) for a finite nonzero `Float` x. MPFR has no acsch, so this is
 // Malachite's own algorithm. The work is done on |x|, acsch being odd.
 //
@@ -37,22 +59,23 @@ use malachite_q::Rational;
 // then approximated by `asinh`'s own internals, with their error bound, rather than by a correctly
 // rounded `asinh`, whose own Ziv loop would run inside this one.
 //
-// When 1/|x| would overflow (EXP(x) <= MIN_EXPONENT + 1), acsch(|x|) = ln(1 + sqrt(1 + x^2)) -
-// ln|x| = ln 2 - ln|x| + c with 0 < c < x^2/4, and x^2 is then far below 2^(1-wp) unless the
-// working precision exceeds 2^31: c is below 1 ulp of the sum, whose ulp is at least 2^(1-wp), and
-// with the three roundings the error stays below 2.5 ulps, under 2^2.
+// When x is a power of 2, 1/x is exact, and the result is taken from `asinh` by
+// `via_exact_reciprocal`.
+//
+// When 1/|x| might overflow (EXP(x) < `RECIPROCAL_SAFE_EXPONENT`), acsch(|x|) = ln(1 + sqrt(1 +
+// x^2)) - ln|x| = ln 2 - ln|x| + c with 0 < c < x^2/4, and x^2 is then far below 2^(1-wp) unless
+// the working precision exceeds 2^31: c is below 1 ulp of the sum, whose ulp is at least 2^(1-wp),
+// and with the three roundings the error stays below 2.5 ulps, under 2^2.
 fn acsch_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact acsch");
     let negative = *x < 0u32;
     let x_abs = x.abs();
     let exp_x = i64::from(x.get_exponent().unwrap());
-    let reciprocal_overflows = exp_x <= Float::MIN_EXPONENT_I64 + 1;
-    if !reciprocal_overflows && x.significand_ref().unwrap().is_power_of_2() {
-        // x = ±2^k, so 1/x = ±2^-k exactly, and acsch(x) = asinh(±2^-k), which `asinh` rounds
-        // correctly. The loop below could not: acsch(x) lies just short of 2^-k in magnitude, an
-        // exactly representable value, so its approximations would land on 2^-k at every working
-        // precision, and the rounding test would never pass.
-        return x.reciprocal_prec_ref(1).0.asinh_prec_round(prec, rm);
+    let reciprocal_overflows = exp_x < RECIPROCAL_SAFE_EXPONENT;
+    if !reciprocal_overflows
+        && let Some(result) = via_exact_reciprocal(x, prec, rm, Float::asinh_prec_round)
+    {
+        return result;
     }
     let mut working_prec = prec + prec.ceiling_log_base_2() + 10;
     let mut increment = Limb::WIDTH;
@@ -62,10 +85,7 @@ fn acsch_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float
                 fail_on_untested_path("acsch_prec_round_normal_ref, x^2 not negligible");
             }
             // ln 2 - ln|x|
-            let t = Float::ln_2_prec(working_prec)
-                .0
-                .sub_prec(x_abs.ln_prec_ref(working_prec).0, working_prec)
-                .0;
+            let t = Float::ln_2_prec(working_prec).0 - x_abs.ln_prec_ref(working_prec).0;
             (t, 2)
         } else {
             // y = 1/|x|, with a relative error of at most 2^-wp, which moves asinh(y) by at most 1
@@ -1158,9 +1178,18 @@ impl Acsch for Float {
     /// assert_eq!(Float::NEGATIVE_INFINITY.acsch().to_string(), "-0.0");
     /// assert_eq!(Float::ZERO.acsch().to_string(), "Infinity");
     /// assert_eq!(Float::NEGATIVE_ZERO.acsch().to_string(), "-Infinity");
-    /// assert_eq!(((Float::one_prec(100) << 1u32)).acsch().to_string(), "0.48121182505960344749775891342426");
-    /// assert_eq!(((Float::one_prec(100) >> 1u32)).acsch().to_string(), "1.4436354751788103424932767402724");
-    /// assert_eq!(((-(Float::one_prec(100) << 1u32))).acsch().to_string(), "-0.48121182505960344749775891342426");
+    /// assert_eq!(
+    ///     (Float::one_prec(100) << 1u32).acsch().to_string(),
+    ///     "0.48121182505960344749775891342426"
+    /// );
+    /// assert_eq!(
+    ///     (Float::one_prec(100) >> 1u32).acsch().to_string(),
+    ///     "1.4436354751788103424932767402724"
+    /// );
+    /// assert_eq!(
+    ///     (-(Float::one_prec(100) << 1u32)).acsch().to_string(),
+    ///     "-0.48121182505960344749775891342426"
+    /// );
     /// ```
     #[inline]
     fn acsch(self) -> Self {
@@ -1220,9 +1249,18 @@ impl Acsch for &Float {
     /// assert_eq!((&Float::NEGATIVE_INFINITY).acsch().to_string(), "-0.0");
     /// assert_eq!((&Float::ZERO).acsch().to_string(), "Infinity");
     /// assert_eq!((&Float::NEGATIVE_ZERO).acsch().to_string(), "-Infinity");
-    /// assert_eq!((&(Float::one_prec(100) << 1u32)).acsch().to_string(), "0.48121182505960344749775891342426");
-    /// assert_eq!((&(Float::one_prec(100) >> 1u32)).acsch().to_string(), "1.4436354751788103424932767402724");
-    /// assert_eq!((&(-(Float::one_prec(100) << 1u32))).acsch().to_string(), "-0.48121182505960344749775891342426");
+    /// assert_eq!(
+    ///     (&(Float::one_prec(100) << 1u32)).acsch().to_string(),
+    ///     "0.48121182505960344749775891342426"
+    /// );
+    /// assert_eq!(
+    ///     (&(Float::one_prec(100) >> 1u32)).acsch().to_string(),
+    ///     "1.4436354751788103424932767402724"
+    /// );
+    /// assert_eq!(
+    ///     (&(-(Float::one_prec(100) << 1u32))).acsch().to_string(),
+    ///     "-0.48121182505960344749775891342426"
+    /// );
     /// ```
     #[inline]
     fn acsch(self) -> Float {
@@ -1332,13 +1370,34 @@ impl AcschAssign for Float {
 /// use malachite_float::float::arithmetic::acsch::primitive_float_acsch;
 ///
 /// assert!(primitive_float_acsch(f32::NAN).is_nan());
-/// assert_eq!(NiceFloat(primitive_float_acsch(f32::INFINITY)), NiceFloat(0.0));
-/// assert_eq!(NiceFloat(primitive_float_acsch(f32::NEGATIVE_INFINITY)), NiceFloat(-0.0));
-/// assert_eq!(NiceFloat(primitive_float_acsch(0.0f32)), NiceFloat(f32::INFINITY));
-/// assert_eq!(NiceFloat(primitive_float_acsch(-0.0f32)), NiceFloat(f32::NEGATIVE_INFINITY));
-/// assert_eq!(NiceFloat(primitive_float_acsch(2.0f32)), NiceFloat(0.4812118));
-/// assert_eq!(NiceFloat(primitive_float_acsch(2.0f64)), NiceFloat(0.48121182505960347));
-/// assert_eq!(NiceFloat(primitive_float_acsch(-0.5f64)), NiceFloat(-1.4436354751788103));
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsch(f32::INFINITY)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsch(f32::NEGATIVE_INFINITY)),
+///     NiceFloat(-0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsch(0.0f32)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsch(-0.0f32)),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsch(2.0f32)),
+///     NiceFloat(0.4812118)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsch(2.0f64)),
+///     NiceFloat(0.48121182505960347)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsch(-0.5f64)),
+///     NiceFloat(-1.4436354751788103)
+/// );
 /// ```
 #[inline]
 #[allow(clippy::type_repetition_in_bounds)]

@@ -12,6 +12,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Two, Zero,
 };
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -1297,9 +1298,9 @@ fn atanh_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     } else {
         assert_eq!(c.is_sign_positive(), x.is_sign_positive());
         let rm_up = if x.is_sign_positive() { Ceiling } else { Floor };
-        let (c_up, _) = x.atanh_prec_round_ref(prec, rm_up);
-        let (x_down, _) = Float::from_float_prec_round_ref(&x, prec, -rm_up);
-        assert!(c_up.abs() >= x_down.abs());
+        let c_up = x.atanh_prec_round_ref(prec, rm_up).0;
+        let x_down = Float::from_float_prec_round_ref(&x, prec, -rm_up).0;
+        assert!(c_up.ge_abs(&x_down));
     }
     if c.is_normal() {
         assert_eq!(c.get_prec(), Some(prec));
@@ -1427,10 +1428,7 @@ fn atanh_properties_helper(x: Float) {
         ComparableFloatRef(&c)
     );
 
-    assert_eq!(
-        c.is_nan(),
-        x.is_nan() || x.is_infinite() || (&x).abs() > 1u32
-    );
+    assert_eq!(c.is_nan(), x.is_nan() || x.is_infinite() || x.gt_abs(&1u32));
 }
 
 #[test]
@@ -1498,9 +1496,8 @@ where
         assert_eq!(c.is_nan(), x.is_nan() || x.abs() > T::ONE);
         assert_eq!(NiceFloat(primitive_float_atanh(-x)), NiceFloat(-c));
         if x.is_finite() && x.abs() < T::ONE {
-            // the result is the correctly rounded inverse hyperbolic tangent, as computed by MPFR
-            // with 64 bits to spare, so that a subnormal result is rounded once by the conversion
-            // rather than twice
+            // the result is the correctly rounded inverse hyperbolic tangent as given by the oracle
+            // and rounded once to the primitive type
             let rug_c: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(
                     &rug_atanh_prec(&rug::Float::exact_from(&Float::from(x)), p).0,
@@ -2401,7 +2398,7 @@ where
     rational_gen().test_properties(|x| {
         let c = primitive_float_atanh_rational::<T>(&x);
         // the inverse hyperbolic tangent of a rational is NaN exactly beyond +/-1
-        assert_eq!(c.is_nan(), (&x).abs() > 1u32);
+        assert_eq!(c.is_nan(), x.gt_abs(&1u32));
         // atanh is odd (a `Rational` has no negative zero, so x = 0 is excluded)
         if x != 0u32 {
             assert_eq!(
@@ -2409,10 +2406,9 @@ where
                 NiceFloat(-c)
             );
         }
-        if (&x).abs() < 1u32 {
-            // the result is the correctly rounded inverse hyperbolic tangent, as computed by MPFR
-            // with 64 bits to spare, so that a subnormal result is rounded once by the conversion
-            // rather than twice
+        if x.lt_abs(&1u32) {
+            // the result is the correctly rounded inverse hyperbolic tangent as given by the oracle
+            // and rounded once to the primitive type
             let rug_c: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(&rug_atanh_rational_prec(&x, p).0)
             });

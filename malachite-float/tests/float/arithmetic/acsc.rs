@@ -27,10 +27,9 @@ use malachite_float::float::arithmetic::acsc::{
     primitive_float_acsc_rational, primitive_float_acsc_with_period,
     primitive_float_acsc_with_period_rational,
 };
-use malachite_float::test_util::common::round_once_to_primitive;
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::acsc::{
     rug_acsc, rug_acsc_prec_round, rug_acsc_rational_prec_round, rug_acsc_with_period_prec_round,
@@ -863,12 +862,9 @@ where
         if !c.is_nan() {
             // the result lies in [-pi/2, pi/2], so it never overflows
             assert!(c.is_finite());
-            // the same as the `Float` version rounded once to the primitive type -- but only where
-            // the result is normal, a subnormal one being rounded twice here
-            if c.is_normal() {
-                let c_float: T = round_once_to_primitive(|p| Float::acsc_prec(Float::from(x), p).0);
-                assert_eq!(NiceFloat(c_float), NiceFloat(c));
-            }
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T = round_once_to_primitive(|p| Float::acsc_prec(Float::from(x), p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 }
@@ -890,14 +886,9 @@ where
         assert_eq!(c.is_nan(), x.lt_abs(&1u32));
         if !c.is_nan() {
             assert!(c.is_finite());
-            // the same as the `Float` version rounded once to the primitive type -- but only where
-            // the result is normal, a subnormal one being rounded twice here and once by
-            // `emulate_rational_to_float_fn`
-            if c.is_normal() {
-                let c_float: T =
-                    round_once_to_primitive(|p| Float::acsc_rational_prec_ref(&x, p).0);
-                assert_eq!(NiceFloat(c_float), NiceFloat(c));
-            }
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T = round_once_to_primitive(|p| Float::acsc_rational_prec_ref(&x, p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 }
@@ -1867,14 +1858,10 @@ where
         if !c.is_nan() {
             // the result lies in [-u/4, u/4], so it never overflows
             assert!(c.is_finite());
-            // the same as the `Float` version rounded once to the primitive type -- but only where
-            // the result is normal, a subnormal one being rounded twice here
-            if c.is_normal() {
-                let c_float: T = round_once_to_primitive(|p| {
-                    Float::acsc_with_period_prec(Float::from(x), u, p).0
-                });
-                assert_eq!(NiceFloat(c_float), NiceFloat(c));
-            }
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T =
+                round_once_to_primitive(|p| Float::acsc_with_period_prec(Float::from(x), u, p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 }
@@ -2386,14 +2373,10 @@ where
         if !c.is_nan() {
             // the result lies in [-u/4, u/4], so it never overflows
             assert!(c.is_finite());
-            // the same as the `Float` version rounded once to the primitive type -- but only where
-            // the result is normal, a subnormal one being rounded twice here
-            if c.is_normal() {
-                let c_float: T = round_once_to_primitive(|p| {
-                    Float::acsc_with_period_rational_prec_ref(&x, u, p).0
-                });
-                assert_eq!(NiceFloat(c_float), NiceFloat(c));
-            }
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T =
+                round_once_to_primitive(|p| Float::acsc_with_period_rational_prec_ref(&x, u, p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 }

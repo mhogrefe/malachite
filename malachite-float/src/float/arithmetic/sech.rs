@@ -67,8 +67,8 @@ fn reciprocal_hyperbolic_scaled(
         // exp(-|x|/2) is transcendental, so it is not exact
         let (a_lo, a_hi) = floor_and_ceiling(neg_half_x.exp_prec_round_ref(working_prec, Floor));
         let s = -i64::from(a_lo.get_exponent().unwrap());
-        let mut lo = (a_lo << s).square_prec_round(working_prec, Floor).0;
-        let mut hi = (a_hi << s).square_prec_round(working_prec, Ceiling).0;
+        let mut lo = (a_lo << s).square_round(Floor).0;
+        let mut hi = (a_hi << s).square_round(Ceiling).0;
         // a < 2^(-S), so a^4 < 2^(-4S)
         let four_s = u64::exact_from(s << 2);
         if working_prec + 2 < four_s {

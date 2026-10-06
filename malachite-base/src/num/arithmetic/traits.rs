@@ -1262,6 +1262,18 @@ pub trait AcschAssign {
     fn acsch_assign(&mut self);
 }
 
+/// Computes $\operatorname{acoth}(x)$, the inverse hyperbolic cotangent of a number.
+pub trait Acoth {
+    type Output;
+
+    fn acoth(self) -> Self::Output;
+}
+
+/// Replaces a number with its inverse hyperbolic cotangent, $\operatorname{acoth}(x)$.
+pub trait AcothAssign {
+    fn acoth_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

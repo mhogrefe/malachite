@@ -972,8 +972,8 @@ where
         if !x.is_nan() {
             // odd
             assert_eq!(NiceFloat(primitive_float_atan(-x)), NiceFloat(-t));
-            // the result is the correctly rounded arctangent, as computed by MPFR with 64 bits to
-            // spare, so that a subnormal result is rounded once by the conversion
+            // the result is the correctly rounded arctangent as given by the oracle and rounded
+            // once to the primitive type
             let rug_t: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(
                     &rug_atan_prec(&rug::Float::exact_from(&Float::from(x)), p).0,

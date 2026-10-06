@@ -5906,6 +5906,16 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_54() -> Generator<(Float, u64
     )
 }
 
+// All `(Float, u64, RoundingMode)` where the `Float` is finite with absolute value at least 1, that
+// are valid inputs to `Float.acoth_prec_round`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_55() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_55,
+        &random_float_unsigned_rounding_mode_triple_gen_var_55,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_55,
+    )
+}
+
 // All `(Float, u64, RoundingMode)` that are valid inputs to `Float.acos_prec_round`.
 pub fn float_unsigned_rounding_mode_triple_gen_var_42() -> Generator<(Float, u64, RoundingMode)> {
     Generator::new(
@@ -6618,6 +6628,16 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_15() -> GT3 {
         &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_15,
         &random_rational_unsigned_rounding_mode_triple_gen_var_15,
         &special_random_rational_unsigned_rounding_mode_triple_gen_var_15,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::acoth_rational_prec_round`,
+// where the `Rational` has absolute value at least 1.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_18() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_18,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_18,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_18,
     )
 }
 

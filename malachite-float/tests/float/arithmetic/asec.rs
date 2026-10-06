@@ -27,10 +27,9 @@ use malachite_float::float::arithmetic::asec::{
     primitive_float_asec_rational, primitive_float_asec_with_period,
     primitive_float_asec_with_period_rational,
 };
-use malachite_float::test_util::common::round_once_to_primitive;
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::asec::{
     rug_asec, rug_asec_prec_round, rug_asec_rational_prec_round, rug_asec_with_period_prec_round,

@@ -4034,8 +4034,8 @@ where
                 NiceFloat(-s)
             );
         }
-        // the result is the correctly rounded sine, as computed by MPFR with 64 bits to spare, so
-        // that a subnormal result is rounded once by the conversion rather than twice
+        // the result is the correctly rounded sine as given by the oracle and rounded once to the
+        // primitive type
         let rug_s: T = round_once_to_primitive(|p| {
             <Float as From<&rug::Float>>::from(&rug_sin_rational_prec(&x, p).0)
         });
@@ -12878,8 +12878,8 @@ where
                 NiceFloat(primitive_float_sin_with_period(-x, u)),
                 NiceFloat(-s)
             );
-            // the result is the correctly rounded sine, as computed by MPFR with 64 bits to spare,
-            // so that a subnormal result is rounded once by the conversion
+            // the result is the correctly rounded sine as given by the oracle and rounded once to
+            // the primitive type
             let rug_s: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(
                     &rug_sin_with_period_prec(&rug::Float::exact_from(&Float::from(x)), u, p).0,

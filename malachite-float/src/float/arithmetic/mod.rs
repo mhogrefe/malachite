@@ -21,6 +21,10 @@ pub mod acos;
 /// inverse hyperbolic cosine of [`Float`](super::Float)s.
 pub mod acosh;
 pub mod acot;
+/// Implementations of [`Acoth`](malachite_base::num::arithmetic::traits::Acoth) and
+/// [`AcothAssign`](malachite_base::num::arithmetic::traits::AcothAssign), traits for computing the
+/// inverse hyperbolic cotangent of [`Float`](super::Float)s.
+pub mod acoth;
 pub mod acsc;
 /// Implementations of [`Acsch`](malachite_base::num::arithmetic::traits::Acsch) and
 /// [`AcschAssign`](malachite_base::num::arithmetic::traits::AcschAssign), traits for computing the

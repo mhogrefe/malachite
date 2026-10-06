@@ -24,8 +24,8 @@ macro_rules! float_impls {
             /// than, equal to, or greater than the original value.
             ///
             /// The floating-point value cannot be NaN or $\infty$. A negative value, including
-            /// $-\infty$, is converted to 0 if the rounding mode is `Down`, `Ceiling`, or `Nearest`,
-            /// and the returned [`Ordering`] is `Greater`.
+            /// $-\infty$, is converted to 0 if the rounding mode is `Down`, `Ceiling`, or
+            /// `Nearest`, and the returned [`Ordering`] is `Greater`.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -35,9 +35,9 @@ macro_rules! float_impls {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `value.sci_exponent()`.
             ///
             /// # Panics
-            /// Panics if `value` is NaN or $\infty$, if `value` is negative and the rounding mode is
-            /// `Floor`, `Up`, or `Exact`, or if the rounding mode is `Exact` and `value` is not an
-            /// integer.
+            /// Panics if `value` is NaN or $\infty$, if `value` is negative and the rounding mode
+            /// is `Floor`, `Up`, or `Exact`, or if the rounding mode is `Exact` and `value` is not
+            /// an integer.
             ///
             /// # Examples
             /// See [here](super::from_primitive_float#rounding_from).

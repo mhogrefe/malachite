@@ -3844,9 +3844,8 @@ where
             assert_eq!(NiceFloat(primitive_float_coth(-x)), NiceFloat(-c));
         }
         if x.is_finite() {
-            // the result is the correctly rounded hyperbolic cotangent, as computed by MPFR with 64
-            // bits to spare, so that a subnormal result is rounded once by the conversion rather
-            // than twice
+            // the result is the correctly rounded hyperbolic cotangent as given by the oracle and
+            // rounded once to the primitive type
             let rug_c: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(
                     &rug_coth_prec(&rug::Float::exact_from(&Float::from(x)), p).0,

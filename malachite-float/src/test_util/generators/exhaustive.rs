@@ -6695,6 +6695,20 @@ pub fn asech_prec_round_valid(x: &Float, _prec: u64, rm: RoundingMode) -> bool {
     *x > 0u32 && *x <= 1u32 && (rm != Exact || *x == 1u32)
 }
 
+// Whether `(x, prec, rm)` is a valid input to `Float::acoth_prec_round` with x finite and |x| >= 1:
+// the inverse hyperbolic cotangent of such an x is transcendental except at x = ±1, where it is
+// infinite.
+pub fn acoth_prec_round_valid(x: &Float, _prec: u64, rm: RoundingMode) -> bool {
+    x.is_finite() && x.ge_abs(&1u32) && (rm != Exact || *x == 1u32 || *x == -1i32)
+}
+
+// Whether `(x, prec, rm)` is a valid input to `Float::acoth_rational_prec_round`.
+pub fn acoth_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
+    // the inverse hyperbolic cotangent of a rational is transcendental for |x| > 1, infinite at x =
+    // ±1, and NaN for |x| < 1
+    rm != Exact || x.le_abs(&1u32)
+}
+
 // Whether `(x, prec, rm)` is a valid input to `Float::acsc_rational_prec_round`.
 pub fn acsc_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
     // the arccosecant of a rational is transcendental for |x| >= 1 -- pi/2 included, unlike the
@@ -7190,6 +7204,18 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_54() -> It<(Float,
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref x, p), rm)| asech_prec_round_valid(x, p, rm)),
+    ))
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.exp_prec_round`.
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_55() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| acoth_prec_round_valid(x, p, rm)),
     ))
 }
 
@@ -8290,6 +8316,26 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_15()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref n, prec), rm)| acosh_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_18()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_rationals().map(|r| {
+                    if r >= 0u32 {
+                        r + Rational::ONE
+                    } else {
+                        r - Rational::ONE
+                    }
+                }),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| acoth_rational_prec_round_valid(n, prec, rm)),
     ))
 }
 

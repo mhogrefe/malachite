@@ -23,10 +23,9 @@ use malachite_base::test_util::generators::{
 use malachite_float::float::arithmetic::acsch::{
     primitive_float_acsch, primitive_float_acsch_rational,
 };
-use malachite_float::test_util::common::round_once_to_primitive;
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::acsch::{
     rug_acsch, rug_acsch_prec, rug_acsch_prec_round, rug_acsch_rational_prec,

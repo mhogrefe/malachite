@@ -926,8 +926,8 @@ where
         if x.is_finite() {
             // even
             assert_eq!(NiceFloat(primitive_float_sec(-x)), NiceFloat(t));
-            // the result is the correctly rounded secant, as computed by MPFR with 64 bits to
-            // spare, so that a subnormal result is rounded once by the conversion
+            // the result is the correctly rounded secant as given by the oracle and rounded once to
+            // the primitive type
             let rug_t: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(
                     &rug_sec_prec(&rug::Float::exact_from(&Float::from(x)), p).0,
@@ -3213,8 +3213,8 @@ where
             NiceFloat(primitive_float_sec_rational::<T>(&-&x)),
             NiceFloat(s)
         );
-        // the result is the correctly rounded secant, as computed by MPFR with 64 bits to spare, so
-        // that a subnormal result is rounded once by the conversion rather than twice
+        // the result is the correctly rounded secant as given by the oracle and rounded once to the
+        // primitive type
         let rug_s: T = round_once_to_primitive(|p| {
             <Float as From<&rug::Float>>::from(&rug_sec_rational_prec(&x, p).0)
         });

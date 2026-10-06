@@ -4718,8 +4718,8 @@ where
                 NiceFloat(-s)
             );
         }
-        // the result is the correctly rounded tangent, as computed by MPFR with 64 bits to spare,
-        // so that a subnormal result is rounded once by the conversion rather than twice
+        // the result is the correctly rounded tangent as given by the oracle and rounded once to
+        // the primitive type
         let rug_s: T = round_once_to_primitive(|p| {
             <Float as From<&rug::Float>>::from(&rug_tan_rational_prec(&x, p).0)
         });
@@ -7962,8 +7962,8 @@ where
                 NiceFloat(primitive_float_tan_with_period(-x, u)),
                 NiceFloat(-t)
             );
-            // the result is the correctly rounded tangent, as computed by MPFR with 64 bits to
-            // spare, so that a subnormal result is rounded once by the conversion
+            // the result is the correctly rounded tangent as given by the oracle and rounded once
+            // to the primitive type
             let rug_t: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(
                     &rug_tan_with_period_prec(&rug::Float::exact_from(&Float::from(x)), u, p).0,
@@ -8711,8 +8711,8 @@ where
         if x.is_finite() {
             // odd
             assert_eq!(NiceFloat(primitive_float_tan(-x)), NiceFloat(-t));
-            // the result is the correctly rounded tangent, as computed by MPFR with 64 bits to
-            // spare, so that a subnormal result is rounded once by the conversion
+            // the result is the correctly rounded tangent as given by the oracle and rounded once
+            // to the primitive type
             let rug_t: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(
                     &rug_tan_prec(&rug::Float::exact_from(&Float::from(x)), p).0,

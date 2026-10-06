@@ -13,18 +13,19 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::float::arithmetic::acsch::RECIPROCAL_SAFE_EXPONENT;
 use crate::float::arithmetic::asinh::round_with_error;
 use crate::float::arithmetic::cosh::same_rounding;
 use crate::float::arithmetic::round_near_x::{
     LEADING_TERM_MIN_EXPONENT, round_rational_leading_term, small_input_shortcut,
 };
-use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
+use crate::float::arithmetic::sin::{TINY_UNDERFLOW_EXPONENT, underflowed};
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, Atanh, AtanhAssign, CeilingLogBase2, IsPowerOf2, Square,
+    Abs, Atanh, AtanhAssign, CeilingLogBase2, IsPowerOf2, Ln, Ln1PlusX, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -47,20 +48,20 @@ use malachite_q::Rational;
 // each time).
 fn atanh_small(x: &Float, p: u64) -> (Float, u64) {
     // t = x * (1 + theta)
-    let mut t = Float::from_float_prec_round_ref(x, p, Nearest).0;
+    let mut t = Float::from_float_prec_ref(x, p).0;
     // exact
     let mut y = t.clone();
     // x2 = x^2 * (1 + theta)
-    let x2 = x.square_prec_round_ref(p, Nearest).0;
+    let x2 = x.square_prec_ref(p).0;
     let p_i64 = i64::exact_from(p);
     let mut i = 3u64;
     // i as a `Float`, kept at 64 bits so that every odd i stays exact
     let mut i_float = Float::from_unsigned_prec(3u32, 64).0;
     loop {
         // t = x^i * (1 + theta)^i
-        t.mul_prec_round_assign_ref(&x2, p, Nearest);
+        t *= &x2;
         // u = x^i/i * (1 + theta)^(i+1)
-        let u = t.div_prec_round_ref_ref(&i_float, p, Nearest).0;
+        let u = t.div_prec_ref_ref(&i_float, p).0;
         if u == 0u32 {
             // MPFR's extended exponent range keeps u from underflowing. Here a u that underflows to
             // zero is negligible too; this needs x^i to underflow before |u| < ulp(y), and so a
@@ -73,9 +74,9 @@ fn atanh_small(x: &Float, p: u64) -> (Float, u64) {
             break;
         }
         // error <= ulp(y)
-        y.add_prec_round_assign(u, p, Nearest);
+        y += u;
         i += 2;
-        i_float.add_prec_assign(Float::TWO, 64);
+        i_float += Float::TWO;
     }
     // See algorithms.tex: the total error is bounded by (i+7)/2 ulp(y).
     let err = (i + 8) >> 1; // ceil((i+7)/2)
@@ -126,20 +127,14 @@ fn atanh_prec_round_normal_ref(xt: &Float, prec: u64, rm: RoundingMode) -> (Floa
             let te = Float::ONE
                 .sub_prec_round_val_ref(&x, working_prec, Ceiling)
                 .0;
-            if i64::from(te.get_exponent().unwrap()) < 2 - Float::MAX_EXPONENT_I64 {
+            if i64::from(te.get_exponent().unwrap()) < RECIPROCAL_SAFE_EXPONENT {
                 fail_on_untested_path("atanh_prec_round_normal_ref, (1+x)/(1-x) may overflow");
                 // ln(1+x) - ln(1-x), halved
-                let t = x
+                let t = (x
                     .add_prec_round_ref_val(Float::ONE, working_prec, Floor)
                     .0
-                    .ln_prec_round(working_prec, Nearest)
-                    .0
-                    .sub_prec_round(
-                        te.ln_prec_round(working_prec, Nearest).0,
-                        working_prec,
-                        Nearest,
-                    )
-                    .0
+                    .ln()
+                    - te.ln())
                     >> 1u32;
                 // error estimate: see algorithms.tex
                 let err = max(4 - i64::from(t.get_exponent().unwrap()), 0) + 1;
@@ -149,12 +144,7 @@ fn atanh_prec_round_normal_ref(xt: &Float, prec: u64, rm: RoundingMode) -> (Floa
                 // (2^(1-wp) from 1 - x rounded up, 2^-wp from the division). Since ln(1+u) >=
                 // u/(1+u), that moves ln(1+u) by less than 3.02 * 2^-wp ln(1+u), about 3 ulps, and
                 // its own rounding adds 1/2 ulp: under 2^3 ulps with room for an exponent boundary.
-                let t = (&x << 1u32)
-                    .div_prec_round(te, working_prec, Nearest)
-                    .0
-                    .ln_1_plus_x_prec_round(working_prec, Nearest)
-                    .0
-                    >> 1u32;
+                let t = (&x << 1u32).div_prec(te, working_prec).0.ln_1_plus_x() >> 1u32;
                 (t, 3)
             }
         };
@@ -201,7 +191,7 @@ fn atanh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, O
     assert_ne!(rm, Exact, "Inexact atanh");
     let positive = *x > 0u32;
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
-    if exp_x < const { UNDERFLOW_EXPONENT - 1 } {
+    if exp_x < TINY_UNDERFLOW_EXPONENT {
         // |x| < 2^(MIN_EXPONENT - 3), so |atanh(x)| < |x| (1 + x^2) is below 2^(MIN_EXPONENT - 2),
         // half the smallest positive Float, and the result is zero or that Float, by the rounding
         // mode alone
@@ -992,16 +982,17 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = Float::atanh_rational_prec_round(Rational::from_unsigneds(1u8, 2), 5, Floor);
+    /// let (c, o) = Float::atanh_rational_prec_round(Rational::ONE_HALF, 5, Floor);
     /// assert_eq!(c.to_string(), "0.531");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::atanh_rational_prec_round(Rational::from_unsigneds(1u8, 2), 5, Ceiling);
+    /// let (c, o) = Float::atanh_rational_prec_round(Rational::ONE_HALF, 5, Ceiling);
     /// assert_eq!(c.to_string(), "0.562");
     /// assert_eq!(o, Greater);
     ///
@@ -1084,24 +1075,27 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = Float::atanh_rational_prec_round_ref(&Rational::from_unsigneds(1u8, 2), 5, Floor);
+    /// let (c, o) = Float::atanh_rational_prec_round_ref(&Rational::ONE_HALF, 5, Floor);
     /// assert_eq!(c.to_string(), "0.531");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::atanh_rational_prec_round_ref(&Rational::from_unsigneds(1u8, 2), 5, Ceiling);
+    /// let (c, o) = Float::atanh_rational_prec_round_ref(&Rational::ONE_HALF, 5, Ceiling);
     /// assert_eq!(c.to_string(), "0.562");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = Float::atanh_rational_prec_round_ref(&Rational::from_signeds(-1i8, 2), 20, Floor);
+    /// let (c, o) =
+    ///     Float::atanh_rational_prec_round_ref(&Rational::from_signeds(-1i8, 2), 20, Floor);
     /// assert_eq!(c.to_string(), "-0.54930687");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::atanh_rational_prec_round_ref(&Rational::from_signeds(-1i8, 2), 20, Ceiling);
+    /// let (c, o) =
+    ///     Float::atanh_rational_prec_round_ref(&Rational::from_signeds(-1i8, 2), 20, Ceiling);
     /// assert_eq!(c.to_string(), "-0.54930592");
     /// assert_eq!(o, Greater);
     /// ```
@@ -1183,16 +1177,16 @@ impl Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{One, OneHalf, Two};
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = Float::atanh_rational_prec(Rational::from_unsigneds(1u8, 2), 5);
+    /// let (c, o) = Float::atanh_rational_prec(Rational::ONE_HALF, 5);
     /// assert_eq!(c.to_string(), "0.562");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = Float::atanh_rational_prec(Rational::from_unsigneds(1u8, 2), 20);
+    /// let (c, o) = Float::atanh_rational_prec(Rational::ONE_HALF, 20);
     /// assert_eq!(c.to_string(), "0.54930592");
     /// assert_eq!(o, Less);
     ///
@@ -1200,7 +1194,7 @@ impl Float {
     /// assert_eq!(c.to_string(), "Infinity");
     /// assert_eq!(o, Equal);
     ///
-    /// let (c, o) = Float::atanh_rational_prec(Rational::from(2u32), 10);
+    /// let (c, o) = Float::atanh_rational_prec(Rational::TWO, 10);
     /// assert!(c.is_nan());
     /// assert_eq!(o, Equal);
     /// ```
@@ -1263,16 +1257,16 @@ impl Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{One, OneHalf, Two};
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = Float::atanh_rational_prec_ref(&Rational::from_unsigneds(1u8, 2), 5);
+    /// let (c, o) = Float::atanh_rational_prec_ref(&Rational::ONE_HALF, 5);
     /// assert_eq!(c.to_string(), "0.562");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = Float::atanh_rational_prec_ref(&Rational::from_unsigneds(1u8, 2), 20);
+    /// let (c, o) = Float::atanh_rational_prec_ref(&Rational::ONE_HALF, 20);
     /// assert_eq!(c.to_string(), "0.54930592");
     /// assert_eq!(o, Less);
     ///
@@ -1280,7 +1274,7 @@ impl Float {
     /// assert_eq!(c.to_string(), "Infinity");
     /// assert_eq!(o, Equal);
     ///
-    /// let (c, o) = Float::atanh_rational_prec_ref(&Rational::from(2u32), 10);
+    /// let (c, o) = Float::atanh_rational_prec_ref(&Rational::TWO, 10);
     /// assert!(c.is_nan());
     /// assert_eq!(o, Equal);
     /// ```
@@ -1344,8 +1338,16 @@ impl Atanh for Float {
     /// assert_eq!(Float::ONE.atanh().to_string(), "Infinity");
     /// assert_eq!(Float::NEGATIVE_ONE.atanh().to_string(), "-Infinity");
     /// assert!(Float::TWO.atanh().is_nan());
-    /// assert_eq!((Float::one_prec(100) >> 1u32).atanh().to_string(), "0.54930614433405484569762261846113");
-    /// assert_eq!((-(Float::from_unsigned_prec(3u32, 100).0 >> 2u32)).atanh().to_string(), "-0.97295507452765665255267637172144");
+    /// assert_eq!(
+    ///     (Float::one_prec(100) >> 1u32).atanh().to_string(),
+    ///     "0.54930614433405484569762261846113"
+    /// );
+    /// assert_eq!(
+    ///     (-(Float::from_unsigned_prec(3u32, 100).0 >> 2u32))
+    ///         .atanh()
+    ///         .to_string(),
+    ///     "-0.97295507452765665255267637172144"
+    /// );
     /// ```
     #[inline]
     fn atanh(self) -> Self {
@@ -1408,8 +1410,16 @@ impl Atanh for &Float {
     /// assert_eq!((&Float::ONE).atanh().to_string(), "Infinity");
     /// assert_eq!((&Float::NEGATIVE_ONE).atanh().to_string(), "-Infinity");
     /// assert!((&Float::TWO).atanh().is_nan());
-    /// assert_eq!((&(Float::one_prec(100) >> 1u32)).atanh().to_string(), "0.54930614433405484569762261846113");
-    /// assert_eq!((&-(Float::from_unsigned_prec(3u32, 100).0 >> 2u32)).atanh().to_string(), "-0.97295507452765665255267637172144");
+    /// assert_eq!(
+    ///     (&(Float::one_prec(100) >> 1u32)).atanh().to_string(),
+    ///     "0.54930614433405484569762261846113"
+    /// );
+    /// assert_eq!(
+    ///     (&-(Float::from_unsigned_prec(3u32, 100).0 >> 2u32))
+    ///         .atanh()
+    ///         .to_string(),
+    ///     "-0.97295507452765665255267637172144"
+    /// );
     /// ```
     #[inline]
     fn atanh(self) -> Float {
@@ -1539,11 +1549,23 @@ impl AtanhAssign for Float {
 /// assert!(primitive_float_atanh(f32::NEGATIVE_INFINITY).is_nan());
 /// assert_eq!(NiceFloat(primitive_float_atanh(0.0f32)), NiceFloat(0.0));
 /// assert_eq!(NiceFloat(primitive_float_atanh(-0.0f32)), NiceFloat(-0.0));
-/// assert_eq!(NiceFloat(primitive_float_atanh(1.0f32)), NiceFloat(f32::INFINITY));
+/// assert_eq!(
+///     NiceFloat(primitive_float_atanh(1.0f32)),
+///     NiceFloat(f32::INFINITY)
+/// );
 /// assert!(primitive_float_atanh(2.0f32).is_nan());
-/// assert_eq!(NiceFloat(primitive_float_atanh(0.5f32)), NiceFloat(0.54930615));
-/// assert_eq!(NiceFloat(primitive_float_atanh(0.5f64)), NiceFloat(0.5493061443340549));
-/// assert_eq!(NiceFloat(primitive_float_atanh(-0.75f64)), NiceFloat(-0.9729550745276566));
+/// assert_eq!(
+///     NiceFloat(primitive_float_atanh(0.5f32)),
+///     NiceFloat(0.54930615)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atanh(0.5f64)),
+///     NiceFloat(0.5493061443340549)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atanh(-0.75f64)),
+///     NiceFloat(-0.9729550745276566)
+/// );
 /// ```
 #[inline]
 #[allow(clippy::type_repetition_in_bounds)]
@@ -1584,7 +1606,7 @@ where
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::basic::traits::{One, Zero};
+/// use malachite_base::num::basic::traits::{One, OneHalf, Two, Zero};
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_float::float::arithmetic::atanh::primitive_float_atanh_rational;
 /// use malachite_q::Rational;
@@ -1597,11 +1619,9 @@ where
 ///     NiceFloat(primitive_float_atanh_rational::<f64>(&Rational::ONE)),
 ///     NiceFloat(f64::INFINITY)
 /// );
-/// assert!(primitive_float_atanh_rational::<f64>(&Rational::from(2u32)).is_nan());
+/// assert!(primitive_float_atanh_rational::<f64>(&Rational::TWO).is_nan());
 /// assert_eq!(
-///     NiceFloat(primitive_float_atanh_rational::<f64>(
-///         &Rational::from_unsigneds(1u8, 2)
-///     )),
+///     NiceFloat(primitive_float_atanh_rational::<f64>(&Rational::ONE_HALF)),
 ///     NiceFloat(0.5493061443340549)
 /// );
 /// assert_eq!(

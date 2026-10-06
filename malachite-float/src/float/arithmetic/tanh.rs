@@ -86,8 +86,8 @@ fn tanh_via_exp_x_minus_1(
     let mut increment = Limb::WIDTH;
     loop {
         let e = (-(x_abs << 1u32)).exp_x_minus_1_prec(working_prec).0;
-        let denominator = e.add_prec_ref_val(Float::TWO, working_prec).0;
-        let t = (-e).div_prec(denominator, working_prec).0;
+        let denominator = &e + Float::TWO;
+        let t = -e / denominator;
         if float_can_round(t.significand_ref().unwrap(), working_prec - 3, prec, rm) {
             return Float::from_float_prec_round(if positive { t } else { -t }, prec, rm);
         }
@@ -131,10 +131,8 @@ fn tanh_prec_round_normal_ref(xt: &Float, prec: u64, rm: RoundingMode) -> (Float
             return tanh_near_one(&x, positive, prec, rm);
         }
         let exp_exp_2x = i64::from(exp_2x.get_exponent().unwrap());
-        let denominator = exp_2x
-            .add_prec_round_ref_val(Float::ONE, working_prec, Floor)
-            .0;
-        exp_2x.sub_prec_round_assign(Float::ONE, working_prec, Ceiling);
+        let denominator = exp_2x.add_round_ref_val(Float::ONE, Floor).0;
+        exp_2x.sub_round_assign(Float::ONE, Ceiling);
         // The subtraction cancels k = EXP(exp(2x)) - EXP(exp(2x) - 1) bits.
         let k = exp_exp_2x - i64::from(exp_2x.get_exponent().unwrap());
         let quotient = exp_2x / denominator;

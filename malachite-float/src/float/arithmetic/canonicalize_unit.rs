@@ -27,7 +27,7 @@ impl CanonicalizeUnit for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CanonicalizeUnit;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero};
+    /// use malachite_base::num::basic::traits::{NaN, NegativeInfinity, NegativeZero};
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::from(-1.5).canonicalize_unit().to_string(), "1.0");
@@ -61,7 +61,7 @@ impl CanonicalizeUnit for &Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CanonicalizeUnit;
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero};
+    /// use malachite_base::num::basic::traits::{NaN, NegativeInfinity, NegativeZero};
     /// use malachite_float::Float;
     ///
     /// assert_eq!((&Float::from(-1.5)).canonicalize_unit().to_string(), "1.0");

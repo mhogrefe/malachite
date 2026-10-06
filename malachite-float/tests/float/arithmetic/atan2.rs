@@ -28,10 +28,9 @@ use malachite_float::float::arithmetic::atan2::{
     primitive_float_atan2_rational, primitive_float_atan2_with_period,
     primitive_float_atan2_with_period_rational,
 };
-use malachite_float::test_util::common::round_once_to_primitive;
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::atan2::{
     rug_atan2, rug_atan2_prec_round, rug_atan2_with_period_prec_round,

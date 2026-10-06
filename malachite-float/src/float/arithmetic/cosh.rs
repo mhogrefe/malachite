@@ -22,7 +22,7 @@ use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, AddMul, CeilingLogBase2, Cosh, CoshAssign, Reciprocal, Square,
+    Abs, AddMul, CeilingLogBase2, Cosh, CoshAssign, Reciprocal, ShrRound, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -61,7 +61,7 @@ fn half_exp_near_overflow(x: &Float, working_prec: u64) -> Option<Float> {
         // and so are cosh(x) and sinh(x), which differ from it by less than 1.
         return None;
     }
-    let h = (&u >> 1u32).mul_prec_round(u, working_prec, Floor).0; // <= exp(x) / 2
+    let h = (&u >> 1u32).mul_round(u, Floor).0; // <= exp(x) / 2
     if is_max_finite(&h) {
         // exp(x) / 2 >= the largest finite Float at precision `working_prec`, which exceeds the
         // midpoint between the largest finite Float at any lower precision and 2^MAX_EXPONENT by
@@ -106,13 +106,9 @@ pub(crate) fn hyperbolic_approx(x: &Float, working_prec: u64) -> Option<Hyperbol
     let (h, near_overflow) = half_exp(x, working_prec)?;
     // exp(-x) / 2 = 1 / (4 h), rounded up. This may underflow, in which case it rounds up to the
     // smallest positive Float, still an upper bound.
-    let exp_neg_x_half = h
-        .reciprocal_round_ref(Ceiling)
-        .0
-        .shr_prec_round(2u32, working_prec, Ceiling)
-        .0;
+    let exp_neg_x_half = h.reciprocal_round_ref(Ceiling).0.shr_round(2u32, Ceiling).0;
     let exp_h = i64::from(h.get_exponent().unwrap());
-    let sinh = h.sub_prec_ref_ref(&exp_neg_x_half, working_prec).0;
+    let sinh = &h - &exp_neg_x_half;
     // h is not the largest finite Float, so adding a value this small rounds up to at most it.
     let cosh = h.add_round(exp_neg_x_half, Ceiling).0;
     // The difference is not zero: that would need exp(x) to round down to exactly 1, so x < 2^(1 -

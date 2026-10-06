@@ -3114,8 +3114,8 @@ where
                 NiceFloat(-c)
             );
         }
-        // the result is the correctly rounded hyperbolic tangent, as computed by MPFR with 64 bits
-        // to spare, so that a subnormal result is rounded once by the conversion rather than twice
+        // the result is the correctly rounded hyperbolic tangent as given by the oracle and rounded
+        // once to the primitive type
         let rug_c: T = round_once_to_primitive(|p| {
             <Float as From<&rug::Float>>::from(&rug_tanh_rational_prec(&x, p).0)
         });

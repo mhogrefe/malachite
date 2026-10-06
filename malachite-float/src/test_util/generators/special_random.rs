@@ -29,19 +29,20 @@ use crate::test_util::generators::exhaustive::{
     acos_with_period_round_valid, acosh_rational_prec_round_valid, acot_prec_round_valid,
     acot_rational_prec_round_valid, acot_round_valid, acot_with_period_prec_round_valid,
     acot_with_period_rational_prec_round_valid, acot_with_period_round_valid,
-    acsc_prec_round_valid, acsc_rational_prec_round_valid, acsc_round_valid,
-    acsc_with_period_prec_round_valid, acsc_with_period_rational_prec_round_valid,
-    acsc_with_period_round_valid, add_mul_prec_round_valid, add_mul_rational_prec_round_valid,
-    add_mul_rational_round_valid, add_mul_round_valid, add_prec_round_valid,
-    add_rational_prec_round_valid, add_rational_round_valid, add_round_valid, agm_prec_round_valid,
-    agm_rational_prec_round_valid, agm_round_valid, asec_prec_round_valid,
-    asec_rational_prec_round_valid, asec_round_valid, asec_with_period_prec_round_valid,
-    asec_with_period_rational_prec_round_valid, asec_with_period_round_valid,
-    asech_prec_round_valid, asech_rational_prec_round_valid, asin_with_period_prec_round_valid,
-    asin_with_period_rational_prec_round_valid, asin_with_period_round_valid,
-    atan_with_period_prec_round_valid, atan_with_period_rational_prec_round_valid,
-    atan_with_period_round_valid, atan2_rational_prec_round_valid, atanh_rational_prec_round_valid,
-    average_prec_round_valid, cbrt_prec_round_valid, cbrt_round_valid, compound_prec_round_valid,
+    acoth_prec_round_valid, acoth_rational_prec_round_valid, acsc_prec_round_valid,
+    acsc_rational_prec_round_valid, acsc_round_valid, acsc_with_period_prec_round_valid,
+    acsc_with_period_rational_prec_round_valid, acsc_with_period_round_valid,
+    add_mul_prec_round_valid, add_mul_rational_prec_round_valid, add_mul_rational_round_valid,
+    add_mul_round_valid, add_prec_round_valid, add_rational_prec_round_valid,
+    add_rational_round_valid, add_round_valid, agm_prec_round_valid, agm_rational_prec_round_valid,
+    agm_round_valid, asec_prec_round_valid, asec_rational_prec_round_valid, asec_round_valid,
+    asec_with_period_prec_round_valid, asec_with_period_rational_prec_round_valid,
+    asec_with_period_round_valid, asech_prec_round_valid, asech_rational_prec_round_valid,
+    asin_with_period_prec_round_valid, asin_with_period_rational_prec_round_valid,
+    asin_with_period_round_valid, atan_with_period_prec_round_valid,
+    atan_with_period_rational_prec_round_valid, atan_with_period_round_valid,
+    atan2_rational_prec_round_valid, atanh_rational_prec_round_valid, average_prec_round_valid,
+    cbrt_prec_round_valid, cbrt_round_valid, compound_prec_round_valid,
     cos_with_period_prec_round_valid, cos_with_period_rational_prec_round_valid,
     cos_with_period_round_valid, div_prec_round_valid, div_rational_prec_round_valid,
     div_rational_round_valid, div_round_valid, dot_prec_round_valid, dot_round_valid,
@@ -12535,6 +12536,38 @@ pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_54(
     )
 }
 
+pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_55(
+    config: &GenConfig,
+) -> It<(Float, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, p, rm)| acoth_prec_round_valid(x, p, rm)),
+    )
+}
+
 pub fn special_random_float_unsigned_rounding_mode_triple_gen_var_42(
     config: &GenConfig,
 ) -> It<(Float, u64, RoundingMode)> {
@@ -14424,6 +14457,41 @@ pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_15(
             &random_rounding_modes,
         )
         .filter(|&(ref n, prec, rm)| acosh_rational_prec_round_valid(n, prec, rm)),
+    )
+}
+
+pub fn special_random_rational_unsigned_rounding_mode_triple_gen_var_18(
+    config: &GenConfig,
+) -> It<(Rational, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+                .map(|r| {
+                    if r >= 0u32 {
+                        r + Rational::ONE
+                    } else {
+                        r - Rational::ONE
+                    }
+                })
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, prec, rm)| acoth_rational_prec_round_valid(n, prec, rm)),
     )
 }
 

@@ -23,7 +23,7 @@ use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{Abs, Asinh, AsinhAssign, CeilingLogBase2};
+use malachite_base::num::arithmetic::traits::{Abs, Asinh, AsinhAssign, CeilingLogBase2, Ln, Sqrt};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait};
@@ -44,21 +44,14 @@ const LN_2_SHORTCUT_MAX_PREC: u64 = (1 << 30) + 28;
 // overflow.
 pub(crate) fn asinh_abs_general(x_abs: &Float, wp: u64) -> Float {
     x_abs
-        // x^2
         .square_prec_round_ref(wp, Floor)
         .0
-        // x^2 + 1
-        .add_prec_round(Float::ONE, wp, Floor)
+        .add_round(Float::ONE, Floor)
         .0
-        // sqrt(x^2 + 1)
-        .sqrt_prec_round(wp, Nearest)
+        .sqrt()
+        .add_prec_val_ref(x_abs, wp)
         .0
-        // sqrt(x^2 + 1) + |x|
-        .add_prec_round_val_ref(x_abs, wp, Nearest)
-        .0
-        // ln(sqrt(x^2 + 1) + |x|)
-        .ln_prec_round(wp, Nearest)
-        .0
+        .ln()
 }
 
 // ln(x) + ln(1 + sqrt(1 + (1/x)^2)) if `plus`, which is asinh(x), or ln(x) + ln(1 + sqrt(1 -
@@ -68,7 +61,7 @@ pub(crate) fn asinh_abs_general(x_abs: &Float, wp: u64) -> Float {
 // half an ulp each from ln(x), ln 2, the addition, and the replacement of the second logarithm by
 // ln 2, so below 2 ulps of the result.
 pub(crate) fn ln_of_large_sum(x: &Float, wp: u64, plus: bool) -> Float {
-    let ln_x = x.ln_prec_round_ref(wp, Nearest).0;
+    let ln_x = x.ln_prec_ref(wp).0;
     let correction = if wp <= LN_2_SHORTCUT_MAX_PREC {
         // ln 2 is needed only to the result's ulp, and the result has the exponent of ln(x) or one
         // more, so wp - EXP(ln(x)) bits suffice, as in MPFR's overflow branch
@@ -79,23 +72,16 @@ pub(crate) fn ln_of_large_sum(x: &Float, wp: u64, plus: bool) -> Float {
         let reciprocal_squared = x
             .reciprocal_prec_round_ref(wp, Floor)
             .0
-            .square_prec_round(wp, Floor)
+            .square_round(Floor)
             .0;
-        let one = Float::ONE;
         let inner = if plus {
-            one.add_prec_round(reciprocal_squared, wp, Floor).0
+            Float::ONE.add_round(reciprocal_squared, Floor).0
         } else {
-            one.sub_prec_round(reciprocal_squared, wp, Floor).0
+            Float::ONE.sub_round(reciprocal_squared, Floor).0
         };
-        inner
-            .sqrt_prec_round(wp, Nearest)
-            .0
-            .add_prec_round(Float::ONE, wp, Nearest)
-            .0
-            .ln_prec_round(wp, Nearest)
-            .0
+        (inner.sqrt() + Float::ONE).ln()
     };
-    ln_x.add_prec_round(correction, wp, Nearest).0
+    ln_x + correction
 }
 
 // Whether x^2 can overflow: x < 2^EXP(x), so x^2 < 2^(2 EXP(x)), which is in range as long as
@@ -1419,7 +1405,9 @@ impl Asinh for &Float {
     /// assert_eq!(Float::ZERO.asinh().to_string(), "0.0");
     /// assert_eq!(Float::NEGATIVE_ZERO.asinh().to_string(), "-0.0");
     /// assert_eq!(
-    ///     (&Float::from_unsigned_prec(1u32, 100).0).asinh().to_string(),
+    ///     (&Float::from_unsigned_prec(1u32, 100).0)
+    ///         .asinh()
+    ///         .to_string(),
     ///     "0.88137358701954302523260932497968"
     /// );
     /// assert_eq!(

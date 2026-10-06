@@ -1278,8 +1278,8 @@ where
         );
         if x > T::ZERO && x <= T::ONE {
             assert!(c >= T::ZERO);
-            // the result is the correctly rounded inverse hyperbolic secant, as given by the oracle
-            // with 64 bits to spare
+            // the result is the correctly rounded inverse hyperbolic secant as given by the oracle
+            // and rounded once to the primitive type
             let rug_c: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(
                     &rug_asech_prec(&rug::Float::exact_from(&Float::from(x)), p).0,

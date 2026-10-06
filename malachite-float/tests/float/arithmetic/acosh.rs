@@ -3800,8 +3800,8 @@ fn acosh_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: Round
 
     // acosh(x) < ln(2x) for x >= 1
     if x >= 1u32 && rm != Exact {
-        let (l, _) = Float::ln_rational_prec_round(x.clone() << 1u32, prec, Ceiling);
-        let (c_floor, _) = Float::acosh_rational_prec_round_ref(&x, prec, Floor);
+        let l = Float::ln_rational_prec_round(x.clone() << 1u32, prec, Ceiling).0;
+        let c_floor = Float::acosh_rational_prec_round_ref(&x, prec, Floor).0;
         assert!(c_floor <= l);
     }
 
@@ -3976,9 +3976,8 @@ where
         // the inverse hyperbolic cosine of a rational is NaN exactly when the rational is below 1
         assert_eq!(c.is_nan(), x < 1u32);
         if x >= 1u32 {
-            // the result is the correctly rounded inverse hyperbolic cosine, as computed by MPFR
-            // with 64 bits to spare, so that a subnormal result is rounded once by the conversion
-            // rather than twice
+            // the result is the correctly rounded inverse hyperbolic cosine as given by the oracle
+            // and rounded once to the primitive type
             let rug_c: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(&rug_acosh_rational_prec(&x, p).0)
             });

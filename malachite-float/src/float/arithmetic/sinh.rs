@@ -18,7 +18,7 @@ use crate::float::arithmetic::cosh::{
     hyperbolic_approx, hyperbolic_can_round, monotone_rational_via_floats,
 };
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
-use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
+use crate::float::arithmetic::sin::{TINY_UNDERFLOW_EXPONENT, underflowed};
 use crate::float::conversion::string::set_str::overflow;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal};
@@ -137,7 +137,7 @@ pub(crate) fn sinh_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
     assert_ne!(rm, Exact, "Inexact sinh");
     let positive = *x > 0u32;
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
-    if exp_x < const { UNDERFLOW_EXPONENT - 1 } {
+    if exp_x < TINY_UNDERFLOW_EXPONENT {
         // |x| < 2^(MIN_EXPONENT - 3), so |sinh(x)| < |x| (1 + x^2) is below 2^(MIN_EXPONENT - 2),
         // half the smallest positive Float, and the result is zero or that Float, by the rounding
         // mode alone, with no 2^30-bit arithmetic needed.

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
-use crate::test_util::common::rug_float_significant_bits;
+use crate::test_util::common::{EXPONENT_GATE, rug_float_significant_bits};
 use crate::test_util::float::arithmetic::asinh::rug_asinh_rational_prec_round;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{Reciprocal, Sign};
@@ -16,13 +16,9 @@ use malachite_q::Rational;
 use rug::float::{Round, Special};
 use rug::ops::AssignRound;
 
-// Beyond this input exponent magnitude the `Rational` asinh oracle's extra input bits, twice the
-// exponent of 1/x, would be impractical.
-const MODERATE_EXPONENT: i32 = 1 << 16;
-
 // MPFR has no acsch, so this oracle uses MPFR in three ways, on |x| (acsch being odd):
-// - For a moderate exponent it evaluates asinh(1/x), the reciprocal of x being an exact `Rational`
-//   (see `rug_asinh_rational_prec_round` for the extra input bits).
+// - For an exponent within `EXPONENT_GATE` it evaluates asinh(1/x), the reciprocal of x being an
+//   exact `Rational` (see `rug_asinh_rational_prec_round` for the extra input bits).
 // - For a tiny x, where 1/x can overflow MPFR's exponent range, it evaluates ln(1 + sqrt(1 + x^2))
 //   - ln|x|, a sum of two positive terms, with 128 extra bits before the final rounding.
 // - For a huge x it evaluates asinh(1/x) with 1/x rounded to 128 bits more than both the target
@@ -49,7 +45,7 @@ pub fn rug_acsch_prec_round(x: &rug::Float, prec: u64, rm: Round) -> (rug::Float
         return (rug::Float::with_val(p, infinity), Equal);
     }
     let exp_x = x.get_exp().unwrap();
-    if (-MODERATE_EXPONENT..=MODERATE_EXPONENT).contains(&exp_x) {
+    if i64::from(exp_x).abs() <= EXPONENT_GATE {
         return rug_asinh_rational_prec_round(
             &Rational::exact_from(&Float::from(x)).reciprocal(),
             prec,

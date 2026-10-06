@@ -21,7 +21,9 @@ use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{Acosh, AcoshAssign, CeilingLogBase2, Square};
+use malachite_base::num::arithmetic::traits::{
+    Acosh, AcoshAssign, CeilingLogBase2, Ln, Sqrt, Square,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
@@ -56,25 +58,16 @@ fn acosh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float
             let sq = x.square_prec_round_ref(working_prec, Floor).0;
             let exp_te = i64::from(sq.get_exponent().unwrap());
             // x^2 - 1
-            let t = sq.sub_prec_round(Float::ONE, working_prec, Floor).0;
+            let t = sq.sub_round(Float::ONE, Floor).0;
             if t == 0u32 {
                 // This means that x is very close to 1: x = 1 + t with t < 2^(-working_prec). We
                 // have acosh(x) = sqrt(2t) (1 - eps(t)) with 0 < eps(t) < t / 12.
                 let t = x.sub_prec_round_ref_val(Float::ONE, working_prec, Floor).0;
                 // sqrt(2t)
-                ((t << 1u32).sqrt_prec_round(working_prec, Nearest).0, 1)
+                ((t << 1u32).sqrt(), 1)
             } else {
                 let d = exp_te - i64::from(t.get_exponent().unwrap());
-                let t = t
-                    // sqrt(x^2 - 1)
-                    .sqrt_prec_round(working_prec, Nearest)
-                    .0
-                    // sqrt(x^2 - 1) + x
-                    .add_prec_round_val_ref(x, working_prec, Nearest)
-                    .0
-                    // ln(sqrt(x^2 - 1) + x)
-                    .ln_prec_round(working_prec, Nearest)
-                    .0;
+                let t = t.sqrt().add_prec_val_ref(x, working_prec).0.ln();
                 // error estimate: see algorithms.tex. The error is bounded by 1/2 + 2^err <=
                 // 2^max(0, 1 + err).
                 let err = 3 + max(1, d) - i64::from(t.get_exponent().unwrap());
@@ -96,7 +89,7 @@ fn acosh_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float
 // are square roots of `Rational`s, so they are rounded directly, underflow included.
 fn acosh_rational_near_one(t: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
     let two_t = t << 1u32;
-    let lower = &two_t - t.square() / Rational::from(3u32);
+    let lower = &two_t - t.square() / const { Rational::const_from_unsigned(3) };
     let (y, o) = Float::sqrt_rational_prec_round(two_t, prec, rm);
     let hi = if o == Equal {
         // sqrt(2t) = y is exactly representable, and acosh(1 + t) lies just below it, so it rounds
@@ -899,7 +892,8 @@ impl Float {
     /// assert_eq!(c.to_string(), "0.96242332");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::acosh_rational_prec_round(Rational::from_unsigneds(3u8, 2), 20, Ceiling);
+    /// let (c, o) =
+    ///     Float::acosh_rational_prec_round(Rational::from_unsigneds(3u8, 2), 20, Ceiling);
     /// assert_eq!(c.to_string(), "0.96242428");
     /// assert_eq!(o, Greater);
     /// ```
@@ -971,19 +965,23 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 5, Floor);
+    /// let (c, o) =
+    ///     Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 5, Floor);
     /// assert_eq!(c.to_string(), "0.938");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 5, Ceiling);
+    /// let (c, o) =
+    ///     Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 5, Ceiling);
     /// assert_eq!(c.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 20, Floor);
+    /// let (c, o) =
+    ///     Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 20, Floor);
     /// assert_eq!(c.to_string(), "0.96242332");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 20, Ceiling);
+    /// let (c, o) =
+    ///     Float::acosh_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 2), 20, Ceiling);
     /// assert_eq!(c.to_string(), "0.96242428");
     /// assert_eq!(o, Greater);
     /// ```
@@ -1049,7 +1047,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{One, OneHalf};
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -1066,7 +1064,7 @@ impl Float {
     /// assert_eq!(c.to_string(), "0.0");
     /// assert_eq!(o, Equal);
     ///
-    /// let (c, o) = Float::acosh_rational_prec(Rational::from_unsigneds(1u8, 2), 10);
+    /// let (c, o) = Float::acosh_rational_prec(Rational::ONE_HALF, 10);
     /// assert!(c.is_nan());
     /// assert_eq!(o, Equal);
     /// ```
@@ -1124,7 +1122,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{One, OneHalf};
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -1141,7 +1139,7 @@ impl Float {
     /// assert_eq!(c.to_string(), "0.0");
     /// assert_eq!(o, Equal);
     ///
-    /// let (c, o) = Float::acosh_rational_prec_ref(&Rational::from_unsigneds(1u8, 2), 10);
+    /// let (c, o) = Float::acosh_rational_prec_ref(&Rational::ONE_HALF, 10);
     /// assert!(c.is_nan());
     /// assert_eq!(o, Equal);
     /// ```
@@ -1274,7 +1272,9 @@ impl Acosh for &Float {
     /// assert!(Float::NEGATIVE_ZERO.acosh().is_nan());
     /// assert_eq!(Float::ONE.acosh().to_string(), "0.0");
     /// assert_eq!(
-    ///     (&Float::from_unsigned_prec(2u32, 100).0).acosh().to_string(),
+    ///     (&Float::from_unsigned_prec(2u32, 100).0)
+    ///         .acosh()
+    ///         .to_string(),
     ///     "1.3169578969248167086250463473073"
     /// );
     /// assert_eq!(
@@ -1454,12 +1454,12 @@ where
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::basic::traits::One;
+/// use malachite_base::num::basic::traits::{One, OneHalf};
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_float::float::arithmetic::acosh::primitive_float_acosh_rational;
 /// use malachite_q::Rational;
 ///
-/// assert!(primitive_float_acosh_rational::<f64>(&Rational::from_unsigneds(1u8, 2)).is_nan());
+/// assert!(primitive_float_acosh_rational::<f64>(&Rational::ONE_HALF).is_nan());
 /// assert_eq!(
 ///     NiceFloat(primitive_float_acosh_rational::<f64>(&Rational::ONE)),
 ///     NiceFloat(0.0)

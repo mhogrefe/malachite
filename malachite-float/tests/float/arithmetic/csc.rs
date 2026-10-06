@@ -919,8 +919,8 @@ where
         if x.is_finite() {
             // odd
             assert_eq!(NiceFloat(primitive_float_csc(-x)), NiceFloat(-t));
-            // the result is the correctly rounded cosecant, as computed by MPFR with 64 bits to
-            // spare, so that a subnormal result is rounded once by the conversion
+            // the result is the correctly rounded cosecant as given by the oracle and rounded once
+            // to the primitive type
             let rug_t: T = round_once_to_primitive(|p| {
                 <Float as From<&rug::Float>>::from(
                     &rug_csc_prec(&rug::Float::exact_from(&Float::from(x)), p).0,

@@ -27,10 +27,9 @@ use malachite_float::float::arithmetic::acot::{
     primitive_float_acot_rational, primitive_float_acot_with_period,
     primitive_float_acot_with_period_rational,
 };
-use malachite_float::test_util::common::round_once_to_primitive;
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::acot::{
     rug_acot, rug_acot_prec_round, rug_acot_rational_prec_round, rug_acot_with_period_prec_round,
@@ -1080,12 +1079,9 @@ where
         if !c.is_nan() {
             // the result lies in [-pi/2, pi/2], so it never overflows
             assert!(c.is_finite());
-            // the same as the `Float` version rounded once to the primitive type -- but only where
-            // the result is normal, a subnormal one being rounded twice here
-            if c.is_normal() {
-                let c_float: T = round_once_to_primitive(|p| Float::acot_prec(Float::from(x), p).0);
-                assert_eq!(NiceFloat(c_float), NiceFloat(c));
-            }
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T = round_once_to_primitive(|p| Float::acot_prec(Float::from(x), p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 }
@@ -1107,14 +1103,9 @@ where
         assert!(!c.is_nan());
         if !c.is_nan() {
             assert!(c.is_finite());
-            // the same as the `Float` version rounded once to the primitive type -- but only where
-            // the result is normal, a subnormal one being rounded twice here and once by
-            // `emulate_rational_to_float_fn`
-            if c.is_normal() {
-                let c_float: T =
-                    round_once_to_primitive(|p| Float::acot_rational_prec_ref(&x, p).0);
-                assert_eq!(NiceFloat(c_float), NiceFloat(c));
-            }
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T = round_once_to_primitive(|p| Float::acot_rational_prec_ref(&x, p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 }
@@ -2103,14 +2094,10 @@ where
         if !c.is_nan() {
             // the result lies in [-u/4, u/4], so it never overflows
             assert!(c.is_finite());
-            // the same as the `Float` version rounded once to the primitive type -- but only where
-            // the result is normal, a subnormal one being rounded twice here
-            if c.is_normal() {
-                let c_float: T = round_once_to_primitive(|p| {
-                    Float::acot_with_period_prec(Float::from(x), u, p).0
-                });
-                assert_eq!(NiceFloat(c_float), NiceFloat(c));
-            }
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T =
+                round_once_to_primitive(|p| Float::acot_with_period_prec(Float::from(x), u, p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 }
@@ -2614,13 +2601,10 @@ where
         assert!(!c.is_nan());
         // the result lies in [-u/4, u/4], so it never overflows
         assert!(c.is_finite());
-        // the same as the `Float` version rounded once to the primitive type -- but only where the
-        // result is normal, a subnormal one being rounded twice here
-        if c.is_normal() {
-            let c_float: T =
-                round_once_to_primitive(|p| Float::acot_with_period_rational_prec_ref(&x, u, p).0);
-            assert_eq!(NiceFloat(c_float), NiceFloat(c));
-        }
+        // the same as the `Float` version rounded once to the primitive type
+        let c_float: T =
+            round_once_to_primitive(|p| Float::acot_with_period_rational_prec_ref(&x, u, p).0);
+        assert_eq!(NiceFloat(c_float), NiceFloat(c));
     });
 }
 
