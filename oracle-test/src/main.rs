@@ -1398,6 +1398,74 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_sub_rational",
     ),
     ("demo_rational_sub_float_debug", "az_float_sub_rational"),
+    ("demo_float_mul_rational_debug", "az_float_mul_rational"),
+    (
+        "demo_float_mul_rational_extreme_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_extreme_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_round_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_round_debug",
+        "az_float_mul_rational",
+    ),
+    ("demo_rational_mul_float_debug", "az_float_mul_rational"),
+    (
+        "demo_rational_mul_float_extreme_debug",
+        "az_float_mul_rational",
+    ),
+    ("demo_float_div_rational_debug", "az_float_div_rational"),
+    (
+        "demo_float_div_rational_extreme_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_extreme_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_round_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_round_debug",
+        "az_float_div_rational",
+    ),
+    ("demo_rational_div_float_debug", "az_float_div_rational"),
+    (
+        "demo_rational_div_float_extreme_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_rational_div_float_prec_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_rational_div_float_prec_extreme_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_rational_div_float_round_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_rational_div_float_prec_round_debug",
+        "az_float_div_rational",
+    ),
     ("demo_float_mul_debug", "az_float_mul"),
     ("demo_float_mul_extreme_debug", "az_float_mul"),
     ("demo_float_mul_prec_debug", "az_float_mul"),
@@ -1593,8 +1661,9 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
 ];
 
-// Float demos whose extreme inputs make each line slow to compute (about a tenth of a second per
-// line in a debug build, on the widest float-rational exponent gaps), checked on fewer lines.
+// Float demos whose extreme inputs make each line slow on Malachite's side (about a tenth of a
+// second per line for the sums and differences, a fiftieth for the `_round` products and
+// quotients), checked on fewer lines.
 const AZURITE_FLOAT_SLOW_LIMIT: usize = 300;
 
 const AZURITE_FLOAT_STAGES_SLOW: &[(&str, &str)] = &[
@@ -1637,6 +1706,30 @@ const AZURITE_FLOAT_STAGES_SLOW: &[(&str, &str)] = &[
     (
         "demo_rational_sub_float_extreme_debug",
         "az_float_sub_rational",
+    ),
+    (
+        "demo_float_mul_rational_round_extreme_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_round_extreme_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_div_rational_round_extreme_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_round_extreme_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_rational_div_float_round_extreme_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_rational_div_float_prec_round_extreme_debug",
+        "az_float_div_rational",
     ),
 ];
 

@@ -2169,7 +2169,7 @@ fn demo_rational_div_float_round_ref_val(gm: GenMode, config: &GenConfig, limit:
     {
         let y_old = y.clone();
         println!(
-            "rational_div_float_round_ref_val(&{}, &{}, {}) = {:?}",
+            "rational_div_float_round_ref_val(&{}, {}, {}) = {:?}",
             x,
             y_old,
             rm,
@@ -2509,7 +2509,7 @@ fn demo_rational_div_float_prec_round_debug(gm: GenMode, config: &GenConfig, lim
         let y_old = y.clone();
         let (sum, o) = Float::rational_div_float_prec_round(x, y, prec, rm);
         println!(
-            "rational_div_float_rational_prec_round({}, {:#x}, {}, {}) = ({:#x}, {:?})",
+            "rational_div_float_prec_round({}, {:#x}, {}, {}) = ({:#x}, {:?})",
             x_old,
             ComparableFloat(y_old),
             prec,
@@ -2547,7 +2547,7 @@ fn demo_rational_div_float_prec_round_extreme_debug(gm: GenMode, config: &GenCon
         let y_old = y.clone();
         let (sum, o) = Float::rational_div_float_prec_round(y, x, prec, rm);
         println!(
-            "rational_div_float_prec_round({}, ({:#x}), {}, {}) = ({:#x}, {:?})",
+            "rational_div_float_prec_round({}, {:#x}, {}, {}) = ({:#x}, {:?})",
             y_old,
             ComparableFloat(x_old),
             prec,
