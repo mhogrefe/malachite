@@ -248,9 +248,22 @@ fn check_demo_against_azurite_in_modes(
     azurite_mode: &str,
     modes: &[&str],
 ) {
+    check_demo_against_azurite_with_limit(oracle, crate_dir, demo_name, azurite_mode, modes, LIMIT);
+}
+
+// Like `check_demo_against_azurite_in_modes`, but with a line limit other than `LIMIT`, for demos
+// whose lines are slow to compute.
+fn check_demo_against_azurite_with_limit(
+    oracle: &Path,
+    crate_dir: &str,
+    demo_name: &str,
+    azurite_mode: &str,
+    modes: &[&str],
+    limit: usize,
+) {
     for mode in modes {
         println!("testing {demo_name} in mode {mode} against Azurite");
-        run_demo(crate_dir, demo_name, mode);
+        run_demo_with_limit(crate_dir, demo_name, mode, limit);
         run_azurite_oracle(oracle, azurite_mode, TEST_OUT);
     }
 }
@@ -398,14 +411,32 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_try_from_float_f32", "az_nat_from_f32"),
     ("demo_natural_exact_from_float_f32", "az_nat_from_f32"),
     ("demo_natural_convertible_from_float_f32", "az_nat_from_f32"),
-    ("demo_natural_sci_mantissa_and_exponent_f32", "az_nat_sci_f32"),
+    (
+        "demo_natural_sci_mantissa_and_exponent_f32",
+        "az_nat_sci_f32",
+    ),
     ("demo_natural_sci_mantissa_f32", "az_nat_sci_f32"),
     ("demo_natural_sci_exponent_f32", "az_nat_sci_f32"),
-    ("demo_natural_sci_mantissa_and_exponent_round_f32", "az_nat_sci_f32"),
-    ("demo_natural_from_sci_mantissa_and_exponent_f32", "az_nat_sci_f32"),
-    ("demo_natural_from_sci_mantissa_and_exponent_targeted_f32", "az_nat_sci_f32"),
-    ("demo_natural_from_sci_mantissa_and_exponent_round_f32", "az_nat_sci_f32"),
-    ("demo_natural_from_sci_mantissa_and_exponent_round_targeted_f32", "az_nat_sci_f32"),
+    (
+        "demo_natural_sci_mantissa_and_exponent_round_f32",
+        "az_nat_sci_f32",
+    ),
+    (
+        "demo_natural_from_sci_mantissa_and_exponent_f32",
+        "az_nat_sci_f32",
+    ),
+    (
+        "demo_natural_from_sci_mantissa_and_exponent_targeted_f32",
+        "az_nat_sci_f32",
+    ),
+    (
+        "demo_natural_from_sci_mantissa_and_exponent_round_f32",
+        "az_nat_sci_f32",
+    ),
+    (
+        "demo_natural_from_sci_mantissa_and_exponent_round_targeted_f32",
+        "az_nat_sci_f32",
+    ),
     ("demo_float_rounding_from_natural_f64", "az_nat_to_float"),
     ("demo_float_try_from_natural_f64", "az_nat_to_float"),
     ("demo_float_exact_from_natural_f64", "az_nat_to_float"),
@@ -414,41 +445,116 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_try_from_float_f64", "az_nat_from_f64"),
     ("demo_natural_exact_from_float_f64", "az_nat_from_f64"),
     ("demo_natural_convertible_from_float_f64", "az_nat_from_f64"),
-    ("demo_natural_sci_mantissa_and_exponent_f64", "az_nat_sci_f64"),
+    (
+        "demo_natural_sci_mantissa_and_exponent_f64",
+        "az_nat_sci_f64",
+    ),
     ("demo_natural_sci_mantissa_f64", "az_nat_sci_f64"),
     ("demo_natural_sci_exponent_f64", "az_nat_sci_f64"),
-    ("demo_natural_sci_mantissa_and_exponent_round_f64", "az_nat_sci_f64"),
-    ("demo_natural_from_sci_mantissa_and_exponent_f64", "az_nat_sci_f64"),
-    ("demo_natural_from_sci_mantissa_and_exponent_targeted_f64", "az_nat_sci_f64"),
-    ("demo_natural_from_sci_mantissa_and_exponent_round_f64", "az_nat_sci_f64"),
-    ("demo_natural_from_sci_mantissa_and_exponent_round_targeted_f64", "az_nat_sci_f64"),
+    (
+        "demo_natural_sci_mantissa_and_exponent_round_f64",
+        "az_nat_sci_f64",
+    ),
+    (
+        "demo_natural_from_sci_mantissa_and_exponent_f64",
+        "az_nat_sci_f64",
+    ),
+    (
+        "demo_natural_from_sci_mantissa_and_exponent_targeted_f64",
+        "az_nat_sci_f64",
+    ),
+    (
+        "demo_natural_from_sci_mantissa_and_exponent_round_f64",
+        "az_nat_sci_f64",
+    ),
+    (
+        "demo_natural_from_sci_mantissa_and_exponent_round_targeted_f64",
+        "az_nat_sci_f64",
+    ),
     ("demo_natural_eq", "az_nat_eq"),
-    ("demo_natural_partial_cmp_unsigned_u8", "az_nat_cmp_primitive"),
-    ("demo_natural_partial_cmp_unsigned_u64", "az_nat_cmp_primitive"),
+    (
+        "demo_natural_partial_cmp_unsigned_u8",
+        "az_nat_cmp_primitive",
+    ),
+    (
+        "demo_natural_partial_cmp_unsigned_u64",
+        "az_nat_cmp_primitive",
+    ),
     ("demo_natural_partial_cmp_signed_i8", "az_nat_cmp_primitive"),
-    ("demo_natural_partial_cmp_signed_i64", "az_nat_cmp_primitive"),
-    ("demo_unsigned_partial_cmp_natural_u8", "az_nat_cmp_primitive_rev"),
-    ("demo_unsigned_partial_cmp_natural_u64", "az_nat_cmp_primitive_rev"),
-    ("demo_signed_partial_cmp_natural_i8", "az_nat_cmp_primitive_rev"),
-    ("demo_signed_partial_cmp_natural_i64", "az_nat_cmp_primitive_rev"),
+    (
+        "demo_natural_partial_cmp_signed_i64",
+        "az_nat_cmp_primitive",
+    ),
+    (
+        "demo_unsigned_partial_cmp_natural_u8",
+        "az_nat_cmp_primitive_rev",
+    ),
+    (
+        "demo_unsigned_partial_cmp_natural_u64",
+        "az_nat_cmp_primitive_rev",
+    ),
+    (
+        "demo_signed_partial_cmp_natural_i8",
+        "az_nat_cmp_primitive_rev",
+    ),
+    (
+        "demo_signed_partial_cmp_natural_i64",
+        "az_nat_cmp_primitive_rev",
+    ),
     ("demo_natural_partial_eq_unsigned_u8", "az_nat_eq_primitive"),
-    ("demo_natural_partial_eq_unsigned_u64", "az_nat_eq_primitive"),
+    (
+        "demo_natural_partial_eq_unsigned_u64",
+        "az_nat_eq_primitive",
+    ),
     ("demo_natural_partial_eq_signed_i8", "az_nat_eq_primitive"),
     ("demo_natural_partial_eq_signed_i64", "az_nat_eq_primitive"),
-    ("demo_unsigned_partial_eq_natural_u8", "az_nat_eq_primitive_rev"),
-    ("demo_unsigned_partial_eq_natural_u64", "az_nat_eq_primitive_rev"),
-    ("demo_signed_partial_eq_natural_i8", "az_nat_eq_primitive_rev"),
-    ("demo_signed_partial_eq_natural_i64", "az_nat_eq_primitive_rev"),
+    (
+        "demo_unsigned_partial_eq_natural_u8",
+        "az_nat_eq_primitive_rev",
+    ),
+    (
+        "demo_unsigned_partial_eq_natural_u64",
+        "az_nat_eq_primitive_rev",
+    ),
+    (
+        "demo_signed_partial_eq_natural_i8",
+        "az_nat_eq_primitive_rev",
+    ),
+    (
+        "demo_signed_partial_eq_natural_i64",
+        "az_nat_eq_primitive_rev",
+    ),
     ("demo_natural_to_string_with_width", "az_nat_format"),
     ("demo_natural_to_binary_string_with_width", "az_nat_format"),
-    ("demo_natural_to_binary_string_with_0b_and_width", "az_nat_format"),
+    (
+        "demo_natural_to_binary_string_with_0b_and_width",
+        "az_nat_format",
+    ),
     ("demo_natural_to_octal_string_with_width", "az_nat_format"),
-    ("demo_natural_to_octal_string_with_0o_and_width", "az_nat_format"),
-    ("demo_natural_to_lower_hex_string_with_width", "az_nat_format"),
-    ("demo_natural_to_lower_hex_string_with_0x_and_width", "az_nat_format"),
-    ("demo_natural_to_upper_hex_string_with_width", "az_nat_format"),
-    ("demo_natural_to_upper_hex_string_with_0x_and_width", "az_nat_format"),
-    ("demo_natural_to_string_base_upper", "az_nat_to_string_base_upper"),
+    (
+        "demo_natural_to_octal_string_with_0o_and_width",
+        "az_nat_format",
+    ),
+    (
+        "demo_natural_to_lower_hex_string_with_width",
+        "az_nat_format",
+    ),
+    (
+        "demo_natural_to_lower_hex_string_with_0x_and_width",
+        "az_nat_format",
+    ),
+    (
+        "demo_natural_to_upper_hex_string_with_width",
+        "az_nat_format",
+    ),
+    (
+        "demo_natural_to_upper_hex_string_with_0x_and_width",
+        "az_nat_format",
+    ),
+    (
+        "demo_natural_to_string_base_upper",
+        "az_nat_to_string_base_upper",
+    ),
     ("demo_natural_from_limbs_desc", "az_nat_from_limbs"),
     ("demo_natural_from_owned_limbs_asc", "az_nat_from_limbs"),
     ("demo_natural_from_owned_limbs_desc", "az_nat_from_limbs"),
@@ -467,15 +573,27 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_rem_power_of_2", "az_nat_rem_power_of_2"),
     ("demo_natural_rem_power_of_2_ref", "az_nat_rem_power_of_2"),
     ("demo_natural_neg_mod_power_of_2", "az_nat_rem_power_of_2"),
-    ("demo_natural_neg_mod_power_of_2_ref", "az_nat_rem_power_of_2"),
+    (
+        "demo_natural_neg_mod_power_of_2_ref",
+        "az_nat_rem_power_of_2",
+    ),
     ("demo_natural_crt", "az_nat_crt"),
     ("demo_natural_crt_ref", "az_nat_crt"),
     ("demo_natural_floor_log_base_2", "az_nat_log_base_2"),
     ("demo_natural_ceiling_log_base_2", "az_nat_log_base_2"),
     ("demo_natural_checked_log_base_2", "az_nat_log_base_2"),
-    ("demo_natural_floor_log_base_power_of_2", "az_nat_log_base_power_of_2"),
-    ("demo_natural_ceiling_log_base_power_of_2", "az_nat_log_base_power_of_2"),
-    ("demo_natural_checked_log_base_power_of_2", "az_nat_log_base_power_of_2"),
+    (
+        "demo_natural_floor_log_base_power_of_2",
+        "az_nat_log_base_power_of_2",
+    ),
+    (
+        "demo_natural_ceiling_log_base_power_of_2",
+        "az_nat_log_base_power_of_2",
+    ),
+    (
+        "demo_natural_checked_log_base_power_of_2",
+        "az_nat_log_base_power_of_2",
+    ),
     ("demo_natural_floor_log_base", "az_nat_log_base"),
     ("demo_natural_ceiling_log_base", "az_nat_log_base"),
     ("demo_natural_checked_log_base", "az_nat_log_base"),
@@ -486,15 +604,30 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_neg", "az_nat_neg"),
     ("demo_natural_neg_ref", "az_nat_neg"),
     ("demo_natural_from_sci_string", "az_nat_from_sci_string"),
-    ("demo_natural_from_sci_string_with_options", "az_nat_from_sci_string"),
+    (
+        "demo_natural_from_sci_string_with_options",
+        "az_nat_from_sci_string",
+    ),
     ("demo_natural_to_sci", "az_nat_to_sci"),
-    ("demo_natural_to_sci_with_options", "az_nat_to_sci_with_options"),
+    (
+        "demo_natural_to_sci_with_options",
+        "az_nat_to_sci_with_options",
+    ),
     ("demo_natural_fmt_sci_valid", "az_nat_fmt_sci_valid"),
     ("demo_exhaustive_naturals", "az_nat_exhaustive_indexed"),
-    ("demo_exhaustive_positive_naturals", "az_nat_exhaustive_indexed"),
+    (
+        "demo_exhaustive_positive_naturals",
+        "az_nat_exhaustive_indexed",
+    ),
     ("demo_exhaustive_natural_range", "az_nat_exhaustive_range"),
-    ("demo_exhaustive_natural_inclusive_range", "az_nat_exhaustive_range"),
-    ("demo_exhaustive_natural_range_to_infinity", "az_nat_exhaustive_range"),
+    (
+        "demo_exhaustive_natural_inclusive_range",
+        "az_nat_exhaustive_range",
+    ),
+    (
+        "demo_exhaustive_natural_range_to_infinity",
+        "az_nat_exhaustive_range",
+    ),
     ("demo_natural_shl_unsigned_u8", "az_nat_shl"),
     ("demo_natural_shl_unsigned_u64", "az_nat_shl"),
     ("demo_natural_shl_unsigned_ref_u64", "az_nat_shl"),
@@ -521,20 +654,62 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_from_digits_desc", "az_nat_from_digits"),
     ("demo_from_digits_asc_targeted", "az_nat_from_digits"),
     ("demo_from_digits_desc_targeted", "az_nat_from_digits"),
-    ("demo_to_power_of_2_digits_asc_u8", "az_nat_to_power_of_2_digits"),
-    ("demo_to_power_of_2_digits_asc_u64", "az_nat_to_power_of_2_digits"),
-    ("demo_to_power_of_2_digits_desc_u8", "az_nat_to_power_of_2_digits"),
-    ("demo_to_power_of_2_digits_desc_u64", "az_nat_to_power_of_2_digits"),
-    ("demo_natural_to_power_of_2_digits_asc_natural", "az_nat_to_power_of_2_digits"),
-    ("demo_natural_to_power_of_2_digits_desc_natural", "az_nat_to_power_of_2_digits"),
-    ("demo_from_power_of_2_digits_asc_u8", "az_nat_from_power_of_2_digits"),
-    ("demo_from_power_of_2_digits_asc_u64", "az_nat_from_power_of_2_digits"),
-    ("demo_from_power_of_2_digits_desc_u8", "az_nat_from_power_of_2_digits"),
-    ("demo_from_power_of_2_digits_desc_u64", "az_nat_from_power_of_2_digits"),
-    ("demo_from_power_of_2_digits_asc_targeted_u8", "az_nat_from_power_of_2_digits"),
-    ("demo_from_power_of_2_digits_desc_targeted_u64", "az_nat_from_power_of_2_digits"),
-    ("demo_natural_from_power_of_2_digits_asc_natural", "az_nat_from_power_of_2_digits"),
-    ("demo_natural_from_power_of_2_digits_desc_natural", "az_nat_from_power_of_2_digits"),
+    (
+        "demo_to_power_of_2_digits_asc_u8",
+        "az_nat_to_power_of_2_digits",
+    ),
+    (
+        "demo_to_power_of_2_digits_asc_u64",
+        "az_nat_to_power_of_2_digits",
+    ),
+    (
+        "demo_to_power_of_2_digits_desc_u8",
+        "az_nat_to_power_of_2_digits",
+    ),
+    (
+        "demo_to_power_of_2_digits_desc_u64",
+        "az_nat_to_power_of_2_digits",
+    ),
+    (
+        "demo_natural_to_power_of_2_digits_asc_natural",
+        "az_nat_to_power_of_2_digits",
+    ),
+    (
+        "demo_natural_to_power_of_2_digits_desc_natural",
+        "az_nat_to_power_of_2_digits",
+    ),
+    (
+        "demo_from_power_of_2_digits_asc_u8",
+        "az_nat_from_power_of_2_digits",
+    ),
+    (
+        "demo_from_power_of_2_digits_asc_u64",
+        "az_nat_from_power_of_2_digits",
+    ),
+    (
+        "demo_from_power_of_2_digits_desc_u8",
+        "az_nat_from_power_of_2_digits",
+    ),
+    (
+        "demo_from_power_of_2_digits_desc_u64",
+        "az_nat_from_power_of_2_digits",
+    ),
+    (
+        "demo_from_power_of_2_digits_asc_targeted_u8",
+        "az_nat_from_power_of_2_digits",
+    ),
+    (
+        "demo_from_power_of_2_digits_desc_targeted_u64",
+        "az_nat_from_power_of_2_digits",
+    ),
+    (
+        "demo_natural_from_power_of_2_digits_asc_natural",
+        "az_nat_from_power_of_2_digits",
+    ),
+    (
+        "demo_natural_from_power_of_2_digits_desc_natural",
+        "az_nat_from_power_of_2_digits",
+    ),
     ("demo_natural_trailing_zeros", "az_nat_trailing_zeros"),
     ("demo_natural_limbs", "az_nat_limbs"),
     ("demo_natural_from_limbs_asc", "az_nat_from_limbs_asc"),
@@ -595,10 +770,22 @@ const AZURITE_NATURAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
         "demo_natural_primes_less_than_or_equal_to",
         "az_nat_primes_less_than",
     ),
-    ("demo_from_digits_asc_unsigned_targeted_u8", "az_nat_from_digits"),
-    ("demo_from_digits_desc_unsigned_targeted_u64", "az_nat_from_digits"),
-    ("demo_natural_from_sci_string_targeted", "az_nat_from_sci_string"),
-    ("demo_natural_from_sci_string_with_options_targeted", "az_nat_from_sci_string"),
+    (
+        "demo_from_digits_asc_unsigned_targeted_u8",
+        "az_nat_from_digits",
+    ),
+    (
+        "demo_from_digits_desc_unsigned_targeted_u64",
+        "az_nat_from_digits",
+    ),
+    (
+        "demo_natural_from_sci_string_targeted",
+        "az_nat_from_sci_string",
+    ),
+    (
+        "demo_natural_from_sci_string_with_options_targeted",
+        "az_nat_from_sci_string",
+    ),
 ];
 
 // The Integer demos checked against Azurite, with the oracle mode that reads each one. The modes
@@ -680,8 +867,14 @@ const AZURITE_INTEGER_STAGES: &[(&str, &str)] = &[
     ("demo_integer_to_string", "az_int_to_string"),
     ("demo_integer_cmp", "az_int_cmp"),
     ("demo_integer_partial_cmp_natural", "az_int_cmp_natural"),
-    ("demo_integer_partial_cmp_unsigned_u8", "az_int_cmp_unsigned"),
-    ("demo_integer_partial_cmp_unsigned_u64", "az_int_cmp_unsigned"),
+    (
+        "demo_integer_partial_cmp_unsigned_u8",
+        "az_int_cmp_unsigned",
+    ),
+    (
+        "demo_integer_partial_cmp_unsigned_u64",
+        "az_int_cmp_unsigned",
+    ),
     ("demo_integer_partial_cmp_signed_i8", "az_int_cmp_signed"),
     ("demo_integer_partial_cmp_signed_i64", "az_int_cmp_signed"),
     ("demo_integer_eq", "az_int_eq"),
@@ -742,42 +935,102 @@ const AZURITE_INTEGER_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
 // Modulo a Power of 2" mapping page.
 const AZURITE_MOD_POWER_OF_2_STAGES: &[(&str, &str)] = &[
     ("demo_natural_mod_power_of_2_add", "az_zmod_pow2_add"),
-    ("demo_natural_mod_power_of_2_add_val_ref", "az_zmod_pow2_add"),
-    ("demo_natural_mod_power_of_2_add_ref_val", "az_zmod_pow2_add"),
-    ("demo_natural_mod_power_of_2_add_ref_ref", "az_zmod_pow2_add"),
+    (
+        "demo_natural_mod_power_of_2_add_val_ref",
+        "az_zmod_pow2_add",
+    ),
+    (
+        "demo_natural_mod_power_of_2_add_ref_val",
+        "az_zmod_pow2_add",
+    ),
+    (
+        "demo_natural_mod_power_of_2_add_ref_ref",
+        "az_zmod_pow2_add",
+    ),
     ("demo_natural_mod_power_of_2_sub", "az_zmod_pow2_sub"),
-    ("demo_natural_mod_power_of_2_sub_val_ref", "az_zmod_pow2_sub"),
-    ("demo_natural_mod_power_of_2_sub_ref_val", "az_zmod_pow2_sub"),
-    ("demo_natural_mod_power_of_2_sub_ref_ref", "az_zmod_pow2_sub"),
+    (
+        "demo_natural_mod_power_of_2_sub_val_ref",
+        "az_zmod_pow2_sub",
+    ),
+    (
+        "demo_natural_mod_power_of_2_sub_ref_val",
+        "az_zmod_pow2_sub",
+    ),
+    (
+        "demo_natural_mod_power_of_2_sub_ref_ref",
+        "az_zmod_pow2_sub",
+    ),
     ("demo_natural_mod_power_of_2_mul", "az_zmod_pow2_mul"),
-    ("demo_natural_mod_power_of_2_mul_val_ref", "az_zmod_pow2_mul"),
-    ("demo_natural_mod_power_of_2_mul_ref_val", "az_zmod_pow2_mul"),
-    ("demo_natural_mod_power_of_2_mul_ref_ref", "az_zmod_pow2_mul"),
+    (
+        "demo_natural_mod_power_of_2_mul_val_ref",
+        "az_zmod_pow2_mul",
+    ),
+    (
+        "demo_natural_mod_power_of_2_mul_ref_val",
+        "az_zmod_pow2_mul",
+    ),
+    (
+        "demo_natural_mod_power_of_2_mul_ref_ref",
+        "az_zmod_pow2_mul",
+    ),
     ("demo_natural_mod_power_of_2_square", "az_zmod_pow2_square"),
-    ("demo_natural_mod_power_of_2_square_ref", "az_zmod_pow2_square"),
+    (
+        "demo_natural_mod_power_of_2_square_ref",
+        "az_zmod_pow2_square",
+    ),
     ("demo_natural_mod_power_of_2_neg", "az_zmod_pow2_neg"),
     ("demo_natural_mod_power_of_2_neg_ref", "az_zmod_pow2_neg"),
     ("demo_natural_mod_power_of_2_pow", "az_zmod_pow2_pow"),
-    ("demo_natural_mod_power_of_2_pow_val_ref", "az_zmod_pow2_pow"),
-    ("demo_natural_mod_power_of_2_pow_ref_val", "az_zmod_pow2_pow"),
-    ("demo_natural_mod_power_of_2_pow_ref_ref", "az_zmod_pow2_pow"),
-    ("demo_natural_mod_power_of_2_inverse", "az_zmod_pow2_inverse"),
-    ("demo_natural_mod_power_of_2_inverse_ref", "az_zmod_pow2_inverse"),
-    ("demo_natural_mod_power_of_2_shl_unsigned_u8", "az_zmod_pow2_shl"),
-    ("demo_natural_mod_power_of_2_shl_unsigned_u64", "az_zmod_pow2_shl"),
+    (
+        "demo_natural_mod_power_of_2_pow_val_ref",
+        "az_zmod_pow2_pow",
+    ),
+    (
+        "demo_natural_mod_power_of_2_pow_ref_val",
+        "az_zmod_pow2_pow",
+    ),
+    (
+        "demo_natural_mod_power_of_2_pow_ref_ref",
+        "az_zmod_pow2_pow",
+    ),
+    (
+        "demo_natural_mod_power_of_2_inverse",
+        "az_zmod_pow2_inverse",
+    ),
+    (
+        "demo_natural_mod_power_of_2_inverse_ref",
+        "az_zmod_pow2_inverse",
+    ),
+    (
+        "demo_natural_mod_power_of_2_shl_unsigned_u8",
+        "az_zmod_pow2_shl",
+    ),
+    (
+        "demo_natural_mod_power_of_2_shl_unsigned_u64",
+        "az_zmod_pow2_shl",
+    ),
     (
         "demo_natural_mod_power_of_2_shl_unsigned_ref_u64",
         "az_zmod_pow2_shl",
     ),
-    ("demo_natural_mod_power_of_2_shl_signed_i8", "az_zmod_pow2_shl"),
-    ("demo_natural_mod_power_of_2_shl_signed_i64", "az_zmod_pow2_shl"),
+    (
+        "demo_natural_mod_power_of_2_shl_signed_i8",
+        "az_zmod_pow2_shl",
+    ),
+    (
+        "demo_natural_mod_power_of_2_shl_signed_i64",
+        "az_zmod_pow2_shl",
+    ),
     (
         "demo_natural_mod_power_of_2_shl_signed_ref_i64",
         "az_zmod_pow2_shl",
     ),
     ("demo_natural_mod_power_of_2_shr_i8", "az_zmod_pow2_shr"),
     ("demo_natural_mod_power_of_2_shr_i64", "az_zmod_pow2_shr"),
-    ("demo_natural_mod_power_of_2_shr_ref_i64", "az_zmod_pow2_shr"),
+    (
+        "demo_natural_mod_power_of_2_shr_ref_i64",
+        "az_zmod_pow2_shr",
+    ),
     (
         "demo_natural_mod_power_of_2_is_reduced",
         "az_zmod_pow2_is_reduced",
@@ -815,22 +1068,58 @@ const AZURITE_MOD_STAGES: &[(&str, &str)] = &[
     ("demo_natural_mod_mul_ref_val_ref", "az_zmod_mul"),
     ("demo_natural_mod_mul_ref_ref_val", "az_zmod_mul"),
     ("demo_natural_mod_mul_ref_ref_ref", "az_zmod_mul"),
-    ("demo_natural_mod_mul_precomputed", "az_zmod_mul_precomputed"),
-    ("demo_natural_mod_mul_precomputed_val_val_ref", "az_zmod_mul_precomputed"),
-    ("demo_natural_mod_mul_precomputed_val_ref_val", "az_zmod_mul_precomputed"),
-    ("demo_natural_mod_mul_precomputed_val_ref_ref", "az_zmod_mul_precomputed"),
-    ("demo_natural_mod_mul_precomputed_ref_val_val", "az_zmod_mul_precomputed"),
-    ("demo_natural_mod_mul_precomputed_ref_val_ref", "az_zmod_mul_precomputed"),
-    ("demo_natural_mod_mul_precomputed_ref_ref_val", "az_zmod_mul_precomputed"),
-    ("demo_natural_mod_mul_precomputed_ref_ref_ref", "az_zmod_mul_precomputed"),
+    (
+        "demo_natural_mod_mul_precomputed",
+        "az_zmod_mul_precomputed",
+    ),
+    (
+        "demo_natural_mod_mul_precomputed_val_val_ref",
+        "az_zmod_mul_precomputed",
+    ),
+    (
+        "demo_natural_mod_mul_precomputed_val_ref_val",
+        "az_zmod_mul_precomputed",
+    ),
+    (
+        "demo_natural_mod_mul_precomputed_val_ref_ref",
+        "az_zmod_mul_precomputed",
+    ),
+    (
+        "demo_natural_mod_mul_precomputed_ref_val_val",
+        "az_zmod_mul_precomputed",
+    ),
+    (
+        "demo_natural_mod_mul_precomputed_ref_val_ref",
+        "az_zmod_mul_precomputed",
+    ),
+    (
+        "demo_natural_mod_mul_precomputed_ref_ref_val",
+        "az_zmod_mul_precomputed",
+    ),
+    (
+        "demo_natural_mod_mul_precomputed_ref_ref_ref",
+        "az_zmod_mul_precomputed",
+    ),
     ("demo_natural_mod_square", "az_zmod_square"),
     ("demo_natural_mod_square_val_ref", "az_zmod_square"),
     ("demo_natural_mod_square_ref_val", "az_zmod_square"),
     ("demo_natural_mod_square_ref_ref", "az_zmod_square"),
-    ("demo_natural_mod_square_precomputed", "az_zmod_square_precomputed"),
-    ("demo_natural_mod_square_precomputed_val_ref", "az_zmod_square_precomputed"),
-    ("demo_natural_mod_square_precomputed_ref_val", "az_zmod_square_precomputed"),
-    ("demo_natural_mod_square_precomputed_ref_ref", "az_zmod_square_precomputed"),
+    (
+        "demo_natural_mod_square_precomputed",
+        "az_zmod_square_precomputed",
+    ),
+    (
+        "demo_natural_mod_square_precomputed_val_ref",
+        "az_zmod_square_precomputed",
+    ),
+    (
+        "demo_natural_mod_square_precomputed_ref_val",
+        "az_zmod_square_precomputed",
+    ),
+    (
+        "demo_natural_mod_square_precomputed_ref_ref",
+        "az_zmod_square_precomputed",
+    ),
     ("demo_natural_mod_neg", "az_zmod_neg"),
     ("demo_natural_mod_neg_val_ref", "az_zmod_neg"),
     ("demo_natural_mod_neg_ref_val", "az_zmod_neg"),
@@ -843,14 +1132,38 @@ const AZURITE_MOD_STAGES: &[(&str, &str)] = &[
     ("demo_natural_mod_pow_ref_val_ref", "az_zmod_pow"),
     ("demo_natural_mod_pow_ref_ref_val", "az_zmod_pow"),
     ("demo_natural_mod_pow_ref_ref_ref", "az_zmod_pow"),
-    ("demo_natural_mod_pow_precomputed", "az_zmod_pow_precomputed"),
-    ("demo_natural_mod_pow_precomputed_val_val_ref", "az_zmod_pow_precomputed"),
-    ("demo_natural_mod_pow_precomputed_val_ref_val", "az_zmod_pow_precomputed"),
-    ("demo_natural_mod_pow_precomputed_val_ref_ref", "az_zmod_pow_precomputed"),
-    ("demo_natural_mod_pow_precomputed_ref_val_val", "az_zmod_pow_precomputed"),
-    ("demo_natural_mod_pow_precomputed_ref_val_ref", "az_zmod_pow_precomputed"),
-    ("demo_natural_mod_pow_precomputed_ref_ref_val", "az_zmod_pow_precomputed"),
-    ("demo_natural_mod_pow_precomputed_ref_ref_ref", "az_zmod_pow_precomputed"),
+    (
+        "demo_natural_mod_pow_precomputed",
+        "az_zmod_pow_precomputed",
+    ),
+    (
+        "demo_natural_mod_pow_precomputed_val_val_ref",
+        "az_zmod_pow_precomputed",
+    ),
+    (
+        "demo_natural_mod_pow_precomputed_val_ref_val",
+        "az_zmod_pow_precomputed",
+    ),
+    (
+        "demo_natural_mod_pow_precomputed_val_ref_ref",
+        "az_zmod_pow_precomputed",
+    ),
+    (
+        "demo_natural_mod_pow_precomputed_ref_val_val",
+        "az_zmod_pow_precomputed",
+    ),
+    (
+        "demo_natural_mod_pow_precomputed_ref_val_ref",
+        "az_zmod_pow_precomputed",
+    ),
+    (
+        "demo_natural_mod_pow_precomputed_ref_ref_val",
+        "az_zmod_pow_precomputed",
+    ),
+    (
+        "demo_natural_mod_pow_precomputed_ref_ref_ref",
+        "az_zmod_pow_precomputed",
+    ),
     ("demo_natural_mod_inverse", "az_zmod_inverse"),
     ("demo_natural_mod_inverse_val_ref", "az_zmod_inverse"),
     ("demo_natural_mod_inverse_ref_val", "az_zmod_inverse"),
@@ -935,20 +1248,47 @@ const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
     ("demo_rational_floor_ref", "az_rat_floor"),
     ("demo_rational_ceiling", "az_rat_ceiling"),
     ("demo_rational_ceiling_ref", "az_rat_ceiling"),
-    ("demo_integer_rounding_from_rational", "az_rat_rounding_from"),
-    ("demo_integer_rounding_from_rational_ref", "az_rat_rounding_from"),
+    (
+        "demo_integer_rounding_from_rational",
+        "az_rat_rounding_from",
+    ),
+    (
+        "demo_integer_rounding_from_rational_ref",
+        "az_rat_rounding_from",
+    ),
     ("demo_rational_floor_log_base_2", "az_rat_floor_log_base_2"),
-    ("demo_rational_floor_log_base_2_abs", "az_rat_floor_log_base_2"),
-    ("demo_rational_ceiling_log_base_2", "az_rat_ceiling_log_base_2"),
-    ("demo_rational_ceiling_log_base_2_abs", "az_rat_ceiling_log_base_2"),
+    (
+        "demo_rational_floor_log_base_2_abs",
+        "az_rat_floor_log_base_2",
+    ),
+    (
+        "demo_rational_ceiling_log_base_2",
+        "az_rat_ceiling_log_base_2",
+    ),
+    (
+        "demo_rational_ceiling_log_base_2_abs",
+        "az_rat_ceiling_log_base_2",
+    ),
     ("demo_rational_floor_log_base_u64", "az_rat_floor_log_base"),
-    ("demo_rational_ceiling_log_base_u64", "az_rat_ceiling_log_base"),
-    ("demo_rational_checked_log_base_u64", "az_rat_checked_log_base"),
+    (
+        "demo_rational_ceiling_log_base_u64",
+        "az_rat_ceiling_log_base",
+    ),
+    (
+        "demo_rational_checked_log_base_u64",
+        "az_rat_checked_log_base",
+    ),
     ("demo_rational_cmp", "az_rat_cmp"),
     ("demo_rational_partial_cmp_natural", "az_rat_cmp_integer"),
     ("demo_rational_partial_cmp_integer", "az_rat_cmp_integer"),
-    ("demo_rational_partial_cmp_unsigned_u8", "az_rat_cmp_unsigned"),
-    ("demo_rational_partial_cmp_unsigned_u64", "az_rat_cmp_unsigned"),
+    (
+        "demo_rational_partial_cmp_unsigned_u8",
+        "az_rat_cmp_unsigned",
+    ),
+    (
+        "demo_rational_partial_cmp_unsigned_u64",
+        "az_rat_cmp_unsigned",
+    ),
     ("demo_rational_partial_cmp_signed_i8", "az_rat_cmp_signed"),
     ("demo_rational_partial_cmp_signed_i64", "az_rat_cmp_signed"),
     ("demo_rational_eq", "az_rat_eq"),
@@ -959,8 +1299,14 @@ const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
     ("demo_from_naturals_ref", "az_rat_from_naturals"),
     ("demo_from_integers", "az_rat_from_integers"),
     ("demo_from_integers_ref", "az_rat_from_integers"),
-    ("demo_from_sign_and_naturals", "az_rat_from_sign_and_naturals"),
-    ("demo_from_sign_and_naturals_ref", "az_rat_from_sign_and_naturals"),
+    (
+        "demo_from_sign_and_naturals",
+        "az_rat_from_sign_and_naturals",
+    ),
+    (
+        "demo_from_sign_and_naturals_ref",
+        "az_rat_from_sign_and_naturals",
+    ),
     ("demo_rational_from_natural", "az_rat_from_integer"),
     ("demo_rational_from_natural_ref", "az_rat_from_integer"),
     ("demo_rational_from_integer", "az_rat_from_integer"),
@@ -973,18 +1319,33 @@ const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
     ("demo_rational_to_debug_string", "az_rat_to_string"),
     ("demo_rational_from_str", "az_rat_from_str"),
     ("demo_rational_from_sci_string", "az_rat_from_sci_string"),
-    ("demo_rational_from_sci_string_with_options", "az_rat_from_sci_string"),
+    (
+        "demo_rational_from_sci_string_with_options",
+        "az_rat_from_sci_string",
+    ),
     ("demo_rational_to_sci", "az_rat_to_sci"),
-    ("demo_rational_to_sci_with_options", "az_rat_to_sci_with_options"),
+    (
+        "demo_rational_to_sci_with_options",
+        "az_rat_to_sci_with_options",
+    ),
     ("demo_rational_fmt_sci_valid", "az_rat_fmt_sci_valid"),
-    ("demo_length_after_point_in_small_base", "az_rat_length_after_point"),
+    (
+        "demo_length_after_point_in_small_base",
+        "az_rat_length_after_point",
+    ),
 ];
 
 // The Rational demos whose generators have no `special_random` mode.
 const AZURITE_RATIONAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ("demo_rational_from_str_targeted", "az_rat_from_str"),
-    ("demo_rational_from_sci_string_targeted", "az_rat_from_sci_string"),
-    ("demo_rational_from_sci_string_with_options_targeted", "az_rat_from_sci_string"),
+    (
+        "demo_rational_from_sci_string_targeted",
+        "az_rat_from_sci_string",
+    ),
+    (
+        "demo_rational_from_sci_string_with_options_targeted",
+        "az_rat_from_sci_string",
+    ),
 ];
 
 // The Float demos (in malachite-float) checked against Azurite's `AzFloat`, with the oracle mode
@@ -1009,6 +1370,34 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ("demo_float_sub_round_extreme_debug", "az_float_sub"),
     ("demo_float_sub_prec_round_debug", "az_float_sub"),
     ("demo_float_sub_prec_round_extreme_debug", "az_float_sub"),
+    ("demo_float_add_rational_debug", "az_float_add_rational"),
+    (
+        "demo_float_add_rational_prec_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_round_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_round_debug",
+        "az_float_add_rational",
+    ),
+    ("demo_rational_add_float_debug", "az_float_add_rational"),
+    ("demo_float_sub_rational_debug", "az_float_sub_rational"),
+    (
+        "demo_float_sub_rational_prec_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_round_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_round_debug",
+        "az_float_sub_rational",
+    ),
+    ("demo_rational_sub_float_debug", "az_float_sub_rational"),
     ("demo_float_mul_debug", "az_float_mul"),
     ("demo_float_mul_extreme_debug", "az_float_mul"),
     ("demo_float_mul_prec_debug", "az_float_mul"),
@@ -1032,7 +1421,10 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ("demo_float_square_round_debug", "az_float_square"),
     ("demo_float_square_round_extreme_debug", "az_float_square"),
     ("demo_float_square_prec_round_debug", "az_float_square"),
-    ("demo_float_square_prec_round_extreme_debug", "az_float_square"),
+    (
+        "demo_float_square_prec_round_extreme_debug",
+        "az_float_square",
+    ),
     ("demo_float_sqrt_debug", "az_float_sqrt"),
     ("demo_float_sqrt_extreme_debug", "az_float_sqrt"),
     ("demo_float_sqrt_prec_debug", "az_float_sqrt"),
@@ -1041,14 +1433,38 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ("demo_float_sqrt_round_extreme_debug", "az_float_sqrt"),
     ("demo_float_sqrt_prec_round_debug", "az_float_sqrt"),
     ("demo_float_sqrt_prec_round_extreme_debug", "az_float_sqrt"),
-    ("demo_float_reciprocal_sqrt_debug", "az_float_reciprocal_sqrt"),
-    ("demo_float_reciprocal_sqrt_extreme_debug", "az_float_reciprocal_sqrt"),
-    ("demo_float_reciprocal_sqrt_prec_debug", "az_float_reciprocal_sqrt"),
-    ("demo_float_reciprocal_sqrt_prec_extreme_debug", "az_float_reciprocal_sqrt"),
-    ("demo_float_reciprocal_sqrt_round_debug", "az_float_reciprocal_sqrt"),
-    ("demo_float_reciprocal_sqrt_round_extreme_debug", "az_float_reciprocal_sqrt"),
-    ("demo_float_reciprocal_sqrt_prec_round_debug", "az_float_reciprocal_sqrt"),
-    ("demo_float_reciprocal_sqrt_prec_round_extreme_debug", "az_float_reciprocal_sqrt"),
+    (
+        "demo_float_reciprocal_sqrt_debug",
+        "az_float_reciprocal_sqrt",
+    ),
+    (
+        "demo_float_reciprocal_sqrt_extreme_debug",
+        "az_float_reciprocal_sqrt",
+    ),
+    (
+        "demo_float_reciprocal_sqrt_prec_debug",
+        "az_float_reciprocal_sqrt",
+    ),
+    (
+        "demo_float_reciprocal_sqrt_prec_extreme_debug",
+        "az_float_reciprocal_sqrt",
+    ),
+    (
+        "demo_float_reciprocal_sqrt_round_debug",
+        "az_float_reciprocal_sqrt",
+    ),
+    (
+        "demo_float_reciprocal_sqrt_round_extreme_debug",
+        "az_float_reciprocal_sqrt",
+    ),
+    (
+        "demo_float_reciprocal_sqrt_prec_round_debug",
+        "az_float_reciprocal_sqrt",
+    ),
+    (
+        "demo_float_reciprocal_sqrt_prec_round_extreme_debug",
+        "az_float_reciprocal_sqrt",
+    ),
     ("demo_float_neg_debug", "az_float_neg"),
     ("demo_float_neg_extreme_debug", "az_float_neg"),
     ("demo_float_abs_debug", "az_float_abs"),
@@ -1070,7 +1486,10 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ("demo_float_shl_signed_extreme_debug_i64", "az_float_shl"),
     ("demo_float_shr_signed_extreme_debug_i64", "az_float_shr"),
     ("demo_float_set_prec_round_debug", "az_float_set_prec"),
-    ("demo_float_set_prec_round_extreme_debug", "az_float_set_prec"),
+    (
+        "demo_float_set_prec_round_extreme_debug",
+        "az_float_set_prec",
+    ),
     ("demo_float_set_prec_debug", "az_float_set_prec"),
     ("demo_float_set_prec_extreme_debug", "az_float_set_prec"),
     ("demo_float_is_nan_debug", "az_float_is_nan"),
@@ -1078,7 +1497,10 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ("demo_float_is_finite_debug", "az_float_is_finite"),
     ("demo_float_is_finite_extreme_debug", "az_float_is_finite"),
     ("demo_float_is_infinite_debug", "az_float_is_infinite"),
-    ("demo_float_is_infinite_extreme_debug", "az_float_is_infinite"),
+    (
+        "demo_float_is_infinite_extreme_debug",
+        "az_float_is_infinite",
+    ),
     ("demo_float_is_zero_debug", "az_float_is_zero"),
     ("demo_float_is_zero_extreme_debug", "az_float_is_zero"),
     ("demo_float_is_normal_debug", "az_float_is_normal"),
@@ -1087,44 +1509,154 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ("demo_float_sign_debug", "az_float_sign"),
     ("demo_float_sign_extreme_debug", "az_float_sign"),
     ("demo_float_get_exponent_debug", "az_float_get_exponent"),
-    ("demo_float_get_exponent_extreme_debug", "az_float_get_exponent"),
+    (
+        "demo_float_get_exponent_extreme_debug",
+        "az_float_get_exponent",
+    ),
     ("demo_float_get_prec_debug", "az_float_get_prec"),
     ("demo_float_to_significand_debug", "az_float_to_significand"),
-    ("demo_float_to_significand_extreme_debug", "az_float_to_significand"),
+    (
+        "demo_float_to_significand_extreme_debug",
+        "az_float_to_significand",
+    ),
     ("demo_float_ulp_debug", "az_float_ulp"),
     ("demo_float_ulp_extreme_debug", "az_float_ulp"),
     ("demo_float_partial_cmp_debug", "az_float_partial_cmp"),
-    ("demo_float_partial_cmp_extreme_debug", "az_float_partial_cmp"),
-    ("demo_comparable_float_partial_cmp_debug", "az_float_comparable_partial_cmp"),
-    ("demo_comparable_float_partial_cmp_extreme_debug", "az_float_comparable_partial_cmp"),
+    (
+        "demo_float_partial_cmp_extreme_debug",
+        "az_float_partial_cmp",
+    ),
+    (
+        "demo_comparable_float_partial_cmp_debug",
+        "az_float_comparable_partial_cmp",
+    ),
+    (
+        "demo_comparable_float_partial_cmp_extreme_debug",
+        "az_float_comparable_partial_cmp",
+    ),
     ("demo_float_eq_debug", "az_float_eq"),
     ("demo_float_eq_extreme_debug", "az_float_eq"),
     ("demo_comparable_float_eq_debug", "az_float_comparable_eq"),
-    ("demo_comparable_float_eq_extreme_debug", "az_float_comparable_eq"),
-    ("demo_float_partial_cmp_natural_debug", "az_float_partial_cmp_integer"),
-    ("demo_float_partial_cmp_integer_debug", "az_float_partial_cmp_integer"),
-    ("demo_float_partial_eq_natural_debug", "az_float_partial_eq_integer"),
-    ("demo_float_partial_eq_integer_debug", "az_float_partial_eq_integer"),
+    (
+        "demo_comparable_float_eq_extreme_debug",
+        "az_float_comparable_eq",
+    ),
+    (
+        "demo_float_partial_cmp_natural_debug",
+        "az_float_partial_cmp_integer",
+    ),
+    (
+        "demo_float_partial_cmp_integer_debug",
+        "az_float_partial_cmp_integer",
+    ),
+    (
+        "demo_float_partial_eq_natural_debug",
+        "az_float_partial_eq_integer",
+    ),
+    (
+        "demo_float_partial_eq_integer_debug",
+        "az_float_partial_eq_integer",
+    ),
     ("demo_float_try_from_natural_debug", "az_float_from_natural"),
-    ("demo_float_from_natural_prec_debug", "az_float_from_natural"),
-    ("demo_float_from_natural_prec_round_debug", "az_float_from_natural"),
+    (
+        "demo_float_from_natural_prec_debug",
+        "az_float_from_natural",
+    ),
+    (
+        "demo_float_from_natural_prec_round_debug",
+        "az_float_from_natural",
+    ),
     ("demo_float_try_from_integer_debug", "az_float_from_integer"),
-    ("demo_float_from_integer_prec_debug", "az_float_from_integer"),
-    ("demo_float_from_integer_prec_round_debug", "az_float_from_integer"),
-    ("demo_float_from_unsigned_debug_u8", "az_float_from_unsigned"),
-    ("demo_float_from_unsigned_debug_u64", "az_float_from_unsigned"),
-    ("demo_float_from_rational_prec_debug", "az_float_from_rational"),
-    ("demo_float_from_rational_prec_round_debug", "az_float_from_rational"),
+    (
+        "demo_float_from_integer_prec_debug",
+        "az_float_from_integer",
+    ),
+    (
+        "demo_float_from_integer_prec_round_debug",
+        "az_float_from_integer",
+    ),
+    (
+        "demo_float_from_unsigned_debug_u8",
+        "az_float_from_unsigned",
+    ),
+    (
+        "demo_float_from_unsigned_debug_u64",
+        "az_float_from_unsigned",
+    ),
+    (
+        "demo_float_from_rational_prec_debug",
+        "az_float_from_rational",
+    ),
+    (
+        "demo_float_from_rational_prec_round_debug",
+        "az_float_from_rational",
+    ),
+];
+
+// Float demos whose extreme inputs make each line slow to compute (about a tenth of a second per
+// line in a debug build, on the widest float-rational exponent gaps), checked on fewer lines.
+const AZURITE_FLOAT_SLOW_LIMIT: usize = 300;
+
+const AZURITE_FLOAT_STAGES_SLOW: &[(&str, &str)] = &[
+    (
+        "demo_float_add_rational_extreme_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_extreme_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_round_extreme_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_round_extreme_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_rational_add_float_extreme_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_sub_rational_extreme_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_extreme_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_round_extreme_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_round_extreme_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_rational_sub_float_extreme_debug",
+        "az_float_sub_rational",
+    ),
 ];
 
 // The Float demos whose generators have no `special_random` mode.
 const AZURITE_FLOAT_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
-    ("demo_float_power_of_2_prec_round_debug", "az_float_power_of_2"),
+    (
+        "demo_float_power_of_2_prec_round_debug",
+        "az_float_power_of_2",
+    ),
     ("demo_float_power_of_2_prec_debug", "az_float_power_of_2"),
     ("demo_float_power_of_2_u64_debug", "az_float_power_of_2"),
     ("demo_float_power_of_2_i64_debug", "az_float_power_of_2"),
-    ("demo_float_min_positive_value_prec_debug", "az_float_constant"),
-    ("demo_float_max_finite_value_with_prec_debug", "az_float_constant"),
+    (
+        "demo_float_min_positive_value_prec_debug",
+        "az_float_constant",
+    ),
+    (
+        "demo_float_max_finite_value_with_prec_debug",
+        "az_float_constant",
+    ),
     ("demo_float_one_prec_debug", "az_float_constant"),
     ("demo_float_two_prec_debug", "az_float_constant"),
 ];
@@ -1167,6 +1699,16 @@ fn test_against_azurite() {
     }
     for (demo, mode) in AZURITE_FLOAT_STAGES_NO_SPECIAL {
         check_demo_against_azurite_in_modes(&oracle, "../malachite-float", demo, mode, &MODES[..2]);
+    }
+    for (demo, mode) in AZURITE_FLOAT_STAGES_SLOW {
+        check_demo_against_azurite_with_limit(
+            &oracle,
+            "../malachite-float",
+            demo,
+            mode,
+            &MODES,
+            AZURITE_FLOAT_SLOW_LIMIT,
+        );
     }
 }
 
