@@ -22,6 +22,10 @@ pub mod acos;
 pub mod acosh;
 pub mod acot;
 pub mod acsc;
+/// Implementations of [`Acsch`](malachite_base::num::arithmetic::traits::Acsch) and
+/// [`AcschAssign`](malachite_base::num::arithmetic::traits::AcschAssign), traits for computing the
+/// inverse hyperbolic cosecant of [`Float`](super::Float)s.
+pub mod acsch;
 /// Addition of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod add;

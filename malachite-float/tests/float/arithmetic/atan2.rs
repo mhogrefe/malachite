@@ -28,6 +28,7 @@ use malachite_float::float::arithmetic::atan2::{
     primitive_float_atan2_rational, primitive_float_atan2_with_period,
     primitive_float_atan2_with_period_rational,
 };
+use malachite_float::test_util::common::round_once_to_primitive;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
@@ -23384,12 +23385,9 @@ where
                 NiceFloat(-t)
             );
         }
-        // the same as the `Float` version taken with 64 bits to spare and rounded once
-        let t_float = Float::atan2_rational_prec_ref(&y, &x, T::MANTISSA_WIDTH + 64).0;
-        assert_eq!(
-            NiceFloat(T::rounding_from(&t_float, Nearest).0),
-            NiceFloat(t)
-        );
+        // the same as the `Float` version rounded once to the primitive type
+        let t_float: T = round_once_to_primitive(|p| Float::atan2_rational_prec_ref(&y, &x, p).0);
+        assert_eq!(NiceFloat(t_float), NiceFloat(t));
     });
 
     primitive_float_pair_gen_var_1::<T>().test_properties(|(y, x)| {
@@ -56953,12 +56951,10 @@ where
                 NiceFloat(-t)
             );
         }
-        let t_float =
-            Float::atan2_with_period_rational_prec_ref(&y, &x, 360, T::MANTISSA_WIDTH + 64).0;
-        assert_eq!(
-            NiceFloat(T::rounding_from(&t_float, Nearest).0),
-            NiceFloat(t)
-        );
+        let t_float: T = round_once_to_primitive(|p| {
+            Float::atan2_with_period_rational_prec_ref(&y, &x, 360, p).0
+        });
+        assert_eq!(NiceFloat(t_float), NiceFloat(t));
     });
 
     primitive_float_pair_gen_var_1::<T>().test_properties(|(y, x)| {

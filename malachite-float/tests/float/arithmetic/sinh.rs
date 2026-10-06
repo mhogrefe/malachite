@@ -25,8 +25,8 @@ use malachite_float::float::arithmetic::sinh::{
     primitive_float_sinh, primitive_float_sinh_rational,
 };
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::sinh::{
     rug_sinh, rug_sinh_prec, rug_sinh_prec_round, rug_sinh_rational_prec,
@@ -2376,7 +2376,9 @@ fn sinh_properties() {
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
 
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_sinh(&rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&<Float as From<&rug::Float>>::from(&rug_sinh(
+                &rug::Float::exact_from(&x)
+            ))),
             ComparableFloatRef(&c)
         );
 
@@ -3540,8 +3542,9 @@ where
         }
         // the result is the correctly rounded hyperbolic sine, as computed by MPFR with 64 bits to
         // spare, so that a subnormal result is rounded once by the conversion rather than twice
-        let rug_c = rug_sinh_rational_prec(&x, T::MANTISSA_WIDTH + 64).0;
-        let rug_c: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_c), Nearest).0;
+        let rug_c: T = round_once_to_primitive(|p| {
+            <Float as From<&rug::Float>>::from(&rug_sinh_rational_prec(&x, p).0)
+        });
         assert_eq!(NiceFloat(rug_c), NiceFloat(c));
     });
 

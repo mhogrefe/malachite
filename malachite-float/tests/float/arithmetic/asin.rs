@@ -27,6 +27,7 @@ use malachite_float::float::arithmetic::asin::{
     primitive_float_asin_rational, primitive_float_asin_with_period,
     primitive_float_asin_with_period_rational,
 };
+use malachite_float::test_util::common::round_once_to_primitive;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
@@ -1390,12 +1391,9 @@ where
             assert!(t.is_finite());
             // odd
             assert_eq!(NiceFloat(primitive_float_asin(-x)), NiceFloat(-t));
-            // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let t_float = Float::from(x).asin_prec(T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&t_float, Nearest).0),
-                NiceFloat(t)
-            );
+            // the same as the `Float` version rounded once to the primitive type
+            let t_float: T = round_once_to_primitive(|p| Float::from(x).asin_prec(p).0);
+            assert_eq!(NiceFloat(t_float), NiceFloat(t));
         }
     });
 }
@@ -1942,11 +1940,8 @@ where
                     NiceFloat(-t)
                 );
             }
-            let t_float = Float::asin_rational_prec_ref(&x, T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&t_float, Nearest).0),
-                NiceFloat(t)
-            );
+            let t_float: T = round_once_to_primitive(|p| Float::asin_rational_prec_ref(&x, p).0);
+            assert_eq!(NiceFloat(t_float), NiceFloat(t));
         }
     });
 
@@ -2711,12 +2706,10 @@ where
                 NiceFloat(primitive_float_asin_with_period(-x, u)),
                 NiceFloat(-t)
             );
-            // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let t_float = Float::asin_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&t_float, Nearest).0),
-                NiceFloat(t)
-            );
+            // the same as the `Float` version rounded once to the primitive type
+            let t_float: T =
+                round_once_to_primitive(|p| Float::asin_with_period_prec(Float::from(x), u, p).0);
+            assert_eq!(NiceFloat(t_float), NiceFloat(t));
             // the result never overflows, since it is at most a quarter turn
             assert!(t.is_finite());
         }
@@ -3245,12 +3238,10 @@ where
                 );
             }
         }
-        // the same as the `Float` version taken with 64 bits to spare and rounded once
-        let t_float = Float::asin_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).0;
-        assert_eq!(
-            NiceFloat(T::rounding_from(&t_float, Nearest).0),
-            NiceFloat(t)
-        );
+        // the same as the `Float` version rounded once to the primitive type
+        let t_float: T =
+            round_once_to_primitive(|p| Float::asin_with_period_rational_prec_ref(&x, u, p).0);
+        assert_eq!(NiceFloat(t_float), NiceFloat(t));
     });
 
     primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(x, u)| {

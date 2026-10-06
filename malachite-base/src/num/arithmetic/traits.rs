@@ -1250,6 +1250,18 @@ pub trait AsechAssign {
     fn asech_assign(&mut self);
 }
 
+/// Computes $\operatorname{acsch}(x)$, the inverse hyperbolic cosecant of a number.
+pub trait Acsch {
+    type Output;
+
+    fn acsch(self) -> Self::Output;
+}
+
+/// Replaces a number with its inverse hyperbolic cosecant, $\operatorname{acsch}(x)$.
+pub trait AcschAssign {
+    fn acsch_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

@@ -27,8 +27,8 @@ use malachite_float::float::arithmetic::cot::{
     primitive_float_cot_with_period_rational,
 };
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::cot::{
     cot_with_period_naive, cot_with_period_rational_naive, rug_cot, rug_cot_prec,
@@ -57,16 +57,6 @@ use std::str::FromStr;
 // - |x| near a nonzero multiple of pi: a large result, from the sine's near-zero path inside
 //   `sin_cos`
 // - |x| near an odd multiple of pi/2: a tiny result, from the cosine's near-zero path
-
-// Whether rounding `x` to `T` is a tie: it is exactly representable one bit past `T`'s precision
-// but not at it. MPFR's wider results are compared against the primitive-float functions only when
-// this is false, since a tie is broken by the value's own last bit rather than by the true result.
-#[allow(clippy::type_repetition_in_bounds)]
-fn ties<T: PrimitiveFloat>(x: &Float) -> bool {
-    x.is_normal()
-        && Float::from_float_prec_round_ref(x, T::MANTISSA_WIDTH + 2, Down).1 == Equal
-        && Float::from_float_prec_round_ref(x, T::MANTISSA_WIDTH + 1, Down).1 != Equal
-}
 
 #[test]
 fn test_cot_prec_round() {
@@ -861,7 +851,9 @@ fn cot_properties() {
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
 
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_cot(&rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&<Float as From<&rug::Float>>::from(&rug_cot(
+                &rug::Float::exact_from(&x)
+            ))),
             ComparableFloatRef(&s)
         );
 
@@ -928,12 +920,11 @@ where
             assert_eq!(NiceFloat(primitive_float_cot(-x)), NiceFloat(-t));
             // the result is the correctly rounded cotangent, as computed by MPFR with 64 bits to
             // spare, so that a subnormal result is rounded once by the conversion
-            let rug_t = rug_cot_prec(
-                &rug::Float::exact_from(&Float::from(x)),
-                T::MANTISSA_WIDTH + 64,
-            )
-            .0;
-            let rug_t: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_t), Nearest).0;
+            let rug_t: T = round_once_to_primitive(|p| {
+                <Float as From<&rug::Float>>::from(
+                    &rug_cot_prec(&rug::Float::exact_from(&Float::from(x)), p).0,
+                )
+            });
             assert_eq!(NiceFloat(rug_t), NiceFloat(t));
         }
     });
@@ -5000,12 +4991,10 @@ where
                 NiceFloat(primitive_float_cot_with_period(-x, u)),
                 NiceFloat(-s)
             );
-            // the same as the `Float` cotangent taken with 64 bits to spare and rounded once
-            let s_float = Float::cot_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&s_float, Nearest).0),
-                NiceFloat(s)
-            );
+            // the same as the `Float` cotangent rounded once to the primitive type
+            let s_float: T =
+                round_once_to_primitive(|p| Float::cot_with_period_prec(Float::from(x), u, p).0);
+            assert_eq!(NiceFloat(s_float), NiceFloat(s));
             // a pole is an infinity in both, but the cotangent of a tiny angle can exceed the
             // largest finite `T` while the `Float` cotangent, with its far wider exponent range,
             // stays finite
@@ -5592,12 +5581,10 @@ where
                     NiceFloat(s)
                 );
             }
-            // the same as the `Float` cotangent taken with 64 bits to spare and rounded once
-            let s_float = Float::cot_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&s_float, Nearest).0),
-                NiceFloat(s)
-            );
+            // the same as the `Float` cotangent rounded once to the primitive type
+            let s_float: T =
+                round_once_to_primitive(|p| Float::cot_with_period_rational_prec_ref(&x, u, p).0);
+            assert_eq!(NiceFloat(s_float), NiceFloat(s));
         }
     });
 
@@ -5745,17 +5732,13 @@ where
                 NiceFloat(-s)
             );
         }
-        // The result is the correctly rounded cotangent, as computed by MPFR with 64 bits to spare.
-        // The comparison is skipped when rounding that wider value to `T` is a tie: cot(1/n) is
-        // just above n, so for an n that is a midpoint of the `T` grid the wider value rounds to
-        // the midpoint itself and the tie breaks the wrong way, though the cotangent is strictly
-        // above it.
-        let wide = <Float as From<&rug::Float>>::from(
-            &rug_cot_rational_prec(&x, T::MANTISSA_WIDTH + 64).0,
-        );
-        if !ties::<T>(&wide) {
-            assert_eq!(NiceFloat(T::rounding_from(&wide, Nearest).0), NiceFloat(s));
-        }
+        // The result is the correctly rounded cotangent, as computed by MPFR and rounded once to
+        // `T`. (cot(1/n) is just above n, so for an n that is a midpoint of the `T` grid a wider
+        // value rounded again to `T` would land on the midpoint and break the tie the wrong way.)
+        let rug_s: T = round_once_to_primitive(|p| {
+            <Float as From<&rug::Float>>::from(&rug_cot_rational_prec(&x, p).0)
+        });
+        assert_eq!(NiceFloat(rug_s), NiceFloat(s));
     });
 
     primitive_float_gen::<T>().test_properties(|x| {

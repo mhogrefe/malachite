@@ -1127,6 +1127,15 @@ documented by git history.
   $u = (t + \sqrt{t(1+x)})/x$ and the exact $t = 1-x$, avoiding the ill-conditioned $1/x$; below
   $\frac{1}{2}$ as $\ln(1+\sqrt{1-x^2}) - \ln x$, which also covers inputs whose reciprocal
   would overflow. The `Rational` form is $\operatorname{acosh}(1/x)$, the reciprocal being exact.
+- `Acsch` and `AcschAssign` (new traits in malachite-base) for `Float`, with the usual
+  `acsch_prec_round`, `acsch_prec`, `acsch_round`, and `_ref`/`_assign` variants, the `Rational`
+  forms `acsch_rational_prec_round` and `acsch_rational_prec` (with `_ref` variants), and
+  `primitive_float_acsch` and `primitive_float_acsch_rational`: the inverse hyperbolic cosecant,
+  which MPFR does not provide. Since the inverse hyperbolic sine is well-conditioned, it is computed
+  as $\operatorname{asinh}(1/x)$ from the rounded reciprocal; when $x$ is a power of 2 the reciprocal
+  is exact and the result is taken from `asinh` directly, and for inputs so small that $1/x$ would
+  overflow it is $\ln 2 - \ln|x|$. The `Rational` form is $\operatorname{asinh}(1/x)$, the
+  reciprocal being exact.
 
 ### Documentation
 

@@ -28,8 +28,8 @@ use malachite_float::float::arithmetic::sin::{
     primitive_float_sin_with_period_rational,
 };
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::sin::{
     rug_sin, rug_sin_pi_prec_round, rug_sin_pi_rational_prec_round, rug_sin_prec,
@@ -863,7 +863,9 @@ fn sin_properties() {
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
 
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_sin(&rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&<Float as From<&rug::Float>>::from(&rug_sin(
+                &rug::Float::exact_from(&x)
+            ))),
             ComparableFloatRef(&s)
         );
 
@@ -3939,14 +3941,15 @@ where
             assert!(s >= T::NEGATIVE_ONE && s <= T::ONE);
             // sin is odd
             assert_eq!(NiceFloat(primitive_float_sin(-x)), NiceFloat(-s));
-            // the result is the correctly rounded sine, as computed by MPFR with 64 bits to spare,
-            // so that a subnormal result is rounded once by the conversion rather than twice
-            let rug_x = rug::Float::with_val(
-                u32::exact_from(T::MANTISSA_WIDTH + 64),
-                &rug::Float::exact_from(&Float::from(x)),
-            );
-            let rug_s: T =
-                T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_x.sin()), Nearest).0;
+            // the result is the correctly rounded sine, as computed by MPFR and rounded once to
+            // `T`, the input being exact at its own precision
+            let rug_x = rug::Float::exact_from(&Float::from(x));
+            let rug_s: T = round_once_to_primitive(|p| {
+                <Float as From<&rug::Float>>::from(&rug::Float::with_val(
+                    u32::exact_from(p),
+                    rug_x.sin_ref(),
+                ))
+            });
             assert_eq!(NiceFloat(rug_s), NiceFloat(s));
         }
     });
@@ -4033,8 +4036,9 @@ where
         }
         // the result is the correctly rounded sine, as computed by MPFR with 64 bits to spare, so
         // that a subnormal result is rounded once by the conversion rather than twice
-        let rug_s = rug_sin_rational_prec(&x, T::MANTISSA_WIDTH + 64).0;
-        let rug_s: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_s), Nearest).0;
+        let rug_s: T = round_once_to_primitive(|p| {
+            <Float as From<&rug::Float>>::from(&rug_sin_rational_prec(&x, p).0)
+        });
         assert_eq!(NiceFloat(rug_s), NiceFloat(s));
     });
 
@@ -12876,13 +12880,11 @@ where
             );
             // the result is the correctly rounded sine, as computed by MPFR with 64 bits to spare,
             // so that a subnormal result is rounded once by the conversion
-            let rug_s = rug_sin_with_period_prec(
-                &rug::Float::exact_from(&Float::from(x)),
-                u,
-                T::MANTISSA_WIDTH + 64,
-            )
-            .0;
-            let rug_s: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_s), Nearest).0;
+            let rug_s: T = round_once_to_primitive(|p| {
+                <Float as From<&rug::Float>>::from(
+                    &rug_sin_with_period_prec(&rug::Float::exact_from(&Float::from(x)), u, p).0,
+                )
+            });
             assert_eq!(NiceFloat(rug_s), NiceFloat(s));
         }
     });
@@ -12929,16 +12931,16 @@ where
                 NiceFloat(s.abs())
             );
             // MPFR agrees, except that it cannot see the exact cases of non-dyadic inputs
-            let (s_float, o) =
-                Float::sin_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64);
-            assert_eq!(
-                NiceFloat(T::rounding_from(&s_float, Nearest).0),
-                NiceFloat(s)
-            );
+            let o = Float::sin_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).1;
+            let s_float: T =
+                round_once_to_primitive(|p| Float::sin_with_period_rational_prec_ref(&x, u, p).0);
+            assert_eq!(NiceFloat(s_float), NiceFloat(s));
             if o != Equal {
-                let rug_s = rug_sin_with_period_rational_prec(&x, u, T::MANTISSA_WIDTH + 64).0;
-                let rug_s: T =
-                    T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_s), Nearest).0;
+                let rug_s: T = round_once_to_primitive(|p| {
+                    <Float as From<&rug::Float>>::from(
+                        &rug_sin_with_period_rational_prec(&x, u, p).0,
+                    )
+                });
                 assert_eq!(NiceFloat(rug_s), NiceFloat(s));
             }
         }

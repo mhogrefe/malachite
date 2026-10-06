@@ -42,7 +42,7 @@ const LN_2_SHORTCUT_MAX_PREC: u64 = (1 << 30) + 28;
 
 // asinh(|x|) = ln(sqrt(x^2 + 1) + |x|), evaluated at a working precision of `wp`. x^2 must not
 // overflow.
-fn asinh_abs_general(x_abs: &Float, wp: u64) -> Float {
+pub(crate) fn asinh_abs_general(x_abs: &Float, wp: u64) -> Float {
     x_abs
         // x^2
         .square_prec_round_ref(wp, Floor)

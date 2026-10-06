@@ -24,8 +24,8 @@ use malachite_float::float::arithmetic::asech::{
     primitive_float_asech, primitive_float_asech_rational,
 };
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::asech::{
     rug_asech, rug_asech_prec, rug_asech_prec_round, rug_asech_rational_prec,
@@ -1202,7 +1202,9 @@ fn asech_properties_helper(x: Float) {
     assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
 
     assert_eq!(
-        ComparableFloatRef(&Float::from(&rug_asech(&rug::Float::exact_from(&x)))),
+        ComparableFloatRef(&<Float as From<&rug::Float>>::from(&rug_asech(
+            &rug::Float::exact_from(&x)
+        ))),
         ComparableFloatRef(&c)
     );
 
@@ -1278,12 +1280,11 @@ where
             assert!(c >= T::ZERO);
             // the result is the correctly rounded inverse hyperbolic secant, as given by the oracle
             // with 64 bits to spare
-            let rug_c = rug_asech_prec(
-                &rug::Float::exact_from(&Float::from(x)),
-                T::MANTISSA_WIDTH + 64,
-            )
-            .0;
-            let rug_c: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_c), Nearest).0;
+            let rug_c: T = round_once_to_primitive(|p| {
+                <Float as From<&rug::Float>>::from(
+                    &rug_asech_prec(&rug::Float::exact_from(&Float::from(x)), p).0,
+                )
+            });
             assert_eq!(NiceFloat(rug_c), NiceFloat(c));
         }
     });
@@ -1862,8 +1863,9 @@ where
         // the inverse hyperbolic secant of a rational is NaN exactly outside [0, 1]
         assert_eq!(c.is_nan(), !(0u32..=1u32).contains(&x));
         if x > 0u32 && x <= 1u32 {
-            let rug_c = rug_asech_rational_prec(&x, T::MANTISSA_WIDTH + 64).0;
-            let rug_c: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_c), Nearest).0;
+            let rug_c: T = round_once_to_primitive(|p| {
+                <Float as From<&rug::Float>>::from(&rug_asech_rational_prec(&x, p).0)
+            });
             assert_eq!(NiceFloat(rug_c), NiceFloat(c));
         }
     });

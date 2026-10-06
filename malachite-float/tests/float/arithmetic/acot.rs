@@ -27,6 +27,7 @@ use malachite_float::float::arithmetic::acot::{
     primitive_float_acot_rational, primitive_float_acot_with_period,
     primitive_float_acot_with_period_rational,
 };
+use malachite_float::test_util::common::round_once_to_primitive;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
@@ -594,7 +595,7 @@ fn acot_properties() {
         let c_alt = x.acot_prec_ref(x.significant_bits()).0;
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         if x.is_finite() && x != 0u32 && x.get_exponent().unwrap().unsigned_abs() <= 1000 {
-            let c_alt = Float::from(&rug_acot(&rug::Float::exact_from(&x)));
+            let c_alt = <Float as From<&rug::Float>>::from(&rug_acot(&rug::Float::exact_from(&x)));
             assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         }
     });
@@ -1079,14 +1080,11 @@ where
         if !c.is_nan() {
             // the result lies in [-pi/2, pi/2], so it never overflows
             assert!(c.is_finite());
-            // the same as the `Float` version taken with 64 bits to spare and rounded once -- but
-            // only where the result is normal, a subnormal one being rounded twice here
+            // the same as the `Float` version rounded once to the primitive type -- but only where
+            // the result is normal, a subnormal one being rounded twice here
             if c.is_normal() {
-                let c_float = Float::acot_prec(Float::from(x), T::MANTISSA_WIDTH + 64).0;
-                assert_eq!(
-                    NiceFloat(T::rounding_from(&c_float, Nearest).0),
-                    NiceFloat(c)
-                );
+                let c_float: T = round_once_to_primitive(|p| Float::acot_prec(Float::from(x), p).0);
+                assert_eq!(NiceFloat(c_float), NiceFloat(c));
             }
         }
     });
@@ -1109,15 +1107,13 @@ where
         assert!(!c.is_nan());
         if !c.is_nan() {
             assert!(c.is_finite());
-            // the same as the `Float` version taken with 64 bits to spare and rounded once -- but
-            // only where the result is normal, a subnormal one being rounded twice here and once by
+            // the same as the `Float` version rounded once to the primitive type -- but only where
+            // the result is normal, a subnormal one being rounded twice here and once by
             // `emulate_rational_to_float_fn`
             if c.is_normal() {
-                let c_float = Float::acot_rational_prec_ref(&x, T::MANTISSA_WIDTH + 64).0;
-                assert_eq!(
-                    NiceFloat(T::rounding_from(&c_float, Nearest).0),
-                    NiceFloat(c)
-                );
+                let c_float: T =
+                    round_once_to_primitive(|p| Float::acot_rational_prec_ref(&x, p).0);
+                assert_eq!(NiceFloat(c_float), NiceFloat(c));
             }
         }
     });
@@ -2107,15 +2103,13 @@ where
         if !c.is_nan() {
             // the result lies in [-u/4, u/4], so it never overflows
             assert!(c.is_finite());
-            // the same as the `Float` version taken with 64 bits to spare and rounded once -- but
-            // only where the result is normal, a subnormal one being rounded twice here
+            // the same as the `Float` version rounded once to the primitive type -- but only where
+            // the result is normal, a subnormal one being rounded twice here
             if c.is_normal() {
-                let c_float =
-                    Float::acot_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
-                assert_eq!(
-                    NiceFloat(T::rounding_from(&c_float, Nearest).0),
-                    NiceFloat(c)
-                );
+                let c_float: T = round_once_to_primitive(|p| {
+                    Float::acot_with_period_prec(Float::from(x), u, p).0
+                });
+                assert_eq!(NiceFloat(c_float), NiceFloat(c));
             }
         }
     });
@@ -2620,15 +2614,12 @@ where
         assert!(!c.is_nan());
         // the result lies in [-u/4, u/4], so it never overflows
         assert!(c.is_finite());
-        // the same as the `Float` version taken with 64 bits to spare and rounded once -- but only
-        // where the result is normal, a subnormal one being rounded twice here
+        // the same as the `Float` version rounded once to the primitive type -- but only where the
+        // result is normal, a subnormal one being rounded twice here
         if c.is_normal() {
-            let c_float =
-                Float::acot_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&c_float, Nearest).0),
-                NiceFloat(c)
-            );
+            let c_float: T =
+                round_once_to_primitive(|p| Float::acot_with_period_rational_prec_ref(&x, u, p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 }

@@ -28,8 +28,8 @@ use malachite_float::float::arithmetic::sec::{
     primitive_float_sec_with_period_rational,
 };
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::sec::{
     rug_sec, rug_sec_prec, rug_sec_prec_round, rug_sec_rational_prec, rug_sec_rational_prec_round,
@@ -859,7 +859,9 @@ fn sec_properties() {
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
 
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_sec(&rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&<Float as From<&rug::Float>>::from(&rug_sec(
+                &rug::Float::exact_from(&x)
+            ))),
             ComparableFloatRef(&s)
         );
 
@@ -926,12 +928,11 @@ where
             assert_eq!(NiceFloat(primitive_float_sec(-x)), NiceFloat(t));
             // the result is the correctly rounded secant, as computed by MPFR with 64 bits to
             // spare, so that a subnormal result is rounded once by the conversion
-            let rug_t = rug_sec_prec(
-                &rug::Float::exact_from(&Float::from(x)),
-                T::MANTISSA_WIDTH + 64,
-            )
-            .0;
-            let rug_t: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_t), Nearest).0;
+            let rug_t: T = round_once_to_primitive(|p| {
+                <Float as From<&rug::Float>>::from(
+                    &rug_sec_prec(&rug::Float::exact_from(&Float::from(x)), p).0,
+                )
+            });
             assert_eq!(NiceFloat(rug_t), NiceFloat(t));
         }
     });
@@ -3214,8 +3215,9 @@ where
         );
         // the result is the correctly rounded secant, as computed by MPFR with 64 bits to spare, so
         // that a subnormal result is rounded once by the conversion rather than twice
-        let rug_s = rug_sec_rational_prec(&x, T::MANTISSA_WIDTH + 64).0;
-        let rug_s: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_s), Nearest).0;
+        let rug_s: T = round_once_to_primitive(|p| {
+            <Float as From<&rug::Float>>::from(&rug_sec_rational_prec(&x, p).0)
+        });
         assert_eq!(NiceFloat(rug_s), NiceFloat(s));
     });
 
@@ -5316,12 +5318,10 @@ where
                 NiceFloat(primitive_float_sec_with_period(-x, u)),
                 NiceFloat(s)
             );
-            // the same as the `Float` secant taken with 64 bits to spare and rounded once
-            let s_float = Float::sec_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&s_float, Nearest).0),
-                NiceFloat(s)
-            );
+            // the same as the `Float` secant rounded once to the primitive type
+            let s_float: T =
+                round_once_to_primitive(|p| Float::sec_with_period_prec(Float::from(x), u, p).0);
+            assert_eq!(NiceFloat(s_float), NiceFloat(s));
             // an infinity is a pole, and no f32 or f64 is merely close enough to one to overflow
             assert_eq!(s.is_infinite(), s_float.is_infinite());
         }
@@ -5881,12 +5881,10 @@ where
                 )),
                 NiceFloat(s)
             );
-            // the same as the `Float` secant taken with 64 bits to spare and rounded once
-            let s_float = Float::sec_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&s_float, Nearest).0),
-                NiceFloat(s)
-            );
+            // the same as the `Float` secant rounded once to the primitive type
+            let s_float: T =
+                round_once_to_primitive(|p| Float::sec_with_period_rational_prec_ref(&x, u, p).0);
+            assert_eq!(NiceFloat(s_float), NiceFloat(s));
         }
     });
 

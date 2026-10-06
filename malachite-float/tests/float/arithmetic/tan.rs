@@ -27,8 +27,8 @@ use malachite_float::float::arithmetic::tan::{
     primitive_float_tan_with_period_rational,
 };
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::tan::{
     rug_tan, rug_tan_pi_prec_round, rug_tan_pi_rational_prec_round, rug_tan_prec,
@@ -851,7 +851,9 @@ fn tan_properties() {
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
 
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_tan(&rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&<Float as From<&rug::Float>>::from(&rug_tan(
+                &rug::Float::exact_from(&x)
+            ))),
             ComparableFloatRef(&s)
         );
 
@@ -4718,8 +4720,9 @@ where
         }
         // the result is the correctly rounded tangent, as computed by MPFR with 64 bits to spare,
         // so that a subnormal result is rounded once by the conversion rather than twice
-        let rug_s = rug_tan_rational_prec(&x, T::MANTISSA_WIDTH + 64).0;
-        let rug_s: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_s), Nearest).0;
+        let rug_s: T = round_once_to_primitive(|p| {
+            <Float as From<&rug::Float>>::from(&rug_tan_rational_prec(&x, p).0)
+        });
         assert_eq!(NiceFloat(rug_s), NiceFloat(s));
     });
 
@@ -7961,13 +7964,11 @@ where
             );
             // the result is the correctly rounded tangent, as computed by MPFR with 64 bits to
             // spare, so that a subnormal result is rounded once by the conversion
-            let rug_t = rug_tan_with_period_prec(
-                &rug::Float::exact_from(&Float::from(x)),
-                u,
-                T::MANTISSA_WIDTH + 64,
-            )
-            .0;
-            let rug_t: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_t), Nearest).0;
+            let rug_t: T = round_once_to_primitive(|p| {
+                <Float as From<&rug::Float>>::from(
+                    &rug_tan_with_period_prec(&rug::Float::exact_from(&Float::from(x)), u, p).0,
+                )
+            });
             assert_eq!(NiceFloat(rug_t), NiceFloat(t));
             // the result is infinite only at a pole, and never through overflow: no f32 or f64 is
             // merely close enough to an odd quarter turn for its tangent to leave the range
@@ -8618,16 +8619,16 @@ where
                 NiceFloat(t.abs())
             );
             // MPFR agrees, except that it cannot see the exact cases of non-dyadic inputs
-            let (t_float, o) =
-                Float::tan_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64);
-            assert_eq!(
-                NiceFloat(T::rounding_from(&t_float, Nearest).0),
-                NiceFloat(t)
-            );
+            let o = Float::tan_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).1;
+            let t_float: T =
+                round_once_to_primitive(|p| Float::tan_with_period_rational_prec_ref(&x, u, p).0);
+            assert_eq!(NiceFloat(t_float), NiceFloat(t));
             if o != Equal {
-                let rug_t = rug_tan_with_period_rational_prec(&x, u, T::MANTISSA_WIDTH + 64).0;
-                let rug_t: T =
-                    T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_t), Nearest).0;
+                let rug_t: T = round_once_to_primitive(|p| {
+                    <Float as From<&rug::Float>>::from(
+                        &rug_tan_with_period_rational_prec(&x, u, p).0,
+                    )
+                });
                 assert_eq!(NiceFloat(rug_t), NiceFloat(t));
             }
         }
@@ -8712,12 +8713,11 @@ where
             assert_eq!(NiceFloat(primitive_float_tan(-x)), NiceFloat(-t));
             // the result is the correctly rounded tangent, as computed by MPFR with 64 bits to
             // spare, so that a subnormal result is rounded once by the conversion
-            let rug_t = rug_tan_prec(
-                &rug::Float::exact_from(&Float::from(x)),
-                T::MANTISSA_WIDTH + 64,
-            )
-            .0;
-            let rug_t: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_t), Nearest).0;
+            let rug_t: T = round_once_to_primitive(|p| {
+                <Float as From<&rug::Float>>::from(
+                    &rug_tan_prec(&rug::Float::exact_from(&Float::from(x)), p).0,
+                )
+            });
             assert_eq!(NiceFloat(rug_t), NiceFloat(t));
         }
     });

@@ -30,6 +30,7 @@ pub(crate) fn register(runner: &mut Runner) {
     acosh::register(runner);
     acot::register(runner);
     acsc::register(runner);
+    acsch::register(runner);
     asec::register(runner);
     asech::register(runner);
     asin::register(runner);
@@ -100,6 +101,7 @@ mod acos;
 mod acosh;
 mod acot;
 mod acsc;
+mod acsch;
 mod add;
 mod add_mul;
 mod agm;

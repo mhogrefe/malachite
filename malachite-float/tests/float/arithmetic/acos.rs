@@ -27,6 +27,7 @@ use malachite_float::float::arithmetic::acos::{
     primitive_float_acos_rational, primitive_float_acos_with_period,
     primitive_float_acos_with_period_rational,
 };
+use malachite_float::test_util::common::round_once_to_primitive;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
@@ -613,12 +614,9 @@ where
             // the result lies in [0, pi], so it never overflows
             assert!(c.is_finite());
             assert!(c >= T::ZERO);
-            // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let c_float = Float::acos_prec(Float::from(x), T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&c_float, Nearest).0),
-                NiceFloat(c)
-            );
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T = round_once_to_primitive(|p| Float::acos_prec(Float::from(x), p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 }
@@ -1109,12 +1107,9 @@ where
             // the result lies in [0, pi], so it never overflows
             assert!(c.is_finite());
             assert!(c >= T::ZERO);
-            // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let c_float = Float::acos_rational_prec_ref(&x, T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&c_float, Nearest).0),
-                NiceFloat(c)
-            );
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T = round_once_to_primitive(|p| Float::acos_rational_prec_ref(&x, p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 
@@ -1797,12 +1792,10 @@ where
             // the result lies in [0, u/2], so it never overflows
             assert!(c.is_finite());
             assert!(c >= T::ZERO);
-            // the same as the `Float` version taken with 64 bits to spare and rounded once
-            let c_float = Float::acos_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64).0;
-            assert_eq!(
-                NiceFloat(T::rounding_from(&c_float, Nearest).0),
-                NiceFloat(c)
-            );
+            // the same as the `Float` version rounded once to the primitive type
+            let c_float: T =
+                round_once_to_primitive(|p| Float::acos_with_period_prec(Float::from(x), u, p).0);
+            assert_eq!(NiceFloat(c_float), NiceFloat(c));
         }
     });
 
@@ -2277,12 +2270,10 @@ where
             assert!(c.is_finite());
             assert!(c >= T::ZERO);
         }
-        // the same as the `Float` version taken with 64 bits to spare and rounded once
-        let c_float = Float::acos_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64).0;
-        assert_eq!(
-            NiceFloat(T::rounding_from(&c_float, Nearest).0),
-            NiceFloat(c)
-        );
+        // the same as the `Float` version rounded once to the primitive type
+        let c_float: T =
+            round_once_to_primitive(|p| Float::acos_with_period_rational_prec_ref(&x, u, p).0);
+        assert_eq!(NiceFloat(c_float), NiceFloat(c));
     });
 
     primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(x, u)| {

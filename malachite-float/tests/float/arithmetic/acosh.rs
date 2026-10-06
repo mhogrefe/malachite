@@ -24,8 +24,8 @@ use malachite_float::float::arithmetic::acosh::{
     primitive_float_acosh, primitive_float_acosh_rational,
 };
 use malachite_float::test_util::common::{
-    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
-    to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
+    rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::acosh::{
     rug_acosh, rug_acosh_prec, rug_acosh_prec_round, rug_acosh_rational_prec,
@@ -2982,7 +2982,9 @@ fn acosh_properties() {
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
 
         assert_eq!(
-            ComparableFloatRef(&Float::from(&rug_acosh(&rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&<Float as From<&rug::Float>>::from(&rug_acosh(
+                &rug::Float::exact_from(&x)
+            ))),
             ComparableFloatRef(&c)
         );
 
@@ -3977,8 +3979,9 @@ where
             // the result is the correctly rounded inverse hyperbolic cosine, as computed by MPFR
             // with 64 bits to spare, so that a subnormal result is rounded once by the conversion
             // rather than twice
-            let rug_c = rug_acosh_rational_prec(&x, T::MANTISSA_WIDTH + 64).0;
-            let rug_c: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_c), Nearest).0;
+            let rug_c: T = round_once_to_primitive(|p| {
+                <Float as From<&rug::Float>>::from(&rug_acosh_rational_prec(&x, p).0)
+            });
             assert_eq!(NiceFloat(rug_c), NiceFloat(c));
         }
     });

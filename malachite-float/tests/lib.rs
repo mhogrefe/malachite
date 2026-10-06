@@ -69,6 +69,7 @@ pub mod float {
         pub mod acosh;
         pub mod acot;
         pub mod acsc;
+        pub mod acsch;
         pub mod add;
         pub mod add_mul;
         pub mod agm;

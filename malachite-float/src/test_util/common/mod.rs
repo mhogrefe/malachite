@@ -8,11 +8,13 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloatRef, Float, significand_bits};
+use malachite_base::num::arithmetic::traits::{Abs, PowerOf2};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
 };
-use malachite_base::num::conversion::traits::{ExactFrom, FromStringBase};
+use malachite_base::num::conversion::traits::{ExactFrom, FromStringBase, RoundingFrom};
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
@@ -333,4 +335,46 @@ pub fn rug_rational_fn_prec_round<F: Fn(&rug::Float, &mut rug::Float, Round) -> 
     let mut c = rug::Float::with_val(u32::exact_from(prec), 0);
     let o = f(&rx, &mut c, rm);
     (c, o)
+}
+
+// Rounds a correctly rounded function value to a primitive float with a single rounding. `f(p)`
+// must return the value correctly rounded to `p` bits with `Nearest`. Rounding first to `p =
+// T::MANTISSA_WIDTH + 64` bits and then to `T` would round twice, which goes wrong when the value
+// lies just short of or just beyond a midpoint of `T`: the wide rounding can land exactly on the
+// midpoint, and the second rounding then breaks the tie its own way. That happens structurally, not
+// just by chance: for example acsch(x) lies just below 1/x, and for x = 2^150/32767 that is a
+// midpoint of two adjacent `f32` subnormals. So `f` is asked instead for the precision the value
+// has in `T`, which is less than `T::MANTISSA_WIDTH + 1` for a subnormal value, and below the
+// smallest positive value the result is decided by comparing with half of it, at increasing
+// precision until the comparison is strict.
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn round_once_to_primitive<T: PrimitiveFloat, F: FnMut(u64) -> Float>(mut f: F) -> T
+where
+    for<'a> T: RoundingFrom<&'a Float>,
+{
+    let approx = f(T::MANTISSA_WIDTH + 64);
+    if !approx.is_normal() {
+        return T::rounding_from(&approx, Nearest).0;
+    }
+    // the value lies in [2^(e-1), 2^e), and the lowest bit available in `T` is 2^MIN_EXPONENT
+    let e = i64::from(approx.get_exponent().unwrap());
+    if e <= T::MIN_EXPONENT {
+        let half = Float::power_of_2(T::MIN_EXPONENT - 1);
+        let mut p = T::MANTISSA_WIDTH + 64;
+        loop {
+            let v = f(p);
+            let v_abs = (&v).abs();
+            if v_abs != half {
+                let t = if v_abs > half {
+                    T::MIN_POSITIVE_SUBNORMAL
+                } else {
+                    T::ZERO
+                };
+                return if v.is_sign_negative() { -t } else { t };
+            }
+            p <<= 1;
+        }
+    }
+    let p = u64::exact_from((e - T::MIN_EXPONENT).min(i64::exact_from(T::MANTISSA_WIDTH + 1)));
+    T::rounding_from(&f(p), Nearest).0
 }
