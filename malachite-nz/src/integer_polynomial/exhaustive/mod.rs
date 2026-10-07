@@ -10,12 +10,14 @@ use crate::integer::Integer;
 use crate::integer::exhaustive::{IntegerUpDown, exhaustive_integers, exhaustive_nonzero_integers};
 use crate::integer_polynomial::IntegerPolynomial;
 use core::iter::{Chain, Once};
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
+use malachite_base::num::iterators::bit_distributor_sequence;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
+    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast,
     exhaustive_vecs_with_last_fixed_length, exhaustive_vecs_with_last_length_inclusive_range,
-    exhaustive_vecs_with_last_min_length,
+    exhaustive_vecs_with_last_min_length, exhaustive_vecs_with_last_with_index_generator,
 };
 
 /// Generates all [`IntegerPolynomial`]s with coefficients from one iterator and leading
@@ -119,7 +121,14 @@ pub fn exhaustive_integer_polynomials_from_iterators<
     xs: I,
     ys: J,
 ) -> ExhaustiveIntegerPolynomials<I, J> {
-    ExhaustiveIntegerPolynomials(exhaustive_vecs_with_last(xs, ys))
+    ExhaustiveIntegerPolynomials(exhaustive_vecs_with_last_with_index_generator(
+        xs,
+        ys,
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(2),
+        ),
+    ))
 }
 
 /// Generates all [`IntegerPolynomial`]s.

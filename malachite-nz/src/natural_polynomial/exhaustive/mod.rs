@@ -12,14 +12,16 @@ use crate::natural::exhaustive::{
     exhaustive_naturals, exhaustive_positive_naturals,
 };
 use crate::natural_polynomial::NaturalPolynomial;
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
+use malachite_base::num::iterators::bit_distributor_sequence;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
+    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast,
     exhaustive_vecs_with_last_fixed_length, exhaustive_vecs_with_last_length_inclusive_range,
-    exhaustive_vecs_with_last_min_length,
+    exhaustive_vecs_with_last_min_length, exhaustive_vecs_with_last_with_index_generator,
 };
 
 /// Generates all [`NaturalPolynomial`]s with coefficients from one iterator and leading
@@ -118,7 +120,14 @@ pub fn exhaustive_natural_polynomials_from_iterators<
     xs: I,
     ys: J,
 ) -> ExhaustiveNaturalPolynomials<I, J> {
-    ExhaustiveNaturalPolynomials(exhaustive_vecs_with_last(xs, ys))
+    ExhaustiveNaturalPolynomials(exhaustive_vecs_with_last_with_index_generator(
+        xs,
+        ys,
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(2),
+        ),
+    ))
 }
 
 /// Generates all [`NaturalPolynomial`]s.

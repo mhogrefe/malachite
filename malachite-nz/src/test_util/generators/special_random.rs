@@ -69,6 +69,8 @@ use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::random::{
     striped_random_natural_polynomials, striped_random_natural_polynomials_min_degree,
 };
+use crate::natural_vector::NaturalVector;
+use crate::natural_vector::random::striped_random_natural_vectors;
 use crate::platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD};
 use crate::test_util::extra_variadic::{
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xxyz,
@@ -7319,6 +7321,20 @@ pub fn special_random_integer_vec_integer_vec_unsigned_triple_gen_var_5(
         )
         .map(|((xs, ys), n)| (xs, ys, n)),
     )
+}
+
+// -- NaturalVector --
+
+pub fn special_random_natural_vector_gen(config: &GenConfig) -> It<NaturalVector> {
+    Box::new(striped_random_natural_vectors(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
 }
 
 // -- Vec<Natural> --

@@ -12,6 +12,7 @@ use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural_polynomial::NaturalPolynomial;
+use crate::natural_vector::NaturalVector;
 use crate::platform::Limb;
 use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use malachite_base::foer_sequences::FoerSequence;
@@ -118,6 +119,20 @@ pub fn natural_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalPo
             )
         },
         bucketing_label: format!("{var_name}'s total coefficient bits"),
+    }
+}
+
+pub fn natural_vector_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalVector> {
+    Bucketer {
+        bucketing_function: &|v| {
+            usize::exact_from(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
     }
 }
 

@@ -1496,19 +1496,24 @@ const fn exhaustive_vecs_from_element_iterator_helper<
 /// Generates all [`Vec`]s with elements from a specified iterator and with lengths from another
 /// iterator.
 #[derive(Clone, Debug)]
-pub struct ExhaustiveVecs<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>>(
+pub struct ExhaustiveVecs<
+    T: Clone,
+    I: Iterator<Item = u64>,
+    J: Clone + Iterator<Item = T>,
+    G: Iterator<Item = usize> = RulerSequence<usize>,
+>(
     ExhaustiveDependentPairs<
         u64,
         Vec<T>,
-        RulerSequence<usize>,
+        G,
         ExhaustiveVecsGenerator<T, J>,
         I,
         ExhaustiveFixedLengthVecs1Input<J>,
     >,
 );
 
-impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
-    for ExhaustiveVecs<T, I, J>
+impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>, G: Iterator<Item = usize>>
+    Iterator for ExhaustiveVecs<T, I, J, G>
 {
     type Item = Vec<T>;
 
@@ -1641,6 +1646,104 @@ where
     I::Item: Clone,
 {
     exhaustive_vecs_from_length_iterator(exhaustive_unsigneds(), xs)
+}
+
+/// Generates all [`Vec`]s with elements from a specified iterator, with the rate at which their
+/// lengths grow chosen by an index generator.
+///
+/// Each output is a length paired with one of the [`Vec`]s of that length. At every step,
+/// `index_generator` picks which length to take the next [`Vec`] of: the $k$th value it yields is
+/// an index into the lengths $0, 1, 2, \ldots$, as in
+/// [`exhaustive_dependent_pairs`](crate::tuples::exhaustive::exhaustive_dependent_pairs). So it is
+/// what decides how quickly long [`Vec`]s come out:
+/// - [`ruler_sequence`] picks the first length that still has [`Vec`]s half of the time, so the
+///   lengths grow logarithmically. [`exhaustive_vecs`] is this function with [`ruler_sequence`].
+/// - `bit_distributor_sequence(BitDistributorOutputType::normal(1),
+///   BitDistributorOutputType::normal(2))` gives the elements' indices twice as many bits as the
+///   length's, so the lengths grow as the cube root of the iteration number. This is the rate the
+///   polynomial generators use.
+///
+/// Every [`Vec`] is generated once, whatever `index_generator` is, provided that it yields every
+/// index infinitely often. If `xs` is empty, the output length is 1; otherwise, the output is
+/// infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i) + T^{\prime\prime}(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i) + M^{\prime\prime}(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, $T^{\prime\prime}$ and
+/// $M^{\prime\prime}$ are those of `index_generator`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+/// use malachite_base::num::exhaustive::exhaustive_unsigneds;
+/// use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
+/// use malachite_base::vecs::exhaustive::{exhaustive_vecs, exhaustive_vecs_with_index_generator};
+///
+/// // With the ruler sequence, this is `exhaustive_vecs`.
+/// assert_eq!(
+///     exhaustive_vecs_with_index_generator(exhaustive_unsigneds::<u8>(), ruler_sequence())
+///         .take(20)
+///         .collect_vec(),
+///     exhaustive_vecs(exhaustive_unsigneds::<u8>())
+///         .take(20)
+///         .collect_vec()
+/// );
+///
+/// // With a bit distributor that favors the elements, longer `Vec`s come out sooner.
+/// let xss = exhaustive_vecs_with_index_generator(
+///     exhaustive_unsigneds::<u8>(),
+///     bit_distributor_sequence(
+///         BitDistributorOutputType::normal(1),
+///         BitDistributorOutputType::normal(2),
+///     ),
+/// )
+/// .take(20)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[][..],
+///         &[0],
+///         &[1],
+///         &[0, 0],
+///         &[2],
+///         &[0, 1],
+///         &[3],
+///         &[1, 0],
+///         &[0, 0, 0],
+///         &[0, 0, 0, 0],
+///         &[0, 0, 1],
+///         &[0, 0, 0, 1],
+///         &[0, 1, 0],
+///         &[0, 0, 1, 0],
+///         &[0, 1, 1],
+///         &[0, 0, 1, 1],
+///         &[4],
+///         &[1, 1],
+///         &[5],
+///         &[0, 2]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_with_index_generator<I: Clone + Iterator, G: Iterator<Item = usize>>(
+    xs: I,
+    index_generator: G,
+) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I, G>
+where
+    I::Item: Clone,
+{
+    ExhaustiveVecs(exhaustive_dependent_pairs_stop_after_empty_ys(
+        index_generator,
+        exhaustive_unsigneds(),
+        ExhaustiveVecsGenerator { ys: xs },
+    ))
 }
 
 /// Generates all [`Vec`]s with a minimum length and with elements from a specified iterator.
@@ -1835,11 +1938,12 @@ pub struct ExhaustiveVecsWithLast<
     I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
     K: Clone + Iterator<Item = T>,
+    G: Iterator<Item = usize> = BitDistributorSequence,
 >(
     ExhaustiveDependentPairs<
         u64,
         Vec<T>,
-        BitDistributorSequence,
+        G,
         ExhaustiveVecsWithLastGenerator<T, J, K>,
         I,
         ExhaustiveFixedLengthVecsWithLast<T, J, K>,
@@ -1851,7 +1955,8 @@ impl<
     I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
     K: Clone + Iterator<Item = T>,
-> Iterator for ExhaustiveVecsWithLast<T, I, J, K>
+    G: Iterator<Item = usize>,
+> Iterator for ExhaustiveVecsWithLast<T, I, J, K, G>
 {
     type Item = Vec<T>;
 
@@ -1940,36 +2045,46 @@ pub fn exhaustive_vecs_with_last_from_length_iterator<
     ))
 }
 
-/// Generates all [`Vec`]s whose last element is drawn from a different iterator than the rest.
+/// Generates all [`Vec`]s whose last element is drawn from a different iterator than the rest, with
+/// the rate at which their lengths grow chosen by an index generator.
 ///
 /// A [`Vec`] of length $n \geq 1$ has its first $n-1$ elements from `xs` and its last from `ys`.
 /// The empty [`Vec`], which has no last element, is generated once, from neither.
 ///
-/// This is [`exhaustive_vecs`] with one element singled out, and it is what generates the
-/// coefficients of a polynomial, whose leading coefficient is the one that may not be zero.
-///
-/// The lengths of the output [`Vec`]s grow logarithmically.
+/// This is [`exhaustive_vecs_with_index_generator`] with one element singled out, and it is what
+/// generates the coefficients of a polynomial, whose leading coefficient is the one that may not be
+/// zero. `index_generator` decides how quickly the lengths grow, as it does there; the polynomial
+/// generators pass `bit_distributor_sequence(BitDistributorOutputType::normal(1),
+/// BitDistributorOutputType::normal(2))`, under which the lengths grow as the cube root of the
+/// iteration number.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(\ell + T^\prime(i))$
+/// $T(i) = O(\ell + T^\prime(i) + T^{\prime\prime}(i))$
 ///
-/// $M(i) = O(\ell + M^\prime(i))$
+/// $M(i) = O(\ell + M^\prime(i) + M^{\prime\prime}(i))$
 ///
 /// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
-/// $M^\prime$ are the time and memory functions of `xs` and `ys`, and $\ell$ is the number of
-/// elements in the $i$th output.
+/// $M^\prime$ are the time and memory functions of `xs` and `ys`, $T^{\prime\prime}$ and
+/// $M^{\prime\prime}$ are those of `index_generator`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::num::exhaustive::{
 ///     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
 /// };
-/// use malachite_base::vecs::exhaustive::exhaustive_vecs_with_last;
+/// use malachite_base::num::iterators::bit_distributor_sequence;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_with_last_with_index_generator;
 ///
-/// let xss = exhaustive_vecs_with_last(
+/// let xss = exhaustive_vecs_with_last_with_index_generator(
 ///     exhaustive_unsigneds::<u8>(),
 ///     exhaustive_positive_primitive_ints::<u8>(),
+///     bit_distributor_sequence(
+///         BitDistributorOutputType::normal(1),
+///         BitDistributorOutputType::normal(2),
+///     ),
 /// )
 /// .take(20)
 /// .collect_vec();
@@ -2000,15 +2115,21 @@ pub fn exhaustive_vecs_with_last_from_length_iterator<
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_vecs_with_last<
+pub fn exhaustive_vecs_with_last_with_index_generator<
     T: Clone,
     J: Clone + Iterator<Item = T>,
     K: Clone + Iterator<Item = T>,
+    G: Iterator<Item = usize>,
 >(
     xs: J,
     ys: K,
-) -> ExhaustiveVecsWithLast<T, PrimitiveIntIncreasingRange<u64>, J, K> {
-    exhaustive_vecs_with_last_from_length_iterator(exhaustive_unsigneds(), xs, ys)
+    index_generator: G,
+) -> ExhaustiveVecsWithLast<T, PrimitiveIntIncreasingRange<u64>, J, K, G> {
+    ExhaustiveVecsWithLast(exhaustive_dependent_pairs_stop_after_empty_ys(
+        index_generator,
+        exhaustive_unsigneds(),
+        ExhaustiveVecsWithLastGenerator { xs, ys },
+    ))
 }
 
 /// Generates all [`Vec`]s with a minimum length whose last element is drawn from a different
@@ -2019,7 +2140,8 @@ pub fn exhaustive_vecs_with_last<
 /// all otherwise.
 ///
 /// The lengths of the output [`Vec`]s grow as the cube root of the iteration number, as they do in
-/// [`exhaustive_vecs_with_last`].
+/// [`exhaustive_vecs_with_last_with_index_generator`] with the bit-distributor index generator the
+/// polynomial generators use.
 ///
 /// # Worst-case complexity per iteration
 /// $T(i) = O(\ell + T^\prime(i))$

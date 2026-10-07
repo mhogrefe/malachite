@@ -6,17 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::exhaustive::{
     PrimitiveIntIncreasingRange, exhaustive_positive_primitive_ints, exhaustive_unsigneds,
     primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
 };
+use crate::num::iterators::bit_distributor_sequence;
 use crate::polynomial::Polynomial;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
+    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast,
     exhaustive_vecs_with_last_fixed_length, exhaustive_vecs_with_last_length_inclusive_range,
-    exhaustive_vecs_with_last_min_length,
+    exhaustive_vecs_with_last_min_length, exhaustive_vecs_with_last_with_index_generator,
 };
 
 /// Generates all [`UnsignedPolynomial`]s with coefficients from one iterator and leading
@@ -120,7 +122,14 @@ pub fn exhaustive_unsigned_polynomials_from_iterators<
     xs: I,
     ys: J,
 ) -> ExhaustiveUnsignedPolynomials<T, I, J> {
-    ExhaustiveUnsignedPolynomials(exhaustive_vecs_with_last(xs, ys))
+    ExhaustiveUnsignedPolynomials(exhaustive_vecs_with_last_with_index_generator(
+        xs,
+        ys,
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(2),
+        ),
+    ))
 }
 
 /// Generates all [`UnsignedPolynomial`]s.

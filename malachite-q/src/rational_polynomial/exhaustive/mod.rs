@@ -12,12 +12,14 @@ use crate::rational::exhaustive::{
 };
 use crate::rational_polynomial::RationalPolynomial;
 use core::iter::{Chain, Once};
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
+use malachite_base::num::iterators::bit_distributor_sequence;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
+    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast,
     exhaustive_vecs_with_last_fixed_length, exhaustive_vecs_with_last_length_inclusive_range,
-    exhaustive_vecs_with_last_min_length,
+    exhaustive_vecs_with_last_min_length, exhaustive_vecs_with_last_with_index_generator,
 };
 
 /// Generates all [`RationalPolynomial`]s with coefficients from one iterator and leading
@@ -121,7 +123,14 @@ pub fn exhaustive_rational_polynomials_from_iterators<
     xs: I,
     ys: J,
 ) -> ExhaustiveRationalPolynomials<I, J> {
-    ExhaustiveRationalPolynomials(exhaustive_vecs_with_last(xs, ys))
+    ExhaustiveRationalPolynomials(exhaustive_vecs_with_last_with_index_generator(
+        xs,
+        ys,
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(2),
+        ),
+    ))
 }
 
 /// Generates all [`RationalPolynomial`]s.

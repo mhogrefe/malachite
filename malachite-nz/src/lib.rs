@@ -237,6 +237,9 @@ pub mod integer_polynomial;
 /// [`NaturalPolynomial`](natural_polynomial::NaturalPolynomial), a type representing polynomials in
 /// one variable whose coefficients are [`Natural`](natural::Natural)s.
 pub mod natural_polynomial;
+/// [`NaturalVector`](natural_vector::NaturalVector), a type representing vectors whose elements are
+/// [`Natural`](natural::Natural)s.
+pub mod natural_vector;
 
 #[cfg(feature = "test_build")]
 pub mod test_util;

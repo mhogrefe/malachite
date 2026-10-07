@@ -80,6 +80,8 @@ use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::exhaustive::{
     exhaustive_natural_polynomials, exhaustive_natural_polynomials_min_degree,
 };
+use crate::natural_vector::NaturalVector;
+use crate::natural_vector::exhaustive::exhaustive_natural_vectors;
 use crate::platform::{
     DoubleLimb, Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
@@ -3378,6 +3380,12 @@ pub fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_5()
         )
         .map(|((xs, ys), n)| (xs, ys, n)),
     )
+}
+
+// -- NaturalVector --
+
+pub fn exhaustive_natural_vector_gen() -> It<NaturalVector> {
+    Box::new(exhaustive_natural_vectors())
 }
 
 // -- Vec<Natural> --

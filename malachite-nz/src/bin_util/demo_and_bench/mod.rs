@@ -51,6 +51,7 @@ pub(crate) fn register(runner: &mut Runner) {
     integer_polynomial::register(runner);
     natural::register(runner);
     natural_polynomial::register(runner);
+    natural_vector::register(runner);
 }
 
 mod gaussian_integer;
@@ -58,3 +59,4 @@ mod integer;
 mod integer_polynomial;
 mod natural;
 mod natural_polynomial;
+mod natural_vector;

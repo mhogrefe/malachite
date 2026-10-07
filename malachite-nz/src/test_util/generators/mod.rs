@@ -15,6 +15,7 @@ use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural_polynomial::NaturalPolynomial;
+use crate::natural_vector::NaturalVector;
 use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
 use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
@@ -3723,6 +3724,16 @@ pub fn integer_vec_integer_vec_unsigned_triple_gen_var_5()
         &exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_5,
         &random_integer_vec_integer_vec_unsigned_triple_gen_var_5,
         &special_random_integer_vec_integer_vec_unsigned_triple_gen_var_5,
+    )
+}
+
+// -- NaturalVector --
+
+pub fn natural_vector_gen() -> Generator<NaturalVector> {
+    Generator::new(
+        &exhaustive_natural_vector_gen,
+        &random_natural_vector_gen,
+        &special_random_natural_vector_gen,
     )
 }
 

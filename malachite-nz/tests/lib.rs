@@ -791,3 +791,29 @@ pub mod natural_polynomial {
         pub mod striped_random_natural_polynomials_with_degree;
     }
 }
+pub mod natural_vector {
+    pub mod basic {
+        pub mod named;
+        pub mod size;
+    }
+    pub mod conversion {
+        #[cfg(feature = "serde")]
+        pub mod serde;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+    }
+    pub mod dimension;
+    pub mod exhaustive {
+        pub mod exhaustive_natural_vectors;
+    }
+    pub mod random {
+        pub mod random_natural_vectors;
+        pub mod random_natural_vectors_with_dimension;
+        pub mod striped_random_natural_vectors;
+        pub mod striped_random_natural_vectors_with_dimension;
+    }
+}
