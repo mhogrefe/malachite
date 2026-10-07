@@ -15,4 +15,5 @@ pub mod integer;
 pub mod integer_polynomial;
 pub mod natural;
 pub mod natural_polynomial;
+pub mod natural_vector;
 pub mod scratch;

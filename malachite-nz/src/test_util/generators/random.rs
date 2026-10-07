@@ -6465,6 +6465,28 @@ pub fn random_natural_vector_gen(config: &GenConfig) -> It<NaturalVector> {
     ))
 }
 
+pub fn random_natural_vector_pair_gen(config: &GenConfig) -> It<(NaturalVector, NaturalVector)> {
+    Box::new(random_pairs_from_single(random_natural_vectors(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
+pub fn random_natural_vector_triple_gen(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, NaturalVector)> {
+    Box::new(random_triples_from_single(random_natural_vectors(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
 // -- Vec<Natural> --
 
 pub fn random_natural_vec_gen(config: &GenConfig) -> It<Vec<Natural>> {

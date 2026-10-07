@@ -136,6 +136,29 @@ pub fn natural_vector_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalVector
     }
 }
 
+pub fn pair_natural_vector_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (NaturalVector, NaturalVector)> {
+    Bucketer {
+        bucketing_function: &|(v, w)| {
+            usize::exact_from(max(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+                w.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}'s total element bits, {y_name}'s total element bits)"
+        ),
+    }
+}
+
 pub fn pair_natural_polynomial_max_bit_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,

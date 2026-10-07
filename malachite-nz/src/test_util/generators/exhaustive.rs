@@ -3388,6 +3388,14 @@ pub fn exhaustive_natural_vector_gen() -> It<NaturalVector> {
     Box::new(exhaustive_natural_vectors())
 }
 
+pub fn exhaustive_natural_vector_pair_gen() -> It<(NaturalVector, NaturalVector)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_natural_vectors()))
+}
+
+pub fn exhaustive_natural_vector_triple_gen() -> It<(NaturalVector, NaturalVector, NaturalVector)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_natural_vectors()))
+}
+
 // -- Vec<Natural> --
 
 pub fn exhaustive_natural_vec_gen() -> It<Vec<Natural>> {

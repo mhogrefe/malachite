@@ -796,6 +796,9 @@ pub mod natural_vector {
         pub mod named;
         pub mod size;
     }
+    pub mod comparison {
+        pub mod shortlex_cmp;
+    }
     pub mod conversion {
         #[cfg(feature = "serde")]
         pub mod serde;

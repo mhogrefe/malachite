@@ -3737,6 +3737,22 @@ pub fn natural_vector_gen() -> Generator<NaturalVector> {
     )
 }
 
+pub fn natural_vector_pair_gen() -> Generator<(NaturalVector, NaturalVector)> {
+    Generator::new(
+        &exhaustive_natural_vector_pair_gen,
+        &random_natural_vector_pair_gen,
+        &special_random_natural_vector_pair_gen,
+    )
+}
+
+pub fn natural_vector_triple_gen() -> Generator<(NaturalVector, NaturalVector, NaturalVector)> {
+    Generator::new(
+        &exhaustive_natural_vector_triple_gen,
+        &random_natural_vector_triple_gen,
+        &special_random_natural_vector_triple_gen,
+    )
+}
+
 // -- Vec<Natural> --
 
 pub fn natural_vec_gen() -> Generator<Vec<Natural>> {
