@@ -1551,7 +1551,7 @@ module generates values for testing, streams with mean-parameterized precisions 
 exponents and striped bit patterns, the same philosophy noted
 [on the FLINT rationals page](/mapping/flint-rationals/#random-number-generation); the
 distribution samplers are all available. `mpfr_urandomb`'s
-distribution — each value $k/2^p$ for uniform $k$, at a fixed precision $p$ — is sampled by
+distribution — each value $$k/2^p$$ for uniform $$k$$, at a fixed precision $$p$$ — is sampled by
 [`uniform_random_non_negative_floats_less_than_one`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.uniform_random_non_negative_floats_less_than_one.html); the latter — a continuous uniform variable on the unit
 interval, correctly rounded to a fixed precision with any rounding mode — by
 [`uniform_random_non_negative_floats_at_most_one`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.uniform_random_non_negative_floats_at_most_one.html).

@@ -647,27 +647,27 @@ The hyperbolic functions, their reciprocals, `sinh_cosh`, and the inverse hyperb
 and tangent of a `Float` are checked against MPFR directly. The `Rational` forms are ≈, for the
 reason given under [Trigonometric functions](#trigonometric-functions). For the inverse hyperbolic
 cosine of a `Rational` near 1, the oracle adds as many bits as the magnitude of the exponent of
-$x - 1$, since a relative error $e$ in the input moves the result by about $e/(2(x-1))$; for the
-inverse hyperbolic tangent of a `Rational` near $\pm1$ it adds as many as the magnitude of the
-exponent of $1 - |x|$, for the same reason.
+$$x - 1$$, since a relative error $$e$$ in the input moves the result by about $$e/(2(x-1))$$; for the
+inverse hyperbolic tangent of a `Rational` near $$\pm1$$ it adds as many as the magnitude of the
+exponent of $$1 - |x|$$, for the same reason.
 
 The `primitive_float_*` versions are ≈: the oracle's value is mapped into the primitive type, whose
 exponent range differs from MPFR's. For `sinh`, `cosh`, `tanh`, `asinh`, and `acosh`, MPFR computes
 at the primitive type's own precision and an overflow is mapped to infinity; for the others the
 value is rounded once at the precision it has in the primitive type, as under
 [Trigonometric functions](#trigonometric-functions), which matters for values just short of a
-midpoint of the primitive type, such as $\operatorname{acsch}(2^{150}/32767)$ in `f32`.
+midpoint of the primitive type, such as $$\operatorname{acsch}(2^{150}/32767)$$ in `f32`.
 `primitive_float_sinh_cosh` is compared with `primitive_float_sinh` and `primitive_float_cosh`.
 
 MPFR has no inverse hyperbolic secant, cosecant, or cotangent, so every `asech`, `acsch`, and
-`acoth` row is ≈. For `asech`, the oracle evaluates $\operatorname{acosh}(1/x)$ with MPFR for
-$x \geq \frac{1}{2}$, the reciprocal being an exact `Rational` (with the extra input bits of the
-inverse hyperbolic cosine's `Rational` oracle), and $\ln(1+\sqrt{1-x^2}) - \ln x$ with 128 extra
-bits for smaller $x$, where $1/x$ could overflow. For `acsch`, it evaluates
-$\operatorname{asinh}(1/x)$, the reciprocal again being exact, and for extreme exponents
-$\ln(1+\sqrt{1+x^2}) - \ln|x|$ or the inverse hyperbolic sine of a reciprocal rounded with 128
-extra bits. For `acoth`, it evaluates $\operatorname{atanh}(1/x)$, whose `Rational` oracle's extra
-input bits cover the ill-conditioning near $|x| = 1$, or, for a huge $x$, the inverse hyperbolic
+`acoth` row is ≈. For `asech`, the oracle evaluates $$\operatorname{acosh}(1/x)$$ with MPFR for
+$$x \geq \frac{1}{2}$$, the reciprocal being an exact `Rational` (with the extra input bits of the
+inverse hyperbolic cosine's `Rational` oracle), and $$\ln(1+\sqrt{1-x^2}) - \ln x$$ with 128 extra
+bits for smaller $$x$$, where $$1/x$$ could overflow. For `acsch`, it evaluates
+$$\operatorname{asinh}(1/x)$$, the reciprocal again being exact, and for extreme exponents
+$$\ln(1+\sqrt{1+x^2}) - \ln|x|$$ or the inverse hyperbolic sine of a reciprocal rounded with 128
+extra bits. For `acoth`, it evaluates $$\operatorname{atanh}(1/x)$$, whose `Rational` oracle's extra
+input bits cover the ill-conditioning near $$|x| = 1$$, or, for a huge $$x$$, the inverse hyperbolic
 tangent of a reciprocal rounded with 128 extra bits. The property tests also compare each `Float`
 function with the `Rational` function of the exact reciprocal (`acosh_rational_prec_round`,
 `asinh_rational_prec_round`, or `atanh_rational_prec_round`), an independent Malachite computation,
