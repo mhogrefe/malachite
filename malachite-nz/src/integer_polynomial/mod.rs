@@ -231,7 +231,7 @@ impl Polynomial for IntegerPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
+    /// use malachite_base::num::basic::traits::{One, Two, Zero};
     /// use malachite_base::polynomial::Polynomial;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;

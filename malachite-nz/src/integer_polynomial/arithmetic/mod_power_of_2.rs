@@ -45,9 +45,7 @@ impl ModPowerOf2 for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::{
-    ///     ModPowerOf2, RemPowerOf2, RemPowerOf2Assign,
-    /// };
+    /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// // Every coefficient is taken modulo 4, and negative ones become non-negative.
@@ -102,9 +100,7 @@ impl ModPowerOf2 for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::{
-    ///     ModPowerOf2, RemPowerOf2, RemPowerOf2Assign,
-    /// };
+    /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// // Every coefficient is taken modulo 4, and negative ones become non-negative.

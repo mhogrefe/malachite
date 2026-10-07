@@ -36,7 +36,6 @@ impl BitUnpack<Natural> for NaturalPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::polynomial::BitUnpack;
     /// use malachite_nz::natural::Natural;
@@ -90,7 +89,6 @@ impl BitUnpack<&Natural> for NaturalPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::polynomial::BitUnpack;
     /// use malachite_nz::natural::Natural;

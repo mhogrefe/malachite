@@ -221,7 +221,6 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::polynomial::Polynomial;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     /// use u64;

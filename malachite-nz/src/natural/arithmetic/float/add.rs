@@ -36,10 +36,10 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 
 pub fn add_float_significands_in_place(
-    mut x: &mut Natural,
+    x: &mut Natural,
     x_exp: &mut i32,
     x_prec: u64,
-    mut y: &mut Natural,
+    y: &mut Natural,
     y_exp: i32,
     y_prec: u64,
     out_prec: u64,
@@ -48,7 +48,7 @@ pub fn add_float_significands_in_place(
     if x_prec == y_prec && out_prec == x_prec {
         add_float_significands_in_place_same_prec(x, x_exp, y, y_exp, out_prec, rm)
     } else if *x_exp >= y_exp {
-        match (&mut x, &mut y) {
+        match (&mut *x, &mut *y) {
             (Natural(Small(small_x)), Natural(Small(small_y))) => {
                 if out_prec <= Limb::WIDTH {
                     let mut out = [0];
@@ -163,7 +163,7 @@ pub fn add_float_significands_in_place(
             }
         }
     } else {
-        match (&mut x, &mut y) {
+        match (&mut *x, &mut *y) {
             (Natural(Small(small_x)), Natural(Small(small_y))) => {
                 if out_prec <= Limb::WIDTH {
                     let mut out = [0];
@@ -281,7 +281,7 @@ pub fn add_float_significands_in_place(
 }
 
 pub fn add_float_significands_in_place_ref(
-    mut x: &mut Natural,
+    x: &mut Natural,
     x_exp: &mut i32,
     x_prec: u64,
     y: &Natural,
@@ -293,7 +293,7 @@ pub fn add_float_significands_in_place_ref(
     if x_prec == y_prec && out_prec == x_prec {
         add_float_significands_in_place_same_prec_ref(x, x_exp, y, y_exp, out_prec, rm)
     } else if *x_exp >= y_exp {
-        match (&mut x, y) {
+        match (&mut *x, y) {
             (Natural(Small(small_x)), Natural(Small(small_y))) => {
                 if out_prec <= Limb::WIDTH {
                     let mut out = [0];
@@ -408,7 +408,7 @@ pub fn add_float_significands_in_place_ref(
             }
         }
     } else {
-        match (&mut x, y) {
+        match (&mut *x, y) {
             (Natural(Small(small_x)), Natural(Small(small_y))) => {
                 if out_prec <= Limb::WIDTH {
                     let mut out = [0];
@@ -1872,11 +1872,8 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
             }
             Floor | Down | Exact => {
                 let inexact = round_bit != 0 || sticky_bit != 0;
-                if rm == Exact && inexact {
-                    panic!("Inexact float addition");
-                } else {
-                    (x_exp, if inexact { Less } else { Equal })
-                }
+                assert!(rm != Exact || !inexact, "Inexact float addition");
+                (x_exp, if inexact { Less } else { Equal })
             }
             Ceiling | Up => {
                 if round_bit != 0 || sticky_bit != 0 {
@@ -2044,11 +2041,8 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
             }
             Floor | Down | Exact => {
                 let inexact = round_bit != 0 || sticky_bit != 0;
-                if rm == Exact && inexact {
-                    panic!("Inexact float addition");
-                } else {
-                    (x_exp, if inexact { Less } else { Equal })
-                }
+                assert!(rm != Exact || !inexact, "Inexact float addition");
+                (x_exp, if inexact { Less } else { Equal })
             }
             Ceiling | Up => {
                 if round_bit != 0 || sticky_bit != 0 {
@@ -2207,11 +2201,8 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
             }
             Floor | Down | Exact => {
                 let inexact = round_bit != 0 || sticky_bit != 0;
-                if rm == Exact && inexact {
-                    panic!("Inexact float addition");
-                } else {
-                    (x_exp, if inexact { Less } else { Equal })
-                }
+                assert!(rm != Exact || !inexact, "Inexact float addition");
+                (x_exp, if inexact { Less } else { Equal })
             }
             Ceiling | Up => {
                 if round_bit != 0 || sticky_bit != 0 {

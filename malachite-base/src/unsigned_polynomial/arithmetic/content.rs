@@ -215,7 +215,6 @@ impl<T: PrimitiveUnsigned> PrimitivePartAssign for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::polynomial::PrimitivePartAssign;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///

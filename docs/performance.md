@@ -11,10 +11,9 @@ Here are some benchmarks comparing the Malachite to two other libraries:
 - [`rug`](https://crates.io/crates/rug), a library that calls GMP, a widely used, highly-optimized
 bignum library written in C.
 
-The `num` version that is compared against is 0.4.3, and the `rug` version is 1.30.0. The
-Malachite version is 0.10.0.
+The `num` version that is compared against is 0.4.3, and the `rug` version is 1.30.0. The Malachite version is 0.13.0.
 
-The general trend is that Malachite is faster than `num` due to better algorithms, and slower than
+The general trend is that Malachite is faster than `num` due to better algorithms, and slightly slower than
 `rug`, though the gap is steadily decreasing. My guess is that the better performance of `rug` is
 due partly to GMP's use of inline assembly (Malachite has none, being written entirely in safe
 Rust), and possibly due to operations on Rust's slices being a little slower than C's raw pointers.
@@ -29,7 +28,7 @@ the `.gp` to your format of choice. I like SVG:
 ## Rational addition
 `cargo run --features bin_build --release -- -l 100000 -m random -b benchmark_rational_add_library_comparison -c "mean_bits_n 256"`
 <p align="center">
-  <img width="650" src="/assets/benchmarks/2026-07-26-q-add.svg" alt="Rational addition">
+  <img width="650" src="/assets/benchmarks/2026-10-06-q-add.svg" alt="Rational addition">
 </p>
 
 The most significant operations involved in adding two rational numbers (fractions) are GCD
@@ -52,7 +51,7 @@ $$O(n \log n \log \log n)$$ time.
 ## Converting a Natural to a string
 `cargo run --features bin_build --release -- -l 100000 -m random -b benchmark_natural_to_string_library_comparison -c "mean_bits_n 1024"`
 <p align="center">
-  <img width="650" src="/assets/benchmarks/2026-07-26-n-to-string.svg" alt="Natural to string">
+  <img width="650" src="/assets/benchmarks/2026-10-06-n-to-string.svg" alt="Natural to string">
 </p>
 
 When converting a natural number to a string, `num` seems to use an $$O(n^{3/2})$$ algorithm.
@@ -61,7 +60,7 @@ Malachite uses a divide-and-conquer algorithm that takes $$O(n (\log n)^2 \log \
 ## Natural multiplication
 `cargo run --features bin_build --release -- -l 20000 -m random -b benchmark_natural_mul_library_comparison -c "mean_bits_n 16384"`
 <p align="center">
-  <img width="650" src="/assets/benchmarks/2026-07-26-n-mul.svg" alt="Natural multiplication">
+  <img width="650" src="/assets/benchmarks/2026-10-06-n-mul.svg" alt="Natural multiplication">
 </p>
 
 For multiplying two natural numbers, `num` uses a basecase quadratic algorithm for small inputs,
@@ -77,13 +76,13 @@ For numbers of up to 1000 bits, all three libraries are about equally fast:
 
 `cargo run --features bin_build --release -- -l 100000 -m random -b benchmark_natural_mul_library_comparison -c "mean_bits_n 64"`
 <p align="center">
-  <img width="650" src="/assets/benchmarks/2026-07-26-n-mul-small.svg" alt="Natural multiplication">
+  <img width="650" src="/assets/benchmarks/2026-10-06-n-mul-small.svg" alt="Natural multiplication">
 </p>
 
 ## Natural addition
 `cargo run --features bin_build --release -- -l 100000 -m random -b benchmark_natural_add_library_comparison -c "mean_bits_n 1024"`
 <p align="center">
-  <img width="650" src="/assets/benchmarks/2026-07-26-n-add.svg" alt="Natural addition">
+  <img width="650" src="/assets/benchmarks/2026-10-06-n-add.svg" alt="Natural addition">
 </p>
 
 Addition of natural numbers is fast for all three libraries, being a straightforward and

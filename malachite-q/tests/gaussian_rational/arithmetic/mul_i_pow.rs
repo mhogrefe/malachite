@@ -7,8 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    AbsSquared, CanonicalUnitIPow, CanonicalizeUnit, DivI, ModPowerOf2, MulI, MulIPow,
-    MulIPowAssign,
+    AbsSquared, CanonicalUnitIPow, DivI, ModPowerOf2, MulI, MulIPow, MulIPowAssign,
 };
 use malachite_q::gaussian_rational::GaussianRational;
 use malachite_q::test_util::generators::{
@@ -94,8 +93,8 @@ fn mul_i_pow_properties() {
         assert_eq!((&x).mul_i_pow(1), (&x).mul_i());
         assert_eq!((&x).mul_i_pow(2), -&x);
         assert_eq!((&x).mul_i_pow(3), (&x).div_i());
-        // FLINT's definition of the canonical unit form
+        // Multiplying by i^k gives the canonical rotation, whose power is 0.
         let k = x.canonical_unit_i_pow();
-        assert_eq!((&x).mul_i_pow(k), (&x).canonicalize_unit());
+        assert_eq!((&x).mul_i_pow(k).canonical_unit_i_pow(), 0);
     });
 }

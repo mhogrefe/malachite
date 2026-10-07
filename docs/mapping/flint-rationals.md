@@ -17,78 +17,60 @@ side and to [Malachite for GMP Users: Rationals](/mapping/gmp-rationals/) on the
 since both map onto the same `Rational`; the [mapping index](/mapping/) lists the whole family.
 The conventions of [the GMP rationals page](/mapping/gmp-rationals/) and
 [the fmpz page](/mapping/flint-integers/#conventions), including word types and aliasing, apply
-here as well.
-
-Functions whose names begin with an underscore are omitted throughout, and this chapter states
-its own reason better than a general policy could: FLINT documents them as component-level
-variants that "may perform less error checking, and may impose limitations on aliasing", the
-internal surface beneath the public one. About twenty such variants are skipped.
+here as well. Functions whose names begin with an underscore are omitted.
 
 ## Conventions {#conventions}
 
 ### Canonical form, three ways
 
-FLINT defines canonical form as `Rational` does, down to the zero convention: numerator and
-denominator without a common factor, a positive denominator, and a denominator of one when the
-numerator is zero. The three libraries that share this page's type differ in who maintains it.
-GMP's `mpq_t` leaves canonicalization to the caller after several assignment functions, the
-situation described at the top of
-[the GMP rationals page](/mapping/gmp-rationals/). FLINT moves the responsibility into the
-library: every `fmpq` function assumes canonical inputs and produces canonical outputs, and the
-caller only takes over after reaching through `fmpq_numref` or `fmpq_denref` to edit a component
-directly, at which point "passing a non-canonical `fmpq_t` gives undefined results" until
-`fmpq_canonicalise` is called. Malachite closes the remaining gap: component access is mediated,
-so a non-canonical
+FLINT defines canonical form as `Rational` does: numerator and denominator coprime, a positive
+denominator, and a denominator of one when the numerator is zero. GMP leaves canonicalization to
+the caller after several assignment functions, as described on
+[the GMP rationals page](/mapping/gmp-rationals/). Every `fmpq` function assumes canonical inputs
+and produces canonical outputs, but editing a component through `fmpq_numref` or `fmpq_denref`
+leaves the caller responsible until `fmpq_canonicalise` is called. In Malachite component access
+is mediated, so a non-canonical
 [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)
-cannot be built or observed at all. In practice this means the mapping below carries no
-canonicalization caveats: on the shared ground of canonical values, the two libraries' functions
-agree about what they consume and produce.
+cannot be built or observed, and the mapping below carries no canonicalization caveats.
 
 ### The `fmpq` representation
 
-An `fmpq` is a pair of `fmpz`s, numerator and denominator, each a tagged word that stores small
-values inline, so a rational with word-sized components occupies two words and no allocated
-memory, and each component promotes to a GMP integer independently as it grows. The trade-offs
-of that tagged-word scheme are analyzed under
-[the fmpz representation](/mapping/flint-integers/#conventions); they apply per component here.
-A [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html) is
-a sign and two
+An `fmpq` is a pair of `fmpz`s, each storing small values inline. A
+[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html) is a
+sign and two
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)s, each
 inline below $$2^{64}$$. The visible difference is where the sign lives: FLINT's numerator is a
 signed integer, while Malachite's numerator and denominator are magnitudes with the sign held
-separately, the difference that runs through
+separately, as discussed in
 [the accessor section](/mapping/gmp-rationals/#applying-integer-functions-to-rationals) of the
-GMP rationals page and reappears wherever this chapter touches components. `fmpq_t` is an
-array of length one, the same pass-by-reference device as every `_t` before it.
+GMP rationals page.
 
 ### Categories
 
-Each function falls into one of four categories:
+Each function falls into one of five categories:
 
 | | meaning |
 | :---: | --- |
 | ✓ | A Malachite function does the same thing. |
 | ≈ | A Malachite function serves the same purpose, but its specification differs. The notes say how. |
+| ⚙ | Malachite does not expose this algorithm or helper; the Malachite column or the notes say what to call instead. |
 | — | No counterpart is needed, either because Rust handles it for you or because it is outside Malachite's scope. The notes say which. |
 | ✗ | Malachite does not fully support this yet, but will in a future version. |
 
 ## [Types, macros and constants](https://flintlib.org/doc/fmpq.html#types-macros-and-constants) {#types-macros-and-constants}
 
-The types themselves are covered under [Conventions](#conventions); the section's two functions
-are the component accessors.
+The types are covered under [Conventions](#conventions).
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | ≈ | `fmpz * fmpq_numref (const fmpq_t x)` | [`numerator_ref`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.numerator_ref), [`mutate_numerator`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.mutate_numerator) |
 | ≈ | `fmpz * fmpq_denref (const fmpq_t x)` | [`denominator_ref`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.denominator_ref), [`mutate_denominator`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.mutate_denominator) |
 
-**`fmpq_numref`, `fmpq_denref`.** The same pair as GMP's `mpq_numref` and `mpq_denref`, and the
-[full discussion on the GMP rationals page](/mapping/gmp-rationals/#applying-integer-functions-to-rationals)
-carries over: reading is free, through `numerator_ref` and `denominator_ref`, with the sign
-asked for separately; writing goes through the `mutate_*` closures, which reduce the value when
-the closure returns. The closures are the answer to this chapter's sharpest caveat: FLINT's
-"user becomes responsible for canonicalising the number" after editing through these pointers is
-exactly the responsibility the mediated access discharges automatically.
+**`fmpq_numref`, `fmpq_denref`.** As for GMP's `mpq_numref` and `mpq_denref`
+([discussion](/mapping/gmp-rationals/#applying-integer-functions-to-rationals)): reading is
+`numerator_ref` and `denominator_ref`, with the sign asked for separately; writing goes through
+the `mutate_*` closures, which reduce the value when the closure returns, so the
+canonicalisation FLINT leaves to the caller after such an edit is automatic.
 
 ## [Memory management](https://flintlib.org/doc/fmpq.html#memory-management) {#memory-management}
 
@@ -97,12 +79,10 @@ exactly the responsibility the mediated access discharges automatically.
 | ✓ | `void fmpq_init (fmpq_t x)` | [`Rational::ZERO`](https://docs.rs/malachite-base/latest/malachite_base/num/basic/traits/trait.Zero.html) |
 | — | `void fmpq_clear (fmpq_t x)` | |
 
-**`fmpq_init`, `fmpq_clear`.** `let x = Rational::ZERO;`, holding the canonical zero, 0/1, that
-`fmpq_init` produces; both are a few inline words with nothing allocated. Dropping replaces
-clearing, and the [fuller discussion](/mapping/gmp-integers/#initializing-integers) of why Rust
-has neither step is on the GMP page.
-[`Default`](https://doc.rust-lang.org/nightly/std/default/trait.Default.html) returns zero here
-too.
+**`fmpq_init`, `fmpq_clear`.** `let x = Rational::ZERO;`, the canonical zero, 0/1, that
+`fmpq_init` produces; [`Default`](https://doc.rust-lang.org/nightly/std/default/trait.Default.html)
+also returns it. Dropping replaces clearing, as
+[on the GMP page](/mapping/gmp-integers/#initializing-integers).
 
 ## [Canonicalisation](https://flintlib.org/doc/fmpq.html#canonicalisation) {#canonicalisation}
 
@@ -111,21 +91,13 @@ too.
 | — | `void fmpq_canonicalise (fmpq_t res)` | |
 | — | `int fmpq_is_canonical (const fmpq_t x)` | |
 
-This is where the [three-ways spectrum](#conventions) settles its accounts. FLINT needs these
-two functions because one road to a non-canonical `fmpq_t` stays open, editing components
-through `fmpq_numref` and `fmpq_denref`; the repair is `fmpq_canonicalise` and the audit is
-`fmpq_is_canonical`. In Malachite that road is closed, so there is nothing to repair and
-nothing to audit: the
+Neither is needed, since a non-canonical
+[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)
+[cannot exist](#conventions): the
 [`mutate_*` closures](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.mutate_numerator)
-reduce on the way out, and every
-[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html) a
-program can observe would answer `fmpq_is_canonical` with yes. Even the corner FLINT leaves
-undefined, canonicalising a fraction whose denominator has been set to zero, is closed: the
-closure that could produce such a denominator panics instead of returning. Malachite does check
-the invariant, in one place, for the same reason FLINT provides the audit function: values
-arriving from outside. Deserialization
-[validates canonical form](/mapping/gmp-rationals/#input-and-output-functions), so the check
-runs exactly where an unchecked value could otherwise enter.
+reduce on the way out, and panic rather than leave a zero denominator. Values arriving from
+outside are checked: deserialization
+[validates canonical form](/mapping/gmp-rationals/#input-and-output-functions).
 
 ## [Basic assignment](https://flintlib.org/doc/fmpq.html#basic-assignment) {#basic-assignment}
 
@@ -138,28 +110,22 @@ runs exactly where an unchecked value could otherwise enter.
 | ✓ | `void fmpq_zero (fmpq_t res)` | [`ZERO`](https://docs.rs/malachite-base/latest/malachite_base/num/basic/traits/trait.Zero.html) |
 | ✓ | `void fmpq_one (fmpq_t res)` | [`ONE`](https://docs.rs/malachite-base/latest/malachite_base/num/basic/traits/trait.One.html) |
 
-Six functions, one note. `dest = src.clone()`, or `dest.clone_from(&src)` to reuse `dest`'s
-allocations; [`std::mem::swap`](https://doc.rust-lang.org/nightly/std/mem/fn.swap.html) for the
-exchange; `-src` and `src.abs()`, sign flips that leave every
-[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
-untouched, with their `Assign` forms in place; and `res = Rational::ZERO` or `Rational::ONE`,
-assignment of a constant being the same act as creation. FLINT's remark that `fmpq_set`
-performs no canonicalisation is not a hazard but a consequence of the chapter's contract: a
-copy of a canonical value is canonical.
+`dest = src.clone()`, or `dest.clone_from(&src)` to reuse `dest`'s allocations;
+[`std::mem::swap`](https://doc.rust-lang.org/nightly/std/mem/fn.swap.html) for the exchange;
+`-src` and `src.abs()`, with their `Assign` forms in place; and `res = Rational::ZERO` or
+`Rational::ONE`.
 
 ## [Comparison](https://flintlib.org/doc/fmpq.html#comparison) {#comparison}
 
-As on [the GMP rationals page](/mapping/gmp-rationals/#comparison-functions), comparison is
-where Malachite provides every combination of types, and the discussions there, of
+The discussions on [the GMP rationals page](/mapping/gmp-rationals/#comparison-functions), of
 [`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) replacing the
 sign-carrying `int` and of the
 [`Ord`](https://doc.rust-lang.org/nightly/std/cmp/trait.Ord.html)/[`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html)
-split, carry over. The collapse is even more direct here than it was for GMP: where
-`mpq_cmp_ui` compares against a fraction passed as separate numerator and denominator, FLINT's
-`_fmpz`, `_si`, and `_ui` forms compare against plain integers, which is exactly what the mixed
+split, carry over. FLINT's `_fmpz`, `_si`, and `_ui` forms compare against plain integers,
+which the mixed
 [`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html) and
 [`PartialEq`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialEq.html) implementations
-take.
+take directly.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -182,23 +148,13 @@ take.
 `==` against another
 [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html), an
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html), or
-any primitive; `x.sign()`; and `<` and friends for the orderings, with primitive floats also
-comparable, exactly, a combination neither C library offers. On canonical values, `==` is the
-[structural equality](/mapping/gmp-rationals/#comparison-functions) described on the GMP
-rationals page, and `fmpq_equal`'s implementation makes the same component-by-component
-comparison.
+any primitive; `x.sign()`; and `<` and friends for the orderings.
 
-**`fmpq_height`, `fmpq_height_bits`.** The height of a rational, the larger of `|p|` and `q`,
-is the measure by which Diophantine results are stated: bounds on heights are what rational
-reconstruction consumes, later in this chapter, and what approximation theorems are written in.
-`to_height` and `into_height` follow the shape of the numerator and denominator extractors,
-by reference with a clone or by value without one, and the components are already magnitudes,
-so no absolute value is taken. `height_significant_bits` is `fmpq_height_bits`; since bit
-length is monotone, it equals `to_height().significant_bits()` without materializing the
-height. Note the distinction from
+**`fmpq_height`, `fmpq_height_bits`.** The height is the larger of `|p|` and `q`. `to_height`
+takes a reference and `into_height` consumes the value. `height_significant_bits` is
+`fmpq_height_bits`, computed without materializing the height. Do not confuse it with
 [`significant_bits`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#impl-SignificantBits-for-%26Rational),
-which is the *sum* of the components' bit counts, a size measure rather than a height
-measure.
+which is the *sum* of the components' bit counts.
 
 ## [Conversion](https://flintlib.org/doc/fmpq.html#conversion) {#conversion}
 
@@ -220,51 +176,39 @@ measure.
 | — | `void fmpq_clear_readonly (fmpq_t f)` | |
 
 **The fraction constructors.** `fmpq_set_fmpz_frac` is `Rational::from_integers(p, q)`, and the
-word-sized forms are `from_unsigneds` and `from_signeds`: all of them, in both libraries,
-produce "the canonical form of the fraction `p / q`", reducing on the way in. One signature
-mixes types: `fmpq_set_si` takes a signed `p` over an unsigned `q`, and a `q` above `i64::MAX`
-does not fit `from_signeds`; `from_sign_and_unsigneds(p >= 0, p.unsigned_abs(), q)` covers the
-full range. A zero denominator panics at the construction site.
+word-sized forms are `from_unsigneds` and `from_signeds`; all reduce on the way in, and a zero
+denominator panics. `fmpq_set_si` takes a signed `p` over an unsigned `q`, and a `q` above
+`i64::MAX` does not fit `from_signeds`; `from_sign_and_unsigneds(p >= 0, p.unsigned_abs(), q)`
+covers the full range.
 
-**`fmpq_get_mpz_frac`.** The pair coming back out is `to_numerator_and_denominator`, with
-`into_numerator_and_denominator` to avoid the copy; the ≈ is the usual sign placement, FLINT's
-`a` being signed where Malachite returns magnitudes, as discussed in
-[the accessor section](/mapping/gmp-rationals/#applying-integer-functions-to-rationals) of the
-GMP rationals page.
+**`fmpq_get_mpz_frac`.** `to_numerator_and_denominator`, or `into_numerator_and_denominator` to
+avoid the copy; the ≈ is the sign placement, FLINT's `a` being signed where Malachite returns
+magnitudes.
 
-**`fmpq_get_d`.** Truncation toward zero: `f64::rounding_from(&f, Down)`. FLINT calls the
-result "system dependent" out of `double` range, and the
+**`fmpq_get_d`.** Truncation toward zero: `f64::rounding_from(&f, Down)`. Out of `double` range,
+where FLINT's result is "system dependent", the
 [defined behavior](/mapping/gmp-rationals/#conversion-functions) described for `mpq_get_d`
-applies in its place, at both ends of the range.
+applies.
 
-**`fmpq_get_mpfr`.** `Float::from_rational_prec_round(src, prec, rnd)`, a full match down to
-the return value: `fmpq_get_mpfr` reports "the sign of the rounding, according to MPFR
-conventions", which is the
-[`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) in Malachite's
-return, and this time nothing is discarded, unlike
-[`fmpz_get_mpfr`](/mapping/flint-integers/#conversion), whose `void` wrapper dropped it.
+**`fmpq_get_mpfr`.** `Float::from_rational_prec_round(src, prec, rnd)`; the returned
+[`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) is the sign of the
+rounding that `fmpq_get_mpfr` returns.
 
 **`fmpq_set_str`, `fmpq_get_str`.** Base 10 is
 [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) and
-[`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html), and
-[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)'s
-`from_string_base` and `to_string_base` now cover the other bases, as described on
-[the GMP rationals page](/mapping/gmp-rationals/#conversion-functions). The ranges line up
-however FLINT's are read: the manual documents `fmpq_get_str` for bases 2 through 36, but both
-halves are thin wrappers, over `fmpz_get_str` per component and over `mpq_set_str`, and that
-machinery runs to 62; Malachite's 2 through 62 spans it either way. One behavioral difference
-matters: `fmpq_set_str` stores the parsed numerator and denominator as given, leaving
-`"2/4"` unreduced until `fmpq_canonicalise`, where `from_string_base` reduces on the way in and
-returns `None` for a zero denominator that FLINT would accept and let surface later. The small
-conventions differ in the usual directions: a bad string is a `-1` return there and no value at
-all here, and `fmpq_get_str` accepts `NULL` and allocates, halfway to returning a
+[`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html); other bases, 2 through
+62, are `from_string_base` and `to_string_base`, as described on
+[the GMP rationals page](/mapping/gmp-rationals/#conversion-functions). `fmpq_set_str` stores the
+parsed numerator and denominator as given, leaving `"2/4"` unreduced and accepting a zero
+denominator, where `from_string_base` reduces and returns `None` for a zero denominator. A bad
+string is a `-1` return there and `None` here, and `fmpq_get_str`'s allocated result becomes a
 [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html).
 
 **The GMP boundary.** `fmpq_set_mpq`, `fmpq_get_mpq`, and the four `readonly` functions are the
 `mpq_t` edition of the boundary
-[described on the fmpz page](/mapping/flint-integers/#conversion): FLINT is built on GMP and
-Malachite is not, so nothing corresponds, and interop routes through numerators and
-denominators, strings, or serde.
+[described on the fmpz page](/mapping/flint-integers/#conversion): Malachite is not built on GMP,
+so nothing corresponds, and interop routes through numerators and denominators, strings, or
+serde.
 
 ## [Input and output](https://flintlib.org/doc/fmpq.html#input-and-output) {#input-and-output}
 
@@ -274,23 +218,19 @@ denominators, strings, or serde.
 | ✓ | `int fmpq_print (const fmpq_t x)` | [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
 
 **`fmpq_print`, `fmpq_fprint`.** `print!("{x}")`, or `write!(f, "{x}")` for any
-[`Write`](https://doc.rust-lang.org/nightly/std/io/trait.Write.html); as on
-[every I/O section before this one](/mapping/flint-integers/#input-and-output), there is no
-`FILE *` half to port, and the success-or-failure `int` becomes a `Result`. The formats agree
-exactly, though the manual undersells it: FLINT's doc describes numerator, slash, denominator
-unconditionally, but the implementation prints a bare integer when the denominator is one, which
-is [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html)'s format to the
-character.
+[`Write`](https://doc.rust-lang.org/nightly/std/io/trait.Write.html), as
+[on the fmpz page](/mapping/flint-integers/#input-and-output); the success-or-failure `int`
+becomes a `Result`. The formats agree exactly, including a bare integer when the denominator is
+one (which FLINT's manual does not mention).
 
 ## [Random number generation](https://flintlib.org/doc/fmpq.html#random-number-generation) {#random-number-generation}
 
-A section GMP's rational chapter does not have. The `flint_rand_t` state maps as it did
-[on the fmpz page](/mapping/flint-integers/#random-generation): Malachite's stream generators
-take a [`Seed`](https://docs.rs/malachite-base/latest/malachite_base/random/struct.Seed.html)
-and return infinite iterators, with nothing to initialize and release in pairs. The generators
-live in
+The `flint_rand_t` state maps as it did
+[on the fmpz page](/mapping/flint-integers/#random-generation): Malachite's generators take a
+[`Seed`](https://docs.rs/malachite-base/latest/malachite_base/random/struct.Seed.html) and return
+infinite iterators. They live in
 [`rational::random`](https://docs.rs/malachite-q/latest/malachite_q/rational/random/index.html),
-behind the `random` feature, and every value they produce is canonical, as FLINT's are.
+behind the `random` feature.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -298,32 +238,20 @@ behind the `random` feature, and every value they produce is canonical, as FLINT
 | ≈ | `void fmpq_randtest_not_zero (fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)` | [`random_nonzero_rationals`](https://docs.rs/malachite-q/latest/malachite_q/rational/random/fn.random_nonzero_rationals.html) |
 | ✓ | `void fmpq_randbits (fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)` | [`get_random_natural_with_bits`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/random/fn.get_random_natural_with_bits.html), [`from_sign_and_naturals`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.from_sign_and_naturals) |
 
-**`fmpq_randtest`, `fmpq_randtest_not_zero`.** FLINT says plainly what this kind of generator
-is for: it "has an increased probability of generating special values which are likely to
-trigger corner cases". That is the philosophy of Malachite's test generators too, pursued with
-different machinery, which keeps the rows at ≈. FLINT caps the components at `bits` bits and
-mixes in its special values; Malachite's streams draw component sizes from a geometric
-distribution around a mean, with no hard cap, and the deliberately-adversarial values come from
-the striped generators, whose long runs of ones and zeros are described
-[on the GMP integers page](/mapping/gmp-integers/#random-number-functions).
-`random_nonzero_rationals` covers the `not_zero` variant directly.
+**`fmpq_randtest`, `fmpq_randtest_not_zero`.** FLINT caps the components at `bits` bits and
+mixes in special values; Malachite's generators draw component sizes from a geometric
+distribution around a mean, with no hard cap, and the corner-case values come from the striped
+generators, described [on the GMP integers page](/mapping/gmp-integers/#random-number-functions).
+`random_nonzero_rationals` is the `not_zero` variant.
 
-**`fmpq_randbits`.** Exact component sizes: draw the numerator and denominator with
-`get_random_natural_with_bits`, choose a sign, and let `from_sign_and_naturals` assemble the
-fraction. The caveat in FLINT's doc, that canonicalisation can leave the components "slightly
-smaller than `bits` bits", holds identically here, and for the same reason: the constructor
-reduces, just as `fmpq_randbits` canonicalises after sampling.
+**`fmpq_randbits`.** Draw the numerator and denominator with `get_random_natural_with_bits`,
+choose a sign, and assemble with `from_sign_and_naturals`. As in FLINT, reduction can leave the
+components "slightly smaller than `bits` bits".
 
 ## [Arithmetic](https://flintlib.org/doc/fmpq.html#arithmetic) {#arithmetic}
 
-The operators do the core of this section, as they did
-[for GMP's rationals](/mapping/gmp-rationals/#arithmetic-functions): results are returned, the
-`*Assign` traits cover the in-place case, every operator has borrowing forms, and canonical in,
-canonical out is the invariant on both sides. What FLINT adds over GMP is the family of mixed
-rational-and-integer forms, and those collapse the usual way: converting an integer of any size
-to a [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)
-costs almost nothing, so each `_si`, `_ui`, and `_fmpz` variant lands on its base operator's
-trait.
+As [for GMP's rationals](/mapping/gmp-rationals/#arithmetic-functions), results are returned,
+the `*Assign` traits cover the in-place case, and every operator has borrowing forms.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -359,45 +287,26 @@ assign and by-value forms as
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) size,
 with a by-value `Integer` donating its storage to the numerator.
 
-**`fmpq_addmul`, `fmpq_submul`.** The accumulate, `res += op1 * op2`. Neither library fuses it:
-`_fmpq_addmul` calls `_fmpq_mul` and then `_fmpq_add`, and Malachite's `add_mul` does the same,
-so the operations exist for uniformity and to name the intent rather than to take a shorter path.
-That is not an oversight in either place. Both steps put their result in lowest terms, and the
-intermediate product is the smaller thing to reduce, so deferring to a single reduction at the
-end would trade two cheap gcds for one expensive one. The `ad + bc` shape in the numerator is the
-one that `fmpz_fmma` [exists to fuse](/mapping/flint-integers/#basic-arithmetic), and that piece
-is available on the integers as `mul_add_mul`; using it here would mean giving up the early
-reduction, which is why it is not simply a matter of lifting.
+**`fmpq_addmul`, `fmpq_submul`.** `res += op1 * op2`, or `res.add_mul_assign(op1, op2)`;
+neither library fuses the two steps.
 
-**`fmpq_inv`, `fmpq_pow_si`, `fmpq_pow_fmpz`.** `src.reciprocal()`, a numerator-denominator
-swap [as on the GMP rationals page](/mapping/gmp-rationals/#arithmetic-functions); and
-`op.pow(e)` with a signed exponent, agreeing that $$0^0 = 1$$. `fmpq_pow_fmpz` takes the
-exponent as a full integer and reports failure instead of building an impossibly large result;
-the treatment written for
-[`fmpz_pow_fmpz`](/mapping/flint-integers/#basic-arithmetic) transfers whole: convert with
-`i64::try_from(&e)`, let the conversion's `Err` play the failure return, and handle the bases
-whose powers stay small, here `0` and `±1`, before converting.
+**`fmpq_inv`, `fmpq_pow_si`, `fmpq_pow_fmpz`.** `src.reciprocal()`, and `op.pow(e)` with a
+signed exponent; both libraries take $$0^0 = 1$$. `fmpq_pow_fmpz` takes the exponent as a full
+integer and reports failure instead of building an impossibly large result; as for
+[`fmpz_pow_fmpz`](/mapping/flint-integers/#basic-arithmetic), convert with `i64::try_from(&e)`,
+let the conversion's `Err` play the failure return, and handle the bases `0` and `±1` before
+converting.
 
-**`fmpq_mul_2exp`, `fmpq_div_2exp`.** `x << exp` and `x >> exp`, both exact, a rational having
-[nowhere to lose bits to](/mapping/gmp-rationals/#arithmetic-functions).
+**`fmpq_mul_2exp`, `fmpq_div_2exp`.** `x << exp` and `x >> exp`, both exact.
 
-**`fmpq_gcd`, `fmpq_gcd_cofactors`.** The GCD of two rationals, which FLINT defines as the
-canonical form of $$\gcd(ps, qr)/(qs)$$ for $$p/q$$ and $$r/s$$, noting that this "is apparently
-Euclid's original definition and is stable under scaling of numerator and denominator".
-`Rational` implements `Gcd` and `GcdAssign` with exactly this definition, which for canonical
-values — the only kind Malachite has — is $$\gcd(p, r)/\operatorname{lcm}(q, s)$$. The
-cofactor row is ≈ because the two functions return different cofactors for the same GCD:
-FLINT returns the integer quotients $$a/g$$ and $$b/g$$, while `Rational`'s `ExtendedGcd`
-returns integer Bézout cofactors $$u$$ and $$v$$ with $$ua + vb = g$$, matching the trait's
-meaning on the other types. Each is a short step from the other: FLINT's quotients are the
-exact divisions `a / &g` and `b / &g`, and since those quotients are coprime, one integer
-`extended_gcd` of them produces Malachite's cofactors, which is how the implementation
-computes them.
+**`fmpq_gcd`, `fmpq_gcd_cofactors`.** `Gcd` uses FLINT's definition, the canonical form of
+$$\gcd(ps, qr)/(qs)$$ for $$p/q$$ and $$r/s$$, which for canonical values is
+$$\gcd(p, r)/\operatorname{lcm}(q, s)$$. The cofactor row is ≈ because the cofactors differ:
+FLINT returns the integer quotients $$a/g$$ and $$b/g$$, while `ExtendedGcd` returns integer
+Bézout cofactors $$u$$ and $$v$$ with $$ua + vb = g$$. FLINT's quotients are the exact divisions
+`a / &g` and `b / &g`.
 
 ## [Modular reduction and rational reconstruction](https://flintlib.org/doc/fmpq.html#modular-reduction-and-rational-reconstruction) {#modular-reduction-and-rational-reconstruction}
-
-The round trip at the heart of multimodular algorithms: project a rational to a residue, compute
-with residues, and recover the rational at the end. Both directions map.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -406,51 +315,33 @@ with residues, and recover the rational at the end. Both directions map.
 | ✓ | `int fmpq_reconstruct_fmpz (fmpq_t res, const fmpz_t a, const fmpz_t m)` | [`Rational::reconstruct`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct) |
 
 **`fmpq_mod_fmpz`.** The residue `a` with $$n \equiv a d \pmod m$$: reduce the denominator,
-invert it, and multiply by the reduced numerator, on the machinery of
-[the fmpz_mod page](/mapping/flint-integers-mod-n/#arithmetic). That composition is FLINT's own
-algorithm, call for call: its implementation is `fmpz_invmod`, a multiplication, and a
-reduction, with the success flag being the inverse's existence, which is
+invert it, and multiply by the reduced numerator, as on
+[the fmpz_mod page](/mapping/flint-integers-mod-n/#arithmetic). FLINT's failure return is
 [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)'s
-[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html). One reading note: the
-doc's "if such an `a` exists" sounds broader than invertibility, but the implementation fails
-exactly when the denominator has no inverse, so the mapped composition and FLINT agree on every
-input.
+[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html): FLINT fails exactly when
+the denominator has no inverse.
 
-**`fmpq_reconstruct_fmpz_2`, `fmpq_reconstruct_fmpz`.** The way back. Given a residue `a`
-modulo `m` and positive bounds `N`, `D` with $$2ND < m$$, reconstruction finds the unique
-fraction `n/d` with $$|n| \le N$$, $$0 < d \le D$$, $$\gcd(n, d) = 1$$, and
-$$n \equiv ad \pmod m$$, if one exists; the shorter form uses the balanced bounds
-$$N = D = \lfloor\sqrt{(m-1)/2}\rfloor$$. This is how a multimodular computation, many images
-under `fmpq_mod_fmpz` combined by CRT, becomes a rational answer again. The mapped functions are
-[`Rational::reconstruct_with_bounds`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct_with_bounds)
-and
-[`Rational::reconstruct`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct),
-with
+**`fmpq_reconstruct_fmpz_2`, `fmpq_reconstruct_fmpz`.** Given a residue `a` modulo `m` and
+positive bounds `N`, `D` with $$2ND < m$$, reconstruction finds the unique fraction `n/d` with
+$$|n| \le N$$, $$0 < d \le D$$, $$\gcd(n, d) = 1$$, and $$n \equiv ad \pmod m$$, if one exists;
+the shorter form uses $$N = D = \lfloor\sqrt{(m-1)/2}\rfloor$$.
 [`Rational::reconstruct_with_bounds_ref`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct_with_bounds_ref)
 and
 [`Rational::reconstruct_ref`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct_ref)
-taking their arguments by reference. FLINT's success flag and out-parameter become an
+take their arguments by reference. FLINT's success flag and out-parameter become an
 [`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html): `None` is FLINT's 0.
 The residue is a
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), so
-$$a \ge 0$$ is carried by the type, and the remaining preconditions, $$a < m$$, positive
-bounds, and $$m > 2$$ for the balanced form, are panics. Within the documented domain
-$$2ND < m$$ the two libraries agree value for value, checked against
-`fmpq_reconstruct_fmpz_2` at every size. Outside that domain the answer is no longer unique
-and neither library promises one; there the mapped functions return the convergent that
-FLINT's reference implementation, `_fmpq_reconstruct_fmpz_2_naive`, returns, while
-`fmpq_reconstruct_fmpz_2` itself can differ from its own reference: its two-limb kernel reads
-the bounds through `fmpz_get_uiui`, which keeps only the low two limbs, so a three-limb bound
-is misread and the kernel can fail on inputs its reference reconstructs. Since
-$$2ND < m$$ forces the bounds to fit wherever `m` fits, no in-contract input reaches the
-misread.
+$$a \ge 0$$ is carried by the type; the other preconditions, $$a < m$$, positive bounds, and $$m > 2$$ for the balanced form, are
+panics. Within $$2ND < m$$ the two libraries agree value for value. Outside it the answer is not
+unique; there the mapped functions return what FLINT's reference implementation,
+`_fmpq_reconstruct_fmpz_2_naive`, returns, which `fmpq_reconstruct_fmpz_2` may not.
 
 ## [Rational enumeration](https://flintlib.org/doc/fmpq.html#rational-enumeration) {#rational-enumeration}
 
-FLINT enumerates the rationals one step at a time, with `next` functions; Malachite enumerates
-them as infinite iterators, in
-[`rational::exhaustive`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/index.html).
-For the Calkin-Wilf order the two agree term for term.
+FLINT's `next` functions become infinite iterators in
+[`rational::exhaustive`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/index.html),
+each step an iterator's `next`.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -461,57 +352,28 @@ For the Calkin-Wilf order the two agree term for term.
 | ✓ | `void fmpq_farey_neighbors (fmpq_t l, fmpq_t r, const fmpq_t x, const fmpz_t Q)` | [`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.farey_neighbors) |
 | ≈ | `void fmpq_simplest_between (fmpq_t x, const fmpq_t l, const fmpq_t r)` | [`SimplestRationalInInterval`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.SimplestRationalInInterval.html) |
 
-**`fmpq_next_calkin_wilf`, `fmpq_next_signed_calkin_wilf`.** The breadth-first traversal of the
-Calkin-Wilf tree is `exhaustive_non_negative_rationals()`, and the signed interleaving is
-`exhaustive_rationals()`; the sequences are identical, element by element, from the leading 0
-on. FLINT's stepping function becomes an iterator's `next`.
-
-**`fmpq_next_minimal`, `fmpq_next_signed_minimal`.** Enumeration in order of height, now
-[`exhaustive_non_negative_rationals_by_height`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_non_negative_rationals_by_height.html)
-and
-[`exhaustive_rationals_by_height`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_rationals_by_height.html),
-agreeing with FLINT term for term from the leading zero on. As with the Calkin-Wilf pair, the
-stepping function becomes an iterator's `next`, and the same family is filled out around it:
-[positive](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_positive_rationals_by_height.html),
-[negative](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_negative_rationals_by_height.html),
-and
-[nonzero](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_nonzero_rationals_by_height.html)
-variants that FLINT does not have. The height is the one the
-[height function](#comparison) returns, and the ordering is by that quantity: within a height
-$$h$$, the numerators coprime to $$h$$ are visited in increasing order, each fraction
-immediately followed by its reciprocal. The practical difference from the Calkin-Wilf order is
-size: the $$n$$th element here has height $$O(\sqrt n)$$, against $$O(n^{\log_2 \phi})$$
-there, which is what FLINT's documentation means by minimal height, and it is paid for by
-FLINT's own observation that the enumeration is slower to step. Malachite's third canonical
-well-order, the complexity order of
-[`cmp_complexity`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.cmp_complexity),
-sorts by denominator before numerator and is still distinct from both.
+**`fmpq_next_calkin_wilf`, `fmpq_next_signed_calkin_wilf`, `fmpq_next_minimal`,
+`fmpq_next_signed_minimal`.** Each iterator yields FLINT's sequence term for term, from the
+leading 0 on.
 
 **`fmpq_farey_neighbors`.**
-[`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.farey_neighbors),
-returning both neighbors as a pair. FLINT's `Q` is spelled `max_denominator`, matching
-[`Approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.Approximate.html),
-which remains the near relative: it returns the best approximation with denominator at most
-`Q`, which is always the nearer of the two neighbors, or the input itself when the input already
-qualifies. FLINT's throw on a denominator exceeding `Q` becomes a panic. Both libraries use the
-extension of the Farey sequence to all of $$\mathbb{Q}$$ rather than the classical restriction
-to $$[0, 1]$$, so the input need not be a proper fraction, and negative inputs are fine.
+[`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.farey_neighbors)
+returns both neighbors as a pair; FLINT's `Q` is `max_denominator`. FLINT's throw on an input
+whose denominator exceeds `Q` becomes a panic. Both libraries extend the Farey sequence to all
+of $$\mathbb{Q}$$, so the input may be negative or exceed 1.
 
-**`fmpq_simplest_between`.** `Rational::simplest_rational_in_closed_interval(&l, &r)`, with an
-open-interval variant FLINT does not have. The ≈ is a genuine difference in what "simplest"
-means when the minimal denominator is achieved more than once. FLINT breaks ties by the signed
-numerator, and its behavior matches its documentation: asked for the simplest fraction in
-$$[-1, 1]$$ it returns $$-1$$, and in $$[-7, -3]$$ it returns $$-7$$. Malachite prefers the
-numerator closest to zero and then the positive sign, returning 0 and $$-3$$ for the same
-intervals. On intervals containing a single fraction of minimal denominator, which is the
-typical case for the intervals these functions are pointed at, the two agree exactly.
+**`fmpq_simplest_between`.** `Rational::simplest_rational_in_closed_interval(&l, &r)`. The ≈ is
+the tie-break when the minimal denominator is achieved more than once: FLINT takes the least
+signed numerator, returning $$-1$$ for $$[-1, 1]$$ and $$-7$$ for $$[-7, -3]$$, while Malachite
+prefers the numerator closest to zero and then the positive sign, returning 0 and $$-3$$. When
+only one fraction in the interval has the minimal denominator, the two agree.
 
 ## [Continued fractions](https://flintlib.org/doc/fmpq.html#continued-fractions) {#continued-fractions}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | ✓ | `slong fmpq_get_cfrac (fmpz * c, fmpq_t rem, const fmpq_t x, slong n)` | [`ContinuedFraction`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/traits/trait.ContinuedFraction.html) |
-| ✓ | `slong fmpq_get_cfrac_naive (fmpz * c, fmpq_t rem, const fmpq_t x, slong n)` | [`ContinuedFraction`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/traits/trait.ContinuedFraction.html) |
+| ⚙ | `slong fmpq_get_cfrac_naive (fmpz * c, fmpq_t rem, const fmpq_t x, slong n)` | [`ContinuedFraction`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/traits/trait.ContinuedFraction.html) |
 | ✓ | `void fmpq_set_cfrac (fmpq_t x, const fmpz * c, slong n)` | [`from_continued_fraction`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.from_continued_fraction) |
 | — | `slong fmpq_cfrac_bound (const fmpq_t x)` | |
 
@@ -520,23 +382,16 @@ typical case for the intervals these functions are pointed at, the two agree exa
 the remaining terms as an iterator of
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)s,
 where FLINT writes all coefficients into one vector with the possibly-negative $$c_0$$ first.
-FLINT's protocol for incremental extraction, take `n` terms and feed the remainder back in to
-continue, is what a lazy iterator does by existing: the suspended iterator is the remainder.
-Both libraries document the same convention for the expansion itself: of the two continued
-fractions every rational has, the shorter one is generated.
+FLINT's incremental extraction, taking `n` terms and feeding the remainder back in, is the
+suspended iterator. Both libraries generate the shorter of the two expansions every rational
+has.
 
 **`fmpq_set_cfrac`.** `Rational::from_continued_fraction(floor, terms)`, with a `_ref` variant
-that borrows the terms. One requirement is stated more strictly: FLINT asks that the
-coefficients after $$c_0$$ "should be nonnegative", while Malachite requires them positive,
-which the shorter canonical expansion always satisfies. Malachite also has
-[`Convergents`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/traits/trait.Convergents.html),
-an iterator over the partial values of the expansion, a function FLINT's `fmpq` module does not
-offer.
+that borrows the terms. FLINT asks that the coefficients after $$c_0$$ be nonnegative, while
+Malachite requires them positive.
 
-**`fmpq_cfrac_bound`.** A preallocation bound for the coefficient vector, which FLINT
-justifies with the fact that "the smallest denominator that can give a continued fraction of
-length `n` is the Fibonacci number" $$F_{n+1}$$; an iterator allocates nothing ahead of time,
-so there is nothing to bound.
+**`fmpq_cfrac_bound`.** A preallocation bound for the coefficient vector; an iterator allocates
+nothing ahead of time, so there is nothing to bound.
 
 ## [Special functions](https://flintlib.org/doc/fmpq.html#special-functions) {#special-functions}
 
@@ -544,13 +399,9 @@ so there is nothing to bound.
 | :---: | --- | --- |
 | ✓ | `void fmpq_harmonic_ui (fmpq_t x, ulong n)` | `Rational::harmonic_number(n)` |
 
-**`fmpq_harmonic_ui`.** The harmonic number $$H_n = 1 + 1/2 + \cdots + 1/n$$. Both libraries use
-a table through $$H_{46}$$ and balanced binary splitting over the odd terms beyond it, with
-word-sized partial sums in the basecase; Malachite uses 64-bit accumulators on every platform,
-where FLINT drops to a 25-entry table and 32-bit words on 32-bit systems. Both reject
-$$n \geq 2^{63}$$, a sum with more terms than could ever be added.
-[`arith_harmonic_number`](/mapping/flint-arithmetic-functions/#harmonic-numbers) wraps this
-function and is covered by the same port.
+**`fmpq_harmonic_ui`.** Both libraries reject $$n \geq 2^{63}$$.
+[`arith_harmonic_number`](/mapping/flint-arithmetic-functions/#harmonic-numbers) maps to the same
+function.
 
 ## [Dedekind sums](https://flintlib.org/doc/fmpq.html#dedekind-sums) {#dedekind-sums}
 
@@ -559,17 +410,8 @@ function and is covered by the same port.
 | ✓ | `void fmpq_dedekind_sum (fmpq_t s, const fmpz_t h, const fmpz_t k)` | `Rational::dedekind_sum(&h, &k)` |
 | — | `void fmpq_dedekind_sum_naive (fmpq_t s, const fmpz_t h, const fmpz_t k)` | |
 
-**`fmpq_dedekind_sum`.** The Dedekind sum $$s(h, k)$$, the sawtooth correlation sum that
-appears in the transformation law of the Dedekind eta function and downstream of it, in the
-Hardy-Ramanujan-Rademacher evaluation of the partition function. Both libraries evaluate it
-through the alternating sum of the continued-fraction quotients of $$h/k$$, in machine words
-whenever $$k$$ fits in one. Beyond word size FLINT switches to its subquadratic
-continued-fraction ball machinery, while Malachite currently walks the remainder sequence
-directly, which is quadratic in the bit length of $$k$$; the results agree exactly, and both
-return 0 for $$k \leq 2$$, negative $$k$$ included.
+**`fmpq_dedekind_sum`.** The results agree exactly; both libraries return 0 for $$k \leq 2$$,
+negative $$k$$ included.
 
-**`fmpq_dedekind_sum_naive`.** The reference implementation of the defining sum, slow for
-large `k` by FLINT's own description. Malachite keeps reference implementations of this kind
-out of its public API: this one lives in its test utilities as `dedekind_sum_naive`, the oracle
-the fast version is property-tested against. The row is outside the public mapping rather than
-a gap.
+**`fmpq_dedekind_sum_naive`.** A slow reference implementation of the defining sum; Malachite
+keeps such implementations out of its public API.

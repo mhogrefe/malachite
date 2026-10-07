@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    AbsSquared, CanonicalizeUnit, CheckedRoot, Conjugate, MulI, MulIPow, Parity, Pow, PowAssign,
+    AbsSquared, CanonicalUnitIPow, CheckedRoot, Conjugate, MulI, MulIPow, Parity, Pow, PowAssign,
     PowerOf2, Reciprocal, Square,
 };
 use malachite_base::num::basic::traits::{I, One, Two, Zero};
@@ -110,7 +110,10 @@ fn principal(x: GaussianRational, exp: u64) -> GaussianRational {
                 -x
             }
         }
-        _ => x.canonicalize_unit(),
+        _ => {
+            let k = x.canonical_unit_i_pow();
+            x.mul_i_pow(k)
+        }
     }
 }
 

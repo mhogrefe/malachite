@@ -40,10 +40,25 @@ MPFR, so the float mapping belongs with
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
 - [Gaussian integers](/mapping/flint-gaussian-integers/): the `fmpzi_t` type, mapped onto
   [`GaussianInteger`](https://docs.rs/malachite-nz/latest/malachite_nz/gaussian_integer/struct.GaussianInteger.html).
+- [Integer polynomials](/mapping/flint-integer-polynomials/): the `fmpz_poly_t` type, mapped onto
+  [`IntegerPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_polynomial/struct.IntegerPolynomial.html).
+  All 48 sections of `fmpz_poly.h` are mapped.
+- [Rational polynomials](/mapping/flint-rational-polynomials/): the `fmpq_poly_t` type, mapped onto
+  [`RationalPolynomial`](https://docs.rs/malachite-q/latest/malachite_q/rational_polynomial/struct.RationalPolynomial.html).
+  All 32 sections of `fmpq_poly.h` are mapped.
+- [Modular polynomials](/mapping/flint-modular-polynomials/): the `fmpz_mod_poly_t` type —
+  polynomials over the integers mod $$n$$ — mapped onto
+  [`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html).
+  All 34 sections of `fmpz_mod_poly.h` are mapped.
+- [Word-sized modular polynomials](/mapping/flint-word-sized-modular-polynomials/): the
+  `nmod_poly_t` type — polynomials over the integers mod $$n$$, for an $$n$$ that fits in a
+  machine word — mapped onto
+  [`UnsignedPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_polynomial/struct.UnsignedPolynomial.html).
+  All 42 sections of `nmod_poly.h` are mapped.
 - [Arithmetic functions](/mapping/flint-arithmetic-functions/): the `arith.h` module, which
   computes number-theoretic and combinatorial sequences.
 
-FLINT is much larger than GMP, and its pages will arrive module by module.
+FLINT modules not listed here have no page.
 
 ## [MPFR](https://www.mpfr.org/)
 
@@ -62,3 +77,23 @@ FLINT is much larger than GMP, and its pages will arrive module by module.
   generic vocabulary.
 
 num-complex has no page: Malachite has no complex type for it to map onto.
+
+## [Azurite](https://github.com/mhogrefe/azurite)
+
+- [Naturals](/mapping/azurite-naturals/): the `AzNat` type, Azurite's formally verified
+  multi-limb natural number, mapped onto
+  [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html).
+- [Integers](/mapping/azurite-integers/): the `AzInt` type, mapped onto
+  [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html).
+- [Integers modulo a power of 2](/mapping/azurite-mod-power-of-2/): the `AzZModPow2 k` type,
+  mapped onto the `mod_power_of_2_*` operations of
+  [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html).
+- [Integers modulo a natural](/mapping/azurite-mod/): the `AzZMod m` type, mapped onto the
+  `mod_*` operations of
+  [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html).
+- [Rationals](/mapping/azurite-rationals/): the `AzRat` type, mapped onto
+  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
+- [Floats](/mapping/azurite-floats/): the `AzFloat` type, mapped onto
+  [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html).
+
+Azurite's polynomial and matrix types will get pages as they are mapped.

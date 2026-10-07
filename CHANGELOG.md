@@ -6,7 +6,7 @@ Unreleased section as work lands; at release time the section is stamped with th
 date. The 0.10.0 section was reconstructed retroactively; releases before 0.10.0 are only
 documented by git history.
 
-## Unreleased
+## 0.13.0 — 2026-10-06
 
 ### Breaking and behavioral changes
 

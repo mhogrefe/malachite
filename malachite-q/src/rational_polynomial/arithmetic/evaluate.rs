@@ -262,7 +262,7 @@ impl Evaluate<&Rational> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::{Evaluate, EvaluateMany};
+    /// use malachite_base::polynomial::Evaluate;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     /// use malachite_q::Rational;
     ///
@@ -329,7 +329,7 @@ impl Evaluate<Rational> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::{Evaluate, EvaluateMany};
+    /// use malachite_base::polynomial::Evaluate;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     /// use malachite_q::Rational;
     ///
@@ -409,7 +409,7 @@ impl Evaluate<&Rational> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::{Evaluate, EvaluateMany};
+    /// use malachite_base::polynomial::Evaluate;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -472,7 +472,7 @@ impl Evaluate<Rational> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::{Evaluate, EvaluateMany};
+    /// use malachite_base::polynomial::Evaluate;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -543,7 +543,7 @@ impl Evaluate<&Integer> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::{Evaluate, EvaluateMany};
+    /// use malachite_base::polynomial::Evaluate;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -593,7 +593,7 @@ impl Evaluate<Integer> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::{Evaluate, EvaluateMany};
+    /// use malachite_base::polynomial::Evaluate;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///

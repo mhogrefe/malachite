@@ -2178,13 +2178,10 @@ impl DivExact<Natural> for &Natural {
             (Natural(Large(ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
-                if ns_len < ds_len {
-                    panic!("division not exact");
-                } else {
-                    let mut qs = vec![0; ns_len - ds_len + 1];
-                    limbs_div_exact_to_out_ref_val(&mut qs, ns, ds);
-                    Natural::from_owned_limbs_asc(qs)
-                }
+                assert!(ns_len >= ds_len, "division not exact");
+                let mut qs = vec![0; ns_len - ds_len + 1];
+                limbs_div_exact_to_out_ref_val(&mut qs, ns, ds);
+                Natural::from_owned_limbs_asc(qs)
             }
         }
     }
@@ -2248,13 +2245,10 @@ impl DivExact<&Natural> for &Natural {
             (Natural(Large(ns)), Natural(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
-                if ns_len < ds_len {
-                    panic!("division not exact");
-                } else {
-                    let mut qs = vec![0; ns_len - ds_len + 1];
-                    limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
-                    Natural::from_owned_limbs_asc(qs)
-                }
+                assert!(ns_len >= ds_len, "division not exact");
+                let mut qs = vec![0; ns_len - ds_len + 1];
+                limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
+                Natural::from_owned_limbs_asc(qs)
             }
         }
     }
@@ -2313,14 +2307,11 @@ impl DivExactAssign<Self> for Natural {
             (Self(Large(ns)), Self(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
-                if ns_len < ds_len {
-                    panic!("division not exact");
-                } else {
-                    let mut qs = vec![0; ns_len - ds_len + 1];
-                    limbs_div_exact_to_out(&mut qs, ns, ds);
-                    swap(&mut qs, ns);
-                    self.trim();
-                }
+                assert!(ns_len >= ds_len, "division not exact");
+                let mut qs = vec![0; ns_len - ds_len + 1];
+                limbs_div_exact_to_out(&mut qs, ns, ds);
+                swap(&mut qs, ns);
+                self.trim();
             }
         }
     }
@@ -2379,14 +2370,11 @@ impl<'a> DivExactAssign<&'a Self> for Natural {
             (Self(Large(ns)), Self(Large(ds))) => {
                 let ns_len = ns.len();
                 let ds_len = ds.len();
-                if ns_len < ds_len {
-                    panic!("division not exact");
-                } else {
-                    let mut qs = vec![0; ns_len - ds_len + 1];
-                    limbs_div_exact_to_out_val_ref(&mut qs, ns, ds);
-                    swap(&mut qs, ns);
-                    self.trim();
-                }
+                assert!(ns_len >= ds_len, "division not exact");
+                let mut qs = vec![0; ns_len - ds_len + 1];
+                limbs_div_exact_to_out_val_ref(&mut qs, ns, ds);
+                swap(&mut qs, ns);
+                self.trim();
             }
         }
     }

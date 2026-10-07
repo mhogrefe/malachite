@@ -905,14 +905,7 @@ pub type StripedRandomNaturalPolynomialsReducedModPowerOf2 = RandomNaturalPolyno
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         striped_random_natural_polynomials_reduced_mod_power_of_2(
-///             EXAMPLE_SEED,
-///             8,
-///             8,
-///             1,
-///             2,
-///             1
-///         ),
+///         striped_random_natural_polynomials_reduced_mod_power_of_2(EXAMPLE_SEED, 8, 8, 1, 2, 1),
 ///         5
 ///     ),
 ///     "[31*x^5+224*x^4+248*x^3+31*x^2+59*x+255, 7, \

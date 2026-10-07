@@ -22,6 +22,7 @@ use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 use rug::float::{Round, Special};
 use std::cmp::Ordering;
+use std::sync::{Mutex, MutexGuard, PoisonError};
 
 // Can't have From impl due to orphan rule. We could define an impl in malachite-base where
 // RoundingMode is defined, but pulling in rug::float just for that purpose seems overkill.
@@ -377,4 +378,17 @@ where
     }
     let p = u64::exact_from((e - T::MIN_EXPONENT).min(i64::exact_from(T::MANTISSA_WIDTH + 1)));
     T::rounding_from(&f(p), Nearest).0
+}
+
+// The tests that compute pi to about 2^30 bits take around 5 GB each, so several of them running at
+// once exhaust memory. Each such test holds this guard for its whole duration, so they run one at a
+// time while the rest of the suite stays parallel.
+static HUGE_PI_TEST_LOCK: Mutex<()> = Mutex::new(());
+
+pub fn huge_pi_test_guard() -> MutexGuard<'static, ()> {
+    // A panic in one of these tests poisons the lock, but the lock guards no data, so the remaining
+    // tests can still run
+    HUGE_PI_TEST_LOCK
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner)
 }

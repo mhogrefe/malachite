@@ -96,7 +96,6 @@ pub mod partial_eq_integer;
 ///
 /// # partial_eq
 /// ```
-/// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::integer_polynomial::IntegerPolynomial;

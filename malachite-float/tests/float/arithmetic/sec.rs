@@ -27,6 +27,8 @@ use malachite_float::float::arithmetic::sec::{
     primitive_float_sec_rational, primitive_float_sec_with_period,
     primitive_float_sec_with_period_rational,
 };
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_float::test_util::common::huge_pi_test_guard;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
     rug_round_try_from_rounding_mode, to_hex_string,
@@ -956,6 +958,7 @@ fn primitive_float_sec_properties() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sec_overflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     // just below pi/2, where the cosine is positive and tiny
     let mut half_pi = Float::pi_prec_round(p, Floor).0 >> 1u32;
@@ -3126,6 +3129,7 @@ fn sec_rational_prec_properties() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sec_rational_huge() {
+    let _guard = huge_pi_test_guard();
     let x = Rational::power_of_2(1i64 << 30);
     let (t, o) = Float::sec_rational_prec_round_ref(&x, 10, Nearest);
     assert_eq!(t.to_string(), "-1.2852");
@@ -3140,6 +3144,7 @@ fn test_sec_rational_huge() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sec_rational_overflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     // just below pi/2, where the cosine is positive and tiny
     let pi = Float::pi_prec_round(p, Floor).0;

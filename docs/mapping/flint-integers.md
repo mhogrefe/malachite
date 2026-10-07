@@ -15,91 +15,54 @@ the `malachite-nz` crate. It follows the organization of the
 [fmpz.h chapter](https://flintlib.org/doc/fmpz.html) of the FLINT manual, as of FLINT 3.6.0, and
 is a companion to [Malachite for GMP Users: Integers](/mapping/gmp-integers/); the
 [mapping index](/mapping/) lists the whole family. The
-[Conventions](/mapping/gmp-integers/#conventions) of the GMP page, including the
-[Allocation](/mapping/gmp-integers/#allocation) discussion, apply here unchanged, since FLINT
-follows GMP's calling style: results are written into an output argument you supply, and
-Malachite returns them instead. The conventions below are the FLINT-specific ones.
-
-Two groups of functions are omitted throughout. Functions whose names begin with an underscore
-are FLINT-internal entry points with preconditions that the public functions establish for their
-callers; they are not part of the surface a port works against. And a few self-contained groups,
-noted in their sections, are summarized in prose rather than mapped row by row.
+[Conventions](/mapping/gmp-integers/#conventions) of the GMP page, including
+[Allocation](/mapping/gmp-integers/#allocation), apply here unchanged: where FLINT writes into an
+output argument, Malachite returns the result. Functions whose names begin with an underscore are
+FLINT-internal and are omitted.
 
 ## Conventions {#conventions}
 
 ### The `fmpz` representation
 
-The manual opens with a section of types, macros, and constants, and it is the one section of
-the chapter that maps onto a design rather than onto functions. An `fmpz` is a single machine
-word. When its two most significant bits are `00` or `11`, the word is an ordinary signed
-integer, so any value whose absolute value is at most $$2^{62}-1$$ (on 64-bit machines) lives
-inline, with no allocation. When they are `01`, the rest of the word is a shifted pointer to a
-GMP integer. Promotion from one form to the other is automatic, and `COEFF_MAX`, `COEFF_MIN`,
-`COEFF_IS_MPZ`, `PTR_TO_COEFF`, and `COEFF_TO_PTR` are the constants and macros that implement
-the scheme.
-
-Malachite makes the same design decision, one level up. A
-[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) is an
-enum: a value below $$2^{64}$$ is stored inline, and a larger one owns a vector of limbs. An
+An `fmpz` stores values of absolute value at most $$2^{62}-1$$ inline and promotes larger ones to
+a GMP integer. A
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) likewise
+stores values below $$2^{64}$$ inline, and an
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) is a
-sign and a `Natural`, so any integer whose absolute value is below $$2^{64}$$ allocates nothing.
-(With 32-bit limbs, the FLINT threshold is $$2^{30}-1$$ and the Malachite threshold is $$2^{32}$$.)
-
-The two layouts trade differently, and the difference is worth knowing when porting. An `fmpz`
-spends two bits of its word on the tag, so its inline range is a factor of four narrower than
-Malachite's; in exchange, every `fmpz` is exactly one word, tagged or not, so an array of a
-million of them is a dense array of words. FLINT's manual points out the memory and cache
-benefits when very many small integers are in play, and those benefits are much of the reason
-`fmpz` exists as a layer over GMP at all: polynomials and matrices are arrays of coefficients.
-A Malachite value keeps its discriminant alongside its data rather than folded into it, so its
-inline range is the full word, no bits are spent on tagging, and no pointer is ever disguised as
-an integer; the value itself is a few words wide rather than one. For a single number the
-difference is irrelevant. For aggregates it will come up again when Malachite's polynomial types
-exist and are mapped.
-
-None of the five macros and constants has a counterpart, and none needs one: they exist so that
-FLINT code can test and build the tagged word, and the tag does not exist in Malachite, whose
-representation is not part of its public API.
-
-`fmpz_t` is an array of `fmpz` of length one, the same pass-by-reference device as GMP's
-`mpz_t`, and the manual's advice about arrays (`fmpz myarr[100]`, with `myarr + 2` usable as an
-`fmpz_t`) is C plumbing that Rust's references and slices replace: a `Vec<Integer>` is indexed,
-borrowed, and passed without any device at all.
+sign and a `Natural`. (With 32-bit limbs, the thresholds are $$2^{30}-1$$ and $$2^{32}$$.) The
+macros and constants of the tagged representation (`COEFF_MAX`, `COEFF_MIN`, `COEFF_IS_MPZ`,
+`PTR_TO_COEFF`, `COEFF_TO_PTR`) have no counterparts, since Malachite's representation is not part
+of its public API. Arrays of `fmpz` become `Vec<Integer>` or slices.
 
 ### Word types
 
-FLINT's `ulong` and `slong` are the machine word on every 64-bit platform, Windows included, so
-the `_ui` and `_si` function variants correspond exactly to `u64` and `i64`. As on the GMP page,
-most of those variants collapse into their base function's row, since converting a primitive
-integer to a `Natural` or an `Integer` costs almost nothing; the collapse is even tidier here,
-with no `unsigned long` width variation to think about.
+FLINT's `ulong` and `slong` are `u64` and `i64` on every 64-bit platform, Windows included. As on
+the GMP page, most `_ui` and `_si` variants collapse into their base function's row.
 
 ### Aliasing
 
-The chapter states that, unless noted otherwise, its functions permit aliasing between inputs
-and outputs, so `fmpz_mul(x, x, x)` squares `x` in place. Rust does not allow an output to alias
-an input; the same computations are spelled through the assign and by-value forms described
-under [Allocation](/mapping/gmp-integers/#allocation), and the specific case of
-`fmpz_mul(x, x, x)` is a named operation,
+FLINT functions generally permit outputs to alias inputs. Rust does not; use the assign and
+by-value forms described under [Allocation](/mapping/gmp-integers/#allocation). The case
+`fmpz_mul(x, x, x)` is
 [`Square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Square.html),
 with `x.square_assign()` as the in-place form.
 
 ### Categories
 
-Each function falls into one of four categories:
+Each function falls into one of five categories:
 
 | | meaning |
 | :---: | --- |
 | ✓ | A Malachite function does the same thing. |
 | ≈ | A Malachite function serves the same purpose, but its specification differs. The notes say how. |
+| ⚙ | Malachite does not expose this algorithm or helper; the Malachite column or the notes say what to call instead. |
 | — | No counterpart is needed, either because Rust handles it for you or because it is outside Malachite's scope. The notes say which. |
 | ✗ | Malachite does not fully support this yet, but will in a future version. |
 
 ## [Memory management](https://flintlib.org/doc/fmpz.html#memory-management) {#memory-management}
 
-A leaner section than GMP's: there are no variadic `inits`/`clears` and no `realloc2`. The
-[fuller discussion](/mapping/gmp-integers/#initializing-integers) on the GMP page, of why Rust
-has no separate initialization step and nothing to clear, applies here without change.
+The [discussion on the GMP page](/mapping/gmp-integers/#initializing-integers) of why Rust has no
+separate initialization step and nothing to clear applies here.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -110,44 +73,29 @@ has no separate initialization step and nothing to clear, applies here without c
 | ✓ | `void fmpz_init_set_ui (fmpz_t f, ulong g)` | [`From`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) |
 | ✓ | `void fmpz_init_set_si (fmpz_t f, slong g)` | [`From`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_int/index.html), [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) |
 
-**`fmpz_init`.** `let x = Integer::ZERO;`, and the correspondence is closer here than it was for
-GMP: a freshly initialized `fmpz` is a small one, a single word with no allocation behind it,
-and `Natural::ZERO` and `Integer::ZERO` are likewise inline values that allocate nothing.
-[`Default`](https://doc.rust-lang.org/nightly/std/default/trait.Default.html) returns zero for
-both types too.
+**`fmpz_init`.** `let x = Integer::ZERO;`, which allocates nothing.
+[`Default`](https://doc.rust-lang.org/nightly/std/default/trait.Default.html) also returns zero.
 
-**`fmpz_init2`.** A capacity hint, and FLINT's manual is candid about its weight: "It is not
-necessary to call this function except to save time. A call to `fmpz_init` will do just fine."
-The same is true in Malachite, and the note under
-[`mpz_init2`](/mapping/gmp-integers/#initializing-integers) on the GMP page, including the
-[`Vec::with_capacity`](https://doc.rust-lang.org/nightly/std/vec/struct.Vec.html#method.with_capacity)
-escape hatch for when a capacity really is worth controlling, applies verbatim.
+**`fmpz_init2`.** A capacity hint; see the note under
+[`mpz_init2`](/mapping/gmp-integers/#initializing-integers) on the GMP page.
 
-**`fmpz_clear`.** Memory is released when the value drops out of scope. FLINT's manual notes
-that a cleared `fmpz` returns its memory "either back to the stack or the OS, depending on
-whether the reentrant or non-reentrant version of FLINT is built"; the non-reentrant build keeps
-a global pool of GMP integers, which is the "FLINT wide array" the chapter's introduction
-mentions. Malachite has no global state of any kind: each value owns its storage, and dropping
-it returns the storage to the allocator, in any build.
+**`fmpz_clear`.** Memory is released when the value goes out of scope.
 
 **`fmpz_init_set`, `fmpz_init_set_ui`, `fmpz_init_set_si`.** `g.clone()`, `Natural::from(g)`,
-and `Integer::from(g)`, exactly as in the
-[corresponding GMP section](/mapping/gmp-integers/#combined-initialization-and-assignment),
-including [`TryFrom`](https://doc.rust-lang.org/nightly/std/convert/trait.TryFrom.html) being
-the way a signed value becomes a `Natural`.
+and `Integer::from(g)`, as in the
+[corresponding GMP section](/mapping/gmp-integers/#combined-initialization-and-assignment);
+[`TryFrom`](https://doc.rust-lang.org/nightly/std/convert/trait.TryFrom.html) turns a signed value
+into a `Natural`.
 
 ## [Random generation](https://flintlib.org/doc/fmpz.html#random-generation) {#random-generation}
 
-FLINT's random functions thread a `flint_rand_t` state through every call, initialized with
-`flint_rand_init` and released with `flint_rand_clear`. That is the same shape as GMP's
-`gmp_randstate_t`, and the
+FLINT's `flint_rand_t` state has the same shape as GMP's `gmp_randstate_t`, and the
 [same note](/mapping/gmp-integers/#random-number-functions) applies: Malachite's stream
 generators take a [`Seed`](https://docs.rs/malachite-base/latest/malachite_base/random/struct.Seed.html)
-and return an infinite iterator, its single-value `get_*` forms borrow a source of random words
-mutably (a
+and return an infinite iterator, and its single-value `get_*` forms borrow a source of random
+words mutably (a
 [`StripedBitSource`](https://docs.rs/malachite-base/latest/malachite_base/num/random/striped/struct.StripedBitSource.html)
-for the striped forms), and in neither case is there an initialize-and-release pair to balance.
-Random generation lives behind the `random` feature, in the
+for the striped forms). Random generation lives behind the `random` feature, in the
 [`natural::random`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/random/index.html)
 and
 [`integer::random`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/random/index.html)
@@ -165,54 +113,37 @@ modules.
 | ≈ | `void fmpz_randtest_mod_signed (fmpz_t f, flint_rand_t state, const fmpz_t m)` | [`striped_random_integer_range`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/random/fn.striped_random_integer_range.html) |
 | ✗ | `void fmpz_randprime (fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int proved)` | |
 
-**`fmpz_randbits`, `fmpz_randbits_unsigned`.** An exact bit length:
-`get_random_natural_with_bits` chooses uniformly among the `Natural`s of precisely `bits` bits.
-For the signed version, FLINT chooses the sign at random; compose the same thing with
-`Integer::from_sign_and_abs` and a random `bool`.
+**`fmpz_randbits`, `fmpz_randbits_unsigned`.** `get_random_natural_with_bits` chooses uniformly
+among the `Natural`s of exactly `bits` bits. FLINT's signed version also picks a random sign;
+compose it with `Integer::from_sign_and_abs` and a random `bool`.
 
-**The `randtest` family.** These exist for the same reason as Malachite's stream generators: test
-inputs should not all be large, since edge cases live among the small and the structured. The
-distributions differ, which is what keeps the rows at ≈. FLINT draws the bit length uniformly
-from `0` to `bits` inclusive, so all magnitudes up to a hard cap are equally represented.
-Malachite's streams take a *mean* bit length and draw sizes from a geometric distribution, with
-no hard cap; `random_nonzero_integers` covers the `not_zero` variant directly. Malachite also
-has a second adversary that FLINT's `fmpz` module does not: the striped generators, described
-[on the GMP page](/mapping/gmp-integers/#random-number-functions), which produce values with
-long runs of zeros and ones to stress carry and borrow paths. If what you want is FLINT's exact
-shape, draw a length and then a value:
+**The `randtest` family.** The distributions differ, hence ≈. FLINT draws the bit length
+uniformly from `0` to `bits` inclusive, with a hard cap. Malachite's streams take a *mean* bit
+length and draw sizes from a geometric distribution, with no cap; `random_nonzero_integers`
+covers the `not_zero` variant. To reproduce FLINT's shape, draw a length and then a value of that
+length;
 [`get_random_natural_with_up_to_bits`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/random/fn.get_random_natural_with_up_to_bits.html)
-caps the length but weights toward full-length values, so it is the uniform-value rather than
-the uniform-length cap.
+caps the length but is uniform over values, not over lengths.
 
-**`fmpz_randm`, `fmpz_randtest_mod`, `fmpz_randtest_mod_signed`.** The uniform one is exact:
-`get_random_natural_less_than` for a single value, or the `random_naturals_less_than` stream.
-The two `randtest_mod` forms bias toward the endpoints of the range (and toward zero, for the
-signed one); Malachite's range generators come in uniform and striped variants instead, so the
-adversarial values are the ones with extreme bit patterns rather than the ones near the
-endpoints. The signed range `(-m/2, m/2]` is spelled as an ordinary range through
+**`fmpz_randm`, `fmpz_randtest_mod`, `fmpz_randtest_mod_signed`.** `fmpz_randm` is
+`get_random_natural_less_than`, or the `random_naturals_less_than` stream. The two `randtest_mod`
+forms bias toward the endpoints of the range (and toward zero, for the signed one); Malachite's
+range generators are uniform or striped instead, with no endpoint bias. The signed range
+`(-m/2, m/2]` is an ordinary range for
 [`uniform_random_integer_inclusive_range`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/random/fn.uniform_random_integer_inclusive_range.html)
 or its striped counterpart.
 
-**`fmpz_randprime`.** A gap: Malachite does not generate random primes at bignum sizes,
-because it does not yet test bignum primality; this row will be filled together with the
-primality work described under
-[Primes and factors](/mapping/gmp-integers/#number-theoretic-functions) on the GMP page. FLINT's
-manual is worth reading on the semantics its version chose: the result is the next prime above a
-random point, so the distribution over primes is not quite uniform, and the generator is "not
-suitable for cryptographic use".
+**`fmpz_randprime`.** No counterpart: Malachite does not generate bignum primes.
 
-FLINT has more random generation in its limb-level
-[mpn_extras](https://flintlib.org/doc/mpn_extras.html) module. That module is not mapped on
-these pages: Malachite's limb-level functions are internal, not part of its public API.
+FLINT's limb-level random functions, in
+[mpn_extras](https://flintlib.org/doc/mpn_extras.html), are not mapped: Malachite's limb-level
+functions are not public.
 
 ## [Conversion](https://flintlib.org/doc/fmpz.html#conversion) {#conversion}
 
-The largest section of the chapter, and three stories run through it. The conversions to and
-from primitives follow the same policy-trait scheme as
-[on the GMP page](/mapping/gmp-integers/#conversion-functions). The many multi-word forms, which
-FLINT needs because C has no integer type wider than a word, collapse into Rust's 128-bit
-primitives and Malachite's limb-slice conversions. And the conversions to and from GMP and MPFR
-types are a boundary that Malachite does not have.
+Conversions to and from primitives follow the policy-trait scheme
+[on the GMP page](/mapping/gmp-integers/#conversion-functions). The multi-word forms become Rust's
+128-bit primitives and Malachite's limb-slice conversions.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -256,103 +187,79 @@ types are a boundary that Malachite does not have.
 fails when the value does not fit, `WrappingFrom` keeps the low bits, `SaturatingFrom` clamps,
 and
 [`ConvertibleFrom`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ConvertibleFrom.html)
-is the fits-test. The difference from GMP is that FLINT leaves more undefined: `fmpz_get_ui` of
-a negative number is undefined where `mpz_get_ui` returns the low bits of the absolute value.
-Malachite's policies are total; each trait says what happens.
+is the fits-test. FLINT leaves `fmpz_get_ui` of a negative number undefined (GMP's `mpz_get_ui`
+returns the low bits of the absolute value); each Malachite trait defines its result.
 
-**Words in pairs and arrays.** Eight of these functions exist because C has no integer wider
-than a word, and they split into two groups. The two-word group is Rust's 128-bit primitives:
-`fmpz_set_uiui(f, hi, lo)` is `Natural::from(x)` for a `u128`, `fmpz_set_signed_uiui` is
+**Words in pairs and arrays.** The two-word forms are Rust's 128-bit primitives:
+`fmpz_set_uiui(f, hi, lo)` is `Natural::from` of a `u128`, `fmpz_set_signed_uiui` is
 `Integer::from` of an `i128`, and the two `neg` forms compose with
-[`Neg`](https://doc.rust-lang.org/nightly/std/ops/trait.Neg.html). In the other direction,
-`fmpz_get_uiui` is a `u128` conversion under whichever policy you choose, and
-`fmpz_get_signed_uiui`, which FLINT specifies as the value modulo $$2^{128}$$ in two's
-complement, is `i128::wrapping_from` exactly. When what you have or want really is a pair of
-words rather than a `u128`, Malachite mimics the `uiui` shape directly:
+[`Neg`](https://doc.rust-lang.org/nightly/std/ops/trait.Neg.html). `fmpz_get_uiui` is a `u128`
+conversion under whichever policy you choose, and `fmpz_get_signed_uiui` (the value modulo
+$$2^{128}$$ in two's complement) is `i128::wrapping_from`. To go between a `u128` and a word pair,
+use
 [`JoinHalves`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.JoinHalves.html)
-builds the wide value as `u128::join_halves(hi, lo)`, and
+(`u128::join_halves(hi, lo)`) and
 [`SplitInHalf`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.SplitInHalf.html)
-takes it back apart with `split_in_half()`, whose pair is ordered `(hi, lo)` just as the FLINT
-arguments are. The wider group is Malachite's limb-slice
-conversions: `fmpz_set_ui_array` is `Natural::from_limbs_asc`, the `signed` versions (including
-the three-word `fmpz_set_signed_uiuiui`) are `Integer::from_twos_complement_limbs_asc`, and the
-`get` versions are `to_limbs_asc` and `to_twos_complement_limbs_asc`, which return a
-minimal-length [`Vec`](https://doc.rust-lang.org/nightly/std/vec/struct.Vec.html) where FLINT
-fills exactly `n` words; extend with zero words (or sign words, in the two's complement case) if
-a fixed width is what you need. `fmpz_set_mpn_large` is `from_limbs_asc` plus
-`Integer::from_sign_and_abs`, and its preconditions (at least two limbs, normalized top limb)
-are not required: `from_limbs_asc` takes any slice, unnormalized or empty. `fmpz_get_mpn`
-allocates an array and returns its length, which is `to_limbs_asc` returning a `Vec`.
+(`split_in_half()`, returning `(hi, lo)`). The array forms are the limb-slice conversions:
+`fmpz_set_ui_array` is `Natural::from_limbs_asc`, the `signed` versions (including
+`fmpz_set_signed_uiuiui`) are `Integer::from_twos_complement_limbs_asc`, and the `get` versions
+are `to_limbs_asc` and `to_twos_complement_limbs_asc`. These return a minimal-length
+[`Vec`](https://doc.rust-lang.org/nightly/std/vec/struct.Vec.html) where FLINT fills exactly `n`
+words; pad with zero words (or sign words, for two's complement) if you need a fixed width.
+`fmpz_set_mpn_large` is `from_limbs_asc` plus `Integer::from_sign_and_abs`, without its
+preconditions: `from_limbs_asc` accepts any slice, unnormalized or empty. `fmpz_get_mpn` is
+`to_limbs_asc`.
 
-**`fmpz_get_d`, `fmpz_set_d`, and the `2exp` pair.** `fmpz_get_d` truncates toward zero, so it
-is `f64::rounding_from(&f, Down)`; FLINT leaves the result undefined when the value is out of
-`double` range, and the
-[defined overflow behavior](/mapping/gmp-integers/#conversion-functions) described on the GMP
-page applies instead. `fmpz_set_d` also truncates, through `Integer::rounding_from(c, Down)`,
-and FLINT's undefined cases are narrowed: an infinity or NaN fails `try_from` and makes
-`rounding_from` panic, and a subnormal, which FLINT also declares undefined, is an ordinary tiny
-value that truncates to zero. `fmpz_get_d_2exp` is
+**`fmpz_get_d`, `fmpz_set_d`, and the `2exp` pair.** `fmpz_get_d` truncates, so it is
+`f64::rounding_from(&f, Down)`; where FLINT leaves out-of-range values undefined, the
+[defined overflow behavior](/mapping/gmp-integers/#conversion-functions) on the GMP page applies.
+`fmpz_set_d` is `Integer::rounding_from(c, Down)`; an infinity or NaN fails `try_from` and makes
+`rounding_from` panic, and a subnormal (undefined in FLINT) truncates to zero. `fmpz_get_d_2exp`
+is
 [`SciMantissaAndExponent`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.SciMantissaAndExponent.html),
 with the mantissa-normalization difference noted
 [on the GMP page](/mapping/gmp-integers/#conversion-functions) for `mpz_get_d_2exp`.
-`fmpz_set_d_2exp` rounds $$d \cdot 2^{exp}$$ to the nearest integer; since every finite `double`
-is a rational, the exact spelling is `Rational::try_from(d)` shifted by `exp`, then
-`Integer::rounding_from(&q, Nearest)`.
+`fmpz_set_d_2exp` rounds $$d \cdot 2^{exp}$$ to the nearest integer; the exact spelling is
+`Rational::try_from(d)` shifted by `exp`, then `Integer::rounding_from(&q, Nearest)`.
 
-**The GMP and MPFR boundary.** Nine functions convert between `fmpz_t` and GMP's `mpz_t` and
-`mpf_t`, including the four `readonly` functions, which exist to present a value across that
-boundary without copying it. The boundary is there because FLINT is built on GMP; Malachite is
-not, so none of these has or needs a counterpart. When a value must cross into C, or into GMP
-through Rust bindings such as [rug](https://docs.rs/rug/latest/rug/), the routes are the
-limb-slice conversions above, strings, or [serde](https://serde.rs/). The exception in the group
-is `fmpz_get_mpfr`: Malachite models MPFR's type as
-[`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html), so
-`Float::from_integer_prec_round(f, prec, rnd)` is a real counterpart, taking the target
-precision explicitly where MPFR reads it from `x`, and returning an
-[`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) that reports the
-rounding direction, the ternary result that FLINT's `void` wrapper discards. For `mpf_t`, see the
-[note on the GMP page](/mapping/gmp-integers/#assigning-integers) about `mpf`'s status.
+**The GMP and MPFR boundary.** The conversions to and from `mpz_t` and `mpf_t`, including the
+four `readonly` functions, have no counterpart because Malachite is not built on GMP. To pass a
+value to C, or to GMP through bindings such as [rug](https://docs.rs/rug/latest/rug/), use the
+limb-slice conversions above, strings, or [serde](https://serde.rs/). For `mpf_t`, see the
+[note on the GMP page](/mapping/gmp-integers/#assigning-integers). `fmpz_get_mpfr` is
+`Float::from_integer_prec_round(f, prec, rnd)` on
+[`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html), which
+takes the target precision explicitly and also returns an
+[`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) giving the rounding
+direction.
 
-**`fmpz_get_nmod`.** The result is `f` reduced modulo a word: per the
-[Conventions](/mapping/gmp-integers/#conventions), spell it with `Natural::from(m)` and
+**`fmpz_get_nmod`.** Reduce with `Natural::from(m)` and
 [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html),
-then convert the word-sized result back down. The `nmod_t` argument is more than a modulus: it
-carries a precomputed inverse so that repeated reductions avoid division. Malachite has no
-public precomputed-modulus context; that machinery reappears throughout FLINT's `fmpz_mod`
-chapter, and the trade is taken up properly on
-[its page](/mapping/flint-integers-mod-n/#conventions).
+then convert the result to a word. Malachite has no public counterpart of the precomputed
+`nmod_t` context; see [the mod-n page](/mapping/flint-integers-mod-n/#conventions).
 
-**`fmpz_get_str`, `fmpz_set_str`.** The same pair as GMP's string functions, and the same
-match: `to_string_base` and `from_string_base` cover the full base range of 2 through 62 with
-the digit alphabet FLINT delegates to GMP for, described in
-[the notes on the GMP page](/mapping/gmp-integers/#assigning-integers) along with
-[`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) in place of a `-1`
-return and [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html) in place
-of a caller-sized buffer. Two differences from GMP do not carry over: FLINT's `fmpz_get_str`
-accepts `NULL` and allocates, so its buffer-management hazard is already halfway to Rust's, and
-FLINT has no negative-base uppercase mode, so `to_string_base` alone is the whole of
-`fmpz_get_str` and `to_string_base_upper` is extra. On the parsing side FLINT skips surrounding
-whitespace itself and inherits GMP's tolerance of interior whitespace; Malachite accepts no
-whitespace, accepts a single leading `+` that FLINT and GMP reject, and, like FLINT's own
-special check, rejects a doubled minus sign.
+**`fmpz_get_str`, `fmpz_set_str`.** `to_string_base` and `from_string_base`, covering bases 2
+through 62 with GMP's digit alphabet, as described in
+[the notes on the GMP page](/mapping/gmp-integers/#assigning-integers):
+[`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) replaces the `-1`
+return and [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html) replaces
+the buffer. FLINT has no uppercase mode, so `to_string_base` covers all of `fmpz_get_str`. When
+parsing, FLINT skips surrounding whitespace and tolerates interior whitespace; Malachite accepts
+no whitespace, accepts a single leading `+` that FLINT rejects, and, like FLINT, rejects a doubled
+minus sign.
 
-**`fmpz_set_ui_smod`.** A balanced remainder: the representative of `x` modulo `m` in
-`(-m/2, m/2]`, which is
-[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html).
-FLINT states a precondition, that `x` already satisfies `0 <= x < m`, and does not check it;
-`balanced_mod` reduces first, so any
-[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) is
-accepted and the result is the same wherever FLINT's precondition holds. Because the
-representative may be negative, the output is an
-[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) even
-though the inputs are not. The full-size version is `fmpz_smod` in the next section, the same
-trait.
+**`fmpz_set_ui_smod`.** The representative of `x` modulo `m` in `(-m/2, m/2]`, which is
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html),
+returning an
+[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html). FLINT
+requires (without checking) `0 <= x < m`; `balanced_mod` accepts any
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and
+agrees wherever FLINT's precondition holds.
 
 ## [Input and output](https://flintlib.org/doc/fmpz.html#input-and-output) {#input-and-output}
 
-As on [the GMP page](/mapping/gmp-integers/#input-and-output-functions), there is no `FILE *`
-half to port: Rust keeps formatting and I/O separate, so nothing in Malachite needs to know
-about streams, and none of it is restricted to `stdio`.
+As on [the GMP page](/mapping/gmp-integers/#input-and-output-functions), Malachite has no
+`FILE *` functions: formatting and parsing work with any Rust reader or writer.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -363,24 +270,18 @@ about streams, and none of it is restricted to `stdio`.
 | ✓ | `int fmpz_fprint (FILE * fs, const fmpz_t x)` | [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
 | ≈ | `size_t fmpz_out_raw (FILE * fout, const fmpz_t x)` | [`Serialize`](https://docs.rs/serde/latest/serde/trait.Serialize.html) |
 
-**`fmpz_read`, `fmpz_fread`.** Pull a token out of your reader and hand it to
-`parse::<Integer>()`; these two are decimal-only, with `from_string_base` covering the other
-bases as under `fmpz_set_str`. Failure is an `Err` rather than a non-positive return, and
-Malachite's parser is the more permissive of the two: FLINT rejects leading zeros, while
-`"00123"` parses.
+**`fmpz_read`, `fmpz_fread`.** Read a token and call `parse::<Integer>()` (decimal), or
+`from_string_base` for other bases. Failure is an `Err` rather than a non-positive return.
+FLINT rejects leading zeros; Malachite parses `"00123"`.
 
 **`fmpz_print`, `fmpz_fprint`.** `print!("{x}")`, or `write!(f, "{x}")` for any
-[`Write`](https://doc.rust-lang.org/nightly/std/io/trait.Write.html). The sign-then-digits
-format is what [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html)
-produces. FLINT returns the number of characters written; Rust's formatting reports failure
-through a `Result` instead, and `x.to_string().len()` gives the count when the count is what
-you want.
+[`Write`](https://doc.rust-lang.org/nightly/std/io/trait.Write.html). FLINT returns the number
+of characters written; `x.to_string().len()` gives it if needed.
 
-**`fmpz_out_raw`, `fmpz_inp_raw`.** FLINT delegates to GMP's raw format, 4 bytes of size and
-then big-endian limbs, so this pair is byte-compatible with `mpz_out_raw` and `mpz_inp_raw`, and
-the [discussion on the GMP page](/mapping/gmp-integers/#input-and-output-functions) of how that
-format corresponds to Malachite's [serde](https://serde.rs/) support, including the encoding and
-size differences that keep the rows at ≈, carries over without change.
+**`fmpz_out_raw`, `fmpz_inp_raw`.** These use GMP's raw format, so the
+[discussion on the GMP page](/mapping/gmp-integers/#input-and-output-functions) of `mpz_out_raw`
+and `mpz_inp_raw` versus Malachite's [serde](https://serde.rs/) support applies, including the
+encoding differences behind the ≈.
 
 ## [Basic properties and manipulation](https://flintlib.org/doc/fmpz.html#basic-properties-and-manipulation) {#basic-properties-and-manipulation}
 
@@ -402,70 +303,44 @@ size differences that keep the rows at ≈, carries over without change.
 | ✓ | `ulong fmpz_abs_lbound_ui_2exp (slong * exp, const fmpz_t x, int bits)` | [`sci_mantissa_and_exponent_round`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.sci_mantissa_and_exponent_round), [`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html) |
 | ✓ | `ulong fmpz_abs_ubound_ui_2exp (slong * exp, const fmpz_t x, int bits)` | [`sci_mantissa_and_exponent_round`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.sci_mantissa_and_exponent_round), [`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html) |
 
-**`fmpz_sizeinbase`, `fmpz_bits`, `fmpz_size`, `fmpz_sgn`.** The measurement functions.
-`fmpz_bits` is `significant_bits()`, agreeing at zero too: both return 0. `fmpz_size` is
-`limb_count()`, on the `Natural` itself or through
-[`unsigned_abs_ref`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.unsigned_abs_ref)
-for an `Integer`'s absolute value, and both again report 0 for zero. `fmpz_sgn` is
+**`fmpz_sizeinbase`, `fmpz_bits`, `fmpz_size`, `fmpz_sgn`.** `fmpz_bits` is
+`significant_bits()`, and `fmpz_size` is `limb_count()`, on a `Natural` or on an `Integer`'s
+[`unsigned_abs_ref`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.unsigned_abs_ref);
+all return 0 for zero. `fmpz_sgn` is
 [`Sign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Sign.html),
-returning an [`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) as
-[on the GMP page](/mapping/gmp-integers/#comparison-functions). For `fmpz_sizeinbase`,
-`f.floor_log_base(&base) + 1` is the digit count; unlike `mpz_sizeinbase`, FLINT's version
-states no overshoot, so the exactness caveat in the
-[GMP note](/mapping/gmp-integers/#miscellaneous-functions) does not arise, but the zero caveat
-does: `floor_log_base` panics on zero, so the zero case is yours to spell out.
+returning an [`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html). For
+`fmpz_sizeinbase`, the digit count is `f.floor_log_base(&base) + 1`, but `floor_log_base` panics
+on zero, so handle zero separately.
 
-**`fmpz_val2`.** The 2-adic valuation, `trailing_zeros()`, on the `Natural` or on an
-`Integer`'s absolute value. The ≈ is the zero convention: zero is divisible by every power of
-two, and FLINT answers 0 while Malachite answers
-[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), the same
-sentinel-becomes-[`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html)
-policy described
-[on the GMP page](/mapping/gmp-integers/#logical-and-bit-manipulation-functions).
+**`fmpz_val2`.** `trailing_zeros()`, on a `Natural` or on an `Integer`'s absolute value. For zero,
+FLINT returns 0 and Malachite returns
+[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), hence ≈.
 
 **`fmpz_swap`, `fmpz_set`, `fmpz_zero`, `fmpz_one`.**
 [`std::mem::swap`](https://doc.rust-lang.org/nightly/std/mem/fn.swap.html); `x = y.clone()` or
-`x.clone_from(&y)`; `x = Integer::ZERO` and `x = Integer::ONE`. Assigning a constant to an
-existing variable is the same operation as creating one, since the old value simply drops.
+`x.clone_from(&y)`; `x = Integer::ZERO` and `x = Integer::ONE`.
 
 **`fmpz_abs_fits_ui`, `fmpz_fits_si`.** `u64::convertible_from(f.unsigned_abs_ref())` and
-`i64::convertible_from(&f)`. The
-[six-functions-into-one-trait note](/mapping/gmp-integers/#miscellaneous-functions) from the GMP
-page applies; FLINT documents only these two of the family.
+`i64::convertible_from(&f)`.
 
 **`fmpz_setbit`, `fmpz_tstbit`.** `f.set_bit(i)` and `f.get_bit(i)`, from
 [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html),
-indexed from the least significant bit, with negative values acting as their two's complement.
-The rest of the family, clearing and flipping, appears under
-[Logic Operations](#logic-operations) below, where FLINT keeps it.
+with negative values acting as their two's complement.
 
-**`fmpz_abs_lbound_ui_2exp`, `fmpz_abs_ubound_ui_2exp`.** A word-sized mantissa of exactly
-`bits` bits and an exponent bounding `|x|` from below or above. Malachite's named version of
-this operation is
-[`sci_mantissa_and_exponent_round`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.sci_mantissa_and_exponent_round):
-passing `Floor` or `Ceiling` produces a mantissa-and-exponent pair that bounds the value from
-below or above, along with an
-[`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) saying whether the
-bound is exact. The difference is the mantissa's form: FLINT returns an integer of a
-caller-chosen width up to a word, while Malachite returns an `f32` or `f64` in `[1, 2)`, so the
-width is the float format's 24 or 53 bits. For FLINT's exact shape at any width, the spelling is
-a rounded shift: with `e = x.significant_bits() as i64 - bits`, the mantissa is
-`x.unsigned_abs_ref().shr_round(e, Floor).0` for the lower bound or `Ceiling` for the upper (a
-negative `e` shifts left, exactly). One edge matches FLINT's own caveat: when the ceiling
-carries to a power of two, the mantissa has gained a bit, which is the case FLINT describes as
-the exponent coming out one too large; renormalize with one more shift if you need the mantissa
-width exact.
+**`fmpz_abs_lbound_ui_2exp`, `fmpz_abs_ubound_ui_2exp`.**
+[`sci_mantissa_and_exponent_round`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.sci_mantissa_and_exponent_round)
+with `Floor` or `Ceiling` gives a mantissa and exponent bounding the value from below or above,
+but its mantissa is an `f32` or `f64` in `[1, 2)` (24 or 53 bits), where FLINT's is an integer of
+a caller-chosen width. For FLINT's shape at width `bits`, let
+`e = x.significant_bits() as i64 - bits`; the mantissa is
+`x.unsigned_abs_ref().shr_round(e, Floor).0`, or `Ceiling` for the upper bound. As in FLINT, the
+ceiling can carry to a power of two and gain a bit; shift once more if the width must be exact.
 
 ## [Comparison](https://flintlib.org/doc/fmpz.html#comparison) {#comparison}
 
-As on [the GMP page](/mapping/gmp-integers/#comparison-functions), comparison is where Malachite
-provides every combination of types, so the `_ui` and `_si` variants land on the same traits as
-their base functions; and the discussions there of
-[`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) replacing the
-sign-carrying `int`, and of why single-type rows say
-[`Ord`](https://doc.rust-lang.org/nightly/std/cmp/trait.Ord.html) while mixed-type rows say
-[`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html), carry over
-unchanged.
+As on [the GMP page](/mapping/gmp-integers/#comparison-functions), comparisons return an
+[`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) instead of a signed
+`int`, and the `_ui` and `_si` variants use the same traits as their base functions.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -483,47 +358,25 @@ unchanged.
 | ✓ | `int fmpz_is_even (const fmpz_t f)` | [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html) |
 | ✓ | `int fmpz_is_odd (const fmpz_t f)` | [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html) |
 
-**`fmpz_cmp2abs`.** [`OrdAbsDouble`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbsDouble.html)'s
-`cmp_abs_double` compares `|f|` against `|2g|` without materializing the doubled value, which is the point of it:
-the comparison of something against twice something else is the shape of a round-to-nearest
-decision, where a remainder is weighed against half a divisor, and it belongs in an inner loop
-with no allocation in sight. `f.cmp_abs(&(g << 1u32))` gets the same answer but builds the
-temporary the FLINT function exists to avoid. On
-[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), where
-there are no signs to take absolute values of, the same comparison is
+**`fmpz_cmp2abs`.** `f.cmp_abs_double(&g)`, from
+[`OrdAbsDouble`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbsDouble.html),
+compares `|f|` against `|2g|` without forming `2g`. On
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), the
+same comparison is
 [`OrdDouble`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdDouble.html)'s
-`cmp_double`. The two traits split by sign exactly as
-[`Ord`](https://doc.rust-lang.org/nightly/std/cmp/trait.Ord.html) and
-[`OrdAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbs.html)
-do, and both are implemented for the primitive integers too, where the doubling would overflow
-rather than allocate.
-Both sit beside
-[`cmp_normalized`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.cmp_normalized),
-which compares two values as if each were scaled into $$[1, 2)$$, likewise without scaling
-anything.
+`cmp_double`.
 
-**The predicates.** `fmpz_is_zero` and `fmpz_is_one` are `f == 0` and `f == 1`: mixed equality
-with a small constant compares against the inline representation and allocates nothing, so the
-dedicated fast-path predicates are not needed as separate functions. `fmpz_is_pm1` is
-`f.eq_abs(&1)`, absolute-value equality from
+**The predicates.** `fmpz_is_zero` and `fmpz_is_one` are `f == 0` and `f == 1`; `fmpz_is_pm1` is
+`f.eq_abs(&1)`, from
 [`EqAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.EqAbs.html);
-and the parity pair is `f.even()` and `f.odd()`, as
-[on the GMP page](/mapping/gmp-integers/#miscellaneous-functions).
-
-`fmpz_cmpabs` and `fmpz_is_pm1` also mark a small asymmetry with GMP worth knowing when porting
-between the three libraries: GMP has `mpz_cmpabs` variants against `double` and `ulong`, which
-Malachite covers with
-[`PartialOrdAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.PartialOrdAbs.html),
-while FLINT has neither; the mixed absolute-value comparisons are there either way.
+and the parity pair is `f.even()` and `f.odd()`.
 
 ## [Basic arithmetic](https://flintlib.org/doc/fmpz.html#basic-arithmetic) {#basic-arithmetic}
 
-The chapter's largest section by far, so it is divided here into themed subsections, in the
-manual's own order. Throughout, the general shape is the one described
-[on the GMP page](/mapping/gmp-integers/#arithmetic-functions): where FLINT writes into an
-output argument, Malachite returns the result, the `*Assign` traits cover the in-place case,
-every operator has borrowing forms, and the `_ui` and `_si` variants collapse into their base
-function's row.
+This section is divided into subsections in the manual's order. As
+[on the GMP page](/mapping/gmp-integers/#arithmetic-functions), the `*Assign` traits cover the
+in-place case, every operator has borrowing forms, and the `_ui` and `_si` variants collapse into
+their base function's row.
 
 ### Addition and multiplication
 
@@ -554,50 +407,36 @@ function's row.
 
 **The operators.** `-g`, `g.abs()`, `g + h`, `g - h`, `g * h`, and `g << e`, with
 [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html)
-producing the absolute value as a `Natural` rather than an `Integer`. The subtraction and
-`submul` rows are ≈ for the reason
-[explained on the GMP page](/mapping/gmp-integers/#arithmetic-functions): on `Natural`, a
-difference that would go negative panics, and
+producing the absolute value as a `Natural`. The subtraction and `submul` rows are ≈ because
+on `Natural` a negative difference panics;
 [`CheckedSub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedSub.html)
-or
+and
 [`SaturatingSub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SaturatingSub.html)
-make the borrow a decision instead. On `Integer`, which is what an `fmpz` is, they are plain ✓.
+are the alternatives. On `Integer` they match exactly.
 
-**`fmpz_mul2_uiui`.** The double word-multiply: form the word product exactly first, since
-`x * y` cannot overflow a `u128`, and multiply once at full size:
-`g * Natural::from(u128::from(x) * u128::from(y))`. That keeps FLINT's point, one bignum pass
-rather than two.
+**`fmpz_mul2_uiui`.** `g * Natural::from(u128::from(x) * u128::from(y))`; the word product
+cannot overflow a `u128`.
 
 **`fmpz_mul_2exp`, `fmpz_one_2exp`.** `g << e`, and `Integer::power_of_2(e)` from
-[`PowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowerOf2.html)
-for the power of two itself. FLINT's caveat that `e + FLINT_BITS` must not overflow has no
-counterpart; the shift count is an ordinary integer, of
-[any primitive type](/mapping/gmp-integers/#arithmetic-functions).
+[`PowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowerOf2.html).
+FLINT's restriction that `e + FLINT_BITS` must not overflow does not apply.
 
-**`fmpz_addmul`, `fmpz_submul`.** `f.add_mul_assign(&g, &h)` and `f.sub_mul_assign(&g, &h)`
-accumulate in one step without a temporary, exactly as FLINT's do; the three-operand
-`f.add_mul(&g, &h)` forms return the result instead.
+**`fmpz_addmul`, `fmpz_submul`.** `f.add_mul_assign(&g, &h)` and `f.sub_mul_assign(&g, &h)`;
+`f.add_mul(&g, &h)` and `f.sub_mul(&g, &h)` return the result instead.
 
-**`fmpz_fmma`, `fmpz_fmms`.** The fused double products, `ab + cd` and `ab - cd`, are
-`a.mul_add_mul(b, c, d)` and `a.mul_sub_mul(b, c, d)`, which form the second product straight
-onto the first rather than building it separately. They earn their keep in inner loops, rational
-arithmetic being the motivating case, since a sum of fractions has an `ad + bc` numerator, the
-shape behind [`fmpq_addmul`](/mapping/flint-rationals/#arithmetic) on the rationals page. The
-`fmms` row is ≈ for the same reason as `submul` above: on `Natural` a difference that would go
-negative panics, so that type also has
-[`CheckedMulSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedMulSubMul.html) and
-[`SaturatingMulSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SaturatingMulSubMul.html),
-which return `None` and 0 respectively. All four traits are also implemented for the primitive
-integers, where the checked, wrapping, saturating, and overflowing variants each form both
-products at double width, so an intermediate that does not fit cannot by itself make a
-representable result unrepresentable.
+**`fmpz_fmma`, `fmpz_fmms`.** $$ab + cd$$ and $$ab - cd$$ are `a.mul_add_mul(b, c, d)` and
+`a.mul_sub_mul(b, c, d)`. The `fmms` row is ≈ for the same reason as `submul`: on `Natural` a
+negative result panics, and
+[`CheckedMulSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedMulSubMul.html)
+and
+[`SaturatingMulSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SaturatingMulSubMul.html)
+return `None` and 0 instead.
 
 ### Division with rounding
 
-FLINT's division matrix uses GMP's naming: `cdiv` rounds the quotient toward positive infinity,
-`fdiv` toward negative infinity, and `tdiv` toward zero. The
-[trait-per-rounding-mode dictionary](/mapping/gmp-integers/#division-functions) from the GMP
-page carries over directly: `cdiv` is
+FLINT uses GMP's naming: `cdiv` rounds the quotient toward positive infinity, `fdiv` toward
+negative infinity, and `tdiv` toward zero. As
+[on the GMP page](/mapping/gmp-integers/#division-functions), `cdiv` is
 [`CeilingDivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingDivMod.html)
 and
 [`CeilingMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingMod.html),
@@ -638,29 +477,23 @@ Malachite.
 | ✓ | `ulong fmpz_fdiv_ui (const fmpz_t g, ulong h)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
 | ✓ | `ulong fmpz_tdiv_ui (const fmpz_t g, ulong h)` | [`Rem`](https://doc.rust-lang.org/nightly/std/ops/trait.Rem.html), [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html) |
 
-**`fmpz_ndiv_qr`.** The member with no GMP ancestor, and the section's ≈. `DivRound` with
-`Nearest` rounds the quotient to minimize the remainder, as `ndiv` does, but the two disagree on
-ties: FLINT rounds a tied quotient toward zero, while Malachite's `Nearest` rounds it to even.
-Dividing 3 by 2 shows the difference: both quotients 1 and 2 leave a remainder of absolute value
-1, and `fmpz_ndiv_qr` picks 1 where `(3).div_round(2, Nearest)` picks 2. When the tie rule
-matters, break it yourself: compare twice the truncated remainder against the divisor, which is
-the comparison `fmpz_cmp2abs` exists for. `DivRound` also returns only the quotient; the
+**`fmpz_ndiv_qr`.** `DivRound` with `Nearest` rounds the quotient to the nearest integer, but
+ties differ: FLINT rounds a tie toward zero, Malachite to even. For 3 / 2, `fmpz_ndiv_qr` gives
+1 and `(3).div_round(2, Nearest)` gives 2. To reproduce FLINT's rule, compare twice the truncated
+remainder against the divisor (`cmp_abs_double`). `DivRound` returns only the quotient; the
 remainder is `g - &q * h`, or one
 [`SubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMul.html).
 
-**The `2exp` columns.** Dividing by $$2^{exp}$$ with a rounding mode is
-[`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html):
-`Ceiling`, `Floor`, and `Down` reproduce `cdiv`, `fdiv`, and `tdiv`, and a plain `g >> exp`
-floors, matching `fdiv_q_2exp`. The three remainder versions are the three flavors of reduction
-modulo a power of two: `ModPowerOf2` (nonnegative, floor), `CeilingModPowerOf2` (nonpositive,
-ceiling), and `RemPowerOf2` (sign of `g`, truncating), an exact one-to-one match.
+**The `2exp` columns.**
+[`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html)
+with `Ceiling`, `Floor`, or `Down` gives `cdiv`, `fdiv`, or `tdiv`; a plain `g >> exp` floors.
+The remainders are `ModPowerOf2` (floor, nonnegative), `CeilingModPowerOf2` (ceiling,
+nonpositive), and `RemPowerOf2` (truncating, sign of `g`).
 
-**`fmpz_cdiv_ui`, `fmpz_fdiv_ui`, `fmpz_tdiv_ui`.** These return the absolute value of the
-remainder as a word. The floor remainder is already nonnegative, so `fmpz_fdiv_ui` is `Mod`
-directly; the ceiling remainder is nonpositive and the truncated remainder takes `g`'s sign, so
-those two compose with
-[`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html)
-before converting the word-sized result down.
+**`fmpz_cdiv_ui`, `fmpz_fdiv_ui`, `fmpz_tdiv_ui`.** These return the remainder's absolute value
+as a word. `fmpz_fdiv_ui` is `Mod`; the other two compose with
+[`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html),
+since the ceiling remainder is nonpositive and the truncated one takes `g`'s sign.
 
 ### Exact division, divisibility, and modular reduction
 
@@ -680,52 +513,32 @@ before converting the word-sized result down.
 | — | `void fmpz_preinvn_clear (fmpz_preinvn_t inv)` | |
 | ✓ | `void fmpz_fdiv_qr_preinvn (fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t hinv)` | [`DivModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModPrecomputed.html), [`DivAssignModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivAssignModPrecomputed.html) |
 
-**The `divexact` family.** `g.div_exact(&h)`, with the same contract as FLINT's: exactness is
-the caller's promise, not checked, and the result is undefined if the promise is broken. The
-[GMP page's note](/mapping/gmp-integers/#division-functions) on why the unchecked version is
-worth having applies. `fmpz_divexact2_uiui` uses the same double-word trick as
-`fmpz_mul2_uiui`: form `x * y` exactly as a `u128` and divide once.
+**The `divexact` family.** `g.div_exact(&h)`. As in FLINT, exactness is not checked: if `h`
+does not divide `g`, `div_exact` may panic or return a meaningless result. For
+`fmpz_divexact2_uiui`, form `x * y` as a `u128` and divide once.
 
-**`fmpz_divisible`, `fmpz_divides`.** `f.divisible_by(&g)` answers the question;
-`fmpz_divides`, which GMP does not have, answers it and hands over the quotient. One
-`(q, r) = f.div_mod(&g)` does both at once, with `r == 0` as the verdict and `q` already in
-hand, which is one division, the same work FLINT's version does. The zero case differs: FLINT
-defines `fmpz_divides(q, f, 0)` to report whether `f` is zero, while `div_mod`
-by zero panics, so test the divisor first when zero can reach this code.
+**`fmpz_divisible`, `fmpz_divides`.** `f.divisible_by(&g)`. For `fmpz_divides`, use
+`let (q, r) = f.div_mod(&g)` and test `r == 0`. FLINT defines `fmpz_divides(q, f, 0)` to report
+whether `f` is zero, while `div_mod` by zero panics, so test the divisor first if it can be zero.
 
-**`fmpz_mod`, `fmpz_mod_ui`.** FLINT's `fmpz_mod` produces a nonnegative remainder whatever the
-sign of `h`, and that is exactly
-[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html)'s
-convention: `mod_euclidean` returns the always-nonnegative remainder, as a `Natural`, and
-`mod_euclidean_assign` leaves it in place. For a positive
-divisor, which is all `fmpz_mod_ui` allows, plain
+**`fmpz_mod`, `fmpz_mod_ui`.** `fmpz_mod` returns a nonnegative remainder whatever the sign of
+`h`, which is
+[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html)
+(`mod_euclidean`, returning a `Natural`). For a positive divisor, as in `fmpz_mod_ui`,
 [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html)
-agrees and is the more common spelling.
+agrees.
 
-**`fmpz_smod`.** The balanced remainder again, in `(-|h|/2, |h|/2]`, the full-size version of
-`fmpz_set_ui_smod` [under Conversion](#conversion) and the same trait,
-[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html),
-with an `Assign` form as well. The conventions agree: only the magnitude of `h` matters, and a
-remainder of exactly `|h|/2` is the positive one, since the range is closed at the top.
+**`fmpz_smod`.** The remainder in `(-|h|/2, |h|/2]`, which is
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html).
+As in FLINT, only the magnitude of `h` matters, and a remainder of exactly `|h|/2` is positive.
 
-**The `preinvn` trio.** A precomputed Newton inverse of a divisor, built once and reused so
-that many divisions by the same `h` skip the setup work. In Malachite this is the
-[`DivModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModPrecomputed.html)
-trait: `Integer::precompute_div_mod_data(&h)` plays the role of `fmpz_preinvn_init`, building a
-normalized copy of the divisor along with the inverses
-that the division engines would otherwise recompute on every call — for large divisors, the
-full-length approximate inverse that Barrett division uses — and
-`g.div_mod_precomputed(&h, &data)` is `fmpz_fdiv_qr_preinvn`, since `fdiv` is floor division,
-which is what `div_mod` performs. The data depends only on `|h|`, as in FLINT. The trait is also
-implemented for
-[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and for
-the primitive integers, and
+**The `preinvn` trio.**
+[`DivModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModPrecomputed.html):
+`Integer::precompute_div_mod_data(&h)` corresponds to `fmpz_preinvn_init`, and
+`g.div_mod_precomputed(&h, &data)` to `fmpz_fdiv_qr_preinvn` (floor division).
 [`DivAssignModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivAssignModPrecomputed.html)
-is the in-place form. `fmpz_preinvn_clear` alone stays —: the precomputed data is an ordinary
-value, and releasing it is what [`Drop`](https://doc.rust-lang.org/nightly/std/ops/trait.Drop.html) does.
-The precomputed-modulus pattern first appeared at `fmpz_get_nmod`
-[under Conversion](#conversion), whose `nmod` context remains a question for the `fmpz_mod`
-chapter; see [its page](/mapping/flint-integers-mod-n/#conventions).
+is the in-place form. As in FLINT, the data depends only on `|h|`. `fmpz_preinvn_clear` is
+replaced by [`Drop`](https://doc.rust-lang.org/nightly/std/ops/trait.Drop.html).
 
 ### Powers and logarithms
 
@@ -743,37 +556,25 @@ chapter; see [its page](/mapping/flint-integers-mod-n/#conventions).
 | ✓ | `double fmpz_dlog (const fmpz_t x)` | [`approx_log`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.approx_log) |
 
 **`fmpz_pow_ui`, `fmpz_ui_pow_ui`, `fmpz_pow_fmpz`.** `g.pow(x)`, with $$0^0 = 1$$ in both
-libraries. `fmpz_pow_fmpz` takes the exponent as a full integer and reports failure instead of
-building an impossibly large result; the spelling is `u64::try_from(&x)` followed by `pow`, with
-the conversion's `Err` playing the role of FLINT's failure return, and FLINT's throw on a
-negative exponent likewise landing in the conversion. One case deserves care when porting:
-for `g` in `{-1, 0, 1}` the power fits no matter how large `x` is, and FLINT succeeds there, so
-handle those three bases before converting the exponent.
+libraries. For `fmpz_pow_fmpz`, convert the exponent with `u64::try_from(&x)`; its `Err` takes
+the place of FLINT's failure return (and of FLINT's throw on a negative exponent). FLINT succeeds
+for bases -1, 0, and 1 at any exponent, so handle those before converting.
 
 **`fmpz_powm`, `fmpz_powm_ui`.** [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html),
-with the [three differences explained on the GMP page](/mapping/gmp-integers/#exponentiation-functions)
-for `mpz_powm`: the base must be reduced ahead of time, the residues are `Natural`s, and a
-negative exponent is spelled as
+with the [differences explained on the GMP page](/mapping/gmp-integers/#exponentiation-functions)
+for `mpz_powm`: the base must already be reduced, the residues are `Natural`s, and a negative
+exponent is spelled as
 [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)
 followed by a positive power. FLINT's `abort` on a zero modulus is a panic.
 
-**`fmpz_clog`, `fmpz_flog`.** `x.ceiling_log_base(&b)` and `x.floor_log_base(&b)`, exact
-integer logarithms with the same domain FLINT assumes: both panic for `x` outside `x >= 1` or a
-base below 2, so the assumption is enforced rather than trusted.
-[`CheckedLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedLogBase.html)
-additionally reports whether `x` is an exact power of `b`, a question FLINT answers separately
-with `fmpz_is_perfect_power`; and the base-2 and power-of-2 cases have dedicated fast versions,
-[`FloorLogBase2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorLogBase2.html)
-and its relatives.
+**`fmpz_clog`, `fmpz_flog`.** `x.ceiling_log_base(&b)` and `x.floor_log_base(&b)`. Both panic
+when `x < 1` or `b < 2`, inputs FLINT assumes do not occur.
 
-**`fmpz_dlog`.** Malachite's
+**`fmpz_dlog`.**
 [`approx_log`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.approx_log)
-is a port of this very function, reached through `Rational::from(&x)` since it lives on
-[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
-One difference in kind: FLINT notes that the accuracy "depends on the implementation of the
-floating-point logarithm provided by the C standard library", while Malachite computes through
-the [libm](https://docs.rs/libm/latest/libm/) crate, a pure-Rust port of MUSL's math library, so
-the approximation is the same bit pattern on every platform.
+on [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html),
+via `Rational::from(&x)`. FLINT's result depends on the platform's C `log`; Malachite's uses the
+[libm](https://docs.rs/libm/latest/libm/) crate and is identical on every platform.
 
 ### Roots
 
@@ -787,54 +588,40 @@ the approximation is the same bit pattern on every platform.
 | ✓ | `int fmpz_is_perfect_power (fmpz_t root, const fmpz_t f)` | [`ExpressAsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.ExpressAsPower.html) |
 
 **`fmpz_sqrt`, `fmpz_sqrtrem`, `fmpz_is_square`.** `g.floor_sqrt()`, `g.sqrt_rem()`, and
-`f.is_square()`, with FLINT's exception on a negative operand becoming a panic. FLINT's warning
-that `fmpz_sqrtrem`'s two outputs must not alias is the same C rule the
-[GMP page notes](/mapping/gmp-integers/#root-extraction-functions) has nothing to correspond to:
-`sqrt_rem` returns a tuple. `IsSquare` is `Natural`-only, which costs nothing, since no negative
-number is a square; test the sign first when the input is an `Integer`.
+`f.is_square()`; FLINT's exception on a negative operand is a panic. `sqrt_rem` returns a tuple.
+`IsSquare` is implemented only for `Natural`; for an `Integer`, test the sign first.
 
-**`fmpz_root`.** The same ≈ as `mpz_root`, for the same reason,
-[explained on the GMP page](/mapping/gmp-integers/#root-extraction-functions): "the integer part
-of the root" truncates toward zero, so on a negative operand with odd `n` it is Malachite's
+**`fmpz_root`.** The same ≈ as `mpz_root`,
+[explained on the GMP page](/mapping/gmp-integers/#root-extraction-functions): FLINT truncates
+toward zero, so for a negative operand with odd `n` use
 [`CeilingRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingRoot.html),
-and on a nonnegative one it is
+and for a nonnegative one
 [`FloorRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorRoot.html).
-FLINT's exactness flag is
-[`CheckedRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedRoot.html),
-which returns the root only when it is exact, or
-[`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html)
-when you want the flag and the truncated root at once.
+For FLINT's exactness flag, use
+[`CheckedRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedRoot.html)
+(the root only when exact) or
+[`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html).
 
 **`fmpz_sqrtmod`.** `a.mod_sqrt(&p)`, returning an `Option` where FLINT sets an output and
-returns a flag. The trait is
-[`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSqrt.html), implemented for
+returns a flag;
+[`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSqrt.html)
+is implemented for
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and the
-unsigned primitives, with the primitive version corresponding to `n_sqrtmod`. FLINT's caveats
-carry over and are worth reading before use: primality of `p` is assumed, not checked, and a
-composite `p` usually, but not always, reports failure — the same inputs produce the same
-results, missed roots, spurious "roots", iteration cap and all, which differential testing
-against FLINT confirms line for line. The two exceptions, where Malachite computes the
-mathematically expected value instead: for even moduli between 50 and 600, FLINT's answer
-passes through a Jacobi-symbol routine whose behavior for even moduli is undefined; and for
-`p` of `2^64 - 1` or `2^64 - 3`, `n_sqrtmod`'s exponent computations wrap, while Malachite (and
-FLINT's own large-`p` path) computes them exactly. Both windows involve only composite moduli.
+unsigned primitives. As in FLINT, `p` is assumed prime but not checked, and for a composite `p`
+the results match FLINT's, including missed and spurious roots, with two exceptions where
+Malachite returns the mathematically expected value: even moduli between 50 and 600, and
+`p = 2^64 - 1` or `2^64 - 3`.
 
-**`fmpz_is_perfect_power`.** Malachite's
-[`ExpressAsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.ExpressAsPower.html)
-has exactly this function's shape, and more precisely than GMP's predicate does:
+**`fmpz_is_perfect_power`.**
+[`ExpressAsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.ExpressAsPower.html):
 `express_as_power` on 64 returns `Some((2, 6))`, the root and the exponent, where
-`fmpz_is_perfect_power` sets the root and returns the exponent. The conventions agree too: 0 and
-1 count as perfect powers, and neither library promises the smallest root. FLINT's negative
-operands are covered as well, since the trait is implemented for
-[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html): a
-negative value can only be an odd power, so $$-8$$ counts as $$(-2)^3$$ and the exponent
-returned for a negative value is always odd. The bare predicate, without the root, is
+`fmpz_is_perfect_power` sets the root and returns the exponent. As in FLINT, 0 and 1 count as
+perfect powers, and the root is not necessarily the smallest. For a negative
+[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html), the
+exponent is always odd ($$-8 = (-2)^3$$). The predicate alone is
 [`IsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsPower.html).
 
 ### Combinatorial functions and fused operations
-
-The last stretch of the section: three classics, a pair of rising factorials, and two fused
-multiply-shifts.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -847,37 +634,16 @@ multiply-shifts.
 | ✓ | `void fmpz_mul_si_tdiv_q_2exp (fmpz_t f, const fmpz_t g, slong x, ulong exp)` | [`MulShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRound.html), [`MulShrRoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRoundAssign.html) |
 
 **`fmpz_fac_ui`, `fmpz_fib_ui`, `fmpz_bin_uiui`.** `Natural::factorial(n)`,
-`Natural::fibonacci(n)`, and `Natural::binomial_coefficient(n, k)`. The wider families are
-described on the GMP page, under
-[Factorials and binomial coefficients](/mapping/gmp-integers/#number-theoretic-functions):
-double, multi-, and subfactorials beyond FLINT's `fmpz` offering, and
-[`fibonacci_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html)
-with the Lucas variants beside it.
+`Natural::fibonacci(n)`, and `Natural::binomial_coefficient(n, k)`.
 
-**`fmpz_rfac_ui`, `fmpz_rfac_uiui`.** The rising factorial $$x (x+1) \cdots (x+n-1)$$, as
-`rising_factorial(n)` on the base: `Integer::rising_factorial` is `fmpz_rfac_ui`, with the
-same handling of negative bases — a factor sequence reaching or crossing zero gives exactly
-zero, and an all-negative sequence gets the parity sign — and `Natural::rising_factorial`
-covers `fmpz_rfac_uiui`, generalized to a base of any size rather than one word. Both share
-FLINT's strategy: factors packed into single-word partial products when the base is small and
-the range short, and binary splitting over the range otherwise. The primitive integer types
-implement the trait too, alongside
-[`CheckedRisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedRisingFactorial.html)
-for the word-sized results FLINT leaves to the caller; there the zero-of-a-spanning-sequence
-rule earns its keep, since a representable zero must be found without forming its
-unrepresentable partial products. Both bignum forms agree with FLINT bit for bit, which the
-differential suite checks against `fmpz_rfac_ui` and, for word-sized bases, `fmpz_rfac_uiui`.
+**`fmpz_rfac_ui`, `fmpz_rfac_uiui`.** The rising factorial $$x (x+1) \cdots (x+k-1)$$ is
+`x.rising_factorial(k)`: `Integer::rising_factorial` for `fmpz_rfac_ui`, with the same handling
+of negative bases, and `Natural::rising_factorial` for `fmpz_rfac_uiui`, with a base of any size.
 
-**`fmpz_mul_tdiv_q_2exp`, `fmpz_mul_si_tdiv_q_2exp`.** `(&g).mul_shr_round(&h, exp, Down).0`.
-`tdiv` truncates toward zero, which is Malachite's `Down`; the operation accepts any
-`RoundingMode`, and its second return value reports how the result compares with the exact
-quotient. The two implementations differ in shape: FLINT multiplies in full and then shifts,
-while `mul_shr_round` is fused — when the shift discards most of the product, only the
-surviving high part is computed, via a short product. Note that the rounding mode matters when
-composing by hand: a plain `>>` floors, so a negative product truncated toward zero needs
-`Down` explicitly. The `si` variant maps to the same trait with the multiplier spelled
-`Integer::from(x)`; a word-sized factor leaves nothing below the cut worth skipping, so that
-case does the same work as multiplying and shifting.
+**`fmpz_mul_tdiv_q_2exp`, `fmpz_mul_si_tdiv_q_2exp`.** `(&g).mul_shr_round(&h, exp, Down).0`;
+`Down` is truncation toward zero. The second return value reports how the result compares with
+the exact quotient. A plain `>>` floors, so a negative product needs `Down` explicitly. For the
+`si` variant, pass `Integer::from(x)`.
 
 ## [Greatest common divisor](https://flintlib.org/doc/fmpz.html#greatest-common-divisor) {#greatest-common-divisor}
 
@@ -890,56 +656,38 @@ case does the same work as multiplying and shifting.
 | ≈ | `void fmpz_gcdinv (fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html), [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
 | ≈ | `void fmpz_xgcd (fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
 | ✓ | `void fmpz_xgcd_canonical_bezout (fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
-| ✓ | `void fmpz_xgcd_partial (fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L)` | internal |
+| ⚙ | `void fmpz_xgcd_partial (fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L)` | internal |
 
-**`fmpz_gcd`, `fmpz_gcd3`, `fmpz_lcm`.** As
-[on the GMP page](/mapping/gmp-integers/#number-theoretic-functions),
+**`fmpz_gcd`, `fmpz_gcd3`, `fmpz_lcm`.**
 [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html)
 and
 [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Lcm.html)
 are defined on
-[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), and
-FLINT documents both results as nonnegative whatever the signs of the inputs, so nothing is
-lost: take
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html); since
+FLINT's results are nonnegative, take
 [`unsigned_abs`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.unsigned_abs)
 of each
-[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) first
-and the answer is the one FLINT would give. `fmpz_gcd3` is `a.gcd(&b).gcd(&c)`, the two calls
-FLINT describes its fused version as equivalent to.
+[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) first.
+`fmpz_gcd3` is `a.gcd(&b).gcd(&c)`.
 
-**The `xgcd` family.** Three functions, three cofactor conventions, and the canonical one is
-the match. `fmpz_xgcd_canonical_bezout` pins down Bézout cofactors by
-$$|a| < |g/2d|$$ and $$|b| < |f/2d|$$, which is the same normalization
-[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html)
-uses (and GMP too, as
-[noted on the GMP page](/mapping/gmp-integers/#number-theoretic-functions)), with the edge cases
-agreeing as well, so `extended_gcd` is a drop-in with identical cofactors. It is also the
-function FLINT itself recommends, calling it faster than plain `fmpz_xgcd`; the plain version's
-cofactors follow the `fmpz_gcdinv` convention instead, which is why its row is ≈. FLINT's
-no-aliasing rules for the outputs have nothing to correspond to: the results arrive as a tuple.
+**The `xgcd` family.** `fmpz_xgcd_canonical_bezout` normalizes the cofactors by
+$$|a| < |g/2d|$$ and $$|b| < |f/2d|$$, the same normalization, edge cases included, as
+[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html),
+so `extended_gcd` returns identical cofactors, as a tuple. Plain `fmpz_xgcd` follows the
+`fmpz_gcdinv` convention instead, hence ≈.
 
-**`fmpz_gcdinv`.** The one-cofactor extended GCD, for `0 <= f < g`: it returns
-`d = gcd(f, g)` together with `a` satisfying $$af \equiv d \pmod{g}$$. When the answer you want
-is the modular inverse,
+**`fmpz_gcdinv`.** For `0 <= f < g`, returns `d = gcd(f, g)` and `a` with
+$$af \equiv d \pmod{g}$$. For a modular inverse,
 [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)
-is the direct spelling, returning
-[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) when `f` and `g` are not
-coprime instead of handing back a `d > 1` to check. When you want `d` and the cofactor in every
-case, `extended_gcd`'s first cofactor satisfies the same congruence, reduced modulo `g` as
-needed; its normalization differs from `fmpz_gcdinv`'s, hence the ≈.
+returns [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) when `f` and `g`
+are not coprime. For `d` and a cofactor in every case, `extended_gcd`'s first cofactor satisfies
+the same congruence after reduction modulo `g`, but is normalized differently, hence ≈.
 
-**`fmpz_xgcd_partial`.** Lehmer's extended GCD with early termination, stopping once the
-remainders fall below a bound: a building block, used by FLINT's binary quadratic form module,
-for algorithms such as Cornacchia's that need only the middle of the remainder sequence. It
-belongs to the same family of algorithm-component exports as the Lucas chains under
-[Primality testing](#primality-testing) below, and Malachite ports it as such: the machinery
-exists, with FLINT's in-place arguments as owned inputs and returned outputs, restricted to
-nonnegative remainders, and is kept internal until the algorithms built on it — Cornacchia's
-and binary quadratic forms, and
-[rational reconstruction](/mapping/flint-rationals/#modular-reduction-and-rational-reconstruction)
-on the rationals page — arrive to define the public surface. The outputs are a mid-sequence
-state of a Lehmer run, not canonical values, so the differential suite pins the port to FLINT's
-exact stopping states and cofactor signs, wrapping word arithmetic included.
+**`fmpz_xgcd_partial`.** Malachite has an internal port of this function (Lehmer's extended GCD
+with early termination), but it is not public. There is no public way to stop the reduction at a
+bound;
+[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html)
+computes the complete GCD and cofactors.
 
 ## [Modular arithmetic](https://flintlib.org/doc/fmpz.html#modular-arithmetic) {#modular-arithmetic}
 
@@ -953,62 +701,44 @@ exact stopping states and cofactor signs, wrapping word arithmetic included.
 | ✓ | `void fmpz_divides_mod_list (fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)` | [`ModDivList`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDivList.html) |
 
 **`fmpz_remove`.** [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html),
-described [on the GMP page](/mapping/gmp-integers/#number-theoretic-functions), which returns the
-reduced number and the count as a tuple instead of writing one and returning the other. The
-conventions line up with FLINT's on both edges it names: a zero input removes nothing, and a
-factor of 1 or below is rejected, where FLINT aborts and Malachite panics.
+which returns the reduced number and the count as a tuple. As in FLINT, a zero input removes
+nothing, and a factor of 1 or less is rejected (FLINT aborts; Malachite panics).
 
 **`fmpz_invmod`.** [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)
-returns [`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), so FLINT's
-flag-plus-undefined-output protocol becomes a value that exists exactly when the inverse does,
-as with [`mpz_invert`](/mapping/gmp-integers/#number-theoretic-functions). Two differences make
-the row ≈. `mod_inverse` requires its input already reduced, nonzero and below the modulus,
-where FLINT reduces for you; and FLINT defines a special case at `h = ±1`, declaring everything
-invertible with inverse 0, which has no counterpart, since modulo 1 the only residue is 0 and
-`mod_inverse` rejects a zero input. Test for a unit modulus first when porting code that can
-reach it.
+returns [`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) instead of a
+flag. It is ≈ for two reasons: `mod_inverse` requires its input already reduced and nonzero,
+where FLINT reduces it; and FLINT treats every value as invertible modulo `h = ±1`, with inverse
+0, while `mod_inverse` rejects the only residue, 0. Test for a unit modulus first if one can
+occur.
 
-**`fmpz_negmod`.** Two spellings, differing in what they do with FLINT's precondition that `g`
-be already reduced. `g.mod_neg(&h)`, from the
-[`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html)
-family of reduced-operand modular functions, shares the precondition but enforces it: where
-FLINT does not check and an unreduced `g` gives an undefined result, `mod_neg` panics.
-`g.neg_mod(&h)`, from
+**`fmpz_negmod`.** FLINT requires `g` to be reduced but does not check. `g.mod_neg(&h)`, from
+[`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html),
+has the same precondition and panics if it fails. `g.neg_mod(&h)`, from
 [`NegMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.NegMod.html),
-drops the precondition instead, reducing any `g`'s negation into `[0, h)`. Reduced inputs give
-the same answer either way; `mod_neg` is the closer match in spirit and cost, and `neg_mod` is
-the one to reach for when `g` might not be reduced.
+accepts any `g`. Both agree on reduced inputs.
 
-**`fmpz_jacobi`, `fmpz_kronecker`.** The
-[symbol discussion on the GMP page](/mapping/gmp-integers/#number-theoretic-functions) applies
-in full: `KroneckerSymbol` is total and matches for every input, while `JacobiSymbol` enforces
-the classical domain, an odd positive denominator. FLINT's `fmpz_jacobi` states that "the parity
-and sign of `n` are not checked", so where FLINT would return an undefined answer, Malachite
-panics or, through the Kronecker symbol, returns the defined extension.
+**`fmpz_jacobi`, `fmpz_kronecker`.** As
+[on the GMP page](/mapping/gmp-integers/#number-theoretic-functions), `KroneckerSymbol` matches
+for every input, while `JacobiSymbol` requires an odd positive denominator. FLINT's `fmpz_jacobi`
+does not check the parity or sign of `n`; where its result would be undefined, `jacobi_symbol`
+panics, and `kronecker_symbol` returns the Kronecker symbol.
 
-**`fmpz_divides_mod_list`.** The solution set of the linear congruence $$ax \equiv b \pmod n$$,
-returned as an arithmetic progression. `b.mod_div_list(&a, &m)` computes the same three numbers,
-as `Some((start, stride, length))` in place of FLINT's three output arguments and
-all-zeros-on-failure convention; note the mirrored argument roles, with the dividend as the
-receiver, matching `mod_div` [on the mod-n page](/mapping/flint-integers-mod-n/#arithmetic).
-The result is canonical, with `start` the smallest solution, `stride` equal to
-`n / gcd(a, n)`, and `length` equal to `gcd(a, n)`, so unlike the single-quotient functions no
-normalization question arises, and FLINT and Malachite agree exactly. FLINT reduces `a` modulo
-`n` itself, while `mod_div_list` requires both inputs already reduced, the standard contract of
-the `Mod*` family. The unsigned primitive types implement `ModDivList` as well.
+**`fmpz_divides_mod_list`.** The solutions of $$ax \equiv b \pmod n$$, as an arithmetic
+progression. `b.mod_div_list(&a, &n)` returns `Some((start, stride, length))` in place of FLINT's
+three outputs and all-zeros-on-failure convention; note that the dividend `b` is the receiver, as
+in `mod_div` [on the mod-n page](/mapping/flint-integers-mod-n/#arithmetic). The results agree
+exactly with FLINT's. FLINT reduces `a` modulo `n` itself, while `mod_div_list` requires both
+inputs already reduced.
 
 ## [Bit packing and unpacking](https://flintlib.org/doc/fmpz.html#bit-packing-and-unpacking) {#bit-packing-and-unpacking}
 
-These three functions exist to pack polynomial coefficients into a contiguous bit array and read
-them back out, which is how FLINT implements Kronecker-substitution multiplication; the "array"
-is a raw limb buffer that the caller walks through. The Malachite counterpart is
+The counterpart is
 [`BitBlockAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitBlockAccess.html),
-which reads or writes a block of adjacent bits at any position in a `Natural` or an `Integer`,
-with the buffer itself held as a
-[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html): the
-[limb-slice conversions](#conversion) turn a raw buffer into one and back without copying more
-than once, and `get_bits`/`assign_bits` take arbitrary `u64` bit positions, so the walking that
-FLINT does with a limb pointer plus a sub-word `shift` is a single index here.
+which reads or writes a block of bits at any position in a `Natural` or an `Integer`. Hold the
+buffer as a
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
+(the [limb-slice conversions](#conversion) convert a raw buffer); FLINT's limb pointer plus
+sub-word `shift` becomes a single `u64` bit position.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -1016,26 +746,18 @@ FLINT does with a limb pointer plus a sub-word `shift` is a single index here.
 | ≈ | `int fmpz_bit_unpack (fmpz_t coeff, ulong * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, int negate, int borrow)` | [`BitBlockAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitBlockAccess.html) |
 | ✓ | `void fmpz_bit_unpack_unsigned (fmpz_t coeff, const ulong * arr, flint_bitcnt_t shift, flint_bitcnt_t bits)` | [`BitBlockAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitBlockAccess.html) |
 
-**`fmpz_bit_unpack_unsigned`.** The exact match: extracting `bits` bits starting at a given
-position is `buffer.get_bits(pos, pos + bits)`.
+**`fmpz_bit_unpack_unsigned`.** `buffer.get_bits(pos, pos + bits)`.
 
-**`fmpz_bit_pack`, `fmpz_bit_unpack`.** The ≈ is the signed-coefficient protocol. FLINT's
-`negate` and `borrow` parameters implement a running two's-complement encoding across the packed
-fields: a negative coefficient is stored as its complement within the field, and the deficit is
-carried into the next field as a borrow, threaded through the whole array by the polynomial
-code. `assign_bits` and `get_bits` move the raw fields, and for nonnegative coefficients with no
-borrow in play they are the whole story; the borrow-and-negate thread itself is
-polynomial-packing plumbing with no counterpart, and it will matter, if at all, only when
-Malachite's polynomial types exist and choose their own packing. One more small difference
-favors the caller here: `fmpz_bit_pack` adds its field into the array and assumes the bits above
-`shift` are zero on entry, while `assign_bits` overwrites the range unconditionally, holes or
-not.
+**`fmpz_bit_pack`, `fmpz_bit_unpack`.** `assign_bits` and `get_bits` move raw fields, which
+covers nonnegative coefficients with no borrow. FLINT's `negate` and `borrow` parameters, which
+store negative coefficients in two's complement and carry a borrow into the next field, have no
+counterpart, hence ≈. Also, `fmpz_bit_pack` adds its field into the array, assuming the bits
+above `shift` are zero, while `assign_bits` overwrites the range.
 
 ## [Logic Operations](https://flintlib.org/doc/fmpz.html#logic-operations) {#logic-operations}
 
-Negative operands behave as their two's complement, sign-extended without end, in both
-libraries; the [worked account](/mapping/gmp-integers/#logical-and-bit-manipulation-functions)
-on the GMP page applies verbatim.
+In both libraries, negative operands behave as infinitely sign-extended two's complement; see
+[the GMP page](/mapping/gmp-integers/#logical-and-bit-manipulation-functions).
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
@@ -1048,19 +770,15 @@ on the GMP page applies verbatim.
 | ✓ | `ulong fmpz_popcnt (const fmpz_t a)` | [`CountOnes`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.CountOnes.html) |
 
 **The operators and bits.** `!f` for the ones' complement; `a & b`, `a | b`, and `a ^ b` with
-their `Assign` forms; and `f.clear_bit(i)` and `f.flip_bit(i)`, completing the
-[`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html)
-family whose `set_bit` and `get_bit` FLINT keeps under
-[Basic properties and manipulation](#basic-properties-and-manipulation) above.
+their `Assign` forms; and `f.clear_bit(i)` and `f.flip_bit(i)`, from
+[`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html).
 
 **`fmpz_popcnt`.** `count_ones()` on a
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html). FLINT
-declares the result undefined for negative input, GMP returns a sentinel, and Malachite's
-`Integer` has
-[`checked_count_ones`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.checked_count_ones),
-whose [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) covers the case
-both C libraries leave to the caller: a negative number's two's complement has infinitely many
-ones.
+leaves negative input undefined; on an `Integer`,
+[`checked_count_ones`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.checked_count_ones)
+returns [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) for negative
+values.
 
 ## [Chinese remaindering](https://flintlib.org/doc/fmpz.html#chinese-remaindering) {#chinese-remaindering}
 
@@ -1069,80 +787,50 @@ ones.
 | ✓ | `void fmpz_CRT_ui (fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, int sign)` | [`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Crt.html), [`BalancedCrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedCrt.html) |
 | ✓ | `void fmpz_CRT (fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign)` | [`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Crt.html), [`BalancedCrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedCrt.html) |
 
-**`fmpz_CRT`, `fmpz_CRT_ui`.** Residue recombination for a pair of congruences: the unique
-number congruent to `r1` modulo `m1` and to `r2` modulo `m2`, for coprime moduli. FLINT's
-`sign` flag selects between the canonical representative in $[0, m_1m_2)$ and the balanced one
-in $(-m_1m_2/2, m_1m_2/2]$; Malachite's convention is a separate named function for each,
-following its `Mod`/`BalancedMod` split. `Natural::crt` is the `sign = 0` case, and
-`Integer::balanced_crt` is `sign = 1`, taking its first residue as an `Integer` anywhere in
-$[-m_1, m_1)$ — the latitude that lets one combination's balanced output feed the next as
-FLINT's chained reconstructions do. Failure conventions differ: FLINT documents coprimality as
-an unchecked precondition and throws from `fmpz_CRT` when `m1` is not invertible, while both
-Malachite functions return an
-[`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), `None` exactly when
-the moduli share a factor. The word-sized case is served by the same traits: `crt` on the
-primitive unsigned types is a genuine word-level algorithm with the products kept in single
-words, and `Natural::crt` dispatches to it when everything fits, the same shape as FLINT's
-small-`fmpz` fast paths. Both functions agree with FLINT bit for bit on the shared domain,
-which the differential suite checks directly against `fmpz_CRT` at both signs.
+**`fmpz_CRT`, `fmpz_CRT_ui`.** FLINT's `sign` flag selects the representative in
+$$[0, m_1m_2)$$ or in $$(-m_1m_2/2, m_1m_2/2]$$; Malachite has a function for each.
+`Natural::crt` is `sign = 0`, and `Integer::balanced_crt` is `sign = 1`, taking its first residue
+as an `Integer` anywhere in $$[-m_1, m_1)$$, so a balanced result can be fed into the next
+combination. FLINT treats coprimality as an unchecked precondition and throws when `m1` is not
+invertible; both Malachite functions return an
+[`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), `None` exactly when the
+moduli share a factor. On their shared domain, the results agree with FLINT's.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_multi_CRT_init (fmpz_multi_CRT_t CRT)` | internal |
-| ✓ | `int fmpz_multi_CRT_precompute (fmpz_multi_CRT_t CRT, const fmpz * moduli, slong len)` | internal |
-| ✓ | `void fmpz_multi_CRT_precomp (fmpz_t output, const fmpz_multi_CRT_t P, const fmpz * inputs, int sign)` | internal |
+| ⚙ | `void fmpz_multi_CRT_init (fmpz_multi_CRT_t CRT)` | internal |
+| ⚙ | `int fmpz_multi_CRT_precompute (fmpz_multi_CRT_t CRT, const fmpz * moduli, slong len)` | internal |
+| ⚙ | `void fmpz_multi_CRT_precomp (fmpz_t output, const fmpz_multi_CRT_t P, const fmpz * inputs, int sign)` | internal |
 | ✓ | `int fmpz_multi_CRT (fmpz_t output, const fmpz * moduli, const fmpz * values, slong len, int sign)` | [`Natural::multi_crt`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.multi_crt), [`Integer::multi_balanced_crt`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.multi_balanced_crt) |
-| ✓ | `void fmpz_multi_CRT_clear (fmpz_multi_CRT_t P)` | internal |
+| ⚙ | `void fmpz_multi_CRT_clear (fmpz_multi_CRT_t P)` | internal |
 
-**The `fmpz_multi_CRT` family.** Any number of pairwise-coprime moduli, combined through a
-compiled subproduct tree. The public surface is the one-shot form: `Natural::multi_crt` is
-`sign = 0` and `Integer::multi_balanced_crt` is `sign = 1`, the same split the pair functions
-made above. The precomputed context behind them — FLINT's `init`/`precompute`/`precomp`/`clear`
-quartet as one compiled-program type — is ported in full but kept internal: reusing a context
-across many residue lists is the multimodular-algorithm pattern, and Malachite will surface it
-when the algorithms that need it arrive, rather than exporting machinery ordinary users reach
-through the one-shots. Failure moves from `precompute`'s success flag to
-[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), under exactly FLINT's
-conditions: with one modulus, only zero is unusable, and 1 is accepted; with two or more, any
-0 or 1, or any non-coprime pair, is rejected. One contract is stricter: FLINT accepts arbitrary
-`fmpz` inputs and reduces them, while Malachite requires each residue already reduced modulo
-its modulus, like the rest of its modular arithmetic. Both output conventions agree with FLINT
-bit for bit, which the differential suite checks against `fmpz_multi_CRT` at both signs, edge
-quirks included.
+**The `fmpz_multi_CRT` family.** `Natural::multi_crt` is `fmpz_multi_CRT` with `sign = 0`, and
+`Integer::multi_balanced_crt` is `sign = 1`. The precomputed context (`init`, `precompute`,
+`precomp`, `clear`) is ported but not public, so each call takes the moduli afresh.
+Failure is [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), under FLINT's
+conditions: with one modulus, only 0 is rejected; with two or more, any 0 or 1, or any
+non-coprime pair, is rejected. FLINT reduces arbitrary inputs, while Malachite requires each
+residue already reduced modulo its modulus. Otherwise the results agree with FLINT's, edge cases
+included.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_multi_mod_ui (ulong * out, const fmpz_t in, const fmpz_comb_t comb, fmpz_comb_temp_t temp)` | internal |
-| ✓ | `void fmpz_multi_CRT_ui (fmpz_t output, nn_srcptr residues, const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)` | internal |
-| ✓ | `void fmpz_comb_init (fmpz_comb_t comb, nn_srcptr primes, slong num_primes)` | internal |
-| ✓ | `void fmpz_comb_temp_init (fmpz_comb_temp_t temp, const fmpz_comb_t comb)` | internal |
-| ✓ | `void fmpz_comb_clear (fmpz_comb_t comb)` | internal |
-| ✓ | `void fmpz_comb_temp_clear (fmpz_comb_temp_t temp)` | internal |
+| ⚙ | `void fmpz_multi_mod_ui (ulong * out, const fmpz_t in, const fmpz_comb_t comb, fmpz_comb_temp_t temp)` | internal |
+| ⚙ | `void fmpz_multi_CRT_ui (fmpz_t output, nn_srcptr residues, const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)` | internal |
+| ⚙ | `void fmpz_comb_init (fmpz_comb_t comb, nn_srcptr primes, slong num_primes)` | internal |
+| ⚙ | `void fmpz_comb_temp_init (fmpz_comb_temp_t temp, const fmpz_comb_t comb)` | internal |
+| ⚙ | `void fmpz_comb_clear (fmpz_comb_t comb)` | internal |
+| ⚙ | `void fmpz_comb_temp_clear (fmpz_comb_temp_t temp)` | internal |
 
-**The comb.** The multimodular workhorse: many word-sized moduli at once, with consecutive
-moduli packed in groups of up to three whose product fits a word, groups packed into multi-limb
-chunks with premultiplied combination multipliers, and the chunks handled by the subproduct
-trees above. It is the largest instance of the precomputed-context pattern this page has met as
-`nmod_t` and `fmpz_preinvn_t`. Malachite ports it in full — one type compiling both directions'
-tables at once, with `fmpz_comb_temp_t`'s workspace allocated per call — but keeps the whole of
-it internal: the comb exists to serve multimodular algorithms, and its word-slice interface is
-kernel plumbing rather than something an ordinary user composes with. It backs the public
-one-shots today only in spirit; its rows are marked mapped because the machinery exists, is
-exercised by the test suite, and agrees with FLINT bit for bit, which the differential suite
-checks against `fmpz_multi_mod_ui` and `fmpz_multi_CRT_ui` at both signs. FLINT's
-documentation asks for primes of `FLINT_BITS - 1` bits; both implementations in fact accept
-any pairwise-coprime word moduli.
+**The comb.** Malachite has an internal port of FLINT's multimodular comb, but it is not public.
+To reduce a value modulo many word-sized moduli, use `Mod` for each; to recombine, use
+`Natural::multi_crt` or `Integer::multi_balanced_crt`.
 
 ## [Primality testing](https://flintlib.org/doc/fmpz.html#primality-testing) {#primality-testing}
 
-Not mapped yet. Malachite does not test bignum primality today, so the headline functions,
-`fmpz_is_prime`, `fmpz_is_probabprime` with its named variants (BPSW, Lucas, strong
-probable-prime), and `fmpz_nextprime`, are all gaps of one family; the
-[Primes and factors discussion](/mapping/gmp-integers/#number-theoretic-functions) on the GMP
-page describes the planned work, and FLINT's API is the model named there. The section also
-exports building blocks, the six `fmpz_lucas_chain` functions and
-`fmpz_divisor_in_residue_class_lenstra`, which sit with `fmpz_xgcd_partial` in the
-algorithm-component family. The section will be mapped in full when the primality work lands.
+This section is not mapped row by row. Malachite does not test the primality of `Natural`s or
+`Integer`s, so `fmpz_is_prime`, `fmpz_is_probabprime` and its variants, `fmpz_nextprime`, the
+`fmpz_lucas_chain` functions, and `fmpz_divisor_in_residue_class_lenstra` have no counterparts.
 
 ## [Special functions](https://flintlib.org/doc/fmpz.html#special-functions) {#special-functions}
 
@@ -1157,17 +845,8 @@ algorithm-component family. The section will be mapped in full when the primalit
 | ✗ | `void fmpz_factor_divisor_sigma (fmpz_t res, ulong k, const fmpz_factor_t fac)` | |
 
 **`fmpz_primorial`.** `Natural::primorial(n)`, the product of the primes up to and including
-`n`, exactly as FLINT defines $$n\#$$. Malachite adds the other convention as a separate
-function, `product_of_first_n_primes`, along with
-[`CheckedPrimorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedPrimorial.html)
-variants for the primitive types.
+`n`, as in FLINT.
 
 **The multiplicative functions.** Euler's totient, the Möbius function, and the divisor sums
-$$\sigma_k$$ are all gaps, and they are one gap rather than three: each is read off a prime
-factorization, which is why FLINT provides every one in two forms, taking `n` itself or a
-precomputed `fmpz_factor_t`. Malachite factors primitive integers, through
-[`Factor`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.Factor.html),
-but not yet `Natural`s, and the multiplicative functions belong downstream of that machinery, at
-both operand sizes. The `fmpz_factor_t`-taking forms raise a further design question, what a
-public factorization type should look like, that is deferred along with FLINT's `fmpz_factor`
-module itself; when that module is taken up, these six rows come with it.
+$$\sigma_k$$ have no counterparts, nor does a factorization type corresponding to
+`fmpz_factor_t`.

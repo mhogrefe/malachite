@@ -142,9 +142,6 @@ pub fn exhaustive_unsigned_polynomials_from_iterators<
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::exhaustive::{
-///     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
-/// };
 /// use malachite_base::unsigned_polynomial::exhaustive::*;
 ///
 /// assert_eq!(
@@ -203,9 +200,6 @@ impl<T: PrimitiveUnsigned> Iterator for ExhaustiveUnsignedPolynomialsWithDegree<
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::exhaustive::{
-///     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
-/// };
 /// use malachite_base::unsigned_polynomial::exhaustive::*;
 ///
 /// assert_eq!(
@@ -246,9 +240,6 @@ pub fn exhaustive_unsigned_polynomials_with_degree<T: PrimitiveUnsigned>(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::exhaustive::{
-///     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
-/// };
 /// use malachite_base::unsigned_polynomial::exhaustive::*;
 ///
 /// assert_eq!(
@@ -288,9 +279,6 @@ pub fn exhaustive_unsigned_polynomials_min_degree<T: PrimitiveUnsigned>(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::exhaustive::{
-///     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
-/// };
 /// use malachite_base::unsigned_polynomial::exhaustive::*;
 ///
 /// assert_eq!(
@@ -339,9 +327,6 @@ pub fn exhaustive_unsigned_polynomials_degree_range<T: PrimitiveUnsigned>(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::num::exhaustive::{
-///     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
-/// };
 /// use malachite_base::unsigned_polynomial::exhaustive::*;
 ///
 /// assert_eq!(

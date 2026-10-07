@@ -669,7 +669,6 @@ impl Polynomial for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::polynomial::Polynomial;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;

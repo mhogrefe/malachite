@@ -118,9 +118,6 @@ pub const fn increment_char(c: &mut char) {
 /// ```
 #[inline]
 pub fn decrement_char(c: &mut char) {
-    if *c == char::MIN {
-        panic!("Cannot decrement char '{}'", *c);
-    } else {
-        *c = contiguous_range_to_char(char_to_contiguous_range(*c) - 1).unwrap();
-    }
+    assert!(*c != char::MIN, "Cannot decrement char '{}'", *c);
+    *c = contiguous_range_to_char(char_to_contiguous_range(*c) - 1).unwrap();
 }

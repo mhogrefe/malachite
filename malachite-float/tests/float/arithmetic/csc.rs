@@ -27,6 +27,8 @@ use malachite_float::float::arithmetic::csc::{
     primitive_float_csc_rational, primitive_float_csc_with_period,
     primitive_float_csc_with_period_rational,
 };
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_float::test_util::common::huge_pi_test_guard;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
     rug_round_try_from_rounding_mode, to_hex_string,
@@ -943,6 +945,7 @@ fn primitive_float_csc_properties() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_csc_overflow() {
+    let _guard = huge_pi_test_guard();
     let max = Float::max_finite_value_with_prec(10);
     let p = (1u64 << 30) + 64;
     // just below pi, where the sine is positive and tiny pi is irrational, so rounding it up gives
@@ -3052,6 +3055,7 @@ fn csc_rational_prec_properties() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_csc_rational_huge() {
+    let _guard = huge_pi_test_guard();
     let x = Rational::power_of_2(1i64 << 30);
     let (t, o) = Float::csc_rational_prec_round_ref(&x, 10, Nearest);
     assert_eq!(t.to_string(), "1.5938");
@@ -3066,6 +3070,7 @@ fn test_csc_rational_huge() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_csc_rational_overflow() {
+    let _guard = huge_pi_test_guard();
     let max = Float::max_finite_value_with_prec(10);
     let p = (1u64 << 30) + 64;
     // just below pi, where the sine is positive and tiny

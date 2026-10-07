@@ -105,7 +105,6 @@ pub mod partial_eq_gaussian_rational;
 ///
 /// # partial_eq
 /// ```
-/// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 /// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::integer::Integer;
@@ -162,7 +161,6 @@ pub mod partial_eq_integer_polynomial;
 ///
 /// # partial_eq
 /// ```
-/// use core::str::FromStr;
 /// use malachite_base::num::basic::traits::{One, Zero};
 /// use malachite_base::polynomial::Polynomial;
 /// use malachite_nz::natural::Natural;

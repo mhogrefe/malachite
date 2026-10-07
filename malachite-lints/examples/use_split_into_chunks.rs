@@ -51,6 +51,7 @@ fn main() {
         // A `mut` chunk binding has no macro equivalent: fine.
         let (mut a, rest) = xs.split_at(4);
         let (b, rest) = rest.split_at(4);
+        consume(a);
         a = b;
         consume(a);
         consume(rest);

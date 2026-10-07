@@ -27,6 +27,8 @@ use malachite_float::float::arithmetic::sin::{
     primitive_float_sin_rational, primitive_float_sin_with_period,
     primitive_float_sin_with_period_rational,
 };
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_float::test_util::common::huge_pi_test_guard;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
     rug_round_try_from_rounding_mode, to_hex_string,
@@ -1089,6 +1091,7 @@ fn test_sin_near_zero() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_underflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     // 2^(-2^30), the smallest positive `Float`, at the output precision
     let min_positive = Float::one_prec(10) >> (1u64 << 30);
@@ -3841,6 +3844,7 @@ fn sin_rational_prec_properties() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_rational_huge() {
+    let _guard = huge_pi_test_guard();
     let x = Rational::power_of_2(1i64 << 30);
     let (s, o) = Float::sin_rational_prec_round_ref(&x, 10, Nearest);
     assert_eq!(s.to_string(), "0.62793");
@@ -3854,6 +3858,7 @@ fn test_sin_rational_huge() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_rational_underflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     // 2^(-2^30), the smallest positive `Float`, at the output precision
     let min_positive = Float::one_prec(10) >> (1u64 << 30);

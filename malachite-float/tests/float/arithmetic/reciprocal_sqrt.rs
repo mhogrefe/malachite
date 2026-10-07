@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use core::{f32, f64};
 use malachite_base::num::arithmetic::traits::{
     PowerOf2, Reciprocal, ReciprocalSqrt, ReciprocalSqrtAssign, Square,
 };
@@ -2694,7 +2693,7 @@ fn test_primitive_float_reciprocal_sqrt_rational() {
     }
     test::<f32>("0", f32::INFINITY);
     test::<f32>("1", 1.0);
-    test::<f32>("1/2", f32::consts::SQRT_2);
+    test::<f32>("1/2", core::f32::consts::SQRT_2);
     test::<f32>("1/3", 1.7320508);
     test::<f32>("22/7", 0.56407607);
     test::<f32>("1/225", 15.0);
@@ -2705,7 +2704,7 @@ fn test_primitive_float_reciprocal_sqrt_rational() {
 
     test::<f64>("0", f64::INFINITY);
     test::<f64>("1", 1.0);
-    test::<f64>("1/2", f64::consts::SQRT_2);
+    test::<f64>("1/2", core::f64::consts::SQRT_2);
     test::<f64>("1/3", 1.7320508075688772);
     test::<f64>("22/7", 0.5640760748177662);
     test::<f64>("1/225", 15.0);

@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use core::{f32, f64};
 use malachite_base::num::arithmetic::traits::{Ln, LnAssign, PowerOf2, Reciprocal};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;

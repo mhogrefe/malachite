@@ -163,7 +163,7 @@ fn atan2_prec_round_normal_ref(
             }
             // error <= 1 ulp, except on underflow or overflow
             if quotient_underflows(y, x, exp_y, exp_x) {
-                // |atan z| < |z|, so an underflowing quotient gives an underflowing result MPFR
+                // |atan z| < |z|, so an underflowing quotient gives an underflowing result. MPFR
                 // takes the sign from the quotient; in this branch x is positive, so it is the sign
                 // of y. With `Nearest` a quotient that rounded to zero is below a quarter of the
                 // smallest positive `Float`, and rounds toward zero rather than away.
@@ -179,42 +179,40 @@ fn atan2_prec_round_normal_ref(
             w += increment;
             increment = w >> 1;
         }
-    } else {
-        // atan2(y, x) = sign(y) (pi - atan|y/x|)
-        loop {
-            // error <= 1 ulp
-            let mut t = y.div_prec_ref_ref(x, w).0.abs();
-            // error <= 2 ulps, since |atan'| <= 1
-            t.atan_prec_assign(w);
-            // error <= 1/2 ulp
-            let pi = Float::pi_prec(w).0;
-            // if the quotient was zero, so is its arctangent, and |y/x| was below 2^(MIN_EXPONENT -
-            // 1)
-            let e = if t == 0u32 {
-                Float::MIN_EXPONENT_I64 - 1
-            } else {
-                i64::from(t.get_exponent().unwrap())
-            };
-            let exp_pi = i64::from(pi.get_exponent().unwrap());
-            let t = pi.sub_prec(t, w).0;
-            let t = if y_negative { -t } else { t };
-            let exp_t = i64::from(t.get_exponent().unwrap());
-            // error(t) is at most (1/2 + 2^(EXP(pi) - EXP(t) - 1) + 2^(e - EXP(t) + 1)) ulps, and
-            // so at most 2^(max(max(EXP(pi) - EXP(t) - 1, e - EXP(t) + 1), -1) + 2) ulps
-            let e = max(max(exp_pi - exp_t - 1, e - exp_t + 1), -1) + 2;
-            if e < i64::exact_from(w)
-                && float_can_round(
-                    t.significand_ref().unwrap(),
-                    w - u64::exact_from(e),
-                    prec,
-                    rm,
-                )
-            {
-                return Float::from_float_prec_round(t, prec, rm);
-            }
-            w += increment;
-            increment = w >> 1;
+    }
+    // atan2(y, x) = sign(y) (pi - atan|y/x|)
+    loop {
+        // error <= 1 ulp
+        let mut t = y.div_prec_ref_ref(x, w).0.abs();
+        // error <= 2 ulps, since |atan'| <= 1
+        t.atan_prec_assign(w);
+        // error <= 1/2 ulp
+        let pi = Float::pi_prec(w).0;
+        // if the quotient was zero, so is its arctangent, and |y/x| was below 2^(MIN_EXPONENT - 1)
+        let e = if t == 0u32 {
+            Float::MIN_EXPONENT_I64 - 1
+        } else {
+            i64::from(t.get_exponent().unwrap())
+        };
+        let exp_pi = i64::from(pi.get_exponent().unwrap());
+        let t = pi.sub_prec(t, w).0;
+        let t = if y_negative { -t } else { t };
+        let exp_t = i64::from(t.get_exponent().unwrap());
+        // error(t) is at most (1/2 + 2^(EXP(pi) - EXP(t) - 1) + 2^(e - EXP(t) + 1)) ulps, and so at
+        // most 2^(max(max(EXP(pi) - EXP(t) - 1, e - EXP(t) + 1), -1) + 2) ulps
+        let e = max(max(exp_pi - exp_t - 1, e - exp_t + 1), -1) + 2;
+        if e < i64::exact_from(w)
+            && float_can_round(
+                t.significand_ref().unwrap(),
+                w - u64::exact_from(e),
+                prec,
+                rm,
+            )
+        {
+            return Float::from_float_prec_round(t, prec, rm);
         }
+        w += increment;
+        increment = w >> 1;
     }
 }
 

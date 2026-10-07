@@ -26,6 +26,8 @@ use malachite_float::float::arithmetic::cot::{
     primitive_float_cot_rational, primitive_float_cot_with_period,
     primitive_float_cot_with_period_rational,
 };
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_float::test_util::common::huge_pi_test_guard;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
     rug_round_try_from_rounding_mode, to_hex_string,
@@ -5765,6 +5767,7 @@ fn primitive_float_cot_rational_properties() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_cot_rational_huge() {
+    let _guard = huge_pi_test_guard();
     let x = Rational::power_of_2(1i64 << 30);
     let (t, o) = Float::cot_rational_prec_round_ref(&x, 10, Nearest);
     assert_eq!(t.to_string(), "-1.2402");
@@ -5781,6 +5784,7 @@ fn test_cot_rational_huge() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_cot_rational_underflow_and_overflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     // a `Rational` far below the `Float` exponent range, where the cotangent is about its
     // reciprocal: the tiny path decides it from the tangent's series bracket
@@ -5827,6 +5831,7 @@ fn test_cot_rational_underflow_and_overflow() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_cot_underflow_and_overflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     // pi rounded down: x < pi, so the sine is positive and tiny while the cosine is just above -1,
     // and the cotangent is negative and beyond the largest finite `Float`

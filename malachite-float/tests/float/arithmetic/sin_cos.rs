@@ -35,6 +35,8 @@ use malachite_float::float::arithmetic::sin_cos::{
     primitive_float_sin_cos_rational, primitive_float_sin_cos_with_period,
     primitive_float_sin_cos_with_period_rational,
 };
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_float::test_util::common::huge_pi_test_guard;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
@@ -3540,6 +3542,7 @@ fn test_sin_cos_near_zero() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_cos_underflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     let min_positive = Float::one_prec(10) >> (1u64 << 30);
     // pi rounded down: the sine is positive and tiny, and the cosine is just above -1
@@ -7660,6 +7663,7 @@ fn sin_cos_rational_prec_properties() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_cos_rational_huge() {
+    let _guard = huge_pi_test_guard();
     let x = Rational::power_of_2(1i64 << 30);
     let (s, c, o_s, o_c) = Float::sin_cos_rational_prec_round_ref(&x, 10, Nearest);
     assert_eq!(s.to_string(), "0.62793");
@@ -7677,6 +7681,7 @@ fn test_sin_cos_rational_huge() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_cos_rational_underflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     let min_positive = Float::one_prec(10) >> (1u64 << 30);
     let pi = Rational::exact_from(&Float::pi_prec_round(p, Floor).0);

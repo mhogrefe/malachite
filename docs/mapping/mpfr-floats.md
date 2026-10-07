@@ -1084,27 +1084,72 @@ range by the rounding function".
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
-| ✗ | `int mpfr_cosh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_sinh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_tanh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_sinh_cosh (mpfr_t sop, mpfr_t cop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_sech (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_csch (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_coth (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_acosh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_asinh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_atanh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_cosh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`cosh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cosh_prec_round), [`Cosh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Cosh.html) |
+| ✓ | `int mpfr_sinh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sinh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sinh_prec_round), [`Sinh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Sinh.html) |
+| ✓ | `int mpfr_tanh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`tanh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.tanh_prec_round), [`Tanh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Tanh.html) |
+| ✓ | `int mpfr_sinh_cosh (mpfr_t sop, mpfr_t cop, mpfr_t op, mpfr_rnd_t rnd)` | [`sinh_cosh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sinh_cosh_prec_round), [`SinhCosh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SinhCosh.html) |
+| ✓ | `int mpfr_sech (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sech_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sech_prec_round), [`Sech`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Sech.html) |
+| ✓ | `int mpfr_csch (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`csch_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.csch_prec_round), [`Csch`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Csch.html) |
+| ✓ | `int mpfr_coth (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`coth_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.coth_prec_round), [`Coth`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Coth.html) |
+| ✓ | `int mpfr_acosh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`acosh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.acosh_prec_round), [`Acosh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Acosh.html) |
+| ✓ | `int mpfr_asinh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`asinh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.asinh_prec_round), [`Asinh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Asinh.html) |
+| ✓ | `int mpfr_atanh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`atanh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.atanh_prec_round), [`Atanh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Atanh.html) |
 
-**The family.** Ten rows, still empty — a shallower gap than the trigonometric block above
-once was. The hyperbolic functions are algebraic combinations of the exponential machinery this
-page has already marked ✓: $$\sinh x = (e^x - e^{-x})/2$$ with `exp_x_minus_1` carrying the
-accuracy near zero, and $$\operatorname{atanh} x$$ living the same way on `ln_1_plus_x`. There
-is no argument-reduction wall here; when these are built they will be layers over the ported
-exponential and logarithm cores. What keeps the rows at ✗ in the meantime is the usual seam:
-composing two correctly rounded steps rounds twice, and twice rounded is not correctly
-rounded. `mpfr_sinh_cosh` shares `mpfr_sin_cos`'s packed return value, zero "iff both results
-are exact", and the same observation about a two-`Ordering` Rust signature applies; `sech`,
-`csch`, and `coth` are the reciprocal trio, and `acosh`, `asinh`, and `atanh` the inverses.
+**The family.** Ten rows, no gaps. The hyperbolic functions and their inverses are algebraic
+combinations of the exponential and the logarithm, whose cores this page already marks ✓, so there
+is no argument reduction here: each is a Ziv loop over those cores. Malachite adds a `Rational`
+variant of each function, and the three inverse reciprocal functions MPFR lacks.
+
+**`mpfr_sinh`, `mpfr_cosh`, and `mpfr_sinh_cosh`.** `sinh_prec_round`, `cosh_prec_round`, and
+`sinh_cosh_prec_round` share one core that computes $$h = e^x/2$$ and returns $$h \pm 1/(4h)$$. MPFR
+detects overflow after the fact, which its extended intermediate exponent range makes safe;
+Malachite has no such range, so where $$e^x$$ overflows but $$e^x/2$$ does not, it computes
+$$h = u \cdot u/2$$ with $$u = e^{x/2}$$, returning the finite result MPFR returns. (MPFR's `sinh`
+falls back on $$2\sinh(x/2)\cosh(x/2)$$ there.) `mpfr_sinh_cosh` maps the way `mpfr_sin_cos` does:
+its packed return value, zero "iff both results are exact", becomes two `Ordering`s. It has no
+small-input shortcut, so for inputs near the smallest positive float its working precision reaches
+about $$2^{30}$$ bits; `sinh_cosh_prec_round` uses the shortcuts of `sinh_prec_round` and
+`cosh_prec_round`.
+
+**`mpfr_tanh`.** `tanh_prec_round` is the same $$(e^{2x}-1)/(e^{2x}+1)$$, without raising its
+working precision to the input's, which MPFR does only to make $$2x$$ exact (doubling a `Float` is
+always exact). Where MPFR rounds a result near $$\pm1$$ from $$\pm1$$ directly, which Malachite's
+narrower exponent range could make unsafe at precisions near $$2^{30}$$ bits, `tanh_prec_round`
+first checks that $$1-|\tanh x|$$ is below half an ulp, and otherwise computes the result from
+`exp_x_minus_1`.
+
+**The reciprocal trio.** `mpfr_sech`, `mpfr_csch`, and `mpfr_coth` take the reciprocal of the
+hyperbolic cosine, sine, and tangent, and `sech_prec_round`, `csch_prec_round`, and
+`coth_prec_round` match them, with three differences. MPFR declares underflow when $$\cosh x$$ or
+$$\sinh x$$ overflows its extended range; in Malachite's, they overflow about two binades before
+their reciprocals leave the range, so for those inputs Malachite computes
+$$2e^{-|x|}/(1 \pm e^{-2|x|})$$ directly, rounding any underflow by an exact scaling. Where MPFR's
+extended range holds the reciprocal of a hyperbolic sine near the smallest positive float,
+`csch_prec_round` decides a result at the top of Malachite's range from an exact bracket, as
+`csc_prec_round` does. And where $$\coth x$$ lies within $$2^{-p}$$ of $$\pm1$$, MPFR rounds its
+approximation directly, while `coth_prec_round` bounds $$|\coth x| - 1 < 4e^{-2|x|}$$ from the input
+and rounds from $$\pm1$$ when the bound allows, skipping the hyperbolic tangent for large inputs.
+
+**The inverse functions.** `asinh_prec_round` and `acosh_prec_round` are the ports of `mpfr_asinh`
+and `mpfr_acosh`, $$\ln(|x| + \sqrt{x^2 \pm 1})$$. MPFR squares $$x$$ in its extended range; in
+Malachite's, $$x^2$$ overflows for $$|x|$$ above about $$2^{2^{29}}$$, so for those inputs both
+compute $$\ln|x| + \ln 2$$, which differs from the true value by less than $$2^{-2^{30}}$$.
+`atanh_prec_round` is the port of `mpfr_atanh`, with its Taylor series for small $$x$$; elsewhere
+MPFR computes $$\frac{1}{2}\ln\frac{1+x}{1-x}$$, losing bits to the logarithm of a quotient near 1,
+while `atanh_prec_round` computes $$\frac{1}{2}\ln(1 + \frac{2x}{1-x})$$ with
+`ln_1_plus_x_prec_round`, whose error bound is constant. Where $$1-|x|$$ is small enough for the
+quotient to overflow Malachite's range, which needs an input with a precision above $$2^{30}$$ bits,
+it computes $$\ln(1+|x|) - \ln(1-|x|)$$ instead.
+
+**Beyond MPFR.** MPFR has no inverse hyperbolic secant, cosecant, or cotangent; Malachite has
+`asech_prec_round`, `acsch_prec_round`, and `acoth_prec_round`. Taking the inverse hyperbolic cosine
+or tangent of a rounded $$1/x$$ would lose accuracy near $$|x| = 1$$, where those functions are
+ill-conditioned, so `asech_prec_round` computes $$\ln(1 + (t + \sqrt{t(1+x)})/x)$$ with the exact
+$$t = 1 - x$$ for $$x \geq \frac{1}{2}$$ and $$\ln(1 + \sqrt{1-x^2}) - \ln x$$ below, and
+`acoth_prec_round` computes $$\frac{1}{2}\ln(1 + 2/(|x| - 1))$$, with $$|x| - 1$$ exact for
+$$|x| < 2$$. The inverse hyperbolic sine is well-conditioned, so `acsch_prec_round` does take
+$$\operatorname{asinh}(1/x)$$, except where $$1/x$$ would overflow, where it computes
+$$\ln 2 - \ln|x|$$.
 
 ### Special functions
 

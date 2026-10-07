@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use core::{f32, f64};
 use malachite_base::num::arithmetic::traits::{PowerOf2, Sqrt, SqrtAssign, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -2989,7 +2988,7 @@ fn test_primitive_float_sqrt_rational() {
 
     test::<f64>("0", 0.0);
     test::<f64>("1", 1.0);
-    test::<f64>("1/2", f64::consts::FRAC_1_SQRT_2);
+    test::<f64>("1/2", core::f64::consts::FRAC_1_SQRT_2);
     test::<f64>("1/3", 0.5773502691896257);
     test::<f64>("22/7", 1.7728105208558367);
     test::<f64>("225", 15.0);

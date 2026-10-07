@@ -161,13 +161,12 @@ fn assign_bits_signed<
             assert!(bits == max.mod_power_of_2(bits_width), "{ERROR_MESSAGE}");
         } else {
             let lower_width = width - start;
-            if end > width && bits >> lower_width != max.mod_power_of_2(end - width) {
-                panic!("{}", ERROR_MESSAGE);
-            } else {
-                *x &=
-                    T::wrapping_from(!(max.mod_power_of_2(min(bits_width, lower_width)) << start));
-                *x |= T::wrapping_from(bits << start);
-            }
+            assert!(
+                end <= width || bits >> lower_width == max.mod_power_of_2(end - width),
+                "{ERROR_MESSAGE}"
+            );
+            *x &= T::wrapping_from(!(max.mod_power_of_2(min(bits_width, lower_width)) << start));
+            *x |= T::wrapping_from(bits << start);
         }
     }
 }

@@ -54,10 +54,10 @@ const WIDTH_P1: u64 = Limb::WIDTH + 1;
 const TWICE_WIDTH_P1: u64 = (Limb::WIDTH << 1) + 1;
 
 pub fn sub_float_significands_in_place(
-    mut x: &mut Natural,
+    x: &mut Natural,
     x_exp: &mut i32,
     x_prec: u64,
-    mut y: &mut Natural,
+    y: &mut Natural,
     y_exp: i32,
     y_prec: u64,
     out_prec: u64,
@@ -66,7 +66,7 @@ pub fn sub_float_significands_in_place(
     if x_prec == y_prec && out_prec == x_prec {
         sub_float_significands_in_place_same_prec(x, x_exp, y, y_exp, out_prec, rm)
     } else {
-        match (&mut x, &mut y) {
+        match (&mut *x, &mut *y) {
             (Natural(Small(small_x)), Natural(Small(small_y))) => {
                 if out_prec <= Limb::WIDTH {
                     let mut out = [0];
@@ -236,7 +236,7 @@ pub fn sub_float_significands_in_place(
 }
 
 pub fn sub_float_significands_in_place_ref(
-    mut x: &mut Natural,
+    x: &mut Natural,
     x_exp: &mut i32,
     x_prec: u64,
     y: &Natural,
@@ -248,7 +248,7 @@ pub fn sub_float_significands_in_place_ref(
     if x_prec == y_prec && out_prec == x_prec {
         sub_float_significands_in_place_same_prec_ref(x, x_exp, y, y_exp, out_prec, rm)
     } else {
-        match (&mut x, y) {
+        match (&mut *x, y) {
             (Natural(Small(small_x)), Natural(Small(small_y))) => {
                 if out_prec <= Limb::WIDTH {
                     let mut out = [0];

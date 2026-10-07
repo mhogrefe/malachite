@@ -26,6 +26,8 @@ use malachite_float::float::arithmetic::tan::{
     primitive_float_tan_rational, primitive_float_tan_with_period,
     primitive_float_tan_with_period_rational,
 };
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_float::test_util::common::huge_pi_test_guard;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, round_once_to_primitive,
     rug_round_try_from_rounding_mode, to_hex_string,
@@ -2364,6 +2366,7 @@ fn test_tan_near_zero() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_tan_underflow_and_overflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     // pi rounded down: x < pi, so the sine is positive and tiny while the cosine is just above -1,
     // and the tangent is negative and tiny
@@ -4627,6 +4630,7 @@ fn tan_rational_prec_properties() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_tan_rational_huge() {
+    let _guard = huge_pi_test_guard();
     let x = Rational::power_of_2(1i64 << 30);
     let (t, o) = Float::tan_rational_prec_round_ref(&x, 10, Nearest);
     assert_eq!(t.to_string(), "-0.80664");
@@ -4641,6 +4645,7 @@ fn test_tan_rational_huge() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_tan_rational_underflow_and_overflow() {
+    let _guard = huge_pi_test_guard();
     let p = (1u64 << 30) + 64;
     // pi rounded down: x < pi, so the tangent is negative and tiny
     let pi = Float::pi_prec_round(p, Floor).0;
