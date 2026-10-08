@@ -8,7 +8,7 @@
 
 use itertools::Itertools;
 use malachite_base::strings::ToDebugString;
-use malachite_base::test_util::generators::unsigned_vec_gen;
+use malachite_base::test_util::generators::{unsigned_vec_gen, unsigned_vector_gen};
 use malachite_base::vector::Vector;
 
 #[test]
@@ -29,6 +29,14 @@ fn test_to_string() {
 
 #[test]
 fn to_string_properties() {
+    unsigned_vector_gen().test_properties(|v| {
+        let s = v.to_string();
+        assert_eq!(v.to_debug_string(), s);
+        assert_eq!(s, format!("({})", v.elements.iter().join(", ")));
+        let vs = vec![v.clone(), v.clone()];
+        assert_eq!(vs.to_debug_string(), format!("[{v}, {v}]"));
+    });
+
     unsigned_vec_gen::<u8>().test_properties(|xs| {
         let v = Vector {
             elements: xs.clone(),

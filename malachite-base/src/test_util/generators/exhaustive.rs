@@ -91,6 +91,8 @@ use crate::vecs::exhaustive::{
     lex_vecs_fixed_length_from_single, shortlex_vecs, shortlex_vecs_length_inclusive_range,
     shortlex_vecs_min_length,
 };
+use crate::vector::Vector;
+use crate::vector::exhaustive::exhaustive_vectors;
 use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
 
@@ -6729,5 +6731,32 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_v
             exhaustive_positive_primitive_ints::<T>(),
         )
         .filter(|(p, q, _, m)| p.mod_is_reduced(m) && q < m),
+    )
+}
+
+// -- Vector<u64> --
+
+pub fn exhaustive_unsigned_vector_gen() -> It<Vector<u64>> {
+    Box::new(exhaustive_vectors(exhaustive_unsigneds::<u64>()))
+}
+
+pub fn exhaustive_unsigned_vector_pair_gen() -> It<(Vector<u64>, Vector<u64>)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_vectors(
+        exhaustive_unsigneds::<u64>(),
+    )))
+}
+
+pub fn exhaustive_unsigned_vector_triple_gen() -> It<(Vector<u64>, Vector<u64>, Vector<u64>)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_vectors(
+        exhaustive_unsigneds::<u64>(),
+    )))
+}
+
+// Each vector paired with each of its indices. A vector has finitely many, so this reaches every
+// pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_1() -> It<(Vector<u64>, usize)> {
+    Box::new(
+        exhaustive_vectors(exhaustive_unsigneds::<u64>())
+            .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
     )
 }

@@ -8,7 +8,7 @@
 
 use itertools::Itertools;
 use malachite_base::strings::latex::ToLatex;
-use malachite_base::test_util::generators::unsigned_vec_gen;
+use malachite_base::test_util::generators::{unsigned_vec_gen, unsigned_vector_gen};
 use malachite_base::vector::Vector;
 
 #[test]
@@ -23,6 +23,16 @@ fn test_to_latex_string() {
 
 #[test]
 fn to_latex_string_properties() {
+    unsigned_vector_gen().test_properties(|v| {
+        // A `u64`'s fragment is its decimal digits, so the fragment is the `Display` output with
+        // growing parentheses.
+        let s = v.to_string();
+        assert_eq!(
+            v.to_latex_string(),
+            format!("\\left({}\\right)", &s[1..s.len() - 1])
+        );
+    });
+
     unsigned_vec_gen::<u8>().test_properties(|xs| {
         let v = Vector {
             elements: xs.clone(),

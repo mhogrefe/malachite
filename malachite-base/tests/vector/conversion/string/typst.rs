@@ -8,7 +8,7 @@
 
 use itertools::Itertools;
 use malachite_base::strings::typst::ToTypst;
-use malachite_base::test_util::generators::unsigned_vec_gen;
+use malachite_base::test_util::generators::{unsigned_vec_gen, unsigned_vector_gen};
 use malachite_base::vector::Vector;
 
 #[test]
@@ -23,6 +23,11 @@ fn test_to_typst_string() {
 
 #[test]
 fn to_typst_string_properties() {
+    unsigned_vector_gen().test_properties(|v| {
+        // A `u64`'s fragment is its decimal digits, so the fragment is the `Display` output.
+        assert_eq!(v.to_typst_string(), v.to_string());
+    });
+
     unsigned_vec_gen::<u8>().test_properties(|xs| {
         let v = Vector {
             elements: xs.clone(),

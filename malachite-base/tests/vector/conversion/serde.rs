@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::test_util::generators::{string_gen, unsigned_vec_gen};
+use malachite_base::test_util::generators::{string_gen, unsigned_vec_gen, unsigned_vector_gen};
 use malachite_base::vector::Vector;
 
 #[test]
@@ -37,6 +37,12 @@ fn test_serde_fail() {
 
 #[test]
 fn serde_properties() {
+    unsigned_vector_gen().test_properties(|v| {
+        let s = serde_json::to_string(&v).unwrap();
+        assert_eq!(serde_json::to_string(&v.elements).unwrap(), s);
+        assert_eq!(serde_json::from_str::<Vector<u64>>(&s).unwrap(), v);
+    });
+
     unsigned_vec_gen::<u32>().test_properties(|xs| {
         let v = Vector {
             elements: xs.clone(),

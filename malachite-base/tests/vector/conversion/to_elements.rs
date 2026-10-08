@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::test_util::generators::unsigned_vec_gen;
+use malachite_base::test_util::generators::{unsigned_vec_gen, unsigned_vector_gen};
 use malachite_base::vector::Vector;
 
 #[test]
@@ -25,6 +25,14 @@ fn test_to_elements() {
 
 #[test]
 fn to_elements_properties() {
+    unsigned_vector_gen().test_properties(|v| {
+        let xs = v.to_elements();
+        assert_eq!(xs, v.elements);
+        assert_eq!(v.elements_ref(), xs.as_slice());
+        assert_eq!(u64::try_from(xs.len()).unwrap(), v.dimension());
+        assert_eq!(v.into_elements(), xs);
+    });
+
     unsigned_vec_gen::<u8>().test_properties(|xs| {
         let v = Vector {
             elements: xs.clone(),

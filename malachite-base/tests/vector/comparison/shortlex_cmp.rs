@@ -9,7 +9,8 @@
 use core::cmp::Ordering::{self, *};
 use malachite_base::test_util::common::test_custom_cmp_helper;
 use malachite_base::test_util::generators::{
-    unsigned_vec_gen, unsigned_vec_pair_gen, unsigned_vec_triple_gen,
+    unsigned_vec_gen, unsigned_vec_pair_gen, unsigned_vec_triple_gen, unsigned_vector_pair_gen,
+    unsigned_vector_triple_gen,
 };
 use malachite_base::test_util::vector::comparison::shortlex_cmp::*;
 use malachite_base::vector::{ShortlexVector, ShortlexVectorRef, Vector};
@@ -42,6 +43,25 @@ fn test_shortlex_cmp() {
 
 #[test]
 fn shortlex_cmp_properties() {
+    unsigned_vector_pair_gen().test_properties(|(v, w)| {
+        let c = shortlex(&v, &w);
+        assert_eq!(shortlex(&w, &v), c.reverse());
+        assert_eq!(v == w, c == Equal);
+        assert_eq!(vector_shortlex_cmp_naive(&v, &w), c);
+        match v.dimension().cmp(&w.dimension()) {
+            Equal => assert_eq!(v.elements.cmp(&w.elements), c),
+            d => assert_eq!(c, d),
+        }
+    });
+
+    unsigned_vector_triple_gen().test_properties(|(u, v, w)| {
+        if shortlex(&u, &v) == Less && shortlex(&v, &w) == Less {
+            assert_eq!(shortlex(&u, &w), Less);
+        } else if shortlex(&u, &v) == Greater && shortlex(&v, &w) == Greater {
+            assert_eq!(shortlex(&u, &w), Greater);
+        }
+    });
+
     unsigned_vec_pair_gen::<u8>().test_properties(|(xs, ys)| {
         let v = Vector { elements: xs };
         let w = Vector { elements: ys };

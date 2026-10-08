@@ -7,7 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::test_util::generators::unsigned_vec_gen;
+use malachite_base::test_util::generators::{
+    unsigned_vec_gen, unsigned_vector_unsigned_pair_gen_var_1,
+};
 use malachite_base::vector::Vector;
 
 #[test]
@@ -45,6 +47,21 @@ fn index_mut_fail() {
 
 #[test]
 fn index_properties() {
+    unsigned_vector_unsigned_pair_gen_var_1().test_properties(|(v, i)| {
+        assert_eq!(v[i], v.elements[i]);
+        assert_eq!(v[i], v.elements_ref()[i]);
+        let mut w = v.clone();
+        w[i] = w[i].wrapping_add(1);
+        assert_eq!(w.dimension(), v.dimension());
+        for j in 0..v.elements.len() {
+            if j != i {
+                assert_eq!(w[j], v[j]);
+            }
+        }
+        w[i] = w[i].wrapping_sub(1);
+        assert_eq!(w, v);
+    });
+
     unsigned_vec_gen::<u8>().test_properties(|xs| {
         let v = Vector { elements: xs };
         for i in 0..v.elements.len() {

@@ -17,6 +17,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::SignificantBits;
 use crate::unsigned_polynomial::UnsignedPolynomial;
+use crate::vector::Vector;
 use std::cmp::{max, min};
 
 pub struct Bucketer<'a, T> {
@@ -1163,5 +1164,31 @@ pub fn quadruple_1_unsigned_polynomial_len_bucketer<T, U, V>(
     Bucketer {
         bucketing_function: &|(p, _, _, _)| p.coefficients_asc().len(),
         bucketing_label: format!("{var_name}.len()"),
+    }
+}
+
+pub fn vector_dimension_bucketer<T>(var_name: &str) -> Bucketer<'_, Vector<T>> {
+    Bucketer {
+        bucketing_function: &|v| v.elements.len(),
+        bucketing_label: format!("{var_name}.dimension()"),
+    }
+}
+
+pub fn pair_1_vector_dimension_bucketer<'a, T, U>(
+    var_name: &'a str,
+) -> Bucketer<'a, (Vector<T>, U)> {
+    Bucketer {
+        bucketing_function: &|(v, _)| v.elements.len(),
+        bucketing_label: format!("{var_name}.dimension()"),
+    }
+}
+
+pub fn pair_vector_max_dimension_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Vector<T>, Vector<T>)> {
+    Bucketer {
+        bucketing_function: &|(v, w)| max(v.elements.len(), w.elements.len()),
+        bucketing_label: format!("max({x_name}.dimension(), {y_name}.dimension())"),
     }
 }

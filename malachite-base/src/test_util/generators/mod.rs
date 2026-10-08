@@ -29,6 +29,7 @@ use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
 use crate::tuples::exhaustive::{ExhaustivePairs, exhaustive_pairs_custom_output};
 use crate::unsigned_polynomial::UnsignedPolynomial;
+use crate::vector::Vector;
 use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
 
@@ -5167,5 +5168,40 @@ pub fn unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1<T: Pri
         &exhaustive_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1,
         &random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1,
         &special_random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// -- Vector<u64> --
+
+pub fn unsigned_vector_gen() -> Generator<Vector<u64>> {
+    Generator::new(
+        &exhaustive_unsigned_vector_gen,
+        &random_unsigned_vector_gen,
+        &special_random_unsigned_vector_gen,
+    )
+}
+
+pub fn unsigned_vector_pair_gen() -> Generator<(Vector<u64>, Vector<u64>)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_pair_gen,
+        &random_unsigned_vector_pair_gen,
+        &special_random_unsigned_vector_pair_gen,
+    )
+}
+
+pub fn unsigned_vector_triple_gen() -> Generator<(Vector<u64>, Vector<u64>, Vector<u64>)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_triple_gen,
+        &random_unsigned_vector_triple_gen,
+        &special_random_unsigned_vector_triple_gen,
+    )
+}
+
+// All `(Vector<u64>, usize)` where the `usize` is less than the vector's dimension.
+pub fn unsigned_vector_unsigned_pair_gen_var_1() -> Generator<(Vector<u64>, usize)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_pair_gen_var_1,
+        &random_unsigned_vector_unsigned_pair_gen_var_1,
+        &special_random_unsigned_vector_unsigned_pair_gen_var_1,
     )
 }
