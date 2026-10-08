@@ -11,6 +11,7 @@ use malachite_base::test_util::bench::bucketers::vec_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_base::vector::Vector;
 use malachite_nz::natural_vector::NaturalVector;
 use malachite_nz::test_util::generators::natural_vec_gen;
 

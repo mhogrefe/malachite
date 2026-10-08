@@ -8,6 +8,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::test_util::generators::integer_vector_unsigned_vector_pair_gen;

@@ -11,6 +11,7 @@ use alloc::vec::Vec;
 use core::ops::Deref;
 use malachite_base::named::Named;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::vector::Vector;
 
 /// Implementations of [`Index`](core::ops::Index) and [`IndexMut`](core::ops::IndexMut) for
 /// [`IntegerVector`].
@@ -24,9 +25,6 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`IntegerVector`]s without repetition.
 pub mod exhaustive;
-/// Functions for finding the pivot of an [`IntegerVector`], its first nonzero element, and its
-/// index.
-pub mod pivot;
 /// Iterators that generate [`IntegerVector`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
@@ -43,6 +41,7 @@ pub mod random;
 /// # Examples
 /// ```
 /// use malachite_base::num::basic::traits::{One, Two};
+/// use malachite_base::vector::Vector;
 /// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer_vector::IntegerVector;
 ///
@@ -58,7 +57,168 @@ pub struct IntegerVector {
     pub elements: Vec<Integer>,
 }
 
-impl IntegerVector {
+impl Vector for IntegerVector {
+    type Element = Integer;
+    type ElementOutput<'a>
+        = &'a Integer
+    where
+        Self: 'a;
+
+    /// Converts a slice of [`Integer`]s to an [`IntegerVector`], cloning them.
+    ///
+    /// The vector's dimension is the length of the slice. Every slice is a valid vector, so this
+    /// cannot fail; the empty slice gives the 0-dimensional vector.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// assert_eq!(
+    ///     IntegerVector::from_elements(&[Integer::ONE, Integer::TWO]).to_string(),
+    ///     "(1, 2)"
+    /// );
+    /// assert_eq!(IntegerVector::from_elements(&[]).to_string(), "()");
+    /// ```
+    #[inline]
+    fn from_elements(xs: &[Integer]) -> Self {
+        Self {
+            elements: xs.to_vec(),
+        }
+    }
+
+    /// Converts a [`Vec`] of [`Integer`]s to an [`IntegerVector`], taking ownership of it.
+    ///
+    /// The vector's dimension is the length of the [`Vec`]. Every [`Vec`] is a valid vector, so
+    /// this cannot fail, and nothing is copied or allocated.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// assert_eq!(
+    ///     IntegerVector::from_owned_elements(vec![Integer::ONE, Integer::TWO]).to_string(),
+    ///     "(1, 2)"
+    /// );
+    /// assert_eq!(
+    ///     IntegerVector::from_owned_elements(Vec::new()).to_string(),
+    ///     "()"
+    /// );
+    /// ```
+    #[inline]
+    fn from_owned_elements(xs: Vec<Integer>) -> Self {
+        Self { elements: xs }
+    }
+
+    /// Returns an [`IntegerVector`]'s elements as a [`Vec`], cloning them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, 2, 3)").unwrap();
+    /// assert_eq!(v.to_elements().to_debug_string(), "[1, 2, 3]");
+    /// assert_eq!(
+    ///     IntegerVector::from_str("()")
+    ///         .unwrap()
+    ///         .to_elements()
+    ///         .to_debug_string(),
+    ///     "[]"
+    /// );
+    /// ```
+    #[inline]
+    fn to_elements(&self) -> Vec<Integer> {
+        self.elements.clone()
+    }
+
+    /// Returns an [`IntegerVector`]'s elements as a [`Vec`], taking ownership of the
+    /// [`IntegerVector`].
+    ///
+    /// Nothing is copied or allocated.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, 2, 3)").unwrap();
+    /// assert_eq!(v.into_elements().to_debug_string(), "[1, 2, 3]");
+    /// assert_eq!(
+    ///     IntegerVector::from_str("()")
+    ///         .unwrap()
+    ///         .into_elements()
+    ///         .to_debug_string(),
+    ///     "[]"
+    /// );
+    /// ```
+    #[inline]
+    fn into_elements(self) -> Vec<Integer> {
+        self.elements
+    }
+
+    /// Returns a reference to an [`IntegerVector`]'s elements, as a slice.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, 2, 3)").unwrap();
+    /// assert_eq!(v.elements_ref().to_debug_string(), "[1, 2, 3]");
+    ///
+    /// // A slice of the elements can be taken directly.
+    /// let tail = &v.elements_ref()[1..];
+    /// assert_eq!(tail.to_debug_string(), "[2, 3]");
+    /// assert_eq!(
+    ///     IntegerVector::from_str("()")
+    ///         .unwrap()
+    ///         .elements_ref()
+    ///         .to_debug_string(),
+    ///     "[]"
+    /// );
+    /// ```
+    #[inline]
+    fn elements_ref(&self) -> &[Integer] {
+        &self.elements
+    }
+
     /// Returns the dimension of an [`IntegerVector`]: the number of its elements.
     ///
     /// # Worst-case complexity
@@ -66,6 +226,7 @@ impl IntegerVector {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::vector::Vector;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_vector::IntegerVector;
     ///
@@ -82,8 +243,80 @@ impl IntegerVector {
     /// );
     /// ```
     #[inline]
-    pub fn dimension(&self) -> u64 {
+    fn dimension(&self) -> u64 {
         u64::exact_from(self.elements.len())
+    }
+
+    /// Returns the pivot of an [`IntegerVector`]: its first nonzero element.
+    ///
+    /// This is the element that leads the vector when it is a row of a matrix in echelon form. It
+    /// returns a reference to it, or `None` if every element is zero, which includes the
+    /// 0-dimensional vector.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// assert_eq!(
+    ///     IntegerVector::from_str("(0, 0, -3, 0, 5)").unwrap().pivot(),
+    ///     Some(&Integer::from(-3))
+    /// );
+    /// assert_eq!(IntegerVector::from_str("(0, 0)").unwrap().pivot(), None);
+    /// assert_eq!(IntegerVector::from_str("()").unwrap().pivot(), None);
+    /// ```
+    #[inline]
+    fn pivot(&self) -> Option<&Integer> {
+        self.elements.iter().find(|x| **x != 0u32)
+    }
+
+    /// Returns the index of the pivot of an [`IntegerVector`]: the position of its first nonzero
+    /// element.
+    ///
+    /// Indices start at 0, as they do for [`Index`](core::ops::Index). Returns `None` if every
+    /// element is zero, which includes the 0-dimensional vector. When it returns `Some(i)`,
+    /// [`pivot`](Self::pivot) is the element at `i`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// assert_eq!(
+    ///     IntegerVector::from_str("(0, 0, -3, 0, 5)")
+    ///         .unwrap()
+    ///         .pivot_index(),
+    ///     Some(2)
+    /// );
+    /// assert_eq!(
+    ///     IntegerVector::from_str("(0, 0)").unwrap().pivot_index(),
+    ///     None
+    /// );
+    /// assert_eq!(IntegerVector::from_str("()").unwrap().pivot_index(), None);
+    /// ```
+    #[inline]
+    fn pivot_index(&self) -> Option<u64> {
+        self.elements
+            .iter()
+            .position(|x| *x != 0u32)
+            .map(u64::exact_from)
     }
 }
 

@@ -34,6 +34,7 @@ impl FromStr for NaturalVector {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
     /// use malachite_nz::natural_vector::NaturalVector;
     ///
     /// assert_eq!(

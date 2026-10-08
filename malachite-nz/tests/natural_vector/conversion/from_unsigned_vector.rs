@@ -9,6 +9,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::test_util::generators::{unsigned_vector_gen, unsigned_vector_pair_gen};
 use malachite_base::unsigned_vector::{ShortlexUnsignedVectorRef, UnsignedVector};
+use malachite_base::vector::Vector;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_vector::{NaturalVector, ShortlexNaturalVectorRef};
 

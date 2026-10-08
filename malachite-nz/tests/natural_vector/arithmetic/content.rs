@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::test_util::generators::unsigned_vector_gen;
+use malachite_base::vector::Vector;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_vector::NaturalVector;
 use malachite_nz::test_util::generators::natural_vector_gen;

@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::test_util::generators::unsigned_vector_gen;
 use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::vector::Vector;
 #[test]
 fn test_pivot() {
     let test = |s, out: Option<&str>| {

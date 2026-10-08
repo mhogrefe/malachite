@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::test_util::generators::unsigned_vector_gen;
 use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::vector::Vector;
 
 #[test]
 fn test_content_and_primitive_part() {

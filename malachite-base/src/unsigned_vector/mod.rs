@@ -9,6 +9,7 @@
 use crate::named::Named;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
+use crate::vector::Vector;
 use alloc::vec::Vec;
 use core::fmt::{self, Debug, Formatter};
 use core::ops::Deref;
@@ -25,9 +26,6 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`UnsignedVector`]s without repetition.
 pub mod exhaustive;
-/// Functions for finding the pivot of an [`UnsignedVector`], its first nonzero element, and its
-/// index.
-pub mod pivot;
 #[cfg(feature = "random")]
 /// Iterators that generate [`UnsignedVector`]s randomly.
 pub mod random;
@@ -43,6 +41,7 @@ pub mod random;
 /// # Examples
 /// ```
 /// use malachite_base::unsigned_vector::UnsignedVector;
+/// use malachite_base::vector::Vector;
 ///
 /// let v = UnsignedVector {
 ///     elements: vec![1u32, 2, 3],
@@ -57,7 +56,154 @@ pub struct UnsignedVector<T: PrimitiveUnsigned> {
     pub elements: Vec<T>,
 }
 
-impl<T: PrimitiveUnsigned> UnsignedVector<T> {
+impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
+    type Element = T;
+    type ElementOutput<'a>
+        = T
+    where
+        Self: 'a;
+
+    /// Converts a slice to an [`UnsignedVector`], cloning the elements.
+    ///
+    /// The vector's dimension is the length of the slice. Every slice is a valid vector, so this
+    /// cannot fail; the empty slice gives the 0-dimensional vector.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(
+    ///     UnsignedVector::from_elements(&[1u32, 2]).to_string(),
+    ///     "(1, 2)"
+    /// );
+    /// assert_eq!(UnsignedVector::<u32>::from_elements(&[]).to_string(), "()");
+    /// ```
+    #[inline]
+    fn from_elements(xs: &[T]) -> Self {
+        Self {
+            elements: xs.to_vec(),
+        }
+    }
+
+    /// Converts a [`Vec`] to an [`UnsignedVector`], taking ownership of it.
+    ///
+    /// The vector's dimension is the length of the [`Vec`]. Every [`Vec`] is a valid vector, so
+    /// this cannot fail, and nothing is copied or allocated.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(
+    ///     UnsignedVector::from_owned_elements(vec![1u32, 2]).to_string(),
+    ///     "(1, 2)"
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u32>::from_owned_elements(Vec::new()).to_string(),
+    ///     "()"
+    /// );
+    /// ```
+    #[inline]
+    fn from_owned_elements(xs: Vec<T>) -> Self {
+        Self { elements: xs }
+    }
+
+    /// Returns an [`UnsignedVector`]'s elements as a [`Vec`], cloning them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// let v = UnsignedVector::<u32>::from_str("(1, 2, 3)").unwrap();
+    /// assert_eq!(v.to_elements(), [1, 2, 3]);
+    /// assert!(
+    ///     UnsignedVector::<u32>::from_str("()")
+    ///         .unwrap()
+    ///         .to_elements()
+    ///         .is_empty()
+    /// );
+    /// ```
+    #[inline]
+    fn to_elements(&self) -> Vec<T> {
+        self.elements.clone()
+    }
+
+    /// Returns an [`UnsignedVector`]'s elements as a [`Vec`], taking ownership of the
+    /// [`UnsignedVector`].
+    ///
+    /// Nothing is copied or allocated.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// let v = UnsignedVector::<u32>::from_str("(1, 2, 3)").unwrap();
+    /// assert_eq!(v.into_elements(), [1, 2, 3]);
+    /// assert!(
+    ///     UnsignedVector::<u32>::from_str("()")
+    ///         .unwrap()
+    ///         .into_elements()
+    ///         .is_empty()
+    /// );
+    /// ```
+    #[inline]
+    fn into_elements(self) -> Vec<T> {
+        self.elements
+    }
+
+    /// Returns a reference to an [`UnsignedVector`]'s elements, as a slice.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// let v = UnsignedVector::<u32>::from_str("(1, 2, 3)").unwrap();
+    /// assert_eq!(v.elements_ref(), [1, 2, 3]);
+    /// // A slice of the elements can be taken directly.
+    /// assert_eq!(&v.elements_ref()[1..], [2, 3]);
+    /// assert!(
+    ///     UnsignedVector::<u32>::from_str("()")
+    ///         .unwrap()
+    ///         .elements_ref()
+    ///         .is_empty()
+    /// );
+    /// ```
+    #[inline]
+    fn elements_ref(&self) -> &[T] {
+        &self.elements
+    }
+
     /// Returns the dimension of an [`UnsignedVector`]: the number of its elements.
     ///
     /// # Worst-case complexity
@@ -66,6 +212,7 @@ impl<T: PrimitiveUnsigned> UnsignedVector<T> {
     /// # Examples
     /// ```
     /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
     ///
     /// assert_eq!(
     ///     UnsignedVector {
@@ -83,8 +230,89 @@ impl<T: PrimitiveUnsigned> UnsignedVector<T> {
     /// );
     /// ```
     #[inline]
-    pub fn dimension(&self) -> u64 {
+    fn dimension(&self) -> u64 {
         u64::exact_from(self.elements.len())
+    }
+
+    /// Returns the pivot of an [`UnsignedVector`]: its first nonzero element.
+    ///
+    /// This is the element that leads the vector when it is a row of a matrix in echelon form. It
+    /// returns a copy of it, or `None` if every element is zero, which includes the 0-dimensional
+    /// vector.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(
+    ///     UnsignedVector::<u32>::from_str("(0, 0, 3, 0, 5)")
+    ///         .unwrap()
+    ///         .pivot(),
+    ///     Some(3)
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u32>::from_str("(0, 0)").unwrap().pivot(),
+    ///     None
+    /// );
+    /// assert_eq!(UnsignedVector::<u32>::from_str("()").unwrap().pivot(), None);
+    /// ```
+    #[inline]
+    fn pivot(&self) -> Option<T> {
+        self.elements.iter().find(|&&x| x != T::ZERO).copied()
+    }
+
+    /// Returns the index of the pivot of an [`UnsignedVector`]: the position of its first nonzero
+    /// element.
+    ///
+    /// Indices start at 0, as they do for [`Index`](core::ops::Index). Returns `None` if every
+    /// element is zero, which includes the 0-dimensional vector. When it returns `Some(i)`,
+    /// [`pivot`](Self::pivot) is the element at `i`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(
+    ///     UnsignedVector::<u32>::from_str("(0, 0, 3, 0, 5)")
+    ///         .unwrap()
+    ///         .pivot_index(),
+    ///     Some(2)
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u32>::from_str("(0, 0)")
+    ///         .unwrap()
+    ///         .pivot_index(),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u32>::from_str("()").unwrap().pivot_index(),
+    ///     None
+    /// );
+    /// ```
+    #[inline]
+    fn pivot_index(&self) -> Option<u64> {
+        self.elements
+            .iter()
+            .position(|&x| x != T::ZERO)
+            .map(u64::exact_from)
     }
 }
 

@@ -35,6 +35,7 @@ impl<T: PrimitiveUnsigned> FromStr for UnsignedVector<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
     ///
     /// assert_eq!(
     ///     UnsignedVector::<u32>::from_str("(1, 2, 3)")

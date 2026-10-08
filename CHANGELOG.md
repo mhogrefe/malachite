@@ -34,10 +34,14 @@ documented by git history.
 - `exhaustive_vecs_with_index_generator`, which generates all [`Vec`]s of elements from one
   iterator, with the lengths stepped by a caller-supplied iterator of indices, the counterpart of
   `exhaustive_vecs_with_last_with_index_generator` without a special last element.
+- A `Vector` trait in `malachite_base::vector`, for what every vector type has in common, as
+  `Polynomial` is for the polynomial types. It has an `Element` associated type and the methods
+  `from_elements`, `from_owned_elements`, `to_elements`, `into_elements`, `elements_ref`,
+  `dimension`, `pivot`, and `pivot_index`; the vector types implement these through the trait, so
+  calling them takes `use malachite_base::vector::Vector;`.
 - `UnsignedVector<T>`, a vector whose elements are primitive unsigned integers. Its `elements`
-  field is public, since every [`Vec`] is a valid vector. It has `dimension`, `Index` and
-  `IndexMut`, `from_elements`, `from_owned_elements`, `to_elements`, `into_elements`, and
-  `elements_ref`, conversions to and from strings (`(1, 2, 3)`, with `()` for the 0-dimensional
+  field is public, since every [`Vec`] is a valid vector. It implements `Vector`, `Index` and
+  `IndexMut`, and has conversions to and from strings (`(1, 2, 3)`, with `()` for the 0-dimensional
   vector), LaTeX and Typst, and serde. It does not implement `Ord`; the `ShortlexUnsignedVector`
   and `ShortlexUnsignedVectorRef` wrappers order vectors by dimension and then lexicographically.
   Generators: `exhaustive_unsigned_vectors`, `random_unsigned_vectors`, and
@@ -52,8 +56,6 @@ documented by git history.
   negating every element modulo $2^k$.
 - `ModNeg<T>` (by value and by reference) and `ModNegAssign<T>` for `UnsignedVector<T>`, negating
   every element modulo $m$.
-- `pivot` and `pivot_index` for `UnsignedVector<T>`: the first nonzero element and its index, or `None`
-  for a vector of zeros.
 - `PrimitivePartAssign`, `CanonicalPrimitivePart`, `CanonicalPrimitivePartAssign`, and
   `ContentAndCanonicalPrimitivePart` traits. The canonical primitive part is the primitive part in
   canonical unit form, as `CanonicalizeUnit` chooses it: for polynomials over the integers or
@@ -66,7 +68,7 @@ documented by git history.
 ### malachite-nz
 
 - `NaturalVector` and `IntegerVector`, with the same API as `UnsignedVector<T>`: public
-  `elements`, access, element conversions, strings, LaTeX, Typst, serde, `Shortlex*` wrappers, and
+  `elements`, the `Vector` trait, `Index`, strings, LaTeX, Typst, serde, `Shortlex*` wrappers, and
   exhaustive, random, and striped random generators.
 - `From<UnsignedVector<T>>` for `NaturalVector` and `IntegerVector`, and `From<NaturalVector>` for
   `IntegerVector`.
@@ -87,8 +89,6 @@ documented by git history.
   negating every element modulo $2^k$.
 - `ModNeg` and `ModNegAssign` for `NaturalVector` with a `Natural` modulus, in every combination of
   value and reference, negating every element modulo $m$.
-- `pivot` and `pivot_index` for `NaturalVector` and `IntegerVector`: the first nonzero element and its index, or `None`
-  for a vector of zeros.
 - `Rem`, `RemAssign`, `Mod`, and `ModAssign` for `NaturalVector` with a `Natural` modulus, in
   every combination of value and reference, reducing every element modulo $m$ and keeping the
   dimension; and `ModIsReduced<Natural>` for `NaturalVector`, checking whether every element is less
@@ -119,7 +119,6 @@ documented by git history.
   numerators over the common denominator and whose primitive part is an `IntegerVector`; and the
   canonical ones for `RationalPolynomial` and `GaussianRational`.
 - `Neg` (by value and by reference) and `NegAssign` for `RationalVector`.
-- `pivot` and `pivot_index` for `RationalVector`.
 
 ## 0.13.0 — 2026-10-06
 

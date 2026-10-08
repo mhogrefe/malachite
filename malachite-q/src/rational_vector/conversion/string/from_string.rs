@@ -34,6 +34,7 @@ impl FromStr for RationalVector {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
     /// use malachite_q::rational_vector::RationalVector;
     ///
     /// assert_eq!(

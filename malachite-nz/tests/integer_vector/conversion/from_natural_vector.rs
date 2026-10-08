@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 use core::str::FromStr;
+use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::{IntegerVector, ShortlexIntegerVectorRef};
 use malachite_nz::natural_vector::{NaturalVector, ShortlexNaturalVectorRef};

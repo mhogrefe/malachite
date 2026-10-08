@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 use core::str::FromStr;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
+use malachite_base::vector::Vector;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::integer_vector::conversion::natural_vector_from_integer_vector::*;
 use malachite_nz::natural_vector::NaturalVector;

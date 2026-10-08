@@ -13,6 +13,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_vec_gen;
 use malachite_base::test_util::runner::Runner;
 use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::vector::Vector;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_unsigned_vector_from_elements);

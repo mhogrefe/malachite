@@ -10,6 +10,7 @@ use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::unsigned_vector::exhaustive::*;
+use malachite_base::vector::Vector;
 use std::collections::HashSet;
 
 fn strings<T: PrimitiveUnsigned, I: Iterator<Item = UnsignedVector<T>>>(

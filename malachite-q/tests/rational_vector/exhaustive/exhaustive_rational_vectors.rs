@@ -8,6 +8,7 @@
 
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::vector::Vector;
 use malachite_q::rational_vector::RationalVector;
 use malachite_q::rational_vector::exhaustive::*;
 use std::collections::HashSet;

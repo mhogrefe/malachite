@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::{
     UnsignedAbs,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;

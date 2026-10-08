@@ -10,6 +10,7 @@ use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::test_util::common::test_custom_cmp_helper;
+use malachite_base::vector::Vector;
 use malachite_q::Rational;
 use malachite_q::rational_vector::{
     RationalVector, ShortlexRationalVector, ShortlexRationalVectorRef,

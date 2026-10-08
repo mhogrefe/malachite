@@ -34,6 +34,7 @@ impl FromStr for IntegerVector {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
     /// use malachite_nz::integer_vector::IntegerVector;
     ///
     /// assert_eq!(

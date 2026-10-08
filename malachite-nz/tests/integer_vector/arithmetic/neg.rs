@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{
     CanonicalPrimitivePart, Content, NegAssign, PrimitivePart,
 };
+use malachite_base::vector::Vector;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::test_util::generators::{integer_vector_gen, natural_vector_gen};
 

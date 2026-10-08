@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::One;
+use malachite_base::vector::Vector;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_vector::{NaturalVector, ShortlexNaturalVectorRef};

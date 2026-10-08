@@ -16,6 +16,7 @@ use malachite_base::test_util::generators::{
     unsigned_vector_gen, unsigned_vector_unsigned_pair_gen_var_2,
 };
 use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::vector::Vector;
 
 #[test]
 fn test_mod_power_of_2() {

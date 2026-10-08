@@ -9,6 +9,7 @@
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_base::vector::Vector;
 use malachite_q::test_util::bench::bucketers::rational_vector_bit_bucketer;
 use malachite_q::test_util::generators::rational_vector_gen;
 

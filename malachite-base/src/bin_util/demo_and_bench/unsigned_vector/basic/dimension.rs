@@ -11,6 +11,7 @@ use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_vector_gen;
 use malachite_base::test_util::runner::Runner;
+use malachite_base::vector::Vector;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_unsigned_vector_dimension);

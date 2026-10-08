@@ -12,6 +12,7 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     CanonicalPrimitivePart, CanonicalPrimitivePartAssign, ContentAndCanonicalPrimitivePart,
 };
+use malachite_base::vector::Vector;
 
 // Whether the canonical primitive part must be negated: when the pivot, the first nonzero element,
 // is negative.

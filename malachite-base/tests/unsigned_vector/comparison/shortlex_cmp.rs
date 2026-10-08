@@ -17,6 +17,7 @@ use malachite_base::test_util::unsigned_vector::comparison::shortlex_cmp::*;
 use malachite_base::unsigned_vector::{
     ShortlexUnsignedVector, ShortlexUnsignedVectorRef, UnsignedVector,
 };
+use malachite_base::vector::Vector;
 
 fn shortlex<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &UnsignedVector<T>) -> Ordering {
     ShortlexUnsignedVectorRef(v).cmp(&ShortlexUnsignedVectorRef(w))

@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Add, ModPowerOf2IsReduced, ModPowerOf2Neg, ModPowerOf2NegAssign,
 };
 use malachite_base::test_util::generators::unsigned_vector_unsigned_pair_gen_var_4;
+use malachite_base::vector::Vector;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_vector::NaturalVector;

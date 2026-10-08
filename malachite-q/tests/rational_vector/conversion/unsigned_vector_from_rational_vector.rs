@@ -11,6 +11,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::test_util::generators::unsigned_vec_gen;
 use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_q::Rational;

@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use itertools::Itertools;
 use malachite_base::strings::ToDebugString;
+use malachite_base::vector::Vector;
 use malachite_q::rational_vector::RationalVector;
 use malachite_q::test_util::generators::{rational_vec_gen, rational_vector_gen};
 

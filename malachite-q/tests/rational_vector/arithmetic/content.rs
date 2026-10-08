@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Content, ContentAndPrimitivePart, PrimitivePart};
+use malachite_base::vector::Vector;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::test_util::generators::integer_vector_gen;
 use malachite_q::Rational;

@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::vector::Vector;
 use malachite_q::Rational;
 use malachite_q::rational_vector::RationalVector;
 use malachite_q::test_util::generators::rational_vector_gen;

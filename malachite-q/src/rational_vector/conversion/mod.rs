@@ -6,9 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-/// Functions for converting a [`Vec`](alloc::vec::Vec) or slice of [`Rational`](crate::Rational)s
-/// to a [`RationalVector`](super::RationalVector).
-pub mod from_elements;
 /// Implementations of traits for converting an
 /// [`IntegerVector`](malachite_nz::integer_vector::IntegerVector) to a
 /// [`RationalVector`](super::RationalVector).
@@ -112,9 +109,6 @@ pub mod integer_vector_from_rational_vector;
 pub mod natural_vector_from_rational_vector;
 /// Functions for converting a [`RationalVector`](super::RationalVector) to and from a [`String`].
 pub mod string;
-/// Functions for converting a [`RationalVector`](super::RationalVector) to a
-/// [`Vec`](alloc::vec::Vec) or slice of [`Rational`](crate::Rational)s.
-pub mod to_elements;
 /// A function for clearing the denominators of a [`RationalVector`](super::RationalVector), giving
 /// a vector of numerators and a single denominator.
 pub mod to_numerators_and_denominator;

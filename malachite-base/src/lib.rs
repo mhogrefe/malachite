@@ -387,6 +387,8 @@ pub mod unsigned_vector;
 pub mod vars;
 /// Functions for working with [`Vec`]s.
 pub mod vecs;
+/// The [`Vector`](vector::Vector) trait, for what every vector type has in common.
+pub mod vector;
 
 #[cfg(feature = "test_build")]
 pub mod test_util;

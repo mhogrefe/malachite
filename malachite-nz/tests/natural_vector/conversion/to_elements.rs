@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use itertools::Itertools;
 use malachite_base::strings::ToDebugString;
+use malachite_base::vector::Vector;
 use malachite_nz::natural_vector::NaturalVector;
 use malachite_nz::test_util::generators::{natural_vec_gen, natural_vector_gen};
 

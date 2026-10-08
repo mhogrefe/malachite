@@ -13,6 +13,7 @@ use malachite_base::test_util::generators::{
     unsigned_vector_unsigned_pair_gen_var_4, unsigned_vector_unsigned_pair_gen_var_5,
 };
 use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::vector::Vector;
 
 #[test]
 fn test_mod_neg() {
