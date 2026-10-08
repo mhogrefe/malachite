@@ -10,15 +10,15 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, GcdAssign, NegAssign};
-use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{
-    Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
+use malachite_base::num::arithmetic::traits::{
+    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, GcdAssign, NegAssign,
+    PrimitivePart, PrimitivePartAssign,
 };
+use malachite_base::num::basic::traits::Zero;
 
 // The GCD of the coefficients' absolute values. It stops as soon as it reaches 1, since nothing can
 // lower it further.
-fn content(coefficients: &[Integer]) -> Natural {
+pub(crate) fn content(coefficients: &[Integer]) -> Natural {
     let mut gcd = Natural::ZERO;
     for c in coefficients {
         gcd.gcd_assign(&c.abs);
@@ -29,15 +29,14 @@ fn content(coefficients: &[Integer]) -> Natural {
     gcd
 }
 
-// Whether the primitive part must be negated: when the leading coefficient is negative.
-fn negate(coefficients: &[Integer]) -> bool {
+// Whether the canonical primitive part must be negated: when the leading coefficient is negative.
+pub(crate) fn negate(coefficients: &[Integer]) -> bool {
     coefficients.last().is_some_and(|c| !c.sign)
 }
 
 // Divides every coefficient by the content, which divides each of them exactly, and negates them
-// all if the leading coefficient is negative.
-fn normalize_in_place(coefficients: &mut [Integer], content: &Natural) {
-    let negate = negate(coefficients);
+// all if `negate` is set.
+pub(crate) fn normalize_in_place(coefficients: &mut [Integer], content: &Natural, negate: bool) {
     for c in coefficients {
         if *content > 1u32 {
             c.abs.div_exact_assign(content);
@@ -48,10 +47,12 @@ fn normalize_in_place(coefficients: &mut [Integer], content: &Natural) {
     }
 }
 
-// The coefficients divided by the content, and negated if the leading coefficient is negative, as
-// new values.
-fn normalized(coefficients: &[Integer], content: &Natural) -> Vec<Integer> {
-    let negate = negate(coefficients);
+// The coefficients divided by the content, and negated if `negate` is set, as new values.
+pub(crate) fn normalized(
+    coefficients: &[Integer],
+    content: &Natural,
+    negate: bool,
+) -> Vec<Integer> {
     coefficients
         .iter()
         .map(|c| {
@@ -91,8 +92,8 @@ impl Content for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Content;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Content;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("-6*x^2+4*x-10").unwrap();
@@ -133,8 +134,8 @@ impl Content for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Content;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Content;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("-6*x^2+4*x-10").unwrap();
@@ -154,13 +155,14 @@ impl PrimitivePart for IntegerPolynomial {
 
     /// Computes the primitive part of an [`IntegerPolynomial`], taking the polynomial by value.
     ///
-    /// This is the polynomial divided by its content, with the sign chosen so that the leading
-    /// coefficient is non-negative. The sign matters: when the leading coefficient is negative, the
-    /// content times the primitive part is the negation of the polynomial, and the identity needs
-    /// the sign of the leading coefficient $\operatorname{lc}(p)$.
+    /// This is the polynomial divided by its content, with every coefficient keeping its sign, so
+    /// the primitive part of $-p$ is the negation of the primitive part of $p$. For the one with a
+    /// non-negative leading coefficient, see
+    /// [`canonical_primitive_part`](
+    /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
     ///
     /// $$
-    /// p = \operatorname{sgn}(\operatorname{lc}(p)) \operatorname{cont}(p) \operatorname{pp}(p).
+    /// p = \operatorname{cont}(p) \operatorname{pp}(p).
     /// $$
     ///
     /// The primitive part of the zero polynomial is zero.
@@ -176,24 +178,21 @@ impl PrimitivePart for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePart;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::PrimitivePart;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("-6*x^2+4*x-10").unwrap();
-    /// assert_eq!(p.clone().primitive_part().to_string(), "3*x^2-2*x+5");
+    /// assert_eq!(p.clone().primitive_part().to_string(), "-3*x^2+2*x-5");
     /// assert_eq!(
     ///     IntegerPolynomial::ZERO.primitive_part(),
     ///     IntegerPolynomial::ZERO
     /// );
     /// ```
-    ///
-    /// This is equivalent to `fmpz_poly_primitive_part` from `fmpz_poly/primitive_part.c`, FLINT
-    /// 3.6.0.
     #[inline]
     fn primitive_part(mut self) -> Self {
         let content = content(&self.coefficients);
-        normalize_in_place(&mut self.coefficients, &content);
+        normalize_in_place(&mut self.coefficients, &content, false);
         self
     }
 }
@@ -203,13 +202,14 @@ impl PrimitivePart for &IntegerPolynomial {
 
     /// Computes the primitive part of an [`IntegerPolynomial`], taking the polynomial by reference.
     ///
-    /// This is the polynomial divided by its content, with the sign chosen so that the leading
-    /// coefficient is non-negative. The sign matters: when the leading coefficient is negative, the
-    /// content times the primitive part is the negation of the polynomial, and the identity needs
-    /// the sign of the leading coefficient $\operatorname{lc}(p)$.
+    /// This is the polynomial divided by its content, with every coefficient keeping its sign, so
+    /// the primitive part of $-p$ is the negation of the primitive part of $p$. For the one with a
+    /// non-negative leading coefficient, see
+    /// [`canonical_primitive_part`](
+    /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
     ///
     /// $$
-    /// p = \operatorname{sgn}(\operatorname{lc}(p)) \operatorname{cont}(p) \operatorname{pp}(p).
+    /// p = \operatorname{cont}(p) \operatorname{pp}(p).
     /// $$
     ///
     /// The primitive part of the zero polynomial is zero.
@@ -225,25 +225,22 @@ impl PrimitivePart for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePart;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::PrimitivePart;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("-6*x^2+4*x-10").unwrap();
-    /// assert_eq!((&p).primitive_part().to_string(), "3*x^2-2*x+5");
+    /// assert_eq!((&p).primitive_part().to_string(), "-3*x^2+2*x-5");
     /// assert_eq!(
     ///     (&IntegerPolynomial::ZERO).primitive_part(),
     ///     IntegerPolynomial::ZERO
     /// );
     /// ```
-    ///
-    /// This is equivalent to `fmpz_poly_primitive_part` from `fmpz_poly/primitive_part.c`, FLINT
-    /// 3.6.0.
     #[inline]
     fn primitive_part(self) -> IntegerPolynomial {
         let content = content(&self.coefficients);
         IntegerPolynomial {
-            coefficients: normalized(&self.coefficients, &content),
+            coefficients: normalized(&self.coefficients, &content, false),
         }
     }
 }
@@ -264,17 +261,17 @@ impl PrimitivePartAssign for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::PrimitivePartAssign;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePartAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("-6*x^2+4*x-10").unwrap();
     /// p.primitive_part_assign();
-    /// assert_eq!(p.to_string(), "3*x^2-2*x+5");
+    /// assert_eq!(p.to_string(), "-3*x^2+2*x-5");
     /// ```
     #[inline]
     fn primitive_part_assign(&mut self) {
         let content = content(&self.coefficients);
-        normalize_in_place(&mut self.coefficients, &content);
+        normalize_in_place(&mut self.coefficients, &content, false);
     }
 }
 
@@ -299,18 +296,18 @@ impl ContentAndPrimitivePart for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ContentAndPrimitivePart;
+    /// use malachite_base::num::arithmetic::traits::ContentAndPrimitivePart;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("-6*x^2+4*x-10").unwrap();
     /// let (content, primitive_part) = p.clone().content_and_primitive_part();
     /// assert_eq!(content, 2);
-    /// assert_eq!(primitive_part.to_string(), "3*x^2-2*x+5");
+    /// assert_eq!(primitive_part.to_string(), "-3*x^2+2*x-5");
     /// ```
     #[inline]
     fn content_and_primitive_part(mut self) -> (Natural, Self) {
         let content = content(&self.coefficients);
-        normalize_in_place(&mut self.coefficients, &content);
+        normalize_in_place(&mut self.coefficients, &content, false);
         (content, self)
     }
 }
@@ -336,18 +333,18 @@ impl ContentAndPrimitivePart for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ContentAndPrimitivePart;
+    /// use malachite_base::num::arithmetic::traits::ContentAndPrimitivePart;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("-6*x^2+4*x-10").unwrap();
     /// let (content, primitive_part) = (&p).content_and_primitive_part();
     /// assert_eq!(content, 2);
-    /// assert_eq!(primitive_part.to_string(), "3*x^2-2*x+5");
+    /// assert_eq!(primitive_part.to_string(), "-3*x^2+2*x-5");
     /// ```
     #[inline]
     fn content_and_primitive_part(self) -> (Natural, IntegerPolynomial) {
         let content = content(&self.coefficients);
-        let coefficients = normalized(&self.coefficients, &content);
+        let coefficients = normalized(&self.coefficients, &content, false);
         (content, IntegerPolynomial { coefficients })
     }
 }

@@ -8,7 +8,8 @@
 
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{
-    Conjugate, Content, ContentAndPrimitivePart, Gcd, MulI, PrimitivePart, Sign, UnsignedAbs,
+    Conjugate, Content, ContentAndPrimitivePart, Gcd, MulI, PrimitivePart, PrimitivePartAssign,
+    Sign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::gaussian_integer::GaussianInteger;
@@ -39,6 +40,9 @@ fn test_content_and_primitive_part() {
         assert_eq!((&x).content().to_string(), content_out);
         assert_eq!(x.clone().primitive_part().to_string(), primitive_out);
         assert_eq!((&x).primitive_part().to_string(), primitive_out);
+        let mut y = x;
+        y.primitive_part_assign();
+        assert_eq!(y.to_string(), primitive_out);
     };
     test("0", "0", "0");
     test("1", "1", "1");
@@ -79,6 +83,9 @@ fn content_and_primitive_part_properties() {
         assert_eq!(x.clone().content(), content);
         assert_eq!((&x).primitive_part(), primitive);
         assert_eq!(x.clone().primitive_part(), primitive);
+        let mut y = x.clone();
+        y.primitive_part_assign();
+        assert_eq!(y, primitive);
 
         // the product is the original number
         assert_eq!(scale(&primitive, &content), x);

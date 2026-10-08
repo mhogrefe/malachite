@@ -7,11 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::DivisibleBy;
-use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{
-    Content, ContentAndPrimitivePart, Polynomial, PrimitivePart, PrimitivePartAssign,
+use malachite_base::num::arithmetic::traits::{
+    Content, ContentAndPrimitivePart, DivisibleBy, PrimitivePart, PrimitivePartAssign,
 };
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;
@@ -41,19 +41,20 @@ fn test_content_and_primitive_part() {
     };
     test("0", "0", "0");
     test("1", "1", "1");
-    test("-1", "1", "1");
-    test("-7", "7", "1");
+    test("-1", "1", "-1");
+    test("-7", "7", "-1");
     test("x", "1", "x");
-    test("-x", "1", "x");
+    test("-x", "1", "-x");
     test("6*x^2+4*x+10", "2", "3*x^2+2*x+5");
-    test("-6*x^2+4*x-10", "2", "3*x^2-2*x+5");
-    test("-2*x-4", "2", "x+2");
+    // Every coefficient keeps its sign, including a negative leading one.
+    test("-6*x^2+4*x-10", "2", "-3*x^2+2*x-5");
+    test("-2*x-4", "2", "-x-2");
     test("6*x^2-9", "3", "2*x^2-3");
-    test("-3*x^2+5*x-7", "1", "3*x^2-5*x+7");
+    test("-3*x^2+5*x-7", "1", "-3*x^2+5*x-7");
     test(
         "-1000000000000000000000*x+3000000000000000000000",
         "1000000000000000000000",
-        "x-3",
+        "-x+3",
     );
     test("12*x^5-18*x^3+30", "6", "2*x^5-3*x^3+5");
 }
@@ -89,19 +90,17 @@ fn content_and_primitive_part_properties() {
         }
         assert_eq!((&primitive_part).primitive_part(), primitive_part);
         assert_eq!(primitive_part.len(), p.len());
-        // p = sgn(lc(p)) cont(p) pp(p), coefficient by coefficient.
-        let negative = *p.leading_coefficient() < 0u32;
+        // p = cont(p) pp(p), coefficient by coefficient.
         let content = Integer::from(&content);
         for (c, d) in p
             .coefficients_asc()
             .iter()
             .zip(primitive_part.coefficients_asc())
         {
-            let product = &content * d;
-            assert_eq!(*c, if negative { -product } else { product });
+            assert_eq!(*c, &content * d);
         }
-        if p != IntegerPolynomial::ZERO {
-            assert!(*primitive_part.leading_coefficient() > 0u32);
-        }
+        // Negating the polynomial negates its primitive part and leaves its content alone.
+        assert_eq!((-&p).primitive_part(), -&primitive_part);
+        assert_eq!(Integer::from((-&p).content()), content);
     });
 }

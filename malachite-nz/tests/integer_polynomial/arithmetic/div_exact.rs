@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, DivisibleBy};
+use malachite_base::num::arithmetic::traits::{Content, DivExact, DivExactAssign, DivisibleBy};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
-use malachite_base::polynomial::{Content, Polynomial};
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::{

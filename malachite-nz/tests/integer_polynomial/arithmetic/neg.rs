@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::NegAssign;
+use malachite_base::num::arithmetic::traits::{Content, NegAssign};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{Content, Evaluate, Polynomial};
+use malachite_base::polynomial::{Evaluate, Polynomial};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::{
     integer_polynomial_gen, integer_polynomial_integer_pair_gen,

@@ -18,6 +18,14 @@ pub(crate) const SIZE_BALANCE_BITS: u64 = 2 * 64;
 pub mod abs_squared;
 /// Addition of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s.
 pub mod add;
+/// Implementations of [`CanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart),
+/// [`CanonicalPrimitivePartAssign`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePartAssign), and
+/// [`ContentAndCanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which compute the
+/// primitive part of a Gaussian integer in canonical unit form.
+pub mod canonical_primitive_part;
 /// An implementation of
 /// [`CanonicalUnitIPow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow), a trait for
 /// finding the power of $i$ that brings a number into canonical unit form.
@@ -33,9 +41,10 @@ pub mod canonicalize_unit;
 pub mod conjugate;
 /// Implementations of
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
-/// [`Content`](malachite_base::num::arithmetic::traits::Content), and
-/// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), traits for splitting
-/// a number into a scalar and an element with coprime parts.
+/// [`Content`](malachite_base::num::arithmetic::traits::Content),
+/// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), and
+/// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), traits
+/// for splitting a number into a scalar and an element with coprime parts.
 pub mod content_and_primitive_part;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for dividing

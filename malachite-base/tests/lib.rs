@@ -873,6 +873,7 @@ pub mod vars {
 }
 pub mod unsigned_polynomial {
     pub mod arithmetic {
+        pub mod canonical_primitive_part;
         pub mod canonicalize_unit;
         pub mod compose_power_of_x;
         pub mod content;
@@ -966,6 +967,8 @@ pub mod unsigned_polynomial {
 pub mod unsigned_vector {
     pub mod access;
     pub mod arithmetic {
+        pub mod canonical_primitive_part;
+        pub mod content;
         pub mod mod_is_reduced;
         pub mod mod_op;
         pub mod mod_power_of_2;

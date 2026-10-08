@@ -25,8 +25,8 @@ impl DivExact<Integer> for IntegerPolynomial {
     /// $$
     ///
     /// A polynomial is divisible by $c$ exactly when $|c|$ divides its
-    /// [`content`](malachite_base::polynomial::Content::content), so that is how to check
-    /// beforehand.
+    /// [`content`](malachite_base::num::arithmetic::traits::Content::content), so that is how to
+    /// check beforehand.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

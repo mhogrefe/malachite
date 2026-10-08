@@ -12,10 +12,22 @@ documented by git history.
 
 - `exhaustive_vecs_with_last` is renamed to `exhaustive_vecs_with_last_with_index_generator`, and
   takes a third argument: the iterator of indices that decides which length comes next, such as a
-  `bit_distributor_sequence`.
-  How fast the lengths grow used to be fixed inside the function; it is now chosen by the caller,
-  independently of the special treatment of the last element. Its `_min_length`, `_length_range`,
+  `bit_distributor_sequence`. How fast the lengths grow used to be fixed inside the function; it is
+  now chosen by the caller, independently of the special treatment of the last element. Its `_min_length`, `_length_range`,
   `_length_inclusive_range`, `_fixed_length`, and `_from_length_iterator` variants are unchanged.
+- The content and primitive part traits are now a single family in
+  `malachite_base::num::arithmetic::traits`. `malachite_base::polynomial::Content`, `PrimitivePart`,
+  `PrimitivePartAssign`, and `ContentAndPrimitivePart` are gone; `Content` and the plain
+  `PrimitivePart`, `PrimitivePartAssign`, and `ContentAndPrimitivePart` live in
+  `num::arithmetic::traits`, alongside the new `CanonicalPrimitivePart`,
+  `CanonicalPrimitivePartAssign`, and `ContentAndCanonicalPrimitivePart`.
+- `primitive_part`, `primitive_part_assign`, and `content_and_primitive_part` on `IntegerPolynomial`
+  and `RationalPolynomial` no longer normalize the sign: they divide by the content and leave every
+  coefficient's sign alone, so $p = \operatorname{cont}(p)\operatorname{pp}(p)$ exactly. The old
+  behavior, with a non-negative leading coefficient as in FLINT's `fmpz_poly_primitive_part`, is
+  now `canonical_primitive_part`, `canonical_primitive_part_assign`, and
+  `content_and_canonical_primitive_part`. On `UnsignedPolynomial<T>` and `NaturalPolynomial` the two
+  agree.
 
 ### malachite-base
 
@@ -36,6 +48,14 @@ documented by git history.
 - `Rem`, `RemAssign`, `Mod`, and `ModAssign` for `UnsignedVector<T>` with a `T` modulus, reducing
   every element modulo $m$ and keeping the dimension; and `ModIsReduced<T>` for `UnsignedVector<T>`,
   checking whether every element is less than $m$.
+- `PrimitivePartAssign`, `CanonicalPrimitivePart`, `CanonicalPrimitivePartAssign`, and
+  `ContentAndCanonicalPrimitivePart` traits. The canonical primitive part is the primitive part in
+  canonical unit form, as `CanonicalizeUnit` chooses it: for polynomials over the integers or
+  rationals, the one with a non-negative leading coefficient; for vectors, the one whose first
+  nonzero element is positive; for Gaussian integers and rationals, the one whose argument lies in
+  $(-\pi/4, \pi/4]$.
+- `Content`, `PrimitivePart`, `PrimitivePartAssign`, `ContentAndPrimitivePart`, and their canonical
+  counterparts for `UnsignedVector<T>`, and the canonical ones for `UnsignedPolynomial<T>`.
 
 ### malachite-nz
 
@@ -61,6 +81,9 @@ documented by git history.
   every combination of value and reference, reducing every element modulo $m$ and keeping the
   dimension; and `ModIsReduced<Natural>` for `NaturalVector`, checking whether every element is less
   than $m$.
+- `Content`, `PrimitivePart`, `PrimitivePartAssign`, `ContentAndPrimitivePart`, and their canonical
+  counterparts for `NaturalVector` and `IntegerVector`; the canonical ones for `NaturalPolynomial`,
+  `IntegerPolynomial`, and `GaussianInteger`; and `PrimitivePartAssign` for `GaussianInteger`.
 
 ### malachite-q
 
@@ -78,6 +101,10 @@ documented by git history.
   `ConvertibleFrom<&RationalVector>`.
 - `PartialEq` in both directions between `RationalVector` and each of `UnsignedVector<T>`,
   `NaturalVector`, and `IntegerVector`.
+- `Content`, `PrimitivePart`, `ContentAndPrimitivePart`, `CanonicalPrimitivePart`, and
+  `ContentAndCanonicalPrimitivePart` for `RationalVector`, whose content is the GCD of the
+  numerators over the common denominator and whose primitive part is an `IntegerVector`; and the
+  canonical ones for `RationalPolynomial` and `GaussianRational`.
 
 ## 0.13.0 — 2026-10-06
 

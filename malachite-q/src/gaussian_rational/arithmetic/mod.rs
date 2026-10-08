@@ -12,6 +12,12 @@
 pub mod abs_squared;
 /// Addition of [`GaussianRational`](crate::gaussian_rational::GaussianRational)s.
 pub mod add;
+/// Implementations of [`CanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart) and
+/// [`ContentAndCanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which compute the
+/// primitive part of a Gaussian rational in canonical unit form.
+pub mod canonical_primitive_part;
 /// An implementation of
 /// [`CanonicalUnitIPow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow), a trait for
 /// finding the power of $i$ that brings a number into canonical unit form.

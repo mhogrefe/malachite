@@ -907,24 +907,16 @@ pub trait LcmAssign<RHS = Self> {
     fn lcm_assign(&mut self, other: RHS);
 }
 
-/// Splits a value into its content and its primitive part.
+/// Computes the content of a value: the unique non-negative rational $c$ such that the value is $c$
+/// times an element of the underlying integer lattice with coprime coordinates.
 ///
 /// This applies to an element of a vector space over the rationals with a distinguished integer
-/// lattice, like a rational polynomial, a Gaussian rational, or a vector of rationals. The content
-/// is the unique non-negative rational $c$ such that the value is $c$ times a lattice element with
-/// coprime coordinates, and the primitive part is that element; the value is the product of the
-/// two. Zero has content 0 and primitive part 0. For an element of the lattice itself, the content
-/// is the GCD of the coordinates, a non-negative integer.
-pub trait ContentAndPrimitivePart {
-    type Content;
-    type PrimitivePart;
-
-    fn content_and_primitive_part(self) -> (Self::Content, Self::PrimitivePart);
-}
-
-/// Computes the content of a value: the unique non-negative rational $c$ such that the value is $c$
-/// times an element of the underlying integer lattice with coprime coordinates. See
-/// [`ContentAndPrimitivePart`].
+/// lattice, like a polynomial, a Gaussian rational, or a vector. For an element of the lattice
+/// itself, such as a polynomial or vector with integer entries, the content is the GCD of the
+/// coordinates, a non-negative integer. Zero has content 0.
+///
+/// The content does not depend on any choice of sign or unit: [`PrimitivePart`] and
+/// [`CanonicalPrimitivePart`] both divide by the same content.
 pub trait Content {
     type Output;
 
@@ -932,12 +924,74 @@ pub trait Content {
 }
 
 /// Computes the primitive part of a value: the element of the underlying integer lattice, with
-/// coprime coordinates, that the value is a non-negative rational multiple of. See
-/// [`ContentAndPrimitivePart`].
+/// coprime coordinates, that the value is the [`Content`] times.
+///
+/// $$
+/// x = \operatorname{cont}(x) \operatorname{pp}(x).
+/// $$
+///
+/// No sign or unit is chosen, so the primitive part of $-x$ is the negative of the primitive part
+/// of $x$. The primitive part of zero is zero. For the representative that is canonical under
+/// multiplication by units, see [`CanonicalPrimitivePart`].
 pub trait PrimitivePart {
     type Output;
 
     fn primitive_part(self) -> Self::Output;
+}
+
+/// Replaces a value with its primitive part.
+///
+/// See [`PrimitivePart`].
+pub trait PrimitivePartAssign {
+    fn primitive_part_assign(&mut self);
+}
+
+/// Computes the content and the primitive part of a value together.
+///
+/// The primitive part is found by dividing by the content, so computing both at once finds the
+/// content only once. See [`Content`] and [`PrimitivePart`].
+pub trait ContentAndPrimitivePart {
+    type Content;
+    type PrimitivePart;
+
+    fn content_and_primitive_part(self) -> (Self::Content, Self::PrimitivePart);
+}
+
+/// Computes the canonical primitive part of a value: its [`PrimitivePart`], replaced by the
+/// canonical associate under multiplication by units, as [`CanonicalizeUnit`] chooses it.
+///
+/// $$
+/// x = u \operatorname{cont}(x) \operatorname{cpp}(x),
+/// $$
+///
+/// where $u$ is a unit. Each implementation documents its choice of associate: for a polynomial
+/// with integer or rational coefficients it is the one with a non-negative leading coefficient, for
+/// a vector it is the one whose first nonzero element is positive, and for a Gaussian rational it
+/// is the one whose argument lies in $(-\pi/4, \pi/4]$. Values with no negative coordinates have
+/// only one associate to choose from, so for them this is the same as [`PrimitivePart`]. The
+/// canonical primitive part of zero is zero.
+pub trait CanonicalPrimitivePart {
+    type Output;
+
+    fn canonical_primitive_part(self) -> Self::Output;
+}
+
+/// Replaces a value with its canonical primitive part.
+///
+/// See [`CanonicalPrimitivePart`].
+pub trait CanonicalPrimitivePartAssign {
+    fn canonical_primitive_part_assign(&mut self);
+}
+
+/// Computes the content and the canonical primitive part of a value together.
+///
+/// The canonical primitive part is found by dividing by the content, so computing both at once
+/// finds the content only once. See [`Content`] and [`CanonicalPrimitivePart`].
+pub trait ContentAndCanonicalPrimitivePart {
+    type Content;
+    type CanonicalPrimitivePart;
+
+    fn content_and_canonical_primitive_part(self) -> (Self::Content, Self::CanonicalPrimitivePart);
 }
 
 /// Computes $e^x$, the exponential of a number.

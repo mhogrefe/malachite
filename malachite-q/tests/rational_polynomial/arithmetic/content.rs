@@ -7,15 +7,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::Sign;
+use malachite_base::num::arithmetic::traits::{
+    Content, ContentAndPrimitivePart, PrimitivePart, Sign,
+};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{Content, ContentAndPrimitivePart, Polynomial, PrimitivePart};
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::integer_polynomial_gen;
 use malachite_q::Rational;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::rational_polynomial_gen;
-use std::cmp::Ordering::*;
 
 #[test]
 fn test_content_and_primitive_part() {
@@ -39,15 +40,16 @@ fn test_content_and_primitive_part() {
     };
     test("0", "0", "0");
     test("1", "1", "1");
-    test("-1", "1", "1");
+    test("-1", "1", "-1");
     test("3/7", "3/7", "1");
-    test("-x", "1", "x");
+    test("-x", "1", "-x");
     test("6*x+4", "2", "3*x+2");
-    test("-2/3*x-4/3", "2/3", "x+2");
+    // Every coefficient keeps its sign, including a negative leading one.
+    test("-2/3*x-4/3", "2/3", "-x-2");
     test("1/2*x^2+1/3", "1/6", "3*x^2+2");
-    test("-5/2*x^3+10/3", "5/6", "3*x^3-4");
+    test("-5/2*x^3+10/3", "5/6", "-3*x^3+4");
     test("x-1/2", "1/2", "2*x-1");
-    test("-1/2*x^2+1/3", "1/6", "3*x^2-2");
+    test("-1/2*x^2+1/3", "1/6", "-3*x^2+2");
     test("4/9*x^2-2/3*x+8/15", "2/45", "10*x^2-15*x+12");
 }
 
@@ -73,18 +75,22 @@ fn content_and_primitive_part_properties() {
         assert_eq!(content == 0u32, p == RationalPolynomial::ZERO);
         if p != RationalPolynomial::ZERO {
             assert_eq!((&primitive_part).content(), 1u32);
-            assert_eq!(primitive_part.leading_coefficient().sign(), Greater);
-        }
-        // p = sgn(lc(p)) cont(p) pp(p), coefficient by coefficient.
-        let negative = p.leading_coefficient() < 0u32;
-        assert_eq!(primitive_part.len(), p.len());
-        for (i, d) in primitive_part.coefficients_asc().iter().enumerate() {
-            let product = &content * Rational::from(d);
+            // The leading coefficient keeps its sign.
             assert_eq!(
-                p.coefficient(u64::try_from(i).unwrap()),
-                if negative { -product } else { product }
+                primitive_part.leading_coefficient().sign(),
+                p.leading_coefficient().sign()
             );
         }
+        // p = cont(p) pp(p), coefficient by coefficient.
+        assert_eq!(primitive_part.len(), p.len());
+        for (i, d) in primitive_part.coefficients_asc().iter().enumerate() {
+            assert_eq!(
+                p.coefficient(u64::try_from(i).unwrap()),
+                &content * Rational::from(d)
+            );
+        }
+        // Negating the polynomial negates its primitive part.
+        assert_eq!((-&p).primitive_part(), -&primitive_part);
         // Dividing by the content leaves a primitive integer polynomial.
         assert_eq!(
             (&RationalPolynomial::from(primitive_part.clone())).primitive_part(),

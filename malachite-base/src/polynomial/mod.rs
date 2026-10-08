@@ -1257,60 +1257,6 @@ pub trait BitUnpack<T>: Sized {
     fn bit_unpack(n: T, bits: u64) -> Self;
 }
 
-/// Computes the content of a polynomial.
-///
-/// For a polynomial with integer coefficients, the content is the greatest common divisor of its
-/// coefficients. For a polynomial with rational coefficients, it is the non-negative rational $c$
-/// for which $p/c$ is a primitive polynomial with integer coefficients. Either way it is
-/// non-negative, and the content of the zero polynomial is zero.
-pub trait Content {
-    /// The type of the content.
-    type Output;
-
-    /// Computes the content of a polynomial.
-    fn content(self) -> Self::Output;
-}
-
-/// Computes the primitive part of a polynomial: the polynomial divided by its content, with the
-/// sign chosen so that the leading coefficient is non-negative.
-///
-/// $$
-/// p = \operatorname{sgn}(\operatorname{lc}(p)) \operatorname{cont}(p) \operatorname{pp}(p),
-/// $$
-///
-/// where $\operatorname{lc}(p)$ is the leading coefficient of $p$. The sign matters: without it the
-/// identity fails whenever the leading coefficient is negative. The primitive part of the zero
-/// polynomial is zero.
-pub trait PrimitivePart {
-    /// The type of the primitive part.
-    type Output;
-
-    /// Computes the primitive part of a polynomial.
-    fn primitive_part(self) -> Self::Output;
-}
-
-/// Replaces a polynomial with its primitive part.
-///
-/// See [`PrimitivePart`].
-pub trait PrimitivePartAssign {
-    /// Replaces a polynomial with its primitive part.
-    fn primitive_part_assign(&mut self);
-}
-
-/// Computes the content and the primitive part of a polynomial together.
-///
-/// The primitive part is found by dividing by the content, so computing both at once finds the
-/// content only once. See [`Content`] and [`PrimitivePart`].
-pub trait ContentAndPrimitivePart {
-    /// The type of the content.
-    type Content;
-    /// The type of the primitive part.
-    type PrimitivePart;
-
-    /// Computes the content and the primitive part of a polynomial.
-    fn content_and_primitive_part(self) -> (Self::Content, Self::PrimitivePart);
-}
-
 /// Makes a polynomial monic, by dividing it by its leading coefficient.
 ///
 /// The zero polynomial has no leading coefficient, and is left as it is.

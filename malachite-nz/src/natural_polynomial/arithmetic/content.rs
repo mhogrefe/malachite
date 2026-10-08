@@ -9,15 +9,15 @@
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, GcdAssign};
-use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{
-    Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
+use malachite_base::num::arithmetic::traits::{
+    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, GcdAssign, PrimitivePart,
+    PrimitivePartAssign,
 };
+use malachite_base::num::basic::traits::Zero;
 
 // The GCD of the coefficients. It stops as soon as it reaches 1, since nothing can lower it
 // further.
-fn content(coefficients: &[Natural]) -> Natural {
+pub(crate) fn content(coefficients: &[Natural]) -> Natural {
     let mut gcd = Natural::ZERO;
     for c in coefficients {
         gcd.gcd_assign(c);
@@ -29,7 +29,7 @@ fn content(coefficients: &[Natural]) -> Natural {
 }
 
 // Divides every coefficient by the content, which divides each of them exactly.
-fn divide_by_content(coefficients: &mut [Natural], content: &Natural) {
+pub(crate) fn divide_by_content(coefficients: &mut [Natural], content: &Natural) {
     if *content > 1u32 {
         for c in coefficients {
             c.div_exact_assign(content);
@@ -38,7 +38,7 @@ fn divide_by_content(coefficients: &mut [Natural], content: &Natural) {
 }
 
 // The coefficients divided by the content, as new values.
-fn divided_by_content(coefficients: &[Natural], content: &Natural) -> Vec<Natural> {
+pub(crate) fn divided_by_content(coefficients: &[Natural], content: &Natural) -> Vec<Natural> {
     if *content > 1u32 {
         coefficients.iter().map(|c| c.div_exact(content)).collect()
     } else {
@@ -72,8 +72,8 @@ impl Content for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Content;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Content;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("6*x^2+4*x+10").unwrap();
@@ -114,8 +114,8 @@ impl Content for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Content;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Content;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("6*x^2+4*x+10").unwrap();
@@ -135,8 +135,9 @@ impl PrimitivePart for NaturalPolynomial {
 
     /// Computes the primitive part of a [`NaturalPolynomial`], taking the polynomial by value.
     ///
-    /// This is the polynomial divided by its content. The coefficients are non-negative, so no sign
-    /// needs normalizing.
+    /// This is the polynomial divided by its content. The coefficients are non-negative, so this is
+    /// also the
+    /// [`CanonicalPrimitivePart`](malachite_base::num::arithmetic::traits::CanonicalPrimitivePart).
     ///
     /// $$
     /// p = \operatorname{cont}(p) \operatorname{pp}(p).
@@ -155,8 +156,8 @@ impl PrimitivePart for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePart;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::PrimitivePart;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("6*x^2+4*x+10").unwrap();
@@ -182,8 +183,9 @@ impl PrimitivePart for &NaturalPolynomial {
 
     /// Computes the primitive part of a [`NaturalPolynomial`], taking the polynomial by reference.
     ///
-    /// This is the polynomial divided by its content. The coefficients are non-negative, so no sign
-    /// needs normalizing.
+    /// This is the polynomial divided by its content. The coefficients are non-negative, so this is
+    /// also the
+    /// [`CanonicalPrimitivePart`](malachite_base::num::arithmetic::traits::CanonicalPrimitivePart).
     ///
     /// $$
     /// p = \operatorname{cont}(p) \operatorname{pp}(p).
@@ -202,8 +204,8 @@ impl PrimitivePart for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePart;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::PrimitivePart;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("6*x^2+4*x+10").unwrap();
@@ -241,7 +243,7 @@ impl PrimitivePartAssign for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::PrimitivePartAssign;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePartAssign;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("6*x^2+4*x+10").unwrap();
@@ -276,7 +278,7 @@ impl ContentAndPrimitivePart for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ContentAndPrimitivePart;
+    /// use malachite_base::num::arithmetic::traits::ContentAndPrimitivePart;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("6*x^2+4*x+10").unwrap();
@@ -313,7 +315,7 @@ impl ContentAndPrimitivePart for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ContentAndPrimitivePart;
+    /// use malachite_base::num::arithmetic::traits::ContentAndPrimitivePart;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("6*x^2+4*x+10").unwrap();

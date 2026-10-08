@@ -6,6 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`CanonicalPrimitivePart`](
+/// crate::num::arithmetic::traits::CanonicalPrimitivePart), [`CanonicalPrimitivePartAssign`](
+/// crate::num::arithmetic::traits::CanonicalPrimitivePartAssign), and
+/// [`ContentAndCanonicalPrimitivePart`](
+/// crate::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which, for a vector with
+/// non-negative elements, are the same as the primitive part.
+pub mod canonical_primitive_part;
+/// Implementations of [`Content`](crate::num::arithmetic::traits::Content),
+/// [`PrimitivePart`](crate::num::arithmetic::traits::PrimitivePart),
+/// [`PrimitivePartAssign`](crate::num::arithmetic::traits::PrimitivePartAssign), and
+/// [`ContentAndPrimitivePart`](crate::num::arithmetic::traits::ContentAndPrimitivePart), which
+/// compute the GCD of a vector's elements and the vector divided by it.
+pub mod content;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;

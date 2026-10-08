@@ -6,7 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Content, ContentAndPrimitivePart, PrimitivePart};
+use malachite_base::num::arithmetic::traits::{
+    Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
+};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -20,6 +22,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_gaussian_integer_content_ref);
     register_demo!(runner, demo_gaussian_integer_primitive_part);
     register_demo!(runner, demo_gaussian_integer_primitive_part_ref);
+    register_demo!(runner, demo_gaussian_integer_primitive_part_assign);
 
     register_bench!(
         runner,
@@ -77,6 +80,14 @@ fn demo_gaussian_integer_primitive_part(gm: GenMode, config: &GenConfig, limit: 
 fn demo_gaussian_integer_primitive_part_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in gaussian_integer_gen().get(gm, config).take(limit) {
         println!("(&{x}).primitive_part() = {}", (&x).primitive_part());
+    }
+}
+
+fn demo_gaussian_integer_primitive_part_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in gaussian_integer_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        x.primitive_part_assign();
+        println!("x := {x_old}; x.primitive_part_assign(); x = {x}");
     }
 }
 
@@ -156,6 +167,9 @@ fn benchmark_gaussian_integer_primitive_part_evaluation_strategy(
             }),
             ("(&GaussianInteger).primitive_part()", &mut |x| {
                 no_out!((&x).primitive_part());
+            }),
+            ("GaussianInteger.primitive_part_assign()", &mut |mut x| {
+                x.primitive_part_assign();
             }),
         ],
     );

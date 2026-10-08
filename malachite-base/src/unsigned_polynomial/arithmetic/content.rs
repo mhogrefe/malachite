@@ -6,13 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::arithmetic::traits::{
+    Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
+};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::polynomial::{Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 
 // The GCD of the coefficients. It stops as soon as it reaches 1, since nothing can lower it
 // further.
-fn content<T: PrimitiveUnsigned>(coefficients: &[T]) -> T {
+pub(crate) fn content<T: PrimitiveUnsigned>(coefficients: &[T]) -> T {
     let mut gcd = T::ZERO;
     for &c in coefficients {
         gcd.gcd_assign(c);
@@ -24,7 +26,7 @@ fn content<T: PrimitiveUnsigned>(coefficients: &[T]) -> T {
 }
 
 // Divides every coefficient by the content, which divides each of them exactly.
-fn divide_by_content<T: PrimitiveUnsigned>(coefficients: &mut [T], content: T) {
+pub(crate) fn divide_by_content<T: PrimitiveUnsigned>(coefficients: &mut [T], content: T) {
     if content > T::ONE {
         for c in coefficients {
             c.div_exact_assign(content);
@@ -57,8 +59,8 @@ impl<T: PrimitiveUnsigned> Content for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Content;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Content;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("6*x^2+4*x+10").unwrap();
@@ -98,8 +100,8 @@ impl<T: PrimitiveUnsigned> Content for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Content;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Content;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("6*x^2+4*x+10").unwrap();
@@ -120,9 +122,10 @@ impl<T: PrimitiveUnsigned> PrimitivePart for UnsignedPolynomial<T> {
     /// Computes the primitive part of an [`UnsignedPolynomial`], the polynomial divided by its
     /// content, taking the polynomial by value.
     ///
-    /// The coefficients are non-negative, so no sign needs normalizing and $p =
-    /// \operatorname{cont}(p) \operatorname{pp}(p)$. The primitive part of the zero polynomial is
-    /// zero.
+    /// $p = \operatorname{cont}(p) \operatorname{pp}(p)$. The coefficients are non-negative, so
+    /// this is also the
+    /// [`CanonicalPrimitivePart`](crate::num::arithmetic::traits::CanonicalPrimitivePart). The
+    /// primitive part of the zero polynomial is zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -134,8 +137,8 @@ impl<T: PrimitiveUnsigned> PrimitivePart for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePart;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::PrimitivePart;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("6*x^2+4*x+10").unwrap();
@@ -162,9 +165,10 @@ impl<T: PrimitiveUnsigned> PrimitivePart for &UnsignedPolynomial<T> {
     /// Computes the primitive part of an [`UnsignedPolynomial`], the polynomial divided by its
     /// content, taking the polynomial by reference.
     ///
-    /// The coefficients are non-negative, so no sign needs normalizing and $p =
-    /// \operatorname{cont}(p) \operatorname{pp}(p)$. The primitive part of the zero polynomial is
-    /// zero.
+    /// $p = \operatorname{cont}(p) \operatorname{pp}(p)$. The coefficients are non-negative, so
+    /// this is also the
+    /// [`CanonicalPrimitivePart`](crate::num::arithmetic::traits::CanonicalPrimitivePart). The
+    /// primitive part of the zero polynomial is zero.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -176,8 +180,8 @@ impl<T: PrimitiveUnsigned> PrimitivePart for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePart;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::PrimitivePart;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("6*x^2+4*x+10").unwrap();
@@ -215,7 +219,7 @@ impl<T: PrimitiveUnsigned> PrimitivePartAssign for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::PrimitivePartAssign;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePartAssign;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let mut p = UnsignedPolynomial::<u8>::from_str("6*x^2+4*x+10").unwrap();
@@ -249,7 +253,7 @@ impl<T: PrimitiveUnsigned> ContentAndPrimitivePart for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ContentAndPrimitivePart;
+    /// use malachite_base::num::arithmetic::traits::ContentAndPrimitivePart;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("6*x^2+4*x+10").unwrap();
@@ -285,7 +289,7 @@ impl<T: PrimitiveUnsigned> ContentAndPrimitivePart for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ContentAndPrimitivePart;
+    /// use malachite_base::num::arithmetic::traits::ContentAndPrimitivePart;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("6*x^2+4*x+10").unwrap();

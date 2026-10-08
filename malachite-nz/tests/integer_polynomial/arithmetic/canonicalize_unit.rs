@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{CanonicalizeUnit, CanonicalizeUnitAssign};
-use malachite_base::polynomial::{Content, Polynomial};
+use malachite_base::num::arithmetic::traits::{CanonicalizeUnit, CanonicalizeUnitAssign, Content};
+use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::integer_polynomial_gen;
 

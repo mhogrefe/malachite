@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     add_truncated::register(runner);
+    canonical_primitive_part::register(runner);
     canonicalize_unit::register(runner);
     compose_power_of_x::register(runner);
     content::register(runner);
@@ -41,6 +42,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod add;
 mod add_truncated;
+mod canonical_primitive_part;
 mod canonicalize_unit;
 mod compose_power_of_x;
 mod content;

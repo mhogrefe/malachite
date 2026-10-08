@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::polynomial::{
+use malachite_base::num::arithmetic::traits::{
     Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
 };
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};

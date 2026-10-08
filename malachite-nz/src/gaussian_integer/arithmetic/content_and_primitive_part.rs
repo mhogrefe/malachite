@@ -10,7 +10,8 @@ use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, DivExact, Gcd, PrimitivePart, UnsignedAbs,
+    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, Gcd, PrimitivePart,
+    PrimitivePartAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::Zero;
 
@@ -278,5 +279,43 @@ impl PrimitivePart for &GaussianInteger {
     #[inline]
     fn primitive_part(self) -> GaussianInteger {
         content_and_primitive_part_ref(self).1
+    }
+}
+
+impl PrimitivePartAssign for GaussianInteger {
+    /// Replaces a [`GaussianInteger`] with its primitive part: the Gaussian integer with coprime
+    /// parts that remains after dividing out the GCD of its real and imaginary parts.
+    ///
+    /// The unit of a nonzero number stays in its primitive part, and zero stays zero. See
+    /// [`content_and_primitive_part`](ContentAndPrimitivePart::content_and_primitive_part).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the real and imaginary parts of `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::PrimitivePartAssign;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
+    /// use std::str::FromStr;
+    ///
+    /// let mut x = GaussianInteger::from_str("-6+9i").unwrap();
+    /// x.primitive_part_assign();
+    /// assert_eq!(x.to_string(), "-2+3i");
+    /// ```
+    fn primitive_part_assign(&mut self) {
+        let g = self
+            .real
+            .unsigned_abs_ref()
+            .gcd(self.imaginary.unsigned_abs_ref());
+        if g > 1u32 {
+            let g = Integer::from(g);
+            self.real.div_exact_assign(&g);
+            self.imaginary.div_exact_assign(g);
+        }
     }
 }

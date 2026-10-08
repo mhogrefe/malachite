@@ -6,6 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of
+/// [`CanonicalPrimitivePart`](crate::num::arithmetic::traits::CanonicalPrimitivePart),
+/// [`CanonicalPrimitivePartAssign`](crate::num::arithmetic::traits::CanonicalPrimitivePartAssign),
+/// and [`ContentAndCanonicalPrimitivePart`](
+/// crate::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which, for a polynomial with
+/// non-negative coefficients, are the same as the primitive part.
+pub mod canonical_primitive_part;
 /// Implementations of [`CanonicalizeUnit`](crate::num::arithmetic::traits::CanonicalizeUnit) and
 /// [`CanonicalizeUnitAssign`](crate::num::arithmetic::traits::CanonicalizeUnitAssign), which bring
 /// a polynomial into canonical unit form.
@@ -14,11 +21,11 @@ pub mod canonicalize_unit;
 /// [`ComposePowerOfXAssign`](crate::polynomial::ComposePowerOfXAssign), for substituting a power of
 /// the variable into a polynomial.
 pub mod compose_power_of_x;
-/// Implementations of [`Content`](crate::polynomial::Content),
-/// [`PrimitivePart`](crate::polynomial::PrimitivePart),
-/// [`PrimitivePartAssign`](crate::polynomial::PrimitivePartAssign), and
-/// [`ContentAndPrimitivePart`](crate::polynomial::ContentAndPrimitivePart), which compute the GCD
-/// of a polynomial's coefficients and the polynomial divided by it.
+/// Implementations of [`Content`](crate::num::arithmetic::traits::Content),
+/// [`PrimitivePart`](crate::num::arithmetic::traits::PrimitivePart),
+/// [`PrimitivePartAssign`](crate::num::arithmetic::traits::PrimitivePartAssign), and
+/// [`ContentAndPrimitivePart`](crate::num::arithmetic::traits::ContentAndPrimitivePart), which
+/// compute the GCD of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
 /// Implementations of [`DeflatePowerOfX`](crate::polynomial::DeflatePowerOfX) and
 /// [`DeflatePowerOfXAssign`](crate::polynomial::DeflatePowerOfXAssign), for undoing the

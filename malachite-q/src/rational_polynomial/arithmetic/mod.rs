@@ -13,6 +13,13 @@ pub mod add;
 /// [`AddTruncatedAssign`](malachite_base::polynomial::AddTruncatedAssign), for adding two
 /// polynomials and keeping only their low coefficients.
 pub mod add_truncated;
+/// Implementations of [`CanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart) and
+/// [`ContentAndCanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart) for
+/// [`RationalPolynomial`](super::RationalPolynomial)s, which give the primitive part with a
+/// non-negative leading coefficient.
+pub mod canonical_primitive_part;
 /// Implementations of
 /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
@@ -22,10 +29,10 @@ pub mod canonicalize_unit;
 /// [`ComposePowerOfXAssign`](malachite_base::polynomial::ComposePowerOfXAssign), for substituting a
 /// power of the variable into a polynomial.
 pub mod compose_power_of_x;
-/// Implementations of [`Content`](malachite_base::polynomial::Content),
-/// [`PrimitivePart`](malachite_base::polynomial::PrimitivePart), and
-/// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart) for
-/// [`RationalPolynomial`](super::RationalPolynomial)s.
+/// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
+/// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), and
+/// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart)
+/// for [`RationalPolynomial`](super::RationalPolynomial)s.
 pub mod content;
 /// Implementations of [`DeflatePowerOfX`](malachite_base::polynomial::DeflatePowerOfX) and
 /// [`DeflatePowerOfXAssign`](malachite_base::polynomial::DeflatePowerOfXAssign), for undoing the

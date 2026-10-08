@@ -23,6 +23,14 @@ pub mod bit_pack;
 /// Implementations of [`BitUnpack`](malachite_base::polynomial::BitUnpack), which unpacks a
 /// polynomial from the fixed-width fields of a single number.
 pub mod bit_unpack;
+/// Implementations of [`CanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart),
+/// [`CanonicalPrimitivePartAssign`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePartAssign), and
+/// [`ContentAndCanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which, for a
+/// polynomial with non-negative coefficients, are the same as the primitive part.
+pub mod canonical_primitive_part;
 /// Implementations of
 /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
@@ -32,11 +40,11 @@ pub mod canonicalize_unit;
 /// [`ComposePowerOfXAssign`](malachite_base::polynomial::ComposePowerOfXAssign), for substituting a
 /// power of the variable into a polynomial.
 pub mod compose_power_of_x;
-/// Implementations of [`Content`](malachite_base::polynomial::Content),
-/// [`PrimitivePart`](malachite_base::polynomial::PrimitivePart),
-/// [`PrimitivePartAssign`](malachite_base::polynomial::PrimitivePartAssign), and
-/// [`ContentAndPrimitivePart`](malachite_base::polynomial::ContentAndPrimitivePart), which compute
-/// the GCD of a polynomial's coefficients and the polynomial divided by it.
+/// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
+/// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart),
+/// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), and
+/// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
+/// which compute the GCD of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
 /// Implementations of [`DeflatePowerOfX`](malachite_base::polynomial::DeflatePowerOfX) and
 /// [`DeflatePowerOfXAssign`](malachite_base::polynomial::DeflatePowerOfXAssign), for undoing the

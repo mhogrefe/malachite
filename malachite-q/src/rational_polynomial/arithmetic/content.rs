@@ -8,13 +8,13 @@
 
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
-use malachite_base::polynomial::{Content, ContentAndPrimitivePart, PrimitivePart};
+use malachite_base::num::arithmetic::traits::{Content, ContentAndPrimitivePart, PrimitivePart};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;
 
 // The content of A/d is cont(A)/d, which is already in lowest terms: a canonical
 // `RationalPolynomial`'s numerator content shares no factor with its denominator.
-const fn content_over(numerator_content: Natural, denominator: Natural) -> Rational {
+pub(crate) const fn content_over(numerator_content: Natural, denominator: Natural) -> Rational {
     Rational {
         sign: true,
         numerator: numerator_content,
@@ -44,8 +44,8 @@ impl Content for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Content;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Content;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("-2/3*x-4/3").unwrap();
@@ -82,8 +82,8 @@ impl Content for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Content;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Content;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("-2/3*x-4/3").unwrap();
@@ -103,13 +103,15 @@ impl PrimitivePart for RationalPolynomial {
 
     /// Computes the primitive part of a [`RationalPolynomial`], taking the polynomial by value.
     ///
-    /// This is the polynomial divided by its content, with the sign chosen so that the leading
-    /// coefficient is non-negative. It always has integer coefficients, so it is an
-    /// [`IntegerPolynomial`]; for $p = A/d$ it is the primitive part of $A$, and the denominator
-    /// plays no part.
+    /// This is the polynomial divided by its content, with every coefficient keeping its sign; for
+    /// the one with a non-negative leading coefficient, see
+    /// [`canonical_primitive_part`](
+    /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
+    /// It always has integer coefficients, so it is an [`IntegerPolynomial`]; for $p = A/d$ it is
+    /// the primitive part of $A$, and the denominator plays no part.
     ///
     /// $$
-    /// p = \operatorname{sgn}(\operatorname{lc}(p)) \operatorname{cont}(p) \operatorname{pp}(p).
+    /// p = \operatorname{cont}(p) \operatorname{pp}(p).
     /// $$
     ///
     /// The primitive part of the zero polynomial is zero.
@@ -125,17 +127,14 @@ impl PrimitivePart for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePart;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::PrimitivePart;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("-2/3*x-4/3").unwrap();
-    /// assert_eq!(p.clone().primitive_part().to_string(), "x+2");
+    /// assert_eq!(p.clone().primitive_part().to_string(), "-x-2");
     /// assert_eq!(RationalPolynomial::ZERO.primitive_part(), 0);
     /// ```
-    ///
-    /// This is equivalent to `fmpq_poly_primitive_part` from `fmpq_poly/primitive_part.c`, FLINT
-    /// 3.6.0, except that the result is an [`IntegerPolynomial`].
     #[inline]
     fn primitive_part(self) -> IntegerPolynomial {
         self.numerator.primitive_part()
@@ -147,13 +146,15 @@ impl PrimitivePart for &RationalPolynomial {
 
     /// Computes the primitive part of a [`RationalPolynomial`], taking the polynomial by reference.
     ///
-    /// This is the polynomial divided by its content, with the sign chosen so that the leading
-    /// coefficient is non-negative. It always has integer coefficients, so it is an
-    /// [`IntegerPolynomial`]; for $p = A/d$ it is the primitive part of $A$, and the denominator
-    /// plays no part.
+    /// This is the polynomial divided by its content, with every coefficient keeping its sign; for
+    /// the one with a non-negative leading coefficient, see
+    /// [`canonical_primitive_part`](
+    /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
+    /// It always has integer coefficients, so it is an [`IntegerPolynomial`]; for $p = A/d$ it is
+    /// the primitive part of $A$, and the denominator plays no part.
     ///
     /// $$
-    /// p = \operatorname{sgn}(\operatorname{lc}(p)) \operatorname{cont}(p) \operatorname{pp}(p).
+    /// p = \operatorname{cont}(p) \operatorname{pp}(p).
     /// $$
     ///
     /// The primitive part of the zero polynomial is zero.
@@ -169,17 +170,14 @@ impl PrimitivePart for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::PrimitivePart;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::PrimitivePart;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("-2/3*x-4/3").unwrap();
-    /// assert_eq!((&p).primitive_part().to_string(), "x+2");
+    /// assert_eq!((&p).primitive_part().to_string(), "-x-2");
     /// assert_eq!((&RationalPolynomial::ZERO).primitive_part(), 0);
     /// ```
-    ///
-    /// This is equivalent to `fmpq_poly_primitive_part` from `fmpq_poly/primitive_part.c`, FLINT
-    /// 3.6.0, except that the result is an [`IntegerPolynomial`].
     #[inline]
     fn primitive_part(self) -> IntegerPolynomial {
         (&self.numerator).primitive_part()
@@ -207,13 +205,13 @@ impl ContentAndPrimitivePart for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ContentAndPrimitivePart;
+    /// use malachite_base::num::arithmetic::traits::ContentAndPrimitivePart;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("-2/3*x-4/3").unwrap();
     /// let (content, primitive_part) = p.clone().content_and_primitive_part();
     /// assert_eq!(content.to_string(), "2/3");
-    /// assert_eq!(primitive_part.to_string(), "x+2");
+    /// assert_eq!(primitive_part.to_string(), "-x-2");
     /// ```
     #[inline]
     fn content_and_primitive_part(self) -> (Rational, IntegerPolynomial) {
@@ -243,13 +241,13 @@ impl ContentAndPrimitivePart for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ContentAndPrimitivePart;
+    /// use malachite_base::num::arithmetic::traits::ContentAndPrimitivePart;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("-2/3*x-4/3").unwrap();
     /// let (content, primitive_part) = (&p).content_and_primitive_part();
     /// assert_eq!(content.to_string(), "2/3");
-    /// assert_eq!(primitive_part.to_string(), "x+2");
+    /// assert_eq!(primitive_part.to_string(), "-x-2");
     /// ```
     #[inline]
     fn content_and_primitive_part(self) -> (Rational, IntegerPolynomial) {

@@ -8,9 +8,10 @@
 
 use core::ops::{Shl, ShlAssign};
 use core::str::FromStr;
+use malachite_base::num::arithmetic::traits::Content;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{Content, Evaluate, Polynomial};
+use malachite_base::polynomial::{Evaluate, Polynomial};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;

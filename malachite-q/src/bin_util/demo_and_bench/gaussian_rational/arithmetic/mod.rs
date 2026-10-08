@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     abs_squared::register(runner);
     add::register(runner);
     canonical_unit_i_pow::register(runner);
+    canonical_primitive_part::register(runner);
     canonicalize_unit::register(runner);
     conjugate::register(runner);
     content_and_primitive_part::register(runner);
@@ -37,6 +38,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod abs_squared;
 mod add;
+mod canonical_primitive_part;
 mod canonical_unit_i_pow;
 mod canonicalize_unit;
 mod conjugate;

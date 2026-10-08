@@ -69,6 +69,7 @@ pub mod gaussian_rational {
     pub mod arithmetic {
         pub mod abs_squared;
         pub mod add;
+        pub mod canonical_primitive_part;
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_unit;
         pub mod conjugate;
@@ -165,6 +166,7 @@ pub mod rational_polynomial {
     pub mod arithmetic {
         pub mod add;
         pub mod add_truncated;
+        pub mod canonical_primitive_part;
         pub mod canonicalize_unit;
         pub mod compose_power_of_x;
         pub mod content;
@@ -414,6 +416,10 @@ pub mod rational {
 }
 pub mod rational_vector {
     pub mod access;
+    pub mod arithmetic {
+        pub mod canonical_primitive_part;
+        pub mod content;
+    }
     pub mod basic {
         pub mod named;
         pub mod size;

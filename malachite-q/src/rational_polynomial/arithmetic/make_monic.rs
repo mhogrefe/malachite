@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_polynomial::RationalPolynomial;
-use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::arithmetic::traits::{CanonicalPrimitivePart, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{MakeMonic, MakeMonicAssign, Polynomial, PrimitivePart};
+use malachite_base::polynomial::{MakeMonic, MakeMonicAssign, Polynomial};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 
 // For p = A/d, the monic multiple of p is A/lc(A). Dividing numerator and denominator by cont(A),
@@ -61,7 +61,7 @@ impl MakeMonic for RationalPolynomial {
     /// This is equivalent to `fmpq_poly_make_monic` from `fmpq_poly/make_monic.c`, FLINT 3.6.0.
     #[inline]
     fn make_monic(self) -> Self {
-        monic_from_primitive_part(self.numerator.primitive_part())
+        monic_from_primitive_part(self.numerator.canonical_primitive_part())
     }
 }
 
@@ -100,7 +100,7 @@ impl MakeMonic for &RationalPolynomial {
     /// This is equivalent to `fmpq_poly_make_monic` from `fmpq_poly/make_monic.c`, FLINT 3.6.0.
     #[inline]
     fn make_monic(self) -> RationalPolynomial {
-        monic_from_primitive_part((&self.numerator).primitive_part())
+        monic_from_primitive_part((&self.numerator).canonical_primitive_part())
     }
 }
 
@@ -130,6 +130,6 @@ impl MakeMonicAssign for RationalPolynomial {
     #[inline]
     fn make_monic_assign(&mut self) {
         let numerator = core::mem::take(&mut self.numerator);
-        *self = monic_from_primitive_part(numerator.primitive_part());
+        *self = monic_from_primitive_part(numerator.canonical_primitive_part());
     }
 }

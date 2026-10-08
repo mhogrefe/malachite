@@ -69,6 +69,7 @@ pub mod gaussian_integer {
     pub mod arithmetic {
         pub mod abs_squared;
         pub mod add;
+        pub mod canonical_primitive_part;
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_unit;
         pub mod conjugate;
@@ -341,6 +342,10 @@ pub mod integer {
 }
 pub mod integer_vector {
     pub mod access;
+    pub mod arithmetic {
+        pub mod canonical_primitive_part;
+        pub mod content;
+    }
     pub mod basic {
         pub mod named;
         pub mod size;
@@ -628,6 +633,7 @@ pub mod integer_polynomial {
         pub mod balanced_mod;
         pub mod bit_pack;
         pub mod bit_unpack;
+        pub mod canonical_primitive_part;
         pub mod canonicalize_unit;
         pub mod compose_power_of_x;
         pub mod content;
@@ -723,6 +729,7 @@ pub mod natural_polynomial {
         pub mod balanced_mod;
         pub mod bit_pack;
         pub mod bit_unpack;
+        pub mod canonical_primitive_part;
         pub mod canonicalize_unit;
         pub mod compose_power_of_x;
         pub mod content;
@@ -832,6 +839,8 @@ pub mod natural_polynomial {
 pub mod natural_vector {
     pub mod access;
     pub mod arithmetic {
+        pub mod canonical_primitive_part;
+        pub mod content;
         pub mod mod_is_reduced;
         pub mod mod_op;
         pub mod mod_power_of_2;
