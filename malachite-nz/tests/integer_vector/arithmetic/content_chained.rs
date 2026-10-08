@@ -12,10 +12,10 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::integer_polynomial::arithmetic::content_chained::integers_content_chained;
+use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_vec_natural_pair_gen;
-use malachite_nz::test_util::integer_polynomial::arithmetic::content_chained::*;
+use malachite_nz::test_util::integer_vector::arithmetic::content_chained::*;
 
 #[test]
 fn test_integers_content_chained() {

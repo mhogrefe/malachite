@@ -11,7 +11,7 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::scalar_add_mul::integers_add_mul_scalar_assign;
-use malachite_nz::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar;
+use malachite_nz::integer_vector::arithmetic::scalar_mul::integers_mul_scalar;
 use malachite_nz::test_util::generators::{
     integer_vec_integer_pair_gen, integer_vec_integer_vec_integer_triple_gen,
 };

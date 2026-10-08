@@ -10,9 +10,9 @@ use malachite_base::test_util::bench::bucketers::vec_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::integer_polynomial::arithmetic::vec::max_limbs::vec_max_limbs;
+use malachite_nz::integer_vector::arithmetic::max_limbs::vec_max_limbs;
 use malachite_nz::test_util::generators::integer_vec_gen;
-use malachite_nz::test_util::integer_polynomial::arithmetic::vec::max_limbs::vec_max_limbs_naive;
+use malachite_nz::test_util::integer_vector::arithmetic::max_limbs::vec_max_limbs_naive;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_vec_max_limbs);

@@ -8,9 +8,9 @@
 
 use crate::num::arithmetic::traits::Parity;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::unsigned_polynomial::arithmetic::mod_mul::{
-    ModData, column_sum, mod_add_assign_slice, mod_sub_assign_slice,
-};
+use crate::unsigned_vector::arithmetic::mod_add::mod_add_assign_slice;
+use crate::unsigned_vector::arithmetic::mod_dot::{ModData, column_sum};
+use crate::unsigned_vector::arithmetic::mod_sub::mod_sub_assign_slice;
 use alloc::vec;
 use core::cmp::Ordering;
 

@@ -12,7 +12,7 @@ use malachite_base::num::arithmetic::traits::DivExactAssign;
 use malachite_base::polynomial::{DivPowerOfX, DivPowerOfXAssign};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::integer_polynomial::arithmetic::content_chained::integers_content_chained;
+use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
 use malachite_nz::natural::Natural;
 
 // Divides out the common factor of a numerator and denominator after low coefficients were dropped

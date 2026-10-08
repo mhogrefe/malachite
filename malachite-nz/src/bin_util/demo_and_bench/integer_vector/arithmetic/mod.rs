@@ -13,7 +13,12 @@ pub(crate) fn register(runner: &mut Runner) {
     canonical_primitive_part::register(runner);
     canonicalize_sign::register(runner);
     content::register(runner);
+    content_chained::register(runner);
+    dot_general::register(runner);
+    max_bits::register(runner);
+    max_limbs::register(runner);
     neg::register(runner);
+    scalar_mul::register(runner);
     sub::register(runner);
 }
 
@@ -21,5 +26,10 @@ mod add;
 mod canonical_primitive_part;
 mod canonicalize_sign;
 mod content;
+mod content_chained;
+mod dot_general;
+mod max_bits;
+mod max_limbs;
 mod neg;
+mod scalar_mul;
 mod sub;

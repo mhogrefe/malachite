@@ -10,9 +10,9 @@ use malachite_base::test_util::bench::bucketers::pair_1_vec_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::integer_polynomial::arithmetic::content_chained::integers_content_chained;
+use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
 use malachite_nz::test_util::generators::integer_vec_natural_pair_gen;
-use malachite_nz::test_util::integer_polynomial::arithmetic::content_chained::*;
+use malachite_nz::test_util::integer_vector::arithmetic::content_chained::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integers_content_chained);

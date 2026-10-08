@@ -11,7 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_to_out;
+use crate::integer_vector::arithmetic::scalar_mul::integers_mul_scalar_to_out;
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::AddMulAssign;
 use malachite_base::num::basic::traits::Zero;

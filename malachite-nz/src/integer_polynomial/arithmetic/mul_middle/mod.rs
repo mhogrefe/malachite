@@ -15,6 +15,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
+use crate::integer_polynomial::arithmetic::mul_dispatch::{
+    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
+    schonhage_strassen_preferred, tiny_kernel,
+};
 use crate::integer_polynomial::arithmetic::mul_middle::classical::mul_middle_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use crate::integer_polynomial::arithmetic::mul_middle::kronecker::mul_middle_to_out_kronecker;
@@ -23,11 +27,7 @@ use crate::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
 use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
-use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
-use crate::integer_polynomial::arithmetic::vec::{
-    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
-    schonhage_strassen_preferred, tiny_kernel,
-};
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use core::cmp::min;
 use core::mem::swap;
 use core::ptr;

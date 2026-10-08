@@ -10,6 +10,13 @@ use crate::num::arithmetic::traits::{ModAdd, ModAddAssign, ModIsReduced};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_vector::UnsignedVector;
 
+// Adds each element of `ys` to the element of `xs` at the same index, modulo `m`.
+pub(crate) fn mod_add_assign_slice<T: PrimitiveUnsigned>(xs: &mut [T], ys: &[T], m: T) {
+    for (x, &y) in xs.iter_mut().zip(ys) {
+        *x = x.mod_add(y, m);
+    }
+}
+
 fn assert_reduced<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &UnsignedVector<T>, m: T) {
     assert_eq!(
         v.elements.len(),
@@ -28,9 +35,7 @@ fn assert_reduced<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &UnsignedVecto
 
 fn mod_add_assign<T: PrimitiveUnsigned>(v: &mut UnsignedVector<T>, w: &UnsignedVector<T>, m: T) {
     assert_reduced(v, w, m);
-    for (x, &y) in v.elements.iter_mut().zip(&w.elements) {
-        x.mod_add_assign(y, m);
-    }
+    mod_add_assign_slice(&mut v.elements, &w.elements, m);
 }
 
 impl<T: PrimitiveUnsigned> ModAdd<Self, T> for UnsignedVector<T> {

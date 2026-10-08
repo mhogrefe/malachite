@@ -18,7 +18,7 @@ use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::{
 };
 use crate::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::square_truncated::classical::*;
-use crate::integer_polynomial::arithmetic::vec::vec_add;
+use crate::integer_vector::arithmetic::add::vec_add;
 use alloc::vec;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Parity, PowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;

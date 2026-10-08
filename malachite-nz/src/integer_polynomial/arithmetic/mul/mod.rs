@@ -19,13 +19,13 @@ use crate::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::mul::kronecker::mul_to_out_kronecker;
 use crate::integer_polynomial::arithmetic::mul::schonhage_strassen::*;
 use crate::integer_polynomial::arithmetic::mul::tiny::{mul_to_out_tiny_1, mul_to_out_tiny_2};
-use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
-use crate::integer_polynomial::arithmetic::square::square_to_out;
-use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
-use crate::integer_polynomial::arithmetic::vec::{
+use crate::integer_polynomial::arithmetic::mul_dispatch::{
     TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
     schonhage_strassen_preferred, tiny_kernel,
 };
+use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
+use crate::integer_polynomial::arithmetic::square::square_to_out;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::mem::take;

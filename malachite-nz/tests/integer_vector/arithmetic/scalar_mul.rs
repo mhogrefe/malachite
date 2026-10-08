@@ -10,11 +10,11 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
-use malachite_nz::integer_polynomial::arithmetic::scalar_mul::{
+use malachite_nz::integer_vector::arithmetic::scalar_mul::{
     integers_mul_scalar, integers_mul_scalar_assign, integers_mul_scalar_to_out,
 };
 use malachite_nz::test_util::generators::{integer_vec_gen, integer_vec_integer_pair_gen};
-use malachite_nz::test_util::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_naive;
+use malachite_nz::test_util::integer_vector::arithmetic::scalar_mul::integers_mul_scalar_naive;
 
 fn parse(xs: &[&str]) -> Vec<Integer> {
     xs.iter().map(|x| Integer::from_str(x).unwrap()).collect()

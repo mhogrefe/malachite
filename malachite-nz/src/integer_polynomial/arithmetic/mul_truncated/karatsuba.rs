@@ -13,7 +13,8 @@
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncated_to_out_classical;
-use crate::integer_polynomial::arithmetic::vec::{vec_add, vec_add_assign, vec_sub_assign};
+use crate::integer_vector::arithmetic::add::{vec_add, vec_add_assign};
+use crate::integer_vector::arithmetic::sub::vec_sub_assign;
 use alloc::borrow::Cow;
 use alloc::vec;
 use alloc::vec::Vec;

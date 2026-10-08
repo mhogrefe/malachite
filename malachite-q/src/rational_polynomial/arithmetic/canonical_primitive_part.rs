@@ -8,7 +8,7 @@
 
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
-use crate::rational_polynomial::arithmetic::content::content_over;
+use crate::rational_vector::arithmetic::content::content_over;
 use malachite_base::num::arithmetic::traits::{
     CanonicalPrimitivePart, ContentAndCanonicalPrimitivePart,
 };

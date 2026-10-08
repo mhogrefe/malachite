@@ -10,6 +10,13 @@ use crate::num::arithmetic::traits::{ModIsReduced, ModSub, ModSubAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_vector::UnsignedVector;
 
+// Subtracts each element of `ys` from the element of `xs` at the same index, modulo `m`.
+pub(crate) fn mod_sub_assign_slice<T: PrimitiveUnsigned>(xs: &mut [T], ys: &[T], m: T) {
+    for (x, &y) in xs.iter_mut().zip(ys) {
+        *x = x.mod_sub(y, m);
+    }
+}
+
 fn assert_reduced<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &UnsignedVector<T>, m: T) {
     assert_eq!(
         v.elements.len(),
@@ -28,9 +35,7 @@ fn assert_reduced<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &UnsignedVecto
 
 fn mod_sub_assign<T: PrimitiveUnsigned>(v: &mut UnsignedVector<T>, w: &UnsignedVector<T>, m: T) {
     assert_reduced(v, w, m);
-    for (x, &y) in v.elements.iter_mut().zip(&w.elements) {
-        x.mod_sub_assign(y, m);
-    }
+    mod_sub_assign_slice(&mut v.elements, &w.elements, m);
 }
 
 fn mod_sub_ref_val<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &mut UnsignedVector<T>, m: T) {

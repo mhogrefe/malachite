@@ -7,12 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use crate::integer_polynomial::arithmetic::scalar_mul::{
+use crate::integer_vector::arithmetic::scalar_mul::{
     integers_mul_scalar_assign, integers_mul_scalar_to_out,
 };
 use crate::natural::InnerNatural::Small;
-use crate::natural::Natural;
-use crate::platform::{SignedDoubleLimb, SignedLimb};
+use crate::natural::{LIMB_MAX_QUARTER, Natural, WIDTH_MINUS_2};
+use crate::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::ops::{AddAssign, MulAssign, SubAssign};
@@ -20,7 +20,7 @@ use malachite_base::num::arithmetic::traits::{
     AddMulAssign, DivExactAssign, Pow, Square, SubMulAssign,
 };
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 
 crate_test_trait! {
 // The coefficients of the polynomials that the multiplication kernels work with: `Integer`s, for
@@ -246,4 +246,34 @@ pub(crate) fn truncate_coefficients<C: PolynomialCoefficient>(xs: &mut Vec<C>, l
         xs.truncate(len);
         trim_coefficients(xs);
     }
+}
+
+// The largest absolute value of a small FLINT `fmpz`, which is stored in a single word with two
+// bits to spare; larger values are stored as GMP integers. Some of FLINT's algorithms take a fast
+// path for small values that depends on the spare bits, so a faithful translation takes it for the
+// same values.
+pub(crate) const COEFF_MAX: Limb = LIMB_MAX_QUARTER;
+
+// The largest number of bits that FLINT stores in a small `fmpz`: `SMALL_FMPZ_BITCOUNT_MAX` from
+// `flint.h`, FLINT 3.6.0.
+pub(crate) const SMALL_FMPZ_BITCOUNT_MAX: u64 = WIDTH_MINUS_2;
+
+// The value of `x` as a signed word, if FLINT would store `x` as a small `fmpz`; that is, if
+// `COEFF_IS_MPZ` from `flint.h`, FLINT 3.6.0, would be false.
+pub(crate) fn small_value<C: PolynomialCoefficient>(x: &C) -> Option<SignedLimb> {
+    match *x.unsigned_abs_ref() {
+        Natural(Small(small)) if small <= COEFF_MAX => {
+            let value = SignedLimb::wrapping_from(small);
+            Some(if x.is_negative() { -value } else { value })
+        }
+        _ => None,
+    }
+}
+
+// The values of the elements of `xs`, each of which FLINT must store as a small `fmpz`, as signed
+// words or as a wider signed type.
+pub(crate) fn small_values<T: From<SignedLimb>, C: PolynomialCoefficient>(xs: &[C]) -> Vec<T> {
+    xs.iter()
+        .map(|x| T::from(small_value(x).unwrap()))
+        .collect()
 }

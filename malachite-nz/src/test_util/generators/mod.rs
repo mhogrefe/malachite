@@ -9,9 +9,9 @@
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
-use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
-use crate::integer_polynomial::arithmetic::vec::{TinyKernel, tiny_kernel};
+use crate::integer_polynomial::arithmetic::mul_dispatch::{TinyKernel, tiny_kernel};
 use crate::integer_vector::IntegerVector;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;

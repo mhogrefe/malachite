@@ -10,15 +10,15 @@ use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::polynomial::{ModSquareTruncated, ModSquareTruncatedAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
-use crate::unsigned_polynomial::arithmetic::mod_mul::{
-    MOD_SQUARE_KARATSUBA_THRESHOLD, ModData, mod_add_assign_slice,
-};
+use crate::unsigned_polynomial::arithmetic::mod_mul::MOD_SQUARE_KARATSUBA_THRESHOLD;
 use crate::unsigned_polynomial::arithmetic::mod_mul_truncated::mod_mul_truncated_karatsuba;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::from_coefficients_trimmed;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::truncated_len;
 use crate::unsigned_polynomial::arithmetic::mod_square::{
     mod_square_classical_prefix, mod_square_karatsuba,
 };
+use crate::unsigned_vector::arithmetic::mod_add::mod_add_assign_slice;
+use crate::unsigned_vector::arithmetic::mod_dot::ModData;
 use alloc::vec;
 use core::cmp::min;
 

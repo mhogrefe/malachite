@@ -18,11 +18,11 @@ use crate::integer::random::{
     striped_random_negative_integers, striped_random_nonzero_integers,
 };
 use crate::integer_polynomial::IntegerPolynomial;
-use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_polynomial::random::{
     striped_random_integer_polynomials, striped_random_integer_polynomials_min_degree,
 };
 use crate::integer_vector::IntegerVector;
+use crate::integer_vector::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_vector::random::striped_random_integer_vectors;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,

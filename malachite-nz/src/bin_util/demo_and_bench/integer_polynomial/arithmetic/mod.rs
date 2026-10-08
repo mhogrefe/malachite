@@ -18,7 +18,6 @@ pub(crate) fn register(runner: &mut Runner) {
     canonicalize_unit::register(runner);
     compose_power_of_x::register(runner);
     content::register(runner);
-    content_chained::register(runner);
     derivative::register(runner);
     div_exact::register(runner);
     div_power_of_x::register(runner);
@@ -35,10 +34,9 @@ pub(crate) fn register(runner: &mut Runner) {
     nth_derivative::register(runner);
     pow::register(runner);
     pow_truncated::register(runner);
+    scalar_add_mul::register(runner);
     shl::register(runner);
     neg::register(runner);
-    scalar_add_mul::register(runner);
-    scalar_mul::register(runner);
     sub::register(runner);
     sub_truncated::register(runner);
     mul::register(runner);
@@ -47,7 +45,6 @@ pub(crate) fn register(runner: &mut Runner) {
     mul_middle::register(runner);
     square::register(runner);
     square_truncated::register(runner);
-    vec::register(runner);
 }
 
 mod add;
@@ -59,7 +56,6 @@ mod canonical_primitive_part;
 mod canonicalize_unit;
 mod compose_power_of_x;
 mod content;
-mod content_chained;
 mod deflate_power_of_x;
 mod derivative;
 mod div_exact;
@@ -82,10 +78,8 @@ mod nth_derivative;
 mod pow;
 mod pow_truncated;
 mod scalar_add_mul;
-mod scalar_mul;
 mod shl;
 mod square;
 mod square_truncated;
 mod sub;
 mod sub_truncated;
-mod vec;

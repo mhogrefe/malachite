@@ -14,7 +14,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::{MulTruncated, MulTruncatedAssign, SquareTruncated};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::integer_polynomial::arithmetic::content_chained::integers_content_chained;
+use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
 use malachite_nz::natural::Natural;
 
 // Divides out whatever `numerator` shares with `denominator`, which is positive, giving a canonical

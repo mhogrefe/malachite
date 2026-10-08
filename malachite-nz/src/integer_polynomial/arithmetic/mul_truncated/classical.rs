@@ -13,7 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::vec::dot_general::vec_dot_general;
+use crate::integer_vector::arithmetic::dot_general::vec_dot_general;
 use core::cmp::min;
 
 // The coefficient of $x^i$ in the product of the polynomials with coefficients `xs` and `ys`, both

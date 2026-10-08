@@ -11,10 +11,12 @@ use crate::polynomial::{ModMulTruncated, ModMulTruncatedAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_add::assert_reduced;
 use crate::unsigned_polynomial::arithmetic::mod_mul::{
-    MOD_MUL_KARATSUBA_THRESHOLD, ModData, column_sum, mod_add_assign_slice, mod_mul_karatsuba,
+    MOD_MUL_KARATSUBA_THRESHOLD, mod_mul_karatsuba,
 };
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::from_coefficients_trimmed;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::truncated_len;
+use crate::unsigned_vector::arithmetic::mod_add::mod_add_assign_slice;
+use crate::unsigned_vector::arithmetic::mod_dot::{ModData, column_sum};
 use alloc::vec;
 use core::cmp::min;
 

@@ -7,9 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::IntegerPolynomial;
-use crate::integer_polynomial::arithmetic::content::{
-    content, negate, normalize_in_place, normalized,
-};
+use crate::integer_polynomial::arithmetic::content::negate;
+use crate::integer_vector::arithmetic::content::{content, normalize_in_place, normalized};
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     CanonicalPrimitivePart, CanonicalPrimitivePartAssign, ContentAndCanonicalPrimitivePart,

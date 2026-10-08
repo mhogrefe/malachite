@@ -23,6 +23,8 @@ pub mod content;
 /// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding vectors modulo a
 /// number.
 pub mod mod_add;
+// Dot products of vectors reduced modulo a word, accumulating the sum before reducing it once.
+pub(crate) mod mod_dot;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;

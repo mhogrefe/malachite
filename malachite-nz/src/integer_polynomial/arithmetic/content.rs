@@ -8,62 +8,15 @@
 
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_vector::arithmetic::content::{content, normalize_in_place, normalized};
 use crate::natural::Natural;
-use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, GcdAssign, NegAssign,
-    PrimitivePart, PrimitivePartAssign,
+    Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
 };
-use malachite_base::num::basic::traits::Zero;
-
-// The GCD of the coefficients' absolute values. It stops as soon as it reaches 1, since nothing can
-// lower it further.
-pub(crate) fn content(coefficients: &[Integer]) -> Natural {
-    let mut gcd = Natural::ZERO;
-    for c in coefficients {
-        gcd.gcd_assign(&c.abs);
-        if gcd == 1u32 {
-            break;
-        }
-    }
-    gcd
-}
 
 // Whether the canonical primitive part must be negated: when the leading coefficient is negative.
 pub(crate) fn negate(coefficients: &[Integer]) -> bool {
     coefficients.last().is_some_and(|c| !c.sign)
-}
-
-// Divides every coefficient by the content, which divides each of them exactly, and negates them
-// all if `negate` is set.
-pub(crate) fn normalize_in_place(coefficients: &mut [Integer], content: &Natural, negate: bool) {
-    for c in coefficients {
-        if *content > 1u32 {
-            c.abs.div_exact_assign(content);
-        }
-        if negate {
-            c.neg_assign();
-        }
-    }
-}
-
-// The coefficients divided by the content, and negated if `negate` is set, as new values.
-pub(crate) fn normalized(
-    coefficients: &[Integer],
-    content: &Natural,
-    negate: bool,
-) -> Vec<Integer> {
-    coefficients
-        .iter()
-        .map(|c| {
-            let abs = if *content > 1u32 {
-                (&c.abs).div_exact(content)
-            } else {
-                c.abs.clone()
-            };
-            Integer::from_sign_and_abs(c.sign != negate, abs)
-        })
-        .collect()
 }
 
 impl Content for IntegerPolynomial {

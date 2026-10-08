@@ -349,7 +349,12 @@ pub mod integer_vector {
         pub mod canonical_primitive_part;
         pub mod canonicalize_sign;
         pub mod content;
+        pub mod content_chained;
+        pub mod dot_general;
+        pub mod max_bits;
+        pub mod max_limbs;
         pub mod neg;
+        pub mod scalar_mul;
         pub mod sub;
     }
     pub mod basic {
@@ -647,7 +652,6 @@ pub mod integer_polynomial {
         pub mod canonicalize_unit;
         pub mod compose_power_of_x;
         pub mod content;
-        pub mod content_chained;
         pub mod deflate_power_of_x;
         pub mod derivative;
         pub mod div_exact;
@@ -670,17 +674,11 @@ pub mod integer_polynomial {
         pub mod pow;
         pub mod pow_truncated;
         pub mod scalar_add_mul;
-        pub mod scalar_mul;
         pub mod shl;
         pub mod square;
         pub mod square_truncated;
         pub mod sub;
         pub mod sub_truncated;
-        pub mod vec {
-            pub mod dot_general;
-            pub mod max_bits;
-            pub mod max_limbs;
-        }
     }
     pub mod basic {
         pub mod coefficients;

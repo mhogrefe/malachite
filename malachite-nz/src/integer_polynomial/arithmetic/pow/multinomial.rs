@@ -11,7 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use malachite_base::num::basic::integers::PrimitiveInt;

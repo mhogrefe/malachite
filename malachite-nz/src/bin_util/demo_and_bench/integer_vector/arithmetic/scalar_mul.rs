@@ -10,11 +10,11 @@ use malachite_base::test_util::bench::bucketers::pair_1_vec_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::integer_polynomial::arithmetic::scalar_mul::{
+use malachite_nz::integer_vector::arithmetic::scalar_mul::{
     integers_mul_scalar, integers_mul_scalar_assign,
 };
 use malachite_nz::test_util::generators::integer_vec_integer_pair_gen;
-use malachite_nz::test_util::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_naive;
+use malachite_nz::test_util::integer_vector::arithmetic::scalar_mul::integers_mul_scalar_naive;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integers_mul_scalar);

@@ -10,10 +10,12 @@ use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_mul::{
-    MOD_SQUARE_KARATSUBA_THRESHOLD, ModData, accumulate, column_sum, mod_add_assign_slice,
-    mod_karatsuba_scratch_len, mod_sub_assign_slice,
+    MOD_SQUARE_KARATSUBA_THRESHOLD, mod_karatsuba_scratch_len,
 };
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::from_coefficients_trimmed;
+use crate::unsigned_vector::arithmetic::mod_add::mod_add_assign_slice;
+use crate::unsigned_vector::arithmetic::mod_dot::{ModData, accumulate, column_sum};
+use crate::unsigned_vector::arithmetic::mod_sub::mod_sub_assign_slice;
 use alloc::vec;
 
 // Doubles the three-word accumulator `(a2, a1, a0)`, which must be less than $2^{3\text{W} - 1}$;

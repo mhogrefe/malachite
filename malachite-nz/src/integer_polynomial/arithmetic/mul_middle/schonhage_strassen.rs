@@ -15,7 +15,7 @@
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_middle::classical::mul_middle_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_middle::truncate_mul_middle_inputs;
-use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::mul::schonhage_strassen::convolution::fft_convolution;
 use crate::natural::arithmetic::mul::schonhage_strassen::limbs_neg_to_out;

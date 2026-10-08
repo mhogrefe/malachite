@@ -8,19 +8,9 @@
 
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
+use crate::rational_vector::arithmetic::content::content_over;
 use malachite_base::num::arithmetic::traits::{Content, ContentAndPrimitivePart, PrimitivePart};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::natural::Natural;
-
-// The content of A/d is cont(A)/d, which is already in lowest terms: a canonical
-// `RationalPolynomial`'s numerator content shares no factor with its denominator.
-pub(crate) const fn content_over(numerator_content: Natural, denominator: Natural) -> Rational {
-    Rational {
-        sign: true,
-        numerator: numerator_content,
-        denominator,
-    }
-}
 
 impl Content for RationalPolynomial {
     type Output = Rational;

@@ -14,8 +14,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::vec::small_values;
+use crate::integer_polynomial::arithmetic::coefficient::{PolynomialCoefficient, small_values};
 use crate::platform::{SignedDoubleLimb, SignedLimb};
 use alloc::vec;
 use alloc::vec::Vec;

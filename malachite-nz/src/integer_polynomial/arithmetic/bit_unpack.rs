@@ -13,8 +13,9 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::bit_pack::field_start;
-use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::vec::SMALL_FMPZ_BITCOUNT_MAX;
+use crate::integer_polynomial::arithmetic::coefficient::{
+    PolynomialCoefficient, SMALL_FMPZ_BITCOUNT_MAX,
+};
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;

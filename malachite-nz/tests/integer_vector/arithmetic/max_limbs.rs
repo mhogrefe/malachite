@@ -8,9 +8,9 @@
 
 use core::str::FromStr;
 use malachite_nz::integer::Integer;
-use malachite_nz::integer_polynomial::arithmetic::vec::max_limbs::vec_max_limbs;
+use malachite_nz::integer_vector::arithmetic::max_limbs::vec_max_limbs;
 use malachite_nz::test_util::generators::integer_vec_gen;
-use malachite_nz::test_util::integer_polynomial::arithmetic::vec::max_limbs::vec_max_limbs_naive;
+use malachite_nz::test_util::integer_vector::arithmetic::max_limbs::vec_max_limbs_naive;
 
 fn parse(xs: &[&str]) -> Vec<Integer> {
     xs.iter().map(|x| Integer::from_str(x).unwrap()).collect()

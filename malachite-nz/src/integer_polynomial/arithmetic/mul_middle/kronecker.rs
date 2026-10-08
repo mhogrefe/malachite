@@ -20,7 +20,7 @@ use crate::integer_polynomial::arithmetic::bit_unpack::{
 };
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_middle::truncate_mul_middle_inputs;
-use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::platform::Limb;

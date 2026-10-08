@@ -10,8 +10,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::vec::small_value;
+use crate::integer_polynomial::arithmetic::coefficient::{PolynomialCoefficient, small_value};
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,

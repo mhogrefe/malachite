@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::pow::pow_ref;
-use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::arithmetic::mod_power_of_2_mul::mod_power_of_2_mul_ref_ref;

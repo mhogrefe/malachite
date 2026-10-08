@@ -6,8 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_vector::IntegerVector;
 use core::ops::{Sub, SubAssign};
+
+// Subtracts each element of `ys` from the element of `xs` at the same index.
+//
+// This is equivalent to `_fmpz_vec_sub` from `fmpz_vec/sub.c`, FLINT 3.6.0, with the output the
+// same as the first input.
+pub(crate) fn vec_sub_assign<C: PolynomialCoefficient>(xs: &mut [C], ys: &[C]) {
+    for (x, y) in xs.iter_mut().zip(ys) {
+        *x -= y;
+    }
+}
 
 fn assert_same_dimension(v: &IntegerVector, w: &IntegerVector) {
     assert_eq!(

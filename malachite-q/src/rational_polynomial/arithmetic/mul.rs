@@ -15,7 +15,7 @@ use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Square};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::integer_polynomial::arithmetic::content_chained::integers_content_chained;
+use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
 use malachite_nz::natural::Natural;
 
 // The factors that the product of canonical $x/a$ and $y/b$, both nonzero, shares with its

@@ -7,10 +7,22 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::rational_polynomial::arithmetic::content::content_over;
 use crate::rational_vector::RationalVector;
 use malachite_base::num::arithmetic::traits::{Content, ContentAndPrimitivePart, PrimitivePart};
 use malachite_nz::integer_vector::IntegerVector;
+use malachite_nz::natural::Natural;
+
+// The content of a vector or polynomial written as integers $A$ over a common denominator $d$ is
+// $\operatorname{cont}(A)/d$. It is already in lowest terms when the numerators and denominator
+// share no factor, as they do for a canonical `RationalPolynomial` and for
+// `to_numerators_and_denominator`.
+pub(crate) const fn content_over(numerator_content: Natural, denominator: Natural) -> Rational {
+    Rational {
+        sign: true,
+        numerator: numerator_content,
+        denominator,
+    }
+}
 
 impl Content for RationalVector {
     type Output = Rational;

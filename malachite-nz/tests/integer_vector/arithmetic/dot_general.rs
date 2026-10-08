@@ -8,11 +8,11 @@
 
 use core::str::FromStr;
 use malachite_nz::integer::Integer;
-use malachite_nz::integer_polynomial::arithmetic::vec::dot_general::vec_dot_general;
+use malachite_nz::integer_vector::arithmetic::dot_general::vec_dot_general;
 use malachite_nz::test_util::generators::{
     integer_vec_integer_pair_gen, integer_vec_integer_vec_integer_triple_gen_var_1,
 };
-use malachite_nz::test_util::integer_polynomial::arithmetic::vec::dot_general::*;
+use malachite_nz::test_util::integer_vector::arithmetic::dot_general::*;
 
 fn parse(xs: &[&str]) -> Vec<Integer> {
     xs.iter().map(|x| Integer::from_str(x).unwrap()).collect()

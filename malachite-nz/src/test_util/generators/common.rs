@@ -9,7 +9,7 @@
 use crate::integer::Integer;
 use crate::integer::exhaustive::exhaustive_integers;
 use crate::integer::random::{random_integers, striped_random_integers};
-use crate::integer_polynomial::arithmetic::vec::max_limbs::vec_max_limbs;
+use crate::integer_vector::arithmetic::max_limbs::vec_max_limbs;
 use crate::natural::Natural;
 use crate::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1::*;
 use crate::platform::{Limb, SignedLimb};

@@ -10,8 +10,28 @@ use crate::num::arithmetic::traits::{
     Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
 };
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::unsigned_polynomial::arithmetic::content::{content, divide_by_content};
 use crate::unsigned_vector::UnsignedVector;
+
+// The GCD of the elements. It stops as soon as it reaches 1, since nothing can lower it further.
+pub(crate) fn content<T: PrimitiveUnsigned>(coefficients: &[T]) -> T {
+    let mut gcd = T::ZERO;
+    for &c in coefficients {
+        gcd.gcd_assign(c);
+        if gcd == T::ONE {
+            break;
+        }
+    }
+    gcd
+}
+
+// Divides every element by the content, which divides each of them exactly.
+pub(crate) fn divide_by_content<T: PrimitiveUnsigned>(coefficients: &mut [T], content: T) {
+    if content > T::ONE {
+        for c in coefficients {
+            c.div_exact_assign(content);
+        }
+    }
+}
 
 impl<T: PrimitiveUnsigned> Content for UnsignedVector<T> {
     type Output = T;

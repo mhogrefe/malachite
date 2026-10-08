@@ -11,28 +11,7 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_polynomial::UnsignedPolynomial;
-
-// The GCD of the coefficients. It stops as soon as it reaches 1, since nothing can lower it
-// further.
-pub(crate) fn content<T: PrimitiveUnsigned>(coefficients: &[T]) -> T {
-    let mut gcd = T::ZERO;
-    for &c in coefficients {
-        gcd.gcd_assign(c);
-        if gcd == T::ONE {
-            break;
-        }
-    }
-    gcd
-}
-
-// Divides every coefficient by the content, which divides each of them exactly.
-pub(crate) fn divide_by_content<T: PrimitiveUnsigned>(coefficients: &mut [T], content: T) {
-    if content > T::ONE {
-        for c in coefficients {
-            c.div_exact_assign(content);
-        }
-    }
-}
+use crate::unsigned_vector::arithmetic::content::{content, divide_by_content};
 
 impl<T: PrimitiveUnsigned> Content for UnsignedPolynomial<T> {
     type Output = T;

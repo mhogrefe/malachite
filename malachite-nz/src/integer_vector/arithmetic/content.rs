@@ -6,12 +6,60 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::content::{content, normalize_in_place, normalized};
+use crate::integer::Integer;
 use crate::integer_vector::IntegerVector;
 use crate::natural::Natural;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
+    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, GcdAssign, NegAssign,
+    PrimitivePart, PrimitivePartAssign,
 };
+use malachite_base::num::basic::traits::Zero;
+
+// The GCD of the elements' absolute values. It stops as soon as it reaches 1, since nothing can
+// lower it further.
+pub(crate) fn content(coefficients: &[Integer]) -> Natural {
+    let mut gcd = Natural::ZERO;
+    for c in coefficients {
+        gcd.gcd_assign(&c.abs);
+        if gcd == 1u32 {
+            break;
+        }
+    }
+    gcd
+}
+
+// Divides every element by the content, which divides each of them exactly, and negates them all if
+// `negate` is set.
+pub(crate) fn normalize_in_place(coefficients: &mut [Integer], content: &Natural, negate: bool) {
+    for c in coefficients {
+        if *content > 1u32 {
+            c.abs.div_exact_assign(content);
+        }
+        if negate {
+            c.neg_assign();
+        }
+    }
+}
+
+// The elements divided by the content, and negated if `negate` is set, as new values.
+pub(crate) fn normalized(
+    coefficients: &[Integer],
+    content: &Natural,
+    negate: bool,
+) -> Vec<Integer> {
+    coefficients
+        .iter()
+        .map(|c| {
+            let abs = if *content > 1u32 {
+                (&c.abs).div_exact(content)
+            } else {
+                c.abs.clone()
+            };
+            Integer::from_sign_and_abs(c.sign != negate, abs)
+        })
+        .collect()
+}
 
 impl Content for IntegerVector {
     type Output = Natural;

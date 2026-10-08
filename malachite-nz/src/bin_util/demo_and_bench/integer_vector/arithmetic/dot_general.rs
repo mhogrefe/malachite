@@ -10,9 +10,9 @@ use malachite_base::test_util::bench::bucketers::triple_1_vec_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::integer_polynomial::arithmetic::vec::dot_general::vec_dot_general;
+use malachite_nz::integer_vector::arithmetic::dot_general::vec_dot_general;
 use malachite_nz::test_util::generators::integer_vec_integer_vec_integer_triple_gen_var_1;
-use malachite_nz::test_util::integer_polynomial::arithmetic::vec::dot_general::*;
+use malachite_nz::test_util::integer_vector::arithmetic::dot_general::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_vec_dot_general);

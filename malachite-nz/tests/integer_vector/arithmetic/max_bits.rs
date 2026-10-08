@@ -10,9 +10,9 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::HeightRef;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
-use malachite_nz::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+use malachite_nz::integer_vector::arithmetic::max_bits::vec_max_bits;
 use malachite_nz::test_util::generators::{integer_polynomial_gen, integer_vec_gen};
-use malachite_nz::test_util::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits_naive;
+use malachite_nz::test_util::integer_vector::arithmetic::max_bits::vec_max_bits_naive;
 
 #[test]
 fn test_vec_max_bits() {

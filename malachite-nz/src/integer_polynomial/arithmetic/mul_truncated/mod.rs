@@ -16,6 +16,10 @@ use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::coefficient::{
     PolynomialCoefficient, trim_coefficients, truncate_coefficients,
 };
+use crate::integer_polynomial::arithmetic::mul_dispatch::{
+    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
+    schonhage_strassen_preferred, tiny_kernel,
+};
 use crate::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncated_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
@@ -25,11 +29,7 @@ use crate::integer_polynomial::arithmetic::mul_truncated::tiny::{
     mul_truncated_to_out_tiny_1, mul_truncated_to_out_tiny_2,
 };
 use crate::integer_polynomial::arithmetic::square_truncated::square_truncated_to_out;
-use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
-use crate::integer_polynomial::arithmetic::vec::{
-    TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
-    schonhage_strassen_preferred, tiny_kernel,
-};
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::min;

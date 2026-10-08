@@ -11,7 +11,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::vec::{vec_add, vec_sub_assign};
+use crate::integer_vector::arithmetic::add::vec_add;
+use crate::integer_vector::arithmetic::sub::vec_sub_assign;
 use alloc::vec;
 use core::borrow::Borrow;
 use core::mem::take;

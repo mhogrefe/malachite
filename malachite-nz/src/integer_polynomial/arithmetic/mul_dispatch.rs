@@ -6,49 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::natural::InnerNatural::Small;
-use crate::natural::{LIMB_MAX_QUARTER, Natural, TWICE_WIDTH, WIDTH_MINUS_2};
-use crate::platform::{Limb, SignedLimb};
-use alloc::vec::Vec;
-use core::borrow::Borrow;
+use crate::integer_polynomial::arithmetic::coefficient::SMALL_FMPZ_BITCOUNT_MAX;
+use crate::natural::TWICE_WIDTH;
 use core::cmp::min;
-use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-
-pub mod dot_general;
-pub mod max_bits;
-pub mod max_limbs;
-
-// The largest absolute value of a small FLINT `fmpz`, which is stored in a single word with two
-// bits to spare; larger values are stored as GMP integers. Some of FLINT's algorithms take a fast
-// path for small values that depends on the spare bits, so a faithful translation takes it for the
-// same values.
-pub(crate) const COEFF_MAX: Limb = LIMB_MAX_QUARTER;
-
-// The largest number of bits that FLINT stores in a small `fmpz`: `SMALL_FMPZ_BITCOUNT_MAX` from
-// `flint.h`, FLINT 3.6.0.
-pub(crate) const SMALL_FMPZ_BITCOUNT_MAX: u64 = WIDTH_MINUS_2;
-
-// The value of `x` as a signed word, if FLINT would store `x` as a small `fmpz`; that is, if
-// `COEFF_IS_MPZ` from `flint.h`, FLINT 3.6.0, would be false.
-pub(crate) fn small_value<C: PolynomialCoefficient>(x: &C) -> Option<SignedLimb> {
-    match *x.unsigned_abs_ref() {
-        Natural(Small(small)) if small <= COEFF_MAX => {
-            let value = SignedLimb::wrapping_from(small);
-            Some(if x.is_negative() { -value } else { value })
-        }
-        _ => None,
-    }
-}
-
-// The values of the elements of `xs`, each of which FLINT must store as a small `fmpz`, as signed
-// words or as a wider signed type.
-pub(crate) fn small_values<T: From<SignedLimb>, C: PolynomialCoefficient>(xs: &[C]) -> Vec<T> {
-    xs.iter()
-        .map(|x| T::from(small_value(x).unwrap()))
-        .collect()
-}
 
 // The kernels that multiply polynomials with small coefficients using word arithmetic.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -80,36 +41,6 @@ pub(crate) fn tiny_kernel(
         Some(TinyKernel::TwoWord)
     } else {
         None
-    }
-}
-
-// Sets each element of `out` to the sum of the elements of `xs` and `ys` at the same index.
-//
-// This is equivalent to `_fmpz_vec_add` from `fmpz_vec/add.c`, FLINT 3.6.0, with the output
-// separate from the inputs.
-pub(crate) fn vec_add<C: PolynomialCoefficient, T: Borrow<C>>(out: &mut [C], xs: &[T], ys: &[T]) {
-    for ((o, x), y) in out.iter_mut().zip(xs).zip(ys) {
-        *o = x.borrow().add_ref(y.borrow());
-    }
-}
-
-// Adds each element of `ys` to the element of `xs` at the same index.
-//
-// This is equivalent to `_fmpz_vec_add` from `fmpz_vec/add.c`, FLINT 3.6.0, with the output the
-// same as the first input.
-pub(crate) fn vec_add_assign<C: PolynomialCoefficient>(xs: &mut [C], ys: &[C]) {
-    for (x, y) in xs.iter_mut().zip(ys) {
-        *x += y;
-    }
-}
-
-// Subtracts each element of `ys` from the element of `xs` at the same index.
-//
-// This is equivalent to `_fmpz_vec_sub` from `fmpz_vec/sub.c`, FLINT 3.6.0, with the output the
-// same as the first input.
-pub(crate) fn vec_sub_assign<C: PolynomialCoefficient>(xs: &mut [C], ys: &[C]) {
-    for (x, y) in xs.iter_mut().zip(ys) {
-        *x -= y;
     }
 }
 

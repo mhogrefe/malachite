@@ -17,11 +17,11 @@ use crate::integer::random::{
     random_nonzero_integers,
 };
 use crate::integer_polynomial::IntegerPolynomial;
-use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_polynomial::random::{
     random_integer_polynomials, random_integer_polynomials_min_degree,
 };
 use crate::integer_vector::IntegerVector;
+use crate::integer_vector::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_vector::random::random_integer_vectors;
 use crate::natural::Natural;
 use crate::natural::arithmetic::binomial_coefficient::{

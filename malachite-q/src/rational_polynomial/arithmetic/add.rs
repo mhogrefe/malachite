@@ -15,9 +15,9 @@ use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::integer_polynomial::arithmetic::content_chained::integers_content_chained;
 use malachite_nz::integer_polynomial::arithmetic::scalar_add_mul::integers_add_mul_scalar_assign;
-use malachite_nz::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_assign;
+use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
+use malachite_nz::integer_vector::arithmetic::scalar_mul::integers_mul_scalar_assign;
 use malachite_nz::natural::Natural;
 
 // Adds $y/b$ to $x/a$, or subtracts it when `negate_y` is true, where both pairs are canonical,

@@ -12,8 +12,7 @@
 
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
-use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::vec::small_value;
+use crate::integer_polynomial::arithmetic::coefficient::{PolynomialCoefficient, small_value};
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};

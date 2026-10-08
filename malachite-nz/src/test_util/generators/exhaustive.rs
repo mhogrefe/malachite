@@ -18,11 +18,11 @@ use crate::integer::exhaustive::{
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer_polynomial::IntegerPolynomial;
-use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
 };
 use crate::integer_vector::IntegerVector;
+use crate::integer_vector::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_vector::exhaustive::{
     exhaustive_integer_vectors, exhaustive_integer_vectors_with_dimension,
 };

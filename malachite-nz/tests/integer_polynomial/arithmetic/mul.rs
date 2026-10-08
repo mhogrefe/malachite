@@ -29,7 +29,7 @@ use malachite_nz::test_util::generators::{
 };
 use malachite_nz::test_util::integer_polynomial::arithmetic::mul::generated_coefficients;
 use malachite_nz::test_util::integer_polynomial::arithmetic::mul::*;
-use malachite_nz::test_util::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar_naive;
+use malachite_nz::test_util::integer_vector::arithmetic::scalar_mul::integers_mul_scalar_naive;
 
 fn coefficients(p: &str) -> Vec<Integer> {
     IntegerPolynomial::from_str(p)

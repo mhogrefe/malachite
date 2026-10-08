@@ -7,13 +7,43 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use crate::natural_polynomial::arithmetic::content::{
-    content, divide_by_content, divided_by_content,
-};
 use crate::natural_vector::NaturalVector;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
+    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, GcdAssign, PrimitivePart,
+    PrimitivePartAssign,
 };
+use malachite_base::num::basic::traits::Zero;
+
+// The GCD of the elements. It stops as soon as it reaches 1, since nothing can lower it further.
+pub(crate) fn content(coefficients: &[Natural]) -> Natural {
+    let mut gcd = Natural::ZERO;
+    for c in coefficients {
+        gcd.gcd_assign(c);
+        if gcd == 1u32 {
+            break;
+        }
+    }
+    gcd
+}
+
+// Divides every element by the content, which divides each of them exactly.
+pub(crate) fn divide_by_content(coefficients: &mut [Natural], content: &Natural) {
+    if *content > 1u32 {
+        for c in coefficients {
+            c.div_exact_assign(content);
+        }
+    }
+}
+
+// The elements divided by the content, as new values.
+pub(crate) fn divided_by_content(coefficients: &[Natural], content: &Natural) -> Vec<Natural> {
+    if *content > 1u32 {
+        coefficients.iter().map(|c| c.div_exact(content)).collect()
+    } else {
+        coefficients.to_vec()
+    }
+}
 
 impl Content for NaturalVector {
     type Output = Natural;

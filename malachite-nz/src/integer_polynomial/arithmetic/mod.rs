@@ -48,8 +48,6 @@ pub mod compose_power_of_x;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which compute the GCD of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
-#[doc(hidden)]
-pub mod content_chained;
 /// Implementations of [`DeflatePowerOfX`](malachite_base::polynomial::DeflatePowerOfX) and
 /// [`DeflatePowerOfXAssign`](malachite_base::polynomial::DeflatePowerOfXAssign), for undoing the
 /// substitution of a power of the variable into a polynomial.
@@ -102,6 +100,10 @@ pub mod mod_power_of_2;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying two polynomials.
 pub mod mul;
+// Helpers for choosing a polynomial multiplication algorithm: the small-coefficient kernels and the
+// size thresholds of the classical, Karatsuba, Schönhage–Strassen, and FFT algorithms.
+#[doc(hidden)]
+pub mod mul_dispatch;
 #[doc(hidden)]
 pub mod mul_high;
 #[doc(hidden)]
@@ -131,8 +133,6 @@ pub mod pow;
 /// to a power and keeping only the low coefficients of the power.
 pub mod pow_truncated;
 pub mod scalar_add_mul;
-#[doc(hidden)]
-pub mod scalar_mul;
 /// Left-shifting an [`IntegerPolynomial`](super::IntegerPolynomial) (multiplying it by a power of
 /// 2), by shifting every coefficient.
 ///
@@ -215,5 +215,3 @@ pub mod sub;
 /// [`SubTruncatedAssign`](malachite_base::polynomial::SubTruncatedAssign), for subtracting one
 /// polynomial from another and keeping only their low coefficients.
 pub mod sub_truncated;
-#[doc(hidden)]
-pub mod vec;

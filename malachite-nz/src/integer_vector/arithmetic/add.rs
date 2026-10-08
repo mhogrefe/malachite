@@ -6,8 +6,30 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_vector::IntegerVector;
+use core::borrow::Borrow;
 use core::ops::{Add, AddAssign};
+
+// Sets each element of `out` to the sum of the elements of `xs` and `ys` at the same index.
+//
+// This is equivalent to `_fmpz_vec_add` from `fmpz_vec/add.c`, FLINT 3.6.0, with the output
+// separate from the inputs.
+pub(crate) fn vec_add<C: PolynomialCoefficient, T: Borrow<C>>(out: &mut [C], xs: &[T], ys: &[T]) {
+    for ((o, x), y) in out.iter_mut().zip(xs).zip(ys) {
+        *o = x.borrow().add_ref(y.borrow());
+    }
+}
+
+// Adds each element of `ys` to the element of `xs` at the same index.
+//
+// This is equivalent to `_fmpz_vec_add` from `fmpz_vec/add.c`, FLINT 3.6.0, with the output the
+// same as the first input.
+pub(crate) fn vec_add_assign<C: PolynomialCoefficient>(xs: &mut [C], ys: &[C]) {
+    for (x, y) in xs.iter_mut().zip(ys) {
+        *x += y;
+    }
+}
 
 fn assert_same_dimension(v: &IntegerVector, w: &IntegerVector) {
     assert_eq!(

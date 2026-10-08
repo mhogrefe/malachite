@@ -26,7 +26,7 @@ use malachite_nz::integer_polynomial::arithmetic::mul_middle::schonhage_strassen
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
-use malachite_nz::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+use malachite_nz::integer_vector::arithmetic::max_bits::vec_max_bits;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::normmod_2expp1::*;
 use malachite_nz::platform::Limb;

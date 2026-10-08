@@ -20,7 +20,7 @@ use crate::integer_polynomial::arithmetic::pow::binomial::pow_to_out_binomial;
 use crate::integer_polynomial::arithmetic::pow::multinomial::pow_to_out_multinomial;
 use crate::integer_polynomial::arithmetic::pow::small::pow_to_out_small;
 use crate::integer_polynomial::arithmetic::square::square_to_out;
-use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};

@@ -15,7 +15,7 @@ use crate::integer_polynomial::arithmetic::mul::kronecker::mul_to_out_kronecker;
 use crate::integer_polynomial::arithmetic::mul::schonhage_strassen::*;
 use crate::integer_polynomial::arithmetic::mul_high::classical::mul_high_to_out_classical;
 use crate::integer_polynomial::arithmetic::mul_high::karatsuba::mul_high_to_out_karatsuba_n;
-use crate::integer_polynomial::arithmetic::vec::max_limbs::vec_max_limbs;
+use crate::integer_vector::arithmetic::max_limbs::vec_max_limbs;
 use crate::platform::Limb;
 use core::cmp::max;
 use malachite_base::num::basic::integers::PrimitiveInt;

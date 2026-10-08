@@ -28,9 +28,19 @@ pub mod canonicalize_sign;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
+#[doc(hidden)]
+pub mod content_chained;
+#[doc(hidden)]
+pub mod dot_general;
+#[doc(hidden)]
+pub mod max_bits;
+#[doc(hidden)]
+pub mod max_limbs;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;
+#[doc(hidden)]
+pub mod scalar_mul;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting vectors.
 pub mod sub;
