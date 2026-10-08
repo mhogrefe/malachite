@@ -9095,3 +9095,19 @@ pub fn random_unsigned_vector_unsigned_pair_gen_var_2(
         &|seed| random_unsigned_inclusive_range(seed, 0, 19),
     ))
 }
+
+pub fn random_unsigned_vector_unsigned_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(UnsignedVector<u64>, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_unsigned_vectors(
+                seed,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &random_positive_unsigneds,
+    ))
+}

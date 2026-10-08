@@ -5218,3 +5218,12 @@ pub fn unsigned_vector_unsigned_pair_gen_var_2() -> Generator<(UnsignedVector<u6
         &special_random_unsigned_vector_unsigned_pair_gen_var_2,
     )
 }
+
+// All `(UnsignedVector<u64>, u64)` pairs, where the `u64` is positive.
+pub fn unsigned_vector_unsigned_pair_gen_var_3() -> Generator<(UnsignedVector<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_pair_gen_var_3,
+        &random_unsigned_vector_unsigned_pair_gen_var_3,
+        &special_random_unsigned_vector_unsigned_pair_gen_var_3,
+    )
+}

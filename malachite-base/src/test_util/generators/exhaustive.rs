@@ -6771,3 +6771,10 @@ pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_2() -> It<(UnsignedVecto
         primitive_int_increasing_inclusive_range(0, 19),
     ))
 }
+
+pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_3() -> It<(UnsignedVector<u64>, u64)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigned_vectors(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}

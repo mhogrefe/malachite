@@ -6,6 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
+/// checks whether every element of a vector is less than a given modulus.
+pub mod mod_is_reduced;
+/// Implementations of [`Mod`](crate::num::arithmetic::traits::Mod),
+/// [`ModAssign`](crate::num::arithmetic::traits::ModAssign), [`Rem`](core::ops::Rem), and
+/// [`RemAssign`](core::ops::RemAssign), traits for reducing every element of a vector modulo a
+/// number.
+pub mod mod_op;
 /// Implementations of [`ModPowerOf2`](crate::num::arithmetic::traits::ModPowerOf2) and
 /// [`ModPowerOf2Assign`](crate::num::arithmetic::traits::ModPowerOf2Assign), which reduce every
 /// element of a vector modulo a power of 2.

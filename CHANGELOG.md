@@ -33,6 +33,9 @@ documented by git history.
 - `ModPowerOf2` (by value and by reference), `ModPowerOf2Assign`, and `ModPowerOf2IsReduced` for
   `UnsignedVector<T>`, reducing every element modulo $2^k$ while keeping the dimension, and checking
   whether every element is less than $2^k$.
+- `Rem`, `RemAssign`, `Mod`, and `ModAssign` for `UnsignedVector<T>` with a `T` modulus, reducing
+  every element modulo $m$ and keeping the dimension; and `ModIsReduced<T>` for `UnsignedVector<T>`,
+  checking whether every element is less than $m$.
 
 ### malachite-nz
 
