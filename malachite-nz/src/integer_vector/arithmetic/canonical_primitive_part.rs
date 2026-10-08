@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer::Integer;
 use crate::integer_polynomial::arithmetic::content::{content, normalize_in_place, normalized};
 use crate::integer_vector::IntegerVector;
 use crate::natural::Natural;
@@ -14,12 +13,10 @@ use malachite_base::num::arithmetic::traits::{
     CanonicalPrimitivePart, CanonicalPrimitivePartAssign, ContentAndCanonicalPrimitivePart,
 };
 
-// Whether the canonical primitive part must be negated: when the first nonzero element is negative.
-fn negate(elements: &[Integer]) -> bool {
-    elements
-        .iter()
-        .find(|x| **x != 0u32)
-        .is_some_and(|x| !x.sign)
+// Whether the canonical primitive part must be negated: when the pivot, the first nonzero element,
+// is negative.
+fn negate(v: &IntegerVector) -> bool {
+    v.pivot().is_some_and(|x| !x.sign)
 }
 
 impl CanonicalPrimitivePart for IntegerVector {
@@ -100,7 +97,7 @@ impl CanonicalPrimitivePart for &IntegerVector {
     fn canonical_primitive_part(self) -> IntegerVector {
         let content = content(&self.elements);
         IntegerVector {
-            elements: normalized(&self.elements, &content, negate(&self.elements)),
+            elements: normalized(&self.elements, &content, negate(self)),
         }
     }
 }
@@ -131,7 +128,7 @@ impl CanonicalPrimitivePartAssign for IntegerVector {
     #[inline]
     fn canonical_primitive_part_assign(&mut self) {
         let content = content(&self.elements);
-        let negate = negate(&self.elements);
+        let negate = negate(self);
         normalize_in_place(&mut self.elements, &content, negate);
     }
 }
@@ -169,7 +166,7 @@ impl ContentAndCanonicalPrimitivePart for IntegerVector {
     #[inline]
     fn content_and_canonical_primitive_part(mut self) -> (Natural, Self) {
         let content = content(&self.elements);
-        let negate = negate(&self.elements);
+        let negate = negate(&self);
         normalize_in_place(&mut self.elements, &content, negate);
         (content, self)
     }
@@ -208,7 +205,7 @@ impl ContentAndCanonicalPrimitivePart for &IntegerVector {
     #[inline]
     fn content_and_canonical_primitive_part(self) -> (Natural, IntegerVector) {
         let content = content(&self.elements);
-        let elements = normalized(&self.elements, &content, negate(&self.elements));
+        let elements = normalized(&self.elements, &content, negate(self));
         (content, IntegerVector { elements })
     }
 }

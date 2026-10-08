@@ -455,6 +455,7 @@ pub mod rational_vector {
     pub mod exhaustive {
         pub mod exhaustive_rational_vectors;
     }
+    pub mod pivot;
     pub mod random {
         pub mod random_rational_vectors;
         pub mod random_rational_vectors_with_dimension;

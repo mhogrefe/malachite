@@ -376,6 +376,7 @@ pub mod integer_vector {
     pub mod exhaustive {
         pub mod exhaustive_integer_vectors;
     }
+    pub mod pivot;
     pub mod random {
         pub mod random_integer_vectors;
         pub mod random_integer_vectors_with_dimension;
@@ -875,6 +876,7 @@ pub mod natural_vector {
     pub mod exhaustive {
         pub mod exhaustive_natural_vectors;
     }
+    pub mod pivot;
     pub mod random {
         pub mod random_natural_vectors;
         pub mod random_natural_vectors_with_dimension;

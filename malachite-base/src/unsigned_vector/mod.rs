@@ -25,6 +25,9 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`UnsignedVector`]s without repetition.
 pub mod exhaustive;
+/// Functions for finding the pivot of an [`UnsignedVector`], its first nonzero element, and its
+/// index.
+pub mod pivot;
 #[cfg(feature = "random")]
 /// Iterators that generate [`UnsignedVector`]s randomly.
 pub mod random;

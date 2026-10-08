@@ -11,7 +11,9 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     dimension::register(runner);
     index::register(runner);
+    pivot::register(runner);
 }
 
 mod dimension;
 mod index;
+mod pivot;

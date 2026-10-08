@@ -999,6 +999,7 @@ pub mod unsigned_vector {
     pub mod exhaustive {
         pub mod exhaustive_unsigned_vectors;
     }
+    pub mod pivot;
     pub mod random {
         pub mod random_unsigned_vectors;
         pub mod random_unsigned_vectors_with_dimension;

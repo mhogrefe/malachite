@@ -24,6 +24,9 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`IntegerVector`]s without repetition.
 pub mod exhaustive;
+/// Functions for finding the pivot of an [`IntegerVector`], its first nonzero element, and its
+/// index.
+pub mod pivot;
 /// Iterators that generate [`IntegerVector`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
