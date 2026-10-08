@@ -3817,6 +3817,15 @@ pub fn natural_vector_unsigned_pair_gen_var_2() -> Generator<(NaturalVector, u64
     )
 }
 
+// The `Natural` is positive.
+pub fn natural_vector_natural_pair_gen_var_1() -> Generator<(NaturalVector, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_pair_gen_var_1,
+        &random_natural_vector_natural_pair_gen_var_1,
+        &special_random_natural_vector_natural_pair_gen_var_1,
+    )
+}
+
 pub fn natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
 -> Generator<(NaturalVector, UnsignedVector<T>)> {
     Generator::new(

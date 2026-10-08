@@ -832,6 +832,8 @@ pub mod natural_polynomial {
 pub mod natural_vector {
     pub mod access;
     pub mod arithmetic {
+        pub mod mod_is_reduced;
+        pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_is_reduced;
     }

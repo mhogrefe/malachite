@@ -51,6 +51,10 @@ documented by git history.
   every element modulo $2^k$. Unlike for `NaturalPolynomial`, elements that reduce to zero are
   kept, so the dimension is unchanged.
 - `ModPowerOf2IsReduced` for `NaturalVector`, checking whether every element is less than $2^k$.
+- `Rem`, `RemAssign`, `Mod`, and `ModAssign` for `NaturalVector` with a `Natural` modulus, in
+  every combination of value and reference, reducing every element modulo $m$ and keeping the
+  dimension; and `ModIsReduced<Natural>` for `NaturalVector`, checking whether every element is less
+  than $m$.
 
 ### malachite-q
 
