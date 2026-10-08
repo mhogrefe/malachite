@@ -352,6 +352,7 @@ pub mod integer_vector {
         pub mod from_elements;
         pub mod from_natural_vector;
         pub mod from_unsigned_vector;
+        pub mod natural_vector_from_integer_vector;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
@@ -361,6 +362,7 @@ pub mod integer_vector {
             pub mod typst;
         }
         pub mod to_elements;
+        pub mod unsigned_vector_from_integer_vector;
     }
     pub mod dimension;
     pub mod exhaustive {

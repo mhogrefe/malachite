@@ -41,6 +41,10 @@ documented by git history.
 - `TryFrom<NaturalVector>` and `TryFrom<&NaturalVector>` for `UnsignedVector<T>`, failing with
   `UnsignedVectorFromNaturalVectorError` when an element is too large for `T`, and the matching
   `ConvertibleFrom<&NaturalVector>`.
+- `TryFrom<IntegerVector>` and `TryFrom<&IntegerVector>` for `NaturalVector`, failing with
+  `NaturalVectorFromIntegerVectorError` when an element is negative, and for `UnsignedVector<T>`,
+  failing with `UnsignedVectorFromIntegerVectorError` when an element is negative or too large for
+  `T`, each with the matching `ConvertibleFrom<&IntegerVector>`.
 
 ### malachite-q
 

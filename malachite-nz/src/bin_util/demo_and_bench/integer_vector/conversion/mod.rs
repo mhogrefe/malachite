@@ -12,14 +12,18 @@ pub(crate) fn register(runner: &mut Runner) {
     from_elements::register(runner);
     from_natural_vector::register(runner);
     from_unsigned_vector::register(runner);
+    natural_vector_from_integer_vector::register(runner);
     serde::register(runner);
     string::register(runner);
     to_elements::register(runner);
+    unsigned_vector_from_integer_vector::register(runner);
 }
 
 mod from_elements;
 mod from_natural_vector;
 mod from_unsigned_vector;
+mod natural_vector_from_integer_vector;
 mod serde;
 mod string;
 mod to_elements;
+mod unsigned_vector_from_integer_vector;
