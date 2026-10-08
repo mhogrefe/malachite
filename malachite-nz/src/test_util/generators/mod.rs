@@ -3808,6 +3808,15 @@ pub fn natural_vector_unsigned_pair_gen_var_1() -> Generator<(NaturalVector, usi
     )
 }
 
+// All `(NaturalVector, u64)` pairs, where the `u64` is a small power.
+pub fn natural_vector_unsigned_pair_gen_var_2() -> Generator<(NaturalVector, u64)> {
+    Generator::new(
+        &exhaustive_natural_vector_unsigned_pair_gen_var_2,
+        &random_natural_vector_unsigned_pair_gen_var_2,
+        &special_random_natural_vector_unsigned_pair_gen_var_2,
+    )
+}
+
 pub fn natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
 -> Generator<(NaturalVector, UnsignedVector<T>)> {
     Generator::new(

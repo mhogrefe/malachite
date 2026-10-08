@@ -47,6 +47,10 @@ documented by git history.
   `T`, each with the matching `ConvertibleFrom<&IntegerVector>`.
 - `PartialEq` in both directions between `UnsignedVector<T>` and `NaturalVector`, between
   `UnsignedVector<T>` and `IntegerVector`, and between `NaturalVector` and `IntegerVector`.
+- `ModPowerOf2` (by value and by reference) and `ModPowerOf2Assign` for `NaturalVector`, reducing
+  every element modulo $2^k$. Unlike for `NaturalPolynomial`, elements that reduce to zero are
+  kept, so the dimension is unchanged.
+- `ModPowerOf2IsReduced` for `NaturalVector`, checking whether every element is less than $2^k$.
 
 ### malachite-q
 

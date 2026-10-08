@@ -6581,6 +6581,24 @@ pub fn random_natural_vector_unsigned_pair_gen_var_1(
     )
 }
 
+pub fn random_natural_vector_unsigned_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalVector, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_vectors(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
+}
+
 pub fn random_natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(NaturalVector, UnsignedVector<T>)> {

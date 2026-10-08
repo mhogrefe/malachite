@@ -3443,6 +3443,13 @@ pub fn exhaustive_natural_vector_unsigned_pair_gen_var_1() -> It<(NaturalVector,
     )
 }
 
+pub fn exhaustive_natural_vector_unsigned_pair_gen_var_2() -> It<(NaturalVector, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_vectors(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
 -> It<(NaturalVector, UnsignedVector<T>)> {
     Box::new(exhaustive_pairs(

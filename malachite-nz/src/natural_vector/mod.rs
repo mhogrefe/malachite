@@ -15,6 +15,8 @@ use malachite_base::num::conversion::traits::ExactFrom;
 /// Implementations of [`Index`](core::ops::Index) and [`IndexMut`](core::ops::IndexMut) for
 /// [`NaturalVector`].
 pub mod access;
+/// Traits for arithmetic on [`NaturalVector`]s.
+pub mod arithmetic;
 /// Implementations of [`Ord`] and [`PartialOrd`] for [`ShortlexNaturalVector`] and
 /// [`ShortlexNaturalVectorRef`], comparing two vectors by dimension and then lexicographically.
 pub mod comparison;
