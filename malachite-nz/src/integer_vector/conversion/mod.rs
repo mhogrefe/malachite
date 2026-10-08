@@ -9,6 +9,14 @@
 /// Functions for converting a [`Vec`](alloc::vec::Vec) or slice of
 /// [`Integer`](crate::integer::Integer)s to an [`IntegerVector`](super::IntegerVector).
 pub mod from_elements;
+/// Implementations of traits for converting a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector) to an
+/// [`IntegerVector`](super::IntegerVector).
+pub mod from_natural_vector;
+/// Implementations of traits for converting an
+/// [`UnsignedVector`](malachite_base::unsigned_vector::UnsignedVector) to an
+/// [`IntegerVector`](super::IntegerVector).
+pub mod from_unsigned_vector;
 /// Functions for converting an [`IntegerVector`](super::IntegerVector) to and from a [`String`].
 pub mod string;
 /// Functions for converting an [`IntegerVector`](super::IntegerVector) to a

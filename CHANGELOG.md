@@ -6,6 +6,46 @@ Unreleased section as work lands; at release time the section is stamped with th
 date. The 0.10.0 section was reconstructed retroactively; releases before 0.10.0 are only
 documented by git history.
 
+## Unreleased
+
+### Breaking and behavioral changes
+
+- `exhaustive_vecs_with_last` is renamed to `exhaustive_vecs_with_last_with_index_generator`, and
+  takes a third argument: the iterator of indices that decides which length comes next, such as a
+  `bit_distributor_sequence`.
+  How fast the lengths grow used to be fixed inside the function; it is now chosen by the caller,
+  independently of the special treatment of the last element. Its `_min_length`, `_length_range`,
+  `_length_inclusive_range`, `_fixed_length`, and `_from_length_iterator` variants are unchanged.
+
+### malachite-base
+
+- `exhaustive_vecs_with_index_generator`, which generates all [`Vec`]s of elements from one
+  iterator, with the lengths stepped by a caller-supplied iterator of indices, the counterpart of
+  `exhaustive_vecs_with_last_with_index_generator` without a special last element.
+- `UnsignedVector<T>`, a vector whose elements are primitive unsigned integers. Its `elements`
+  field is public, since every [`Vec`] is a valid vector. It has `dimension`, `Index` and
+  `IndexMut`, `from_elements`, `from_owned_elements`, `to_elements`, `into_elements`, and
+  `elements_ref`, conversions to and from strings (`(1, 2, 3)`, with `()` for the 0-dimensional
+  vector), LaTeX and Typst, and serde. It does not implement `Ord`; the `ShortlexUnsignedVector`
+  and `ShortlexUnsignedVectorRef` wrappers order vectors by dimension and then lexicographically.
+  Generators: `exhaustive_unsigned_vectors`, `random_unsigned_vectors`, and
+  `striped_random_unsigned_vectors`, each with a `_with_dimension` variant.
+
+### malachite-nz
+
+- `NaturalVector` and `IntegerVector`, with the same API as `UnsignedVector<T>`: public
+  `elements`, access, element conversions, strings, LaTeX, Typst, serde, `Shortlex*` wrappers, and
+  exhaustive, random, and striped random generators.
+- `From<UnsignedVector<T>>` for `NaturalVector` and `IntegerVector`, and `From<NaturalVector>` for
+  `IntegerVector`.
+
+### malachite-q
+
+- `RationalVector`, with the same API as `NaturalVector`. Its elements are held entrywise, each a
+  `Rational` in lowest terms, as in FLINT's `fmpq_vec`, rather than over a common denominator.
+  `to_numerators_and_denominator` gives the common-denominator form, with the least common
+  multiple of the denominators, and `from_numerators_and_denominator` converts back.
+
 ## 0.13.0 — 2026-10-06
 
 ### Breaking and behavioral changes

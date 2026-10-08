@@ -350,6 +350,8 @@ pub mod integer_vector {
     }
     pub mod conversion {
         pub mod from_elements;
+        pub mod from_natural_vector;
+        pub mod from_unsigned_vector;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
