@@ -54,6 +54,12 @@ documented by git history.
   multiple of the denominators, and `from_numerators_and_denominator` converts back.
 - `From<UnsignedVector<T>>`, `From<NaturalVector>`, and `From<IntegerVector>` for
   `RationalVector`.
+- `TryFrom<RationalVector>` and `TryFrom<&RationalVector>` for `IntegerVector`, failing with
+  `IntegerVectorFromRationalVectorError` when an element is not an integer; for `NaturalVector`,
+  failing with `NaturalVectorFromRationalVectorError` when an element is negative or not an
+  integer; and for `UnsignedVector<T>`, failing with `UnsignedVectorFromRationalVectorError` when an
+  element is negative, not an integer, or too large for `T`. Each comes with the matching
+  `ConvertibleFrom<&RationalVector>`.
 
 ## 0.13.0 — 2026-10-06
 

@@ -14,10 +14,13 @@ pub(crate) fn register(runner: &mut Runner) {
     from_natural_vector::register(runner);
     from_numerators_and_denominator::register(runner);
     from_unsigned_vector::register(runner);
+    integer_vector_from_rational_vector::register(runner);
+    natural_vector_from_rational_vector::register(runner);
     serde::register(runner);
     string::register(runner);
     to_elements::register(runner);
     to_numerators_and_denominator::register(runner);
+    unsigned_vector_from_rational_vector::register(runner);
 }
 
 mod from_elements;
@@ -25,7 +28,10 @@ mod from_integer_vector;
 mod from_natural_vector;
 mod from_numerators_and_denominator;
 mod from_unsigned_vector;
+mod integer_vector_from_rational_vector;
+mod natural_vector_from_rational_vector;
 mod serde;
 mod string;
 mod to_elements;
 mod to_numerators_and_denominator;
+mod unsigned_vector_from_rational_vector;

@@ -427,6 +427,8 @@ pub mod rational_vector {
         pub mod from_natural_vector;
         pub mod from_numerators_and_denominator;
         pub mod from_unsigned_vector;
+        pub mod integer_vector_from_rational_vector;
+        pub mod natural_vector_from_rational_vector;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
@@ -437,6 +439,7 @@ pub mod rational_vector {
         }
         pub mod to_elements;
         pub mod to_numerators_and_denominator;
+        pub mod unsigned_vector_from_rational_vector;
     }
     pub mod dimension;
     pub mod exhaustive {
