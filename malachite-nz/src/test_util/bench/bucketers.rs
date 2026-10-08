@@ -9,6 +9,7 @@
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_vector::IntegerVector;
 use crate::natural::Natural;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural_polynomial::NaturalPolynomial;
@@ -61,6 +62,20 @@ pub fn pair_1_natural_polynomial_bit_bucketer<T>(
 }
 
 pub fn pair_1_natural_vector_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (NaturalVector, T)> {
+    Bucketer {
+        bucketing_function: &|(v, _)| {
+            usize::exact_from(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn pair_1_integer_vector_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (IntegerVector, T)> {
     Bucketer {
         bucketing_function: &|(v, _)| {
             usize::exact_from(
@@ -150,10 +165,47 @@ pub fn natural_vector_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalVector
     }
 }
 
+pub fn integer_vector_bit_bucketer(var_name: &str) -> Bucketer<'_, IntegerVector> {
+    Bucketer {
+        bucketing_function: &|v| {
+            usize::exact_from(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
 pub fn pair_natural_vector_max_bit_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,
 ) -> Bucketer<'a, (NaturalVector, NaturalVector)> {
+    Bucketer {
+        bucketing_function: &|(v, w)| {
+            usize::exact_from(max(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+                w.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}'s total element bits, {y_name}'s total element bits)"
+        ),
+    }
+}
+
+pub fn pair_integer_vector_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (IntegerVector, IntegerVector)> {
     Bucketer {
         bucketing_function: &|(v, w)| {
             usize::exact_from(max(

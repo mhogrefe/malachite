@@ -96,10 +96,10 @@ impl_named!(NaturalVector);
 /// to last. Its equality agrees with [`NaturalVector`] equality.
 ///
 /// Unlike lexicographic order on [`Vec`]s, this order puts every vector of a smaller dimension
-/// before every vector of a larger one, so that $(5) < (0, 0)$. It is not a well-order, since the
-/// vectors of any positive dimension, like the [`Natural`]s, have no largest element and so there
-/// are infinitely many vectors below $(0, 0)$; but every vector has only finitely many vectors of
-/// its own dimension below it.
+/// before every vector of a larger one, so that $(5) < (0, 0)$. It is a well-order: any nonempty
+/// set of vectors has a least element, the lexicographically least of those of the smallest
+/// dimension present, which exists because lexicographic order on the vectors of a fixed dimension
+/// is a well-order.
 ///
 /// `ShortlexNaturalVector` owns its value. This is useful in many cases, for example if you want to
 /// use [`NaturalVector`]s as keys in a [`BTreeMap`](alloc::collections::BTreeMap). In other

@@ -22,6 +22,8 @@ use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
 };
+use crate::integer_vector::IntegerVector;
+use crate::integer_vector::exhaustive::exhaustive_integer_vectors;
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place};
 use crate::natural::arithmetic::binomial_coefficient::{
@@ -3380,6 +3382,29 @@ pub fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_5()
         )
         .map(|((xs, ys), n)| (xs, ys, n)),
     )
+}
+
+// -- IntegerVector --
+
+pub fn exhaustive_integer_vector_gen() -> It<IntegerVector> {
+    Box::new(exhaustive_integer_vectors())
+}
+
+pub fn exhaustive_integer_vector_pair_gen() -> It<(IntegerVector, IntegerVector)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_integer_vectors()))
+}
+
+// Each vector paired with each of its indices. A vector has finitely many, so this reaches every
+// pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_integer_vector_unsigned_pair_gen_var_1() -> It<(IntegerVector, usize)> {
+    Box::new(
+        exhaustive_integer_vectors()
+            .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
+    )
+}
+
+pub fn exhaustive_integer_vector_triple_gen() -> It<(IntegerVector, IntegerVector, IntegerVector)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_integer_vectors()))
 }
 
 // -- NaturalVector --

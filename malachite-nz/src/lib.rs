@@ -234,6 +234,9 @@ pub mod integer;
 /// [`IntegerPolynomial`](integer_polynomial::IntegerPolynomial), a type representing polynomials in
 /// one variable whose coefficients are [`Integer`](integer::Integer)s.
 pub mod integer_polynomial;
+/// [`IntegerVector`](integer_vector::IntegerVector), a type representing vectors whose elements are
+/// [`Integer`](integer::Integer)s.
+pub mod integer_vector;
 /// [`NaturalPolynomial`](natural_polynomial::NaturalPolynomial), a type representing polynomials in
 /// one variable whose coefficients are [`Natural`](natural::Natural)s.
 pub mod natural_polynomial;

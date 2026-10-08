@@ -11,6 +11,7 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::vec::max_bits::vec_max_bits;
 use crate::integer_polynomial::arithmetic::vec::{TinyKernel, tiny_kernel};
+use crate::integer_vector::IntegerVector;
 use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
@@ -3724,6 +3725,41 @@ pub fn integer_vec_integer_vec_unsigned_triple_gen_var_5()
         &exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_5,
         &random_integer_vec_integer_vec_unsigned_triple_gen_var_5,
         &special_random_integer_vec_integer_vec_unsigned_triple_gen_var_5,
+    )
+}
+
+// -- IntegerVector --
+
+pub fn integer_vector_gen() -> Generator<IntegerVector> {
+    Generator::new(
+        &exhaustive_integer_vector_gen,
+        &random_integer_vector_gen,
+        &special_random_integer_vector_gen,
+    )
+}
+
+pub fn integer_vector_pair_gen() -> Generator<(IntegerVector, IntegerVector)> {
+    Generator::new(
+        &exhaustive_integer_vector_pair_gen,
+        &random_integer_vector_pair_gen,
+        &special_random_integer_vector_pair_gen,
+    )
+}
+
+// All indices in [0, dimension).
+pub fn integer_vector_unsigned_pair_gen_var_1() -> Generator<(IntegerVector, usize)> {
+    Generator::new(
+        &exhaustive_integer_vector_unsigned_pair_gen_var_1,
+        &random_integer_vector_unsigned_pair_gen_var_1,
+        &special_random_integer_vector_unsigned_pair_gen_var_1,
+    )
+}
+
+pub fn integer_vector_triple_gen() -> Generator<(IntegerVector, IntegerVector, IntegerVector)> {
+    Generator::new(
+        &exhaustive_integer_vector_triple_gen,
+        &random_integer_vector_triple_gen,
+        &special_random_integer_vector_triple_gen,
     )
 }
 

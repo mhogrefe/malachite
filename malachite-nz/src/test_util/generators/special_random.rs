@@ -22,6 +22,8 @@ use crate::integer_polynomial::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_polynomial::random::{
     striped_random_integer_polynomials, striped_random_integer_polynomials_min_degree,
 };
+use crate::integer_vector::IntegerVector;
+use crate::integer_vector::random::striped_random_integer_vectors;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -7321,6 +7323,57 @@ pub fn special_random_integer_vec_integer_vec_unsigned_triple_gen_var_5(
         )
         .map(|((xs, ys), n)| (xs, ys, n)),
     )
+}
+
+// -- IntegerVector --
+
+pub fn special_random_integer_vector_gen(config: &GenConfig) -> It<IntegerVector> {
+    Box::new(striped_random_integer_vectors(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn special_random_integer_vector_pair_gen(
+    config: &GenConfig,
+) -> It<(IntegerVector, IntegerVector)> {
+    Box::new(random_pairs_from_single(striped_random_integer_vectors(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
+pub fn special_random_integer_vector_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerVector, usize)> {
+    Box::new(
+        special_random_integer_vector_gen(config)
+            .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
+    )
+}
+
+pub fn special_random_integer_vector_triple_gen(
+    config: &GenConfig,
+) -> It<(IntegerVector, IntegerVector, IntegerVector)> {
+    Box::new(random_triples_from_single(striped_random_integer_vectors(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
 }
 
 // -- NaturalVector --

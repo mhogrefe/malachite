@@ -339,6 +339,38 @@ pub mod integer {
         pub mod uniform_random_integer_range;
     }
 }
+pub mod integer_vector {
+    pub mod access;
+    pub mod basic {
+        pub mod named;
+        pub mod size;
+    }
+    pub mod comparison {
+        pub mod shortlex_cmp;
+    }
+    pub mod conversion {
+        pub mod from_elements;
+        #[cfg(feature = "serde")]
+        pub mod serde;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+        pub mod to_elements;
+    }
+    pub mod dimension;
+    pub mod exhaustive {
+        pub mod exhaustive_integer_vectors;
+    }
+    pub mod random {
+        pub mod random_integer_vectors;
+        pub mod random_integer_vectors_with_dimension;
+        pub mod striped_random_integer_vectors;
+        pub mod striped_random_integer_vectors_with_dimension;
+    }
+}
 pub mod natural {
     pub mod arithmetic {
         pub mod abs_diff;
