@@ -846,6 +846,7 @@ pub mod natural_vector {
             pub mod typst;
         }
         pub mod to_elements;
+        pub mod unsigned_vector_from_natural_vector;
     }
     pub mod dimension;
     pub mod exhaustive {

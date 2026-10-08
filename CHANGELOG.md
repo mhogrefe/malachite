@@ -38,6 +38,9 @@ documented by git history.
   exhaustive, random, and striped random generators.
 - `From<UnsignedVector<T>>` for `NaturalVector` and `IntegerVector`, and `From<NaturalVector>` for
   `IntegerVector`.
+- `TryFrom<NaturalVector>` and `TryFrom<&NaturalVector>` for `UnsignedVector<T>`, failing with
+  `UnsignedVectorFromNaturalVectorError` when an element is too large for `T`, and the matching
+  `ConvertibleFrom<&NaturalVector>`.
 
 ### malachite-q
 

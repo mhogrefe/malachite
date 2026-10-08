@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     serde::register(runner);
     string::register(runner);
     to_elements::register(runner);
+    unsigned_vector_from_natural_vector::register(runner);
 }
 
 mod from_elements;
@@ -21,3 +22,4 @@ mod from_unsigned_vector;
 mod serde;
 mod string;
 mod to_elements;
+mod unsigned_vector_from_natural_vector;
