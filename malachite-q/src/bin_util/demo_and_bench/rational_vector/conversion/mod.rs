@@ -10,7 +10,10 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     from_elements::register(runner);
+    from_integer_vector::register(runner);
+    from_natural_vector::register(runner);
     from_numerators_and_denominator::register(runner);
+    from_unsigned_vector::register(runner);
     serde::register(runner);
     string::register(runner);
     to_elements::register(runner);
@@ -18,7 +21,10 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod from_elements;
+mod from_integer_vector;
+mod from_natural_vector;
 mod from_numerators_and_denominator;
+mod from_unsigned_vector;
 mod serde;
 mod string;
 mod to_elements;

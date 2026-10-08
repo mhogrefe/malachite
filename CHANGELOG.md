@@ -45,6 +45,8 @@ documented by git history.
   `Rational` in lowest terms, as in FLINT's `fmpq_vec`, rather than over a common denominator.
   `to_numerators_and_denominator` gives the common-denominator form, with the least common
   multiple of the denominators, and `from_numerators_and_denominator` converts back.
+- `From<UnsignedVector<T>>`, `From<NaturalVector>`, and `From<IntegerVector>` for
+  `RationalVector`.
 
 ## 0.13.0 — 2026-10-06
 

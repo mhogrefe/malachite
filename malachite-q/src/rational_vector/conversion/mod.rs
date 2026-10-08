@@ -9,9 +9,21 @@
 /// Functions for converting a [`Vec`](alloc::vec::Vec) or slice of [`Rational`](crate::Rational)s
 /// to a [`RationalVector`](super::RationalVector).
 pub mod from_elements;
+/// Implementations of traits for converting an
+/// [`IntegerVector`](malachite_nz::integer_vector::IntegerVector) to a
+/// [`RationalVector`](super::RationalVector).
+pub mod from_integer_vector;
+/// Implementations of traits for converting a
+/// [`NaturalVector`](malachite_nz::natural_vector::NaturalVector) to a
+/// [`RationalVector`](super::RationalVector).
+pub mod from_natural_vector;
 /// A function for building a [`RationalVector`](super::RationalVector) from a vector of numerators
 /// and a single denominator.
 pub mod from_numerators_and_denominator;
+/// Implementations of traits for converting an
+/// [`UnsignedVector`](malachite_base::unsigned_vector::UnsignedVector) to a
+/// [`RationalVector`](super::RationalVector).
+pub mod from_unsigned_vector;
 /// Functions for converting a [`RationalVector`](super::RationalVector) to and from a [`String`].
 pub mod string;
 /// Functions for converting a [`RationalVector`](super::RationalVector) to a
