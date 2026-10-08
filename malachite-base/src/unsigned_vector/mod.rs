@@ -16,6 +16,8 @@ use core::ops::Deref;
 /// Implementations of [`Index`](core::ops::Index) and [`IndexMut`](core::ops::IndexMut) for
 /// [`UnsignedVector`].
 pub mod access;
+/// Traits for arithmetic on [`UnsignedVector`]s.
+pub mod arithmetic;
 /// Implementations of [`Ord`] and [`PartialOrd`] for [`ShortlexUnsignedVector`] and
 /// [`ShortlexUnsignedVectorRef`], comparing two vectors by dimension and then lexicographically.
 pub mod comparison;

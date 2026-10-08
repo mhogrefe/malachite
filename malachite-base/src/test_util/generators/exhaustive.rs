@@ -6764,3 +6764,10 @@ pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_1() -> It<(UnsignedVecto
             .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
     )
 }
+
+pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_2() -> It<(UnsignedVector<u64>, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_unsigned_vectors(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}

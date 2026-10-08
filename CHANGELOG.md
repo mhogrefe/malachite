@@ -30,6 +30,9 @@ documented by git history.
   and `ShortlexUnsignedVectorRef` wrappers order vectors by dimension and then lexicographically.
   Generators: `exhaustive_unsigned_vectors`, `random_unsigned_vectors`, and
   `striped_random_unsigned_vectors`, each with a `_with_dimension` variant.
+- `ModPowerOf2` (by value and by reference), `ModPowerOf2Assign`, and `ModPowerOf2IsReduced` for
+  `UnsignedVector<T>`, reducing every element modulo $2^k$ while keeping the dimension, and checking
+  whether every element is less than $2^k$.
 
 ### malachite-nz
 

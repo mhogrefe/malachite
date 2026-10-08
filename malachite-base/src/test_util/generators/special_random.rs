@@ -10714,3 +10714,21 @@ pub fn special_random_unsigned_vector_unsigned_pair_gen_var_1(
             .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
     )
 }
+
+pub fn special_random_unsigned_vector_unsigned_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(UnsignedVector<u64>, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigned_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
+}
