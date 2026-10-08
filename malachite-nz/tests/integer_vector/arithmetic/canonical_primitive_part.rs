@@ -11,7 +11,6 @@ use malachite_base::num::arithmetic::traits::{
     CanonicalPrimitivePart, CanonicalPrimitivePartAssign, Content,
     ContentAndCanonicalPrimitivePart, PrimitivePart,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_vector_gen;
@@ -73,8 +72,7 @@ fn canonical_primitive_part_properties() {
         // It is the primitive part, or its negation, chosen so that the first nonzero element is
         // positive.
         let primitive_part = (&v).primitive_part();
-        let negated_pp: Vec<Integer> = primitive_part.elements.iter().map(|x| -x).collect();
-        assert!(cpp == primitive_part || cpp.elements == negated_pp);
+        assert!(cpp == primitive_part || cpp == -&primitive_part);
         if let Some(first) = cpp.elements.iter().find(|x| **x != 0u32) {
             assert!(*first > 0u32);
         }
@@ -84,9 +82,7 @@ fn canonical_primitive_part_properties() {
         assert_eq!((&cpp).canonical_primitive_part(), cpp);
         assert_eq!(cpp.dimension(), v.dimension());
         // A vector and its negation have the same canonical primitive part.
-        let negated = IntegerVector {
-            elements: v.elements.iter().map(|x| -x).collect(),
-        };
+        let negated = -&v;
         assert_eq!((&negated).canonical_primitive_part(), cpp);
     });
 }

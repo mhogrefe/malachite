@@ -157,8 +157,7 @@ impl PrimitivePart for IntegerPolynomial {
     ///
     /// This is the polynomial divided by its content, with every coefficient keeping its sign, so
     /// the primitive part of $-p$ is the negation of the primitive part of $p$. For the one with a
-    /// non-negative leading coefficient, see
-    /// [`canonical_primitive_part`](
+    /// non-negative leading coefficient, see [`canonical_primitive_part`](
     /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
     ///
     /// $$
@@ -204,8 +203,7 @@ impl PrimitivePart for &IntegerPolynomial {
     ///
     /// This is the polynomial divided by its content, with every coefficient keeping its sign, so
     /// the primitive part of $-p$ is the negation of the primitive part of $p$. For the one with a
-    /// non-negative leading coefficient, see
-    /// [`canonical_primitive_part`](
+    /// non-negative leading coefficient, see [`canonical_primitive_part`](
     /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
     ///
     /// $$

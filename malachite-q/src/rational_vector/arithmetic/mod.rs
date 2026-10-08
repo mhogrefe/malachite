@@ -17,3 +17,6 @@ pub mod canonical_primitive_part;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which split a vector into a rational scalar and a vector of coprime integers.
 pub mod content;
+/// Implementations of [`Neg`](core::ops::Neg) and
+/// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
+pub mod neg;

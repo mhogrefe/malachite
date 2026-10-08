@@ -104,8 +104,7 @@ impl PrimitivePart for RationalPolynomial {
     /// Computes the primitive part of a [`RationalPolynomial`], taking the polynomial by value.
     ///
     /// This is the polynomial divided by its content, with every coefficient keeping its sign; for
-    /// the one with a non-negative leading coefficient, see
-    /// [`canonical_primitive_part`](
+    /// the one with a non-negative leading coefficient, see [`canonical_primitive_part`](
     /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
     /// It always has integer coefficients, so it is an [`IntegerPolynomial`]; for $p = A/d$ it is
     /// the primitive part of $A$, and the denominator plays no part.
@@ -147,8 +146,7 @@ impl PrimitivePart for &RationalPolynomial {
     /// Computes the primitive part of a [`RationalPolynomial`], taking the polynomial by reference.
     ///
     /// This is the polynomial divided by its content, with every coefficient keeping its sign; for
-    /// the one with a non-negative leading coefficient, see
-    /// [`canonical_primitive_part`](
+    /// the one with a non-negative leading coefficient, see [`canonical_primitive_part`](
     /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
     /// It always has integer coefficients, so it is an [`IntegerPolynomial`]; for $p = A/d$ it is
     /// the primitive part of $A$, and the denominator plays no part.

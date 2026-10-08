@@ -94,9 +94,7 @@ fn content_and_primitive_part_properties() {
         }
         assert_eq!((&primitive_part).primitive_part(), primitive_part);
         // Negating the vector negates its primitive part and leaves its content alone.
-        let negated = IntegerVector {
-            elements: v.elements.iter().map(|x| -x).collect(),
-        };
+        let negated = -&v;
         assert_eq!((&negated).content(), content);
         assert_eq!(
             (&negated).primitive_part().elements,

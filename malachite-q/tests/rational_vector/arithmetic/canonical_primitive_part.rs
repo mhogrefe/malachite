@@ -10,7 +10,6 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{
     CanonicalPrimitivePart, Content, ContentAndCanonicalPrimitivePart, PrimitivePart,
 };
-use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_vector_gen;
 use malachite_q::Rational;
 use malachite_q::rational_vector::RationalVector;
@@ -57,17 +56,14 @@ fn canonical_primitive_part_properties() {
         // It is the primitive part, or its negation, chosen so that the first nonzero element is
         // positive: the canonical primitive part of the cleared numerators.
         let primitive_part = (&v).primitive_part();
-        let negated_pp: Vec<Integer> = primitive_part.elements.iter().map(|x| -x).collect();
-        assert!(cpp == primitive_part || cpp.elements == negated_pp);
+        assert!(cpp == primitive_part || cpp == -&primitive_part);
         if let Some(first) = cpp.elements.iter().find(|x| **x != 0u32) {
             assert!(*first > 0u32);
         }
         let numerators = v.to_numerators_and_denominator().0;
         assert_eq!(numerators.canonical_primitive_part(), cpp);
         // A vector and its negation have the same canonical primitive part.
-        let negated = RationalVector {
-            elements: v.elements.iter().map(|x| -x).collect(),
-        };
+        let negated = -&v;
         assert_eq!((&negated).canonical_primitive_part(), cpp);
     });
 

@@ -77,9 +77,7 @@ fn content_and_primitive_part_properties() {
         let numerators = v.to_numerators_and_denominator().0;
         assert_eq!((&numerators).primitive_part(), primitive_part);
         // Negating the vector negates its primitive part.
-        let negated = RationalVector {
-            elements: v.elements.iter().map(|x| -x).collect(),
-        };
+        let negated = -&v;
         assert_eq!(
             (&negated).primitive_part().elements,
             primitive_part

@@ -84,6 +84,7 @@ documented by git history.
 - `Content`, `PrimitivePart`, `PrimitivePartAssign`, `ContentAndPrimitivePart`, and their canonical
   counterparts for `NaturalVector` and `IntegerVector`; the canonical ones for `NaturalPolynomial`,
   `IntegerPolynomial`, and `GaussianInteger`; and `PrimitivePartAssign` for `GaussianInteger`.
+- `Neg` (by value and by reference) and `NegAssign` for `IntegerVector`.
 
 ### malachite-q
 
@@ -105,6 +106,7 @@ documented by git history.
   `ContentAndCanonicalPrimitivePart` for `RationalVector`, whose content is the GCD of the
   numerators over the common denominator and whose primitive part is an `IntegerVector`; and the
   canonical ones for `RationalPolynomial` and `GaussianRational`.
+- `Neg` (by value and by reference) and `NegAssign` for `RationalVector`.
 
 ## 0.13.0 — 2026-10-06
 

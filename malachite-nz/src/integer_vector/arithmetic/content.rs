@@ -109,8 +109,7 @@ impl PrimitivePart for IntegerVector {
     ///
     /// This is the vector divided by its content, with every element keeping its sign, so the
     /// primitive part of $-v$ is the negation of the primitive part of $v$. For the one whose first
-    /// nonzero element is positive, see
-    /// [`canonical_primitive_part`](
+    /// nonzero element is positive, see [`canonical_primitive_part`](
     /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
     ///
     /// $$
@@ -157,8 +156,7 @@ impl PrimitivePart for &IntegerVector {
     ///
     /// This is the vector divided by its content, with every element keeping its sign, so the
     /// primitive part of $-v$ is the negation of the primitive part of $v$. For the one whose first
-    /// nonzero element is positive, see
-    /// [`canonical_primitive_part`](
+    /// nonzero element is positive, see [`canonical_primitive_part`](
     /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart::canonical_primitive_part).
     ///
     /// $$

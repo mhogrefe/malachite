@@ -20,3 +20,6 @@ pub mod canonical_primitive_part;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
+/// Implementations of [`Neg`](core::ops::Neg) and
+/// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
+pub mod neg;

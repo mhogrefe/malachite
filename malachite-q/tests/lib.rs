@@ -419,6 +419,7 @@ pub mod rational_vector {
     pub mod arithmetic {
         pub mod canonical_primitive_part;
         pub mod content;
+        pub mod neg;
     }
     pub mod basic {
         pub mod named;
