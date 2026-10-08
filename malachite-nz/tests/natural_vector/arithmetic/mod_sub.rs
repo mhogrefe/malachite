@@ -168,8 +168,7 @@ fn mod_sub_properties() {
         x.mod_sub_assign(w.clone(), m.clone());
         assert_eq!(x, r);
 
-        // The result is reduced, has the same dimension, and is the elementwise modular
-        // difference.
+        // The result is reduced, has the same dimension, and is the elementwise modular difference.
         assert!(r.mod_is_reduced(&m));
         assert_eq!(r.dimension(), v.dimension());
         for ((x, y), z) in v.elements.iter().zip(&w.elements).zip(&r.elements) {

@@ -21,7 +21,8 @@ use malachite_nz::natural::random::{RandomNaturals, StripedRandomNaturals};
 
 /// Generates random [`RationalVector`]s from an iterator of [`Vec`]s of [`Rational`]s.
 ///
-/// This `struct` is created by [`random_rational_vectors`],
+/// This `struct` is created by [`random_rational_vectors_from_iterator`],
+/// [`random_rational_vectors_with_dimension_from_iterator`], [`random_rational_vectors`],
 /// [`random_rational_vectors_with_dimension`], [`striped_random_rational_vectors`], and
 /// [`striped_random_rational_vectors_with_dimension`]; see their documentation for more.
 #[derive(Clone, Debug)]
@@ -47,6 +48,128 @@ pub type StripedRandomVectorElements = RandomRationalsFromDoubleAndSign<
     StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
     StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
 >;
+
+/// Generates random [`RationalVector`]s whose elements come from an iterator.
+///
+/// `xs_gen` is given a seed derived from `seed` and produces the iterator of elements; each vector
+/// takes its elements, in order, from that iterator. This allows any distribution of elements, for
+/// example one with a bounded number of bits. The dimensions are sampled from a geometric
+/// distribution with mean `mean_length_numerator / mean_length_denominator`, so the 0-dimensional
+/// vector is generated with the probability that that distribution gives to 0.
+///
+/// The iterator produced by `xs_gen` must be infinite, and so is the output.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterator produced by `xs_gen`, and $n$ is
+/// the dimension of the $i$th output.
+///
+/// # Panics
+/// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or if, after being
+/// reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// The elements here are [`Rational`]s in $[-1, 1)$.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_range;
+/// use malachite_q::rational_vector::random::random_rational_vectors_from_iterator;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_rational_vectors_from_iterator(
+///             EXAMPLE_SEED,
+///             &|seed| random_rational_range(
+///                 seed,
+///                 Rational::from(-1),
+///                 Rational::from(1),
+///                 3,
+///                 1,
+///                 3,
+///                 1
+///             ),
+///             2,
+///             1
+///         ),
+///         5
+///     ),
+///     "[(1/3, -3/4, 0, -1/6, 1/10, 6/7), (0), (-5/9, 1/3, 5/6, 1/8, 1/2, 1/2, -1/3, -1), \
+///     (-4/5), (0, -2/7, -1/10, -1, 1/2, 0, -1, 0, -1/3, 1/3, 0, 1/2, 0, -1/5), ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_rational_vectors_from_iterator<I: Iterator<Item = Rational>>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomRationalVectors<RandomVecs<Rational, GeometricRandomNaturalValues<u64>, I>> {
+    RandomRationalVectors(random_vecs(
+        seed,
+        xs_gen,
+        mean_length_numerator,
+        mean_length_denominator,
+    ))
+}
+
+/// Generates random [`RationalVector`]s of a given dimension whose elements come from an iterator.
+///
+/// Each vector takes its `dimension` elements, in order, from `xs`. This allows any distribution of
+/// elements, for example one with a bounded number of bits. If `dimension` is 0, the output
+/// consists of the 0-dimensional vector, repeated.
+///
+/// `xs` must be infinite, and so is the output.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $n$ is `dimension`.
+///
+/// # Examples
+/// The elements here are [`Rational`]s in $[-1, 1)$.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_range;
+/// use malachite_q::rational_vector::random::random_rational_vectors_with_dimension_from_iterator;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_rational_vectors_with_dimension_from_iterator(
+///             3,
+///             random_rational_range(
+///                 EXAMPLE_SEED,
+///                 Rational::from(-1),
+///                 Rational::from(1),
+///                 3,
+///                 1,
+///                 3,
+///                 1
+///             )
+///         ),
+///         5
+///     ),
+///     "[(1/2, 0, 0), (-1/2, 4/11, -1), (-1, -1, -1/2), (1/8, -9/11, -5/9), (1/2, 1/8, -2/5), \
+///     ...]"
+/// );
+/// ```
+#[inline]
+pub const fn random_rational_vectors_with_dimension_from_iterator<I: Iterator<Item = Rational>>(
+    dimension: u64,
+    xs: I,
+) -> RandomRationalVectors<RandomFixedLengthVecsFromSingle<I>> {
+    RandomRationalVectors(random_vecs_fixed_length_from_single(dimension, xs))
+}
 
 /// Generates random [`RationalVector`]s.
 ///
@@ -93,12 +216,12 @@ pub fn random_rational_vectors(
 ) -> RandomRationalVectors<
     RandomVecs<Rational, GeometricRandomNaturalValues<u64>, RandomVectorElements>,
 > {
-    RandomRationalVectors(random_vecs(
+    random_rational_vectors_from_iterator(
         seed,
         &|seed_2| random_rationals(seed_2, mean_bits_numerator, mean_bits_denominator),
         mean_length_numerator,
         mean_length_denominator,
-    ))
+    )
 }
 
 /// Generates random [`RationalVector`]s of a given dimension.
@@ -141,10 +264,10 @@ pub fn random_rational_vectors_with_dimension(
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
 ) -> RandomRationalVectors<RandomFixedLengthVecsFromSingle<RandomVectorElements>> {
-    RandomRationalVectors(random_vecs_fixed_length_from_single(
+    random_rational_vectors_with_dimension_from_iterator(
         dimension,
         random_rationals(seed, mean_bits_numerator, mean_bits_denominator),
-    ))
+    )
 }
 
 /// Generates random [`RationalVector`]s with striped elements.
@@ -203,7 +326,7 @@ pub fn striped_random_rational_vectors(
 ) -> RandomRationalVectors<
     RandomVecs<Rational, GeometricRandomNaturalValues<u64>, StripedRandomVectorElements>,
 > {
-    RandomRationalVectors(random_vecs(
+    random_rational_vectors_from_iterator(
         seed,
         &|seed_2| {
             striped_random_rationals(
@@ -216,7 +339,7 @@ pub fn striped_random_rational_vectors(
         },
         mean_length_numerator,
         mean_length_denominator,
-    ))
+    )
 }
 
 /// Generates random [`RationalVector`]s of a given dimension, with striped elements.
@@ -264,7 +387,7 @@ pub fn striped_random_rational_vectors_with_dimension(
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
 ) -> RandomRationalVectors<RandomFixedLengthVecsFromSingle<StripedRandomVectorElements>> {
-    RandomRationalVectors(random_vecs_fixed_length_from_single(
+    random_rational_vectors_with_dimension_from_iterator(
         dimension,
         striped_random_rationals(
             seed,
@@ -273,5 +396,5 @@ pub fn striped_random_rational_vectors_with_dimension(
             mean_bits_numerator,
             mean_bits_denominator,
         ),
-    ))
+    )
 }

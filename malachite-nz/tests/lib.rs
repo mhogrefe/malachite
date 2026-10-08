@@ -384,7 +384,9 @@ pub mod integer_vector {
     pub mod pivot;
     pub mod random {
         pub mod random_integer_vectors;
+        pub mod random_integer_vectors_from_iterator;
         pub mod random_integer_vectors_with_dimension;
+        pub mod random_integer_vectors_with_dimension_from_iterator;
         pub mod striped_random_integer_vectors;
         pub mod striped_random_integer_vectors_with_dimension;
     }
@@ -890,7 +892,9 @@ pub mod natural_vector {
     pub mod pivot;
     pub mod random {
         pub mod random_natural_vectors;
+        pub mod random_natural_vectors_from_iterator;
         pub mod random_natural_vectors_with_dimension;
+        pub mod random_natural_vectors_with_dimension_from_iterator;
         pub mod striped_random_natural_vectors;
         pub mod striped_random_natural_vectors_with_dimension;
     }

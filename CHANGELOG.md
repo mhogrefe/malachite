@@ -51,6 +51,10 @@ documented by git history.
   and `ShortlexUnsignedVectorRef` wrappers order vectors by dimension and then lexicographically.
   Generators: `exhaustive_unsigned_vectors`, `random_unsigned_vectors`, and
   `striped_random_unsigned_vectors`, each with a `_with_dimension` variant.
+- `random_unsigned_vectors_from_iterator` and
+  `random_unsigned_vectors_with_dimension_from_iterator`, which take the elements of
+  `UnsignedVector<T>`s from any iterator, for example one with bounded elements. The other
+  `UnsignedVector<T>` generators are built on them.
 - `ModPowerOf2` (by value and by reference), `ModPowerOf2Assign`, and `ModPowerOf2IsReduced` for
   `UnsignedVector<T>`, reducing every element modulo $2^k$ while keeping the dimension, and checking
   whether every element is less than $2^k$.
@@ -91,6 +95,10 @@ documented by git history.
 - `NaturalVector` and `IntegerVector`, with the same API as `UnsignedVector<T>`: public
   `elements`, the `Vector` trait, `Index`, strings, LaTeX, Typst, serde, `Shortlex*` wrappers, and
   exhaustive, random, and striped random generators.
+- `random_natural_vectors_from_iterator`, `random_integer_vectors_from_iterator`, and their
+  `_with_dimension_from_iterator` variants, which take the elements from any iterator, for example
+  one with bounded elements. The other `NaturalVector` and `IntegerVector` generators are built on
+  them.
 - `From<UnsignedVector<T>>` for `NaturalVector` and `IntegerVector`, and `From<NaturalVector>` for
   `IntegerVector`.
 - `TryFrom<NaturalVector>` and `TryFrom<&NaturalVector>` for `UnsignedVector<T>`, failing with
@@ -137,6 +145,10 @@ documented by git history.
   `Rational` in lowest terms, as in FLINT's `fmpq_vec`, rather than over a common denominator.
   `to_numerators_and_denominator` gives the common-denominator form, with the least common
   multiple of the denominators, and `from_numerators_and_denominator` converts back.
+- `random_rational_vectors_from_iterator` and
+  `random_rational_vectors_with_dimension_from_iterator`, which take the elements of
+  `RationalVector`s from any iterator, for example one with bounded elements. The other
+  `RationalVector` generators are built on them.
 - `From<UnsignedVector<T>>`, `From<NaturalVector>`, and `From<IntegerVector>` for
   `RationalVector`.
 - `TryFrom<RationalVector>` and `TryFrom<&RationalVector>` for `IntegerVector`, failing with

@@ -19,7 +19,8 @@ use alloc::vec::Vec;
 
 /// Generates random [`UnsignedVector`]s from an iterator of [`Vec`]s.
 ///
-/// This `struct` is created by [`random_unsigned_vectors`],
+/// This `struct` is created by [`random_unsigned_vectors_from_iterator`],
+/// [`random_unsigned_vectors_with_dimension_from_iterator`], [`random_unsigned_vectors`],
 /// [`random_unsigned_vectors_with_dimension`], [`striped_random_unsigned_vectors`], and
 /// [`striped_random_unsigned_vectors_with_dimension`]; see their documentation for more.
 #[derive(Clone, Debug)]
@@ -32,6 +33,112 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = Vec<T>>> Iterator for RandomUnsign
     fn next(&mut self) -> Option<UnsignedVector<T>> {
         self.0.next().map(|elements| UnsignedVector { elements })
     }
+}
+
+/// Generates random [`UnsignedVector`]s whose elements come from an iterator.
+///
+/// `xs_gen` is given a seed derived from `seed` and produces the iterator of elements; each vector
+/// takes its elements, in order, from that iterator. This allows any distribution of elements, for
+/// example one with a bounded number of bits. The dimensions are sampled from a geometric
+/// distribution with mean `mean_length_numerator / mean_length_denominator`, so the 0-dimensional
+/// vector is generated with the probability that that distribution gives to 0.
+///
+/// The iterator produced by `xs_gen` must be infinite, and so is the output.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterator produced by `xs_gen`, and $n$ is
+/// the dimension of the $i$th output.
+///
+/// # Panics
+/// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or if, after being
+/// reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// The elements here are [`u8`]s from 0 to 15.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::unsigned_vector::random::random_unsigned_vectors_from_iterator;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_unsigned_vectors_from_iterator(
+///             EXAMPLE_SEED,
+///             &|seed| random_unsigned_inclusive_range::<u8>(seed, 0, 15),
+///             2,
+///             1
+///         ),
+///         5
+///     ),
+///     "[(5, 5, 11, 0, 8, 8), (8), (12, 11, 14, 6, 8, 11, 12, 15), (13), (6, 2, 11, 14, 9, 13, \
+///     1, 11, 2, 10, 0, 2, 6, 10), ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_unsigned_vectors_from_iterator<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomUnsignedVectors<RandomVecs<T, GeometricRandomNaturalValues<u64>, I>> {
+    RandomUnsignedVectors(random_vecs(
+        seed,
+        xs_gen,
+        mean_length_numerator,
+        mean_length_denominator,
+    ))
+}
+
+/// Generates random [`UnsignedVector`]s of a given dimension whose elements come from an iterator.
+///
+/// Each vector takes its `dimension` elements, in order, from `xs`. This allows any distribution of
+/// elements, for example one with a bounded number of bits. If `dimension` is 0, the output
+/// consists of the 0-dimensional vector, repeated.
+///
+/// `xs` must be infinite, and so is the output.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $n$ is `dimension`.
+///
+/// # Examples
+/// The elements here are [`u8`]s from 0 to 15.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::unsigned_vector::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_unsigned_vectors_with_dimension_from_iterator(
+///             3,
+///             random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 0, 15)
+///         ),
+///         5
+///     ),
+///     "[(1, 7, 15), (14, 5, 4), (12, 6, 4), (14, 2, 13), (8, 10, 1), ...]"
+/// );
+/// ```
+#[inline]
+pub const fn random_unsigned_vectors_with_dimension_from_iterator<
+    T: PrimitiveUnsigned,
+    I: Iterator<Item = T>,
+>(
+    dimension: u64,
+    xs: I,
+) -> RandomUnsignedVectors<RandomFixedLengthVecsFromSingle<I>> {
+    RandomUnsignedVectors(random_vecs_fixed_length_from_single(dimension, xs))
 }
 
 /// Generates random [`UnsignedVector`]s.
@@ -74,12 +181,12 @@ pub fn random_unsigned_vectors<T: PrimitiveUnsigned>(
     mean_length_denominator: u64,
 ) -> RandomUnsignedVectors<RandomVecs<T, GeometricRandomNaturalValues<u64>, RandomPrimitiveInts<T>>>
 {
-    RandomUnsignedVectors(random_vecs(
+    random_unsigned_vectors_from_iterator(
         seed,
         &random_primitive_ints,
         mean_length_numerator,
         mean_length_denominator,
-    ))
+    )
 }
 
 /// Generates random [`UnsignedVector`]s of a given dimension.
@@ -118,10 +225,7 @@ pub fn random_unsigned_vectors_with_dimension<T: PrimitiveUnsigned>(
     seed: Seed,
     dimension: u64,
 ) -> RandomUnsignedVectors<RandomFixedLengthVecsFromSingle<RandomPrimitiveInts<T>>> {
-    RandomUnsignedVectors(random_vecs_fixed_length_from_single(
-        dimension,
-        random_primitive_ints(seed),
-    ))
+    random_unsigned_vectors_with_dimension_from_iterator(dimension, random_primitive_ints(seed))
 }
 
 /// Generates random [`UnsignedVector`]s with striped elements.
@@ -175,12 +279,12 @@ pub fn striped_random_unsigned_vectors<T: PrimitiveUnsigned>(
 ) -> RandomUnsignedVectors<
     RandomVecs<T, GeometricRandomNaturalValues<u64>, StripedRandomUnsignedBitChunks<T>>,
 > {
-    RandomUnsignedVectors(random_vecs(
+    random_unsigned_vectors_from_iterator(
         seed,
         &|seed_2| striped_random_unsigneds(seed_2, mean_stripe_numerator, mean_stripe_denominator),
         mean_length_numerator,
         mean_length_denominator,
-    ))
+    )
 }
 
 /// Generates random [`UnsignedVector`]s of a given dimension, with striped elements.
@@ -224,8 +328,8 @@ pub fn striped_random_unsigned_vectors_with_dimension<T: PrimitiveUnsigned>(
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
 ) -> RandomUnsignedVectors<RandomFixedLengthVecsFromSingle<StripedRandomUnsignedBitChunks<T>>> {
-    RandomUnsignedVectors(random_vecs_fixed_length_from_single(
+    random_unsigned_vectors_with_dimension_from_iterator(
         dimension,
         striped_random_unsigneds(seed, mean_stripe_numerator, mean_stripe_denominator),
-    ))
+    )
 }
