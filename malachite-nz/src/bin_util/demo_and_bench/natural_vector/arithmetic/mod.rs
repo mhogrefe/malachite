@@ -15,6 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_op::register(runner);
     mod_power_of_2::register(runner);
     mod_power_of_2_is_reduced::register(runner);
+    mod_power_of_2_neg::register(runner);
 }
 
 mod canonical_primitive_part;
@@ -23,3 +24,4 @@ mod mod_is_reduced;
 mod mod_op;
 mod mod_power_of_2;
 mod mod_power_of_2_is_reduced;
+mod mod_power_of_2_neg;

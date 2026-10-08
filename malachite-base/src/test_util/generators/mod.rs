@@ -5227,3 +5227,14 @@ pub fn unsigned_vector_unsigned_pair_gen_var_3() -> Generator<(UnsignedVector<u6
         &special_random_unsigned_vector_unsigned_pair_gen_var_3,
     )
 }
+
+// All `(UnsignedVector<T>, u64)` where the `u64` is no greater than `T::WIDTH`, and the vector's
+// elements are less than 2 to the power of the `u64`.
+pub fn unsigned_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_pair_gen_var_4,
+        &random_unsigned_vector_unsigned_pair_gen_var_4,
+        &special_random_unsigned_vector_unsigned_pair_gen_var_4,
+    )
+}

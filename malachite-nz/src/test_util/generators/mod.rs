@@ -3826,6 +3826,16 @@ pub fn natural_vector_natural_pair_gen_var_1() -> Generator<(NaturalVector, Natu
     )
 }
 
+// All `(NaturalVector, u64)` where every element of the vector is less than 2 to the power of the
+// `u64`.
+pub fn natural_vector_unsigned_pair_gen_var_3() -> Generator<(NaturalVector, u64)> {
+    Generator::new(
+        &exhaustive_natural_vector_unsigned_pair_gen_var_3,
+        &random_natural_vector_unsigned_pair_gen_var_3,
+        &special_random_natural_vector_unsigned_pair_gen_var_3,
+    )
+}
+
 pub fn natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
 -> Generator<(NaturalVector, UnsignedVector<T>)> {
     Generator::new(

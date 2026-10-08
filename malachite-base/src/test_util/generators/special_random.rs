@@ -10756,3 +10756,24 @@ pub fn special_random_unsigned_vector_unsigned_pair_gen_var_3(
         },
     ))
 }
+
+pub fn special_random_unsigned_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vectors(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(v, pow)| (v.mod_power_of_2(pow), pow)),
+    )
+}

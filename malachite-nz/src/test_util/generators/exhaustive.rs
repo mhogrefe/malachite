@@ -3457,6 +3457,22 @@ pub fn exhaustive_natural_vector_natural_pair_gen_var_1() -> It<(NaturalVector, 
     ))
 }
 
+pub fn exhaustive_natural_vector_unsigned_pair_gen_var_3() -> It<(NaturalVector, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(exhaustive_natural_vectors(), exhaustive_unsigneds::<u64>()).map(
+            |(v, pow)| {
+                let bits = v
+                    .elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (v, pow + bits)
+            },
+        ),
+    )
+}
+
 pub fn exhaustive_natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
 -> It<(NaturalVector, UnsignedVector<T>)> {
     Box::new(exhaustive_pairs(
