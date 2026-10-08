@@ -19,7 +19,9 @@ use crate::rational::exhaustive::{
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::exhaustive::exhaustive_rational_polynomials;
 use crate::rational_vector::RationalVector;
-use crate::rational_vector::exhaustive::exhaustive_rational_vectors;
+use crate::rational_vector::exhaustive::{
+    exhaustive_rational_vectors, exhaustive_rational_vectors_with_dimension,
+};
 use crate::test_util::extra_variadic::{
     exhaustive_ordered_unique_triples, exhaustive_quadruples_from_single,
     exhaustive_quadruples_xxyz, exhaustive_quadruples_xyyy, exhaustive_triples_from_single,
@@ -48,6 +50,7 @@ use malachite_base::polynomial::ComposePowerOfX;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};
+use malachite_base::test_util::generators::exhaustive::exhaustive_tuples_by_dimension;
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
 };
@@ -1018,6 +1021,23 @@ pub fn exhaustive_rational_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>
 pub fn exhaustive_rational_vector_triple_gen()
 -> It<(RationalVector, RationalVector, RationalVector)> {
     Box::new(exhaustive_triples_from_single(exhaustive_rational_vectors()))
+}
+
+pub fn exhaustive_rational_vector_pair_gen_var_1() -> It<(RationalVector, RationalVector)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_rational_vectors_with_dimension(dimension),
+        ))
+    })
+}
+
+pub fn exhaustive_rational_vector_triple_gen_var_1()
+-> It<(RationalVector, RationalVector, RationalVector)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_triples_from_single(
+            exhaustive_rational_vectors_with_dimension(dimension),
+        ))
+    })
 }
 
 // -- Vec<Rational> --

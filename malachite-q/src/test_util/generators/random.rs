@@ -2309,6 +2309,66 @@ pub fn random_rational_vector_triple_gen(
     )))
 }
 
+pub fn random_rational_vector_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalVector, RationalVector)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|ps| {
+            let (xs, ys) = ps.into_iter().unzip();
+            (
+                RationalVector { elements: xs },
+                RationalVector { elements: ys },
+            )
+        }),
+    )
+}
+
+pub fn random_rational_vector_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalVector, RationalVector, RationalVector)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_triples_from_single(random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|ts| {
+            let mut xs = Vec::with_capacity(ts.len());
+            let mut ys = Vec::with_capacity(ts.len());
+            let mut zs = Vec::with_capacity(ts.len());
+            for (x, y, z) in ts {
+                xs.push(x);
+                ys.push(y);
+                zs.push(z);
+            }
+            (
+                RationalVector { elements: xs },
+                RationalVector { elements: ys },
+                RationalVector { elements: zs },
+            )
+        }),
+    )
+}
+
 // -- Vec<Rational> --
 
 pub fn random_rational_vec_gen(config: &GenConfig) -> It<Vec<Rational>> {

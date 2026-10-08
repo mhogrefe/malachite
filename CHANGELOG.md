@@ -110,6 +110,8 @@ documented by git history.
   counterparts for `NaturalVector` and `IntegerVector`; the canonical ones for `NaturalPolynomial`,
   `IntegerPolynomial`, and `GaussianInteger`; and `PrimitivePartAssign` for `GaussianInteger`.
 - `Neg` (by value and by reference) and `NegAssign` for `IntegerVector`.
+- `Add` and `AddAssign` for `NaturalVector` and `IntegerVector`, in every combination of value and
+  reference. The vectors must have the same dimension.
 
 ### malachite-q
 
@@ -132,6 +134,8 @@ documented by git history.
   numerators over the common denominator and whose primitive part is an `IntegerVector`; and the
   canonical ones for `RationalPolynomial` and `GaussianRational`.
 - `Neg` (by value and by reference) and `NegAssign` for `RationalVector`.
+- `Add` and `AddAssign` for `RationalVector`, in every combination of value and reference. The
+  vectors must have the same dimension.
 
 ## 0.13.0 — 2026-10-06
 

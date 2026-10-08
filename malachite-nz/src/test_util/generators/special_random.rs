@@ -7436,6 +7436,70 @@ pub fn special_random_integer_vector_triple_gen(
     )))
 }
 
+pub fn special_random_integer_vector_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerVector, IntegerVector)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|ps| {
+            let (xs, ys) = ps.into_iter().unzip();
+            (
+                IntegerVector { elements: xs },
+                IntegerVector { elements: ys },
+            )
+        }),
+    )
+}
+
+pub fn special_random_integer_vector_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerVector, IntegerVector, IntegerVector)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_triples_from_single(striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|ts| {
+            let mut xs = Vec::with_capacity(ts.len());
+            let mut ys = Vec::with_capacity(ts.len());
+            let mut zs = Vec::with_capacity(ts.len());
+            for (x, y, z) in ts {
+                xs.push(x);
+                ys.push(y);
+                zs.push(z);
+            }
+            (
+                IntegerVector { elements: xs },
+                IntegerVector { elements: ys },
+                IntegerVector { elements: zs },
+            )
+        }),
+    )
+}
+
 // -- NaturalVector --
 
 pub fn special_random_natural_vector_gen(config: &GenConfig) -> It<NaturalVector> {
@@ -7632,6 +7696,70 @@ pub fn special_random_natural_vector_triple_gen(
         config.get_or("mean_length_n", 4),
         config.get_or("mean_length_d", 1),
     )))
+}
+
+pub fn special_random_natural_vector_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|ps| {
+            let (xs, ys) = ps.into_iter().unzip();
+            (
+                NaturalVector { elements: xs },
+                NaturalVector { elements: ys },
+            )
+        }),
+    )
+}
+
+pub fn special_random_natural_vector_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, NaturalVector)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_triples_from_single(striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|ts| {
+            let mut xs = Vec::with_capacity(ts.len());
+            let mut ys = Vec::with_capacity(ts.len());
+            let mut zs = Vec::with_capacity(ts.len());
+            for (x, y, z) in ts {
+                xs.push(x);
+                ys.push(y);
+                zs.push(z);
+            }
+            (
+                NaturalVector { elements: xs },
+                NaturalVector { elements: ys },
+                NaturalVector { elements: zs },
+            )
+        }),
+    )
 }
 
 // -- Vec<Natural> --

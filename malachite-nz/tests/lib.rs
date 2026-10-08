@@ -345,6 +345,7 @@ pub mod integer {
 pub mod integer_vector {
     pub mod access;
     pub mod arithmetic {
+        pub mod add;
         pub mod canonical_primitive_part;
         pub mod canonicalize_sign;
         pub mod content;
@@ -845,6 +846,7 @@ pub mod natural_polynomial {
 pub mod natural_vector {
     pub mod access;
     pub mod arithmetic {
+        pub mod add;
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod mod_is_reduced;

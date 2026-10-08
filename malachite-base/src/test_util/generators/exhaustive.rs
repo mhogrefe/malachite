@@ -6800,3 +6800,37 @@ pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
         .filter(|(v, m)| v.mod_is_reduced(m)),
     )
 }
+
+// -- tuples of vectors of a common dimension --
+
+struct TuplesByDimensionGenerator<T> {
+    tuples_with_dimension: fn(u64) -> It<T>,
+}
+
+impl<T> ExhaustiveDependentPairsYsGenerator<u64, T, It<T>> for TuplesByDimensionGenerator<T> {
+    #[inline]
+    fn get_ys(&self, &dimension: &u64) -> It<T> {
+        (self.tuples_with_dimension)(dimension)
+    }
+}
+
+// Every tuple that `tuples_with_dimension` gives for some dimension, each exactly once. The
+// dimensions are selected the way the exhaustive vector generators select them, by a
+// bit-distributor sequence, so that dimension d is first reached after O(d^3) outputs.
+pub fn exhaustive_tuples_by_dimension<T: 'static>(
+    tuples_with_dimension: fn(u64) -> It<T>,
+) -> It<T> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(2),
+            ),
+            exhaustive_unsigneds::<u64>(),
+            TuplesByDimensionGenerator {
+                tuples_with_dimension,
+            },
+        )
+        .map(|(_, t)| t),
+    )
+}

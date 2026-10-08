@@ -23,7 +23,9 @@ use crate::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
 };
 use crate::integer_vector::IntegerVector;
-use crate::integer_vector::exhaustive::exhaustive_integer_vectors;
+use crate::integer_vector::exhaustive::{
+    exhaustive_integer_vectors, exhaustive_integer_vectors_with_dimension,
+};
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place};
 use crate::natural::arithmetic::binomial_coefficient::{
@@ -83,7 +85,9 @@ use crate::natural_polynomial::exhaustive::{
     exhaustive_natural_polynomials, exhaustive_natural_polynomials_min_degree,
 };
 use crate::natural_vector::NaturalVector;
-use crate::natural_vector::exhaustive::exhaustive_natural_vectors;
+use crate::natural_vector::exhaustive::{
+    exhaustive_natural_vectors, exhaustive_natural_vectors_with_dimension,
+};
 use crate::platform::{
     DoubleLimb, Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
@@ -152,8 +156,8 @@ use malachite_base::test_util::generators::common::{
 use malachite_base::test_util::generators::exhaustive::{
     UnsignedVecPairLenGenerator1, UnsignedVecPairLenGenerator2, UnsignedVecQuadrupleLenGenerator1,
     UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
-    exhaustive_unsigned_pair_gen_var_20, exhaustive_unsigned_pair_gen_var_24,
-    exhaustive_unsigned_vec_unsigned_pair_gen_var_17,
+    exhaustive_tuples_by_dimension, exhaustive_unsigned_pair_gen_var_20,
+    exhaustive_unsigned_pair_gen_var_24, exhaustive_unsigned_vec_unsigned_pair_gen_var_17,
 };
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
@@ -3424,6 +3428,23 @@ pub fn exhaustive_integer_vector_triple_gen() -> It<(IntegerVector, IntegerVecto
     Box::new(exhaustive_triples_from_single(exhaustive_integer_vectors()))
 }
 
+pub fn exhaustive_integer_vector_pair_gen_var_1() -> It<(IntegerVector, IntegerVector)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_integer_vectors_with_dimension(dimension),
+        ))
+    })
+}
+
+pub fn exhaustive_integer_vector_triple_gen_var_1()
+-> It<(IntegerVector, IntegerVector, IntegerVector)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_triples_from_single(
+            exhaustive_integer_vectors_with_dimension(dimension),
+        ))
+    })
+}
+
 // -- NaturalVector --
 
 pub fn exhaustive_natural_vector_gen() -> It<NaturalVector> {
@@ -3492,6 +3513,23 @@ pub fn exhaustive_natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>(
 
 pub fn exhaustive_natural_vector_triple_gen() -> It<(NaturalVector, NaturalVector, NaturalVector)> {
     Box::new(exhaustive_triples_from_single(exhaustive_natural_vectors()))
+}
+
+pub fn exhaustive_natural_vector_pair_gen_var_1() -> It<(NaturalVector, NaturalVector)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_natural_vectors_with_dimension(dimension),
+        ))
+    })
+}
+
+pub fn exhaustive_natural_vector_triple_gen_var_1()
+-> It<(NaturalVector, NaturalVector, NaturalVector)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_triples_from_single(
+            exhaustive_natural_vectors_with_dimension(dimension),
+        ))
+    })
 }
 
 // -- Vec<Natural> --

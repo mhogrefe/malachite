@@ -3781,6 +3781,25 @@ pub fn integer_vector_triple_gen() -> Generator<(IntegerVector, IntegerVector, I
     )
 }
 
+// All pairs of `IntegerVector`s of the same dimension.
+pub fn integer_vector_pair_gen_var_1() -> Generator<(IntegerVector, IntegerVector)> {
+    Generator::new(
+        &exhaustive_integer_vector_pair_gen_var_1,
+        &random_integer_vector_pair_gen_var_1,
+        &special_random_integer_vector_pair_gen_var_1,
+    )
+}
+
+// All triples of `IntegerVector`s of the same dimension.
+pub fn integer_vector_triple_gen_var_1() -> Generator<(IntegerVector, IntegerVector, IntegerVector)>
+{
+    Generator::new(
+        &exhaustive_integer_vector_triple_gen_var_1,
+        &random_integer_vector_triple_gen_var_1,
+        &special_random_integer_vector_triple_gen_var_1,
+    )
+}
+
 // -- NaturalVector --
 
 pub fn natural_vector_gen() -> Generator<NaturalVector> {
@@ -3859,6 +3878,25 @@ pub fn natural_vector_triple_gen() -> Generator<(NaturalVector, NaturalVector, N
         &exhaustive_natural_vector_triple_gen,
         &random_natural_vector_triple_gen,
         &special_random_natural_vector_triple_gen,
+    )
+}
+
+// All pairs of `NaturalVector`s of the same dimension.
+pub fn natural_vector_pair_gen_var_1() -> Generator<(NaturalVector, NaturalVector)> {
+    Generator::new(
+        &exhaustive_natural_vector_pair_gen_var_1,
+        &random_natural_vector_pair_gen_var_1,
+        &special_random_natural_vector_pair_gen_var_1,
+    )
+}
+
+// All triples of `NaturalVector`s of the same dimension.
+pub fn natural_vector_triple_gen_var_1() -> Generator<(NaturalVector, NaturalVector, NaturalVector)>
+{
+    Generator::new(
+        &exhaustive_natural_vector_triple_gen_var_1,
+        &random_natural_vector_triple_gen_var_1,
+        &special_random_natural_vector_triple_gen_var_1,
     )
 }
 
