@@ -9211,3 +9211,27 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple
         }),
     )
 }
+
+pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, T)> {
+    Box::new(
+        random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1::<T>(config)
+            .zip(random_positive_unsigneds::<T>(EXAMPLE_SEED.fork("m")))
+            .map(|((v, w, _), m)| (v % m, w % m, m)),
+    )
+}
+
+pub fn random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, T)> {
+    Box::new(
+        random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_1::<T>(
+            config,
+        )
+        .zip(random_positive_unsigneds::<T>(EXAMPLE_SEED.fork("m")))
+        .map(|((u, v, w, _), m)| (u % m, v % m, w % m, m)),
+    )
+}

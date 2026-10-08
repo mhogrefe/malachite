@@ -11,6 +11,8 @@ long_lines_exceptions = [
     { file = "malachite-base/src/test_util/generators/exhaustive.rs", line = 6502 },
     { file = "malachite-base/src/test_util/generators/exhaustive.rs", line = 6515 },
     { file = "malachite-base/src/test_util/generators/mod.rs", line = 5274 },
+    { file = "malachite-base/src/test_util/generators/mod.rs", line = 5297 },
+    { file = "malachite-base/src/test_util/generators/special_random.rs", line = 10906 },
     { file = "malachite-base/src/num/arithmetic/primorial.rs", line = 85 },
     { file = "malachite-base/src/num/arithmetic/primorial.rs", line = 244 },
     { file = "malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs", line = 118 },

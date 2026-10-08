@@ -6876,3 +6876,39 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadr
         )
     })
 }
+
+pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, UnsignedVector<T>, T)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
+                    dimension,
+                )),
+                exhaustive_positive_primitive_ints::<T>(),
+            )
+            .filter(|((v, w), m)| v.mod_is_reduced(m) && w.mod_is_reduced(m))
+            .map(|((v, w), m)| (v, w, m)),
+        )
+    })
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, T)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_triples_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
+                    dimension,
+                )),
+                exhaustive_positive_primitive_ints::<T>(),
+            )
+            .filter(|((u, v, w), m)| {
+                u.mod_is_reduced(m) && v.mod_is_reduced(m) && w.mod_is_reduced(m)
+            })
+            .map(|((u, v, w), m)| (u, v, w, m)),
+        )
+    })
+}

@@ -19,6 +19,10 @@ pub mod canonical_primitive_part;
 /// [`ContentAndPrimitivePart`](crate::num::arithmetic::traits::ContentAndPrimitivePart), which
 /// compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
+/// Implementations of [`ModAdd`](crate::num::arithmetic::traits::ModAdd) and
+/// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding vectors modulo a
+/// number.
+pub mod mod_add;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;

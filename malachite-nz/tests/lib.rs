@@ -849,6 +849,7 @@ pub mod natural_vector {
         pub mod add;
         pub mod canonical_primitive_part;
         pub mod content;
+        pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_neg;
         pub mod mod_op;

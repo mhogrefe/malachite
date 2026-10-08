@@ -3579,6 +3579,57 @@ pub fn exhaustive_natural_vector_natural_vector_natural_vector_unsigned_quadrupl
     })
 }
 
+pub fn exhaustive_natural_vector_natural_vector_natural_triple_gen_var_1()
+-> It<(NaturalVector, NaturalVector, Natural)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_natural_vectors_with_dimension(dimension)),
+                exhaustive_naturals(),
+            )
+            .map(|((v, w), m)| {
+                let m = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .max()
+                    .cloned()
+                    .unwrap_or_default()
+                    + m
+                    + Natural::ONE;
+                (v, w, m)
+            }),
+        )
+    })
+}
+
+pub fn exhaustive_natural_vector_natural_vector_natural_vector_natural_quadruple_gen_var_1()
+-> It<(NaturalVector, NaturalVector, NaturalVector, Natural)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_triples_from_single(exhaustive_natural_vectors_with_dimension(
+                    dimension,
+                )),
+                exhaustive_naturals(),
+            )
+            .map(|((u, v, w), m)| {
+                let m = u
+                    .elements
+                    .iter()
+                    .chain(&v.elements)
+                    .chain(&w.elements)
+                    .max()
+                    .cloned()
+                    .unwrap_or_default()
+                    + m
+                    + Natural::ONE;
+                (u, v, w, m)
+            }),
+        )
+    })
+}
+
 // -- Vec<Natural> --
 
 pub fn exhaustive_natural_vec_gen() -> It<Vec<Natural>> {

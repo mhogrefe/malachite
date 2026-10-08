@@ -6891,6 +6891,57 @@ pub fn random_natural_vector_natural_vector_natural_vector_unsigned_quadruple_ge
     )
 }
 
+pub fn random_natural_vector_natural_vector_natural_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, Natural)> {
+    Box::new(
+        random_natural_vector_pair_gen_var_1(config)
+            .zip(random_naturals(
+                EXAMPLE_SEED.fork("m"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((v, w), m)| {
+                let m = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .max()
+                    .cloned()
+                    .unwrap_or_default()
+                    + m
+                    + Natural::ONE;
+                (v, w, m)
+            }),
+    )
+}
+
+pub fn random_natural_vector_natural_vector_natural_vector_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, NaturalVector, Natural)> {
+    Box::new(
+        random_natural_vector_triple_gen_var_1(config)
+            .zip(random_naturals(
+                EXAMPLE_SEED.fork("m"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((u, v, w), m)| {
+                let m = u
+                    .elements
+                    .iter()
+                    .chain(&v.elements)
+                    .chain(&w.elements)
+                    .max()
+                    .cloned()
+                    .unwrap_or_default()
+                    + m
+                    + Natural::ONE;
+                (u, v, w, m)
+            }),
+    )
+}
+
 // -- Vec<Natural> --
 
 pub fn random_natural_vec_gen(config: &GenConfig) -> It<Vec<Natural>> {

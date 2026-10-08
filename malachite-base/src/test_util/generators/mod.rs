@@ -5274,3 +5274,26 @@ pub fn unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_va
         &special_random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_1,
     )
 }
+
+// All `(UnsignedVector<T>, UnsignedVector<T>, T)` where the vectors have the same dimension, the
+// `T` is positive, and every element of both vectors is less than it.
+pub fn unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, UnsignedVector<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2,
+        &random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2,
+        &special_random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, T)` where the vectors have the
+// same dimension, the `T` is positive, and every element of all three vectors is less than it.
+pub fn unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> Generator<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_2,
+        &random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_2,
+        &special_random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_2,
+    )
+}
