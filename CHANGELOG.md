@@ -45,8 +45,8 @@ documented by git history.
   `NaturalVectorFromIntegerVectorError` when an element is negative, and for `UnsignedVector<T>`,
   failing with `UnsignedVectorFromIntegerVectorError` when an element is negative or too large for
   `T`, each with the matching `ConvertibleFrom<&IntegerVector>`.
-- `PartialEq<UnsignedVector<T>>` for `NaturalVector` and `PartialEq<NaturalVector>` for
-  `UnsignedVector<T>`.
+- `PartialEq` in both directions between `UnsignedVector<T>` and `NaturalVector`, between
+  `UnsignedVector<T>` and `IntegerVector`, and between `NaturalVector` and `IntegerVector`.
 
 ### malachite-q
 

@@ -55,12 +55,13 @@ fn from_unsigned_vector_properties() {
     });
 
     unsigned_vector_pair_gen().test_properties(|(v, w)| {
+        let v_i = IntegerVector::from(v.clone());
+        let w_i = IntegerVector::from(w.clone());
         // The two types order their vectors the same way.
         assert_eq!(
             ShortlexUnsignedVectorRef(&v).cmp(&ShortlexUnsignedVectorRef(&w)),
-            ShortlexIntegerVectorRef(&IntegerVector::from(v.clone()))
-                .cmp(&ShortlexIntegerVectorRef(&IntegerVector::from(w.clone())))
+            ShortlexIntegerVectorRef(&v_i).cmp(&ShortlexIntegerVectorRef(&w_i))
         );
-        assert_eq!(v == w, IntegerVector::from(v) == IntegerVector::from(w));
+        assert_eq!(v == w, v_i == w_i);
     });
 }

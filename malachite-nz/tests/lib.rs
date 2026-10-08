@@ -346,6 +346,8 @@ pub mod integer_vector {
         pub mod size;
     }
     pub mod comparison {
+        pub mod partial_eq_natural_vector;
+        pub mod partial_eq_unsigned_vector;
         pub mod shortlex_cmp;
     }
     pub mod conversion {

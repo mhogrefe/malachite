@@ -3756,6 +3756,23 @@ pub fn integer_vector_unsigned_pair_gen_var_1() -> Generator<(IntegerVector, usi
     )
 }
 
+pub fn integer_vector_natural_vector_pair_gen() -> Generator<(IntegerVector, NaturalVector)> {
+    Generator::new(
+        &exhaustive_integer_vector_natural_vector_pair_gen,
+        &random_integer_vector_natural_vector_pair_gen,
+        &special_random_integer_vector_natural_vector_pair_gen,
+    )
+}
+
+pub fn integer_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(IntegerVector, UnsignedVector<T>)> {
+    Generator::new(
+        &exhaustive_integer_vector_unsigned_vector_pair_gen,
+        &random_integer_vector_unsigned_vector_pair_gen,
+        &special_random_integer_vector_unsigned_vector_pair_gen,
+    )
+}
+
 pub fn integer_vector_triple_gen() -> Generator<(IntegerVector, IntegerVector, IntegerVector)> {
     Generator::new(
         &exhaustive_integer_vector_triple_gen,

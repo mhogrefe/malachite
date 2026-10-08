@@ -3405,6 +3405,21 @@ pub fn exhaustive_integer_vector_unsigned_pair_gen_var_1() -> It<(IntegerVector,
     )
 }
 
+pub fn exhaustive_integer_vector_natural_vector_pair_gen() -> It<(IntegerVector, NaturalVector)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_vectors(),
+        exhaustive_natural_vectors(),
+    ))
+}
+
+pub fn exhaustive_integer_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
+-> It<(IntegerVector, UnsignedVector<T>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_vectors(),
+        exhaustive_unsigned_vectors(),
+    ))
+}
+
 pub fn exhaustive_integer_vector_triple_gen() -> It<(IntegerVector, IntegerVector, IntegerVector)> {
     Box::new(exhaustive_triples_from_single(exhaustive_integer_vectors()))
 }
