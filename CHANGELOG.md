@@ -120,6 +120,8 @@ documented by git history.
 - `Neg` (by value and by reference) and `NegAssign` for `IntegerVector`.
 - `Add` and `AddAssign` for `NaturalVector` and `IntegerVector`, in every combination of value and
   reference. The vectors must have the same dimension.
+- `Sub` and `SubAssign` for `IntegerVector`, in every combination of value and reference. The
+  vectors must have the same dimension.
 
 ### malachite-q
 
@@ -143,6 +145,8 @@ documented by git history.
   canonical ones for `RationalPolynomial` and `GaussianRational`.
 - `Neg` (by value and by reference) and `NegAssign` for `RationalVector`.
 - `Add` and `AddAssign` for `RationalVector`, in every combination of value and reference. The
+  vectors must have the same dimension.
+- `Sub` and `SubAssign` for `RationalVector`, in every combination of value and reference. The
   vectors must have the same dimension.
 
 ## 0.13.0 — 2026-10-06

@@ -28,3 +28,6 @@ pub mod content;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;
+/// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
+/// subtracting vectors.
+pub mod sub;

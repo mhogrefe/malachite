@@ -350,6 +350,7 @@ pub mod integer_vector {
         pub mod canonicalize_sign;
         pub mod content;
         pub mod neg;
+        pub mod sub;
     }
     pub mod basic {
         pub mod named;

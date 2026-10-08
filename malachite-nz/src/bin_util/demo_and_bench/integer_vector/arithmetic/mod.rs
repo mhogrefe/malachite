@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonicalize_sign::register(runner);
     content::register(runner);
     neg::register(runner);
+    sub::register(runner);
 }
 
 mod add;
@@ -21,3 +22,4 @@ mod canonical_primitive_part;
 mod canonicalize_sign;
 mod content;
 mod neg;
+mod sub;
