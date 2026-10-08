@@ -8,15 +8,34 @@
 
 use crate::Rational;
 use crate::rational::exhaustive::{ExhaustiveNonzeroRationals, exhaustive_rationals};
+use crate::rational_vector::RationalVector;
+use alloc::vec::Vec;
 use core::iter::{Chain, Once};
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
-use malachite_base::num::iterators::BitDistributorSequence;
-use malachite_base::vecs::exhaustive::{ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs};
-use malachite_base::vector::exhaustive::{
-    ExhaustiveVectors, exhaustive_vectors, exhaustive_vectors_with_dimension,
+use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
+use malachite_base::vecs::exhaustive::{
+    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs_fixed_length_from_single,
+    exhaustive_vecs_with_index_generator,
 };
 
-/// Generates all [`RationalVector`](super::RationalVector)s.
+/// Generates [`RationalVector`]s from an iterator of [`Vec`]s of [`Rational`]s.
+///
+/// This `struct` is created by [`exhaustive_rational_vectors`] and
+/// [`exhaustive_rational_vectors_with_dimension`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveRationalVectors<I: Iterator<Item = Vec<Rational>>>(I);
+
+impl<I: Iterator<Item = Vec<Rational>>> Iterator for ExhaustiveRationalVectors<I> {
+    type Item = RationalVector;
+
+    #[inline]
+    fn next(&mut self) -> Option<RationalVector> {
+        self.0.next().map(|elements| RationalVector { elements })
+    }
+}
+
+/// Generates all [`RationalVector`]s.
 ///
 /// Every vector, of every dimension, is generated once, the 0-dimensional vector first.
 ///
@@ -49,7 +68,7 @@ use malachite_base::vector::exhaustive::{
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_rational_vectors() -> ExhaustiveVectors<
+pub fn exhaustive_rational_vectors() -> ExhaustiveRationalVectors<
     ExhaustiveVecs<
         Rational,
         PrimitiveIntIncreasingRange<u64>,
@@ -57,10 +76,16 @@ pub fn exhaustive_rational_vectors() -> ExhaustiveVectors<
         BitDistributorSequence,
     >,
 > {
-    exhaustive_vectors(exhaustive_rationals())
+    ExhaustiveRationalVectors(exhaustive_vecs_with_index_generator(
+        exhaustive_rationals(),
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(2),
+        ),
+    ))
 }
 
-/// Generates all [`RationalVector`](super::RationalVector)s of a given dimension.
+/// Generates all [`RationalVector`]s of a given dimension.
 ///
 /// If `dimension` is 0, the only output is the 0-dimensional vector; otherwise the output length is
 /// infinite.
@@ -91,8 +116,11 @@ pub fn exhaustive_rational_vectors() -> ExhaustiveVectors<
 #[inline]
 pub fn exhaustive_rational_vectors_with_dimension(
     dimension: u64,
-) -> ExhaustiveVectors<
+) -> ExhaustiveRationalVectors<
     ExhaustiveFixedLengthVecs1Input<Chain<Once<Rational>, ExhaustiveNonzeroRationals>>,
 > {
-    exhaustive_vectors_with_dimension(dimension, exhaustive_rationals())
+    ExhaustiveRationalVectors(exhaustive_vecs_fixed_length_from_single(
+        dimension,
+        exhaustive_rationals(),
+    ))
 }

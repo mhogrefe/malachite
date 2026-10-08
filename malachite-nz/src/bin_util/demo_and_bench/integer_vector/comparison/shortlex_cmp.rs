@@ -9,10 +9,10 @@
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_base::test_util::vector::comparison::shortlex_cmp::*;
-use malachite_base::vector::ShortlexVectorRef;
+use malachite_nz::integer_vector::ShortlexIntegerVectorRef;
 use malachite_nz::test_util::bench::bucketers::pair_integer_vector_max_bit_bucketer;
 use malachite_nz::test_util::generators::integer_vector_pair_gen;
+use malachite_nz::test_util::integer_vector::comparison::shortlex_cmp::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_shortlex_integer_vector_cmp);
@@ -26,7 +26,7 @@ fn demo_shortlex_integer_vector_cmp(gm: GenMode, config: &GenConfig, limit: usiz
             "{}.cmp(&{}) = {:?}",
             v,
             w,
-            ShortlexVectorRef(&v).cmp(&ShortlexVectorRef(&w))
+            ShortlexIntegerVectorRef(&v).cmp(&ShortlexIntegerVectorRef(&w))
         );
     }
 }
@@ -39,7 +39,7 @@ fn benchmark_shortlex_integer_vector_cmp_algorithms(
     file_name: &str,
 ) {
     run_benchmark(
-        "ShortlexVectorRef.cmp(&ShortlexVectorRef)",
+        "ShortlexIntegerVectorRef.cmp(&ShortlexIntegerVectorRef)",
         BenchmarkType::Algorithms,
         integer_vector_pair_gen().get(gm, config),
         gm.name(),
@@ -48,10 +48,10 @@ fn benchmark_shortlex_integer_vector_cmp_algorithms(
         &pair_integer_vector_max_bit_bucketer("v", "w"),
         &mut [
             ("default", &mut |(v, w)| {
-                no_out!(ShortlexVectorRef(&v).cmp(&ShortlexVectorRef(&w)));
+                no_out!(ShortlexIntegerVectorRef(&v).cmp(&ShortlexIntegerVectorRef(&w)));
             }),
             ("walking the elements", &mut |(v, w)| {
-                no_out!(vector_shortlex_cmp_naive(&v, &w));
+                no_out!(integer_vector_shortlex_cmp_naive(&v, &w));
             }),
         ],
     );

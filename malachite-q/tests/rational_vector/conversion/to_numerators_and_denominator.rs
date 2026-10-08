@@ -12,15 +12,15 @@ use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 use malachite_q::rational_vector::RationalVector;
-use malachite_q::rational_vector::conversion::from_numerators_and_denominator::*;
-use malachite_q::rational_vector::conversion::to_numerators_and_denominator::*;
 use malachite_q::test_util::generators::rational_vector_gen;
 use malachite_q::test_util::rational_vector::conversion::to_numerators_and_denominator::*;
 
 #[test]
 fn test_to_numerators_and_denominator() {
     let test = |s, numerators_out, denominator_out: u64| {
-        let (ns, d) = to_numerators_and_denominator(&RationalVector::from_str(s).unwrap());
+        let (ns, d) = RationalVector::from_str(s)
+            .unwrap()
+            .to_numerators_and_denominator();
         assert_eq!(ns.to_string(), numerators_out);
         assert_eq!(d, denominator_out);
     };
@@ -39,7 +39,7 @@ fn test_to_numerators_and_denominator() {
 #[test]
 fn to_numerators_and_denominator_properties() {
     rational_vector_gen().test_properties(|v| {
-        let (ns, d) = to_numerators_and_denominator(&v);
+        let (ns, d) = v.to_numerators_and_denominator();
         assert_ne!(d, 0u32);
         assert_eq!(ns.dimension(), v.dimension());
         // The quotients are the elements.
@@ -63,6 +63,6 @@ fn to_numerators_and_denominator_properties() {
         );
 
         // Building the vector back gives the original.
-        assert_eq!(from_numerators_and_denominator(&ns, &d), v);
+        assert_eq!(RationalVector::from_numerators_and_denominator(&ns, &d), v);
     });
 }

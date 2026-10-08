@@ -10,27 +10,45 @@ use crate::Rational;
 use crate::rational::random::{
     RandomRationalsFromDoubleAndSign, random_rationals, striped_random_rationals,
 };
+use crate::rational_vector::RationalVector;
+use alloc::vec::Vec;
 use malachite_base::num::random::geometric::GeometricRandomNaturalValues;
 use malachite_base::random::Seed;
-use malachite_base::vecs::random::{RandomFixedLengthVecsFromSingle, RandomVecs};
-use malachite_base::vector::random::{
-    RandomVectors, random_vectors, random_vectors_with_dimension,
+use malachite_base::vecs::random::{
+    RandomFixedLengthVecsFromSingle, RandomVecs, random_vecs, random_vecs_fixed_length_from_single,
 };
 use malachite_nz::natural::random::{RandomNaturals, StripedRandomNaturals};
 
-/// The elements that the unstriped [`RationalVector`](super::RationalVector) generators draw on.
+/// Generates random [`RationalVector`]s from an iterator of [`Vec`]s of [`Rational`]s.
+///
+/// This `struct` is created by [`random_rational_vectors`],
+/// [`random_rational_vectors_with_dimension`], [`striped_random_rational_vectors`], and
+/// [`striped_random_rational_vectors_with_dimension`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomRationalVectors<I: Iterator<Item = Vec<Rational>>>(I);
+
+impl<I: Iterator<Item = Vec<Rational>>> Iterator for RandomRationalVectors<I> {
+    type Item = RationalVector;
+
+    #[inline]
+    fn next(&mut self) -> Option<RationalVector> {
+        self.0.next().map(|elements| RationalVector { elements })
+    }
+}
+
+/// The elements that the unstriped [`RationalVector`] generators draw on.
 pub type RandomVectorElements = RandomRationalsFromDoubleAndSign<
     RandomNaturals<GeometricRandomNaturalValues<u64>>,
     RandomNaturals<GeometricRandomNaturalValues<u64>>,
 >;
 
-/// The elements that the striped [`RationalVector`](super::RationalVector) generators draw on.
+/// The elements that the striped [`RationalVector`] generators draw on.
 pub type StripedRandomVectorElements = RandomRationalsFromDoubleAndSign<
     StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
     StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
 >;
 
-/// Generates random [`RationalVector`](super::RationalVector)s.
+/// Generates random [`RationalVector`]s.
 ///
 /// The elements are sampled from [`random_rationals`], with a mean bit count of
 /// `mean_bits_numerator / mean_bits_denominator`. The dimensions are sampled from a geometric
@@ -72,16 +90,18 @@ pub fn random_rational_vectors(
     mean_bits_denominator: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
-) -> RandomVectors<RandomVecs<Rational, GeometricRandomNaturalValues<u64>, RandomVectorElements>> {
-    random_vectors(
+) -> RandomRationalVectors<
+    RandomVecs<Rational, GeometricRandomNaturalValues<u64>, RandomVectorElements>,
+> {
+    RandomRationalVectors(random_vecs(
         seed,
         &|seed_2| random_rationals(seed_2, mean_bits_numerator, mean_bits_denominator),
         mean_length_numerator,
         mean_length_denominator,
-    )
+    ))
 }
 
-/// Generates random [`RationalVector`](super::RationalVector)s of a given dimension.
+/// Generates random [`RationalVector`]s of a given dimension.
 ///
 /// The elements are sampled from [`random_rationals`], with a mean bit count of
 /// `mean_bits_numerator / mean_bits_denominator`.
@@ -120,14 +140,14 @@ pub fn random_rational_vectors_with_dimension(
     dimension: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-) -> RandomVectors<RandomFixedLengthVecsFromSingle<RandomVectorElements>> {
-    random_vectors_with_dimension(
+) -> RandomRationalVectors<RandomFixedLengthVecsFromSingle<RandomVectorElements>> {
+    RandomRationalVectors(random_vecs_fixed_length_from_single(
         dimension,
         random_rationals(seed, mean_bits_numerator, mean_bits_denominator),
-    )
+    ))
 }
 
-/// Generates random [`RationalVector`](super::RationalVector)s with striped elements.
+/// Generates random [`RationalVector`]s with striped elements.
 ///
 /// The elements are sampled from [`striped_random_rationals`]: each element's bit count has mean
 /// `mean_bits_numerator / mean_bits_denominator`, and its bits come in runs whose mean length is
@@ -180,10 +200,10 @@ pub fn striped_random_rational_vectors(
     mean_bits_denominator: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
-) -> RandomVectors<
+) -> RandomRationalVectors<
     RandomVecs<Rational, GeometricRandomNaturalValues<u64>, StripedRandomVectorElements>,
 > {
-    random_vectors(
+    RandomRationalVectors(random_vecs(
         seed,
         &|seed_2| {
             striped_random_rationals(
@@ -196,11 +216,10 @@ pub fn striped_random_rational_vectors(
         },
         mean_length_numerator,
         mean_length_denominator,
-    )
+    ))
 }
 
-/// Generates random [`RationalVector`](super::RationalVector)s of a given dimension, with striped
-/// elements.
+/// Generates random [`RationalVector`]s of a given dimension, with striped elements.
 ///
 /// The elements are striped, as they are in [`striped_random_rational_vectors`].
 ///
@@ -244,8 +263,8 @@ pub fn striped_random_rational_vectors_with_dimension(
     mean_stripe_denominator: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-) -> RandomVectors<RandomFixedLengthVecsFromSingle<StripedRandomVectorElements>> {
-    random_vectors_with_dimension(
+) -> RandomRationalVectors<RandomFixedLengthVecsFromSingle<StripedRandomVectorElements>> {
+    RandomRationalVectors(random_vecs_fixed_length_from_single(
         dimension,
         striped_random_rationals(
             seed,
@@ -254,5 +273,5 @@ pub fn striped_random_rational_vectors_with_dimension(
             mean_bits_numerator,
             mean_bits_denominator,
         ),
-    )
+    ))
 }

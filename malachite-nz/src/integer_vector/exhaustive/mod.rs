@@ -8,15 +8,34 @@
 
 use crate::integer::Integer;
 use crate::integer::exhaustive::{IntegerUpDown, exhaustive_integers};
+use crate::integer_vector::IntegerVector;
+use alloc::vec::Vec;
 use core::iter::{Chain, Once};
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
-use malachite_base::num::iterators::BitDistributorSequence;
-use malachite_base::vecs::exhaustive::{ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs};
-use malachite_base::vector::exhaustive::{
-    ExhaustiveVectors, exhaustive_vectors, exhaustive_vectors_with_dimension,
+use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
+use malachite_base::vecs::exhaustive::{
+    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs_fixed_length_from_single,
+    exhaustive_vecs_with_index_generator,
 };
 
-/// Generates all [`IntegerVector`](super::IntegerVector)s.
+/// Generates [`IntegerVector`]s from an iterator of [`Vec`]s of [`Integer`]s.
+///
+/// This `struct` is created by [`exhaustive_integer_vectors`] and
+/// [`exhaustive_integer_vectors_with_dimension`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveIntegerVectors<I: Iterator<Item = Vec<Integer>>>(I);
+
+impl<I: Iterator<Item = Vec<Integer>>> Iterator for ExhaustiveIntegerVectors<I> {
+    type Item = IntegerVector;
+
+    #[inline]
+    fn next(&mut self) -> Option<IntegerVector> {
+        self.0.next().map(|elements| IntegerVector { elements })
+    }
+}
+
+/// Generates all [`IntegerVector`]s.
 ///
 /// Every vector, of every dimension, is generated once, the 0-dimensional vector first.
 ///
@@ -49,7 +68,7 @@ use malachite_base::vector::exhaustive::{
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_integer_vectors() -> ExhaustiveVectors<
+pub fn exhaustive_integer_vectors() -> ExhaustiveIntegerVectors<
     ExhaustiveVecs<
         Integer,
         PrimitiveIntIncreasingRange<u64>,
@@ -57,10 +76,16 @@ pub fn exhaustive_integer_vectors() -> ExhaustiveVectors<
         BitDistributorSequence,
     >,
 > {
-    exhaustive_vectors(exhaustive_integers())
+    ExhaustiveIntegerVectors(exhaustive_vecs_with_index_generator(
+        exhaustive_integers(),
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(2),
+        ),
+    ))
 }
 
-/// Generates all [`IntegerVector`](super::IntegerVector)s of a given dimension.
+/// Generates all [`IntegerVector`]s of a given dimension.
 ///
 /// If `dimension` is 0, the only output is the 0-dimensional vector; otherwise the output length is
 /// infinite.
@@ -90,6 +115,10 @@ pub fn exhaustive_integer_vectors() -> ExhaustiveVectors<
 #[inline]
 pub fn exhaustive_integer_vectors_with_dimension(
     dimension: u64,
-) -> ExhaustiveVectors<ExhaustiveFixedLengthVecs1Input<Chain<Once<Integer>, IntegerUpDown>>> {
-    exhaustive_vectors_with_dimension(dimension, exhaustive_integers())
+) -> ExhaustiveIntegerVectors<ExhaustiveFixedLengthVecs1Input<Chain<Once<Integer>, IntegerUpDown>>>
+{
+    ExhaustiveIntegerVectors(exhaustive_vecs_fixed_length_from_single(
+        dimension,
+        exhaustive_integers(),
+    ))
 }

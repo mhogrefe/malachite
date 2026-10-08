@@ -8,14 +8,33 @@
 
 use crate::natural::Natural;
 use crate::natural::exhaustive::{ExhaustiveNaturalRangeToInfinity, exhaustive_naturals};
+use crate::natural_vector::NaturalVector;
+use alloc::vec::Vec;
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
-use malachite_base::num::iterators::BitDistributorSequence;
-use malachite_base::vecs::exhaustive::{ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs};
-use malachite_base::vector::exhaustive::{
-    ExhaustiveVectors, exhaustive_vectors, exhaustive_vectors_with_dimension,
+use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
+use malachite_base::vecs::exhaustive::{
+    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs_fixed_length_from_single,
+    exhaustive_vecs_with_index_generator,
 };
 
-/// Generates all [`NaturalVector`](super::NaturalVector)s.
+/// Generates [`NaturalVector`]s from an iterator of [`Vec`]s of [`Natural`]s.
+///
+/// This `struct` is created by [`exhaustive_natural_vectors`] and
+/// [`exhaustive_natural_vectors_with_dimension`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveNaturalVectors<I: Iterator<Item = Vec<Natural>>>(I);
+
+impl<I: Iterator<Item = Vec<Natural>>> Iterator for ExhaustiveNaturalVectors<I> {
+    type Item = NaturalVector;
+
+    #[inline]
+    fn next(&mut self) -> Option<NaturalVector> {
+        self.0.next().map(|elements| NaturalVector { elements })
+    }
+}
+
+/// Generates all [`NaturalVector`]s.
 ///
 /// Every vector, of every dimension, is generated once, the 0-dimensional vector first.
 ///
@@ -48,7 +67,7 @@ use malachite_base::vector::exhaustive::{
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_natural_vectors() -> ExhaustiveVectors<
+pub fn exhaustive_natural_vectors() -> ExhaustiveNaturalVectors<
     ExhaustiveVecs<
         Natural,
         PrimitiveIntIncreasingRange<u64>,
@@ -56,10 +75,16 @@ pub fn exhaustive_natural_vectors() -> ExhaustiveVectors<
         BitDistributorSequence,
     >,
 > {
-    exhaustive_vectors(exhaustive_naturals())
+    ExhaustiveNaturalVectors(exhaustive_vecs_with_index_generator(
+        exhaustive_naturals(),
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(2),
+        ),
+    ))
 }
 
-/// Generates all [`NaturalVector`](super::NaturalVector)s of a given dimension.
+/// Generates all [`NaturalVector`]s of a given dimension.
 ///
 /// If `dimension` is 0, the only output is the 0-dimensional vector; otherwise the output length is
 /// infinite.
@@ -89,6 +114,9 @@ pub fn exhaustive_natural_vectors() -> ExhaustiveVectors<
 #[inline]
 pub fn exhaustive_natural_vectors_with_dimension(
     dimension: u64,
-) -> ExhaustiveVectors<ExhaustiveFixedLengthVecs1Input<ExhaustiveNaturalRangeToInfinity>> {
-    exhaustive_vectors_with_dimension(dimension, exhaustive_naturals())
+) -> ExhaustiveNaturalVectors<ExhaustiveFixedLengthVecs1Input<ExhaustiveNaturalRangeToInfinity>> {
+    ExhaustiveNaturalVectors(exhaustive_vecs_fixed_length_from_single(
+        dimension,
+        exhaustive_naturals(),
+    ))
 }

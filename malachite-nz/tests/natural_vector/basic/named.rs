@@ -11,5 +11,5 @@ use malachite_nz::natural_vector::NaturalVector;
 
 #[test]
 fn test_named() {
-    assert_eq!(NaturalVector::NAME, "Vector");
+    assert_eq!(NaturalVector::NAME, "NaturalVector");
 }

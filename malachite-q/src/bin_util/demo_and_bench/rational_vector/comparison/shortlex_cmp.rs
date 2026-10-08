@@ -9,10 +9,10 @@
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_base::test_util::vector::comparison::shortlex_cmp::*;
-use malachite_base::vector::ShortlexVectorRef;
+use malachite_q::rational_vector::ShortlexRationalVectorRef;
 use malachite_q::test_util::bench::bucketers::pair_rational_vector_max_bit_bucketer;
 use malachite_q::test_util::generators::rational_vector_pair_gen;
+use malachite_q::test_util::rational_vector::comparison::shortlex_cmp::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_shortlex_rational_vector_cmp);
@@ -26,7 +26,7 @@ fn demo_shortlex_rational_vector_cmp(gm: GenMode, config: &GenConfig, limit: usi
             "{}.cmp(&{}) = {:?}",
             v,
             w,
-            ShortlexVectorRef(&v).cmp(&ShortlexVectorRef(&w))
+            ShortlexRationalVectorRef(&v).cmp(&ShortlexRationalVectorRef(&w))
         );
     }
 }
@@ -39,7 +39,7 @@ fn benchmark_shortlex_rational_vector_cmp_algorithms(
     file_name: &str,
 ) {
     run_benchmark(
-        "ShortlexVectorRef.cmp(&ShortlexVectorRef)",
+        "ShortlexRationalVectorRef.cmp(&ShortlexRationalVectorRef)",
         BenchmarkType::Algorithms,
         rational_vector_pair_gen().get(gm, config),
         gm.name(),
@@ -48,10 +48,10 @@ fn benchmark_shortlex_rational_vector_cmp_algorithms(
         &pair_rational_vector_max_bit_bucketer("v", "w"),
         &mut [
             ("default", &mut |(v, w)| {
-                no_out!(ShortlexVectorRef(&v).cmp(&ShortlexVectorRef(&w)));
+                no_out!(ShortlexRationalVectorRef(&v).cmp(&ShortlexRationalVectorRef(&w)));
             }),
             ("walking the elements", &mut |(v, w)| {
-                no_out!(vector_shortlex_cmp_naive(&v, &w));
+                no_out!(rational_vector_shortlex_cmp_naive(&v, &w));
             }),
         ],
     );

@@ -97,9 +97,9 @@ use crate::unions::Union2;
 use crate::unions::random::random_union2s;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::random::striped_random_unsigned_polynomials;
+use crate::unsigned_vector::UnsignedVector;
+use crate::unsigned_vector::random::{RandomUnsignedVectors, striped_random_unsigned_vectors};
 use crate::vecs::random::{RandomVecs, random_vecs};
-use crate::vector::Vector;
-use crate::vector::random::{RandomVectors, random_vectors};
 use alloc::collections::{BTreeMap, BTreeSet};
 
 #[cfg(not(feature = "std"))]
@@ -10665,31 +10665,30 @@ pub fn special_random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_g
     )
 }
 
-// -- Vector<u64> --
+// -- UnsignedVector<u64> --
 
 fn striped_random_unsigned_vectors_helper(
     config: &GenConfig,
     seed: Seed,
-) -> RandomVectors<
+) -> RandomUnsignedVectors<
     RandomVecs<u64, GeometricRandomNaturalValues<u64>, StripedRandomUnsignedBitChunks<u64>>,
 > {
-    let mean_stripe_n = config.get_or("mean_stripe_n", 32);
-    let mean_stripe_d = config.get_or("mean_stripe_d", 1);
-    random_vectors(
+    striped_random_unsigned_vectors(
         seed,
-        &|seed_2| striped_random_unsigneds::<u64>(seed_2, mean_stripe_n, mean_stripe_d),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
         config.get_or("mean_length_n", 4),
         config.get_or("mean_length_d", 1),
     )
 }
 
-pub fn special_random_unsigned_vector_gen(config: &GenConfig) -> It<Vector<u64>> {
+pub fn special_random_unsigned_vector_gen(config: &GenConfig) -> It<UnsignedVector<u64>> {
     Box::new(striped_random_unsigned_vectors_helper(config, EXAMPLE_SEED))
 }
 
 pub fn special_random_unsigned_vector_pair_gen(
     config: &GenConfig,
-) -> It<(Vector<u64>, Vector<u64>)> {
+) -> It<(UnsignedVector<u64>, UnsignedVector<u64>)> {
     Box::new(random_pairs_from_single(
         striped_random_unsigned_vectors_helper(config, EXAMPLE_SEED),
     ))
@@ -10697,7 +10696,11 @@ pub fn special_random_unsigned_vector_pair_gen(
 
 pub fn special_random_unsigned_vector_triple_gen(
     config: &GenConfig,
-) -> It<(Vector<u64>, Vector<u64>, Vector<u64>)> {
+) -> It<(
+    UnsignedVector<u64>,
+    UnsignedVector<u64>,
+    UnsignedVector<u64>,
+)> {
     Box::new(random_triples_from_single(
         striped_random_unsigned_vectors_helper(config, EXAMPLE_SEED),
     ))
@@ -10705,7 +10708,7 @@ pub fn special_random_unsigned_vector_triple_gen(
 
 pub fn special_random_unsigned_vector_unsigned_pair_gen_var_1(
     config: &GenConfig,
-) -> It<(Vector<u64>, usize)> {
+) -> It<(UnsignedVector<u64>, usize)> {
     Box::new(
         striped_random_unsigned_vectors_helper(config, EXAMPLE_SEED)
             .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),

@@ -9,8 +9,7 @@
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_q::rational_vector::conversion::from_numerators_and_denominator::*;
-use malachite_q::rational_vector::conversion::to_numerators_and_denominator::*;
+use malachite_q::rational_vector::RationalVector;
 use malachite_q::test_util::bench::bucketers::pair_1_rational_vector_bit_bucketer;
 use malachite_q::test_util::generators::rational_vector_gen;
 
@@ -28,10 +27,10 @@ fn demo_rational_vector_from_numerators_and_denominator(
     limit: usize,
 ) {
     for v in rational_vector_gen().get(gm, config).take(limit) {
-        let (ns, d) = to_numerators_and_denominator(&v);
+        let (ns, d) = v.to_numerators_and_denominator();
         println!(
             "from_numerators_and_denominator({ns}, {d}) = {}",
-            from_numerators_and_denominator(&ns, &d)
+            RationalVector::from_numerators_and_denominator(&ns, &d)
         );
     }
 }
@@ -47,13 +46,13 @@ fn benchmark_rational_vector_from_numerators_and_denominator(
         BenchmarkType::Single,
         rational_vector_gen()
             .get(gm, config)
-            .map(|v| (v.clone(), to_numerators_and_denominator(&v))),
+            .map(|v| (v.clone(), v.to_numerators_and_denominator())),
         gm.name(),
         limit,
         file_name,
         &pair_1_rational_vector_bit_bucketer("v"),
         &mut [("Malachite", &mut |(_, (ns, d))| {
-            no_out!(from_numerators_and_denominator(&ns, &d));
+            no_out!(RationalVector::from_numerators_and_denominator(&ns, &d));
         })],
     );
 }

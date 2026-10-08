@@ -11,5 +11,5 @@ use malachite_q::rational_vector::RationalVector;
 
 #[test]
 fn test_named() {
-    assert_eq!(RationalVector::NAME, "Vector");
+    assert_eq!(RationalVector::NAME, "RationalVector");
 }

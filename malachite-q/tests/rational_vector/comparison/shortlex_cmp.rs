@@ -10,16 +10,17 @@ use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::test_util::common::test_custom_cmp_helper;
-use malachite_base::test_util::vector::comparison::shortlex_cmp::*;
-use malachite_base::vector::{ShortlexVector, ShortlexVectorRef};
 use malachite_q::Rational;
-use malachite_q::rational_vector::RationalVector;
+use malachite_q::rational_vector::{
+    RationalVector, ShortlexRationalVector, ShortlexRationalVectorRef,
+};
 use malachite_q::test_util::generators::{
     rational_vec_gen, rational_vector_gen, rational_vector_pair_gen, rational_vector_triple_gen,
 };
+use malachite_q::test_util::rational_vector::comparison::shortlex_cmp::*;
 
 fn shortlex(v: &RationalVector, w: &RationalVector) -> Ordering {
-    ShortlexVectorRef(v).cmp(&ShortlexVectorRef(w))
+    ShortlexRationalVectorRef(v).cmp(&ShortlexRationalVectorRef(w))
 }
 
 #[test]
@@ -82,11 +83,11 @@ fn shortlex_cmp_properties() {
         assert_eq!(v == w, c == Equal);
 
         // The default comparison gives the same answer as an explicit walk over the elements.
-        assert_eq!(vector_shortlex_cmp_naive(&v, &w), c);
+        assert_eq!(rational_vector_shortlex_cmp_naive(&v, &w), c);
 
         // The owned wrapper and the borrowing one agree, and both agree with `as_ref`.
-        let owned = ShortlexVector(v.clone());
-        let other_owned = ShortlexVector(w.clone());
+        let owned = ShortlexRationalVector(v.clone());
+        let other_owned = ShortlexRationalVector(w.clone());
         assert_eq!(owned.cmp(&other_owned), c);
         assert_eq!(owned.as_ref().cmp(&other_owned.as_ref()), c);
         assert_eq!(owned.partial_cmp(&other_owned), Some(c));
@@ -108,8 +109,8 @@ fn shortlex_cmp_properties() {
         // Reflexivity, and the 0-dimensional vector is the least of them all.
         assert_eq!(shortlex(&v, &v), Equal);
         assert!(
-            ShortlexVector(v)
-                >= ShortlexVector(RationalVector {
+            ShortlexRationalVector(v)
+                >= ShortlexRationalVector(RationalVector {
                     elements: Vec::new()
                 })
         );

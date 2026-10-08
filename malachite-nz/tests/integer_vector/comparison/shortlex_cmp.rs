@@ -10,16 +10,17 @@ use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::test_util::common::test_custom_cmp_helper;
-use malachite_base::test_util::vector::comparison::shortlex_cmp::*;
-use malachite_base::vector::{ShortlexVector, ShortlexVectorRef};
 use malachite_nz::integer::Integer;
-use malachite_nz::integer_vector::IntegerVector;
+use malachite_nz::integer_vector::{
+    IntegerVector, ShortlexIntegerVector, ShortlexIntegerVectorRef,
+};
 use malachite_nz::test_util::generators::{
     integer_vec_gen, integer_vector_gen, integer_vector_pair_gen, integer_vector_triple_gen,
 };
+use malachite_nz::test_util::integer_vector::comparison::shortlex_cmp::*;
 
 fn shortlex(v: &IntegerVector, w: &IntegerVector) -> Ordering {
-    ShortlexVectorRef(v).cmp(&ShortlexVectorRef(w))
+    ShortlexIntegerVectorRef(v).cmp(&ShortlexIntegerVectorRef(w))
 }
 
 #[test]
@@ -77,11 +78,11 @@ fn shortlex_cmp_properties() {
         assert_eq!(v == w, c == Equal);
 
         // The default comparison gives the same answer as an explicit walk over the elements.
-        assert_eq!(vector_shortlex_cmp_naive(&v, &w), c);
+        assert_eq!(integer_vector_shortlex_cmp_naive(&v, &w), c);
 
         // The owned wrapper and the borrowing one agree, and both agree with `as_ref`.
-        let owned = ShortlexVector(v.clone());
-        let other_owned = ShortlexVector(w.clone());
+        let owned = ShortlexIntegerVector(v.clone());
+        let other_owned = ShortlexIntegerVector(w.clone());
         assert_eq!(owned.cmp(&other_owned), c);
         assert_eq!(owned.as_ref().cmp(&other_owned.as_ref()), c);
         assert_eq!(owned.partial_cmp(&other_owned), Some(c));
@@ -103,8 +104,8 @@ fn shortlex_cmp_properties() {
         // Reflexivity, and the 0-dimensional vector is the least of them all.
         assert_eq!(shortlex(&v, &v), Equal);
         assert!(
-            ShortlexVector(v)
-                >= ShortlexVector(IntegerVector {
+            ShortlexIntegerVector(v)
+                >= ShortlexIntegerVector(IntegerVector {
                     elements: Vec::new()
                 })
         );

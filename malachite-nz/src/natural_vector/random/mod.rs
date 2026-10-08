@@ -10,20 +10,38 @@ use crate::natural::Natural;
 use crate::natural::random::{
     RandomNaturals, StripedRandomNaturals, random_naturals, striped_random_naturals,
 };
+use crate::natural_vector::NaturalVector;
+use alloc::vec::Vec;
 use malachite_base::num::random::geometric::GeometricRandomNaturalValues;
 use malachite_base::random::Seed;
-use malachite_base::vecs::random::{RandomFixedLengthVecsFromSingle, RandomVecs};
-use malachite_base::vector::random::{
-    RandomVectors, random_vectors, random_vectors_with_dimension,
+use malachite_base::vecs::random::{
+    RandomFixedLengthVecsFromSingle, RandomVecs, random_vecs, random_vecs_fixed_length_from_single,
 };
 
-/// The elements that the unstriped [`NaturalVector`](super::NaturalVector) generators draw on.
+/// Generates random [`NaturalVector`]s from an iterator of [`Vec`]s of [`Natural`]s.
+///
+/// This `struct` is created by [`random_natural_vectors`],
+/// [`random_natural_vectors_with_dimension`], [`striped_random_natural_vectors`], and
+/// [`striped_random_natural_vectors_with_dimension`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomNaturalVectors<I: Iterator<Item = Vec<Natural>>>(I);
+
+impl<I: Iterator<Item = Vec<Natural>>> Iterator for RandomNaturalVectors<I> {
+    type Item = NaturalVector;
+
+    #[inline]
+    fn next(&mut self) -> Option<NaturalVector> {
+        self.0.next().map(|elements| NaturalVector { elements })
+    }
+}
+
+/// The elements that the unstriped [`NaturalVector`] generators draw on.
 pub type RandomVectorElements = RandomNaturals<GeometricRandomNaturalValues<u64>>;
 
-/// The elements that the striped [`NaturalVector`](super::NaturalVector) generators draw on.
+/// The elements that the striped [`NaturalVector`] generators draw on.
 pub type StripedRandomVectorElements = StripedRandomNaturals<GeometricRandomNaturalValues<u64>>;
 
-/// Generates random [`NaturalVector`](super::NaturalVector)s.
+/// Generates random [`NaturalVector`]s.
 ///
 /// The elements are sampled from [`random_naturals`], with a mean bit count of `mean_bits_numerator
 /// / mean_bits_denominator`. The dimensions are sampled from a geometric distribution with mean
@@ -64,16 +82,18 @@ pub fn random_natural_vectors(
     mean_bits_denominator: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
-) -> RandomVectors<RandomVecs<Natural, GeometricRandomNaturalValues<u64>, RandomVectorElements>> {
-    random_vectors(
+) -> RandomNaturalVectors<
+    RandomVecs<Natural, GeometricRandomNaturalValues<u64>, RandomVectorElements>,
+> {
+    RandomNaturalVectors(random_vecs(
         seed,
         &|seed_2| random_naturals(seed_2, mean_bits_numerator, mean_bits_denominator),
         mean_length_numerator,
         mean_length_denominator,
-    )
+    ))
 }
 
-/// Generates random [`NaturalVector`](super::NaturalVector)s of a given dimension.
+/// Generates random [`NaturalVector`]s of a given dimension.
 ///
 /// The elements are sampled from [`random_naturals`], with a mean bit count of `mean_bits_numerator
 /// / mean_bits_denominator`.
@@ -111,14 +131,14 @@ pub fn random_natural_vectors_with_dimension(
     dimension: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-) -> RandomVectors<RandomFixedLengthVecsFromSingle<RandomVectorElements>> {
-    random_vectors_with_dimension(
+) -> RandomNaturalVectors<RandomFixedLengthVecsFromSingle<RandomVectorElements>> {
+    RandomNaturalVectors(random_vecs_fixed_length_from_single(
         dimension,
         random_naturals(seed, mean_bits_numerator, mean_bits_denominator),
-    )
+    ))
 }
 
-/// Generates random [`NaturalVector`](super::NaturalVector)s with striped elements.
+/// Generates random [`NaturalVector`]s with striped elements.
 ///
 /// The elements are sampled from [`striped_random_naturals`]: each element's bit count has mean
 /// `mean_bits_numerator / mean_bits_denominator`, and its bits come in runs whose mean length is
@@ -170,10 +190,10 @@ pub fn striped_random_natural_vectors(
     mean_bits_denominator: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
-) -> RandomVectors<
+) -> RandomNaturalVectors<
     RandomVecs<Natural, GeometricRandomNaturalValues<u64>, StripedRandomVectorElements>,
 > {
-    random_vectors(
+    RandomNaturalVectors(random_vecs(
         seed,
         &|seed_2| {
             striped_random_naturals(
@@ -186,11 +206,10 @@ pub fn striped_random_natural_vectors(
         },
         mean_length_numerator,
         mean_length_denominator,
-    )
+    ))
 }
 
-/// Generates random [`NaturalVector`](super::NaturalVector)s of a given dimension, with striped
-/// elements.
+/// Generates random [`NaturalVector`]s of a given dimension, with striped elements.
 ///
 /// The elements are striped, as they are in [`striped_random_natural_vectors`].
 ///
@@ -233,8 +252,8 @@ pub fn striped_random_natural_vectors_with_dimension(
     mean_stripe_denominator: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-) -> RandomVectors<RandomFixedLengthVecsFromSingle<StripedRandomVectorElements>> {
-    random_vectors_with_dimension(
+) -> RandomNaturalVectors<RandomFixedLengthVecsFromSingle<StripedRandomVectorElements>> {
+    RandomNaturalVectors(random_vecs_fixed_length_from_single(
         dimension,
         striped_random_naturals(
             seed,
@@ -243,5 +262,5 @@ pub fn striped_random_natural_vectors_with_dimension(
             mean_bits_numerator,
             mean_bits_denominator,
         ),
-    )
+    ))
 }

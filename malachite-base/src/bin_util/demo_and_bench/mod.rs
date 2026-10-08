@@ -87,7 +87,7 @@ pub(crate) fn register(runner: &mut Runner) {
     strings::register(runner);
     tuples::register(runner);
     unsigned_polynomial::register(runner);
-    vector::register(runner);
+    unsigned_vector::register(runner);
     vars::register(runner);
     vecs::register(runner);
 }
@@ -106,6 +106,6 @@ mod slices;
 mod strings;
 mod tuples;
 mod unsigned_polynomial;
+mod unsigned_vector;
 mod vars;
 mod vecs;
-mod vector;
