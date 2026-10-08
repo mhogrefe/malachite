@@ -63,6 +63,8 @@ use malachite_base::unions::Union2;
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::random::striped_random_unsigned_polynomials;
+use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::unsigned_vector::random::striped_random_unsigned_vectors;
 use malachite_base::vecs::random::random_vecs;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::gaussian_integer::random::striped_random_gaussian_integers;
@@ -72,6 +74,8 @@ use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::random::{
     striped_random_integer_polynomials, striped_random_integer_polynomials_min_degree,
 };
+use malachite_nz::integer_vector::IntegerVector;
+use malachite_nz::integer_vector::random::striped_random_integer_vectors;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::random::{
     striped_random_natural_range_to_infinity, striped_random_naturals,
@@ -79,6 +83,8 @@ use malachite_nz::natural::random::{
 };
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::natural_polynomial::random::striped_random_natural_polynomials;
+use malachite_nz::natural_vector::NaturalVector;
+use malachite_nz::natural_vector::random::striped_random_natural_vectors;
 use malachite_nz::test_util::generators::random::random_gmp_format_strings;
 use num::BigRational;
 use std::ops::Shr;
@@ -2446,6 +2452,94 @@ pub fn special_random_rational_vector_unsigned_pair_gen_var_1(
         special_random_rational_vector_gen(config)
             .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
     )
+}
+
+pub fn special_random_rational_vector_integer_vector_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalVector, IntegerVector)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integer_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_rational_vector_natural_vector_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalVector, NaturalVector)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_natural_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_rational_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(RationalVector, UnsignedVector<T>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_vectors(
+                seed,
+                config.get_or("mean_unsigned_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_unsigned_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
 }
 
 pub fn special_random_rational_vector_triple_gen(

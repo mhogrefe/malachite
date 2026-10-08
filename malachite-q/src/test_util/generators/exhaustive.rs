@@ -58,6 +58,8 @@ use malachite_base::tuples::exhaustive::{
 };
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
+use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::unsigned_vector::exhaustive::exhaustive_unsigned_vectors;
 use malachite_base::vecs::exhaustive::exhaustive_vecs;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::gaussian_integer::exhaustive::exhaustive_gaussian_integers;
@@ -67,12 +69,16 @@ use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
 };
+use malachite_nz::integer_vector::IntegerVector;
+use malachite_nz::integer_vector::exhaustive::exhaustive_integer_vectors;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
 };
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::natural_polynomial::exhaustive::exhaustive_natural_polynomials;
+use malachite_nz::natural_vector::NaturalVector;
+use malachite_nz::natural_vector::exhaustive::exhaustive_natural_vectors;
 use malachite_nz::test_util::generators::common::{
     GMP_FORMAT_COMBO_COUNT, gmp_format_string_from_parts,
 };
@@ -985,6 +991,28 @@ pub fn exhaustive_rational_vector_unsigned_pair_gen_var_1() -> It<(RationalVecto
         exhaustive_rational_vectors()
             .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
     )
+}
+
+pub fn exhaustive_rational_vector_integer_vector_pair_gen() -> It<(RationalVector, IntegerVector)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_vectors(),
+        exhaustive_integer_vectors(),
+    ))
+}
+
+pub fn exhaustive_rational_vector_natural_vector_pair_gen() -> It<(RationalVector, NaturalVector)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_vectors(),
+        exhaustive_natural_vectors(),
+    ))
+}
+
+pub fn exhaustive_rational_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
+-> It<(RationalVector, UnsignedVector<T>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_vectors(),
+        exhaustive_unsigned_vectors(),
+    ))
 }
 
 pub fn exhaustive_rational_vector_triple_gen()

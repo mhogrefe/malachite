@@ -57,12 +57,13 @@ fn from_natural_vector_properties() {
     });
 
     natural_vector_pair_gen().test_properties(|(v, w)| {
+        let v_q = RationalVector::from(v.clone());
+        let w_q = RationalVector::from(w.clone());
         // The two types order their vectors the same way.
         assert_eq!(
             ShortlexNaturalVectorRef(&v).cmp(&ShortlexNaturalVectorRef(&w)),
-            ShortlexRationalVectorRef(&RationalVector::from(v.clone()))
-                .cmp(&ShortlexRationalVectorRef(&RationalVector::from(w.clone())))
+            ShortlexRationalVectorRef(&v_q).cmp(&ShortlexRationalVectorRef(&w_q))
         );
-        assert_eq!(v == w, RationalVector::from(v) == RationalVector::from(w));
+        assert_eq!(v == w, v_q == w_q);
     });
 }

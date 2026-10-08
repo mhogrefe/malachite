@@ -27,11 +27,14 @@ use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
+use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
+use malachite_nz::natural_vector::NaturalVector;
 use num::BigRational;
 use std::ops::Shr;
 
@@ -1272,6 +1275,31 @@ pub fn rational_vector_unsigned_pair_gen_var_1() -> Generator<(RationalVector, u
         &exhaustive_rational_vector_unsigned_pair_gen_var_1,
         &random_rational_vector_unsigned_pair_gen_var_1,
         &special_random_rational_vector_unsigned_pair_gen_var_1,
+    )
+}
+
+pub fn rational_vector_integer_vector_pair_gen() -> Generator<(RationalVector, IntegerVector)> {
+    Generator::new(
+        &exhaustive_rational_vector_integer_vector_pair_gen,
+        &random_rational_vector_integer_vector_pair_gen,
+        &special_random_rational_vector_integer_vector_pair_gen,
+    )
+}
+
+pub fn rational_vector_natural_vector_pair_gen() -> Generator<(RationalVector, NaturalVector)> {
+    Generator::new(
+        &exhaustive_rational_vector_natural_vector_pair_gen,
+        &random_rational_vector_natural_vector_pair_gen,
+        &special_random_rational_vector_natural_vector_pair_gen,
+    )
+}
+
+pub fn rational_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(RationalVector, UnsignedVector<T>)> {
+    Generator::new(
+        &exhaustive_rational_vector_unsigned_vector_pair_gen,
+        &random_rational_vector_unsigned_vector_pair_gen,
+        &special_random_rational_vector_unsigned_vector_pair_gen,
     )
 }
 

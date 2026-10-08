@@ -62,6 +62,8 @@ documented by git history.
   integer; and for `UnsignedVector<T>`, failing with `UnsignedVectorFromRationalVectorError` when an
   element is negative, not an integer, or too large for `T`. Each comes with the matching
   `ConvertibleFrom<&RationalVector>`.
+- `PartialEq` in both directions between `RationalVector` and each of `UnsignedVector<T>`,
+  `NaturalVector`, and `IntegerVector`.
 
 ## 0.13.0 — 2026-10-06
 
