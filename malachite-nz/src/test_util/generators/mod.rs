@@ -41,6 +41,7 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, Satura
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
 use num::{BigInt, BigUint};
 use std::cmp::min;
@@ -3787,6 +3788,15 @@ pub fn natural_vector_unsigned_pair_gen_var_1() -> Generator<(NaturalVector, usi
         &exhaustive_natural_vector_unsigned_pair_gen_var_1,
         &random_natural_vector_unsigned_pair_gen_var_1,
         &special_random_natural_vector_unsigned_pair_gen_var_1,
+    )
+}
+
+pub fn natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(NaturalVector, UnsignedVector<T>)> {
+    Generator::new(
+        &exhaustive_natural_vector_unsigned_vector_pair_gen,
+        &random_natural_vector_unsigned_vector_pair_gen,
+        &special_random_natural_vector_unsigned_vector_pair_gen,
     )
 }
 

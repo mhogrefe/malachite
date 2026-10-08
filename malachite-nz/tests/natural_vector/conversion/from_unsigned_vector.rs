@@ -50,12 +50,13 @@ fn from_unsigned_vector_properties() {
     });
 
     unsigned_vector_pair_gen().test_properties(|(v, w)| {
+        let v_n = NaturalVector::from(v.clone());
+        let w_n = NaturalVector::from(w.clone());
         // The two types order their vectors the same way.
         assert_eq!(
             ShortlexUnsignedVectorRef(&v).cmp(&ShortlexUnsignedVectorRef(&w)),
-            ShortlexNaturalVectorRef(&NaturalVector::from(v.clone()))
-                .cmp(&ShortlexNaturalVectorRef(&NaturalVector::from(w.clone())))
+            ShortlexNaturalVectorRef(&v_n).cmp(&ShortlexNaturalVectorRef(&w_n))
         );
-        assert_eq!(v == w, NaturalVector::from(v) == NaturalVector::from(w));
+        assert_eq!(v == w, v_n == w_n);
     });
 }

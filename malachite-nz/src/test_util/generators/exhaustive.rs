@@ -166,6 +166,8 @@ use malachite_base::tuples::exhaustive::{
 };
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
+use malachite_base::unsigned_vector::UnsignedVector;
+use malachite_base::unsigned_vector::exhaustive::exhaustive_unsigned_vectors;
 use malachite_base::vecs::exhaustive::{
     ExhaustiveVecs, LexFixedLengthVecsFromSingle, exhaustive_vecs,
     exhaustive_vecs_fixed_length_from_single, exhaustive_vecs_length_range,
@@ -3424,6 +3426,14 @@ pub fn exhaustive_natural_vector_unsigned_pair_gen_var_1() -> It<(NaturalVector,
         exhaustive_natural_vectors()
             .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
     )
+}
+
+pub fn exhaustive_natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
+-> It<(NaturalVector, UnsignedVector<T>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_vectors(),
+        exhaustive_unsigned_vectors(),
+    ))
 }
 
 pub fn exhaustive_natural_vector_triple_gen() -> It<(NaturalVector, NaturalVector, NaturalVector)> {
