@@ -119,8 +119,7 @@ fn mod_power_of_2_sub_properties() {
         x.mod_power_of_2_sub_assign(w.clone(), pow);
         assert_eq!(x, r);
 
-        // The result is reduced, has the same dimension, and is the elementwise modular
-        // difference.
+        // The result is reduced, has the same dimension, and is the elementwise modular difference.
         assert!(r.mod_power_of_2_is_reduced(pow));
         assert_eq!(r.dimension(), v.dimension());
         for ((x, y), z) in v.elements.iter().zip(&w.elements).zip(&r.elements) {

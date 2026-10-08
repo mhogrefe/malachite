@@ -59,3 +59,7 @@ pub mod mod_power_of_2_neg;
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting vectors modulo a power of 2.
 pub mod mod_power_of_2_sub;
+/// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
+/// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting vectors
+/// modulo a number.
+pub mod mod_sub;

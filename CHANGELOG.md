@@ -61,6 +61,8 @@ documented by git history.
   negating every element modulo $2^k$.
 - `ModAdd<_, T>` and `ModAddAssign<_, T>` for `UnsignedVector<T>`, in every combination of value
   and reference, adding two vectors of the same dimension modulo $m$.
+- `ModSub<_, T>` and `ModSubAssign<_, T>` for `UnsignedVector<T>`, in every combination of value
+  and reference, subtracting two vectors of the same dimension modulo $m$.
 - `ModNeg<T>` (by value and by reference) and `ModNegAssign<T>` for `UnsignedVector<T>`, negating
   every element modulo $m$.
 - `ModPowerOf2Add` and `ModPowerOf2AddAssign` for `UnsignedVector<T>`, in every combination of
@@ -108,6 +110,8 @@ documented by git history.
   negating every element modulo $2^k$.
 - `ModAdd` and `ModAddAssign` for `NaturalVector` with a `Natural` modulus, in every combination
   of value and reference, adding two vectors of the same dimension modulo $m$.
+- `ModSub` and `ModSubAssign` for `NaturalVector` with a `Natural` modulus, in every combination
+  of value and reference, subtracting two vectors of the same dimension modulo $m$.
 - `ModNeg` and `ModNegAssign` for `NaturalVector` with a `Natural` modulus, in every combination of
   value and reference, negating every element modulo $m$.
 - `ModPowerOf2Add` and `ModPowerOf2AddAssign` for `NaturalVector`, in every combination of value
