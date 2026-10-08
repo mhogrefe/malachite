@@ -20,7 +20,7 @@ fn assert_same_dimension(v: &RationalVector, w: &RationalVector) {
 impl Sub<Self> for RationalVector {
     type Output = Self;
 
-    /// Subtracts a [`RationalVector`] from another [`RationalVector`], taking both by value.
+    /// Subtracts two [`RationalVector`]s, taking both by value.
     ///
     /// The difference is taken element by element, so the result has the same dimension as the
     /// operands.
@@ -59,8 +59,7 @@ impl Sub<Self> for RationalVector {
 impl Sub<&Self> for RationalVector {
     type Output = Self;
 
-    /// Subtracts a [`RationalVector`] from another [`RationalVector`], taking the first by value
-    /// and the second by reference.
+    /// Subtracts two [`RationalVector`]s, taking the first by value and the second by reference.
     ///
     /// The difference is taken element by element, so the result has the same dimension as the
     /// operands.
@@ -99,8 +98,7 @@ impl Sub<&Self> for RationalVector {
 impl Sub<RationalVector> for &RationalVector {
     type Output = RationalVector;
 
-    /// Subtracts a [`RationalVector`] from another [`RationalVector`], taking the first by
-    /// reference and the second by value.
+    /// Subtracts two [`RationalVector`]s, taking the first by reference and the second by value.
     ///
     /// The difference is taken element by element, so the result has the same dimension as the
     /// operands.
@@ -139,7 +137,7 @@ impl Sub<RationalVector> for &RationalVector {
 impl Sub<&RationalVector> for &RationalVector {
     type Output = RationalVector;
 
-    /// Subtracts a [`RationalVector`] from another [`RationalVector`], taking both by reference.
+    /// Subtracts two [`RationalVector`]s, taking both by reference.
     ///
     /// The difference is taken element by element, so the result has the same dimension as the
     /// operands.

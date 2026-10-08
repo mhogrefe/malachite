@@ -51,3 +51,7 @@ pub mod mod_power_of_2_is_reduced;
 /// [`ModPowerOf2NegAssign`](crate::num::arithmetic::traits::ModPowerOf2NegAssign), for negating a
 /// vector modulo a power of 2.
 pub mod mod_power_of_2_neg;
+/// Implementations of [`ModPowerOf2Sub`](crate::num::arithmetic::traits::ModPowerOf2Sub) and
+/// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
+/// vectors modulo a power of 2.
+pub mod mod_power_of_2_sub;

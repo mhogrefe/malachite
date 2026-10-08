@@ -20,7 +20,7 @@ fn assert_same_dimension(v: &IntegerVector, w: &IntegerVector) {
 impl Sub<Self> for IntegerVector {
     type Output = Self;
 
-    /// Subtracts a [`IntegerVector`] from another [`IntegerVector`], taking both by value.
+    /// Subtracts two [`IntegerVector`]s, taking both by value.
     ///
     /// The difference is taken element by element, so the result has the same dimension as the
     /// operands.
@@ -61,8 +61,7 @@ impl Sub<Self> for IntegerVector {
 impl Sub<&Self> for IntegerVector {
     type Output = Self;
 
-    /// Subtracts a [`IntegerVector`] from another [`IntegerVector`], taking the first by value and
-    /// the second by reference.
+    /// Subtracts two [`IntegerVector`]s, taking the first by value and the second by reference.
     ///
     /// The difference is taken element by element, so the result has the same dimension as the
     /// operands.
@@ -103,8 +102,7 @@ impl Sub<&Self> for IntegerVector {
 impl Sub<IntegerVector> for &IntegerVector {
     type Output = IntegerVector;
 
-    /// Subtracts a [`IntegerVector`] from another [`IntegerVector`], taking the first by reference
-    /// and the second by value.
+    /// Subtracts two [`IntegerVector`]s, taking the first by reference and the second by value.
     ///
     /// The difference is taken element by element, so the result has the same dimension as the
     /// operands.
@@ -145,7 +143,7 @@ impl Sub<IntegerVector> for &IntegerVector {
 impl Sub<&IntegerVector> for &IntegerVector {
     type Output = IntegerVector;
 
-    /// Subtracts a [`IntegerVector`] from another [`IntegerVector`], taking both by reference.
+    /// Subtracts two [`IntegerVector`]s, taking both by reference.
     ///
     /// The difference is taken element by element, so the result has the same dimension as the
     /// operands.
