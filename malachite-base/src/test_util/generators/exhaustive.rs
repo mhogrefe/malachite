@@ -5550,6 +5550,12 @@ impl<T: PrimitiveUnsigned>
     }
 }
 
+pub fn exhaustive_unsigned_vec_triple_gen<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_vecs(
+        exhaustive_unsigneds(),
+    )))
+}
+
 pub fn exhaustive_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(

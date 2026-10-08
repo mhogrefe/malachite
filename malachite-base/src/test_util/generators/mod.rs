@@ -4481,6 +4481,14 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_24<T: PrimitiveUnsigned
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
+pub fn unsigned_vec_triple_gen<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen,
+        &random_primitive_int_vec_triple_gen,
+        &special_random_unsigned_vec_triple_gen,
+    )
+}
+
 // All `(Vec<T>, Vec<T>, Vec<T>)` where `T` is unsigned, no `Vec` is empty, the second and third
 // `Vec`s have equal length, and the first is at least twice as long as the second.
 pub fn unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>

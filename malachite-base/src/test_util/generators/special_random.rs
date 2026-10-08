@@ -8919,6 +8919,18 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64)>> Iterator
     }
 }
 
+pub fn special_random_unsigned_vec_triple_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(random_triples_from_single(striped_random_unsigned_vecs(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", T::WIDTH << 1),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
 pub fn special_random_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {

@@ -17,6 +17,8 @@ use crate::rational::random::{
 };
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::random::random_rational_polynomials;
+use crate::rational_vector::RationalVector;
+use crate::rational_vector::random::random_rational_vectors;
 use crate::test_util::extra_variadic::{
     random_ordered_unique_triples, random_quadruples, random_quadruples_from_single,
     random_quadruples_xxyz, random_triples, random_triples_from_single, random_triples_xxy,
@@ -2180,6 +2182,49 @@ pub fn random_gaussian_rational_vec_gen(config: &GenConfig) -> It<Vec<GaussianRa
         config.get_or("mean_len_n", 4),
         config.get_or("mean_len_d", 1),
     ))
+}
+
+// -- RationalVector --
+
+pub fn random_rational_vector_gen(config: &GenConfig) -> It<RationalVector> {
+    Box::new(random_rational_vectors(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn random_rational_vector_pair_gen(config: &GenConfig) -> It<(RationalVector, RationalVector)> {
+    Box::new(random_pairs_from_single(random_rational_vectors(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
+pub fn random_rational_vector_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalVector, usize)> {
+    Box::new(
+        random_rational_vector_gen(config)
+            .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
+    )
+}
+
+pub fn random_rational_vector_triple_gen(
+    config: &GenConfig,
+) -> It<(RationalVector, RationalVector, RationalVector)> {
+    Box::new(random_triples_from_single(random_rational_vectors(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
 }
 
 // -- Vec<Rational> --

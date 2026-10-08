@@ -12,8 +12,10 @@ pub(crate) fn register(runner: &mut Runner) {
     gaussian_rational::register(runner);
     rational::register(runner);
     rational_polynomial::register(runner);
+    rational_vector::register(runner);
 }
 
 mod gaussian_rational;
 mod rational;
 mod rational_polynomial;
+mod rational_vector;

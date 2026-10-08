@@ -18,6 +18,8 @@ use crate::rational::exhaustive::{
 };
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::exhaustive::exhaustive_rational_polynomials;
+use crate::rational_vector::RationalVector;
+use crate::rational_vector::exhaustive::exhaustive_rational_vectors;
 use crate::test_util::extra_variadic::{
     exhaustive_ordered_unique_triples, exhaustive_quadruples_from_single,
     exhaustive_quadruples_xxyz, exhaustive_quadruples_xyyy, exhaustive_triples_from_single,
@@ -964,6 +966,30 @@ pub fn exhaustive_string_triple_gen_var_3() -> It<(String, String, String)> {
 
 pub fn exhaustive_gaussian_rational_vec_gen() -> It<Vec<GaussianRational>> {
     Box::new(exhaustive_vecs(exhaustive_gaussian_rationals()))
+}
+
+// -- RationalVector --
+
+pub fn exhaustive_rational_vector_gen() -> It<RationalVector> {
+    Box::new(exhaustive_rational_vectors())
+}
+
+pub fn exhaustive_rational_vector_pair_gen() -> It<(RationalVector, RationalVector)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_rational_vectors()))
+}
+
+// Each vector paired with each of its indices. A vector has finitely many, so this reaches every
+// pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_rational_vector_unsigned_pair_gen_var_1() -> It<(RationalVector, usize)> {
+    Box::new(
+        exhaustive_rational_vectors()
+            .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
+    )
+}
+
+pub fn exhaustive_rational_vector_triple_gen()
+-> It<(RationalVector, RationalVector, RationalVector)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_rational_vectors()))
 }
 
 // -- Vec<Rational> --

@@ -412,3 +412,37 @@ pub mod rational {
         pub mod striped_random_rationals;
     }
 }
+pub mod rational_vector {
+    pub mod access;
+    pub mod basic {
+        pub mod named;
+        pub mod size;
+    }
+    pub mod comparison {
+        pub mod shortlex_cmp;
+    }
+    pub mod conversion {
+        pub mod from_elements;
+        pub mod from_numerators_and_denominator;
+        #[cfg(feature = "serde")]
+        pub mod serde;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+        pub mod to_elements;
+        pub mod to_numerators_and_denominator;
+    }
+    pub mod dimension;
+    pub mod exhaustive {
+        pub mod exhaustive_rational_vectors;
+    }
+    pub mod random {
+        pub mod random_rational_vectors;
+        pub mod random_rational_vectors_with_dimension;
+        pub mod striped_random_rational_vectors;
+        pub mod striped_random_rational_vectors_with_dimension;
+    }
+}

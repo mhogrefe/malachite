@@ -9,6 +9,7 @@
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
 use crate::rational_polynomial::RationalPolynomial;
+use crate::rational_vector::RationalVector;
 use crate::test_util::generators::common::{
     rational_integer_pair_rm, rational_natural_pair_rm, rational_nrm, rational_pair_1_nrm,
     rational_pair_1_rm, rational_pair_nm, rational_pair_nrm, rational_pair_rm, rational_rm,
@@ -1244,6 +1245,41 @@ pub fn gaussian_rational_vec_gen() -> Generator<Vec<GaussianRational>> {
         &exhaustive_gaussian_rational_vec_gen,
         &random_gaussian_rational_vec_gen,
         &special_random_gaussian_rational_vec_gen,
+    )
+}
+
+// -- RationalVector --
+
+pub fn rational_vector_gen() -> Generator<RationalVector> {
+    Generator::new(
+        &exhaustive_rational_vector_gen,
+        &random_rational_vector_gen,
+        &special_random_rational_vector_gen,
+    )
+}
+
+pub fn rational_vector_pair_gen() -> Generator<(RationalVector, RationalVector)> {
+    Generator::new(
+        &exhaustive_rational_vector_pair_gen,
+        &random_rational_vector_pair_gen,
+        &special_random_rational_vector_pair_gen,
+    )
+}
+
+// All indices in [0, dimension).
+pub fn rational_vector_unsigned_pair_gen_var_1() -> Generator<(RationalVector, usize)> {
+    Generator::new(
+        &exhaustive_rational_vector_unsigned_pair_gen_var_1,
+        &random_rational_vector_unsigned_pair_gen_var_1,
+        &special_random_rational_vector_unsigned_pair_gen_var_1,
+    )
+}
+
+pub fn rational_vector_triple_gen() -> Generator<(RationalVector, RationalVector, RationalVector)> {
+    Generator::new(
+        &exhaustive_rational_vector_triple_gen,
+        &random_rational_vector_triple_gen,
+        &special_random_rational_vector_triple_gen,
     )
 }
 

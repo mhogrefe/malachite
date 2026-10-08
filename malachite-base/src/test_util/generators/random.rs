@@ -7193,6 +7193,17 @@ impl<T: PrimitiveInt, I: Iterator<Item = (usize, usize)>> Iterator
     }
 }
 
+pub fn random_primitive_int_vec_triple_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(random_triples_from_single(random_vecs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
+
 pub fn random_primitive_int_vec_triple_gen_var_1<T: PrimitiveInt>(
     config: &GenConfig,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {

@@ -21,3 +21,4 @@ pub mod stats;
 pub mod unsigned_polynomial;
 pub mod vars;
 pub mod vecs;
+pub mod vector;

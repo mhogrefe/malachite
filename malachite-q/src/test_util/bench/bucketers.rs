@@ -9,6 +9,7 @@
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
 use crate::rational_polynomial::RationalPolynomial;
+use crate::rational_vector::RationalVector;
 use malachite_base::max;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -577,6 +578,57 @@ pub fn triple_1_2_rational_polynomial_max_bit_bucketer<'a, T>(
             ))
         },
         bucketing_label: format!("max({x_name}'s total bits, {y_name}'s total bits)"),
+    }
+}
+
+pub fn rational_vector_bit_bucketer(var_name: &str) -> Bucketer<'_, RationalVector> {
+    Bucketer {
+        bucketing_function: &|v| {
+            usize::exact_from(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn pair_rational_vector_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (RationalVector, RationalVector)> {
+    Bucketer {
+        bucketing_function: &|(v, w)| {
+            usize::exact_from(max(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+                w.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}'s total element bits, {y_name}'s total element bits)"
+        ),
+    }
+}
+
+pub fn pair_1_rational_vector_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (RationalVector, T)> {
+    Bucketer {
+        bucketing_function: &|(v, _)| {
+            usize::exact_from(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
     }
 }
 

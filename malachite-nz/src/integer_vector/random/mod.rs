@@ -10,40 +10,22 @@ use crate::integer::Integer;
 use crate::integer::random::{
     RandomIntegers, StripedRandomIntegers, random_integers, striped_random_integers,
 };
-use crate::integer_vector::IntegerVector;
-use alloc::vec::Vec;
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, GeometricRandomSigneds,
 };
 use malachite_base::random::Seed;
-use malachite_base::vecs::random::{
-    RandomFixedLengthVecsFromSingle, RandomVecs, random_vecs, random_vecs_fixed_length_from_single,
+use malachite_base::vecs::random::{RandomFixedLengthVecsFromSingle, RandomVecs};
+use malachite_base::vector::random::{
+    RandomVectors, random_vectors, random_vectors_with_dimension,
 };
 
-/// Generates random [`IntegerVector`]s from an iterator of [`Vec`]s of [`Integer`]s.
-///
-/// This `struct` is created by [`random_integer_vectors`],
-/// [`random_integer_vectors_with_dimension`], [`striped_random_integer_vectors`], and
-/// [`striped_random_integer_vectors_with_dimension`]; see their documentation for more.
-#[derive(Clone, Debug)]
-pub struct RandomIntegerVectors<I: Iterator<Item = Vec<Integer>>>(I);
-
-impl<I: Iterator<Item = Vec<Integer>>> Iterator for RandomIntegerVectors<I> {
-    type Item = IntegerVector;
-
-    #[inline]
-    fn next(&mut self) -> Option<IntegerVector> {
-        self.0.next().map(|elements| IntegerVector { elements })
-    }
-}
-
-/// The elements that the unstriped [`IntegerVector`] generators draw on.
+/// The elements that the unstriped [`IntegerVector`](super::IntegerVector) generators draw on.
 pub type RandomVectorElements = RandomIntegers<GeometricRandomSigneds<i64>>;
 
-/// The elements that the striped [`IntegerVector`] generators draw on.
+/// The elements that the striped [`IntegerVector`](super::IntegerVector) generators draw on.
 pub type StripedRandomVectorElements = StripedRandomIntegers<GeometricRandomSigneds<i64>>;
 
-/// Generates random [`IntegerVector`]s.
+/// Generates random [`IntegerVector`](super::IntegerVector)s.
 ///
 /// The elements are sampled from [`random_integers`], with a mean bit count of `mean_bits_numerator
 /// / mean_bits_denominator`. The dimensions are sampled from a geometric distribution with mean
@@ -84,18 +66,16 @@ pub fn random_integer_vectors(
     mean_bits_denominator: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
-) -> RandomIntegerVectors<
-    RandomVecs<Integer, GeometricRandomNaturalValues<u64>, RandomVectorElements>,
-> {
-    RandomIntegerVectors(random_vecs(
+) -> RandomVectors<RandomVecs<Integer, GeometricRandomNaturalValues<u64>, RandomVectorElements>> {
+    random_vectors(
         seed,
         &|seed_2| random_integers(seed_2, mean_bits_numerator, mean_bits_denominator),
         mean_length_numerator,
         mean_length_denominator,
-    ))
+    )
 }
 
-/// Generates random [`IntegerVector`]s of a given dimension.
+/// Generates random [`IntegerVector`](super::IntegerVector)s of a given dimension.
 ///
 /// The elements are sampled from [`random_integers`], with a mean bit count of `mean_bits_numerator
 /// / mean_bits_denominator`.
@@ -134,14 +114,14 @@ pub fn random_integer_vectors_with_dimension(
     dimension: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-) -> RandomIntegerVectors<RandomFixedLengthVecsFromSingle<RandomVectorElements>> {
-    RandomIntegerVectors(random_vecs_fixed_length_from_single(
+) -> RandomVectors<RandomFixedLengthVecsFromSingle<RandomVectorElements>> {
+    random_vectors_with_dimension(
         dimension,
         random_integers(seed, mean_bits_numerator, mean_bits_denominator),
-    ))
+    )
 }
 
-/// Generates random [`IntegerVector`]s with striped elements.
+/// Generates random [`IntegerVector`](super::IntegerVector)s with striped elements.
 ///
 /// The elements are sampled from [`striped_random_integers`]: each element's bit count has mean
 /// `mean_bits_numerator / mean_bits_denominator`, and its bits come in runs whose mean length is
@@ -193,10 +173,10 @@ pub fn striped_random_integer_vectors(
     mean_bits_denominator: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
-) -> RandomIntegerVectors<
+) -> RandomVectors<
     RandomVecs<Integer, GeometricRandomNaturalValues<u64>, StripedRandomVectorElements>,
 > {
-    RandomIntegerVectors(random_vecs(
+    random_vectors(
         seed,
         &|seed_2| {
             striped_random_integers(
@@ -209,10 +189,11 @@ pub fn striped_random_integer_vectors(
         },
         mean_length_numerator,
         mean_length_denominator,
-    ))
+    )
 }
 
-/// Generates random [`IntegerVector`]s of a given dimension, with striped elements.
+/// Generates random [`IntegerVector`](super::IntegerVector)s of a given dimension, with striped
+/// elements.
 ///
 /// The elements are striped, as they are in [`striped_random_integer_vectors`].
 ///
@@ -256,8 +237,8 @@ pub fn striped_random_integer_vectors_with_dimension(
     mean_stripe_denominator: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-) -> RandomIntegerVectors<RandomFixedLengthVecsFromSingle<StripedRandomVectorElements>> {
-    RandomIntegerVectors(random_vecs_fixed_length_from_single(
+) -> RandomVectors<RandomFixedLengthVecsFromSingle<StripedRandomVectorElements>> {
+    random_vectors_with_dimension(
         dimension,
         striped_random_integers(
             seed,
@@ -266,5 +247,5 @@ pub fn striped_random_integer_vectors_with_dimension(
             mean_bits_numerator,
             mean_bits_denominator,
         ),
-    ))
+    )
 }

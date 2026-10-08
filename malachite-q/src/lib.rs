@@ -151,6 +151,9 @@ pub mod rational;
 /// [`RationalPolynomial`](rational_polynomial::RationalPolynomial), a type representing polynomials
 /// in one variable whose coefficients are [`Rational`]s.
 pub mod rational_polynomial;
+/// [`RationalVector`](rational_vector::RationalVector), a type representing vectors whose elements
+/// are [`Rational`]s.
+pub mod rational_vector;
 pub use rational::Rational;
 
 #[cfg(feature = "test_build")]

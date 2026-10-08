@@ -11,5 +11,5 @@ use malachite_nz::integer_vector::IntegerVector;
 
 #[test]
 fn test_named() {
-    assert_eq!(IntegerVector::NAME, "IntegerVector");
+    assert_eq!(IntegerVector::NAME, "Vector");
 }

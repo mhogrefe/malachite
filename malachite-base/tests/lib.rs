@@ -1063,3 +1063,33 @@ pub mod vecs {
     pub mod vec_from_str;
     pub mod vec_pad_left;
 }
+pub mod vector {
+    pub mod access;
+    pub mod basic {
+        pub mod named;
+        pub mod size;
+    }
+    pub mod comparison {
+        pub mod shortlex_cmp;
+    }
+    pub mod conversion {
+        pub mod from_elements;
+        #[cfg(feature = "serde")]
+        pub mod serde;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+        pub mod to_elements;
+    }
+    pub mod dimension;
+    pub mod exhaustive {
+        pub mod exhaustive_vectors;
+    }
+    pub mod random {
+        pub mod random_vectors;
+        pub mod random_vectors_with_dimension;
+    }
+}
