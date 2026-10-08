@@ -12,13 +12,13 @@ use malachite_base::num::arithmetic::traits::CanonicalUnitIPow;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 
 impl CanonicalUnitIPow for GaussianInteger {
-    /// Finds the power of $i$ that brings a [`GaussianInteger`] into canonical unit form.
+    /// Finds the power of $i$ that brings a [`GaussianInteger`] into canonical Gaussian-unit form.
     ///
-    /// A nonzero value has four associates, $x$, $ix$, $-x$, and $-ix$; the canonical one is the
-    /// associate whose argument lies in $(-\pi/4, \pi/4]$, that is, whose real part $a$ is positive
-    /// and whose imaginary part $b$ satisfies $-a < b \leq a$. The result is the $k \in \\{0, 1, 2,
-    /// 3\\}$ such that $x i^k$ is canonical, and 0 for zero. The choice of associate, including the
-    /// tie on the diagonals, matches FLINT's `fmpzi_canonical_unit_i_pow`.
+    /// A nonzero value has four Gaussian associates, $x$, $ix$, $-x$, and $-ix$; the canonical one
+    /// is the associate whose argument lies in $(-\pi/4, \pi/4]$, that is, whose real part $a$ is
+    /// positive and whose imaginary part $b$ satisfies $-a < b \leq a$. The result is the $k \in
+    /// \\{0, 1, 2, 3\\}$ such that $x i^k$ is canonical, and 0 for zero. The choice of associate,
+    /// including the tie on the diagonals, matches FLINT's `fmpzi_canonical_unit_i_pow`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

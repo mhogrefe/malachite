@@ -71,6 +71,7 @@ pub mod gaussian_rational {
         pub mod add;
         pub mod canonical_primitive_part;
         pub mod canonical_unit_i_pow;
+        pub mod canonicalize_gaussian_unit;
         pub mod canonicalize_unit;
         pub mod conjugate;
         pub mod content_and_primitive_part;
@@ -260,6 +261,7 @@ pub mod rational {
         pub mod approximate;
         pub mod average;
         pub mod canonical_unit_i_pow;
+        pub mod canonicalize_gaussian_unit;
         pub mod canonicalize_unit;
         pub mod ceiling;
         pub mod cfrac_helpers;
@@ -418,6 +420,7 @@ pub mod rational_vector {
     pub mod access;
     pub mod arithmetic {
         pub mod canonical_primitive_part;
+        pub mod canonicalize_sign;
         pub mod content;
         pub mod neg;
     }

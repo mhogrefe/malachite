@@ -28,6 +28,11 @@ documented by git history.
   now `canonical_primitive_part`, `canonical_primitive_part_assign`, and
   `content_and_canonical_primitive_part`. On `UnsignedPolynomial<T>` and `NaturalPolynomial` the two
   agree.
+- The `CanonicalUnitIPow` docs now describe what the power of $i$ brings a number into as its
+  *canonical Gaussian-unit form*: the Gaussian associate, under the units $\pm 1$ and $\pm i$ of the
+  Gaussian integers, whose argument lies in $(-\pi/4, \pi/4]$. They used to call it the canonical
+  unit form, which since 0.13.0 is 1 for every nonzero element of a field, so that for `Rational`,
+  `GaussianRational`, and `Float` the two no longer agreed. The functions themselves are unchanged.
 
 ### malachite-base
 
@@ -64,6 +69,14 @@ documented by git history.
   $(-\pi/4, \pi/4]$.
 - `Content`, `PrimitivePart`, `PrimitivePartAssign`, `ContentAndPrimitivePart`, and their canonical
   counterparts for `UnsignedVector<T>`, and the canonical ones for `UnsignedPolynomial<T>`.
+- `CanonicalizeGaussianUnit` and `CanonicalizeGaussianUnitAssign`, which multiply a number by the
+  power of $i$ that `CanonicalUnitIPow` finds, bringing it into canonical Gaussian-unit form; for a
+  real number that is its absolute value. Implemented for the primitive integers and floats,
+  `Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, and `GaussianRational`. For
+  `GaussianInteger` this is `canonicalize_unit`; for `GaussianRational` it is what
+  `canonicalize_unit` did before 0.13.0.
+- `CanonicalizeSign` and `CanonicalizeSignAssign`, which negate a value if it is negative; for a
+  vector, "negative" means that its pivot is. Implemented for `IntegerVector` and `RationalVector`.
 
 ### malachite-nz
 

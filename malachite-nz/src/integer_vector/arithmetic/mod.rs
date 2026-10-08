@@ -14,6 +14,11 @@
 /// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which compute the
 /// primitive part of a vector with its first nonzero element made positive.
 pub mod canonical_primitive_part;
+/// Implementations of
+/// [`CanonicalizeSign`](malachite_base::num::arithmetic::traits::CanonicalizeSign) and
+/// [`CanonicalizeSignAssign`](malachite_base::num::arithmetic::traits::CanonicalizeSignAssign),
+/// which negate a vector if its pivot is negative.
+pub mod canonicalize_sign;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart),
 /// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), and

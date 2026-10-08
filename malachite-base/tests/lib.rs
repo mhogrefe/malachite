@@ -268,6 +268,7 @@ pub mod num {
         pub mod bell_number;
         pub mod binomial_coefficient;
         pub mod canonical_unit_i_pow;
+        pub mod canonicalize_gaussian_unit;
         pub mod canonicalize_unit;
         pub mod ceiling;
         pub mod checked_abs;

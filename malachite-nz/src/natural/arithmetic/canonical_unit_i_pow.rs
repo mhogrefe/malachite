@@ -10,8 +10,8 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::CanonicalUnitIPow;
 
 impl CanonicalUnitIPow for Natural {
-    /// Finds the power of $i$ that brings a [`Natural`] into canonical unit form. A [`Natural`] is
-    /// already in canonical unit form, so this is always 0.
+    /// Finds the power of $i$ that brings a [`Natural`] into canonical Gaussian-unit form. A
+    /// [`Natural`] is already in canonical Gaussian-unit form, so this is always 0.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

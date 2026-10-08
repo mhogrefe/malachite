@@ -10,10 +10,10 @@ use crate::Float;
 use malachite_base::num::arithmetic::traits::CanonicalUnitIPow;
 
 impl CanonicalUnitIPow for Float {
-    /// Finds the power of $i$ that brings a [`Float`] into canonical unit form. The canonical unit
-    /// form of a [`Float`] is its absolute value, so this is 2 for values with the sign bit set,
-    /// negative zero and negative infinity included, since $x i^2 = -x$, and 0 otherwise, NaN
-    /// included.
+    /// Finds the power of $i$ that brings a [`Float`] into canonical Gaussian-unit form. The
+    /// canonical unit form of a [`Float`] is its absolute value, so this is 2 for values with the
+    /// sign bit set, negative zero and negative infinity included, since $x i^2 = -x$, and 0
+    /// otherwise, NaN included.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

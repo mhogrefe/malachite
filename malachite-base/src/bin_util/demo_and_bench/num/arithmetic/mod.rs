@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     bell_number::register(runner);
     binomial_coefficient::register(runner);
     canonical_unit_i_pow::register(runner);
+    canonicalize_gaussian_unit::register(runner);
     canonicalize_unit::register(runner);
     ceiling::register(runner);
     checked_add_mul::register(runner);
@@ -154,6 +155,7 @@ mod balanced_mod;
 mod bell_number;
 mod binomial_coefficient;
 mod canonical_unit_i_pow;
+mod canonicalize_gaussian_unit;
 mod canonicalize_unit;
 mod ceiling;
 mod checked_add_mul;

@@ -10,9 +10,9 @@ use crate::integer::Integer;
 use malachite_base::num::arithmetic::traits::CanonicalUnitIPow;
 
 impl CanonicalUnitIPow for Integer {
-    /// Finds the power of $i$ that brings a [`Integer`] into canonical unit form. The canonical
-    /// unit form of an [`Integer`] is its absolute value, so this is 2 for negative values, since
-    /// $x i^2 = -x$, and 0 otherwise.
+    /// Finds the power of $i$ that brings a [`Integer`] into canonical Gaussian-unit form. The
+    /// canonical unit form of an [`Integer`] is its absolute value, so this is 2 for negative
+    /// values, since $x i^2 = -x$, and 0 otherwise.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

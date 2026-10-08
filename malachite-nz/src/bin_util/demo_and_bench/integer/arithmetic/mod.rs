@@ -18,6 +18,7 @@ pub(crate) fn register(runner: &mut Runner) {
     balanced_mod::register(runner);
     binomial_coefficient::register(runner);
     canonical_unit_i_pow::register(runner);
+    canonicalize_gaussian_unit::register(runner);
     canonicalize_unit::register(runner);
     conjugate::register(runner);
     crt::register(runner);
@@ -73,6 +74,7 @@ mod average;
 mod balanced_mod;
 mod binomial_coefficient;
 mod canonical_unit_i_pow;
+mod canonicalize_gaussian_unit;
 mod canonicalize_unit;
 mod conjugate;
 mod crt;

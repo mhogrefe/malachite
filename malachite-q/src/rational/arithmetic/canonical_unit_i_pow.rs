@@ -10,9 +10,9 @@ use crate::Rational;
 use malachite_base::num::arithmetic::traits::CanonicalUnitIPow;
 
 impl CanonicalUnitIPow for Rational {
-    /// Finds the power of $i$ that brings a [`Rational`] into canonical unit form. The canonical
-    /// unit form of a [`Rational`] is its absolute value, so this is 2 for negative values, since
-    /// $x i^2 = -x$, and 0 otherwise.
+    /// Finds the power of $i$ that brings a [`Rational`] into canonical Gaussian-unit form. The
+    /// canonical unit form of a [`Rational`] is its absolute value, so this is 2 for negative
+    /// values, since $x i^2 = -x$, and 0 otherwise.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

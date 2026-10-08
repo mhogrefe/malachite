@@ -1,0 +1,60 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use malachite_base::num::arithmetic::traits::{
+    Abs, CanonicalUnitIPow, CanonicalizeGaussianUnit, CanonicalizeGaussianUnitAssign,
+    CanonicalizeUnit,
+};
+use malachite_nz::integer::Integer;
+use malachite_nz::test_util::generators::integer_gen;
+use std::str::FromStr;
+
+#[test]
+fn test_canonicalize_gaussian_unit() {
+    let test = |s, out| {
+        let x = Integer::from_str(s).unwrap();
+
+        let y = x.clone().canonicalize_gaussian_unit();
+        assert!(y.is_valid());
+        assert_eq!(y.to_string(), out);
+
+        let y = (&x).canonicalize_gaussian_unit();
+        assert!(y.is_valid());
+        assert_eq!(y.to_string(), out);
+
+        let mut y = x;
+        y.canonicalize_gaussian_unit_assign();
+        assert!(y.is_valid());
+        assert_eq!(y.to_string(), out);
+    };
+    test("0", "0");
+    test("123", "123");
+    test("-123", "123");
+    test("-1000000000000", "1000000000000");
+}
+
+#[test]
+fn canonicalize_gaussian_unit_properties() {
+    integer_gen().test_properties(|x| {
+        let y = x.clone().canonicalize_gaussian_unit();
+        assert!(y.is_valid());
+        assert_eq!((&x).canonicalize_gaussian_unit(), y);
+        let mut x_alt = x.clone();
+        x_alt.canonicalize_gaussian_unit_assign();
+        assert_eq!(x_alt, y.clone());
+
+        assert_eq!(y, (&x).abs());
+        // The units of the integers are the Gaussian units 1 and -1, so this is
+        // `canonicalize_unit`.
+        assert_eq!((&x).canonicalize_unit(), y);
+        assert!(y >= 0u32);
+        assert_eq!((&y).canonicalize_gaussian_unit(), y.clone());
+        assert_eq!(y.canonical_unit_i_pow(), 0);
+        assert_eq!((-&x).canonicalize_gaussian_unit(), y);
+    });
+}

@@ -83,6 +83,7 @@ pub mod float {
         pub mod atanh;
         pub mod average;
         pub mod canonical_unit_i_pow;
+        pub mod canonicalize_gaussian_unit;
         pub mod canonicalize_unit;
         pub mod cbrt;
         pub mod compound;

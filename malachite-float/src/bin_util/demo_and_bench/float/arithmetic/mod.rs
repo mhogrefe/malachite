@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     agm::register(runner);
     average::register(runner);
     canonical_unit_i_pow::register(runner);
+    canonicalize_gaussian_unit::register(runner);
     canonicalize_unit::register(runner);
     cbrt::register(runner);
     compound::register(runner);
@@ -116,6 +117,7 @@ mod atan2;
 mod atanh;
 mod average;
 mod canonical_unit_i_pow;
+mod canonicalize_gaussian_unit;
 mod canonicalize_unit;
 mod cbrt;
 mod compound;

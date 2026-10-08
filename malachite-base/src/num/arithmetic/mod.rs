@@ -354,7 +354,7 @@ pub mod balanced_mod;
 pub mod bell_number;
 pub mod binomial_coefficient;
 /// [`CanonicalUnitIPow`](traits::CanonicalUnitIPow), a trait for finding the power of $i$ that
-/// brings a number into canonical unit form.
+/// brings a number into canonical Gaussian-unit form.
 ///
 /// # canonical_unit_i_pow
 /// ```
@@ -367,6 +367,33 @@ pub mod binomial_coefficient;
 /// assert_eq!(f64::NAN.canonical_unit_i_pow(), 0);
 /// ```
 pub mod canonical_unit_i_pow;
+/// [`CanonicalizeGaussianUnit`](traits::CanonicalizeGaussianUnit) and
+/// [`CanonicalizeGaussianUnitAssign`](traits::CanonicalizeGaussianUnitAssign), traits for bringing
+/// a number into canonical Gaussian-unit form: for a real number, its absolute value.
+///
+/// # canonicalize_gaussian_unit
+/// ```
+/// use malachite_base::num::arithmetic::traits::CanonicalizeGaussianUnit;
+///
+/// assert_eq!(123u32.canonicalize_gaussian_unit(), 123);
+/// assert_eq!((-123i32).canonicalize_gaussian_unit(), 123);
+/// assert_eq!((-1.5f64).canonicalize_gaussian_unit(), 1.5);
+/// assert_eq!((-0.0f64).canonicalize_gaussian_unit(), 0.0);
+/// assert_eq!(
+///     f64::NEG_INFINITY.canonicalize_gaussian_unit(),
+///     f64::INFINITY
+/// );
+/// ```
+///
+/// # canonicalize_gaussian_unit_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::CanonicalizeGaussianUnitAssign;
+///
+/// let mut x = -123i32;
+/// x.canonicalize_gaussian_unit_assign();
+/// assert_eq!(x, 123);
+/// ```
+pub mod canonicalize_gaussian_unit;
 /// [`CanonicalizeUnit`](traits::CanonicalizeUnit) and
 /// [`CanonicalizeUnitAssign`](traits::CanonicalizeUnitAssign), traits for bringing a number into
 /// canonical unit form.

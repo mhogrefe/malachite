@@ -135,16 +135,23 @@ pub trait IsUnit {
     fn is_unit(&self) -> bool;
 }
 
-/// Finds the power of $i$ that brings a number into canonical unit form.
+/// Finds the power of $i$ that brings a number into canonical Gaussian-unit form.
 ///
-/// A nonzero complex number has four associates under multiplication by the units $\pm 1$ and $\pm
-/// i$; the canonical one is the associate whose argument lies in $(-\pi/4, \pi/4]$, meaning that
-/// its real part is positive and its imaginary part $b$ satisfies $-a < b \leq a$. This function
-/// returns the $k \in \\{0, 1, 2, 3\\}$ such that $x i^k$ is canonical, and 0 for zero.
+/// The Gaussian units are $1$, $i$, $-1$, and $-i$: the units of the Gaussian integers. Multiplying
+/// a nonzero complex number by them gives its four Gaussian associates, $x$, $ix$, $-x$, and $-ix$,
+/// and the canonical one is the one whose argument lies in $(-\pi/4, \pi/4]$, meaning that its real
+/// part $a$ is positive and its imaginary part $b$ satisfies $-a < b \leq a$. This function returns
+/// the $k \in \\{0, 1, 2, 3\\}$ such that $x i^k$ is canonical, and 0 for zero;
+/// [`CanonicalizeGaussianUnit`] does the multiplication.
 ///
-/// A real number has only the two associates $\pm x$ to choose between, so the answer there is 0
-/// for a nonnegative number and 2 for a negative one, $i^2$ being $-1$. That is what the primitive
-/// implementations return.
+/// A real number has only the two Gaussian associates $\pm x$ to choose between, so the answer
+/// there is 0 for a nonnegative number and 2 for a negative one, $i^2$ being $-1$. That is what the
+/// primitive implementations return.
+///
+/// This is the canonical form of [`CanonicalizeUnit`] only when the ring's units are Gaussian
+/// units: for the integers, whose units are $\pm 1$, and the Gaussian integers, whose units are
+/// $\pm 1$ and $\pm i$. In a field every nonzero element is a unit, so the canonical associate of a
+/// nonzero rational or Gaussian rational is 1, which no power of $i$ reaches.
 pub trait CanonicalUnitIPow {
     fn canonical_unit_i_pow(&self) -> u64;
 }
@@ -162,6 +169,10 @@ pub trait CanonicalUnitIPow {
 /// infinities, and NaN are not units, and keep their absolute value. For a polynomial over the
 /// integers it is the associate with a positive leading coefficient, and over the rationals it is
 /// the monic one.
+///
+/// For the canonical form under the Gaussian units $\pm 1$ and $\pm i$ alone, which rotates a
+/// number by a power of $i$ rather than collapsing a field's units to 1, see
+/// [`CanonicalizeGaussianUnit`].
 pub trait CanonicalizeUnit {
     type Output;
 
@@ -173,6 +184,46 @@ pub trait CanonicalizeUnit {
 /// This is the in-place form of [`CanonicalizeUnit`], and the same per-type behaviour applies.
 pub trait CanonicalizeUnitAssign {
     fn canonicalize_unit_assign(&mut self);
+}
+
+/// Brings a number into canonical Gaussian-unit form: multiplies it by the power of $i$ that
+/// [`CanonicalUnitIPow`] finds.
+///
+/// The result is the Gaussian associate whose argument lies in $(-\pi/4, \pi/4]$. For a real number
+/// that is its absolute value, and zero is its own canonical form. This differs from
+/// [`CanonicalizeUnit`] exactly in a field, where every nonzero element is a unit and canonicalizes
+/// to 1; here a nonzero number keeps its magnitude and is only rotated by a quarter turn or
+/// negated.
+pub trait CanonicalizeGaussianUnit {
+    type Output;
+
+    fn canonicalize_gaussian_unit(self) -> Self::Output;
+}
+
+/// Replaces a number with its canonical Gaussian-unit form.
+///
+/// This is the in-place form of [`CanonicalizeGaussianUnit`].
+pub trait CanonicalizeGaussianUnitAssign {
+    fn canonicalize_gaussian_unit_assign(&mut self);
+}
+
+/// Brings a value into canonical sign form: negates it if it is negative, so that the result is
+/// non-negative.
+///
+/// A value and its negation are the same up to multiplication by $\pm 1$, and this picks one of the
+/// two to represent both. What "negative" means is up to the type: a vector is negative when its
+/// pivot, its first nonzero element, is, so a vector of zeros is already canonical.
+pub trait CanonicalizeSign {
+    type Output;
+
+    fn canonicalize_sign(self) -> Self::Output;
+}
+
+/// Replaces a value with its canonical sign form.
+///
+/// This is the in-place form of [`CanonicalizeSign`].
+pub trait CanonicalizeSignAssign {
+    fn canonicalize_sign_assign(&mut self);
 }
 
 /// Takes the absolute value of a number and converts to the unsigned equivalent.

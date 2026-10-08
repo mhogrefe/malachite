@@ -35,6 +35,12 @@ pub mod average;
 /// finding the power of $i$ that brings a number into canonical unit form.
 pub mod canonical_unit_i_pow;
 /// Implementations of
+/// [`CanonicalizeGaussianUnit`](malachite_base::num::arithmetic::traits::CanonicalizeGaussianUnit)
+/// and [`CanonicalizeGaussianUnitAssign`](
+/// malachite_base::num::arithmetic::traits::CanonicalizeGaussianUnitAssign), traits for bringing a
+/// number into canonical Gaussian-unit form.
+pub mod canonicalize_gaussian_unit;
+/// Implementations of
 /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
 /// traits for bringing a number into canonical unit form.

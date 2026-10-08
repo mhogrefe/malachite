@@ -71,6 +71,7 @@ pub mod gaussian_integer {
         pub mod add;
         pub mod canonical_primitive_part;
         pub mod canonical_unit_i_pow;
+        pub mod canonicalize_gaussian_unit;
         pub mod canonicalize_unit;
         pub mod conjugate;
         pub mod content_and_primitive_part;
@@ -170,6 +171,7 @@ pub mod integer {
         pub mod balanced_mod;
         pub mod binomial_coefficient;
         pub mod canonical_unit_i_pow;
+        pub mod canonicalize_gaussian_unit;
         pub mod canonicalize_unit;
         pub mod conjugate;
         pub mod crt;
@@ -344,6 +346,7 @@ pub mod integer_vector {
     pub mod access;
     pub mod arithmetic {
         pub mod canonical_primitive_part;
+        pub mod canonicalize_sign;
         pub mod content;
         pub mod neg;
     }
@@ -394,6 +397,7 @@ pub mod natural {
         pub mod bell_number;
         pub mod binomial_coefficient;
         pub mod canonical_unit_i_pow;
+        pub mod canonicalize_gaussian_unit;
         pub mod canonicalize_unit;
         pub mod checked_sub;
         pub mod checked_sub_mul;

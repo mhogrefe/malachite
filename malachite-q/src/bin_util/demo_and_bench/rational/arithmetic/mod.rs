@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     approximate::register(runner);
     average::register(runner);
     canonical_unit_i_pow::register(runner);
+    canonicalize_gaussian_unit::register(runner);
     canonicalize_unit::register(runner);
     ceiling::register(runner);
     conjugate::register(runner);
@@ -65,6 +66,7 @@ mod add_mul;
 mod approximate;
 mod average;
 mod canonical_unit_i_pow;
+mod canonicalize_gaussian_unit;
 mod canonicalize_unit;
 mod ceiling;
 mod conjugate;
