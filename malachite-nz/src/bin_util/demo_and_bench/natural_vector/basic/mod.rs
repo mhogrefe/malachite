@@ -12,8 +12,10 @@ pub(crate) fn register(runner: &mut Runner) {
     dimension::register(runner);
     index::register(runner);
     pivot::register(runner);
+    zero::register(runner);
 }
 
 mod dimension;
 mod index;
 mod pivot;
+mod zero;

@@ -7,9 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
 use malachite_base::named::Named;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vector::Vector;
 
@@ -124,6 +126,36 @@ impl Vector for IntegerVector {
     #[inline]
     fn from_owned_elements(xs: Vec<Integer>) -> Self {
         Self { elements: xs }
+    }
+
+    /// Returns the zero vector of a given dimension: a vector of `dimension` zeros.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `dimension`.
+    ///
+    /// # Panics
+    /// Panics if `dimension` is greater than [`usize::MAX`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// assert_eq!(IntegerVector::zero(3).to_string(), "(0, 0, 0)");
+    /// assert_eq!(IntegerVector::zero(0).to_string(), "()");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_vec_init` from `fmpz_vec/vec.c`, FLINT 3.6.0, and to
+    /// `_fmpz_vec_init` from `fmpz_vec.h`.
+    #[inline]
+    fn zero(dimension: u64) -> Self {
+        Self {
+            elements: vec![Integer::ZERO; usize::exact_from(dimension)],
+        }
     }
 
     /// Returns an [`IntegerVector`]'s elements as a [`Vec`], cloning them.

@@ -39,6 +39,9 @@ pub trait Vector: Sized {
     /// this cannot fail, and nothing is copied or allocated.
     fn from_owned_elements(xs: Vec<Self::Element>) -> Self;
 
+    /// Returns the zero vector of a given dimension: a vector of `dimension` zeros.
+    fn zero(dimension: u64) -> Self;
+
     /// Returns a vector's elements as a [`Vec`], cloning them.
     fn to_elements(&self) -> Vec<Self::Element>
     where

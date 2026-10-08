@@ -10,6 +10,7 @@ use crate::named::Named;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
 use crate::vector::Vector;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::{self, Debug, Formatter};
 use core::ops::Deref;
@@ -118,6 +119,36 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
     #[inline]
     fn from_owned_elements(xs: Vec<T>) -> Self {
         Self { elements: xs }
+    }
+
+    /// Returns the zero vector of a given dimension: a vector of `dimension` zeros.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `dimension`.
+    ///
+    /// # Panics
+    /// Panics if `dimension` is greater than [`usize::MAX`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(UnsignedVector::<u8>::zero(3).to_string(), "(0, 0, 0)");
+    /// assert_eq!(UnsignedVector::<u8>::zero(0).to_string(), "()");
+    /// ```
+    ///
+    /// This is equivalent to `_nmod_vec_init` from `nmod_vec.h`, FLINT 3.6.0, followed by
+    /// `_nmod_vec_zero`, since `_nmod_vec_init` leaves the elements uninitialized.
+    #[inline]
+    fn zero(dimension: u64) -> Self {
+        Self {
+            elements: vec![T::ZERO; usize::exact_from(dimension)],
+        }
     }
 
     /// Returns an [`UnsignedVector`]'s elements as a [`Vec`], cloning them.

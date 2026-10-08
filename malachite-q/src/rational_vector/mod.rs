@@ -7,9 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
 use malachite_base::named::Named;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vector::Vector;
 
@@ -132,6 +134,35 @@ impl Vector for RationalVector {
     #[inline]
     fn from_owned_elements(xs: Vec<Rational>) -> Self {
         Self { elements: xs }
+    }
+
+    /// Returns the zero vector of a given dimension: a vector of `dimension` zeros.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `dimension`.
+    ///
+    /// # Panics
+    /// Panics if `dimension` is greater than [`usize::MAX`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vector::Vector;
+    /// use malachite_q::rational_vector::RationalVector;
+    ///
+    /// assert_eq!(RationalVector::zero(3).to_string(), "(0, 0, 0)");
+    /// assert_eq!(RationalVector::zero(0).to_string(), "()");
+    /// ```
+    ///
+    /// This is equivalent to `_fmpq_vec_init` from `fmpq_vec/init.c`, FLINT 3.6.0.
+    #[inline]
+    fn zero(dimension: u64) -> Self {
+        Self {
+            elements: vec![Rational::ZERO; usize::exact_from(dimension)],
+        }
     }
 
     /// Returns a [`RationalVector`]'s elements as a [`Vec`], cloning them.
