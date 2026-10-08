@@ -7762,6 +7762,53 @@ pub fn special_random_natural_vector_triple_gen_var_1(
     )
 }
 
+pub fn special_random_natural_vector_natural_vector_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, u64)> {
+    Box::new(
+        special_random_natural_vector_pair_gen_var_1(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((v, w), pow)| {
+                let bits = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (v, w, pow + bits)
+            }),
+    )
+}
+
+pub fn special_random_natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, NaturalVector, u64)> {
+    Box::new(
+        special_random_natural_vector_triple_gen_var_1(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((v, v2, w), pow)| {
+                let bits = v
+                    .elements
+                    .iter()
+                    .chain(&v2.elements)
+                    .chain(&w.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (v, v2, w, pow + bits)
+            }),
+    )
+}
+
 // -- Vec<Natural> --
 
 pub fn special_random_natural_vec_gen(config: &GenConfig) -> It<Vec<Natural>> {

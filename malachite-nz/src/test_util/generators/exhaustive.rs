@@ -3532,6 +3532,53 @@ pub fn exhaustive_natural_vector_triple_gen_var_1()
     })
 }
 
+pub fn exhaustive_natural_vector_natural_vector_unsigned_triple_gen_var_1()
+-> It<(NaturalVector, NaturalVector, u64)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_natural_vectors_with_dimension(dimension)),
+                exhaustive_unsigneds::<u64>(),
+            )
+            .map(|((v, w), pow)| {
+                let bits = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (v, w, pow + bits)
+            }),
+        )
+    })
+}
+
+pub fn exhaustive_natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1()
+-> It<(NaturalVector, NaturalVector, NaturalVector, u64)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_triples_from_single(exhaustive_natural_vectors_with_dimension(
+                    dimension,
+                )),
+                exhaustive_unsigneds::<u64>(),
+            )
+            .map(|((v, v2, w), pow)| {
+                let bits = v
+                    .elements
+                    .iter()
+                    .chain(&v2.elements)
+                    .chain(&w.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (v, v2, w, pow + bits)
+            }),
+        )
+    })
+}
+
 // -- Vec<Natural> --
 
 pub fn exhaustive_natural_vec_gen() -> It<Vec<Natural>> {

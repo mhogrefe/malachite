@@ -85,7 +85,9 @@ use crate::tuples::exhaustive::{
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
 use crate::unsigned_vector::UnsignedVector;
-use crate::unsigned_vector::exhaustive::exhaustive_unsigned_vectors;
+use crate::unsigned_vector::exhaustive::{
+    exhaustive_unsigned_vectors, exhaustive_unsigned_vectors_with_dimension,
+};
 use crate::vecs::exhaustive::{
     ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, LexFixedLengthVecsFromSingle, ShortlexVecs,
     exhaustive_vecs, exhaustive_vecs_fixed_length_from_single,
@@ -6833,4 +6835,44 @@ pub fn exhaustive_tuples_by_dimension<T: 'static>(
         )
         .map(|(_, t)| t),
     )
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, UnsignedVector<T>, u64)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
+                    dimension,
+                )),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )
+            .filter(|((v, w), pow)| {
+                v.mod_power_of_2_is_reduced(*pow) && w.mod_power_of_2_is_reduced(*pow)
+            })
+            .map(|((v, w), pow)| (v, w, pow)),
+        )
+    })
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, u64)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_triples_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
+                    dimension,
+                )),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )
+            .filter(|((u, v, w), pow)| {
+                u.mod_power_of_2_is_reduced(*pow)
+                    && v.mod_power_of_2_is_reduced(*pow)
+                    && w.mod_power_of_2_is_reduced(*pow)
+            })
+            .map(|((u, v, w), pow)| (u, v, w, pow)),
+        )
+    })
 }

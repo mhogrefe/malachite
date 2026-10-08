@@ -35,6 +35,10 @@ pub mod mod_op;
 /// [`ModPowerOf2Assign`](crate::num::arithmetic::traits::ModPowerOf2Assign), which reduce every
 /// element of a vector modulo a power of 2.
 pub mod mod_power_of_2;
+/// Implementations of [`ModPowerOf2Add`](crate::num::arithmetic::traits::ModPowerOf2Add) and
+/// [`ModPowerOf2AddAssign`](crate::num::arithmetic::traits::ModPowerOf2AddAssign), for adding
+/// vectors modulo a power of 2.
+pub mod mod_power_of_2_add;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every element of a vector is less than a given power of 2.

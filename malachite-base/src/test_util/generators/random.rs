@@ -9149,3 +9149,65 @@ pub fn random_unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
         .map(|(v, m)| (v % m, m)),
     )
 }
+
+pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, u64)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| random_pairs_from_single(random_primitive_ints::<T>(seed)),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            T::WIDTH,
+        ))
+        .map(|(ps, pow)| {
+            let (xs, ys): (Vec<T>, Vec<T>) = ps.into_iter().unzip();
+            (
+                UnsignedVector { elements: xs }.mod_power_of_2(pow),
+                UnsignedVector { elements: ys }.mod_power_of_2(pow),
+                pow,
+            )
+        }),
+    )
+}
+
+pub fn random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, u64)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| random_triples_from_single(random_primitive_ints::<T>(seed)),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            T::WIDTH,
+        ))
+        .map(|(ts, pow)| {
+            let mut xs = Vec::with_capacity(ts.len());
+            let mut ys = Vec::with_capacity(ts.len());
+            let mut zs = Vec::with_capacity(ts.len());
+            for (x, y, z) in ts {
+                xs.push(x);
+                ys.push(y);
+                zs.push(z);
+            }
+            (
+                UnsignedVector { elements: xs }.mod_power_of_2(pow),
+                UnsignedVector { elements: ys }.mod_power_of_2(pow),
+                UnsignedVector { elements: zs }.mod_power_of_2(pow),
+                pow,
+            )
+        }),
+    )
+}
