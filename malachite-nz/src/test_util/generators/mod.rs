@@ -3745,6 +3745,15 @@ pub fn natural_vector_pair_gen() -> Generator<(NaturalVector, NaturalVector)> {
     )
 }
 
+// All indices in [0, dimension).
+pub fn natural_vector_unsigned_pair_gen_var_1() -> Generator<(NaturalVector, usize)> {
+    Generator::new(
+        &exhaustive_natural_vector_unsigned_pair_gen_var_1,
+        &random_natural_vector_unsigned_pair_gen_var_1,
+        &special_random_natural_vector_unsigned_pair_gen_var_1,
+    )
+}
+
 pub fn natural_vector_triple_gen() -> Generator<(NaturalVector, NaturalVector, NaturalVector)> {
     Generator::new(
         &exhaustive_natural_vector_triple_gen,

@@ -7351,6 +7351,15 @@ pub fn special_random_natural_vector_pair_gen(
     )))
 }
 
+pub fn special_random_natural_vector_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, usize)> {
+    Box::new(
+        special_random_natural_vector_gen(config)
+            .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
+    )
+}
+
 pub fn special_random_natural_vector_triple_gen(
     config: &GenConfig,
 ) -> It<(NaturalVector, NaturalVector, NaturalVector)> {

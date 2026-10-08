@@ -60,6 +60,20 @@ pub fn pair_1_natural_polynomial_bit_bucketer<T>(
     }
 }
 
+pub fn pair_1_natural_vector_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (NaturalVector, T)> {
+    Bucketer {
+        bucketing_function: &|(v, _)| {
+            usize::exact_from(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
 pub fn pair_1_integer_polynomial_bit_bucketer<T>(
     var_name: &str,
 ) -> Bucketer<'_, (IntegerPolynomial, T)> {

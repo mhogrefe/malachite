@@ -792,6 +792,7 @@ pub mod natural_polynomial {
     }
 }
 pub mod natural_vector {
+    pub mod access;
     pub mod basic {
         pub mod named;
         pub mod size;
@@ -800,6 +801,7 @@ pub mod natural_vector {
         pub mod shortlex_cmp;
     }
     pub mod conversion {
+        pub mod from_elements;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
@@ -808,6 +810,7 @@ pub mod natural_vector {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod to_elements;
     }
     pub mod dimension;
     pub mod exhaustive {

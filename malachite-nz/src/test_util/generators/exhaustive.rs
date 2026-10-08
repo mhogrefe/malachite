@@ -3392,6 +3392,15 @@ pub fn exhaustive_natural_vector_pair_gen() -> It<(NaturalVector, NaturalVector)
     Box::new(exhaustive_pairs_from_single(exhaustive_natural_vectors()))
 }
 
+// Each vector paired with each of its indices. A vector has finitely many, so this reaches every
+// pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_natural_vector_unsigned_pair_gen_var_1() -> It<(NaturalVector, usize)> {
+    Box::new(
+        exhaustive_natural_vectors()
+            .flat_map(|v| (0..v.elements.len()).map(move |i| (v.clone(), i))),
+    )
+}
+
 pub fn exhaustive_natural_vector_triple_gen() -> It<(NaturalVector, NaturalVector, NaturalVector)> {
     Box::new(exhaustive_triples_from_single(exhaustive_natural_vectors()))
 }
