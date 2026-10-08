@@ -50,6 +50,8 @@ documented by git history.
   checking whether every element is less than $m$.
 - `ModPowerOf2Neg` (by value and by reference) and `ModPowerOf2NegAssign` for `UnsignedVector<T>`,
   negating every element modulo $2^k$.
+- `ModNeg<T>` (by value and by reference) and `ModNegAssign<T>` for `UnsignedVector<T>`, negating
+  every element modulo $m$.
 - `PrimitivePartAssign`, `CanonicalPrimitivePart`, `CanonicalPrimitivePartAssign`, and
   `ContentAndCanonicalPrimitivePart` traits. The canonical primitive part is the primitive part in
   canonical unit form, as `CanonicalizeUnit` chooses it: for polynomials over the integers or
@@ -81,6 +83,8 @@ documented by git history.
 - `ModPowerOf2IsReduced` for `NaturalVector`, checking whether every element is less than $2^k$.
 - `ModPowerOf2Neg` (by value and by reference) and `ModPowerOf2NegAssign` for `NaturalVector`,
   negating every element modulo $2^k$.
+- `ModNeg` and `ModNegAssign` for `NaturalVector` with a `Natural` modulus, in every combination of
+  value and reference, negating every element modulo $m$.
 - `Rem`, `RemAssign`, `Mod`, and `ModAssign` for `NaturalVector` with a `Natural` modulus, in
   every combination of value and reference, reducing every element modulo $m$ and keeping the
   dimension; and `ModIsReduced<Natural>` for `NaturalVector`, checking whether every element is less

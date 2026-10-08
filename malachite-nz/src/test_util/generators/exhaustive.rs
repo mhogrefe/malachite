@@ -3473,6 +3473,15 @@ pub fn exhaustive_natural_vector_unsigned_pair_gen_var_3() -> It<(NaturalVector,
     )
 }
 
+pub fn exhaustive_natural_vector_natural_pair_gen_var_2() -> It<(NaturalVector, Natural)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_natural_vectors(), exhaustive_naturals()).map(|(v, m)| {
+            let m = v.elements.iter().max().cloned().unwrap_or_default() + m + Natural::ONE;
+            (v, m)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>()
 -> It<(NaturalVector, UnsignedVector<T>)> {
     Box::new(exhaustive_pairs(

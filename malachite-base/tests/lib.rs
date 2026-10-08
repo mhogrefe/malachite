@@ -970,6 +970,7 @@ pub mod unsigned_vector {
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod mod_is_reduced;
+        pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_is_reduced;

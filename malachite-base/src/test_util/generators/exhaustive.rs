@@ -6789,3 +6789,14 @@ pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
         .filter(|(v, pow)| v.mod_power_of_2_is_reduced(*pow)),
     )
 }
+
+pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>()
+-> It<(UnsignedVector<T>, T)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_unsigned_vectors::<T>(),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(v, m)| v.mod_is_reduced(m)),
+    )
+}

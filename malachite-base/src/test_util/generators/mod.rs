@@ -5238,3 +5238,14 @@ pub fn unsigned_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
         &special_random_unsigned_vector_unsigned_pair_gen_var_4,
     )
 }
+
+// All `(UnsignedVector<T>, T)` where the `T` is positive and the vector's elements are less than
+// it.
+pub fn unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_pair_gen_var_5,
+        &random_unsigned_vector_unsigned_pair_gen_var_5,
+        &special_random_unsigned_vector_unsigned_pair_gen_var_5,
+    )
+}

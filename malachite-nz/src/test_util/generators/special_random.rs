@@ -7558,6 +7558,40 @@ pub fn special_random_natural_vector_unsigned_pair_gen_var_3(
     )
 }
 
+pub fn special_random_natural_vector_natural_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalVector, Natural)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_vectors(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(v, m)| {
+            let m = v.elements.iter().max().cloned().unwrap_or_default() + m + Natural::ONE;
+            (v, m)
+        }),
+    )
+}
+
 pub fn special_random_natural_vector_unsigned_vector_pair_gen<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(NaturalVector, UnsignedVector<T>)> {
