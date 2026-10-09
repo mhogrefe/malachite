@@ -233,6 +233,9 @@ documented by git history.
 - `EntrywiseMax` and `EntrywiseMaxAssign` for `NaturalVector` and `IntegerVector`, in every
   combination of value and reference, like FLINT's `_fmpz_vec_max` and `_fmpz_vec_max_inplace`;
   and `EntrywiseMin` and `EntrywiseMinAssign`, like `_fmpz_vec_min` and `_fmpz_vec_min_inplace`.
+- `Mul` and `MulAssign` of `NaturalVector` by `Natural` and of `IntegerVector` by `Integer`, in
+  every combination of value and reference, with the scalar on either side, like FLINT's
+  `_fmpz_vec_scalar_mul_fmpz`.
 
 ### malachite-q
 
@@ -279,6 +282,8 @@ documented by git history.
 - `EntrywiseAbs` (by value and by reference) and `EntrywiseAbsAssign` for `RationalVector`.
 - `EntrywiseMax`, `EntrywiseMaxAssign`, `EntrywiseMin`, and `EntrywiseMinAssign` for
   `RationalVector`, in every combination of value and reference.
+- `Mul` and `MulAssign` of `RationalVector` by `Rational`, in every combination of value and
+  reference, with the scalar on either side.
 
 ## 0.13.0 — 2026-10-06
 

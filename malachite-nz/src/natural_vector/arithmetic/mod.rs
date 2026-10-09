@@ -80,3 +80,6 @@ pub mod mod_sub;
 /// [`NaturalVector::multi_crt`](super::NaturalVector::multi_crt), which combines vectors of
 /// residues modulo many word-sized moduli by the Chinese remainder theorem.
 pub mod multi_crt;
+/// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
+/// multiplying a vector by a scalar, with the scalar on either side.
+pub mod scalar_mul;

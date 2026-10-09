@@ -3485,6 +3485,13 @@ pub fn exhaustive_natural_vector_natural_pair_gen_var_1() -> It<(NaturalVector, 
     ))
 }
 
+pub fn exhaustive_natural_vector_natural_pair_gen() -> It<(NaturalVector, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_vectors(),
+        exhaustive_naturals(),
+    ))
+}
+
 pub fn exhaustive_integer_vector_natural_pair_gen_var_1() -> It<(IntegerVector, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_integer_vectors(),
@@ -3496,6 +3503,13 @@ pub fn exhaustive_integer_vector_integer_pair_gen_var_1() -> It<(IntegerVector, 
     Box::new(exhaustive_pairs(
         exhaustive_integer_vectors(),
         exhaustive_nonzero_integers(),
+    ))
+}
+
+pub fn exhaustive_integer_vector_integer_pair_gen() -> It<(IntegerVector, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_vectors(),
+        exhaustive_integers(),
     ))
 }
 

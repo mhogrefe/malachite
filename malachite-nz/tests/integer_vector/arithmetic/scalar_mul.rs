@@ -7,13 +7,18 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::num::arithmetic::traits::{L1Norm, UnsignedAbs};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::strings::ToDebugString;
+use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::integer_vector::arithmetic::scalar_mul::{
     integers_mul_scalar, integers_mul_scalar_assign, integers_mul_scalar_to_out,
 };
-use malachite_nz::test_util::generators::{integer_vec_gen, integer_vec_integer_pair_gen};
+use malachite_nz::test_util::generators::{
+    integer_vec_gen, integer_vec_integer_pair_gen, integer_vector_integer_pair_gen,
+};
 use malachite_nz::test_util::integer_vector::arithmetic::scalar_mul::integers_mul_scalar_naive;
 
 fn parse(xs: &[&str]) -> Vec<Integer> {
@@ -87,5 +92,72 @@ fn integers_mul_scalar_properties() {
             integers_mul_scalar(&xs, &Integer::NEGATIVE_ONE),
             xs.iter().map(|x| -x).collect::<Vec<_>>()
         );
+    });
+}
+
+#[test]
+fn test_mul_scalar() {
+    let test = |s, c, out| {
+        let v = IntegerVector::from_str(s).unwrap();
+        let c = Integer::from_str(c).unwrap();
+        // All four combinations of value and reference, on either side, and in place with both.
+        let w = &v * &c;
+        assert_eq!(w.to_string(), out);
+        assert_eq!(&v * c.clone(), w);
+        assert_eq!(v.clone() * &c, w);
+        assert_eq!(v.clone() * c.clone(), w);
+        assert_eq!(&c * &v, w);
+        assert_eq!(&c * v.clone(), w);
+        assert_eq!(c.clone() * &v, w);
+        assert_eq!(c.clone() * v.clone(), w);
+        let mut x = v.clone();
+        x *= &c;
+        assert_eq!(x, w);
+        let mut x = v;
+        x *= c;
+        assert_eq!(x, w);
+    };
+    test("()", "5", "()");
+    test("(1, -2, 3)", "0", "(0, 0, 0)");
+    test("(1, -2, 3)", "1", "(1, -2, 3)");
+    test("(1, -2, 3)", "-1", "(-1, 2, -3)");
+    test("(1, -2, 3)", "-3", "(-3, 6, -9)");
+}
+
+#[test]
+fn mul_scalar_properties() {
+    integer_vector_integer_pair_gen().test_properties(|(v, c)| {
+        let w = &v * &c;
+        // The forms agree.
+        assert_eq!(&v * c.clone(), w);
+        assert_eq!(v.clone() * &c, w);
+        assert_eq!(v.clone() * c.clone(), w);
+        assert_eq!(&c * &v, w);
+        assert_eq!(&c * v.clone(), w);
+        assert_eq!(c.clone() * &v, w);
+        assert_eq!(c.clone() * v.clone(), w);
+        let mut x = v.clone();
+        x *= &c;
+        assert_eq!(x, w);
+        let mut x = v.clone();
+        x *= c.clone();
+        assert_eq!(x, w);
+
+        // Element by element, this is the scalar product, and the dimension is unchanged.
+        assert_eq!(w.dimension(), v.dimension());
+        for (x, y) in v.elements.iter().zip(&w.elements) {
+            assert_eq!(*y, x * &c);
+        }
+        // Multiplying by 0 gives the zero vector, by 1 changes nothing, and products of scalars act
+        // one after the other.
+        assert_eq!(&v * Integer::ZERO, IntegerVector::zero(v.dimension()));
+        assert_eq!(&v * Integer::ONE, v);
+        // Multiplying by -1 negates.
+        assert_eq!(&v * Integer::NEGATIVE_ONE, -&v);
+        assert_eq!(&v * (&c * &c), &w * &c);
+        // It distributes over vector addition.
+        assert_eq!((&v + &v) * &c, &w + &w);
+        // The l^1 norm scales by the absolute value of the scalar.
+        assert_eq!(w.to_l1_norm(), v.to_l1_norm() * (&c).unsigned_abs());
     });
 }

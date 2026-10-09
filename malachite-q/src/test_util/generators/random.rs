@@ -2370,6 +2370,30 @@ pub fn random_rational_vector_triple_gen_var_1(
     )
 }
 
+pub fn random_rational_vector_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalVector, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_vectors(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 // -- Vec<Rational> --
 
 pub fn random_rational_vec_gen(config: &GenConfig) -> It<Vec<Rational>> {

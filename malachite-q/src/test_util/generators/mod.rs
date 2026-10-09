@@ -1330,6 +1330,14 @@ pub fn rational_vector_triple_gen_var_1()
     )
 }
 
+pub fn rational_vector_rational_pair_gen() -> Generator<(RationalVector, Rational)> {
+    Generator::new(
+        &exhaustive_rational_vector_rational_pair_gen,
+        &random_rational_vector_rational_pair_gen,
+        &special_random_rational_vector_rational_pair_gen,
+    )
+}
+
 // -- Vec<Rational> --
 
 pub fn rational_vec_gen() -> Generator<Vec<Rational>> {

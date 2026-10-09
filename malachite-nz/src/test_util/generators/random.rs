@@ -6701,6 +6701,28 @@ pub fn random_natural_vector_natural_pair_gen_var_1(
     ))
 }
 
+pub fn random_natural_vector_natural_pair_gen(config: &GenConfig) -> It<(NaturalVector, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_vectors(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_integer_vector_natural_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerVector, Natural)> {
@@ -6741,6 +6763,28 @@ pub fn random_integer_vector_integer_pair_gen_var_1(
         },
         &|seed| {
             random_nonzero_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_integer_vector_integer_pair_gen(config: &GenConfig) -> It<(IntegerVector, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_vectors(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_integers(
                 seed,
                 config.get_or("mean_bits_n", 64),
                 config.get_or("mean_bits_d", 1),

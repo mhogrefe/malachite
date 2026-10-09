@@ -3854,6 +3854,14 @@ pub fn natural_vector_natural_pair_gen_var_1() -> Generator<(NaturalVector, Natu
     )
 }
 
+pub fn natural_vector_natural_pair_gen() -> Generator<(NaturalVector, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_pair_gen,
+        &random_natural_vector_natural_pair_gen,
+        &special_random_natural_vector_natural_pair_gen,
+    )
+}
+
 // The `Natural` is positive.
 pub fn integer_vector_natural_pair_gen_var_1() -> Generator<(IntegerVector, Natural)> {
     Generator::new(
@@ -3869,6 +3877,14 @@ pub fn integer_vector_integer_pair_gen_var_1() -> Generator<(IntegerVector, Inte
         &exhaustive_integer_vector_integer_pair_gen_var_1,
         &random_integer_vector_integer_pair_gen_var_1,
         &special_random_integer_vector_integer_pair_gen_var_1,
+    )
+}
+
+pub fn integer_vector_integer_pair_gen() -> Generator<(IntegerVector, Integer)> {
+    Generator::new(
+        &exhaustive_integer_vector_integer_pair_gen,
+        &random_integer_vector_integer_pair_gen,
+        &special_random_integer_vector_integer_pair_gen,
     )
 }
 
