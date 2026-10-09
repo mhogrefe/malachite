@@ -15,8 +15,8 @@ use malachite_base::num::arithmetic::traits::{L1Norm, UnsignedAbs};
 impl L1Norm for IntegerVector {
     type Output = Natural;
 
-    /// Returns the $\ell^1$ norm of an [`IntegerVector`]: the sum of the absolute values of its elements, taking the vector by
-    /// reference.
+    /// Returns the $\ell^1$ norm of an [`IntegerVector`]: the sum of the absolute values of its
+    /// elements, taking the vector by reference.
     ///
     /// The 0-dimensional vector has no elements, and its norm is 0.
     ///
@@ -29,7 +29,8 @@ impl L1Norm for IntegerVector {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
     ///
     /// # Examples
     /// ```
@@ -37,7 +38,10 @@ impl L1Norm for IntegerVector {
     /// use malachite_base::num::arithmetic::traits::L1Norm;
     /// use malachite_nz::integer_vector::IntegerVector;
     ///
-    /// assert_eq!(IntegerVector::from_str("(1, -5, 2)").unwrap().to_l1_norm(), 8);
+    /// assert_eq!(
+    ///     IntegerVector::from_str("(1, -5, 2)").unwrap().to_l1_norm(),
+    ///     8
+    /// );
     /// assert_eq!(IntegerVector::from_str("()").unwrap().to_l1_norm(), 0);
     /// ```
     #[inline]
@@ -45,14 +49,16 @@ impl L1Norm for IntegerVector {
         self.elements.iter().map(Integer::unsigned_abs_ref).sum()
     }
 
-    /// Returns the $\ell^1$ norm of an [`IntegerVector`]: the sum of the absolute values of its elements, taking the vector by value.
+    /// Returns the $\ell^1$ norm of an [`IntegerVector`]: the sum of the absolute values of its
+    /// elements, taking the vector by value.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
     ///
     /// # Examples
     /// ```
@@ -60,7 +66,12 @@ impl L1Norm for IntegerVector {
     /// use malachite_base::num::arithmetic::traits::L1Norm;
     /// use malachite_nz::integer_vector::IntegerVector;
     ///
-    /// assert_eq!(IntegerVector::from_str("(1, -5, 2)").unwrap().into_l1_norm(), 8);
+    /// assert_eq!(
+    ///     IntegerVector::from_str("(1, -5, 2)")
+    ///         .unwrap()
+    ///         .into_l1_norm(),
+    ///     8
+    /// );
     /// assert_eq!(IntegerVector::from_str("()").unwrap().into_l1_norm(), 0);
     /// ```
     #[inline]
@@ -70,15 +81,16 @@ impl L1Norm for IntegerVector {
 
     /// Returns the number of significant bits of the $\ell^1$ norm of an [`IntegerVector`].
     ///
-    /// While every element fits in one limb, the absolute values are added in two limbs, so nothing is
-    /// allocated, as in FLINT's `_fmpz_vec_sum_max_bits`.
+    /// While every element fits in one limb, the absolute values are added in two limbs, so nothing
+    /// is allocated, as in FLINT's `_fmpz_vec_sum_max_bits`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
     ///
     /// # Examples
     /// ```

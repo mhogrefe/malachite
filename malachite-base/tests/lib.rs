@@ -947,6 +947,9 @@ pub mod unsigned_polynomial {
     pub mod exhaustive {
         pub mod exhaustive_unsigned_polynomials;
     }
+    pub mod logic {
+        pub mod significant_bits;
+    }
     pub mod random {
         pub mod properties;
         pub mod random_unsigned_polynomials;

@@ -28,6 +28,8 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`IntegerPolynomial`]s without repetition.
 pub mod exhaustive;
+/// Traits for logic and bit manipulation on [`IntegerPolynomial`]s.
+pub mod logic;
 #[cfg(feature = "random")]
 /// Iterators that generate [`IntegerPolynomial`]s randomly.
 pub mod random;

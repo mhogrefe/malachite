@@ -27,6 +27,8 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`UnsignedPolynomial`]s without repetition.
 pub mod exhaustive;
+/// Traits for logic and bit manipulation on [`UnsignedPolynomial`]s.
+pub mod logic;
 #[cfg(feature = "random")]
 /// Iterators that generate [`UnsignedPolynomial`]s randomly.
 pub mod random;

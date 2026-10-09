@@ -16,9 +16,9 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::SignificantBits;
 
 // Returns the number of significant bits of the sum of the absolute values of the elements of `xs`,
-// and of the largest absolute value. While every element fits in one limb, their absolute values are
-// added in two limbs and or-ed together, so nothing is allocated; at the first element that does
-// not, the sum is redone exactly as a `Natural`.
+// and of the largest absolute value. While every element fits in one limb, their absolute values
+// are added in two limbs and or-ed together, so nothing is allocated; at the first element that
+// does not, the sum is redone exactly as a `Natural`.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$

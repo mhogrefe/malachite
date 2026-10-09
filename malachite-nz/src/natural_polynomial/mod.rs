@@ -27,6 +27,8 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`NaturalPolynomial`]s without repetition.
 pub mod exhaustive;
+/// Traits for logic and bit manipulation on [`NaturalPolynomial`]s.
+pub mod logic;
 #[cfg(feature = "random")]
 /// Iterators that generate [`NaturalPolynomial`]s randomly.
 pub mod random;

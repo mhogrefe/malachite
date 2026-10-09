@@ -6,6 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-/// An implementation of [`SignificantBits`](malachite_base::num::logic::traits::SignificantBits), the total
-/// number of significant bits of the elements.
+/// An implementation of [`SignificantBits`](malachite_base::num::logic::traits::SignificantBits),
+/// the total number of significant bits of the elements.
 pub mod significant_bits;

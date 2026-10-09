@@ -14,8 +14,8 @@ use malachite_base::num::arithmetic::traits::L1Norm;
 impl L1Norm for NaturalVector {
     type Output = Natural;
 
-    /// Returns the $\ell^1$ norm of a [`NaturalVector`]: the sum of its elements, taking the vector by
-    /// reference.
+    /// Returns the $\ell^1$ norm of a [`NaturalVector`]: the sum of its elements, taking the vector
+    /// by reference.
     ///
     /// The 0-dimensional vector has no elements, and its norm is 0.
     ///
@@ -28,7 +28,8 @@ impl L1Norm for NaturalVector {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
     ///
     /// # Examples
     /// ```
@@ -36,7 +37,10 @@ impl L1Norm for NaturalVector {
     /// use malachite_base::num::arithmetic::traits::L1Norm;
     /// use malachite_nz::natural_vector::NaturalVector;
     ///
-    /// assert_eq!(NaturalVector::from_str("(1, 5, 2)").unwrap().to_l1_norm(), 8);
+    /// assert_eq!(
+    ///     NaturalVector::from_str("(1, 5, 2)").unwrap().to_l1_norm(),
+    ///     8
+    /// );
     /// assert_eq!(NaturalVector::from_str("()").unwrap().to_l1_norm(), 0);
     /// ```
     #[inline]
@@ -44,14 +48,16 @@ impl L1Norm for NaturalVector {
         self.elements.iter().sum()
     }
 
-    /// Returns the $\ell^1$ norm of a [`NaturalVector`]: the sum of its elements, taking the vector by value.
+    /// Returns the $\ell^1$ norm of a [`NaturalVector`]: the sum of its elements, taking the vector
+    /// by value.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
     ///
     /// # Examples
     /// ```
@@ -59,7 +65,10 @@ impl L1Norm for NaturalVector {
     /// use malachite_base::num::arithmetic::traits::L1Norm;
     /// use malachite_nz::natural_vector::NaturalVector;
     ///
-    /// assert_eq!(NaturalVector::from_str("(1, 5, 2)").unwrap().into_l1_norm(), 8);
+    /// assert_eq!(
+    ///     NaturalVector::from_str("(1, 5, 2)").unwrap().into_l1_norm(),
+    ///     8
+    /// );
     /// assert_eq!(NaturalVector::from_str("()").unwrap().into_l1_norm(), 0);
     /// ```
     #[inline]
@@ -77,7 +86,8 @@ impl L1Norm for NaturalVector {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
     ///
     /// # Examples
     /// ```

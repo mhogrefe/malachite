@@ -23,7 +23,7 @@ fn test_l1_norm() {
         assert_eq!(v.l1_norm_significant_bits(), bits);
         assert_eq!(v.into_l1_norm(), norm);
     };
-    test("()", "0", 0);
+    test("()", "0", 1);
     test("(1/2, -1/3)", "5/6", 6);
 }
 

@@ -237,6 +237,9 @@ pub mod rational_polynomial {
     pub mod exhaustive {
         pub mod exhaustive_rational_polynomials;
     }
+    pub mod logic {
+        pub mod significant_bits;
+    }
     pub mod random {
         pub mod properties;
         pub mod random_rational_polynomials;

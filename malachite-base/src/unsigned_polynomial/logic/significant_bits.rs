@@ -8,35 +8,36 @@
 
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::logic::traits::SignificantBits;
-use crate::unsigned_vector::UnsignedVector;
+use crate::unsigned_polynomial::UnsignedPolynomial;
 
-impl<T: PrimitiveUnsigned> SignificantBits for &UnsignedVector<T> {
-    /// Returns the sum of the numbers of significant bits of the elements of an [`UnsignedVector`].
+impl<T: PrimitiveUnsigned> SignificantBits for &UnsignedPolynomial<T> {
+    /// Returns the sum of the numbers of significant bits of the coefficients of an
+    /// [`UnsignedPolynomial`].
     ///
-    /// This is the number of bits needed to store all of the elements, and 0 for the 0-dimensional
-    /// vector.
+    /// This is the number of bits needed to store all of the coefficients, and 0 for the zero
+    /// polynomial. Zero coefficients below the leading one contribute nothing.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of coefficients.
     ///
     /// # Examples
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::logic::traits::SignificantBits;
-    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// assert_eq!(
-    ///     UnsignedVector::<u8>::from_str("(1, 5, 2)")
+    ///     UnsignedPolynomial::<u8>::from_str("5*x^2+2*x+1")
     ///         .unwrap()
     ///         .significant_bits(),
     ///     6
     /// );
     /// assert_eq!(
-    ///     UnsignedVector::<u8>::from_str("()")
+    ///     UnsignedPolynomial::<u8>::from_str("0")
     ///         .unwrap()
     ///         .significant_bits(),
     ///     0
@@ -44,6 +45,9 @@ impl<T: PrimitiveUnsigned> SignificantBits for &UnsignedVector<T> {
     /// ```
     #[inline]
     fn significant_bits(self) -> u64 {
-        self.elements.iter().map(|&x| x.significant_bits()).sum()
+        self.coefficients
+            .iter()
+            .map(|&c| c.significant_bits())
+            .sum()
     }
 }

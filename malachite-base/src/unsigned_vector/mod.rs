@@ -573,8 +573,16 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
     /// use malachite_base::unsigned_vector::UnsignedVector;
     /// use malachite_base::vector::Vector;
     ///
-    /// assert_eq!(UnsignedVector::<u8>::from_str("(255, 255)").unwrap().sum_max_bits(), (9, 8));
-    /// assert_eq!(UnsignedVector::<u8>::from_str("()").unwrap().sum_max_bits(), (0, 0));
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("(255, 255)")
+    ///         .unwrap()
+    ///         .sum_max_bits(),
+    ///     (9, 8)
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("()").unwrap().sum_max_bits(),
+    ///     (0, 0)
+    /// );
     /// ```
     fn sum_max_bits(&self) -> (u64, u64) {
         let mut sum = T::ZERO;

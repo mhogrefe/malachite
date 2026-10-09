@@ -732,6 +732,9 @@ pub mod integer_polynomial {
     pub mod exhaustive {
         pub mod exhaustive_integer_polynomials;
     }
+    pub mod logic {
+        pub mod significant_bits;
+    }
     pub mod random {
         pub mod properties;
         pub mod random_integer_polynomials;
@@ -841,6 +844,9 @@ pub mod natural_polynomial {
     }
     pub mod exhaustive {
         pub mod exhaustive_natural_polynomials;
+    }
+    pub mod logic {
+        pub mod significant_bits;
     }
     pub mod random {
         pub mod properties;

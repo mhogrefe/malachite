@@ -12,8 +12,8 @@ use malachite_base::num::logic::traits::SignificantBits;
 impl SignificantBits for &NaturalVector {
     /// Returns the sum of the numbers of significant bits of the elements of a [`NaturalVector`].
     ///
-    /// This is the number of bits needed to store all of the elements, and 0 for the
-    /// 0-dimensional vector.
+    /// This is the number of bits needed to store all of the elements, and 0 for the 0-dimensional
+    /// vector.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -28,7 +28,12 @@ impl SignificantBits for &NaturalVector {
     /// use malachite_base::num::logic::traits::SignificantBits;
     /// use malachite_nz::natural_vector::NaturalVector;
     ///
-    /// assert_eq!(NaturalVector::from_str("(1, 5, 2)").unwrap().significant_bits(), 6);
+    /// assert_eq!(
+    ///     NaturalVector::from_str("(1, 5, 2)")
+    ///         .unwrap()
+    ///         .significant_bits(),
+    ///     6
+    /// );
     /// assert_eq!(NaturalVector::from_str("()").unwrap().significant_bits(), 0);
     /// ```
     #[inline]

@@ -102,8 +102,8 @@ pub trait Vector: Sized {
     /// values of its elements, together with the number of significant bits of its height.
     ///
     /// The counts are what `L1Norm::l1_norm_significant_bits` and `Height::height_significant_bits`
-    /// return, computed together in one pass where possible. Both are 0 for the 0-dimensional
-    /// vector.
+    /// return, computed together in one pass where possible. The height of the 0-dimensional vector
+    /// is 0, and so, for integer elements, is its norm.
     fn sum_max_bits(&self) -> (u64, u64);
 }
 

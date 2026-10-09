@@ -11,8 +11,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::L1Norm;
-use malachite_base::num::arithmetic::traits::{Height, HeightRef};
+use malachite_base::num::arithmetic::traits::{Height, HeightRef, L1Norm};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vector::Vector;
@@ -569,17 +568,20 @@ impl Vector for RationalVector {
     }
 
     /// Returns the number of significant bits of the sum of the absolute values of the elements of
-    /// a [`RationalVector`] (its $\ell^1$ norm), together with the number of significant bits of its height.
+    /// a [`RationalVector`] (its $\ell^1$ norm), together with the number of significant bits of
+    /// its height.
     ///
     /// The $\ell^1$ norm is a rational number, and, as for a single [`Rational`], its number of
-    /// significant bits is the sum of those of its numerator and denominator.
+    /// significant bits is the sum of those of its numerator and denominator. So a norm of 0, which
+    /// is $0/1$, has 1 significant bit, even for the 0-dimensional vector.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements' numerators and denominators.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements' numerators and denominators.
     ///
     /// # Examples
     /// ```
@@ -587,8 +589,16 @@ impl Vector for RationalVector {
     /// use malachite_base::vector::Vector;
     /// use malachite_q::rational_vector::RationalVector;
     ///
-    /// assert_eq!(RationalVector::from_str("(1/2, -1/3)").unwrap().sum_max_bits(), (6, 2));
-    /// assert_eq!(RationalVector::from_str("()").unwrap().sum_max_bits(), (0, 0));
+    /// assert_eq!(
+    ///     RationalVector::from_str("(1/2, -1/3)")
+    ///         .unwrap()
+    ///         .sum_max_bits(),
+    ///     (6, 2)
+    /// );
+    /// assert_eq!(
+    ///     RationalVector::from_str("()").unwrap().sum_max_bits(),
+    ///     (1, 0)
+    /// );
     /// ```
     fn sum_max_bits(&self) -> (u64, u64) {
         (

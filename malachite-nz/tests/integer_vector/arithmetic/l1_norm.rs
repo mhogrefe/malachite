@@ -44,8 +44,8 @@ fn l1_norm_properties() {
             norm
         );
         assert_eq!(vec_sum_max_bits_naive(&v.elements).0, bits);
-        // The norm is at least the height, and at most the dimension times the height, and
-        // negating the vector does not change it.
+        // The norm is at least the height, and at most the dimension times the height, and negating
+        // the vector does not change it.
         let height = v.to_height();
         assert!(height <= norm);
         assert!(norm <= &height * Natural::from(v.dimension()));

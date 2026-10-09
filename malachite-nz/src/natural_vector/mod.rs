@@ -566,7 +566,8 @@ impl Vector for NaturalVector {
     }
 
     /// Returns the number of significant bits of the sum of the absolute values of the elements of
-    /// a [`NaturalVector`] (its $\ell^1$ norm), together with the number of significant bits of its height.
+    /// a [`NaturalVector`] (its $\ell^1$ norm), together with the number of significant bits of its
+    /// height.
     ///
     /// While every element fits in one limb, the elements are added in two limbs, so nothing is
     /// allocated.
@@ -576,7 +577,8 @@ impl Vector for NaturalVector {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
     ///
     /// # Examples
     /// ```
@@ -584,11 +586,18 @@ impl Vector for NaturalVector {
     /// use malachite_base::vector::Vector;
     /// use malachite_nz::natural_vector::NaturalVector;
     ///
-    /// assert_eq!(NaturalVector::from_str("(1, 5, 2)").unwrap().sum_max_bits(), (4, 3));
-    /// assert_eq!(NaturalVector::from_str("()").unwrap().sum_max_bits(), (0, 0));
+    /// assert_eq!(
+    ///     NaturalVector::from_str("(1, 5, 2)").unwrap().sum_max_bits(),
+    ///     (4, 3)
+    /// );
+    /// assert_eq!(
+    ///     NaturalVector::from_str("()").unwrap().sum_max_bits(),
+    ///     (0, 0)
+    /// );
     /// ```
     ///
     /// This is equivalent to `_fmpz_vec_sum_max_bits` from `fmpz_vec/sum_max_bits.c`, FLINT 3.6.0.
+    #[inline]
     fn sum_max_bits(&self) -> (u64, u64) {
         vec_sum_max_bits(&self.elements)
     }

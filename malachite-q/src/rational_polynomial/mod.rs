@@ -37,6 +37,8 @@ pub mod arithmetic;
 pub mod comparison;
 /// Functions for converting a [`RationalPolynomial`] to and from other types.
 pub mod conversion;
+/// Traits for logic and bit manipulation on [`RationalPolynomial`]s.
+pub mod logic;
 
 /// A polynomial in one variable whose coefficients are [`Rational`]s.
 ///

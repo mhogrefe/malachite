@@ -76,6 +76,8 @@ documented by git history.
   `height_significant_bits` like `_nmod_vec_max_bits`.
 - `SignificantBits` for `UnsignedVector<T>`: the sum of the numbers of significant bits of the
   elements.
+- `SignificantBits` for `UnsignedPolynomial<T>`: the sum of the numbers of significant bits of the
+  coefficients.
 - `random_unsigned_vectors_from_iterator` and
   `random_unsigned_vectors_with_dimension_from_iterator`, which take the elements of
   `UnsignedVector<T>`s from any iterator, for example one with bounded elements. The other
@@ -132,6 +134,8 @@ documented by git history.
   like FLINT's `_fmpz_vec_sum_max_bits`.
 - `SignificantBits` for `NaturalVector` and `IntegerVector`: the sum of the numbers of significant
   bits of the elements.
+- `SignificantBits` for `NaturalPolynomial` and `IntegerPolynomial`: the sum of the numbers of
+  significant bits of the coefficients.
 - `random_natural_vectors_from_iterator`, `random_integer_vectors_from_iterator`, and their
   `_with_dimension_from_iterator` variants, which take the elements from any iterator, for example
   one with bounded elements. The other `NaturalVector` and `IntegerVector` generators are built on
@@ -192,6 +196,9 @@ documented by git history.
 - `L1Norm` for `RationalVector`: the sum of the absolute values of the elements, as a `Rational`.
 - `SignificantBits` for `RationalVector`: the sum of the numbers of significant bits of the
   elements, each counting the bits of its numerator and denominator, as for `Rational`.
+- `SignificantBits` for `RationalPolynomial`: the sum of the numbers of significant bits of the
+  coefficients, each in lowest terms, so that a polynomial agrees with the `RationalVector` of its
+  coefficients.
 - `random_rational_vectors_from_iterator` and
   `random_rational_vectors_with_dimension_from_iterator`, which take the elements of
   `RationalVector`s from any iterator, for example one with bounded elements. The other

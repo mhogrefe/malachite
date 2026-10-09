@@ -21,7 +21,7 @@ fn test_sum_max_bits() {
         assert_eq!(v.sum_max_bits(), out);
         assert_eq!(v.height_significant_bits(), out.1);
     };
-    test("()", (0, 0));
+    test("()", (1, 0));
     test("(0, 0)", (1, 1));
     test("(1/2, -1/3)", (6, 2));
     test("(1/2, 1/2)", (2, 2));
@@ -33,10 +33,11 @@ fn sum_max_bits_properties() {
         let (sum_bits, max_bits) = v.sum_max_bits();
         assert_eq!(v.height_significant_bits(), max_bits);
         assert_eq!(v.l1_norm_significant_bits(), sum_bits);
-        // Negating the vector changes neither count, and both are 0 exactly for the 0-dimensional
-        // vector, since every rational number has height at least 1.
+        // Negating the vector changes neither count. The norm has at least 1 bit, since 0 is 0/1,
+        // and the height is 0 exactly for the 0-dimensional vector, since every rational number has
+        // height at least 1.
         assert_eq!((-&v).sum_max_bits(), (sum_bits, max_bits));
-        assert_eq!(sum_bits == 0, v.dimension() == 0);
+        assert_ne!(sum_bits, 0);
         assert_eq!(max_bits == 0, v.dimension() == 0);
     });
 
@@ -46,7 +47,7 @@ fn sum_max_bits_properties() {
         // bit.
         let (sum_bits, max_bits) = v.sum_max_bits();
         let expected = if v.dimension() == 0 {
-            (0, 0)
+            (1, 0)
         } else {
             (sum_bits + 1, max(max_bits, 1))
         };
