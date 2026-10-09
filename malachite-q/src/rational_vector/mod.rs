@@ -319,6 +319,37 @@ impl Vector for RationalVector {
         self.elements.fill(Rational::ZERO);
     }
 
+    /// Sorts the elements of a [`RationalVector`] in ascending order, keeping its dimension.
+    ///
+    /// Equal elements are indistinguishable, so the sort does not need to be stable, and an
+    /// unstable sort is used.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`, assuming that
+    /// comparing two elements takes constant time; comparing large elements takes time proportional
+    /// to their sizes.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_q::rational_vector::RationalVector;
+    ///
+    /// let mut v = RationalVector::from_str("(1/2, -1, 1/3, 0)").unwrap();
+    /// v.sort();
+    /// assert_eq!(v.to_string(), "(-1, 0, 1/3, 1/2)");
+    /// ```
+    ///
+    /// This is equivalent to `_fmpq_vec_sort` from `fmpq_vec/sort.c`, FLINT 3.6.0.
+    #[inline]
+    fn sort(&mut self) {
+        self.elements.sort_unstable();
+    }
+
     /// Returns a [`RationalVector`]'s elements as a [`Vec`], cloning them.
     ///
     /// # Worst-case complexity

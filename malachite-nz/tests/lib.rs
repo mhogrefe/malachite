@@ -419,6 +419,7 @@ pub mod integer_vector {
         pub mod striped_random_integer_vectors;
         pub mod striped_random_integer_vectors_with_dimension;
     }
+    pub mod sort;
     pub mod standard_basis_index;
     pub mod standard_basis_vector;
     pub mod sum_max_bits;
@@ -953,6 +954,7 @@ pub mod natural_vector {
         pub mod striped_random_natural_vectors;
         pub mod striped_random_natural_vectors_with_dimension;
     }
+    pub mod sort;
     pub mod standard_basis_index;
     pub mod standard_basis_vector;
     pub mod sum_max_bits;

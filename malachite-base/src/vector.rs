@@ -59,6 +59,9 @@ pub trait Vector: Sized {
     /// Sets every element of a vector to zero, keeping its dimension.
     fn set_zero(&mut self);
 
+    /// Sorts the elements of a vector in ascending order, keeping its dimension.
+    fn sort(&mut self);
+
     /// Returns a vector's elements as a [`Vec`], cloning them.
     fn to_elements(&self) -> Vec<Self::Element>
     where

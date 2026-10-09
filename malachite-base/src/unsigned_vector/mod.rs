@@ -299,6 +299,35 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
         self.elements.fill(T::ZERO);
     }
 
+    /// Sorts the elements of an [`UnsignedVector`] in ascending order, keeping its dimension.
+    ///
+    /// Equal elements are indistinguishable, so the sort does not need to be stable, and an
+    /// unstable sort is used.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`, assuming that
+    /// comparing two elements takes constant time; comparing large elements takes time proportional
+    /// to their sizes.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// let mut v = UnsignedVector::<u8>::from_str("(3, 1, 2, 1)").unwrap();
+    /// v.sort();
+    /// assert_eq!(v.to_string(), "(1, 1, 2, 3)");
+    /// ```
+    #[inline]
+    fn sort(&mut self) {
+        self.elements.sort_unstable();
+    }
+
     /// Returns an [`UnsignedVector`]'s elements as a [`Vec`], cloning them.
     ///
     /// # Worst-case complexity

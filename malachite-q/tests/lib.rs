@@ -490,6 +490,7 @@ pub mod rational_vector {
         pub mod striped_random_rational_vectors;
         pub mod striped_random_rational_vectors_with_dimension;
     }
+    pub mod sort;
     pub mod standard_basis_index;
     pub mod standard_basis_vector;
     pub mod sum_max_bits;

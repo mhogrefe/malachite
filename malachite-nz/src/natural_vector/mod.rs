@@ -320,6 +320,37 @@ impl Vector for NaturalVector {
         self.elements.fill(Natural::ZERO);
     }
 
+    /// Sorts the elements of a [`NaturalVector`] in ascending order, keeping its dimension.
+    ///
+    /// Equal elements are indistinguishable, so the sort does not need to be stable, and an
+    /// unstable sort is used.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`, assuming that
+    /// comparing two elements takes constant time; comparing large elements takes time proportional
+    /// to their sizes.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// let mut v = NaturalVector::from_str("(3, 1, 2, 1)").unwrap();
+    /// v.sort();
+    /// assert_eq!(v.to_string(), "(1, 1, 2, 3)");
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_sort` from `fmpz_vec/sort.c`, FLINT 3.6.0.
+    #[inline]
+    fn sort(&mut self) {
+        self.elements.sort_unstable();
+    }
+
     /// Returns a [`NaturalVector`]'s elements as a [`Vec`], cloning them.
     ///
     /// # Worst-case complexity
