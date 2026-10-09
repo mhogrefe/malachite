@@ -1278,6 +1278,16 @@ pub fn rational_vector_unsigned_pair_gen_var_1() -> Generator<(RationalVector, u
     )
 }
 
+// All `(RationalVector, T)` where `T` is unsigned and small.
+pub fn rational_vector_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(RationalVector, T)> {
+    Generator::new(
+        &exhaustive_rational_vector_unsigned_pair_gen_var_2,
+        &random_rational_vector_unsigned_pair_gen_var_2,
+        &special_random_rational_vector_unsigned_pair_gen_var_2,
+    )
+}
+
 pub fn rational_vector_integer_vector_pair_gen() -> Generator<(RationalVector, IntegerVector)> {
     Generator::new(
         &exhaustive_rational_vector_integer_vector_pair_gen,

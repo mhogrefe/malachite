@@ -248,6 +248,8 @@ documented by git history.
   combination of value and reference, with the multiplication data for the modulus computed once,
   like FLINT's `_fmpz_mod_vec_scalar_mul_fmpz_mod`. The elements and the scalar must already be
   reduced.
+- `Shl` (by value and by reference) and `ShlAssign` for `NaturalVector` and `IntegerVector`, by any
+  primitive unsigned type, shifting every element left, like FLINT's `_fmpz_vec_scalar_mul_2exp`.
 
 ### malachite-q
 
@@ -296,6 +298,8 @@ documented by git history.
   `RationalVector`, in every combination of value and reference.
 - `Mul` and `MulAssign` of `RationalVector` by `Rational`, in every combination of value and
   reference, with the scalar on either side.
+- `Shl` (by value and by reference) and `ShlAssign` for `RationalVector`, by any primitive unsigned
+  type, multiplying every element by a power of 2.
 
 ## 0.13.0 — 2026-10-06
 

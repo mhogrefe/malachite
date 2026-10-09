@@ -42,6 +42,42 @@ pub mod neg;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a vector by a scalar, with the scalar on either side.
 pub mod scalar_mul;
+/// Left-shifting a vector (multiplying it by a power of 2), by implementations of
+/// [`Shl`](core::ops::Shl) and [`ShlAssign`](core::ops::ShlAssign).
+///
+/// # shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_q::rational_vector::RationalVector;
+///
+/// assert_eq!(
+///     (RationalVector::from_str("()").unwrap() << 10u8).to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     (RationalVector::from_str("(1/2, -3/4, 3)").unwrap() << 0u16).to_string(),
+///     "(1/2, -3/4, 3)"
+/// );
+/// assert_eq!(
+///     (RationalVector::from_str("(1/2, -3/4, 3)").unwrap() << 2u32).to_string(),
+///     "(2, -3, 12)"
+/// );
+/// assert_eq!(
+///     (&RationalVector::from_str("(1/8, 0)").unwrap() << 100u64).to_string(),
+///     "(158456325028528675187087900672, 0)"
+/// );
+/// ```
+///
+/// # shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_q::rational_vector::RationalVector;
+///
+/// let mut v = RationalVector::from_str("(1/2, -3/4, 3)").unwrap();
+/// v <<= 2u32;
+/// assert_eq!(v.to_string(), "(2, -3, 12)");
+/// ```
+pub mod shl;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting vectors.
 pub mod sub;

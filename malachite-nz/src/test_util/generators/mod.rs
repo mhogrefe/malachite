@@ -3765,6 +3765,16 @@ pub fn integer_vector_unsigned_pair_gen_var_2() -> Generator<(IntegerVector, u64
     )
 }
 
+// All `(IntegerVector, T)` where `T` is unsigned and small.
+pub fn integer_vector_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
+-> Generator<(IntegerVector, T)> {
+    Generator::new(
+        &exhaustive_integer_vector_unsigned_pair_gen_var_3,
+        &random_integer_vector_unsigned_pair_gen_var_3,
+        &special_random_integer_vector_unsigned_pair_gen_var_3,
+    )
+}
+
 pub fn integer_vector_natural_vector_pair_gen() -> Generator<(IntegerVector, NaturalVector)> {
     Generator::new(
         &exhaustive_integer_vector_natural_vector_pair_gen,
@@ -3920,6 +3930,16 @@ pub fn natural_vector_unsigned_pair_gen_var_3() -> Generator<(NaturalVector, u64
         &exhaustive_natural_vector_unsigned_pair_gen_var_3,
         &random_natural_vector_unsigned_pair_gen_var_3,
         &special_random_natural_vector_unsigned_pair_gen_var_3,
+    )
+}
+
+// All `(NaturalVector, T)` where `T` is unsigned and small.
+pub fn natural_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
+-> Generator<(NaturalVector, T)> {
+    Generator::new(
+        &exhaustive_natural_vector_unsigned_pair_gen_var_4,
+        &random_natural_vector_unsigned_pair_gen_var_4,
+        &special_random_natural_vector_unsigned_pair_gen_var_4,
     )
 }
 

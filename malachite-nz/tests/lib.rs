@@ -364,6 +364,7 @@ pub mod integer_vector {
         pub mod multi_crt;
         pub mod neg;
         pub mod scalar_mul;
+        pub mod shl;
         pub mod sub;
     }
     pub mod basic {
@@ -906,6 +907,7 @@ pub mod natural_vector {
         pub mod mod_sub;
         pub mod multi_crt;
         pub mod scalar_mul;
+        pub mod shl;
     }
     pub mod basic {
         pub mod named;

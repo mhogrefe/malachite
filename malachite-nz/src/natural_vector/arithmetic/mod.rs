@@ -91,3 +91,39 @@ pub mod multi_crt;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a vector by a scalar, with the scalar on either side.
 pub mod scalar_mul;
+/// Left-shifting a vector (multiplying it by a power of 2), by implementations of
+/// [`Shl`](core::ops::Shl) and [`ShlAssign`](core::ops::ShlAssign).
+///
+/// # shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// assert_eq!(
+///     (NaturalVector::from_str("()").unwrap() << 10u8).to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3)").unwrap() << 0u16).to_string(),
+///     "(1, 2, 3)"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3)").unwrap() << 2u32).to_string(),
+///     "(4, 8, 12)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(3, 0)").unwrap() << 100u64).to_string(),
+///     "(3802951800684688204490109616128, 0)"
+/// );
+/// ```
+///
+/// # shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(1, 2, 3)").unwrap();
+/// v <<= 2u32;
+/// assert_eq!(v.to_string(), "(4, 8, 12)");
+/// ```
+pub mod shl;

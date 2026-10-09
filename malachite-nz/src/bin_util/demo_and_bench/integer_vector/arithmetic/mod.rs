@@ -27,6 +27,7 @@ pub(crate) fn register(runner: &mut Runner) {
     multi_crt::register(runner);
     neg::register(runner);
     scalar_mul::register(runner);
+    shl::register(runner);
     sub::register(runner);
 }
 
@@ -48,4 +49,5 @@ mod mod_power_of_2;
 mod multi_crt;
 mod neg;
 mod scalar_mul;
+mod shl;
 mod sub;
