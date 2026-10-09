@@ -41,10 +41,12 @@ documented by git history.
   `exhaustive_vecs_with_last_with_index_generator` without a special last element.
 - A `Vector` trait in `malachite_base::vector`, for what every vector type has in common, as
   `Polynomial` is for the polynomial types. It has an `Element` associated type and the methods
-  `from_elements`, `from_owned_elements`, `zero`, `to_elements`, `into_elements`, `elements_ref`,
-  `dimension`, `pivot`, and `pivot_index`; the vector types implement these through the trait, so
-  calling them takes `use malachite_base::vector::Vector;`. `zero(dimension)` returns the zero
-  vector of a given dimension, like FLINT's `fmpz_vec_init`.
+  `from_elements`, `from_owned_elements`, `zero`, `standard_basis_vector`, `to_elements`,
+  `into_elements`, `elements_ref`, `dimension`, `pivot`, and `pivot_index`; the vector types
+  implement these through the trait, so calling them takes `use malachite_base::vector::Vector;`.
+  `zero(dimension)` returns the zero vector of a given dimension, like FLINT's `fmpz_vec_init`, and
+  `standard_basis_vector(dimension, index)` returns the vector with a 1 at `index` and 0
+  elsewhere.
 - `UnsignedVector<T>`, a vector whose elements are primitive unsigned integers. Its `elements`
   field is public, since every [`Vec`] is a valid vector. It implements `Vector`, `Index` and
   `IndexMut`, and has conversions to and from strings (`(1, 2, 3)`, with `()` for the 0-dimensional

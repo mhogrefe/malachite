@@ -11,7 +11,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
 use malachite_base::named::Named;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vector::Vector;
 
@@ -156,6 +156,46 @@ impl Vector for NaturalVector {
         Self {
             elements: vec![Natural::ZERO; usize::exact_from(dimension)],
         }
+    }
+
+    /// Returns the standard basis vector $e_i$ of a given dimension: the vector whose element at
+    /// `index` is 1 and whose other elements are 0.
+    ///
+    /// Indices start at 0, as they do for [`Index`](core::ops::Index).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `dimension`.
+    ///
+    /// # Panics
+    /// Panics if `index` is greater than or equal to `dimension`, or if `dimension` is greater than
+    /// [`usize::MAX`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// assert_eq!(
+    ///     NaturalVector::standard_basis_vector(3, 1).to_string(),
+    ///     "(0, 1, 0)"
+    /// );
+    /// assert_eq!(
+    ///     NaturalVector::standard_basis_vector(1, 0).to_string(),
+    ///     "(1)"
+    /// );
+    /// ```
+    fn standard_basis_vector(dimension: u64, index: u64) -> Self {
+        assert!(
+            index < dimension,
+            "the index {index} is not less than the dimension {dimension}"
+        );
+        let mut v = Self::zero(dimension);
+        v.elements[usize::exact_from(index)] = Natural::ONE;
+        v
     }
 
     /// Returns a [`NaturalVector`]'s elements as a [`Vec`], cloning them.

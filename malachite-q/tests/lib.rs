@@ -469,5 +469,6 @@ pub mod rational_vector {
         pub mod striped_random_rational_vectors;
         pub mod striped_random_rational_vectors_with_dimension;
     }
+    pub mod standard_basis_vector;
     pub mod zero;
 }

@@ -395,6 +395,7 @@ pub mod integer_vector {
         pub mod striped_random_integer_vectors;
         pub mod striped_random_integer_vectors_with_dimension;
     }
+    pub mod standard_basis_vector;
     pub mod zero;
 }
 pub mod natural {
@@ -897,5 +898,6 @@ pub mod natural_vector {
         pub mod striped_random_natural_vectors;
         pub mod striped_random_natural_vectors_with_dimension;
     }
+    pub mod standard_basis_vector;
     pub mod zero;
 }

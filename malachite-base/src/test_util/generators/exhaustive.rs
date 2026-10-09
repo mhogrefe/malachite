@@ -6912,3 +6912,7 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadr
         )
     })
 }
+
+pub fn exhaustive_unsigned_pair_gen_var_33() -> It<(u64, u64)> {
+    Box::new(exhaustive_unsigned_primitive_int_gen_var_1::<u64, u64>().map(|(i, k)| (i, i + k)))
+}

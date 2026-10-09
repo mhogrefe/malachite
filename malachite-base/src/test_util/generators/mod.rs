@@ -5297,3 +5297,12 @@ pub fn unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_va
         &special_random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_2,
     )
 }
+
+// All `(u64, u64)` where both `u64`s are small and the first is less than the second: an index into
+// a vector and the vector's dimension.
+pub fn unsigned_pair_gen_var_51() -> Generator<(u64, u64)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_33,
+        &random_unsigned_pair_gen_var_40,
+    )
+}

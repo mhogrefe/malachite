@@ -151,6 +151,46 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
         }
     }
 
+    /// Returns the standard basis vector $e_i$ of a given dimension: the vector whose element at
+    /// `index` is 1 and whose other elements are 0.
+    ///
+    /// Indices start at 0, as they do for [`Index`](core::ops::Index).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `dimension`.
+    ///
+    /// # Panics
+    /// Panics if `index` is greater than or equal to `dimension`, or if `dimension` is greater than
+    /// [`usize::MAX`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::standard_basis_vector(3, 1).to_string(),
+    ///     "(0, 1, 0)"
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::standard_basis_vector(1, 0).to_string(),
+    ///     "(1)"
+    /// );
+    /// ```
+    fn standard_basis_vector(dimension: u64, index: u64) -> Self {
+        assert!(
+            index < dimension,
+            "the index {index} is not less than the dimension {dimension}"
+        );
+        let mut v = Self::zero(dimension);
+        v.elements[usize::exact_from(index)] = T::ONE;
+        v
+    }
+
     /// Returns an [`UnsignedVector`]'s elements as a [`Vec`], cloning them.
     ///
     /// # Worst-case complexity

@@ -9235,3 +9235,7 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple
         .map(|((u, v, w, _), m)| (u % m, v % m, w % m, m)),
     )
 }
+
+pub fn random_unsigned_pair_gen_var_40(config: &GenConfig) -> It<(u64, u64)> {
+    Box::new(random_unsigned_pair_gen_var_9::<u64, u64>(config).map(|(i, k)| (i, i + k)))
+}

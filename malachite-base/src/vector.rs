@@ -42,6 +42,10 @@ pub trait Vector: Sized {
     /// Returns the zero vector of a given dimension: a vector of `dimension` zeros.
     fn zero(dimension: u64) -> Self;
 
+    /// Returns a standard basis vector: the vector of a given dimension whose element at `index` is
+    /// 1 and whose other elements are 0.
+    fn standard_basis_vector(dimension: u64, index: u64) -> Self;
+
     /// Returns a vector's elements as a [`Vec`], cloning them.
     fn to_elements(&self) -> Vec<Self::Element>
     where
