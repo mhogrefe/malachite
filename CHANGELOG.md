@@ -184,6 +184,11 @@ documented by git history.
 - `BalancedMod` and `BalancedModAssign` for `IntegerVector` with an `Integer` modulus, in every
   combination of value and reference, reducing every element into $(-|m|/2, |m|/2]$, like FLINT's
   `_fmpz_vec_scalar_smod_fmpz`.
+- `ModPowerOf2` for `IntegerVector`, by value and by reference, reducing every element into
+  $[0, 2^k)$ and returning a `NaturalVector`, like FLINT's `_fmpz_vec_scalar_fdiv_r_2exp`; and
+  `RemPowerOf2` and `RemPowerOf2Assign`, which keep each element's sign.
+- `Rem` and `RemAssign` for `IntegerVector` with an `Integer` modulus, in every combination of value
+  and reference, taking each element's truncating remainder.
 - `NaturalVector::multi_crt` and `IntegerVector::multi_balanced_crt`, which combine one vector of
   residues per word-sized modulus into the vector of canonical or balanced representatives by the
   Chinese remainder theorem, doing the work that depends only on the moduli once. Like

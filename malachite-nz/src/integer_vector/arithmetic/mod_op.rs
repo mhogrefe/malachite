@@ -11,6 +11,7 @@ use crate::integer_vector::IntegerVector;
 use crate::natural::Natural;
 use crate::natural_vector::NaturalVector;
 use alloc::vec::Vec;
+use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{Mod, NegMod};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -319,5 +320,254 @@ where
     #[inline]
     fn mod_op(self, m: T) -> UnsignedVector<T> {
         (&self).mod_op(m)
+    }
+}
+
+impl Rem<Integer> for IntegerVector {
+    type Output = Self;
+
+    /// Divides every element of an [`IntegerVector`] by an [`Integer`], keeping the remainders,
+    /// taking the vector by value and the modulus by value.
+    ///
+    /// Each remainder has the sign of its element and a smaller absolute value than $m$, as with
+    /// [`Rem`] for [`Integer`]s, so the sign of $m$ makes no difference. This is the remainder of
+    /// truncating division. For a remainder that is always non-negative, and a [`NaturalVector`]
+    /// result, use [`Mod`]. The dimension is unchanged.
+    ///
+    /// $$
+    /// f(v, m) = w, \quad \text{where} \quad w_i = v_i - m \operatorname{sgn}(v_im)
+    ///     \left \lfloor \left | \frac{v_i}{m} \right | \right \rfloor.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// vector's elements.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// // Every element is taken modulo 3, keeping its sign.
+    /// let v = IntegerVector::from_str("(1, -4, -5)").unwrap();
+    /// assert_eq!((v.clone() % Integer::from(3)).to_string(), "(1, -1, -2)");
+    ///
+    /// // The sign of the modulus makes no difference, and an element that reduces to zero stays.
+    /// let v = IntegerVector::from_str("(-6, 3, -1)").unwrap();
+    /// assert_eq!((v.clone() % Integer::from(-3)).to_string(), "(0, 0, -1)");
+    /// ```
+    #[inline]
+    fn rem(mut self, m: Integer) -> Self {
+        self %= m;
+        self
+    }
+}
+
+impl<'a> Rem<&'a Integer> for IntegerVector {
+    type Output = Self;
+
+    /// Divides every element of an [`IntegerVector`] by an [`Integer`], keeping the remainders,
+    /// taking the vector by value and the modulus by reference.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerVector`] that takes both
+    /// arguments by value for details, including the signs of the remainders.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// vector's elements.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// // Every element is taken modulo 3, keeping its sign.
+    /// let v = IntegerVector::from_str("(1, -4, -5)").unwrap();
+    /// assert_eq!((v.clone() % &Integer::from(3)).to_string(), "(1, -1, -2)");
+    ///
+    /// // The sign of the modulus makes no difference, and an element that reduces to zero stays.
+    /// let v = IntegerVector::from_str("(-6, 3, -1)").unwrap();
+    /// assert_eq!((v.clone() % &Integer::from(-3)).to_string(), "(0, 0, -1)");
+    /// ```
+    #[inline]
+    fn rem(mut self, m: &'a Integer) -> Self {
+        self %= m;
+        self
+    }
+}
+
+impl Rem<Integer> for &IntegerVector {
+    type Output = IntegerVector;
+
+    /// Divides every element of an [`IntegerVector`] by an [`Integer`], keeping the remainders,
+    /// taking the vector by reference and the modulus by value.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerVector`] that takes both
+    /// arguments by value for details, including the signs of the remainders.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// vector's elements.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// // Every element is taken modulo 3, keeping its sign.
+    /// let v = IntegerVector::from_str("(1, -4, -5)").unwrap();
+    /// assert_eq!((&v % Integer::from(3)).to_string(), "(1, -1, -2)");
+    ///
+    /// // The sign of the modulus makes no difference, and an element that reduces to zero stays.
+    /// let v = IntegerVector::from_str("(-6, 3, -1)").unwrap();
+    /// assert_eq!((&v % Integer::from(-3)).to_string(), "(0, 0, -1)");
+    /// ```
+    #[inline]
+    fn rem(self, m: Integer) -> IntegerVector {
+        self % &m
+    }
+}
+
+impl<'a> Rem<&'a Integer> for &IntegerVector {
+    type Output = IntegerVector;
+
+    /// Divides every element of an [`IntegerVector`] by an [`Integer`], keeping the remainders,
+    /// taking the vector by reference and the modulus by reference.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerVector`] that takes both
+    /// arguments by value for details, including the signs of the remainders.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// vector's elements.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// // Every element is taken modulo 3, keeping its sign.
+    /// let v = IntegerVector::from_str("(1, -4, -5)").unwrap();
+    /// assert_eq!((&v % &Integer::from(3)).to_string(), "(1, -1, -2)");
+    ///
+    /// // The sign of the modulus makes no difference, and an element that reduces to zero stays.
+    /// let v = IntegerVector::from_str("(-6, 3, -1)").unwrap();
+    /// assert_eq!((&v % &Integer::from(-3)).to_string(), "(0, 0, -1)");
+    /// ```
+    fn rem(self, m: &'a Integer) -> IntegerVector {
+        assert_ne!(*m, 0u32, "division by zero");
+        IntegerVector {
+            elements: self.elements.iter().map(|x| x % m).collect(),
+        }
+    }
+}
+
+impl RemAssign<Integer> for IntegerVector {
+    /// Divides every element of an [`IntegerVector`] by an [`Integer`], replacing each element by
+    /// the remainder, taking the modulus by value.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerVector`] that takes both
+    /// arguments by value for details, including the signs of the remainders.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// vector's elements.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let mut v = IntegerVector::from_str("(1, -4, -5)").unwrap();
+    /// v %= Integer::from(3);
+    /// assert_eq!(v.to_string(), "(1, -1, -2)");
+    ///
+    /// let mut v = IntegerVector::from_str("(-6, 3, -1)").unwrap();
+    /// v %= Integer::from(-3);
+    /// assert_eq!(v.to_string(), "(0, 0, -1)");
+    /// ```
+    #[inline]
+    fn rem_assign(&mut self, m: Integer) {
+        *self %= &m;
+    }
+}
+
+impl<'a> RemAssign<&'a Integer> for IntegerVector {
+    /// Divides every element of an [`IntegerVector`] by an [`Integer`], replacing each element by
+    /// the remainder, taking the modulus by reference.
+    ///
+    /// See the documentation for the [`Rem`] implementation on [`IntegerVector`] that takes both
+    /// arguments by value for details, including the signs of the remainders.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// vector's elements.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let mut v = IntegerVector::from_str("(1, -4, -5)").unwrap();
+    /// v %= &Integer::from(3);
+    /// assert_eq!(v.to_string(), "(1, -1, -2)");
+    ///
+    /// let mut v = IntegerVector::from_str("(-6, 3, -1)").unwrap();
+    /// v %= &Integer::from(-3);
+    /// assert_eq!(v.to_string(), "(0, 0, -1)");
+    /// ```
+    fn rem_assign(&mut self, m: &'a Integer) {
+        assert_ne!(*m, 0u32, "division by zero");
+        for x in &mut self.elements {
+            *x %= m;
+        }
     }
 }

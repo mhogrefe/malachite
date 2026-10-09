@@ -357,6 +357,7 @@ pub mod integer_vector {
         pub mod max_bits;
         pub mod max_limbs;
         pub mod mod_op;
+        pub mod mod_power_of_2;
         pub mod multi_crt;
         pub mod neg;
         pub mod scalar_mul;

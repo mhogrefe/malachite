@@ -3756,6 +3756,15 @@ pub fn integer_vector_unsigned_pair_gen_var_1() -> Generator<(IntegerVector, usi
     )
 }
 
+// All `(IntegerVector, u64)` pairs, where the `u64` is a small power.
+pub fn integer_vector_unsigned_pair_gen_var_2() -> Generator<(IntegerVector, u64)> {
+    Generator::new(
+        &exhaustive_integer_vector_unsigned_pair_gen_var_2,
+        &random_integer_vector_unsigned_pair_gen_var_2,
+        &special_random_integer_vector_unsigned_pair_gen_var_2,
+    )
+}
+
 pub fn integer_vector_natural_vector_pair_gen() -> Generator<(IntegerVector, NaturalVector)> {
     Generator::new(
         &exhaustive_integer_vector_natural_vector_pair_gen,

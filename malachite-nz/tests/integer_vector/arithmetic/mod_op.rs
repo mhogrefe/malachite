@@ -8,7 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{
-    DivisibleBy, Mod, ModIsReduced, ModPowerOf2, PowerOf2,
+    DivisibleBy, Mod, ModIsReduced, ModPowerOf2, PowerOf2, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -20,7 +20,8 @@ use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_vector::NaturalVector;
 use malachite_nz::test_util::generators::{
-    integer_vector_gen, integer_vector_natural_pair_gen_var_1, integer_vector_unsigned_pair_gen,
+    integer_vector_gen, integer_vector_integer_pair_gen_var_1,
+    integer_vector_natural_pair_gen_var_1, integer_vector_unsigned_pair_gen,
 };
 
 #[test]
@@ -145,13 +146,11 @@ fn mod_op_properties() {
             (&v).mod_op(Natural::ONE),
             NaturalVector::zero(v.dimension())
         );
-        // For a power-of-2 divisor this is `mod_power_of_2`, element by element.
+        // For a power-of-2 divisor this is `mod_power_of_2`.
         for pow in [1, 7, 64, 100] {
             assert_eq!(
                 (&v).mod_op(Natural::power_of_2(pow)),
-                NaturalVector {
-                    elements: v.elements.iter().map(|x| x.mod_power_of_2(pow)).collect()
-                }
+                (&v).mod_power_of_2(pow)
             );
         }
     });
@@ -240,4 +239,106 @@ where
 #[test]
 fn mod_op_unsigned_properties() {
     apply_fn_to_unsigneds!(mod_op_unsigned_properties_helper);
+}
+
+#[test]
+fn test_rem() {
+    let test = |s, m, out| {
+        let v = IntegerVector::from_str(s).unwrap();
+        let m = Integer::from_str(m).unwrap();
+        // All four combinations of value and reference, and in place with both.
+        let w = &v % &m;
+        assert_eq!(w.to_string(), out);
+        assert_eq!(&v % m.clone(), w);
+        assert_eq!(v.clone() % &m, w);
+        assert_eq!(v.clone() % m.clone(), w);
+        let mut x = v.clone();
+        x %= &m;
+        assert_eq!(x, w);
+        let mut x = v;
+        x %= m;
+        assert_eq!(x, w);
+    };
+    test("()", "1", "()");
+    test("()", "-7", "()");
+    // Modulo 1 every element is zero, but the dimension is unchanged.
+    test("(1, -4, -5)", "1", "(0, 0, 0)");
+    // Every element keeps its sign, and the sign of the modulus makes no difference.
+    test("(1, -4, -5)", "3", "(1, -1, -2)");
+    test("(1, -4, -5)", "-3", "(1, -1, -2)");
+    // Multiples of the modulus become zero and stay.
+    test("(-6, 3, -1)", "-3", "(0, 0, -1)");
+    // Elements and divisor of many limbs.
+    test(
+        "(-1000000000000000000000000, 1)",
+        "1234567890987",
+        "(-530068894399, 1)",
+    );
+}
+
+#[test]
+#[should_panic]
+fn rem_fail() {
+    let _ = IntegerVector::from_str("(1)").unwrap() % Integer::ZERO;
+}
+
+#[test]
+#[should_panic]
+fn rem_ref_ref_fail() {
+    let _ = &IntegerVector::from_str("(1)").unwrap() % &Integer::ZERO;
+}
+
+#[test]
+#[should_panic]
+fn rem_assign_fail() {
+    let mut v = IntegerVector::from_str("(1)").unwrap();
+    v %= Integer::ZERO;
+}
+
+// The empty vector has no elements, so a zero divisor is never reached by the elementwise loop;
+// only the explicit check makes these panic rather than quietly returning the empty vector.
+#[test]
+#[should_panic]
+fn rem_empty_vector_fail() {
+    let _ = &IntegerVector::from_str("()").unwrap() % &Integer::ZERO;
+}
+
+#[test]
+#[should_panic]
+fn rem_assign_empty_vector_fail() {
+    let mut v = IntegerVector::from_str("()").unwrap();
+    v %= &Integer::ZERO;
+}
+
+#[test]
+fn rem_properties() {
+    integer_vector_integer_pair_gen_var_1().test_properties(|(v, m)| {
+        let w = &v % &m;
+        // The forms agree.
+        assert_eq!(&v % m.clone(), w);
+        assert_eq!(v.clone() % &m, w);
+        assert_eq!(v.clone() % m.clone(), w);
+        let mut x = v.clone();
+        x %= &m;
+        assert_eq!(x, w);
+        let mut x = v.clone();
+        x %= m.clone();
+        assert_eq!(x, w);
+
+        // The sign of the modulus makes no difference, the result commutes with negation, and
+        // reducing again changes nothing.
+        assert_eq!(&v % -&m, w);
+        assert_eq!(-&v % &m, -&w);
+        assert_eq!(&w % &m, w);
+        assert_eq!(w.dimension(), v.dimension());
+
+        // Element by element, this is the `Integer` operation.
+        for (x, y) in v.elements.iter().zip(&w.elements) {
+            assert_eq!(*y, x % &m);
+        }
+
+        // Reducing into [0, |m|) gives the same result as from the original vector.
+        let abs_m = (&m).unsigned_abs();
+        assert_eq!((&w).mod_op(&abs_m), (&v).mod_op(&abs_m));
+    });
 }

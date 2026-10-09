@@ -47,9 +47,15 @@ pub mod l1_norm;
 pub mod max_bits;
 #[doc(hidden)]
 pub mod max_limbs;
-/// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod), for reducing every
-/// element of a vector modulo a number.
+/// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
+/// [`Rem`](core::ops::Rem), and [`RemAssign`](core::ops::RemAssign), for reducing every element of
+/// a vector modulo a number.
 pub mod mod_op;
+/// Implementations of [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2),
+/// [`RemPowerOf2`](malachite_base::num::arithmetic::traits::RemPowerOf2), and
+/// [`RemPowerOf2Assign`](malachite_base::num::arithmetic::traits::RemPowerOf2Assign), for reducing
+/// every element of a vector modulo a power of 2.
+pub mod mod_power_of_2;
 /// [`IntegerVector::multi_balanced_crt`](super::IntegerVector::multi_balanced_crt), which combines
 /// vectors of residues modulo many word-sized moduli into balanced representatives by the Chinese
 /// remainder theorem.
