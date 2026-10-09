@@ -7585,6 +7585,86 @@ pub fn special_random_natural_vector_natural_pair_gen_var_1(
     ))
 }
 
+pub fn special_random_integer_vector_natural_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerVector, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_positive_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_vector_unsigned_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(IntegerVector, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_unsigned_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_unsigned_stripe_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_natural_vector_unsigned_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalVector, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_unsigned_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_unsigned_stripe_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_natural_vector_unsigned_pair_gen_var_3(
     config: &GenConfig,
 ) -> It<(NaturalVector, u64)> {

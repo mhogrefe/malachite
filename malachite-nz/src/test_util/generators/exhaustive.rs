@@ -3478,6 +3478,29 @@ pub fn exhaustive_natural_vector_natural_pair_gen_var_1() -> It<(NaturalVector, 
     ))
 }
 
+pub fn exhaustive_integer_vector_natural_pair_gen_var_1() -> It<(IntegerVector, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_vectors(),
+        exhaustive_positive_naturals(),
+    ))
+}
+
+pub fn exhaustive_integer_vector_unsigned_pair_gen<T: PrimitiveUnsigned>() -> It<(IntegerVector, T)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_vectors(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_natural_vector_unsigned_pair_gen<T: PrimitiveUnsigned>() -> It<(NaturalVector, T)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_vectors(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 pub fn exhaustive_natural_vector_unsigned_pair_gen_var_3() -> It<(NaturalVector, u64)> {
     Box::new(
         exhaustive_pairs_big_tiny(exhaustive_natural_vectors(), exhaustive_unsigneds::<u64>()).map(

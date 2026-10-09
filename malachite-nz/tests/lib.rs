@@ -355,6 +355,7 @@ pub mod integer_vector {
         pub mod l1_norm;
         pub mod max_bits;
         pub mod max_limbs;
+        pub mod mod_op;
         pub mod neg;
         pub mod scalar_mul;
         pub mod sub;
@@ -870,6 +871,7 @@ pub mod natural_vector {
     pub mod access;
     pub mod arithmetic {
         pub mod add;
+        pub mod balanced_mod;
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod height;

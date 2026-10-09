@@ -3845,6 +3845,31 @@ pub fn natural_vector_natural_pair_gen_var_1() -> Generator<(NaturalVector, Natu
     )
 }
 
+// The `Natural` is positive.
+pub fn integer_vector_natural_pair_gen_var_1() -> Generator<(IntegerVector, Natural)> {
+    Generator::new(
+        &exhaustive_integer_vector_natural_pair_gen_var_1,
+        &random_integer_vector_natural_pair_gen_var_1,
+        &special_random_integer_vector_natural_pair_gen_var_1,
+    )
+}
+
+pub fn integer_vector_unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(IntegerVector, T)> {
+    Generator::new(
+        &exhaustive_integer_vector_unsigned_pair_gen,
+        &random_integer_vector_unsigned_pair_gen,
+        &special_random_integer_vector_unsigned_pair_gen,
+    )
+}
+
+pub fn natural_vector_unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(NaturalVector, T)> {
+    Generator::new(
+        &exhaustive_natural_vector_unsigned_pair_gen,
+        &random_natural_vector_unsigned_pair_gen,
+        &special_random_natural_vector_unsigned_pair_gen,
+    )
+}
+
 // All `(NaturalVector, Natural)` where every element of the vector is less than the `Natural`.
 pub fn natural_vector_natural_pair_gen_var_2() -> Generator<(NaturalVector, Natural)> {
     Generator::new(

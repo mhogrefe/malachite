@@ -11,12 +11,15 @@ use malachite_base::num::arithmetic::traits::{
     Mod, ModAssign, ModIsReduced, ModPowerOf2, PowerOf2,
 };
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::unsigned_vector_gen;
+use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vector::Vector;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_vector::NaturalVector;
 use malachite_nz::test_util::generators::{
-    natural_vector_gen, natural_vector_natural_pair_gen_var_1,
+    natural_vector_gen, natural_vector_natural_pair_gen_var_1, natural_vector_unsigned_pair_gen,
 };
 
 #[test]
@@ -233,4 +236,90 @@ fn rem_properties() {
             );
         }
     });
+}
+
+#[test]
+fn test_rem_unsigned() {
+    fn test<T: PrimitiveUnsigned + for<'a> ExactFrom<&'a Natural>>(s: &str, m: T, out: &str)
+    where
+        Natural: From<T>,
+    {
+        let v = NaturalVector::from_str(s).unwrap();
+        // Both forms of `%` and of `mod_op`.
+        let w: UnsignedVector<T> = &v % m;
+        assert_eq!(w.to_string(), out);
+        assert_eq!(v.clone() % m, w);
+        assert_eq!((&v).mod_op(m), w);
+        assert_eq!(v.mod_op(m), w);
+    }
+    test("()", 1u8, "()");
+    test("()", 5u16, "()");
+    test("(1000000000001, 2000000000003, 5)", 1000u32, "(1, 3, 5)");
+    test("(1000000000001, 2000000000003, 5)", 1u64, "(0, 0, 0)");
+    // The result's element type is the modulus's.
+    test("(1000000000001, 2000000000003, 5)", 7u8, "(2, 5, 5)");
+    test("(18446744073709551616)", u64::MAX, "(1)");
+    test(
+        "(18446744073709551616)",
+        u128::MAX,
+        "(18446744073709551616)",
+    );
+    // An element that reduces to zero stays, so the dimension is unchanged.
+    test("(1024, 3)", 4usize, "(0, 3)");
+}
+
+#[test]
+#[should_panic]
+fn rem_unsigned_fail() {
+    let _: UnsignedVector<u8> = NaturalVector::from_str("(1)").unwrap() % 0u8;
+}
+
+#[test]
+#[should_panic]
+fn rem_unsigned_ref_fail() {
+    let _: UnsignedVector<u64> = &NaturalVector::from_str("(1)").unwrap() % 0u64;
+}
+
+#[test]
+#[should_panic]
+fn rem_unsigned_empty_vector_fail() {
+    let _: UnsignedVector<u32> = &NaturalVector::from_str("()").unwrap() % 0u32;
+}
+
+#[test]
+#[should_panic]
+fn mod_op_unsigned_fail() {
+    let _: UnsignedVector<u16> = NaturalVector::from_str("(1)").unwrap().mod_op(0u16);
+}
+
+fn rem_unsigned_properties_helper<
+    T: PrimitiveUnsigned + for<'a> ExactFrom<&'a Natural> + for<'a> TryFrom<&'a Natural>,
+>()
+where
+    Natural: From<T>,
+{
+    natural_vector_unsigned_pair_gen::<T>().test_properties(|(v, m)| {
+        if m == T::ZERO {
+            return;
+        }
+        let w: UnsignedVector<T> = &v % m;
+        // The forms agree.
+        assert_eq!(v.clone() % m, w);
+        assert_eq!((&v).mod_op(m), w);
+        assert_eq!(v.clone().mod_op(m), w);
+
+        // The result is reduced, and reducing it again changes nothing.
+        assert!(w.mod_is_reduced(&m));
+        assert_eq!((&w).mod_op(m), w);
+
+        // Apart from its type, the result is the reduction modulo the Natural with the same value.
+        let r = &v % Natural::from(m);
+        assert_eq!(UnsignedVector::<T>::try_from(&r), Ok(w.clone()));
+        assert_eq!(NaturalVector::from(w), r);
+    });
+}
+
+#[test]
+fn rem_unsigned_properties() {
+    apply_fn_to_unsigneds!(rem_unsigned_properties_helper);
 }

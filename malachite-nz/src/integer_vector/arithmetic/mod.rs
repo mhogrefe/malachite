@@ -43,6 +43,9 @@ pub mod l1_norm;
 pub mod max_bits;
 #[doc(hidden)]
 pub mod max_limbs;
+/// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod), for reducing every
+/// element of a vector modulo a number.
+pub mod mod_op;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;

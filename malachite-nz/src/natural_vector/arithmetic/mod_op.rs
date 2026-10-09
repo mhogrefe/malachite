@@ -10,6 +10,9 @@ use crate::natural::Natural;
 use crate::natural_vector::NaturalVector;
 use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{Mod, ModAssign};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::unsigned_vector::UnsignedVector;
 
 impl Rem<Natural> for NaturalVector {
     type Output = Self;
@@ -486,5 +489,185 @@ impl<'a> ModAssign<&'a Natural> for NaturalVector {
     #[inline]
     fn mod_assign(&mut self, m: &'a Natural) {
         *self %= m;
+    }
+}
+
+impl<T: PrimitiveUnsigned + for<'a> ExactFrom<&'a Natural>> Rem<T> for &NaturalVector
+where
+    Natural: From<T>,
+{
+    type Output = UnsignedVector<T>;
+
+    /// Divides every element of a [`NaturalVector`] by a value of an unsigned primitive integer
+    /// type, keeping the remainders as an [`UnsignedVector`] with that element type, taking the
+    /// vector by reference.
+    ///
+    /// Every remainder is less than `m`, so every one fits in `m`'s type, and this is the natural
+    /// way to go from a vector with arbitrarily large elements to one reduced modulo a word-sized
+    /// modulus. Apart from the result's type, it is the same operation as reducing modulo
+    /// `Natural::from(m)`; see the documentation for the [`Rem`] implementation on
+    /// [`NaturalVector`] that takes both arguments by value for details.
+    ///
+    /// The result is reduced modulo $m$, which is to say that
+    /// [`mod_is_reduced`](malachite_base::num::arithmetic::traits::ModIsReduced::mod_is_reduced)
+    /// returns `true` for it.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits in the vector's
+    /// elements, and $m$ is `self.dimension()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// let v = NaturalVector::from_str("(1000000000001, 2000000000003, 5)").unwrap();
+    /// assert_eq!((&v % 1000u32).to_string(), "(1, 3, 5)");
+    ///
+    /// // The result's element type is the modulus's.
+    /// let w: UnsignedVector<u8> = &v % 7u8;
+    /// assert_eq!(w.to_string(), "(2, 5, 5)");
+    ///
+    /// // An element that reduces to zero stays, so the dimension is unchanged.
+    /// let v = NaturalVector::from_str("(1024, 3)").unwrap();
+    /// assert_eq!((&v % 4u64).to_string(), "(0, 3)");
+    /// ```
+    fn rem(self, m: T) -> UnsignedVector<T> {
+        assert_ne!(m, T::ZERO, "division by zero");
+        let m = Natural::from(m);
+        UnsignedVector {
+            elements: self
+                .elements
+                .iter()
+                .map(|x| T::exact_from(&(x % &m)))
+                .collect(),
+        }
+    }
+}
+
+impl<T: PrimitiveUnsigned + for<'a> ExactFrom<&'a Natural>> Rem<T> for NaturalVector
+where
+    Natural: From<T>,
+{
+    type Output = UnsignedVector<T>;
+
+    /// Divides every element of a [`NaturalVector`] by a value of an unsigned primitive integer
+    /// type, keeping the remainders as an [`UnsignedVector`] with that element type, taking the
+    /// vector by value.
+    ///
+    /// Taking the vector by value saves nothing, since the remainders go into new storage either
+    /// way. See the documentation for the [`Rem`] implementation that takes the vector by reference
+    /// for details.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits in the vector's
+    /// elements, and $m$ is `self.dimension()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// let v = NaturalVector::from_str("(1000000000001, 2000000000003, 5)").unwrap();
+    /// assert_eq!((v % 1000u32).to_string(), "(1, 3, 5)");
+    /// ```
+    #[inline]
+    fn rem(self, m: T) -> UnsignedVector<T> {
+        &self % m
+    }
+}
+
+impl<T: PrimitiveUnsigned + for<'a> ExactFrom<&'a Natural>> Mod<T> for &NaturalVector
+where
+    Natural: From<T>,
+{
+    type Output = UnsignedVector<T>;
+
+    /// Divides every element of a [`NaturalVector`] by a value of an unsigned primitive integer
+    /// type, keeping the remainders as an [`UnsignedVector`] with that element type, taking the
+    /// vector by reference.
+    ///
+    /// A [`NaturalVector`]'s elements are never negative, so this agrees with `%` everywhere. See
+    /// the documentation for the [`Rem`] implementation that takes the vector by reference for
+    /// details.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits in the vector's
+    /// elements, and $m$ is `self.dimension()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Mod;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// let v = NaturalVector::from_str("(1000000000001, 2000000000003, 5)").unwrap();
+    /// assert_eq!((&v).mod_op(1000u32).to_string(), "(1, 3, 5)");
+    /// ```
+    #[inline]
+    fn mod_op(self, m: T) -> UnsignedVector<T> {
+        self % m
+    }
+}
+
+impl<T: PrimitiveUnsigned + for<'a> ExactFrom<&'a Natural>> Mod<T> for NaturalVector
+where
+    Natural: From<T>,
+{
+    type Output = UnsignedVector<T>;
+
+    /// Divides every element of a [`NaturalVector`] by a value of an unsigned primitive integer
+    /// type, keeping the remainders as an [`UnsignedVector`] with that element type, taking the
+    /// vector by value.
+    ///
+    /// A [`NaturalVector`]'s elements are never negative, so this agrees with `%` everywhere. See
+    /// the documentation for the [`Rem`] implementation that takes the vector by reference for
+    /// details.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits in the vector's
+    /// elements, and $m$ is `self.dimension()`.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Mod;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// let v = NaturalVector::from_str("(1000000000001, 2000000000003, 5)").unwrap();
+    /// assert_eq!(v.mod_op(1000u32).to_string(), "(1, 3, 5)");
+    /// ```
+    #[inline]
+    fn mod_op(self, m: T) -> UnsignedVector<T> {
+        self % m
     }
 }

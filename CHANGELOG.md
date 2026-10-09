@@ -171,6 +171,15 @@ documented by git history.
   every combination of value and reference, reducing every element modulo $m$ and keeping the
   dimension; and `ModIsReduced<Natural>` for `NaturalVector`, checking whether every element is less
   than $m$.
+- `Rem` and `Mod` for `NaturalVector` with a primitive unsigned modulus of type `T`, by value and by
+  reference, returning the remainders as an `UnsignedVector<T>`.
+- `Mod` for `IntegerVector` with a `Natural` modulus, in every combination of value and reference,
+  reducing every element into $[0, m)$ and returning a `NaturalVector`, like FLINT's
+  `_fmpz_vec_scalar_mod_fmpz`; and with a primitive unsigned modulus of type `T`, returning an
+  `UnsignedVector<T>`, like `_fmpz_vec_get_nmod_vec`.
+- `BalancedMod` for `NaturalVector` with a `Natural` modulus, in every combination of value and
+  reference, reducing every element into $(-m/2, m/2]$ and returning an `IntegerVector`, like
+  `_fmpz_vec_set_nmod_vec`.
 - `Content`, `PrimitivePart`, `PrimitivePartAssign`, `ContentAndPrimitivePart`, and their canonical
   counterparts for `NaturalVector` and `IntegerVector`; the canonical ones for `NaturalPolynomial`,
   `IntegerPolynomial`, and `GaussianInteger`; and `PrimitivePartAssign` for `GaussianInteger`.

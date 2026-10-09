@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     l1_norm::register(runner);
     max_bits::register(runner);
     max_limbs::register(runner);
+    mod_op::register(runner);
     neg::register(runner);
     scalar_mul::register(runner);
     sub::register(runner);
@@ -34,6 +35,7 @@ mod height;
 mod l1_norm;
 mod max_bits;
 mod max_limbs;
+mod mod_op;
 mod neg;
 mod scalar_mul;
 mod sub;
