@@ -977,6 +977,7 @@ pub mod unsigned_vector {
         pub mod height;
         pub mod mod_add;
         pub mod mod_is_reduced;
+        pub mod mod_mul;
         pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_2;

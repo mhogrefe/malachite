@@ -894,6 +894,7 @@ pub mod natural_vector {
         pub mod l1_norm;
         pub mod mod_add;
         pub mod mod_is_reduced;
+        pub mod mod_mul;
         pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_2;

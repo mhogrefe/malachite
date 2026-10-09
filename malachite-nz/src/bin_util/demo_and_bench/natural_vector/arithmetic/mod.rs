@@ -18,6 +18,7 @@ pub(crate) fn register(runner: &mut Runner) {
     l1_norm::register(runner);
     mod_add::register(runner);
     mod_is_reduced::register(runner);
+    mod_mul::register(runner);
     mod_neg::register(runner);
     mod_op::register(runner);
     mod_power_of_2::register(runner);
@@ -40,6 +41,7 @@ mod height;
 mod l1_norm;
 mod mod_add;
 mod mod_is_reduced;
+mod mod_mul;
 mod mod_neg;
 mod mod_op;
 mod mod_power_of_2;

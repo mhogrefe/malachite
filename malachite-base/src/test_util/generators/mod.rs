@@ -5293,6 +5293,17 @@ pub fn unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
     )
 }
 
+// All `(UnsignedVector<T>, T, T)` where the last `T` is positive, and every element of the vector,
+// and the first `T`, is less than it.
+pub fn unsigned_vector_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_2,
+        &random_unsigned_vector_unsigned_unsigned_triple_gen_var_2,
+        &special_random_unsigned_vector_unsigned_unsigned_triple_gen_var_2,
+    )
+}
+
 // All `(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, u64)` where the vectors have the
 // same dimension, the `u64` is no greater than `T::WIDTH`, and every element of all three vectors
 // is less than 2 to the power of the `u64`.

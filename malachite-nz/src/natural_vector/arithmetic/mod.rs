@@ -44,6 +44,10 @@ pub mod mod_add;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;
+/// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) and
+/// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign), for multiplying a
+/// vector by a scalar modulo a number.
+pub mod mod_mul;
 /// Implementations of [`ModNeg`](malachite_base::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), for negating a vector
 /// modulo a number.

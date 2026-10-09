@@ -3982,6 +3982,17 @@ pub fn natural_vector_natural_unsigned_triple_gen_var_1() -> Generator<(NaturalV
     )
 }
 
+// All `(NaturalVector, Natural, Natural)` where every element of the vector, and the first
+// `Natural`, is less than the second `Natural`.
+pub fn natural_vector_natural_natural_triple_gen_var_1()
+-> Generator<(NaturalVector, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_natural_triple_gen_var_1,
+        &random_natural_vector_natural_natural_triple_gen_var_1,
+        &special_random_natural_vector_natural_natural_triple_gen_var_1,
+    )
+}
+
 // All `(NaturalVector, NaturalVector, NaturalVector, u64)` where the vectors have the same
 // dimension and every element of all three is less than 2 to the power of the `u64`.
 pub fn natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1()

@@ -3625,6 +3625,22 @@ pub fn exhaustive_natural_vector_natural_unsigned_triple_gen_var_1()
     )
 }
 
+// The modulus is the largest input plus 1 plus a free `Natural`, so that no triple is generated
+// twice.
+pub fn exhaustive_natural_vector_natural_natural_triple_gen_var_1()
+-> It<(NaturalVector, Natural, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_vector_natural_pair_gen(),
+            exhaustive_naturals(),
+        )
+        .map(|((v, c), k)| {
+            let max = v.elements.iter().max().unwrap_or(&c).max(&c).clone();
+            (v, c, max + k + Natural::ONE)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1()
 -> It<(NaturalVector, NaturalVector, NaturalVector, u64)> {
     exhaustive_tuples_by_dimension(|dimension| {

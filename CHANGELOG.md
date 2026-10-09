@@ -141,6 +141,9 @@ documented by git history.
   Implemented for `UnsignedVector<T>`, in every combination of value and reference.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` of `UnsignedVector<T>` by a `T`, multiplying every
   element modulo $2^k$. The elements and the scalar must already be reduced.
+- `ModMul` and `ModMulAssign` of `UnsignedVector<T>` by a `T` modulo a `T`, multiplying every
+  element modulo $m$ with the multiplication data for $m$ computed once, like FLINT's
+  `_nmod_vec_scalar_mul_nmod`. The elements and the scalar must already be reduced.
 
 ### malachite-nz
 
@@ -241,6 +244,10 @@ documented by git history.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` of `NaturalVector` by `Natural`, in every
   combination of value and reference, multiplying every element modulo $2^k$. The elements and the
   scalar must already be reduced.
+- `ModMul` and `ModMulAssign` of `NaturalVector` by `Natural` modulo `Natural`, in every
+  combination of value and reference, with the multiplication data for the modulus computed once,
+  like FLINT's `_fmpz_mod_vec_scalar_mul_fmpz_mod`. The elements and the scalar must already be
+  reduced.
 
 ### malachite-q
 

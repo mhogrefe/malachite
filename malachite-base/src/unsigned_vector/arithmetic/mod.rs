@@ -31,6 +31,10 @@ pub(crate) mod mod_dot;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;
+/// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) and
+/// [`ModMulAssign`](crate::num::arithmetic::traits::ModMulAssign), for multiplying a vector by a
+/// scalar modulo a number.
+pub mod mod_mul;
 /// Implementations of [`ModNeg`](crate::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](crate::num::arithmetic::traits::ModNegAssign), for negating a vector modulo a
 /// number.

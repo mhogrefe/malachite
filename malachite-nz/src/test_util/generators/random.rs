@@ -7036,6 +7036,23 @@ pub fn random_natural_vector_natural_unsigned_triple_gen_var_1(
     )
 }
 
+pub fn random_natural_vector_natural_natural_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, Natural, Natural)> {
+    Box::new(
+        random_natural_vector_natural_pair_gen(config)
+            .zip(random_naturals(
+                EXAMPLE_SEED.fork("m"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((v, c), k)| {
+                let max = v.elements.iter().max().unwrap_or(&c).max(&c).clone();
+                (v, c, max + k + Natural::ONE)
+            }),
+    )
+}
+
 pub fn random_natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalVector, NaturalVector, NaturalVector, u64)> {
