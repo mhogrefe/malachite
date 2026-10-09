@@ -25,6 +25,10 @@ pub mod canonicalize_sign;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which split a vector into a rational scalar and a vector of coprime integers.
 pub mod content;
+/// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height) and
+/// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
+/// element.
+pub mod height;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;

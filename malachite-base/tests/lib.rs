@@ -970,6 +970,7 @@ pub mod unsigned_vector {
     pub mod arithmetic {
         pub mod canonical_primitive_part;
         pub mod content;
+        pub mod height;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_neg;
@@ -1007,6 +1008,7 @@ pub mod unsigned_vector {
         pub mod exhaustive_unsigned_vectors;
     }
     pub mod extend;
+    pub mod height_index;
     pub mod pivot;
     pub mod push;
     pub mod select_coordinates;

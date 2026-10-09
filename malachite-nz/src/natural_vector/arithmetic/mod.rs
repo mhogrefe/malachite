@@ -23,6 +23,10 @@ pub mod canonical_primitive_part;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
+/// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height) and
+/// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
+/// element.
+pub mod height;
 /// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding vectors
 /// modulo a number.

@@ -84,6 +84,12 @@ pub trait Vector: Sized {
     /// element is zero, which includes the 0-dimensional vector. When it returns `Some(i)`,
     /// [`pivot`](Self::pivot) is the element at `i`.
     fn pivot_index(&self) -> Option<u64>;
+
+    /// Returns the index of an element of largest height: the first one, when several share it.
+    ///
+    /// The height of an integer is its absolute value, and the height of a rational number $p/q$
+    /// in lowest terms is $\max(|p|, q)$. Returns `None` for the 0-dimensional vector.
+    fn height_index(&self) -> Option<u64>;
 }
 
 /// Selects coordinates of a vector by index: the result's element $j$ is the original's element

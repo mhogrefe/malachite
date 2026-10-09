@@ -423,6 +423,7 @@ pub mod rational_vector {
         pub mod canonical_primitive_part;
         pub mod canonicalize_sign;
         pub mod content;
+        pub mod height;
         pub mod neg;
         pub mod sub;
     }
@@ -463,6 +464,7 @@ pub mod rational_vector {
         pub mod exhaustive_rational_vectors;
     }
     pub mod extend;
+    pub mod height_index;
     pub mod pivot;
     pub mod push;
     pub mod select_coordinates;

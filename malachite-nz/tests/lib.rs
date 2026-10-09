@@ -351,6 +351,7 @@ pub mod integer_vector {
         pub mod content;
         pub mod content_chained;
         pub mod dot_general;
+        pub mod height;
         pub mod max_bits;
         pub mod max_limbs;
         pub mod neg;
@@ -389,6 +390,7 @@ pub mod integer_vector {
         pub mod exhaustive_integer_vectors;
     }
     pub mod extend;
+    pub mod height_index;
     pub mod pivot;
     pub mod push;
     pub mod select_coordinates;
@@ -858,6 +860,7 @@ pub mod natural_vector {
         pub mod add;
         pub mod canonical_primitive_part;
         pub mod content;
+        pub mod height;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_neg;
@@ -898,6 +901,7 @@ pub mod natural_vector {
         pub mod exhaustive_natural_vectors;
     }
     pub mod extend;
+    pub mod height_index;
     pub mod pivot;
     pub mod push;
     pub mod select_coordinates;

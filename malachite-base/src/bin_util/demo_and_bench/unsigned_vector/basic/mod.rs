@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     dimension::register(runner);
     extend::register(runner);
+    height_index::register(runner);
     index::register(runner);
     pivot::register(runner);
     push::register(runner);
@@ -22,6 +23,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod dimension;
 mod extend;
+mod height_index;
 mod index;
 mod pivot;
 mod push;

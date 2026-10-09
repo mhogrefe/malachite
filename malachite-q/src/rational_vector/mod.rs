@@ -11,9 +11,11 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
 use malachite_base::named::Named;
+use malachite_base::num::arithmetic::traits::HeightRef;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vector::Vector;
+use malachite_nz::natural::Natural;
 
 /// Implementations of [`Index`](core::ops::Index) and [`IndexMut`](core::ops::IndexMut) for
 /// [`RationalVector`].
@@ -37,6 +39,11 @@ pub mod random;
 /// [`SelectCoordinatesAssign`](malachite_base::vector::SelectCoordinatesAssign), for selecting
 /// coordinates of a [`RationalVector`] by index.
 pub mod select_coordinates;
+
+// The height of the 0-dimensional vector, which `height_ref` lends. A `Natural` owns a `Vec` when
+// it is large, so it has a destructor, and a reference to a constant with a destructor cannot be
+// promoted to `'static`; a `static` can be borrowed for as long as needed.
+pub(crate) static ZERO: Natural = Natural::ZERO;
 
 /// A vector whose elements are [`Rational`]s.
 ///
@@ -473,6 +480,52 @@ impl Vector for RationalVector {
             .iter()
             .position(|x| *x != 0u32)
             .map(u64::exact_from)
+    }
+
+    /// Returns the index of an element of largest height of a [`RationalVector`]: the first one,
+    /// when several are tied.
+    ///
+    /// Indices start at 0, as they do for [`Index`](core::ops::Index). Returns `None` for the
+    /// 0-dimensional vector.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_q::rational_vector::RationalVector;
+    ///
+    /// assert_eq!(
+    ///     RationalVector::from_str("(1/2, -3, 1/4)")
+    ///         .unwrap()
+    ///         .height_index(),
+    ///     Some(2)
+    /// );
+    /// assert_eq!(
+    ///     RationalVector::from_str("(3, -1/3)")
+    ///         .unwrap()
+    ///         .height_index(),
+    ///     Some(0)
+    /// );
+    /// assert_eq!(RationalVector::from_str("()").unwrap().height_index(), None);
+    /// ```
+    #[inline]
+    fn height_index(&self) -> Option<u64> {
+        // `max_by` returns the last of several equal maxima, so iterating in reverse gives the
+        // first.
+        self.elements
+            .iter()
+            .enumerate()
+            .rev()
+            .max_by(|(_, x), (_, y)| x.height_ref().cmp(y.height_ref()))
+            .map(|(i, _)| u64::exact_from(i))
     }
 }
 

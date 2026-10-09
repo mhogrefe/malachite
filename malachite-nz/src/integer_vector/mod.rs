@@ -469,6 +469,54 @@ impl Vector for IntegerVector {
             .position(|x| *x != 0u32)
             .map(u64::exact_from)
     }
+
+    /// Returns the index of an element of largest absolute value of an [`IntegerVector`]: the first
+    /// one, when several are tied.
+    ///
+    /// Indices start at 0, as they do for [`Index`](core::ops::Index). Returns `None` for the
+    /// 0-dimensional vector.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// assert_eq!(
+    ///     IntegerVector::from_str("(1, -3, 3, 2)")
+    ///         .unwrap()
+    ///         .height_index(),
+    ///     Some(1)
+    /// );
+    /// assert_eq!(
+    ///     IntegerVector::from_str("(-5, 5)").unwrap().height_index(),
+    ///     Some(0)
+    /// );
+    /// assert_eq!(IntegerVector::from_str("()").unwrap().height_index(), None);
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_height_index` from `fmpz_vec/height_index.c`, FLINT 3.6.0,
+    /// except that it returns `None` for the 0-dimensional vector, where FLINT requires a nonempty
+    /// vector.
+    #[inline]
+    fn height_index(&self) -> Option<u64> {
+        // `max_by` returns the last of several equal maxima, so iterating in reverse gives the
+        // first.
+        self.elements
+            .iter()
+            .enumerate()
+            .rev()
+            .max_by(|(_, x), (_, y)| x.unsigned_abs_ref().cmp(y.unsigned_abs_ref()))
+            .map(|(i, _)| u64::exact_from(i))
+    }
 }
 
 // Implements `Named` for `IntegerVector`.

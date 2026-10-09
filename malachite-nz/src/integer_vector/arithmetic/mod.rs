@@ -32,6 +32,10 @@ pub mod content;
 pub mod content_chained;
 #[doc(hidden)]
 pub mod dot_general;
+/// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height) and
+/// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
+/// element.
+pub mod height;
 #[doc(hidden)]
 pub mod max_bits;
 #[doc(hidden)]

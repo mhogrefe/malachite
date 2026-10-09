@@ -458,6 +458,55 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
             .position(|&x| x != T::ZERO)
             .map(u64::exact_from)
     }
+
+    /// Returns the index of the largest element of an [`UnsignedVector`]: the first one, when
+    /// several are tied.
+    ///
+    /// Indices start at 0, as they do for [`Index`](core::ops::Index). Returns `None` for the
+    /// 0-dimensional vector.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("(1, 3, 3, 2)")
+    ///         .unwrap()
+    ///         .height_index(),
+    ///     Some(1)
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("(5, 5)")
+    ///         .unwrap()
+    ///         .height_index(),
+    ///     Some(0)
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("()").unwrap().height_index(),
+    ///     None
+    /// );
+    /// ```
+    #[inline]
+    fn height_index(&self) -> Option<u64> {
+        // `max_by` returns the last of several equal maxima, so iterating in reverse gives the
+        // first.
+        self.elements
+            .iter()
+            .enumerate()
+            .rev()
+            .max_by(|(_, x), (_, y)| x.cmp(y))
+            .map(|(i, _)| u64::exact_from(i))
+    }
 }
 
 macro_rules! impl_named_unsigned_vector {
