@@ -169,6 +169,7 @@ pub mod integer {
         pub mod add_mul;
         pub mod average;
         pub mod balanced_mod;
+        pub mod balanced_mod_power_of_2;
         pub mod binomial_coefficient;
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_gaussian_unit;
@@ -347,6 +348,7 @@ pub mod integer_vector {
     pub mod arithmetic {
         pub mod add;
         pub mod balanced_mod;
+        pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
         pub mod canonicalize_sign;
         pub mod content;
@@ -424,6 +426,7 @@ pub mod natural {
         pub mod add;
         pub mod add_mul;
         pub mod average;
+        pub mod balanced_mod_power_of_2;
         pub mod bell_number;
         pub mod binomial_coefficient;
         pub mod canonical_unit_i_pow;
@@ -667,6 +670,7 @@ pub mod integer_polynomial {
         pub mod add;
         pub mod add_truncated;
         pub mod balanced_mod;
+        pub mod balanced_mod_power_of_2;
         pub mod bit_pack;
         pub mod bit_unpack;
         pub mod canonical_primitive_part;
@@ -759,6 +763,7 @@ pub mod natural_polynomial {
         pub mod add;
         pub mod add_truncated;
         pub mod balanced_mod;
+        pub mod balanced_mod_power_of_2;
         pub mod bit_pack;
         pub mod bit_unpack;
         pub mod canonical_primitive_part;
@@ -876,6 +881,7 @@ pub mod natural_vector {
     pub mod arithmetic {
         pub mod add;
         pub mod balanced_mod;
+        pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod height;

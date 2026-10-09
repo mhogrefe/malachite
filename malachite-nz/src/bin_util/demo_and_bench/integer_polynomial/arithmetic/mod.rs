@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     add_truncated::register(runner);
     balanced_mod::register(runner);
+    balanced_mod_power_of_2::register(runner);
     bit_pack::register(runner);
     bit_unpack::register(runner);
     canonical_primitive_part::register(runner);
@@ -50,6 +51,7 @@ pub(crate) fn register(runner: &mut Runner) {
 mod add;
 mod add_truncated;
 mod balanced_mod;
+mod balanced_mod_power_of_2;
 mod bit_pack;
 mod bit_unpack;
 mod canonical_primitive_part;

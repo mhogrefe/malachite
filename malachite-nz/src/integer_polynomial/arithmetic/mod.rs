@@ -17,6 +17,12 @@ pub mod add_truncated;
 /// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
 /// every coefficient of a polynomial to the representative closest to zero.
 pub mod balanced_mod;
+/// Implementations of
+/// [`BalancedModPowerOf2`](malachite_base::num::arithmetic::traits::BalancedModPowerOf2) and
+/// [`BalancedModPowerOf2Assign`](
+/// malachite_base::num::arithmetic::traits::BalancedModPowerOf2Assign), which reduce every
+/// coefficient of a polynomial to the representative closest to zero modulo a power of 2.
+pub mod balanced_mod_power_of_2;
 /// Implementations of [`BitPack`](malachite_base::polynomial::BitPack), which packs a polynomial's
 /// coefficients into fixed-width fields of a single integer.
 pub mod bit_pack;

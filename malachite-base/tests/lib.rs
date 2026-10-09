@@ -265,6 +265,7 @@ pub mod num {
         pub mod arithmetic_checked_shr;
         pub mod average;
         pub mod balanced_mod;
+        pub mod balanced_mod_power_of_2;
         pub mod bell_number;
         pub mod binomial_coefficient;
         pub mod canonical_unit_i_pow;

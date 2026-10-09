@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     balanced_mod::register(runner);
+    balanced_mod_power_of_2::register(runner);
     canonical_primitive_part::register(runner);
     content::register(runner);
     height::register(runner);
@@ -30,6 +31,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod add;
 mod balanced_mod;
+mod balanced_mod_power_of_2;
 mod canonical_primitive_part;
 mod content;
 mod height;

@@ -117,6 +117,13 @@ documented by git history.
   `canonicalize_unit` did before 0.13.0.
 - `CanonicalizeSign` and `CanonicalizeSignAssign`, which negate a value if it is negative; for a
   vector, "negative" means that its pivot is. Implemented for `IntegerVector` and `RationalVector`.
+- `BalancedModPowerOf2` and `BalancedModPowerOf2Assign` traits in
+  `malachite_base::num::arithmetic::traits`, the power-of-2 counterparts of `BalancedMod` and
+  `BalancedModAssign`, as `ModPowerOf2` is of `Mod`. The balanced remainder modulo $2^k$ lies in
+  $(-2^{k-1}, 2^{k-1}]$, with the tie positive, so it equals `balanced_mod` with modulus $2^k$.
+  Implemented for the primitive integers, unsigned types returning the signed type of the same
+  width; a result that does not fit, $2^{W-1}$, panics. They are now among the `PrimitiveInt`,
+  `PrimitiveUnsigned`, and `PrimitiveSigned` bounds.
 
 ### malachite-nz
 
@@ -202,6 +209,10 @@ documented by git history.
   reference. The vectors must have the same dimension.
 - `Sub` and `SubAssign` for `IntegerVector`, in every combination of value and reference. The
   vectors must have the same dimension.
+- `BalancedModPowerOf2` for `Natural` (returning an `Integer`), `NaturalPolynomial` (returning an
+  `IntegerPolynomial`), and `NaturalVector` (returning an `IntegerVector`); and `BalancedModPowerOf2`
+  and `BalancedModPowerOf2Assign` for `Integer`, `IntegerPolynomial`, and `IntegerVector`. Each is
+  `balanced_mod` with modulus $2^k$, computed by masking rather than dividing.
 
 ### malachite-q
 

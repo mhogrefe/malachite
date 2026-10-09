@@ -2019,6 +2019,27 @@ pub trait ModPowerOf2SubAssign<RHS = Self> {
     fn mod_power_of_2_sub_assign(&mut self, other: RHS, pow: u64);
 }
 
+/// Divides a number by $2^k$, returning the balanced remainder: the representative of the number
+/// modulo $2^k$ that is closest to zero.
+///
+/// The remainder $r$ satisfies $-2^{k-1} < r \leq 2^{k-1}$, so a remainder of exactly $2^{k-1}$ is
+/// positive, as with [`BalancedMod`]; for $k = 0$ it is 0. It is congruent to $x$ modulo $2^k$, and
+/// those two properties determine it uniquely.
+pub trait BalancedModPowerOf2 {
+    type Output;
+
+    fn balanced_mod_power_of_2(self, pow: u64) -> Self::Output;
+}
+
+/// Divides a number by $2^k$, replacing the number by the balanced remainder: the representative of
+/// the number modulo $2^k$ that is closest to zero.
+///
+/// The remainder $r$ satisfies $-2^{k-1} < r \leq 2^{k-1}$, so a remainder of exactly $2^{k-1}$ is
+/// positive; for $k = 0$ it is 0.
+pub trait BalancedModPowerOf2Assign {
+    fn balanced_mod_power_of_2_assign(&mut self, pow: u64);
+}
+
 /// Divides a number by $2^k$, returning just the remainder. The remainder is non-negative.
 ///
 /// If the quotient were computed, the quotient and remainder would satisfy $x = q2^k + r$ and $0

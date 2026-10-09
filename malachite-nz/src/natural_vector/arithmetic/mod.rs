@@ -12,6 +12,10 @@ pub mod add;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), which
 /// reduces every element of a vector to the representative closest to zero modulo a number.
 pub mod balanced_mod;
+/// Implementations of
+/// [`BalancedModPowerOf2`](malachite_base::num::arithmetic::traits::BalancedModPowerOf2), which
+/// reduce every element of a vector to the representative closest to zero modulo a power of 2.
+pub mod balanced_mod_power_of_2;
 /// Implementations of [`CanonicalPrimitivePart`](
 /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart),
 /// [`CanonicalPrimitivePartAssign`](

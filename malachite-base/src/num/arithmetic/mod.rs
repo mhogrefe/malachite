@@ -287,6 +287,37 @@ pub mod average;
 /// assert_eq!(x, -3);
 /// ```
 pub mod balanced_mod;
+/// [`BalancedModPowerOf2`](traits::BalancedModPowerOf2) and
+/// [`BalancedModPowerOf2Assign`](traits::BalancedModPowerOf2Assign), traits for finding the
+/// representative of a number modulo $2^k$ that is closest to zero.
+///
+/// # balanced_mod_power_of_2
+/// ```
+/// use malachite_base::num::arithmetic::traits::BalancedModPowerOf2;
+///
+/// assert_eq!(19u32.balanced_mod_power_of_2(3), 3);
+/// // 7 is more than half of 8, so the closest representative is negative
+/// assert_eq!(23u32.balanced_mod_power_of_2(3), -1);
+/// // exactly half the modulus is the top of the range, so it stays positive
+/// assert_eq!(20u32.balanced_mod_power_of_2(3), 4);
+/// // with pow equal to the width, the low bits are reinterpreted around zero
+/// assert_eq!(200u8.balanced_mod_power_of_2(8), -56);
+///
+/// assert_eq!((-19i32).balanced_mod_power_of_2(3), -3);
+/// assert_eq!((-20i32).balanced_mod_power_of_2(3), 4);
+/// // every i8 is its own balanced remainder modulo 2^9
+/// assert_eq!((-100i8).balanced_mod_power_of_2(9), -100);
+/// ```
+///
+/// # balanced_mod_power_of_2_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::BalancedModPowerOf2Assign;
+///
+/// let mut x = 23i32;
+/// x.balanced_mod_power_of_2_assign(3);
+/// assert_eq!(x, -1);
+/// ```
+pub mod balanced_mod_power_of_2;
 /// Traits for computing the binomial coefficient of two numbers. There is a trait whose
 /// implementations panic if the result cannot be represented, and a checked trait whose
 /// implementations return `None` in that case: [`BinomialCoefficient`](traits::BinomialCoefficient)

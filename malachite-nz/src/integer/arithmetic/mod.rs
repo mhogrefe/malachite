@@ -33,6 +33,11 @@ pub mod average;
 /// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), traits for
 /// finding the representative of a number modulo another number that is closest to zero.
 pub mod balanced_mod;
+/// [`BalancedModPowerOf2`](malachite_base::num::arithmetic::traits::BalancedModPowerOf2) and
+/// [`BalancedModPowerOf2Assign`](
+/// malachite_base::num::arithmetic::traits::BalancedModPowerOf2Assign), traits for finding the
+/// representative of a number modulo $2^k$ that is closest to zero.
+pub mod balanced_mod_power_of_2;
 /// Implementations of
 /// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
 /// for computing the binomial coefficient of two numbers.

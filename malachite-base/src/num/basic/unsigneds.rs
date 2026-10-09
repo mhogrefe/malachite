@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{
-    AbsDiff, AbsDiffAssign, BalancedMod, BellNumber, CeilingDivAssignNegMod, CeilingDivNegMod,
-    CeilingLogBase, CeilingLogBase2, CeilingLogBasePowerOf2, CheckedBellNumber,
+    AbsDiff, AbsDiffAssign, BalancedMod, BalancedModPowerOf2, BellNumber, CeilingDivAssignNegMod,
+    CeilingDivNegMod, CeilingLogBase, CeilingLogBase2, CeilingLogBasePowerOf2, CheckedBellNumber,
     CheckedDoubleFactorial, CheckedFactorial, CheckedFibonacci, CheckedLcm, CheckedLogBase,
     CheckedLogBase2, CheckedLogBasePowerOf2, CheckedLucasNumber, CheckedMultifactorial,
     CheckedNextPowerOf2, CheckedPrimorial, CheckedSubfactorial, CoprimeWith, DoubleFactorial,
@@ -42,6 +42,7 @@ pub trait PrimitiveUnsigned:
     AbsDiff<Self, Output = Self>
     + AbsDiffAssign<Self>
     + BalancedMod<Self, Output: PrimitiveSigned + UnsignedAbs<Output = Self>>
+    + BalancedModPowerOf2<Output: PrimitiveSigned + UnsignedAbs<Output = Self>>
     + BitBlockAccess<Bits = Self>
     + CeilingLogBase<Output = u64>
     + CeilingLogBase2<Output = u64>

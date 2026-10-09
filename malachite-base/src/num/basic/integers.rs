@@ -11,7 +11,7 @@ use crate::named::Named;
 use crate::num::arithmetic::traits::{
     AbsDiff, AbsSquared, AbsSquaredAssign, AddMul, AddMulAssign, ArithmeticCheckedShl,
     ArithmeticCheckedShr, Average, AverageAssign, AverageRound, AverageRoundAssign, BalancedMod,
-    BinomialCoefficient, CanonicalUnitIPow, CanonicalizeGaussianUnit,
+    BalancedModPowerOf2, BinomialCoefficient, CanonicalUnitIPow, CanonicalizeGaussianUnit,
     CanonicalizeGaussianUnitAssign, CanonicalizeUnit, CanonicalizeUnitAssign, CeilingRoot,
     CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul,
     CheckedBinomialCoefficient, CheckedDiv, CheckedMul, CheckedMulAddMul, CheckedMulSubMul,
@@ -141,6 +141,7 @@ pub trait PrimitiveInt:
     + AverageRound<Self, Output = Self>
     + AverageRoundAssign<Self>
     + BalancedMod<Self>
+    + BalancedModPowerOf2
     + Binary
     + BinomialCoefficient<Self>
     + BitAccess

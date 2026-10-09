@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     arithmetic_checked_shr::register(runner);
     average::register(runner);
     balanced_mod::register(runner);
+    balanced_mod_power_of_2::register(runner);
     bell_number::register(runner);
     binomial_coefficient::register(runner);
     canonical_unit_i_pow::register(runner);
@@ -152,6 +153,7 @@ mod arithmetic_checked_shl;
 mod arithmetic_checked_shr;
 mod average;
 mod balanced_mod;
+mod balanced_mod_power_of_2;
 mod bell_number;
 mod binomial_coefficient;
 mod canonical_unit_i_pow;

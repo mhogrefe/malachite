@@ -7,10 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{
-    Abs, AbsAssign, BalancedMod, BalancedModAssign, CeilingDivAssignMod, CeilingDivMod, CeilingMod,
-    CeilingModAssign, CeilingModPowerOf2, CeilingModPowerOf2Assign, CheckedAbs, ExtendedGcd,
-    NegAssign, OverflowingAbs, OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign,
-    SaturatingNeg, SaturatingNegAssign, UnsignedAbs, WrappingAbs, WrappingAbsAssign,
+    Abs, AbsAssign, BalancedMod, BalancedModAssign, BalancedModPowerOf2, BalancedModPowerOf2Assign,
+    CeilingDivAssignMod, CeilingDivMod, CeilingMod, CeilingModAssign, CeilingModPowerOf2,
+    CeilingModPowerOf2Assign, CheckedAbs, ExtendedGcd, NegAssign, OverflowingAbs,
+    OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign,
+    UnsignedAbs, WrappingAbs, WrappingAbsAssign,
 };
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::traits::NegativeOne;
@@ -49,6 +50,8 @@ pub trait PrimitiveSigned:
     + AbsAssign
     + BalancedMod<Self, Output = Self>
     + BalancedModAssign<Self>
+    + BalancedModPowerOf2<Output = Self>
+    + BalancedModPowerOf2Assign
     + CeilingDivAssignMod<Self, ModOutput = Self>
     + CeilingDivMod<Self, DivOutput = Self, ModOutput = Self>
     + CeilingMod<Self, Output = Self>
