@@ -6888,6 +6888,20 @@ pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_2<T: Primitiv
     )
 }
 
+pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_3<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, U, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_vectors::<T>(),
+            primitive_int_increasing_inclusive_range(U::ZERO, U::exact_from(T::WIDTH + 1)),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(v, _, pow)| v.mod_power_of_2_is_reduced(*pow)),
+    )
+}
+
 pub fn exhaustive_unsigned_vector_pair_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, UnsignedVector<T>)> {
     exhaustive_tuples_by_dimension(|dimension| {

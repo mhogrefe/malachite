@@ -144,6 +144,8 @@ documented by git history.
 - `ModMul` and `ModMulAssign` of `UnsignedVector<T>` by a `T` modulo a `T`, multiplying every
   element modulo $m$ with the multiplication data for $m$ computed once, like FLINT's
   `_nmod_vec_scalar_mul_nmod`. The elements and the scalar must already be reduced.
+- `ModPowerOf2Shl` and `ModPowerOf2ShlAssign` for `UnsignedVector<T>`, by any primitive unsigned
+  type, shifting every element left modulo $2^k$. The elements must already be reduced.
 
 ### malachite-nz
 
@@ -248,6 +250,9 @@ documented by git history.
   combination of value and reference, with the multiplication data for the modulus computed once,
   like FLINT's `_fmpz_mod_vec_scalar_mul_fmpz_mod`. The elements and the scalar must already be
   reduced.
+- `ModPowerOf2Shl` (by value and by reference) and `ModPowerOf2ShlAssign` for `NaturalVector`, by
+  any primitive unsigned type, shifting every element left modulo $2^k$. The elements must already
+  be reduced.
 - `Shl` (by value and by reference) and `ShlAssign` for `NaturalVector` and `IntegerVector`, by any
   primitive unsigned type, shifting every element left, like FLINT's `_fmpz_vec_scalar_mul_2exp`.
 

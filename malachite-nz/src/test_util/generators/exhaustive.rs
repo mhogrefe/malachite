@@ -3657,6 +3657,29 @@ pub fn exhaustive_natural_vector_natural_natural_triple_gen_var_1()
     )
 }
 
+pub fn exhaustive_natural_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(NaturalVector, T, u64)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_natural_vectors(),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_unsigneds::<u64>(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(v, bits, mut pow)| {
+            pow += v
+                .elements
+                .iter()
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (v, bits, pow)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1()
 -> It<(NaturalVector, NaturalVector, NaturalVector, u64)> {
     exhaustive_tuples_by_dimension(|dimension| {

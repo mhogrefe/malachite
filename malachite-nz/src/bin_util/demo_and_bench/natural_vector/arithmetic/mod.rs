@@ -26,6 +26,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_is_reduced::register(runner);
     mod_power_of_2_mul::register(runner);
     mod_power_of_2_neg::register(runner);
+    mod_power_of_2_shl::register(runner);
     mod_power_of_2_sub::register(runner);
     mod_sub::register(runner);
     multi_crt::register(runner);
@@ -50,6 +51,7 @@ mod mod_power_of_2_add;
 mod mod_power_of_2_is_reduced;
 mod mod_power_of_2_mul;
 mod mod_power_of_2_neg;
+mod mod_power_of_2_shl;
 mod mod_power_of_2_sub;
 mod mod_sub;
 mod multi_crt;

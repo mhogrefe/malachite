@@ -77,6 +77,52 @@ pub mod mod_power_of_2_mul;
 /// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign), for
 /// negating a vector modulo a power of 2.
 pub mod mod_power_of_2_neg;
+/// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
+/// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign), for
+/// left-shifting a vector (multiplying it by a power of 2) modulo another power of 2.
+///
+/// # mod_power_of_2_shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let v = NaturalVector::from_str("(5, 1, 3)").unwrap();
+/// assert_eq!(
+///     v.clone().mod_power_of_2_shl(1u8, 3).to_string(),
+///     "(2, 2, 6)"
+/// );
+/// // Shifting by at least the power zeroes every element, keeping the dimension.
+/// assert_eq!(v.mod_power_of_2_shl(3u32, 3).to_string(), "(0, 0, 0)");
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 128, 1)").unwrap())
+///         .mod_power_of_2_shl(1u64, 8)
+///         .to_string(),
+///     "(2, 0, 2)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 1)").unwrap())
+///         .mod_power_of_2_shl(100u128, 101)
+///         .to_string(),
+///     "(1267650600228229401496703205376, 1267650600228229401496703205376)"
+/// );
+/// ```
+///
+/// # mod_power_of_2_shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(5, 1, 3)").unwrap();
+/// v.mod_power_of_2_shl_assign(1u8, 3);
+/// assert_eq!(v.to_string(), "(2, 2, 6)");
+///
+/// let mut v = NaturalVector::from_str("(5, 1, 3)").unwrap();
+/// v.mod_power_of_2_shl_assign(3u32, 3);
+/// assert_eq!(v.to_string(), "(0, 0, 0)");
+/// ```
+pub mod mod_power_of_2_shl;
 /// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting vectors modulo a power of 2.

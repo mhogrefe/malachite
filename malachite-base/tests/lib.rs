@@ -985,6 +985,7 @@ pub mod unsigned_vector {
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;
+        pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_sub;
         pub mod mod_sub;
     }
