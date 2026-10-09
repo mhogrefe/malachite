@@ -1009,6 +1009,8 @@ pub mod unsigned_vector {
     pub mod extend;
     pub mod pivot;
     pub mod push;
+    pub mod select_coordinates;
+    pub mod set_dimension;
     pub mod random {
         pub mod random_unsigned_vectors;
         pub mod random_unsigned_vectors_from_iterator;

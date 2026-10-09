@@ -6916,3 +6916,21 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadr
 pub fn exhaustive_unsigned_pair_gen_var_33() -> It<(u64, u64)> {
     Box::new(exhaustive_unsigned_primitive_int_gen_var_1::<u64, u64>().map(|(i, k)| (i, i + k)))
 }
+
+// Every list of indices less than `dimension`: every way of selecting coordinates of a vector of
+// that dimension. The only one for dimension 0 is the empty list.
+pub fn exhaustive_index_vecs(dimension: u64) -> It<Vec<u64>> {
+    Box::new(exhaustive_vecs(primitive_int_increasing_range(
+        0, dimension,
+    )))
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_vec_pair_gen_var_1()
+-> It<(UnsignedVector<u64>, Vec<u64>)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_vectors_with_dimension::<u64>(dimension),
+            exhaustive_index_vecs(dimension),
+        ))
+    })
+}

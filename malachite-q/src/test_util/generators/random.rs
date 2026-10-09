@@ -51,6 +51,7 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::test_util::generators::common::{GenConfig, It};
+use malachite_base::test_util::generators::random::random_vector_index_vec_pairs;
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
 };
@@ -3051,4 +3052,10 @@ pub fn random_rational_polynomial_signed_pair_gen_var_1<T: PrimitiveSigned>(
             )
         },
     ))
+}
+
+pub fn random_rational_vector_unsigned_vec_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalVector, Vec<u64>)> {
+    random_vector_index_vec_pairs(random_rational_vector_gen(config), config)
 }

@@ -104,6 +104,7 @@ use crate::vecs::random::{
     random_vecs_length_inclusive_range, random_vecs_min_length,
 };
 use crate::vecs::random_values_from_vec;
+use crate::vector::Vector;
 use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
 
@@ -9238,4 +9239,36 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple
 
 pub fn random_unsigned_pair_gen_var_40(config: &GenConfig) -> It<(u64, u64)> {
     Box::new(random_unsigned_pair_gen_var_9::<u64, u64>(config).map(|(i, k)| (i, i + k)))
+}
+
+// Pairs of a vector from `vectors` and a list of indices less than its dimension; the only list for
+// the 0-dimensional vector is the empty one.
+pub fn random_vector_index_vec_pairs<V: Vector + 'static>(
+    vectors: It<V>,
+    config: &GenConfig,
+) -> It<(V, Vec<u64>)> {
+    Box::new(
+        vectors
+            .zip(random_vecs(
+                EXAMPLE_SEED.fork("indices"),
+                &random_primitive_ints::<u64>,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .map(|(v, xs)| {
+                let dimension = v.dimension();
+                let indices = if dimension == 0 {
+                    Vec::new()
+                } else {
+                    xs.into_iter().map(|x| x % dimension).collect()
+                };
+                (v, indices)
+            }),
+    )
+}
+
+pub fn random_unsigned_vector_unsigned_vec_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedVector<u64>, Vec<u64>)> {
+    random_vector_index_vec_pairs(random_unsigned_vector_gen(config), config)
 }

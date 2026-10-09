@@ -50,7 +50,9 @@ use malachite_base::polynomial::ComposePowerOfX;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};
-use malachite_base::test_util::generators::exhaustive::exhaustive_tuples_by_dimension;
+use malachite_base::test_util::generators::exhaustive::{
+    exhaustive_index_vecs, exhaustive_tuples_by_dimension,
+};
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
 };
@@ -1280,4 +1282,13 @@ pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsign
         exhaustive_rational_polynomials(),
         exhaustive_unsigneds(),
     ))
+}
+
+pub fn exhaustive_rational_vector_unsigned_vec_pair_gen_var_1() -> It<(RationalVector, Vec<u64>)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_pairs(
+            exhaustive_rational_vectors_with_dimension(dimension),
+            exhaustive_index_vecs(dimension),
+        ))
+    })
 }

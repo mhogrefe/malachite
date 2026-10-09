@@ -42,9 +42,16 @@ documented by git history.
 - A `Vector` trait in `malachite_base::vector`, for what every vector type has in common, as
   `Polynomial` is for the polynomial types. It has an `Element` associated type and the methods
   `from_elements`, `from_owned_elements`, `zero`, `standard_basis_vector`, `to_elements`,
-  `into_elements`, `elements_ref`, `dimension`, `pivot`, `pivot_index`, and `push`; the vector
-  types implement these through the trait, so calling them takes
-  `use malachite_base::vector::Vector;`. `push` appends an element, like FLINT's `fmpz_vec_append`.
+  `into_elements`, `elements_ref`, `dimension`, `pivot`, `pivot_index`, `push`, and
+  `set_dimension`; the vector types implement these through the trait, so calling them takes
+  `use malachite_base::vector::Vector;`. `push` appends an element, like FLINT's `fmpz_vec_append`,
+  and `set_dimension` truncates or pads with zeros, like `fmpz_vec_set_length`.
+- `SelectCoordinates` and `SelectCoordinatesAssign` traits in `malachite_base::vector`, for
+  selecting the coordinates of a vector by a list of indices, which may repeat and appear in any
+  order, so that projection, permutation, and duplication of coordinates are all selections. The
+  by-value and in-place forms move elements rather than cloning them wherever possible: strictly
+  increasing indices are handled in place, and otherwise an element is cloned only once for each
+  extra time it is selected. Implemented for `UnsignedVector<T>`.
   `zero(dimension)` returns the zero vector of a given dimension, like FLINT's `fmpz_vec_init`, and
   `standard_basis_vector(dimension, index)` returns the vector with a 1 at `index` and 0
   elsewhere.
@@ -105,6 +112,8 @@ documented by git history.
 - `IntoIterator` (by value, by reference, and by mutable reference), `FromIterator`, and `Extend`
   for `NaturalVector` and `IntegerVector`, so that a vector can be iterated over with `for`,
   collected from an iterator, and extended by one.
+- `SelectCoordinates` (by value and by reference) and `SelectCoordinatesAssign` for `NaturalVector`
+  and `IntegerVector`.
 - `random_natural_vectors_from_iterator`, `random_integer_vectors_from_iterator`, and their
   `_with_dimension_from_iterator` variants, which take the elements from any iterator, for example
   one with bounded elements. The other `NaturalVector` and `IntegerVector` generators are built on
@@ -158,6 +167,8 @@ documented by git history.
 - `IntoIterator` (by value, by reference, and by mutable reference), `FromIterator`, and `Extend`
   for `RationalVector`, so that a vector can be iterated over with `for`, collected from an
   iterator, and extended by one.
+- `SelectCoordinates` (by value and by reference) and `SelectCoordinatesAssign` for
+  `RationalVector`.
 - `random_rational_vectors_from_iterator` and
   `random_rational_vectors_with_dimension_from_iterator`, which take the elements of
   `RationalVector`s from any iterator, for example one with bounded elements. The other

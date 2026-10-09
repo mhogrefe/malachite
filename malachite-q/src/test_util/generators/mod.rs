@@ -1623,3 +1623,12 @@ pub fn rational_polynomial_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
         &special_random_rational_polynomial_unsigned_pair_gen_var_3,
     )
 }
+
+// All `(RationalVector, Vec<u64>)` where every `u64` in the `Vec` is less than the vector's
+// dimension: a vector and a selection of its coordinates.
+pub fn rational_vector_unsigned_vec_pair_gen_var_1() -> Generator<(RationalVector, Vec<u64>)> {
+    Generator::new_no_special(
+        &exhaustive_rational_vector_unsigned_vec_pair_gen_var_1,
+        &random_rational_vector_unsigned_vec_pair_gen_var_1,
+    )
+}

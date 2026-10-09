@@ -155,7 +155,7 @@ use malachite_base::test_util::generators::common::{
 };
 use malachite_base::test_util::generators::exhaustive::{
     UnsignedVecPairLenGenerator1, UnsignedVecPairLenGenerator2, UnsignedVecQuadrupleLenGenerator1,
-    UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
+    UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator, exhaustive_index_vecs,
     exhaustive_tuples_by_dimension, exhaustive_unsigned_pair_gen_var_20,
     exhaustive_unsigned_pair_gen_var_24, exhaustive_unsigned_vec_unsigned_pair_gen_var_17,
 };
@@ -6326,4 +6326,22 @@ pub fn exhaustive_large_type_gen_var_58() -> It<(Vec<Vec<Limb>>, usize, bool)> {
 #[allow(clippy::type_complexity)]
 pub fn exhaustive_large_type_gen_var_59() -> It<usize> {
     exhaustive_ss_var_59()
+}
+
+pub fn exhaustive_natural_vector_unsigned_vec_pair_gen_var_1() -> It<(NaturalVector, Vec<u64>)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_pairs(
+            exhaustive_natural_vectors_with_dimension(dimension),
+            exhaustive_index_vecs(dimension),
+        ))
+    })
+}
+
+pub fn exhaustive_integer_vector_unsigned_vec_pair_gen_var_1() -> It<(IntegerVector, Vec<u64>)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_pairs(
+            exhaustive_integer_vectors_with_dimension(dimension),
+            exhaustive_index_vecs(dimension),
+        ))
+    })
 }

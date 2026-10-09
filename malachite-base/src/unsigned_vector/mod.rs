@@ -33,6 +33,10 @@ pub mod extend;
 #[cfg(feature = "random")]
 /// Iterators that generate [`UnsignedVector`]s randomly.
 pub mod random;
+/// Implementations of [`SelectCoordinates`](crate::vector::SelectCoordinates) and
+/// [`SelectCoordinatesAssign`](crate::vector::SelectCoordinatesAssign), for selecting coordinates
+/// of an [`UnsignedVector`] by index.
+pub mod select_coordinates;
 
 /// A vector whose elements are primitive unsigned integers.
 ///
@@ -222,6 +226,42 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
     #[inline]
     fn push(&mut self, x: T) {
         self.elements.push(x);
+    }
+
+    /// Sets the dimension of an [`UnsignedVector`], removing elements from the end if the new
+    /// dimension is smaller, and appending zeros if it is larger.
+    ///
+    /// Reducing the dimension keeps the first `dimension` coordinates: it is the projection onto
+    /// them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the larger of `self.dimension()` and
+    /// `dimension`.
+    ///
+    /// # Panics
+    /// Panics if `dimension` is greater than [`usize::MAX`].
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// let mut v = UnsignedVector::<u8>::from_str("(1, 2, 3)").unwrap();
+    /// v.set_dimension(5);
+    /// assert_eq!(v.to_string(), "(1, 2, 3, 0, 0)");
+    /// v.set_dimension(2);
+    /// assert_eq!(v.to_string(), "(1, 2)");
+    /// v.set_dimension(0);
+    /// assert_eq!(v.to_string(), "()");
+    /// ```
+    #[inline]
+    fn set_dimension(&mut self, dimension: u64) {
+        self.elements.resize(usize::exact_from(dimension), T::ZERO);
     }
 
     /// Returns an [`UnsignedVector`]'s elements as a [`Vec`], cloning them.

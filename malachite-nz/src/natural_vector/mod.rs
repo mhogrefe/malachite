@@ -33,6 +33,10 @@ pub mod extend;
 /// Iterators that generate [`NaturalVector`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
+/// Implementations of [`SelectCoordinates`](malachite_base::vector::SelectCoordinates) and
+/// [`SelectCoordinatesAssign`](malachite_base::vector::SelectCoordinatesAssign), for selecting
+/// coordinates of a [`NaturalVector`] by index.
+pub mod select_coordinates;
 
 /// A vector whose elements are [`Natural`]s.
 ///
@@ -233,6 +237,46 @@ impl Vector for NaturalVector {
     #[inline]
     fn push(&mut self, x: Natural) {
         self.elements.push(x);
+    }
+
+    /// Sets the dimension of a [`NaturalVector`], removing elements from the end if the new
+    /// dimension is smaller, and appending zeros if it is larger.
+    ///
+    /// Reducing the dimension keeps the first `dimension` coordinates: it is the projection onto
+    /// them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the larger of `self.dimension()` and
+    /// `dimension`.
+    ///
+    /// # Panics
+    /// Panics if `dimension` is greater than [`usize::MAX`].
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// let mut v = NaturalVector::from_str("(1, 2, 3)").unwrap();
+    /// v.set_dimension(5);
+    /// assert_eq!(v.to_string(), "(1, 2, 3, 0, 0)");
+    /// v.set_dimension(2);
+    /// assert_eq!(v.to_string(), "(1, 2)");
+    /// v.set_dimension(0);
+    /// assert_eq!(v.to_string(), "()");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_vec_set_length` from `fmpz_vec/vec.c`, FLINT 3.6.0, with
+    /// elements that are never negative.
+    #[inline]
+    fn set_dimension(&mut self, dimension: u64) {
+        self.elements
+            .resize(usize::exact_from(dimension), Natural::ZERO);
     }
 
     /// Returns a [`NaturalVector`]'s elements as a [`Vec`], cloning them.

@@ -14,6 +14,8 @@ pub(crate) fn register(runner: &mut Runner) {
     index::register(runner);
     pivot::register(runner);
     push::register(runner);
+    select_coordinates::register(runner);
+    set_dimension::register(runner);
     standard_basis_vector::register(runner);
     zero::register(runner);
 }
@@ -23,5 +25,7 @@ mod extend;
 mod index;
 mod pivot;
 mod push;
+mod select_coordinates;
+mod set_dimension;
 mod standard_basis_vector;
 mod zero;

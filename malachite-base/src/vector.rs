@@ -6,7 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::conversion::traits::ExactFrom;
+use alloc::vec;
 use alloc::vec::Vec;
+use core::mem::take;
 
 /// What every vector type has in common: a vector of a fixed dimension, stored as its elements in
 /// order.
@@ -49,6 +52,10 @@ pub trait Vector: Sized {
     /// Appends an element to the end of a vector, increasing its dimension by 1.
     fn push(&mut self, x: Self::Element);
 
+    /// Sets the dimension of a vector, removing elements from the end if the new dimension is
+    /// smaller, and appending zeros if it is larger.
+    fn set_dimension(&mut self, dimension: u64);
+
     /// Returns a vector's elements as a [`Vec`], cloning them.
     fn to_elements(&self) -> Vec<Self::Element>
     where
@@ -77,4 +84,80 @@ pub trait Vector: Sized {
     /// element is zero, which includes the 0-dimensional vector. When it returns `Some(i)`,
     /// [`pivot`](Self::pivot) is the element at `i`.
     fn pivot_index(&self) -> Option<u64>;
+}
+
+/// Selects coordinates of a vector by index: the result's element $j$ is the original's element
+/// `indices[j]`.
+///
+/// The indices may repeat and may appear in any order, so this covers projection onto some of the
+/// coordinates (strictly increasing indices), permutation, and duplication of coordinates. The
+/// result's dimension is the number of indices.
+pub trait SelectCoordinates {
+    type Output;
+
+    fn select_coordinates(self, indices: &[u64]) -> Self::Output;
+}
+
+/// Selects coordinates of a vector by index, in place: afterwards, element $j$ of the vector is
+/// what element `indices[j]` was before.
+pub trait SelectCoordinatesAssign {
+    fn select_coordinates_assign(&mut self, indices: &[u64]);
+}
+
+fn check_index(index: u64, dimension: usize) -> usize {
+    let index = usize::exact_from(index);
+    assert!(
+        index < dimension,
+        "index {index} is out of range for a vector of dimension {dimension}"
+    );
+    index
+}
+
+// The elements of `xs` at `indices`, cloned. Panics if an index is out of range.
+#[doc(hidden)]
+#[inline]
+pub fn select_elements<T: Clone>(xs: &[T], indices: &[u64]) -> Vec<T> {
+    indices
+        .iter()
+        .map(|&i| xs[check_index(i, xs.len())].clone())
+        .collect()
+}
+
+// Replaces `xs` with its elements at `indices`, cloning as few as possible. Panics if an index is
+// out of range.
+//
+// When the indices are strictly increasing, the selected elements are swapped into place and the
+// rest truncated away, so nothing is cloned or allocated. Otherwise each element is moved out at
+// its last use and cloned at any earlier one, so an element is cloned once for each extra time it
+// is selected, which is as few clones as any method needs.
+#[doc(hidden)]
+pub fn select_elements_in_place<T: Clone + Default>(xs: &mut Vec<T>, indices: &[u64]) {
+    let n = xs.len();
+    if indices.windows(2).all(|w| w[0] < w[1]) {
+        if let Some(&last) = indices.last() {
+            check_index(last, n);
+        }
+        for (j, &i) in indices.iter().enumerate() {
+            let i = usize::exact_from(i);
+            if i != j {
+                xs.swap(j, i);
+            }
+        }
+        xs.truncate(indices.len());
+        return;
+    }
+    let mut last_use = vec![usize::MAX; n];
+    for (j, &i) in indices.iter().enumerate() {
+        last_use[check_index(i, n)] = j;
+    }
+    let mut selected = Vec::with_capacity(indices.len());
+    for (j, &i) in indices.iter().enumerate() {
+        let i = usize::exact_from(i);
+        selected.push(if last_use[i] == j {
+            take(&mut xs[i])
+        } else {
+            xs[i].clone()
+        });
+    }
+    *xs = selected;
 }

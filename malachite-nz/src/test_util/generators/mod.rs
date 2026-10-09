@@ -5603,3 +5603,21 @@ pub fn large_type_gen_var_59() -> Generator<usize> {
         &special_random_large_type_gen_var_59,
     )
 }
+
+// All `(NaturalVector, Vec<u64>)` where every `u64` in the `Vec` is less than the vector's
+// dimension: a vector and a selection of its coordinates.
+pub fn natural_vector_unsigned_vec_pair_gen_var_1() -> Generator<(NaturalVector, Vec<u64>)> {
+    Generator::new_no_special(
+        &exhaustive_natural_vector_unsigned_vec_pair_gen_var_1,
+        &random_natural_vector_unsigned_vec_pair_gen_var_1,
+    )
+}
+
+// All `(IntegerVector, Vec<u64>)` where every `u64` in the `Vec` is less than the vector's
+// dimension: a vector and a selection of its coordinates.
+pub fn integer_vector_unsigned_vec_pair_gen_var_1() -> Generator<(IntegerVector, Vec<u64>)> {
+    Generator::new_no_special(
+        &exhaustive_integer_vector_unsigned_vec_pair_gen_var_1,
+        &random_integer_vector_unsigned_vec_pair_gen_var_1,
+    )
+}

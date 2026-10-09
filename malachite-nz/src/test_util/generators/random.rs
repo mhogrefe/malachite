@@ -151,7 +151,7 @@ use malachite_base::test_util::generators::random::{
     PrimitiveIntVecPairLenGenerator1, PrimitiveIntVecPairLenGenerator2,
     PrimitiveIntVecQuadrupleLenGenerator1, PrimitiveIntVecTripleLenGenerator1,
     PrimitiveIntVecTripleXYYLenGenerator, get_two_highest,
-    random_primitive_int_vec_unsigned_pair_gen_var_10,
+    random_primitive_int_vec_unsigned_pair_gen_var_10, random_vector_index_vec_pairs,
 };
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
@@ -10331,4 +10331,16 @@ pub fn random_large_type_gen_var_58(config: &GenConfig) -> It<(Vec<Vec<Limb>>, u
 #[allow(clippy::type_complexity)]
 pub fn random_large_type_gen_var_59(config: &GenConfig) -> It<usize> {
     random_adjust_limbs(config)
+}
+
+pub fn random_natural_vector_unsigned_vec_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, Vec<u64>)> {
+    random_vector_index_vec_pairs(random_natural_vector_gen(config), config)
+}
+
+pub fn random_integer_vector_unsigned_vec_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerVector, Vec<u64>)> {
+    random_vector_index_vec_pairs(random_integer_vector_gen(config), config)
 }

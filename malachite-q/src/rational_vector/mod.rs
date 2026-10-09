@@ -33,6 +33,10 @@ pub mod extend;
 /// Iterators that generate [`RationalVector`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
+/// Implementations of [`SelectCoordinates`](malachite_base::vector::SelectCoordinates) and
+/// [`SelectCoordinatesAssign`](malachite_base::vector::SelectCoordinatesAssign), for selecting
+/// coordinates of a [`RationalVector`] by index.
+pub mod select_coordinates;
 
 /// A vector whose elements are [`Rational`]s.
 ///
@@ -237,6 +241,43 @@ impl Vector for RationalVector {
     #[inline]
     fn push(&mut self, x: Rational) {
         self.elements.push(x);
+    }
+
+    /// Sets the dimension of a [`RationalVector`], removing elements from the end if the new
+    /// dimension is smaller, and appending zeros if it is larger.
+    ///
+    /// Reducing the dimension keeps the first `dimension` coordinates: it is the projection onto
+    /// them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the larger of `self.dimension()` and
+    /// `dimension`.
+    ///
+    /// # Panics
+    /// Panics if `dimension` is greater than [`usize::MAX`].
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_q::rational_vector::RationalVector;
+    ///
+    /// let mut v = RationalVector::from_str("(1, 2, 3)").unwrap();
+    /// v.set_dimension(5);
+    /// assert_eq!(v.to_string(), "(1, 2, 3, 0, 0)");
+    /// v.set_dimension(2);
+    /// assert_eq!(v.to_string(), "(1, 2)");
+    /// v.set_dimension(0);
+    /// assert_eq!(v.to_string(), "()");
+    /// ```
+    #[inline]
+    fn set_dimension(&mut self, dimension: u64) {
+        self.elements
+            .resize(usize::exact_from(dimension), Rational::ZERO);
     }
 
     /// Returns a [`RationalVector`]'s elements as a [`Vec`], cloning them.

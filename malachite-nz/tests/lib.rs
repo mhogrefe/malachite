@@ -391,6 +391,8 @@ pub mod integer_vector {
     pub mod extend;
     pub mod pivot;
     pub mod push;
+    pub mod select_coordinates;
+    pub mod set_dimension;
     pub mod random {
         pub mod random_integer_vectors;
         pub mod random_integer_vectors_from_iterator;
@@ -898,6 +900,8 @@ pub mod natural_vector {
     pub mod extend;
     pub mod pivot;
     pub mod push;
+    pub mod select_coordinates;
+    pub mod set_dimension;
     pub mod random {
         pub mod random_natural_vectors;
         pub mod random_natural_vectors_from_iterator;

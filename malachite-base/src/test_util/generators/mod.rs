@@ -5306,3 +5306,12 @@ pub fn unsigned_pair_gen_var_51() -> Generator<(u64, u64)> {
         &random_unsigned_pair_gen_var_40,
     )
 }
+
+// All `(UnsignedVector<u64>, Vec<u64>)` where every `u64` in the `Vec` is less than the vector's
+// dimension: a vector and a selection of its coordinates.
+pub fn unsigned_vector_unsigned_vec_pair_gen_var_1() -> Generator<(UnsignedVector<u64>, Vec<u64>)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_vector_unsigned_vec_pair_gen_var_1,
+        &random_unsigned_vector_unsigned_vec_pair_gen_var_1,
+    )
+}
