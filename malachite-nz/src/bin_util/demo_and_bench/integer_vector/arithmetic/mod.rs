@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content::register(runner);
     content_chained::register(runner);
     dot_general::register(runner);
+    entrywise_abs::register(runner);
     height::register(runner);
     l1_norm::register(runner);
     max_bits::register(runner);
@@ -37,6 +38,7 @@ mod canonicalize_sign;
 mod content;
 mod content_chained;
 mod dot_general;
+mod entrywise_abs;
 mod height;
 mod l1_norm;
 mod max_bits;

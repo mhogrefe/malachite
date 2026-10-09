@@ -28,8 +28,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_balanced_mod_power_of_2_algorithms_signed);
 }
 
-// Whether the result fits in the signed type; the generators also produce inputs whose result
-// does not.
+// Whether the result fits in the signed type; the generators also produce inputs whose result does
+// not.
 fn fits_unsigned<T: PrimitiveUnsigned>(x: T, pow: u64) -> bool {
     let top = T::power_of_2(T::WIDTH - 1);
     !(pow == T::WIDTH && x == top || pow > T::WIDTH && x >= top)

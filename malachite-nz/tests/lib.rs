@@ -354,6 +354,7 @@ pub mod integer_vector {
         pub mod content;
         pub mod content_chained;
         pub mod dot_general;
+        pub mod entrywise_abs;
         pub mod height;
         pub mod l1_norm;
         pub mod max_bits;

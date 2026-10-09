@@ -127,6 +127,10 @@ documented by git history.
   $(-2^{k-1}, 2^{k-1}]$, with the tie positive, so it equals `balanced_mod` with modulus $2^k$.
   Implemented for the primitive integers, unsigned types returning the signed type of the same
   width; a result that does not fit, $2^{W-1}$, panics.
+- `EntrywiseAbs`, `EntrywiseAbsAssign`, and `EntrywiseUnsignedAbs` traits in
+  `malachite_base::num::arithmetic::traits`, which replace every entry of a value, such as every
+  element of a vector, by its absolute value. They are separate from `Abs`, which for a vector
+  would be its Euclidean length.
 
 ### malachite-nz
 
@@ -216,6 +220,8 @@ documented by git history.
   `IntegerPolynomial`), and `NaturalVector` (returning an `IntegerVector`); and `BalancedModPowerOf2`
   and `BalancedModPowerOf2Assign` for `Integer`, `IntegerPolynomial`, and `IntegerVector`. Each is
   `balanced_mod` with modulus $2^k$, computed by masking rather than dividing.
+- `EntrywiseAbs` (by value and by reference) and `EntrywiseAbsAssign` for `IntegerVector`, like
+  FLINT's `_fmpz_vec_scalar_abs`, and `EntrywiseUnsignedAbs`, which returns a `NaturalVector`.
 
 ### malachite-q
 
@@ -259,6 +265,7 @@ documented by git history.
   vectors must have the same dimension.
 - `Sub` and `SubAssign` for `RationalVector`, in every combination of value and reference. The
   vectors must have the same dimension.
+- `EntrywiseAbs` (by value and by reference) and `EntrywiseAbsAssign` for `RationalVector`.
 
 ## 0.13.0 — 2026-10-06
 

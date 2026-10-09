@@ -233,6 +233,29 @@ pub trait UnsignedAbs {
     fn unsigned_abs(self) -> Self::Output;
 }
 
+/// Replaces every entry of a value, such as every element of a vector, by its absolute value.
+///
+/// This is distinct from [`Abs`], which for a vector would be its Euclidean length.
+pub trait EntrywiseAbs {
+    type Output;
+
+    fn entrywise_abs(self) -> Self::Output;
+}
+
+/// Replaces every entry of a value, such as every element of a vector, by its absolute value, in
+/// place.
+pub trait EntrywiseAbsAssign {
+    fn entrywise_abs_assign(&mut self);
+}
+
+/// Replaces every entry of a value, such as every element of a vector, by its absolute value,
+/// converting to the unsigned equivalent, as [`UnsignedAbs`] does for a single number.
+pub trait EntrywiseUnsignedAbs {
+    type Output;
+
+    fn entrywise_unsigned_abs(self) -> Self::Output;
+}
+
 /// Subtracts two numbers and takes the absolute value of the difference.
 pub trait AbsDiff<RHS = Self> {
     type Output;

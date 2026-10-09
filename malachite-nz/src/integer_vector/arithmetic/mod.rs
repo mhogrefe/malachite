@@ -42,6 +42,11 @@ pub mod content;
 pub mod content_chained;
 #[doc(hidden)]
 pub mod dot_general;
+/// Implementations of [`EntrywiseAbs`](malachite_base::num::arithmetic::traits::EntrywiseAbs),
+/// [`EntrywiseAbsAssign`](malachite_base::num::arithmetic::traits::EntrywiseAbsAssign), and
+/// [`EntrywiseUnsignedAbs`](malachite_base::num::arithmetic::traits::EntrywiseUnsignedAbs), which
+/// replace every element of a vector by its absolute value.
+pub mod entrywise_abs;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
 /// element.
