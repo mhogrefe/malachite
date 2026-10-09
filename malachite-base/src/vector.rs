@@ -22,8 +22,8 @@ pub trait Vector: Sized {
 
     /// What [`pivot`](Self::pivot) returns.
     ///
-    /// This is a reference to an [`Element`](Self::Element) when the vector holds elements that
-    /// are expensive to copy, and an [`Element`](Self::Element) itself when one is cheap to copy.
+    /// This is a reference to an [`Element`](Self::Element) when the vector holds elements that are
+    /// expensive to copy, and an [`Element`](Self::Element) itself when one is cheap to copy.
     type ElementOutput<'a>
     where
         Self: 'a;
@@ -75,6 +75,10 @@ pub trait Vector: Sized {
     /// Returns the dimension of a vector: the number of its elements.
     fn dimension(&self) -> u64;
 
+    /// Determines whether every element of a vector is zero. This includes the 0-dimensional
+    /// vector, which has no elements.
+    fn is_zero(&self) -> bool;
+
     /// Returns the pivot of a vector: its first nonzero element.
     ///
     /// This is the element that leads the vector when it is a row of a matrix in echelon form.
@@ -90,9 +94,19 @@ pub trait Vector: Sized {
 
     /// Returns the index of an element of largest height: the first one, when several share it.
     ///
-    /// The height of an integer is its absolute value, and the height of a rational number $p/q$
-    /// in lowest terms is $\max(|p|, q)$. Returns `None` for the 0-dimensional vector.
+    /// The height of an integer is its absolute value, and the height of a rational number $p/q$ in
+    /// lowest terms is $\max(|p|, q)$. Returns `None` for the 0-dimensional vector.
     fn height_index(&self) -> Option<u64>;
+
+    /// Determines whether a vector is a standard basis vector, returning the index of its 1 if it
+    /// is.
+    ///
+    /// A standard basis vector has a single element equal to 1 and every other element 0, as
+    /// [`standard_basis_vector`](Self::standard_basis_vector) builds. Returns `None` for every
+    /// other vector, including the zero vectors and the 0-dimensional vector. When it returns
+    /// `Some(i)`, `i` is also the [`pivot_index`](Self::pivot_index), and the vector equals
+    /// `standard_basis_vector(self.dimension(), i)`.
+    fn standard_basis_index(&self) -> Option<u64>;
 
     /// Returns the number of significant bits of a vector's height, together with whether any of
     /// its elements is negative.

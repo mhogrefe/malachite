@@ -1658,10 +1658,10 @@ where
 /// what decides how quickly long [`Vec`]s come out:
 /// - [`ruler_sequence`] picks the first length that still has [`Vec`]s half of the time, so the
 ///   lengths grow logarithmically. [`exhaustive_vecs`] is this function with [`ruler_sequence`].
-/// - `bit_distributor_sequence(BitDistributorOutputType::normal(1),
-///   BitDistributorOutputType::normal(2))` gives the elements' indices twice as many bits as the
-///   length's, so the lengths grow as the cube root of the iteration number. This is the rate the
-///   polynomial generators use.
+/// - [`bit_distributor_sequence`] with `BitDistributorOutputType::normal(1)` and
+///   `BitDistributorOutputType::normal(2)`, in that order, gives the elements' indices twice as
+///   many bits as the length's, so the lengths grow as the cube root of the iteration number. This
+///   is the rate the polynomial generators use.
 ///
 /// Every [`Vec`] is generated once, whatever `index_generator` is, provided that it yields every
 /// index infinitely often. If `xs` is empty, the output length is 1; otherwise, the output is
@@ -1673,9 +1673,8 @@ where
 /// $M(i) = O(\ell + M^\prime(i) + M^{\prime\prime}(i))$
 ///
 /// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
-/// $M^\prime$ are the time and memory functions of `xs`, $T^{\prime\prime}$ and
-/// $M^{\prime\prime}$ are those of `index_generator`, and $\ell$ is the number of elements in
-/// the $i$th output.
+/// $M^\prime$ are the time and memory functions of `xs`, $T^{\prime\prime}$ and $M^{\prime\prime}$
+/// are those of `index_generator`, and $\ell$ is the number of elements in the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -2065,8 +2064,8 @@ pub fn exhaustive_vecs_with_last_from_length_iterator<
 ///
 /// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
 /// $M^\prime$ are the time and memory functions of `xs` and `ys`, $T^{\prime\prime}$ and
-/// $M^{\prime\prime}$ are those of `index_generator`, and $\ell$ is the number of elements in
-/// the $i$th output.
+/// $M^{\prime\prime}$ are those of `index_generator`, and $\ell$ is the number of elements in the
+/// $i$th output.
 ///
 /// # Examples
 /// ```

@@ -543,6 +543,90 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
             .map(|(i, _)| u64::exact_from(i))
     }
 
+    /// Determines whether every element of an [`UnsignedVector`] is zero.
+    ///
+    /// The 0-dimensional vector, which has no elements, counts as zero.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert!(UnsignedVector::<u8>::from_str("(0, 0)").unwrap().is_zero());
+    /// assert!(UnsignedVector::<u8>::from_str("()").unwrap().is_zero());
+    /// assert!(
+    ///     !UnsignedVector::<u8>::from_str("(0, 1, 0)")
+    ///         .unwrap()
+    ///         .is_zero()
+    /// );
+    /// ```
+    #[inline]
+    fn is_zero(&self) -> bool {
+        self.elements.iter().all(|&x| x == T::ZERO)
+    }
+
+    /// Determines whether an [`UnsignedVector`] is a standard basis vector, returning the index of
+    /// its 1 if it is.
+    ///
+    /// A standard basis vector has a single element equal to 1 and every other element 0. Returns
+    /// `None` for every other vector, including the zero vectors and the 0-dimensional vector.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("(0, 1, 0)")
+    ///         .unwrap()
+    ///         .standard_basis_index(),
+    ///     Some(1)
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("(0, 2, 0)")
+    ///         .unwrap()
+    ///         .standard_basis_index(),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("(1, 0, 1)")
+    ///         .unwrap()
+    ///         .standard_basis_index(),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("(0, 0)")
+    ///         .unwrap()
+    ///         .standard_basis_index(),
+    ///     None
+    /// );
+    /// ```
+    fn standard_basis_index(&self) -> Option<u64> {
+        let index = self.pivot_index()?;
+        let i = usize::exact_from(index);
+        if self.elements[i] == T::ONE && self.elements[i + 1..].iter().all(|&x| x == T::ZERO) {
+            Some(index)
+        } else {
+            None
+        }
+    }
+
     /// Returns the number of significant bits of the height of an [`UnsignedVector`], together with
     /// whether any of its elements is negative.
     ///

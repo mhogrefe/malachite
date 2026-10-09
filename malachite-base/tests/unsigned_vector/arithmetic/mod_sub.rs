@@ -143,8 +143,8 @@ fn mod_sub_properties_helper<T: PrimitiveUnsigned>() {
             for ((&x, &y), &z) in v.elements.iter().zip(&w.elements).zip(&r.elements) {
                 assert_eq!(z, x.mod_sub(y, m));
             }
-            // Subtracting is adding the negation, swapping the operands negates the difference,
-            // and adding back the subtrahend recovers the minuend.
+            // Subtracting is adding the negation, swapping the operands negates the difference, and
+            // adding back the subtrahend recovers the minuend.
             assert_eq!((&v).mod_add((&w).mod_neg(m), m), r);
             assert_eq!((&w).mod_sub(&v, m), (&r).mod_neg(m));
             assert_eq!((&r).mod_add(&w, m), v);

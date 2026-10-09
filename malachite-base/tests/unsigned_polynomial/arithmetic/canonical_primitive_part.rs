@@ -41,8 +41,7 @@ fn test_canonical_primitive_part() {
 #[test]
 fn canonical_primitive_part_properties() {
     unsigned_polynomial_gen().test_properties(|p| {
-        // With no negative coefficients there is only one associate, so this is the primitive
-        // part.
+        // With no negative coefficients there is only one associate, so this is the primitive part.
         let cpp = (&p).canonical_primitive_part();
         assert!(cpp.is_valid());
         assert_eq!(cpp, (&p).primitive_part());

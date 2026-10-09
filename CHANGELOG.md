@@ -46,18 +46,21 @@ documented by git history.
 - A `Vector` trait in `malachite_base::vector`, for what every vector type has in common, as
   `Polynomial` is for the polynomial types. It has an `Element` associated type and the methods
   `from_elements`, `from_owned_elements`, `zero`, `standard_basis_vector`, `to_elements`,
-  `into_elements`, `elements_ref`, `dimension`, `pivot`, `pivot_index`, `height_index`, `max_bits`,
-  `sum_max_bits`, `push`, `set_dimension`, and `set_zero`; the vector types implement these through
-  the trait, so calling them takes `use malachite_base::vector::Vector;`. `zero(dimension)` returns
-  the zero vector of a given dimension, like FLINT's `fmpz_vec_init`, and
-  `standard_basis_vector(dimension, index)` returns the vector with a 1 at `index` and 0 elsewhere.
-  `push` appends an element, like FLINT's `fmpz_vec_append`, and `set_dimension` truncates or pads
-  with zeros, like `fmpz_vec_set_length`. `set_zero` sets every element to zero, keeping the
-  dimension, like `_fmpz_vec_zero` and `_nmod_vec_zero`. `height_index` returns the index of the
-  first element of largest height, like FLINT's `_fmpz_vec_height_index`. `max_bits` returns the bit
-  length of the height together with whether any element is negative, the two facts that FLINT's
-  `_fmpz_vec_max_bits` combines into one signed count. `sum_max_bits` returns the bit lengths of the
-  sum of the absolute values of the elements and of the height, like `_fmpz_vec_sum_max_bits`.
+  `into_elements`, `elements_ref`, `dimension`, `is_zero`, `pivot`, `pivot_index`, `height_index`,
+  `standard_basis_index`, `max_bits`, `sum_max_bits`, `push`, `set_dimension`, and `set_zero`; the
+  vector types implement these through the trait, so calling them takes `use
+  malachite_base::vector::Vector;`. `zero(dimension)` returns the zero vector of a given dimension,
+  like FLINT's `fmpz_vec_init`, and `standard_basis_vector(dimension, index)` returns the vector
+  with a 1 at `index` and 0 elsewhere. `push` appends an element, like FLINT's `fmpz_vec_append`,
+  and `set_dimension` truncates or pads with zeros, like `fmpz_vec_set_length`. `set_zero` sets
+  every element to zero, keeping the dimension, like `_fmpz_vec_zero` and `_nmod_vec_zero`, and
+  `is_zero` tests for the zero vector, like `_fmpz_vec_is_zero`. `standard_basis_index` returns the
+  index of the 1 in a standard basis vector, and `None` for any other vector. `height_index` returns
+  the index of the first element of largest height, like FLINT's `_fmpz_vec_height_index`.
+  `max_bits` returns the bit length of the height together with whether any element is negative, the
+  two facts that FLINT's `_fmpz_vec_max_bits` combines into one signed count. `sum_max_bits` returns
+  the bit lengths of the sum of the absolute values of the elements and of the height, like
+  `_fmpz_vec_sum_max_bits`.
 - An `L1Norm` trait in `malachite_base::num::arithmetic::traits`, for the $\ell^1$ norm of a value:
   the sum of the absolute values of the parts it is built from, such as the elements of a vector.
   It has `to_l1_norm`, `into_l1_norm`, and `l1_norm_significant_bits`, mirroring `Height`.

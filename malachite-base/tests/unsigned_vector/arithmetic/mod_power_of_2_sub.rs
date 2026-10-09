@@ -143,8 +143,8 @@ fn mod_power_of_2_sub_properties_helper<T: PrimitiveUnsigned>() {
             for ((&x, &y), &z) in v.elements.iter().zip(&w.elements).zip(&r.elements) {
                 assert_eq!(z, x.mod_power_of_2_sub(y, pow));
             }
-            // Subtracting is adding the negation, swapping the operands negates the difference,
-            // and adding back the subtrahend recovers the minuend.
+            // Subtracting is adding the negation, swapping the operands negates the difference, and
+            // adding back the subtrahend recovers the minuend.
             assert_eq!(
                 (&v).mod_power_of_2_add((&w).mod_power_of_2_neg(pow), pow),
                 r
