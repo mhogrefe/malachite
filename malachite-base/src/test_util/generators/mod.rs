@@ -5201,6 +5201,26 @@ pub fn unsigned_vector_triple_gen() -> Generator<(
     )
 }
 
+// All pairs of `UnsignedVector<T>`s of the same dimension.
+pub fn unsigned_vector_pair_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, UnsignedVector<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_pair_gen_var_1,
+        &random_unsigned_vector_pair_gen_var_1,
+        &special_random_unsigned_vector_pair_gen_var_1,
+    )
+}
+
+// All triples of `UnsignedVector<T>`s of the same dimension.
+pub fn unsigned_vector_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_triple_gen_var_1,
+        &random_unsigned_vector_triple_gen_var_1,
+        &special_random_unsigned_vector_triple_gen_var_1,
+    )
+}
+
 // All `(UnsignedVector<u64>, usize)` where the `usize` is less than the vector's dimension.
 pub fn unsigned_vector_unsigned_pair_gen_var_1() -> Generator<(UnsignedVector<u64>, usize)> {
     Generator::new(

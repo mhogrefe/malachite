@@ -134,6 +134,10 @@ documented by git history.
   `malachite_base::num::arithmetic::traits`, which replace every entry of a value, such as every
   element of a vector, by its absolute value. They are separate from `Abs`, which for a vector
   would be its Euclidean length.
+- `EntrywiseMax` and `EntrywiseMaxAssign` traits in `malachite_base::num::arithmetic::traits`, for
+  the value whose every entry is the larger of the corresponding entries of two values, such as
+  two vectors of the same dimension, and `EntrywiseMin` and `EntrywiseMinAssign` for the smaller.
+  Implemented for `UnsignedVector<T>`, in every combination of value and reference.
 
 ### malachite-nz
 
@@ -225,6 +229,9 @@ documented by git history.
   `balanced_mod` with modulus $2^k$, computed by masking rather than dividing.
 - `EntrywiseAbs` (by value and by reference) and `EntrywiseAbsAssign` for `IntegerVector`, like
   FLINT's `_fmpz_vec_scalar_abs`, and `EntrywiseUnsignedAbs`, which returns a `NaturalVector`.
+- `EntrywiseMax` and `EntrywiseMaxAssign` for `NaturalVector` and `IntegerVector`, in every
+  combination of value and reference, like FLINT's `_fmpz_vec_max` and `_fmpz_vec_max_inplace`;
+  and `EntrywiseMin` and `EntrywiseMinAssign`, like `_fmpz_vec_min` and `_fmpz_vec_min_inplace`.
 
 ### malachite-q
 
@@ -269,6 +276,8 @@ documented by git history.
 - `Sub` and `SubAssign` for `RationalVector`, in every combination of value and reference. The
   vectors must have the same dimension.
 - `EntrywiseAbs` (by value and by reference) and `EntrywiseAbsAssign` for `RationalVector`.
+- `EntrywiseMax`, `EntrywiseMaxAssign`, `EntrywiseMin`, and `EntrywiseMinAssign` for
+  `RationalVector`, in every combination of value and reference.
 
 ## 0.13.0 — 2026-10-06
 

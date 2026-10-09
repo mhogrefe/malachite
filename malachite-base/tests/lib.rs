@@ -991,6 +991,8 @@ pub mod unsigned_vector {
         pub mod size;
     }
     pub mod comparison {
+        pub mod entrywise_max;
+        pub mod entrywise_min;
         pub mod shortlex_cmp;
     }
     pub mod conversion {

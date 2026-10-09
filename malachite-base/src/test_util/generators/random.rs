@@ -9177,6 +9177,54 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<T: Primi
     )
 }
 
+pub fn random_unsigned_vector_pair_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| random_pairs_from_single(random_primitive_ints::<T>(seed)),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|ps| {
+            let (xs, ys): (Vec<T>, Vec<T>) = ps.into_iter().unzip();
+            (
+                UnsignedVector { elements: xs },
+                UnsignedVector { elements: ys },
+            )
+        }),
+    )
+}
+
+pub fn random_unsigned_vector_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| random_triples_from_single(random_primitive_ints::<T>(seed)),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|ts| {
+            let mut xs = Vec::with_capacity(ts.len());
+            let mut ys = Vec::with_capacity(ts.len());
+            let mut zs = Vec::with_capacity(ts.len());
+            for (x, y, z) in ts {
+                xs.push(x);
+                ys.push(y);
+                zs.push(z);
+            }
+            (
+                UnsignedVector { elements: xs },
+                UnsignedVector { elements: ys },
+                UnsignedVector { elements: zs },
+            )
+        }),
+    )
+}
+
 pub fn random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_1<
     T: PrimitiveUnsigned,
 >(

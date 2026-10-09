@@ -6,6 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`EntrywiseMax`](malachite_base::num::arithmetic::traits::EntrywiseMax) and
+/// [`EntrywiseMaxAssign`](malachite_base::num::arithmetic::traits::EntrywiseMaxAssign), which take
+/// the larger of each pair of corresponding elements of two vectors.
+pub mod entrywise_max;
+/// Implementations of [`EntrywiseMin`](malachite_base::num::arithmetic::traits::EntrywiseMin) and
+/// [`EntrywiseMinAssign`](malachite_base::num::arithmetic::traits::EntrywiseMinAssign), which take
+/// the smaller of each pair of corresponding elements of two vectors.
+pub mod entrywise_min;
 /// Equality of [`IntegerVector`](super::IntegerVector)s and
 /// [`NaturalVector`](crate::natural_vector::NaturalVector)s.
 ///

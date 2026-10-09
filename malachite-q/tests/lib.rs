@@ -437,6 +437,8 @@ pub mod rational_vector {
         pub mod size;
     }
     pub mod comparison {
+        pub mod entrywise_max;
+        pub mod entrywise_min;
         pub mod partial_eq_integer_vector;
         pub mod partial_eq_natural_vector;
         pub mod partial_eq_unsigned_vector;

@@ -6856,6 +6856,24 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<
     })
 }
 
+pub fn exhaustive_unsigned_vector_pair_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(UnsignedVector<T>, UnsignedVector<T>)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_unsigned_vectors_with_dimension::<T>(dimension),
+        ))
+    })
+}
+
+pub fn exhaustive_unsigned_vector_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(exhaustive_triples_from_single(
+            exhaustive_unsigned_vectors_with_dimension::<T>(dimension),
+        ))
+    })
+}
+
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_1<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, u64)> {

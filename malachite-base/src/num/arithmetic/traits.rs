@@ -256,6 +256,34 @@ pub trait EntrywiseUnsignedAbs {
     fn entrywise_unsigned_abs(self) -> Self::Output;
 }
 
+/// Takes the entrywise maximum of two values, such as two vectors of the same dimension: the value
+/// whose every entry is the larger of the corresponding entries.
+pub trait EntrywiseMax<RHS = Self> {
+    type Output;
+
+    fn entrywise_max(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces a value, such as a vector, by its entrywise maximum with another: every entry becomes
+/// the larger of itself and the corresponding entry of the other value.
+pub trait EntrywiseMaxAssign<RHS = Self> {
+    fn entrywise_max_assign(&mut self, other: RHS);
+}
+
+/// Takes the entrywise minimum of two values, such as two vectors of the same dimension: the value
+/// whose every entry is the smaller of the corresponding entries.
+pub trait EntrywiseMin<RHS = Self> {
+    type Output;
+
+    fn entrywise_min(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces a value, such as a vector, by its entrywise minimum with another: every entry becomes
+/// the smaller of itself and the corresponding entry of the other value.
+pub trait EntrywiseMinAssign<RHS = Self> {
+    fn entrywise_min_assign(&mut self, other: RHS);
+}
+
 /// Subtracts two numbers and takes the absolute value of the difference.
 pub trait AbsDiff<RHS = Self> {
     type Output;
