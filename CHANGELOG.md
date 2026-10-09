@@ -33,6 +33,10 @@ documented by git history.
   Gaussian integers, whose argument lies in $(-\pi/4, \pi/4]$. They used to call it the canonical
   unit form, which since 0.13.0 is 1 for every nonzero element of a field, so that for `Rational`,
   `GaussianRational`, and `Float` the two no longer agreed. The functions themselves are unchanged.
+- `PrimitiveInt` now requires `BalancedModPowerOf2`, `PrimitiveUnsigned` requires it with a signed
+  output, and `PrimitiveSigned` requires `BalancedModPowerOf2<Output = Self>` and
+  `BalancedModPowerOf2Assign`, as they already required `BalancedMod`. A type outside Malachite that
+  implements these traits must now implement the new ones too.
 
 ### malachite-base
 
@@ -122,8 +126,7 @@ documented by git history.
   `BalancedModAssign`, as `ModPowerOf2` is of `Mod`. The balanced remainder modulo $2^k$ lies in
   $(-2^{k-1}, 2^{k-1}]$, with the tie positive, so it equals `balanced_mod` with modulus $2^k$.
   Implemented for the primitive integers, unsigned types returning the signed type of the same
-  width; a result that does not fit, $2^{W-1}$, panics. They are now among the `PrimitiveInt`,
-  `PrimitiveUnsigned`, and `PrimitiveSigned` bounds.
+  width; a result that does not fit, $2^{W-1}$, panics.
 
 ### malachite-nz
 
