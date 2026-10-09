@@ -65,6 +65,10 @@ pub mod mod_power_of_2_add;
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
 /// checks whether every element of a vector is less than a given power of 2.
 pub mod mod_power_of_2_is_reduced;
+/// Implementations of [`ModPowerOf2Mul`](malachite_base::num::arithmetic::traits::ModPowerOf2Mul)
+/// and [`ModPowerOf2MulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign), for
+/// multiplying a vector by a scalar modulo a power of 2.
+pub mod mod_power_of_2_mul;
 /// Implementations of [`ModPowerOf2Neg`](malachite_base::num::arithmetic::traits::ModPowerOf2Neg)
 /// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign), for
 /// negating a vector modulo a power of 2.

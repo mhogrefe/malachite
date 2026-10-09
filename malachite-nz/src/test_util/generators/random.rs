@@ -7013,6 +7013,29 @@ pub fn random_natural_vector_natural_vector_unsigned_triple_gen_var_1(
     )
 }
 
+pub fn random_natural_vector_natural_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, Natural, u64)> {
+    Box::new(
+        random_natural_vector_natural_pair_gen(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((v, c), pow)| {
+                let bits = v
+                    .elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0)
+                    .max(c.significant_bits());
+                (v, c, pow + bits)
+            }),
+    )
+}
+
 pub fn random_natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalVector, NaturalVector, NaturalVector, u64)> {

@@ -10839,6 +10839,42 @@ pub fn special_random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<
     )
 }
 
+pub fn special_random_unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, T, u64)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .zip(striped_random_unsigneds::<T>(
+            EXAMPLE_SEED.fork("scalar"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            T::WIDTH,
+        ))
+        .map(|((xs, c), pow)| {
+            (
+                UnsignedVector { elements: xs }.mod_power_of_2(pow),
+                c.mod_power_of_2(pow),
+                pow,
+            )
+        }),
+    )
+}
+
 pub fn special_random_unsigned_vector_pair_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedVector<T>, UnsignedVector<T>)> {

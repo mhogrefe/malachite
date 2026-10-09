@@ -6856,6 +6856,23 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<
     })
 }
 
+pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(UnsignedVector<T>, T, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_pairs(
+                exhaustive_unsigned_vectors::<T>(),
+                exhaustive_unsigneds::<T>(),
+            ),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|((v, c), pow)| {
+            v.mod_power_of_2_is_reduced(*pow) && c.mod_power_of_2_is_reduced(*pow)
+        })
+        .map(|((v, c), pow)| (v, c, pow)),
+    )
+}
+
 pub fn exhaustive_unsigned_vector_pair_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, UnsignedVector<T>)> {
     exhaustive_tuples_by_dimension(|dimension| {

@@ -9177,6 +9177,32 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<T: Primi
     )
 }
 
+pub fn random_unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, T, u64)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| random_primitive_ints::<T>(seed),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .zip(random_primitive_ints::<T>(EXAMPLE_SEED.fork("scalar")))
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            T::WIDTH,
+        ))
+        .map(|((xs, c), pow)| {
+            (
+                UnsignedVector { elements: xs }.mod_power_of_2(pow),
+                c.mod_power_of_2(pow),
+                pow,
+            )
+        }),
+    )
+}
+
 pub fn random_unsigned_vector_pair_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedVector<T>, UnsignedVector<T>)> {

@@ -3605,6 +3605,26 @@ pub fn exhaustive_natural_vector_natural_vector_unsigned_triple_gen_var_1()
     })
 }
 
+pub fn exhaustive_natural_vector_natural_unsigned_triple_gen_var_1()
+-> It<(NaturalVector, Natural, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_pairs(exhaustive_natural_vectors(), exhaustive_naturals()),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((v, c), pow)| {
+            let bits = v
+                .elements
+                .iter()
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0)
+                .max(c.significant_bits());
+            (v, c, pow + bits)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1()
 -> It<(NaturalVector, NaturalVector, NaturalVector, u64)> {
     exhaustive_tuples_by_dimension(|dimension| {
