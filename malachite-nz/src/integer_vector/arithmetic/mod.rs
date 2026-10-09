@@ -36,6 +36,9 @@ pub mod dot_general;
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
 /// element.
 pub mod height;
+/// An implementation of [`L1Norm`](malachite_base::num::arithmetic::traits::L1Norm), the sum of the
+/// absolute values of the elements.
+pub mod l1_norm;
 #[doc(hidden)]
 pub mod max_bits;
 #[doc(hidden)]
@@ -48,3 +51,5 @@ pub mod scalar_mul;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting vectors.
 pub mod sub;
+#[doc(hidden)]
+pub mod sum_max_bits;

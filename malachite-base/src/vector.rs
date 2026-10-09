@@ -97,6 +97,14 @@ pub trait Vector: Sized {
     /// The bit count is the largest bit length of any element's height, or 0 for the 0-dimensional
     /// vector; it is what `Height::height_significant_bits` returns.
     fn max_bits(&self) -> (u64, bool);
+
+    /// Returns the number of significant bits of a vector's $\ell^1$ norm, the sum of the absolute
+    /// values of its elements, together with the number of significant bits of its height.
+    ///
+    /// The counts are what `L1Norm::l1_norm_significant_bits` and `Height::height_significant_bits`
+    /// return, computed together in one pass where possible. Both are 0 for the 0-dimensional
+    /// vector.
+    fn sum_max_bits(&self) -> (u64, u64);
 }
 
 /// Selects coordinates of a vector by index: the result's element $j$ is the original's element

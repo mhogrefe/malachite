@@ -11,6 +11,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
 use malachite_base::named::Named;
+use malachite_base::num::arithmetic::traits::L1Norm;
 use malachite_base::num::arithmetic::traits::{Height, HeightRef};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -32,6 +33,8 @@ pub mod exhaustive;
 /// An implementation of [`Extend`], for appending the elements produced by an iterator to a
 /// [`RationalVector`].
 pub mod extend;
+/// Traits for logic and bit manipulation on [`RationalVector`]s.
+pub mod logic;
 /// Iterators that generate [`RationalVector`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
@@ -562,6 +565,35 @@ impl Vector for RationalVector {
         (
             self.height_significant_bits(),
             self.elements.iter().any(|x| *x < 0u32),
+        )
+    }
+
+    /// Returns the number of significant bits of the sum of the absolute values of the elements of
+    /// a [`RationalVector`] (its $\ell^1$ norm), together with the number of significant bits of its height.
+    ///
+    /// The $\ell^1$ norm is a rational number, and, as for a single [`Rational`], its number of
+    /// significant bits is the sum of those of its numerator and denominator.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements' numerators and denominators.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_q::rational_vector::RationalVector;
+    ///
+    /// assert_eq!(RationalVector::from_str("(1/2, -1/3)").unwrap().sum_max_bits(), (6, 2));
+    /// assert_eq!(RationalVector::from_str("()").unwrap().sum_max_bits(), (0, 0));
+    /// ```
+    fn sum_max_bits(&self) -> (u64, u64) {
+        (
+            self.l1_norm_significant_bits(),
+            self.height_significant_bits(),
         )
     }
 }

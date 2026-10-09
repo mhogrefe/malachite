@@ -11,3 +11,4 @@ pub mod dot_general;
 pub mod max_bits;
 pub mod max_limbs;
 pub mod scalar_mul;
+pub mod sum_max_bits;

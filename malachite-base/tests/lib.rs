@@ -1009,6 +1009,9 @@ pub mod unsigned_vector {
     }
     pub mod extend;
     pub mod height_index;
+    pub mod logic {
+        pub mod significant_bits;
+    }
     pub mod max_bits;
     pub mod pivot;
     pub mod push;
@@ -1023,6 +1026,7 @@ pub mod unsigned_vector {
         pub mod striped_random_unsigned_vectors_with_dimension;
     }
     pub mod standard_basis_vector;
+    pub mod sum_max_bits;
     pub mod zero;
 }
 pub mod vecs {

@@ -941,6 +941,18 @@ pub trait HeightRef: Height {
     fn height_ref(&self) -> &Self::Output;
 }
 
+/// Calculates the $\ell^1$ norm of a value: the sum of the absolute values of the parts it is built
+/// from, such as the elements of a vector.
+pub trait L1Norm {
+    type Output;
+
+    fn to_l1_norm(&self) -> Self::Output;
+
+    fn into_l1_norm(self) -> Self::Output;
+
+    fn l1_norm_significant_bits(&self) -> u64;
+}
+
 /// Determines whether a number is an integer power of 2.
 pub trait IsPowerOf2 {
     fn is_power_of_2(&self) -> bool;

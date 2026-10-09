@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     select_coordinates::register(runner);
     set_dimension::register(runner);
     standard_basis_vector::register(runner);
+    sum_max_bits::register(runner);
     zero::register(runner);
 }
 
@@ -32,4 +33,5 @@ mod push;
 mod select_coordinates;
 mod set_dimension;
 mod standard_basis_vector;
+mod sum_max_bits;
 mod zero;

@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content_chained::register(runner);
     dot_general::register(runner);
     height::register(runner);
+    l1_norm::register(runner);
     max_bits::register(runner);
     max_limbs::register(runner);
     neg::register(runner);
@@ -30,6 +31,7 @@ mod content;
 mod content_chained;
 mod dot_general;
 mod height;
+mod l1_norm;
 mod max_bits;
 mod max_limbs;
 mod neg;

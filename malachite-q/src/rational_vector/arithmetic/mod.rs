@@ -29,6 +29,9 @@ pub mod content;
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
 /// element.
 pub mod height;
+/// An implementation of [`L1Norm`](malachite_base::num::arithmetic::traits::L1Norm), the sum of the
+/// absolute values of the elements.
+pub mod l1_norm;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;

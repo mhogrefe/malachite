@@ -9,6 +9,7 @@
 use crate::named::Named;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
+use crate::num::logic::traits::SignificantBits;
 use crate::vector::Vector;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -30,6 +31,8 @@ pub mod exhaustive;
 /// An implementation of [`Extend`], for appending the elements produced by an iterator to an
 /// [`UnsignedVector`].
 pub mod extend;
+/// Traits for logic and bit manipulation on [`UnsignedVector`]s.
+pub mod logic;
 #[cfg(feature = "random")]
 /// Iterators that generate [`UnsignedVector`]s randomly.
 pub mod random;
@@ -548,6 +551,50 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
             or |= x;
         }
         (or.significant_bits(), false)
+    }
+
+    /// Returns the number of significant bits of the sum of the absolute values of the elements of
+    /// an [`UnsignedVector`] (its $\ell^1$ norm), together with the number of significant bits of
+    /// its height.
+    ///
+    /// The sum may not fit in a `T`, so the carries out of the top bit are counted; no wider type
+    /// is needed.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(UnsignedVector::<u8>::from_str("(255, 255)").unwrap().sum_max_bits(), (9, 8));
+    /// assert_eq!(UnsignedVector::<u8>::from_str("()").unwrap().sum_max_bits(), (0, 0));
+    /// ```
+    fn sum_max_bits(&self) -> (u64, u64) {
+        let mut sum = T::ZERO;
+        let mut carries = 0u64;
+        let mut or = T::ZERO;
+        for &x in &self.elements {
+            let overflow;
+            (sum, overflow) = sum.overflowing_add(x);
+            if overflow {
+                carries += 1;
+            }
+            or |= x;
+        }
+        // The sum is `carries` times 2^W plus `sum`.
+        let sum_bits = if carries == 0 {
+            sum.significant_bits()
+        } else {
+            T::WIDTH + carries.significant_bits()
+        };
+        (sum_bits, or.significant_bits())
     }
 }
 

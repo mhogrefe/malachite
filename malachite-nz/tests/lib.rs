@@ -352,6 +352,7 @@ pub mod integer_vector {
         pub mod content_chained;
         pub mod dot_general;
         pub mod height;
+        pub mod l1_norm;
         pub mod max_bits;
         pub mod max_limbs;
         pub mod neg;
@@ -391,6 +392,9 @@ pub mod integer_vector {
     }
     pub mod extend;
     pub mod height_index;
+    pub mod logic {
+        pub mod significant_bits;
+    }
     pub mod max_bits;
     pub mod pivot;
     pub mod push;
@@ -405,6 +409,7 @@ pub mod integer_vector {
         pub mod striped_random_integer_vectors_with_dimension;
     }
     pub mod standard_basis_vector;
+    pub mod sum_max_bits;
     pub mod zero;
 }
 pub mod natural {
@@ -862,6 +867,7 @@ pub mod natural_vector {
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod height;
+        pub mod l1_norm;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_neg;
@@ -903,6 +909,9 @@ pub mod natural_vector {
     }
     pub mod extend;
     pub mod height_index;
+    pub mod logic {
+        pub mod significant_bits;
+    }
     pub mod max_bits;
     pub mod pivot;
     pub mod push;
@@ -917,5 +926,6 @@ pub mod natural_vector {
         pub mod striped_random_natural_vectors_with_dimension;
     }
     pub mod standard_basis_vector;
+    pub mod sum_max_bits;
     pub mod zero;
 }

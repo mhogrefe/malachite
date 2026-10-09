@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonical_primitive_part::register(runner);
     content::register(runner);
     height::register(runner);
+    l1_norm::register(runner);
     mod_add::register(runner);
     mod_is_reduced::register(runner);
     mod_neg::register(runner);
@@ -29,6 +30,7 @@ mod add;
 mod canonical_primitive_part;
 mod content;
 mod height;
+mod l1_norm;
 mod mod_add;
 mod mod_is_reduced;
 mod mod_neg;

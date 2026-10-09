@@ -43,15 +43,19 @@ documented by git history.
   `Polynomial` is for the polynomial types. It has an `Element` associated type and the methods
   `from_elements`, `from_owned_elements`, `zero`, `standard_basis_vector`, `to_elements`,
   `into_elements`, `elements_ref`, `dimension`, `pivot`, `pivot_index`, `height_index`, `max_bits`,
-  `push`, and `set_dimension`; the vector types implement these through the trait, so calling them
-  takes `use malachite_base::vector::Vector;`. `zero(dimension)` returns the zero vector of a given
-  dimension, like FLINT's `fmpz_vec_init`, and `standard_basis_vector(dimension, index)` returns the
-  vector with a 1 at `index` and 0 elsewhere. `push` appends an element, like FLINT's
-  `fmpz_vec_append`, and `set_dimension` truncates or pads with zeros, like `fmpz_vec_set_length`.
-  `height_index` returns the index of the first element of largest height, like FLINT's
-  `_fmpz_vec_height_index`. `max_bits` returns the bit length of the height together with whether
-  any element is negative, the two facts that FLINT's `_fmpz_vec_max_bits` combines into one signed
-  count.
+  `sum_max_bits`, `push`, and `set_dimension`; the vector types implement these through the trait,
+  so calling them takes `use malachite_base::vector::Vector;`. `zero(dimension)` returns the zero
+  vector of a given dimension, like FLINT's `fmpz_vec_init`, and `standard_basis_vector(dimension,
+  index)` returns the vector with a 1 at `index` and 0 elsewhere. `push` appends an element, like
+  FLINT's `fmpz_vec_append`, and `set_dimension` truncates or pads with zeros, like
+  `fmpz_vec_set_length`. `height_index` returns the index of the first element of largest height,
+  like FLINT's `_fmpz_vec_height_index`. `max_bits` returns the bit length of the height together
+  with whether any element is negative, the two facts that FLINT's `_fmpz_vec_max_bits` combines
+  into one signed count. `sum_max_bits` returns the bit lengths of the sum of the absolute values of
+  the elements and of the height, like `_fmpz_vec_sum_max_bits`.
+- An `L1Norm` trait in `malachite_base::num::arithmetic::traits`, for the $\ell^1$ norm of a value:
+  the sum of the absolute values of the parts it is built from, such as the elements of a vector.
+  It has `to_l1_norm`, `into_l1_norm`, and `l1_norm_significant_bits`, mirroring `Height`.
 - `SelectCoordinates` and `SelectCoordinatesAssign` traits in `malachite_base::vector`, for
   selecting the coordinates of a vector by a list of indices, which may repeat and appear in any
   order, so that projection, permutation, and duplication of coordinates are all selections. The
@@ -70,6 +74,8 @@ documented by git history.
   iterator, and extended by one.
 - `Height` for `UnsignedVector<T>`: the largest element, like FLINT's `_fmpz_vec_height`, with
   `height_significant_bits` like `_nmod_vec_max_bits`.
+- `SignificantBits` for `UnsignedVector<T>`: the sum of the numbers of significant bits of the
+  elements.
 - `random_unsigned_vectors_from_iterator` and
   `random_unsigned_vectors_with_dimension_from_iterator`, which take the elements of
   `UnsignedVector<T>`s from any iterator, for example one with bounded elements. The other
@@ -121,6 +127,11 @@ documented by git history.
   and `IntegerVector`.
 - `Height` and `HeightRef` for `NaturalVector` and `IntegerVector`: the largest absolute value of an
   element, like FLINT's `_fmpz_vec_height`. The height of the 0-dimensional vector is 0.
+- `L1Norm` for `NaturalVector` and `IntegerVector`: the sum of the absolute values of the elements,
+  as a `Natural`. `l1_norm_significant_bits` adds the elements in two words while each fits in one,
+  like FLINT's `_fmpz_vec_sum_max_bits`.
+- `SignificantBits` for `NaturalVector` and `IntegerVector`: the sum of the numbers of significant
+  bits of the elements.
 - `random_natural_vectors_from_iterator`, `random_integer_vectors_from_iterator`, and their
   `_with_dimension_from_iterator` variants, which take the elements from any iterator, for example
   one with bounded elements. The other `NaturalVector` and `IntegerVector` generators are built on
@@ -178,6 +189,9 @@ documented by git history.
   `RationalVector`.
 - `Height` and `HeightRef` for `RationalVector`: the largest height of an element, like FLINT's
   `_fmpq_vec_max_height`. The height of the 0-dimensional vector is 0.
+- `L1Norm` for `RationalVector`: the sum of the absolute values of the elements, as a `Rational`.
+- `SignificantBits` for `RationalVector`: the sum of the numbers of significant bits of the
+  elements, each counting the bits of its numerator and denominator, as for `Rational`.
 - `random_rational_vectors_from_iterator` and
   `random_rational_vectors_with_dimension_from_iterator`, which take the elements of
   `RationalVector`s from any iterator, for example one with bounded elements. The other

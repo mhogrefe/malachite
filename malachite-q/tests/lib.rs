@@ -424,6 +424,7 @@ pub mod rational_vector {
         pub mod canonicalize_sign;
         pub mod content;
         pub mod height;
+        pub mod l1_norm;
         pub mod neg;
         pub mod sub;
     }
@@ -465,6 +466,9 @@ pub mod rational_vector {
     }
     pub mod extend;
     pub mod height_index;
+    pub mod logic {
+        pub mod significant_bits;
+    }
     pub mod max_bits;
     pub mod pivot;
     pub mod push;
@@ -479,5 +483,6 @@ pub mod rational_vector {
         pub mod striped_random_rational_vectors_with_dimension;
     }
     pub mod standard_basis_vector;
+    pub mod sum_max_bits;
     pub mod zero;
 }

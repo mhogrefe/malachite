@@ -8,6 +8,7 @@
 
 use crate::integer::Integer;
 use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
+use crate::integer_vector::arithmetic::sum_max_bits::vec_sum_max_bits;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
@@ -31,6 +32,8 @@ pub mod exhaustive;
 /// An implementation of [`Extend`], for appending the elements produced by an iterator to an
 /// [`IntegerVector`].
 pub mod extend;
+/// Traits for logic and bit manipulation on [`IntegerVector`]s.
+pub mod logic;
 /// Iterators that generate [`IntegerVector`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
@@ -553,6 +556,34 @@ impl Vector for IntegerVector {
     #[inline]
     fn max_bits(&self) -> (u64, bool) {
         vec_max_bits(&self.elements)
+    }
+
+    /// Returns the number of significant bits of the sum of the absolute values of the elements of
+    /// an [`IntegerVector`] (its $\ell^1$ norm), together with the number of significant bits of its height.
+    ///
+    /// While every element fits in one limb, the absolute values are added in two limbs, so nothing is
+    /// allocated.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// assert_eq!(IntegerVector::from_str("(1, -5, 2)").unwrap().sum_max_bits(), (4, 3));
+    /// assert_eq!(IntegerVector::from_str("()").unwrap().sum_max_bits(), (0, 0));
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_sum_max_bits` from `fmpz_vec/sum_max_bits.c`, FLINT 3.6.0.
+    fn sum_max_bits(&self) -> (u64, u64) {
+        vec_sum_max_bits(&self.elements)
     }
 }
 
