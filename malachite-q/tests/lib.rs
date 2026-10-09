@@ -465,6 +465,7 @@ pub mod rational_vector {
     }
     pub mod extend;
     pub mod height_index;
+    pub mod max_bits;
     pub mod pivot;
     pub mod push;
     pub mod select_coordinates;

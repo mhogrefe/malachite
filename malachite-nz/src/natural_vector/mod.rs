@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::Natural;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -523,6 +524,42 @@ impl Vector for NaturalVector {
             .rev()
             .max_by(|(_, x), (_, y)| x.cmp(y))
             .map(|(i, _)| u64::exact_from(i))
+    }
+
+    /// Returns the number of significant bits of the height of a [`NaturalVector`], together with
+    /// whether any of its elements is negative.
+    ///
+    /// Since no element is negative, the flag is always `false`. The top limbs of the elements with
+    /// the most limbs are or-ed together, so no element's bit length is computed separately.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// assert_eq!(
+    ///     NaturalVector::from_str("(1, 5, 2)").unwrap().max_bits(),
+    ///     (3, false)
+    /// );
+    /// assert_eq!(
+    ///     NaturalVector::from_str("()").unwrap().max_bits(),
+    ///     (0, false)
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_max_bits` from `fmpz_vec/max_bits.c`, FLINT 3.6.0, which
+    /// returns the two results combined, as a count that is negated when some element is negative.
+    #[inline]
+    fn max_bits(&self) -> (u64, bool) {
+        vec_max_bits(&self.elements)
     }
 }
 

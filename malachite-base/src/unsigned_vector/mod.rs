@@ -507,6 +507,48 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
             .max_by(|(_, x), (_, y)| x.cmp(y))
             .map(|(i, _)| u64::exact_from(i))
     }
+
+    /// Returns the number of significant bits of the height of an [`UnsignedVector`], together with
+    /// whether any of its elements is negative.
+    ///
+    /// Since no element is negative, the flag is always `false`. The bit count is the bit length of
+    /// the bitwise or of the elements.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("(1, 5, 2)")
+    ///         .unwrap()
+    ///         .max_bits(),
+    ///     (3, false)
+    /// );
+    /// assert_eq!(
+    ///     UnsignedVector::<u8>::from_str("()").unwrap().max_bits(),
+    ///     (0, false)
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `_nmod_vec_max_bits` from `nmod_vec/max_bits.c`, FLINT 3.6.0, together
+    /// with the flag.
+    #[inline]
+    fn max_bits(&self) -> (u64, bool) {
+        let mut or = T::ZERO;
+        for &x in &self.elements {
+            or |= x;
+        }
+        (or.significant_bits(), false)
+    }
 }
 
 macro_rules! impl_named_unsigned_vector {

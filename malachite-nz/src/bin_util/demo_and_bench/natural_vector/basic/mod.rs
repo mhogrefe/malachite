@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     extend::register(runner);
     height_index::register(runner);
     index::register(runner);
+    max_bits::register(runner);
     pivot::register(runner);
     push::register(runner);
     select_coordinates::register(runner);
@@ -25,6 +26,7 @@ mod dimension;
 mod extend;
 mod height_index;
 mod index;
+mod max_bits;
 mod pivot;
 mod push;
 mod select_coordinates;

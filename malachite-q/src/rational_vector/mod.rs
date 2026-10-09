@@ -11,7 +11,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::HeightRef;
+use malachite_base::num::arithmetic::traits::{Height, HeightRef};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vector::Vector;
@@ -526,6 +526,43 @@ impl Vector for RationalVector {
             .rev()
             .max_by(|(_, x), (_, y)| x.height_ref().cmp(y.height_ref()))
             .map(|(i, _)| u64::exact_from(i))
+    }
+
+    /// Returns the number of significant bits of the height of a [`RationalVector`], together with
+    /// whether any of its elements is negative.
+    ///
+    /// The bit count is that of the largest of the elements' heights, $\max(|p|, q)$ for $p/q$ in
+    /// lowest terms.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements' numerators and denominators.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_q::rational_vector::RationalVector;
+    ///
+    /// assert_eq!(
+    ///     RationalVector::from_str("(1/4, -2)").unwrap().max_bits(),
+    ///     (3, true)
+    /// );
+    /// assert_eq!(
+    ///     RationalVector::from_str("()").unwrap().max_bits(),
+    ///     (0, false)
+    /// );
+    /// ```
+    #[inline]
+    fn max_bits(&self) -> (u64, bool) {
+        (
+            self.height_significant_bits(),
+            self.elements.iter().any(|x| *x < 0u32),
+        )
     }
 }
 

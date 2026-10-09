@@ -90,6 +90,13 @@ pub trait Vector: Sized {
     /// The height of an integer is its absolute value, and the height of a rational number $p/q$
     /// in lowest terms is $\max(|p|, q)$. Returns `None` for the 0-dimensional vector.
     fn height_index(&self) -> Option<u64>;
+
+    /// Returns the number of significant bits of a vector's height, together with whether any of
+    /// its elements is negative.
+    ///
+    /// The bit count is the largest bit length of any element's height, or 0 for the 0-dimensional
+    /// vector; it is what `Height::height_significant_bits` returns.
+    fn max_bits(&self) -> (u64, bool);
 }
 
 /// Selects coordinates of a vector by index: the result's element $j$ is the original's element

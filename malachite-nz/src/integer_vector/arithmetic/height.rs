@@ -8,11 +8,11 @@
 
 use crate::integer::Integer;
 use crate::integer_vector::IntegerVector;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::Natural;
 use crate::natural_vector::ZERO;
 use malachite_base::num::arithmetic::traits::{Height, HeightRef, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::logic::traits::SignificantBits;
 
 impl Height for IntegerVector {
     type Output = Natural;
@@ -124,7 +124,7 @@ impl Height for IntegerVector {
     /// This is the absolute value of `_fmpz_vec_max_bits` from `fmpz_vec/max_bits.c`, FLINT 3.6.0.
     #[inline]
     fn height_significant_bits(&self) -> u64 {
-        self.height_ref().significant_bits()
+        vec_max_bits(&self.elements).0
     }
 }
 

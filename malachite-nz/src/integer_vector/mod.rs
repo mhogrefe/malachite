@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
@@ -516,6 +517,42 @@ impl Vector for IntegerVector {
             .rev()
             .max_by(|(_, x), (_, y)| x.unsigned_abs_ref().cmp(y.unsigned_abs_ref()))
             .map(|(i, _)| u64::exact_from(i))
+    }
+
+    /// Returns the number of significant bits of the height of an [`IntegerVector`], together with
+    /// whether any of its elements is negative.
+    ///
+    /// The top limbs of the elements with the most limbs are or-ed together, so no element's bit
+    /// length is computed separately.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// assert_eq!(
+    ///     IntegerVector::from_str("(1, -5, 2)").unwrap().max_bits(),
+    ///     (3, true)
+    /// );
+    /// assert_eq!(
+    ///     IntegerVector::from_str("()").unwrap().max_bits(),
+    ///     (0, false)
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_max_bits` from `fmpz_vec/max_bits.c`, FLINT 3.6.0, which
+    /// returns the two results combined, as a count that is negated when some element is negative.
+    #[inline]
+    fn max_bits(&self) -> (u64, bool) {
+        vec_max_bits(&self.elements)
     }
 }
 

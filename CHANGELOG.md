@@ -42,21 +42,22 @@ documented by git history.
 - A `Vector` trait in `malachite_base::vector`, for what every vector type has in common, as
   `Polynomial` is for the polynomial types. It has an `Element` associated type and the methods
   `from_elements`, `from_owned_elements`, `zero`, `standard_basis_vector`, `to_elements`,
-  `into_elements`, `elements_ref`, `dimension`, `pivot`, `pivot_index`, `height_index`, `push`, and
-  `set_dimension`; the vector types implement these through the trait, so calling them takes
-  `use malachite_base::vector::Vector;`. `push` appends an element, like FLINT's `fmpz_vec_append`,
-  and `set_dimension` truncates or pads with zeros, like `fmpz_vec_set_length`.
+  `into_elements`, `elements_ref`, `dimension`, `pivot`, `pivot_index`, `height_index`, `max_bits`,
+  `push`, and `set_dimension`; the vector types implement these through the trait, so calling them
+  takes `use malachite_base::vector::Vector;`. `zero(dimension)` returns the zero vector of a given
+  dimension, like FLINT's `fmpz_vec_init`, and `standard_basis_vector(dimension, index)` returns the
+  vector with a 1 at `index` and 0 elsewhere. `push` appends an element, like FLINT's
+  `fmpz_vec_append`, and `set_dimension` truncates or pads with zeros, like `fmpz_vec_set_length`.
   `height_index` returns the index of the first element of largest height, like FLINT's
-  `_fmpz_vec_height_index`.
+  `_fmpz_vec_height_index`. `max_bits` returns the bit length of the height together with whether
+  any element is negative, the two facts that FLINT's `_fmpz_vec_max_bits` combines into one signed
+  count.
 - `SelectCoordinates` and `SelectCoordinatesAssign` traits in `malachite_base::vector`, for
   selecting the coordinates of a vector by a list of indices, which may repeat and appear in any
   order, so that projection, permutation, and duplication of coordinates are all selections. The
   by-value and in-place forms move elements rather than cloning them wherever possible: strictly
   increasing indices are handled in place, and otherwise an element is cloned only once for each
   extra time it is selected. Implemented for `UnsignedVector<T>`.
-  `zero(dimension)` returns the zero vector of a given dimension, like FLINT's `fmpz_vec_init`, and
-  `standard_basis_vector(dimension, index)` returns the vector with a 1 at `index` and 0
-  elsewhere.
 - `UnsignedVector<T>`, a vector whose elements are primitive unsigned integers. Its `elements`
   field is public, since every [`Vec`] is a valid vector. It implements `Vector`, `Index` and
   `IndexMut`, and has conversions to and from strings (`(1, 2, 3)`, with `()` for the 0-dimensional
