@@ -1978,6 +1978,22 @@ fn test_against_flint() {
         "demo_natural_crt_comb_combine_balanced",
         "fmpz_multi_CRT_ui_balanced",
     );
+    // The generated cases from multi_crt_properties and multi_balanced_crt_properties in
+    // malachite-nz's NaturalVector and IntegerVector tests: residues of vectors modulo usable
+    // moduli, and residues of 0 modulo arbitrary moduli, most of them unusable.
+    for demo_name in [
+        "demo_natural_vector_multi_crt",
+        "demo_natural_vector_multi_crt_unrestricted_moduli",
+        "demo_integer_vector_multi_balanced_crt",
+        "demo_integer_vector_multi_balanced_crt_unrestricted_moduli",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "_fmpz_vec_multi_CRT_ui",
+        );
+    }
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -2122,6 +2138,23 @@ fn test_against_flint() {
             "../malachite-nz",
             demo_name,
             "fmpz_poly_scalar_smod_fmpz",
+        );
+    }
+
+    // The generated cases from balanced_mod_properties in malachite-nz's IntegerVector tests: the
+    // (vector, nonzero modulus) pairs, by value, by reference, and in place, and every vector
+    // against the moduli 1, -1, and 2.
+    for demo_name in [
+        "demo_integer_vector_balanced_mod",
+        "demo_integer_vector_balanced_mod_ref",
+        "demo_integer_vector_balanced_mod_assign",
+        "demo_integer_vector_balanced_mod_small_moduli",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "_fmpz_vec_scalar_smod_fmpz",
         );
     }
 

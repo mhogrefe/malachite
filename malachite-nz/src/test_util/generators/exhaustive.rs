@@ -3835,6 +3835,18 @@ pub fn exhaustive_unsigned_vec_natural_pair_gen_var_1() -> It<(Vec<Limb>, Natura
     )
 }
 
+// The moduli lists are filtered rather than repaired, so that no pair is generated twice.
+pub fn exhaustive_unsigned_vec_natural_vector_pair_gen_var_1() -> It<(Vec<Limb>, NaturalVector)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()).filter(|ms| {
+            ms.iter()
+                .enumerate()
+                .all(|(i, &m)| m >= 2 && ms[..i].iter().all(|&prev| m.coprime_with(prev)))
+        }),
+        exhaustive_natural_vectors(),
+    ))
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned)
 
 // vars 1 through 3 are in malachite-base

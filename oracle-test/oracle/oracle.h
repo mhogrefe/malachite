@@ -61,6 +61,22 @@ int fmpq_poly_set_str_malachite(fmpq_poly_t poly, const char * s);
 int split_polynomial_scalar_line(char * line, const char * method, const char * assign_method,
                                  const char * op, char ** receiver, char ** arg, char ** result);
 
+/* Parses a vector as Malachite displays it, such as `(1, -3, 5)` or `()`, returning a new
+   vector of `*len` entries for the caller to free with `_fmpz_vec_clear`, or NULL (with `*len`
+   set to 0) if the text is not exactly in that form. */
+fmpz * fmpz_vec_set_str_malachite(slong * len, const char * s);
+
+/* Prints a vector as Malachite displays it. */
+void fmpz_vec_print_malachite(const fmpz * vec, slong len);
+
+/* Splits, in place, a line in which a vector meets a scalar, in one of the shapes the vector
+   demos print: `V.method(M) = R`, `(&V).method(M) = R`, or `v := V; v.assign_method(M); v = R`,
+   where `V` and `R` are parenthesized vectors. Pass NULL for `method` or `assign_method` to skip
+   those shapes. Strips a trailing newline. Returns 1 and sets the three pointers on success, with
+   `*receiver` keeping its parentheses, and 0 if the line has none of the shapes. */
+int split_vector_scalar_line(char * line, const char * method, const char * assign_method,
+                             char ** receiver, char ** arg, char ** result);
+
 /* Returns 0 if `checked` is positive, and otherwise reports that no line of the input had the
    shape the mode `name` looks for and returns 1. A mode skips lines it cannot parse, so without
    this check a change to a demo's output format would make every run pass vacuously. */
@@ -245,5 +261,11 @@ int run_fft_combine_bits(const char * arg);
 int run_fft_convolution(const char * arg);
 int run__fmpz_vec_get_fft(const char * arg);
 int run__fmpz_vec_set_fft(const char * arg);
+
+/* fmpz_vec_smod.c */
+int run__fmpz_vec_scalar_smod_fmpz(const char * arg);
+
+/* fmpz_vec_multi_crt.c */
+int run__fmpz_vec_multi_CRT_ui(const char * arg);
 
 #endif

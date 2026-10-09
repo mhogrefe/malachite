@@ -72,6 +72,8 @@ string in a unit file is printed bare, exactly as the demo would print it.
 | `n_sqrtmod` | `n_sqrtmod` | `demo_mod_sqrt_u64` (malachite-base) |
 | `n_primitive_root_prime` | `n_primitive_root_prime` | `demo_*_primitive_root_prime` (malachite-base) |
 | `fmpz_poly_scalar_smod_fmpz` | `fmpz_poly_scalar_smod_fmpz` | `demo_integer_polynomial_balanced_mod`, `_ref`, `_assign`, and `_small_moduli` (malachite-nz), plus unit rows |
+| `_fmpz_vec_scalar_smod_fmpz` | `_fmpz_vec_scalar_smod_fmpz` | `demo_integer_vector_balanced_mod`, `_ref`, `_assign`, and `_small_moduli` (malachite-nz), plus unit rows; the oracle passes the modulus's absolute value, as for `fmpz_poly_scalar_smod_fmpz` |
+| `_fmpz_vec_multi_CRT_ui` | `_fmpz_vec_multi_CRT_ui` | `demo_natural_vector_multi_crt` and `demo_integer_vector_multi_balanced_crt`, each with an `_unrestricted_moduli` variant (malachite-nz), plus unit rows. FLINT aborts on unusable moduli, so a `None` line is checked against the documented conditions instead |
 | `fmpz_poly_scalar_mod_fmpz` | `fmpz_poly_scalar_mod_fmpz` | `demo_integer_polynomial_mod_op`, `_ref`, `_power_of_2_moduli`, and `_unsigned_u128` (malachite-nz), plus unit rows |
 | `fmpz_poly_get_nmod_poly` | `fmpz_poly_get_nmod_poly` | `demo_integer_polynomial_mod_op_unsigned_*` for every word-sized type (malachite-nz), plus unit rows |
 | `fmpz_mod_poly_set_fmpz_poly` | `fmpz_mod_poly_set_fmpz_poly` | `demo_natural_polynomial_rem`, `_ref`, `_assign`, `_special_moduli`, `_unsigned_*`, and `_unsigned_ref_*`, and `demo_natural_polynomial_mod_op` and `_mod_assign` (malachite-nz), plus unit rows |

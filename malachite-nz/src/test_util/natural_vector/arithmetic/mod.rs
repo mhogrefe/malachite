@@ -6,10 +6,4 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod content_chained;
-pub mod dot_general;
-pub mod max_bits;
-pub mod max_limbs;
 pub mod multi_crt;
-pub mod scalar_mul;
-pub mod sum_max_bits;

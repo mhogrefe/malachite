@@ -50,6 +50,10 @@ pub mod max_limbs;
 /// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod), for reducing every
 /// element of a vector modulo a number.
 pub mod mod_op;
+/// [`IntegerVector::multi_balanced_crt`](super::IntegerVector::multi_balanced_crt), which combines
+/// vectors of residues modulo many word-sized moduli into balanced representatives by the Chinese
+/// remainder theorem.
+pub mod multi_crt;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;

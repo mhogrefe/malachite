@@ -183,6 +183,11 @@ documented by git history.
 - `BalancedMod` and `BalancedModAssign` for `IntegerVector` with an `Integer` modulus, in every
   combination of value and reference, reducing every element into $(-|m|/2, |m|/2]$, like FLINT's
   `_fmpz_vec_scalar_smod_fmpz`.
+- `NaturalVector::multi_crt` and `IntegerVector::multi_balanced_crt`, which combine one vector of
+  residues per word-sized modulus into the vector of canonical or balanced representatives by the
+  Chinese remainder theorem, doing the work that depends only on the moduli once. Like
+  `Natural::multi_crt`, they return `None` for unusable moduli and require reduced residues. This
+  is FLINT's `_fmpz_vec_multi_CRT_ui`.
 - `Content`, `PrimitivePart`, `PrimitivePartAssign`, `ContentAndPrimitivePart`, and their canonical
   counterparts for `NaturalVector` and `IntegerVector`; the canonical ones for `NaturalPolynomial`,
   `IntegerPolynomial`, and `GaussianInteger`; and `PrimitivePartAssign` for `GaussianInteger`.

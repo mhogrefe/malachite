@@ -7,16 +7,21 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{BalancedMod, BalancedModAssign};
+use malachite_base::num::basic::traits::{NegativeOne, One, Two};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::integer::Integer;
 use malachite_nz::test_util::bench::bucketers::pair_1_integer_vector_bit_bucketer;
-use malachite_nz::test_util::generators::integer_vector_integer_pair_gen_var_1;
+use malachite_nz::test_util::generators::{
+    integer_vector_gen, integer_vector_integer_pair_gen_var_1,
+};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_vector_balanced_mod);
     register_demo!(runner, demo_integer_vector_balanced_mod_ref);
     register_demo!(runner, demo_integer_vector_balanced_mod_assign);
+    register_demo!(runner, demo_integer_vector_balanced_mod_small_moduli);
 
     register_bench!(
         runner,
@@ -51,6 +56,14 @@ fn demo_integer_vector_balanced_mod_assign(gm: GenMode, config: &GenConfig, limi
         let v_old = v.clone();
         v.balanced_mod_assign(&m);
         println!("v := {v_old}; v.balanced_mod_assign({m}); v = {v}");
+    }
+}
+
+fn demo_integer_vector_balanced_mod_small_moduli(gm: GenMode, config: &GenConfig, limit: usize) {
+    for v in integer_vector_gen().get(gm, config).take(limit) {
+        for m in [Integer::ONE, Integer::NEGATIVE_ONE, Integer::TWO] {
+            println!("(&{v}).balanced_mod({m}) = {}", (&v).balanced_mod(&m));
+        }
     }
 }
 

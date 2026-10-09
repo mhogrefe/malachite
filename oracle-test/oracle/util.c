@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include <flint/fmpz_poly.h>
+#include <flint/fmpz_vec.h>
 
 #include "oracle.h"
 
@@ -399,6 +400,153 @@ split_polynomial_scalar_line(char * line, const char * method, const char * assi
         }
     }
     return 0;
+}
+
+fmpz *
+fmpz_vec_set_str_malachite(slong * len, const char * s)
+{
+    *len = 0;
+    if (*s != '(')
+    {
+        return NULL;
+    }
+    s++;
+    slong cap = 4;
+    fmpz * vec = _fmpz_vec_init(cap);
+    size_t n = strlen(s);
+    char * buf = flint_malloc(n + 1);
+    int ok = 1;
+    if (*s == ')')
+    {
+        s++;
+    }
+    else
+    {
+        while (1)
+        {
+            /* An optional minus sign, then digits with no leading zeros other than 0 itself. */
+            size_t sign = *s == '-';
+            size_t digits = strspn(s + sign, "0123456789");
+            if (digits == 0 || (digits > 1 && s[sign] == '0') || (sign && digits == 1
+                                                                   && s[1] == '0'))
+            {
+                ok = 0;
+                break;
+            }
+            memcpy(buf, s, sign + digits);
+            buf[sign + digits] = '\0';
+            if (*len == cap)
+            {
+                fmpz * bigger = _fmpz_vec_init(2 * cap);
+                _fmpz_vec_swap(bigger, vec, cap);
+                _fmpz_vec_clear(vec, cap);
+                vec = bigger;
+                cap *= 2;
+            }
+            fmpz_set_str(vec + *len, buf, 10);
+            (*len)++;
+            s += sign + digits;
+            if (*s == ')')
+            {
+                s++;
+                break;
+            }
+            if (strncmp(s, ", ", 2) != 0)
+            {
+                ok = 0;
+                break;
+            }
+            s += 2;
+        }
+    }
+    flint_free(buf);
+    if (!ok || *s != '\0')
+    {
+        _fmpz_vec_clear(vec, cap);
+        *len = 0;
+        return NULL;
+    }
+    /* The caller frees exactly `*len` entries, so shed the spare capacity. */
+    fmpz * result = _fmpz_vec_init(*len);
+    _fmpz_vec_swap(result, vec, *len);
+    _fmpz_vec_clear(vec, cap);
+    return result;
+}
+
+void
+fmpz_vec_print_malachite(const fmpz * vec, slong len)
+{
+    flint_printf("(");
+    for (slong i = 0; i < len; i++)
+    {
+        if (i != 0)
+        {
+            flint_printf(", ");
+        }
+        fmpz_print(vec + i);
+    }
+    flint_printf(")");
+}
+
+int
+split_vector_scalar_line(char * line, const char * method, const char * assign_method,
+                         char ** receiver, char ** arg, char ** result)
+{
+    line[strcspn(line, "\r\n")] = '\0';
+    char needle[64];
+    if (strncmp(line, "v := ", 5) == 0)
+    {
+        /* `v := V; v.assign_method(M); v = R` */
+        if (assign_method == NULL)
+        {
+            return 0;
+        }
+        snprintf(needle, sizeof(needle), "; v.%s(", assign_method);
+        if (strstr(line, needle) == NULL)
+        {
+            return 0;
+        }
+        *receiver = line + 5;
+        *arg = cut_after(line, needle);
+        *result = cut_after(*arg, "); v = ");
+        return *result != NULL;
+    }
+    if (method == NULL)
+    {
+        return 0;
+    }
+    /* `V.method(M) = R` or `(&V).method(M) = R`, where V is parenthesized and holds no other
+       parentheses. */
+    if (strncmp(line, "(&(", 3) == 0)
+    {
+        snprintf(needle, sizeof(needle), ")).%s(", method);
+        char * close = strstr(line, needle);
+        if (close == NULL)
+        {
+            return 0;
+        }
+        *receiver = line + 2;
+        close[1] = '\0';
+        *arg = close + strlen(needle);
+    }
+    else if (line[0] == '(')
+    {
+        snprintf(needle, sizeof(needle), ").%s(", method);
+        char * close = strstr(line, needle);
+        if (close == NULL)
+        {
+            return 0;
+        }
+        *receiver = line;
+        close[1] = '\0';
+        *arg = close + strlen(needle);
+    }
+    else
+    {
+        return 0;
+    }
+    *result = cut_after(*arg, ") = ");
+    return *result != NULL;
 }
 
 int

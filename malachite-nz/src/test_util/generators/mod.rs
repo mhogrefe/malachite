@@ -4108,6 +4108,18 @@ pub fn unsigned_vec_natural_pair_gen_var_1() -> Generator<(Vec<Limb>, Natural)> 
     )
 }
 
+// -- (Vec<PrimitiveUnsigned>, NaturalVector) --
+
+// All `(Vec<Limb>, NaturalVector)` where the `Limb`s are pairwise-coprime moduli that are at least
+// 2, so that the vector's elements can be reduced modulo them and combined again.
+pub fn unsigned_vec_natural_vector_pair_gen_var_1() -> Generator<(Vec<Limb>, NaturalVector)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_natural_vector_pair_gen_var_1,
+        &random_unsigned_vec_natural_vector_pair_gen_var_1,
+        &special_random_unsigned_vec_natural_vector_pair_gen_var_1,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // vars 1 through 3 are in malachite-base

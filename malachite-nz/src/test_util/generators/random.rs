@@ -8029,6 +8029,44 @@ pub fn random_unsigned_vec_natural_pair_gen_var_1(config: &GenConfig) -> It<(Vec
     )
 }
 
+pub fn random_unsigned_vec_natural_vector_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, NaturalVector)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &random_primitive_ints::<Limb>,
+                    config.get_or("mean_length_n", 6),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_natural_vectors(
+                    seed,
+                    config.get_or("mean_bits_n", 256),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+        )
+        .map(|(ms, v): (Vec<Limb>, NaturalVector)| {
+            let mut moduli = Vec::new();
+            for a in ms {
+                let m = a.max(2);
+                if moduli.iter().all(|&prev: &Limb| m.coprime_with(prev)) {
+                    moduli.push(m);
+                }
+            }
+            (moduli, v)
+        }),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // vars 1 through 7 are in malachite-base

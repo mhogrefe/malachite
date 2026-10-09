@@ -73,3 +73,6 @@ pub mod mod_power_of_2_sub;
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting vectors
 /// modulo a number.
 pub mod mod_sub;
+/// [`NaturalVector::multi_crt`](super::NaturalVector::multi_crt), which combines vectors of
+/// residues modulo many word-sized moduli by the Chinese remainder theorem.
+pub mod multi_crt;

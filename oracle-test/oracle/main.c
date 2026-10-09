@@ -155,6 +155,8 @@ static const oracle_mode modes[] = {
     {"fft_combine_bits", run_fft_combine_bits},
     {"fft_convolution", run_fft_convolution},
     {"_fmpz_vec_get_fft", run__fmpz_vec_get_fft},
+    {"_fmpz_vec_scalar_smod_fmpz", run__fmpz_vec_scalar_smod_fmpz},
+    {"_fmpz_vec_multi_CRT_ui", run__fmpz_vec_multi_CRT_ui},
     {"_fmpz_vec_set_fft", run__fmpz_vec_set_fft},
 };
 
