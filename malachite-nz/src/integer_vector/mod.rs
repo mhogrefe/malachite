@@ -281,6 +281,38 @@ impl Vector for IntegerVector {
             .resize(usize::exact_from(dimension), Integer::ZERO);
     }
 
+    /// Sets every element of an [`IntegerVector`] to zero, keeping its dimension.
+    ///
+    /// Afterwards the vector equals [`zero`](Vector::zero) of the same dimension.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let mut v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// v.set_zero();
+    /// assert_eq!(v.to_string(), "(0, 0, 0)");
+    ///
+    /// let mut v = IntegerVector::from_str("()").unwrap();
+    /// v.set_zero();
+    /// assert_eq!(v.to_string(), "()");
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_zero` from `fmpz_vec/zero.c`, FLINT 3.6.0.
+    #[inline]
+    fn set_zero(&mut self) {
+        self.elements.fill(Integer::ZERO);
+    }
+
     /// Returns an [`IntegerVector`]'s elements as a [`Vec`], cloning them.
     ///
     /// # Worst-case complexity

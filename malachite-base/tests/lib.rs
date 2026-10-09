@@ -1020,6 +1020,7 @@ pub mod unsigned_vector {
     pub mod push;
     pub mod select_coordinates;
     pub mod set_dimension;
+    pub mod set_zero;
     pub mod random {
         pub mod random_unsigned_vectors;
         pub mod random_unsigned_vectors_from_iterator;

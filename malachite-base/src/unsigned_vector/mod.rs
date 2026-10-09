@@ -267,6 +267,38 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
         self.elements.resize(usize::exact_from(dimension), T::ZERO);
     }
 
+    /// Sets every element of an [`UnsignedVector`] to zero, keeping its dimension.
+    ///
+    /// Afterwards the vector equals [`zero`](Vector::zero) of the same dimension.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// let mut v = UnsignedVector::<u8>::from_str("(1, 2, 3)").unwrap();
+    /// v.set_zero();
+    /// assert_eq!(v.to_string(), "(0, 0, 0)");
+    ///
+    /// let mut v = UnsignedVector::<u8>::from_str("()").unwrap();
+    /// v.set_zero();
+    /// assert_eq!(v.to_string(), "()");
+    /// ```
+    ///
+    /// This is equivalent to `_nmod_vec_zero` from `nmod_vec.h`, FLINT 3.6.0.
+    #[inline]
+    fn set_zero(&mut self) {
+        self.elements.fill(T::ZERO);
+    }
+
     /// Returns an [`UnsignedVector`]'s elements as a [`Vec`], cloning them.
     ///
     /// # Worst-case complexity

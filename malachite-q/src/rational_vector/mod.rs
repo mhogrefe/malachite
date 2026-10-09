@@ -289,6 +289,36 @@ impl Vector for RationalVector {
             .resize(usize::exact_from(dimension), Rational::ZERO);
     }
 
+    /// Sets every element of a [`RationalVector`] to zero, keeping its dimension.
+    ///
+    /// Afterwards the vector equals [`zero`](Vector::zero) of the same dimension.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_q::rational_vector::RationalVector;
+    ///
+    /// let mut v = RationalVector::from_str("(1/2, -2, 3)").unwrap();
+    /// v.set_zero();
+    /// assert_eq!(v.to_string(), "(0, 0, 0)");
+    ///
+    /// let mut v = RationalVector::from_str("()").unwrap();
+    /// v.set_zero();
+    /// assert_eq!(v.to_string(), "()");
+    /// ```
+    #[inline]
+    fn set_zero(&mut self) {
+        self.elements.fill(Rational::ZERO);
+    }
+
     /// Returns a [`RationalVector`]'s elements as a [`Vec`], cloning them.
     ///
     /// # Worst-case complexity

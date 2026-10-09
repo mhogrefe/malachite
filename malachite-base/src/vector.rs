@@ -56,6 +56,9 @@ pub trait Vector: Sized {
     /// smaller, and appending zeros if it is larger.
     fn set_dimension(&mut self, dimension: u64);
 
+    /// Sets every element of a vector to zero, keeping its dimension.
+    fn set_zero(&mut self);
+
     /// Returns a vector's elements as a [`Vec`], cloning them.
     fn to_elements(&self) -> Vec<Self::Element>
     where
