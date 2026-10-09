@@ -3485,6 +3485,13 @@ pub fn exhaustive_integer_vector_natural_pair_gen_var_1() -> It<(IntegerVector, 
     ))
 }
 
+pub fn exhaustive_integer_vector_integer_pair_gen_var_1() -> It<(IntegerVector, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_vectors(),
+        exhaustive_nonzero_integers(),
+    ))
+}
+
 pub fn exhaustive_integer_vector_unsigned_pair_gen<T: PrimitiveUnsigned>() -> It<(IntegerVector, T)>
 {
     Box::new(exhaustive_pairs(

@@ -346,6 +346,7 @@ pub mod integer_vector {
     pub mod access;
     pub mod arithmetic {
         pub mod add;
+        pub mod balanced_mod;
         pub mod canonical_primitive_part;
         pub mod canonicalize_sign;
         pub mod content;

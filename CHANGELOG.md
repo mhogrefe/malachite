@@ -180,6 +180,9 @@ documented by git history.
 - `BalancedMod` for `NaturalVector` with a `Natural` modulus, in every combination of value and
   reference, reducing every element into $(-m/2, m/2]$ and returning an `IntegerVector`, like
   `_fmpz_vec_set_nmod_vec`.
+- `BalancedMod` and `BalancedModAssign` for `IntegerVector` with an `Integer` modulus, in every
+  combination of value and reference, reducing every element into $(-|m|/2, |m|/2]$, like FLINT's
+  `_fmpz_vec_scalar_smod_fmpz`.
 - `Content`, `PrimitivePart`, `PrimitivePartAssign`, `ContentAndPrimitivePart`, and their canonical
   counterparts for `NaturalVector` and `IntegerVector`; the canonical ones for `NaturalPolynomial`,
   `IntegerPolynomial`, and `GaussianInteger`; and `PrimitivePartAssign` for `GaussianInteger`.

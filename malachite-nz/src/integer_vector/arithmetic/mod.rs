@@ -9,6 +9,10 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// vectors.
 pub mod add;
+/// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod) and
+/// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
+/// every element of a vector to the representative closest to zero modulo a number.
+pub mod balanced_mod;
 /// Implementations of [`CanonicalPrimitivePart`](
 /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart),
 /// [`CanonicalPrimitivePartAssign`](
