@@ -42,8 +42,9 @@ documented by git history.
 - A `Vector` trait in `malachite_base::vector`, for what every vector type has in common, as
   `Polynomial` is for the polynomial types. It has an `Element` associated type and the methods
   `from_elements`, `from_owned_elements`, `zero`, `standard_basis_vector`, `to_elements`,
-  `into_elements`, `elements_ref`, `dimension`, `pivot`, and `pivot_index`; the vector types
-  implement these through the trait, so calling them takes `use malachite_base::vector::Vector;`.
+  `into_elements`, `elements_ref`, `dimension`, `pivot`, `pivot_index`, and `push`; the vector
+  types implement these through the trait, so calling them takes
+  `use malachite_base::vector::Vector;`. `push` appends an element, like FLINT's `fmpz_vec_append`.
   `zero(dimension)` returns the zero vector of a given dimension, like FLINT's `fmpz_vec_init`, and
   `standard_basis_vector(dimension, index)` returns the vector with a 1 at `index` and 0
   elsewhere.
@@ -54,6 +55,9 @@ documented by git history.
   and `ShortlexUnsignedVectorRef` wrappers order vectors by dimension and then lexicographically.
   Generators: `exhaustive_unsigned_vectors`, `random_unsigned_vectors`, and
   `striped_random_unsigned_vectors`, each with a `_with_dimension` variant.
+- `IntoIterator` (by value, by reference, and by mutable reference), `FromIterator`, and `Extend`
+  for `UnsignedVector<T>`, so that a vector can be iterated over with `for`, collected from an
+  iterator, and extended by one.
 - `random_unsigned_vectors_from_iterator` and
   `random_unsigned_vectors_with_dimension_from_iterator`, which take the elements of
   `UnsignedVector<T>`s from any iterator, for example one with bounded elements. The other
@@ -98,6 +102,9 @@ documented by git history.
 - `NaturalVector` and `IntegerVector`, with the same API as `UnsignedVector<T>`: public
   `elements`, the `Vector` trait, `Index`, strings, LaTeX, Typst, serde, `Shortlex*` wrappers, and
   exhaustive, random, and striped random generators.
+- `IntoIterator` (by value, by reference, and by mutable reference), `FromIterator`, and `Extend`
+  for `NaturalVector` and `IntegerVector`, so that a vector can be iterated over with `for`,
+  collected from an iterator, and extended by one.
 - `random_natural_vectors_from_iterator`, `random_integer_vectors_from_iterator`, and their
   `_with_dimension_from_iterator` variants, which take the elements from any iterator, for example
   one with bounded elements. The other `NaturalVector` and `IntegerVector` generators are built on
@@ -148,6 +155,9 @@ documented by git history.
   `Rational` in lowest terms, as in FLINT's `fmpq_vec`, rather than over a common denominator.
   `to_numerators_and_denominator` gives the common-denominator form, with the least common
   multiple of the denominators, and `from_numerators_and_denominator` converts back.
+- `IntoIterator` (by value, by reference, and by mutable reference), `FromIterator`, and `Extend`
+  for `RationalVector`, so that a vector can be iterated over with `for`, collected from an
+  iterator, and extended by one.
 - `random_rational_vectors_from_iterator` and
   `random_rational_vectors_with_dimension_from_iterator`, which take the elements of
   `RationalVector`s from any iterator, for example one with bounded elements. The other

@@ -10,12 +10,16 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     from_elements::register(runner);
+    from_iterator::register(runner);
+    into_iterator::register(runner);
     serde::register(runner);
     string::register(runner);
     to_elements::register(runner);
 }
 
 mod from_elements;
+mod from_iterator;
+mod into_iterator;
 mod serde;
 mod string;
 mod to_elements;

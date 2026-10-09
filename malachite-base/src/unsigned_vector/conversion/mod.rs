@@ -8,4 +8,6 @@
 
 /// Functions for converting an [`UnsignedVector`](super::UnsignedVector) to and from a
 /// [`String`](alloc::string::String).
+pub mod from_iterator;
+pub mod into_iterator;
 pub mod string;

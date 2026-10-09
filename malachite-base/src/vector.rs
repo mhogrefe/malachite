@@ -46,6 +46,9 @@ pub trait Vector: Sized {
     /// 1 and whose other elements are 0.
     fn standard_basis_vector(dimension: u64, index: u64) -> Self;
 
+    /// Appends an element to the end of a vector, increasing its dimension by 1.
+    fn push(&mut self, x: Self::Element);
+
     /// Returns a vector's elements as a [`Vec`], cloning them.
     fn to_elements(&self) -> Vec<Self::Element>
     where

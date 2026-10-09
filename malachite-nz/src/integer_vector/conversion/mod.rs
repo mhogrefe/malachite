@@ -9,6 +9,7 @@
 /// Implementations of traits for converting a
 /// [`NaturalVector`](crate::natural_vector::NaturalVector) to an
 /// [`IntegerVector`](super::IntegerVector).
+pub mod from_iterator;
 pub mod from_natural_vector;
 /// Implementations of traits for converting an
 /// [`UnsignedVector`](malachite_base::unsigned_vector::UnsignedVector) to an
@@ -67,6 +68,7 @@ pub mod from_unsigned_vector;
 ///     true
 /// );
 /// ```
+pub mod into_iterator;
 pub mod natural_vector_from_integer_vector;
 /// Functions for converting an [`IntegerVector`](super::IntegerVector) to and from a [`String`].
 pub mod string;

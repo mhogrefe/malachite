@@ -27,6 +27,9 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`NaturalVector`]s without repetition.
 pub mod exhaustive;
+/// An implementation of [`Extend`], for appending the elements produced by an iterator to a
+/// [`NaturalVector`].
+pub mod extend;
 /// Iterators that generate [`NaturalVector`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
@@ -196,6 +199,40 @@ impl Vector for NaturalVector {
         let mut v = Self::zero(dimension);
         v.elements[usize::exact_from(index)] = Natural::ONE;
         v
+    }
+
+    /// Appends an element to the end of a [`NaturalVector`], increasing its dimension by 1.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`. The capacity
+    /// grows geometrically, so pushing $n$ elements onto an empty vector takes $O(n)$ time in
+    /// total.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::vector::Vector;
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// let mut v = NaturalVector::from_str("(1, 2)").unwrap();
+    /// v.push(Natural::from(3u32));
+    /// assert_eq!(v.to_string(), "(1, 2, 3)");
+    ///
+    /// let mut v = NaturalVector::zero(0);
+    /// v.push(Natural::from(5u32));
+    /// assert_eq!(v.to_string(), "(5)");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_vec_append` from `fmpz_vec/vec.c`, FLINT 3.6.0, with an element
+    /// that is never negative.
+    #[inline]
+    fn push(&mut self, x: Natural) {
+        self.elements.push(x);
     }
 
     /// Returns a [`NaturalVector`]'s elements as a [`Vec`], cloning them.

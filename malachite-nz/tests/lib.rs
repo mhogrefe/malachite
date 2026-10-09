@@ -368,8 +368,10 @@ pub mod integer_vector {
     }
     pub mod conversion {
         pub mod from_elements;
+        pub mod from_iterator;
         pub mod from_natural_vector;
         pub mod from_unsigned_vector;
+        pub mod into_iterator;
         pub mod natural_vector_from_integer_vector;
         #[cfg(feature = "serde")]
         pub mod serde;
@@ -386,7 +388,9 @@ pub mod integer_vector {
     pub mod exhaustive {
         pub mod exhaustive_integer_vectors;
     }
+    pub mod extend;
     pub mod pivot;
+    pub mod push;
     pub mod random {
         pub mod random_integer_vectors;
         pub mod random_integer_vectors_from_iterator;
@@ -873,8 +877,10 @@ pub mod natural_vector {
     }
     pub mod conversion {
         pub mod from_elements;
+        pub mod from_iterator;
         pub mod from_unsigned_vector;
         #[cfg(feature = "serde")]
+        pub mod into_iterator;
         pub mod serde;
         pub mod string {
             pub mod from_string;
@@ -889,7 +895,9 @@ pub mod natural_vector {
     pub mod exhaustive {
         pub mod exhaustive_natural_vectors;
     }
+    pub mod extend;
     pub mod pivot;
+    pub mod push;
     pub mod random {
         pub mod random_natural_vectors;
         pub mod random_natural_vectors_from_iterator;

@@ -27,6 +27,9 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`UnsignedVector`]s without repetition.
 pub mod exhaustive;
+/// An implementation of [`Extend`], for appending the elements produced by an iterator to an
+/// [`UnsignedVector`].
+pub mod extend;
 #[cfg(feature = "random")]
 /// Iterators that generate [`UnsignedVector`]s randomly.
 pub mod random;
@@ -189,6 +192,36 @@ impl<T: PrimitiveUnsigned> Vector for UnsignedVector<T> {
         let mut v = Self::zero(dimension);
         v.elements[usize::exact_from(index)] = T::ONE;
         v
+    }
+
+    /// Appends an element to the end of an [`UnsignedVector`], increasing its dimension by 1.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.dimension()`. The capacity
+    /// grows geometrically, so pushing $n$ elements onto an empty vector takes $O(n)$ time in
+    /// total.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_base::vector::Vector;
+    ///
+    /// let mut v = UnsignedVector::<u8>::from_str("(1, 2)").unwrap();
+    /// v.push(3);
+    /// assert_eq!(v.to_string(), "(1, 2, 3)");
+    ///
+    /// let mut v = UnsignedVector::<u8>::zero(0);
+    /// v.push(5);
+    /// assert_eq!(v.to_string(), "(5)");
+    /// ```
+    #[inline]
+    fn push(&mut self, x: T) {
+        self.elements.push(x);
     }
 
     /// Returns an [`UnsignedVector`]'s elements as a [`Vec`], cloning them.

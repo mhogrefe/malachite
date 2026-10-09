@@ -13,6 +13,7 @@ pub mod from_integer_vector;
 /// Implementations of traits for converting a
 /// [`NaturalVector`](malachite_nz::natural_vector::NaturalVector) to a
 /// [`RationalVector`](super::RationalVector).
+pub mod from_iterator;
 pub mod from_natural_vector;
 /// A function for building a [`RationalVector`](super::RationalVector) from a vector of numerators
 /// and a single denominator.
@@ -106,6 +107,7 @@ pub mod integer_vector_from_rational_vector;
 ///     true
 /// );
 /// ```
+pub mod into_iterator;
 pub mod natural_vector_from_rational_vector;
 /// Functions for converting a [`RationalVector`](super::RationalVector) to and from a [`String`].
 pub mod string;

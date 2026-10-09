@@ -9,8 +9,10 @@
 /// Implementations of traits for converting an
 /// [`UnsignedVector`](malachite_base::unsigned_vector::UnsignedVector) to a
 /// [`NaturalVector`](super::NaturalVector).
+pub mod from_iterator;
 pub mod from_unsigned_vector;
 /// Functions for converting a [`NaturalVector`](super::NaturalVector) to and from a [`String`].
+pub mod into_iterator;
 pub mod string;
 /// Implementations of traits for converting a [`NaturalVector`](super::NaturalVector) to an
 /// [`UnsignedVector`](malachite_base::unsigned_vector::UnsignedVector).

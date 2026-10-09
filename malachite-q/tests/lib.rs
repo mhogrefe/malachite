@@ -439,10 +439,12 @@ pub mod rational_vector {
     pub mod conversion {
         pub mod from_elements;
         pub mod from_integer_vector;
+        pub mod from_iterator;
         pub mod from_natural_vector;
         pub mod from_numerators_and_denominator;
         pub mod from_unsigned_vector;
         pub mod integer_vector_from_rational_vector;
+        pub mod into_iterator;
         pub mod natural_vector_from_rational_vector;
         #[cfg(feature = "serde")]
         pub mod serde;
@@ -460,7 +462,9 @@ pub mod rational_vector {
     pub mod exhaustive {
         pub mod exhaustive_rational_vectors;
     }
+    pub mod extend;
     pub mod pivot;
+    pub mod push;
     pub mod random {
         pub mod random_rational_vectors;
         pub mod random_rational_vectors_from_iterator;

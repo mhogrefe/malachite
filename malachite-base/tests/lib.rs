@@ -991,6 +991,8 @@ pub mod unsigned_vector {
     pub mod conversion {
         pub mod from_elements;
         #[cfg(feature = "serde")]
+        pub mod from_iterator;
+        pub mod into_iterator;
         pub mod serde;
         pub mod string {
             pub mod from_string;
@@ -1004,7 +1006,9 @@ pub mod unsigned_vector {
     pub mod exhaustive {
         pub mod exhaustive_unsigned_vectors;
     }
+    pub mod extend;
     pub mod pivot;
+    pub mod push;
     pub mod random {
         pub mod random_unsigned_vectors;
         pub mod random_unsigned_vectors_from_iterator;
