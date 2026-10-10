@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod add;
+pub mod add_mul_shl;
 pub mod binomial_coefficient;
 pub mod checked_sub;
 pub mod crt;

@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     abs_diff::register(runner);
     add::register(runner);
     add_mul::register(runner);
+    add_mul_shl::register(runner);
     average::register(runner);
     balanced_mod_power_of_2::register(runner);
     bell_number::register(runner);
@@ -118,6 +119,7 @@ mod abs_diff;
 mod abs_squared;
 mod add;
 mod add_mul;
+mod add_mul_shl;
 mod average;
 mod balanced_mod_power_of_2;
 mod bell_number;

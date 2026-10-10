@@ -442,6 +442,7 @@ pub mod natural {
         pub mod abs_squared;
         pub mod add;
         pub mod add_mul;
+        pub mod add_mul_shl;
         pub mod average;
         pub mod balanced_mod_power_of_2;
         pub mod bell_number;

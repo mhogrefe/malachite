@@ -347,6 +347,8 @@ documented by git history.
 - `AddMulShl`, `AddMulShlAssign`, `SubMulShl`, and `SubMulShlAssign` for `Integer`, taking the
   arguments in every combination of value and reference (with a borrowed receiver, all of them by
   reference).
+- `AddMulShl` and `AddMulShlAssign` for `Natural`, taking the arguments in every combination of
+  value and reference (with a borrowed receiver, all of them by reference).
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `Natural`, taking the
   arguments in every combination of value and reference (with a borrowed receiver, all of them by
   reference); moduli that fit in a limb use the primitive implementation.
