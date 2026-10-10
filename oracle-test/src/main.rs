@@ -1003,10 +1003,7 @@ const AZURITE_MOD_POWER_OF_2_STAGES: &[(&str, &str)] = &[
         "az_zmod_pow2_inverse",
     ),
     ("demo_natural_mod_power_of_2_sqrt", "az_zmod_pow2_sqrt"),
-    (
-        "demo_natural_mod_power_of_2_sqrt_ref",
-        "az_zmod_pow2_sqrt",
-    ),
+    ("demo_natural_mod_power_of_2_sqrt_ref", "az_zmod_pow2_sqrt"),
     (
         "demo_natural_mod_power_of_2_shl_unsigned_u8",
         "az_zmod_pow2_shl",
@@ -1854,6 +1851,17 @@ fn test_against_azurite() {
     }
     for (demo, mode) in AZURITE_MOD_POWER_OF_2_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
+    }
+    // The primitive unsigned mod_power_of_2_sqrt, read by the same mode as the Natural one.
+    for demo in [
+        "demo_mod_power_of_2_sqrt_u8",
+        "demo_mod_power_of_2_sqrt_u16",
+        "demo_mod_power_of_2_sqrt_u32",
+        "demo_mod_power_of_2_sqrt_u64",
+        "demo_mod_power_of_2_sqrt_u128",
+        "demo_mod_power_of_2_sqrt_usize",
+    ] {
+        check_demo_against_azurite(&oracle, "../malachite-base", demo, "az_zmod_pow2_sqrt");
     }
     for (demo, mode) in AZURITE_MOD_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);

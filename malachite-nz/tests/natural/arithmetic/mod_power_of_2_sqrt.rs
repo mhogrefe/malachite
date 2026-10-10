@@ -11,7 +11,10 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::test_util::generators::unsigned_pair_gen_var_17;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::mod_power_of_2_sqrt::mod_power_of_2_sqrt_natural;
+use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
     natural_unsigned_pair_gen_var_11, natural_unsigned_pair_gen_var_15,
 };
@@ -24,6 +27,7 @@ fn test_mod_power_of_2_sqrt() {
         let x = Natural::from_str(x).unwrap();
         let out = out.map(|s| Natural::from_str(s).unwrap());
         assert_eq!((&x).mod_power_of_2_sqrt(pow), out);
+        assert_eq!(mod_power_of_2_sqrt_natural(&x, pow), out);
         assert_eq!(x.mod_power_of_2_sqrt(pow), out);
     };
     // - x == 0
@@ -93,6 +97,8 @@ fn mod_power_of_2_sqrt_properties() {
     natural_unsigned_pair_gen_var_11().test_properties(|(x, pow)| {
         let root = (&x).mod_power_of_2_sqrt(pow);
         assert_eq!(x.clone().mod_power_of_2_sqrt(pow), root);
+        // The Limb path, taken for powers up to Limb::WIDTH, agrees with the general path.
+        assert_eq!(mod_power_of_2_sqrt_natural(&x, pow), root);
         // A root exists exactly when x is 0 or 4 ^ w times a number that is 1 mod 8.
         let is_square = x
             .trailing_zeros()
@@ -122,9 +128,16 @@ fn mod_power_of_2_sqrt_properties() {
     });
 
     natural_unsigned_pair_gen_var_15().test_properties(|(x, pow)| {
+        let root = mod_power_of_2_sqrt_naive(&x, pow);
+        assert_eq!((&x).mod_power_of_2_sqrt(pow), root);
+        assert_eq!(mod_power_of_2_sqrt_natural(&x, pow), root);
+    });
+
+    unsigned_pair_gen_var_17::<Limb>().test_properties(|(x, pow)| {
+        // The general path finds the same root as the Limb implementation.
         assert_eq!(
-            (&x).mod_power_of_2_sqrt(pow),
-            mod_power_of_2_sqrt_naive(&x, pow)
+            mod_power_of_2_sqrt_natural(&Natural::from(x), pow),
+            x.mod_power_of_2_sqrt(pow).map(Natural::from)
         );
     });
 

@@ -2569,6 +2569,26 @@ pub mod mod_power_of_2_shl;
 /// assert_eq!(n, 16);
 /// ```
 pub mod mod_power_of_2_shr;
+/// [`ModPowerOf2Sqrt`](traits::ModPowerOf2Sqrt), a trait for finding the least square root of a
+/// number modulo $2^k$.
+///
+/// # mod_power_of_2_sqrt
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Sqrt;
+///
+/// // The roots of 17 modulo 32 are 7, 9, 23, and 25.
+/// assert_eq!(17u8.mod_power_of_2_sqrt(5), Some(7));
+/// assert_eq!(17u64.mod_power_of_2_sqrt(64), Some(405959429219100393));
+/// assert_eq!(
+///     (17u64 << 20).mod_power_of_2_sqrt(64),
+///     Some(2195515552539648)
+/// );
+/// // 3 is not 1 mod 8, and 8 = 2 ^ 3 has an odd power of 2.
+/// assert_eq!(3u16.mod_power_of_2_sqrt(4), None);
+/// assert_eq!(8u32.mod_power_of_2_sqrt(4), None);
+/// assert_eq!(0u128.mod_power_of_2_sqrt(10), Some(0));
+/// ```
+pub mod mod_power_of_2_sqrt;
 /// [`ModPowerOf2Square`](traits::ModPowerOf2Square) and
 /// [`ModPowerOf2SquareAssign`](traits::ModPowerOf2SquareAssign), traits for squaring a number
 /// modulo $2^k$.

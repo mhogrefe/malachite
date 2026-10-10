@@ -19,8 +19,8 @@ use crate::num::arithmetic::traits::{
     ModPowerOf2AddAssign, ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul,
     ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
     ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
-    ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
-    ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
+    ModPowerOf2ShrAssign, ModPowerOf2Sqrt, ModPowerOf2Square, ModPowerOf2SquareAssign,
+    ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
     ModSquarePrecomputedAssign, ModSub, ModSubAssign, Multifactorial, NegMod, NegModAssign,
     NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, Primorial,
     RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, UnsignedAbs, XMulYToZZ,
@@ -147,6 +147,7 @@ pub trait PrimitiveUnsigned:
     + ModPowerOf2ShrAssign<i64>
     + ModPowerOf2ShrAssign<i128>
     + ModPowerOf2ShrAssign<isize>
+    + ModPowerOf2Sqrt<Output = Self>
     + ModPowerOf2Square<Output = Self>
     + ModPowerOf2SquareAssign
     + ModPowerOf2Sub<Self, Output = Self>

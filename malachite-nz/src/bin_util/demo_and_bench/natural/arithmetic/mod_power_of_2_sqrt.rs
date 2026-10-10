@@ -11,6 +11,7 @@ use malachite_base::test_util::bench::bucketers::pair_2_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::arithmetic::mod_power_of_2_sqrt::mod_power_of_2_sqrt_natural;
 use malachite_nz::test_util::generators::{
     natural_unsigned_pair_gen_var_11, natural_unsigned_pair_gen_var_15,
 };
@@ -98,6 +99,9 @@ fn benchmark_natural_mod_power_of_2_sqrt_algorithms(
         &mut [
             ("default", &mut |(n, pow)| {
                 no_out!(n.mod_power_of_2_sqrt(pow));
+            }),
+            ("Natural algorithm", &mut |(n, pow)| {
+                no_out!(mod_power_of_2_sqrt_natural(&n, pow));
             }),
             ("naive", &mut |(n, pow)| {
                 no_out!(mod_power_of_2_sqrt_naive(&n, pow));

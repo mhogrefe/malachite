@@ -37,6 +37,9 @@ documented by git history.
   output, and `PrimitiveSigned` requires `BalancedModPowerOf2<Output = Self>` and
   `BalancedModPowerOf2Assign`, as they already required `BalancedMod`. A type outside Malachite that
   implements these traits must now implement the new ones too.
+- `PrimitiveUnsigned` now requires `ModPowerOf2Sqrt<Output = Self>`, as it already required
+  `ModPowerOf2Inverse`. A type outside Malachite that implements `PrimitiveUnsigned` must now
+  implement it too.
 
 ### malachite-base
 
@@ -144,7 +147,8 @@ documented by git history.
   entry of a vector and rounding each according to a `RoundingMode`. Unlike `ShlRound` and
   `ShrRound`, they return no `Ordering`, since entries may round in different directions.
 - `ModPowerOf2Sqrt` trait in `malachite_base::num::arithmetic::traits`, for the least square root
-  of a number modulo $2^k$.
+  of a number modulo $2^k$, implemented for every primitive unsigned type by 2-adic Newton
+  iteration on the odd part, following Azurite's `AzZModPow2.sqrt?`.
 - `EntrywiseDivRound` and `EntrywiseDivRoundAssign` traits in
   `malachite_base::num::arithmetic::traits`, for dividing every entry of a value, such as a vector,
   by a scalar and rounding each quotient according to a `RoundingMode`. Unlike `DivRound`, they
@@ -298,7 +302,7 @@ documented by git history.
   `Natural`, toward zero for `Integer`), like FLINT's `_fmpz_vec_scalar_tdiv_q_fmpz`.
 - `ModPowerOf2Sqrt` for `Natural`, by value and by reference: the least square root modulo $2^k$,
   or `None` for a non-square, by 2-adic Newton iteration on the odd part, following Azurite's
-  `AzZModPow2.sqrt?`.
+  `AzZModPow2.sqrt?`; powers up to the limb width use the primitive implementation.
 - `EntrywiseDivRound` and `EntrywiseDivRoundAssign` of `NaturalVector` by `Natural` and of
   `IntegerVector` by `Integer`, in every combination of value and reference, rounding every quotient
   according to a `RoundingMode`; with `Floor`, this is FLINT's `_fmpz_vec_scalar_fdiv_q_fmpz`.

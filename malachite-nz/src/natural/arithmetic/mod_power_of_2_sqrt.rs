@@ -7,11 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
+use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Mul,
     ModPowerOf2Neg, ModPowerOf2Sqrt, ModPowerOf2Square, ModPowerOf2Sub, Parity, PowerOf2,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 // Returns a square root of `u` modulo `2 ^ n`, where `u` is reduced modulo `2 ^ n` and `u ≡ 1 mod
@@ -44,12 +47,11 @@ fn odd_mod_power_of_2_sqrt(u: &Natural, n: u64) -> Natural {
 // of `u` modulo `2 ^ n` are `±s` and `±s + 2 ^ (n - 1)` for any one root `s`, so the least root
 // of `a` is `2 ^ w` times the least of those four residues that squares to `u` modulo `2 ^ n`.
 //
+// The input must be reduced modulo `2 ^ pow`. This is the general path, used when `pow` is greater
+// than `Limb::WIDTH`; for smaller powers, `mod_power_of_2_sqrt_ref` uses the `Limb` implementation.
+//
 // This is equivalent to `AzZModPow2.sqrt?` from `Azurite/AzZModPow2/Sqrt.lean`, Azurite.
-fn mod_power_of_2_sqrt_ref(a: &Natural, pow: u64) -> Option<Natural> {
-    assert!(
-        a.significant_bits() <= pow,
-        "self must be reduced mod 2^pow, but {a} >= 2^{pow}"
-    );
+crate_test_fn! {mod_power_of_2_sqrt_natural(a: &Natural, pow: u64) -> Option<Natural> {
     let Some(v) = a.trailing_zeros() else {
         return Some(Natural::ZERO);
     };
@@ -74,6 +76,21 @@ fn mod_power_of_2_sqrt_ref(a: &Natural, pow: u64) -> Option<Natural> {
         .min()
         .unwrap();
     Some(least << (v >> 1))
+}}
+
+fn mod_power_of_2_sqrt_ref(a: &Natural, pow: u64) -> Option<Natural> {
+    assert!(
+        a.significant_bits() <= pow,
+        "self must be reduced mod 2^pow, but {a} >= 2^{pow}"
+    );
+    if pow <= Limb::WIDTH {
+        // A reduced `a` fits in a limb.
+        Limb::exact_from(a)
+            .mod_power_of_2_sqrt(pow)
+            .map(Natural::from)
+    } else {
+        mod_power_of_2_sqrt_natural(a, pow)
+    }
 }
 
 impl ModPowerOf2Sqrt for Natural {
