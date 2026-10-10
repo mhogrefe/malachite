@@ -66,6 +66,15 @@ pub mod scalar_mul;
 ///     (&RationalVector::from_str("(1/8, 0)").unwrap() << 100u64).to_string(),
 ///     "(158456325028528675187087900672, 0)"
 /// );
+///
+/// assert_eq!(
+///     (RationalVector::from_str("(1/2, -3/4, 3)").unwrap() << 2i8).to_string(),
+///     "(2, -3, 12)"
+/// );
+/// assert_eq!(
+///     (&RationalVector::from_str("(1/2, -3/4, 3)").unwrap() << -2i64).to_string(),
+///     "(1/8, -3/16, 3/4)"
+/// );
 /// ```
 ///
 /// # shl_assign
@@ -76,8 +85,61 @@ pub mod scalar_mul;
 /// let mut v = RationalVector::from_str("(1/2, -3/4, 3)").unwrap();
 /// v <<= 2u32;
 /// assert_eq!(v.to_string(), "(2, -3, 12)");
+///
+/// let mut v = RationalVector::from_str("(1/2, -3/4, 3)").unwrap();
+/// v <<= -2i32;
+/// assert_eq!(v.to_string(), "(1/8, -3/16, 3/4)");
 /// ```
 pub mod shl;
+/// Right-shifting a vector (dividing it by a power of 2), by implementations of
+/// [`Shr`](core::ops::Shr) and [`ShrAssign`](core::ops::ShrAssign).
+///
+/// # shr
+/// ```
+/// use core::str::FromStr;
+/// use malachite_q::rational_vector::RationalVector;
+///
+/// assert_eq!(
+///     (RationalVector::from_str("()").unwrap() >> 10u8).to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     (RationalVector::from_str("(1/2, -3/4, 3)").unwrap() >> 0u16).to_string(),
+///     "(1/2, -3/4, 3)"
+/// );
+/// assert_eq!(
+///     (RationalVector::from_str("(1/2, -3/4, 3)").unwrap() >> 2u32).to_string(),
+///     "(1/8, -3/16, 3/4)"
+/// );
+/// assert_eq!(
+///     (&RationalVector::from_str("(12, 0)").unwrap() >> 100u64).to_string(),
+///     "(3/316912650057057350374175801344, 0)"
+/// );
+///
+/// assert_eq!(
+///     (RationalVector::from_str("(1/2, -3/4, 3)").unwrap() >> 2i8).to_string(),
+///     "(1/8, -3/16, 3/4)"
+/// );
+/// assert_eq!(
+///     (&RationalVector::from_str("(1/2, -3/4, 3)").unwrap() >> -2i64).to_string(),
+///     "(2, -3, 12)"
+/// );
+/// ```
+///
+/// # shr_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_q::rational_vector::RationalVector;
+///
+/// let mut v = RationalVector::from_str("(1/2, -3/4, 3)").unwrap();
+/// v >>= 2u32;
+/// assert_eq!(v.to_string(), "(1/8, -3/16, 3/4)");
+///
+/// let mut v = RationalVector::from_str("(1/2, -3/4, 3)").unwrap();
+/// v >>= -2i32;
+/// assert_eq!(v.to_string(), "(2, -3, 12)");
+/// ```
+pub mod shr;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting vectors.
 pub mod sub;

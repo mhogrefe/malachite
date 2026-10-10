@@ -1006,6 +1006,14 @@ pub fn exhaustive_rational_vector_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn exhaustive_rational_vector_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> It<(RationalVector, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_rational_vectors(),
+        exhaustive_signeds(),
+    ))
+}
+
 pub fn exhaustive_rational_vector_integer_vector_pair_gen() -> It<(RationalVector, IntegerVector)> {
     Box::new(exhaustive_pairs(
         exhaustive_rational_vectors(),

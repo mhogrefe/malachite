@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::ops::{Shl, ShlAssign};
+use core::ops::{Shr, ShrAssign};
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -22,84 +22,84 @@ use malachite_q::test_util::generators::{
 };
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_rational_vector_shl_unsigned);
-    register_unsigned_demos!(runner, demo_rational_vector_shl_unsigned_ref);
-    register_unsigned_demos!(runner, demo_rational_vector_shl_assign_unsigned);
-    register_signed_demos!(runner, demo_rational_vector_shl_signed);
-    register_signed_demos!(runner, demo_rational_vector_shl_signed_ref);
-    register_signed_demos!(runner, demo_rational_vector_shl_assign_signed);
+    register_unsigned_demos!(runner, demo_rational_vector_shr_unsigned);
+    register_unsigned_demos!(runner, demo_rational_vector_shr_unsigned_ref);
+    register_unsigned_demos!(runner, demo_rational_vector_shr_assign_unsigned);
+    register_signed_demos!(runner, demo_rational_vector_shr_signed);
+    register_signed_demos!(runner, demo_rational_vector_shr_signed_ref);
+    register_signed_demos!(runner, demo_rational_vector_shr_assign_signed);
 
     register_unsigned_benches!(
         runner,
-        benchmark_rational_vector_shl_unsigned_evaluation_strategy
+        benchmark_rational_vector_shr_unsigned_evaluation_strategy
     );
-    register_unsigned_benches!(runner, benchmark_rational_vector_shl_unsigned_algorithms);
+    register_unsigned_benches!(runner, benchmark_rational_vector_shr_unsigned_algorithms);
     register_signed_benches!(
         runner,
-        benchmark_rational_vector_shl_signed_evaluation_strategy
+        benchmark_rational_vector_shr_signed_evaluation_strategy
     );
-    register_signed_benches!(runner, benchmark_rational_vector_shl_signed_algorithms);
+    register_signed_benches!(runner, benchmark_rational_vector_shr_signed_algorithms);
 }
 
-fn demo_rational_vector_shl_unsigned<T: PrimitiveUnsigned>(
+fn demo_rational_vector_shr_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
 ) where
-    RationalVector: Shl<T, Output = RationalVector>,
+    RationalVector: Shr<T, Output = RationalVector>,
 {
     for (v, bits) in rational_vector_unsigned_pair_gen_var_2::<T>()
         .get(gm, config)
         .take(limit)
     {
         let v_old = v.clone();
-        println!("{v_old} << {bits} = {}", v << bits);
+        println!("{v_old} >> {bits} = {}", v >> bits);
     }
 }
 
-fn demo_rational_vector_shl_unsigned_ref<T: PrimitiveUnsigned>(
+fn demo_rational_vector_shr_unsigned_ref<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a RationalVector: Shl<T, Output = RationalVector>,
+    for<'a> &'a RationalVector: Shr<T, Output = RationalVector>,
 {
     for (v, bits) in rational_vector_unsigned_pair_gen_var_2::<T>()
         .get(gm, config)
         .take(limit)
     {
-        println!("&{v} << {bits} = {}", &v << bits);
+        println!("&{v} >> {bits} = {}", &v >> bits);
     }
 }
 
-fn demo_rational_vector_shl_assign_unsigned<T: PrimitiveUnsigned>(
+fn demo_rational_vector_shr_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
 ) where
-    RationalVector: ShlAssign<T>,
+    RationalVector: ShrAssign<T>,
 {
     for (mut v, bits) in rational_vector_unsigned_pair_gen_var_2::<T>()
         .get(gm, config)
         .take(limit)
     {
         let v_old = v.clone();
-        v <<= bits;
-        println!("v := {v_old}; v <<= {bits}; v = {v}");
+        v >>= bits;
+        println!("v := {v_old}; v >>= {bits}; v = {v}");
     }
 }
 
-fn benchmark_rational_vector_shl_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
+fn benchmark_rational_vector_shr_unsigned_evaluation_strategy<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    RationalVector: Shl<T, Output = RationalVector> + ShlAssign<T>,
-    for<'a> &'a RationalVector: Shl<T, Output = RationalVector>,
+    RationalVector: Shr<T, Output = RationalVector> + ShrAssign<T>,
+    for<'a> &'a RationalVector: Shr<T, Output = RationalVector>,
 {
     run_benchmark(
-        &format!("RationalVector << {}", T::NAME),
+        &format!("RationalVector >> {}", T::NAME),
         BenchmarkType::EvaluationStrategy,
         rational_vector_unsigned_pair_gen_var_2::<T>().get(gm, config),
         gm.name(),
@@ -107,30 +107,30 @@ fn benchmark_rational_vector_shl_unsigned_evaluation_strategy<T: PrimitiveUnsign
         file_name,
         &pair_1_rational_vector_bit_bucketer("v"),
         &mut [
-            ("RationalVector << T", &mut |(v, bits)| {
-                no_out!(v << bits);
+            ("RationalVector >> T", &mut |(v, bits)| {
+                no_out!(v >> bits);
             }),
-            ("&RationalVector << T", &mut |(v, bits)| {
-                no_out!(&v << bits);
+            ("&RationalVector >> T", &mut |(v, bits)| {
+                no_out!(&v >> bits);
             }),
-            ("RationalVector <<= T", &mut |(mut v, bits)| {
-                v <<= bits;
+            ("RationalVector >>= T", &mut |(mut v, bits)| {
+                v >>= bits;
             }),
         ],
     );
 }
 
-fn benchmark_rational_vector_shl_unsigned_algorithms<T: PrimitiveUnsigned>(
+fn benchmark_rational_vector_shr_unsigned_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    RationalVector: Shl<T, Output = RationalVector>,
-    u64: ExactFrom<T>,
+    RationalVector: Shr<T, Output = RationalVector>,
+    i64: ExactFrom<T>,
 {
     run_benchmark(
-        &format!("RationalVector << {}", T::NAME),
+        &format!("RationalVector >> {}", T::NAME),
         BenchmarkType::Algorithms,
         rational_vector_unsigned_pair_gen_var_2::<T>().get(gm, config),
         gm.name(),
@@ -139,74 +139,74 @@ fn benchmark_rational_vector_shl_unsigned_algorithms<T: PrimitiveUnsigned>(
         &pair_1_rational_vector_bit_bucketer("v"),
         &mut [
             ("default", &mut |(v, bits)| {
-                no_out!(v << bits);
+                no_out!(v >> bits);
             }),
-            ("multiplying by a power of 2", &mut |(v, bits)| {
-                no_out!(v * Rational::power_of_2(u64::exact_from(bits)));
+            ("dividing by a power of 2", &mut |(v, bits)| {
+                no_out!(v * Rational::power_of_2(-i64::exact_from(bits)));
             }),
         ],
     );
 }
 
-fn demo_rational_vector_shl_signed<T: PrimitiveSigned>(
+fn demo_rational_vector_shr_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
 ) where
-    RationalVector: Shl<T, Output = RationalVector>,
+    RationalVector: Shr<T, Output = RationalVector>,
 {
     for (v, bits) in rational_vector_signed_pair_gen_var_1::<T>()
         .get(gm, config)
         .take(limit)
     {
         let v_old = v.clone();
-        println!("{v_old} << {bits} = {}", v << bits);
+        println!("{v_old} >> {bits} = {}", v >> bits);
     }
 }
 
-fn demo_rational_vector_shl_signed_ref<T: PrimitiveSigned>(
+fn demo_rational_vector_shr_signed_ref<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
 ) where
-    for<'a> &'a RationalVector: Shl<T, Output = RationalVector>,
+    for<'a> &'a RationalVector: Shr<T, Output = RationalVector>,
 {
     for (v, bits) in rational_vector_signed_pair_gen_var_1::<T>()
         .get(gm, config)
         .take(limit)
     {
-        println!("&{v} << {bits} = {}", &v << bits);
+        println!("&{v} >> {bits} = {}", &v >> bits);
     }
 }
 
-fn demo_rational_vector_shl_assign_signed<T: PrimitiveSigned>(
+fn demo_rational_vector_shr_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
 ) where
-    RationalVector: ShlAssign<T>,
+    RationalVector: ShrAssign<T>,
 {
     for (mut v, bits) in rational_vector_signed_pair_gen_var_1::<T>()
         .get(gm, config)
         .take(limit)
     {
         let v_old = v.clone();
-        v <<= bits;
-        println!("v := {v_old}; v <<= {bits}; v = {v}");
+        v >>= bits;
+        println!("v := {v_old}; v >>= {bits}; v = {v}");
     }
 }
 
-fn benchmark_rational_vector_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
+fn benchmark_rational_vector_shr_signed_evaluation_strategy<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    RationalVector: Shl<T, Output = RationalVector> + ShlAssign<T>,
-    for<'a> &'a RationalVector: Shl<T, Output = RationalVector>,
+    RationalVector: Shr<T, Output = RationalVector> + ShrAssign<T>,
+    for<'a> &'a RationalVector: Shr<T, Output = RationalVector>,
 {
     run_benchmark(
-        &format!("RationalVector << {}", T::NAME),
+        &format!("RationalVector >> {}", T::NAME),
         BenchmarkType::EvaluationStrategy,
         rational_vector_signed_pair_gen_var_1::<T>().get(gm, config),
         gm.name(),
@@ -214,30 +214,30 @@ fn benchmark_rational_vector_shl_signed_evaluation_strategy<T: PrimitiveSigned>(
         file_name,
         &pair_1_rational_vector_bit_bucketer("v"),
         &mut [
-            ("RationalVector << T", &mut |(v, bits)| {
-                no_out!(v << bits);
+            ("RationalVector >> T", &mut |(v, bits)| {
+                no_out!(v >> bits);
             }),
-            ("&RationalVector << T", &mut |(v, bits)| {
-                no_out!(&v << bits);
+            ("&RationalVector >> T", &mut |(v, bits)| {
+                no_out!(&v >> bits);
             }),
-            ("RationalVector <<= T", &mut |(mut v, bits)| {
-                v <<= bits;
+            ("RationalVector >>= T", &mut |(mut v, bits)| {
+                v >>= bits;
             }),
         ],
     );
 }
 
-fn benchmark_rational_vector_shl_signed_algorithms<T: PrimitiveSigned>(
+fn benchmark_rational_vector_shr_signed_algorithms<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) where
-    RationalVector: Shl<T, Output = RationalVector>,
+    RationalVector: Shr<T, Output = RationalVector>,
     i64: ExactFrom<T>,
 {
     run_benchmark(
-        &format!("RationalVector << {}", T::NAME),
+        &format!("RationalVector >> {}", T::NAME),
         BenchmarkType::Algorithms,
         rational_vector_signed_pair_gen_var_1::<T>().get(gm, config),
         gm.name(),
@@ -246,10 +246,10 @@ fn benchmark_rational_vector_shl_signed_algorithms<T: PrimitiveSigned>(
         &pair_1_rational_vector_bit_bucketer("v"),
         &mut [
             ("default", &mut |(v, bits)| {
-                no_out!(v << bits);
+                no_out!(v >> bits);
             }),
-            ("multiplying by a power of 2", &mut |(v, bits)| {
-                no_out!(v * Rational::power_of_2(i64::exact_from(bits)));
+            ("dividing by a power of 2", &mut |(v, bits)| {
+                no_out!(v * Rational::power_of_2(-i64::exact_from(bits)));
             }),
         ],
     );

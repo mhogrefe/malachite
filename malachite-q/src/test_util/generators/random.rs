@@ -2246,6 +2246,30 @@ pub fn random_rational_vector_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn random_rational_vector_signed_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(RationalVector, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_vectors(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_rational_vector_integer_vector_pair_gen(
     config: &GenConfig,
 ) -> It<(RationalVector, IntegerVector)> {

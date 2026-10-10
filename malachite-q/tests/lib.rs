@@ -432,6 +432,7 @@ pub mod rational_vector {
         pub mod neg;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod shr;
         pub mod sub;
     }
     pub mod basic {

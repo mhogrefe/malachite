@@ -309,8 +309,9 @@ documented by git history.
   `RationalVector`, in every combination of value and reference.
 - `Mul` and `MulAssign` of `RationalVector` by `Rational`, in every combination of value and
   reference, with the scalar on either side.
-- `Shl` (by value and by reference) and `ShlAssign` for `RationalVector`, by any primitive unsigned
-  type, multiplying every element by a power of 2.
+- `Shl`, `ShlAssign`, `Shr`, and `ShrAssign` for `RationalVector`, with every unsigned and signed
+  primitive integer shift amount, taking the vector by value or by reference. `Shl` multiplies
+  every element by a power of 2 and `Shr` divides by one; a negative amount shifts the other way.
 
 ## 0.13.0 — 2026-10-06
 

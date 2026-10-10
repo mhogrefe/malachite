@@ -8,37 +8,37 @@
 
 use crate::Rational;
 use crate::rational_vector::RationalVector;
-use core::ops::{Shl, ShlAssign};
+use core::ops::{Shr, ShrAssign};
 
-// Shifts every element left by `bits`.
-fn shl_ref<T: Copy>(v: &RationalVector, bits: T) -> RationalVector
+// Shifts every element right by `bits`.
+fn shr_ref<T: Copy>(v: &RationalVector, bits: T) -> RationalVector
 where
-    for<'a> &'a Rational: Shl<T, Output = Rational>,
+    for<'a> &'a Rational: Shr<T, Output = Rational>,
 {
     RationalVector {
-        elements: v.elements.iter().map(|x| x << bits).collect(),
+        elements: v.elements.iter().map(|x| x >> bits).collect(),
     }
 }
 
-// Shifts every element left by `bits`, in place.
-fn shl_assign<T: Copy>(v: &mut RationalVector, bits: T)
+// Shifts every element right by `bits`, in place.
+fn shr_assign<T: Copy>(v: &mut RationalVector, bits: T)
 where
-    Rational: ShlAssign<T>,
+    Rational: ShrAssign<T>,
 {
     for x in &mut v.elements {
-        *x <<= bits;
+        *x >>= bits;
     }
 }
 
-macro_rules! impl_rational_vector_shl_unsigned {
+macro_rules! impl_rational_vector_shr_unsigned {
     ($t:ident) => {
-        impl Shl<$t> for RationalVector {
+        impl Shr<$t> for RationalVector {
             type Output = RationalVector;
 
-            /// Left-shifts a [`RationalVector`] (multiplies it by a power of 2), taking it by
-            /// value. Every element is shifted, and the dimension is unchanged.
+            /// Right-shifts a [`RationalVector`] (divides it by a power of 2), taking it by value.
+            /// Every element is shifted, and the dimension is unchanged.
             ///
-            /// $f(v, k) = 2^kv$.
+            /// $f(v, k) = v/2^k$.
             ///
             /// # Worst-case complexity
             /// $T(n, m, k) = O(n + km)$
@@ -49,21 +49,21 @@ macro_rules! impl_rational_vector_shl_unsigned {
             /// elements, $m$ is `bits`, and $k$ is `self.dimension()`.
             ///
             /// # Examples
-            /// See [here](super::shl#shl).
+            /// See [here](super::shr#shr).
             #[inline]
-            fn shl(mut self, bits: $t) -> RationalVector {
-                self <<= bits;
+            fn shr(mut self, bits: $t) -> RationalVector {
+                self >>= bits;
                 self
             }
         }
 
-        impl Shl<$t> for &RationalVector {
+        impl Shr<$t> for &RationalVector {
             type Output = RationalVector;
 
-            /// Left-shifts a [`RationalVector`] (multiplies it by a power of 2), taking it by
+            /// Right-shifts a [`RationalVector`] (divides it by a power of 2), taking it by
             /// reference. Every element is shifted, and the dimension is unchanged.
             ///
-            /// $f(v, k) = 2^kv$.
+            /// $f(v, k) = v/2^k$.
             ///
             /// # Worst-case complexity
             /// $T(n, m, k) = O(n + km)$
@@ -74,18 +74,18 @@ macro_rules! impl_rational_vector_shl_unsigned {
             /// elements, $m$ is `bits`, and $k$ is `self.dimension()`.
             ///
             /// # Examples
-            /// See [here](super::shl#shl).
+            /// See [here](super::shr#shr).
             #[inline]
-            fn shl(self, bits: $t) -> RationalVector {
-                shl_ref(self, bits)
+            fn shr(self, bits: $t) -> RationalVector {
+                shr_ref(self, bits)
             }
         }
 
-        impl ShlAssign<$t> for RationalVector {
-            /// Left-shifts a [`RationalVector`] (multiplies it by a power of 2), in place. Every
+        impl ShrAssign<$t> for RationalVector {
+            /// Right-shifts a [`RationalVector`] (divides it by a power of 2), in place. Every
             /// element is shifted, and the dimension is unchanged.
             ///
-            /// $v \gets 2^kv$.
+            /// $v \gets v/2^k$.
             ///
             /// # Worst-case complexity
             /// $T(n, m, k) = O(n + km)$
@@ -96,28 +96,27 @@ macro_rules! impl_rational_vector_shl_unsigned {
             /// elements, $m$ is `bits`, and $k$ is `self.dimension()`.
             ///
             /// # Examples
-            /// See [here](super::shl#shl_assign).
+            /// See [here](super::shr#shr_assign).
             #[inline]
-            fn shl_assign(&mut self, bits: $t) {
-                shl_assign(self, bits);
+            fn shr_assign(&mut self, bits: $t) {
+                shr_assign(self, bits);
             }
         }
     };
 }
-apply_to_unsigneds!(impl_rational_vector_shl_unsigned);
+apply_to_unsigneds!(impl_rational_vector_shr_unsigned);
 
-macro_rules! impl_rational_vector_shl_signed {
+macro_rules! impl_rational_vector_shr_signed {
     ($t:ident) => {
-        impl Shl<$t> for RationalVector {
+        impl Shr<$t> for RationalVector {
             type Output = RationalVector;
 
-            /// Left-shifts a [`RationalVector`] (multiplies it by a power of 2), taking it by
-            /// value. Every element is shifted, and the dimension is unchanged.
+            /// Right-shifts a [`RationalVector`] (divides it by a power of 2), taking it by value.
+            /// Every element is shifted, and the dimension is unchanged.
             ///
-            /// $f(v, k) = 2^kv$.
+            /// $f(v, k) = v/2^k$.
             ///
-            /// A negative `bits` shifts right, dividing every element by $2^{-k}$; each element
-            /// stays in lowest terms.
+            /// A negative `bits` shifts left, multiplying every element by $2^{-k}$.
             ///
             /// # Worst-case complexity
             /// $T(n, m, k) = O(n + km)$
@@ -128,24 +127,23 @@ macro_rules! impl_rational_vector_shl_signed {
             /// elements, $m$ is `bits.unsigned_abs()`, and $k$ is `self.dimension()`.
             ///
             /// # Examples
-            /// See [here](super::shl#shl).
+            /// See [here](super::shr#shr).
             #[inline]
-            fn shl(mut self, bits: $t) -> RationalVector {
-                self <<= bits;
+            fn shr(mut self, bits: $t) -> RationalVector {
+                self >>= bits;
                 self
             }
         }
 
-        impl Shl<$t> for &RationalVector {
+        impl Shr<$t> for &RationalVector {
             type Output = RationalVector;
 
-            /// Left-shifts a [`RationalVector`] (multiplies it by a power of 2), taking it by
+            /// Right-shifts a [`RationalVector`] (divides it by a power of 2), taking it by
             /// reference. Every element is shifted, and the dimension is unchanged.
             ///
-            /// $f(v, k) = 2^kv$.
+            /// $f(v, k) = v/2^k$.
             ///
-            /// A negative `bits` shifts right, dividing every element by $2^{-k}$; each element
-            /// stays in lowest terms.
+            /// A negative `bits` shifts left, multiplying every element by $2^{-k}$.
             ///
             /// # Worst-case complexity
             /// $T(n, m, k) = O(n + km)$
@@ -156,21 +154,20 @@ macro_rules! impl_rational_vector_shl_signed {
             /// elements, $m$ is `bits.unsigned_abs()`, and $k$ is `self.dimension()`.
             ///
             /// # Examples
-            /// See [here](super::shl#shl).
+            /// See [here](super::shr#shr).
             #[inline]
-            fn shl(self, bits: $t) -> RationalVector {
-                shl_ref(self, bits)
+            fn shr(self, bits: $t) -> RationalVector {
+                shr_ref(self, bits)
             }
         }
 
-        impl ShlAssign<$t> for RationalVector {
-            /// Left-shifts a [`RationalVector`] (multiplies it by a power of 2), in place. Every
+        impl ShrAssign<$t> for RationalVector {
+            /// Right-shifts a [`RationalVector`] (divides it by a power of 2), in place. Every
             /// element is shifted, and the dimension is unchanged.
             ///
-            /// $v \gets 2^kv$.
+            /// $v \gets v/2^k$.
             ///
-            /// A negative `bits` shifts right, dividing every element by $2^{-k}$; each element
-            /// stays in lowest terms.
+            /// A negative `bits` shifts left, multiplying every element by $2^{-k}$.
             ///
             /// # Worst-case complexity
             /// $T(n, m, k) = O(n + km)$
@@ -181,12 +178,12 @@ macro_rules! impl_rational_vector_shl_signed {
             /// elements, $m$ is `bits.unsigned_abs()`, and $k$ is `self.dimension()`.
             ///
             /// # Examples
-            /// See [here](super::shl#shl_assign).
+            /// See [here](super::shr#shr_assign).
             #[inline]
-            fn shl_assign(&mut self, bits: $t) {
-                shl_assign(self, bits);
+            fn shr_assign(&mut self, bits: $t) {
+                shr_assign(self, bits);
             }
         }
     };
 }
-apply_to_signeds!(impl_rational_vector_shl_signed);
+apply_to_signeds!(impl_rational_vector_shr_signed);
