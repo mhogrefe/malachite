@@ -802,6 +802,10 @@ const AZURITE_NATURAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
 // Natural demo whose Bézout coefficients are Integers.
 const AZURITE_INTEGER_STAGES: &[(&str, &str)] = &[
     ("demo_integer_add", "az_int_add"),
+    ("demo_integer_sum", "az_int_sum"),
+    ("demo_integer_ref_sum", "az_int_sum"),
+    ("demo_integer_product", "az_int_product"),
+    ("demo_integer_ref_product", "az_int_product"),
     ("demo_integer_add_val_ref", "az_int_add"),
     ("demo_integer_add_ref_val", "az_int_add"),
     ("demo_integer_add_ref_ref", "az_int_add"),
