@@ -9,6 +9,88 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// vectors.
 pub mod add;
+/// Adding a multiple of one vector to another, by implementations of
+/// [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
+/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign).
+///
+/// # add_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMul;
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// assert_eq!(
+///     IntegerVector::from_str("()")
+///         .unwrap()
+///         .add_mul(IntegerVector::from_str("()").unwrap(), Integer::from(5))
+///         .to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(1, -2, 3)")
+///         .unwrap()
+///         .add_mul(
+///             IntegerVector::from_str("(4, 5, -6)").unwrap(),
+///             Integer::ZERO
+///         )
+///         .to_string(),
+///     "(1, -2, 3)"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(1, -2, 3)")
+///         .unwrap()
+///         .add_mul(IntegerVector::from_str("(4, 5, -6)").unwrap(), Integer::ONE)
+///         .to_string(),
+///     "(5, 3, -3)"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(1, -2, 3)")
+///         .unwrap()
+///         .add_mul(
+///             IntegerVector::from_str("(4, 5, -6)").unwrap(),
+///             Integer::NEGATIVE_ONE
+///         )
+///         .to_string(),
+///     "(-3, -7, 9)"
+/// );
+/// assert_eq!(
+///     (&IntegerVector::from_str("(1, -2, 3)").unwrap())
+///         .add_mul(
+///             &IntegerVector::from_str("(4, 5, -6)").unwrap(),
+///             &Integer::from(10)
+///         )
+///         .to_string(),
+///     "(41, 48, -57)"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(1, 0)")
+///         .unwrap()
+///         .add_mul(
+///             &IntegerVector::from_str("(18446744073709551615, -1)").unwrap(),
+///             &Integer::from_str("18446744073709551617").unwrap()
+///         )
+///         .to_string(),
+///     "(340282366920938463463374607431768211456, -18446744073709551617)"
+/// );
+/// ```
+///
+/// # add_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// let mut v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+/// v.add_mul_assign(
+///     IntegerVector::from_str("(4, 5, -6)").unwrap(),
+///     Integer::from(10),
+/// );
+/// assert_eq!(v.to_string(), "(41, 48, -57)");
+/// ```
+pub mod add_mul;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod) and
 /// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
 /// every element of a vector to the representative closest to zero modulo a number.
@@ -495,5 +577,87 @@ pub mod shr;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting vectors.
 pub mod sub;
+/// Subtracting a multiple of one vector from another, by implementations of
+/// [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
+/// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign).
+///
+/// # sub_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::SubMul;
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// assert_eq!(
+///     IntegerVector::from_str("()")
+///         .unwrap()
+///         .sub_mul(IntegerVector::from_str("()").unwrap(), Integer::from(5))
+///         .to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(1, -2, 3)")
+///         .unwrap()
+///         .sub_mul(
+///             IntegerVector::from_str("(4, 5, -6)").unwrap(),
+///             Integer::ZERO
+///         )
+///         .to_string(),
+///     "(1, -2, 3)"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(1, -2, 3)")
+///         .unwrap()
+///         .sub_mul(IntegerVector::from_str("(4, 5, -6)").unwrap(), Integer::ONE)
+///         .to_string(),
+///     "(-3, -7, 9)"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(1, -2, 3)")
+///         .unwrap()
+///         .sub_mul(
+///             IntegerVector::from_str("(4, 5, -6)").unwrap(),
+///             Integer::NEGATIVE_ONE
+///         )
+///         .to_string(),
+///     "(5, 3, -3)"
+/// );
+/// assert_eq!(
+///     (&IntegerVector::from_str("(1, -2, 3)").unwrap())
+///         .sub_mul(
+///             &IntegerVector::from_str("(4, 5, -6)").unwrap(),
+///             &Integer::from(10)
+///         )
+///         .to_string(),
+///     "(-39, -52, 63)"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(1, 0)")
+///         .unwrap()
+///         .sub_mul(
+///             &IntegerVector::from_str("(18446744073709551615, -1)").unwrap(),
+///             &Integer::from_str("18446744073709551617").unwrap()
+///         )
+///         .to_string(),
+///     "(-340282366920938463463374607431768211454, 18446744073709551617)"
+/// );
+/// ```
+///
+/// # sub_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::SubMulAssign;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// let mut v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+/// v.sub_mul_assign(
+///     IntegerVector::from_str("(4, 5, -6)").unwrap(),
+///     Integer::from(10),
+/// );
+/// assert_eq!(v.to_string(), "(-39, -52, 63)");
+/// ```
+pub mod sub_mul;
 #[doc(hidden)]
 pub mod sum_max_bits;

@@ -271,9 +271,10 @@ documented by git history.
 - `Mul` and `MulAssign` of `NaturalVector` by `Natural` and of `IntegerVector` by `Integer`, in
   every combination of value and reference, with the scalar on either side, like FLINT's
   `_fmpz_vec_scalar_mul_fmpz`.
-- `AddMul` (by value and by reference) and `AddMulAssign` for `NaturalVector`, adding a `Natural`
-  multiple of one vector to another, in every combination of value and reference, like FLINT's
-  `_fmpz_vec_scalar_addmul_fmpz`.
+- `AddMul` (by value and by reference) and `AddMulAssign` for `NaturalVector` and `IntegerVector`,
+  adding a `Natural` or `Integer` multiple of one vector to another, in every combination of value
+  and reference, like FLINT's `_fmpz_vec_scalar_addmul_fmpz`; and `SubMul` and `SubMulAssign` for
+  `IntegerVector`, like `_fmpz_vec_scalar_submul_fmpz`.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` of `NaturalVector` by `Natural`, in every
   combination of value and reference, multiplying every element modulo $2^k$. The elements and the
   scalar must already be reduced.

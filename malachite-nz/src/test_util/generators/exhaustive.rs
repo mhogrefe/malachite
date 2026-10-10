@@ -3442,6 +3442,19 @@ pub fn exhaustive_integer_vector_pair_gen_var_1() -> It<(IntegerVector, IntegerV
     })
 }
 
+pub fn exhaustive_integer_vector_integer_vector_integer_triple_gen_var_1()
+-> It<(IntegerVector, IntegerVector, Integer)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_integer_vectors_with_dimension(dimension)),
+                exhaustive_integers(),
+            )
+            .map(|((v, w), c)| (v, w, c)),
+        )
+    })
+}
+
 pub fn exhaustive_integer_vector_triple_gen_var_1()
 -> It<(IntegerVector, IntegerVector, IntegerVector)> {
     exhaustive_tuples_by_dimension(|dimension| {

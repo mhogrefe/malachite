@@ -6594,6 +6594,20 @@ pub fn random_integer_vector_pair_gen_var_1(
     )
 }
 
+pub fn random_integer_vector_integer_vector_integer_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerVector, IntegerVector, Integer)> {
+    Box::new(
+        random_integer_vector_pair_gen_var_1(config)
+            .zip(random_integers(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((v, w), c)| (v, w, c)),
+    )
+}
+
 pub fn random_integer_vector_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerVector, IntegerVector, IntegerVector)> {
