@@ -349,6 +349,9 @@ documented by git history.
   reference).
 - `AddMulShl` and `AddMulShlAssign` for `Natural`, taking the arguments in every combination of
   value and reference (with a borrowed receiver, all of them by reference).
+- `AddMulShl`, `AddMulShlAssign`, `SubMulShl`, and `SubMulShlAssign` for `Rational`, taking the
+  arguments in every combination of value and reference (with a borrowed receiver, all of them by
+  reference).
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `Natural`, taking the
   arguments in every combination of value and reference (with a borrowed receiver, all of them by
   reference); moduli that fit in a limb use the primitive implementation.

@@ -511,6 +511,26 @@ pub fn triple_rational_rational_primitive_int_max_bit_bucketer<'a, T: PrimitiveI
     }
 }
 
+pub fn quadruple_1_2_3_rational_max_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Rational, Rational, Rational, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, _)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
+            {z_name}.significant_bits())"
+        ),
+    }
+}
+
 pub fn quadruple_1_2_3_rational_rational_primitive_int_max_bit_bucketer<'a, T: PrimitiveInt, U>(
     x_name: &'a str,
     y_name: &'a str,

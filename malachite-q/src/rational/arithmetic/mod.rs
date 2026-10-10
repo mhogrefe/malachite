@@ -22,6 +22,10 @@ pub mod add;
 /// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign), traits for adding a
 /// number and the product of two other numbers.
 pub mod add_mul;
+/// Implementations of [`AddMulShl`](malachite_base::num::arithmetic::traits::AddMulShl) and
+/// [`AddMulShlAssign`](malachite_base::num::arithmetic::traits::AddMulShlAssign), traits for adding
+/// a number and the product of two other numbers shifted left.
+pub mod add_mul_shl;
 /// Implementations of [`Approximate`](traits::Approximate) and
 /// [`ApproximateAssign`](traits::ApproximateAssign), traits for approximating a
 /// [`Rational`](super::Rational) by a [`Rational`](super::Rational) with a bounded denominator.
@@ -345,5 +349,9 @@ pub mod sub;
 /// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign), traits for subtracting
 /// the product of two numbers from a number.
 pub mod sub_mul;
+/// Implementations of [`SubMulShl`](malachite_base::num::arithmetic::traits::SubMulShl) and
+/// [`SubMulShlAssign`](malachite_base::num::arithmetic::traits::SubMulShlAssign), traits for
+/// subtracting the product of two numbers, shifted left, from a number.
+pub mod sub_mul_shl;
 /// Various traits for performing arithmetic operations on numbers.
 pub mod traits;

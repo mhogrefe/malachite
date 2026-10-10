@@ -23,8 +23,8 @@ use crate::rational_vector::RationalVector;
 use crate::rational_vector::random::striped_random_rational_vectors;
 use crate::test_util::extra_variadic::{
     random_ordered_unique_triples, random_quadruples, random_quadruples_from_single,
-    random_quadruples_xxyz, random_triples, random_triples_from_single, random_triples_xxy,
-    random_triples_xyy,
+    random_quadruples_xxxy, random_quadruples_xxyz, random_triples, random_triples_from_single,
+    random_triples_xxy, random_triples_xyy,
 };
 use crate::test_util::generators::round_to_multiple_rational_filter;
 use malachite_base::bools::random::random_bools;
@@ -1949,6 +1949,32 @@ pub fn special_random_rational_rational_unsigned_triple_gen_var_1<T: PrimitiveUn
     config: &GenConfig,
 ) -> It<(Rational, Rational, T)> {
     Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_rational_rational_rational_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Rational, Rational, Rational, T)> {
+    Box::new(random_quadruples_xxxy(
         EXAMPLE_SEED,
         &|seed| {
             striped_random_rationals(

@@ -1010,6 +1010,16 @@ pub fn rational_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(Rational, Rational, Rational, T)` where `T` is unsigned and small.
+pub fn rational_rational_rational_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(Rational, Rational, Rational, T)> {
+    Generator::new(
+        &exhaustive_rational_rational_rational_unsigned_quadruple_gen_var_1,
+        &random_rational_rational_rational_unsigned_quadruple_gen_var_1,
+        &special_random_rational_rational_rational_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // All `(Rational, Rational, T)` where `T` is positive, unsigned, and small.
 pub fn rational_rational_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
 -> Generator<(Rational, Rational, T)> {

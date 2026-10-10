@@ -24,8 +24,9 @@ use crate::rational_vector::exhaustive::{
 };
 use crate::test_util::extra_variadic::{
     exhaustive_ordered_unique_triples, exhaustive_quadruples_from_single,
-    exhaustive_quadruples_xxyz, exhaustive_quadruples_xyyy, exhaustive_triples_from_single,
-    exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
+    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xxyz,
+    exhaustive_quadruples_xyyy, exhaustive_triples_from_single, exhaustive_triples_xxy,
+    exhaustive_triples_xxy_custom_output,
 };
 use itertools::Itertools;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -799,6 +800,18 @@ pub fn exhaustive_rational_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsign
     Box::new(exhaustive_triples_xxy_custom_output(
         exhaustive_rationals(),
         exhaustive_unsigneds::<T>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+pub fn exhaustive_rational_rational_rational_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(Rational, Rational, Rational, T)> {
+    Box::new(exhaustive_quadruples_xxxy_custom_output(
+        exhaustive_rationals(),
+        exhaustive_unsigneds::<T>(),
+        BitDistributorOutputType::normal(1),
         BitDistributorOutputType::normal(1),
         BitDistributorOutputType::normal(1),
         BitDistributorOutputType::tiny(),

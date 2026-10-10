@@ -261,6 +261,7 @@ pub mod rational {
         pub mod abs_squared;
         pub mod add;
         pub mod add_mul;
+        pub mod add_mul_shl;
         pub mod approximate;
         pub mod average;
         pub mod canonical_unit_i_pow;
@@ -304,6 +305,7 @@ pub mod rational {
         pub mod square;
         pub mod sub;
         pub mod sub_mul;
+        pub mod sub_mul_shl;
     }
     pub mod basic {
         pub mod constants;
