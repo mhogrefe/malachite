@@ -84,6 +84,10 @@ pub mod add;
 /// assert_eq!(v.to_string(), "(13/2, -3/2, -6)");
 /// ```
 pub mod add_mul;
+/// Implementations of [`AddMulShl`](malachite_base::num::arithmetic::traits::AddMulShl) and
+/// [`AddMulShlAssign`](malachite_base::num::arithmetic::traits::AddMulShlAssign), for adding a
+/// scalar multiple of one vector, shifted left, to another.
+pub mod add_mul_shl;
 /// Implementations of [`CanonicalPrimitivePart`](
 /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart) and
 /// [`ContentAndCanonicalPrimitivePart`](
@@ -296,3 +300,7 @@ pub mod sub;
 /// assert_eq!(v.to_string(), "(-11/2, -5/2, 12)");
 /// ```
 pub mod sub_mul;
+/// Implementations of [`SubMulShl`](malachite_base::num::arithmetic::traits::SubMulShl) and
+/// [`SubMulShlAssign`](malachite_base::num::arithmetic::traits::SubMulShlAssign), for subtracting a
+/// scalar multiple of one vector, shifted left, from another.
+pub mod sub_mul_shl;

@@ -1075,6 +1075,17 @@ pub fn exhaustive_rational_vector_rational_vector_rational_triple_gen_var_1()
     })
 }
 
+pub fn exhaustive_rational_vector_rational_vector_rational_unsigned_quadruple_gen_var_1()
+-> It<(RationalVector, RationalVector, Rational, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_rational_vector_rational_vector_rational_triple_gen_var_1(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((v, w, c), bits)| (v, w, c, bits)),
+    )
+}
+
 pub fn exhaustive_rational_vector_triple_gen_var_1()
 -> It<(RationalVector, RationalVector, RationalVector)> {
     exhaustive_tuples_by_dimension(|dimension| {

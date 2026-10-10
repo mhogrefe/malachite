@@ -1360,6 +1360,17 @@ pub fn rational_vector_rational_vector_rational_triple_gen_var_1()
     )
 }
 
+// All `(RationalVector, RationalVector, Rational, u64)` where the vectors have the same dimension
+// and the `u64` is small.
+pub fn rational_vector_rational_vector_rational_unsigned_quadruple_gen_var_1()
+-> Generator<(RationalVector, RationalVector, Rational, u64)> {
+    Generator::new(
+        &exhaustive_rational_vector_rational_vector_rational_unsigned_quadruple_gen_var_1,
+        &random_rational_vector_rational_vector_rational_unsigned_quadruple_gen_var_1,
+        &special_random_rational_vector_rational_vector_rational_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // All triples of `RationalVector`s of the same dimension.
 pub fn rational_vector_triple_gen_var_1()
 -> Generator<(RationalVector, RationalVector, RationalVector)> {

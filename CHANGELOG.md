@@ -359,6 +359,10 @@ documented by git history.
 - `AddMulShl` and `AddMulShlAssign` for `NaturalVector`, adding a `Natural` multiple of one vector,
   shifted left, to another, with the arguments in every combination of value and reference (with a
   borrowed receiver, all of them by reference).
+- `AddMulShl`, `AddMulShlAssign`, `SubMulShl`, and `SubMulShlAssign` for `RationalVector`, adding
+  or subtracting a `Rational` multiple of one vector, shifted left, to or from another, with the
+  arguments in every combination of value and reference (with a borrowed receiver, all of them by
+  reference).
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `Natural`, taking the
   arguments in every combination of value and reference (with a borrowed receiver, all of them by
   reference); moduli that fit in a limb use the primitive implementation.

@@ -2420,6 +2420,20 @@ pub fn random_rational_vector_rational_vector_rational_triple_gen_var_1(
     )
 }
 
+pub fn random_rational_vector_rational_vector_rational_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalVector, RationalVector, Rational, u64)> {
+    Box::new(
+        random_rational_vector_rational_vector_rational_triple_gen_var_1(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("bits"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((v, w, c), bits)| (v, w, c, bits)),
+    )
+}
+
 pub fn random_rational_vector_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(RationalVector, RationalVector, RationalVector)> {
