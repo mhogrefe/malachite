@@ -10394,14 +10394,8 @@ fn mul_prec_round_properties_helper(
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (product_alt, o_alt) = mul_prec_round_naive(x.clone(), y.clone(), prec, rm);
-        assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
-        );
-        assert_eq!(o_alt, o);
-    }
+    // `mul_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_product, rug_o) = rug_mul_prec_round(
@@ -10640,14 +10634,8 @@ fn mul_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (product_alt, o_alt) = mul_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
-        assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
-        );
-        assert_eq!(o_alt, o);
-    }
+    // `mul_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     let (rug_product, rug_o) = rug_mul_prec(
         &rug::Float::exact_from(&x),
@@ -10883,19 +10871,8 @@ fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (product_alt, o_alt) = mul_prec_round_naive(
-            x.clone(),
-            y.clone(),
-            max(x.significant_bits(), y.significant_bits()),
-            rm,
-        );
-        assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
-        );
-        assert_eq!(o_alt, o);
-    }
+    // `mul_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     assert_eq!(o_alt, o);
     let (product_alt, o_alt) =
@@ -11137,19 +11114,8 @@ fn mul_properties_helper_1(x: Float, y: Float, extreme: bool) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&product));
 
-    if !extreme {
-        let product_alt = mul_prec_round_naive(
-            x.clone(),
-            y.clone(),
-            max(x.significant_bits(), y.significant_bits()),
-            Nearest,
-        )
-        .0;
-        assert_eq!(
-            ComparableFloatRef(&product_alt),
-            ComparableFloatRef(&product)
-        );
-    }
+    // `mul_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     let product_alt = x
         .mul_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), Nearest)

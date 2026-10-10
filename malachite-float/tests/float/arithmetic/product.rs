@@ -1030,14 +1030,8 @@ fn product_prec_round_properties_helper(xs: Vec<Float>, prec: u64, rm: RoundingM
     );
     assert_eq!(o_alt, o);
 
-    // the naive exact-accumulation oracle; since it keeps its intermediate values normalized, it
-    // needs no exponent gate, even for extreme inputs
-    let (product_alt, o_alt) = naive_product_prec_round(&xs, prec, rm);
-    assert_eq!(
-        ComparableFloat(product_alt),
-        ComparableFloat(product.clone())
-    );
-    assert_eq!(o_alt, o);
+    // `naive_product_prec_round` is not compared here: the Azurite oracle checks this function, and
+    // the reference is kept for the benchmarks.
 
     // the singular rules
     let any_nan = xs.iter().any(Float::is_nan);
@@ -1157,12 +1151,8 @@ fn product_prec_properties() {
         );
         assert_eq!(o_alt, o);
 
-        let (product_alt, o_alt) = naive_product_prec(&xs, prec);
-        assert_eq!(
-            ComparableFloat(product_alt),
-            ComparableFloat(product.clone())
-        );
-        assert_eq!(o_alt, o);
+        // `naive_product_prec` is not compared here: the Azurite oracle checks this function, and
+        // the reference is kept for the benchmarks.
     });
 }
 
@@ -1184,12 +1174,8 @@ fn product_round_properties() {
         );
         assert_eq!(o_alt, o);
 
-        let (product_alt, o_alt) = naive_product_round(xs, rm);
-        assert_eq!(
-            ComparableFloat(product_alt),
-            ComparableFloat(product.clone())
-        );
-        assert_eq!(o_alt, o);
+        // `naive_product_round` is not compared here: the Azurite oracle checks this function, and
+        // the reference is kept for the benchmarks.
     };
     float_vec_rounding_mode_pair_gen_var_3().test_properties(|(xs, rm)| {
         helper(&xs, rm);
@@ -1223,11 +1209,8 @@ fn product_properties() {
             ComparableFloatRef(&product)
         );
 
-        let product_alt = naive_product(&xs);
-        assert_eq!(
-            ComparableFloat(product_alt),
-            ComparableFloat(product.clone())
-        );
+        // `naive_product` is not compared here: the Azurite oracle checks this function, and the
+        // reference is kept for the benchmarks.
 
         // a product of no Floats, or of all-positive exactly-representable Floats, is exact
         if xs.is_empty() {

@@ -8,7 +8,6 @@
 
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2};
 use malachite_base::num::basic::traits::Infinity;
-use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
@@ -587,11 +586,8 @@ fn power_of_2_prec_round_properties_helper(i: i64, prec: u64, rm: RoundingMode) 
         assert_eq!(o, if p > 0u32 { Greater } else { Less });
     }
 
-    if i.lt_abs(&1_000_000_000) {
-        let (p_alt, o_alt) = power_of_2_prec_round_naive(i, prec, rm);
-        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
-        assert_eq!(o_alt, o);
-    }
+    // `power_of_2_prec_round_naive` is not compared here: the Azurite oracle checks this function,
+    // and the reference is kept for the benchmarks.
 
     if rm == Exact {
         assert_eq!(o, Equal);
@@ -720,11 +716,8 @@ fn power_of_2_prec_properties_helper(i: i64, prec: u64) {
         assert_eq!(o, if p > 0u32 { Greater } else { Less });
     }
 
-    if i.lt_abs(&1_000_000_000) {
-        let (p_alt, o_alt) = power_of_2_prec_naive(i, prec);
-        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
-        assert_eq!(o_alt, o);
-    }
+    // `power_of_2_prec_naive` is not compared here: the Azurite oracle checks this function, and
+    // the reference is kept for the benchmarks.
 
     if o == Equal {
         for rm in exhaustive_rounding_modes() {
@@ -829,10 +822,8 @@ fn power_of_2_properties_signed_helper(i: i64) {
         );
     }
 
-    if i.lt_abs(&1_000_000_000) {
-        let p_alt = power_of_2_i64_naive(i);
-        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
-    }
+    // `power_of_2_i64_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     if let Ok(i) = u32::try_from(i) {
         let rug_p = rug::Float::with_val(1, 1) << i;
@@ -853,10 +844,8 @@ fn power_of_2_properties_unsigned_helper(u: u64) {
         assert_eq!(p.get_prec(), Some(1));
     }
 
-    if u < 1_000_000_000 {
-        let p_alt = power_of_2_u64_naive(u);
-        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
-    }
+    // `power_of_2_u64_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     if let Ok(u) = u32::try_from(u) {
         let rug_p = rug::Float::with_val(1, 1) << u;

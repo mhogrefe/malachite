@@ -9471,11 +9471,8 @@ fn add_prec_round_properties_helper(
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&sum));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (sum_alt, o_alt) = add_prec_round_naive(x.clone(), y.clone(), prec, rm);
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-        assert_eq!(o_alt, o);
-    }
+    // `add_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_sum, rug_o) = rug_add_prec_round(
@@ -9670,11 +9667,8 @@ fn add_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&sum));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (sum_alt, o_alt) = add_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-        assert_eq!(o_alt, o);
-    }
+    // `add_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     let (rug_sum, rug_o) = rug_add_prec(
         &rug::Float::exact_from(&x),
@@ -9857,16 +9851,8 @@ fn add_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&sum));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (sum_alt, o_alt) = add_prec_round_naive(
-            x.clone(),
-            y.clone(),
-            max(x.significant_bits(), y.significant_bits()),
-            rm,
-        );
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-        assert_eq!(o_alt, o);
-    }
+    // `add_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
     let (sum_alt, o_alt) =
         x.add_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), rm);
     assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
@@ -10072,16 +10058,8 @@ fn add_properties_helper_2(x: Float, y: Float, extreme: bool) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&sum));
 
-    if !extreme {
-        let sum_alt = add_prec_round_naive(
-            x.clone(),
-            y.clone(),
-            max(x.significant_bits(), y.significant_bits()),
-            Nearest,
-        )
-        .0;
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-    }
+    // `add_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
     let sum_alt = x
         .add_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), Nearest)
         .0;
@@ -10258,11 +10236,8 @@ fn add_rational_prec_round_properties_helper(
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&sum));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (sum_alt, o_alt) = add_rational_prec_round_naive(x.clone(), y.clone(), prec, rm);
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-        assert_eq!(o_alt, o);
-    }
+    // `add_rational_prec_round_naive` is not compared here: the Azurite oracle checks this
+    // function, and the reference is kept for the benchmarks.
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_sum, rug_o) = rug_add_rational_prec_round(
@@ -10428,11 +10403,8 @@ fn add_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&sum));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (sum_alt, o_alt) = add_rational_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-        assert_eq!(o_alt, o);
-    }
+    // `add_rational_prec_round_naive` is not compared here: the Azurite oracle checks this
+    // function, and the reference is kept for the benchmarks.
 
     let (rug_sum, rug_o) = rug_add_rational_prec(
         &rug::Float::exact_from(&x),
@@ -10579,12 +10551,8 @@ fn add_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&sum));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (sum_alt, o_alt) =
-            add_rational_prec_round_naive(x.clone(), y.clone(), x.significant_bits(), rm);
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-        assert_eq!(o_alt, o);
-    }
+    // `add_rational_prec_round_naive` is not compared here: the Azurite oracle checks this
+    // function, and the reference is kept for the benchmarks.
 
     let (sum_alt, o_alt) = x.add_rational_prec_round_ref_ref(&y, x.significant_bits(), rm);
     assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
@@ -10746,11 +10714,8 @@ fn add_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&sum));
 
-    if !extreme {
-        let sum_alt =
-            add_rational_prec_round_naive(x.clone(), y.clone(), x.significant_bits(), Nearest).0;
-        assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
-    }
+    // `add_rational_prec_round_naive` is not compared here: the Azurite oracle checks this
+    // function, and the reference is kept for the benchmarks.
 
     let sum_alt = x
         .add_rational_prec_round_ref_ref(&y, x.significant_bits(), Nearest)

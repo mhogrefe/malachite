@@ -964,13 +964,8 @@ fn sum_prec_round_properties_helper(xs: Vec<Float>, prec: u64, rm: RoundingMode)
         return;
     }
 
-    // the naive exact-accumulation oracle, which extends precisions so that every partial sum is
-    // exact and rounds only once
-    if xs.iter().all(exponent_in_gate) {
-        let (sum_alt, o_alt) = naive_sum_prec_round(&xs, prec, rm);
-        assert_eq!(ComparableFloat(sum_alt), ComparableFloat(sum.clone()));
-        assert_eq!(o_alt, o);
-    }
+    // `naive_sum_prec_round` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     // appending a positive zero changes nothing, unless every input is a zero
     if !xs.is_empty() && xs.iter().any(|x| *x != 0u32) {

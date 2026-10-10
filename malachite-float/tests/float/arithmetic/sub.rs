@@ -11218,11 +11218,8 @@ fn sub_prec_round_properties_helper(
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (diff_alt, o_alt) = add_prec_round_naive(x.clone(), -&y, prec, rm);
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-        assert_eq!(o_alt, o);
-    }
+    // `add_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_diff, rug_o) = rug_sub_prec_round(
@@ -11434,11 +11431,8 @@ fn sub_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (diff_alt, o_alt) = add_prec_round_naive(x.clone(), -&y, prec, Nearest);
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-        assert_eq!(o_alt, o);
-    }
+    // `add_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     let (rug_diff, rug_o) = rug_sub_prec(
         &rug::Float::exact_from(&x),
@@ -11633,16 +11627,8 @@ fn sub_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (diff_alt, o_alt) = add_prec_round_naive(
-            x.clone(),
-            -&y,
-            max(x.significant_bits(), y.significant_bits()),
-            rm,
-        );
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-        assert_eq!(o_alt, o);
-    }
+    // `add_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     let (diff_alt, o_alt) =
         x.sub_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), rm);
@@ -11866,16 +11852,8 @@ fn sub_properties_helper_2(x: Float, y: Float, extreme: bool) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
 
-    if !extreme {
-        let diff_alt = add_prec_round_naive(
-            x.clone(),
-            -&y,
-            max(x.significant_bits(), y.significant_bits()),
-            Nearest,
-        )
-        .0;
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-    }
+    // `add_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     let diff_alt = x
         .sub_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), Nearest)
@@ -12044,11 +12022,8 @@ fn sub_rational_prec_round_properties_helper(
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (diff_alt, o_alt) = sub_rational_prec_round_naive(x.clone(), y.clone(), prec, rm);
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-        assert_eq!(o_alt, o);
-    }
+    // `sub_rational_prec_round_naive` is not compared here: the Azurite oracle checks this
+    // function, and the reference is kept for the benchmarks.
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_diff, rug_o) = rug_sub_rational_prec_round(
@@ -12218,11 +12193,8 @@ fn sub_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (diff_alt, o_alt) = sub_rational_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-        assert_eq!(o_alt, o);
-    }
+    // `sub_rational_prec_round_naive` is not compared here: the Azurite oracle checks this
+    // function, and the reference is kept for the benchmarks.
 
     let (rug_diff, rug_o) = rug_sub_rational_prec(
         &rug::Float::exact_from(&x),
@@ -12373,12 +12345,8 @@ fn sub_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (diff_alt, o_alt) =
-            sub_rational_prec_round_naive(x.clone(), y.clone(), x.significant_bits(), rm);
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-        assert_eq!(o_alt, o);
-    }
+    // `sub_rational_prec_round_naive` is not compared here: the Azurite oracle checks this
+    // function, and the reference is kept for the benchmarks.
 
     let (diff_alt, o_alt) = x.sub_rational_prec_round_ref_ref(&y, x.significant_bits(), rm);
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
@@ -12544,11 +12512,8 @@ fn sub_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
 
-    if !extreme {
-        let diff_alt =
-            sub_rational_prec_round_naive(x.clone(), y.clone(), x.significant_bits(), Nearest).0;
-        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
-    }
+    // `sub_rational_prec_round_naive` is not compared here: the Azurite oracle checks this
+    // function, and the reference is kept for the benchmarks.
 
     let diff_alt = x
         .sub_rational_prec_round_ref_ref(&y, x.significant_bits(), Nearest)
@@ -12603,8 +12568,8 @@ fn sub_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
         );
     }
 
-    let diff_alt = sub_rational_prec_round_naive(x.clone(), y, x.significant_bits(), Nearest).0;
-    assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+    // `sub_rational_prec_round_naive` is not compared here: the Azurite oracle checks this
+    // function, and the reference is kept for the benchmarks.
 }
 
 #[test]

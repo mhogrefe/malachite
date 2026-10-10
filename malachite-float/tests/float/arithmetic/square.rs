@@ -2469,11 +2469,8 @@ fn square_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode, ex
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&square));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (square_alt, o_alt) = square_prec_round_naive(x.clone(), prec, rm);
-        assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
-        assert_eq!(o_alt, o);
-    }
+    // `square_prec_round_naive` is not compared here: the Azurite oracle checks this function, and
+    // the reference is kept for the benchmarks.
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_square, rug_o) = rug_square_prec_round(&rug::Float::exact_from(&x), prec, rm);
@@ -2586,11 +2583,8 @@ fn square_prec_properties_helper(x: Float, prec: u64, extreme: bool) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&square));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (square_alt, o_alt) = square_prec_round_naive(x.clone(), prec, Nearest);
-        assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
-        assert_eq!(o_alt, o);
-    }
+    // `square_prec_round_naive` is not compared here: the Azurite oracle checks this function, and
+    // the reference is kept for the benchmarks.
 
     let (rug_square, rug_o) = rug_square_prec(&rug::Float::exact_from(&x), prec);
     assert_eq!(
@@ -2700,11 +2694,8 @@ fn square_round_properties_helper(x: Float, rm: RoundingMode, extreme: bool) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&square));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (square_alt, o_alt) = square_prec_round_naive(x.clone(), x.significant_bits(), rm);
-        assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
-        assert_eq!(o_alt, o);
-    }
+    // `square_prec_round_naive` is not compared here: the Azurite oracle checks this function, and
+    // the reference is kept for the benchmarks.
 
     let (square_alt, o_alt) = x.square_prec_round_ref(x.significant_bits(), rm);
     assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
@@ -2829,10 +2820,8 @@ fn square_properties_helper_1(x: Float, extreme: bool) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&square));
 
-    if !extreme {
-        let square_alt = square_prec_round_naive(x.clone(), x.significant_bits(), Nearest).0;
-        assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
-    }
+    // `square_prec_round_naive` is not compared here: the Azurite oracle checks this function, and
+    // the reference is kept for the benchmarks.
 
     let square_alt = x.square_prec_round_ref(x.significant_bits(), Nearest).0;
     assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));

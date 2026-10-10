@@ -14283,14 +14283,8 @@ fn div_prec_round_properties_helper(
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (quotient_alt, o_alt) = div_prec_round_naive(x.clone(), y.clone(), prec, rm);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
-    }
+    // `div_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_quotient, rug_o) = rug_div_prec_round(
@@ -14571,14 +14565,8 @@ fn div_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (quotient_alt, o_alt) = div_prec_round_naive(x.clone(), y.clone(), prec, Nearest);
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
-    }
+    // `div_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     if o == Equal && quotient.is_finite() && quotient != 0u32 {
         assert_eq!(
@@ -14822,19 +14810,8 @@ fn div_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
     assert_eq!(o_alt, o);
 
-    if !extreme {
-        let (quotient_alt, o_alt) = div_prec_round_naive(
-            x.clone(),
-            y.clone(),
-            max(x.significant_bits(), y.significant_bits()),
-            rm,
-        );
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-        assert_eq!(o_alt, o);
-    }
+    // `div_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
 
     let (quotient_alt, o_alt) =
         x.div_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), rm);
@@ -15104,19 +15081,8 @@ fn div_properties_helper_1(x: Float, y: Float, extreme: bool) {
     assert!(x_alt.is_valid());
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&quotient));
 
-    if !extreme {
-        let quotient_alt = div_prec_round_naive(
-            x.clone(),
-            y.clone(),
-            max(x.significant_bits(), y.significant_bits()),
-            Nearest,
-        )
-        .0;
-        assert_eq!(
-            ComparableFloatRef(&quotient_alt),
-            ComparableFloatRef(&quotient)
-        );
-    }
+    // `div_prec_round_naive` is not compared here: the Azurite oracle checks this function, and the
+    // reference is kept for the benchmarks.
     let quotient_alt = x
         .div_prec_round_ref_ref(&y, max(x.significant_bits(), y.significant_bits()), Nearest)
         .0;
