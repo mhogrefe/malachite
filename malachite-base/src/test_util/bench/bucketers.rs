@@ -1204,6 +1204,15 @@ pub fn triple_1_unsigned_vector_dimension_bucketer<'a, T: PrimitiveUnsigned, U, 
     }
 }
 
+pub fn quadruple_1_unsigned_vector_dimension_bucketer<'a, T: PrimitiveUnsigned, U, V, W>(
+    var_name: &'a str,
+) -> Bucketer<'a, (UnsignedVector<T>, U, V, W)> {
+    Bucketer {
+        bucketing_function: &|(v, _, _, _)| v.elements.len(),
+        bucketing_label: format!("{var_name}.dimension()"),
+    }
+}
+
 pub fn pair_unsigned_vector_max_dimension_bucketer<'a, T: PrimitiveUnsigned>(
     x_name: &'a str,
     y_name: &'a str,

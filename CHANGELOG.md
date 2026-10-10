@@ -168,6 +168,12 @@ documented by git history.
   return no `Ordering`, since entries may round in different directions.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` of `UnsignedVector<T>` by a `T`, multiplying every
   element modulo $2^k$. The elements and the scalar must already be reduced.
+- `ModPowerOf2AddMul`, `ModPowerOf2AddMulAssign`, `ModPowerOf2SubMul`, and
+  `ModPowerOf2SubMulAssign` for `UnsignedVector<T>`, adding or subtracting a `T` multiple of one
+  vector to or from another modulo $2^k$. The elements and the scalar must already be reduced.
+- `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `UnsignedVector<T>`,
+  adding or subtracting a `T` multiple of one vector to or from another modulo a `T`, like FLINT's
+  `_nmod_vec_scalar_addmul_nmod`. The elements and the scalar must already be reduced.
 - `ModMul` and `ModMulAssign` of `UnsignedVector<T>` by a `T` modulo a `T`, multiplying every
   element modulo $m$ with the multiplication data for $m$ computed once, like FLINT's
   `_nmod_vec_scalar_mul_nmod`. The elements and the scalar must already be reduced.
@@ -292,6 +298,16 @@ documented by git history.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` of `NaturalVector` by `Natural`, in every
   combination of value and reference, multiplying every element modulo $2^k$. The elements and the
   scalar must already be reduced.
+- `ModPowerOf2AddMul`, `ModPowerOf2AddMulAssign`, `ModPowerOf2SubMul`, and
+  `ModPowerOf2SubMulAssign` for `NaturalVector`, adding or subtracting a `Natural` multiple of one
+  vector to or from another modulo $2^k$, with the arguments in every combination of value and
+  reference (with a borrowed receiver, all of them by reference). The elements and the scalar must
+  already be reduced.
+- `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `NaturalVector`, adding
+  or subtracting a `Natural` multiple of one vector to or from another modulo a `Natural`, like
+  FLINT's `_fmpz_mod_vec_scalar_addmul_fmpz_mod`, with the arguments in every combination of value
+  and reference (with a borrowed receiver, all of them by reference). The elements and the scalar
+  must already be reduced.
 - `ModMul` and `ModMulAssign` of `NaturalVector` by `Natural` modulo `Natural`, in every
   combination of value and reference, with the multiplication data for the modulus computed once,
   like FLINT's `_fmpz_mod_vec_scalar_mul_fmpz_mod`. The elements and the scalar must already be

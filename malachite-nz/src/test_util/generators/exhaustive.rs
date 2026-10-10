@@ -3814,6 +3814,35 @@ pub fn exhaustive_natural_vector_natural_vector_unsigned_triple_gen_var_1()
     })
 }
 
+pub fn exhaustive_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_1()
+-> It<(NaturalVector, NaturalVector, Natural, u64)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs(
+                    exhaustive_pairs_from_single(exhaustive_natural_vectors_with_dimension(
+                        dimension,
+                    )),
+                    exhaustive_naturals(),
+                )
+                .map(|((v, w), c)| (v, w, c)),
+                exhaustive_unsigneds::<u64>(),
+            )
+            .map(|((v, w, c), pow)| {
+                let bits = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0)
+                    .max(c.significant_bits());
+                (v, w, c, pow + bits)
+            }),
+        )
+    })
+}
+
 pub fn exhaustive_natural_vector_natural_unsigned_triple_gen_var_1()
 -> It<(NaturalVector, Natural, u64)> {
     Box::new(
@@ -3937,6 +3966,38 @@ pub fn exhaustive_natural_vector_natural_vector_natural_triple_gen_var_1()
                     + m
                     + Natural::ONE;
                 (v, w, m)
+            }),
+        )
+    })
+}
+
+// The modulus is the largest input plus 1 plus a free `Natural`, so that no quadruple is generated
+// twice.
+pub fn exhaustive_natural_vector_natural_vector_natural_natural_quadruple_gen_var_1()
+-> It<(NaturalVector, NaturalVector, Natural, Natural)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs(
+                    exhaustive_pairs_from_single(exhaustive_natural_vectors_with_dimension(
+                        dimension,
+                    )),
+                    exhaustive_naturals(),
+                )
+                .map(|((v, w), c)| (v, w, c)),
+                exhaustive_naturals(),
+            )
+            .map(|((v, w, c), k)| {
+                let m = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .chain(core::iter::once(&c))
+                    .max()
+                    .unwrap()
+                    + k
+                    + Natural::ONE;
+                (v, w, c, m)
             }),
         )
     })

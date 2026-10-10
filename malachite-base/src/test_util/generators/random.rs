@@ -9292,6 +9292,18 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<T: Primi
     )
 }
 
+pub fn random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, T, u64)> {
+    Box::new(
+        random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1::<T>(config)
+            .zip(random_primitive_ints::<T>(EXAMPLE_SEED.fork("c")))
+            .map(|((v, w, pow), c)| (v, w, c.mod_power_of_2(pow), pow)),
+    )
+}
+
 pub fn random_unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedVector<T>, T, u64)> {
@@ -9481,6 +9493,18 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2<T: Primi
         random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1::<T>(config)
             .zip(random_positive_unsigneds::<T>(EXAMPLE_SEED.fork("m")))
             .map(|((v, w, _), m)| (v % m, w % m, m)),
+    )
+}
+
+pub fn random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, T, T)> {
+    Box::new(
+        random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2::<T>(config)
+            .zip(random_primitive_ints::<T>(EXAMPLE_SEED.fork("c")))
+            .map(|((v, w, m), c)| (v, w, c % m, m)),
     )
 }
 

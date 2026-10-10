@@ -984,19 +984,23 @@ pub mod unsigned_vector {
         pub mod entrywise_shr_round;
         pub mod height;
         pub mod mod_add;
+        pub mod mod_add_mul;
         pub mod mod_is_reduced;
         pub mod mod_mul;
         pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_sub;
+        pub mod mod_power_of_2_sub_mul;
         pub mod mod_shl;
         pub mod mod_sub;
+        pub mod mod_sub_mul;
         pub mod scalar_div;
         pub mod shr;
     }

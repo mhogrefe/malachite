@@ -7403,6 +7403,30 @@ pub fn random_natural_vector_natural_vector_unsigned_triple_gen_var_1(
     )
 }
 
+pub fn random_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, Natural, u64)> {
+    Box::new(
+        random_natural_vector_natural_vector_natural_triple_gen_var_2(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((v, w, c), pow)| {
+                let bits = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0)
+                    .max(c.significant_bits());
+                (v, w, c, pow + bits)
+            }),
+    )
+}
+
 pub fn random_natural_vector_natural_unsigned_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalVector, Natural, u64)> {
@@ -7567,6 +7591,31 @@ pub fn random_natural_vector_natural_vector_natural_triple_gen_var_1(
                     + m
                     + Natural::ONE;
                 (v, w, m)
+            }),
+    )
+}
+
+pub fn random_natural_vector_natural_vector_natural_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, Natural, Natural)> {
+    Box::new(
+        random_natural_vector_natural_vector_natural_triple_gen_var_2(config)
+            .zip(random_naturals(
+                EXAMPLE_SEED.fork("k"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((v, w, c), k)| {
+                let m = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .chain(core::iter::once(&c))
+                    .max()
+                    .unwrap()
+                    + k
+                    + Natural::ONE;
+                (v, w, c, m)
             }),
     )
 }

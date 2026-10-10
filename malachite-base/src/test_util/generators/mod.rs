@@ -5336,6 +5336,19 @@ pub fn unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<T: PrimitiveUns
     )
 }
 
+// All `(UnsignedVector<T>, UnsignedVector<T>, T, u64)` where the vectors have the same dimension,
+// the `u64` is no greater than `T::WIDTH`, and every element of both vectors, and the `T`, is less
+// than 2 to the power of the `u64`.
+pub fn unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> Generator<(UnsignedVector<T>, UnsignedVector<T>, T, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1,
+        &random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // All `(UnsignedVector<T>, T, u64)` where the `u64` is no greater than `T::WIDTH`, and every
 // element of the vector, and the `T`, is less than 2 to the power of the `u64`.
 pub fn unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
@@ -5406,6 +5419,18 @@ pub fn unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2<T: PrimitiveUns
         &exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2,
         &random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2,
         &special_random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(UnsignedVector<T>, UnsignedVector<T>, T, T)` where the vectors have the same dimension, the
+// last `T` is positive, and every element of both vectors, and the first `T`, is less than it.
+pub fn unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> Generator<(UnsignedVector<T>, UnsignedVector<T>, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2,
+        &random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2,
+        &special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2,
     )
 }
 
