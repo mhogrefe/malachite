@@ -3880,6 +3880,17 @@ pub fn integer_vector_integer_vector_integer_triple_gen_var_1()
     )
 }
 
+// All `(IntegerVector, IntegerVector, Integer, u64)` where the vectors have the same dimension and
+// the `u64` is small.
+pub fn integer_vector_integer_vector_integer_unsigned_quadruple_gen_var_1()
+-> Generator<(IntegerVector, IntegerVector, Integer, u64)> {
+    Generator::new(
+        &exhaustive_integer_vector_integer_vector_integer_unsigned_quadruple_gen_var_1,
+        &random_integer_vector_integer_vector_integer_unsigned_quadruple_gen_var_1,
+        &special_random_integer_vector_integer_vector_integer_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // All triples of `IntegerVector`s of the same dimension.
 pub fn integer_vector_triple_gen_var_1() -> Generator<(IntegerVector, IntegerVector, IntegerVector)>
 {

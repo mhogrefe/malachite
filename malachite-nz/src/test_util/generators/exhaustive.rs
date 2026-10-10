@@ -3455,6 +3455,17 @@ pub fn exhaustive_integer_vector_integer_vector_integer_triple_gen_var_1()
     })
 }
 
+pub fn exhaustive_integer_vector_integer_vector_integer_unsigned_quadruple_gen_var_1()
+-> It<(IntegerVector, IntegerVector, Integer, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_integer_vector_integer_vector_integer_triple_gen_var_1(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((v, w, c), bits)| (v, w, c, bits)),
+    )
+}
+
 pub fn exhaustive_integer_vector_triple_gen_var_1()
 -> It<(IntegerVector, IntegerVector, IntegerVector)> {
     exhaustive_tuples_by_dimension(|dimension| {

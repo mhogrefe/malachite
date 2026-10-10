@@ -91,6 +91,10 @@ pub mod add;
 /// assert_eq!(v.to_string(), "(41, 48, -57)");
 /// ```
 pub mod add_mul;
+/// Implementations of [`AddMulShl`](malachite_base::num::arithmetic::traits::AddMulShl) and
+/// [`AddMulShlAssign`](malachite_base::num::arithmetic::traits::AddMulShlAssign), for adding a
+/// scalar multiple of one vector, shifted left, to another.
+pub mod add_mul_shl;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod) and
 /// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
 /// every element of a vector to the representative closest to zero modulo a number.
@@ -659,5 +663,9 @@ pub mod sub;
 /// assert_eq!(v.to_string(), "(-39, -52, 63)");
 /// ```
 pub mod sub_mul;
+/// Implementations of [`SubMulShl`](malachite_base::num::arithmetic::traits::SubMulShl) and
+/// [`SubMulShlAssign`](malachite_base::num::arithmetic::traits::SubMulShlAssign), for subtracting a
+/// scalar multiple of one vector, shifted left, from another.
+pub mod sub_mul_shl;
 #[doc(hidden)]
 pub mod sum_max_bits;

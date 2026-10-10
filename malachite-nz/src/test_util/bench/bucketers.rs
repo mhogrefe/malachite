@@ -137,6 +137,22 @@ pub fn triple_1_integer_vector_bit_bucketer<T, U>(
     }
 }
 
+pub fn quadruple_1_integer_vector_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (IntegerVector, T, U, V)> {
+    Bucketer {
+        bucketing_function: &|(v, _, _, _)| {
+            usize::exact_from(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
 pub fn pair_1_integer_polynomial_bit_bucketer<T>(
     var_name: &str,
 ) -> Bucketer<'_, (IntegerPolynomial, T)> {

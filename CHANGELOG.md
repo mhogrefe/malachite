@@ -352,6 +352,10 @@ documented by git history.
 - `AddMulShl`, `AddMulShlAssign`, `SubMulShl`, and `SubMulShlAssign` for `Rational`, taking the
   arguments in every combination of value and reference (with a borrowed receiver, all of them by
   reference).
+- `AddMulShl`, `AddMulShlAssign`, `SubMulShl`, and `SubMulShlAssign` for `IntegerVector`, adding
+  or subtracting an `Integer` multiple of one vector, shifted left, to or from another, like FLINT's
+  `_fmpz_vec_scalar_addmul_si_2exp` and `_fmpz_vec_scalar_submul_si_2exp`, with the arguments in
+  every combination of value and reference (with a borrowed receiver, all of them by reference).
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `Natural`, taking the
   arguments in every combination of value and reference (with a borrowed receiver, all of them by
   reference); moduli that fit in a limb use the primitive implementation.

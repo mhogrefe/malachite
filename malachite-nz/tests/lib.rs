@@ -350,6 +350,7 @@ pub mod integer_vector {
     pub mod arithmetic {
         pub mod add;
         pub mod add_mul;
+        pub mod add_mul_shl;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
@@ -376,6 +377,7 @@ pub mod integer_vector {
         pub mod shr;
         pub mod sub;
         pub mod sub_mul;
+        pub mod sub_mul_shl;
     }
     pub mod basic {
         pub mod named;
