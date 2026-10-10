@@ -1759,6 +1759,27 @@ pub mod log_base_power_of_2;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_add;
+/// [`ModAddMul`](traits::ModAddMul) and [`ModAddMulAssign`](traits::ModAddMulAssign), traits for
+/// adding a number and the product of two other numbers modulo another number.
+///
+/// # mod_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModAddMul;
+///
+/// assert_eq!(3u8.mod_add_mul(2, 5, 7), 6);
+/// assert_eq!(10u32.mod_add_mul(14, 3, 15), 7);
+/// assert_eq!(200u16.mod_add_mul(100, 3, 255), 245);
+/// ```
+///
+/// # mod_add_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModAddMulAssign;
+///
+/// let mut x = 10u32;
+/// x.mod_add_mul_assign(14, 3, 15);
+/// assert_eq!(x, 7);
+/// ```
+pub mod mod_add_mul;
 /// [`ModDiv`](traits::ModDiv), a trait for dividing two numbers modulo another number.
 ///
 /// # mod_div
@@ -2836,6 +2857,27 @@ pub mod mod_square;
 /// assert_eq!(n, 8);
 /// ```
 pub mod mod_sub;
+/// [`ModSubMul`](traits::ModSubMul) and [`ModSubMulAssign`](traits::ModSubMulAssign), traits for
+/// subtracting the product of two numbers from a number modulo another number.
+///
+/// # mod_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModSubMul;
+///
+/// assert_eq!(6u8.mod_sub_mul(2, 5, 7), 3);
+/// assert_eq!(10u32.mod_sub_mul(14, 3, 15), 13);
+/// assert_eq!(200u16.mod_sub_mul(100, 3, 255), 155);
+/// ```
+///
+/// # mod_sub_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModSubMulAssign;
+///
+/// let mut x = 10u32;
+/// x.mod_sub_mul_assign(14, 3, 15);
+/// assert_eq!(x, 13);
+/// ```
+pub mod mod_sub_mul;
 /// [`MulAddMul`](traits::MulAddMul) and [`MulAddMulAssign`](traits::MulAddMulAssign), traits for
 /// adding the products of two pairs of numbers.
 ///

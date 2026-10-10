@@ -304,6 +304,7 @@ pub mod num {
         pub mod log_base_2;
         pub mod log_base_power_of_2;
         pub mod mod_add;
+        pub mod mod_add_mul;
         pub mod mod_div;
         pub mod mod_div_list;
         pub mod mod_euclidean;
@@ -332,6 +333,7 @@ pub mod num {
         pub mod mod_sqrt;
         pub mod mod_square;
         pub mod mod_sub;
+        pub mod mod_sub_mul;
         pub mod mul_add_mul;
         pub mod mul_shr_round;
         pub mod mul_sub_mul;

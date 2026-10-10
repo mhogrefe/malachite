@@ -1860,6 +1860,34 @@ pub trait ModMulPrecomputedAssign<RHS = Self, M = Self>: ModMulPrecomputed<RHS, 
     fn mod_mul_precomputed_assign(&mut self, other: RHS, m: M, data: &Self::Data);
 }
 
+/// Adds a number and the product of two other numbers, modulo a fourth number $m$. All three inputs
+/// must be already reduced modulo $m$.
+pub trait ModAddMul<Y = Self, Z = Self, M = Self> {
+    type Output;
+
+    fn mod_add_mul(self, y: Y, z: Z, m: M) -> Self::Output;
+}
+
+/// Adds the product of two numbers to a number modulo a fourth number $m$, in place. All three
+/// inputs must be already reduced modulo $m$.
+pub trait ModAddMulAssign<Y = Self, Z = Self, M = Self> {
+    fn mod_add_mul_assign(&mut self, y: Y, z: Z, m: M);
+}
+
+/// Subtracts the product of two numbers from a number, modulo a fourth number $m$. All three inputs
+/// must be already reduced modulo $m$.
+pub trait ModSubMul<Y = Self, Z = Self, M = Self> {
+    type Output;
+
+    fn mod_sub_mul(self, y: Y, z: Z, m: M) -> Self::Output;
+}
+
+/// Subtracts the product of two numbers from a number modulo a fourth number $m$, in place. All
+/// three inputs must be already reduced modulo $m$.
+pub trait ModSubMulAssign<Y = Self, Z = Self, M = Self> {
+    fn mod_sub_mul_assign(&mut self, y: Y, z: Z, m: M);
+}
+
 /// Negates a number modulo another number $m$. The input must be already reduced modulo $m$.
 pub trait ModNeg<M = Self> {
     type Output;

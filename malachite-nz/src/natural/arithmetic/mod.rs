@@ -185,6 +185,10 @@ pub mod log_base_power_of_2;
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), traits for adding two
 /// numbers modulo another number.
 pub mod mod_add;
+/// Implementations of [`ModAddMul`](malachite_base::num::arithmetic::traits::ModAddMul) and
+/// [`ModAddMulAssign`](malachite_base::num::arithmetic::traits::ModAddMulAssign), traits for adding
+/// a number and the product of two other numbers modulo another number.
+pub mod mod_add_mul;
 /// Implementations of [`ModDiv`](malachite_base::num::arithmetic::traits::ModDiv), a trait for
 /// dividing two numbers modulo another number.
 pub mod mod_div;
@@ -639,6 +643,10 @@ pub mod mod_square;
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), traits for subtracting
 /// two numbers modulo another number.
 pub mod mod_sub;
+/// Implementations of [`ModSubMul`](malachite_base::num::arithmetic::traits::ModSubMul) and
+/// [`ModSubMulAssign`](malachite_base::num::arithmetic::traits::ModSubMulAssign), traits for
+/// subtracting the product of two numbers from a number modulo another number.
+pub mod mod_sub_mul;
 /// Multiplication of [`Natural`](super::Natural)s.
 pub mod mul;
 pub mod mul_add_mul;

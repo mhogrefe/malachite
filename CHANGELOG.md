@@ -43,6 +43,9 @@ documented by git history.
 - `PrimitiveUnsigned` now requires `ModPowerOf2AddMul`, `ModPowerOf2AddMulAssign`,
   `ModPowerOf2SubMul`, and `ModPowerOf2SubMulAssign`, as it already required `ModPowerOf2Mul`. A
   type outside Malachite that implements `PrimitiveUnsigned` must now implement them too.
+- `PrimitiveUnsigned` now requires `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and
+  `ModSubMulAssign`, as it already required `ModMul`. A type outside Malachite that implements
+  `PrimitiveUnsigned` must now implement them too.
 
 ### malachite-base
 
@@ -156,6 +159,9 @@ documented by git history.
   `ModPowerOf2SubMulAssign` traits in `malachite_base::num::arithmetic::traits`, for computing
   $x + yz$ and $x - yz$ modulo $2^k$, implemented for every primitive unsigned type. All three
   arguments must already be reduced.
+- `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` traits in
+  `malachite_base::num::arithmetic::traits`, for computing $x + yz$ and $x - yz$ modulo $m$,
+  implemented for every primitive unsigned type. All three arguments must already be reduced.
 - `EntrywiseDivRound` and `EntrywiseDivRoundAssign` traits in
   `malachite_base::num::arithmetic::traits`, for dividing every entry of a value, such as a vector,
   by a scalar and rounding each quotient according to a `RoundingMode`. Unlike `DivRound`, they
@@ -316,8 +322,12 @@ documented by git history.
   or `None` for a non-square, by 2-adic Newton iteration on the odd part, following Azurite's
   `AzZModPow2.sqrt?`; powers up to the limb width use the primitive implementation.
 - `ModPowerOf2AddMul`, `ModPowerOf2AddMulAssign`, `ModPowerOf2SubMul`, and
-  `ModPowerOf2SubMulAssign` for `Natural`, in every combination of value and reference; powers up
-  to the limb width use the primitive implementation.
+  `ModPowerOf2SubMulAssign` for `Natural`, taking the arguments in every combination of value and
+  reference (with a borrowed receiver, all of them by reference); powers up to the limb width use
+  the primitive implementation.
+- `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `Natural`, taking the
+  arguments in every combination of value and reference (with a borrowed receiver, all of them by
+  reference); moduli that fit in a limb use the primitive implementation.
 - `EntrywiseDivRound` and `EntrywiseDivRoundAssign` of `NaturalVector` by `Natural` and of
   `IntegerVector` by `Integer`, in every combination of value and reference, rounding every quotient
   according to a `RoundingMode`; with `Floor`, this is FLINT's `_fmpz_vec_scalar_fdiv_q_fmpz`.
