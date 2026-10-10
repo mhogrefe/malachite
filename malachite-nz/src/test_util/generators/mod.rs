@@ -3915,6 +3915,17 @@ pub fn natural_vector_natural_pair_gen_var_1() -> Generator<(NaturalVector, Natu
     )
 }
 
+// All `(NaturalVector, Natural, RoundingMode)` where the `Natural` is nonzero and the triple is a
+// valid input to `NaturalVector::entrywise_div_round`.
+pub fn natural_vector_natural_rounding_mode_triple_gen_var_1()
+-> Generator<(NaturalVector, Natural, RoundingMode)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_rounding_mode_triple_gen_var_1,
+        &random_natural_vector_natural_rounding_mode_triple_gen_var_1,
+        &special_random_natural_vector_natural_rounding_mode_triple_gen_var_1,
+    )
+}
+
 // The `Natural` is positive and divides every element of the vector.
 pub fn natural_vector_natural_pair_gen_var_3() -> Generator<(NaturalVector, Natural)> {
     Generator::new(
@@ -3947,6 +3958,17 @@ pub fn integer_vector_integer_pair_gen_var_1() -> Generator<(IntegerVector, Inte
         &exhaustive_integer_vector_integer_pair_gen_var_1,
         &random_integer_vector_integer_pair_gen_var_1,
         &special_random_integer_vector_integer_pair_gen_var_1,
+    )
+}
+
+// All `(IntegerVector, Integer, RoundingMode)` where the `Integer` is nonzero and the triple is a
+// valid input to `IntegerVector::entrywise_div_round`.
+pub fn integer_vector_integer_rounding_mode_triple_gen_var_1()
+-> Generator<(IntegerVector, Integer, RoundingMode)> {
+    Generator::new(
+        &exhaustive_integer_vector_integer_rounding_mode_triple_gen_var_1,
+        &random_integer_vector_integer_rounding_mode_triple_gen_var_1,
+        &special_random_integer_vector_integer_rounding_mode_triple_gen_var_1,
     )
 }
 

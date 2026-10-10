@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonical_primitive_part::register(runner);
     content::register(runner);
     div_exact::register(runner);
+    entrywise_div_round::register(runner);
     entrywise_shr_round::register(runner);
     height::register(runner);
     mod_add::register(runner);
@@ -28,12 +29,14 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_sub::register(runner);
     mod_shl::register(runner);
     mod_sub::register(runner);
+    scalar_div::register(runner);
     shr::register(runner);
 }
 
 mod canonical_primitive_part;
 mod content;
 mod div_exact;
+mod entrywise_div_round;
 mod entrywise_shr_round;
 mod height;
 mod mod_add;
@@ -50,4 +53,5 @@ mod mod_power_of_2_shl;
 mod mod_power_of_2_sub;
 mod mod_shl;
 mod mod_sub;
+mod scalar_div;
 mod shr;

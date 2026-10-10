@@ -82,6 +82,61 @@ pub mod content;
 /// assert_eq!(v.to_string(), "(0, 2, 85)");
 /// ```
 pub mod div_exact;
+/// Dividing every element of a vector by a scalar and rounding each quotient, by implementations of
+/// [`EntrywiseDivRound`](malachite_base::num::arithmetic::traits::EntrywiseDivRound) and
+/// [`EntrywiseDivRoundAssign`](malachite_base::num::arithmetic::traits::EntrywiseDivRoundAssign).
+///
+/// # entrywise_div_round
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseDivRound;
+/// use malachite_base::num::basic::traits::Two;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// assert_eq!(
+///     NaturalVector::from_str("(1, 2, 3, 5)")
+///         .unwrap()
+///         .entrywise_div_round(Natural::TWO, Floor)
+///         .to_string(),
+///     "(0, 1, 1, 2)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 2, 3, 5)").unwrap())
+///         .entrywise_div_round(Natural::TWO, Ceiling)
+///         .to_string(),
+///     "(1, 1, 2, 3)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 2, 3, 5)").unwrap())
+///         .entrywise_div_round(Natural::TWO, Nearest)
+///         .to_string(),
+///     "(0, 1, 2, 2)"
+/// );
+/// assert_eq!(
+///     NaturalVector::from_str("(3, 6, 255)")
+///         .unwrap()
+///         .entrywise_div_round(Natural::from(3u32), Exact)
+///         .to_string(),
+///     "(1, 2, 85)"
+/// );
+/// ```
+///
+/// # entrywise_div_round_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseDivRoundAssign;
+/// use malachite_base::num::basic::traits::Two;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(1, 2, 3, 5)").unwrap();
+/// v.entrywise_div_round_assign(Natural::TWO, Nearest);
+/// assert_eq!(v.to_string(), "(0, 1, 2, 2)");
+/// ```
+pub mod entrywise_div_round;
 /// Left-shifting a vector (multiplying it by a power of 2) and rounding every element, by
 /// implementations of
 /// [`EntrywiseShlRound`](malachite_base::num::arithmetic::traits::EntrywiseShlRound) and
@@ -365,6 +420,48 @@ pub mod mod_sub;
 /// [`NaturalVector::multi_crt`](super::NaturalVector::multi_crt), which combines vectors of
 /// residues modulo many word-sized moduli by the Chinese remainder theorem.
 pub mod multi_crt;
+/// Implementations of [`Div`](core::ops::Div) and [`DivAssign`](core::ops::DivAssign), for dividing
+/// a vector by a scalar.
+///
+/// # div
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::{One, Two};
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// assert_eq!(
+///     (NaturalVector::from_str("()").unwrap() / Natural::from(5u32)).to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(0, 7, 255)").unwrap() / Natural::ONE).to_string(),
+///     "(0, 7, 255)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(0, 7, 255)").unwrap() / Natural::TWO).to_string(),
+///     "(0, 3, 127)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(3802951800684688204490109616128, 7)").unwrap()
+///         / Natural::from(3u32))
+///     .to_string(),
+///     "(1267650600228229401496703205376, 2)"
+/// );
+/// ```
+///
+/// # div_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Two;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(0, 7, 255)").unwrap();
+/// v /= Natural::TWO;
+/// assert_eq!(v.to_string(), "(0, 3, 127)");
+/// ```
+pub mod scalar_div;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a vector by a scalar, with the scalar on either side.
 pub mod scalar_mul;

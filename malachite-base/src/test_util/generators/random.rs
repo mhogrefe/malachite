@@ -9207,6 +9207,24 @@ pub fn random_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1<
     )
 }
 
+// When the rounding mode is `Exact`, every element is rounded down to a multiple of the scalar.
+pub fn random_unsigned_vector_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, T, RoundingMode)> {
+    Box::new(
+        random_unsigned_vector_unsigned_pair_gen_var_8::<T>(config)
+            .zip(random_rounding_modes(EXAMPLE_SEED.fork("rm")))
+            .map(|((mut v, c), rm)| {
+                if rm == Exact {
+                    for x in &mut v.elements {
+                        *x = x.round_to_multiple(c, Down).0;
+                    }
+                }
+                (v, c, rm)
+            }),
+    )
+}
+
 // Every element is rounded down to a multiple of the scalar.
 pub fn random_unsigned_vector_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
     config: &GenConfig,
@@ -9230,6 +9248,22 @@ pub fn random_unsigned_vector_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
             (v, c)
         }),
     )
+}
+
+pub fn random_unsigned_vector_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_unsigned_vectors::<T>(
+                seed,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &random_positive_unsigneds::<T>,
+    ))
 }
 
 pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(

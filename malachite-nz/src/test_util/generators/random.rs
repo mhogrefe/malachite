@@ -7023,6 +7023,17 @@ pub fn random_natural_vector_natural_pair_gen_var_1(
     ))
 }
 
+// When the rounding mode is `Exact`, every element of the vector is multiplied by the scalar.
+pub fn random_natural_vector_natural_rounding_mode_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, Natural, RoundingMode)> {
+    Box::new(
+        random_natural_vector_natural_pair_gen_var_1(config)
+            .zip(random_rounding_modes(EXAMPLE_SEED.fork("rm")))
+            .map(|((v, c), rm)| (if rm == Exact { v * &c } else { v }, c, rm)),
+    )
+}
+
 // Every element of the vector is multiplied by the scalar.
 pub fn random_natural_vector_natural_pair_gen_var_3(
     config: &GenConfig,
@@ -7098,6 +7109,17 @@ pub fn random_integer_vector_integer_pair_gen_var_1(
             )
         },
     ))
+}
+
+// When the rounding mode is `Exact`, every element of the vector is multiplied by the scalar.
+pub fn random_integer_vector_integer_rounding_mode_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerVector, Integer, RoundingMode)> {
+    Box::new(
+        random_integer_vector_integer_pair_gen_var_1(config)
+            .zip(random_rounding_modes(EXAMPLE_SEED.fork("rm")))
+            .map(|((v, c), rm)| (if rm == Exact { v * &c } else { v }, c, rm)),
+    )
 }
 
 // Every element of the vector is multiplied by the scalar.

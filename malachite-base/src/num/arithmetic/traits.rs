@@ -284,6 +284,26 @@ pub trait EntrywiseMinAssign<RHS = Self> {
     fn entrywise_min_assign(&mut self, other: RHS);
 }
 
+/// Divides every entry of a value, such as a vector, by a scalar, rounding each quotient according
+/// to a specified rounding mode.
+///
+/// Unlike [`DivRound`], no [`Ordering`] is returned, since different entries may be rounded in
+/// different directions.
+pub trait EntrywiseDivRound<RHS> {
+    type Output;
+
+    fn entrywise_div_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+/// Divides every entry of a value, such as a vector, by a scalar in place, rounding each quotient
+/// according to a specified rounding mode.
+///
+/// Unlike [`DivRoundAssign`], no [`Ordering`] is returned, since different entries may be rounded
+/// in different directions.
+pub trait EntrywiseDivRoundAssign<RHS> {
+    fn entrywise_div_round_assign(&mut self, other: RHS, rm: RoundingMode);
+}
+
 /// Left-shifts every entry of a value, such as a vector (multiplying it by a power of 2), rounding
 /// each entry according to a specified rounding mode.
 ///

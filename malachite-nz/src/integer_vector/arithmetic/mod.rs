@@ -106,6 +106,67 @@ pub mod dot_general;
 /// [`EntrywiseUnsignedAbs`](malachite_base::num::arithmetic::traits::EntrywiseUnsignedAbs), which
 /// replace every element of a vector by its absolute value.
 pub mod entrywise_abs;
+/// Dividing every element of a vector by a scalar and rounding each quotient, by implementations of
+/// [`EntrywiseDivRound`](malachite_base::num::arithmetic::traits::EntrywiseDivRound) and
+/// [`EntrywiseDivRoundAssign`](malachite_base::num::arithmetic::traits::EntrywiseDivRoundAssign).
+///
+/// # entrywise_div_round
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseDivRound;
+/// use malachite_base::num::basic::traits::Two;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// assert_eq!(
+///     IntegerVector::from_str("(-3, -1, 1, 3)")
+///         .unwrap()
+///         .entrywise_div_round(Integer::TWO, Floor)
+///         .to_string(),
+///     "(-2, -1, 0, 1)"
+/// );
+/// assert_eq!(
+///     (&IntegerVector::from_str("(-3, -1, 1, 3)").unwrap())
+///         .entrywise_div_round(Integer::TWO, Down)
+///         .to_string(),
+///     "(-1, 0, 0, 1)"
+/// );
+/// assert_eq!(
+///     (&IntegerVector::from_str("(-3, -1, 1, 3)").unwrap())
+///         .entrywise_div_round(Integer::TWO, Ceiling)
+///         .to_string(),
+///     "(-1, 0, 1, 2)"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(-3, -1, 1, 3)")
+///         .unwrap()
+///         .entrywise_div_round(Integer::TWO, Nearest)
+///         .to_string(),
+///     "(-2, 0, 0, 2)"
+/// );
+/// assert_eq!(
+///     (&IntegerVector::from_str("(3, -6, 255)").unwrap())
+///         .entrywise_div_round(Integer::from(-3), Exact)
+///         .to_string(),
+///     "(-1, 2, -85)"
+/// );
+/// ```
+///
+/// # entrywise_div_round_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseDivRoundAssign;
+/// use malachite_base::num::basic::traits::Two;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// let mut v = IntegerVector::from_str("(-3, -1, 1, 3)").unwrap();
+/// v.entrywise_div_round_assign(Integer::TWO, Floor);
+/// assert_eq!(v.to_string(), "(-2, -1, 0, 1)");
+/// ```
+pub mod entrywise_div_round;
 /// Left-shifting a vector (multiplying it by a power of 2) and rounding every element, by
 /// implementations of
 /// [`EntrywiseShlRound`](malachite_base::num::arithmetic::traits::EntrywiseShlRound) and
@@ -282,6 +343,50 @@ pub mod multi_crt;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;
+/// Implementations of [`Div`](core::ops::Div) and [`DivAssign`](core::ops::DivAssign), for dividing
+/// a vector by a scalar.
+///
+/// # div
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Two};
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// assert_eq!(
+///     (IntegerVector::from_str("()").unwrap() / Integer::from(5)).to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     (IntegerVector::from_str("(0, -7, 255)").unwrap() / Integer::ONE).to_string(),
+///     "(0, -7, 255)"
+/// );
+/// assert_eq!(
+///     (IntegerVector::from_str("(0, -7, 255)").unwrap() / Integer::NEGATIVE_ONE).to_string(),
+///     "(0, 7, -255)"
+/// );
+/// assert_eq!(
+///     (&IntegerVector::from_str("(0, -7, 255)").unwrap() / Integer::TWO).to_string(),
+///     "(0, -3, 127)"
+/// );
+/// assert_eq!(
+///     (&IntegerVector::from_str("(0, -7, 255)").unwrap() / Integer::from(-2)).to_string(),
+///     "(0, 3, -127)"
+/// );
+/// ```
+///
+/// # div_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::basic::traits::Two;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// let mut v = IntegerVector::from_str("(0, -7, 255)").unwrap();
+/// v /= Integer::TWO;
+/// assert_eq!(v.to_string(), "(0, -3, 127)");
+/// ```
+pub mod scalar_div;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a vector by a scalar, with the scalar on either side.
 pub mod scalar_mul;

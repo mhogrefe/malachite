@@ -143,6 +143,10 @@ documented by git history.
   `EntrywiseShrRoundAssign` traits in `malachite_base::num::arithmetic::traits`, for shifting every
   entry of a vector and rounding each according to a `RoundingMode`. Unlike `ShlRound` and
   `ShrRound`, they return no `Ordering`, since entries may round in different directions.
+- `EntrywiseDivRound` and `EntrywiseDivRoundAssign` traits in
+  `malachite_base::num::arithmetic::traits`, for dividing every entry of a value, such as a vector,
+  by a scalar and rounding each quotient according to a `RoundingMode`. Unlike `DivRound`, they
+  return no `Ordering`, since entries may round in different directions.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` of `UnsignedVector<T>` by a `T`, multiplying every
   element modulo $2^k$. The elements and the scalar must already be reduced.
 - `ModMul` and `ModMulAssign` of `UnsignedVector<T>` by a `T` modulo a `T`, multiplying every
@@ -161,6 +165,9 @@ documented by git history.
   `RoundingMode`.
 - `DivExact` (by value and by reference) and `DivExactAssign` of `UnsignedVector<T>` by a `T`,
   dividing every element by a scalar that divides it exactly.
+- `Div` (by value and by reference) and `DivAssign` of `UnsignedVector<T>` by a `T`, rounding every
+  quotient down, and `EntrywiseDivRound` (by value and by reference) and `EntrywiseDivRoundAssign`
+  by a `T`, rounding every quotient according to a `RoundingMode`.
 
 ### malachite-nz
 
@@ -284,6 +291,12 @@ documented by git history.
 - `DivExact` and `DivExactAssign` of `NaturalVector` by `Natural` and of `IntegerVector` by
   `Integer`, in every combination of value and reference, dividing every element by a scalar that
   divides it exactly, like FLINT's `_fmpz_vec_scalar_divexact_fmpz`.
+- `Div` and `DivAssign` of `NaturalVector` by `Natural` and of `IntegerVector` by `Integer`, in
+  every combination of value and reference, rounding every quotient as the scalar `/` does (down for
+  `Natural`, toward zero for `Integer`), like FLINT's `_fmpz_vec_scalar_tdiv_q_fmpz`.
+- `EntrywiseDivRound` and `EntrywiseDivRoundAssign` of `NaturalVector` by `Natural` and of
+  `IntegerVector` by `Integer`, in every combination of value and reference, rounding every quotient
+  according to a `RoundingMode`; with `Floor`, this is FLINT's `_fmpz_vec_scalar_fdiv_q_fmpz`.
 
 ### malachite-q
 

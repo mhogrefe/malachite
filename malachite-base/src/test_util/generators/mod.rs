@@ -5290,6 +5290,16 @@ pub fn unsigned_vector_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(UnsignedVector<T>, T)` where the `T` is positive.
+pub fn unsigned_vector_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_pair_gen_var_8,
+        &random_unsigned_vector_unsigned_pair_gen_var_8,
+        &special_random_unsigned_vector_unsigned_pair_gen_var_8,
+    )
+}
+
 // All `(UnsignedVector<T>, U, RoundingMode)` where the `U` is no greater than `T::WIDTH + 1` and
 // the triple is a valid input to `UnsignedVector::entrywise_shr_round`.
 pub fn unsigned_vector_unsigned_rounding_mode_triple_gen_var_1<
@@ -5300,6 +5310,17 @@ pub fn unsigned_vector_unsigned_rounding_mode_triple_gen_var_1<
         &exhaustive_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1,
         &random_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1,
         &special_random_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(UnsignedVector<T>, T, RoundingMode)` where the `T` is positive and the triple is a valid
+// input to `UnsignedVector::entrywise_div_round`.
+pub fn unsigned_vector_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, T, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_rounding_mode_triple_gen_var_2,
+        &random_unsigned_vector_unsigned_rounding_mode_triple_gen_var_2,
+        &special_random_unsigned_vector_unsigned_rounding_mode_triple_gen_var_2,
     )
 }
 

@@ -68,6 +68,57 @@ pub mod content;
 /// assert_eq!(v.to_string(), "(0, 2, 85)");
 /// ```
 pub mod div_exact;
+/// Dividing every element of a vector by a scalar and rounding each quotient, by implementations of
+/// [`EntrywiseDivRound`](crate::num::arithmetic::traits::EntrywiseDivRound) and
+/// [`EntrywiseDivRoundAssign`](crate::num::arithmetic::traits::EntrywiseDivRoundAssign).
+///
+/// # entrywise_div_round
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseDivRound;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// assert_eq!(
+///     UnsignedVector::<u8>::from_str("(1, 2, 3, 5)")
+///         .unwrap()
+///         .entrywise_div_round(2u8, Floor)
+///         .to_string(),
+///     "(0, 1, 1, 2)"
+/// );
+/// assert_eq!(
+///     (&UnsignedVector::<u8>::from_str("(1, 2, 3, 5)").unwrap())
+///         .entrywise_div_round(2u8, Ceiling)
+///         .to_string(),
+///     "(1, 1, 2, 3)"
+/// );
+/// assert_eq!(
+///     (&UnsignedVector::<u8>::from_str("(1, 2, 3, 5)").unwrap())
+///         .entrywise_div_round(2u8, Nearest)
+///         .to_string(),
+///     "(0, 1, 2, 2)"
+/// );
+/// assert_eq!(
+///     UnsignedVector::<u8>::from_str("(3, 6, 255)")
+///         .unwrap()
+///         .entrywise_div_round(3u8, Exact)
+///         .to_string(),
+///     "(1, 2, 85)"
+/// );
+/// ```
+///
+/// # entrywise_div_round_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseDivRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// let mut v = UnsignedVector::<u8>::from_str("(1, 2, 3, 5)").unwrap();
+/// v.entrywise_div_round_assign(2u8, Nearest);
+/// assert_eq!(v.to_string(), "(0, 1, 2, 2)");
+/// ```
+pub mod entrywise_div_round;
 /// Right-shifting a vector (dividing it by a power of 2) and rounding every element, by
 /// implementations of [`EntrywiseShrRound`](crate::num::arithmetic::traits::EntrywiseShrRound) and
 /// [`EntrywiseShrRoundAssign`](crate::num::arithmetic::traits::EntrywiseShrRoundAssign).
@@ -265,6 +316,42 @@ pub mod mod_shl;
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting vectors modulo a
 /// number.
 pub mod mod_sub;
+/// Implementations of [`Div`](core::ops::Div) and [`DivAssign`](core::ops::DivAssign), for dividing
+/// a vector by a scalar.
+///
+/// # div
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// assert_eq!(
+///     (UnsignedVector::<u8>::from_str("()").unwrap() / 5u8).to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     (UnsignedVector::<u8>::from_str("(0, 7, 255)").unwrap() / 1u8).to_string(),
+///     "(0, 7, 255)"
+/// );
+/// assert_eq!(
+///     (&UnsignedVector::<u8>::from_str("(0, 7, 255)").unwrap() / 2u8).to_string(),
+///     "(0, 3, 127)"
+/// );
+/// assert_eq!(
+///     (&UnsignedVector::<u8>::from_str("(0, 7, 255)").unwrap() / 255u8).to_string(),
+///     "(0, 0, 1)"
+/// );
+/// ```
+///
+/// # div_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// let mut v = UnsignedVector::<u8>::from_str("(0, 7, 255)").unwrap();
+/// v /= 2u8;
+/// assert_eq!(v.to_string(), "(0, 3, 127)");
+/// ```
+pub mod scalar_div;
 /// Right-shifting a vector (dividing it by a power of 2 and taking the floor), by implementations
 /// of [`Shr`](core::ops::Shr) and [`ShrAssign`](core::ops::ShrAssign).
 ///

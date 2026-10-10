@@ -356,6 +356,7 @@ pub mod integer_vector {
         pub mod div_exact;
         pub mod dot_general;
         pub mod entrywise_abs;
+        pub mod entrywise_div_round;
         pub mod entrywise_shl_round;
         pub mod entrywise_shr_round;
         pub mod height;
@@ -366,6 +367,7 @@ pub mod integer_vector {
         pub mod mod_power_of_2;
         pub mod multi_crt;
         pub mod neg;
+        pub mod scalar_div;
         pub mod scalar_mul;
         pub mod shl;
         pub mod shr;
@@ -896,6 +898,7 @@ pub mod natural_vector {
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod div_exact;
+        pub mod entrywise_div_round;
         pub mod entrywise_shl_round;
         pub mod entrywise_shr_round;
         pub mod height;
@@ -915,6 +918,7 @@ pub mod natural_vector {
         pub mod mod_shl;
         pub mod mod_sub;
         pub mod multi_crt;
+        pub mod scalar_div;
         pub mod scalar_mul;
         pub mod shl;
         pub mod shr;

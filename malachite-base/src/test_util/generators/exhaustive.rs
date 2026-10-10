@@ -6834,6 +6834,20 @@ pub fn exhaustive_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1<
     ))
 }
 
+pub fn exhaustive_unsigned_vector_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> It<(UnsignedVector<T>, T, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs(
+                exhaustive_unsigned_vectors::<T>(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|((v, c), rm)| *rm != Exact || v.elements.iter().all(|x| x.divisible_by(*c))),
+    ))
+}
+
 struct UnsignedVectorDivisiblePairsGenerator<T: PrimitiveUnsigned> {
     phantom: PhantomData<*const T>,
 }
@@ -6867,6 +6881,14 @@ pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
             phantom: PhantomData,
         },
     )))
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>()
+-> It<(UnsignedVector<T>, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigned_vectors::<T>(),
+        exhaustive_positive_primitive_ints(),
+    ))
 }
 
 // -- tuples of vectors of a common dimension --
