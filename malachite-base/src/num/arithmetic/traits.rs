@@ -380,6 +380,20 @@ pub trait AddMulAssign<Y = Self, Z = Self> {
     fn add_mul_assign(&mut self, y: Y, z: Z);
 }
 
+/// Adds a number and the product of two other numbers, shifted left by a number of bits:
+/// $x + yz2^k$.
+pub trait AddMulShl<Y = Self, Z = Self> {
+    type Output;
+
+    fn add_mul_shl(self, y: Y, z: Z, bits: u64) -> Self::Output;
+}
+
+/// Adds the product of two numbers, shifted left by a number of bits, to a number in place:
+/// $x \gets x + yz2^k$.
+pub trait AddMulShlAssign<Y = Self, Z = Self> {
+    fn add_mul_shl_assign(&mut self, y: Y, z: Z, bits: u64);
+}
+
 /// Adds the products of two pairs of numbers.
 pub trait MulAddMul<Y = Self, Z = Self, W = Self> {
     type Output;
@@ -3103,6 +3117,20 @@ pub trait SubMul<Y = Self, Z = Self> {
 /// implementation's documentation for which contract it provides.
 pub trait SubMulAssign<Y = Self, Z = Self> {
     fn sub_mul_assign(&mut self, y: Y, z: Z);
+}
+
+/// Subtracts the product of two numbers, shifted left by a number of bits, from a number:
+/// $x - yz2^k$.
+pub trait SubMulShl<Y = Self, Z = Self> {
+    type Output;
+
+    fn sub_mul_shl(self, y: Y, z: Z, bits: u64) -> Self::Output;
+}
+
+/// Subtracts the product of two numbers, shifted left by a number of bits, from a number in place:
+/// $x \gets x - yz2^k$.
+pub trait SubMulShlAssign<Y = Self, Z = Self> {
+    fn sub_mul_shl_assign(&mut self, y: Y, z: Z, bits: u64);
 }
 
 /// Takes the absolute value of a number, wrapping around at the boundary of the type.

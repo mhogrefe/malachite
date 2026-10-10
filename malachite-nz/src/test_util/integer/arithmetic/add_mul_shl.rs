@@ -6,11 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod add;
-pub mod add_mul_shl;
-pub mod crt;
-pub mod divisible_by;
-pub mod falling_factorial;
-pub mod mul;
-pub mod sign;
-pub mod sub_mul_shl;
+use crate::integer::Integer;
+use malachite_base::num::arithmetic::traits::PowerOf2;
+
+// Multiplies by $2^k$ instead of shifting.
+pub fn add_mul_shl_naive(x: &Integer, y: &Integer, z: &Integer, bits: u64) -> Integer {
+    x + y * z * Integer::power_of_2(bits)
+}

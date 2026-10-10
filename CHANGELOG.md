@@ -159,6 +159,9 @@ documented by git history.
   `ModPowerOf2SubMulAssign` traits in `malachite_base::num::arithmetic::traits`, for computing
   $x + yz$ and $x - yz$ modulo $2^k$, implemented for every primitive unsigned type. All three
   arguments must already be reduced.
+- `AddMulShl`, `AddMulShlAssign`, `SubMulShl`, and `SubMulShlAssign` traits in
+  `malachite_base::num::arithmetic::traits`, for computing $x + yz2^k$ and $x - yz2^k$, the scalar
+  operations behind FLINT's `_fmpz_vec_scalar_addmul_si_2exp` and `_fmpz_vec_scalar_submul_si_2exp`.
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` traits in
   `malachite_base::num::arithmetic::traits`, for computing $x + yz$ and $x - yz$ modulo $m$,
   implemented for every primitive unsigned type. All three arguments must already be reduced.
@@ -341,6 +344,9 @@ documented by git history.
   `ModPowerOf2SubMulAssign` for `Natural`, taking the arguments in every combination of value and
   reference (with a borrowed receiver, all of them by reference); powers up to the limb width use
   the primitive implementation.
+- `AddMulShl`, `AddMulShlAssign`, `SubMulShl`, and `SubMulShlAssign` for `Integer`, taking the
+  arguments in every combination of value and reference (with a borrowed receiver, all of them by
+  reference).
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `Natural`, taking the
   arguments in every combination of value and reference (with a borrowed receiver, all of them by
   reference); moduli that fit in a limb use the primitive implementation.

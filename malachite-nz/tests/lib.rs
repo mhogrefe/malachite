@@ -167,6 +167,7 @@ pub mod integer {
         pub mod abs_squared;
         pub mod add;
         pub mod add_mul;
+        pub mod add_mul_shl;
         pub mod average;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
@@ -216,6 +217,7 @@ pub mod integer {
         pub mod square;
         pub mod sub;
         pub mod sub_mul;
+        pub mod sub_mul_shl;
     }
     pub mod basic {
         pub mod constants;

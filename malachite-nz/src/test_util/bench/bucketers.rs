@@ -571,6 +571,26 @@ pub fn quadruple_1_2_3_integer_bit_i64_u64_max_bucketer<'a, T>(
     }
 }
 
+pub fn quadruple_1_2_3_integer_max_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Integer, Integer, Integer, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, _)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
+            {z_name}.significant_bits())"
+        ),
+    }
+}
+
 pub fn triple_3_pair_natural_max_bit_bucketer<'a, T, U>(
     x_name: &'a str,
     y_name: &'a str,
