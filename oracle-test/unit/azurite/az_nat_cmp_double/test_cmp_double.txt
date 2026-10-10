@@ -1,0 +1,11 @@
+0.cmp_double(&0) = Equal
+0.cmp_double(&1) = Less
+1.cmp_double(&0) = Greater
+4.cmp_double(&2) = Equal
+3.cmp_double(&2) = Less
+5.cmp_double(&2) = Greater
+18446744073709551616.cmp_double(&9223372036854775808) = Equal
+18446744073709551615.cmp_double(&9223372036854775808) = Less
+18446744073709551617.cmp_double(&9223372036854775808) = Greater
+18446744073709551616.cmp_double(&1) = Greater
+1.cmp_double(&18446744073709551616) = Less

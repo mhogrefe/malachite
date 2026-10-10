@@ -720,6 +720,7 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_to_string_base", "az_nat_to_string_base"),
     ("demo_natural_cmp", "az_nat_cmp"),
     ("demo_natural_cmp_normalized", "az_nat_cmp_normalized"),
+    ("demo_natural_cmp_double", "az_nat_cmp_double"),
     ("demo_natural_from_unsigned_u8", "az_nat_from_unsigned"),
     ("demo_natural_from_unsigned_u64", "az_nat_from_unsigned"),
     (
