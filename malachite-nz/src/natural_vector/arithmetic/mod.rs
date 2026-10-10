@@ -78,6 +78,10 @@ pub mod add;
 /// assert_eq!(v.to_string(), "(41, 52, 63)");
 /// ```
 pub mod add_mul;
+/// Implementations of [`AddMulShl`](malachite_base::num::arithmetic::traits::AddMulShl) and
+/// [`AddMulShlAssign`](malachite_base::num::arithmetic::traits::AddMulShlAssign), for adding a
+/// scalar multiple of one vector, shifted left, to another.
+pub mod add_mul_shl;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), which
 /// reduces every element of a vector to the representative closest to zero modulo a number.
 pub mod balanced_mod;

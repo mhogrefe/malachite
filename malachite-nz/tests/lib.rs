@@ -906,6 +906,7 @@ pub mod natural_vector {
     pub mod arithmetic {
         pub mod add;
         pub mod add_mul;
+        pub mod add_mul_shl;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;

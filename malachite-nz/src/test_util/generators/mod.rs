@@ -4174,6 +4174,17 @@ pub fn natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_1()
     )
 }
 
+// All `(NaturalVector, NaturalVector, Natural, u64)` where the vectors have the same dimension and
+// the `u64` is small.
+pub fn natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_2()
+-> Generator<(NaturalVector, NaturalVector, Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_2,
+        &random_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_2,
+        &special_random_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_2,
+    )
+}
+
 // All `(NaturalVector, Natural, u64)` where every element of the vector, and the `Natural`, is less
 // than 2 to the power of the `u64`.
 #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
