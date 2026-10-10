@@ -114,6 +114,39 @@ pub mod mod_power_of_2_shl;
 /// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
 /// vectors modulo a power of 2.
 pub mod mod_power_of_2_sub;
+/// Implementations of [`ModShl`](crate::num::arithmetic::traits::ModShl) and
+/// [`ModShlAssign`](crate::num::arithmetic::traits::ModShlAssign), for left-shifting a vector
+/// (multiplying it by a power of 2) modulo a number.
+///
+/// # mod_shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModShl;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// let v = UnsignedVector::<u8>::from_str("(5, 1, 3)").unwrap();
+/// assert_eq!(v.clone().mod_shl(1u8, 7).to_string(), "(3, 2, 6)");
+/// // The modulus need not be odd, so elements can become zero, keeping the dimension.
+/// assert_eq!(v.mod_shl(3u32, 8).to_string(), "(0, 0, 0)");
+/// assert_eq!(
+///     (&UnsignedVector::<u8>::from_str("(1, 2)").unwrap())
+///         .mod_shl(8u64, 255)
+///         .to_string(),
+///     "(1, 2)"
+/// );
+/// ```
+///
+/// # mod_shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModShlAssign;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// let mut v = UnsignedVector::<u8>::from_str("(5, 1, 3)").unwrap();
+/// v.mod_shl_assign(1u8, 7);
+/// assert_eq!(v.to_string(), "(3, 2, 6)");
+/// ```
+pub mod mod_shl;
 /// Implementations of [`ModSub`](crate::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting vectors modulo a
 /// number.

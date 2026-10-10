@@ -4024,6 +4024,17 @@ pub fn natural_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(NaturalVector, T, Natural)` where the vector's elements are less than the `Natural`, and
+// the `T` is small and unsigned.
+pub fn natural_vector_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(NaturalVector, T, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vector_unsigned_natural_triple_gen_var_1,
+        &random_natural_vector_unsigned_natural_triple_gen_var_1,
+        &special_random_natural_vector_unsigned_natural_triple_gen_var_1,
+    )
+}
+
 // All `(NaturalVector, NaturalVector, NaturalVector, u64)` where the vectors have the same
 // dimension and every element of all three is less than 2 to the power of the `u64`.
 pub fn natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1()

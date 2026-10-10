@@ -905,6 +905,7 @@ pub mod natural_vector {
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_sub;
+        pub mod mod_shl;
         pub mod mod_sub;
         pub mod multi_crt;
         pub mod scalar_mul;

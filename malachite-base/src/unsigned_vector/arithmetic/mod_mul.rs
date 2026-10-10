@@ -9,6 +9,7 @@
 use crate::num::arithmetic::traits::{ModIsReduced, ModMul, ModMulAssign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_vector::UnsignedVector;
+use alloc::vec::Vec;
 
 fn assert_reduced<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, c: T, m: T) {
     assert!(
@@ -19,6 +20,23 @@ fn assert_reduced<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, c: T, m: T) {
         c.mod_is_reduced(&m),
         "c must be reduced mod m, but {c} >= {m}"
     );
+}
+
+// Multiplies every element by `c` modulo `m`, which the elements and `c` are already reduced
+// modulo. The data for multiplying modulo `m` is computed once and shared by all the elements.
+pub(crate) fn mod_mul_assign_unchecked<T: PrimitiveUnsigned>(xs: &mut [T], c: T, m: T) {
+    let data = T::precompute_mod_mul_data(&m);
+    for x in xs {
+        x.mod_mul_precomputed_assign(c, m, &data);
+    }
+}
+
+// The elements multiplied by `c` modulo `m`, as `mod_mul_assign_unchecked` computes them.
+pub(crate) fn mod_mul_unchecked<T: PrimitiveUnsigned>(xs: &[T], c: T, m: T) -> Vec<T> {
+    let data = T::precompute_mod_mul_data(&m);
+    xs.iter()
+        .map(|&x| x.mod_mul_precomputed(c, m, &data))
+        .collect()
 }
 
 impl<T: PrimitiveUnsigned> ModMul<T, T> for UnsignedVector<T> {
@@ -90,13 +108,8 @@ impl<T: PrimitiveUnsigned> ModMul<T, T> for &UnsignedVector<T> {
     /// ```
     fn mod_mul(self, c: T, m: T) -> UnsignedVector<T> {
         assert_reduced(self, c, m);
-        let data = T::precompute_mod_mul_data(&m);
         UnsignedVector {
-            elements: self
-                .elements
-                .iter()
-                .map(|&x| x.mod_mul_precomputed(c, m, &data))
-                .collect(),
+            elements: mod_mul_unchecked(&self.elements, c, m),
         }
     }
 }
@@ -130,9 +143,6 @@ impl<T: PrimitiveUnsigned> ModMulAssign<T, T> for UnsignedVector<T> {
     /// ```
     fn mod_mul_assign(&mut self, c: T, m: T) {
         assert_reduced(self, c, m);
-        let data = T::precompute_mod_mul_data(&m);
-        for x in &mut self.elements {
-            x.mod_mul_precomputed_assign(c, m, &data);
-        }
+        mod_mul_assign_unchecked(&mut self.elements, c, m);
     }
 }

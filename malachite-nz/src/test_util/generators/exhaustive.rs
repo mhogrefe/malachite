@@ -3680,6 +3680,26 @@ pub fn exhaustive_natural_vector_unsigned_unsigned_triple_gen_var_1<T: Primitive
     )
 }
 
+// The modulus is the largest element plus 1 plus a free `Natural`, so that no triple is generated
+// twice.
+pub fn exhaustive_natural_vector_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(NaturalVector, T, Natural)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_natural_vectors(),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_naturals(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::normal(1),
+        )
+        .map(|(v, bits, k)| {
+            let m = v.elements.iter().max().cloned().unwrap_or_default() + k + Natural::ONE;
+            (v, bits, m)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1()
 -> It<(NaturalVector, NaturalVector, NaturalVector, u64)> {
     exhaustive_tuples_by_dimension(|dimension| {

@@ -7143,6 +7143,43 @@ pub fn random_natural_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsi
     )
 }
 
+pub fn random_natural_vector_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalVector, T, Natural)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_vectors(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(v, bits, k)| {
+            let m = v.elements.iter().max().cloned().unwrap_or_default() + k + Natural::ONE;
+            (v, bits, m)
+        }),
+    )
+}
+
 pub fn random_natural_vector_natural_vector_natural_vector_unsigned_quadruple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalVector, NaturalVector, NaturalVector, u64)> {

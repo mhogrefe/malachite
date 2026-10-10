@@ -29,6 +29,11 @@ fn assert_reduced(v: &NaturalVector, c: &Natural, m: &Natural) {
 // is computed once and shared by all the elements.
 fn mod_mul_assign_helper(v: &mut NaturalVector, c: &Natural, m: &Natural) {
     assert_reduced(v, c, m);
+    mod_mul_assign_unchecked(v, c, m);
+}
+
+// As `mod_mul_assign_helper`, for elements and `c` already known to be reduced modulo `m`.
+pub(crate) fn mod_mul_assign_unchecked(v: &mut NaturalVector, c: &Natural, m: &Natural) {
     match *c {
         Natural::ZERO => v.elements.fill(Natural::ZERO),
         Natural::ONE => {}
@@ -44,6 +49,11 @@ fn mod_mul_assign_helper(v: &mut NaturalVector, c: &Natural, m: &Natural) {
 
 fn mod_mul_ref_helper(v: &NaturalVector, c: &Natural, m: &Natural) -> NaturalVector {
     assert_reduced(v, c, m);
+    mod_mul_unchecked(v, c, m)
+}
+
+// As `mod_mul_ref_helper`, for elements and `c` already known to be reduced modulo `m`.
+pub(crate) fn mod_mul_unchecked(v: &NaturalVector, c: &Natural, m: &Natural) -> NaturalVector {
     NaturalVector {
         elements: match *c {
             Natural::ZERO => vec![Natural::ZERO; v.elements.len()],

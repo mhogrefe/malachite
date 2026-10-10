@@ -6902,6 +6902,23 @@ pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_3<
     )
 }
 
+pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, U, T)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_unsigned_vectors::<T>(),
+            exhaustive_unsigneds::<U>(),
+            exhaustive_positive_primitive_ints::<T>(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::normal(1),
+        )
+        .filter(|(v, _, m)| v.mod_is_reduced(m)),
+    )
+}
+
 pub fn exhaustive_unsigned_vector_pair_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, UnsignedVector<T>)> {
     exhaustive_tuples_by_dimension(|dimension| {

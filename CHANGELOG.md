@@ -146,6 +146,9 @@ documented by git history.
   `_nmod_vec_scalar_mul_nmod`. The elements and the scalar must already be reduced.
 - `ModPowerOf2Shl` and `ModPowerOf2ShlAssign` for `UnsignedVector<T>`, by any primitive unsigned
   type, shifting every element left modulo $2^k$. The elements must already be reduced.
+- `ModShl` and `ModShlAssign` for `UnsignedVector<T>`, by any primitive unsigned type, modulo a
+  `T`, computing $2^k \bmod m$ once and multiplying every element by it. The elements must already
+  be reduced.
 
 ### malachite-nz
 
@@ -253,6 +256,9 @@ documented by git history.
 - `ModPowerOf2Shl` (by value and by reference) and `ModPowerOf2ShlAssign` for `NaturalVector`, by
   any primitive unsigned type, shifting every element left modulo $2^k$. The elements must already
   be reduced.
+- `ModShl` and `ModShlAssign` for `NaturalVector`, by any primitive unsigned type, modulo a
+  `Natural`, in every combination of value and reference, computing $2^k \bmod m$ once and
+  multiplying every element by it. The elements must already be reduced.
 - `Shl` (by value and by reference) and `ShlAssign` for `NaturalVector` and `IntegerVector`, by any
   primitive unsigned type, shifting every element left, like FLINT's `_fmpz_vec_scalar_mul_2exp`.
 

@@ -127,6 +127,50 @@ pub mod mod_power_of_2_shl;
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting vectors modulo a power of 2.
 pub mod mod_power_of_2_sub;
+/// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
+/// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
+/// vector (multiplying it by a power of 2) modulo a number.
+///
+/// # mod_shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModShl;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let v = NaturalVector::from_str("(5, 1, 3)").unwrap();
+/// assert_eq!(
+///     v.clone().mod_shl(1u8, Natural::from(7u32)).to_string(),
+///     "(3, 2, 6)"
+/// );
+/// // The modulus need not be odd, so elements can become zero, keeping the dimension.
+/// assert_eq!(
+///     v.mod_shl(3u32, Natural::from(8u32)).to_string(),
+///     "(0, 0, 0)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 1)").unwrap())
+///         .mod_shl(
+///             100u64,
+///             Natural::from_str("1000000000000000000000000000000").unwrap()
+///         )
+///         .to_string(),
+///     "(267650600228229401496703205376, 267650600228229401496703205376)"
+/// );
+/// ```
+///
+/// # mod_shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModShlAssign;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(5, 1, 3)").unwrap();
+/// v.mod_shl_assign(1u8, Natural::from(7u32));
+/// assert_eq!(v.to_string(), "(3, 2, 6)");
+/// ```
+pub mod mod_shl;
 /// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting vectors
 /// modulo a number.
