@@ -16,11 +16,12 @@ use crate::num::arithmetic::traits::{
     GcdAssign, Lcm, LcmAssign, LucasNumber, ModAdd, ModAddAssign, ModInverse, ModIsReduced, ModMul,
     ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow,
     ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add,
-    ModPowerOf2AddAssign, ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul,
-    ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
-    ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
-    ModPowerOf2ShrAssign, ModPowerOf2Sqrt, ModPowerOf2Square, ModPowerOf2SquareAssign,
-    ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
+    ModPowerOf2AddAssign, ModPowerOf2AddMul, ModPowerOf2AddMulAssign, ModPowerOf2Inverse,
+    ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg,
+    ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Shl,
+    ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Sqrt, ModPowerOf2Square,
+    ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModPowerOf2SubMul,
+    ModPowerOf2SubMulAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
     ModSquarePrecomputedAssign, ModSub, ModSubAssign, Multifactorial, NegMod, NegModAssign,
     NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, Primorial,
     RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, UnsignedAbs, XMulYToZZ,
@@ -110,6 +111,10 @@ pub trait PrimitiveUnsigned:
     + ModPowerOf2IsReduced
     + ModPowerOf2Mul<Self, Output = Self>
     + ModPowerOf2MulAssign<Self>
+    + ModPowerOf2AddMul<Self, Self, Output = Self>
+    + ModPowerOf2AddMulAssign<Self, Self>
+    + ModPowerOf2SubMul<Self, Self, Output = Self>
+    + ModPowerOf2SubMulAssign<Self, Self>
     + ModPowerOf2Neg<Output = Self>
     + ModPowerOf2NegAssign
     + ModPowerOf2Pow<u64, Output = Self>

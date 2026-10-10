@@ -2061,6 +2061,34 @@ pub trait ModPowerOf2MulAssign<RHS = Self> {
     fn mod_power_of_2_mul_assign(&mut self, other: RHS, pow: u64);
 }
 
+/// Adds a number and the product of two other numbers, modulo $2^k$. All three inputs must be
+/// already reduced modulo $2^k$.
+pub trait ModPowerOf2AddMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn mod_power_of_2_add_mul(self, y: Y, z: Z, pow: u64) -> Self::Output;
+}
+
+/// Adds the product of two numbers to a number modulo $2^k$, in place. All three inputs must be
+/// already reduced modulo $2^k$.
+pub trait ModPowerOf2AddMulAssign<Y = Self, Z = Self> {
+    fn mod_power_of_2_add_mul_assign(&mut self, y: Y, z: Z, pow: u64);
+}
+
+/// Subtracts the product of two numbers from a number, modulo $2^k$. All three inputs must be
+/// already reduced modulo $2^k$.
+pub trait ModPowerOf2SubMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn mod_power_of_2_sub_mul(self, y: Y, z: Z, pow: u64) -> Self::Output;
+}
+
+/// Subtracts the product of two numbers from a number modulo $2^k$, in place. All three inputs must
+/// be already reduced modulo $2^k$.
+pub trait ModPowerOf2SubMulAssign<Y = Self, Z = Self> {
+    fn mod_power_of_2_sub_mul_assign(&mut self, y: Y, z: Z, pow: u64);
+}
+
 /// Negates a number modulo $2^k$. The input must be already reduced modulo $2^k$.
 pub trait ModPowerOf2Neg {
     type Output;

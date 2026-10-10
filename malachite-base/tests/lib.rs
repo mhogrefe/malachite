@@ -315,6 +315,7 @@ pub mod num {
         pub mod mod_pow;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_inverse;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
@@ -325,6 +326,7 @@ pub mod num {
         pub mod mod_power_of_2_sqrt;
         pub mod mod_power_of_2_square;
         pub mod mod_power_of_2_sub;
+        pub mod mod_power_of_2_sub_mul;
         pub mod mod_shl;
         pub mod mod_shr;
         pub mod mod_sqrt;

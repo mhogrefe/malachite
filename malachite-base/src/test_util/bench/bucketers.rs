@@ -669,6 +669,16 @@ where
     }
 }
 
+pub fn quadruple_4_bucketer<T, U, V, W: Copy>(w_name: &str) -> Bucketer<'_, (T, U, V, W)>
+where
+    usize: ExactFrom<W>,
+{
+    Bucketer {
+        bucketing_function: &|&(_, _, _, w)| usize::exact_from(w),
+        bucketing_label: w_name.to_string(),
+    }
+}
+
 pub fn pair_primitive_int_bit_u64_max_bucketer<'a, T: PrimitiveInt>(
     x_name: &'a str,
     y_name: &'a str,

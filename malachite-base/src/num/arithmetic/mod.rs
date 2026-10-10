@@ -2404,6 +2404,28 @@ pub mod mod_power_of_2;
 /// assert_eq!(n, 8);
 /// ```
 pub mod mod_power_of_2_add;
+/// [`ModPowerOf2AddMul`](traits::ModPowerOf2AddMul) and
+/// [`ModPowerOf2AddMulAssign`](traits::ModPowerOf2AddMulAssign), traits for adding a number and the
+/// product of two other numbers modulo $2^k$.
+///
+/// # mod_power_of_2_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2AddMul;
+///
+/// assert_eq!(3u8.mod_power_of_2_add_mul(2, 5, 5), 13);
+/// assert_eq!(10u32.mod_power_of_2_add_mul(14, 3, 4), 4);
+/// assert_eq!(200u16.mod_power_of_2_add_mul(100, 3, 8), 244);
+/// ```
+///
+/// # mod_power_of_2_add_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2AddMulAssign;
+///
+/// let mut x = 10u32;
+/// x.mod_power_of_2_add_mul_assign(14, 3, 4);
+/// assert_eq!(x, 4);
+/// ```
+pub mod mod_power_of_2_add_mul;
 /// [`ModPowerOf2Inverse`](traits::ModPowerOf2Inverse), a trait for finding the multiplicative
 /// inverse of a number modulo $2^k$.
 ///
@@ -2639,6 +2661,28 @@ pub mod mod_power_of_2_square;
 /// assert_eq!(n, 12);
 /// ```
 pub mod mod_power_of_2_sub;
+/// [`ModPowerOf2SubMul`](traits::ModPowerOf2SubMul) and
+/// [`ModPowerOf2SubMulAssign`](traits::ModPowerOf2SubMulAssign), traits for subtracting the product
+/// of two numbers from a number modulo $2^k$.
+///
+/// # mod_power_of_2_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2SubMul;
+///
+/// assert_eq!(13u8.mod_power_of_2_sub_mul(2, 5, 5), 3);
+/// assert_eq!(4u32.mod_power_of_2_sub_mul(14, 3, 4), 10);
+/// assert_eq!(10u16.mod_power_of_2_sub_mul(100, 3, 8), 222);
+/// ```
+///
+/// # mod_power_of_2_sub_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2SubMulAssign;
+///
+/// let mut x = 4u32;
+/// x.mod_power_of_2_sub_mul_assign(14, 3, 4);
+/// assert_eq!(x, 10);
+/// ```
+pub mod mod_power_of_2_sub_mul;
 /// [`ModShl`](traits::ModShl) and [`ModShlAssign`](traits::ModShlAssign), traits for left-shifting
 /// a number modulo another number.
 ///
