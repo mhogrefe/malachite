@@ -501,6 +501,7 @@ pub mod natural {
         pub mod mod_power_of_2_pow;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_shr;
+        pub mod mod_power_of_2_sqrt;
         pub mod mod_power_of_2_square;
         pub mod mod_power_of_2_sub;
         pub mod mod_shl;

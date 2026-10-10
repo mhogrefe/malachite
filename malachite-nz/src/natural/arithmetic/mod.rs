@@ -363,6 +363,35 @@ pub mod mod_power_of_2_shl;
 /// assert_eq!(n, 30);
 /// ```
 pub mod mod_power_of_2_shr;
+/// An implementation of
+/// [`ModPowerOf2Sqrt`](malachite_base::num::arithmetic::traits::ModPowerOf2Sqrt), a trait for
+/// finding the least square root of a number modulo $2^k$.
+///
+/// # mod_power_of_2_sqrt
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Sqrt;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_nz::natural::Natural;
+///
+/// // The roots of 17 modulo 32 are 7, 9, 23, and 25.
+/// assert_eq!(
+///     Natural::from(17u32).mod_power_of_2_sqrt(5),
+///     Some(Natural::from(7u32))
+/// );
+/// assert_eq!(
+///     (&Natural::from(17u32)).mod_power_of_2_sqrt(64),
+///     Some(Natural::from(405959429219100393u64))
+/// );
+/// assert_eq!(
+///     Natural::from(17u32 << 20).mod_power_of_2_sqrt(64),
+///     Some(Natural::from(2195515552539648u64))
+/// );
+/// // 3 is not 1 mod 8, and 8 = 2 ^ 3 has an odd power of 2.
+/// assert_eq!(Natural::from(3u32).mod_power_of_2_sqrt(4), None);
+/// assert_eq!(Natural::from(8u32).mod_power_of_2_sqrt(4), None);
+/// assert_eq!(Natural::ZERO.mod_power_of_2_sqrt(10), Some(Natural::ZERO));
+/// ```
+pub mod mod_power_of_2_sqrt;
 /// Implementations of
 /// `ModPowerOf2Square`](malachite_base::num::arithmetic::traits::ModPowerOf2Square) and
 /// [`ModPowerOf2SquareAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign),

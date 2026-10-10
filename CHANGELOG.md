@@ -143,6 +143,8 @@ documented by git history.
   `EntrywiseShrRoundAssign` traits in `malachite_base::num::arithmetic::traits`, for shifting every
   entry of a vector and rounding each according to a `RoundingMode`. Unlike `ShlRound` and
   `ShrRound`, they return no `Ordering`, since entries may round in different directions.
+- `ModPowerOf2Sqrt` trait in `malachite_base::num::arithmetic::traits`, for the least square root
+  of a number modulo $2^k$.
 - `EntrywiseDivRound` and `EntrywiseDivRoundAssign` traits in
   `malachite_base::num::arithmetic::traits`, for dividing every entry of a value, such as a vector,
   by a scalar and rounding each quotient according to a `RoundingMode`. Unlike `DivRound`, they
@@ -294,6 +296,9 @@ documented by git history.
 - `Div` and `DivAssign` of `NaturalVector` by `Natural` and of `IntegerVector` by `Integer`, in
   every combination of value and reference, rounding every quotient as the scalar `/` does (down for
   `Natural`, toward zero for `Integer`), like FLINT's `_fmpz_vec_scalar_tdiv_q_fmpz`.
+- `ModPowerOf2Sqrt` for `Natural`, by value and by reference: the least square root modulo $2^k$,
+  or `None` for a non-square, by 2-adic Newton iteration on the odd part, following Azurite's
+  `AzZModPow2.sqrt?`.
 - `EntrywiseDivRound` and `EntrywiseDivRoundAssign` of `NaturalVector` by `Natural` and of
   `IntegerVector` by `Integer`, in every combination of value and reference, rounding every quotient
   according to a `RoundingMode`; with `Floor`, this is FLINT's `_fmpz_vec_scalar_fdiv_q_fmpz`.

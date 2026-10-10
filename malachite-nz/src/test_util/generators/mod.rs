@@ -3062,6 +3062,16 @@ pub fn natural_unsigned_pair_gen_var_14() -> Generator<(Natural, u64)> {
     )
 }
 
+// All `(Natural, u64)` where the `u64` is at most 12 and the `Natural` is less than 2 to the power
+// of the `u64`.
+pub fn natural_unsigned_pair_gen_var_15() -> Generator<(Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_pair_gen_var_11,
+        &random_natural_unsigned_pair_gen_var_14,
+        &special_random_natural_unsigned_pair_gen_var_15,
+    )
+}
+
 // -- (Natural, PrimitiveUnsigned, bool) --
 
 // All `(Natural, T, bool)` where `T` is unsigned and small.

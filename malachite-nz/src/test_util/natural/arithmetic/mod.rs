@@ -30,6 +30,7 @@ pub mod mod_mul;
 pub mod mod_op;
 pub mod mod_pow;
 pub mod mod_power_of_2_pow;
+pub mod mod_power_of_2_sqrt;
 pub mod mod_power_of_2_square;
 pub mod mul;
 pub mod neg;

@@ -6073,6 +6073,26 @@ pub fn special_random_natural_unsigned_pair_gen_var_10(config: &GenConfig) -> It
     )
 }
 
+// The `Natural` is reduced from an arbitrary one.
+pub fn special_random_natural_unsigned_pair_gen_var_15(config: &GenConfig) -> It<(Natural, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 12),
+        )
+        .map(|(x, pow)| (x.mod_power_of_2(pow), pow)),
+    )
+}
+
 pub fn special_random_natural_unsigned_pair_gen_var_11<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(Natural, T)> {

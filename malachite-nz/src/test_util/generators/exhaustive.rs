@@ -2636,6 +2636,12 @@ pub fn exhaustive_natural_unsigned_pair_gen_var_7() -> It<(Natural, u64)> {
     )
 }
 
+pub fn exhaustive_natural_unsigned_pair_gen_var_11() -> It<(Natural, u64)> {
+    Box::new((0..=12u64).flat_map(|pow| {
+        exhaustive_natural_range(Natural::ZERO, Natural::power_of_2(pow)).map(move |x| (x, pow))
+    }))
+}
+
 pub fn exhaustive_natural_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
     Box::new(exhaustive_pairs(
         exhaustive_positive_naturals(),

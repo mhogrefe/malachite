@@ -2036,6 +2036,14 @@ pub trait ModPowerOf2Inverse {
     fn mod_power_of_2_inverse(self, pow: u64) -> Option<Self::Output>;
 }
 
+/// Finds the least square root of a number modulo $2^k$, returning `None` if the number is not a
+/// square modulo $2^k$. The input must be already reduced modulo $2^k$.
+pub trait ModPowerOf2Sqrt {
+    type Output;
+
+    fn mod_power_of_2_sqrt(self, pow: u64) -> Option<Self::Output>;
+}
+
 /// Checks whether a number is reduced modulo $2^k$.
 pub trait ModPowerOf2IsReduced {
     fn mod_power_of_2_is_reduced(&self, pow: u64) -> bool;
