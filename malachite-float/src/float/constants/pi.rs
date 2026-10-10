@@ -20,6 +20,36 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+#[cfg(feature = "test_build")]
+use std::sync::{Mutex, PoisonError};
+
+// Test builds only: the extreme trig tests each need pi to about 2^30 bits (several minutes per
+// computation), both directly and inside argument reduction. This cache keeps the most accurate
+// unrounded approximation computed so far, along with the number of its bits known to be correct,
+// and answers any later request that the approximation can provably round, using the same
+// `float_can_round` test as a fresh computation. Small precisions bypass it, so pi's own tests and
+// the property tests exercise the real computation.
+#[cfg(feature = "test_build")]
+const PI_CACHE_MIN_PREC: u64 = 1 << 20;
+
+#[cfg(feature = "test_build")]
+static PI_CACHE: Mutex<Option<(Float, u64)>> = Mutex::new(None);
+
+#[cfg(feature = "test_build")]
+fn pi_from_cache(prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
+    let cache = PI_CACHE.lock().unwrap_or_else(PoisonError::into_inner);
+    let (pi, err_prec) = cache.as_ref()?;
+    float_can_round(pi.significand_ref().unwrap(), *err_prec, prec, rm)
+        .then(|| Float::from_float_prec_round_ref(pi, prec, rm))
+}
+
+#[cfg(feature = "test_build")]
+fn pi_to_cache(pi: &Float, err_prec: u64) {
+    let mut cache = PI_CACHE.lock().unwrap_or_else(PoisonError::into_inner);
+    if cache.as_ref().is_none_or(|&(_, cached_err_prec)| cached_err_prec < err_prec) {
+        *cache = Some((pi.clone(), err_prec));
+    }
+}
 
 impl Float {
     /// Returns an approximation of $\pi$, with the given precision and rounded using the given
@@ -67,6 +97,12 @@ impl Float {
     // This is mpfr_const_pi_internal from const_pi.c, MPFR 4.2.0.
     #[inline]
     pub fn pi_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        #[cfg(feature = "test_build")]
+        if prec >= PI_CACHE_MIN_PREC
+            && let Some(result) = pi_from_cache(prec, rm)
+        {
+            return result;
+        }
         // we need 9 * 2 ^ kmax - 4 >= px + 2 * kmax + 8
         let mut kmax = 2;
         while ((prec + (kmax << 1) + 12) / 9) >> kmax != 0 {
@@ -103,12 +139,12 @@ impl Float {
                 k += 1;
             }
             let pi: Self = big_b / big_d;
-            if float_can_round(
-                pi.significand_ref().unwrap(),
-                working_prec - (k << 1) - 8,
-                prec,
-                rm,
-            ) {
+            let err_prec = working_prec - (k << 1) - 8;
+            if float_can_round(pi.significand_ref().unwrap(), err_prec, prec, rm) {
+                #[cfg(feature = "test_build")]
+                if prec >= PI_CACHE_MIN_PREC {
+                    pi_to_cache(&pi, err_prec);
+                }
                 return Self::from_float_prec_round(pi, prec, rm);
             }
             working_prec += kmax + increment;
