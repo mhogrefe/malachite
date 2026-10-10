@@ -768,6 +768,9 @@ const AZURITE_NATURAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ("demo_natural_from_str_targeted", "az_nat_from_str"),
     ("demo_natural_primes_less_than", "az_nat_primes_less_than"),
     ("demo_factorial", "az_nat_factorial"),
+    ("demo_double_factorial", "az_nat_double_factorial"),
+    ("demo_multifactorial", "az_nat_multifactorial"),
+    ("demo_subfactorial", "az_nat_subfactorial"),
     (
         "demo_natural_primes_less_than_or_equal_to",
         "az_nat_primes_less_than",
