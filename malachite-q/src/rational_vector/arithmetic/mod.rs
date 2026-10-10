@@ -39,6 +39,9 @@ pub mod l1_norm;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;
+/// Implementations of [`Div`](core::ops::Div) and [`DivAssign`](core::ops::DivAssign), for dividing
+/// a vector by a scalar.
+pub mod scalar_div;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a vector by a scalar, with the scalar on either side.
 pub mod scalar_mul;

@@ -1065,6 +1065,13 @@ pub fn exhaustive_rational_vector_rational_pair_gen() -> It<(RationalVector, Rat
     ))
 }
 
+pub fn exhaustive_rational_vector_rational_pair_gen_var_1() -> It<(RationalVector, Rational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_vectors(),
+        exhaustive_nonzero_rationals(),
+    ))
+}
+
 // -- Vec<Rational> --
 
 pub fn exhaustive_rational_vec_gen() -> It<Vec<Rational>> {

@@ -2700,6 +2700,34 @@ pub fn special_random_rational_vector_rational_pair_gen(
     ))
 }
 
+pub fn special_random_rational_vector_rational_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalVector, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_vectors(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_nonzero_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 // -- Vec<Rational> --
 
 pub fn special_random_rational_vec_gen(config: &GenConfig) -> It<Vec<Rational>> {

@@ -1358,6 +1358,15 @@ pub fn rational_vector_rational_pair_gen() -> Generator<(RationalVector, Rationa
     )
 }
 
+// All `(RationalVector, Rational)` where the `Rational` is nonzero.
+pub fn rational_vector_rational_pair_gen_var_1() -> Generator<(RationalVector, Rational)> {
+    Generator::new(
+        &exhaustive_rational_vector_rational_pair_gen_var_1,
+        &random_rational_vector_rational_pair_gen_var_1,
+        &special_random_rational_vector_rational_pair_gen_var_1,
+    )
+}
+
 // -- Vec<Rational> --
 
 pub fn rational_vec_gen() -> Generator<Vec<Rational>> {
