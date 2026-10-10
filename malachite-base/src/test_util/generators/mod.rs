@@ -5270,6 +5270,29 @@ pub fn unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(UnsignedVector<T>, U)` where the `U` is no greater than `T::WIDTH + 1`.
+pub fn unsigned_vector_unsigned_pair_gen_var_6<T: PrimitiveUnsigned, U: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, U)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_pair_gen_var_6,
+        &random_unsigned_vector_unsigned_pair_gen_var_6,
+        &special_random_unsigned_vector_unsigned_pair_gen_var_6,
+    )
+}
+
+// All `(UnsignedVector<T>, U, RoundingMode)` where the `U` is no greater than `T::WIDTH + 1` and
+// the triple is a valid input to `UnsignedVector::entrywise_shr_round`.
+pub fn unsigned_vector_unsigned_rounding_mode_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(UnsignedVector<T>, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1,
+        &random_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
 // All `(UnsignedVector<T>, UnsignedVector<T>, u64)` where the vectors have the same dimension, the
 // `u64` is no greater than `T::WIDTH`, and every element of both vectors is less than 2 to the
 // power of the `u64`.

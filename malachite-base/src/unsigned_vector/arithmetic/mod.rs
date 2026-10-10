@@ -19,6 +19,71 @@ pub mod canonical_primitive_part;
 /// [`ContentAndPrimitivePart`](crate::num::arithmetic::traits::ContentAndPrimitivePart), which
 /// compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
+/// Right-shifting a vector (dividing it by a power of 2) and rounding every element, by
+/// implementations of [`EntrywiseShrRound`](crate::num::arithmetic::traits::EntrywiseShrRound) and
+/// [`EntrywiseShrRoundAssign`](crate::num::arithmetic::traits::EntrywiseShrRoundAssign).
+///
+/// # entrywise_shr_round
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShrRound;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// let v = UnsignedVector::<u8>::from_str("(1, 2, 3, 5)").unwrap();
+/// assert_eq!(
+///     (&v).entrywise_shr_round(1u8, Floor).to_string(),
+///     "(0, 1, 1, 2)"
+/// );
+/// assert_eq!(
+///     (&v).entrywise_shr_round(1u16, Ceiling).to_string(),
+///     "(1, 1, 2, 3)"
+/// );
+/// // Ties round to even.
+/// assert_eq!(
+///     (&v).entrywise_shr_round(1u32, Nearest).to_string(),
+///     "(0, 1, 2, 2)"
+/// );
+/// assert_eq!(
+///     UnsignedVector::<u8>::from_str("(4, 8, 12)")
+///         .unwrap()
+///         .entrywise_shr_round(2u64, Exact)
+///         .to_string(),
+///     "(1, 2, 3)"
+/// );
+/// // Shifting by at least the width rounds every element to 0 or 1.
+/// assert_eq!(
+///     UnsignedVector::<u8>::from_str("(255, 128, 127)")
+///         .unwrap()
+///         .entrywise_shr_round(8u8, Nearest)
+///         .to_string(),
+///     "(1, 0, 0)"
+/// );
+/// assert_eq!(
+///     UnsignedVector::<u8>::from_str("(255, 1, 0)")
+///         .unwrap()
+///         .entrywise_shr_round(100u128, Ceiling)
+///         .to_string(),
+///     "(1, 1, 0)"
+/// );
+/// ```
+///
+/// # entrywise_shr_round_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShrRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// let mut v = UnsignedVector::<u8>::from_str("(1, 2, 3, 5)").unwrap();
+/// v.entrywise_shr_round_assign(1u8, Nearest);
+/// assert_eq!(v.to_string(), "(0, 1, 2, 2)");
+///
+/// let mut v = UnsignedVector::<u8>::from_str("(1, 2, 3, 5)").unwrap();
+/// v.entrywise_shr_round_assign(1u32, Up);
+/// assert_eq!(v.to_string(), "(1, 1, 2, 3)");
+/// ```
+pub mod entrywise_shr_round;
 /// An implementation of [`Height`](crate::num::arithmetic::traits::Height), the largest height of
 /// any element.
 pub mod height;
@@ -151,3 +216,53 @@ pub mod mod_shl;
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting vectors modulo a
 /// number.
 pub mod mod_sub;
+/// Right-shifting a vector (dividing it by a power of 2 and taking the floor), by implementations
+/// of [`Shr`](core::ops::Shr) and [`ShrAssign`](core::ops::ShrAssign).
+///
+/// # shr
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// assert_eq!(
+///     (UnsignedVector::<u8>::from_str("()").unwrap() >> 10u8).to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     (UnsignedVector::<u8>::from_str("(1, 2, 3, 5)").unwrap() >> 0u16).to_string(),
+///     "(1, 2, 3, 5)"
+/// );
+/// assert_eq!(
+///     (UnsignedVector::<u8>::from_str("(1, 2, 3, 5)").unwrap() >> 1u32).to_string(),
+///     "(0, 1, 1, 2)"
+/// );
+/// assert_eq!(
+///     (&UnsignedVector::<u8>::from_str("(255, 128)").unwrap() >> 7u64).to_string(),
+///     "(1, 1)"
+/// );
+/// // Shifting by at least the width zeroes every element, keeping the dimension.
+/// assert_eq!(
+///     (&UnsignedVector::<u8>::from_str("(255, 128)").unwrap() >> 8u128).to_string(),
+///     "(0, 0)"
+/// );
+/// assert_eq!(
+///     (UnsignedVector::<u64>::from_str("(18446744073709551615, 1)").unwrap() >> 63usize)
+///         .to_string(),
+///     "(1, 0)"
+/// );
+/// ```
+///
+/// # shr_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// let mut v = UnsignedVector::<u8>::from_str("(1, 2, 3, 5)").unwrap();
+/// v >>= 1u8;
+/// assert_eq!(v.to_string(), "(0, 1, 1, 2)");
+///
+/// let mut v = UnsignedVector::<u8>::from_str("(255, 128)").unwrap();
+/// v >>= 200u32;
+/// assert_eq!(v.to_string(), "(0, 0)");
+/// ```
+pub mod shr;

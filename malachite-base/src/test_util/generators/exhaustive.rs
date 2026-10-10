@@ -6803,6 +6803,37 @@ pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
     )
 }
 
+pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_6<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, U)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigned_vectors::<T>(),
+        primitive_int_increasing_inclusive_range(U::ZERO, U::exact_from(T::WIDTH + 1)),
+    ))
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, U, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs(
+                exhaustive_unsigned_vectors::<T>(),
+                primitive_int_increasing_inclusive_range(U::ZERO, U::exact_from(T::WIDTH + 1)),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|((v, bits), rm)| {
+            *rm != Exact
+                || v.elements
+                    .iter()
+                    .all(|x| x.divisible_by_power_of_2((*bits).exact_into()))
+        }),
+    ))
+}
+
 // -- tuples of vectors of a common dimension --
 
 struct TuplesByDimensionGenerator<T> {

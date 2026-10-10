@@ -153,6 +153,12 @@ documented by git history.
 - `ModShl` and `ModShlAssign` for `UnsignedVector<T>`, by any primitive unsigned type, modulo a
   `T`, computing $2^k \bmod m$ once and multiplying every element by it. The elements must already
   be reduced.
+- `Shr` (by value and by reference) and `ShrAssign` for `UnsignedVector<T>`, by any primitive
+  unsigned type, taking the floor of every element; shifting by at least `T::WIDTH` zeroes every
+  element. There is no non-modular left shift, since it could overflow.
+- `EntrywiseShrRound` (by value and by reference) and `EntrywiseShrRoundAssign` for
+  `UnsignedVector<T>`, by any primitive unsigned type, rounding every element according to a
+  `RoundingMode`.
 
 ### malachite-nz
 
