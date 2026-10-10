@@ -30,6 +30,58 @@ pub mod canonical_primitive_part;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
+/// Exact division of a vector by a scalar, by implementations of
+/// [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
+/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign).
+///
+/// # div_exact
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExact;
+/// use malachite_base::num::basic::traits::One;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// assert_eq!(
+///     NaturalVector::from_str("()")
+///         .unwrap()
+///         .div_exact(Natural::from(5u32))
+///         .to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     NaturalVector::from_str("(0, 6, 255)")
+///         .unwrap()
+///         .div_exact(Natural::ONE)
+///         .to_string(),
+///     "(0, 6, 255)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(0, 6, 255)").unwrap())
+///         .div_exact(Natural::from(3u32))
+///         .to_string(),
+///     "(0, 2, 85)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(3802951800684688204490109616128, 6)").unwrap())
+///         .div_exact(Natural::from(3u32))
+///         .to_string(),
+///     "(1267650600228229401496703205376, 2)"
+/// );
+/// ```
+///
+/// # div_exact_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExactAssign;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(0, 6, 255)").unwrap();
+/// v.div_exact_assign(Natural::from(3u32));
+/// assert_eq!(v.to_string(), "(0, 2, 85)");
+/// ```
+pub mod div_exact;
 /// Left-shifting a vector (multiplying it by a power of 2) and rounding every element, by
 /// implementations of
 /// [`EntrywiseShlRound`](malachite_base::num::arithmetic::traits::EntrywiseShlRound) and

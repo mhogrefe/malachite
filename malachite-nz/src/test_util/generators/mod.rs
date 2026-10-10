@@ -3915,6 +3915,15 @@ pub fn natural_vector_natural_pair_gen_var_1() -> Generator<(NaturalVector, Natu
     )
 }
 
+// The `Natural` is positive and divides every element of the vector.
+pub fn natural_vector_natural_pair_gen_var_3() -> Generator<(NaturalVector, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_pair_gen_var_3,
+        &random_natural_vector_natural_pair_gen_var_3,
+        &special_random_natural_vector_natural_pair_gen_var_3,
+    )
+}
+
 pub fn natural_vector_natural_pair_gen() -> Generator<(NaturalVector, Natural)> {
     Generator::new(
         &exhaustive_natural_vector_natural_pair_gen,
@@ -3938,6 +3947,15 @@ pub fn integer_vector_integer_pair_gen_var_1() -> Generator<(IntegerVector, Inte
         &exhaustive_integer_vector_integer_pair_gen_var_1,
         &random_integer_vector_integer_pair_gen_var_1,
         &special_random_integer_vector_integer_pair_gen_var_1,
+    )
+}
+
+// The `Integer` is nonzero and divides every element of the vector.
+pub fn integer_vector_integer_pair_gen_var_2() -> Generator<(IntegerVector, Integer)> {
+    Generator::new(
+        &exhaustive_integer_vector_integer_pair_gen_var_2,
+        &random_integer_vector_integer_pair_gen_var_2,
+        &special_random_integer_vector_integer_pair_gen_var_2,
     )
 }
 

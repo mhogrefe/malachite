@@ -6834,6 +6834,41 @@ pub fn exhaustive_unsigned_vector_unsigned_rounding_mode_triple_gen_var_1<
     ))
 }
 
+struct UnsignedVectorDivisiblePairsGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned>
+    ExhaustiveDependentPairsYsGenerator<T, UnsignedVector<T>, It<UnsignedVector<T>>>
+    for UnsignedVectorDivisiblePairsGenerator<T>
+{
+    // The vectors whose elements are the multiples of `c` that fit in a `T`.
+    #[inline]
+    fn get_ys(&self, c: &T) -> It<UnsignedVector<T>> {
+        let c = *c;
+        Box::new(
+            exhaustive_vecs(
+                primitive_int_increasing_inclusive_range(T::ZERO, T::MAX / c).map(move |k| k * c),
+            )
+            .map(|elements| UnsignedVector { elements }),
+        )
+    }
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>()
+-> It<(UnsignedVector<T>, T)> {
+    permute_2_1(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_positive_primitive_ints(),
+        UnsignedVectorDivisiblePairsGenerator {
+            phantom: PhantomData,
+        },
+    )))
+}
+
 // -- tuples of vectors of a common dimension --
 
 struct TuplesByDimensionGenerator<T> {

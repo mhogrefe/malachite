@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonicalize_sign::register(runner);
     content::register(runner);
     content_chained::register(runner);
+    div_exact::register(runner);
     dot_general::register(runner);
     entrywise_abs::register(runner);
     entrywise_shl_round::register(runner);
@@ -41,6 +42,7 @@ mod canonical_primitive_part;
 mod canonicalize_sign;
 mod content;
 mod content_chained;
+mod div_exact;
 mod dot_general;
 mod entrywise_abs;
 mod entrywise_shl_round;

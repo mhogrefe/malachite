@@ -974,6 +974,7 @@ pub mod unsigned_vector {
     pub mod arithmetic {
         pub mod canonical_primitive_part;
         pub mod content;
+        pub mod div_exact;
         pub mod entrywise_shr_round;
         pub mod height;
         pub mod mod_add;

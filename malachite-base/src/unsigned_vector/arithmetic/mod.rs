@@ -19,6 +19,55 @@ pub mod canonical_primitive_part;
 /// [`ContentAndPrimitivePart`](crate::num::arithmetic::traits::ContentAndPrimitivePart), which
 /// compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
+/// Exact division of a vector by a scalar, by implementations of
+/// [`DivExact`](crate::num::arithmetic::traits::DivExact) and
+/// [`DivExactAssign`](crate::num::arithmetic::traits::DivExactAssign).
+///
+/// # div_exact
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExact;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// assert_eq!(
+///     UnsignedVector::<u8>::from_str("()")
+///         .unwrap()
+///         .div_exact(5)
+///         .to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     UnsignedVector::<u8>::from_str("(0, 6, 255)")
+///         .unwrap()
+///         .div_exact(1)
+///         .to_string(),
+///     "(0, 6, 255)"
+/// );
+/// assert_eq!(
+///     (&UnsignedVector::<u8>::from_str("(0, 6, 255)").unwrap())
+///         .div_exact(3)
+///         .to_string(),
+///     "(0, 2, 85)"
+/// );
+/// assert_eq!(
+///     (&UnsignedVector::<u64>::from_str("(18446744073709551614, 4)").unwrap())
+///         .div_exact(2)
+///         .to_string(),
+///     "(9223372036854775807, 2)"
+/// );
+/// ```
+///
+/// # div_exact_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExactAssign;
+/// use malachite_base::unsigned_vector::UnsignedVector;
+///
+/// let mut v = UnsignedVector::<u8>::from_str("(0, 6, 255)").unwrap();
+/// v.div_exact_assign(3);
+/// assert_eq!(v.to_string(), "(0, 2, 85)");
+/// ```
+pub mod div_exact;
 /// Right-shifting a vector (dividing it by a power of 2) and rounding every element, by
 /// implementations of [`EntrywiseShrRound`](crate::num::arithmetic::traits::EntrywiseShrRound) and
 /// [`EntrywiseShrRoundAssign`](crate::num::arithmetic::traits::EntrywiseShrRoundAssign).

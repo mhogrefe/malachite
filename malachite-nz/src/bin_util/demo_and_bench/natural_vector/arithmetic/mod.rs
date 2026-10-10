@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     balanced_mod_power_of_2::register(runner);
     canonical_primitive_part::register(runner);
     content::register(runner);
+    div_exact::register(runner);
     entrywise_shl_round::register(runner);
     entrywise_shr_round::register(runner);
     height::register(runner);
@@ -43,6 +44,7 @@ mod balanced_mod;
 mod balanced_mod_power_of_2;
 mod canonical_primitive_part;
 mod content;
+mod div_exact;
 mod entrywise_shl_round;
 mod entrywise_shr_round;
 mod height;

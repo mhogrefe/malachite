@@ -3563,6 +3563,11 @@ pub fn exhaustive_natural_vector_natural_pair_gen_var_1() -> It<(NaturalVector, 
     ))
 }
 
+// Every element of the vector is multiplied by the scalar.
+pub fn exhaustive_natural_vector_natural_pair_gen_var_3() -> It<(NaturalVector, Natural)> {
+    Box::new(exhaustive_natural_vector_natural_pair_gen_var_1().map(|(v, c)| (v * &c, c)))
+}
+
 pub fn exhaustive_natural_vector_natural_pair_gen() -> It<(NaturalVector, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_natural_vectors(),
@@ -3582,6 +3587,11 @@ pub fn exhaustive_integer_vector_integer_pair_gen_var_1() -> It<(IntegerVector, 
         exhaustive_integer_vectors(),
         exhaustive_nonzero_integers(),
     ))
+}
+
+// Every element of the vector is multiplied by the scalar.
+pub fn exhaustive_integer_vector_integer_pair_gen_var_2() -> It<(IntegerVector, Integer)> {
+    Box::new(exhaustive_integer_vector_integer_pair_gen_var_1().map(|(v, c)| (v * &c, c)))
 }
 
 pub fn exhaustive_integer_vector_integer_pair_gen() -> It<(IntegerVector, Integer)> {

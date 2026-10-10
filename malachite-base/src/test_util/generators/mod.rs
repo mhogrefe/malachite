@@ -5280,6 +5280,16 @@ pub fn unsigned_vector_unsigned_pair_gen_var_6<T: PrimitiveUnsigned, U: Primitiv
     )
 }
 
+// All `(UnsignedVector<T>, T)` where the `T` is positive and divides every element of the vector.
+pub fn unsigned_vector_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedVector<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_pair_gen_var_7,
+        &random_unsigned_vector_unsigned_pair_gen_var_7,
+        &special_random_unsigned_vector_unsigned_pair_gen_var_7,
+    )
+}
+
 // All `(UnsignedVector<T>, U, RoundingMode)` where the `U` is no greater than `T::WIDTH + 1` and
 // the triple is a valid input to `UnsignedVector::entrywise_shr_round`.
 pub fn unsigned_vector_unsigned_rounding_mode_triple_gen_var_1<

@@ -353,6 +353,7 @@ pub mod integer_vector {
         pub mod canonicalize_sign;
         pub mod content;
         pub mod content_chained;
+        pub mod div_exact;
         pub mod dot_general;
         pub mod entrywise_abs;
         pub mod entrywise_shl_round;
@@ -894,6 +895,7 @@ pub mod natural_vector {
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
         pub mod content;
+        pub mod div_exact;
         pub mod entrywise_shl_round;
         pub mod entrywise_shr_round;
         pub mod height;

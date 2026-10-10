@@ -7947,6 +7947,13 @@ pub fn special_random_natural_vector_natural_pair_gen_var_1(
     ))
 }
 
+// Every element of the vector is multiplied by the scalar.
+pub fn special_random_natural_vector_natural_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalVector, Natural)> {
+    Box::new(special_random_natural_vector_natural_pair_gen_var_1(config).map(|(v, c)| (v * &c, c)))
+}
+
 pub fn special_random_natural_vector_natural_pair_gen(
     config: &GenConfig,
 ) -> It<(NaturalVector, Natural)> {
@@ -8029,6 +8036,13 @@ pub fn special_random_integer_vector_integer_pair_gen_var_1(
             )
         },
     ))
+}
+
+// Every element of the vector is multiplied by the scalar.
+pub fn special_random_integer_vector_integer_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerVector, Integer)> {
+    Box::new(special_random_integer_vector_integer_pair_gen_var_1(config).map(|(v, c)| (v * &c, c)))
 }
 
 pub fn special_random_integer_vector_integer_pair_gen(

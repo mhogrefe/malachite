@@ -40,6 +40,65 @@ pub mod canonicalize_sign;
 pub mod content;
 #[doc(hidden)]
 pub mod content_chained;
+/// Exact division of a vector by a scalar, by implementations of
+/// [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
+/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign).
+///
+/// # div_exact
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExact;
+/// use malachite_base::num::basic::traits::{NegativeOne, One};
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// assert_eq!(
+///     IntegerVector::from_str("()")
+///         .unwrap()
+///         .div_exact(Integer::from(5))
+///         .to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(0, -6, 255)")
+///         .unwrap()
+///         .div_exact(Integer::ONE)
+///         .to_string(),
+///     "(0, -6, 255)"
+/// );
+/// assert_eq!(
+///     IntegerVector::from_str("(0, -6, 255)")
+///         .unwrap()
+///         .div_exact(Integer::NEGATIVE_ONE)
+///         .to_string(),
+///     "(0, 6, -255)"
+/// );
+/// assert_eq!(
+///     (&IntegerVector::from_str("(0, -6, 255)").unwrap())
+///         .div_exact(Integer::from(-3))
+///         .to_string(),
+///     "(0, 2, -85)"
+/// );
+/// assert_eq!(
+///     (&IntegerVector::from_str("(-3802951800684688204490109616128, 6)").unwrap())
+///         .div_exact(Integer::from(3))
+///         .to_string(),
+///     "(-1267650600228229401496703205376, 2)"
+/// );
+/// ```
+///
+/// # div_exact_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExactAssign;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_vector::IntegerVector;
+///
+/// let mut v = IntegerVector::from_str("(0, -6, 255)").unwrap();
+/// v.div_exact_assign(Integer::from(-3));
+/// assert_eq!(v.to_string(), "(0, 2, -85)");
+/// ```
+pub mod div_exact;
 #[doc(hidden)]
 pub mod dot_general;
 /// Implementations of [`EntrywiseAbs`](malachite_base::num::arithmetic::traits::EntrywiseAbs),

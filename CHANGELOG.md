@@ -159,6 +159,8 @@ documented by git history.
 - `EntrywiseShrRound` (by value and by reference) and `EntrywiseShrRoundAssign` for
   `UnsignedVector<T>`, by any primitive unsigned type, rounding every element according to a
   `RoundingMode`.
+- `DivExact` (by value and by reference) and `DivExactAssign` of `UnsignedVector<T>` by a `T`,
+  dividing every element by a scalar that divides it exactly.
 
 ### malachite-nz
 
@@ -279,6 +281,9 @@ documented by git history.
   and `IntegerVector`, by any primitive unsigned or signed type, and `EntrywiseShlRound` and
   `EntrywiseShlRoundAssign` by any primitive signed type, rounding every element according to a
   `RoundingMode`; with `Down`, `entrywise_shr_round` is FLINT's `_fmpz_vec_scalar_tdiv_q_2exp`.
+- `DivExact` and `DivExactAssign` of `NaturalVector` by `Natural` and of `IntegerVector` by
+  `Integer`, in every combination of value and reference, dividing every element by a scalar that
+  divides it exactly, like FLINT's `_fmpz_vec_scalar_divexact_fmpz`.
 
 ### malachite-q
 
