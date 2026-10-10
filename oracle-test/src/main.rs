@@ -1375,6 +1375,25 @@ const AZURITE_RATIONAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
 // in Azurite's `MalachiteFloat` module. The modes follow the rows of the "Malachite for Azurite
 // Users: Floats" mapping page.
 const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
+    ("demo_float_sum_debug", "az_float_sum"),
+    ("demo_float_sum_extreme_debug", "az_float_sum"),
+    ("demo_float_ref_sum_debug", "az_float_sum"),
+    ("demo_float_sum_prec_debug", "az_float_sum"),
+    ("demo_float_sum_round_debug", "az_float_sum"),
+    ("demo_float_sum_round_extreme_debug", "az_float_sum"),
+    ("demo_float_sum_prec_round_debug", "az_float_sum"),
+    ("demo_float_sum_prec_round_extreme_debug", "az_float_sum"),
+    ("demo_float_product_debug", "az_float_product"),
+    ("demo_float_product_extreme_debug", "az_float_product"),
+    ("demo_float_ref_product_debug", "az_float_product"),
+    ("demo_float_product_prec_debug", "az_float_product"),
+    ("demo_float_product_round_debug", "az_float_product"),
+    ("demo_float_product_round_extreme_debug", "az_float_product"),
+    ("demo_float_product_prec_round_debug", "az_float_product"),
+    (
+        "demo_float_product_prec_round_extreme_debug",
+        "az_float_product",
+    ),
     ("demo_float_add_debug", "az_float_add"),
     ("demo_float_add_extreme_debug", "az_float_add"),
     ("demo_float_add_prec_debug", "az_float_add"),

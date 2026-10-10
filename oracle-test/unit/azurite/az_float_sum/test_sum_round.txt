@@ -1,0 +1,7 @@
+Float::sum_round(&[Infinity, Infinity], Nearest) = (Infinity, Equal)
+Float::sum_round(&[0x1.0#1, 0x2.0#1, 0x3.0#2], Exact) = (0x6.0#2, Equal)
+Float::sum_round(&[0x1.000#10, 0x0.00001#1, 0x1.0E-10#1], Floor) = (0x1.000#10, Less)
+Float::sum_round(&[0x1.000#10, 0x0.00001#1, 0x1.0E-10#1], Ceiling) = (0x1.008#10, Greater)
+Float::sum_round(&[0x1.000#10, 0x0.00001#1, 0x1.0E-10#1], Down) = (0x1.000#10, Less)
+Float::sum_round(&[0x1.000#10, 0x0.00001#1, 0x1.0E-10#1], Up) = (0x1.008#10, Greater)
+Float::sum_round(&[0x1.000#10, 0x0.00001#1, 0x1.0E-10#1], Nearest) = (0x1.000#10, Less)

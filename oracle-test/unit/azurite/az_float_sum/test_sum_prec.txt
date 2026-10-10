@@ -1,0 +1,6 @@
+Float::sum_prec(&[], 10) = (0x0.0, Equal)
+Float::sum_prec(&[NaN, 0x2.0#1], 10) = (NaN, Equal)
+Float::sum_prec(&[0x1.0#1, 0x2.0#1, 0x3.0#2], 10) = (0x6.00#10, Equal)
+Float::sum_prec(&[0x1.0#1, 0x2.0#1, 0x3.0#2], 2) = (0x6.0#2, Equal)
+Float::sum_prec(&[0x1.0#1, 0x0.00001#1, 0x1.0E-10#1], 30) = (0x1.00001000#30, Less)
+Float::sum_prec(&[0x1.0#1, 0x1.0#1, 0x1.0#1, 0x1.0#1, 0x1.0#1, 0x1.0#1, 0x1.0#1], 2) = (0x8.0#2, Greater)

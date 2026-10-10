@@ -19,6 +19,7 @@ use malachite_float::test_util::bench::bucketers::{
     pair_2_triple_1_vec_float_sum_complexity_bucketer, pair_2_vec_float_sum_complexity_bucketer,
     triple_1_vec_float_sum_complexity_bucketer, vec_float_sum_complexity_bucketer,
 };
+use malachite_float::test_util::common::to_hex_string;
 use malachite_float::test_util::float::arithmetic::sum::{rug_sum, rug_sum_prec_round};
 use malachite_float::test_util::generators::{
     float_vec_gen, float_vec_gen_rm, float_vec_gen_var_1, float_vec_rounding_mode_pair_gen_var_1,
@@ -29,6 +30,15 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, Float};
 use malachite_q::Rational;
+
+// The floats of a slice in hexadecimal, as `[0x1.0#1, …]`, so that a reader can recover them
+// exactly.
+fn hex_list(xs: &[Float]) -> String {
+    format!(
+        "[{}]",
+        xs.iter().map(to_hex_string).collect::<Vec<_>>().join(", ")
+    )
+}
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_sum);
@@ -65,10 +75,8 @@ fn demo_float_sum(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_float_sum_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in float_vec_gen().get(gm, config).take(limit) {
         println!(
-            "sum({:?}) = {:#x}",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "sum({}) = {:#x}",
+            hex_list(&xs),
             ComparableFloat(Float::sum(xs.into_iter()))
         );
     }
@@ -83,10 +91,8 @@ fn demo_float_sum_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_float_sum_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in float_vec_gen_var_1().get(gm, config).take(limit) {
         println!(
-            "sum({:?}) = {:#x}",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "sum({}) = {:#x}",
+            hex_list(&xs),
             ComparableFloat(Float::sum(xs.into_iter()))
         );
     }
@@ -101,10 +107,8 @@ fn demo_float_ref_sum(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_float_ref_sum_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in float_vec_gen().get(gm, config).take(limit) {
         println!(
-            "sum({:?}) = {:#x}",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "sum({}) = {:#x}",
+            hex_list(&xs),
             ComparableFloat(Float::sum(xs.iter()))
         );
     }
@@ -127,10 +131,8 @@ fn demo_float_sum_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     {
         let (sum, o) = Float::sum_prec(&xs, prec);
         println!(
-            "Float::sum_prec(&{:?}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::sum_prec(&{}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             prec,
             ComparableFloat(sum),
             o
@@ -155,10 +157,8 @@ fn demo_float_sum_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     {
         let (sum, o) = Float::sum_round(&xs, rm);
         println!(
-            "Float::sum_round(&{:?}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::sum_round(&{}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             rm,
             ComparableFloat(sum),
             o
@@ -183,10 +183,8 @@ fn demo_float_sum_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: us
     {
         let (sum, o) = Float::sum_round(&xs, rm);
         println!(
-            "Float::sum_round(&{:?}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::sum_round(&{}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             rm,
             ComparableFloat(sum),
             o
@@ -211,10 +209,8 @@ fn demo_float_sum_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize
     {
         let (sum, o) = Float::sum_prec_round(&xs, prec, rm);
         println!(
-            "Float::sum_prec_round(&{:?}, {}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::sum_prec_round(&{}, {}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             prec,
             rm,
             ComparableFloat(sum),
@@ -240,10 +236,8 @@ fn demo_float_sum_prec_round_extreme_debug(gm: GenMode, config: &GenConfig, limi
     {
         let (sum, o) = Float::sum_prec_round(&xs, prec, rm);
         println!(
-            "Float::sum_prec_round(&{:?}, {}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::sum_prec_round(&{}, {}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             prec,
             rm,
             ComparableFloat(sum),

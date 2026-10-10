@@ -18,6 +18,7 @@ use malachite_float::float::arithmetic::product::primitive_float_product;
 use malachite_float::test_util::bench::bucketers::{
     triple_1_vec_float_sum_complexity_bucketer, vec_float_sum_complexity_bucketer,
 };
+use malachite_float::test_util::common::to_hex_string;
 use malachite_float::test_util::generators::{
     float_vec_gen, float_vec_gen_var_1, float_vec_rounding_mode_pair_gen_var_3,
     float_vec_rounding_mode_pair_gen_var_4, float_vec_unsigned_pair_gen_var_1,
@@ -26,6 +27,15 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, Float};
 use malachite_q::Rational;
+
+// The floats of a slice in hexadecimal, as `[0x1.0#1, …]`, so that a reader can recover them
+// exactly.
+fn hex_list(xs: &[Float]) -> String {
+    format!(
+        "[{}]",
+        xs.iter().map(to_hex_string).collect::<Vec<_>>().join(", ")
+    )
+}
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_product);
@@ -64,10 +74,8 @@ fn demo_float_product(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_float_product_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in float_vec_gen().get(gm, config).take(limit) {
         println!(
-            "product({:?}) = {:#x}",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "product({}) = {:#x}",
+            hex_list(&xs),
             ComparableFloat(Float::product(xs.into_iter()))
         );
     }
@@ -86,10 +94,8 @@ fn demo_float_product_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_float_product_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in float_vec_gen_var_1().get(gm, config).take(limit) {
         println!(
-            "product({:?}) = {:#x}",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "product({}) = {:#x}",
+            hex_list(&xs),
             ComparableFloat(Float::product(xs.into_iter()))
         );
     }
@@ -104,10 +110,8 @@ fn demo_float_ref_product(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_float_ref_product_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for xs in float_vec_gen().get(gm, config).take(limit) {
         println!(
-            "product({:?}) = {:#x}",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "product({}) = {:#x}",
+            hex_list(&xs),
             ComparableFloat(Float::product(xs.iter()))
         );
     }
@@ -130,10 +134,8 @@ fn demo_float_product_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) 
     {
         let (product, o) = Float::product_prec(&xs, prec);
         println!(
-            "Float::product_prec(&{:?}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::product_prec(&{}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             prec,
             ComparableFloat(product),
             o
@@ -158,10 +160,8 @@ fn demo_float_product_round_debug(gm: GenMode, config: &GenConfig, limit: usize)
     {
         let (product, o) = Float::product_round(&xs, rm);
         println!(
-            "Float::product_round(&{:?}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::product_round(&{}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             rm,
             ComparableFloat(product),
             o
@@ -186,10 +186,8 @@ fn demo_float_product_round_extreme_debug(gm: GenMode, config: &GenConfig, limit
     {
         let (product, o) = Float::product_round(&xs, rm);
         println!(
-            "Float::product_round(&{:?}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::product_round(&{}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             rm,
             ComparableFloat(product),
             o
@@ -214,10 +212,8 @@ fn demo_float_product_prec_round_debug(gm: GenMode, config: &GenConfig, limit: u
     {
         let (product, o) = Float::product_prec_round(&xs, prec, rm);
         println!(
-            "Float::product_prec_round(&{:?}, {}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::product_prec_round(&{}, {}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             prec,
             rm,
             ComparableFloat(product),
@@ -243,10 +239,8 @@ fn demo_float_product_prec_round_extreme_debug(gm: GenMode, config: &GenConfig, 
     {
         let (product, o) = Float::product_prec_round(&xs, prec, rm);
         println!(
-            "Float::product_prec_round(&{:?}, {}, {}) = ({:#x}, {:?})",
-            xs.iter()
-                .map(|x| ComparableFloat(x.clone()))
-                .collect::<Vec<_>>(),
+            "Float::product_prec_round(&{}, {}, {}) = ({:#x}, {:?})",
+            hex_list(&xs),
             prec,
             rm,
             ComparableFloat(product),
