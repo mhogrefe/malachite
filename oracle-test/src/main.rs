@@ -1191,6 +1191,8 @@ const AZURITE_MOD_STAGES: &[(&str, &str)] = &[
     ("demo_natural_mod_div_ref_val_val", "az_zmod_div"),
     ("demo_natural_mod_div_ref_val_ref", "az_zmod_div"),
     ("demo_natural_mod_div_ref_ref_val", "az_zmod_div"),
+    ("demo_natural_mod_sqrt", "az_zmod_sqrt"),
+    ("demo_natural_mod_sqrt_ref_ref", "az_zmod_sqrt"),
     ("demo_natural_mod_div_ref_ref_ref", "az_zmod_div"),
     ("demo_natural_mod_is_reduced", "az_zmod_is_reduced"),
     ("demo_natural_eq_mod", "az_zmod_eq"),
