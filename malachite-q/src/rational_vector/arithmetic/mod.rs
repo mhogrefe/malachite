@@ -9,6 +9,81 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// vectors.
 pub mod add;
+/// Adding a multiple of one vector to another, by implementations of
+/// [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
+/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign).
+///
+/// # add_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMul;
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_q::Rational;
+/// use malachite_q::rational_vector::RationalVector;
+///
+/// assert_eq!(
+///     RationalVector::from_str("()")
+///         .unwrap()
+///         .add_mul(RationalVector::from_str("()").unwrap(), Rational::from(5))
+///         .to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     RationalVector::from_str("(1/2, -2, 3)")
+///         .unwrap()
+///         .add_mul(
+///             RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///             Rational::ZERO
+///         )
+///         .to_string(),
+///     "(1/2, -2, 3)"
+/// );
+/// assert_eq!(
+///     RationalVector::from_str("(1/2, -2, 3)")
+///         .unwrap()
+///         .add_mul(
+///             RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///             Rational::ONE
+///         )
+///         .to_string(),
+///     "(9/2, -5/3, -3)"
+/// );
+/// assert_eq!(
+///     RationalVector::from_str("(1/2, -2, 3)")
+///         .unwrap()
+///         .add_mul(
+///             RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///             Rational::NEGATIVE_ONE
+///         )
+///         .to_string(),
+///     "(-7/2, -7/3, 9)"
+/// );
+/// assert_eq!(
+///     (&RationalVector::from_str("(1/2, -2, 3)").unwrap())
+///         .add_mul(
+///             &RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///             &Rational::from_signeds(3, 2)
+///         )
+///         .to_string(),
+///     "(13/2, -3/2, -6)"
+/// );
+/// ```
+///
+/// # add_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
+/// use malachite_q::Rational;
+/// use malachite_q::rational_vector::RationalVector;
+///
+/// let mut v = RationalVector::from_str("(1/2, -2, 3)").unwrap();
+/// v.add_mul_assign(
+///     RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///     Rational::from_signeds(3, 2),
+/// );
+/// assert_eq!(v.to_string(), "(13/2, -3/2, -6)");
+/// ```
+pub mod add_mul;
 /// Implementations of [`CanonicalPrimitivePart`](
 /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart) and
 /// [`ContentAndCanonicalPrimitivePart`](
@@ -146,3 +221,78 @@ pub mod shr;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting vectors.
 pub mod sub;
+/// Subtracting a multiple of one vector from another, by implementations of
+/// [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
+/// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign).
+///
+/// # sub_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::SubMul;
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_q::Rational;
+/// use malachite_q::rational_vector::RationalVector;
+///
+/// assert_eq!(
+///     RationalVector::from_str("()")
+///         .unwrap()
+///         .sub_mul(RationalVector::from_str("()").unwrap(), Rational::from(5))
+///         .to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     RationalVector::from_str("(1/2, -2, 3)")
+///         .unwrap()
+///         .sub_mul(
+///             RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///             Rational::ZERO
+///         )
+///         .to_string(),
+///     "(1/2, -2, 3)"
+/// );
+/// assert_eq!(
+///     RationalVector::from_str("(1/2, -2, 3)")
+///         .unwrap()
+///         .sub_mul(
+///             RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///             Rational::ONE
+///         )
+///         .to_string(),
+///     "(-7/2, -7/3, 9)"
+/// );
+/// assert_eq!(
+///     RationalVector::from_str("(1/2, -2, 3)")
+///         .unwrap()
+///         .sub_mul(
+///             RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///             Rational::NEGATIVE_ONE
+///         )
+///         .to_string(),
+///     "(9/2, -5/3, -3)"
+/// );
+/// assert_eq!(
+///     (&RationalVector::from_str("(1/2, -2, 3)").unwrap())
+///         .sub_mul(
+///             &RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///             &Rational::from_signeds(3, 2)
+///         )
+///         .to_string(),
+///     "(-11/2, -5/2, 12)"
+/// );
+/// ```
+///
+/// # sub_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::SubMulAssign;
+/// use malachite_q::Rational;
+/// use malachite_q::rational_vector::RationalVector;
+///
+/// let mut v = RationalVector::from_str("(1/2, -2, 3)").unwrap();
+/// v.sub_mul_assign(
+///     RationalVector::from_str("(4, 1/3, -6)").unwrap(),
+///     Rational::from_signeds(3, 2),
+/// );
+/// assert_eq!(v.to_string(), "(-11/2, -5/2, 12)");
+/// ```
+pub mod sub_mul;

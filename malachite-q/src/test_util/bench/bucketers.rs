@@ -632,6 +632,22 @@ pub fn pair_1_rational_vector_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (R
     }
 }
 
+pub fn triple_1_rational_vector_bit_bucketer<T, U>(
+    var_name: &str,
+) -> Bucketer<'_, (RationalVector, T, U)> {
+    Bucketer {
+        bucketing_function: &|(v, _, _)| {
+            usize::exact_from(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
 pub fn rational_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, RationalPolynomial> {
     Bucketer {
         bucketing_function: &|p| {

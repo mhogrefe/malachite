@@ -423,6 +423,7 @@ pub mod rational_vector {
     pub mod access;
     pub mod arithmetic {
         pub mod add;
+        pub mod add_mul;
         pub mod canonical_primitive_part;
         pub mod canonicalize_sign;
         pub mod content;
@@ -435,6 +436,7 @@ pub mod rational_vector {
         pub mod shl;
         pub mod shr;
         pub mod sub;
+        pub mod sub_mul;
     }
     pub mod basic {
         pub mod named;

@@ -2636,6 +2636,22 @@ pub fn special_random_rational_vector_pair_gen_var_1(
     )
 }
 
+pub fn special_random_rational_vector_rational_vector_rational_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalVector, RationalVector, Rational)> {
+    Box::new(
+        special_random_rational_vector_pair_gen_var_1(config)
+            .zip(striped_random_rationals(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((v, w), c)| (v, w, c)),
+    )
+}
+
 pub fn special_random_rational_vector_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(RationalVector, RationalVector, RationalVector)> {

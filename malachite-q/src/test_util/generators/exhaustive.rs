@@ -1049,6 +1049,19 @@ pub fn exhaustive_rational_vector_pair_gen_var_1() -> It<(RationalVector, Ration
     })
 }
 
+pub fn exhaustive_rational_vector_rational_vector_rational_triple_gen_var_1()
+-> It<(RationalVector, RationalVector, Rational)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_rational_vectors_with_dimension(dimension)),
+                exhaustive_rationals(),
+            )
+            .map(|((v, w), c)| (v, w, c)),
+        )
+    })
+}
+
 pub fn exhaustive_rational_vector_triple_gen_var_1()
 -> It<(RationalVector, RationalVector, RationalVector)> {
     exhaustive_tuples_by_dimension(|dimension| {
