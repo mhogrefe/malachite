@@ -3486,6 +3486,76 @@ pub fn exhaustive_integer_vector_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
     ))
 }
 
+pub fn exhaustive_integer_vector_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> It<(IntegerVector, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integer_vectors(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_integer_vector_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(IntegerVector, T, RoundingMode)>
+where
+    IntegerVector: Shl<T, Output = IntegerVector>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_integer_vectors(), exhaustive_unsigneds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| (if rm == Exact { v << i } else { v }, i, rm)),
+    )
+}
+
+pub fn exhaustive_integer_vector_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> It<(IntegerVector, T, RoundingMode)>
+where
+    IntegerVector: Shr<T, Output = IntegerVector>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_integer_vectors(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| {
+            (
+                if i < T::ZERO && rm == Exact {
+                    v >> i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn exhaustive_integer_vector_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> It<(IntegerVector, T, RoundingMode)>
+where
+    IntegerVector: Shl<T, Output = IntegerVector>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_integer_vectors(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| {
+            (
+                if i > T::ZERO && rm == Exact {
+                    v << i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
 pub fn exhaustive_natural_vector_natural_pair_gen_var_1() -> It<(NaturalVector, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_natural_vectors(),
@@ -3559,6 +3629,76 @@ pub fn exhaustive_natural_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
         exhaustive_natural_vectors(),
         exhaustive_unsigneds(),
     ))
+}
+
+pub fn exhaustive_natural_vector_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> It<(NaturalVector, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_vectors(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_natural_vector_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(NaturalVector, T, RoundingMode)>
+where
+    NaturalVector: Shl<T, Output = NaturalVector>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_natural_vectors(), exhaustive_unsigneds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| (if rm == Exact { v << i } else { v }, i, rm)),
+    )
+}
+
+pub fn exhaustive_natural_vector_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> It<(NaturalVector, T, RoundingMode)>
+where
+    NaturalVector: Shr<T, Output = NaturalVector>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_natural_vectors(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| {
+            (
+                if i < T::ZERO && rm == Exact {
+                    v >> i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn exhaustive_natural_vector_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> It<(NaturalVector, T, RoundingMode)>
+where
+    NaturalVector: Shl<T, Output = NaturalVector>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_natural_vectors(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| {
+            (
+                if i > T::ZERO && rm == Exact {
+                    v << i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
 }
 
 pub fn exhaustive_natural_vector_natural_pair_gen_var_2() -> It<(NaturalVector, Natural)> {

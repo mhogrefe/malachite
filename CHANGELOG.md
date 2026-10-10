@@ -139,6 +139,10 @@ documented by git history.
   the value whose every entry is the larger of the corresponding entries of two values, such as
   two vectors of the same dimension, and `EntrywiseMin` and `EntrywiseMinAssign` for the smaller.
   Implemented for `UnsignedVector<T>`, in every combination of value and reference.
+- `EntrywiseShlRound`, `EntrywiseShlRoundAssign`, `EntrywiseShrRound`, and
+  `EntrywiseShrRoundAssign` traits in `malachite_base::num::arithmetic::traits`, for shifting every
+  entry of a vector and rounding each according to a `RoundingMode`. Unlike `ShlRound` and
+  `ShrRound`, they return no `Ordering`, since entries may round in different directions.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` of `UnsignedVector<T>` by a `T`, multiplying every
   element modulo $2^k$. The elements and the scalar must already be reduced.
 - `ModMul` and `ModMulAssign` of `UnsignedVector<T>` by a `T` modulo a `T`, multiplying every
@@ -260,7 +264,15 @@ documented by git history.
   `Natural`, in every combination of value and reference, computing $2^k \bmod m$ once and
   multiplying every element by it. The elements must already be reduced.
 - `Shl` (by value and by reference) and `ShlAssign` for `NaturalVector` and `IntegerVector`, by any
-  primitive unsigned type, shifting every element left, like FLINT's `_fmpz_vec_scalar_mul_2exp`.
+  primitive unsigned or signed type, shifting every element left, like FLINT's
+  `_fmpz_vec_scalar_mul_2exp`; a negative amount shifts right, taking the floor.
+- `Shr` (by value and by reference) and `ShrAssign` for `NaturalVector` and `IntegerVector`, by any
+  primitive unsigned or signed type, taking the floor of every element, like FLINT's
+  `_fmpz_vec_scalar_fdiv_q_2exp`.
+- `EntrywiseShrRound` (by value and by reference) and `EntrywiseShrRoundAssign` for `NaturalVector`
+  and `IntegerVector`, by any primitive unsigned or signed type, and `EntrywiseShlRound` and
+  `EntrywiseShlRoundAssign` by any primitive signed type, rounding every element according to a
+  `RoundingMode`; with `Down`, `entrywise_shr_round` is FLINT's `_fmpz_vec_scalar_tdiv_q_2exp`.
 
 ### malachite-q
 

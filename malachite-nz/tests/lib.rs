@@ -355,6 +355,8 @@ pub mod integer_vector {
         pub mod content_chained;
         pub mod dot_general;
         pub mod entrywise_abs;
+        pub mod entrywise_shl_round;
+        pub mod entrywise_shr_round;
         pub mod height;
         pub mod l1_norm;
         pub mod max_bits;
@@ -365,6 +367,7 @@ pub mod integer_vector {
         pub mod neg;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod shr;
         pub mod sub;
     }
     pub mod basic {
@@ -891,6 +894,8 @@ pub mod natural_vector {
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
         pub mod content;
+        pub mod entrywise_shl_round;
+        pub mod entrywise_shr_round;
         pub mod height;
         pub mod l1_norm;
         pub mod mod_add;
@@ -910,6 +915,7 @@ pub mod natural_vector {
         pub mod multi_crt;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod shr;
     }
     pub mod basic {
         pub mod named;

@@ -284,6 +284,46 @@ pub trait EntrywiseMinAssign<RHS = Self> {
     fn entrywise_min_assign(&mut self, other: RHS);
 }
 
+/// Left-shifts every entry of a value, such as a vector (multiplying it by a power of 2), rounding
+/// each entry according to a specified rounding mode.
+///
+/// Unlike [`ShlRound`], no [`Ordering`] is returned, since different entries may be rounded in
+/// different directions. Rounding might only be necessary if `other` is negative.
+pub trait EntrywiseShlRound<RHS> {
+    type Output;
+
+    fn entrywise_shl_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+/// Left-shifts every entry of a value, such as a vector (multiplying it by a power of 2), in place,
+/// rounding each entry according to a specified rounding mode.
+///
+/// Unlike [`ShlRoundAssign`], no [`Ordering`] is returned, since different entries may be rounded
+/// in different directions. Rounding might only be necessary if `other` is negative.
+pub trait EntrywiseShlRoundAssign<RHS> {
+    fn entrywise_shl_round_assign(&mut self, other: RHS, rm: RoundingMode);
+}
+
+/// Right-shifts every entry of a value, such as a vector (dividing it by a power of 2), rounding
+/// each entry according to a specified rounding mode.
+///
+/// Unlike [`ShrRound`], no [`Ordering`] is returned, since different entries may be rounded in
+/// different directions. Rounding might only be necessary if `other` is positive.
+pub trait EntrywiseShrRound<RHS> {
+    type Output;
+
+    fn entrywise_shr_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+/// Right-shifts every entry of a value, such as a vector (dividing it by a power of 2), in place,
+/// rounding each entry according to a specified rounding mode.
+///
+/// Unlike [`ShrRoundAssign`], no [`Ordering`] is returned, since different entries may be rounded
+/// in different directions. Rounding might only be necessary if `other` is positive.
+pub trait EntrywiseShrRoundAssign<RHS> {
+    fn entrywise_shr_round_assign(&mut self, other: RHS, rm: RoundingMode);
+}
+
 /// Subtracts two numbers and takes the absolute value of the difference.
 pub trait AbsDiff<RHS = Self> {
     type Output;

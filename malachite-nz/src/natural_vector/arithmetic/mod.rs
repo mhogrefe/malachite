@@ -30,6 +30,141 @@ pub mod canonical_primitive_part;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
+/// Left-shifting a vector (multiplying it by a power of 2) and rounding every element, by
+/// implementations of
+/// [`EntrywiseShlRound`](malachite_base::num::arithmetic::traits::EntrywiseShlRound) and
+/// [`EntrywiseShlRoundAssign`](malachite_base::num::arithmetic::traits::EntrywiseShlRoundAssign).
+///
+/// # entrywise_shl_round
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShlRound;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3, 5)")
+///         .unwrap()
+///         .entrywise_shl_round(-1i8, Floor))
+///     .to_string(),
+///     "(0, 1, 1, 2)"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3, 5)")
+///         .unwrap()
+///         .entrywise_shl_round(-1i16, Ceiling))
+///     .to_string(),
+///     "(1, 1, 2, 3)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 2, 3, 5)")
+///         .unwrap()
+///         .entrywise_shl_round(-1i32, Nearest))
+///         .to_string(),
+///     "(0, 1, 2, 2)"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(4, 8, 12)")
+///         .unwrap()
+///         .entrywise_shl_round(-2i64, Exact))
+///     .to_string(),
+///     "(1, 2, 3)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 2, 3)")
+///         .unwrap()
+///         .entrywise_shl_round(2i8, Exact))
+///         .to_string(),
+///     "(4, 8, 12)"
+/// );
+/// ```
+///
+/// # entrywise_shl_round_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShlRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(1, 2, 3, 5)").unwrap();
+/// v.entrywise_shl_round_assign(-1i8, Nearest);
+/// assert_eq!(v.to_string(), "(0, 1, 2, 2)");
+/// let mut v = NaturalVector::from_str("(1, 2, 3)").unwrap();
+/// v.entrywise_shl_round_assign(2i32, Exact);
+/// assert_eq!(v.to_string(), "(4, 8, 12)");
+/// ```
+pub mod entrywise_shl_round;
+/// Right-shifting a vector (dividing it by a power of 2) and rounding every element, by
+/// implementations of
+/// [`EntrywiseShrRound`](malachite_base::num::arithmetic::traits::EntrywiseShrRound) and
+/// [`EntrywiseShrRoundAssign`](malachite_base::num::arithmetic::traits::EntrywiseShrRoundAssign).
+///
+/// # entrywise_shr_round
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShrRound;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3, 5)")
+///         .unwrap()
+///         .entrywise_shr_round(1u8, Floor))
+///     .to_string(),
+///     "(0, 1, 1, 2)"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3, 5)")
+///         .unwrap()
+///         .entrywise_shr_round(1u16, Ceiling))
+///     .to_string(),
+///     "(1, 1, 2, 3)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 2, 3, 5)")
+///         .unwrap()
+///         .entrywise_shr_round(1u32, Nearest))
+///         .to_string(),
+///     "(0, 1, 2, 2)"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(4, 8, 12)")
+///         .unwrap()
+///         .entrywise_shr_round(2u64, Exact))
+///     .to_string(),
+///     "(1, 2, 3)"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3, 5)")
+///         .unwrap()
+///         .entrywise_shr_round(1i8, Down))
+///     .to_string(),
+///     "(0, 1, 1, 2)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 2, 3)")
+///         .unwrap()
+///         .entrywise_shr_round(-2i16, Exact))
+///         .to_string(),
+///     "(4, 8, 12)"
+/// );
+/// ```
+///
+/// # entrywise_shr_round_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShrRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(1, 2, 3, 5)").unwrap();
+/// v.entrywise_shr_round_assign(1u8, Nearest);
+/// assert_eq!(v.to_string(), "(0, 1, 2, 2)");
+/// let mut v = NaturalVector::from_str("(1, 2, 3, 5)").unwrap();
+/// v.entrywise_shr_round_assign(1i32, Up);
+/// assert_eq!(v.to_string(), "(1, 1, 2, 3)");
+/// ```
+pub mod entrywise_shr_round;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
 /// element.
@@ -205,6 +340,16 @@ pub mod scalar_mul;
 ///     (&NaturalVector::from_str("(3, 0)").unwrap() << 100u64).to_string(),
 ///     "(3802951800684688204490109616128, 0)"
 /// );
+///
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3)").unwrap() << 2i8).to_string(),
+///     "(4, 8, 12)"
+/// );
+///
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 2, 3, 5)").unwrap() << -1i64).to_string(),
+///     "(0, 1, 1, 2)"
+/// );
 /// ```
 ///
 /// # shl_assign
@@ -215,5 +360,61 @@ pub mod scalar_mul;
 /// let mut v = NaturalVector::from_str("(1, 2, 3)").unwrap();
 /// v <<= 2u32;
 /// assert_eq!(v.to_string(), "(4, 8, 12)");
+///
+/// let mut v = NaturalVector::from_str("(1, 2, 3, 5)").unwrap();
+/// v <<= -1i32;
+/// assert_eq!(v.to_string(), "(0, 1, 1, 2)");
 /// ```
 pub mod shl;
+/// Right-shifting a vector (dividing it by a power of 2 and taking the floor), by implementations
+/// of [`Shr`](core::ops::Shr) and [`ShrAssign`](core::ops::ShrAssign).
+///
+/// # shr
+/// ```
+/// use core::str::FromStr;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// assert_eq!(
+///     (NaturalVector::from_str("()").unwrap() >> 10u8).to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3)").unwrap() >> 0u16).to_string(),
+///     "(1, 2, 3)"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(4, 8, 12)").unwrap() >> 2u32).to_string(),
+///     "(1, 2, 3)"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3, 5)").unwrap() >> 1u8).to_string(),
+///     "(0, 1, 1, 2)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(3802951800684688204490109616128, 0)").unwrap() >> 100u64)
+///         .to_string(),
+///     "(3, 0)"
+/// );
+/// assert_eq!(
+///     (NaturalVector::from_str("(1, 2, 3)").unwrap() >> -2i8).to_string(),
+///     "(4, 8, 12)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(4, 8, 12)").unwrap() >> 2i64).to_string(),
+///     "(1, 2, 3)"
+/// );
+/// ```
+///
+/// # shr_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(4, 8, 12)").unwrap();
+/// v >>= 2u32;
+/// assert_eq!(v.to_string(), "(1, 2, 3)");
+/// let mut v = NaturalVector::from_str("(1, 2, 3)").unwrap();
+/// v >>= -2i32;
+/// assert_eq!(v.to_string(), "(4, 8, 12)");
+/// ```
+pub mod shr;

@@ -3775,6 +3775,57 @@ pub fn integer_vector_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(IntegerVector, T)` where `T` is small and signed.
+pub fn integer_vector_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(IntegerVector, T)> {
+    Generator::new(
+        &exhaustive_integer_vector_signed_pair_gen_var_1,
+        &random_integer_vector_signed_pair_gen_var_1,
+        &special_random_integer_vector_signed_pair_gen_var_1,
+    )
+}
+
+// All `(IntegerVector, T, RoundingMode)` where `T` is small and unsigned and the triple is a valid
+// input to `IntegerVector::entrywise_shr_round`.
+pub fn integer_vector_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(IntegerVector, T, RoundingMode)>
+where
+    IntegerVector: Shl<T, Output = IntegerVector>,
+{
+    Generator::new(
+        &exhaustive_integer_vector_unsigned_rounding_mode_triple_gen_var_1,
+        &random_integer_vector_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_integer_vector_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(IntegerVector, T, RoundingMode)` where `T` is small and signed and the triple is a valid
+// input to `IntegerVector::entrywise_shl_round`.
+pub fn integer_vector_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(IntegerVector, T, RoundingMode)>
+where
+    IntegerVector: Shr<T, Output = IntegerVector>,
+{
+    Generator::new(
+        &exhaustive_integer_vector_signed_rounding_mode_triple_gen_var_1,
+        &random_integer_vector_signed_rounding_mode_triple_gen_var_1,
+        &special_random_integer_vector_signed_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(IntegerVector, T, RoundingMode)` where `T` is small and signed and the triple is a valid
+// input to `IntegerVector::entrywise_shr_round`.
+pub fn integer_vector_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> Generator<(IntegerVector, T, RoundingMode)>
+where
+    IntegerVector: Shl<T, Output = IntegerVector>,
+{
+    Generator::new(
+        &exhaustive_integer_vector_signed_rounding_mode_triple_gen_var_2,
+        &random_integer_vector_signed_rounding_mode_triple_gen_var_2,
+        &special_random_integer_vector_signed_rounding_mode_triple_gen_var_2,
+    )
+}
+
 pub fn integer_vector_natural_vector_pair_gen() -> Generator<(IntegerVector, NaturalVector)> {
     Generator::new(
         &exhaustive_integer_vector_natural_vector_pair_gen,
@@ -3940,6 +3991,57 @@ pub fn natural_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
         &exhaustive_natural_vector_unsigned_pair_gen_var_4,
         &random_natural_vector_unsigned_pair_gen_var_4,
         &special_random_natural_vector_unsigned_pair_gen_var_4,
+    )
+}
+
+// All `(NaturalVector, T)` where `T` is small and signed.
+pub fn natural_vector_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(NaturalVector, T)> {
+    Generator::new(
+        &exhaustive_natural_vector_signed_pair_gen_var_1,
+        &random_natural_vector_signed_pair_gen_var_1,
+        &special_random_natural_vector_signed_pair_gen_var_1,
+    )
+}
+
+// All `(NaturalVector, T, RoundingMode)` where `T` is small and unsigned and the triple is a valid
+// input to `NaturalVector::entrywise_shr_round`.
+pub fn natural_vector_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(NaturalVector, T, RoundingMode)>
+where
+    NaturalVector: Shl<T, Output = NaturalVector>,
+{
+    Generator::new(
+        &exhaustive_natural_vector_unsigned_rounding_mode_triple_gen_var_1,
+        &random_natural_vector_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_natural_vector_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalVector, T, RoundingMode)` where `T` is small and signed and the triple is a valid
+// input to `NaturalVector::entrywise_shl_round`.
+pub fn natural_vector_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(NaturalVector, T, RoundingMode)>
+where
+    NaturalVector: Shr<T, Output = NaturalVector>,
+{
+    Generator::new(
+        &exhaustive_natural_vector_signed_rounding_mode_triple_gen_var_1,
+        &random_natural_vector_signed_rounding_mode_triple_gen_var_1,
+        &special_random_natural_vector_signed_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalVector, T, RoundingMode)` where `T` is small and signed and the triple is a valid
+// input to `NaturalVector::entrywise_shr_round`.
+pub fn natural_vector_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> Generator<(NaturalVector, T, RoundingMode)>
+where
+    NaturalVector: Shl<T, Output = NaturalVector>,
+{
+    Generator::new(
+        &exhaustive_natural_vector_signed_rounding_mode_triple_gen_var_2,
+        &random_natural_vector_signed_rounding_mode_triple_gen_var_2,
+        &special_random_natural_vector_signed_rounding_mode_triple_gen_var_2,
     )
 }
 

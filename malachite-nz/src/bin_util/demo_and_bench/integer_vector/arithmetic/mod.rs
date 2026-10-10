@@ -18,6 +18,8 @@ pub(crate) fn register(runner: &mut Runner) {
     content_chained::register(runner);
     dot_general::register(runner);
     entrywise_abs::register(runner);
+    entrywise_shl_round::register(runner);
+    entrywise_shr_round::register(runner);
     height::register(runner);
     l1_norm::register(runner);
     max_bits::register(runner);
@@ -28,6 +30,7 @@ pub(crate) fn register(runner: &mut Runner) {
     neg::register(runner);
     scalar_mul::register(runner);
     shl::register(runner);
+    shr::register(runner);
     sub::register(runner);
 }
 
@@ -40,6 +43,8 @@ mod content;
 mod content_chained;
 mod dot_general;
 mod entrywise_abs;
+mod entrywise_shl_round;
+mod entrywise_shr_round;
 mod height;
 mod l1_norm;
 mod max_bits;
@@ -50,4 +55,5 @@ mod multi_crt;
 mod neg;
 mod scalar_mul;
 mod shl;
+mod shr;
 mod sub;
