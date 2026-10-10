@@ -4209,6 +4209,16 @@ pub fn natural_vector_natural_vector_natural_triple_gen_var_1()
     )
 }
 
+// All `(NaturalVector, NaturalVector, Natural)` where the vectors have the same dimension.
+pub fn natural_vector_natural_vector_natural_triple_gen_var_2()
+-> Generator<(NaturalVector, NaturalVector, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_vector_natural_triple_gen_var_2,
+        &random_natural_vector_natural_vector_natural_triple_gen_var_2,
+        &special_random_natural_vector_natural_vector_natural_triple_gen_var_2,
+    )
+}
+
 // All `(NaturalVector, NaturalVector, NaturalVector, Natural)` where the vectors have the same
 // dimension and every element of all three is less than the `Natural`.
 pub fn natural_vector_natural_vector_natural_vector_natural_quadruple_gen_var_1()

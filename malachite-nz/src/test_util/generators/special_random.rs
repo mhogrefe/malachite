@@ -8545,6 +8545,22 @@ pub fn special_random_natural_vector_natural_vector_natural_triple_gen_var_1(
     )
 }
 
+pub fn special_random_natural_vector_natural_vector_natural_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, Natural)> {
+    Box::new(
+        special_random_natural_vector_pair_gen_var_1(config)
+            .zip(striped_random_naturals(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((v, w), c)| (v, w, c)),
+    )
+}
+
 pub fn special_random_natural_vector_natural_vector_natural_vector_natural_quadruple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalVector, NaturalVector, NaturalVector, Natural)> {

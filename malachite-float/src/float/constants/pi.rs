@@ -46,7 +46,10 @@ fn pi_from_cache(prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
 #[cfg(feature = "test_build")]
 fn pi_to_cache(pi: &Float, err_prec: u64) {
     let mut cache = PI_CACHE.lock().unwrap_or_else(PoisonError::into_inner);
-    if cache.as_ref().is_none_or(|&(_, cached_err_prec)| cached_err_prec < err_prec) {
+    if cache
+        .as_ref()
+        .is_none_or(|&(_, cached_err_prec)| cached_err_prec < err_prec)
+    {
         *cache = Some((pi.clone(), err_prec));
     }
 }

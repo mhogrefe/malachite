@@ -9,6 +9,75 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// vectors.
 pub mod add;
+/// Adding a multiple of one vector to another, by implementations of
+/// [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
+/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign).
+///
+/// # add_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMul;
+/// use malachite_base::num::basic::traits::{One, Zero};
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// assert_eq!(
+///     NaturalVector::from_str("()")
+///         .unwrap()
+///         .add_mul(NaturalVector::from_str("()").unwrap(), Natural::from(5u32))
+///         .to_string(),
+///     "()"
+/// );
+/// assert_eq!(
+///     NaturalVector::from_str("(1, 2, 3)")
+///         .unwrap()
+///         .add_mul(NaturalVector::from_str("(4, 5, 6)").unwrap(), Natural::ZERO)
+///         .to_string(),
+///     "(1, 2, 3)"
+/// );
+/// assert_eq!(
+///     NaturalVector::from_str("(1, 2, 3)")
+///         .unwrap()
+///         .add_mul(NaturalVector::from_str("(4, 5, 6)").unwrap(), Natural::ONE)
+///         .to_string(),
+///     "(5, 7, 9)"
+/// );
+/// assert_eq!(
+///     (&NaturalVector::from_str("(1, 2, 3)").unwrap())
+///         .add_mul(
+///             &NaturalVector::from_str("(4, 5, 6)").unwrap(),
+///             &Natural::from(10u32)
+///         )
+///         .to_string(),
+///     "(41, 52, 63)"
+/// );
+/// assert_eq!(
+///     NaturalVector::from_str("(1, 0)")
+///         .unwrap()
+///         .add_mul(
+///             &NaturalVector::from_str("(18446744073709551615, 1)").unwrap(),
+///             &Natural::from_str("18446744073709551617").unwrap()
+///         )
+///         .to_string(),
+///     "(340282366920938463463374607431768211456, 18446744073709551617)"
+/// );
+/// ```
+///
+/// # add_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_vector::NaturalVector;
+///
+/// let mut v = NaturalVector::from_str("(1, 2, 3)").unwrap();
+/// v.add_mul_assign(
+///     NaturalVector::from_str("(4, 5, 6)").unwrap(),
+///     Natural::from(10u32),
+/// );
+/// assert_eq!(v.to_string(), "(41, 52, 63)");
+/// ```
+pub mod add_mul;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), which
 /// reduces every element of a vector to the representative closest to zero modulo a number.
 pub mod balanced_mod;

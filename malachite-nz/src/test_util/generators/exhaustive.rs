@@ -3929,6 +3929,19 @@ pub fn exhaustive_natural_vector_natural_vector_natural_triple_gen_var_1()
     })
 }
 
+pub fn exhaustive_natural_vector_natural_vector_natural_triple_gen_var_2()
+-> It<(NaturalVector, NaturalVector, Natural)> {
+    exhaustive_tuples_by_dimension(|dimension| {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_natural_vectors_with_dimension(dimension)),
+                exhaustive_naturals(),
+            )
+            .map(|((v, w), c)| (v, w, c)),
+        )
+    })
+}
+
 pub fn exhaustive_natural_vector_natural_vector_natural_vector_natural_quadruple_gen_var_1()
 -> It<(NaturalVector, NaturalVector, NaturalVector, Natural)> {
     exhaustive_tuples_by_dimension(|dimension| {
