@@ -1223,6 +1223,10 @@ const AZURITE_MOD_STAGES: &[(&str, &str)] = &[
 // reads each one. The modes follow the rows of the "Malachite for Azurite Users: Rationals"
 // mapping page; `rounding_from` is an Integer demo whose input is a Rational.
 const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
+    ("demo_rational_sum", "az_rat_sum"),
+    ("demo_rational_ref_sum", "az_rat_sum"),
+    ("demo_rational_product", "az_rat_product"),
+    ("demo_rational_ref_product", "az_rat_product"),
     ("demo_rational_add", "az_rat_add"),
     ("demo_rational_add_val_ref", "az_rat_add"),
     ("demo_rational_add_ref_val", "az_rat_add"),
