@@ -1,0 +1,112 @@
+error: use `add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:28:13
+   |
+LL |     let _ = &i + ((&j * &k) << bits);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_fused_mul_shl)]` on by default
+
+error: use `sub_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:29:13
+   |
+LL |     let _ = &i - ((&j * &k) << bits);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:31:13
+   |
+LL |     let _ = ((&j * &k) << bits) + &i;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `add_mul_shl_assign()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:33:5
+   |
+LL |     a += (&j * &k) << bits;
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `sub_mul_shl_assign()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:35:5
+   |
+LL |     b -= (&j * &k) << bits;
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:36:13
+   |
+LL |     let _ = &P + ((&Q * &P) << 2u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:38:13
+   |
+LL |     let _ = &X + ((&Y * &Z) << bits);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:49:13
+   |
+LL |     let _ = (&i).add_mul(&(&j << bits), &k);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `sub_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:50:13
+   |
+LL |     let _ = (&i).sub_mul(&j, &(&k << bits));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `add_mul_shl_assign()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:52:5
+   |
+LL |     c.add_mul_assign(&Y << bits, &Z);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mod_power_of_2_add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:60:13
+   |
+LL |     let _ = x.mod_power_of_2_add(x.mod_power_of_2_mul(y, pow).mod_power_of_2_shl(2u64, pow), pow);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mod_power_of_2_sub_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:61:13
+   |
+LL |     let _ = x.mod_power_of_2_sub(x.mod_power_of_2_shl(2u64, pow).mod_power_of_2_mul(y, pow), pow);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mod_power_of_2_add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:62:13
+   |
+LL |     let _ = x.mod_power_of_2_add_mul(x.mod_power_of_2_shl(2u64, pow), x, pow);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mod_add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:68:13
+   |
+LL |     let _ = x.mod_add(x.mod_mul(y, m).mod_shl(2u64, m), m);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mod_sub_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:69:13
+   |
+LL |     let _ = x.mod_sub(x.mod_mul(x.mod_shl(2u64, m), m), m);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mod_add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:70:13
+   |
+LL |     let _ = x.mod_add_mul(x, x.mod_shl(2u64, m), m);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mod_add_mul_shl_assign()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:72:5
+   |
+LL |     d.mod_add_assign(x.mod_mul(y, m).mod_shl(2u64, m), m);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mod_add_mul_shl()` instead of shifting the product separately
+  --> $DIR/use_fused_mul_shl.rs:73:13
+   |
+LL |     let _ = (&X).mod_add((&Y).mod_mul(&Z, &M).mod_shl(2u64, &M), &M);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 18 previous errors
+

@@ -269,6 +269,22 @@ Flags multiplying a bignum by itself (`&x * &x`) and raising one to the power of
 `x.pow_assign(2)`): squaring has a dedicated, faster implementation — `square()`, `(&x).square()`,
 or `square_assign()`.
 
+### `use_fused_mul_shl`
+
+Flags a product shifted left as a separate step from the addition or subtraction that consumes it,
+where a fused operation exists: `x + ((y * z) << k)` and `x - ((y * z) << k)` (and the `+=`/`-=`
+forms) are `add_mul_shl` and `sub_mul_shl`; `x.add_mul(y << k, z)` and `x.sub_mul(y << k, z)`, with
+either factor shifted, are the same operations; and the modular chains, such as
+`x.mod_power_of_2_add(y.mod_power_of_2_mul(z, p).mod_power_of_2_shl(k, p), p)`,
+`x.mod_power_of_2_add_mul(y.mod_power_of_2_shl(k, p), z, p)`, and their `mod_add`/`mod_mul`/
+`mod_shl` counterparts, are `mod_power_of_2_add_mul_shl` and `mod_add_mul_shl` (and likewise for
+subtraction). The fused forms never materialize the shifted product; the power-of-2 forms multiply
+only the bits that survive the shift, and the vector forms shift the scalar once rather than every
+element. The shift amount must be unsigned and the modulus the same throughout, and the receiver's
+type must implement the suggested trait, so `Natural` (which has no `SubMulShl`) is flagged only
+for addition and primitive integers only for the modular forms. Test code and the operations' own
+definitions are exempt.
+
 ### `use_parity`
 
 Flags parity tests spelled the long way — `x % 2` or `x & 1` compared with 0 or 1 (with `% 2`

@@ -91,7 +91,7 @@ fn operator_form_is_worthwhile<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> bo
 // as inference variables, and a bignum has an impl for every by-value/by-reference permutation of
 // them, so the solver finds the goal ambiguous and reports no impl at all -- while a primitive,
 // with exactly one impl, resolves fine. Scanning the impl list sidesteps the ambiguity.
-fn has_trait_impl<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>, path: &str) -> bool {
+pub(crate) fn has_trait_impl<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>, path: &str) -> bool {
     use clippy_utils::paths::{PathNS, lookup_path_str};
     use rustc_middle::ty::TyKind;
     let target = ty.peel_refs();
@@ -157,7 +157,11 @@ fn classify_alias<'tcx>(
 // *is* the definition; suggesting `add_mul` there would be circular. Comparing against the
 // enclosing function's name catches the whole family, including the `limbs_*` helpers and the
 // `_assign`/`_ref` variants.
-fn inside_own_definition<'tcx>(cx: &LateContext<'tcx>, expr: &Expr<'tcx>, fused: &str) -> bool {
+pub(crate) fn inside_own_definition<'tcx>(
+    cx: &LateContext<'tcx>,
+    expr: &Expr<'tcx>,
+    fused: &str,
+) -> bool {
     let base = fused
         .trim_start_matches("wrapping_")
         .trim_start_matches("checked_")
@@ -169,14 +173,14 @@ fn inside_own_definition<'tcx>(cx: &LateContext<'tcx>, expr: &Expr<'tcx>, fused:
 }
 
 // Peels borrows and `.clone()` so that `&x`, `x.clone()`, and `x` all report the same type.
-fn operand_ty<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Ty<'tcx> {
+pub(crate) fn operand_ty<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Ty<'tcx> {
     cx.typeck_results()
         .expr_ty(crate::peel_clone_and_borrows(e))
         .peel_refs()
 }
 
 // If `e` is a multiplication, returns its two operands.
-fn as_mul<'tcx>(e: &'tcx Expr<'tcx>) -> Option<(&'tcx Expr<'tcx>, &'tcx Expr<'tcx>)> {
+pub(crate) fn as_mul<'tcx>(e: &'tcx Expr<'tcx>) -> Option<(&'tcx Expr<'tcx>, &'tcx Expr<'tcx>)> {
     match crate::peel_clone_and_borrows(e).kind {
         ExprKind::Binary(op, l, r) if op.node == BinOpKind::Mul => Some((l, r)),
         _ => None,
@@ -357,7 +361,7 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
 }
 
 // `add_mul_assign` -> `AddMulAssign`, so that a method name can name its trait.
-fn camel(snake: &str) -> String {
+pub(crate) fn camel(snake: &str) -> String {
     snake
         .split('_')
         .map(|w| {

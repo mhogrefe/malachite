@@ -23,7 +23,8 @@ use alloc::vec;
 use core::cmp::Ordering::{self, *};
 use core::mem::{swap, take};
 use malachite_base::num::arithmetic::traits::{
-    Abs, Agm, CeilingLogBase2, IsPowerOf2, Ln, LnAssign, NegAssign, Parity, PowerOf2, Sign,
+    Abs, AddMulShl, Agm, CeilingLogBase2, IsPowerOf2, Ln, LnAssign, NegAssign, Parity, PowerOf2,
+    Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -457,7 +458,7 @@ fn log_ui_s(
         log_ui_s(p_tail, b_tail, t_tail, &mut q1, m, n2, p_val, k, need_p);
         // T[0] <- T[0] * B[1] * 2^q1 + P[0] * B[0] * T[1]
         t_tail[0] *= &*p_head * &*b_head;
-        *t_head = ((&*t_head * &b_tail[0]) << q1) + &t_tail[0];
+        *t_head = (&t_tail[0]).add_mul_shl(&*t_head, &b_tail[0], q1);
         if need_p {
             *p_head *= &p_tail[0];
         }
