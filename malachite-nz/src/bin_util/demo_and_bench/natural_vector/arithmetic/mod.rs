@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonical_primitive_part::register(runner);
     content::register(runner);
     div_exact::register(runner);
+    element_sum::register(runner);
     entrywise_div_round::register(runner);
     entrywise_shl_round::register(runner);
     entrywise_shr_round::register(runner);
@@ -62,6 +63,7 @@ mod balanced_mod_power_of_2;
 mod canonical_primitive_part;
 mod content;
 mod div_exact;
+mod element_sum;
 mod entrywise_div_round;
 mod entrywise_shl_round;
 mod entrywise_shr_round;

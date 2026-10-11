@@ -1078,6 +1078,18 @@ pub trait L1Norm {
     fn l1_norm_significant_bits(&self) -> u64;
 }
 
+/// Calculates the sum of the elements of a vector.
+///
+/// Unlike [`Sum`](core::iter::Sum), which adds vectors to each other, this adds up the elements of
+/// one vector, producing a single element.
+pub trait ElementSum {
+    type Output;
+
+    fn to_element_sum(&self) -> Self::Output;
+
+    fn into_element_sum(self) -> Self::Output;
+}
+
 /// Determines whether a number is an integer power of 2.
 pub trait IsPowerOf2 {
     fn is_power_of_2(&self) -> bool;

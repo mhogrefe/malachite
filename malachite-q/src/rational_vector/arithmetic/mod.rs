@@ -104,6 +104,9 @@ pub mod canonicalize_sign;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which split a vector into a rational scalar and a vector of coprime integers.
 pub mod content;
+/// An implementation of [`ElementSum`](malachite_base::num::arithmetic::traits::ElementSum), the
+/// sum of the elements.
+pub mod element_sum;
 /// Implementations of [`EntrywiseAbs`](malachite_base::num::arithmetic::traits::EntrywiseAbs) and
 /// [`EntrywiseAbsAssign`](malachite_base::num::arithmetic::traits::EntrywiseAbsAssign), which
 /// replace every element of a vector by its absolute value.

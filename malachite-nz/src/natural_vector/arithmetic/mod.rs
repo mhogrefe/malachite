@@ -155,6 +155,9 @@ pub mod content;
 /// assert_eq!(v.to_string(), "(0, 2, 85)");
 /// ```
 pub mod div_exact;
+/// An implementation of [`ElementSum`](malachite_base::num::arithmetic::traits::ElementSum), the
+/// sum of the elements.
+pub mod element_sum;
 /// Dividing every element of a vector by a scalar and rounding each quotient, by implementations of
 /// [`EntrywiseDivRound`](malachite_base::num::arithmetic::traits::EntrywiseDivRound) and
 /// [`EntrywiseDivRoundAssign`](malachite_base::num::arithmetic::traits::EntrywiseDivRoundAssign).

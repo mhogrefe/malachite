@@ -85,6 +85,9 @@ documented by git history.
   two facts that FLINT's `_fmpz_vec_max_bits` combines into one signed count. `sum_max_bits` returns
   the bit lengths of the sum of the absolute values of the elements and of the height, like
   `_fmpz_vec_sum_max_bits`.
+- An `ElementSum` trait in `malachite_base::num::arithmetic::traits`, for the sum of the elements of
+  a vector, as a single element, with `to_element_sum` and `into_element_sum`. It is distinct from
+  `Sum`, which adds vectors to each other.
 - An `L1Norm` trait in `malachite_base::num::arithmetic::traits`, for the $\ell^1$ norm of a value:
   the sum of the absolute values of the parts it is built from, such as the elements of a vector.
   It has `to_l1_norm`, `into_l1_norm`, and `l1_norm_significant_bits`, mirroring `Height`.
@@ -260,6 +263,8 @@ documented by git history.
   and `IntegerVector`.
 - `Height` and `HeightRef` for `NaturalVector` and `IntegerVector`: the largest absolute value of an
   element, like FLINT's `_fmpz_vec_height`. The height of the 0-dimensional vector is 0.
+- `ElementSum` for `NaturalVector` and `IntegerVector`: the sum of the elements, like FLINT's
+  `_fmpz_vec_sum`. The sum of the 0-dimensional vector is 0.
 - `L1Norm` for `NaturalVector` and `IntegerVector`: the sum of the absolute values of the elements,
   as a `Natural`. `l1_norm_significant_bits` adds the elements in two words while each fits in one,
   like FLINT's `_fmpz_vec_sum_max_bits`.
@@ -482,6 +487,8 @@ documented by git history.
   `RationalVector`.
 - `Height` and `HeightRef` for `RationalVector`: the largest height of an element, like FLINT's
   `_fmpq_vec_max_height`. The height of the 0-dimensional vector is 0.
+- `ElementSum` for `RationalVector`: the sum of the elements, as a `Rational`. The sum of the
+  0-dimensional vector is 0.
 - `L1Norm` for `RationalVector`: the sum of the absolute values of the elements, as a `Rational`.
 - `SignificantBits` for `RationalVector`: the sum of the numbers of significant bits of the
   elements, each counting the bits of its numerator and denominator, as for `Rational`.

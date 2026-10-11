@@ -187,6 +187,9 @@ pub mod content_chained;
 pub mod div_exact;
 #[doc(hidden)]
 pub mod dot_general;
+/// An implementation of [`ElementSum`](malachite_base::num::arithmetic::traits::ElementSum), the
+/// sum of the elements.
+pub mod element_sum;
 /// Implementations of [`EntrywiseAbs`](malachite_base::num::arithmetic::traits::EntrywiseAbs),
 /// [`EntrywiseAbsAssign`](malachite_base::num::arithmetic::traits::EntrywiseAbsAssign), and
 /// [`EntrywiseUnsignedAbs`](malachite_base::num::arithmetic::traits::EntrywiseUnsignedAbs), which
