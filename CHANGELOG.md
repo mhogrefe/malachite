@@ -98,6 +98,8 @@ documented by git history.
 - `ModPowerOf2ElementSum` and `ModElementSum` traits in `malachite_base::num::arithmetic::traits`,
   for the sum of the elements of a vector modulo $2^k$ or modulo $m$, as a single element, with
   `to_` and `into_` forms. The elements must already be reduced.
+- An `ElementLcm` trait in `malachite_base::num::arithmetic::traits`, for the LCM of the elements
+  of a vector, with `to_element_lcm` and `into_element_lcm`.
 - An `ElementProduct` trait in `malachite_base::num::arithmetic::traits`, for the product of the
   elements of a vector, as a single element, with `to_element_product` and `into_element_product`.
 - An `ElementSum` trait in `malachite_base::num::arithmetic::traits`, for the sum of the elements of
@@ -283,6 +285,9 @@ documented by git history.
   and `IntegerVector`.
 - `Height` and `HeightRef` for `NaturalVector` and `IntegerVector`: the largest absolute value of an
   element, like FLINT's `_fmpz_vec_height`. The height of the 0-dimensional vector is 0.
+- `ElementLcm` for `NaturalVector` and `IntegerVector`: the LCM of the elements' absolute values,
+  like FLINT's `_fmpz_vec_lcm`. The LCM of the 0-dimensional vector is 1, and it is 0, found as
+  soon as a zero element is reached, if any element is 0.
 - `ElementProduct` for `NaturalVector` and `IntegerVector`: the product of the elements, like
   FLINT's `_fmpz_vec_prod`, multiplied in a balanced tree and stopping at a zero element. The
   product of the 0-dimensional vector is 1.

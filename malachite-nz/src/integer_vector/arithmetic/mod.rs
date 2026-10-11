@@ -188,6 +188,9 @@ pub mod content_chained;
 pub mod div_exact;
 #[doc(hidden)]
 pub mod dot_general;
+/// An implementation of [`ElementLcm`](malachite_base::num::arithmetic::traits::ElementLcm), the
+/// LCM of the elements.
+pub mod element_lcm;
 /// An implementation of
 /// [`ElementProduct`](malachite_base::num::arithmetic::traits::ElementProduct), the product of the
 /// elements.

@@ -2117,6 +2117,14 @@ fn test_against_flint() {
         );
     }
     for demo_name in [
+        "demo_natural_vector_to_element_lcm",
+        "demo_natural_vector_into_element_lcm",
+        "demo_integer_vector_to_element_lcm",
+        "demo_integer_vector_into_element_lcm",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_fmpz_vec_lcm");
+    }
+    for demo_name in [
         "demo_unsigned_vector_content_chained",
         "demo_unsigned_vector_content_chained_ref",
     ] {

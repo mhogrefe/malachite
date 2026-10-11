@@ -1139,6 +1139,17 @@ pub trait ModElementProduct<M> {
     fn into_mod_element_product(self, m: M) -> Self::Output;
 }
 
+/// Calculates the LCM of the elements of a vector.
+///
+/// The LCM of the elements of the 0-dimensional vector is 1, and the LCM is 0 if any element is 0.
+pub trait ElementLcm {
+    type Output;
+
+    fn to_element_lcm(&self) -> Self::Output;
+
+    fn into_element_lcm(self) -> Self::Output;
+}
+
 /// Calculates the product of the elements of a vector.
 ///
 /// Unlike [`Product`](core::iter::Product), which would multiply vectors together, this multiplies

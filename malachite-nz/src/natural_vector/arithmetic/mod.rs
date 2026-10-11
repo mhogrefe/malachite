@@ -158,6 +158,9 @@ pub mod content_chained;
 /// assert_eq!(v.to_string(), "(0, 2, 85)");
 /// ```
 pub mod div_exact;
+/// An implementation of [`ElementLcm`](malachite_base::num::arithmetic::traits::ElementLcm), the
+/// LCM of the elements.
+pub mod element_lcm;
 /// An implementation of
 /// [`ElementProduct`](malachite_base::num::arithmetic::traits::ElementProduct), the product of the
 /// elements.
