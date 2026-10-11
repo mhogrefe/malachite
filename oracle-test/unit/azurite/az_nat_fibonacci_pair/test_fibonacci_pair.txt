@@ -1,0 +1,7 @@
+fibonacci_pair(0) = (0, 1)
+fibonacci_pair(1) = (1, 0)
+fibonacci_pair(2) = (1, 1)
+fibonacci_pair(10) = (55, 34)
+fibonacci_pair(93) = (12200160415121876738, 7540113804746346429)
+fibonacci_pair(94) = (19740274219868223167, 12200160415121876738)
+fibonacci_pair(100) = (354224848179261915075, 218922995834555169026)

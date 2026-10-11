@@ -1,0 +1,4 @@
+bell_numbers_prefix(0) = []
+bell_numbers_prefix(1) = [1]
+bell_numbers_prefix(2) = [1, 1]
+bell_numbers_prefix(3) = [1, 1, 2]

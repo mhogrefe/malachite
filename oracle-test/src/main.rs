@@ -725,6 +725,24 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_ref_sum", "az_nat_sum"),
     ("demo_natural_product", "az_nat_product"),
     ("demo_natural_ref_product", "az_nat_product"),
+    ("demo_natural_rising_factorial", "az_nat_rising_factorial"),
+    (
+        "demo_natural_rising_factorial_ref",
+        "az_nat_rising_factorial",
+    ),
+    ("demo_natural_falling_factorial", "az_nat_falling_factorial"),
+    (
+        "demo_natural_falling_factorial_ref",
+        "az_nat_falling_factorial",
+    ),
+    (
+        "demo_natural_binomial_coefficient",
+        "az_nat_binomial_coefficient",
+    ),
+    (
+        "demo_natural_binomial_coefficient_ref",
+        "az_nat_binomial_coefficient",
+    ),
     ("demo_natural_from_unsigned_u8", "az_nat_from_unsigned"),
     ("demo_natural_from_unsigned_u64", "az_nat_from_unsigned"),
     (
@@ -775,6 +793,24 @@ const AZURITE_NATURAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ("demo_double_factorial", "az_nat_double_factorial"),
     ("demo_multifactorial", "az_nat_multifactorial"),
     ("demo_subfactorial", "az_nat_subfactorial"),
+    ("demo_fibonacci", "az_nat_fibonacci"),
+    ("demo_fibonacci_pair", "az_nat_fibonacci_pair"),
+    ("demo_lucas_number", "az_nat_lucas_number"),
+    ("demo_lucas_number_pair", "az_nat_lucas_number_pair"),
+    ("demo_primorial", "az_nat_primorial"),
+    (
+        "demo_product_of_first_n_primes",
+        "az_nat_product_of_first_n_primes",
+    ),
+    ("demo_natural_bell_number", "az_nat_bell_number"),
+    (
+        "demo_natural_bell_numbers_prefix",
+        "az_nat_bell_numbers_prefix",
+    ),
+    (
+        "demo_natural_landau_function_prefix",
+        "az_nat_landau_function_prefix",
+    ),
     (
         "demo_natural_primes_less_than_or_equal_to",
         "az_nat_primes_less_than",
