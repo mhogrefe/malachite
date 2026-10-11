@@ -36,10 +36,12 @@ pub mod balanced_mod;
 /// [`BalancedModPowerOf2`](malachite_base::num::arithmetic::traits::BalancedModPowerOf2), a trait
 /// for finding the representative of a number modulo $2^k$ that is closest to zero.
 pub mod balanced_mod_power_of_2;
+/// An implementation of [`BellNumber`](malachite_base::num::arithmetic::traits::BellNumber), a
+/// trait for computing the number of ways to partition a set.
+pub mod bell_number;
 /// Implementations of
 /// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
 /// for computing the binomial coefficient of two numbers.
-pub mod bell_number;
 pub mod binomial_coefficient;
 /// An implementation of
 /// [`CanonicalUnitIPow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow), a trait for

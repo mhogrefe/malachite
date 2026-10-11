@@ -318,6 +318,32 @@ pub mod balanced_mod;
 /// assert_eq!(x, -1);
 /// ```
 pub mod balanced_mod_power_of_2;
+/// [`BellNumber`](traits::BellNumber) and [`CheckedBellNumber`](traits::CheckedBellNumber), traits
+/// for computing Bell numbers. The first panics if the result cannot be represented; the second
+/// returns `None` in that case.
+///
+/// # bell_number
+/// ```
+/// use malachite_base::num::arithmetic::traits::BellNumber;
+///
+/// assert_eq!(u8::bell_number(0), 1);
+/// assert_eq!(u8::bell_number(4), 15);
+/// assert_eq!(u8::bell_number(6), 203);
+/// assert_eq!(u32::bell_number(10), 115975);
+/// assert_eq!(u64::bell_number(20), 51724158235372);
+/// ```
+///
+/// # checked_bell_number
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedBellNumber;
+///
+/// assert_eq!(u8::checked_bell_number(0), Some(1));
+/// assert_eq!(u8::checked_bell_number(6), Some(203));
+/// assert_eq!(u8::checked_bell_number(7), None);
+/// assert_eq!(u32::checked_bell_number(10), Some(115975));
+/// assert_eq!(u32::checked_bell_number(100), None);
+/// ```
+pub mod bell_number;
 /// Traits for computing the binomial coefficient of two numbers. There is a trait whose
 /// implementations panic if the result cannot be represented, and a checked trait whose
 /// implementations return `None` in that case: [`BinomialCoefficient`](traits::BinomialCoefficient)
@@ -357,32 +383,6 @@ pub mod balanced_mod_power_of_2;
 /// assert_eq!(i8::checked_binomial_coefficient(-3, -3), None);
 /// assert_eq!(i8::checked_binomial_coefficient(11, 5), None);
 /// ```
-/// [`BellNumber`](traits::BellNumber) and [`CheckedBellNumber`](traits::CheckedBellNumber), traits
-/// for computing Bell numbers. The first panics if the result cannot be represented; the second
-/// returns `None` in that case.
-///
-/// # bell_number
-/// ```
-/// use malachite_base::num::arithmetic::traits::BellNumber;
-///
-/// assert_eq!(u8::bell_number(0), 1);
-/// assert_eq!(u8::bell_number(4), 15);
-/// assert_eq!(u8::bell_number(6), 203);
-/// assert_eq!(u32::bell_number(10), 115975);
-/// assert_eq!(u64::bell_number(20), 51724158235372);
-/// ```
-///
-/// # checked_bell_number
-/// ```
-/// use malachite_base::num::arithmetic::traits::CheckedBellNumber;
-///
-/// assert_eq!(u8::checked_bell_number(0), Some(1));
-/// assert_eq!(u8::checked_bell_number(6), Some(203));
-/// assert_eq!(u8::checked_bell_number(7), None);
-/// assert_eq!(u32::checked_bell_number(10), Some(115975));
-/// assert_eq!(u32::checked_bell_number(100), None);
-/// ```
-pub mod bell_number;
 pub mod binomial_coefficient;
 /// [`CanonicalUnitIPow`](traits::CanonicalUnitIPow), a trait for finding the power of $i$ that
 /// brings a number into canonical Gaussian-unit form.
