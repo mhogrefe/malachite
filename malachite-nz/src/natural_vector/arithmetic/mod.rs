@@ -371,6 +371,13 @@ pub mod mod_add_mul;
 /// [`ModAddMulShlAssign`](malachite_base::num::arithmetic::traits::ModAddMulShlAssign), for adding
 /// a scalar multiple of one vector, shifted left, to another modulo a number.
 pub mod mod_add_mul_shl;
+/// Implementations of
+/// [`ModElementProduct`](malachite_base::num::arithmetic::traits::ModElementProduct), the product
+/// of the elements modulo a number.
+pub mod mod_element_product;
+/// Implementations of [`ModElementSum`](malachite_base::num::arithmetic::traits::ModElementSum),
+/// the sum of the elements modulo a number.
+pub mod mod_element_sum;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;
@@ -406,6 +413,15 @@ pub mod mod_power_of_2_add_mul;
 /// malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), for adding a scalar
 /// multiple of one vector, shifted left, to another modulo a power of 2.
 pub mod mod_power_of_2_add_mul_shl;
+/// An implementation of
+/// [`ModPowerOf2ElementProduct`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2ElementProduct),
+/// the product of the elements modulo a power of 2.
+pub mod mod_power_of_2_element_product;
+/// An implementation of
+/// [`ModPowerOf2ElementSum`](malachite_base::num::arithmetic::traits::ModPowerOf2ElementSum), the
+/// sum of the elements modulo a power of 2.
+pub mod mod_power_of_2_element_sum;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
 /// checks whether every element of a vector is less than a given power of 2.

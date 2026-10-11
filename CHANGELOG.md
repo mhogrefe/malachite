@@ -85,6 +85,13 @@ documented by git history.
   two facts that FLINT's `_fmpz_vec_max_bits` combines into one signed count. `sum_max_bits` returns
   the bit lengths of the sum of the absolute values of the elements and of the height, like
   `_fmpz_vec_sum_max_bits`.
+- `ModPowerOf2ElementProduct` and `ModElementProduct` traits in
+  `malachite_base::num::arithmetic::traits`, for the product of the elements of a vector modulo
+  $2^k$ or modulo $m$, as a single element, with `to_` and `into_` forms. The elements must already
+  be reduced.
+- `ModPowerOf2ElementSum` and `ModElementSum` traits in `malachite_base::num::arithmetic::traits`,
+  for the sum of the elements of a vector modulo $2^k$ or modulo $m$, as a single element, with
+  `to_` and `into_` forms. The elements must already be reduced.
 - An `ElementProduct` trait in `malachite_base::num::arithmetic::traits`, for the product of the
   elements of a vector, as a single element, with `to_element_product` and `into_element_product`.
 - An `ElementSum` trait in `malachite_base::num::arithmetic::traits`, for the sum of the elements of
@@ -221,6 +228,11 @@ documented by git history.
   `ModPowerOf2SubMulShlAssign` for `UnsignedVector<T>`, adding or subtracting a `T` multiple of one
   vector, shifted left, to or from another modulo $2^k$. The elements and the scalar must already
   be reduced.
+- `ModPowerOf2ElementProduct` and `ModElementProduct` for `UnsignedVector<T>`: the product of the
+  elements modulo $2^k$ or modulo $m$, as a `T`. The product of the 0-dimensional vector is 1,
+  reduced, and it returns as soon as the partial product is zero.
+- `ModPowerOf2ElementSum` and `ModElementSum` for `UnsignedVector<T>`: the sum of the elements
+  modulo $2^k$ or modulo $m$, as a `T`. The sum of the 0-dimensional vector is 0.
 - `ModSum` for `UnsignedVector<T>`, for iterators of vectors or of references, with a `T`
   modulus: the entrywise sum modulo $m$ of vectors of the same dimension. An empty iterator
   panics.
@@ -268,6 +280,13 @@ documented by git history.
 - `ElementProduct` for `NaturalVector` and `IntegerVector`: the product of the elements, like
   FLINT's `_fmpz_vec_prod`, multiplied in a balanced tree and stopping at a zero element. The
   product of the 0-dimensional vector is 1.
+- `ModPowerOf2ElementProduct` and `ModElementProduct` for `NaturalVector`: the product of the
+  elements modulo $2^k$ or modulo $m$, as a `Natural`, with the modulus by value or by reference.
+  The product of the 0-dimensional vector is 1, reduced, and it returns as soon as the partial
+  product is zero.
+- `ModPowerOf2ElementSum` and `ModElementSum` for `NaturalVector`: the sum of the elements modulo
+  $2^k$ or modulo $m$, as a `Natural`, with the modulus by value or by reference. The sum of the
+  0-dimensional vector is 0.
 - `ElementSum` for `NaturalVector` and `IntegerVector`: the sum of the elements, like FLINT's
   `_fmpz_vec_sum`. The sum of the 0-dimensional vector is 0.
 - `L1Norm` for `NaturalVector` and `IntegerVector`: the sum of the absolute values of the elements,

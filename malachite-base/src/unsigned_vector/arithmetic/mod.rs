@@ -201,6 +201,12 @@ pub mod mod_add_mul;
 pub mod mod_add_mul_shl;
 // Dot products of vectors reduced modulo a word, accumulating the sum before reducing it once.
 pub(crate) mod mod_dot;
+/// Implementations of [`ModElementProduct`](crate::num::arithmetic::traits::ModElementProduct), the
+/// product of the elements modulo a number.
+pub mod mod_element_product;
+/// Implementations of [`ModElementSum`](crate::num::arithmetic::traits::ModElementSum), the sum of
+/// the elements modulo a number.
+pub mod mod_element_sum;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;
@@ -234,6 +240,14 @@ pub mod mod_power_of_2_add_mul;
 /// [`ModPowerOf2AddMulShlAssign`](crate::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), for
 /// adding a scalar multiple of one vector, shifted left, to another modulo a power of 2.
 pub mod mod_power_of_2_add_mul_shl;
+/// An implementation of
+/// [`ModPowerOf2ElementProduct`](crate::num::arithmetic::traits::ModPowerOf2ElementProduct), the
+/// product of the elements modulo a power of 2.
+pub mod mod_power_of_2_element_product;
+/// An implementation of
+/// [`ModPowerOf2ElementSum`](crate::num::arithmetic::traits::ModPowerOf2ElementSum), the sum of the
+/// elements modulo a power of 2.
+pub mod mod_power_of_2_element_sum;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every element of a vector is less than a given power of 2.

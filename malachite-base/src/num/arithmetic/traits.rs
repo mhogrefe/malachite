@@ -1078,6 +1078,55 @@ pub trait L1Norm {
     fn l1_norm_significant_bits(&self) -> u64;
 }
 
+/// Calculates the sum of the elements of a vector modulo $2^k$.
+///
+/// The elements must already be reduced modulo $2^k$. Unlike [`ModPowerOf2Sum`], which adds vectors
+/// to each other, this adds up the elements of one vector, producing a single element.
+pub trait ModPowerOf2ElementSum {
+    type Output;
+
+    fn to_mod_power_of_2_element_sum(&self, pow: u64) -> Self::Output;
+
+    fn into_mod_power_of_2_element_sum(self, pow: u64) -> Self::Output;
+}
+
+/// Calculates the sum of the elements of a vector modulo another number $m$.
+///
+/// The elements must already be reduced modulo $m$. Unlike [`ModSum`], which adds vectors to each
+/// other, this adds up the elements of one vector, producing a single element.
+pub trait ModElementSum<M> {
+    type Output;
+
+    fn to_mod_element_sum(&self, m: M) -> Self::Output;
+
+    fn into_mod_element_sum(self, m: M) -> Self::Output;
+}
+
+/// Calculates the product of the elements of a vector modulo $2^k$.
+///
+/// The elements must already be reduced modulo $2^k$. Unlike [`ModPowerOf2Product`], which
+/// multiplies values from an iterator, this multiplies the elements of one vector, producing a
+/// single element.
+pub trait ModPowerOf2ElementProduct {
+    type Output;
+
+    fn to_mod_power_of_2_element_product(&self, pow: u64) -> Self::Output;
+
+    fn into_mod_power_of_2_element_product(self, pow: u64) -> Self::Output;
+}
+
+/// Calculates the product of the elements of a vector modulo another number $m$.
+///
+/// The elements must already be reduced modulo $m$. Unlike [`ModProduct`], which multiplies values
+/// from an iterator, this multiplies the elements of one vector, producing a single element.
+pub trait ModElementProduct<M> {
+    type Output;
+
+    fn to_mod_element_product(&self, m: M) -> Self::Output;
+
+    fn into_mod_element_product(self, m: M) -> Self::Output;
+}
+
 /// Calculates the product of the elements of a vector.
 ///
 /// Unlike [`Product`](core::iter::Product), which would multiply vectors together, this multiplies
