@@ -2187,6 +2187,15 @@ pub trait ModPowerOf2SubMulShlAssign<Y = Self, Z = Self> {
     fn mod_power_of_2_sub_mul_shl_assign(&mut self, y: Y, z: Z, bits: u64, pow: u64);
 }
 
+/// Adds up the numbers in an iterator, modulo $2^k$. Every number must be already reduced modulo
+/// $2^k$.
+///
+/// Like [`Sum`](core::iter::Sum), this is implemented both for iterators of values and for
+/// iterators of references.
+pub trait ModPowerOf2Sum<A = Self>: Sized {
+    fn mod_power_of_2_sum<I: Iterator<Item = A>>(xs: I, pow: u64) -> Self;
+}
+
 /// Negates a number modulo $2^k$. The input must be already reduced modulo $2^k$.
 pub trait ModPowerOf2Neg {
     type Output;

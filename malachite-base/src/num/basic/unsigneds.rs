@@ -22,10 +22,10 @@ use crate::num::arithmetic::traits::{
     ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Shl,
     ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Sqrt, ModPowerOf2Square,
     ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModPowerOf2SubMul,
-    ModPowerOf2SubMulAssign, ModPowerOf2SubMulShl, ModPowerOf2SubMulShlAssign, ModSquare,
-    ModSquareAssign, ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign,
-    ModSubMul, ModSubMulAssign, ModSubMulShl, ModSubMulShlAssign, Multifactorial, NegMod,
-    NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign,
+    ModPowerOf2SubMulAssign, ModPowerOf2SubMulShl, ModPowerOf2SubMulShlAssign, ModPowerOf2Sum,
+    ModSquare, ModSquareAssign, ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub,
+    ModSubAssign, ModSubMul, ModSubMulAssign, ModSubMulShl, ModSubMulShlAssign, Multifactorial,
+    NegMod, NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign,
     Primorial, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, UnsignedAbs,
     XMulYToZZ, XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ,
     XXXXAddYYYYToZZZZ,
@@ -130,6 +130,8 @@ pub trait PrimitiveUnsigned:
     + ModPowerOf2AddMulShlAssign<Self, Self>
     + ModPowerOf2SubMulShl<Self, Self, Output = Self>
     + ModPowerOf2SubMulShlAssign<Self, Self>
+    + ModPowerOf2Sum
+    + for<'a> ModPowerOf2Sum<&'a Self>
     + ModPowerOf2Neg<Output = Self>
     + ModPowerOf2NegAssign
     + ModPowerOf2Pow<u64, Output = Self>

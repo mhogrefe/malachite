@@ -2770,6 +2770,19 @@ pub mod mod_power_of_2_sub_mul;
 /// assert_eq!(x, 34);
 /// ```
 pub mod mod_power_of_2_sub_mul_shl;
+/// [`ModPowerOf2Sum`](traits::ModPowerOf2Sum), a trait for adding up the numbers in an iterator
+/// modulo $2^k$.
+///
+/// # mod_power_of_2_sum
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Sum;
+///
+/// assert_eq!(u8::mod_power_of_2_sum([200, 100, 50].into_iter(), 8), 94);
+/// assert_eq!(u32::mod_power_of_2_sum([2, 3, 5, 7].into_iter(), 4), 1);
+/// assert_eq!(u64::mod_power_of_2_sum(core::iter::empty::<u64>(), 10), 0);
+/// assert_eq!(u8::mod_power_of_2_sum([200, 100, 50].iter(), 8), 94);
+/// ```
+pub mod mod_power_of_2_sum;
 /// [`ModShl`](traits::ModShl) and [`ModShlAssign`](traits::ModShlAssign), traits for left-shifting
 /// a number modulo another number.
 ///

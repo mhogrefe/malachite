@@ -517,6 +517,7 @@ pub mod natural {
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_mul;
         pub mod mod_power_of_2_sub_mul_shl;
+        pub mod mod_power_of_2_sum;
         pub mod mod_shl;
         pub mod mod_shr;
         pub mod mod_sqrt;
