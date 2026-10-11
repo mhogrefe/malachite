@@ -2446,6 +2446,17 @@ pub fn natural_quadruple_gen_var_1() -> Generator<(Natural, Natural, Natural, Na
     )
 }
 
+// All `(Natural, Natural, Natural, u64, Natural)` where the first three `Natural`s are less than
+// the last, and the `u64` is small.
+pub fn natural_natural_natural_unsigned_natural_quintuple_gen_var_1()
+-> Generator<(Natural, Natural, Natural, u64, Natural)> {
+    Generator::new(
+        &exhaustive_natural_natural_natural_unsigned_natural_quintuple_gen_var_1,
+        &random_natural_natural_natural_unsigned_natural_quintuple_gen_var_1,
+        &special_random_natural_natural_natural_unsigned_natural_quintuple_gen_var_1,
+    )
+}
+
 // All quadruples of `Natural` where the first two elements are each smaller than the fourth.
 pub fn natural_quadruple_gen_var_2() -> Generator<(Natural, Natural, Natural, Natural)> {
     Generator::new(
@@ -2504,6 +2515,17 @@ pub fn natural_natural_natural_unsigned_quadruple_gen_var_2()
         &exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_2,
         &random_natural_natural_natural_unsigned_quadruple_gen_var_2,
         &special_random_natural_natural_natural_unsigned_quadruple_gen_var_2,
+    )
+}
+
+// All `(Natural, Natural, Natural, u64, u64)` where all `Natural`s are less than 2 to the power of
+// the last `u64`, and the first `u64` is small.
+pub fn natural_natural_natural_unsigned_unsigned_quintuple_gen_var_1()
+-> Generator<(Natural, Natural, Natural, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_natural_natural_unsigned_unsigned_quintuple_gen_var_1,
+        &random_natural_natural_natural_unsigned_unsigned_quintuple_gen_var_1,
+        &special_random_natural_natural_natural_unsigned_unsigned_quintuple_gen_var_1,
     )
 }
 
@@ -4174,6 +4196,18 @@ pub fn natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_1()
     )
 }
 
+// All `(NaturalVector, NaturalVector, Natural, u64, u64)` where the vectors have the same
+// dimension, every element of both, and the `Natural`, is less than 2 to the power of the last
+// `u64`, and the first `u64` is small.
+pub fn natural_vector_natural_vector_natural_unsigned_unsigned_quintuple_gen_var_1()
+-> Generator<(NaturalVector, NaturalVector, Natural, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_vector_natural_unsigned_unsigned_quintuple_gen_var_1,
+        &random_natural_vector_natural_vector_natural_unsigned_unsigned_quintuple_gen_var_1,
+        &special_random_natural_vector_natural_vector_natural_unsigned_unsigned_quintuple_gen_var_1,
+    )
+}
+
 // All `(NaturalVector, NaturalVector, Natural, u64)` where the vectors have the same dimension and
 // the `u64` is small.
 pub fn natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_2()
@@ -4260,6 +4294,18 @@ pub fn natural_vector_natural_vector_natural_natural_quadruple_gen_var_1()
         &exhaustive_natural_vector_natural_vector_natural_natural_quadruple_gen_var_1,
         &random_natural_vector_natural_vector_natural_natural_quadruple_gen_var_1,
         &special_random_natural_vector_natural_vector_natural_natural_quadruple_gen_var_1,
+    )
+}
+
+// All `(NaturalVector, NaturalVector, Natural, u64, Natural)` where the vectors have the same
+// dimension, every element of both, and the first `Natural`, is less than the second `Natural`, and
+// the `u64` is small.
+pub fn natural_vector_natural_vector_natural_unsigned_natural_quintuple_gen_var_1()
+-> Generator<(NaturalVector, NaturalVector, Natural, u64, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_vector_natural_unsigned_natural_quintuple_gen_var_1,
+        &random_natural_vector_natural_vector_natural_unsigned_natural_quintuple_gen_var_1,
+        &special_random_natural_vector_natural_vector_natural_unsigned_natural_quintuple_gen_var_1,
     )
 }
 

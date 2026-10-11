@@ -3039,11 +3039,31 @@ pub fn exhaustive_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>() -> It<(T,
     ))))
 }
 
+pub fn exhaustive_unsigned_quintuple_gen_var_1<T: PrimitiveUnsigned>() -> It<(T, T, T, u64, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_unsigned_quadruple_gen_var_3::<T>(),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH + 1),
+        )
+        .map(|((x, y, z, pow), bits)| (x, y, z, bits, pow)),
+    )
+}
+
 pub fn exhaustive_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>() -> It<(T, T, T, T)> {
     Box::new(
         exhaustive_quadruples_from_single(exhaustive_unsigneds::<T>()).filter_map(
             |(x, y, z, w)| Some((x, y, z, max!(x, y, z).checked_add(w)?.checked_add(T::ONE)?)),
         ),
+    )
+}
+
+pub fn exhaustive_unsigned_quintuple_gen_var_2<T: PrimitiveUnsigned>() -> It<(T, T, T, u64, T)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_unsigned_quadruple_gen_var_4::<T>(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((x, y, z, m), bits)| (x, y, z, bits, m)),
     )
 }
 
@@ -6968,6 +6988,18 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_ge
     })
 }
 
+pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, UnsignedVector<T>, T, u64, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1::<T>(),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH + 1),
+        )
+        .map(|((v, w, c, pow), bits)| (v, w, c, bits, pow)),
+    )
+}
+
 pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, T, u64)> {
     Box::new(
@@ -7105,6 +7137,18 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_ge
             .map(|((v, w), (c, m))| (v, w, c, m)),
         )
     })
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, UnsignedVector<T>, T, u64, T)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2::<T>(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((v, w, c, m), bits)| (v, w, c, bits, m)),
+    )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_2<

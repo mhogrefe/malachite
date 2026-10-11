@@ -2745,6 +2745,27 @@ pub fn unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(T, T, 
     )
 }
 
+// All `(T, T, T, u64, u64)` where `T` is unsigned, the last `u64` is no greater than `T::WIDTH`,
+// all three `T`s are less than 2 to the power of the last `u64`, and the first `u64` is no greater
+// than `T::WIDTH + 1`.
+pub fn unsigned_quintuple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, T, T, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_quintuple_gen_var_1,
+        &random_unsigned_quintuple_gen_var_1,
+        &special_random_unsigned_quintuple_gen_var_1,
+    )
+}
+
+// All `(T, T, T, u64, T)` where `T` is unsigned, the last `T` is positive, the first three `T`s are
+// less than it, and the `u64` is small.
+pub fn unsigned_quintuple_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(T, T, T, u64, T)> {
+    Generator::new(
+        &exhaustive_unsigned_quintuple_gen_var_2,
+        &random_unsigned_quintuple_gen_var_2,
+        &special_random_unsigned_quintuple_gen_var_2,
+    )
+}
+
 // All `(T, T, T, T)` where `T` is unsigned and the first three elements are each less than the
 // fourth.
 pub fn unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T)> {
@@ -5349,6 +5370,20 @@ pub fn unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1<
     )
 }
 
+// All `(UnsignedVector<T>, UnsignedVector<T>, T, u64, u64)` where the vectors have the same
+// dimension, the last `u64` is no greater than `T::WIDTH`, every element of both vectors, and the
+// `T`, is less than 2 to the power of the last `u64`, and the first `u64` is no greater than
+// `T::WIDTH + 1`.
+pub fn unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> Generator<(UnsignedVector<T>, UnsignedVector<T>, T, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+        &random_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+        &special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+    )
+}
+
 // All `(UnsignedVector<T>, T, u64)` where the `u64` is no greater than `T::WIDTH`, and every
 // element of the vector, and the `T`, is less than 2 to the power of the `u64`.
 pub fn unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
@@ -5431,6 +5466,19 @@ pub fn unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2<
         &exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2,
         &random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2,
         &special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2,
+    )
+}
+
+// All `(UnsignedVector<T>, UnsignedVector<T>, T, u64, T)` where the vectors have the same
+// dimension, the last `T` is positive, every element of both vectors, and the first `T`, is less
+// than it, and the `u64` is small.
+pub fn unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> Generator<(UnsignedVector<T>, UnsignedVector<T>, T, u64, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_2,
+        &random_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_2,
+        &special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_2,
     )
 }
 

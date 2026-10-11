@@ -195,6 +195,10 @@ pub mod mod_add;
 /// [`ModAddMulAssign`](crate::num::arithmetic::traits::ModAddMulAssign), for adding a scalar
 /// multiple of one vector to another modulo a number.
 pub mod mod_add_mul;
+/// Implementations of [`ModAddMulShl`](crate::num::arithmetic::traits::ModAddMulShl) and
+/// [`ModAddMulShlAssign`](crate::num::arithmetic::traits::ModAddMulShlAssign), for adding a scalar
+/// multiple of one vector, shifted left, to another modulo a number.
+pub mod mod_add_mul_shl;
 // Dot products of vectors reduced modulo a word, accumulating the sum before reducing it once.
 pub(crate) mod mod_dot;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
@@ -225,6 +229,11 @@ pub mod mod_power_of_2_add;
 /// [`ModPowerOf2AddMulAssign`](crate::num::arithmetic::traits::ModPowerOf2AddMulAssign), for adding
 /// a scalar multiple of one vector to another modulo a power of 2.
 pub mod mod_power_of_2_add_mul;
+/// Implementations of
+/// [`ModPowerOf2AddMulShl`](crate::num::arithmetic::traits::ModPowerOf2AddMulShl) and
+/// [`ModPowerOf2AddMulShlAssign`](crate::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), for
+/// adding a scalar multiple of one vector, shifted left, to another modulo a power of 2.
+pub mod mod_power_of_2_add_mul_shl;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every element of a vector is less than a given power of 2.
@@ -291,6 +300,11 @@ pub mod mod_power_of_2_sub;
 /// [`ModPowerOf2SubMulAssign`](crate::num::arithmetic::traits::ModPowerOf2SubMulAssign), for
 /// subtracting a scalar multiple of one vector from another modulo a power of 2.
 pub mod mod_power_of_2_sub_mul;
+/// Implementations of
+/// [`ModPowerOf2SubMulShl`](crate::num::arithmetic::traits::ModPowerOf2SubMulShl) and
+/// [`ModPowerOf2SubMulShlAssign`](crate::num::arithmetic::traits::ModPowerOf2SubMulShlAssign), for
+/// subtracting a scalar multiple of one vector, shifted left, from another modulo a power of 2.
+pub mod mod_power_of_2_sub_mul_shl;
 /// Implementations of [`ModShl`](crate::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](crate::num::arithmetic::traits::ModShlAssign), for left-shifting a vector
 /// (multiplying it by a power of 2) modulo a number.
@@ -332,6 +346,10 @@ pub mod mod_sub;
 /// [`ModSubMulAssign`](crate::num::arithmetic::traits::ModSubMulAssign), for subtracting a scalar
 /// multiple of one vector from another modulo a number.
 pub mod mod_sub_mul;
+/// Implementations of [`ModSubMulShl`](crate::num::arithmetic::traits::ModSubMulShl) and
+/// [`ModSubMulShlAssign`](crate::num::arithmetic::traits::ModSubMulShlAssign), for subtracting a
+/// scalar multiple of one vector, shifted left, from another modulo a number.
+pub mod mod_sub_mul_shl;
 /// Implementations of [`Div`](core::ops::Div) and [`DivAssign`](core::ops::DivAssign), for dividing
 /// a vector by a scalar.
 ///

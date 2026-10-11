@@ -5248,6 +5248,20 @@ pub fn special_random_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>(
     })
 }
 
+pub fn special_random_unsigned_quintuple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T, u64, u64)> {
+    Box::new(
+        special_random_unsigned_quadruple_gen_var_3::<T>(config)
+            .zip(random_unsigned_inclusive_range::<u64>(
+                EXAMPLE_SEED.fork("bits"),
+                0,
+                T::WIDTH + 1,
+            ))
+            .map(|((x, y, z, pow), bits)| (x, y, z, bits, pow)),
+    )
+}
+
 pub fn special_random_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(T, T, T, T)> {
@@ -5271,6 +5285,20 @@ pub fn special_random_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>(
                 })
             }
         }),
+    )
+}
+
+pub fn special_random_unsigned_quintuple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T, u64, T)> {
+    Box::new(
+        special_random_unsigned_quadruple_gen_var_4::<T>(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("bits"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((x, y, z, m), bits)| (x, y, z, bits, m)),
     )
 }
 
@@ -10992,6 +11020,24 @@ pub fn special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadrupl
     )
 }
 
+pub fn special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, T, u64, u64)> {
+    Box::new(
+        special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1::<T>(
+            config,
+        )
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("bits"),
+            0,
+            T::WIDTH + 1,
+        ))
+        .map(|((v, w, c, pow), bits)| (v, w, c, bits, pow)),
+    )
+}
+
 pub fn special_random_unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedVector<T>, T, u64)> {
@@ -11253,6 +11299,24 @@ pub fn special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadrupl
                 config.get_or("mean_stripe_d", 1),
             ))
             .map(|((v, w, m), c)| (v, w, c % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, T, u64, T)> {
+    Box::new(
+        special_random_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2::<T>(
+            config,
+        )
+        .zip(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("bits"),
+            config.get_or("mean_small_n", 64),
+            config.get_or("mean_small_d", 1),
+        ))
+        .map(|((v, w, c, m), bits)| (v, w, c, bits, m)),
     )
 }
 

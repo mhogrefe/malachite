@@ -380,16 +380,16 @@ pub trait AddMulAssign<Y = Self, Z = Self> {
     fn add_mul_assign(&mut self, y: Y, z: Z);
 }
 
-/// Adds a number and the product of two other numbers, shifted left by a number of bits:
-/// $x + yz2^k$.
+/// Adds a number and the product of two other numbers, shifted left by a number of bits: $x +
+/// yz2^k$.
 pub trait AddMulShl<Y = Self, Z = Self> {
     type Output;
 
     fn add_mul_shl(self, y: Y, z: Z, bits: u64) -> Self::Output;
 }
 
-/// Adds the product of two numbers, shifted left by a number of bits, to a number in place:
-/// $x \gets x + yz2^k$.
+/// Adds the product of two numbers, shifted left by a number of bits, to a number in place: $x
+/// \gets x + yz2^k$.
 pub trait AddMulShlAssign<Y = Self, Z = Self> {
     fn add_mul_shl_assign(&mut self, y: Y, z: Z, bits: u64);
 }
@@ -1902,6 +1902,34 @@ pub trait ModSubMulAssign<Y = Self, Z = Self, M = Self> {
     fn mod_sub_mul_assign(&mut self, y: Y, z: Z, m: M);
 }
 
+/// Adds a number and the product of two other numbers, shifted left by a number of bits, modulo a
+/// fourth number $m$: $x + yz2^b \bmod m$. All three inputs must be already reduced modulo $m$.
+pub trait ModAddMulShl<Y = Self, Z = Self, M = Self> {
+    type Output;
+
+    fn mod_add_mul_shl(self, y: Y, z: Z, bits: u64, m: M) -> Self::Output;
+}
+
+/// Adds the product of two numbers, shifted left by a number of bits, to a number modulo a fourth
+/// number $m$, in place. All three inputs must be already reduced modulo $m$.
+pub trait ModAddMulShlAssign<Y = Self, Z = Self, M = Self> {
+    fn mod_add_mul_shl_assign(&mut self, y: Y, z: Z, bits: u64, m: M);
+}
+
+/// Subtracts the product of two numbers, shifted left by a number of bits, from a number, modulo a
+/// fourth number $m$: $x - yz2^b \bmod m$. All three inputs must be already reduced modulo $m$.
+pub trait ModSubMulShl<Y = Self, Z = Self, M = Self> {
+    type Output;
+
+    fn mod_sub_mul_shl(self, y: Y, z: Z, bits: u64, m: M) -> Self::Output;
+}
+
+/// Subtracts the product of two numbers, shifted left by a number of bits, from a number modulo a
+/// fourth number $m$, in place. All three inputs must be already reduced modulo $m$.
+pub trait ModSubMulShlAssign<Y = Self, Z = Self, M = Self> {
+    fn mod_sub_mul_shl_assign(&mut self, y: Y, z: Z, bits: u64, m: M);
+}
+
 /// Negates a number modulo another number $m$. The input must be already reduced modulo $m$.
 pub trait ModNeg<M = Self> {
     type Output;
@@ -2117,6 +2145,20 @@ pub trait ModPowerOf2AddMulAssign<Y = Self, Z = Self> {
     fn mod_power_of_2_add_mul_assign(&mut self, y: Y, z: Z, pow: u64);
 }
 
+/// Adds a number and the product of two other numbers, shifted left by a number of bits, modulo
+/// $2^k$: $x + yz2^b \bmod 2^k$. All three inputs must be already reduced modulo $2^k$.
+pub trait ModPowerOf2AddMulShl<Y = Self, Z = Self> {
+    type Output;
+
+    fn mod_power_of_2_add_mul_shl(self, y: Y, z: Z, bits: u64, pow: u64) -> Self::Output;
+}
+
+/// Adds the product of two numbers, shifted left by a number of bits, to a number modulo $2^k$, in
+/// place. All three inputs must be already reduced modulo $2^k$.
+pub trait ModPowerOf2AddMulShlAssign<Y = Self, Z = Self> {
+    fn mod_power_of_2_add_mul_shl_assign(&mut self, y: Y, z: Z, bits: u64, pow: u64);
+}
+
 /// Subtracts the product of two numbers from a number, modulo $2^k$. All three inputs must be
 /// already reduced modulo $2^k$.
 pub trait ModPowerOf2SubMul<Y = Self, Z = Self> {
@@ -2129,6 +2171,20 @@ pub trait ModPowerOf2SubMul<Y = Self, Z = Self> {
 /// be already reduced modulo $2^k$.
 pub trait ModPowerOf2SubMulAssign<Y = Self, Z = Self> {
     fn mod_power_of_2_sub_mul_assign(&mut self, y: Y, z: Z, pow: u64);
+}
+
+/// Subtracts the product of two numbers, shifted left by a number of bits, from a number, modulo
+/// $2^k$: $x - yz2^b \bmod 2^k$. All three inputs must be already reduced modulo $2^k$.
+pub trait ModPowerOf2SubMulShl<Y = Self, Z = Self> {
+    type Output;
+
+    fn mod_power_of_2_sub_mul_shl(self, y: Y, z: Z, bits: u64, pow: u64) -> Self::Output;
+}
+
+/// Subtracts the product of two numbers, shifted left by a number of bits, from a number modulo
+/// $2^k$, in place. All three inputs must be already reduced modulo $2^k$.
+pub trait ModPowerOf2SubMulShlAssign<Y = Self, Z = Self> {
+    fn mod_power_of_2_sub_mul_shl_assign(&mut self, y: Y, z: Z, bits: u64, pow: u64);
 }
 
 /// Negates a number modulo $2^k$. The input must be already reduced modulo $2^k$.
@@ -3119,8 +3175,8 @@ pub trait SubMulAssign<Y = Self, Z = Self> {
     fn sub_mul_assign(&mut self, y: Y, z: Z);
 }
 
-/// Subtracts the product of two numbers, shifted left by a number of bits, from a number:
-/// $x - yz2^k$.
+/// Subtracts the product of two numbers, shifted left by a number of bits, from a number: $x -
+/// yz2^k$.
 pub trait SubMulShl<Y = Self, Z = Self> {
     type Output;
 

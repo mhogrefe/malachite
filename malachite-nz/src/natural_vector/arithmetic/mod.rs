@@ -360,6 +360,10 @@ pub mod mod_add;
 /// [`ModAddMulAssign`](malachite_base::num::arithmetic::traits::ModAddMulAssign), for adding a
 /// scalar multiple of one vector to another modulo a number.
 pub mod mod_add_mul;
+/// Implementations of [`ModAddMulShl`](malachite_base::num::arithmetic::traits::ModAddMulShl) and
+/// [`ModAddMulShlAssign`](malachite_base::num::arithmetic::traits::ModAddMulShlAssign), for adding
+/// a scalar multiple of one vector, shifted left, to another modulo a number.
+pub mod mod_add_mul_shl;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;
@@ -389,6 +393,12 @@ pub mod mod_power_of_2_add;
 /// [`ModPowerOf2AddMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMulAssign),
 /// for adding a scalar multiple of one vector to another modulo a power of 2.
 pub mod mod_power_of_2_add_mul;
+/// Implementations of
+/// [`ModPowerOf2AddMulShl`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShl) and
+/// [`ModPowerOf2AddMulShlAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), for adding a scalar
+/// multiple of one vector, shifted left, to another modulo a power of 2.
+pub mod mod_power_of_2_add_mul_shl;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
 /// checks whether every element of a vector is less than a given power of 2.
@@ -456,6 +466,12 @@ pub mod mod_power_of_2_sub;
 /// [`ModPowerOf2SubMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMulAssign),
 /// for subtracting a scalar multiple of one vector from another modulo a power of 2.
 pub mod mod_power_of_2_sub_mul;
+/// Implementations of
+/// [`ModPowerOf2SubMulShl`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMulShl) and
+/// [`ModPowerOf2SubMulShlAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2SubMulShlAssign), for subtracting a scalar
+/// multiple of one vector, shifted left, from another modulo a power of 2.
+pub mod mod_power_of_2_sub_mul_shl;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
 /// vector (multiplying it by a power of 2) modulo a number.
@@ -508,6 +524,10 @@ pub mod mod_sub;
 /// [`ModSubMulAssign`](malachite_base::num::arithmetic::traits::ModSubMulAssign), for subtracting a
 /// scalar multiple of one vector from another modulo a number.
 pub mod mod_sub_mul;
+/// Implementations of [`ModSubMulShl`](malachite_base::num::arithmetic::traits::ModSubMulShl) and
+/// [`ModSubMulShlAssign`](malachite_base::num::arithmetic::traits::ModSubMulShlAssign), for
+/// subtracting a scalar multiple of one vector, shifted left, from another modulo a number.
+pub mod mod_sub_mul_shl;
 /// [`NaturalVector::multi_crt`](super::NaturalVector::multi_crt), which combines vectors of
 /// residues modulo many word-sized moduli by the Chinese remainder theorem.
 pub mod multi_crt;

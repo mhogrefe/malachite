@@ -1780,6 +1780,28 @@ pub mod mod_add;
 /// assert_eq!(x, 7);
 /// ```
 pub mod mod_add_mul;
+/// [`ModAddMulShl`](traits::ModAddMulShl) and [`ModAddMulShlAssign`](traits::ModAddMulShlAssign),
+/// traits for adding a number and the product of two other numbers, shifted left, modulo another
+/// number.
+///
+/// # mod_add_mul_shl
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModAddMulShl;
+///
+/// assert_eq!(3u8.mod_add_mul_shl(2, 5, 1, 7), 2);
+/// assert_eq!(10u32.mod_add_mul_shl(14, 3, 2, 15), 13);
+/// assert_eq!(200u16.mod_add_mul_shl(100, 3, 40, 255), 245);
+/// ```
+///
+/// # mod_add_mul_shl_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModAddMulShlAssign;
+///
+/// let mut x = 10u32;
+/// x.mod_add_mul_shl_assign(14, 3, 2, 15);
+/// assert_eq!(x, 13);
+/// ```
+pub mod mod_add_mul_shl;
 /// [`ModDiv`](traits::ModDiv), a trait for dividing two numbers modulo another number.
 ///
 /// # mod_div
@@ -2447,6 +2469,28 @@ pub mod mod_power_of_2_add;
 /// assert_eq!(x, 4);
 /// ```
 pub mod mod_power_of_2_add_mul;
+/// [`ModPowerOf2AddMulShl`](traits::ModPowerOf2AddMulShl) and
+/// [`ModPowerOf2AddMulShlAssign`](traits::ModPowerOf2AddMulShlAssign), traits for adding a number
+/// and the product of two other numbers, shifted left, modulo $2^k$.
+///
+/// # mod_power_of_2_add_mul_shl
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShl;
+///
+/// assert_eq!(3u8.mod_power_of_2_add_mul_shl(2, 5, 1, 5), 23);
+/// assert_eq!(10u32.mod_power_of_2_add_mul_shl(14, 3, 2, 6), 50);
+/// assert_eq!(7u16.mod_power_of_2_add_mul_shl(1, 1, 8, 8), 7);
+/// ```
+///
+/// # mod_power_of_2_add_mul_shl_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShlAssign;
+///
+/// let mut x = 10u32;
+/// x.mod_power_of_2_add_mul_shl_assign(14, 3, 2, 6);
+/// assert_eq!(x, 50);
+/// ```
+pub mod mod_power_of_2_add_mul_shl;
 /// [`ModPowerOf2Inverse`](traits::ModPowerOf2Inverse), a trait for finding the multiplicative
 /// inverse of a number modulo $2^k$.
 ///
@@ -2704,6 +2748,28 @@ pub mod mod_power_of_2_sub;
 /// assert_eq!(x, 10);
 /// ```
 pub mod mod_power_of_2_sub_mul;
+/// [`ModPowerOf2SubMulShl`](traits::ModPowerOf2SubMulShl) and
+/// [`ModPowerOf2SubMulShlAssign`](traits::ModPowerOf2SubMulShlAssign), traits for subtracting the
+/// product of two numbers, shifted left, from a number modulo $2^k$.
+///
+/// # mod_power_of_2_sub_mul_shl
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2SubMulShl;
+///
+/// assert_eq!(3u8.mod_power_of_2_sub_mul_shl(2, 5, 1, 5), 15);
+/// assert_eq!(10u32.mod_power_of_2_sub_mul_shl(14, 3, 2, 6), 34);
+/// assert_eq!(7u16.mod_power_of_2_sub_mul_shl(1, 1, 8, 8), 7);
+/// ```
+///
+/// # mod_power_of_2_sub_mul_shl_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2SubMulShlAssign;
+///
+/// let mut x = 10u32;
+/// x.mod_power_of_2_sub_mul_shl_assign(14, 3, 2, 6);
+/// assert_eq!(x, 34);
+/// ```
+pub mod mod_power_of_2_sub_mul_shl;
 /// [`ModShl`](traits::ModShl) and [`ModShlAssign`](traits::ModShlAssign), traits for left-shifting
 /// a number modulo another number.
 ///
@@ -2878,6 +2944,28 @@ pub mod mod_sub;
 /// assert_eq!(x, 13);
 /// ```
 pub mod mod_sub_mul;
+/// [`ModSubMulShl`](traits::ModSubMulShl) and [`ModSubMulShlAssign`](traits::ModSubMulShlAssign),
+/// traits for subtracting the product of two numbers, shifted left, from a number modulo another
+/// number.
+///
+/// # mod_sub_mul_shl
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModSubMulShl;
+///
+/// assert_eq!(3u8.mod_sub_mul_shl(2, 5, 1, 7), 4);
+/// assert_eq!(10u32.mod_sub_mul_shl(14, 3, 2, 15), 7);
+/// assert_eq!(200u16.mod_sub_mul_shl(100, 3, 40, 255), 155);
+/// ```
+///
+/// # mod_sub_mul_shl_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModSubMulShlAssign;
+///
+/// let mut x = 10u32;
+/// x.mod_sub_mul_shl_assign(14, 3, 2, 15);
+/// assert_eq!(x, 7);
+/// ```
+pub mod mod_sub_mul_shl;
 /// [`MulAddMul`](traits::MulAddMul) and [`MulAddMulAssign`](traits::MulAddMulAssign), traits for
 /// adding the products of two pairs of numbers.
 ///

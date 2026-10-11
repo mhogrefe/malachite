@@ -193,6 +193,10 @@ pub mod mod_add;
 /// [`ModAddMulAssign`](malachite_base::num::arithmetic::traits::ModAddMulAssign), traits for adding
 /// a number and the product of two other numbers modulo another number.
 pub mod mod_add_mul;
+/// Implementations of [`ModAddMulShl`](malachite_base::num::arithmetic::traits::ModAddMulShl) and
+/// [`ModAddMulShlAssign`](malachite_base::num::arithmetic::traits::ModAddMulShlAssign), traits for
+/// adding a number and the product of two other numbers, shifted left, modulo another number.
+pub mod mod_add_mul_shl;
 /// Implementations of [`ModDiv`](malachite_base::num::arithmetic::traits::ModDiv), a trait for
 /// dividing two numbers modulo another number.
 pub mod mod_div;
@@ -273,6 +277,12 @@ pub mod mod_power_of_2_add;
 /// [`ModPowerOf2AddMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMulAssign),
 /// traits for adding a number and the product of two other numbers modulo $2^k$.
 pub mod mod_power_of_2_add_mul;
+/// Implementations of
+/// [`ModPowerOf2AddMulShl`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShl) and
+/// [`ModPowerOf2AddMulShlAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), traits for adding a number
+/// and the product of two other numbers, shifted left, modulo $2^k$.
+pub mod mod_power_of_2_add_mul_shl;
 /// Implementations of
 /// [`ModPowerOf2Inverse`](malachite_base::num::arithmetic::traits::ModPowerOf2Inverse), a trait for
 /// finding the multiplicative inverse of a number modulo $2^k$.
@@ -419,6 +429,12 @@ pub mod mod_power_of_2_sub;
 /// [`ModPowerOf2SubMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMulAssign),
 /// traits for subtracting the product of two numbers from a number modulo $2^k$.
 pub mod mod_power_of_2_sub_mul;
+/// Implementations of
+/// [`ModPowerOf2SubMulShl`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMulShl) and
+/// [`ModPowerOf2SubMulShlAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2SubMulShlAssign), traits for subtracting the
+/// product of two numbers, shifted left, from a number modulo $2^k$.
+pub mod mod_power_of_2_sub_mul_shl;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), traits for
 /// left-shifting a number modulo another number.
@@ -651,6 +667,10 @@ pub mod mod_sub;
 /// [`ModSubMulAssign`](malachite_base::num::arithmetic::traits::ModSubMulAssign), traits for
 /// subtracting the product of two numbers from a number modulo another number.
 pub mod mod_sub_mul;
+/// Implementations of [`ModSubMulShl`](malachite_base::num::arithmetic::traits::ModSubMulShl) and
+/// [`ModSubMulShlAssign`](malachite_base::num::arithmetic::traits::ModSubMulShlAssign), traits for
+/// subtracting the product of two numbers, shifted left, from a number modulo another number.
+pub mod mod_sub_mul_shl;
 /// Multiplication of [`Natural`](super::Natural)s.
 pub mod mul;
 pub mod mul_add_mul;

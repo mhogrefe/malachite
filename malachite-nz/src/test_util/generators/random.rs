@@ -4184,6 +4184,20 @@ pub fn random_natural_quadruple_gen_var_1(
     )
 }
 
+pub fn random_natural_natural_natural_unsigned_natural_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, u64, Natural)> {
+    Box::new(
+        random_natural_quadruple_gen_var_1(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("bits"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((x, y, z, m), bits)| (x, y, z, bits, m)),
+    )
+}
+
 pub fn random_natural_quadruple_gen_var_2(
     config: &GenConfig,
 ) -> It<(Natural, Natural, Natural, Natural)> {
@@ -4294,6 +4308,20 @@ pub fn random_natural_natural_natural_unsigned_quadruple_gen_var_2(
             );
             (x, y, z, m)
         }),
+    )
+}
+
+pub fn random_natural_natural_natural_unsigned_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, u64, u64)> {
+    Box::new(
+        random_natural_natural_natural_unsigned_quadruple_gen_var_2(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("bits"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((x, y, z, pow), bits)| (x, y, z, bits, pow)),
     )
 }
 
@@ -7441,6 +7469,20 @@ pub fn random_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_1
     )
 }
 
+pub fn random_natural_vector_natural_vector_natural_unsigned_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, Natural, u64, u64)> {
+    Box::new(
+        random_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_1(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("bits"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((v, w, c, pow), bits)| (v, w, c, bits, pow)),
+    )
+}
+
 pub fn random_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_2(
     config: &GenConfig,
 ) -> It<(NaturalVector, NaturalVector, Natural, u64)> {
@@ -7645,6 +7687,20 @@ pub fn random_natural_vector_natural_vector_natural_natural_quadruple_gen_var_1(
                     + Natural::ONE;
                 (v, w, c, m)
             }),
+    )
+}
+
+pub fn random_natural_vector_natural_vector_natural_unsigned_natural_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, Natural, u64, Natural)> {
+    Box::new(
+        random_natural_vector_natural_vector_natural_natural_quadruple_gen_var_1(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("bits"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((v, w, c, m), bits)| (v, w, c, bits, m)),
     )
 }
 

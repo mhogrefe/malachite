@@ -107,6 +107,22 @@ pub fn quadruple_1_natural_vector_bit_bucketer<T, U, V>(
     }
 }
 
+pub fn quintuple_1_natural_vector_bit_bucketer<T, U, V, W>(
+    var_name: &str,
+) -> Bucketer<'_, (NaturalVector, T, U, V, W)> {
+    Bucketer {
+        bucketing_function: &|(v, _, _, _, _)| {
+            usize::exact_from(
+                v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
 pub fn pair_1_integer_vector_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (IntegerVector, T)> {
     Bucketer {
         bucketing_function: &|(v, _)| {
@@ -735,6 +751,28 @@ pub fn quadruple_1_2_natural_sum_bit_bucketer<'a, T, U>(
             usize::exact_from(x.significant_bits() + y.significant_bits())
         },
         bucketing_label: format!("{x_name}.significant_bits() + {y_name}.significant_bits()"),
+    }
+}
+
+pub fn quintuple_1_2_3_5_natural_max_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+    m_name: &'a str,
+) -> Bucketer<'a, (Natural, Natural, Natural, T, Natural)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, _, m)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits(),
+                m.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
+            {z_name}.significant_bits(), {m_name}.significant_bits())"
+        ),
     }
 }
 

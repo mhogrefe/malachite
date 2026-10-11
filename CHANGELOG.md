@@ -46,6 +46,12 @@ documented by git history.
 - `PrimitiveUnsigned` now requires `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and
   `ModSubMulAssign`, as it already required `ModMul`. A type outside Malachite that implements
   `PrimitiveUnsigned` must now implement them too.
+- `PrimitiveUnsigned` now requires `ModAddMulShl`, `ModAddMulShlAssign`, `ModSubMulShl`, and
+  `ModSubMulShlAssign`. A type outside Malachite that implements `PrimitiveUnsigned` must now
+  implement them too.
+- `PrimitiveUnsigned` now requires `ModPowerOf2AddMulShl`, `ModPowerOf2AddMulShlAssign`,
+  `ModPowerOf2SubMulShl`, and `ModPowerOf2SubMulShlAssign`. A type outside Malachite that implements
+  `PrimitiveUnsigned` must now implement them too.
 
 ### malachite-base
 
@@ -162,6 +168,13 @@ documented by git history.
 - `AddMulShl`, `AddMulShlAssign`, `SubMulShl`, and `SubMulShlAssign` traits in
   `malachite_base::num::arithmetic::traits`, for computing $x + yz2^k$ and $x - yz2^k$, the scalar
   operations behind FLINT's `_fmpz_vec_scalar_addmul_si_2exp` and `_fmpz_vec_scalar_submul_si_2exp`.
+- `ModPowerOf2AddMulShl`, `ModPowerOf2AddMulShlAssign`, `ModPowerOf2SubMulShl`, and
+  `ModPowerOf2SubMulShlAssign` traits in `malachite_base::num::arithmetic::traits`, for computing
+  $x + yz2^b$ and $x - yz2^b$ modulo $2^k$, implemented for every primitive unsigned type. All
+  three arguments must already be reduced.
+- `ModAddMulShl`, `ModAddMulShlAssign`, `ModSubMulShl`, and `ModSubMulShlAssign` traits in
+  `malachite_base::num::arithmetic::traits`, for computing $x + yz2^b$ and $x - yz2^b$ modulo $m$,
+  implemented for every primitive unsigned type. All three arguments must already be reduced.
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` traits in
   `malachite_base::num::arithmetic::traits`, for computing $x + yz$ and $x - yz$ modulo $m$,
   implemented for every primitive unsigned type. All three arguments must already be reduced.
@@ -174,6 +187,13 @@ documented by git history.
 - `ModPowerOf2AddMul`, `ModPowerOf2AddMulAssign`, `ModPowerOf2SubMul`, and
   `ModPowerOf2SubMulAssign` for `UnsignedVector<T>`, adding or subtracting a `T` multiple of one
   vector to or from another modulo $2^k$. The elements and the scalar must already be reduced.
+- `ModPowerOf2AddMulShl`, `ModPowerOf2AddMulShlAssign`, `ModPowerOf2SubMulShl`, and
+  `ModPowerOf2SubMulShlAssign` for `UnsignedVector<T>`, adding or subtracting a `T` multiple of one
+  vector, shifted left, to or from another modulo $2^k$. The elements and the scalar must already
+  be reduced.
+- `ModAddMulShl`, `ModAddMulShlAssign`, `ModSubMulShl`, and `ModSubMulShlAssign` for
+  `UnsignedVector<T>`, adding or subtracting a `T` multiple of one vector, shifted left, to or from
+  another modulo a `T`. The elements and the scalar must already be reduced.
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `UnsignedVector<T>`,
   adding or subtracting a `T` multiple of one vector to or from another modulo a `T`, like FLINT's
   `_nmod_vec_scalar_addmul_nmod`. The elements and the scalar must already be reduced.
@@ -306,6 +326,16 @@ documented by git history.
   vector to or from another modulo $2^k$, with the arguments in every combination of value and
   reference (with a borrowed receiver, all of them by reference). The elements and the scalar must
   already be reduced.
+- `ModPowerOf2AddMulShl`, `ModPowerOf2AddMulShlAssign`, `ModPowerOf2SubMulShl`, and
+  `ModPowerOf2SubMulShlAssign` for `NaturalVector`, adding or subtracting a `Natural` multiple of
+  one vector, shifted left, to or from another modulo $2^k$, with the arguments in every
+  combination of value and reference (with a borrowed receiver, all of them by reference). The
+  elements and the scalar must already be reduced.
+- `ModAddMulShl`, `ModAddMulShlAssign`, `ModSubMulShl`, and `ModSubMulShlAssign` for
+  `NaturalVector`, adding or subtracting a `Natural` multiple of one vector, shifted left, to or
+  from another modulo a `Natural`, with the arguments in every combination of value and reference
+  (with a borrowed receiver, all of them by reference). The elements and the scalar must already be
+  reduced.
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `NaturalVector`, adding
   or subtracting a `Natural` multiple of one vector to or from another modulo a `Natural`, like
   FLINT's `_fmpz_mod_vec_scalar_addmul_fmpz_mod`, with the arguments in every combination of value
@@ -363,6 +393,13 @@ documented by git history.
   or subtracting a `Rational` multiple of one vector, shifted left, to or from another, with the
   arguments in every combination of value and reference (with a borrowed receiver, all of them by
   reference).
+- `ModPowerOf2AddMulShl`, `ModPowerOf2AddMulShlAssign`, `ModPowerOf2SubMulShl`, and
+  `ModPowerOf2SubMulShlAssign` for `Natural`, taking the arguments in every combination of value
+  and reference (with a borrowed receiver, all of them by reference). Only the low $k - b$ bits of
+  the product are computed, and powers up to the limb width use the primitive implementation.
+- `ModAddMulShl`, `ModAddMulShlAssign`, `ModSubMulShl`, and `ModSubMulShlAssign` for `Natural`,
+  taking the arguments in every combination of value and reference (with a borrowed receiver, all of
+  them by reference); moduli that fit in a limb use the primitive implementation.
 - `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and `ModSubMulAssign` for `Natural`, taking the
   arguments in every combination of value and reference (with a borrowed receiver, all of them by
   reference); moduli that fit in a limb use the primitive implementation.

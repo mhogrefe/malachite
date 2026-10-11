@@ -679,6 +679,26 @@ where
     }
 }
 
+pub fn quintuple_5_bucketer<T, U, V, W, X: Copy>(x_name: &str) -> Bucketer<'_, (T, U, V, W, X)>
+where
+    usize: ExactFrom<X>,
+{
+    Bucketer {
+        bucketing_function: &|&(_, _, _, _, x)| usize::exact_from(x),
+        bucketing_label: x_name.to_string(),
+    }
+}
+
+pub fn quintuple_4_bucketer<T, U, V, W: Copy, X>(w_name: &str) -> Bucketer<'_, (T, U, V, W, X)>
+where
+    usize: ExactFrom<W>,
+{
+    Bucketer {
+        bucketing_function: &|&(_, _, _, w, _)| usize::exact_from(w),
+        bucketing_label: w_name.to_string(),
+    }
+}
+
 pub fn pair_primitive_int_bit_u64_max_bucketer<'a, T: PrimitiveInt>(
     x_name: &'a str,
     y_name: &'a str,
@@ -1209,6 +1229,15 @@ pub fn quadruple_1_unsigned_vector_dimension_bucketer<'a, T: PrimitiveUnsigned, 
 ) -> Bucketer<'a, (UnsignedVector<T>, U, V, W)> {
     Bucketer {
         bucketing_function: &|(v, _, _, _)| v.elements.len(),
+        bucketing_label: format!("{var_name}.dimension()"),
+    }
+}
+
+pub fn quintuple_1_unsigned_vector_dimension_bucketer<'a, T: PrimitiveUnsigned, U, V, W, X>(
+    var_name: &'a str,
+) -> Bucketer<'a, (UnsignedVector<T>, U, V, W, X)> {
+    Bucketer {
+        bucketing_function: &|(v, _, _, _, _)| v.elements.len(),
         bucketing_label: format!("{var_name}.dimension()"),
     }
 }

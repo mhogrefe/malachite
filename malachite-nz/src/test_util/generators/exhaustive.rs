@@ -2079,6 +2079,17 @@ pub fn exhaustive_natural_quadruple_gen_var_1() -> It<(Natural, Natural, Natural
     )
 }
 
+pub fn exhaustive_natural_natural_natural_unsigned_natural_quintuple_gen_var_1()
+-> It<(Natural, Natural, Natural, u64, Natural)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_quadruple_gen_var_1(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((x, y, z, m), bits)| (x, y, z, bits, m)),
+    )
+}
+
 pub fn exhaustive_natural_quadruple_gen_var_2() -> It<(Natural, Natural, Natural, Natural)> {
     Box::new(
         exhaustive_quadruples_from_single(exhaustive_naturals()).map(|(x, y, z, mut w)| {
@@ -2140,6 +2151,17 @@ pub fn exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_2()
                 (x, y, z, m)
             },
         ),
+    )
+}
+
+pub fn exhaustive_natural_natural_natural_unsigned_unsigned_quintuple_gen_var_1()
+-> It<(Natural, Natural, Natural, u64, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_2(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((x, y, z, pow), bits)| (x, y, z, bits, pow)),
     )
 }
 
@@ -3854,6 +3876,17 @@ pub fn exhaustive_natural_vector_natural_vector_natural_unsigned_quadruple_gen_v
     })
 }
 
+pub fn exhaustive_natural_vector_natural_vector_natural_unsigned_unsigned_quintuple_gen_var_1()
+-> It<(NaturalVector, NaturalVector, Natural, u64, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_1(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((v, w, c, pow), bits)| (v, w, c, bits, pow)),
+    )
+}
+
 pub fn exhaustive_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_2()
 -> It<(NaturalVector, NaturalVector, Natural, u64)> {
     Box::new(
@@ -4023,6 +4056,17 @@ pub fn exhaustive_natural_vector_natural_vector_natural_natural_quadruple_gen_va
             }),
         )
     })
+}
+
+pub fn exhaustive_natural_vector_natural_vector_natural_unsigned_natural_quintuple_gen_var_1()
+-> It<(NaturalVector, NaturalVector, Natural, u64, Natural)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_vector_natural_vector_natural_natural_quadruple_gen_var_1(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((v, w, c, m), bits)| (v, w, c, bits, m)),
+    )
 }
 
 pub fn exhaustive_natural_vector_natural_vector_natural_triple_gen_var_2()
