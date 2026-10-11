@@ -85,6 +85,8 @@ documented by git history.
   two facts that FLINT's `_fmpz_vec_max_bits` combines into one signed count. `sum_max_bits` returns
   the bit lengths of the sum of the absolute values of the elements and of the height, like
   `_fmpz_vec_sum_max_bits`.
+- An `ElementProduct` trait in `malachite_base::num::arithmetic::traits`, for the product of the
+  elements of a vector, as a single element, with `to_element_product` and `into_element_product`.
 - An `ElementSum` trait in `malachite_base::num::arithmetic::traits`, for the sum of the elements of
   a vector, as a single element, with `to_element_sum` and `into_element_sum`. It is distinct from
   `Sum`, which adds vectors to each other.
@@ -263,6 +265,9 @@ documented by git history.
   and `IntegerVector`.
 - `Height` and `HeightRef` for `NaturalVector` and `IntegerVector`: the largest absolute value of an
   element, like FLINT's `_fmpz_vec_height`. The height of the 0-dimensional vector is 0.
+- `ElementProduct` for `NaturalVector` and `IntegerVector`: the product of the elements, like
+  FLINT's `_fmpz_vec_prod`, multiplied in a balanced tree and stopping at a zero element. The
+  product of the 0-dimensional vector is 1.
 - `ElementSum` for `NaturalVector` and `IntegerVector`: the sum of the elements, like FLINT's
   `_fmpz_vec_sum`. The sum of the 0-dimensional vector is 0.
 - `L1Norm` for `NaturalVector` and `IntegerVector`: the sum of the absolute values of the elements,
@@ -487,6 +492,8 @@ documented by git history.
   `RationalVector`.
 - `Height` and `HeightRef` for `RationalVector`: the largest height of an element, like FLINT's
   `_fmpq_vec_max_height`. The height of the 0-dimensional vector is 0.
+- `ElementProduct` for `RationalVector`: the product of the elements, as a `Rational`, multiplied
+  in a balanced tree and stopping at a zero element. The product of the 0-dimensional vector is 1.
 - `ElementSum` for `RationalVector`: the sum of the elements, as a `Rational`. The sum of the
   0-dimensional vector is 0.
 - `L1Norm` for `RationalVector`: the sum of the absolute values of the elements, as a `Rational`.

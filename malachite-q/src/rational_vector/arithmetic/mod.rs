@@ -104,6 +104,10 @@ pub mod canonicalize_sign;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which split a vector into a rational scalar and a vector of coprime integers.
 pub mod content;
+/// An implementation of
+/// [`ElementProduct`](malachite_base::num::arithmetic::traits::ElementProduct), the product of the
+/// elements.
+pub mod element_product;
 /// An implementation of [`ElementSum`](malachite_base::num::arithmetic::traits::ElementSum), the
 /// sum of the elements.
 pub mod element_sum;

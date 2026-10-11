@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content_chained::register(runner);
     div_exact::register(runner);
     dot_general::register(runner);
+    element_product::register(runner);
     element_sum::register(runner);
     entrywise_abs::register(runner);
     entrywise_div_round::register(runner);
@@ -54,6 +55,7 @@ mod content;
 mod content_chained;
 mod div_exact;
 mod dot_general;
+mod element_product;
 mod element_sum;
 mod entrywise_abs;
 mod entrywise_div_round;

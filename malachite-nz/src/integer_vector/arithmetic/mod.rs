@@ -187,6 +187,10 @@ pub mod content_chained;
 pub mod div_exact;
 #[doc(hidden)]
 pub mod dot_general;
+/// An implementation of
+/// [`ElementProduct`](malachite_base::num::arithmetic::traits::ElementProduct), the product of the
+/// elements.
+pub mod element_product;
 /// An implementation of [`ElementSum`](malachite_base::num::arithmetic::traits::ElementSum), the
 /// sum of the elements.
 pub mod element_sum;

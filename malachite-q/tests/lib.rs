@@ -430,6 +430,7 @@ pub mod rational_vector {
         pub mod canonical_primitive_part;
         pub mod canonicalize_sign;
         pub mod content;
+        pub mod element_product;
         pub mod element_sum;
         pub mod entrywise_abs;
         pub mod height;

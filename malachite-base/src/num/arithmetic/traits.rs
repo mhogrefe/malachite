@@ -1078,6 +1078,18 @@ pub trait L1Norm {
     fn l1_norm_significant_bits(&self) -> u64;
 }
 
+/// Calculates the product of the elements of a vector.
+///
+/// Unlike [`Product`](core::iter::Product), which would multiply vectors together, this multiplies
+/// the elements of one vector, producing a single element.
+pub trait ElementProduct {
+    type Output;
+
+    fn to_element_product(&self) -> Self::Output;
+
+    fn into_element_product(self) -> Self::Output;
+}
+
 /// Calculates the sum of the elements of a vector.
 ///
 /// Unlike [`Sum`](core::iter::Sum), which adds vectors to each other, this adds up the elements of
