@@ -542,6 +542,7 @@ pub mod natural {
         pub mod pow;
         pub mod power_of_2;
         pub mod primorial;
+        pub mod product_of_unsigneds;
         pub mod rising_factorial;
         pub mod root;
         pub mod round_to_multiple;
@@ -586,6 +587,7 @@ pub mod natural {
             pub mod sum_diff;
         }
         pub mod sub_mul;
+        pub mod widening_element_product;
     }
     pub mod basic {
         pub mod constants;

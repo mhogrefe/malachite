@@ -1421,3 +1421,8 @@ pub mod sub;
 /// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign), traits for subtracting
 /// the product of two numbers from a number.
 pub mod sub_mul;
+/// An implementation of
+/// [`WideningElementProduct`](malachite_base::num::arithmetic::traits::WideningElementProduct) for
+/// [`UnsignedVector`](malachite_base::unsigned_vector::UnsignedVector), the product of the elements
+/// as a [`Natural`](crate::natural::Natural).
+pub mod widening_element_product;

@@ -916,6 +916,24 @@ pub mod product_of_limbs;
 #[cfg(not(feature = "test_build"))]
 /// Code for multiplying several limbs together.
 pub(crate) mod product_of_limbs;
+/// Implementations of [`Product`](core::iter::Product) for [`Natural`](crate::natural::Natural)
+/// over iterators of unsigned primitive integers, multiplying machine words together into a
+/// [`Natural`].
+///
+/// # product
+/// ```
+/// use core::iter::Product;
+/// use malachite_nz::natural::Natural;
+///
+/// assert_eq!(Natural::product(core::iter::empty::<u64>()), 1);
+/// assert_eq!(Natural::product([2u8, 3, 5, 7].iter()), 210);
+/// assert_eq!(Natural::product([3u32, 0, 5].into_iter()), 0);
+/// assert_eq!(
+///     Natural::product([u64::MAX, u64::MAX].into_iter()).to_string(),
+///     "340282366920938463426481119284349108225"
+/// );
+/// ```
+pub mod product_of_unsigneds;
 #[cfg(feature = "test_build")]
 /// Code for multiplying residues modulo $2^n + 1$ with transforms that need no multiplications.
 /// Derived from William Hart's Schönhage-Strassen implementation for FLINT.

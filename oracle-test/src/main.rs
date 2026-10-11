@@ -725,6 +725,8 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_ref_sum", "az_nat_sum"),
     ("demo_natural_product", "az_nat_product"),
     ("demo_natural_ref_product", "az_nat_product"),
+    ("demo_natural_product_of_unsigneds", "az_nat_product"),
+    ("demo_natural_product_of_unsigneds_ref", "az_nat_product"),
     ("demo_natural_rising_factorial", "az_nat_rising_factorial"),
     (
         "demo_natural_rising_factorial_ref",
@@ -2093,6 +2095,12 @@ fn test_against_flint() {
         "demo_integer_rising_factorial",
         "fmpz_rfac",
     );
+    for demo_name in [
+        "demo_natural_product_of_unsigneds",
+        "demo_natural_product_of_unsigneds_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_fmpz_ui_vec_prod");
+    }
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",

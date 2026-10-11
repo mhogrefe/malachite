@@ -41,6 +41,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::factorization::traits::{IsPrime, PrimitiveRootPrime};
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
@@ -720,4 +721,11 @@ pub fn mul_dispatch_thresholds() -> Vec<usize> {
         MUL_FFT_THRESHOLD,
         FFT_MUL_THRESHOLD,
     ]
+}
+
+pub fn natural_product_of_unsigneds_naive<T: PrimitiveUnsigned>(xs: &[T]) -> Natural
+where
+    Natural: From<T>,
+{
+    natural_product_naive(xs.iter().map(|&x| Natural::from(x)))
 }

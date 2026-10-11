@@ -85,6 +85,9 @@ documented by git history.
   two facts that FLINT's `_fmpz_vec_max_bits` combines into one signed count. `sum_max_bits` returns
   the bit lengths of the sum of the absolute values of the elements and of the height, like
   `_fmpz_vec_sum_max_bits`.
+- A `WideningElementProduct<T>` trait in `malachite_base::num::arithmetic::traits`, for the product
+  of the elements of a vector as a value of a wider type `T`, so that it cannot overflow, with
+  `to_widening_element_product` and `into_widening_element_product`.
 - `ModPowerOf2ElementProduct` and `ModElementProduct` traits in
   `malachite_base::num::arithmetic::traits`, for the product of the elements of a vector modulo
   $2^k$ or modulo $m$, as a single element, with `to_` and `into_` forms. The elements must already
@@ -280,6 +283,12 @@ documented by git history.
 - `ElementProduct` for `NaturalVector` and `IntegerVector`: the product of the elements, like
   FLINT's `_fmpz_vec_prod`, multiplied in a balanced tree and stopping at a zero element. The
   product of the 0-dimensional vector is 1.
+- `Product<T>` and `Product<&T>` for `Natural`, for every unsigned primitive integer type `T`: the
+  product of the integers in an iterator as a `Natural`, like FLINT's `_fmpz_ui_vec_prod`. Adjacent
+  factors are multiplied as words while their product fits in one, the words are combined in a
+  balanced tree, and it stops at a zero factor.
+- `WideningElementProduct<Natural>` for `UnsignedVector<T>`: the product of the elements as a
+  `Natural`, through the `Product` above.
 - `ModPowerOf2ElementProduct` and `ModElementProduct` for `NaturalVector`: the product of the
   elements modulo $2^k$ or modulo $m$, as a `Natural`, with the modulus by value or by reference.
   The product of the 0-dimensional vector is 1, reduced, and it returns as soon as the partial

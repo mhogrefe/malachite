@@ -413,10 +413,9 @@ pub mod mod_power_of_2_add_mul;
 /// malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), for adding a scalar
 /// multiple of one vector, shifted left, to another modulo a power of 2.
 pub mod mod_power_of_2_add_mul_shl;
-/// An implementation of
-/// [`ModPowerOf2ElementProduct`](
-/// malachite_base::num::arithmetic::traits::ModPowerOf2ElementProduct),
-/// the product of the elements modulo a power of 2.
+/// An implementation of [`ModPowerOf2ElementProduct`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2ElementProduct), the product of the elements
+/// modulo a power of 2.
 pub mod mod_power_of_2_element_product;
 /// An implementation of
 /// [`ModPowerOf2ElementSum`](malachite_base::num::arithmetic::traits::ModPowerOf2ElementSum), the

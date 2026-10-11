@@ -1102,6 +1102,18 @@ pub trait ModElementSum<M> {
     fn into_mod_element_sum(self, m: M) -> Self::Output;
 }
 
+/// Calculates the product of the elements of a vector as a value of a wider type, so that the
+/// product cannot overflow.
+///
+/// Unlike [`ElementProduct`], whose output has the type of the elements, this produces a `T` that
+/// can hold any product of them: for example, the product of the elements of an
+/// [`UnsignedVector<u64>`](crate::unsigned_vector::UnsignedVector) as a `Natural`.
+pub trait WideningElementProduct<T> {
+    fn to_widening_element_product(&self) -> T;
+
+    fn into_widening_element_product(self) -> T;
+}
+
 /// Calculates the product of the elements of a vector modulo $2^k$.
 ///
 /// The elements must already be reduced modulo $2^k$. Unlike [`ModPowerOf2Product`], which
