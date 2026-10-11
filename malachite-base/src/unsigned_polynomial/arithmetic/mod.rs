@@ -150,6 +150,9 @@ pub mod mod_power_of_2_pow;
 /// [`ModPowerOf2PowTruncatedAssign`](crate::polynomial::ModPowerOf2PowTruncatedAssign), for raising
 /// a polynomial to a power modulo a power of 2 and keeping only the low coefficients.
 pub mod mod_power_of_2_pow_truncated;
+/// Implementations of [`ModPowerOf2Product`](crate::num::arithmetic::traits::ModPowerOf2Product),
+/// for multiplying polynomials together modulo a power of 2.
+pub mod mod_power_of_2_product;
 /// Implementations of [`ModPowerOf2Shl`](crate::num::arithmetic::traits::ModPowerOf2Shl) and
 /// [`ModPowerOf2ShlAssign`](crate::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a polynomial modulo a power of 2.
@@ -245,6 +248,9 @@ pub mod mod_power_of_2_sub_truncated;
 /// Implementations of [`ModPowerOf2Sum`](crate::num::arithmetic::traits::ModPowerOf2Sum), for
 /// adding up polynomials modulo a power of 2.
 pub mod mod_power_of_2_sum;
+/// Implementations of [`ModProduct`](crate::num::arithmetic::traits::ModProduct), for multiplying
+/// polynomials together modulo a number.
+pub mod mod_product;
 /// Implementations of [`ModShl`](crate::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](crate::num::arithmetic::traits::ModShlAssign), for left-shifting a polynomial
 /// modulo a number.

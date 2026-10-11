@@ -19,12 +19,12 @@ use crate::num::arithmetic::traits::{
     ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign,
     ModPowerOf2AddMul, ModPowerOf2AddMulAssign, ModPowerOf2AddMulShl, ModPowerOf2AddMulShlAssign,
     ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg,
-    ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Shl,
+    ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Product, ModPowerOf2Shl,
     ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Sqrt, ModPowerOf2Square,
     ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModPowerOf2SubMul,
     ModPowerOf2SubMulAssign, ModPowerOf2SubMulShl, ModPowerOf2SubMulShlAssign, ModPowerOf2Sum,
-    ModSquare, ModSquareAssign, ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub,
-    ModSubAssign, ModSubMul, ModSubMulAssign, ModSubMulShl, ModSubMulShlAssign, ModSum,
+    ModProduct, ModSquare, ModSquareAssign, ModSquarePrecomputed, ModSquarePrecomputedAssign,
+    ModSub, ModSubAssign, ModSubMul, ModSubMulAssign, ModSubMulShl, ModSubMulShlAssign, ModSum,
     Multifactorial, NegMod, NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2,
     NextPowerOf2Assign, Primorial, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial,
     UnsignedAbs, XMulYToZZ, XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ,
@@ -111,6 +111,8 @@ pub trait PrimitiveUnsigned:
     + ModSubMulShlAssign<Self, Self, Self>
     + ModSum<Self, Self>
     + for<'a> ModSum<&'a Self, Self>
+    + ModProduct<Self, Self>
+    + for<'a> ModProduct<&'a Self, Self>
     + ModMulPrecomputed<Self, Self, Output = Self>
     + ModMulPrecomputedAssign<Self, Self>
     + ModNeg<Self, Output = Self>
@@ -134,6 +136,8 @@ pub trait PrimitiveUnsigned:
     + ModPowerOf2SubMulShlAssign<Self, Self>
     + ModPowerOf2Sum
     + for<'a> ModPowerOf2Sum<&'a Self>
+    + ModPowerOf2Product
+    + for<'a> ModPowerOf2Product<&'a Self>
     + ModPowerOf2Neg<Output = Self>
     + ModPowerOf2NegAssign
     + ModPowerOf2Pow<u64, Output = Self>

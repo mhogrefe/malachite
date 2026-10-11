@@ -303,6 +303,10 @@ pub mod mod_power_of_2_neg;
 /// and [`ModPowerOf2PowAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign),
 /// traits for raising a number to a power modulo $2^k$.
 pub mod mod_power_of_2_pow;
+/// Implementations of
+/// [`ModPowerOf2Product`](malachite_base::num::arithmetic::traits::ModPowerOf2Product), a trait for
+/// multiplying together the numbers in an iterator modulo $2^k$.
+pub mod mod_power_of_2_product;
 /// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
 /// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign),
 /// traits for left-shifting a number modulo $2^k$.
@@ -438,6 +442,9 @@ pub mod mod_power_of_2_sub_mul_shl;
 /// Implementations of [`ModPowerOf2Sum`](malachite_base::num::arithmetic::traits::ModPowerOf2Sum),
 /// a trait for adding up the numbers in an iterator modulo $2^k$.
 pub mod mod_power_of_2_sum;
+/// Implementations of [`ModProduct`](malachite_base::num::arithmetic::traits::ModProduct), a trait
+/// for multiplying together the numbers in an iterator modulo another number.
+pub mod mod_product;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), traits for
 /// left-shifting a number modulo another number.

@@ -191,6 +191,10 @@ pub mod mod_power_of_2_pow;
 /// [`ModPowerOf2PowTruncatedAssign`](malachite_base::polynomial::ModPowerOf2PowTruncatedAssign),
 /// for raising a polynomial to a power modulo a power of 2 and keeping only the low coefficients.
 pub mod mod_power_of_2_pow_truncated;
+/// Implementations of
+/// [`ModPowerOf2Product`](malachite_base::num::arithmetic::traits::ModPowerOf2Product), for
+/// multiplying polynomials together modulo a power of 2.
+pub mod mod_power_of_2_product;
 /// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
 /// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a polynomial modulo a power of 2.
@@ -294,6 +298,9 @@ pub mod mod_power_of_2_sub_truncated;
 /// Implementations of [`ModPowerOf2Sum`](malachite_base::num::arithmetic::traits::ModPowerOf2Sum),
 /// for adding up polynomials modulo a power of 2.
 pub mod mod_power_of_2_sum;
+/// Implementations of [`ModProduct`](malachite_base::num::arithmetic::traits::ModProduct), for
+/// multiplying polynomials together modulo a number.
+pub mod mod_product;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
 /// polynomial modulo a number.

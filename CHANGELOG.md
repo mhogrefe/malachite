@@ -46,6 +46,10 @@ documented by git history.
 - `PrimitiveUnsigned` now requires `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and
   `ModSubMulAssign`, as it already required `ModMul`. A type outside Malachite that implements
   `PrimitiveUnsigned` must now implement them too.
+- `PrimitiveUnsigned` now requires `ModProduct<Self, Self>` and `for<'a> ModProduct<&'a Self, Self>`.
+  A type outside Malachite that implements `PrimitiveUnsigned` must now implement them too.
+- `PrimitiveUnsigned` now requires `ModPowerOf2Product` and `for<'a> ModPowerOf2Product<&'a Self>`.
+  A type outside Malachite that implements `PrimitiveUnsigned` must now implement them too.
 - `PrimitiveUnsigned` now requires `ModSum<Self, Self>` and `for<'a> ModSum<&'a Self, Self>`. A
   type outside Malachite that implements `PrimitiveUnsigned` must now implement them too.
 - `PrimitiveUnsigned` now requires `ModPowerOf2Sum` and `for<'a> ModPowerOf2Sum<&'a Self>`. A type
@@ -176,6 +180,16 @@ documented by git history.
   `ModPowerOf2SubMulShlAssign` traits in `malachite_base::num::arithmetic::traits`, for computing
   $x + yz2^b$ and $x - yz2^b$ modulo $2^k$, implemented for every primitive unsigned type. All
   three arguments must already be reduced.
+- `ModPowerOf2Product` trait in `malachite_base::num::arithmetic::traits`, for multiplying together
+  the numbers in an iterator modulo $2^k$, like `Product`, for iterators of values or of
+  references; implemented for every primitive unsigned type. Every number must already be reduced,
+  and the product of no numbers is 1 reduced modulo $2^k$. It returns as soon as the partial
+  product is zero, without examining the remaining numbers.
+- `ModProduct` trait in `malachite_base::num::arithmetic::traits`, for multiplying together the
+  numbers in an iterator modulo another number, like `Product`, for iterators of values or of
+  references; implemented for every primitive unsigned type, reusing the data for multiplying
+  modulo $m$. Every number must already be reduced, the modulus must be positive, the product of no
+  numbers is 1 reduced modulo $m$, and it returns as soon as the partial product is zero.
 - `ModSum` trait in `malachite_base::num::arithmetic::traits`, for adding up the numbers in an
   iterator modulo another number, like `Sum`, for iterators of values or of references; implemented
   for every primitive unsigned type. Every number must already be reduced, and the modulus must be
@@ -348,6 +362,12 @@ documented by git history.
   one vector, shifted left, to or from another modulo $2^k$, with the arguments in every
   combination of value and reference (with a borrowed receiver, all of them by reference). The
   elements and the scalar must already be reduced.
+- `ModPowerOf2Product` and `ModProduct` for `UnsignedPolynomial<T>` and `NaturalPolynomial`, for
+  iterators of polynomials or of references: the product modulo $2^k$ or modulo $m$. The product of
+  none is the constant 1, reduced (the zero polynomial when the modulus is 1). Since nonzero
+  polynomials can multiply to zero modulo a power of 2 or a composite number, it returns as soon as
+  the partial product is zero, without examining the remaining polynomials. The coefficients must
+  already be reduced.
 - `ModPowerOf2Sum` and `ModSum` for `UnsignedPolynomial<T>` and `NaturalPolynomial`, for iterators
   of polynomials or of references: the sum modulo $2^k$ or modulo $m$, coefficient by coefficient.
   The summands may have different degrees, and the sum of none is zero. The coefficients must
@@ -427,6 +447,13 @@ documented by git history.
   `ModPowerOf2SubMulShlAssign` for `Natural`, taking the arguments in every combination of value
   and reference (with a borrowed receiver, all of them by reference). Only the low $k - b$ bits of
   the product are computed, and powers up to the limb width use the primitive implementation.
+- `ModPowerOf2Product` for `Natural`, for iterators of values or of references; powers up to the
+  limb width use the primitive implementation, and larger ones reduce after every multiplication
+  with the low-half `mod_power_of_2_mul`, returning as soon as the partial product is zero.
+- `ModProduct` for `Natural`, for iterators of values or of references and a modulus by value or by
+  reference; moduli that fit in a limb use the primitive implementation, and larger ones reduce
+  after every multiplication, reusing the data for multiplying modulo $m$ and returning as soon as
+  the partial product is zero.
 - `ModSum` for `Natural`, for iterators of values or of references and a modulus by value or by
   reference; moduli that fit in a limb use the primitive implementation, and larger ones reduce the
   exact sum once at the end.

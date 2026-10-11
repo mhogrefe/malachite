@@ -2595,6 +2595,29 @@ pub mod mod_power_of_2_neg;
 /// assert_eq!(n, 1);
 /// ```
 pub mod mod_power_of_2_pow;
+/// [`ModPowerOf2Product`](traits::ModPowerOf2Product), a trait for multiplying together the numbers
+/// in an iterator modulo $2^k$.
+///
+/// # mod_power_of_2_product
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Product;
+///
+/// assert_eq!(
+///     u8::mod_power_of_2_product([200, 100, 50].into_iter(), 8),
+///     64
+/// );
+/// assert_eq!(u32::mod_power_of_2_product([2, 3, 5, 7].into_iter(), 4), 2);
+/// assert_eq!(
+///     u64::mod_power_of_2_product(core::iter::empty::<u64>(), 10),
+///     1
+/// );
+/// assert_eq!(
+///     u64::mod_power_of_2_product(core::iter::empty::<u64>(), 0),
+///     0
+/// );
+/// assert_eq!(u8::mod_power_of_2_product([3, 5, 7].iter(), 4), 9);
+/// ```
+pub mod mod_power_of_2_product;
 /// [`ModPowerOf2Shl`](traits::ModPowerOf2Shl) and
 /// [`ModPowerOf2ShlAssign`](traits::ModPowerOf2ShlAssign), traits for left-shifting a number modulo
 /// $2^k$.
@@ -2783,6 +2806,20 @@ pub mod mod_power_of_2_sub_mul_shl;
 /// assert_eq!(u8::mod_power_of_2_sum([200, 100, 50].iter(), 8), 94);
 /// ```
 pub mod mod_power_of_2_sum;
+/// [`ModProduct`](traits::ModProduct), a trait for multiplying together the numbers in an iterator
+/// modulo another number.
+///
+/// # mod_product
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModProduct;
+///
+/// assert_eq!(u8::mod_product([200, 100, 50].into_iter(), 255), 145);
+/// assert_eq!(u32::mod_product([2, 3, 5, 7].into_iter(), 11), 1);
+/// assert_eq!(u64::mod_product(core::iter::empty::<u64>(), 10), 1);
+/// assert_eq!(u64::mod_product(core::iter::empty::<u64>(), 1), 0);
+/// assert_eq!(u8::mod_product([3, 5, 7].iter(), 10), 5);
+/// ```
+pub mod mod_product;
 /// [`ModShl`](traits::ModShl) and [`ModShlAssign`](traits::ModShlAssign), traits for left-shifting
 /// a number modulo another number.
 ///

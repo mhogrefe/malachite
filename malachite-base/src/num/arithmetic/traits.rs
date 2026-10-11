@@ -1939,6 +1939,16 @@ pub trait ModSum<A = Self, M = Self>: Sized {
     fn mod_sum<I: Iterator<Item = A>>(xs: I, m: M) -> Self;
 }
 
+/// Multiplies together the numbers in an iterator, modulo another number $m$. Every number must be
+/// already reduced modulo $m$.
+///
+/// Like [`Product`](core::iter::Product), this is implemented both for iterators of values and for
+/// iterators of references. The product of no numbers is 1 reduced modulo $m$, which is 0 when $m =
+/// 1$.
+pub trait ModProduct<A = Self, M = Self>: Sized {
+    fn mod_product<I: Iterator<Item = A>>(xs: I, m: M) -> Self;
+}
+
 /// Negates a number modulo another number $m$. The input must be already reduced modulo $m$.
 pub trait ModNeg<M = Self> {
     type Output;
@@ -2203,6 +2213,16 @@ pub trait ModPowerOf2SubMulShlAssign<Y = Self, Z = Self> {
 /// iterators of references.
 pub trait ModPowerOf2Sum<A = Self>: Sized {
     fn mod_power_of_2_sum<I: Iterator<Item = A>>(xs: I, pow: u64) -> Self;
+}
+
+/// Multiplies together the numbers in an iterator, modulo $2^k$. Every number must be already
+/// reduced modulo $2^k$.
+///
+/// Like [`Product`](core::iter::Product), this is implemented both for iterators of values and for
+/// iterators of references. The product of no numbers is 1 reduced modulo $2^k$, which is 0 when $k
+/// = 0$.
+pub trait ModPowerOf2Product<A = Self>: Sized {
+    fn mod_power_of_2_product<I: Iterator<Item = A>>(xs: I, pow: u64) -> Self;
 }
 
 /// Negates a number modulo $2^k$. The input must be already reduced modulo $2^k$.

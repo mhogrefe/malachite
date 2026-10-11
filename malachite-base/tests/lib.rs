@@ -324,6 +324,7 @@ pub mod num {
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_pow;
+        pub mod mod_power_of_2_product;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_shr;
         pub mod mod_power_of_2_sqrt;
@@ -332,6 +333,7 @@ pub mod num {
         pub mod mod_power_of_2_sub_mul;
         pub mod mod_power_of_2_sub_mul_shl;
         pub mod mod_power_of_2_sum;
+        pub mod mod_product;
         pub mod mod_shl;
         pub mod mod_shr;
         pub mod mod_sqrt;
@@ -921,12 +923,14 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_nth_derivative;
         pub mod mod_power_of_2_pow;
         pub mod mod_power_of_2_pow_truncated;
+        pub mod mod_power_of_2_product;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_square;
         pub mod mod_power_of_2_square_truncated;
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_truncated;
         pub mod mod_power_of_2_sum;
+        pub mod mod_product;
         pub mod mod_shl;
         pub mod mod_square;
         pub mod mod_square_truncated;
