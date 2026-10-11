@@ -674,6 +674,9 @@ pub mod mod_sub_mul;
 /// [`ModSubMulShlAssign`](malachite_base::num::arithmetic::traits::ModSubMulShlAssign), traits for
 /// subtracting the product of two numbers, shifted left, from a number modulo another number.
 pub mod mod_sub_mul_shl;
+/// Implementations of [`ModSum`](malachite_base::num::arithmetic::traits::ModSum), a trait for
+/// adding up the numbers in an iterator modulo another number.
+pub mod mod_sum;
 /// Multiplication of [`Natural`](super::Natural)s.
 pub mod mul;
 pub mod mul_add_mul;

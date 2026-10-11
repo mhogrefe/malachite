@@ -242,6 +242,9 @@ pub mod mod_power_of_2_sub;
 /// [`ModPowerOf2SubTruncatedAssign`](crate::polynomial::ModPowerOf2SubTruncatedAssign), for
 /// subtracting one polynomial from another modulo $2^k$ and keeping only their low coefficients.
 pub mod mod_power_of_2_sub_truncated;
+/// Implementations of [`ModPowerOf2Sum`](crate::num::arithmetic::traits::ModPowerOf2Sum), for
+/// adding up polynomials modulo a power of 2.
+pub mod mod_power_of_2_sum;
 /// Implementations of [`ModShl`](crate::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](crate::num::arithmetic::traits::ModShlAssign), for left-shifting a polynomial
 /// modulo a number.
@@ -326,6 +329,9 @@ pub mod mod_sub;
 /// [`ModSubTruncatedAssign`](crate::polynomial::ModSubTruncatedAssign), for subtracting one
 /// polynomial from another modulo a value and keeping only their low coefficients.
 pub mod mod_sub_truncated;
+/// Implementations of [`ModSum`](crate::num::arithmetic::traits::ModSum), for adding up polynomials
+/// modulo a number.
+pub mod mod_sum;
 /// Implementations of [`MulPowerOfX`](crate::polynomial::MulPowerOfX) and
 /// [`MulPowerOfXAssign`](crate::polynomial::MulPowerOfXAssign), for multiplying a polynomial by a
 /// power of its variable.

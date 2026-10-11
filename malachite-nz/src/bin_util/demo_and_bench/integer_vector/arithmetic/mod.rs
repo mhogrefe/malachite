@@ -39,6 +39,7 @@ pub(crate) fn register(runner: &mut Runner) {
     sub::register(runner);
     sub_mul::register(runner);
     sub_mul_shl::register(runner);
+    sum::register(runner);
 }
 
 mod add;
@@ -71,3 +72,4 @@ mod shr;
 mod sub;
 mod sub_mul;
 mod sub_mul_shl;
+mod sum;

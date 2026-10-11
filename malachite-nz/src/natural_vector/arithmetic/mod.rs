@@ -472,6 +472,9 @@ pub mod mod_power_of_2_sub_mul;
 /// malachite_base::num::arithmetic::traits::ModPowerOf2SubMulShlAssign), for subtracting a scalar
 /// multiple of one vector, shifted left, from another modulo a power of 2.
 pub mod mod_power_of_2_sub_mul_shl;
+/// Implementations of [`ModPowerOf2Sum`](malachite_base::num::arithmetic::traits::ModPowerOf2Sum),
+/// for adding up vectors entry by entry modulo a power of 2.
+pub mod mod_power_of_2_sum;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
 /// vector (multiplying it by a power of 2) modulo a number.
@@ -528,6 +531,9 @@ pub mod mod_sub_mul;
 /// [`ModSubMulShlAssign`](malachite_base::num::arithmetic::traits::ModSubMulShlAssign), for
 /// subtracting a scalar multiple of one vector, shifted left, from another modulo a number.
 pub mod mod_sub_mul_shl;
+/// Implementations of [`ModSum`](malachite_base::num::arithmetic::traits::ModSum), for adding up
+/// vectors entry by entry modulo a number.
+pub mod mod_sum;
 /// [`NaturalVector::multi_crt`](super::NaturalVector::multi_crt), which combines vectors of
 /// residues modulo many word-sized moduli by the Chinese remainder theorem.
 pub mod multi_crt;
@@ -678,3 +684,5 @@ pub mod shl;
 /// assert_eq!(v.to_string(), "(4, 8, 12)");
 /// ```
 pub mod shr;
+/// Implementations of [`Sum`](core::iter::Sum), for adding up vectors entry by entry.
+pub mod sum;

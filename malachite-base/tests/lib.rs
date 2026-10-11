@@ -339,6 +339,7 @@ pub mod num {
         pub mod mod_sub;
         pub mod mod_sub_mul;
         pub mod mod_sub_mul_shl;
+        pub mod mod_sum;
         pub mod mul_add_mul;
         pub mod mul_shr_round;
         pub mod mul_sub_mul;
@@ -925,11 +926,13 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_square_truncated;
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_truncated;
+        pub mod mod_power_of_2_sum;
         pub mod mod_shl;
         pub mod mod_square;
         pub mod mod_square_truncated;
         pub mod mod_sub;
         pub mod mod_sub_truncated;
+        pub mod mod_sum;
         pub mod mul_power_of_x;
     }
     pub mod basic {
@@ -1006,10 +1009,12 @@ pub mod unsigned_vector {
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_mul;
         pub mod mod_power_of_2_sub_mul_shl;
+        pub mod mod_power_of_2_sum;
         pub mod mod_shl;
         pub mod mod_sub;
         pub mod mod_sub_mul;
         pub mod mod_sub_mul_shl;
+        pub mod mod_sum;
         pub mod scalar_div;
         pub mod shr;
     }

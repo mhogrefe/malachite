@@ -24,11 +24,11 @@ use crate::num::arithmetic::traits::{
     ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModPowerOf2SubMul,
     ModPowerOf2SubMulAssign, ModPowerOf2SubMulShl, ModPowerOf2SubMulShlAssign, ModPowerOf2Sum,
     ModSquare, ModSquareAssign, ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub,
-    ModSubAssign, ModSubMul, ModSubMulAssign, ModSubMulShl, ModSubMulShlAssign, Multifactorial,
-    NegMod, NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign,
-    Primorial, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, UnsignedAbs,
-    XMulYToZZ, XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ,
-    XXXXAddYYYYToZZZZ,
+    ModSubAssign, ModSubMul, ModSubMulAssign, ModSubMulShl, ModSubMulShlAssign, ModSum,
+    Multifactorial, NegMod, NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2,
+    NextPowerOf2Assign, Primorial, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial,
+    UnsignedAbs, XMulYToZZ, XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ,
+    XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
 };
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
@@ -109,6 +109,8 @@ pub trait PrimitiveUnsigned:
     + ModAddMulShlAssign<Self, Self, Self>
     + ModSubMulShl<Self, Self, Self, Output = Self>
     + ModSubMulShlAssign<Self, Self, Self>
+    + ModSum<Self, Self>
+    + for<'a> ModSum<&'a Self, Self>
     + ModMulPrecomputed<Self, Self, Output = Self>
     + ModMulPrecomputedAssign<Self, Self>
     + ModNeg<Self, Output = Self>

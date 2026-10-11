@@ -46,6 +46,8 @@ documented by git history.
 - `PrimitiveUnsigned` now requires `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and
   `ModSubMulAssign`, as it already required `ModMul`. A type outside Malachite that implements
   `PrimitiveUnsigned` must now implement them too.
+- `PrimitiveUnsigned` now requires `ModSum<Self, Self>` and `for<'a> ModSum<&'a Self, Self>`. A
+  type outside Malachite that implements `PrimitiveUnsigned` must now implement them too.
 - `PrimitiveUnsigned` now requires `ModPowerOf2Sum` and `for<'a> ModPowerOf2Sum<&'a Self>`. A type
   outside Malachite that implements `PrimitiveUnsigned` must now implement them too.
 - `PrimitiveUnsigned` now requires `ModAddMulShl`, `ModAddMulShlAssign`, `ModSubMulShl`, and
@@ -174,6 +176,10 @@ documented by git history.
   `ModPowerOf2SubMulShlAssign` traits in `malachite_base::num::arithmetic::traits`, for computing
   $x + yz2^b$ and $x - yz2^b$ modulo $2^k$, implemented for every primitive unsigned type. All
   three arguments must already be reduced.
+- `ModSum` trait in `malachite_base::num::arithmetic::traits`, for adding up the numbers in an
+  iterator modulo another number, like `Sum`, for iterators of values or of references; implemented
+  for every primitive unsigned type. Every number must already be reduced, and the modulus must be
+  positive.
 - `ModPowerOf2Sum` trait in `malachite_base::num::arithmetic::traits`, for adding up the numbers
   in an iterator modulo $2^k$, like `Sum`, for iterators of values or of references; implemented
   for every primitive unsigned type. Every number must already be reduced.
@@ -196,6 +202,12 @@ documented by git history.
   `ModPowerOf2SubMulShlAssign` for `UnsignedVector<T>`, adding or subtracting a `T` multiple of one
   vector, shifted left, to or from another modulo $2^k$. The elements and the scalar must already
   be reduced.
+- `ModSum` for `UnsignedVector<T>`, for iterators of vectors or of references, with a `T`
+  modulus: the entrywise sum modulo $m$ of vectors of the same dimension. An empty iterator
+  panics.
+- `ModPowerOf2Sum` for `UnsignedVector<T>`, for iterators of vectors or of references: the
+  entrywise sum modulo $2^k$ of vectors of the same dimension. An empty iterator panics, since the
+  dimension of its sum is unknown.
 - `ModAddMulShl`, `ModAddMulShlAssign`, `ModSubMulShl`, and `ModSubMulShlAssign` for
   `UnsignedVector<T>`, adding or subtracting a `T` multiple of one vector, shifted left, to or from
   another modulo a `T`. The elements and the scalar must already be reduced.
@@ -336,6 +348,19 @@ documented by git history.
   one vector, shifted left, to or from another modulo $2^k$, with the arguments in every
   combination of value and reference (with a borrowed receiver, all of them by reference). The
   elements and the scalar must already be reduced.
+- `ModPowerOf2Sum` and `ModSum` for `UnsignedPolynomial<T>` and `NaturalPolynomial`, for iterators
+  of polynomials or of references: the sum modulo $2^k$ or modulo $m$, coefficient by coefficient.
+  The summands may have different degrees, and the sum of none is zero. The coefficients must
+  already be reduced.
+- `Sum` for `NaturalVector`, `IntegerVector`, and `RationalVector`, for iterators of vectors or of
+  references: the entrywise sum of vectors of the same dimension. Unlike `Sum` for numbers, an
+  empty iterator panics, since the dimension of its sum is unknown.
+- `ModSum` for `NaturalVector`, for iterators of vectors or of references and a `Natural` modulus
+  by value or by reference: the entrywise sum modulo $m$ of vectors of the same dimension,
+  reducing each entry once at the end. An empty iterator panics.
+- `ModPowerOf2Sum` for `NaturalVector`, for iterators of vectors or of references: the entrywise
+  sum modulo $2^k$ of vectors of the same dimension, reducing each entry once at the end. An empty
+  iterator panics.
 - `ModAddMulShl`, `ModAddMulShlAssign`, `ModSubMulShl`, and `ModSubMulShlAssign` for
   `NaturalVector`, adding or subtracting a `Natural` multiple of one vector, shifted left, to or
   from another modulo a `Natural`, with the arguments in every combination of value and reference
@@ -402,6 +427,9 @@ documented by git history.
   `ModPowerOf2SubMulShlAssign` for `Natural`, taking the arguments in every combination of value
   and reference (with a borrowed receiver, all of them by reference). Only the low $k - b$ bits of
   the product are computed, and powers up to the limb width use the primitive implementation.
+- `ModSum` for `Natural`, for iterators of values or of references and a modulus by value or by
+  reference; moduli that fit in a limb use the primitive implementation, and larger ones reduce the
+  exact sum once at the end.
 - `ModPowerOf2Sum` for `Natural`, for iterators of values or of references; powers up to the limb
   width use the primitive implementation, and larger ones reduce the exact sum once at the end.
 - `ModAddMulShl`, `ModAddMulShlAssign`, `ModSubMulShl`, and `ModSubMulShlAssign` for `Natural`,

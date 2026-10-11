@@ -441,6 +441,7 @@ pub mod rational_vector {
         pub mod sub;
         pub mod sub_mul;
         pub mod sub_mul_shl;
+        pub mod sum;
     }
     pub mod basic {
         pub mod named;

@@ -88,6 +88,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_sub::register(runner);
     mod_sub_mul::register(runner);
     mod_sub_mul_shl::register(runner);
+    mod_sum::register(runner);
     mul_add_mul::register(runner);
     mul_shr_round::register(runner);
     mul_sub_mul::register(runner);
@@ -236,6 +237,7 @@ mod mod_square;
 mod mod_sub;
 mod mod_sub_mul;
 mod mod_sub_mul_shl;
+mod mod_sum;
 mod mul_add_mul;
 mod mul_shr_round;
 mod mul_sub_mul;

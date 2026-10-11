@@ -667,5 +667,7 @@ pub mod sub_mul;
 /// [`SubMulShlAssign`](malachite_base::num::arithmetic::traits::SubMulShlAssign), for subtracting a
 /// scalar multiple of one vector, shifted left, from another.
 pub mod sub_mul_shl;
+/// Implementations of [`Sum`](core::iter::Sum), for adding up vectors entry by entry.
+pub mod sum;
 #[doc(hidden)]
 pub mod sum_max_bits;

@@ -378,6 +378,7 @@ pub mod integer_vector {
         pub mod sub;
         pub mod sub_mul;
         pub mod sub_mul_shl;
+        pub mod sum;
     }
     pub mod basic {
         pub mod named;
@@ -525,6 +526,7 @@ pub mod natural {
         pub mod mod_sub;
         pub mod mod_sub_mul;
         pub mod mod_sub_mul_shl;
+        pub mod mod_sum;
         pub mod mul;
         pub mod mul_add_mul;
         pub mod mul_shr_round;
@@ -838,11 +840,13 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_square_truncated;
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_truncated;
+        pub mod mod_power_of_2_sum;
         pub mod mod_shl;
         pub mod mod_square;
         pub mod mod_square_truncated;
         pub mod mod_sub;
         pub mod mod_sub_truncated;
+        pub mod mod_sum;
         pub mod mul;
         pub mod mul_power_of_x;
         pub mod mul_truncated;
@@ -940,15 +944,18 @@ pub mod natural_vector {
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_mul;
         pub mod mod_power_of_2_sub_mul_shl;
+        pub mod mod_power_of_2_sum;
         pub mod mod_shl;
         pub mod mod_sub;
         pub mod mod_sub_mul;
         pub mod mod_sub_mul_shl;
+        pub mod mod_sum;
         pub mod multi_crt;
         pub mod scalar_div;
         pub mod scalar_mul;
         pub mod shl;
         pub mod shr;
+        pub mod sum;
     }
     pub mod basic {
         pub mod named;

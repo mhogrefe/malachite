@@ -51,8 +51,10 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_square_truncated::register(runner);
     mod_power_of_2_sub::register(runner);
     mod_power_of_2_sub_truncated::register(runner);
+    mod_power_of_2_sum::register(runner);
     mod_sub::register(runner);
     mod_sub_truncated::register(runner);
+    mod_sum::register(runner);
     mul_power_of_x::register(runner);
 }
 
@@ -95,9 +97,11 @@ mod mod_power_of_2_square;
 mod mod_power_of_2_square_truncated;
 mod mod_power_of_2_sub;
 mod mod_power_of_2_sub_truncated;
+mod mod_power_of_2_sum;
 mod mod_shl;
 mod mod_square;
 mod mod_square_truncated;
 mod mod_sub;
 mod mod_sub_truncated;
+mod mod_sum;
 mod mul_power_of_x;

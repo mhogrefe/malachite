@@ -1930,6 +1930,15 @@ pub trait ModSubMulShlAssign<Y = Self, Z = Self, M = Self> {
     fn mod_sub_mul_shl_assign(&mut self, y: Y, z: Z, bits: u64, m: M);
 }
 
+/// Adds up the numbers in an iterator, modulo another number $m$. Every number must be already
+/// reduced modulo $m$.
+///
+/// Like [`Sum`](core::iter::Sum), this is implemented both for iterators of values and for
+/// iterators of references.
+pub trait ModSum<A = Self, M = Self>: Sized {
+    fn mod_sum<I: Iterator<Item = A>>(xs: I, m: M) -> Self;
+}
+
 /// Negates a number modulo another number $m$. The input must be already reduced modulo $m$.
 pub trait ModNeg<M = Self> {
     type Output;

@@ -33,10 +33,12 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_sub::register(runner);
     mod_power_of_2_sub_mul::register(runner);
     mod_power_of_2_sub_mul_shl::register(runner);
+    mod_power_of_2_sum::register(runner);
     mod_shl::register(runner);
     mod_sub::register(runner);
     mod_sub_mul::register(runner);
     mod_sub_mul_shl::register(runner);
+    mod_sum::register(runner);
     scalar_div::register(runner);
     shr::register(runner);
 }
@@ -65,9 +67,11 @@ mod mod_power_of_2_shl;
 mod mod_power_of_2_sub;
 mod mod_power_of_2_sub_mul;
 mod mod_power_of_2_sub_mul_shl;
+mod mod_power_of_2_sum;
 mod mod_shl;
 mod mod_sub;
 mod mod_sub_mul;
 mod mod_sub_mul_shl;
+mod mod_sum;
 mod scalar_div;
 mod shr;

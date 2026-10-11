@@ -2979,6 +2979,19 @@ pub mod mod_sub_mul;
 /// assert_eq!(x, 7);
 /// ```
 pub mod mod_sub_mul_shl;
+/// [`ModSum`](traits::ModSum), a trait for adding up the numbers in an iterator modulo another
+/// number.
+///
+/// # mod_sum
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModSum;
+///
+/// assert_eq!(u8::mod_sum([200, 100, 50].into_iter(), 255), 95);
+/// assert_eq!(u32::mod_sum([2, 3, 5, 7].into_iter(), 10), 7);
+/// assert_eq!(u64::mod_sum(core::iter::empty::<u64>(), 10), 0);
+/// assert_eq!(u8::mod_sum([200, 100, 50].iter(), 255), 95);
+/// ```
+pub mod mod_sum;
 /// [`MulAddMul`](traits::MulAddMul) and [`MulAddMulAssign`](traits::MulAddMulAssign), traits for
 /// adding the products of two pairs of numbers.
 ///

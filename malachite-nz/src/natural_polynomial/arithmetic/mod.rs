@@ -291,6 +291,9 @@ pub mod mod_power_of_2_sub;
 /// for subtracting one polynomial from another modulo $2^k$ and keeping only their low
 /// coefficients.
 pub mod mod_power_of_2_sub_truncated;
+/// Implementations of [`ModPowerOf2Sum`](malachite_base::num::arithmetic::traits::ModPowerOf2Sum),
+/// for adding up polynomials modulo a power of 2.
+pub mod mod_power_of_2_sum;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
 /// polynomial modulo a number.
@@ -440,6 +443,9 @@ pub mod mod_sub;
 /// one polynomial from another modulo a [`Natural`](crate::natural::Natural) and keeping only their
 /// low coefficients.
 pub mod mod_sub_truncated;
+/// Implementations of [`ModSum`](malachite_base::num::arithmetic::traits::ModSum), for adding up
+/// polynomials modulo a number.
+pub mod mod_sum;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying two polynomials.
 pub mod mul;
