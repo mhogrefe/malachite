@@ -124,7 +124,8 @@ pub mod canonicalize_sign;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
-#[doc(hidden)]
+/// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
+/// which computes the GCD of a number and a vector's elements.
 pub mod content_chained;
 /// Exact division of a vector by a scalar, by implementations of
 /// [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and

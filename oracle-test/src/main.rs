@@ -2101,6 +2101,32 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_fmpz_ui_vec_prod");
     }
+    for demo_name in [
+        "demo_integer_vector_content_chained",
+        "demo_integer_vector_content_chained_ref_ref",
+        "demo_natural_vector_content_chained",
+        "demo_natural_vector_content_chained_val_ref",
+        "demo_natural_vector_content_chained_ref_val",
+        "demo_natural_vector_content_chained_ref_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "_fmpz_vec_content_chained",
+        );
+    }
+    for demo_name in [
+        "demo_unsigned_vector_content_chained",
+        "demo_unsigned_vector_content_chained_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "_fmpz_vec_content_chained",
+        );
+    }
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",

@@ -1196,6 +1196,17 @@ pub trait Content {
     fn content(self) -> Self::Output;
 }
 
+/// Computes the GCD of a given value and the content of another: for a vector, the GCD of the value
+/// and the vector's elements.
+///
+/// This makes it possible to accumulate the common content of several values one at a time,
+/// starting from 0. As with [`Content`], the computation can stop as soon as the GCD reaches 1.
+pub trait ContentChained<T> {
+    type Output;
+
+    fn content_chained(self, x: T) -> Self::Output;
+}
+
 /// Computes the primitive part of a value: the element of the underlying integer lattice, with
 /// coprime coordinates, that the value is the [`Content`] times.
 ///

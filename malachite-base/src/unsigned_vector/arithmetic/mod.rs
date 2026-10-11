@@ -19,6 +19,9 @@ pub mod canonical_primitive_part;
 /// [`ContentAndPrimitivePart`](crate::num::arithmetic::traits::ContentAndPrimitivePart), which
 /// compute the GCD of a vector's elements and the vector divided by it.
 pub mod content;
+/// Implementations of [`ContentChained`](crate::num::arithmetic::traits::ContentChained), which
+/// computes the GCD of a number and a vector's elements.
+pub mod content_chained;
 /// Exact division of a vector by a scalar, by implementations of
 /// [`DivExact`](crate::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](crate::num::arithmetic::traits::DivExactAssign).

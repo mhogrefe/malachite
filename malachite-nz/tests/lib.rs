@@ -928,6 +928,7 @@ pub mod natural_vector {
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
         pub mod content;
+        pub mod content_chained;
         pub mod div_exact;
         pub mod element_product;
         pub mod element_sum;

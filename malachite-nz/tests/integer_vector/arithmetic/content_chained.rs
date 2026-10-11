@@ -7,11 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{Content, DivisibleBy};
+use malachite_base::num::arithmetic::traits::{Content, ContentChained, DivisibleBy, Gcd};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
+use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
+use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_vec_natural_pair_gen;
@@ -78,5 +80,43 @@ fn integers_content_chained_properties() {
         // With `x` zero, this is the content of the polynomial with coefficients `xs`.
         let content = IntegerPolynomial::from_coefficients_asc(xs.clone()).content();
         assert_eq!(integers_content_chained(&xs, &Natural::ZERO), content);
+    });
+}
+
+#[test]
+fn test_content_chained() {
+    let test = |s, x, out| {
+        let v = IntegerVector::from_str(s).unwrap();
+        let x = Natural::from_str(x).unwrap();
+        let g = (&v).content_chained(&x);
+        assert_eq!(g.to_string(), out);
+        assert_eq!((&v).content_chained(x.clone()), g);
+        assert_eq!(v.clone().content_chained(&x), g);
+        assert_eq!(v.content_chained(x), g);
+    };
+    test("()", "6", "6");
+    test("()", "0", "0");
+    test("(0, 0)", "6", "6");
+    test("(-6, 4, -10)", "4", "2");
+    test("(-6, 4, -10)", "0", "2");
+    test("(-1, 6)", "4", "1");
+    test(
+        "(1000000000000000000000, -3000000000000000000000, 0)",
+        "5000000000000000000000",
+        "1000000000000000000000",
+    );
+}
+
+#[test]
+fn content_chained_properties() {
+    integer_vec_natural_pair_gen().test_properties(|(xs, x)| {
+        let v = IntegerVector::from_owned_elements(xs.clone());
+        let g = (&v).content_chained(&x);
+        assert_eq!((&v).content_chained(x.clone()), g);
+        assert_eq!(v.clone().content_chained(&x), g);
+        assert_eq!(v.clone().content_chained(x.clone()), g);
+        assert_eq!(integers_content_chained(&xs, &x), g);
+        // It is the GCD of `x` and the content.
+        assert_eq!((&x).gcd(v.content()), g);
     });
 }

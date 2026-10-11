@@ -85,6 +85,9 @@ documented by git history.
   two facts that FLINT's `_fmpz_vec_max_bits` combines into one signed count. `sum_max_bits` returns
   the bit lengths of the sum of the absolute values of the elements and of the height, like
   `_fmpz_vec_sum_max_bits`.
+- A `ContentChained<T>` trait in `malachite_base::num::arithmetic::traits`, for the GCD of a value
+  and the content of another, which accumulates the common content of several values one at a
+  time.
 - A `WideningElementProduct<T>` trait in `malachite_base::num::arithmetic::traits`, for the product
   of the elements of a vector as a value of a wider type `T`, so that it cannot overflow, with
   `to_widening_element_product` and `into_widening_element_product`.
@@ -287,6 +290,9 @@ documented by git history.
   product of the integers in an iterator as a `Natural`, like FLINT's `_fmpz_ui_vec_prod`. Adjacent
   factors are multiplied as words while their product fits in one, the words are combined in a
   balanced tree, and it stops at a zero factor.
+- `ContentChained` for `UnsignedVector<T>`, `NaturalVector`, `IntegerVector`, and `RationalVector`:
+  the GCD of a given number and the elements, like FLINT's `_fmpz_vec_content_chained`, stopping as
+  soon as it reaches 1.
 - `WideningElementProduct<Natural>` for `UnsignedVector<T>`: the product of the elements as a
   `Natural`, through the `Product` above.
 - `ModPowerOf2ElementProduct` and `ModElementProduct` for `NaturalVector`: the product of the

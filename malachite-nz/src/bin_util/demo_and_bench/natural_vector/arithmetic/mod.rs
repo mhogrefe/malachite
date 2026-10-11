@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     balanced_mod_power_of_2::register(runner);
     canonical_primitive_part::register(runner);
     content::register(runner);
+    content_chained::register(runner);
     div_exact::register(runner);
     element_product::register(runner);
     element_sum::register(runner);
@@ -67,6 +68,7 @@ mod balanced_mod;
 mod balanced_mod_power_of_2;
 mod canonical_primitive_part;
 mod content;
+mod content_chained;
 mod div_exact;
 mod element_product;
 mod element_sum;
