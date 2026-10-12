@@ -1,0 +1,67 @@
+error: use `cmp_product` instead of comparing a product
+  --> $DIR/use_cmp_product.rs:18:13
+   |
+LL |     let _ = &A * &B < C;
+   |             ^^^^^^^^^^^
+   |
+   = help: `T::cmp_product(&a, &b, &c)` decides most comparisons from signs, bit lengths, and the factors, multiplying only when it must
+   = note: `#[deny(use_cmp_product)]` on by default
+
+error: use `cmp_product` instead of comparing a product
+  --> $DIR/use_cmp_product.rs:19:13
+   |
+LL |     let _ = (&A * &B).cmp(&C);
+   |             ^^^^^^^^^^^^^^^^^
+   |
+   = help: `T::cmp_product(&a, &b, &c)` decides most comparisons from signs, bit lengths, and the factors, multiplying only when it must
+
+error: use `cmp_product` instead of comparing a product
+  --> $DIR/use_cmp_product.rs:20:13
+   |
+LL |     let _ = (&A * &B).partial_cmp(&C) == Some(Greater);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `T::cmp_product(&a, &b, &c)` decides most comparisons from signs, bit lengths, and the factors, multiplying only when it must
+
+error: use `cmp_product` instead of comparing a product
+  --> $DIR/use_cmp_product.rs:22:13
+   |
+LL |     let _ = C.cmp(&(&A * &B));
+   |             ^^^^^^^^^^^^^^^^^
+   |
+   = help: the product is on the right, so the comparison is reversed: `T::cmp_product(&a, &b, &c)` compares the product on the left
+
+error: use `cmp_products` instead of comparing a product
+  --> $DIR/use_cmp_product.rs:24:13
+   |
+LL |     let _ = (&A * &B).cmp(&(&C * &D));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `T::cmp_products(&a, &b, &c, &d)` decides most comparisons from signs, bit lengths, and the factors, multiplying only when it must
+
+error: use `cmp_product_neg` instead of comparing a product
+  --> $DIR/use_cmp_product.rs:27:13
+   |
+LL |     let _ = &I * &J < -&K;
+   |             ^^^^^^^^^^^^^
+   |
+   = help: `T::cmp_product_neg(&a, &b, &c)` decides most comparisons from signs, bit lengths, and the factors, multiplying only when it must
+
+error: use `cmp_products_neg` instead of comparing a product
+  --> $DIR/use_cmp_product.rs:28:13
+   |
+LL |     let _ = (&I * &J).cmp(&-(&J * &K));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `T::cmp_products_neg(&a, &b, &c, &d)` decides most comparisons from signs, bit lengths, and the factors, multiplying only when it must
+
+error: use `cmp_product` instead of comparing a product
+  --> $DIR/use_cmp_product.rs:30:13
+   |
+LL |     let _ = &P * &Q > P;
+   |             ^^^^^^^^^^^
+   |
+   = help: `T::cmp_product(&a, &b, &c)` decides most comparisons from signs, bit lengths, and the factors, multiplying only when it must
+
+error: aborting due to 8 previous errors
+

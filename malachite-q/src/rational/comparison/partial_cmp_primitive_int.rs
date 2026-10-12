@@ -14,6 +14,9 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 
+// The screens of `cmp_product` have already been applied above, so the final cross-multiplication
+// is formed directly.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
 #[allow(clippy::unnecessary_wraps)]
 fn partial_cmp_unsigned<T: Copy + One + Ord + Sign + SignificantBits>(
     x: &Rational,
@@ -102,6 +105,9 @@ macro_rules! impl_unsigned {
 }
 apply_to_unsigneds!(impl_unsigned);
 
+// The screens of `cmp_product` have already been applied above, so the final cross-multiplication
+// is formed directly.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
 #[allow(clippy::unnecessary_wraps)]
 fn partial_cmp_signed<
     U: Copy + One + Ord + SignificantBits,

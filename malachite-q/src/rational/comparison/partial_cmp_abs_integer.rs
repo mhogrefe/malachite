@@ -41,6 +41,9 @@ impl PartialOrdAbs<Integer> for Rational {
     ///     Some(Greater)
     /// );
     /// ```
+    // The screens of `cmp_product` have already been applied above, so the final
+    // cross-multiplication is formed directly.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
         // First check whether either value is zero
         let self_sign = self.numerator_ref().sign();

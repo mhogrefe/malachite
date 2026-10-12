@@ -32,7 +32,13 @@ fn natural_to_integer(x: &Natural) -> Integer {
     Integer::from(x)
 }
 
-// Whether x / d equals y, which is whether x equals y * d.
+// Whether x / d equals y, which is whether x equals y * d. The coefficients are scanned until the
+// first mismatch, so at most one comparison per call is between unequal coefficients; the rest are
+// between equal ones, which no screen of `cmp_product` can decide. Measured on the
+// `RationalPolynomial` comparison (2026-10-12): the screens cost up to 17% when every compared
+// coefficient is equal and saved up to 9% when the polynomials differ, so the product is formed
+// directly.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
 fn eq_scaled(x: &Integer, y: Integer, d: &Integer) -> bool {
     *x == y * d
 }
@@ -56,6 +62,12 @@ impl EqTruncated for RationalPolynomial {
     /// See [here](super::eq_truncated#eq_truncated).
     ///
     /// This is equivalent to `fmpq_poly_equal_trunc` from `fmpq_poly/equal_trunc.c`, FLINT 3.6.0.
+    // The coefficients are scanned until the first mismatch, so at most one comparison per call is
+    // between unequal coefficients; the rest are between equal ones, which no screen of
+    // `cmp_product` or `cmp_products` can decide. Measured (2026-10-12): comparing through
+    // `cmp_products` was up to 17% slower when every compared coefficient is equal and up to 9%
+    // faster when the polynomials differ, so the products are formed directly.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
     fn eq_truncated(&self, other: &Self, len: u64) -> bool {
         let xs = self.numerator.coefficients_asc();
         let ys = other.numerator.coefficients_asc();
@@ -224,6 +236,12 @@ impl EqTruncated<IntegerPolynomial> for RationalPolynomial {
     ///
     /// # Examples
     /// See [here](super::eq_truncated#eq_truncated).
+    // The coefficients are scanned until the first mismatch, so at most one comparison per call is
+    // between unequal coefficients; the rest are between equal ones, which no screen of
+    // `cmp_product` or `cmp_products` can decide. Measured (2026-10-12): comparing through
+    // `cmp_products` was up to 17% slower when every compared coefficient is equal and up to 9%
+    // faster when the polynomials differ, so the products are formed directly.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
     fn eq_truncated(&self, other: &IntegerPolynomial, len: u64) -> bool {
         let xs = self.numerator.coefficients_asc();
         let ys = other.coefficients_asc();

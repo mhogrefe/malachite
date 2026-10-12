@@ -165,7 +165,10 @@ pub(crate) fn log_base_helper(x: &Rational, base: &Rational) -> (i64, bool) {
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`. The estimate of
+// the log puts `n` within a factor of `base^2` of `d * base^log`, so the screens of `cmp_product`
+// would rarely decide; the product is formed directly.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
 fn log_base_u64_helper(x: &Rational, base: u64) -> (i64, bool) {
     let n = x.numerator_ref();
     let d = x.denominator_ref();

@@ -57,6 +57,7 @@ mod use_abs_comparison;
 mod use_assign_variant;
 mod use_checked_log_base_2;
 mod use_cmp_double;
+mod use_cmp_product;
 mod use_const_binding;
 mod use_const_block;
 mod use_const_cast;
@@ -583,6 +584,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_assign_variant::USE_ASSIGN_VARIANT,
         use_checked_log_base_2::USE_CHECKED_LOG_BASE_2,
         use_cmp_double::USE_CMP_DOUBLE,
+        use_cmp_product::USE_CMP_PRODUCT,
         use_const_binding::USE_CONST_BINDING,
         use_const_block::USE_CONST_BLOCK,
         use_const_cast::USE_CONST_CAST,
@@ -667,6 +669,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
     lint_store.register_late_pass(|_| Box::new(use_checked_log_base_2::UseCheckedLogBase2));
     lint_store.register_late_pass(|_| Box::new(use_cmp_double::UseCmpDouble));
+    lint_store.register_late_pass(|_| Box::new(use_cmp_product::UseCmpProduct));
     lint_store.register_late_pass(|_| Box::new(use_const_binding::UseConstBinding));
     lint_store.register_late_pass(|_| Box::new(use_const_block::UseConstBlock));
     lint_store.register_late_pass(|_| Box::new(use_const_cast::UseConstCast));

@@ -285,6 +285,17 @@ type must implement the suggested trait, so `Natural` (which has no `SubMulShl`)
 for addition and primitive integers only for the modular forms. Test code and the operations' own
 definitions are exempt.
 
+### `use_cmp_product`
+
+Flags comparing a product of two bignums with a third, or with another product: `a * b` against `c`
+is `T::cmp_product(&a, &b, &c)`, `a * b` against `c * d` is `T::cmp_products(&a, &b, &c, &d)`, and
+against `-c` or `-(c * d)` they are `cmp_product_neg` and `cmp_products_neg`. Covers the comparison
+operators and the comparison methods, with the product on either side; every factor and the compared
+value must have the same type, and the type must implement the suggested trait (`Natural`, `Integer`,
+and `Rational` do). The functions usually decide without forming any product, and never reduce a
+`Rational` product. Where the comparison is almost always too close for that to help, opt out with
+`allow(use_cmp_product)`. Test code and the functions' own definitions are exempt.
+
 ### `use_parity`
 
 Flags parity tests spelled the long way — `x % 2` or `x & 1` compared with 0 or 1 (with `% 2`

@@ -57,8 +57,14 @@ fn main() {
     let pow = 8u64;
     let x = 5u32;
     let y = 6u32;
-    let _ = x.mod_power_of_2_add(x.mod_power_of_2_mul(y, pow).mod_power_of_2_shl(2u64, pow), pow);
-    let _ = x.mod_power_of_2_sub(x.mod_power_of_2_shl(2u64, pow).mod_power_of_2_mul(y, pow), pow);
+    let _ = x.mod_power_of_2_add(
+        x.mod_power_of_2_mul(y, pow).mod_power_of_2_shl(2u64, pow),
+        pow,
+    );
+    let _ = x.mod_power_of_2_sub(
+        x.mod_power_of_2_shl(2u64, pow).mod_power_of_2_mul(y, pow),
+        pow,
+    );
     let _ = x.mod_power_of_2_add_mul(x.mod_power_of_2_shl(2u64, pow), x, pow);
     // Different powers: not flagged.
     let _ = x.mod_power_of_2_add(x.mod_power_of_2_mul(y, 4).mod_power_of_2_shl(2u64, 4), pow);

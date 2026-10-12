@@ -32,6 +32,9 @@ impl PartialOrd<Natural> for Rational {
     /// assert!(Rational::from_signeds(22, 7) > Natural::from(3u32));
     /// assert!(Rational::from_signeds(22, 7) < Natural::from(4u32));
     /// ```
+    // The screens of `cmp_product` have already been applied above, so the final
+    // cross-multiplication is formed directly.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
         // First check signs
         let self_sign = self.sign();

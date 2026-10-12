@@ -40,6 +40,9 @@ impl Ord for Rational {
     /// assert!(Rational::from_str("2/3").unwrap() > Rational::ONE_HALF);
     /// assert!(Rational::from_str("-2/3").unwrap() < Rational::ONE_HALF);
     /// ```
+    // Every screen of `cmp_products` has already been applied above, with an exact log comparison
+    // in place of its bit lengths, so the final cross-multiplication is formed directly.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
     fn cmp(&self, other: &Self) -> Ordering {
         if core::ptr::eq(self, other) {
             return Equal;

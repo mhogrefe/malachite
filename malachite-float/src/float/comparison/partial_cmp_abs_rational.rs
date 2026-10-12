@@ -42,6 +42,9 @@ impl PartialOrdAbs<Rational> for Float {
     /// assert!(Float::NEGATIVE_INFINITY.gt_abs(&Rational::from(-100)));
     /// assert!(Float::from(1.0f64 / 3.0).lt_abs(&Rational::from_unsigneds(1u8, 3)));
     /// ```
+    // The exact exponent comparison above already decides every case the screens of `cmp_product`
+    // could, so the final cross-multiplication is formed directly.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
     fn partial_cmp_abs(&self, other: &Rational) -> Option<Ordering> {
         match (self, other) {
             (float_nan!(), _) => None,

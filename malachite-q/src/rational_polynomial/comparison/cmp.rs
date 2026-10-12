@@ -27,7 +27,10 @@ use malachite_nz::natural::Natural;
 // appears anywhere here, and why the difference of the two polynomials is never formed.
 //
 // The denominators do not change from one coefficient to the next, so everything derived from them
-// is computed once, outside the loop.
+// is computed once, outside the loop. Comparing the coefficients through `cmp_products` was
+// measured slower when the coefficients are equal in value over different denominators
+// (2026-10-12), so the products are formed directly.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(use_cmp_product))]
 pub(crate) fn cmp_coefficients_same_length(
     xs: &[Integer],
     x_den: &Natural,
