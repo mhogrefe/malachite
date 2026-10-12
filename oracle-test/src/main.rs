@@ -919,6 +919,10 @@ const AZURITE_INTEGER_STAGES: &[(&str, &str)] = &[
     ("demo_integer_from_str", "az_int_from_str"),
     ("demo_integer_to_string", "az_int_to_string"),
     ("demo_integer_cmp", "az_int_cmp"),
+    ("demo_integer_cmp_product", "az_int_cmp_product"),
+    ("demo_integer_cmp_product_neg", "az_int_cmp_product"),
+    ("demo_integer_cmp_products", "az_int_cmp_products"),
+    ("demo_integer_cmp_products_neg", "az_int_cmp_products"),
     ("demo_integer_partial_cmp_natural", "az_int_cmp_natural"),
     (
         "demo_integer_partial_cmp_unsigned_u8",

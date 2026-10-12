@@ -98,6 +98,12 @@ documented by git history.
 - `ModPowerOf2ElementSum` and `ModElementSum` traits in `malachite_base::num::arithmetic::traits`,
   for the sum of the elements of a vector modulo $2^k$ or modulo $m$, as a single element, with
   `to_` and `into_` forms. The elements must already be reduced.
+- An `OrdProductsNeg` trait in `malachite_base::num::comparison::traits`, whose associated function
+  `cmp_products_neg(&a, &b, &c, &d)` compares $ab$ with $-cd$ (the sign of $ab + cd$) without
+  computing the negative.
+- An `OrdProductNeg` trait in `malachite_base::num::comparison::traits`, whose associated function
+  `cmp_product_neg(&a, &b, &c)` compares $ab$ with $-c$ (the sign of $ab + c$) without computing
+  the negative.
 - An `OrdProducts` trait in `malachite_base::num::comparison::traits`, whose associated function
   `cmp_products(&a, &b, &c, &d)` compares $ab$ with $cd$ without computing the products unless
   cheaper checks cannot decide.
@@ -319,6 +325,12 @@ documented by git history.
   elements modulo $2^k$ or modulo $m$, as a `Natural`, with the modulus by value or by reference.
   The product of the 0-dimensional vector is 1, reduced, and it returns as soon as the partial
   product is zero.
+- `OrdProducts` and `OrdProductsNeg` for `Integer`: the signs decide every case except two nonzero
+  products of the same sign, which `Natural::cmp_products` decides, following Azurite's AzInt
+  `compareProducts`.
+- `OrdProduct` and `OrdProductNeg` for `Integer`: the signs decide every case except a nonzero product
+  and $c$ of the same sign, which `Natural::cmp_product` decides, following Azurite's AzInt
+  `compareProduct`.
 - `OrdProducts` for `Natural`, deciding by a zero factor, by either pairing of the factors, or by the
   bit lengths before multiplying, following Azurite's `compareProducts`.
 - `OrdProduct` for `Natural`, deciding by a zero or unit factor, a factor at least $c$, or the bit

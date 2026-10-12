@@ -123,6 +123,15 @@ pub trait OrdProduct {
     fn cmp_product(a: &Self, b: &Self, c: &Self) -> Ordering;
 }
 
+/// Compares the product of two numbers with the negative of a third number, without computing the
+/// product unless it is needed and without computing the negative.
+///
+/// `T::cmp_product_neg(&a, &b, &c)` compares $ab$ with $-c$; equivalently, it gives the sign of $ab
+/// + c$.
+pub trait OrdProductNeg {
+    fn cmp_product_neg(a: &Self, b: &Self, c: &Self) -> Ordering;
+}
+
 /// Compares the products of two pairs of numbers, without computing the products unless they are
 /// needed.
 ///
@@ -131,6 +140,15 @@ pub trait OrdProduct {
 /// computed only when they cannot decide.
 pub trait OrdProducts {
     fn cmp_products(a: &Self, b: &Self, c: &Self, d: &Self) -> Ordering;
+}
+
+/// Compares the product of two numbers with the negative of the product of two others, without
+/// computing the products unless they are needed and without computing the negative.
+///
+/// `T::cmp_products_neg(&a, &b, &c, &d)` compares $ab$ with $-cd$; equivalently, it gives the sign
+/// of $ab + cd$.
+pub trait OrdProductsNeg {
+    fn cmp_products_neg(a: &Self, b: &Self, c: &Self, d: &Self) -> Ordering;
 }
 
 /// Compares the absolute values of two numbers.

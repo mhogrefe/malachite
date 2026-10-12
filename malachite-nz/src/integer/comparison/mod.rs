@@ -80,6 +80,15 @@ pub mod cmp_abs_primitive_float;
 /// assert!(123i64.le_abs(&-Integer::from(10u32).pow(12)));
 /// ```
 pub mod cmp_abs_primitive_int;
+/// Implementations of [`OrdProduct`](malachite_base::num::comparison::traits::OrdProduct) and
+/// [`OrdProductNeg`](malachite_base::num::comparison::traits::OrdProductNeg), which compare the
+/// product of two [`Integer`](crate::integer::Integer)s with a third or with its negative.
+pub mod cmp_product;
+/// Implementations of [`OrdProducts`](malachite_base::num::comparison::traits::OrdProducts) and
+/// [`OrdProductsNeg`](malachite_base::num::comparison::traits::OrdProductsNeg), which compare the
+/// products of two pairs of [`Integer`](crate::integer::Integer)s, or one with the negative of the
+/// other.
+pub mod cmp_products;
 /// Equality of the absolute values of two [`Integer`](crate::integer::Integer)s.
 pub mod eq_abs;
 /// Equality of the absolute values of an [`Integer`](crate::integer::Integer) and a
