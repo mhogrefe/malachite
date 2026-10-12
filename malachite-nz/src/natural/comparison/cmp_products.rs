@@ -33,11 +33,11 @@ impl OrdProducts for Natural {
     ///
     /// The products are not computed when one of these decides the comparison:
     /// - a zero factor on either side;
+    /// - the bit lengths: with $s$ the sum of the bit lengths of a pair, $2^{s - 2} \leq ab < 2^s$,
+    ///   so a difference of at least 2 between the two sums decides;
     /// - the pairing of $a$ with $c$ and $b$ with $d$: if both comparisons agree, the products
     ///   compare the same way, and if one is an equality, the other decides;
-    /// - the same for the pairing of $a$ with $d$ and $b$ with $c$;
-    /// - the bit lengths: with $s$ the sum of the bit lengths of a pair, $2^{s - 2} \leq ab < 2^s$,
-    ///   so a difference of at least 2 between the two sums decides.
+    /// - the same for the pairing of $a$ with $d$ and $b$ with $c$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -66,20 +66,19 @@ impl OrdProducts for Natural {
         if left_zero || right_zero {
             return right_zero.cmp(&left_zero);
         }
+        let left_bits = a.significant_bits() + b.significant_bits();
+        let right_bits = c.significant_bits() + d.significant_bits();
+        if right_bits + 2 <= left_bits {
+            return Greater;
+        } else if left_bits + 2 <= right_bits {
+            return Less;
+        }
         if let Some(o) = from_pairing(a.cmp(c), b.cmp(d)) {
             return o;
         }
         if let Some(o) = from_pairing(a.cmp(d), b.cmp(c)) {
             return o;
         }
-        let left_bits = a.significant_bits() + b.significant_bits();
-        let right_bits = c.significant_bits() + d.significant_bits();
-        if right_bits + 2 <= left_bits {
-            Greater
-        } else if left_bits + 2 <= right_bits {
-            Less
-        } else {
-            (a * b).cmp(&(c * d))
-        }
+        (a * b).cmp(&(c * d))
     }
 }

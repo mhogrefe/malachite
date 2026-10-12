@@ -12,12 +12,13 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::bench::bucketers::quadruple_integer_max_bit_bucketer;
-use malachite_nz::test_util::generators::integer_quadruple_gen;
+use malachite_nz::test_util::generators::{integer_quadruple_gen, integer_triple_gen};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_cmp_products);
     register_demo!(runner, demo_integer_cmp_products_neg);
     register_bench!(runner, benchmark_integer_cmp_products_algorithms);
+    register_bench!(runner, benchmark_integer_cmp_products_near_algorithms);
     register_bench!(runner, benchmark_integer_cmp_products_neg_algorithms);
 }
 
@@ -84,6 +85,41 @@ fn benchmark_integer_cmp_products_neg_algorithms(
             }),
             ("multiplying and negating first", &mut |(a, b, c, d)| {
                 no_out!((&a * &b).cmp(&-(&c * &d)));
+            }),
+        ],
+    );
+}
+
+// Quadruples `(a, b, c, (a * b) / c)`, whose products differ by less than `|c|`, so that the
+// screens rarely decide.
+fn benchmark_integer_cmp_products_near_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer::cmp_products(..), near the product",
+        BenchmarkType::Algorithms,
+        integer_triple_gen()
+            .get(gm, config)
+            .filter_map(|(a, b, c)| {
+                if c == 0u32 {
+                    return None;
+                }
+                let d = &a * &b / &c;
+                Some((a, b, c, d))
+            }),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_integer_max_bit_bucketer("a", "b", "c", "d"),
+        &mut [
+            ("default", &mut |(a, b, c, d)| {
+                no_out!(Integer::cmp_products(&a, &b, &c, &d));
+            }),
+            ("multiplying first", &mut |(a, b, c, d)| {
+                no_out!((&a * &b).cmp(&(&c * &d)));
             }),
         ],
     );

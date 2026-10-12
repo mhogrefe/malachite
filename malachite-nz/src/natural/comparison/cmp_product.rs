@@ -23,7 +23,6 @@ impl OrdProduct for Natural {
     /// The product is not computed when one of these decides the comparison:
     /// - a zero factor, or $c = 0$;
     /// - a factor of 1, which leaves a single comparison;
-    /// - a factor that is at least $c$, since the other factor is then at least 2 and $ab \geq 2c$;
     /// - the bit lengths: with $s$ the sum of the bit lengths of $a$ and $b$, $2^{s - 2} \leq ab <
     ///   2^s$, so $ab > c$ if $c$ has at most $s - 2$ bits and $ab < c$ if it has at least $s + 1$.
     ///
@@ -70,7 +69,6 @@ impl OrdProduct for Natural {
             _ if *c == 0u32 => Greater,
             (&Self::ONE, _) => b.cmp(c),
             (_, &Self::ONE) => a.cmp(c),
-            _ if c <= a || c <= b => Greater,
             _ => {
                 let s = a.significant_bits() + b.significant_bits();
                 let c_bits = c.significant_bits();

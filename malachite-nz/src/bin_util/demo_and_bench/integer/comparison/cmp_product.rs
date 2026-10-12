@@ -12,12 +12,13 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::bench::bucketers::triple_integer_max_bit_bucketer;
-use malachite_nz::test_util::generators::integer_triple_gen;
+use malachite_nz::test_util::generators::{integer_pair_gen, integer_triple_gen};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_cmp_product);
     register_demo!(runner, demo_integer_cmp_product_neg);
     register_bench!(runner, benchmark_integer_cmp_product_algorithms);
+    register_bench!(runner, benchmark_integer_cmp_product_near_algorithms);
     register_bench!(runner, benchmark_integer_cmp_product_neg_algorithms);
 }
 
@@ -84,6 +85,35 @@ fn benchmark_integer_cmp_product_neg_algorithms(
             }),
             ("negating, then multiplying", &mut |(a, b, c)| {
                 no_out!((&a * &b).cmp(&-c));
+            }),
+        ],
+    );
+}
+
+// Triples `(a, b, a * b)`, where every screen fails and the product must be formed.
+fn benchmark_integer_cmp_product_near_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer::cmp_product(..), near the product",
+        BenchmarkType::Algorithms,
+        integer_pair_gen().get(gm, config).map(|(a, b)| {
+            let c = &a * &b;
+            (a, b, c)
+        }),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_integer_max_bit_bucketer("a", "b", "c"),
+        &mut [
+            ("default", &mut |(a, b, c)| {
+                no_out!(Integer::cmp_product(&a, &b, &c));
+            }),
+            ("multiplying first", &mut |(a, b, c)| {
+                no_out!((&a * &b).cmp(&c));
             }),
         ],
     );

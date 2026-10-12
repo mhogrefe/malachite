@@ -317,6 +317,8 @@ pub mod rational {
     pub mod comparison {
         pub mod cmp;
         pub mod cmp_abs;
+        pub mod cmp_product;
+        pub mod cmp_products;
         pub mod eq;
         pub mod eq_abs;
         pub mod eq_abs_integer;

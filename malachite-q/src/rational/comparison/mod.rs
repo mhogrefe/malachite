@@ -12,6 +12,14 @@ pub mod cmp;
 /// and [`OrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`) (traits for comparing
 /// the absolute values of numbers by order) for [`Rational`](crate::Rational)s.
 pub mod cmp_abs;
+/// Implementations of [`OrdProduct`](malachite_base::num::comparison::traits::OrdProduct) and
+/// [`OrdProductNeg`](malachite_base::num::comparison::traits::OrdProductNeg), which compare the
+/// product of two [`Rational`](crate::Rational)s with a third or with its negative.
+pub mod cmp_product;
+/// Implementations of [`OrdProducts`](malachite_base::num::comparison::traits::OrdProducts) and
+/// [`OrdProductsNeg`](malachite_base::num::comparison::traits::OrdProductsNeg), which compare the
+/// products of two pairs of [`Rational`](crate::Rational)s, or one with the negative of the other.
+pub mod cmp_products;
 /// Equality of the absolute values of two [`Rational`](crate::Rational)s.
 pub mod eq_abs;
 /// Equality of the absolute values of a [`Rational`](crate::Rational) and an

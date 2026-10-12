@@ -34,7 +34,7 @@ fn test_cmp_product() {
     test("3", "7", "21", Equal);
     test("3", "7", "20", Greater);
     test("3", "7", "22", Less);
-    // - a factor that is at least c
+    // - the bit lengths, with a factor at least c
     test("3", "7", "5", Greater);
     // - the bit lengths
     test("3", "7", "100", Less);

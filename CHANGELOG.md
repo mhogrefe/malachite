@@ -325,6 +325,13 @@ documented by git history.
   elements modulo $2^k$ or modulo $m$, as a `Natural`, with the modulus by value or by reference.
   The product of the 0-dimensional vector is 1, reduced, and it returns as soon as the partial
   product is zero.
+- `OrdProducts` and `OrdProductsNeg` for `Rational`, comparing $wx$ with $yz$ or $-yz$ without
+  forming either product: after the signs, the eight numerator and denominator factors are screened
+  by bit lengths and pairwise comparisons, following Azurite's AzRat `compareProducts`.
+- `OrdProduct` and `OrdProductNeg` for `Rational`, comparing $xy$ with $z$ or $-z$ without reducing
+  a product: after the signs, the six numerator and denominator factors are screened by bit
+  lengths and pairwise comparisons before any multiplication, following Azurite's AzRat
+  `compareProduct`.
 - `OrdProducts` and `OrdProductsNeg` for `Integer`: the signs decide every case except two nonzero
   products of the same sign, which `Natural::cmp_products` decides, following Azurite's AzInt
   `compareProducts`.

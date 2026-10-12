@@ -6,9 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::polynomial::{MulPowerOfX, Polynomial};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::bench::bucketers::pair_rational_polynomial_max_bit_bucketer;
 use malachite_q::test_util::generators::rational_polynomial_pair_gen;
 use malachite_q::test_util::rational_polynomial::comparison::cmp::{
@@ -19,6 +21,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_polynomial_cmp);
 
     register_bench!(runner, benchmark_rational_polynomial_cmp_algorithms);
+    register_bench!(
+        runner,
+        benchmark_rational_polynomial_cmp_equal_but_constant_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_rational_polynomial_cmp_same_degree_algorithms
+    );
 }
 
 fn demo_rational_polynomial_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -51,6 +61,89 @@ fn benchmark_rational_polynomial_cmp_algorithms(
             }),
             ("evaluating the difference", &mut |(p, q)| {
                 no_out!(rational_polynomial_cmp_evaluated(&p, &q));
+            }),
+        ],
+    );
+}
+
+// Pairs `(p, p + c)`, with `c` the constant term of the generated `q`: every coefficient but the
+// constant has the same value on both sides, usually over different denominators, so the comparison
+// works through the whole polynomial.
+fn equal_but_constant_pairs(
+    gm: GenMode,
+    config: &GenConfig,
+) -> impl Iterator<Item = (RationalPolynomial, RationalPolynomial)> {
+    rational_polynomial_pair_gen()
+        .get(gm, config)
+        .map(|(p, q)| {
+            let c = RationalPolynomial::from_coefficients_asc(vec![q.coefficient(0)]);
+            let q = &p + c;
+            (p, q)
+        })
+}
+
+// Pairs of polynomials of the same degree, the lower-degree one of a generated pair multiplied by a
+// power of x, so that the comparison reaches the leading coefficients.
+fn same_degree_pairs(
+    gm: GenMode,
+    config: &GenConfig,
+) -> impl Iterator<Item = (RationalPolynomial, RationalPolynomial)> {
+    rational_polynomial_pair_gen()
+        .get(gm, config)
+        .filter_map(|(p, q)| {
+            let p_degree = p.degree()?;
+            let q_degree = q.degree()?;
+            Some(if p_degree >= q_degree {
+                (p, q.mul_power_of_x(p_degree - q_degree))
+            } else {
+                (p.mul_power_of_x(q_degree - p_degree), q)
+            })
+        })
+}
+
+#[allow(unused_must_use)]
+fn benchmark_rational_polynomial_cmp_equal_but_constant_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "RationalPolynomial.cmp(&RationalPolynomial)",
+        BenchmarkType::Algorithms,
+        equal_but_constant_pairs(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_rational_polynomial_max_bit_bucketer("p", "q"),
+        &mut [
+            ("default", &mut |(p, q)| no_out!(p.cmp(&q))),
+            ("materializing each coefficient", &mut |(p, q)| {
+                no_out!(rational_polynomial_cmp_naive(&p, &q));
+            }),
+        ],
+    );
+}
+
+#[allow(unused_must_use)]
+fn benchmark_rational_polynomial_cmp_same_degree_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "RationalPolynomial.cmp(&RationalPolynomial)",
+        BenchmarkType::Algorithms,
+        same_degree_pairs(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_rational_polynomial_max_bit_bucketer("p", "q"),
+        &mut [
+            ("default", &mut |(p, q)| no_out!(p.cmp(&q))),
+            ("materializing each coefficient", &mut |(p, q)| {
+                no_out!(rational_polynomial_cmp_naive(&p, &q));
             }),
         ],
     );

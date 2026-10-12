@@ -1344,6 +1344,10 @@ const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
         "az_rat_checked_log_base",
     ),
     ("demo_rational_cmp", "az_rat_cmp"),
+    ("demo_rational_cmp_product", "az_rat_cmp_product"),
+    ("demo_rational_cmp_product_neg", "az_rat_cmp_product"),
+    ("demo_rational_cmp_products", "az_rat_cmp_products"),
+    ("demo_rational_cmp_products_neg", "az_rat_cmp_products"),
     ("demo_rational_partial_cmp_natural", "az_rat_cmp_integer"),
     ("demo_rational_partial_cmp_integer", "az_rat_cmp_integer"),
     (
