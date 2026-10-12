@@ -98,6 +98,12 @@ documented by git history.
 - `ModPowerOf2ElementSum` and `ModElementSum` traits in `malachite_base::num::arithmetic::traits`,
   for the sum of the elements of a vector modulo $2^k$ or modulo $m$, as a single element, with
   `to_` and `into_` forms. The elements must already be reduced.
+- An `OrdProducts` trait in `malachite_base::num::comparison::traits`, whose associated function
+  `cmp_products(&a, &b, &c, &d)` compares $ab$ with $cd$ without computing the products unless
+  cheaper checks cannot decide.
+- An `OrdProduct` trait in `malachite_base::num::comparison::traits`, whose associated function
+  `cmp_product(&a, &b, &c)` compares $ab$ with $c$ without computing the product unless cheaper
+  checks cannot decide.
 - `ModPowerOf2Dot` and `ModDot` traits in `malachite_base::num::arithmetic::traits`, for the dot
   product of two vectors modulo $2^k$ or modulo $m$. The elements must already be reduced.
 - A `Dot` trait in `malachite_base::num::arithmetic::traits`, for the dot product of two vectors.
@@ -313,6 +319,10 @@ documented by git history.
   elements modulo $2^k$ or modulo $m$, as a `Natural`, with the modulus by value or by reference.
   The product of the 0-dimensional vector is 1, reduced, and it returns as soon as the partial
   product is zero.
+- `OrdProducts` for `Natural`, deciding by a zero factor, by either pairing of the factors, or by the
+  bit lengths before multiplying, following Azurite's `compareProducts`.
+- `OrdProduct` for `Natural`, deciding by a zero or unit factor, a factor at least $c$, or the bit
+  lengths before multiplying, following Azurite's `compareProduct`.
 - `ModPowerOf2Dot` and `ModDot` for `NaturalVector`, like FLINT's `_fmpz_mod_vec_dot`: word
   arithmetic when the modulus fits in a limb, and otherwise the exact dot product reduced once.
 - `ModPowerOf2ElementSum` and `ModElementSum` for `NaturalVector`: the sum of the elements modulo

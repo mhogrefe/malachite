@@ -11,6 +11,8 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     cmp::register(runner);
     cmp_double::register(runner);
+    cmp_product::register(runner);
+    cmp_products::register(runner);
     eq::register(runner);
     eq_abs_primitive_float::register(runner);
     eq_abs_primitive_int::register(runner);
@@ -25,6 +27,8 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod cmp;
 mod cmp_double;
+mod cmp_product;
+mod cmp_products;
 mod eq;
 mod eq_abs_primitive_float;
 mod eq_abs_primitive_int;

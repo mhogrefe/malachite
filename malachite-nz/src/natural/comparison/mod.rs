@@ -8,6 +8,12 @@
 
 /// Comparison of [`Natural`](crate::natural::Natural)s.
 pub mod cmp;
+/// An implementation of [`OrdProduct`](malachite_base::num::comparison::traits::OrdProduct), which
+/// compares the product of two [`Natural`](crate::natural::Natural)s with a third.
+pub mod cmp_product;
+/// An implementation of [`OrdProducts`](malachite_base::num::comparison::traits::OrdProducts),
+/// which compares the products of two pairs of [`Natural`](crate::natural::Natural)s.
+pub mod cmp_products;
 /// Equality of the absolute values of a [`Natural`](crate::natural::Natural) and a primitive float.
 ///
 /// # eq_abs

@@ -721,6 +721,8 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_cmp", "az_nat_cmp"),
     ("demo_natural_cmp_normalized", "az_nat_cmp_normalized"),
     ("demo_natural_cmp_double", "az_nat_cmp_double"),
+    ("demo_natural_cmp_product", "az_nat_cmp_product"),
+    ("demo_natural_cmp_products", "az_nat_cmp_products"),
     ("demo_natural_sum", "az_nat_sum"),
     ("demo_natural_ref_sum", "az_nat_sum"),
     ("demo_natural_product", "az_nat_product"),

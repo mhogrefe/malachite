@@ -1,0 +1,13 @@
+Natural::cmp_products(&0, &5, &0, &0) = Equal
+Natural::cmp_products(&0, &5, &3, &7) = Less
+Natural::cmp_products(&3, &7, &0, &9) = Greater
+Natural::cmp_products(&3, &7, &3, &7) = Equal
+Natural::cmp_products(&3, &7, &7, &3) = Equal
+Natural::cmp_products(&3, &7, &4, &8) = Less
+Natural::cmp_products(&3, &7, &3, &8) = Less
+Natural::cmp_products(&3, &7, &2, &7) = Greater
+Natural::cmp_products(&3, &7, &4, &5) = Greater
+Natural::cmp_products(&3, &7, &5, &4) = Greater
+Natural::cmp_products(&3, &7, &2, &11) = Less
+Natural::cmp_products(&1000000, &1000000, &999999, &1000001) = Greater
+Natural::cmp_products(&123456789012345678901234567890, &987654321098765432109876543210, &123456789012345678901234567891, &987654321098765432109876543209) = Less

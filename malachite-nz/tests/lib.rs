@@ -600,6 +600,8 @@ pub mod natural {
     pub mod comparison {
         pub mod cmp;
         pub mod cmp_double;
+        pub mod cmp_product;
+        pub mod cmp_products;
         pub mod eq;
         pub mod eq_abs_primitive_float;
         pub mod eq_abs_primitive_int;

@@ -114,6 +114,25 @@ pub trait OrdAbsDouble<Rhs: ?Sized = Self>: PartialOrdAbsDouble<Rhs> {
     fn cmp_abs_double(&self, other: &Rhs) -> Ordering;
 }
 
+/// Compares the product of two numbers with a third number, without computing the product unless it
+/// is needed.
+///
+/// `T::cmp_product(&a, &b, &c)` compares $ab$ with $c$. Most comparisons are decided by cheap
+/// checks, such as comparing bit lengths, and the product is computed only when they cannot decide.
+pub trait OrdProduct {
+    fn cmp_product(a: &Self, b: &Self, c: &Self) -> Ordering;
+}
+
+/// Compares the products of two pairs of numbers, without computing the products unless they are
+/// needed.
+///
+/// `T::cmp_products(&a, &b, &c, &d)` compares $ab$ with $cd$. Most comparisons are decided by cheap
+/// checks, such as comparing the factors pairwise or comparing bit lengths, and the products are
+/// computed only when they cannot decide.
+pub trait OrdProducts {
+    fn cmp_products(a: &Self, b: &Self, c: &Self, d: &Self) -> Ordering;
+}
+
 /// Compares the absolute values of two numbers.
 pub trait OrdAbs: Eq + PartialOrdAbs<Self> {
     fn cmp_abs(&self, other: &Self) -> Ordering;
