@@ -161,6 +161,9 @@ pub mod div_exact;
 /// Implementations of [`Dot`](malachite_base::num::arithmetic::traits::Dot), the dot product of two
 /// vectors.
 pub mod dot;
+/// Implementations of [`DotSign`](malachite_base::num::arithmetic::traits::DotSign), the sign of
+/// the dot product of two vectors.
+pub mod dot_sign;
 /// An implementation of [`ElementLcm`](malachite_base::num::arithmetic::traits::ElementLcm), the
 /// LCM of the elements.
 pub mod element_lcm;

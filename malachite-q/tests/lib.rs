@@ -434,6 +434,7 @@ pub mod rational_vector {
         pub mod content;
         pub mod content_chained;
         pub mod dot;
+        pub mod dot_sign;
         pub mod element_product;
         pub mod element_sum;
         pub mod entrywise_abs;

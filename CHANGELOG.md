@@ -112,6 +112,8 @@ documented by git history.
   checks cannot decide.
 - `ModPowerOf2Dot` and `ModDot` traits in `malachite_base::num::arithmetic::traits`, for the dot
   product of two vectors modulo $2^k$ or modulo $m$. The elements must already be reduced.
+- A `DotSign` trait in `malachite_base::num::arithmetic::traits`, for the sign of the dot product of
+  two vectors, as its ordering against 0, without computing the dot product when it can be avoided.
 - A `Dot` trait in `malachite_base::num::arithmetic::traits`, for the dot product of two vectors.
 - An `ElementLcm` trait in `malachite_base::num::arithmetic::traits`, for the LCM of the elements
   of a vector, with `to_element_lcm` and `into_element_lcm`.
@@ -303,6 +305,12 @@ documented by git history.
   and `IntegerVector`.
 - `Height` and `HeightRef` for `NaturalVector` and `IntegerVector`: the largest absolute value of an
   element, like FLINT's `_fmpz_vec_height`. The height of the 0-dimensional vector is 0.
+- `DotSign` for `IntegerVector`, with as few multiplications as possible: the terms are split by
+  sign, and an empty side, one term on each side (`Natural::cmp_products`), or bit lengths far
+  enough apart decide without any product; otherwise the largest term is weighed against the dot
+  product of the rest with `Integer::cmp_product_neg`.
+- `DotSign` for `NaturalVector`: `Greater` exactly when some coordinate is nonzero in both vectors,
+  found in one pass with no multiplication, following Azurite's `dotSign`.
 - `Dot` for `NaturalVector` and `IntegerVector`, like FLINT's `_fmpz_vec_dot`, summing small products
   in a three-limb accumulator and the rest in limb buffers. The vectors must have the same
   dimension.
@@ -573,6 +581,10 @@ documented by git history.
   `_fmpq_vec_max_height`. The height of the 0-dimensional vector is 0.
 - `ElementProduct` for `RationalVector`: the product of the elements, as a `Rational`, multiplied
   in a balanced tree and stopping at a zero element. The product of the 0-dimensional vector is 1.
+- `DotSign` for `RationalVector`: two-dimensional vectors through `Rational::cmp_products_neg`;
+  otherwise the terms are split by sign, and an empty side, one term on each side, or sizes far
+  enough apart decide without any product; only then are the vectors written as integer numerators
+  over common denominators, whose dot product's sign `IntegerVector::dot_sign` finds.
 - `Dot` for `RationalVector`, like FLINT's `_fmpq_vec_dot`: each vector is written as integer
   numerators over a common denominator, so that one integer dot product and one reduction replace a
   reduction per pair.

@@ -1149,6 +1149,14 @@ pub trait Dot<RHS = Self> {
     fn dot(self, other: RHS) -> Self::Output;
 }
 
+/// Determines the sign of the dot product of two vectors, as the ordering of the dot product
+/// against 0, without computing the dot product when it can be avoided.
+///
+/// The vectors must have the same dimension.
+pub trait DotSign<RHS = Self> {
+    fn dot_sign(self, other: RHS) -> Ordering;
+}
+
 /// Computes the dot product of two vectors modulo $2^k$. The elements must already be reduced
 /// modulo $2^k$.
 pub trait ModPowerOf2Dot<RHS = Self> {

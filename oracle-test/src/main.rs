@@ -723,6 +723,8 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_cmp_double", "az_nat_cmp_double"),
     ("demo_natural_cmp_product", "az_nat_cmp_product"),
     ("demo_natural_cmp_products", "az_nat_cmp_products"),
+    ("demo_natural_vector_dot_sign", "az_nat_dot_sign"),
+    ("demo_natural_vector_dot_sign_ref_ref", "az_nat_dot_sign"),
     ("demo_natural_sum", "az_nat_sum"),
     ("demo_natural_ref_sum", "az_nat_sum"),
     ("demo_natural_product", "az_nat_product"),
@@ -923,6 +925,8 @@ const AZURITE_INTEGER_STAGES: &[(&str, &str)] = &[
     ("demo_integer_cmp_product_neg", "az_int_cmp_product"),
     ("demo_integer_cmp_products", "az_int_cmp_products"),
     ("demo_integer_cmp_products_neg", "az_int_cmp_products"),
+    ("demo_integer_vector_dot_sign", "az_int_dot_sign"),
+    ("demo_integer_vector_dot_sign_ref_ref", "az_int_dot_sign"),
     ("demo_integer_partial_cmp_natural", "az_int_cmp_natural"),
     (
         "demo_integer_partial_cmp_unsigned_u8",
@@ -1348,6 +1352,8 @@ const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
     ("demo_rational_cmp_product_neg", "az_rat_cmp_product"),
     ("demo_rational_cmp_products", "az_rat_cmp_products"),
     ("demo_rational_cmp_products_neg", "az_rat_cmp_products"),
+    ("demo_rational_vector_dot_sign", "az_rat_dot_sign"),
+    ("demo_rational_vector_dot_sign_ref_ref", "az_rat_dot_sign"),
     ("demo_rational_partial_cmp_natural", "az_rat_cmp_integer"),
     ("demo_rational_partial_cmp_integer", "az_rat_cmp_integer"),
     (

@@ -1,0 +1,9 @@
+().dot_sign(()) = Equal
+(0, 0, 0).dot_sign((1, 2, 3)) = Equal
+(1, 0, 3).dot_sign((0, 5, 0)) = Equal
+(1, 0, 3).dot_sign((0, 5, 7)) = Greater
+(0, 0, 0, 2).dot_sign((0, 0, 0, 2)) = Greater
+(18446744073709551616, 0).dot_sign((0, 18446744073709551616)) = Equal
+(18446744073709551616, 0).dot_sign((1, 18446744073709551616)) = Greater
+(5).dot_sign((3)) = Greater
+(0).dot_sign((3)) = Equal
