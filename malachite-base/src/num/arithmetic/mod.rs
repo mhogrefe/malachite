@@ -1735,6 +1735,31 @@ pub mod log_base_2;
 /// assert_eq!(0.0625f32.checked_log_base_power_of_2(2), Some(-2));
 /// ```
 pub mod log_base_power_of_2;
+/// [`ModAbsSquared`](traits::ModAbsSquared) and
+/// [`ModAbsSquaredAssign`](traits::ModAbsSquaredAssign), traits for computing the squared absolute
+/// value of a number modulo another number, which for an unsigned number is its square.
+///
+/// # mod_abs_squared
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModAbsSquared;
+///
+/// assert_eq!(2u8.mod_abs_squared(10), 4);
+/// assert_eq!(100u32.mod_abs_squared(497), 60);
+/// ```
+///
+/// # mod_abs_squared_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModAbsSquaredAssign;
+///
+/// let mut n = 2u8;
+/// n.mod_abs_squared_assign(10);
+/// assert_eq!(n, 4);
+///
+/// let mut n = 100u32;
+/// n.mod_abs_squared_assign(497);
+/// assert_eq!(n, 60);
+/// ```
+pub mod mod_abs_squared;
 /// [`ModAdd`](traits::ModAdd) and [`ModAddAssign`](traits::ModAddAssign), traits for adding two
 /// numbers modulo another number.
 ///
@@ -2422,6 +2447,31 @@ pub mod mod_pow;
 /// ```
 #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mod_power_of_2;
+/// [`ModPowerOf2AbsSquared`](traits::ModPowerOf2AbsSquared) and
+/// [`ModPowerOf2AbsSquaredAssign`](traits::ModPowerOf2AbsSquaredAssign), traits for computing the
+/// squared absolute value of a number modulo $2^k$, which for an unsigned number is its square.
+///
+/// # mod_power_of_2_abs_squared
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2AbsSquared;
+///
+/// assert_eq!(5u8.mod_power_of_2_abs_squared(3), 1);
+/// assert_eq!(100u32.mod_power_of_2_abs_squared(8), 16);
+/// ```
+///
+/// # mod_power_of_2_abs_squared_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2AbsSquaredAssign;
+///
+/// let mut n = 5u8;
+/// n.mod_power_of_2_abs_squared_assign(3);
+/// assert_eq!(n, 1);
+///
+/// let mut n = 100u32;
+/// n.mod_power_of_2_abs_squared_assign(8);
+/// assert_eq!(n, 16);
+/// ```
+pub mod mod_power_of_2_abs_squared;
 /// [`ModPowerOf2Add`](traits::ModPowerOf2Add) and
 /// [`ModPowerOf2AddAssign`](traits::ModPowerOf2AddAssign), traits for adding two numbers modulo
 /// $2^k$.
@@ -2879,6 +2929,19 @@ pub mod mod_shl;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_shr;
+/// [`ModSqrt`](traits::ModSqrt), a trait for computing a square root of a number modulo another
+/// number.
+///
+/// # mod_sqrt
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModSqrt;
+///
+/// assert_eq!(4u32.mod_sqrt(5), Some(2));
+/// assert_eq!(2u32.mod_sqrt(3), None);
+/// assert_eq!(12909u64.mod_sqrt(65537), Some(50618));
+/// assert_eq!(3u16.mod_sqrt(611), Some(183));
+/// ```
+pub mod mod_sqrt;
 /// Traits for squaring a number modulo another number.
 ///
 /// The traits are [`ModSquare`](traits::ModSquare), [`ModSquareAssign`](traits::ModSquareAssign),
@@ -2935,19 +2998,6 @@ pub mod mod_shr;
 /// x.mod_square_precomputed_assign(497, &data);
 /// assert_eq!(x, 43);
 /// ```
-/// [`ModSqrt`](traits::ModSqrt), a trait for computing a square root of a number modulo another
-/// number.
-///
-/// # mod_sqrt
-/// ```
-/// use malachite_base::num::arithmetic::traits::ModSqrt;
-///
-/// assert_eq!(4u32.mod_sqrt(5), Some(2));
-/// assert_eq!(2u32.mod_sqrt(3), None);
-/// assert_eq!(12909u64.mod_sqrt(65537), Some(50618));
-/// assert_eq!(3u16.mod_sqrt(611), Some(183));
-/// ```
-pub mod mod_sqrt;
 pub mod mod_square;
 /// [`ModSub`](traits::ModSub) and [`ModSubAssign`](traits::ModSubAssign), traits for subtracting
 /// two numbers modulo another number.

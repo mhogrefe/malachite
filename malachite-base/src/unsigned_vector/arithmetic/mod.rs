@@ -190,6 +190,9 @@ pub mod entrywise_shr_round;
 /// An implementation of [`Height`](crate::num::arithmetic::traits::Height), the largest height of
 /// any element.
 pub mod height;
+/// Implementations of [`ModAbsSquared`](crate::num::arithmetic::traits::ModAbsSquared), the squared
+/// norm of a vector modulo a number.
+pub mod mod_abs_squared;
 /// Implementations of [`ModAdd`](crate::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding vectors modulo a
 /// number.
@@ -231,6 +234,10 @@ pub mod mod_op;
 /// [`ModPowerOf2Assign`](crate::num::arithmetic::traits::ModPowerOf2Assign), which reduce every
 /// element of a vector modulo a power of 2.
 pub mod mod_power_of_2;
+/// Implementations of
+/// [`ModPowerOf2AbsSquared`](crate::num::arithmetic::traits::ModPowerOf2AbsSquared), the squared
+/// norm of a vector modulo a power of 2.
+pub mod mod_power_of_2_abs_squared;
 /// Implementations of [`ModPowerOf2Add`](crate::num::arithmetic::traits::ModPowerOf2Add) and
 /// [`ModPowerOf2AddAssign`](crate::num::arithmetic::traits::ModPowerOf2AddAssign), for adding
 /// vectors modulo a power of 2.

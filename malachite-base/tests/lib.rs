@@ -303,6 +303,7 @@ pub mod num {
         pub mod log_base;
         pub mod log_base_2;
         pub mod log_base_power_of_2;
+        pub mod mod_abs_squared;
         pub mod mod_add;
         pub mod mod_add_mul;
         pub mod mod_add_mul_shl;
@@ -316,6 +317,7 @@ pub mod num {
         pub mod mod_op;
         pub mod mod_pow;
         pub mod mod_power_of_2;
+        pub mod mod_power_of_2_abs_squared;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_add_mul_shl;
@@ -996,6 +998,7 @@ pub mod unsigned_vector {
         pub mod entrywise_div_round;
         pub mod entrywise_shr_round;
         pub mod height;
+        pub mod mod_abs_squared;
         pub mod mod_add;
         pub mod mod_add_mul;
         pub mod mod_add_mul_shl;
@@ -1007,6 +1010,7 @@ pub mod unsigned_vector {
         pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_2;
+        pub mod mod_power_of_2_abs_squared;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_add_mul_shl;

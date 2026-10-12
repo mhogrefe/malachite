@@ -187,6 +187,10 @@ pub mod log_base_2;
 /// [`CeilingLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CeilingLogBasePowerOf2), and
 /// [`CheckedLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2).
 pub mod log_base_power_of_2;
+/// Implementations of [`ModAbsSquared`](malachite_base::num::arithmetic::traits::ModAbsSquared) and
+/// [`ModAbsSquaredAssign`](malachite_base::num::arithmetic::traits::ModAbsSquaredAssign), traits
+/// for computing the squared absolute value of a number modulo another number.
+pub mod mod_abs_squared;
 /// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), traits for adding two
 /// numbers modulo another number.
@@ -270,6 +274,12 @@ pub mod mod_pow;
 /// the usual relation $x = q2^k + r$ to $x = q2^k - r$.
 #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod mod_power_of_2;
+/// Implementations of
+/// [`ModPowerOf2AbsSquared`](malachite_base::num::arithmetic::traits::ModPowerOf2AbsSquared) and
+/// [`ModPowerOf2AbsSquaredAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2AbsSquaredAssign), traits for computing the
+/// squared absolute value of a number modulo $2^k$.
+pub mod mod_power_of_2_abs_squared;
 /// Implementations of [`ModPowerOf2Add`](malachite_base::num::arithmetic::traits::ModPowerOf2Add)
 /// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign),
 /// traits for adding two numbers modulo $2^k$.

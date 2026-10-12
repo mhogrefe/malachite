@@ -13,10 +13,11 @@ use crate::num::arithmetic::traits::{
     CheckedLogBase2, CheckedLogBasePowerOf2, CheckedLucasNumber, CheckedMultifactorial,
     CheckedNextPowerOf2, CheckedPrimorial, CheckedSubfactorial, CoprimeWith, DoubleFactorial,
     ExtendedGcd, Factorial, Fibonacci, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, Gcd,
-    GcdAssign, Lcm, LcmAssign, LucasNumber, ModAdd, ModAddAssign, ModAddMul, ModAddMulAssign,
-    ModAddMulShl, ModAddMulShlAssign, ModInverse, ModIsReduced, ModMul, ModMulAssign,
-    ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow, ModPowAssign,
-    ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign,
+    GcdAssign, Lcm, LcmAssign, LucasNumber, ModAbsSquared, ModAbsSquaredAssign, ModAdd,
+    ModAddAssign, ModAddMul, ModAddMulAssign, ModAddMulShl, ModAddMulShlAssign, ModInverse,
+    ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg,
+    ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2,
+    ModPowerOf2AbsSquared, ModPowerOf2AbsSquaredAssign, ModPowerOf2Add, ModPowerOf2AddAssign,
     ModPowerOf2AddMul, ModPowerOf2AddMulAssign, ModPowerOf2AddMulShl, ModPowerOf2AddMulShlAssign,
     ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg,
     ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Product, ModPowerOf2Shl,
@@ -176,12 +177,16 @@ pub trait PrimitiveUnsigned:
     + ModPowerOf2ShrAssign<i128>
     + ModPowerOf2ShrAssign<isize>
     + ModPowerOf2Sqrt<Output = Self>
+    + ModPowerOf2AbsSquared<Output = Self>
+    + ModPowerOf2AbsSquaredAssign
     + ModPowerOf2Square<Output = Self>
     + ModPowerOf2SquareAssign
     + ModPowerOf2Sub<Self, Output = Self>
     + ModPowerOf2SubAssign<Self>
     + ModPowPrecomputed<u64, Self, Output = Self>
     + ModPowPrecomputedAssign<u64, Self>
+    + ModAbsSquared<Self, Output = Self>
+    + ModAbsSquaredAssign<Self>
     + ModSquare<Self, Output = Self>
     + ModSquareAssign<Self>
     + ModSquarePrecomputed<u64, Self, Output = Self>

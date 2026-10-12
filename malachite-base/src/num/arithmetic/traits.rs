@@ -2431,6 +2431,23 @@ pub trait ModPowerOf2SquareAssign {
     fn mod_power_of_2_square_assign(&mut self, pow: u64);
 }
 
+/// Computes the squared absolute value of a number modulo $2^k$. The input must be already reduced
+/// modulo $2^k$.
+///
+/// For a real number this is its square modulo $2^k$; the trait exists for the types where it is
+/// not, such as complex numbers and vectors, for which it is the reduced sum of squares.
+pub trait ModPowerOf2AbsSquared {
+    type Output;
+
+    fn mod_power_of_2_abs_squared(self, pow: u64) -> Self::Output;
+}
+
+/// Replaces a number with its squared absolute value modulo $2^k$. The input must be already
+/// reduced modulo $2^k$.
+pub trait ModPowerOf2AbsSquaredAssign {
+    fn mod_power_of_2_abs_squared_assign(&mut self, pow: u64);
+}
+
 /// Subtracts two numbers modulo $2^k$. The inputs must be already reduced modulo $2^k$.
 pub trait ModPowerOf2Sub<RHS = Self> {
     type Output;
@@ -2589,6 +2606,23 @@ pub trait ModSquare<M = Self> {
 /// $m$.
 pub trait ModSquareAssign<M = Self> {
     fn mod_square_assign(&mut self, m: M);
+}
+
+/// Computes the squared absolute value of a number modulo another number $m$. The input must be
+/// already reduced modulo $m$.
+///
+/// For a real number this is its square modulo $m$; the trait exists for the types where it is not,
+/// such as complex numbers and vectors, for which it is the reduced sum of squares.
+pub trait ModAbsSquared<M = Self> {
+    type Output;
+
+    fn mod_abs_squared(self, m: M) -> Self::Output;
+}
+
+/// Replaces a number with its squared absolute value modulo another number $m$. The input must be
+/// already reduced modulo $m$.
+pub trait ModAbsSquaredAssign<M = Self> {
+    fn mod_abs_squared_assign(&mut self, m: M);
 }
 
 /// Squares a number modulo another number $m$. The input must be already reduced modulo $m$.

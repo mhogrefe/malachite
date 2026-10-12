@@ -374,6 +374,9 @@ pub mod height;
 /// An implementation of [`L1Norm`](malachite_base::num::arithmetic::traits::L1Norm), the sum of the
 /// absolute values of the elements.
 pub mod l1_norm;
+/// Implementations of [`ModAbsSquared`](malachite_base::num::arithmetic::traits::ModAbsSquared),
+/// the squared norm of a vector modulo a number.
+pub mod mod_abs_squared;
 /// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding vectors
 /// modulo a number.
@@ -416,6 +419,10 @@ pub mod mod_op;
 /// [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign), which reduce
 /// every element of a vector modulo a power of 2.
 pub mod mod_power_of_2;
+/// Implementations of
+/// [`ModPowerOf2AbsSquared`](malachite_base::num::arithmetic::traits::ModPowerOf2AbsSquared), the
+/// squared norm of a vector modulo a power of 2.
+pub mod mod_power_of_2_abs_squared;
 /// Implementations of [`ModPowerOf2Add`](malachite_base::num::arithmetic::traits::ModPowerOf2Add)
 /// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign), for
 /// adding vectors modulo a power of 2.

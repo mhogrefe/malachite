@@ -46,6 +46,10 @@ documented by git history.
 - `PrimitiveUnsigned` now requires `ModAddMul`, `ModAddMulAssign`, `ModSubMul`, and
   `ModSubMulAssign`, as it already required `ModMul`. A type outside Malachite that implements
   `PrimitiveUnsigned` must now implement them too.
+- `PrimitiveUnsigned` now requires `ModPowerOf2AbsSquared<Output = Self>`,
+  `ModPowerOf2AbsSquaredAssign`, `ModAbsSquared<Self, Output = Self>`, and
+  `ModAbsSquaredAssign<Self>`. A type outside Malachite that implements `PrimitiveUnsigned` must now
+  implement them too.
 - `PrimitiveUnsigned` now requires `ModProduct<Self, Self>` and `for<'a> ModProduct<&'a Self, Self>`.
   A type outside Malachite that implements `PrimitiveUnsigned` must now implement them too.
 - `PrimitiveUnsigned` now requires `ModPowerOf2Product` and `for<'a> ModPowerOf2Product<&'a Self>`.
@@ -110,6 +114,10 @@ documented by git history.
 - An `OrdProduct` trait in `malachite_base::num::comparison::traits`, whose associated function
   `cmp_product(&a, &b, &c)` compares $ab$ with $c$ without computing the product unless cheaper
   checks cannot decide.
+- `ModPowerOf2AbsSquared`, `ModPowerOf2AbsSquaredAssign`, `ModAbsSquared`, and `ModAbsSquaredAssign`
+  traits in `malachite_base::num::arithmetic::traits`, for the squared absolute value modulo $2^k$
+  or modulo $m$, implemented for every primitive unsigned type. For a real number this is the
+  modular square; the traits are for types where it is not, such as vectors.
 - `ModPowerOf2Dot` and `ModDot` traits in `malachite_base::num::arithmetic::traits`, for the dot
   product of two vectors modulo $2^k$ or modulo $m$. The elements must already be reduced.
 - A `DotSign` trait in `malachite_base::num::arithmetic::traits`, for the sign of the dot product of
@@ -256,6 +264,8 @@ documented by git history.
 - `ModPowerOf2ElementProduct` and `ModElementProduct` for `UnsignedVector<T>`: the product of the
   elements modulo $2^k$ or modulo $m$, as a `T`. The product of the 0-dimensional vector is 1,
   reduced, and it returns as soon as the partial product is zero.
+- `ModPowerOf2AbsSquared` and `ModAbsSquared` for `UnsignedVector<T>`: the squared norm modulo $2^k$
+  or modulo $m$, computed as the modular dot product of the vector with itself.
 - `ModPowerOf2Dot` and `ModDot` for `UnsignedVector<T>`: the dot product modulo $2^k$ (a wrapping
   sum of wrapping products, masked once) or modulo $m$ (like FLINT's `_nmod_vec_dot`, the products
   summed exactly in one to three words and reduced once).
@@ -353,8 +363,12 @@ documented by git history.
   `compareProduct`.
 - `OrdProducts` for `Natural`, deciding by a zero factor, by either pairing of the factors, or by the
   bit lengths before multiplying, following Azurite's `compareProducts`.
+- `ModPowerOf2AbsSquared`, `ModPowerOf2AbsSquaredAssign`, `ModAbsSquared`, and `ModAbsSquaredAssign`
+  for `Natural`, which are the modular squares.
 - `OrdProduct` for `Natural`, deciding by a zero or unit factor, a factor at least $c$, or the bit
   lengths before multiplying, following Azurite's `compareProduct`.
+- `ModPowerOf2AbsSquared` and `ModAbsSquared` for `NaturalVector`: the squared norm modulo $2^k$ or
+  modulo $m$, computed as the modular dot product of the vector with itself.
 - `ModPowerOf2Dot` and `ModDot` for `NaturalVector`, like FLINT's `_fmpz_mod_vec_dot`: word
   arithmetic when the modulus fits in a limb, and otherwise the exact dot product reduced once.
 - `ModPowerOf2ElementSum` and `ModElementSum` for `NaturalVector`: the sum of the elements modulo
