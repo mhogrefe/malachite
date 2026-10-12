@@ -11,12 +11,10 @@ use crate::integer::exhaustive::{IntegerUpDown, exhaustive_integers};
 use crate::integer_vector::IntegerVector;
 use alloc::vec::Vec;
 use core::iter::{Chain, Once};
-use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
-use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
 use malachite_base::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs_fixed_length_from_single,
-    exhaustive_vecs_with_index_generator,
+    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs,
+    exhaustive_vecs_fixed_length_from_single,
 };
 
 /// Generates [`IntegerVector`]s from an iterator of [`Vec`]s of [`Integer`]s.
@@ -39,11 +37,9 @@ impl<I: Iterator<Item = Vec<Integer>>> Iterator for ExhaustiveIntegerVectors<I> 
 ///
 /// Every vector, of every dimension, is generated once, the 0-dimensional vector first.
 ///
-/// The dimensions grow as the cube root of the iteration number, as the degrees do in
-/// [`exhaustive_integer_polynomials`](
+/// The dimensions grow logarithmically, as the degrees do in [`exhaustive_integer_polynomials`](
 /// crate::integer_polynomial::exhaustive::exhaustive_integer_polynomials): dimension $d$ is first
-/// reached after $O(d^3)$ outputs, which is slow enough to leave room for the elements and fast
-/// enough that low-dimensional vectors are not most of what comes out.
+/// reached after $O(2^d)$ outputs.
 ///
 /// The output length is infinite.
 ///
@@ -62,27 +58,15 @@ impl<I: Iterator<Item = Vec<Integer>>> Iterator for ExhaustiveIntegerVectors<I> 
 ///
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_integer_vectors(), 20),
-///     "[(), (0), (1), (0, 0), (-1), (0, 1), (2), (1, 0), (0, 0, 0), (0, 0, 0, 0), (0, 0, 1), \
-///     (0, 0, 0, 1), (0, 1, 0), (0, 0, 1, 0), (0, 1, 1), (0, 0, 1, 1), (-2), (1, 1), (3), \
-///     (0, -1), ...]"
+///     "[(), (0), (1), (0, 0, 0), (-1), (0, 0), (2), (0, 0, 0, 0), (-2), (0, 1), (3), (0, 0, 1), \
+///     (-3), (1, 0), (4), (0, 0, 0, 0, 0), (-4), (1, 1), (5), (0, 1, 0), ...]"
 /// );
 /// ```
 #[inline]
 pub fn exhaustive_integer_vectors() -> ExhaustiveIntegerVectors<
-    ExhaustiveVecs<
-        Integer,
-        PrimitiveIntIncreasingRange<u64>,
-        Chain<Once<Integer>, IntegerUpDown>,
-        BitDistributorSequence,
-    >,
+    ExhaustiveVecs<Integer, PrimitiveIntIncreasingRange<u64>, Chain<Once<Integer>, IntegerUpDown>>,
 > {
-    ExhaustiveIntegerVectors(exhaustive_vecs_with_index_generator(
-        exhaustive_integers(),
-        bit_distributor_sequence(
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-        ),
-    ))
+    ExhaustiveIntegerVectors(exhaustive_vecs(exhaustive_integers()))
 }
 
 /// Generates all [`IntegerVector`]s of a given dimension.

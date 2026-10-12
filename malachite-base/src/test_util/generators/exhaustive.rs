@@ -6925,17 +6925,14 @@ impl<T> ExhaustiveDependentPairsYsGenerator<u64, T, It<T>> for TuplesByDimension
 }
 
 // Every tuple that `tuples_with_dimension` gives for some dimension, each exactly once. The
-// dimensions are selected the way the exhaustive vector generators select them, by a
-// bit-distributor sequence, so that dimension d is first reached after O(d^3) outputs.
+// dimensions are selected the way the exhaustive vector generators select them, by the ruler
+// sequence.
 pub fn exhaustive_tuples_by_dimension<T: 'static>(
     tuples_with_dimension: fn(u64) -> It<T>,
 ) -> It<T> {
     Box::new(
         exhaustive_dependent_pairs(
-            bit_distributor_sequence(
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(2),
-            ),
+            ruler_sequence(),
             exhaustive_unsigneds::<u64>(),
             TuplesByDimensionGenerator {
                 tuples_with_dimension,

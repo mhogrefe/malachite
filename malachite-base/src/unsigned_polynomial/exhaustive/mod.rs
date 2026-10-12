@@ -6,19 +6,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::exhaustive::{
     PrimitiveIntIncreasingRange, exhaustive_positive_primitive_ints, exhaustive_unsigneds,
     primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
 };
-use crate::num::iterators::bit_distributor_sequence;
 use crate::polynomial::Polynomial;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast,
+    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
     exhaustive_vecs_with_last_fixed_length, exhaustive_vecs_with_last_length_inclusive_range,
-    exhaustive_vecs_with_last_min_length, exhaustive_vecs_with_last_with_index_generator,
+    exhaustive_vecs_with_last_min_length,
 };
 
 /// Generates all [`UnsignedPolynomial`]s with coefficients from one iterator and leading
@@ -65,9 +63,8 @@ pub type ExhaustiveUnsignedPolynomialsFromUnsigneds<T> = ExhaustiveUnsignedPolyn
 ///
 /// The leading coefficient grows at the same rate as the others, which is what makes the output
 /// balanced: drawing a polynomial's lower coefficients and its leading one separately and pairing
-/// them would grow the two apart. Degree $d$ is first reached after $O(d^3)$ outputs, which is slow
-/// enough to leave room for the coefficients and fast enough that constants are not most of what
-/// comes out.
+/// them would grow the two apart. The degrees grow logarithmically: degree $d$ is first reached
+/// after $O(2^d)$ outputs.
 ///
 /// The zero polynomial has no coefficients at all, and so takes nothing from either iterator; it is
 /// generated once, first.
@@ -98,7 +95,7 @@ pub type ExhaustiveUnsignedPolynomialsFromUnsigneds<T> = ExhaustiveUnsignedPolyn
 ///         ),
 ///         10
 ///     ),
-///     "[0, 1, 2, x, 3, 2*x, 4, x+1, x^2, x^3, ...]"
+///     "[0, 1, 2, x^2, 3, x, 4, x^3, 5, 2*x, ...]"
 /// );
 ///
 /// // Only the leading coefficient is restricted, so the lower ones may be anything `xs` gives.
@@ -110,7 +107,7 @@ pub type ExhaustiveUnsignedPolynomialsFromUnsigneds<T> = ExhaustiveUnsignedPolyn
 ///         ),
 ///         10
 ///     ),
-///     "[0, 1, 2, x+1, 3, 2*x+1, 4, x+2, x^2+x+1, x^3+x^2+x+1, ...]"
+///     "[0, 1, 2, x^2+x+1, 3, x+1, 4, x^3+x^2+x+1, 5, 2*x+1, ...]"
 /// );
 /// ```
 #[inline]
@@ -122,14 +119,7 @@ pub fn exhaustive_unsigned_polynomials_from_iterators<
     xs: I,
     ys: J,
 ) -> ExhaustiveUnsignedPolynomials<T, I, J> {
-    ExhaustiveUnsignedPolynomials(exhaustive_vecs_with_last_with_index_generator(
-        xs,
-        ys,
-        bit_distributor_sequence(
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-        ),
-    ))
+    ExhaustiveUnsignedPolynomials(exhaustive_vecs_with_last(xs, ys))
 }
 
 /// Generates all [`UnsignedPolynomial`]s.
@@ -138,7 +128,7 @@ pub fn exhaustive_unsigned_polynomials_from_iterators<
 /// coefficient and every positive one as a leading coefficient, which between them are every
 /// polynomial there is.
 ///
-/// The output length is infinite, and degree $d$ is first reached after $O(d^3)$ outputs.
+/// The output length is infinite, and degree $d$ is first reached after $O(2^d)$ outputs.
 ///
 /// # Worst-case complexity per iteration
 /// $T(i) = O(d + \ell)$
@@ -155,8 +145,7 @@ pub fn exhaustive_unsigned_polynomials_from_iterators<
 ///
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_unsigned_polynomials::<u64>(), 20),
-///     "[0, 1, 2, x, 3, 2*x, 4, x+1, x^2, x^3, 2*x^2, 2*x^3, x^2+x, x^3+x^2, 2*x^2+x, \
-///     2*x^3+x^2, 5, 2*x+1, 6, 3*x, ...]"
+///     "[0, 1, 2, x^2, 3, x, 4, x^3, 5, 2*x, 6, 2*x^2, 7, x+1, 8, x^4, 9, 2*x+1, 10, x^2+x, ...]"
 /// );
 /// ```
 #[inline]
@@ -236,7 +225,7 @@ pub fn exhaustive_unsigned_polynomials_with_degree<T: PrimitiveUnsigned>(
 /// The zero polynomial is never generated: it has no degree at all, so it is not of any degree at
 /// least `min_degree`. Every other polynomial of degree at least `min_degree` is generated once.
 ///
-/// The output length is infinite, and degree $d$ is first reached after $O(d^3)$ outputs.
+/// The output length is infinite, and degree $d$ is first reached after $O(2^d)$ outputs.
 ///
 /// # Worst-case complexity per iteration
 /// $T(i) = O(d + \ell)$
@@ -253,11 +242,11 @@ pub fn exhaustive_unsigned_polynomials_with_degree<T: PrimitiveUnsigned>(
 ///
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_unsigned_polynomials_min_degree::<u64>(0), 10),
-///     "[1, x, 2, 2*x, 3, x+1, 4, 2*x+1, x^2, x^3, ...]"
+///     "[1, x, 2, x^2, 3, 2*x, 4, x^3, 5, x+1, ...]"
 /// );
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_unsigned_polynomials_min_degree::<u64>(2), 10),
-///     "[x^2, x^3, 2*x^2, 2*x^3, x^2+x, x^3+x^2, 2*x^2+x, 2*x^3+x^2, x^4, x^5, ...]"
+///     "[x^2, x^3, 2*x^2, x^4, x^2+x, 2*x^3, 2*x^2+x, x^5, x^2+1, x^3+x^2, ...]"
 /// );
 /// ```
 #[inline]
@@ -295,7 +284,7 @@ pub fn exhaustive_unsigned_polynomials_min_degree<T: PrimitiveUnsigned>(
 ///         exhaustive_unsigned_polynomials_degree_range::<u64>(1, 3),
 ///         10
 ///     ),
-///     "[x, x^2, 2*x, 2*x^2, x+1, x^2+x, 2*x+1, 2*x^2+x, 3*x, x^2+1, ...]"
+///     "[x, x^2, 2*x, x+1, 2*x+1, 2*x^2, 3*x, x^2+x, 4*x, 2*x^2+x, ...]"
 /// );
 /// assert_eq!(
 ///     prefix_to_string(
@@ -343,7 +332,7 @@ pub fn exhaustive_unsigned_polynomials_degree_range<T: PrimitiveUnsigned>(
 ///         exhaustive_unsigned_polynomials_degree_inclusive_range::<u64>(1, 2),
 ///         10
 ///     ),
-///     "[x, x^2, 2*x, 2*x^2, x+1, x^2+x, 2*x+1, 2*x^2+x, 3*x, x^2+1, ...]"
+///     "[x, x^2, 2*x, x+1, 2*x+1, 2*x^2, 3*x, x^2+x, 4*x, 2*x^2+x, ...]"
 /// );
 /// assert_eq!(
 ///     prefix_to_string(
@@ -412,7 +401,7 @@ pub type ExhaustiveUnsignedPolynomialsReducedModPowerOf2<T> = ExhaustiveUnsigned
 ///         exhaustive_unsigned_polynomials_reduced_mod_power_of_2::<u64>(2),
 ///         10
 ///     ),
-///     "[0, 1, 2, x, 3, 2*x, x+1, x^2, x^3, x^4, ...]"
+///     "[0, 1, 2, x^2, 3, x, 2*x, x^4, x+1, 2*x^2, ...]"
 /// );
 ///
 /// // Modulo 2, the coefficients are all 0 or 1, so these are the polynomials over GF(2).
@@ -421,7 +410,7 @@ pub type ExhaustiveUnsignedPolynomialsReducedModPowerOf2<T> = ExhaustiveUnsigned
 ///         exhaustive_unsigned_polynomials_reduced_mod_power_of_2::<u64>(1),
 ///         10
 ///     ),
-///     "[0, 1, x, x^2, x+1, x^2+x, x^2+1, x^3, x^4, x^5, ...]"
+///     "[0, 1, x, x^3, x+1, x^2, x^2+x, x^5, x^2+1, x^3+x^2, ...]"
 /// );
 /// ```
 #[inline]
@@ -479,7 +468,7 @@ pub type ExhaustiveUnsignedPolynomialsReducedMod<T> = ExhaustiveUnsignedPolynomi
 /// // Modulo 3, every coefficient is 0, 1, or 2.
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_unsigned_polynomials_reduced_mod::<u64>(3), 10),
-///     "[0, 1, 2, x, 2*x, x^2, x+1, 2*x^2, x^3, x^4, ...]"
+///     "[0, 1, 2, x^2, x, 2*x^2, 2*x, x^4, x+1, x^2+x, ...]"
 /// );
 /// ```
 #[inline]

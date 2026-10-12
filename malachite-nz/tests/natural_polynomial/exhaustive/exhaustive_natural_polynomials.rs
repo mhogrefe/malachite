@@ -26,8 +26,7 @@ fn strings<I: Iterator<Item = NaturalPolynomial>>(xs: I, n: usize) -> String {
 fn test_exhaustive_natural_polynomials() {
     assert_eq!(
         strings(exhaustive_natural_polynomials(), 20),
-        "[0, 1, 2, x, 3, 2*x, 4, x+1, x^2, x^3, 2*x^2, 2*x^3, x^2+x, x^3+x^2, 2*x^2+x, \
-        2*x^3+x^2, 5, 2*x+1, 6, 3*x, ...]"
+        "[0, 1, 2, x^2, 3, x, 4, x^3, 5, 2*x, 6, 2*x^2, 7, x+1, 8, x^4, 9, 2*x+1, 10, x^2+x, ...]"
     );
     assert_eq!(
         strings(
@@ -47,7 +46,7 @@ fn test_exhaustive_natural_polynomials() {
             ),
             10
         ),
-        "[0, 1, 2, x+1, 3, 2*x+1, 4, x+2, x^2+x+1, x^3+x^2+x+1, ...]"
+        "[0, 1, 2, x^2+x+1, 3, x+1, 4, x^3+x^2+x+1, 5, 2*x+1, ...]"
     );
 }
 
@@ -71,15 +70,15 @@ fn test_exhaustive_natural_polynomials_with_degree() {
 fn test_exhaustive_natural_polynomials_degree_bounds() {
     assert_eq!(
         strings(exhaustive_natural_polynomials_min_degree(0), 10),
-        "[1, x, 2, 2*x, 3, x+1, 4, 2*x+1, x^2, x^3, ...]"
+        "[1, x, 2, x^2, 3, 2*x, 4, x^3, 5, x+1, ...]"
     );
     assert_eq!(
         strings(exhaustive_natural_polynomials_min_degree(2), 10),
-        "[x^2, x^3, 2*x^2, 2*x^3, x^2+x, x^3+x^2, 2*x^2+x, 2*x^3+x^2, x^4, x^5, ...]"
+        "[x^2, x^3, 2*x^2, x^4, x^2+x, 2*x^3, 2*x^2+x, x^5, x^2+1, x^3+x^2, ...]"
     );
     assert_eq!(
         strings(exhaustive_natural_polynomials_degree_range(1, 3), 10),
-        "[x, x^2, 2*x, 2*x^2, x+1, x^2+x, 2*x+1, 2*x^2+x, 3*x, x^2+1, ...]"
+        "[x, x^2, 2*x, x+1, 2*x+1, 2*x^2, 3*x, x^2+x, 4*x, 2*x^2+x, ...]"
     );
     assert_eq!(
         strings(
@@ -166,11 +165,11 @@ fn test_exhaustive_natural_polynomials_reduced_mod_power_of_2() {
     // Modulo 2 the coefficients are all 0 or 1, so these are the polynomials over GF(2).
     assert_eq!(
         strings(exhaustive_natural_polynomials_reduced_mod_power_of_2(1), 10),
-        "[0, 1, x, x^2, x+1, x^2+x, x^2+1, x^3, x^4, x^5, ...]"
+        "[0, 1, x, x^3, x+1, x^2, x^2+x, x^5, x^2+1, x^3+x^2, ...]"
     );
     assert_eq!(
         strings(exhaustive_natural_polynomials_reduced_mod_power_of_2(2), 10),
-        "[0, 1, 2, x, 3, 2*x, x+1, x^2, x^3, x^4, ...]"
+        "[0, 1, 2, x^2, 3, x, 2*x, x^4, x+1, 2*x^2, ...]"
     );
 }
 
@@ -217,7 +216,7 @@ fn test_exhaustive_natural_polynomials_reduced_mod() {
             exhaustive_natural_polynomials_reduced_mod(Natural::from(3u32)),
             10
         ),
-        "[0, 1, 2, x, 2*x, x^2, x+1, 2*x^2, x^3, x^4, ...]"
+        "[0, 1, 2, x^2, x, 2*x^2, 2*x, x^4, x+1, x^2+x, ...]"
     );
     // A modulus that is not a power of 2 admits coefficients a power of 2 would not.
     assert_eq!(
@@ -225,7 +224,7 @@ fn test_exhaustive_natural_polynomials_reduced_mod() {
             exhaustive_natural_polynomials_reduced_mod(Natural::from(5u32)),
             10
         ),
-        "[0, 1, 2, x, 3, 2*x, 4, x+1, x^2, x^3, ...]"
+        "[0, 1, 2, x^2, 3, x, 4, x^3, 2*x, 2*x^2, ...]"
     );
 }
 

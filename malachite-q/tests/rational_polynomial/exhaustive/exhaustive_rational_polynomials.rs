@@ -23,8 +23,8 @@ fn strings<I: Iterator<Item = RationalPolynomial>>(xs: I, n: usize) -> String {
 fn test_exhaustive_rational_polynomials() {
     assert_eq!(
         strings(exhaustive_rational_polynomials(), 20),
-        "[0, 1, -1, x, 1/2, -x, -1/2, x+1, x^2, x^3, -x^2, -x^3, x^2+x, x^3+x^2, -x^2+x, -x^3+x^2, \
-        2, -x+1, -2, 1/2*x, ...]"
+        "[0, 1, -1, x^2, 1/2, x, -1/2, x^3, 2, -x, -2, -x^2, 1/3, x+1, -1/3, x^4, 3/2, -x+1, -3/2, \
+        x^2+x, ...]"
     );
     assert_eq!(
         strings(
@@ -44,7 +44,7 @@ fn test_exhaustive_rational_polynomials() {
             ),
             10
         ),
-        "[0, 1, -1, x+1, 1/2, -x+1, -1/2, x-1, x^2+x+1, x^3+x^2+x+1, ...]"
+        "[0, 1, -1, x^2+x+1, 1/2, x+1, -1/2, x^3+x^2+x+1, 2, -x+1, ...]"
     );
 }
 
@@ -68,15 +68,15 @@ fn test_exhaustive_rational_polynomials_with_degree() {
 fn test_exhaustive_rational_polynomials_degree_bounds() {
     assert_eq!(
         strings(exhaustive_rational_polynomials_min_degree(0), 10),
-        "[1, x, -1, -x, 1/2, x+1, -1/2, -x+1, x^2, x^3, ...]"
+        "[1, x, -1, x^2, 1/2, -x, -1/2, x^3, 2, x+1, ...]"
     );
     assert_eq!(
         strings(exhaustive_rational_polynomials_min_degree(2), 10),
-        "[x^2, x^3, -x^2, -x^3, x^2+x, x^3+x^2, -x^2+x, -x^3+x^2, x^4, x^5, ...]"
+        "[x^2, x^3, -x^2, x^4, x^2+x, -x^3, -x^2+x, x^5, x^2+1, x^3+x^2, ...]"
     );
     assert_eq!(
         strings(exhaustive_rational_polynomials_degree_range(1, 3), 10),
-        "[x, x^2, -x, -x^2, x+1, x^2+x, -x+1, -x^2+x, 1/2*x, x^2+1, ...]"
+        "[x, x^2, -x, x+1, -x+1, -x^2, 1/2*x, x^2+x, -1/2*x, -x^2+x, ...]"
     );
     assert_eq!(
         strings(

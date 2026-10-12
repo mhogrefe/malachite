@@ -10,14 +10,12 @@ use crate::integer::Integer;
 use crate::integer::exhaustive::{IntegerUpDown, exhaustive_integers, exhaustive_nonzero_integers};
 use crate::integer_polynomial::IntegerPolynomial;
 use core::iter::{Chain, Once};
-use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
-use malachite_base::num::iterators::bit_distributor_sequence;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast,
+    ExhaustiveFixedLengthVecsWithLast, ExhaustiveVecsWithLast, exhaustive_vecs_with_last,
     exhaustive_vecs_with_last_fixed_length, exhaustive_vecs_with_last_length_inclusive_range,
-    exhaustive_vecs_with_last_min_length, exhaustive_vecs_with_last_with_index_generator,
+    exhaustive_vecs_with_last_min_length,
 };
 
 /// Generates all [`IntegerPolynomial`]s with coefficients from one iterator and leading
@@ -67,9 +65,8 @@ pub type NonzeroIntegers = IntegerUpDown;
 ///
 /// The leading coefficient grows at the same rate as the others, which is what makes the output
 /// balanced: drawing a polynomial's lower coefficients and its leading one separately and pairing
-/// them would grow the two apart. Degree $d$ is first reached after $O(d^3)$ outputs, which is slow
-/// enough to leave room for the coefficients and fast enough that constants are not most of what
-/// comes out.
+/// them would grow the two apart. The degrees grow logarithmically: degree $d$ is first reached
+/// after $O(2^d)$ outputs.
 ///
 /// The zero polynomial has no coefficients at all, and so takes nothing from either iterator; it is
 /// generated once, first.
@@ -98,7 +95,7 @@ pub type NonzeroIntegers = IntegerUpDown;
 ///         ),
 ///         10
 ///     ),
-///     "[0, 1, -1, x, 2, -x, -2, x+1, x^2, x^3, ...]"
+///     "[0, 1, -1, x^2, 2, x, -2, x^3, 3, -x, ...]"
 /// );
 ///
 /// // Only the leading coefficient is restricted, so the lower ones may be anything `xs` gives.
@@ -110,7 +107,7 @@ pub type NonzeroIntegers = IntegerUpDown;
 ///         ),
 ///         10
 ///     ),
-///     "[0, 1, -1, x+1, 2, -x+1, -2, x-1, x^2+x+1, x^3+x^2+x+1, ...]"
+///     "[0, 1, -1, x^2+x+1, 2, x+1, -2, x^3+x^2+x+1, 3, -x+1, ...]"
 /// );
 /// ```
 #[inline]
@@ -121,14 +118,7 @@ pub fn exhaustive_integer_polynomials_from_iterators<
     xs: I,
     ys: J,
 ) -> ExhaustiveIntegerPolynomials<I, J> {
-    ExhaustiveIntegerPolynomials(exhaustive_vecs_with_last_with_index_generator(
-        xs,
-        ys,
-        bit_distributor_sequence(
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-        ),
-    ))
+    ExhaustiveIntegerPolynomials(exhaustive_vecs_with_last(xs, ys))
 }
 
 /// Generates all [`IntegerPolynomial`]s.
@@ -137,7 +127,7 @@ pub fn exhaustive_integer_polynomials_from_iterators<
 /// coefficient and every nonzero one as a leading coefficient, which between them are every
 /// polynomial there is.
 ///
-/// The output length is infinite, and degree $d$ is first reached after $O(d^3)$ outputs.
+/// The output length is infinite, and degree $d$ is first reached after $O(2^d)$ outputs.
 ///
 /// # Worst-case complexity per iteration
 /// $T(i) = O(d + \ell)$
@@ -154,8 +144,8 @@ pub fn exhaustive_integer_polynomials_from_iterators<
 ///
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_integer_polynomials(), 20),
-///     "[0, 1, -1, x, 2, -x, -2, x+1, x^2, x^3, -x^2, -x^3, x^2+x, x^3+x^2, -x^2+x, -x^3+x^2, 3, \
-///      -x+1, -3, 2*x, ...]"
+///     "[0, 1, -1, x^2, 2, x, -2, x^3, 3, -x, -3, -x^2, 4, x+1, -4, x^4, 5, -x+1, -5, x^2+x, \
+///     ...]"
 /// );
 /// ```
 #[inline]
@@ -229,7 +219,7 @@ pub fn exhaustive_integer_polynomials_with_degree(
 /// The zero polynomial is never generated: it has no degree at all, so it is not of any degree at
 /// least `min_degree`. Every other polynomial of degree at least `min_degree` is generated once.
 ///
-/// The output length is infinite, and degree $d$ is first reached after $O(d^3)$ outputs.
+/// The output length is infinite, and degree $d$ is first reached after $O(2^d)$ outputs.
 ///
 /// # Worst-case complexity per iteration
 /// $T(i) = O(d + \ell)$
@@ -246,11 +236,11 @@ pub fn exhaustive_integer_polynomials_with_degree(
 ///
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_integer_polynomials_min_degree(0), 10),
-///     "[1, x, -1, -x, 2, x+1, -2, -x+1, x^2, x^3, ...]"
+///     "[1, x, -1, x^2, 2, -x, -2, x^3, 3, x+1, ...]"
 /// );
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_integer_polynomials_min_degree(2), 10),
-///     "[x^2, x^3, -x^2, -x^3, x^2+x, x^3+x^2, -x^2+x, -x^3+x^2, x^4, x^5, ...]"
+///     "[x^2, x^3, -x^2, x^4, x^2+x, -x^3, -x^2+x, x^5, x^2+1, x^3+x^2, ...]"
 /// );
 /// ```
 #[inline]
@@ -285,7 +275,7 @@ pub fn exhaustive_integer_polynomials_min_degree(
 ///
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_integer_polynomials_degree_range(1, 3), 10),
-///     "[x, x^2, -x, -x^2, x+1, x^2+x, -x+1, -x^2+x, 2*x, x^2+1, ...]"
+///     "[x, x^2, -x, x+1, -x+1, -x^2, 2*x, x^2+x, -2*x, -x^2+x, ...]"
 /// );
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_integer_polynomials_degree_range(1, 1), 10),
@@ -330,7 +320,7 @@ pub fn exhaustive_integer_polynomials_degree_range(
 ///         exhaustive_integer_polynomials_degree_inclusive_range(1, 2),
 ///         10
 ///     ),
-///     "[x, x^2, -x, -x^2, x+1, x^2+x, -x+1, -x^2+x, 2*x, x^2+1, ...]"
+///     "[x, x^2, -x, x+1, -x+1, -x^2, 2*x, x^2+x, -2*x, -x^2+x, ...]"
 /// );
 /// assert_eq!(
 ///     prefix_to_string(

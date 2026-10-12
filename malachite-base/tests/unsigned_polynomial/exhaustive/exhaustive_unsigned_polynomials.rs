@@ -24,8 +24,7 @@ fn strings<I: Iterator<Item = UnsignedPolynomial<u64>>>(xs: I, n: usize) -> Stri
 fn test_exhaustive_unsigned_polynomials() {
     assert_eq!(
         strings(exhaustive_unsigned_polynomials::<u64>(), 20),
-        "[0, 1, 2, x, 3, 2*x, 4, x+1, x^2, x^3, 2*x^2, 2*x^3, x^2+x, x^3+x^2, 2*x^2+x, \
-        2*x^3+x^2, 5, 2*x+1, 6, 3*x, ...]"
+        "[0, 1, 2, x^2, 3, x, 4, x^3, 5, 2*x, 6, 2*x^2, 7, x+1, 8, x^4, 9, 2*x+1, 10, x^2+x, ...]"
     );
     assert_eq!(
         strings(
@@ -45,7 +44,7 @@ fn test_exhaustive_unsigned_polynomials() {
             ),
             10
         ),
-        "[0, 1, 2, x+1, 3, 2*x+1, 4, x+2, x^2+x+1, x^3+x^2+x+1, ...]"
+        "[0, 1, 2, x^2+x+1, 3, x+1, 4, x^3+x^2+x+1, 5, 2*x+1, ...]"
     );
 }
 
@@ -69,18 +68,18 @@ fn test_exhaustive_unsigned_polynomials_with_degree() {
 fn test_exhaustive_unsigned_polynomials_degree_bounds() {
     assert_eq!(
         strings(exhaustive_unsigned_polynomials_min_degree::<u64>(0), 10),
-        "[1, x, 2, 2*x, 3, x+1, 4, 2*x+1, x^2, x^3, ...]"
+        "[1, x, 2, x^2, 3, 2*x, 4, x^3, 5, x+1, ...]"
     );
     assert_eq!(
         strings(exhaustive_unsigned_polynomials_min_degree::<u64>(2), 10),
-        "[x^2, x^3, 2*x^2, 2*x^3, x^2+x, x^3+x^2, 2*x^2+x, 2*x^3+x^2, x^4, x^5, ...]"
+        "[x^2, x^3, 2*x^2, x^4, x^2+x, 2*x^3, 2*x^2+x, x^5, x^2+1, x^3+x^2, ...]"
     );
     assert_eq!(
         strings(
             exhaustive_unsigned_polynomials_degree_range::<u64>(1, 3),
             10
         ),
-        "[x, x^2, 2*x, 2*x^2, x+1, x^2+x, 2*x+1, 2*x^2+x, 3*x, x^2+1, ...]"
+        "[x, x^2, 2*x, x+1, 2*x+1, 2*x^2, 3*x, x^2+x, 4*x, 2*x^2+x, ...]"
     );
     assert_eq!(
         strings(
@@ -181,14 +180,14 @@ fn test_exhaustive_unsigned_polynomials_reduced_mod_power_of_2() {
             exhaustive_unsigned_polynomials_reduced_mod_power_of_2::<u64>(1),
             10
         ),
-        "[0, 1, x, x^2, x+1, x^2+x, x^2+1, x^3, x^4, x^5, ...]"
+        "[0, 1, x, x^3, x+1, x^2, x^2+x, x^5, x^2+1, x^3+x^2, ...]"
     );
     assert_eq!(
         strings(
             exhaustive_unsigned_polynomials_reduced_mod_power_of_2::<u64>(2),
             10
         ),
-        "[0, 1, 2, x, 3, 2*x, x+1, x^2, x^3, x^4, ...]"
+        "[0, 1, 2, x^2, 3, x, 2*x, x^4, x+1, 2*x^2, ...]"
     );
     // Modulo 2^64 nothing is excluded, so this is every polynomial.
     assert_eq!(
@@ -251,12 +250,12 @@ fn test_exhaustive_unsigned_polynomials_reduced_mod() {
     );
     assert_eq!(
         strings(exhaustive_unsigned_polynomials_reduced_mod::<u64>(3), 10),
-        "[0, 1, 2, x, 2*x, x^2, x+1, 2*x^2, x^3, x^4, ...]"
+        "[0, 1, 2, x^2, x, 2*x^2, 2*x, x^4, x+1, x^2+x, ...]"
     );
     // A modulus that is not a power of 2 admits coefficients a power of 2 would not.
     assert_eq!(
         strings(exhaustive_unsigned_polynomials_reduced_mod::<u64>(5), 10),
-        "[0, 1, 2, x, 3, 2*x, 4, x+1, x^2, x^3, ...]"
+        "[0, 1, 2, x^2, 3, x, 4, x^3, 2*x, 2*x^2, ...]"
     );
 }
 

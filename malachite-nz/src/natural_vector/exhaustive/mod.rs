@@ -10,12 +10,10 @@ use crate::natural::Natural;
 use crate::natural::exhaustive::{ExhaustiveNaturalRangeToInfinity, exhaustive_naturals};
 use crate::natural_vector::NaturalVector;
 use alloc::vec::Vec;
-use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
-use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
 use malachite_base::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs_fixed_length_from_single,
-    exhaustive_vecs_with_index_generator,
+    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs,
+    exhaustive_vecs_fixed_length_from_single,
 };
 
 /// Generates [`NaturalVector`]s from an iterator of [`Vec`]s of [`Natural`]s.
@@ -38,11 +36,9 @@ impl<I: Iterator<Item = Vec<Natural>>> Iterator for ExhaustiveNaturalVectors<I> 
 ///
 /// Every vector, of every dimension, is generated once, the 0-dimensional vector first.
 ///
-/// The dimensions grow as the cube root of the iteration number, as the degrees do in
-/// [`exhaustive_natural_polynomials`](
+/// The dimensions grow logarithmically, as the degrees do in [`exhaustive_natural_polynomials`](
 /// crate::natural_polynomial::exhaustive::exhaustive_natural_polynomials): dimension $d$ is first
-/// reached after $O(d^3)$ outputs, which is slow enough to leave room for the elements and fast
-/// enough that low-dimensional vectors are not most of what comes out.
+/// reached after $O(2^d)$ outputs.
 ///
 /// The output length is infinite.
 ///
@@ -61,27 +57,15 @@ impl<I: Iterator<Item = Vec<Natural>>> Iterator for ExhaustiveNaturalVectors<I> 
 ///
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_natural_vectors(), 20),
-///     "[(), (0), (1), (0, 0), (2), (0, 1), (3), (1, 0), (0, 0, 0), (0, 0, 0, 0), (0, 0, 1), \
-///     (0, 0, 0, 1), (0, 1, 0), (0, 0, 1, 0), (0, 1, 1), (0, 0, 1, 1), (4), (1, 1), (5), \
-///     (0, 2), ...]"
+///     "[(), (0), (1), (0, 0, 0), (2), (0, 0), (3), (0, 0, 0, 0), (4), (0, 1), (5), (0, 0, 1), \
+///     (6), (1, 0), (7), (0, 0, 0, 0, 0), (8), (1, 1), (9), (0, 1, 0), ...]"
 /// );
 /// ```
 #[inline]
 pub fn exhaustive_natural_vectors() -> ExhaustiveNaturalVectors<
-    ExhaustiveVecs<
-        Natural,
-        PrimitiveIntIncreasingRange<u64>,
-        ExhaustiveNaturalRangeToInfinity,
-        BitDistributorSequence,
-    >,
+    ExhaustiveVecs<Natural, PrimitiveIntIncreasingRange<u64>, ExhaustiveNaturalRangeToInfinity>,
 > {
-    ExhaustiveNaturalVectors(exhaustive_vecs_with_index_generator(
-        exhaustive_naturals(),
-        bit_distributor_sequence(
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-        ),
-    ))
+    ExhaustiveNaturalVectors(exhaustive_vecs(exhaustive_naturals()))
 }
 
 /// Generates all [`NaturalVector`]s of a given dimension.

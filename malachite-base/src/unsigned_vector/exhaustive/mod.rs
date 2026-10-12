@@ -6,14 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::exhaustive::{PrimitiveIntIncreasingRange, exhaustive_unsigneds};
-use crate::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
 use crate::unsigned_vector::UnsignedVector;
 use crate::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs_fixed_length_from_single,
-    exhaustive_vecs_with_index_generator,
+    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs,
+    exhaustive_vecs_fixed_length_from_single,
 };
 use alloc::vec::Vec;
 
@@ -37,11 +35,9 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = Vec<T>>> Iterator for ExhaustiveUn
 ///
 /// Every vector, of every dimension, is generated once, the 0-dimensional vector first.
 ///
-/// The dimensions grow as the cube root of the iteration number, as the degrees do in
-/// [`exhaustive_unsigned_polynomials`](
+/// The dimensions grow logarithmically, as the degrees do in [`exhaustive_unsigned_polynomials`](
 /// crate::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials): dimension $d$ is first
-/// reached after $O(d^3)$ outputs, which is slow enough to leave room for the elements and fast
-/// enough that low-dimensional vectors are not most of what comes out.
+/// reached after $O(2^d)$ outputs.
 ///
 /// The output length is infinite.
 ///
@@ -60,27 +56,15 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = Vec<T>>> Iterator for ExhaustiveUn
 ///
 /// assert_eq!(
 ///     prefix_to_string(exhaustive_unsigned_vectors::<u8>(), 20),
-///     "[(), (0), (1), (0, 0), (2), (0, 1), (3), (1, 0), (0, 0, 0), (0, 0, 0, 0), (0, 0, 1), \
-///     (0, 0, 0, 1), (0, 1, 0), (0, 0, 1, 0), (0, 1, 1), (0, 0, 1, 1), (4), (1, 1), (5), \
-///     (0, 2), ...]"
+///     "[(), (0), (1), (0, 0, 0), (2), (0, 0), (3), (0, 0, 0, 0), (4), (0, 1), (5), (0, 0, 1), \
+///     (6), (1, 0), (7), (0, 0, 0, 0, 0), (8), (1, 1), (9), (0, 1, 0), ...]"
 /// );
 /// ```
 #[inline]
 pub fn exhaustive_unsigned_vectors<T: PrimitiveUnsigned>() -> ExhaustiveUnsignedVectors<
-    ExhaustiveVecs<
-        T,
-        PrimitiveIntIncreasingRange<u64>,
-        PrimitiveIntIncreasingRange<T>,
-        BitDistributorSequence,
-    >,
+    ExhaustiveVecs<T, PrimitiveIntIncreasingRange<u64>, PrimitiveIntIncreasingRange<T>>,
 > {
-    ExhaustiveUnsignedVectors(exhaustive_vecs_with_index_generator(
-        exhaustive_unsigneds(),
-        bit_distributor_sequence(
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-        ),
-    ))
+    ExhaustiveUnsignedVectors(exhaustive_vecs(exhaustive_unsigneds()))
 }
 
 /// Generates all [`UnsignedVector`]s of a given dimension.

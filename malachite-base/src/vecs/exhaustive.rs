@@ -14,9 +14,7 @@ use crate::num::exhaustive::{
     PrimitiveIntIncreasingRange, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
     primitive_int_increasing_range,
 };
-use crate::num::iterators::{
-    BitDistributorSequence, RulerSequence, bit_distributor_sequence, ruler_sequence,
-};
+use crate::num::iterators::{RulerSequence, ruler_sequence};
 use crate::num::logic::traits::SignificantBits;
 use crate::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, ExhaustivePairs,
@@ -1658,10 +1656,10 @@ where
 /// what decides how quickly long [`Vec`]s come out:
 /// - [`ruler_sequence`] picks the first length that still has [`Vec`]s half of the time, so the
 ///   lengths grow logarithmically. [`exhaustive_vecs`] is this function with [`ruler_sequence`].
-/// - [`bit_distributor_sequence`] with `BitDistributorOutputType::normal(1)` and
-///   `BitDistributorOutputType::normal(2)`, in that order, gives the elements' indices twice as
-///   many bits as the length's, so the lengths grow as the cube root of the iteration number. This
-///   is the rate the polynomial generators use.
+/// - [`bit_distributor_sequence`](crate::num::iterators::bit_distributor_sequence) with
+///   `BitDistributorOutputType::normal(1)` and `BitDistributorOutputType::normal(2)`, in that
+///   order, gives the elements' indices twice as many bits as the length's, so the lengths grow as
+///   the cube root of the iteration number.
 ///
 /// Every [`Vec`] is generated once, whatever `index_generator` is, provided that it yields every
 /// index infinitely often. If `xs` is empty, the output length is 1; otherwise, the output is
@@ -1937,7 +1935,7 @@ pub struct ExhaustiveVecsWithLast<
     I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
     K: Clone + Iterator<Item = T>,
-    G: Iterator<Item = usize> = BitDistributorSequence,
+    G: Iterator<Item = usize> = RulerSequence<usize>,
 >(
     ExhaustiveDependentPairs<
         u64,
@@ -1978,12 +1976,8 @@ impl<
 /// or slower than the others; pairing a shorter [`Vec`] with a last element would grow the two
 /// apart instead.
 ///
-/// It differs from that function in how often it visits each length. Singling out the last element
-/// makes a one-element [`Vec`] a kind of its own — it is all last element and nothing else —
-/// and the ruler sequence that [`exhaustive_vecs_from_length_iterator`] steps through lengths with
-/// would spend half of its time there. This one steps through them with a
-/// [`bit_distributor_sequence`] instead, which reaches the length $\ell$ after $O(\ell^3)$ outputs
-/// rather than $O(2^\ell)$.
+/// Like that function, it steps through the lengths with [`ruler_sequence`], so half of the time it
+/// takes the next [`Vec`] of the first length that still has some.
 ///
 /// If the lengths iterator has repetitions, then the generated [`Vec`]s will be repeated too.
 ///
@@ -2008,14 +2002,14 @@ impl<
 ///         &[][..],
 ///         &[8],
 ///         &[9],
-///         &[0, 8],
-///         &[0, 9],
 ///         &[0, 0, 8],
-///         &[1, 8],
+///         &[0, 8],
 ///         &[0, 0, 9],
-///         &[1, 9],
+///         &[0, 9],
 ///         &[0, 1, 8],
+///         &[1, 8],
 ///         &[0, 1, 9],
+///         &[1, 9],
 ///         &[1, 0, 8],
 ///         &[1, 0, 9],
 ///         &[1, 1, 8],
@@ -2024,7 +2018,7 @@ impl<
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_vecs_with_last_from_length_iterator<
+pub const fn exhaustive_vecs_with_last_from_length_iterator<
     T: Clone,
     I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
@@ -2035,13 +2029,80 @@ pub fn exhaustive_vecs_with_last_from_length_iterator<
     ys: K,
 ) -> ExhaustiveVecsWithLast<T, I, J, K> {
     ExhaustiveVecsWithLast(exhaustive_dependent_pairs_stop_after_empty_ys(
-        bit_distributor_sequence(
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-        ),
+        ruler_sequence(),
         lengths,
         ExhaustiveVecsWithLastGenerator { xs, ys },
     ))
+}
+
+/// Generates all [`Vec`]s whose last element is drawn from a different iterator than the rest.
+///
+/// A [`Vec`] of length $n \geq 1$ has its first $n-1$ elements from `xs` and its last from `ys`.
+/// The empty [`Vec`], which has no last element, is generated once, from neither.
+///
+/// If `xs` or `ys` is empty, the output is finite; otherwise, it is infinite.
+///
+/// The lengths of the output [`Vec`]s grow logarithmically.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs` and `ys`, and $\ell$ is the number of
+/// elements in the $i$th output.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::exhaustive::{
+///     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
+/// };
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_with_last;
+///
+/// let xss = exhaustive_vecs_with_last(
+///     exhaustive_unsigneds::<u8>(),
+///     exhaustive_positive_primitive_ints::<u8>(),
+/// )
+/// .take(20)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[][..],
+///         &[1],
+///         &[2],
+///         &[0, 0, 1],
+///         &[3],
+///         &[0, 1],
+///         &[4],
+///         &[0, 0, 0, 1],
+///         &[5],
+///         &[0, 2],
+///         &[6],
+///         &[0, 0, 2],
+///         &[7],
+///         &[1, 1],
+///         &[8],
+///         &[0, 0, 0, 0, 1],
+///         &[9],
+///         &[1, 2],
+///         &[10],
+///         &[0, 1, 1]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_with_last<
+    T: Clone,
+    J: Clone + Iterator<Item = T>,
+    K: Clone + Iterator<Item = T>,
+>(
+    xs: J,
+    ys: K,
+) -> ExhaustiveVecsWithLast<T, PrimitiveIntIncreasingRange<u64>, J, K> {
+    exhaustive_vecs_with_last_from_length_iterator(exhaustive_unsigneds(), xs, ys)
 }
 
 /// Generates all [`Vec`]s whose last element is drawn from a different iterator than the rest, with
@@ -2052,10 +2113,8 @@ pub fn exhaustive_vecs_with_last_from_length_iterator<
 ///
 /// This is [`exhaustive_vecs_with_index_generator`] with one element singled out, and it is what
 /// generates the coefficients of a polynomial, whose leading coefficient is the one that may not be
-/// zero. `index_generator` decides how quickly the lengths grow, as it does there; the polynomial
-/// generators pass `bit_distributor_sequence(BitDistributorOutputType::normal(1),
-/// BitDistributorOutputType::normal(2))`, under which the lengths grow as the cube root of the
-/// iteration number.
+/// zero. `index_generator` decides how quickly the lengths grow, as it does there.
+/// [`exhaustive_vecs_with_last`] is this function with [`ruler_sequence`].
 ///
 /// # Worst-case complexity per iteration
 /// $T(i) = O(\ell + T^\prime(i) + T^{\prime\prime}(i))$
@@ -2138,9 +2197,7 @@ pub fn exhaustive_vecs_with_last_with_index_generator<
 /// The empty [`Vec`], which has no last element, is generated once if `min_length` is 0, and not at
 /// all otherwise.
 ///
-/// The lengths of the output [`Vec`]s grow as the cube root of the iteration number, as they do in
-/// [`exhaustive_vecs_with_last_with_index_generator`] with the bit-distributor index generator the
-/// polynomial generators use.
+/// The lengths of the output [`Vec`]s grow logarithmically.
 ///
 /// # Worst-case complexity per iteration
 /// $T(i) = O(\ell + T^\prime(i))$
@@ -2172,13 +2229,13 @@ pub fn exhaustive_vecs_with_last_with_index_generator<
 ///         &[0, 1][..],
 ///         &[0, 0, 1],
 ///         &[0, 2],
-///         &[0, 0, 2],
-///         &[1, 1],
-///         &[0, 1, 1],
-///         &[1, 2],
-///         &[0, 1, 2],
 ///         &[0, 0, 0, 1],
-///         &[0, 0, 0, 0, 1]
+///         &[1, 1],
+///         &[0, 0, 2],
+///         &[1, 2],
+///         &[0, 0, 0, 0, 1],
+///         &[0, 3],
+///         &[0, 1, 1]
 ///     ]
 /// );
 /// ```

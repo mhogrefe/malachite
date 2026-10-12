@@ -10,11 +10,14 @@ documented by git history.
 
 ### Breaking and behavioral changes
 
-- `exhaustive_vecs_with_last` is renamed to `exhaustive_vecs_with_last_with_index_generator`, and
-  takes a third argument: the iterator of indices that decides which length comes next, such as a
-  `bit_distributor_sequence`. How fast the lengths grow used to be fixed inside the function; it is
-  now chosen by the caller, independently of the special treatment of the last element. Its `_min_length`, `_length_range`,
-  `_length_inclusive_range`, `_fixed_length`, and `_from_length_iterator` variants are unchanged.
+- `exhaustive_vecs_with_last` and its `_min_length`, `_length_range`, `_length_inclusive_range`,
+  and `_from_length_iterator` variants now step through the lengths with a `ruler_sequence`, as
+  `exhaustive_vecs` does, instead of a `bit_distributor_sequence`, so the lengths grow
+  logarithmically rather than as the cube root of the iteration number. The exhaustive polynomial
+  generators (`exhaustive_unsigned_polynomials`, `exhaustive_natural_polynomials`,
+  `exhaustive_integer_polynomials`, `exhaustive_rational_polynomials`, and their `_min_degree` and
+  `_from_iterators` variants) change with them: half of their output is now constants. The
+  bit-distributor rate generated many long polynomials whose coefficients were all 0s and 1s.
 - The content and primitive part traits are now a single family in
   `malachite_base::num::arithmetic::traits`. `malachite_base::polynomial::Content`, `PrimitivePart`,
   `PrimitivePartAssign`, and `ContentAndPrimitivePart` are gone; `Content` and the plain
@@ -67,9 +70,11 @@ documented by git history.
 
 ### malachite-base
 
-- `exhaustive_vecs_with_index_generator`, which generates all [`Vec`]s of elements from one
-  iterator, with the lengths stepped by a caller-supplied iterator of indices, the counterpart of
-  `exhaustive_vecs_with_last_with_index_generator` without a special last element.
+- `exhaustive_vecs_with_index_generator` and `exhaustive_vecs_with_last_with_index_generator`,
+  which generate all [`Vec`]s, the second with its last element drawn from a different iterator
+  than the rest, with the lengths stepped by a caller-supplied iterator of indices, such as a
+  `bit_distributor_sequence`. `exhaustive_vecs` and `exhaustive_vecs_with_last` are these with a
+  `ruler_sequence`.
 - A `Vector` trait in `malachite_base::vector`, for what every vector type has in common, as
   `Polynomial` is for the polynomial types. It has an `Element` associated type and the methods
   `from_elements`, `from_owned_elements`, `zero`, `standard_basis_vector`, `to_elements`,
