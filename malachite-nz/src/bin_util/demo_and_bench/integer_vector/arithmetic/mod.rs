@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content::register(runner);
     content_chained::register(runner);
     div_exact::register(runner);
+    dot::register(runner);
     dot_general::register(runner);
     element_lcm::register(runner);
     element_product::register(runner);
@@ -55,6 +56,7 @@ mod canonicalize_sign;
 mod content;
 mod content_chained;
 mod div_exact;
+mod dot;
 mod dot_general;
 mod element_lcm;
 mod element_product;

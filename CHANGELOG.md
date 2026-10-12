@@ -98,6 +98,9 @@ documented by git history.
 - `ModPowerOf2ElementSum` and `ModElementSum` traits in `malachite_base::num::arithmetic::traits`,
   for the sum of the elements of a vector modulo $2^k$ or modulo $m$, as a single element, with
   `to_` and `into_` forms. The elements must already be reduced.
+- `ModPowerOf2Dot` and `ModDot` traits in `malachite_base::num::arithmetic::traits`, for the dot
+  product of two vectors modulo $2^k$ or modulo $m$. The elements must already be reduced.
+- A `Dot` trait in `malachite_base::num::arithmetic::traits`, for the dot product of two vectors.
 - An `ElementLcm` trait in `malachite_base::num::arithmetic::traits`, for the LCM of the elements
   of a vector, with `to_element_lcm` and `into_element_lcm`.
 - An `ElementProduct` trait in `malachite_base::num::arithmetic::traits`, for the product of the
@@ -239,6 +242,9 @@ documented by git history.
 - `ModPowerOf2ElementProduct` and `ModElementProduct` for `UnsignedVector<T>`: the product of the
   elements modulo $2^k$ or modulo $m$, as a `T`. The product of the 0-dimensional vector is 1,
   reduced, and it returns as soon as the partial product is zero.
+- `ModPowerOf2Dot` and `ModDot` for `UnsignedVector<T>`: the dot product modulo $2^k$ (a wrapping
+  sum of wrapping products, masked once) or modulo $m$ (like FLINT's `_nmod_vec_dot`, the products
+  summed exactly in one to three words and reduced once).
 - `ModPowerOf2ElementSum` and `ModElementSum` for `UnsignedVector<T>`: the sum of the elements
   modulo $2^k$ or modulo $m$, as a `T`. The sum of the 0-dimensional vector is 0.
 - `ModSum` for `UnsignedVector<T>`, for iterators of vectors or of references, with a `T`
@@ -285,6 +291,9 @@ documented by git history.
   and `IntegerVector`.
 - `Height` and `HeightRef` for `NaturalVector` and `IntegerVector`: the largest absolute value of an
   element, like FLINT's `_fmpz_vec_height`. The height of the 0-dimensional vector is 0.
+- `Dot` for `NaturalVector` and `IntegerVector`, like FLINT's `_fmpz_vec_dot`, summing small products
+  in a three-limb accumulator and the rest in limb buffers. The vectors must have the same
+  dimension.
 - `ElementLcm` for `NaturalVector` and `IntegerVector`: the LCM of the elements' absolute values,
   like FLINT's `_fmpz_vec_lcm`. The LCM of the 0-dimensional vector is 1, and it is 0, found as
   soon as a zero element is reached, if any element is 0.
@@ -304,6 +313,8 @@ documented by git history.
   elements modulo $2^k$ or modulo $m$, as a `Natural`, with the modulus by value or by reference.
   The product of the 0-dimensional vector is 1, reduced, and it returns as soon as the partial
   product is zero.
+- `ModPowerOf2Dot` and `ModDot` for `NaturalVector`, like FLINT's `_fmpz_mod_vec_dot`: word
+  arithmetic when the modulus fits in a limb, and otherwise the exact dot product reduced once.
 - `ModPowerOf2ElementSum` and `ModElementSum` for `NaturalVector`: the sum of the elements modulo
   $2^k$ or modulo $m$, as a `Natural`, with the modulus by value or by reference. The sum of the
   0-dimensional vector is 0.
@@ -533,6 +544,11 @@ documented by git history.
   `_fmpq_vec_max_height`. The height of the 0-dimensional vector is 0.
 - `ElementProduct` for `RationalVector`: the product of the elements, as a `Rational`, multiplied
   in a balanced tree and stopping at a zero element. The product of the 0-dimensional vector is 1.
+- `Dot` for `RationalVector`, like FLINT's `_fmpq_vec_dot`: each vector is written as integer
+  numerators over a common denominator, so that one integer dot product and one reduction replace a
+  reduction per pair.
+- `RationalVector::into_numerators_and_denominator`, the consuming form of
+  `to_numerators_and_denominator`, which scales each numerator in place.
 - `ElementSum` for `RationalVector`: the sum of the elements, as a `Rational`. The sum of the
   0-dimensional vector is 0.
 - `L1Norm` for `RationalVector`: the sum of the absolute values of the elements, as a `Rational`.

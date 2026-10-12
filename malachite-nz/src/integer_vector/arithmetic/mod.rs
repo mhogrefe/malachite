@@ -186,6 +186,9 @@ pub mod content_chained;
 /// assert_eq!(v.to_string(), "(0, 2, -85)");
 /// ```
 pub mod div_exact;
+/// Implementations of [`Dot`](malachite_base::num::arithmetic::traits::Dot), the dot product of two
+/// vectors.
+pub mod dot;
 #[doc(hidden)]
 pub mod dot_general;
 /// An implementation of [`ElementLcm`](malachite_base::num::arithmetic::traits::ElementLcm), the

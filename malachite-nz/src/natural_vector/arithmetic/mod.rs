@@ -158,6 +158,9 @@ pub mod content_chained;
 /// assert_eq!(v.to_string(), "(0, 2, 85)");
 /// ```
 pub mod div_exact;
+/// Implementations of [`Dot`](malachite_base::num::arithmetic::traits::Dot), the dot product of two
+/// vectors.
+pub mod dot;
 /// An implementation of [`ElementLcm`](malachite_base::num::arithmetic::traits::ElementLcm), the
 /// LCM of the elements.
 pub mod element_lcm;
@@ -377,6 +380,9 @@ pub mod mod_add_mul;
 /// [`ModAddMulShlAssign`](malachite_base::num::arithmetic::traits::ModAddMulShlAssign), for adding
 /// a scalar multiple of one vector, shifted left, to another modulo a number.
 pub mod mod_add_mul_shl;
+/// Implementations of [`ModDot`](malachite_base::num::arithmetic::traits::ModDot), the dot product
+/// of two vectors modulo a number.
+pub mod mod_dot;
 /// Implementations of
 /// [`ModElementProduct`](malachite_base::num::arithmetic::traits::ModElementProduct), the product
 /// of the elements modulo a number.
@@ -419,6 +425,9 @@ pub mod mod_power_of_2_add_mul;
 /// malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), for adding a scalar
 /// multiple of one vector, shifted left, to another modulo a power of 2.
 pub mod mod_power_of_2_add_mul_shl;
+/// Implementations of [`ModPowerOf2Dot`](malachite_base::num::arithmetic::traits::ModPowerOf2Dot),
+/// the dot product of two vectors modulo a power of 2.
+pub mod mod_power_of_2_dot;
 /// An implementation of [`ModPowerOf2ElementProduct`](
 /// malachite_base::num::arithmetic::traits::ModPowerOf2ElementProduct), the product of the elements
 /// modulo a power of 2.

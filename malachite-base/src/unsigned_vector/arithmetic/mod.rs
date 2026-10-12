@@ -202,8 +202,9 @@ pub mod mod_add_mul;
 /// [`ModAddMulShlAssign`](crate::num::arithmetic::traits::ModAddMulShlAssign), for adding a scalar
 /// multiple of one vector, shifted left, to another modulo a number.
 pub mod mod_add_mul_shl;
-// Dot products of vectors reduced modulo a word, accumulating the sum before reducing it once.
-pub(crate) mod mod_dot;
+/// Implementations of [`ModDot`](crate::num::arithmetic::traits::ModDot), the dot product of two
+/// vectors modulo a number, accumulating the sum before reducing it once.
+pub mod mod_dot;
 /// Implementations of [`ModElementProduct`](crate::num::arithmetic::traits::ModElementProduct), the
 /// product of the elements modulo a number.
 pub mod mod_element_product;
@@ -243,6 +244,9 @@ pub mod mod_power_of_2_add_mul;
 /// [`ModPowerOf2AddMulShlAssign`](crate::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), for
 /// adding a scalar multiple of one vector, shifted left, to another modulo a power of 2.
 pub mod mod_power_of_2_add_mul_shl;
+/// Implementations of [`ModPowerOf2Dot`](crate::num::arithmetic::traits::ModPowerOf2Dot), the dot
+/// product of two vectors modulo a power of 2.
+pub mod mod_power_of_2_dot;
 /// An implementation of
 /// [`ModPowerOf2ElementProduct`](crate::num::arithmetic::traits::ModPowerOf2ElementProduct), the
 /// product of the elements modulo a power of 2.

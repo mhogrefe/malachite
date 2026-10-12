@@ -1139,6 +1139,32 @@ pub trait ModElementProduct<M> {
     fn into_mod_element_product(self, m: M) -> Self::Output;
 }
 
+/// Computes the dot product of two vectors: the sum of the products of their corresponding
+/// elements.
+///
+/// The vectors must have the same dimension. The dot product of two 0-dimensional vectors is 0.
+pub trait Dot<RHS = Self> {
+    type Output;
+
+    fn dot(self, other: RHS) -> Self::Output;
+}
+
+/// Computes the dot product of two vectors modulo $2^k$. The elements must already be reduced
+/// modulo $2^k$.
+pub trait ModPowerOf2Dot<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_2_dot(self, other: RHS, pow: u64) -> Self::Output;
+}
+
+/// Computes the dot product of two vectors modulo another number $m$. The elements must already be
+/// reduced modulo $m$.
+pub trait ModDot<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_dot(self, other: RHS, m: M) -> Self::Output;
+}
+
 /// Calculates the LCM of the elements of a vector.
 ///
 /// The LCM of the elements of the 0-dimensional vector is 1, and the LCM is 0 if any element is 0.

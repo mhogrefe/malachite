@@ -107,6 +107,9 @@ pub mod content;
 /// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
 /// which computes the GCD of a number and a vector's elements.
 pub mod content_chained;
+/// Implementations of [`Dot`](malachite_base::num::arithmetic::traits::Dot), the dot product of two
+/// vectors.
+pub mod dot;
 /// An implementation of
 /// [`ElementProduct`](malachite_base::num::arithmetic::traits::ElementProduct), the product of the
 /// elements.

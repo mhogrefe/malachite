@@ -24,6 +24,11 @@ fn test_to_numerators_and_denominator() {
             .to_numerators_and_denominator();
         assert_eq!(ns.to_string(), numerators_out);
         assert_eq!(d, denominator_out);
+        let (ns_alt, d_alt) = RationalVector::from_str(s)
+            .unwrap()
+            .into_numerators_and_denominator();
+        assert_eq!(ns_alt, ns);
+        assert_eq!(d_alt, d);
     };
     test("()", "()", 1);
     test("(0)", "(0)", 1);
@@ -41,6 +46,10 @@ fn test_to_numerators_and_denominator() {
 fn to_numerators_and_denominator_properties() {
     rational_vector_gen().test_properties(|v| {
         let (ns, d) = v.to_numerators_and_denominator();
+        assert_eq!(
+            v.clone().into_numerators_and_denominator(),
+            (ns.clone(), d.clone())
+        );
         assert_ne!(d, 0u32);
         assert_eq!(ns.dimension(), v.dimension());
         // The quotients are the elements.

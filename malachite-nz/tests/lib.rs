@@ -358,6 +358,7 @@ pub mod integer_vector {
         pub mod content;
         pub mod content_chained;
         pub mod div_exact;
+        pub mod dot;
         pub mod dot_general;
         pub mod element_lcm;
         pub mod element_product;
@@ -931,6 +932,7 @@ pub mod natural_vector {
         pub mod content;
         pub mod content_chained;
         pub mod div_exact;
+        pub mod dot;
         pub mod element_lcm;
         pub mod element_product;
         pub mod element_sum;
@@ -942,6 +944,7 @@ pub mod natural_vector {
         pub mod mod_add;
         pub mod mod_add_mul;
         pub mod mod_add_mul_shl;
+        pub mod mod_dot;
         pub mod mod_element_product;
         pub mod mod_element_sum;
         pub mod mod_is_reduced;
@@ -952,6 +955,7 @@ pub mod natural_vector {
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_add_mul_shl;
+        pub mod mod_power_of_2_dot;
         pub mod mod_power_of_2_element_product;
         pub mod mod_power_of_2_element_sum;
         pub mod mod_power_of_2_is_reduced;

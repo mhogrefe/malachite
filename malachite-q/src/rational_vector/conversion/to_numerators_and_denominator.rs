@@ -80,4 +80,60 @@ impl RationalVector {
             d,
         )
     }
+
+    /// Clears the denominators of a [`RationalVector`], taking the vector by value and returning a
+    /// vector of [`Integer`] numerators and a single positive [`Natural`] denominator whose
+    /// quotients are the elements.
+    ///
+    /// This is [`to_numerators_and_denominator`](RationalVector::to_numerators_and_denominator),
+    /// except that each numerator is scaled in place rather than cloned first, and an element whose
+    /// denominator is already the common one is moved over unchanged.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn (\log n)^2 \log\log n)$
+    ///
+    /// $M(n, m) = O(mn)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits of the
+    /// elements' numerators and denominators, and $m$ is the dimension.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_q::rational_vector::RationalVector;
+    ///
+    /// let v = RationalVector::from_str("(1/2, -2/3, 5)").unwrap();
+    /// let (ns, d) = v.into_numerators_and_denominator();
+    /// assert_eq!(ns.to_string(), "(3, -4, 30)");
+    /// assert_eq!(d, 6);
+    ///
+    /// let v = RationalVector::from_str("()").unwrap();
+    /// let (ns, d) = v.into_numerators_and_denominator();
+    /// assert_eq!(ns.to_string(), "()");
+    /// assert_eq!(d, 1);
+    /// ```
+    pub fn into_numerators_and_denominator(self) -> (IntegerVector, Natural) {
+        let mut d = Natural::ONE;
+        for x in &self.elements {
+            d.lcm_assign(x.denominator_ref());
+        }
+        let numerators = self
+            .elements
+            .into_iter()
+            .map(|x| {
+                let sign = x >= 0u32;
+                let (mut n, x_d) = x.into_numerator_and_denominator();
+                if x_d != d {
+                    n *= (&d).div_exact(x_d);
+                }
+                Integer::from_sign_and_abs(sign, n)
+            })
+            .collect();
+        (
+            IntegerVector {
+                elements: numerators,
+            },
+            d,
+        )
+    }
 }

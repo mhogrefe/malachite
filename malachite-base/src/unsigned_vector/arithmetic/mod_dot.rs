@@ -7,9 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::mod_mul::{limbs_invert_limb_u64, mod_preinverted_double};
+use crate::num::arithmetic::traits::{ModDot, ModIsReduced};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::logic::traits::LeadingZeros;
+use crate::unsigned_vector::UnsignedVector;
 
 // Dot products of vectors whose elements are words reduced modulo a word $m$. As in FLINT's
 // `nmod_vec` dot products, the sum of products is accumulated exactly, in one, two, or three words,
@@ -171,5 +173,247 @@ pub(crate) fn column_sum<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], d: &ModData<T
             }
             acc
         }
+    }
+}
+
+// The sum of the products of `xs[i]` and `ys[i]`, as a three-word value: `column_sum` without the
+// reversal of `ys`.
+#[inline]
+pub(crate) fn dot_sum<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], d: &ModData<T>) -> (T, T, T) {
+    match d.words {
+        1 => {
+            let mut sum = T::ZERO;
+            for (&x, &y) in xs.iter().zip(ys) {
+                sum.wrapping_add_assign(x.wrapping_mul(y));
+            }
+            (T::ZERO, T::ZERO, sum)
+        }
+        2 => {
+            let (mut hi, mut lo) = (T::ZERO, T::ZERO);
+            for (&x, &y) in xs.iter().zip(ys) {
+                let (p_hi, p_lo) = T::x_mul_y_to_zz(x, y);
+                (hi, lo) = T::xx_add_yy_to_zz(hi, lo, p_hi, p_lo);
+            }
+            (T::ZERO, hi, lo)
+        }
+        _ => {
+            let mut acc = (T::ZERO, T::ZERO, T::ZERO);
+            for (i, (x_chunk, y_chunk)) in xs
+                .chunks(d.max_terms)
+                .zip(ys.chunks(d.max_terms))
+                .enumerate()
+            {
+                if i != 0 {
+                    acc = (T::ZERO, T::ZERO, d.reduce(acc.0, acc.1, acc.2));
+                }
+                for (&x, &y) in x_chunk.iter().zip(y_chunk) {
+                    accumulate(&mut acc, x, y);
+                }
+            }
+            acc
+        }
+    }
+}
+
+// The dot product of `xs` and `ys` modulo `m`, which must be positive; `xs` and `ys` must have the
+// same length and be reduced. The products are summed exactly in one, two, or three words and the
+// sum is reduced once.
+//
+// This is equivalent to `_nmod_vec_dot` from `nmod_vec/dot.c`, FLINT 3.6.0.
+pub(crate) fn mod_dot<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], m: T) -> T {
+    if xs.is_empty() {
+        return T::ZERO;
+    }
+    let d = ModData::new(m, xs.len());
+    d.reduce_sum(dot_sum(xs, ys, &d))
+}
+
+fn mod_dot_vectors<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &UnsignedVector<T>, m: T) -> T {
+    assert_ne!(m, T::ZERO, "m cannot be zero");
+    assert_eq!(
+        v.elements.len(),
+        w.elements.len(),
+        "the vectors must have the same dimension"
+    );
+    assert!(
+        v.mod_is_reduced(&m),
+        "self must be reduced mod m, but {v} has an element >= {m}"
+    );
+    assert!(
+        w.mod_is_reduced(&m),
+        "other must be reduced mod m, but {w} has an element >= {m}"
+    );
+    mod_dot(&v.elements, &w.elements, m)
+}
+
+impl<T: PrimitiveUnsigned> ModDot<Self, T> for UnsignedVector<T> {
+    type Output = T;
+
+    /// Computes the dot product of two [`UnsignedVector`]s modulo $m$, taking the first by value
+    /// and the second by value. The elements of both must already be reduced.
+    ///
+    /// The dot product of two 0-dimensional vectors is 0.
+    ///
+    /// $$
+    /// f(v, w, m) = \sum_{i=0}^{n-1} v_iw_i \bmod m,
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the dimension of the vectors.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero, if the vectors have different dimensions, or if any element is
+    /// greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModDot;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    ///
+    /// let v = UnsignedVector::<u8>::from_str("(1, 2, 3)").unwrap();
+    /// let w = UnsignedVector::<u8>::from_str("(4, 5, 7)").unwrap();
+    /// assert_eq!(v.clone().mod_dot(w.clone(), 10), 5);
+    /// ```
+    ///
+    /// This is equivalent to `_nmod_vec_dot` from `nmod_vec/dot.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_dot(self, other: Self, m: T) -> T {
+        mod_dot_vectors(&self, &other, m)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModDot<&Self, T> for UnsignedVector<T> {
+    type Output = T;
+
+    /// Computes the dot product of two [`UnsignedVector`]s modulo $m$, taking the first by value
+    /// and the second by reference. The elements of both must already be reduced.
+    ///
+    /// The dot product of two 0-dimensional vectors is 0.
+    ///
+    /// $$
+    /// f(v, w, m) = \sum_{i=0}^{n-1} v_iw_i \bmod m,
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the dimension of the vectors.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero, if the vectors have different dimensions, or if any element is
+    /// greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModDot;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    ///
+    /// let v = UnsignedVector::<u8>::from_str("(1, 2, 3)").unwrap();
+    /// let w = UnsignedVector::<u8>::from_str("(4, 5, 7)").unwrap();
+    /// assert_eq!(v.clone().mod_dot(&w, 10), 5);
+    /// ```
+    ///
+    /// This is equivalent to `_nmod_vec_dot` from `nmod_vec/dot.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_dot(self, other: &Self, m: T) -> T {
+        mod_dot_vectors(&self, other, m)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModDot<UnsignedVector<T>, T> for &UnsignedVector<T> {
+    type Output = T;
+
+    /// Computes the dot product of two [`UnsignedVector`]s modulo $m$, taking the first by
+    /// reference and the second by value. The elements of both must already be reduced.
+    ///
+    /// The dot product of two 0-dimensional vectors is 0.
+    ///
+    /// $$
+    /// f(v, w, m) = \sum_{i=0}^{n-1} v_iw_i \bmod m,
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the dimension of the vectors.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero, if the vectors have different dimensions, or if any element is
+    /// greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModDot;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    ///
+    /// let v = UnsignedVector::<u8>::from_str("(1, 2, 3)").unwrap();
+    /// let w = UnsignedVector::<u8>::from_str("(4, 5, 7)").unwrap();
+    /// assert_eq!((&v).mod_dot(w.clone(), 10), 5);
+    /// ```
+    ///
+    /// This is equivalent to `_nmod_vec_dot` from `nmod_vec/dot.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_dot(self, other: UnsignedVector<T>, m: T) -> T {
+        mod_dot_vectors(self, &other, m)
+    }
+}
+
+impl<T: PrimitiveUnsigned> ModDot<&UnsignedVector<T>, T> for &UnsignedVector<T> {
+    type Output = T;
+
+    /// Computes the dot product of two [`UnsignedVector`]s modulo $m$, taking the first by
+    /// reference and the second by reference. The elements of both must already be reduced.
+    ///
+    /// The dot product of two 0-dimensional vectors is 0.
+    ///
+    /// $$
+    /// f(v, w, m) = \sum_{i=0}^{n-1} v_iw_i \bmod m,
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the dimension of the vectors.
+    ///
+    /// # Panics
+    /// Panics if `m` is zero, if the vectors have different dimensions, or if any element is
+    /// greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::ModDot;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    ///
+    /// let v = UnsignedVector::<u8>::from_str("(1, 2, 3)").unwrap();
+    /// let w = UnsignedVector::<u8>::from_str("(4, 5, 7)").unwrap();
+    /// assert_eq!((&v).mod_dot(&w, 10), 5);
+    /// ```
+    ///
+    /// This is equivalent to `_nmod_vec_dot` from `nmod_vec/dot.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_dot(self, other: &UnsignedVector<T>, m: T) -> T {
+        mod_dot_vectors(self, other, m)
     }
 }

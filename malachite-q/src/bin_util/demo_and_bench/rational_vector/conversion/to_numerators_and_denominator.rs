@@ -15,9 +15,14 @@ use malachite_q::test_util::rational_vector::conversion::to_numerators_and_denom
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_vector_to_numerators_and_denominator);
+    register_demo!(runner, demo_rational_vector_into_numerators_and_denominator);
     register_bench!(
         runner,
         benchmark_rational_vector_to_numerators_and_denominator_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_rational_vector_to_numerators_and_denominator_evaluation_strategy
     );
 }
 
@@ -29,6 +34,18 @@ fn demo_rational_vector_to_numerators_and_denominator(
     for v in rational_vector_gen().get(gm, config).take(limit) {
         let (ns, d) = v.to_numerators_and_denominator();
         println!("{v}.to_numerators_and_denominator() = ({ns}, {d})");
+    }
+}
+
+fn demo_rational_vector_into_numerators_and_denominator(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for v in rational_vector_gen().get(gm, config).take(limit) {
+        let v_old = v.clone();
+        let (ns, d) = v.into_numerators_and_denominator();
+        println!("{v_old}.into_numerators_and_denominator() = ({ns}, {d})");
     }
 }
 
@@ -53,6 +70,34 @@ fn benchmark_rational_vector_to_numerators_and_denominator_algorithms(
             ("product, then gcd", &mut |v| {
                 no_out!(rational_vector_to_numerators_and_denominator_naive(&v));
             }),
+        ],
+    );
+}
+
+fn benchmark_rational_vector_to_numerators_and_denominator_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "RationalVector.to_numerators_and_denominator()",
+        BenchmarkType::EvaluationStrategy,
+        rational_vector_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &rational_vector_bit_bucketer("v"),
+        &mut [
+            ("RationalVector.to_numerators_and_denominator()", &mut |v| {
+                no_out!(v.to_numerators_and_denominator());
+            }),
+            (
+                "RationalVector.into_numerators_and_denominator()",
+                &mut |v| {
+                    no_out!(v.into_numerators_and_denominator());
+                },
+            ),
         ],
     );
 }
