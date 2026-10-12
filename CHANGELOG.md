@@ -305,6 +305,11 @@ documented by git history.
   and `IntegerVector`.
 - `Height` and `HeightRef` for `NaturalVector` and `IntegerVector`: the largest absolute value of an
   element, like FLINT's `_fmpz_vec_height`. The height of the 0-dimensional vector is 0.
+- `AbsSquared` for `NaturalVector`, `IntegerVector`, and `RationalVector`: the squared norm, the sum
+  of the squares of the elements, as a `Natural` (for the natural and integer vectors) or a
+  `Rational`. It is the dot product of the vector with itself, which squares each element rather
+  than multiplying it by itself; the rational version works over a common denominator and reduces
+  once.
 - `DotSign` for `IntegerVector`, with as few multiplications as possible: the terms are split by
   sign, and an empty side, one term on each side (`Natural::cmp_products`), or bit lengths far
   enough apart decide without any product; otherwise the largest term is weighed against the dot

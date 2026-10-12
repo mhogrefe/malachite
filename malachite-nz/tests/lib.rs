@@ -350,6 +350,7 @@ pub mod integer {
 pub mod integer_vector {
     pub mod access;
     pub mod arithmetic {
+        pub mod abs_squared;
         pub mod add;
         pub mod add_mul;
         pub mod add_mul_shl;
@@ -928,6 +929,7 @@ pub mod natural_polynomial {
 pub mod natural_vector {
     pub mod access;
     pub mod arithmetic {
+        pub mod abs_squared;
         pub mod add;
         pub mod add_mul;
         pub mod add_mul_shl;

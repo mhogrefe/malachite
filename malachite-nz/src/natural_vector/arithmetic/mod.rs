@@ -6,6 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared), the
+/// squared norm of a vector: the sum of the squares of its elements.
+pub mod abs_squared;
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// vectors.
 pub mod add;

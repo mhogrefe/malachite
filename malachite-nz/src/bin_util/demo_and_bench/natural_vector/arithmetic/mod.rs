@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    abs_squared::register(runner);
     add::register(runner);
     add_mul::register(runner);
     add_mul_shl::register(runner);
@@ -66,6 +67,7 @@ pub(crate) fn register(runner: &mut Runner) {
     sum::register(runner);
 }
 
+mod abs_squared;
 mod add;
 mod add_mul;
 mod add_mul_shl;
