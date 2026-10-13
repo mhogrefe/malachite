@@ -284,6 +284,21 @@ pub trait EntrywiseMinAssign<RHS = Self> {
     fn entrywise_min_assign(&mut self, other: RHS);
 }
 
+/// Takes the entrywise product of two values, such as two vectors of the same dimension: the value
+/// whose every entry is the product of the corresponding entries. For vectors this is also called
+/// the Hadamard or Schur product.
+pub trait EntrywiseMul<RHS = Self> {
+    type Output;
+
+    fn entrywise_mul(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces a value, such as a vector, by its entrywise product with another: every entry is
+/// multiplied by the corresponding entry of the other value.
+pub trait EntrywiseMulAssign<RHS = Self> {
+    fn entrywise_mul_assign(&mut self, other: RHS);
+}
+
 /// Divides every entry of a value, such as a vector, by a scalar, rounding each quotient according
 /// to a specified rounding mode.
 ///

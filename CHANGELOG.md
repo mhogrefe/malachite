@@ -30,6 +30,8 @@ documented by git history.
   `UnsignedVector`s whose elements are distinct and in ascending order, like FLINT's
   `_fmpq_vec_randtest_uniq_sorted`; and `exhaustive_ordered_unique_unsigned_vectors_with_dimension`,
   which generates every such vector once.
+- `EntrywiseMul` and `EntrywiseMulAssign` traits, for the entrywise (Hadamard) product of two
+  values such as vectors: $(v_0w_0, v_1w_1, \ldots, v_{n-1}w_{n-1})$.
 
 ### malachite-nz
 
@@ -46,6 +48,8 @@ documented by git history.
 - The same ordered, distinct-element generators, random, striped, and exhaustive, for
   `NaturalVector` and `IntegerVector`: `random_ordered_unique_natural_vectors_with_dimension`,
   `exhaustive_ordered_unique_integer_vectors_with_dimension`, and the rest.
+- `EntrywiseMul` and `EntrywiseMulAssign` for `NaturalVector` and `IntegerVector`, with both
+  vectors by value or by reference.
 
 ### malachite-q
 
@@ -56,6 +60,8 @@ documented by git history.
   `RationalVector`: `random_ordered_unique_rational_vectors_with_dimension`,
   `exhaustive_ordered_unique_rational_vectors_with_dimension`, and the rest. The random ones are the
   counterparts of FLINT's `_fmpq_vec_randtest_uniq_sorted`.
+- `EntrywiseMul` and `EntrywiseMulAssign` for `RationalVector`, with both vectors by value or by
+  reference.
 
 ## 0.14.0 — 2026-10-13
 

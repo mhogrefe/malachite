@@ -138,6 +138,10 @@ pub mod element_sum;
 /// [`EntrywiseAbsAssign`](malachite_base::num::arithmetic::traits::EntrywiseAbsAssign), which
 /// replace every element of a vector by its absolute value.
 pub mod entrywise_abs;
+/// Multiplying two vectors element by element, by implementations of
+/// [`EntrywiseMul`](malachite_base::num::arithmetic::traits::EntrywiseMul) and
+/// [`EntrywiseMulAssign`](malachite_base::num::arithmetic::traits::EntrywiseMulAssign).
+pub mod entrywise_mul;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
 /// element.

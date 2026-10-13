@@ -25,6 +25,7 @@ pub(crate) fn register(runner: &mut Runner) {
     element_product::register(runner);
     element_sum::register(runner);
     entrywise_abs::register(runner);
+    entrywise_mul::register(runner);
     height::register(runner);
     l1_norm::register(runner);
     neg::register(runner);
@@ -56,6 +57,7 @@ mod dot_sign;
 mod element_product;
 mod element_sum;
 mod entrywise_abs;
+mod entrywise_mul;
 mod height;
 mod l1_norm;
 mod neg;

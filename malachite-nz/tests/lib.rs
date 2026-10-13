@@ -372,6 +372,7 @@ pub mod integer_vector {
         pub mod element_sum;
         pub mod entrywise_abs;
         pub mod entrywise_div_round;
+        pub mod entrywise_mul;
         pub mod entrywise_shl_round;
         pub mod entrywise_shr_round;
         pub mod height;
@@ -958,6 +959,7 @@ pub mod natural_vector {
         pub mod element_product;
         pub mod element_sum;
         pub mod entrywise_div_round;
+        pub mod entrywise_mul;
         pub mod entrywise_shl_round;
         pub mod entrywise_shr_round;
         pub mod height;

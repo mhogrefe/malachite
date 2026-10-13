@@ -1,0 +1,122 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use core::str::FromStr;
+use malachite_base::num::arithmetic::traits::{Dot, ElementSum, EntrywiseMul, EntrywiseMulAssign};
+use malachite_base::num::basic::traits::One;
+use malachite_base::vector::Vector;
+use malachite_nz::integer_vector::IntegerVector;
+use malachite_nz::natural::Natural;
+use malachite_nz::natural_vector::NaturalVector;
+use malachite_nz::test_util::generators::{
+    natural_vector_pair_gen_var_1, natural_vector_triple_gen_var_1,
+};
+
+#[test]
+fn test_entrywise_mul() {
+    let test = |s, t, out| {
+        let v = NaturalVector::from_str(s).unwrap();
+        let w = NaturalVector::from_str(t).unwrap();
+        // All four combinations of value and reference, and in place with both.
+        let r = (&v).entrywise_mul(&w);
+        assert_eq!(r.to_string(), out);
+        assert_eq!((&v).entrywise_mul(w.clone()), r);
+        assert_eq!(v.clone().entrywise_mul(&w), r);
+        assert_eq!(v.clone().entrywise_mul(w.clone()), r);
+        let mut x = v.clone();
+        x.entrywise_mul_assign(&w);
+        assert_eq!(x, r);
+        let mut x = v;
+        x.entrywise_mul_assign(w);
+        assert_eq!(x, r);
+    };
+    test("()", "()", "()");
+    test("(0)", "(5)", "(0)");
+    test("(1, 2, 3)", "(4, 5, 6)", "(4, 10, 18)");
+    test(
+        "(18446744073709551616, 3)",
+        "(18446744073709551615, 5)",
+        "(340282366920938463444927863358058659840, 15)",
+    );
+}
+
+#[test]
+#[should_panic]
+fn entrywise_mul_fail() {
+    let _ = NaturalVector::from_str("(1, 2)")
+        .unwrap()
+        .entrywise_mul(NaturalVector::from_str("(1)").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn entrywise_mul_ref_ref_fail() {
+    let _ = (&NaturalVector::from_str("(1, 2)").unwrap())
+        .entrywise_mul(&NaturalVector::from_str("(1)").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn entrywise_mul_assign_fail() {
+    let mut v = NaturalVector::from_str("(1)").unwrap();
+    v.entrywise_mul_assign(NaturalVector::from_str("(1, 2)").unwrap());
+}
+
+#[test]
+fn entrywise_mul_properties() {
+    natural_vector_pair_gen_var_1().test_properties(|(v, w)| {
+        let r = (&v).entrywise_mul(&w);
+        // The forms agree.
+        assert_eq!((&v).entrywise_mul(w.clone()), r);
+        assert_eq!(v.clone().entrywise_mul(&w), r);
+        assert_eq!(v.clone().entrywise_mul(w.clone()), r);
+        let mut x = v.clone();
+        x.entrywise_mul_assign(&w);
+        assert_eq!(x, r);
+        let mut x = v.clone();
+        x.entrywise_mul_assign(w.clone());
+        assert_eq!(x, r);
+
+        // Element by element, this is the product, and the dimension is unchanged.
+        assert_eq!(r.dimension(), v.dimension());
+        for ((x, y), z) in v.elements.iter().zip(&w.elements).zip(&r.elements) {
+            assert_eq!(*z, x * y);
+        }
+        // It is commutative.
+        assert_eq!((&w).entrywise_mul(&v), r);
+        // The sum of its elements is the dot product.
+        assert_eq!(r.to_element_sum(), (&v).dot(&w));
+        // The all-ones vector is the identity, and the zero vector absorbs everything.
+        let ones = NaturalVector {
+            elements: vec![Natural::ONE; v.elements.len()],
+        };
+        assert_eq!((&v).entrywise_mul(&ones), v);
+        let zero = NaturalVector::zero(v.dimension());
+        assert_eq!((&v).entrywise_mul(&zero), zero);
+    });
+
+    natural_vector_triple_gen_var_1().test_properties(|(u, v, w)| {
+        // It is associative, and it distributes over addition.
+        assert_eq!(
+            (&u).entrywise_mul(&v).entrywise_mul(&w),
+            (&u).entrywise_mul((&v).entrywise_mul(&w))
+        );
+        assert_eq!(
+            (&u).entrywise_mul(&v + &w),
+            (&u).entrywise_mul(&v) + u.entrywise_mul(w)
+        );
+    });
+
+    natural_vector_pair_gen_var_1().test_properties(|(v, w)| {
+        // As IntegerVectors, the result is the same.
+        assert_eq!(
+            IntegerVector::from((&v).entrywise_mul(&w)),
+            IntegerVector::from(v).entrywise_mul(IntegerVector::from(w))
+        );
+    });
+}

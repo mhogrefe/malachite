@@ -284,6 +284,10 @@ pub mod entrywise_abs;
 /// assert_eq!(v.to_string(), "(-2, -1, 0, 1)");
 /// ```
 pub mod entrywise_div_round;
+/// Multiplying two vectors element by element, by implementations of
+/// [`EntrywiseMul`](malachite_base::num::arithmetic::traits::EntrywiseMul) and
+/// [`EntrywiseMulAssign`](malachite_base::num::arithmetic::traits::EntrywiseMulAssign).
+pub mod entrywise_mul;
 /// Left-shifting a vector (multiplying it by a power of 2) and rounding every element, by
 /// implementations of
 /// [`EntrywiseShlRound`](malachite_base::num::arithmetic::traits::EntrywiseShlRound) and

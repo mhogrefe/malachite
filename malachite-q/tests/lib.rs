@@ -442,6 +442,7 @@ pub mod rational_vector {
         pub mod element_product;
         pub mod element_sum;
         pub mod entrywise_abs;
+        pub mod entrywise_mul;
         pub mod height;
         pub mod l1_norm;
         pub mod neg;
