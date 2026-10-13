@@ -12,6 +12,14 @@ pub mod abs_squared;
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// vectors.
 pub mod add;
+/// Implementations of [`AddDot`](malachite_base::num::arithmetic::traits::AddDot) and
+/// [`AddDotAssign`](malachite_base::num::arithmetic::traits::AddDotAssign), for adding the dot
+/// product of two vectors to a number.
+pub mod add_dot;
+/// Implementations of [`AddDotReversed`](malachite_base::num::arithmetic::traits::AddDotReversed)
+/// and [`AddDotReversedAssign`](malachite_base::num::arithmetic::traits::AddDotReversedAssign), for
+/// adding the dot product of a vector and the reverse of another to a number.
+pub mod add_dot_reversed;
 /// Adding a multiple of one vector to another, by implementations of
 /// [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
 /// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign).
@@ -164,6 +172,9 @@ pub mod div_exact;
 /// Implementations of [`Dot`](malachite_base::num::arithmetic::traits::Dot), the dot product of two
 /// vectors.
 pub mod dot;
+/// Implementations of [`DotReversed`](malachite_base::num::arithmetic::traits::DotReversed), the
+/// dot product of a vector and the reverse of another.
+pub mod dot_reversed;
 /// Implementations of [`DotSign`](malachite_base::num::arithmetic::traits::DotSign), the sign of
 /// the dot product of two vectors.
 pub mod dot_sign;
@@ -381,6 +392,15 @@ pub mod mod_abs_squared;
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding vectors
 /// modulo a number.
 pub mod mod_add;
+/// Implementations of [`ModAddDot`](malachite_base::num::arithmetic::traits::ModAddDot) and
+/// [`ModAddDotAssign`](malachite_base::num::arithmetic::traits::ModAddDotAssign), for adding the
+/// dot product of two vectors to a number modulo a number.
+pub mod mod_add_dot;
+/// Implementations of
+/// [`ModAddDotReversed`](malachite_base::num::arithmetic::traits::ModAddDotReversed) and
+/// [`ModAddDotReversedAssign`](malachite_base::num::arithmetic::traits::ModAddDotReversedAssign),
+/// for adding the dot product of a vector and the reverse of another to a number modulo a number.
+pub mod mod_add_dot_reversed;
 /// Implementations of [`ModAddMul`](malachite_base::num::arithmetic::traits::ModAddMul) and
 /// [`ModAddMulAssign`](malachite_base::num::arithmetic::traits::ModAddMulAssign), for adding a
 /// scalar multiple of one vector to another modulo a number.
@@ -392,6 +412,9 @@ pub mod mod_add_mul_shl;
 /// Implementations of [`ModDot`](malachite_base::num::arithmetic::traits::ModDot), the dot product
 /// of two vectors modulo a number.
 pub mod mod_dot;
+/// Implementations of [`ModDotReversed`](malachite_base::num::arithmetic::traits::ModDotReversed),
+/// the dot product of a vector and the reverse of another modulo a number.
+pub mod mod_dot_reversed;
 /// Implementations of
 /// [`ModElementProduct`](malachite_base::num::arithmetic::traits::ModElementProduct), the product
 /// of the elements modulo a number.
@@ -428,6 +451,17 @@ pub mod mod_power_of_2_abs_squared;
 /// adding vectors modulo a power of 2.
 pub mod mod_power_of_2_add;
 /// Implementations of
+/// [`ModPowerOf2AddDot`](malachite_base::num::arithmetic::traits::ModPowerOf2AddDot) and
+/// [`ModPowerOf2AddDotAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddDotAssign),
+/// for adding the dot product of two vectors to a number modulo a power of 2.
+pub mod mod_power_of_2_add_dot;
+/// Implementations of [`ModPowerOf2AddDotReversed`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2AddDotReversed) and
+/// [`ModPowerOf2AddDotReversedAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2AddDotReversedAssign), for adding the dot
+/// product of a vector and the reverse of another to a number modulo a power of 2.
+pub mod mod_power_of_2_add_dot_reversed;
+/// Implementations of
 /// [`ModPowerOf2AddMul`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMul) and
 /// [`ModPowerOf2AddMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMulAssign),
 /// for adding a scalar multiple of one vector to another modulo a power of 2.
@@ -441,6 +475,10 @@ pub mod mod_power_of_2_add_mul_shl;
 /// Implementations of [`ModPowerOf2Dot`](malachite_base::num::arithmetic::traits::ModPowerOf2Dot),
 /// the dot product of two vectors modulo a power of 2.
 pub mod mod_power_of_2_dot;
+/// Implementations of
+/// [`ModPowerOf2DotReversed`](malachite_base::num::arithmetic::traits::ModPowerOf2DotReversed), the
+/// dot product of a vector and the reverse of another modulo a power of 2.
+pub mod mod_power_of_2_dot_reversed;
 /// An implementation of [`ModPowerOf2ElementProduct`](
 /// malachite_base::num::arithmetic::traits::ModPowerOf2ElementProduct), the product of the elements
 /// modulo a power of 2.
@@ -512,6 +550,17 @@ pub mod mod_power_of_2_shl;
 /// subtracting vectors modulo a power of 2.
 pub mod mod_power_of_2_sub;
 /// Implementations of
+/// [`ModPowerOf2SubDot`](malachite_base::num::arithmetic::traits::ModPowerOf2SubDot) and
+/// [`ModPowerOf2SubDotAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubDotAssign),
+/// for subtracting the dot product of two vectors from a number modulo a power of 2.
+pub mod mod_power_of_2_sub_dot;
+/// Implementations of [`ModPowerOf2SubDotReversed`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2SubDotReversed) and
+/// [`ModPowerOf2SubDotReversedAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2SubDotReversedAssign), for subtracting the
+/// dot product of a vector and the reverse of another from a number modulo a power of 2.
+pub mod mod_power_of_2_sub_dot_reversed;
+/// Implementations of
 /// [`ModPowerOf2SubMul`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMul) and
 /// [`ModPowerOf2SubMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMulAssign),
 /// for subtracting a scalar multiple of one vector from another modulo a power of 2.
@@ -573,6 +622,16 @@ pub mod mod_shl;
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting vectors
 /// modulo a number.
 pub mod mod_sub;
+/// Implementations of [`ModSubDot`](malachite_base::num::arithmetic::traits::ModSubDot) and
+/// [`ModSubDotAssign`](malachite_base::num::arithmetic::traits::ModSubDotAssign), for subtracting
+/// the dot product of two vectors from a number modulo a number.
+pub mod mod_sub_dot;
+/// Implementations of
+/// [`ModSubDotReversed`](malachite_base::num::arithmetic::traits::ModSubDotReversed) and
+/// [`ModSubDotReversedAssign`](malachite_base::num::arithmetic::traits::ModSubDotReversedAssign),
+/// for subtracting the dot product of a vector and the reverse of another from a number modulo a
+/// number.
+pub mod mod_sub_dot_reversed;
 /// Implementations of [`ModSubMul`](malachite_base::num::arithmetic::traits::ModSubMul) and
 /// [`ModSubMulAssign`](malachite_base::num::arithmetic::traits::ModSubMulAssign), for subtracting a
 /// scalar multiple of one vector from another modulo a number.
@@ -734,5 +793,13 @@ pub mod shl;
 /// assert_eq!(v.to_string(), "(4, 8, 12)");
 /// ```
 pub mod shr;
+/// Implementations of [`SubDot`](malachite_base::num::arithmetic::traits::SubDot) and
+/// [`SubDotAssign`](malachite_base::num::arithmetic::traits::SubDotAssign), for subtracting the dot
+/// product of two vectors from a number.
+pub mod sub_dot;
+/// Implementations of [`SubDotReversed`](malachite_base::num::arithmetic::traits::SubDotReversed)
+/// and [`SubDotReversedAssign`](malachite_base::num::arithmetic::traits::SubDotReversedAssign), for
+/// subtracting the dot product of a vector and the reverse of another from a number.
+pub mod sub_dot_reversed;
 /// Implementations of [`Sum`](core::iter::Sum), for adding up vectors entry by entry.
 pub mod sum;

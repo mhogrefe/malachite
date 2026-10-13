@@ -12,6 +12,14 @@ pub mod abs_squared;
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// vectors.
 pub mod add;
+/// Implementations of [`AddDot`](malachite_base::num::arithmetic::traits::AddDot) and
+/// [`AddDotAssign`](malachite_base::num::arithmetic::traits::AddDotAssign), for adding the dot
+/// product of two vectors to a number.
+pub mod add_dot;
+/// Implementations of [`AddDotReversed`](malachite_base::num::arithmetic::traits::AddDotReversed)
+/// and [`AddDotReversedAssign`](malachite_base::num::arithmetic::traits::AddDotReversedAssign), for
+/// adding the dot product of a vector and the reverse of another to a number.
+pub mod add_dot_reversed;
 /// Adding a multiple of one vector to another, by implementations of
 /// [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
 /// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign).
@@ -113,6 +121,9 @@ pub mod content_chained;
 /// Implementations of [`Dot`](malachite_base::num::arithmetic::traits::Dot), the dot product of two
 /// vectors.
 pub mod dot;
+/// Implementations of [`DotReversed`](malachite_base::num::arithmetic::traits::DotReversed), the
+/// dot product of a vector and the reverse of another.
+pub mod dot_reversed;
 /// Implementations of [`DotSign`](malachite_base::num::arithmetic::traits::DotSign), the sign of
 /// the dot product of two vectors.
 pub mod dot_sign;
@@ -244,6 +255,14 @@ pub mod shr;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting vectors.
 pub mod sub;
+/// Implementations of [`SubDot`](malachite_base::num::arithmetic::traits::SubDot) and
+/// [`SubDotAssign`](malachite_base::num::arithmetic::traits::SubDotAssign), for subtracting the dot
+/// product of two vectors from a number.
+pub mod sub_dot;
+/// Implementations of [`SubDotReversed`](malachite_base::num::arithmetic::traits::SubDotReversed)
+/// and [`SubDotReversedAssign`](malachite_base::num::arithmetic::traits::SubDotReversedAssign), for
+/// subtracting the dot product of a vector and the reverse of another from a number.
+pub mod sub_dot_reversed;
 /// Subtracting a multiple of one vector from another, by implementations of
 /// [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
 /// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign).

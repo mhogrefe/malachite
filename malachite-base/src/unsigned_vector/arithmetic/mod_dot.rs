@@ -228,7 +228,29 @@ pub(crate) fn mod_dot<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], m: T) -> T {
     d.reduce_sum(dot_sum(xs, ys, &d))
 }
 
-fn mod_dot_vectors<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &UnsignedVector<T>, m: T) -> T {
+// The dot product of `xs` and the reverse of `ys` modulo `m`, which must be positive; `xs` and `ys`
+// must have the same length and be reduced. As for `mod_dot`, the products are summed exactly and
+// the sum is reduced once.
+//
+// This is equivalent to `_nmod_vec_dot_rev` from `nmod_vec/dot.c`, FLINT 3.6.0.
+pub(crate) fn mod_dot_reversed<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], m: T) -> T {
+    if xs.is_empty() {
+        return T::ZERO;
+    }
+    let d = ModData::new(m, xs.len());
+    d.reduce_sum(column_sum(xs, ys, &d))
+}
+
+// Checks the arguments of a modular dot product: `m` is positive, the vectors have the same
+// dimension, and their elements are reduced. `v_name` and `w_name` name the vectors in the panic
+// messages.
+fn assert_mod_dot_arguments<T: PrimitiveUnsigned>(
+    v: &UnsignedVector<T>,
+    w: &UnsignedVector<T>,
+    m: T,
+    v_name: &str,
+    w_name: &str,
+) {
     assert_ne!(m, T::ZERO, "m cannot be zero");
     assert_eq!(
         v.elements.len(),
@@ -237,13 +259,51 @@ fn mod_dot_vectors<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &UnsignedVect
     );
     assert!(
         v.mod_is_reduced(&m),
-        "self must be reduced mod m, but {v} has an element >= {m}"
+        "{v_name} must be reduced mod m, but {v} has an element >= {m}"
     );
     assert!(
         w.mod_is_reduced(&m),
-        "other must be reduced mod m, but {w} has an element >= {m}"
+        "{w_name} must be reduced mod m, but {w} has an element >= {m}"
     );
+}
+
+fn mod_dot_vectors<T: PrimitiveUnsigned>(v: &UnsignedVector<T>, w: &UnsignedVector<T>, m: T) -> T {
+    assert_mod_dot_arguments(v, w, m, "self", "other");
     mod_dot(&v.elements, &w.elements, m)
+}
+
+// The dot product of `v` and the reverse of `w` modulo `m`, after checking the arguments.
+pub(crate) fn mod_dot_reversed_vectors<T: PrimitiveUnsigned>(
+    v: &UnsignedVector<T>,
+    w: &UnsignedVector<T>,
+    m: T,
+) -> T {
+    assert_mod_dot_arguments(v, w, m, "self", "other");
+    mod_dot_reversed(&v.elements, &w.elements, m)
+}
+
+// `x` plus, or if `subtract` minus, the dot product of `v` and `w` modulo `m`, with `w` read
+// backwards if `reverse`, after checking the arguments.
+pub(crate) fn mod_dot_general<T: PrimitiveUnsigned>(
+    x: T,
+    subtract: bool,
+    v: &UnsignedVector<T>,
+    w: &UnsignedVector<T>,
+    reverse: bool,
+    m: T,
+) -> T {
+    assert_mod_dot_arguments(v, w, m, "v", "w");
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+    let d = if reverse {
+        mod_dot_reversed(&v.elements, &w.elements, m)
+    } else {
+        mod_dot(&v.elements, &w.elements, m)
+    };
+    if subtract {
+        x.mod_sub(d, m)
+    } else {
+        x.mod_add(d, m)
+    }
 }
 
 impl<T: PrimitiveUnsigned> ModDot<Self, T> for UnsignedVector<T> {

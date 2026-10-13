@@ -6,6 +6,44 @@ Unreleased section as work lands; at release time the section is stamped with th
 date. The 0.10.0 section was reconstructed retroactively; releases before 0.10.0 are only
 documented by git history.
 
+## Unreleased
+
+### malachite-base
+
+- `AddDot`, `AddDotAssign`, `SubDot`, and `SubDotAssign` traits in
+  `malachite_base::num::arithmetic::traits`, for adding the dot product of two vectors to a number
+  or subtracting it, $x \pm \sum_i v_iw_i$; `DotReversed`, for the dot product of a vector and the
+  reverse of another, $\sum_i v_iw_{n-1-i}$; and `AddDotReversed`, `AddDotReversedAssign`,
+  `SubDotReversed`, and `SubDotReversedAssign`, for the reversed form with an initial term.
+  Together they cover FLINT's `_fmpz_vec_dot_general`.
+- `Mod` and `ModPowerOf2` versions of those nine traits: `ModAddDot`, `ModSubDot`,
+  `ModDotReversed`, `ModAddDotReversed`, `ModSubDotReversed`, and their `Assign` forms, modulo
+  $m$; and `ModPowerOf2AddDot` and the rest, modulo $2^k$. The number and the elements must
+  already be reduced.
+- These traits for `UnsignedVector<T>` with a `T` receiver and modulus. Modulo $m$ the products
+  are summed exactly in one to three words and reduced once, the reversed sum by the same
+  accumulator that the polynomial products use; `mod_dot_reversed` is FLINT's `_nmod_vec_dot_rev`.
+  Modulo $2^k$ the products are summed in wrapping arithmetic and masked once.
+
+### malachite-nz
+
+- `AddDot`, `SubDot`, `AddDotReversed`, `SubDotReversed`, and their `Assign` forms for `Integer`
+  with `IntegerVector`s and `Natural` with `NaturalVector`s, and `DotReversed` for `IntegerVector`
+  and `NaturalVector`, like FLINT's `_fmpz_vec_dot_general`: the initial term and the products are
+  accumulated together, in a three-limb accumulator for small products and limb buffers for the
+  rest. The receiver may be taken by value or by reference, and the vectors in every combination.
+  For a `Natural`, subtracting a dot product greater than the receiver panics, as `sub_mul` does.
+- The `Mod` and `ModPowerOf2` dot traits above for `Natural` with `NaturalVector`s, with the
+  receiver, the vectors, and a `Natural` modulus by value or by reference. A modulus that fits in a
+  limb uses the `UnsignedVector<Limb>` implementation; a larger one reduces the exact dot product
+  once. `mod_dot_reversed` is FLINT's `_fmpz_mod_vec_dot_rev`.
+
+### malachite-q
+
+- `AddDot`, `SubDot`, `AddDotReversed`, `SubDotReversed`, and their `Assign` forms for `Rational`
+  with `RationalVector`s, and `DotReversed` for `RationalVector`. Each vector is written over a
+  common denominator, so that the products need one integer dot product and one reduction.
+
 ## 0.14.0 — 2026-10-13
 
 ### Breaking and behavioral changes

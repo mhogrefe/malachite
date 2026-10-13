@@ -6,19 +6,26 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer_vector::arithmetic::dot_general::vec_dot_general;
 use crate::natural::Natural;
 use crate::natural_vector::NaturalVector;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{
-    Dot, ModPowerOf2, ModPowerOf2Dot, ModPowerOf2IsReduced, WrappingAddAssign,
+    Dot, ModPowerOf2, ModPowerOf2Add, ModPowerOf2Dot, ModPowerOf2IsReduced, ModPowerOf2Sub,
+    WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::WrappingFrom;
 
-// The dot product of two vectors modulo $2^k$. When $k$ is at most the width of a limb, every
-// element fits in a limb, and the products are summed in wrapping limb arithmetic, since $2^k$
-// divides the limb modulus; otherwise the exact dot product is reduced once.
-fn mod_power_of_2_dot(v: &NaturalVector, w: &NaturalVector, pow: u64) -> Natural {
+// Checks the arguments of a dot product modulo $2^k$: the vectors have the same dimension, and
+// their elements are reduced. `v_name` and `w_name` name the vectors in the panic messages.
+fn assert_mod_power_of_2_dot_arguments(
+    v: &NaturalVector,
+    w: &NaturalVector,
+    pow: u64,
+    v_name: &str,
+    w_name: &str,
+) {
     assert_eq!(
         v.elements.len(),
         w.elements.len(),
@@ -26,20 +33,82 @@ fn mod_power_of_2_dot(v: &NaturalVector, w: &NaturalVector, pow: u64) -> Natural
     );
     assert!(
         v.mod_power_of_2_is_reduced(pow),
-        "self must be reduced mod 2^{pow}, but {v} has an element >= 2^{pow}"
+        "{v_name} must be reduced mod 2^{pow}, but {v} has an element >= 2^{pow}"
     );
     assert!(
         w.mod_power_of_2_is_reduced(pow),
-        "other must be reduced mod 2^{pow}, but {w} has an element >= 2^{pow}"
+        "{w_name} must be reduced mod 2^{pow}, but {w} has an element >= 2^{pow}"
     );
+}
+
+// The dot product of two vectors modulo $2^k$, with `w` read backwards if `reverse`; the arguments
+// have already been checked. When $k$ is at most the width of a limb, every element fits in a limb,
+// and the products are summed in wrapping limb arithmetic, since $2^k$ divides the limb modulus;
+// otherwise the exact dot product is reduced once.
+fn mod_power_of_2_dot_checked(
+    v: &NaturalVector,
+    w: &NaturalVector,
+    reverse: bool,
+    pow: u64,
+) -> Natural {
     if pow <= Limb::WIDTH {
         let mut sum: Limb = 0;
-        for (x, y) in v.elements.iter().zip(&w.elements) {
+        let mut add = |x: &Natural, y: &Natural| {
             sum.wrapping_add_assign(Limb::wrapping_from(x).wrapping_mul(Limb::wrapping_from(y)));
+        };
+        if reverse {
+            for (x, y) in v.elements.iter().zip(w.elements.iter().rev()) {
+                add(x, y);
+            }
+        } else {
+            for (x, y) in v.elements.iter().zip(&w.elements) {
+                add(x, y);
+            }
         }
         Natural::from(sum.mod_power_of_2(pow))
+    } else if reverse {
+        vec_dot_general(None, false, &v.elements, &w.elements, true).mod_power_of_2(pow)
     } else {
         v.dot(w).mod_power_of_2(pow)
+    }
+}
+
+// The dot product of two vectors modulo $2^k$, after checking the arguments.
+fn mod_power_of_2_dot(v: &NaturalVector, w: &NaturalVector, pow: u64) -> Natural {
+    assert_mod_power_of_2_dot_arguments(v, w, pow, "self", "other");
+    mod_power_of_2_dot_checked(v, w, false, pow)
+}
+
+// The dot product of `v` and the reverse of `w` modulo $2^k$, after checking the arguments.
+pub(crate) fn mod_power_of_2_dot_reversed_vectors(
+    v: &NaturalVector,
+    w: &NaturalVector,
+    pow: u64,
+) -> Natural {
+    assert_mod_power_of_2_dot_arguments(v, w, pow, "self", "other");
+    mod_power_of_2_dot_checked(v, w, true, pow)
+}
+
+// `x` plus, or if `subtract` minus, the dot product of `v` and `w` modulo $2^k$, with `w` read
+// backwards if `reverse`, after checking the arguments.
+pub(crate) fn mod_power_of_2_dot_general(
+    x: &Natural,
+    subtract: bool,
+    v: &NaturalVector,
+    w: &NaturalVector,
+    reverse: bool,
+    pow: u64,
+) -> Natural {
+    assert_mod_power_of_2_dot_arguments(v, w, pow, "v", "w");
+    assert!(
+        x.mod_power_of_2_is_reduced(pow),
+        "x must be reduced mod 2^{pow}, but {x} >= 2^{pow}"
+    );
+    let d = mod_power_of_2_dot_checked(v, w, reverse, pow);
+    if subtract {
+        x.mod_power_of_2_sub(d, pow)
+    } else {
+        x.mod_power_of_2_add(d, pow)
     }
 }
 

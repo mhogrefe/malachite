@@ -428,6 +428,8 @@ pub mod rational_vector {
     pub mod arithmetic {
         pub mod abs_squared;
         pub mod add;
+        pub mod add_dot;
+        pub mod add_dot_reversed;
         pub mod add_mul;
         pub mod add_mul_shl;
         pub mod canonical_primitive_part;
@@ -435,6 +437,7 @@ pub mod rational_vector {
         pub mod content;
         pub mod content_chained;
         pub mod dot;
+        pub mod dot_reversed;
         pub mod dot_sign;
         pub mod element_product;
         pub mod element_sum;
@@ -447,6 +450,8 @@ pub mod rational_vector {
         pub mod shl;
         pub mod shr;
         pub mod sub;
+        pub mod sub_dot;
+        pub mod sub_dot_reversed;
         pub mod sub_mul;
         pub mod sub_mul_shl;
         pub mod sum;

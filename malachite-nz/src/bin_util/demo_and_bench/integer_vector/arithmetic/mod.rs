@@ -11,6 +11,8 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     abs_squared::register(runner);
     add::register(runner);
+    add_dot::register(runner);
+    add_dot_reversed::register(runner);
     add_mul::register(runner);
     add_mul_shl::register(runner);
     balanced_mod::register(runner);
@@ -21,6 +23,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content_chained::register(runner);
     div_exact::register(runner);
     dot::register(runner);
+    dot_reversed::register(runner);
     dot_sign::register(runner);
     dot_general::register(runner);
     element_lcm::register(runner);
@@ -43,6 +46,8 @@ pub(crate) fn register(runner: &mut Runner) {
     shl::register(runner);
     shr::register(runner);
     sub::register(runner);
+    sub_dot::register(runner);
+    sub_dot_reversed::register(runner);
     sub_mul::register(runner);
     sub_mul_shl::register(runner);
     sum::register(runner);
@@ -50,6 +55,8 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod abs_squared;
 mod add;
+mod add_dot;
+mod add_dot_reversed;
 mod add_mul;
 mod add_mul_shl;
 mod balanced_mod;
@@ -61,6 +68,7 @@ mod content_chained;
 mod div_exact;
 mod dot;
 mod dot_general;
+mod dot_reversed;
 mod dot_sign;
 mod element_lcm;
 mod element_product;
@@ -82,6 +90,8 @@ mod scalar_mul;
 mod shl;
 mod shr;
 mod sub;
+mod sub_dot;
+mod sub_dot_reversed;
 mod sub_mul;
 mod sub_mul_shl;
 mod sum;

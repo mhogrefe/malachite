@@ -1149,6 +1149,87 @@ pub trait Dot<RHS = Self> {
     fn dot(self, other: RHS) -> Self::Output;
 }
 
+/// Adds the dot product of two vectors to a number: $x + \sum_i v_iw_i$.
+///
+/// The vectors must have the same dimension. Computing the sum and the products together can avoid
+/// creating each product as a separate number, and is FLINT's `_fmpz_vec_dot_general` with an
+/// initial term.
+pub trait AddDot<V, W = V> {
+    type Output;
+
+    fn add_dot(self, v: V, w: W) -> Self::Output;
+}
+
+/// Adds the dot product of two vectors to a number in place: $x \gets x + \sum_i v_iw_i$.
+///
+/// The vectors must have the same dimension.
+pub trait AddDotAssign<V, W = V> {
+    fn add_dot_assign(&mut self, v: V, w: W);
+}
+
+/// Subtracts the dot product of two vectors from a number: $x - \sum_i v_iw_i$.
+///
+/// The vectors must have the same dimension.
+pub trait SubDot<V, W = V> {
+    type Output;
+
+    fn sub_dot(self, v: V, w: W) -> Self::Output;
+}
+
+/// Subtracts the dot product of two vectors from a number in place: $x \gets x - \sum_i v_iw_i$.
+///
+/// The vectors must have the same dimension.
+pub trait SubDotAssign<V, W = V> {
+    fn sub_dot_assign(&mut self, v: V, w: W);
+}
+
+/// Computes the dot product of a vector and the reverse of another: $\sum_i v_iw_{n-1-i}$, where
+/// $n$ is the dimension.
+///
+/// Reading the second vector backwards pairs the first element of one vector with the last of the
+/// other, as in the coefficient of a polynomial product. The vectors must have the same dimension.
+pub trait DotReversed<RHS = Self> {
+    type Output;
+
+    fn dot_reversed(self, other: RHS) -> Self::Output;
+}
+
+/// Adds the dot product of a vector and the reverse of another to a number: $x + \sum_i
+/// v_iw_{n-1-i}$.
+///
+/// The vectors must have the same dimension.
+pub trait AddDotReversed<V, W = V> {
+    type Output;
+
+    fn add_dot_reversed(self, v: V, w: W) -> Self::Output;
+}
+
+/// Adds the dot product of a vector and the reverse of another to a number in place: $x \gets x +
+/// \sum_i v_iw_{n-1-i}$.
+///
+/// The vectors must have the same dimension.
+pub trait AddDotReversedAssign<V, W = V> {
+    fn add_dot_reversed_assign(&mut self, v: V, w: W);
+}
+
+/// Subtracts the dot product of a vector and the reverse of another from a number: $x - \sum_i
+/// v_iw_{n-1-i}$.
+///
+/// The vectors must have the same dimension.
+pub trait SubDotReversed<V, W = V> {
+    type Output;
+
+    fn sub_dot_reversed(self, v: V, w: W) -> Self::Output;
+}
+
+/// Subtracts the dot product of a vector and the reverse of another from a number in place: $x
+/// \gets x - \sum_i v_iw_{n-1-i}$.
+///
+/// The vectors must have the same dimension.
+pub trait SubDotReversedAssign<V, W = V> {
+    fn sub_dot_reversed_assign(&mut self, v: V, w: W);
+}
+
 /// Determines the sign of the dot product of two vectors, as the ordering of the dot product
 /// against 0, without computing the dot product when it can be avoided.
 ///
@@ -1171,6 +1252,144 @@ pub trait ModDot<RHS = Self, M = Self> {
     type Output;
 
     fn mod_dot(self, other: RHS, m: M) -> Self::Output;
+}
+
+/// Adds the dot product of two vectors to a number modulo another number $m$. The number and the
+/// elements must already be reduced modulo $m$, and the vectors must have the same dimension.
+pub trait ModAddDot<V, W = V, M = Self> {
+    type Output;
+
+    fn mod_add_dot(self, v: V, w: W, m: M) -> Self::Output;
+}
+
+/// Adds the dot product of two vectors to a number in place modulo another number $m$. The number
+/// and the elements must already be reduced modulo $m$, and the vectors must have the same
+/// dimension.
+pub trait ModAddDotAssign<V, W = V, M = Self> {
+    fn mod_add_dot_assign(&mut self, v: V, w: W, m: M);
+}
+
+/// Adds the dot product of a vector and the reverse of another to a number modulo another number
+/// $m$. The number and the elements must already be reduced modulo $m$, and the vectors must have
+/// the same dimension.
+pub trait ModAddDotReversed<V, W = V, M = Self> {
+    type Output;
+
+    fn mod_add_dot_reversed(self, v: V, w: W, m: M) -> Self::Output;
+}
+
+/// Adds the dot product of a vector and the reverse of another to a number in place modulo another
+/// number $m$. The number and the elements must already be reduced modulo $m$, and the vectors must
+/// have the same dimension.
+pub trait ModAddDotReversedAssign<V, W = V, M = Self> {
+    fn mod_add_dot_reversed_assign(&mut self, v: V, w: W, m: M);
+}
+
+/// Subtracts the dot product of two vectors from a number modulo another number $m$. The number and
+/// the elements must already be reduced modulo $m$, and the vectors must have the same dimension.
+pub trait ModSubDot<V, W = V, M = Self> {
+    type Output;
+
+    fn mod_sub_dot(self, v: V, w: W, m: M) -> Self::Output;
+}
+
+/// Subtracts the dot product of two vectors from a number in place modulo another number $m$. The
+/// number and the elements must already be reduced modulo $m$, and the vectors must have the same
+/// dimension.
+pub trait ModSubDotAssign<V, W = V, M = Self> {
+    fn mod_sub_dot_assign(&mut self, v: V, w: W, m: M);
+}
+
+/// Subtracts the dot product of a vector and the reverse of another from a number modulo another
+/// number $m$. The number and the elements must already be reduced modulo $m$, and the vectors must
+/// have the same dimension.
+pub trait ModSubDotReversed<V, W = V, M = Self> {
+    type Output;
+
+    fn mod_sub_dot_reversed(self, v: V, w: W, m: M) -> Self::Output;
+}
+
+/// Subtracts the dot product of a vector and the reverse of another from a number in place modulo
+/// another number $m$. The number and the elements must already be reduced modulo $m$, and the
+/// vectors must have the same dimension.
+pub trait ModSubDotReversedAssign<V, W = V, M = Self> {
+    fn mod_sub_dot_reversed_assign(&mut self, v: V, w: W, m: M);
+}
+
+/// Computes the dot product of a vector and the reverse of another modulo another number $m$. The
+/// elements must already be reduced modulo $m$, and the vectors must have the same dimension.
+pub trait ModDotReversed<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_dot_reversed(self, other: RHS, m: M) -> Self::Output;
+}
+
+/// Adds the dot product of two vectors to a number modulo $2^k$. The number and the elements must
+/// already be reduced modulo $2^k$, and the vectors must have the same dimension.
+pub trait ModPowerOf2AddDot<V, W = V> {
+    type Output;
+
+    fn mod_power_of_2_add_dot(self, v: V, w: W, pow: u64) -> Self::Output;
+}
+
+/// Adds the dot product of two vectors to a number in place modulo $2^k$. The number and the
+/// elements must already be reduced modulo $2^k$, and the vectors must have the same dimension.
+pub trait ModPowerOf2AddDotAssign<V, W = V> {
+    fn mod_power_of_2_add_dot_assign(&mut self, v: V, w: W, pow: u64);
+}
+
+/// Adds the dot product of a vector and the reverse of another to a number modulo $2^k$. The number
+/// and the elements must already be reduced modulo $2^k$, and the vectors must have the same
+/// dimension.
+pub trait ModPowerOf2AddDotReversed<V, W = V> {
+    type Output;
+
+    fn mod_power_of_2_add_dot_reversed(self, v: V, w: W, pow: u64) -> Self::Output;
+}
+
+/// Adds the dot product of a vector and the reverse of another to a number in place modulo $2^k$.
+/// The number and the elements must already be reduced modulo $2^k$, and the vectors must have the
+/// same dimension.
+pub trait ModPowerOf2AddDotReversedAssign<V, W = V> {
+    fn mod_power_of_2_add_dot_reversed_assign(&mut self, v: V, w: W, pow: u64);
+}
+
+/// Subtracts the dot product of two vectors from a number modulo $2^k$. The number and the elements
+/// must already be reduced modulo $2^k$, and the vectors must have the same dimension.
+pub trait ModPowerOf2SubDot<V, W = V> {
+    type Output;
+
+    fn mod_power_of_2_sub_dot(self, v: V, w: W, pow: u64) -> Self::Output;
+}
+
+/// Subtracts the dot product of two vectors from a number in place modulo $2^k$. The number and the
+/// elements must already be reduced modulo $2^k$, and the vectors must have the same dimension.
+pub trait ModPowerOf2SubDotAssign<V, W = V> {
+    fn mod_power_of_2_sub_dot_assign(&mut self, v: V, w: W, pow: u64);
+}
+
+/// Subtracts the dot product of a vector and the reverse of another from a number modulo $2^k$. The
+/// number and the elements must already be reduced modulo $2^k$, and the vectors must have the same
+/// dimension.
+pub trait ModPowerOf2SubDotReversed<V, W = V> {
+    type Output;
+
+    fn mod_power_of_2_sub_dot_reversed(self, v: V, w: W, pow: u64) -> Self::Output;
+}
+
+/// Subtracts the dot product of a vector and the reverse of another from a number in place modulo
+/// $2^k$. The number and the elements must already be reduced modulo $2^k$, and the vectors must
+/// have the same dimension.
+pub trait ModPowerOf2SubDotReversedAssign<V, W = V> {
+    fn mod_power_of_2_sub_dot_reversed_assign(&mut self, v: V, w: W, pow: u64);
+}
+
+/// Computes the dot product of a vector and the reverse of another modulo $2^k$. The elements must
+/// already be reduced modulo $2^k$, and the vectors must have the same dimension.
+pub trait ModPowerOf2DotReversed<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_2_dot_reversed(self, other: RHS, pow: u64) -> Self::Output;
 }
 
 /// Calculates the LCM of the elements of a vector.

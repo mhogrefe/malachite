@@ -1,0 +1,444 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::integer::Integer;
+use crate::integer_vector::IntegerVector;
+use crate::integer_vector::arithmetic::dot_general::vec_dot_general;
+use malachite_base::num::arithmetic::traits::{SubDotReversed, SubDotReversedAssign};
+
+// `x` minus the reversed dot product of `v` and `w`.
+fn sub_dot_reversed(x: &Integer, v: &IntegerVector, w: &IntegerVector) -> Integer {
+    assert_eq!(
+        v.elements.len(),
+        w.elements.len(),
+        "the vectors must have the same dimension"
+    );
+    vec_dot_general(Some(x), true, &v.elements, &w.elements, true)
+}
+
+impl SubDotReversed<IntegerVector, IntegerVector> for Integer {
+    type Output = Self;
+
+    /// Subtracts the dot product of a [`IntegerVector`] and the reverse of another from an
+    /// [`Integer`], taking the [`Integer`] by value, the first vector by value, and the second by
+    /// value.
+    ///
+    /// The second vector is read backwards, so that the first element of one vector is paired with
+    /// the last of the other, as in the coefficient of a polynomial product.
+    ///
+    /// $$
+    /// f(x, v, w) = x - \sum_{i=0}^{n-1} v_iw_{n-1-i},
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log m \log\log m)$
+    ///
+    /// $M(m) = O(m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the vectors, and $m$ is
+    /// the largest number of significant bits of `x` and of any element.
+    ///
+    /// # Panics
+    /// Panics if the vectors have different dimensions.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::SubDotReversed;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// let w = IntegerVector::from_str("(4, 5, -6)").unwrap();
+    /// assert_eq!(
+    ///     Integer::from(7).sub_dot_reversed(v.clone(), w.clone()),
+    ///     11i32
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with
+    /// `initial` set to `x`, `subtract` set to 1, and `reverse` set to 1.
+    #[inline]
+    fn sub_dot_reversed(self, v: IntegerVector, w: IntegerVector) -> Self {
+        sub_dot_reversed(&self, &v, &w)
+    }
+}
+
+impl SubDotReversed<IntegerVector, &IntegerVector> for Integer {
+    type Output = Self;
+
+    /// Subtracts the dot product of a [`IntegerVector`] and the reverse of another from an
+    /// [`Integer`], taking the [`Integer`] by value, the first vector by value, and the second by
+    /// reference.
+    ///
+    /// The second vector is read backwards, so that the first element of one vector is paired with
+    /// the last of the other, as in the coefficient of a polynomial product.
+    ///
+    /// $$
+    /// f(x, v, w) = x - \sum_{i=0}^{n-1} v_iw_{n-1-i},
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log m \log\log m)$
+    ///
+    /// $M(m) = O(m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the vectors, and $m$ is
+    /// the largest number of significant bits of `x` and of any element.
+    ///
+    /// # Panics
+    /// Panics if the vectors have different dimensions.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::SubDotReversed;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// let w = IntegerVector::from_str("(4, 5, -6)").unwrap();
+    /// assert_eq!(Integer::from(7).sub_dot_reversed(v.clone(), &w), 11i32);
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with
+    /// `initial` set to `x`, `subtract` set to 1, and `reverse` set to 1.
+    #[inline]
+    fn sub_dot_reversed(self, v: IntegerVector, w: &IntegerVector) -> Self {
+        sub_dot_reversed(&self, &v, w)
+    }
+}
+
+impl SubDotReversed<&IntegerVector, IntegerVector> for Integer {
+    type Output = Self;
+
+    /// Subtracts the dot product of a [`IntegerVector`] and the reverse of another from an
+    /// [`Integer`], taking the [`Integer`] by value, the first vector by reference, and the second
+    /// by value.
+    ///
+    /// The second vector is read backwards, so that the first element of one vector is paired with
+    /// the last of the other, as in the coefficient of a polynomial product.
+    ///
+    /// $$
+    /// f(x, v, w) = x - \sum_{i=0}^{n-1} v_iw_{n-1-i},
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log m \log\log m)$
+    ///
+    /// $M(m) = O(m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the vectors, and $m$ is
+    /// the largest number of significant bits of `x` and of any element.
+    ///
+    /// # Panics
+    /// Panics if the vectors have different dimensions.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::SubDotReversed;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// let w = IntegerVector::from_str("(4, 5, -6)").unwrap();
+    /// assert_eq!(Integer::from(7).sub_dot_reversed(&v, w.clone()), 11i32);
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with
+    /// `initial` set to `x`, `subtract` set to 1, and `reverse` set to 1.
+    #[inline]
+    fn sub_dot_reversed(self, v: &IntegerVector, w: IntegerVector) -> Self {
+        sub_dot_reversed(&self, v, &w)
+    }
+}
+
+impl SubDotReversed<&IntegerVector, &IntegerVector> for Integer {
+    type Output = Self;
+
+    /// Subtracts the dot product of a [`IntegerVector`] and the reverse of another from an
+    /// [`Integer`], taking the [`Integer`] by value, the first vector by reference, and the second
+    /// by reference.
+    ///
+    /// The second vector is read backwards, so that the first element of one vector is paired with
+    /// the last of the other, as in the coefficient of a polynomial product.
+    ///
+    /// $$
+    /// f(x, v, w) = x - \sum_{i=0}^{n-1} v_iw_{n-1-i},
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log m \log\log m)$
+    ///
+    /// $M(m) = O(m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the vectors, and $m$ is
+    /// the largest number of significant bits of `x` and of any element.
+    ///
+    /// # Panics
+    /// Panics if the vectors have different dimensions.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::SubDotReversed;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// let w = IntegerVector::from_str("(4, 5, -6)").unwrap();
+    /// assert_eq!(Integer::from(7).sub_dot_reversed(&v, &w), 11i32);
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with
+    /// `initial` set to `x`, `subtract` set to 1, and `reverse` set to 1.
+    #[inline]
+    fn sub_dot_reversed(self, v: &IntegerVector, w: &IntegerVector) -> Self {
+        sub_dot_reversed(&self, v, w)
+    }
+}
+
+impl SubDotReversed<&IntegerVector, &IntegerVector> for &Integer {
+    type Output = Integer;
+
+    /// Subtracts the dot product of a [`IntegerVector`] and the reverse of another from an
+    /// [`Integer`], taking the [`Integer`] by reference, the first vector by reference, and the
+    /// second by reference.
+    ///
+    /// The second vector is read backwards, so that the first element of one vector is paired with
+    /// the last of the other, as in the coefficient of a polynomial product.
+    ///
+    /// $$
+    /// f(x, v, w) = x - \sum_{i=0}^{n-1} v_iw_{n-1-i},
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log m \log\log m)$
+    ///
+    /// $M(m) = O(m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the vectors, and $m$ is
+    /// the largest number of significant bits of `x` and of any element.
+    ///
+    /// # Panics
+    /// Panics if the vectors have different dimensions.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::SubDotReversed;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// let w = IntegerVector::from_str("(4, 5, -6)").unwrap();
+    /// assert_eq!((&Integer::from(7)).sub_dot_reversed(&v, &w), 11i32);
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with
+    /// `initial` set to `x`, `subtract` set to 1, and `reverse` set to 1.
+    #[inline]
+    fn sub_dot_reversed(self, v: &IntegerVector, w: &IntegerVector) -> Integer {
+        sub_dot_reversed(self, v, w)
+    }
+}
+
+impl SubDotReversedAssign<IntegerVector, IntegerVector> for Integer {
+    /// Subtracts the dot product of a [`IntegerVector`] and the reverse of another from an
+    /// [`Integer`] in place, taking the first vector by value and the second by value.
+    ///
+    /// The second vector is read backwards, so that the first element of one vector is paired with
+    /// the last of the other, as in the coefficient of a polynomial product.
+    ///
+    /// $$
+    /// x \gets x - \sum_{i=0}^{n-1} v_iw_{n-1-i},
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log m \log\log m)$
+    ///
+    /// $M(m) = O(m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the vectors, and $m$ is
+    /// the largest number of significant bits of `x` and of any element.
+    ///
+    /// # Panics
+    /// Panics if the vectors have different dimensions.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::SubDotReversedAssign;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// let w = IntegerVector::from_str("(4, 5, -6)").unwrap();
+    /// let mut x = Integer::from(7);
+    /// x.sub_dot_reversed_assign(v.clone(), w.clone());
+    /// assert_eq!(x, 11i32);
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with
+    /// `initial` set to `x`, `subtract` set to 1, and `reverse` set to 1.
+    #[inline]
+    fn sub_dot_reversed_assign(&mut self, v: IntegerVector, w: IntegerVector) {
+        *self = sub_dot_reversed(self, &v, &w);
+    }
+}
+
+impl SubDotReversedAssign<IntegerVector, &IntegerVector> for Integer {
+    /// Subtracts the dot product of a [`IntegerVector`] and the reverse of another from an
+    /// [`Integer`] in place, taking the first vector by value and the second by reference.
+    ///
+    /// The second vector is read backwards, so that the first element of one vector is paired with
+    /// the last of the other, as in the coefficient of a polynomial product.
+    ///
+    /// $$
+    /// x \gets x - \sum_{i=0}^{n-1} v_iw_{n-1-i},
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log m \log\log m)$
+    ///
+    /// $M(m) = O(m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the vectors, and $m$ is
+    /// the largest number of significant bits of `x` and of any element.
+    ///
+    /// # Panics
+    /// Panics if the vectors have different dimensions.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::SubDotReversedAssign;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// let w = IntegerVector::from_str("(4, 5, -6)").unwrap();
+    /// let mut x = Integer::from(7);
+    /// x.sub_dot_reversed_assign(v.clone(), &w);
+    /// assert_eq!(x, 11i32);
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with
+    /// `initial` set to `x`, `subtract` set to 1, and `reverse` set to 1.
+    #[inline]
+    fn sub_dot_reversed_assign(&mut self, v: IntegerVector, w: &IntegerVector) {
+        *self = sub_dot_reversed(self, &v, w);
+    }
+}
+
+impl SubDotReversedAssign<&IntegerVector, IntegerVector> for Integer {
+    /// Subtracts the dot product of a [`IntegerVector`] and the reverse of another from an
+    /// [`Integer`] in place, taking the first vector by reference and the second by value.
+    ///
+    /// The second vector is read backwards, so that the first element of one vector is paired with
+    /// the last of the other, as in the coefficient of a polynomial product.
+    ///
+    /// $$
+    /// x \gets x - \sum_{i=0}^{n-1} v_iw_{n-1-i},
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log m \log\log m)$
+    ///
+    /// $M(m) = O(m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the vectors, and $m$ is
+    /// the largest number of significant bits of `x` and of any element.
+    ///
+    /// # Panics
+    /// Panics if the vectors have different dimensions.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::SubDotReversedAssign;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// let w = IntegerVector::from_str("(4, 5, -6)").unwrap();
+    /// let mut x = Integer::from(7);
+    /// x.sub_dot_reversed_assign(&v, w.clone());
+    /// assert_eq!(x, 11i32);
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with
+    /// `initial` set to `x`, `subtract` set to 1, and `reverse` set to 1.
+    #[inline]
+    fn sub_dot_reversed_assign(&mut self, v: &IntegerVector, w: IntegerVector) {
+        *self = sub_dot_reversed(self, v, &w);
+    }
+}
+
+impl SubDotReversedAssign<&IntegerVector, &IntegerVector> for Integer {
+    /// Subtracts the dot product of a [`IntegerVector`] and the reverse of another from an
+    /// [`Integer`] in place, taking the first vector by reference and the second by reference.
+    ///
+    /// The second vector is read backwards, so that the first element of one vector is paired with
+    /// the last of the other, as in the coefficient of a polynomial product.
+    ///
+    /// $$
+    /// x \gets x - \sum_{i=0}^{n-1} v_iw_{n-1-i},
+    /// $$
+    ///
+    /// where $n$ is the dimension of $v$ and $w$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm \log m \log\log m)$
+    ///
+    /// $M(m) = O(m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the vectors, and $m$ is
+    /// the largest number of significant bits of `x` and of any element.
+    ///
+    /// # Panics
+    /// Panics if the vectors have different dimensions.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::SubDotReversedAssign;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// let w = IntegerVector::from_str("(4, 5, -6)").unwrap();
+    /// let mut x = Integer::from(7);
+    /// x.sub_dot_reversed_assign(&v, &w);
+    /// assert_eq!(x, 11i32);
+    /// ```
+    ///
+    /// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with
+    /// `initial` set to `x`, `subtract` set to 1, and `reverse` set to 1.
+    #[inline]
+    fn sub_dot_reversed_assign(&mut self, v: &IntegerVector, w: &IntegerVector) {
+        *self = sub_dot_reversed(self, v, w);
+    }
+}

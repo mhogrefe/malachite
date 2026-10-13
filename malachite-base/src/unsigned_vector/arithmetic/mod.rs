@@ -197,6 +197,14 @@ pub mod mod_abs_squared;
 /// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding vectors modulo a
 /// number.
 pub mod mod_add;
+/// Implementations of [`ModAddDot`](crate::num::arithmetic::traits::ModAddDot) and
+/// [`ModAddDotAssign`](crate::num::arithmetic::traits::ModAddDotAssign), for adding the dot product
+/// of two vectors to a number modulo a number.
+pub mod mod_add_dot;
+/// Implementations of [`ModAddDotReversed`](crate::num::arithmetic::traits::ModAddDotReversed) and
+/// [`ModAddDotReversedAssign`](crate::num::arithmetic::traits::ModAddDotReversedAssign), for adding
+/// the dot product of a vector and the reverse of another to a number modulo a number.
+pub mod mod_add_dot_reversed;
 /// Implementations of [`ModAddMul`](crate::num::arithmetic::traits::ModAddMul) and
 /// [`ModAddMulAssign`](crate::num::arithmetic::traits::ModAddMulAssign), for adding a scalar
 /// multiple of one vector to another modulo a number.
@@ -208,6 +216,9 @@ pub mod mod_add_mul_shl;
 /// Implementations of [`ModDot`](crate::num::arithmetic::traits::ModDot), the dot product of two
 /// vectors modulo a number, accumulating the sum before reducing it once.
 pub mod mod_dot;
+/// Implementations of [`ModDotReversed`](crate::num::arithmetic::traits::ModDotReversed), the dot
+/// product of a vector and the reverse of another modulo a number.
+pub mod mod_dot_reversed;
 /// Implementations of [`ModElementProduct`](crate::num::arithmetic::traits::ModElementProduct), the
 /// product of the elements modulo a number.
 pub mod mod_element_product;
@@ -242,6 +253,16 @@ pub mod mod_power_of_2_abs_squared;
 /// [`ModPowerOf2AddAssign`](crate::num::arithmetic::traits::ModPowerOf2AddAssign), for adding
 /// vectors modulo a power of 2.
 pub mod mod_power_of_2_add;
+/// Implementations of [`ModPowerOf2AddDot`](crate::num::arithmetic::traits::ModPowerOf2AddDot) and
+/// [`ModPowerOf2AddDotAssign`](crate::num::arithmetic::traits::ModPowerOf2AddDotAssign), for adding
+/// the dot product of two vectors to a number modulo a power of 2.
+pub mod mod_power_of_2_add_dot;
+/// Implementations of
+/// [`ModPowerOf2AddDotReversed`](crate::num::arithmetic::traits::ModPowerOf2AddDotReversed) and
+/// [`ModPowerOf2AddDotReversedAssign`](
+/// crate::num::arithmetic::traits::ModPowerOf2AddDotReversedAssign), for adding the dot product of
+/// a vector and the reverse of another to a number modulo a power of 2.
+pub mod mod_power_of_2_add_dot_reversed;
 /// Implementations of [`ModPowerOf2AddMul`](crate::num::arithmetic::traits::ModPowerOf2AddMul) and
 /// [`ModPowerOf2AddMulAssign`](crate::num::arithmetic::traits::ModPowerOf2AddMulAssign), for adding
 /// a scalar multiple of one vector to another modulo a power of 2.
@@ -254,6 +275,10 @@ pub mod mod_power_of_2_add_mul_shl;
 /// Implementations of [`ModPowerOf2Dot`](crate::num::arithmetic::traits::ModPowerOf2Dot), the dot
 /// product of two vectors modulo a power of 2.
 pub mod mod_power_of_2_dot;
+/// Implementations of
+/// [`ModPowerOf2DotReversed`](crate::num::arithmetic::traits::ModPowerOf2DotReversed), the dot
+/// product of a vector and the reverse of another modulo a power of 2.
+pub mod mod_power_of_2_dot_reversed;
 /// An implementation of
 /// [`ModPowerOf2ElementProduct`](crate::num::arithmetic::traits::ModPowerOf2ElementProduct), the
 /// product of the elements modulo a power of 2.
@@ -324,6 +349,16 @@ pub mod mod_power_of_2_shl;
 /// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
 /// vectors modulo a power of 2.
 pub mod mod_power_of_2_sub;
+/// Implementations of [`ModPowerOf2SubDot`](crate::num::arithmetic::traits::ModPowerOf2SubDot) and
+/// [`ModPowerOf2SubDotAssign`](crate::num::arithmetic::traits::ModPowerOf2SubDotAssign), for
+/// subtracting the dot product of two vectors from a number modulo a power of 2.
+pub mod mod_power_of_2_sub_dot;
+/// Implementations of
+/// [`ModPowerOf2SubDotReversed`](crate::num::arithmetic::traits::ModPowerOf2SubDotReversed) and
+/// [`ModPowerOf2SubDotReversedAssign`](
+/// crate::num::arithmetic::traits::ModPowerOf2SubDotReversedAssign), for subtracting the dot
+/// product of a vector and the reverse of another from a number modulo a power of 2.
+pub mod mod_power_of_2_sub_dot_reversed;
 /// Implementations of [`ModPowerOf2SubMul`](crate::num::arithmetic::traits::ModPowerOf2SubMul) and
 /// [`ModPowerOf2SubMulAssign`](crate::num::arithmetic::traits::ModPowerOf2SubMulAssign), for
 /// subtracting a scalar multiple of one vector from another modulo a power of 2.
@@ -373,6 +408,15 @@ pub mod mod_shl;
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting vectors modulo a
 /// number.
 pub mod mod_sub;
+/// Implementations of [`ModSubDot`](crate::num::arithmetic::traits::ModSubDot) and
+/// [`ModSubDotAssign`](crate::num::arithmetic::traits::ModSubDotAssign), for subtracting the dot
+/// product of two vectors from a number modulo a number.
+pub mod mod_sub_dot;
+/// Implementations of [`ModSubDotReversed`](crate::num::arithmetic::traits::ModSubDotReversed) and
+/// [`ModSubDotReversedAssign`](crate::num::arithmetic::traits::ModSubDotReversedAssign), for
+/// subtracting the dot product of a vector and the reverse of another from a number modulo a
+/// number.
+pub mod mod_sub_dot_reversed;
 /// Implementations of [`ModSubMul`](crate::num::arithmetic::traits::ModSubMul) and
 /// [`ModSubMulAssign`](crate::num::arithmetic::traits::ModSubMulAssign), for subtracting a scalar
 /// multiple of one vector from another modulo a number.

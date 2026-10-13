@@ -352,6 +352,8 @@ pub mod integer_vector {
     pub mod arithmetic {
         pub mod abs_squared;
         pub mod add;
+        pub mod add_dot;
+        pub mod add_dot_reversed;
         pub mod add_mul;
         pub mod add_mul_shl;
         pub mod balanced_mod;
@@ -363,6 +365,7 @@ pub mod integer_vector {
         pub mod div_exact;
         pub mod dot;
         pub mod dot_general;
+        pub mod dot_reversed;
         pub mod dot_sign;
         pub mod element_lcm;
         pub mod element_product;
@@ -384,6 +387,8 @@ pub mod integer_vector {
         pub mod shl;
         pub mod shr;
         pub mod sub;
+        pub mod sub_dot;
+        pub mod sub_dot_reversed;
         pub mod sub_mul;
         pub mod sub_mul_shl;
         pub mod sum;
@@ -933,6 +938,8 @@ pub mod natural_vector {
     pub mod arithmetic {
         pub mod abs_squared;
         pub mod add;
+        pub mod add_dot;
+        pub mod add_dot_reversed;
         pub mod add_mul;
         pub mod add_mul_shl;
         pub mod balanced_mod;
@@ -942,6 +949,7 @@ pub mod natural_vector {
         pub mod content_chained;
         pub mod div_exact;
         pub mod dot;
+        pub mod dot_reversed;
         pub mod dot_sign;
         pub mod element_lcm;
         pub mod element_product;
@@ -953,9 +961,12 @@ pub mod natural_vector {
         pub mod l1_norm;
         pub mod mod_abs_squared;
         pub mod mod_add;
+        pub mod mod_add_dot;
+        pub mod mod_add_dot_reversed;
         pub mod mod_add_mul;
         pub mod mod_add_mul_shl;
         pub mod mod_dot;
+        pub mod mod_dot_reversed;
         pub mod mod_element_product;
         pub mod mod_element_sum;
         pub mod mod_is_reduced;
@@ -965,9 +976,12 @@ pub mod natural_vector {
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_abs_squared;
         pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_add_dot;
+        pub mod mod_power_of_2_add_dot_reversed;
         pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_add_mul_shl;
         pub mod mod_power_of_2_dot;
+        pub mod mod_power_of_2_dot_reversed;
         pub mod mod_power_of_2_element_product;
         pub mod mod_power_of_2_element_sum;
         pub mod mod_power_of_2_is_reduced;
@@ -975,11 +989,15 @@ pub mod natural_vector {
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_sub;
+        pub mod mod_power_of_2_sub_dot;
+        pub mod mod_power_of_2_sub_dot_reversed;
         pub mod mod_power_of_2_sub_mul;
         pub mod mod_power_of_2_sub_mul_shl;
         pub mod mod_power_of_2_sum;
         pub mod mod_shl;
         pub mod mod_sub;
+        pub mod mod_sub_dot;
+        pub mod mod_sub_dot_reversed;
         pub mod mod_sub_mul;
         pub mod mod_sub_mul_shl;
         pub mod mod_sum;
@@ -988,6 +1006,8 @@ pub mod natural_vector {
         pub mod scalar_mul;
         pub mod shl;
         pub mod shr;
+        pub mod sub_dot;
+        pub mod sub_dot_reversed;
         pub mod sum;
     }
     pub mod basic {

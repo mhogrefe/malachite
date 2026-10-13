@@ -6,12 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer_vector::arithmetic::dot_general::vec_dot_general;
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use crate::natural_vector::NaturalVector;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{Dot, Mod, ModDot, ModIsReduced};
+use malachite_base::num::arithmetic::traits::{
+    Dot, Mod, ModAdd, ModDot, ModDotReversed, ModIsReduced, ModSub,
+};
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vector::Vector;
@@ -26,10 +29,16 @@ fn to_limb_vector(v: &NaturalVector) -> UnsignedVector<Limb> {
     )
 }
 
-// The dot product of two vectors modulo `m`. When `m` fits in a limb, so does every element, and
-// the products are summed exactly in one to three limbs and reduced once, by the `UnsignedVector`
-// implementation; otherwise the exact dot product is reduced once.
-fn mod_dot(v: &NaturalVector, w: &NaturalVector, m: &Natural) -> Natural {
+// Checks the arguments of a modular dot product: `m` is positive, the vectors have the same
+// dimension, and their elements are reduced. `v_name` and `w_name` name the vectors in the panic
+// messages.
+fn assert_mod_dot_arguments(
+    v: &NaturalVector,
+    w: &NaturalVector,
+    m: &Natural,
+    v_name: &str,
+    w_name: &str,
+) {
     assert_ne!(*m, 0u32, "m cannot be zero");
     assert_eq!(
         v.elements.len(),
@@ -38,16 +47,66 @@ fn mod_dot(v: &NaturalVector, w: &NaturalVector, m: &Natural) -> Natural {
     );
     assert!(
         v.mod_is_reduced(m),
-        "self must be reduced mod m, but {v} has an element >= {m}"
+        "{v_name} must be reduced mod m, but {v} has an element >= {m}"
     );
     assert!(
         w.mod_is_reduced(m),
-        "other must be reduced mod m, but {w} has an element >= {m}"
+        "{w_name} must be reduced mod m, but {w} has an element >= {m}"
     );
+}
+
+// The dot product of two vectors modulo `m`, with `w` read backwards if `reverse`; the arguments
+// have already been checked. When `m` fits in a limb, so does every element, and the products are
+// summed exactly in one to three limbs and reduced once, by the `UnsignedVector` implementation;
+// otherwise the exact dot product is reduced once.
+fn mod_dot_checked(v: &NaturalVector, w: &NaturalVector, reverse: bool, m: &Natural) -> Natural {
     if let Natural(Small(small_m)) = *m {
-        Natural::from(to_limb_vector(v).mod_dot(to_limb_vector(w), small_m))
+        let (v, w) = (to_limb_vector(v), to_limb_vector(w));
+        Natural::from(if reverse {
+            v.mod_dot_reversed(w, small_m)
+        } else {
+            v.mod_dot(w, small_m)
+        })
+    } else if reverse {
+        vec_dot_general(None, false, &v.elements, &w.elements, true).mod_op(m)
     } else {
         v.dot(w).mod_op(m)
+    }
+}
+
+// The dot product of two vectors modulo `m`, after checking the arguments.
+fn mod_dot(v: &NaturalVector, w: &NaturalVector, m: &Natural) -> Natural {
+    assert_mod_dot_arguments(v, w, m, "self", "other");
+    mod_dot_checked(v, w, false, m)
+}
+
+// The dot product of `v` and the reverse of `w` modulo `m`, after checking the arguments.
+pub(crate) fn mod_dot_reversed_vectors(
+    v: &NaturalVector,
+    w: &NaturalVector,
+    m: &Natural,
+) -> Natural {
+    assert_mod_dot_arguments(v, w, m, "self", "other");
+    mod_dot_checked(v, w, true, m)
+}
+
+// `x` plus, or if `subtract` minus, the dot product of `v` and `w` modulo `m`, with `w` read
+// backwards if `reverse`, after checking the arguments.
+pub(crate) fn mod_dot_general(
+    x: &Natural,
+    subtract: bool,
+    v: &NaturalVector,
+    w: &NaturalVector,
+    reverse: bool,
+    m: &Natural,
+) -> Natural {
+    assert_mod_dot_arguments(v, w, m, "v", "w");
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+    let d = mod_dot_checked(v, w, reverse, m);
+    if subtract {
+        x.mod_sub(d, m)
+    } else {
+        x.mod_add(d, m)
     }
 }
 

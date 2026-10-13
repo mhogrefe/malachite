@@ -10,13 +10,16 @@ use crate::num::arithmetic::traits::{ModPowerOf2Dot, ModPowerOf2IsReduced};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_vector::UnsignedVector;
 
-// The dot product of two vectors modulo $2^k$, which is the wrapping sum of the wrapping products
-// with all but the lowest $k$ bits cleared, since $2^k$ divides $2^W$.
-fn mod_power_of_2_dot<T: PrimitiveUnsigned>(
+// Checks the arguments of a dot product modulo $2^k$: `pow` is at most the width of `T`, the
+// vectors have the same dimension, and their elements are reduced. `v_name` and `w_name` name the
+// vectors in the panic messages.
+fn assert_mod_power_of_2_dot_arguments<T: PrimitiveUnsigned>(
     v: &UnsignedVector<T>,
     w: &UnsignedVector<T>,
     pow: u64,
-) -> T {
+    v_name: &str,
+    w_name: &str,
+) {
     assert!(
         pow <= T::WIDTH,
         "pow must be at most {}, but is {pow}",
@@ -29,17 +32,72 @@ fn mod_power_of_2_dot<T: PrimitiveUnsigned>(
     );
     assert!(
         v.mod_power_of_2_is_reduced(pow),
-        "self must be reduced mod 2^{pow}, but {v} has an element >= 2^{pow}"
+        "{v_name} must be reduced mod 2^{pow}, but {v} has an element >= 2^{pow}"
     );
     assert!(
         w.mod_power_of_2_is_reduced(pow),
-        "other must be reduced mod 2^{pow}, but {w} has an element >= 2^{pow}"
+        "{w_name} must be reduced mod 2^{pow}, but {w} has an element >= 2^{pow}"
     );
+}
+
+// The dot product of `xs` and `ys`, with `ys` read backwards if `reverse`, modulo $2^k$: the
+// wrapping sum of the wrapping products with all but the lowest $k$ bits cleared, since $2^k$
+// divides $2^W$.
+fn wrapping_dot<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], reverse: bool, pow: u64) -> T {
     let mut sum = T::ZERO;
-    for (&x, &y) in v.elements.iter().zip(&w.elements) {
-        sum.wrapping_add_assign(x.wrapping_mul(y));
+    if reverse {
+        for (&x, &y) in xs.iter().zip(ys.iter().rev()) {
+            sum.wrapping_add_assign(x.wrapping_mul(y));
+        }
+    } else {
+        for (&x, &y) in xs.iter().zip(ys) {
+            sum.wrapping_add_assign(x.wrapping_mul(y));
+        }
     }
     sum.mod_power_of_2(pow)
+}
+
+// The dot product of two vectors modulo $2^k$, after checking the arguments.
+fn mod_power_of_2_dot<T: PrimitiveUnsigned>(
+    v: &UnsignedVector<T>,
+    w: &UnsignedVector<T>,
+    pow: u64,
+) -> T {
+    assert_mod_power_of_2_dot_arguments(v, w, pow, "self", "other");
+    wrapping_dot(&v.elements, &w.elements, false, pow)
+}
+
+// The dot product of `v` and the reverse of `w` modulo $2^k$, after checking the arguments.
+pub(crate) fn mod_power_of_2_dot_reversed_vectors<T: PrimitiveUnsigned>(
+    v: &UnsignedVector<T>,
+    w: &UnsignedVector<T>,
+    pow: u64,
+) -> T {
+    assert_mod_power_of_2_dot_arguments(v, w, pow, "self", "other");
+    wrapping_dot(&v.elements, &w.elements, true, pow)
+}
+
+// `x` plus, or if `subtract` minus, the dot product of `v` and `w` modulo $2^k$, with `w` read
+// backwards if `reverse`, after checking the arguments.
+pub(crate) fn mod_power_of_2_dot_general<T: PrimitiveUnsigned>(
+    x: T,
+    subtract: bool,
+    v: &UnsignedVector<T>,
+    w: &UnsignedVector<T>,
+    reverse: bool,
+    pow: u64,
+) -> T {
+    assert_mod_power_of_2_dot_arguments(v, w, pow, "v", "w");
+    assert!(
+        x.mod_power_of_2_is_reduced(pow),
+        "x must be reduced mod 2^{pow}, but {x} >= 2^{pow}"
+    );
+    let d = wrapping_dot(&v.elements, &w.elements, reverse, pow);
+    if subtract {
+        x.mod_power_of_2_sub(d, pow)
+    } else {
+        x.mod_power_of_2_add(d, pow)
+    }
 }
 
 impl<T: PrimitiveUnsigned> ModPowerOf2Dot<Self> for UnsignedVector<T> {
