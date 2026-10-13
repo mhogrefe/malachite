@@ -225,6 +225,9 @@ pub mod mod_element_product;
 /// Implementations of [`ModElementSum`](crate::num::arithmetic::traits::ModElementSum), the sum of
 /// the elements modulo a number.
 pub mod mod_element_sum;
+/// Inverting every element of a vector modulo $m$, by implementations of
+/// [`ModEntrywiseInverse`](crate::num::arithmetic::traits::ModEntrywiseInverse).
+pub mod mod_entrywise_inverse;
 /// Multiplying two vectors element by element modulo $m$, by implementations of
 /// [`ModEntrywiseMul`](crate::num::arithmetic::traits::ModEntrywiseMul) and
 /// [`ModEntrywiseMulAssign`](crate::num::arithmetic::traits::ModEntrywiseMulAssign).

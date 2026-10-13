@@ -8,4 +8,5 @@
 
 pub mod abs_squared;
 pub mod dot;
+pub mod mod_entrywise_inverse;
 pub mod multi_crt;

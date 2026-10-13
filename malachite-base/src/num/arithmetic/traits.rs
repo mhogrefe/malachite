@@ -2238,6 +2238,15 @@ pub trait ModEntrywiseMulAssign<RHS = Self, M = Self> {
     fn mod_entrywise_mul_assign(&mut self, other: RHS, m: M);
 }
 
+/// Finds the multiplicative inverses of all the entries of a value, such as a vector, modulo a
+/// number $m$, returning `None` if any entry is not invertible. The entries must be already reduced
+/// modulo $m$.
+pub trait ModEntrywiseInverse<M = Self> {
+    type Output;
+
+    fn mod_entrywise_inverse(self, m: M) -> Option<Self::Output>;
+}
+
 /// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo $m$.
 ///
 /// If multiple modular multiplications with the same modulus are necessary, it can be quicker to

@@ -36,6 +36,10 @@ documented by git history.
   `ModPowerOf2EntrywiseMulAssign` traits, for the entrywise product modulo $m$ or $2^k$, and their
   implementations for `UnsignedVector<T>` with a `T` modulus. Modulo $m$, the data for
   multiplying is precomputed once and shared by all the elements.
+- A `ModEntrywiseInverse` trait, for inverting every entry of a value such as a vector modulo $m$,
+  and its implementation for `UnsignedVector<T>`, like FLINT's `_nmod_vec_invert`: the product of
+  the elements is inverted once and each inverse is recovered from partial products. It returns
+  `None` if some element is not invertible, where FLINT assumes that every element is.
 
 ### malachite-nz
 
@@ -57,6 +61,8 @@ documented by git history.
 - `ModEntrywiseMul`, `ModPowerOf2EntrywiseMul`, and their `Assign` forms for `NaturalVector`, with
   the vectors and a `Natural` modulus by value or by reference. `mod_entrywise_mul` is FLINT's
   `_fmpz_mod_vec_mul`.
+- `ModEntrywiseInverse` for `NaturalVector`, with the vector and a `Natural` modulus by value or
+  by reference, by the same method.
 
 ### malachite-q
 

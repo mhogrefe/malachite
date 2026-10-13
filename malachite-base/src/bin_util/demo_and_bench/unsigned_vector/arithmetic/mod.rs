@@ -26,6 +26,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_dot_reversed::register(runner);
     mod_element_product::register(runner);
     mod_element_sum::register(runner);
+    mod_entrywise_inverse::register(runner);
     mod_entrywise_mul::register(runner);
     mod_is_reduced::register(runner);
     mod_mul::register(runner);
@@ -81,6 +82,7 @@ mod mod_dot;
 mod mod_dot_reversed;
 mod mod_element_product;
 mod mod_element_sum;
+mod mod_entrywise_inverse;
 mod mod_entrywise_mul;
 mod mod_is_reduced;
 mod mod_mul;

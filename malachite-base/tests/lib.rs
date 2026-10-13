@@ -1008,6 +1008,7 @@ pub mod unsigned_vector {
         pub mod mod_dot_reversed;
         pub mod mod_element_product;
         pub mod mod_element_sum;
+        pub mod mod_entrywise_inverse;
         pub mod mod_entrywise_mul;
         pub mod mod_is_reduced;
         pub mod mod_mul;

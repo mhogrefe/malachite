@@ -426,6 +426,9 @@ pub mod mod_element_product;
 /// Implementations of [`ModElementSum`](malachite_base::num::arithmetic::traits::ModElementSum),
 /// the sum of the elements modulo a number.
 pub mod mod_element_sum;
+/// Inverting every element of a vector modulo $m$, by implementations of
+/// [`ModEntrywiseInverse`](malachite_base::num::arithmetic::traits::ModEntrywiseInverse).
+pub mod mod_entrywise_inverse;
 /// Multiplying two vectors element by element modulo $m$, by implementations of
 /// [`ModEntrywiseMul`](malachite_base::num::arithmetic::traits::ModEntrywiseMul) and
 /// [`ModEntrywiseMulAssign`](malachite_base::num::arithmetic::traits::ModEntrywiseMulAssign).

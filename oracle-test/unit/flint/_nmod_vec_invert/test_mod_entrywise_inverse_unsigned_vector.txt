@@ -1,0 +1,11 @@
+().mod_entrywise_inverse(1) = Some(())
+().mod_entrywise_inverse(5) = Some(())
+(0).mod_entrywise_inverse(1) = Some((0))
+(0, 0).mod_entrywise_inverse(1) = Some((0, 0))
+(1, 2, 3, 4).mod_entrywise_inverse(7) = Some((1, 4, 5, 2))
+(1, 2, 3).mod_entrywise_inverse(6) = None
+(0, 1).mod_entrywise_inverse(7) = None
+(5).mod_entrywise_inverse(6) = Some((5))
+(254, 253).mod_entrywise_inverse(255) = Some((254, 127))
+(3, 4).mod_entrywise_inverse(255) = None
+(2, 18446744073709551614, 7).mod_entrywise_inverse(18446744073709551615) = Some((9223372036854775808, 18446744073709551614, 15811494920322472813))

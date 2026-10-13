@@ -271,4 +271,7 @@ int run__fmpz_vec_scalar_smod_fmpz(const char * arg);
 /* fmpz_vec_multi_crt.c */
 int run__fmpz_vec_multi_CRT_ui(const char * arg);
 
+/* nmod_vec_invert.c */
+int run__nmod_vec_invert(const char * arg);
+
 #endif
