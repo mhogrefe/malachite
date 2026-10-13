@@ -17,7 +17,9 @@
 # resolved to `name.rs` or `name/mod.rs` — relative to the file's directory for roots and mod.rs
 # files and to a directory named after the file otherwise, with the names of any enclosing inline
 # modules (`mod outer { mod name; }`, as in bin.rs and tests/lib.rs) appended to the base — and
-# followed transitively. `#[path]` attributes are not supported (nothing in Malachite uses them).
+# followed transitively. A `#[path = "file.rs"] mod name;` declaration resolves to that file,
+# relative to the directory of the declaring file (as it does for a module declared outside an
+# inline module; the FFT backends in malachite-nz include their kernels this way).
 # The `crate_test_mod!` visibility macro wraps a module declaration; its invocations are rewritten
 # to plain `mod name;` before scanning.
 
@@ -45,6 +47,9 @@ CHAR_LITERAL = re.compile(r"'(?:[^'\\]|\\.)'")
 EVENT = re.compile(r"(?:\bmod\s+([A-Za-z_][A-Za-z0-9_]*)\s*([;{]))|([{}])")
 # a `crate_test_mod!` invocation: a module declaration behind the visibility macro
 CRATE_TEST_MOD = re.compile(r"\bcrate_test_mod!\s*\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}")
+PATH_ATTRIBUTE_MOD = re.compile(
+    r'#\[path\s*=\s*"([^"]+)"\]\s*(?:pub(?:\([^)]*\))?\s+)?mod\s+([A-Za-z_][A-Za-z0-9_]*)\s*;'
+)
 
 
 def crate_roots(crate: Path) -> set[Path]:
@@ -79,6 +84,8 @@ def crate_roots(crate: Path) -> set[Path]:
 def mod_declarations(source: str) -> list[tuple[list[str], str]]:
     source = BLOCK_COMMENT.sub(" ", source)
     source = LINE_COMMENT.sub(" ", source)
+    # Modules with explicit paths are handled by `included_files`; drop their declarations here.
+    source = PATH_ATTRIBUTE_MOD.sub(" ", source)
     source = STRING_LITERAL.sub('""', source)
     source = CHAR_LITERAL.sub("' '", source)
     source = CRATE_TEST_MOD.sub(lambda m: f"mod {m.group(1)};", source)
@@ -112,13 +119,21 @@ def included_files(roots: set[Path]) -> set[Path]:
             base = file.parent
         else:
             base = file.parent / file.stem
-        for inline_names, name in mod_declarations(file.read_text()):
+        source = file.read_text()
+        candidates = [
+            (file.parent / path).resolve()
+            for path, _ in PATH_ATTRIBUTE_MOD.findall(LINE_COMMENT.sub(" ", source))
+        ]
+        for inline_names, name in mod_declarations(source):
             file_base = base.joinpath(*inline_names)
-            for candidate in [file_base / f"{name}.rs", file_base / name / "mod.rs"]:
-                candidate = candidate.resolve()
-                if candidate.is_file() and candidate not in included:
-                    included.add(candidate)
-                    stack.append(candidate)
+            candidates.extend(
+                candidate.resolve()
+                for candidate in [file_base / f"{name}.rs", file_base / name / "mod.rs"]
+            )
+        for candidate in candidates:
+            if candidate.is_file() and candidate not in included:
+                included.add(candidate)
+                stack.append(candidate)
     return included
 
 

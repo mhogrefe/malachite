@@ -358,6 +358,8 @@ cargo run --release -- flint &&
 echo "Step 168. Testing against Azurite" &&
 cargo run --release -- azurite &&
 cd .. &&
-echo "Step 169. Checking links" &&
+echo "Step 169. Running the FFT's AVX2 kernels under x86_64 emulation" &&
+bash x86-fft-check.sh &&
+echo "Step 170. Checking links" &&
 cd ../check-malachite-links &&
 cargo run --release

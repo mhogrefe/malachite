@@ -91,6 +91,15 @@ major improvement warrants re-porting.
   check is dead weight, and the spelling misleads the reader into thinking the bound is in doubt.
   Record the reason it fits in a comment instead. (This is not lint-enforced: whether a bound is
   known is a fact about the algorithm, not the syntax.)
+- **No `unsafe`, with one exception.** `malachite-base` forbids `unsafe_code`; `malachite-nz`
+  denies it and allows it only in `natural/arithmetic/mul/fft/avx2.rs` (the `__m256d` vector type
+  behind the AVX2 instantiation of the FFT, whose operator impls cannot carry `#[target_feature]`)
+  and in the two `fft/mod.rs` functions that enter that instantiation after
+  `is_x86_feature_detected!`. Keep it that way: a port that seems to need `unsafe` needs a
+  different design. The FFT kernels themselves are safe code — intrinsics are safe inside a
+  function compiled with the feature — and `avx2_body.rs` is generated from `body.rs` by
+  `malachite-nz/gen-fft-avx2-body.py`, which the test `test_fft_avx2_body_in_sync` enforces; edit
+  `body.rs`, never the generated copy.
 - **Visibility macros**: `private_test_fn!`/`crate_test_fn!` make internals `pub` under `test_build` so
   tests, demos, and tuning code can call them. For tuner- or test-only entry points that don't fit
   the macros, add explicit `#[cfg(feature = "test_build")] pub fn ..._for_tuning` wrappers.

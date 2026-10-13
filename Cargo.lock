@@ -1576,6 +1576,7 @@ dependencies = [
 name = "malachite-nz"
 version = "0.13.0"
 dependencies = [
+ "bytemuck",
  "embed-doc-image",
  "indoc",
  "itertools 0.14.0",

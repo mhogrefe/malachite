@@ -1,0 +1,4 @@
+# The static Linux x86_64 binary that x86-fft-check.sh runs under emulation is linked with the
+# linker Rust ships, so no cross C toolchain is needed.
+[target.x86_64-unknown-linux-musl]
+linker = "rust-lld"

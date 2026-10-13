@@ -2,8 +2,8 @@
 
 This harness checks Malachite functions against other libraries by comparing text, not by
 linking: a Malachite demo prints one `input = output` line per case, and an oracle re-reads the
-file, recomputes every line, and exits nonzero on the first disagreement. There is no FFI, no
-`unsafe`, and no foreign build coupling in the Malachite crates themselves. Two oracles exist: a
+file, recomputes every line, and exits nonzero on the first disagreement. It adds no FFI, no
+`unsafe`, and no foreign build coupling to the Malachite crates themselves. Two oracles exist: a
 small C program (the sources in `oracle/`) built against FLINT, and the `oracle` executable of
 [Azurite](https://github.com/mhogrefe/azurite), a Lean library whose arithmetic is formally
 verified, so that a disagreement there is a bug in Malachite, in a demo's output format, or in

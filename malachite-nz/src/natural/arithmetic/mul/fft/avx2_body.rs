@@ -1,0 +1,3481 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// Uses code adopted from the FLINT Library.
+//
+//      Copyright © 2022 Daniel Schultz
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+// GENERATED FILE: `body.rs` with `#[target_feature(enable = "avx2,fma")]` on every function.
+// Do not edit; edit `body.rs` and run `python3 gen-fft-avx2-body.py` in malachite-nz.
+
+use super::super::*;
+use super::{f64x4, f64x8, u64x4};
+use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
+use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
+use crate::natural::Natural;
+#[cfg(not(feature = "32_bit_limbs"))]
+use crate::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
+use crate::platform::Limb;
+use core::cmp::{max, min};
+use malachite_base::fail_on_untested_path;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::arithmetic::traits::ShrRound;
+use malachite_base::num::arithmetic::traits::{
+    CeilingLogBase2, DivRound, DivisibleByPowerOf2, FloorLogBase2, ModInverse, ModPow, Parity,
+    PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ,
+    XXAddYYToZZ,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::num::conversion::traits::SplitInHalf;
+use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits};
+
+// The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride
+//
+// This is mpn_to_ffts from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+macro_rules! apply_mpn_to_fft_func {
+    ($f: ident, $np: expr, $bits: expr, $nvs: expr) => {
+        #[target_feature(enable = "avx2,fma")]
+        fn $f(
+            rffts: &[FFTContext],
+            ds: &mut [f64],
+            dstride: usize,
+            a: &[Limb],
+            atrunc: usize,
+            two_pow: &[f64x4],
+            stop_easy: usize,
+            start_hard: usize,
+            stop_hard: usize,
+        ) {
+            let mut xs = [f64x4::default(); $nvs];
+            let mut ps = [f64x4::default(); $nvs];
+            let mut pinvs = [f64x4::default(); $nvs];
+            // Only the first `nvs` chunks: `rffts` is the full MPN_CTX_NCRTS-entry context array
+            // (as in FLINT, which does exactly `nvs` vector loads from it). Iterating further
+            // overran `ps` for the np = 4 profiles, which is why balanced multiplications of 64-384
+            // limbs (the np = 4 size range) used to panic.
+            for (i, r) in rffts.chunks(4).take($nvs).enumerate() {
+                ps[i] = f64x4::from([r[0].p, r[1].p, r[2].p, r[3].p]);
+                pinvs[i] = f64x4::from([r[0].pinv, r[1].pinv, r[2].pinv, r[3].pinv]);
+            }
+            if const { $bits & 7 == 0 } {
+                assert_eq!(stop_easy & 3, 0);
+                for i in (0..stop_easy).step_by(4) {
+                    code!(
+                        0, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        1, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        2, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        3, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                }
+            } else {
+                assert_eq!(stop_easy & 7, 0);
+                for i in (0..stop_easy).step_by(8) {
+                    code!(
+                        0, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        1, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        2, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        3, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        4, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        5, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        6, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                    code!(
+                        7, $nvs, $np, ds, dstride, xs, ps, pinvs, two_pow, a, i, $bits
+                    );
+                }
+            }
+            mpn_to_ffts_hard!(
+                $np, $nvs, rffts, ds, dstride, a, atrunc, two_pow, start_hard, stop_hard, $bits
+            );
+        }
+    };
+}
+
+// nvs == np.div_ceil(4)
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_4_84, 4, 84, 1);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_4_88, 4, 88, 1);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_4_92, 4, 92, 1);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_5_112, 5, 112, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_5_116, 5, 116, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_5_120, 5, 120, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_6_136, 6, 136, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_6_140, 6, 140, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_6_144, 6, 144, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_7_160, 7, 160, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_7_164, 7, 164, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_7_168, 7, 168, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_8_184, 8, 184, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_8_188, 8, 188, 2);
+
+apply_mpn_to_fft_func!(apply_mpn_to_fft_func_8_192, 8, 192, 2);
+
+// This is slow_mpn_to_fft_easy from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn slow_mpn_to_fft_easy(
+    q: &FFTContext,
+    zs: &mut [f64],
+    a: &[Limb],
+    iq_stop_easy: usize,
+    bits: usize,
+    two_pow: &[f64],
+) {
+    let p = f64x8::splat(q.p);
+    let pinv = f64x8::splat(q.pinv);
+    let b2 = bits << 1;
+    let b3 = b2 + bits;
+    let b4 = b3 + bits;
+    let b5 = b4 + bits;
+    let b6 = b5 + bits;
+    let b7 = b6 + bits;
+    for iq in 0..iq_stop_easy {
+        let zi = &mut zs[iq << LG_BLK_SZ..];
+        let mut m = 0;
+        for ir in 0..BLK_SZ_DIV_8 {
+            let mut k = iq * const { BLK_SZ >> 5 } * bits + (m >> 5);
+            // the `>> 5`/`& 31` pair is the kernel's word-index/bit-offset split
+            #[cfg_attr(dylint_lib = "malachite_lints", allow(use_mod_power_of_2))]
+            let mut j = m & 31;
+            let mut ak = f64x8::from([
+                f64::from(get!(a, k) >> j),
+                f64::from(get!(a, k + bits) >> j),
+                f64::from(get!(a, k + b2) >> j),
+                f64::from(get!(a, k + b3) >> j),
+                f64::from(get!(a, k + b4) >> j),
+                f64::from(get!(a, k + b5) >> j),
+                f64::from(get!(a, k + b6) >> j),
+                f64::from(get!(a, k + b7) >> j),
+            ]);
+            let mut x = ak;
+            k += 1;
+            j = 32 - j;
+            let bm32 = bits - 32;
+            while j <= bm32 {
+                ak = f64x8::from([
+                    f64::from(get!(a, k)),
+                    f64::from(get!(a, k + bits)),
+                    f64::from(get!(a, k + b2)),
+                    f64::from(get!(a, k + b3)),
+                    f64::from(get!(a, k + b4)),
+                    f64::from(get!(a, k + b5)),
+                    f64::from(get!(a, k + b6)),
+                    f64::from(get!(a, k + b7)),
+                ]);
+                x += f64x8_mulmod!(ak, f64x8::splat(two_pow[j]), p, pinv);
+                k += 1;
+                j += 32;
+            }
+            let bmj = bits - j;
+            if bmj != 0 {
+                let shift = 32 - bmj;
+                ak = f64x8::from([
+                    f64::from(get!(a, k) << shift),
+                    f64::from(get!(a, k + bits) << shift),
+                    f64::from(get!(a, k + b2) << shift),
+                    f64::from(get!(a, k + b3) << shift),
+                    f64::from(get!(a, k + b4) << shift),
+                    f64::from(get!(a, k + b5) << shift),
+                    f64::from(get!(a, k + b6) << shift),
+                    f64::from(get!(a, k + b7) << shift),
+                ]);
+                x += f64x8_mulmod!(ak, f64x8::splat(two_pow[bm32]), p, pinv);
+            }
+            x = f64x8_reduce_to_pm1n!(x, p, pinv);
+            let [x_0, x_1, x_2, x_3, x_4, x_5, x_6, x_7] = x.to_array();
+            let zi_hi = &mut zi[ir..];
+            zi_hi[0] = x_0;
+            zi_hi[BLK_SZ_DIV_8] = x_1;
+            zi_hi[const { BLK_SZ_DIV_8 << 1 }] = x_2;
+            zi_hi[const { 3 * BLK_SZ_DIV_8 }] = x_3;
+            zi_hi[const { BLK_SZ_DIV_8 << 2 }] = x_4;
+            zi_hi[const { 5 * BLK_SZ_DIV_8 }] = x_5;
+            zi_hi[const { 6 * BLK_SZ_DIV_8 }] = x_6;
+            zi_hi[const { 7 * BLK_SZ_DIV_8 }] = x_7;
+            m += bits;
+        }
+    }
+}
+
+// This is slow_mpn_to_fft from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn slow_mpn_to_fft(
+    q: &FFTContext,
+    zs: &mut [f64],
+    ztrunc: usize,
+    a: &[Limb],
+    bits: usize,
+    two_pow: &[f64],
+) {
+    let an = a.len();
+    #[cfg(not(feature = "32_bit_limbs"))]
+    let an = an << 1;
+    let bm32 = bits - 32;
+    // the highest index read from two_pow is bits - 32
+    assert!(bm32 < MPN_CTX_TWO_POWER_TAB_SIZE);
+    // if i*bits + 32 < 32*an, then the index into a is always in bounds
+    let i_stop_easy = min(ztrunc, ((an << 5) - 33) / bits);
+    let iq_stop_easy = i_stop_easy >> LG_BLK_SZ;
+    slow_mpn_to_fft_easy(q, zs, a, iq_stop_easy, bits, two_pow);
+    // now the hard ones
+    let p = q.p;
+    let pinv = q.pinv;
+    for iq in iq_stop_easy..ztrunc >> LG_BLK_SZ {
+        let big_i = iq << LG_BLK_SZ;
+        for (i, z) in zs[big_i..].iter_mut().enumerate().take(BLK_SZ) {
+            let n = (big_i + i) * bits;
+            let mut k = n >> 5;
+            // the `>> 5`/`& 31` pair is the kernel's word-index/bit-offset split
+            #[cfg_attr(dylint_lib = "malachite_lints", allow(use_mod_power_of_2))]
+            let mut j = n & 31;
+            let mut x = f64::from(get_or_default!(a, k) >> j);
+            k += 1;
+            j = 32 - j;
+            while j <= bm32 {
+                x += f64_mulmod!(f64::from(get_or_default!(a, k)), two_pow[j], p, pinv);
+                k += 1;
+                j += 32;
+            }
+            let bmj = bits - j;
+            if bmj != 0 {
+                x += f64_mulmod!(
+                    f64::from(get_or_default!(a, k) << (32 - bmj)),
+                    two_pow[bm32],
+                    p,
+                    pinv
+                );
+            }
+            *z = f64_reduce_to_pm1n!(x, p, pinv);
+        }
+    }
+}
+
+// S is stride; BLK_SZ transforms each of length 2^k
+//
+// This is sd_fft_no_trunc_block from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_no_trunc_block(q: &FFTContext, xs: &mut [f64], s: usize, k: u64, j: usize) {
+    let big_s = s << LG_BLK_SZ;
+    if k > 4 {
+        let k1 = k >> 1;
+        let k2 = k - k1;
+        let shifted = s << k2;
+        let mut m = 0;
+        for _ in 0..usize::power_of_2(k2) {
+            sd_fft_no_trunc_block(q, &mut xs[m..], shifted, k1, j);
+            m += big_s;
+        }
+        // row ffts
+        let big_s = s << (k2 + LG_BLK_SZ);
+        let shifted = j << k1;
+        let mut m = 0;
+        for b in 0..usize::power_of_2(k1) {
+            sd_fft_no_trunc_block(q, &mut xs[m..], s, k2, shifted + b);
+            m += big_s;
+        }
+        return;
+    }
+    set_j_bits_and_j_r!(j, j_bits, j_r);
+    if k >= 2 {
+        let k1 = 2;
+        let k2 = k - k1;
+        let l2 = usize::power_of_2(k2);
+        let big_s_2 = s << (k2 + LG_BLK_SZ);
+        // column ffts
+        if j_bits == 0 {
+            radix_4_forward_param_j_is_z!(q, iw, n, ninv);
+            for a in 0..l2 {
+                split_into_chunks_mut!(&mut xs[a * big_s..], big_s_2, [x0, x1, x2], x3);
+                process_4_3!(
+                    radix_4_forward_moth_j_is_z,
+                    BLK_SZ,
+                    x0,
+                    x1,
+                    x2,
+                    x3,
+                    iw,
+                    n,
+                    ninv
+                );
+            }
+        } else {
+            radix_4_forward_param_j_is_nz!(q, j_r, j_bits, w, w2, iw, n, ninv);
+            for a in 0..l2 {
+                split_into_chunks_mut!(&mut xs[a * big_s..], big_s_2, [x0, x1, x2], x3);
+                process_4_5!(
+                    radix_4_forward_moth_j_is_nz,
+                    BLK_SZ,
+                    x0,
+                    x1,
+                    x2,
+                    x3,
+                    w,
+                    w2,
+                    iw,
+                    n,
+                    ninv
+                );
+            }
+        }
+        if l2 == 1 {
+            return;
+        }
+        // row ffts
+        let shifted = j << k1;
+        let mut m = 0;
+        for b in 0..usize::power_of_2(k1) {
+            sd_fft_no_trunc_block(q, &mut xs[m..], s, k2, shifted + b);
+            m += big_s_2;
+        }
+    } else if k == 1 {
+        let (x0, x1) = xs.split_at_mut(big_s);
+        if j_bits == 0 {
+            radix_2_forward_param_j_is_z!(q, n, ninv);
+            process_2_2!(radix_2_forward_moth_j_is_z, BLK_SZ, x0, x1, n, ninv);
+        } else {
+            radix_2_forward_param_j_is_nz!(q, j_r, j_bits, w, n, ninv);
+            process_2_3!(radix_2_forward_moth_j_is_nz, BLK_SZ, x0, x1, w, n, ninv);
+        }
+    }
+}
+
+// This is sd_fft_basecase_0_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev. Not `const`: the AVX2
+// instantiation adds `#[target_feature]`, which `const fn` does not allow.
+#[allow(clippy::missing_const_for_fn)]
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_basecase_0_1(_q: &FFTContext, _xs: &mut [f64]) {}
+
+// This is sd_fft_basecase_1_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_basecase_1_1(q: &FFTContext, xs: &mut [f64]) {
+    let n = q.p;
+    let ninv = q.pinv;
+    let x0 = f64_reduce_to_pm1n!(xs[0], n, ninv);
+    let x1 = f64_reduce_to_pm1n!(xs[1], n, ninv);
+    xs[0] = x0 + x1;
+    xs[1] = x0 - x1;
+}
+
+// This is sd_fft_basecase_2_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_basecase_2_1(q: &FFTContext, xs: &mut [f64]) {
+    if let &mut [ref mut x0, ref mut x1, ref mut x2, ref mut x3, ..] = xs {
+        f64_length4_zero_j!(x0, x1, x2, x3, q.p, q.pinv, w2tab!(q, 1, 0));
+    }
+}
+
+// This is sd_fft_basecase_3_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_basecase_3_1(q: &FFTContext, xs: &mut [f64]) {
+    if let &mut [
+        ref mut x0,
+        ref mut x1,
+        ref mut x2,
+        ref mut x3,
+        ref mut x4,
+        ref mut x5,
+        ref mut x6,
+        ref mut x7,
+        ..,
+    ] = xs
+    {
+        f64_length8_zero_j!(
+            x0,
+            x1,
+            x2,
+            x3,
+            x4,
+            x5,
+            x6,
+            x7,
+            q.p,
+            q.pinv,
+            w2tab!(q, 1, 0),
+            w2tab!(q, 2, 0),
+            w2tab!(q, 2, 1)
+        );
+    }
+}
+
+// This is sd_fft_basecase_4_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_basecase_4_1(q: &FFTContext, xs: &mut [f64]) {
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let mut x0 = read_f64x4!(xs, 0);
+    let mut x1 = read_f64x4!(xs, 4);
+    let mut x2 = read_f64x4!(xs, 8);
+    let mut x3 = read_f64x4!(xs, 12);
+    // q.w2tab[0] points to consecutive entries
+    const _: () = assert!(SD_FFT_CTX_W2TAB_INIT >= 4);
+    let iw = f64x4::splat(w2tab!(q, 0, 1));
+    f64x4_length4_zero_j!(x0, x1, x2, x3, n, ninv, iw);
+    let u = read_f64x4_w2tab!(q, 0, 0);
+    let v = read_f64x4_w2tab!(q, 0, 4);
+    let w = f64x4_unpack_lo_permute_0_2_1_3!(u, v);
+    let iw = f64x4_unpack_hi_permute_0_2_1_3!(u, v);
+    f64x4_transpose!(x0, x1, x2, x3);
+    length4_any_j!(x0, x1, x2, x3, n, ninv, u, w, iw);
+    write_f64x4!(xs, 0, x0);
+    write_f64x4!(xs, 4, x1);
+    write_f64x4!(xs, 8, x2);
+    write_f64x4!(xs, 12, x3);
+}
+
+// This is sd_fft_basecase_4_0 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_basecase_4_0(q: &FFTContext, xs: &mut [f64], j_r: usize, j_bits: u64) {
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let mut x0 = read_f64x4!(xs, 0);
+    let mut x1 = read_f64x4!(xs, 4);
+    let mut x2 = read_f64x4!(xs, 8);
+    let mut x3 = read_f64x4!(xs, 12);
+    let j_bits = usize::exact_from(j_bits);
+    let w2 = f64x4::splat(w2tab!(q, j_bits, j_r));
+    let jp1 = j_bits + 1;
+    let j_2 = j_r << 1;
+    let w = f64x4::splat(w2tab!(q, jp1, j_2));
+    let iw = f64x4::splat(w2tab!(q, jp1, j_2 + 1));
+    length4_any_j!(x0, x1, x2, x3, n, ninv, w2, w, iw);
+    let jp3 = j_bits + 3;
+    let j_8 = j_r << 3;
+    let u = read_f64x4_w2tab!(q, jp3, j_8);
+    let v = read_f64x4_w2tab!(q, jp3, j_8 + 4);
+    let w2 = read_f64x4_w2tab!(q, j_bits + 2, j_r << 2);
+    let w = f64x4_unpack_lo_permute_0_2_1_3!(u, v);
+    let iw = f64x4_unpack_hi_permute_0_2_1_3!(u, v);
+    f64x4_transpose!(x0, x1, x2, x3);
+    length4_any_j!(x0, x1, x2, x3, n, ninv, w2, w, iw);
+    write_f64x4!(xs, 0, x0);
+    write_f64x4!(xs, 4, x1);
+    write_f64x4!(xs, 8, x2);
+    write_f64x4!(xs, 12, x3);
+}
+
+// The length 32 transform can be broken up as
+// - 8 transforms of length 4 within columns, followed by 4 transforms of length 8 in the rows, or
+// - 4 transforms of length 8 within columns, followed by 8 transforms of length 4 in the rows
+// Since the length 16 basecase is missing the final 4x4 transpose, so the output is worse than
+// bit-reversed. If the length 32 transform used a order different from 16's, then we will have a
+// problem at a higher level since it would be difficult to keep track of what basecase happened to
+// have be used. Therefore, the length 16 and 32 basecases should produce the same order, and this
+// is easier with (b).
+//
+// This is sd_fft_basecase_5_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_basecase_5_1(q: &FFTContext, xs: &mut [f64]) {
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let mut x0 = read_f64x4!(xs, 0);
+    let mut x1 = read_f64x4!(xs, 4);
+    let mut x2 = read_f64x4!(xs, 8);
+    let mut x3 = read_f64x4!(xs, 12);
+    let mut x4 = read_f64x4!(xs, 16);
+    let mut x5 = read_f64x4!(xs, 20);
+    let mut x6 = read_f64x4!(xs, 24);
+    let mut x7 = read_f64x4!(xs, 28);
+    let q00 = w2tab!(q, 0, 0);
+    let q10 = w2tab!(q, 1, 0);
+    let q20 = w2tab!(q, 2, 0);
+    let q21 = w2tab!(q, 2, 1);
+    let ww1 = f64x4::splat(q10);
+    let www2 = f64x4::splat(q20);
+    let www3 = f64x4::splat(q21);
+    f64x4_length8_zero_j!(x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, ww1, www2, www3);
+    f64x4_transpose!(x0, x1, x2, x3);
+    f64x4_transpose!(x4, x5, x6, x7);
+    // j = 0, 1, 2, 3
+    let mut w0 = f64x4::from([q00, q10, q20, q21]);
+    let mut ww0 = f64x4::from([q00, q20, w2tab!(q, 3, 0), w2tab!(q, 3, 2)]);
+    let mut ww1 = f64x4::from([q10, q21, w2tab!(q, 3, 1), w2tab!(q, 3, 3)]);
+    length4_any_j!(x0, x1, x2, x3, n, ninv, w0, ww0, ww1);
+    // j = 4, 5, 6, 7
+    w0 = f64x4::from([w2tab!(q, 3, 0), w2tab!(q, 3, 1), w2tab!(q, 3, 2), w2tab!(q, 3, 3)]);
+    let u = read_f64x4_w2tab!(q, 4, 0);
+    let v = read_f64x4_w2tab!(q, 4, 4);
+    ww0 = f64x4_unpack_lo_permute_0_2_1_3!(u, v);
+    ww1 = f64x4_unpack_hi_permute_0_2_1_3!(u, v);
+    length4_any_j!(x4, x5, x6, x7, n, ninv, w0, ww0, ww1);
+    write_f64x4!(xs, 0, x0);
+    write_f64x4!(xs, 4, x1);
+    write_f64x4!(xs, 8, x2);
+    write_f64x4!(xs, 12, x3);
+    write_f64x4!(xs, 16, x4);
+    write_f64x4!(xs, 20, x5);
+    write_f64x4!(xs, 24, x6);
+    write_f64x4!(xs, 28, x7);
+}
+
+// This is sd_fft_basecase_5_0 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_basecase_5_0(q: &FFTContext, xs: &mut [f64], j_r: usize, j_bits: u64) {
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let mut x0 = read_f64x4!(xs, 0);
+    let mut x1 = read_f64x4!(xs, 4);
+    let mut x2 = read_f64x4!(xs, 8);
+    let mut x3 = read_f64x4!(xs, 12);
+    let mut x4 = read_f64x4!(xs, 16);
+    let mut x5 = read_f64x4!(xs, 20);
+    let mut x6 = read_f64x4!(xs, 24);
+    let mut x7 = read_f64x4!(xs, 28);
+    let j_bits = usize::exact_from(j_bits);
+    let w0 = f64x4::splat(w2tab!(q, j_bits, j_r));
+    let jp1 = j_bits + 1;
+    let j_2 = j_r << 1;
+    let ww0 = f64x4::splat(w2tab!(q, jp1, j_2));
+    let ww1 = f64x4::splat(w2tab!(q, jp1, j_2 + 1));
+    let jp2 = j_bits + 2;
+    let j_4 = j_r << 2;
+    let www0 = f64x4::splat(w2tab!(q, jp2, j_4));
+    let www1 = f64x4::splat(w2tab!(q, jp2, j_4 + 1));
+    let www2 = f64x4::splat(w2tab!(q, jp2, j_4 + 2));
+    let www3 = f64x4::splat(w2tab!(q, jp2, j_4 + 3));
+    length8_any_j!(
+        x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, w0, ww0, ww1, www0, www1, www2, www3
+    );
+    f64x4_transpose!(x0, x1, x2, x3);
+    f64x4_transpose!(x4, x5, x6, x7);
+    // j = 8*j+0, 8*j+1, 8*j+2, 8*j+3
+    let jp3 = j_bits + 3;
+    let jp4 = j_bits + 4;
+    let j_8 = j_r << 3;
+    let w0 = read_f64x4_w2tab!(q, jp3, j_8);
+    let sixteen_j = j_r << 4;
+    let u = read_f64x4_w2tab!(q, jp4, sixteen_j);
+    let v = read_f64x4_w2tab!(q, jp4, sixteen_j + 4);
+    let ww0 = f64x4_unpack_lo_permute_0_2_1_3!(u, v);
+    let ww1 = f64x4_unpack_hi_permute_0_2_1_3!(u, v);
+    length4_any_j!(x0, x1, x2, x3, n, ninv, w0, ww0, ww1);
+    // j = 8*j+4, 8*j+5, 8*j+6, 8*j+7
+    let w0 = read_f64x4_w2tab!(q, jp3, j_8 + 4);
+    let u = read_f64x4_w2tab!(q, jp4, sixteen_j + 8);
+    let v = read_f64x4_w2tab!(q, jp4, sixteen_j + 12);
+    let ww0 = f64x4_unpack_lo_permute_0_2_1_3!(u, v);
+    let ww1 = f64x4_unpack_hi_permute_0_2_1_3!(u, v);
+    length4_any_j!(x4, x5, x6, x7, n, ninv, w0, ww0, ww1);
+    write_f64x4!(xs, 0, x0);
+    write_f64x4!(xs, 4, x1);
+    write_f64x4!(xs, 8, x2);
+    write_f64x4!(xs, 12, x3);
+    write_f64x4!(xs, 16, x4);
+    write_f64x4!(xs, 20, x5);
+    write_f64x4!(xs, 24, x6);
+    write_f64x4!(xs, 28, x7);
+}
+
+macro_rules! sd_fft_basecase {
+    ($n: expr, $f0: ident, $f1: ident, $fs0: ident, $fs1: ident) => {
+        // This is sd_fft_basecase_n_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+        #[target_feature(enable = "avx2,fma")]
+        fn $f1(q: &FFTContext, xs: &mut [f64]) {
+            const LIMIT: usize = 1 << ($n - 2);
+            radix_4_forward_param_j_is_z!(q, iw, n, ninv);
+            split_into_chunks_mut!(xs, LIMIT, [xs0, xs1, xs2], xs3);
+            process_4_3!(
+                radix_4_forward_moth_j_is_z,
+                LIMIT,
+                xs0,
+                xs1,
+                xs2,
+                xs3,
+                iw,
+                n,
+                ninv
+            );
+            $fs1(q, xs0);
+            $fs0(q, xs1, 0, 1);
+            $fs0(q, xs2, 0, 2);
+            $fs0(q, xs3, 1, 2);
+        }
+
+        // This is sd_fft_basecase_n_0 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+        #[target_feature(enable = "avx2,fma")]
+        fn $f0(q: &FFTContext, xs: &mut [f64], j_r: usize, j_bits: u64) {
+            const LIMIT: usize = 1 << ($n - 2);
+            radix_4_forward_param_j_is_nz!(q, j_r, j_bits, w, w2, iw, n, ninv);
+            split_into_chunks_mut!(xs, LIMIT, [xs0, xs1, xs2], xs3);
+            process_4_5!(
+                radix_4_forward_moth_j_is_nz,
+                LIMIT,
+                xs0,
+                xs1,
+                xs2,
+                xs3,
+                w,
+                w2,
+                iw,
+                n,
+                ninv
+            );
+            let j_r_4 = j_r << 2;
+            let j_bits_p_2 = j_bits + 2;
+            $fs0(q, xs0, j_r_4, j_bits_p_2);
+            $fs0(q, xs1, j_r_4 + 1, j_bits_p_2);
+            $fs0(q, xs2, j_r_4 + 2, j_bits_p_2);
+            $fs0(q, xs3, j_r_4 + 3, j_bits_p_2);
+        }
+    };
+}
+
+sd_fft_basecase!(
+    6,
+    sd_fft_basecase_6_0,
+    sd_fft_basecase_6_1,
+    sd_fft_basecase_4_0,
+    sd_fft_basecase_4_1
+);
+
+sd_fft_basecase!(
+    7,
+    sd_fft_basecase_7_0,
+    sd_fft_basecase_7_1,
+    sd_fft_basecase_5_0,
+    sd_fft_basecase_5_1
+);
+
+sd_fft_basecase!(
+    8,
+    sd_fft_basecase_8_0,
+    sd_fft_basecase_8_1,
+    sd_fft_basecase_6_0,
+    sd_fft_basecase_6_1
+);
+
+sd_fft_basecase!(
+    9,
+    sd_fft_basecase_9_0,
+    sd_fft_basecase_9_1,
+    sd_fft_basecase_7_0,
+    sd_fft_basecase_7_1
+);
+
+// parameter 1: j can be zero
+//
+// This is sd_fft_base_8_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_base_8_1(q: &FFTContext, xs: &mut [f64], j: usize) {
+    set_j_bits_and_j_r!(j, j_bits, j_r);
+    if j == 0 {
+        sd_fft_basecase_8_1(q, xs);
+    } else {
+        sd_fft_basecase_8_0(q, xs, j_r, j_bits);
+    }
+}
+
+// parameter 0: j cannot be zero
+//
+// This is sd_fft_base_8_0 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_base_8_0(q: &FFTContext, xs: &mut [f64], j: usize) {
+    assert_ne!(j, 0);
+    set_j_bits_and_j_r!(j, j_bits, j_r);
+    sd_fft_basecase_8_0(q, xs, j_r, j_bits);
+}
+
+// This is sd_fft_base_9_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_base_9_1(q: &FFTContext, xs: &mut [f64], j: usize) {
+    set_j_bits_and_j_r!(j, j_bits, j_r);
+    if j == 0 {
+        sd_fft_basecase_9_1(q, xs);
+    } else {
+        sd_fft_basecase_9_0(q, xs, j_r, j_bits);
+    }
+}
+
+// This is sd_fft_no_trunc_internal from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_no_trunc_internal(
+    q: &FFTContext,
+    xs: &mut [f64],
+    // stride
+    s: usize,
+    // 1 transform of length BLK_SZ*2^k
+    k: u64,
+    // twist param
+    j: usize,
+) {
+    if k > 2 {
+        let k1 = k >> 1;
+        let k2 = k - k1;
+        // column ffts
+        let shift = s << k2;
+        let big_s = s << LG_BLK_SZ;
+        let mut m = 0;
+        for _ in 0..usize::power_of_2(k2) {
+            sd_fft_no_trunc_block(q, &mut xs[m..], shift, k1, j);
+            m += big_s;
+        }
+        // row ffts
+        let shift = k2 + LG_BLK_SZ;
+        let shifted = j << k1;
+        let big_s = s << shift;
+        let mut m = 0;
+        for b in 0..usize::power_of_2(k1) {
+            sd_fft_no_trunc_internal(q, &mut xs[m..], s, k2, shifted + b);
+            m += big_s;
+        }
+        return;
+    }
+    if k == 2 {
+        // k1 = 2; k2 = 0
+        sd_fft_no_trunc_block(q, xs, s, 2, j);
+        split_into_chunks_mut!(xs, s << LG_BLK_SZ, [xs0, xs1, xs2], xs3);
+        let j_4 = j << 2;
+        sd_fft_base_8_1(q, xs0, j_4);
+        sd_fft_base_8_0(q, xs1, j_4 + 1);
+        sd_fft_base_8_0(q, xs2, j_4 + 2);
+        sd_fft_base_8_0(q, xs3, j_4 + 3);
+    } else if k == 1 {
+        sd_fft_base_9_1(q, xs, j);
+    } else {
+        // currently unreachable because all ffts are called with k > 0
+        sd_fft_base_8_1(q, xs, j);
+    }
+}
+
+// This is sd_fft_moth_trunc_block_i_j_1 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_moth_trunc_block_1<const ITRUNC: usize, const OTRUNC: usize>(
+    q: &FFTContext,
+    _j_r: usize,
+    _j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    radix_4_forward_param_j_is_z!(q, iw, n, ninv);
+    let gap_2 = gap << 1;
+    let gap_3 = gap_2 + gap;
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let mut x0 = f64x8::default();
+        let mut x1 = f64x8::default();
+        let mut x2 = f64x8::default();
+        let mut x3 = f64x8::default();
+        if 0 < ITRUNC {
+            x0 = read_f64x8!(xs, i);
+        }
+        if 0 < ITRUNC {
+            x0 = f64x8_reduce_to_pm1n!(x0, n, ninv);
+        }
+        if 1 < ITRUNC {
+            x1 = read_f64x8!(xs, gap + i);
+        }
+        if 2 < ITRUNC {
+            x2 = read_f64x8!(xs, gap_2 + i);
+        }
+        if 2 < ITRUNC {
+            x2 = f64x8_reduce_to_pm1n!(x2, n, ninv);
+        }
+        if 3 < ITRUNC {
+            x3 = read_f64x8!(xs, gap_3 + i);
+        }
+        if 3 < ITRUNC {
+            x3 = f64x8_reduce_to_pm1n!(x3, n, ninv);
+        }
+        let y0 = if 2 < ITRUNC { x0 + x2 } else { x0 };
+        let mut y1 = if 3 < ITRUNC { x1 + x3 } else { x1 };
+        let y2 = if 2 < ITRUNC { x0 - x2 } else { x0 };
+        let mut y3 = if 3 < ITRUNC { x1 - x3 } else { x1 };
+        y1 = f64x8_reduce_to_pm1n!(y1, n, ninv);
+        y3 = f64x8_mulmod!(y3, iw, n, ninv);
+        x0 = y0 + y1;
+        x1 = y0 - y1;
+        x2 = y2 + y3;
+        x3 = y2 - y3;
+        if 0 < OTRUNC {
+            write_f64x8!(xs, i, x0);
+        }
+        if 1 < OTRUNC {
+            write_f64x8!(xs, gap + i, x1);
+        }
+        if 2 < OTRUNC {
+            write_f64x8!(xs, gap_2 + i, x2);
+        }
+        if 3 < OTRUNC {
+            write_f64x8!(xs, gap_3 + i, x3);
+        }
+    }
+}
+
+// This is sd_fft_moth_trunc_block_i_j_0 from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_moth_trunc_block_0<const ITRUNC: usize, const OTRUNC: usize>(
+    q: &FFTContext,
+    j_r: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    radix_4_forward_param_j_is_nz!(q, j_r, j_bits, w, w2, iw, n, ninv);
+    let gap_2 = gap << 1;
+    let gap_3 = gap_2 + gap;
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let mut x0 = f64x8::default();
+        let mut x1 = f64x8::default();
+        let mut x2 = f64x8::default();
+        let mut x3 = f64x8::default();
+        if 0 < ITRUNC {
+            x0 = read_f64x8!(xs, i);
+        }
+        if 0 < ITRUNC {
+            x0 = f64x8_reduce_to_pm1n!(x0, n, ninv);
+        }
+        if 1 < ITRUNC {
+            x1 = read_f64x8!(xs, gap + i);
+        }
+        if 2 < ITRUNC {
+            x2 = read_f64x8!(xs, gap_2 + i);
+        }
+        if 2 < ITRUNC {
+            x2 = f64x8_mulmod!(x2, w2, n, ninv);
+        }
+        if 3 < ITRUNC {
+            x3 = read_f64x8!(xs, gap_3 + i);
+        }
+        if 3 < ITRUNC {
+            x3 = f64x8_mulmod!(x3, w2, n, ninv);
+        }
+        let y0 = if 2 < ITRUNC { x0 + x2 } else { x0 };
+        let mut y1 = if 3 < ITRUNC { x1 + x3 } else { x1 };
+        let y2 = if 2 < ITRUNC { x0 - x2 } else { x0 };
+        let mut y3 = if 3 < ITRUNC { x1 - x3 } else { x1 };
+        y1 = f64x8_mulmod!(y1, w, n, ninv);
+        y3 = f64x8_mulmod!(y3, iw, n, ninv);
+        x0 = y0 + y1;
+        x1 = y0 - y1;
+        x2 = y2 + y3;
+        x3 = y2 - y3;
+        if 0 < OTRUNC {
+            write_f64x8!(xs, i, x0);
+        }
+        if 1 < OTRUNC {
+            write_f64x8!(xs, gap + i, x1);
+        }
+        if 2 < OTRUNC {
+            write_f64x8!(xs, gap_2 + i, x2);
+        }
+        if 3 < OTRUNC {
+            write_f64x8!(xs, gap_3 + i, x3);
+        }
+    }
+}
+
+// Dispatches to the `sd_fft_moth_trunc_block_*` function for the given truncation lengths,
+// replacing FLINT's table of function pointers. `j_is_zero` selects the `_1` variants, which are
+// specialized to `j == 0`.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_moth_trunc_block(
+    itrunc: usize,
+    otrunc: usize,
+    j_is_zero: bool,
+    q: &FFTContext,
+    j_r: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    big_s: usize,
+) {
+    match (itrunc, otrunc, j_is_zero) {
+        (2, 1, false) => sd_fft_moth_trunc_block_0::<2, 1>(q, j_r, j_bits, xs, big_s),
+        (2, 1, true) => sd_fft_moth_trunc_block_1::<2, 1>(q, j_r, j_bits, xs, big_s),
+        (2, 2, false) => sd_fft_moth_trunc_block_0::<2, 2>(q, j_r, j_bits, xs, big_s),
+        (2, 2, true) => sd_fft_moth_trunc_block_1::<2, 2>(q, j_r, j_bits, xs, big_s),
+        (2, 3, false) => sd_fft_moth_trunc_block_0::<2, 3>(q, j_r, j_bits, xs, big_s),
+        (2, 3, true) => sd_fft_moth_trunc_block_1::<2, 3>(q, j_r, j_bits, xs, big_s),
+        (2, 4, false) => sd_fft_moth_trunc_block_0::<2, 4>(q, j_r, j_bits, xs, big_s),
+        (2, 4, true) => sd_fft_moth_trunc_block_1::<2, 4>(q, j_r, j_bits, xs, big_s),
+        (3, 1, false) => sd_fft_moth_trunc_block_0::<3, 1>(q, j_r, j_bits, xs, big_s),
+        (3, 1, true) => sd_fft_moth_trunc_block_1::<3, 1>(q, j_r, j_bits, xs, big_s),
+        (3, 2, false) => sd_fft_moth_trunc_block_0::<3, 2>(q, j_r, j_bits, xs, big_s),
+        (3, 2, true) => sd_fft_moth_trunc_block_1::<3, 2>(q, j_r, j_bits, xs, big_s),
+        (3, 3, false) => sd_fft_moth_trunc_block_0::<3, 3>(q, j_r, j_bits, xs, big_s),
+        (3, 3, true) => sd_fft_moth_trunc_block_1::<3, 3>(q, j_r, j_bits, xs, big_s),
+        (3, 4, false) => sd_fft_moth_trunc_block_0::<3, 4>(q, j_r, j_bits, xs, big_s),
+        (3, 4, true) => sd_fft_moth_trunc_block_1::<3, 4>(q, j_r, j_bits, xs, big_s),
+        (4, 1, false) => sd_fft_moth_trunc_block_0::<4, 1>(q, j_r, j_bits, xs, big_s),
+        (4, 1, true) => sd_fft_moth_trunc_block_1::<4, 1>(q, j_r, j_bits, xs, big_s),
+        (4, 2, false) => sd_fft_moth_trunc_block_0::<4, 2>(q, j_r, j_bits, xs, big_s),
+        (4, 2, true) => sd_fft_moth_trunc_block_1::<4, 2>(q, j_r, j_bits, xs, big_s),
+        (4, 3, false) => sd_fft_moth_trunc_block_0::<4, 3>(q, j_r, j_bits, xs, big_s),
+        (4, 3, true) => sd_fft_moth_trunc_block_1::<4, 3>(q, j_r, j_bits, xs, big_s),
+        (4, 4, false) => sd_fft_moth_trunc_block_0::<4, 4>(q, j_r, j_bits, xs, big_s),
+        (4, 4, true) => sd_fft_moth_trunc_block_1::<4, 4>(q, j_r, j_bits, xs, big_s),
+        _ => unreachable!(),
+    }
+}
+
+// This is sd_fft_trunc_block from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_trunc_block(
+    q: &FFTContext,
+    xs: &mut [f64],
+    s: usize,
+    // transform length 2^k
+    k: u64,
+    j: usize,
+    itrunc: usize,
+    otrunc: usize,
+) {
+    let pow = usize::power_of_2(k);
+    assert!(itrunc <= pow);
+    assert!(otrunc <= pow);
+    if otrunc < 1 {
+        fail_on_untested_path("sd_fft_trunc_block, otrunc < 1");
+        return;
+    }
+    if itrunc <= 1 {
+        let big_s = s << LG_BLK_SZ;
+        if itrunc < 1 {
+            fail_on_untested_path("sd_fft_trunc_block, itrunc < 1");
+            for c in xs[..big_s * otrunc].chunks_mut(big_s) {
+                c[..BLK_SZ].fill(0.0);
+            }
+        } else {
+            let mut m = big_s;
+            for _ in 1..otrunc {
+                let (xs_lo, xs_hi) = xs.split_at_mut(m);
+                xs_hi[..BLK_SZ].copy_from_slice(&xs_lo[..BLK_SZ]);
+                m += big_s;
+            }
+        }
+        return;
+    }
+    if itrunc == otrunc && otrunc == pow {
+        sd_fft_no_trunc_block(q, xs, s, k, j);
+        return;
+    }
+    let big_s = s << LG_BLK_SZ;
+    if k > 2 {
+        let k1 = k >> 1;
+        let k2 = k - k1;
+        let l2 = usize::power_of_2(k2);
+        let n1 = otrunc >> k2;
+        let mask = l2 - 1;
+        let n2 = otrunc & mask;
+        let z1 = itrunc >> k2;
+        let z2 = itrunc & mask;
+        let n1p = n1 + usize::from(n2 != 0);
+        let z2p = min(l2, itrunc);
+        // columns
+        let shifted = s << k2;
+        let mut m = 0;
+        for a in 0..z2p {
+            sd_fft_trunc_block(
+                q,
+                &mut xs[m..],
+                shifted,
+                k1,
+                j,
+                z1 + usize::from(a < z2),
+                n1p,
+            );
+            m += big_s;
+        }
+        // full rows
+        let big_s_2 = s << (k2 + LG_BLK_SZ);
+        let shifted = j << k1;
+        let mut m = 0;
+        for b in 0..n1 {
+            sd_fft_trunc_block(q, &mut xs[m..], s, k2, shifted + b, z2p, l2);
+            m += big_s_2;
+        }
+        // last partial row
+        if n2 != 0 {
+            sd_fft_trunc_block(q, &mut xs[n1 * big_s_2..], s, k2, shifted + n1, z2p, n2);
+        }
+        return;
+    }
+    set_j_bits_and_j_r!(j, j_bits, j_r);
+    if k == 2 {
+        sd_fft_moth_trunc_block(itrunc, otrunc, j == 0, q, j_r, j_bits, xs, big_s);
+    } else if k == 1 {
+        let (xs0, xs1) = xs.split_at_mut(big_s);
+        assert_eq!(itrunc, 2);
+        assert_eq!(otrunc, 1);
+        if j_bits == 0 {
+            fail_on_untested_path("sd_fft_trunc_block, j_bits == 0");
+            radix_2_forward_param_j_is_z!(q, n, ninv);
+            process_2_2!(
+                radix_2_forward_moth_trunc_2_1_j_is_z,
+                BLK_SZ,
+                xs0,
+                xs1,
+                n,
+                ninv
+            );
+        } else {
+            radix_2_forward_param_j_is_nz!(q, j_r, j_bits, w, n, ninv);
+            process_2_3!(
+                radix_2_forward_moth_trunc_2_1_j_is_nz,
+                BLK_SZ,
+                xs0,
+                xs1,
+                w,
+                n,
+                ninv
+            );
+        }
+    }
+}
+
+// This is sd_fft_trunc_internal from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_trunc_internal(
+    q: &FFTContext,
+    // x = data + BLK_SZ*I  where I = starting index
+    xs: &mut [f64],
+    // stride
+    s: usize,
+    // transform length BLK_SZ*2^k
+    k: u64,
+    j: usize,
+    // actual trunc is BLK_SZ*itrunc
+    itrunc: usize,
+    // actual trunc is BLK_SZ*otrunc
+    otrunc: usize,
+) {
+    if otrunc < 1 {
+        fail_on_untested_path("sd_fft_trunc_internal, otrunc < 1");
+        return;
+    }
+    if itrunc < 1 {
+        fail_on_untested_path("sd_fft_trunc_internal, itrunc < 1");
+        let big_s = s << LG_BLK_SZ;
+        for c in xs[..big_s * otrunc].chunks_mut(big_s) {
+            c[..BLK_SZ].fill(0.0);
+        }
+        return;
+    }
+    if itrunc == otrunc && otrunc == usize::power_of_2(k) {
+        sd_fft_no_trunc_internal(q, xs, s, k, j);
+        return;
+    }
+    let big_s = s << LG_BLK_SZ;
+    if k > 2 {
+        let k1 = k >> 1;
+        let k2 = k - k1;
+        let l2 = usize::power_of_2(k2);
+        let n1 = otrunc >> k2;
+        let mask = l2 - 1;
+        let n2 = otrunc & mask;
+        let z1 = itrunc >> k2;
+        let z2 = itrunc & mask;
+        let n1p = n1 + usize::from(n2 != 0);
+        let z2p = min(l2, itrunc);
+        // columns
+        let shifted = s << k2;
+        let mut m = 0;
+        for a in 0..z2p {
+            sd_fft_trunc_block(
+                q,
+                &mut xs[m..],
+                shifted,
+                k1,
+                j,
+                z1 + usize::from(a < z2),
+                n1p,
+            );
+            m += big_s;
+        }
+        // full rows
+        let big_s_2 = s << (k2 + LG_BLK_SZ);
+        let shifted = j << k1;
+        let mut m = 0;
+        for b in 0..n1 {
+            sd_fft_trunc_internal(q, &mut xs[m..], s, k2, shifted + b, z2p, l2);
+            m += big_s_2;
+        }
+        // last partial row
+        if n2 > 0 {
+            sd_fft_trunc_internal(q, &mut xs[n1 * big_s_2..], s, k2, shifted + n1, z2p, n2);
+        }
+        return;
+    }
+    if k == 2 {
+        sd_fft_trunc_block(q, xs, s, 2, j, itrunc, otrunc);
+        let j_4 = j << 2;
+        sd_fft_base_8_1(q, xs, j_4);
+        if otrunc > 1 {
+            sd_fft_base_8_0(q, &mut xs[big_s..], j_4 + 1);
+        }
+        if otrunc > 2 {
+            sd_fft_base_8_0(q, &mut xs[big_s << 1..], j_4 + 2);
+        }
+        if otrunc > 3 {
+            sd_fft_base_8_0(q, &mut xs[big_s * 3..], j_4 + 3);
+        }
+    } else if k == 1 {
+        sd_fft_trunc_block(q, xs, s, 1, j, itrunc, otrunc);
+        let j_2 = j << 1;
+        sd_fft_base_8_1(q, xs, j_2);
+        if otrunc > 1 {
+            sd_fft_base_8_0(q, &mut xs[big_s..], j_2 + 1);
+        }
+    } else {
+        // currently unreachable
+        sd_fft_base_8_1(q, xs, j);
+    }
+}
+
+// This is sd_fft_ctx_fit_depth_with_lock from fft_small/sd_fft_ctx.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_ctx_fit_depth_with_lock(q: &mut FFTContext, depth: u64) {
+    for k in q.w2tab_depth..depth {
+        let ww = q
+            .primitive_root
+            .mod_pow((q.mod_data.n - 1) >> (k + 1), q.mod_data.n);
+        let w = f64x8::splat(f64_reduce_0n_to_pmhn!(ww as f64, q.p));
+        let n = f64x8::splat(q.p);
+        let ninv = f64x8::splat(q.pinv);
+        let big_n = usize::power_of_2(k - 1);
+        let old_len = q.w2tab_backing.len();
+        q.w2tab_backing.to_mut().resize(
+            old_len + big_n.round_to_multiple_of_power_of_2(12, Ceiling).0,
+            0.0,
+        );
+        let ku = k as usize;
+        q.w2tab_offsets[ku] = old_len;
+        // The first few tables are stored consecutively, so vec16 is ok.
+        let mut off = 0;
+        let mut l = const { 1 << (SD_FFT_CTX_W2TAB_INIT - 1) };
+        let mut kk = 0;
+        for j in SD_FFT_CTX_W2TAB_INIT - 1..k {
+            for i in (0..l).step_by(16) {
+                let x0 = read_f64x8_w2tab!(q, kk, i);
+                let x1 = read_f64x8_w2tab!(q, kk, i + 8);
+                let y0 = f64x8_reduce_pm1n_to_pmhn!(f64x8_mulmod!(x0, w, n, ninv), n);
+                let y1 = f64x8_reduce_pm1n_to_pmhn!(f64x8_mulmod!(x1, w, n, ninv), n);
+                write_f64x8_w2tab!(q, ku, off + i, y0);
+                write_f64x8_w2tab!(q, ku, off + i + 8, y1);
+            }
+            kk = j as usize + 1;
+            l += off;
+            off = l;
+        }
+        q.w2tab_depth = k;
+    }
+}
+
+// This is sd_fft_ctx_fit_depth from fft_small.h, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_ctx_fit_depth(q: &mut FFTContext, depth: u64) {
+    if q.w2tab_depth < depth {
+        sd_fft_ctx_fit_depth_with_lock(q, depth);
+    }
+}
+
+// This is sd_fft_trunc from fft_small/sd_fft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_trunc(
+    q: &mut FFTContext,
+    ds: &mut [f64],
+    // convolution length 2^L
+    l: u64,
+    itrunc: usize,
+    otrunc: usize,
+) {
+    let pow = usize::power_of_2(l);
+    assert!(itrunc <= pow);
+    assert!(otrunc <= pow);
+    if l > LG_BLK_SZ {
+        sd_fft_ctx_fit_depth(q, l);
+        let new_itrunc = itrunc.div_round(BLK_SZ, Ceiling).0;
+        let new_otrunc = otrunc.div_round(BLK_SZ, Ceiling).0;
+        ds[itrunc..][..itrunc.wrapping_neg() & const { BLK_SZ - 1 }].fill(0.0);
+        sd_fft_trunc_internal(q, ds, 1, l - LG_BLK_SZ, 0, new_itrunc, new_otrunc);
+        return;
+    }
+    // This small-transform branch is reached by multiplications below ~385 balanced limbs (the np =
+    // 4 profiles), which became reachable when the `mpn_to_ffts` context-loading bug was fixed
+    // (2026-07); `tune_fft_small_check` verifies it against the Toom dispatch.
+    ds[itrunc..usize::power_of_2(l)].fill(0.0);
+    // L=8 reads from w2tab[7]
+    const _: () = assert!(LG_BLK_SZ <= SD_FFT_CTX_W2TAB_INIT);
+    match l {
+        0 => sd_fft_basecase_0_1(q, ds),
+        1 => sd_fft_basecase_1_1(q, ds),
+        2 => sd_fft_basecase_2_1(q, ds),
+        3 => sd_fft_basecase_3_1(q, ds),
+        4 => sd_fft_basecase_4_1(q, ds),
+        5 => sd_fft_basecase_5_1(q, ds),
+        6 => sd_fft_basecase_6_1(q, ds),
+        7 => sd_fft_basecase_7_1(q, ds),
+        8 => sd_fft_basecase_8_1(q, ds),
+        _ => unreachable!(),
+    }
+}
+
+// This is sd_ifft_no_trunc_block from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_no_trunc_block(
+    q: &FFTContext,
+    xs: &mut [f64],
+    // stride
+    s: usize,
+    // BLK_SZ transforms each of length 2^k
+    k: u64,
+    j: usize,
+) {
+    let big_s = s << LG_BLK_SZ;
+    if k > 2 {
+        let k1 = k >> 1;
+        let k2 = k - k1;
+        // row ffts
+        let big_s_2 = s << (k2 + LG_BLK_SZ);
+        let shifted = j << k1;
+        let mut m = 0;
+        for b in 0..usize::power_of_2(k1) {
+            sd_ifft_no_trunc_block(q, &mut xs[m..], s, k2, shifted + b);
+            m += big_s_2;
+        }
+        // column ffts
+        let shifted = s << k2;
+        let mut m = 0;
+        for _ in 0..usize::power_of_2(k2) {
+            sd_ifft_no_trunc_block(q, &mut xs[m..], shifted, k1, j);
+            m += big_s;
+        }
+        return;
+    }
+    set_j_bits_and_j_mr!(j, j_bits, j_mr);
+    if k == 2 {
+        split_into_chunks_mut!(xs, big_s, [xs0, xs1, xs2], xs3);
+        if j_bits == 0 {
+            radix_4_reverse_param_j_is_z!(q, iw, n, ninv);
+            process_4_3!(
+                radix_4_reverse_moth_j_is_z,
+                BLK_SZ,
+                xs0,
+                xs1,
+                xs2,
+                xs3,
+                iw,
+                n,
+                ninv
+            );
+        } else {
+            radix_4_reverse_param_j_is_nz!(q, j_mr, j_bits, w, w2, iw, n, ninv);
+            process_4_5!(
+                radix_4_reverse_moth_j_is_nz,
+                BLK_SZ,
+                xs0,
+                xs1,
+                xs2,
+                xs3,
+                w,
+                w2,
+                iw,
+                n,
+                ninv
+            );
+        }
+    } else if k == 1 {
+        let (xs0, xs1) = xs.split_at_mut(big_s);
+        if j_bits == 0 {
+            radix_2_reverse_param_j_is_z!(q, n, ninv);
+            process_2_2!(radix_2_reverse_moth_j_is_z, BLK_SZ, xs0, xs1, n, ninv);
+        } else {
+            radix_2_reverse_param_j_is_nz!(q, j_mr, j_bits, w, n, ninv);
+            process_2_3!(radix_2_reverse_moth_j_is_nz, BLK_SZ, xs0, xs1, w, n, ninv);
+        }
+    }
+}
+
+// This is sd_ifft_basecase_0_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev. Not `const`: the AVX2
+// instantiation adds `#[target_feature]`, which `const fn` does not allow.
+#[allow(clippy::missing_const_for_fn)]
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_basecase_0_1(_q: &FFTContext, _xs: &mut [f64]) {}
+
+// This is sd_ifft_basecase_1_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_basecase_1_1(q: &FFTContext, xs: &mut [f64]) {
+    if let &mut [ref mut x0, ref mut x1, ..] = xs {
+        f64_length2inv_zero_j_mut!(x0, x1, q.p, q.pinv);
+    }
+}
+
+// This is sd_ifft_basecase_2_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_basecase_2_1(q: &FFTContext, xs: &mut [f64]) {
+    if let &mut [ref mut x0, ref mut x1, ref mut x2, ref mut x3, ..] = xs {
+        f64_length4inv_zero_j_mut!(x0, x1, x2, x3, q.p, q.pinv, w2tab!(q, 1, 0));
+    }
+}
+
+// This is sd_ifft_basecase_3_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_basecase_3_1(q: &FFTContext, xs: &mut [f64]) {
+    if let &mut [
+        ref mut x0,
+        ref mut x1,
+        ref mut x2,
+        ref mut x3,
+        ref mut x4,
+        ref mut x5,
+        ref mut x6,
+        ref mut x7,
+        ..,
+    ] = xs
+    {
+        f64_length8inv_zero_j!(
+            x0,
+            x1,
+            x2,
+            x3,
+            x4,
+            x5,
+            x6,
+            x7,
+            q.p,
+            q.pinv,
+            w2tab!(q, 1, 0),
+            w2tab!(q, 2, 1),
+            w2tab!(q, 2, 0)
+        );
+    }
+}
+
+// This is sd_ifft_basecase_4_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_basecase_4_1(q: &FFTContext, xs: &mut [f64]) {
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let mut x0 = read_f64x4!(xs, 0);
+    let mut x1 = read_f64x4!(xs, 4);
+    let mut x2 = read_f64x4!(xs, 8);
+    let mut x3 = read_f64x4!(xs, 12);
+    let q00 = w2tab!(q, 0, 0);
+    let q01 = w2tab!(q, 0, 1);
+    let q02 = w2tab!(q, 0, 2);
+    let q03 = w2tab!(q, 0, 3);
+    let w = f64x4::from([-q00, q03, w2tab!(q, 0, 7), w2tab!(q, 0, 5)]);
+    let iw = f64x4::from([q01, q02, w2tab!(q, 0, 6), w2tab!(q, 0, 4)]);
+    let w2 = f64x4::from([-q00, q01, q03, q02]);
+    f64x4_length4inv_any_j!(x0, x1, x2, x3, n, ninv, w2, w, iw);
+    f64x4_transpose!(x0, x1, x2, x3);
+    let iw = f64x4::splat(q01);
+    f64x4_length4inv_zero_j!(x0, x1, x2, x3, n, ninv, iw);
+    write_f64x4!(xs, 0, x0);
+    write_f64x4!(xs, 4, x1);
+    write_f64x4!(xs, 8, x2);
+    write_f64x4!(xs, 12, x3);
+}
+
+// This is sd_ifft_basecase_4_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_basecase_4_0(q: &FFTContext, xs: &mut [f64], j_mr: usize, j_bits: u64) {
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let mut x0 = read_f64x4!(xs, 0);
+    let mut x1 = read_f64x4!(xs, 4);
+    let mut x2 = read_f64x4!(xs, 8);
+    let mut x3 = read_f64x4!(xs, 12);
+    let j_bits = usize::exact_from(j_bits);
+    let w2 = read_f64x4_w2tab!(q, j_bits + 2, j_mr << 2);
+    let [w20, w21, w22, w23] = w2.to_array();
+    let w2 = f64x4::from([w23, w22, w21, w20]);
+    let jp3 = j_bits + 3;
+    let j_8 = j_mr << 3;
+    let [u0, u1, u2, u3] = read_f64x4_w2tab!(q, jp3, j_8).to_array();
+    let [v0, v1, v2, v3] = read_f64x4_w2tab!(q, jp3, j_8 + 4).to_array();
+    let mut w = f64x4::from([v3, v1, u3, u1]);
+    let mut iw = f64x4::from([v2, v0, u2, u0]);
+    f64x4_length4inv_any_j!(x0, x1, x2, x3, n, ninv, w2, w, iw);
+    f64x4_transpose!(x0, x1, x2, x3);
+    let jp1 = j_bits + 1;
+    let j_2 = j_mr << 1;
+    w = f64x4::splat(w2tab!(q, jp1, j_2 + 1));
+    iw = f64x4::splat(w2tab!(q, jp1, j_2));
+    let w2 = f64x4::splat(w2tab!(q, j_bits, j_mr));
+    f64x4_length4inv_any_j!(x0, x1, x2, x3, n, ninv, w2, w, iw);
+    write_f64x4!(xs, 0, x0);
+    write_f64x4!(xs, 4, x1);
+    write_f64x4!(xs, 8, x2);
+    write_f64x4!(xs, 12, x3);
+}
+
+// This is sd_ifft_basecase_5_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_basecase_5_1(q: &FFTContext, xs: &mut [f64]) {
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let mut x0 = read_f64x4!(xs, 0);
+    let mut x1 = read_f64x4!(xs, 4);
+    let mut x2 = read_f64x4!(xs, 8);
+    let mut x3 = read_f64x4!(xs, 12);
+    let mut x4 = read_f64x4!(xs, 16);
+    let mut x5 = read_f64x4!(xs, 20);
+    let mut x6 = read_f64x4!(xs, 24);
+    let mut x7 = read_f64x4!(xs, 28);
+    let q00 = w2tab!(q, 0, 0);
+    let q10 = w2tab!(q, 1, 0);
+    let q20 = w2tab!(q, 2, 0);
+    let q21 = w2tab!(q, 2, 1);
+    let q30 = w2tab!(q, 3, 0);
+    let q31 = w2tab!(q, 3, 1);
+    let q32 = w2tab!(q, 3, 2);
+    let q33 = w2tab!(q, 3, 3);
+    // j = 0, 1, 2, 3  then {j,2j+0,2j+1}^-1 in each column
+    let mut w0 = f64x4::from([-q00, q10, q21, q20]);
+    let mut ww0 = f64x4::from([-q00, q21, q33, q31]);
+    let mut ww1 = f64x4::from([q10, q20, q32, q30]);
+    f64x4_length4inv_any_j!(x0, x1, x2, x3, n, ninv, w0, ww0, ww1);
+    // j = 4, 5, 6, 7  then {j,2j+0,2j+1}^-1 in each column
+    w0 = f64x4::from([q33, q32, q31, q30]);
+    ww0 = f64x4::from([w2tab!(q, 4, 7), w2tab!(q, 4, 5), w2tab!(q, 4, 3), w2tab!(q, 4, 1)]);
+    ww1 = f64x4::from([w2tab!(q, 4, 6), w2tab!(q, 4, 4), w2tab!(q, 4, 2), w2tab!(q, 4, 0)]);
+    f64x4_length4inv_any_j!(x4, x5, x6, x7, n, ninv, w0, ww0, ww1);
+    f64x4_transpose!(x0, x1, x2, x3);
+    f64x4_transpose!(x4, x5, x6, x7);
+    ww1 = f64x4::splat(q10);
+    let www2 = f64x4::splat(q21);
+    let www3 = f64x4::splat(q20);
+    f64x4_length8inv_zero_j!(x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, ww1, www2, www3);
+    write_f64x4!(xs, 0, x0);
+    write_f64x4!(xs, 4, x1);
+    write_f64x4!(xs, 8, x2);
+    write_f64x4!(xs, 12, x3);
+    write_f64x4!(xs, 16, x4);
+    write_f64x4!(xs, 20, x5);
+    write_f64x4!(xs, 24, x6);
+    write_f64x4!(xs, 28, x7);
+}
+
+// This is sd_ifft_basecase_5_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_basecase_5_0(q: &FFTContext, xs: &mut [f64], j_mr: usize, j_bits: u64) {
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let mut x0 = read_f64x4!(xs, 0);
+    let mut x1 = read_f64x4!(xs, 4);
+    let mut x2 = read_f64x4!(xs, 8);
+    let mut x3 = read_f64x4!(xs, 12);
+    let mut x4 = read_f64x4!(xs, 16);
+    let mut x5 = read_f64x4!(xs, 20);
+    let mut x6 = read_f64x4!(xs, 24);
+    let mut x7 = read_f64x4!(xs, 28);
+    let j_bits = usize::exact_from(j_bits);
+    let j_8 = j_mr << 3;
+    let jp3 = j_bits + 3;
+    let [w00, w01, w02, w03] = read_f64x4_w2tab!(q, jp3, j_8 + 4).to_array();
+    let w0 = f64x4::from([w03, w02, w01, w00]);
+    let jp4 = j_bits + 4;
+    let j_16 = j_mr << 4;
+    let [u0, u1, u2, u3] = read_f64x4_w2tab!(q, jp4, j_16 + 8).to_array();
+    let [v0, v1, v2, v3] = read_f64x4_w2tab!(q, jp4, j_16 + 12).to_array();
+    let mut ww0 = f64x4::from([v3, v1, u3, u1]);
+    let mut ww1 = f64x4::from([v2, v0, u2, u0]);
+    f64x4_length4inv_any_j!(x0, x1, x2, x3, n, ninv, w0, ww0, ww1);
+    let [w00, w01, w02, w03] = read_f64x4_w2tab!(q, jp3, j_8).to_array();
+    let w0 = f64x4::from([w03, w02, w01, w00]);
+    let [u0, u1, u2, u3] = read_f64x4_w2tab!(q, jp4, j_16).to_array();
+    let [v0, v1, v2, v3] = read_f64x4_w2tab!(q, jp4, j_16 + 4).to_array();
+    ww0 = f64x4::from([v3, v1, u3, u1]);
+    ww1 = f64x4::from([v2, v0, u2, u0]);
+    f64x4_length4inv_any_j!(x4, x5, x6, x7, n, ninv, w0, ww0, ww1);
+    f64x4_transpose!(x0, x1, x2, x3);
+    f64x4_transpose!(x4, x5, x6, x7);
+    let w0 = f64x4::splat(w2tab!(q, j_bits, j_mr));
+    let jp1 = j_bits + 1;
+    let j_2 = j_mr << 1;
+    ww0 = f64x4::splat(w2tab!(q, jp1, j_2 + 1));
+    ww1 = f64x4::splat(w2tab!(q, jp1, j_2));
+    let jp2 = j_bits + 2;
+    let j_4 = j_mr << 2;
+    let www0 = f64x4::splat(w2tab!(q, jp2, j_4 + 3));
+    let www1 = f64x4::splat(w2tab!(q, jp2, j_4 + 2));
+    let www2 = f64x4::splat(w2tab!(q, jp2, j_4 + 1));
+    let www3 = f64x4::splat(w2tab!(q, jp2, j_4));
+    f64x4_length8inv_any_j!(
+        x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, w0, ww0, ww1, www0, www1, www2, www3
+    );
+    write_f64x4!(xs, 0, x0);
+    write_f64x4!(xs, 4, x1);
+    write_f64x4!(xs, 8, x2);
+    write_f64x4!(xs, 12, x3);
+    write_f64x4!(xs, 16, x4);
+    write_f64x4!(xs, 20, x5);
+    write_f64x4!(xs, 24, x6);
+    write_f64x4!(xs, 28, x7);
+}
+
+macro_rules! sd_ifft_basecase {
+    ($n: expr, $f0: ident, $f1: ident, $fs0: ident, $fs1: ident) => {
+        // This is sd_ifft_basecase_n_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+        #[target_feature(enable = "avx2,fma")]
+        fn $f1(q: &FFTContext, xs: &mut [f64]) {
+            const LIMIT: usize = 1 << ($n - 2);
+            split_into_chunks_mut!(xs, LIMIT, [xs0, xs1, xs2], xs3);
+            $fs1(q, xs0);
+            $fs0(q, xs1, 0, 1);
+            $fs0(q, xs2, 1, 2);
+            $fs0(q, xs3, 0, 2);
+            radix_4_reverse_param_j_is_z!(q, iw, n, ninv);
+            process_4_3!(
+                radix_4_reverse_moth_j_is_z,
+                LIMIT,
+                xs0,
+                xs1,
+                xs2,
+                xs3,
+                iw,
+                n,
+                ninv
+            );
+        }
+
+        // This is sd_ifft_basecase_n_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+        #[target_feature(enable = "avx2,fma")]
+        fn $f0(q: &FFTContext, xs: &mut [f64], j_mr: usize, j_bits: u64) {
+            const LIMIT: usize = 1 << ($n - 2);
+            assert_ne!(j_bits, 0);
+            split_into_chunks_mut!(xs, LIMIT, [xs0, xs1, xs2], xs3);
+            let j_mr_4 = j_mr << 2;
+            let j_bits_p_2 = j_bits + 2;
+            $fs0(q, xs0, j_mr_4 + 3, j_bits_p_2);
+            $fs0(q, xs1, j_mr_4 + 2, j_bits_p_2);
+            $fs0(q, xs2, j_mr_4 + 1, j_bits_p_2);
+            $fs0(q, xs3, j_mr_4, j_bits_p_2);
+            radix_4_reverse_param_j_is_nz!(q, j_mr, j_bits, w, w2, iw, n, ninv);
+            process_4_5!(
+                radix_4_reverse_moth_j_is_nz,
+                LIMIT,
+                xs0,
+                xs1,
+                xs2,
+                xs3,
+                w,
+                w2,
+                iw,
+                n,
+                ninv
+            );
+        }
+    };
+}
+
+sd_ifft_basecase!(
+    6,
+    sd_ifft_basecase_6_0,
+    sd_ifft_basecase_6_1,
+    sd_ifft_basecase_4_0,
+    sd_ifft_basecase_4_1
+);
+
+sd_ifft_basecase!(
+    7,
+    sd_ifft_basecase_7_0,
+    sd_ifft_basecase_7_1,
+    sd_ifft_basecase_5_0,
+    sd_ifft_basecase_5_1
+);
+
+sd_ifft_basecase!(
+    8,
+    sd_ifft_basecase_8_0,
+    sd_ifft_basecase_8_1,
+    sd_ifft_basecase_6_0,
+    sd_ifft_basecase_6_1
+);
+
+sd_ifft_basecase!(
+    9,
+    sd_ifft_basecase_9_0,
+    sd_ifft_basecase_9_1,
+    sd_ifft_basecase_7_0,
+    sd_ifft_basecase_7_1
+);
+
+// parameter 1: j can be zero
+//
+// This is sd_ifft_base_8_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_base_8_1(q: &FFTContext, x: &mut [f64], j: usize) {
+    set_j_bits_and_j_mr!(j, j_bits, j_mr);
+    if j == 0 {
+        sd_ifft_basecase_8_1(q, x);
+    } else {
+        sd_ifft_basecase_8_0(q, x, j_mr, j_bits);
+    }
+}
+
+// parameter 1: j cannot be zero
+//
+// This is sd_ifft_base_8_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_base_8_0(q: &FFTContext, x: &mut [f64], j: usize) {
+    set_j_bits_and_j_mr!(j, j_bits, j_mr);
+    sd_ifft_basecase_8_0(q, x, j_mr, j_bits);
+}
+
+// parameter 1: j can be zero
+//
+// This is sd_ifft_base_9_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_base_9_1(q: &FFTContext, x: &mut [f64], j: usize) {
+    set_j_bits_and_j_mr!(j, j_bits, j_mr);
+    if j == 0 {
+        sd_ifft_basecase_9_1(q, x);
+    } else {
+        sd_ifft_basecase_9_0(q, x, j_mr, j_bits);
+    }
+}
+
+// This is sd_ifft_no_trunc_internal from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_no_trunc_internal(
+    q: &FFTContext,
+    xs: &mut [f64],
+    // stride
+    s: usize,
+    // transform length BLK_SZ*2^k
+    k: u64,
+    j: usize,
+) {
+    if k > 2 {
+        let k1 = k >> 1;
+        let k2 = k - k1;
+        let big_s_2 = s << (k2 + LG_BLK_SZ);
+        let shifted = j << k1;
+        let mut m = 0;
+        for b in 0..usize::power_of_2(k1) {
+            sd_ifft_no_trunc_internal(q, &mut xs[m..], s, k2, shifted + b);
+            m += big_s_2;
+        }
+        let big_s = s << LG_BLK_SZ;
+        let shifted = s << k2;
+        let mut m = 0;
+        for _ in 0..usize::power_of_2(k2) {
+            sd_ifft_no_trunc_block(q, &mut xs[m..], shifted, k1, j);
+            m += big_s;
+        }
+        return;
+    }
+    if k == 2 {
+        let big_s = s << LG_BLK_SZ;
+        // k1 = 2; k2 = 0
+        split_into_chunks_mut!(xs, big_s, [xs0, xs1, xs2], xs3);
+        let j_4 = j << 2;
+        sd_ifft_base_8_1(q, xs0, j_4);
+        sd_ifft_base_8_0(q, xs1, j_4 + 1);
+        sd_ifft_base_8_0(q, xs2, j_4 + 2);
+        sd_ifft_base_8_0(q, xs3, j_4 + 3);
+        sd_ifft_no_trunc_block(q, xs, s, 2, j);
+    } else if k == 1 {
+        sd_ifft_base_9_1(q, xs, j);
+    } else {
+        sd_ifft_base_8_1(q, xs, j);
+    }
+}
+
+// ```
+// k = 2, n = 3, z = 4, f = true
+// [      -r + 1           r + 1         2   r*w^3]
+// [        2//w           -2//w         0    -w^2]
+// [(r + 1)//w^2   (-r + 1)//w^2   -2//w^2    -r*w]
+// [          -r               r         1   r*w^3]
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_3_4_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_3_4_1(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1, xs2], xs3);
+    let pow = usize::power_of_2(j_bits);
+    let j_mr = pow - 1 - j;
+    let j_r = j & ((pow >> 1) - 1);
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let j_bits = usize::exact_from(j_bits);
+    let w = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, 1 + j_bits, (j_mr << 1) + 1)
+    };
+    let w2 = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, j_bits, j_mr)
+    };
+    let two_w = f64_reduce_pm1n_to_pmhn!(-2.0 * w, q.p);
+    let f0 = f64x4::splat(w2tab!(q, 0, 1)); // r
+    let f1 = f64x4::splat(two_w); // 2*w^-1
+    let f2 = f64x4::splat(2.0);
+    let f3 = f64x4::splat(w2); // -w^-2
+    let rw = if j == 0 {
+        w2tab!(q, 0, 1)
+    } else {
+        w2tab!(q, 1 + j_bits, (j_r << 1) + 1)
+    };
+    let fr = f64x4::splat(rw); // r*w
+    let fq = f64x4::splat(w2tab!(q, j_bits, j_r)); // w^2
+    let fp_alt = f64x4_mulmod!(fr, fq, n, ninv);
+    let fp = f64x4_reduce_pm1n_to_pmhn!(fp_alt, n); // r*w^3
+    for i in (0..BLK_SZ).step_by(BIG_M) {
+        let a = read_f64x4!(xs0, i);
+        let mut b = read_f64x4!(xs1, i);
+        let mut c = read_f64x4!(xs2, i);
+        let mut d = read_f64x4!(xs3, i);
+        let mut v = a - b;
+        let p = f64x4_mulmod!(d, fp, n, ninv);
+        let q = f64x4_mulmod!(d, fq, n, ninv);
+        let r = f64x4_mulmod!(d, fr, n, ninv);
+        c = f64x4_reduce_to_pm1n!(c, n, ninv);
+        let u = f64x4_reduce_to_pm1n!(a + b, n, ninv);
+        b = f64x4_mulmod!(v, f1, n, ninv);
+        v = f64x4_mulmod!(v, f0, n, ninv);
+        d = c - v;
+        c = f64x4_mul_add!(f2, c, -v);
+        write_f64x4!(xs0, i, c + u + p);
+        write_f64x4!(xs1, i, b - q);
+        write_f64x4!(xs2, i, f64x4_mulmod!(c - u, f3, n, ninv) - r);
+        write_f64x4!(xs3, i, d + p);
+    }
+}
+
+// ```
+// k = 2, n = 3, z = 4, f = false
+// [      -r + 1           r + 1         2   r*w^3]
+// [        2//w           -2//w         0    -w^2]
+// [(r + 1)//w^2   (-r + 1)//w^2   -2//w^2    -r*w]
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_3_4_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_3_4_0(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1, xs2], xs3);
+    let pow = usize::power_of_2(j_bits);
+    let j_mr = pow - 1 - j;
+    let j_r = j & ((pow >> 1) - 1);
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let j_bits = usize::exact_from(j_bits);
+    let jp1 = j_bits + 1;
+    let w = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, jp1, (j_mr << 1) + 1)
+    };
+    let w2 = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, j_bits, j_mr)
+    };
+    let two_w = f64_reduce_pm1n_to_pmhn!(-2.0 * w, q.p);
+    let f0 = f64x4::splat(w2tab!(q, 0, 1)); // r
+    let f1 = f64x4::splat(two_w); // 2*w^-1
+    let f2 = f64x4::splat(2.0);
+    let f3 = f64x4::splat(w2); // -w^-2
+    let rw = if j == 0 {
+        w2tab!(q, 0, 1)
+    } else {
+        w2tab!(q, jp1, (j_r << 1) + 1)
+    };
+    let fr = f64x4::splat(rw); // r*w
+    let fq = f64x4::splat(w2tab!(q, j_bits, j_r)); // w^2
+    let fp_alt = f64x4_mulmod!(fr, fq, n, ninv);
+    let fp = f64x4_reduce_pm1n_to_pmhn!(fp_alt, n); // r*w^3
+    for i in (0..BLK_SZ).step_by(BIG_M) {
+        let a = read_f64x4!(xs0, i);
+        let b = read_f64x4!(xs1, i);
+        let mut c = read_f64x4!(xs2, i);
+        let d = read_f64x4!(xs3, i);
+        let u = f64x4_reduce_to_pm1n!(a + b, n, ninv);
+        let v = a - b;
+        c = f64x4_mul_add!(
+            f2,
+            f64x4_reduce_to_pm1n!(c, n, ninv),
+            -f64x4_mulmod!(v, f0, n, ninv)
+        );
+        write_f64x4!(xs0, i, c + u + f64x4_mulmod!(d, fp, n, ninv));
+        write_f64x4!(
+            xs1,
+            i,
+            f64x4_mulmod!(v, f1, n, ninv) - f64x4_mulmod!(d, fq, n, ninv)
+        );
+        write_f64x4!(
+            xs2,
+            i,
+            f64x4_mulmod!(c - u, f3, n, ninv) - f64x4_mulmod!(d, fr, n, ninv)
+        );
+    }
+}
+
+// ```
+// k = 2, n = 3, z = 3, f = true
+// [      -r + 1           r + 1         2]
+// [        2//w           -2//w         0]
+// [(r + 1)//w^2   (-r + 1)//w^2   -2//w^2]
+// [          -r               r         1]
+//
+//     {x0, x1, x3, x4} = {        -r*(x0 - x1) + (x0 + x1) + 2*x2,
+//                         2*w^-1*    (x0 - x1),
+//                          -w^-2*(-r*(x0 - x1) - (x0 + x1) + 2*x2),
+//                                 -r*(x0 - x1)             +   x2  }
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_3_3_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_3_3_1(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1, xs2], xs3);
+    let j_mr = usize::power_of_2(j_bits) - 1 - j;
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let j_bits = usize::exact_from(j_bits);
+    let w = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, 1 + j_bits, (j_mr << 1) + 1)
+    };
+    let w2 = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, j_bits, j_mr)
+    };
+    let two_w = f64_reduce_pm1n_to_pmhn!(-2.0 * w, q.p);
+    let f0 = f64x8::splat(w2tab!(q, 0, 1)); // r
+    let f1 = f64x8::splat(two_w); // 2*w^-1
+    let f2 = f64x8::splat(2.0);
+    let f3 = f64x8::splat(w2); // -w^-2
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        let b = read_f64x8!(xs1, i);
+        let mut c = read_f64x8!(xs2, i);
+        let mut v = a - b;
+        write_f64x8!(xs1, i, f64x8_mulmod!(v, f1, n, ninv));
+        c = f64x8_reduce_to_pm1n!(c, n, ninv);
+        v = f64x8_mulmod!(v, f0, n, ninv);
+        write_f64x8!(xs3, i, c - v);
+        let u = f64x8_reduce_to_pm1n!(a + b, n, ninv);
+        c = f64x8_mul_add!(-f2, c, v);
+        write_f64x8!(xs0, i, u - c);
+        write_f64x8!(xs2, i, f64x8_nmulmod!(u + c, f3, n, ninv));
+    }
+}
+
+// ```
+// k = 2, n = 3, z = 3, f = false
+// [      -r + 1           r + 1         2]
+// [        2//w           -2//w         0]
+// [(r + 1)//w^2   (-r + 1)//w^2   -2//w^2]
+//
+//     {x0, x1, x3} = {        -r*(x0 - x1) + (x0 + x1) + 2*x2,
+//                     2*w^-1*(x0 - x1),
+//                      -w^-2*(-r*(x0 - x1) - (x0 + x1) + 2*x2)}
+//
+//                  = {        2*x2 - r*v + u,
+//                     2*w^-1*v,
+//                      -w^-2*(2*x2 - r*v - u)}
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_3_3_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_3_3_0(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1], xs2);
+    let j_mr = usize::power_of_2(j_bits) - 1 - j;
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let j_bits = usize::exact_from(j_bits);
+    let w = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, 1 + j_bits, (j_mr << 1) + 1)
+    };
+    let w2 = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, j_bits, j_mr)
+    };
+    let two_w = f64_reduce_pm1n_to_pmhn!(-2.0 * w, q.p);
+    let f0 = f64x8::splat(w2tab!(q, 0, 1)); // r
+    let f1 = f64x8::splat(two_w); // 2*w^-1
+    let f2 = f64x8::splat(2.0);
+    let f3 = f64x8::splat(w2); // -w^-2
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        let b = read_f64x8!(xs1, i);
+        let mut c = read_f64x8!(xs2, i);
+        let v = a - b;
+        write_f64x8!(xs1, i, f64x8_mulmod!(v, f1, n, ninv));
+        c = f64x8_reduce_to_pm1n!(c, n, ninv);
+        let mut u = a + b;
+        u = f64x8_reduce_to_pm1n!(u, n, ninv);
+        c = f64x8_mul_add!(-f2, c, f64x8_mulmod!(v, f0, n, ninv));
+        write_f64x8!(xs0, i, u - c);
+        write_f64x8!(xs2, i, f64x8_nmulmod!(u + c, f3, n, ninv));
+    }
+}
+
+// ```
+// k = 2, n = 2, z = 4, f = true
+// [            2                2        -w^2             0]
+// [         2//w            -2//w           0          -w^2]
+// [1//2*r + 1//2   -1//2*r + 1//2   -1//2*w^2   -1//2*r*w^3]
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_2_4_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_2_4_1(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1, xs2], xs3);
+    let pow = usize::power_of_2(j_bits);
+    let j_mr = pow - 1 - j;
+    let j_r = j & ((pow >> 1) - 1);
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let j_bits = usize::exact_from(j_bits);
+    let jp1 = j_bits + 1;
+    let big_w = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, jp1, (j_mr << 1) + 1)
+    };
+    let rw = if j == 0 {
+        w2tab!(q, 0, 1)
+    } else {
+        w2tab!(q, jp1, (j_r << 1) + 1)
+    };
+    let w = w2tab!(q, j_bits, j_r);
+    let two_w = f64_reduce_pm1n_to_pmhn!(-2.0 * big_w, q.p);
+    let rw3 = f64_mulmod!(w, rw, q.p, q.pinv);
+    let f0 = f64x4::splat(2.0);
+    let f1 = f64x4::splat(two_w); // 2*w^-1
+    let f2 = f64x4::splat(fma!(-0.5f64, q.p, 0.5)); // 1/2
+    let f3 = f64x4::splat(w2tab!(q, 0, 1)); // r
+    let f4 = f64x4::splat(w); // w^2
+    let f5 = f64x4::splat(f64_reduce_pm1n_to_pmhn!(rw3, q.p)); // r*w^3
+    for i in (0..BLK_SZ).step_by(BIG_M) {
+        let u = read_f64x4!(xs0, i);
+        let v = read_f64x4!(xs1, i);
+        let a = read_f64x4!(xs2, i);
+        let b = read_f64x4!(xs3, i);
+        let p = f64x4_mulmod!(a, f4, n, ninv);
+        let q = f64x4_mulmod!(b, f4, n, ninv);
+        let r = f64x4_mulmod!(b, f5, n, ninv);
+        let s = f64x4_reduce_to_pm1n!(u + v, n, ninv);
+        let t = u - v;
+        write_f64x4!(xs0, i, f64x4_mulmod!(s, f0, n, ninv) - p);
+        write_f64x4!(xs1, i, f64x4_mulmod!(t, f1, n, ninv) - q);
+        write_f64x4!(
+            xs2,
+            i,
+            f64x4_mulmod!((s + f64x4_mulmod!(t, f3, n, ninv)) - (p + r), f2, n, ninv)
+        );
+    }
+}
+
+// ```
+// k = 2, n = 2, z = 4, f = false
+// [   2       2   -w^2      0]
+// [2//w   -2//w      0   -w^2]
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_2_4_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_2_4_0(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1, xs2], xs3);
+    let pow = usize::power_of_2(j_bits);
+    let j_mr = pow - 1 - j;
+    let j_r = j & ((pow >> 1) - 1);
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let j_bits = usize::exact_from(j_bits);
+    let wi = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, 1 + j_bits, (j_mr << 1) + 1)
+    };
+    let w2 = f64x8::splat(w2tab!(q, j_bits, j_r));
+    let twowi = f64x8::splat(f64_reduce_pm1n_to_pmhn!(-2.0 * wi, q.p));
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        let b = read_f64x8!(xs1, i);
+        let c = read_f64x8!(xs2, i);
+        let d = read_f64x8!(xs3, i);
+        let mut u = a + b;
+        u += u;
+        write_f64x8!(
+            xs0,
+            i,
+            f64x8_reduce_to_pm1n!(u, n, ninv) - f64x8_mulmod!(c, w2, n, ninv)
+        );
+        write_f64x8!(
+            xs1,
+            i,
+            f64x8_mulmod!(a - b, twowi, n, ninv) - f64x8_mulmod!(d, w2, n, ninv)
+        );
+    }
+}
+
+// ```
+// k = 2, n = 2, z = 2, f = true
+// [            2                2]
+// [         2//w            -2//w]
+// [1//2*r + 1//2   -1//2*r + 1//2]
+//
+// {x0, x1, x2} = {2*(x0 + x1), 2*w^-1*(x0 - x1), (x0+x1)/2 + (x0-x1)*i/2}
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_2_2_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_2_2_1(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1], xs2);
+    let j_mr = usize::power_of_2(j_bits) - 1 - j;
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let j_bits = usize::exact_from(j_bits);
+    let w = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, 1 + j_bits, (j_mr << 1) + 1)
+    };
+    let c1 = f64x8::splat(f64_reduce_pm1n_to_pmhn!(-2.0 * w, q.p)); // 2/w
+    let c2 = f64x8::splat(fma!(-0.5f64, q.p, 0.5)); // 1/2
+    let c3 = f64x8::splat(w2tab!(q, 1, 0)); // r
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let mut u = read_f64x8!(xs0, i);
+        let v = read_f64x8!(xs1, i);
+        let s = u + v;
+        let t = u - v;
+        u = s + s;
+        write_f64x8!(xs0, i, f64x8_reduce_to_pm1n!(u, n, ninv));
+        write_f64x8!(xs1, i, f64x8_mulmod!(t, c1, n, ninv));
+        write_f64x8!(
+            xs2,
+            i,
+            f64x8_mulmod!(s + f64x8_mulmod!(t, c3, n, ninv), c2, n, ninv)
+        );
+    }
+}
+
+// ```
+// k = 2, n = 2, z = 2, f = 0
+//
+// {x0, x1} = {2*(x0 + x1), 2*w^-1*(x0 - x1)}
+//
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_2_2_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_2_2_0(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    fail_on_untested_path("radix_4_moth_inv_trunc_block_2_2_0");
+    let (xs0, xs1) = xs.split_at_mut(gap);
+    let j_mr = usize::power_of_2(j_bits) - 1 - j;
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let j_bits = usize::exact_from(j_bits);
+    let w = if j == 0 {
+        -1.0
+    } else {
+        w2tab!(q, 1 + j_bits, (j_mr << 1) + 1)
+    };
+    let c0 = f64x8::splat(2.0);
+    let c1 = f64x8::splat(f64_reduce_pm1n_to_pmhn!(-2.0 * w, q.p));
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let u = read_f64x8!(xs0, i);
+        let v = read_f64x8!(xs1, i);
+        write_f64x8!(xs0, i, f64x8_mulmod!(u + v, c0, n, ninv));
+        write_f64x8!(xs1, i, f64x8_mulmod!(u - v, c1, n, ninv));
+    }
+}
+
+// ```
+// k = 2, n = 1, z = 4, f = true
+// [4        -w   -w^2        -w^3]
+// [1   -1//2*w      0   -1//2*w^3]
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_1_4_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_1_4_1(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1, xs2], xs3);
+    let j_r = j & ((usize::power_of_2(j_bits) >> 1) - 1);
+    let j_bits = usize::exact_from(j_bits);
+    let big_w2 = w2tab!(q, j_bits, j_r);
+    let w = if j == 0 {
+        1.0
+    } else {
+        w2tab!(q, 1 + j_bits, (j_r << 1))
+    };
+    let n = f64x4::splat(q.p);
+    let ninv = f64x4::splat(q.pinv);
+    let f2 = f64x4::splat(2.0);
+    let w2 = f64x4::splat(big_w2);
+    let ha = fma!(-0.5f64, q.p, 0.5);
+    let ha_w = f64_mulmod!(w, ha, q.p, q.pinv);
+    let wo2 = f64x4::splat(f64_reduce_pm1n_to_pmhn!(ha_w, q.p));
+    for i in (0..BLK_SZ).step_by(BIG_M) {
+        let mut a = read_f64x4!(xs0, i);
+        a = f64x4_reduce_to_pm1n!(a, n, ninv);
+        let mut b = read_f64x4!(xs1, i);
+        let mut c = read_f64x4!(xs2, i);
+        let mut d = read_f64x4!(xs3, i);
+        c = f64x4_nmulmod!(c, w2, n, ninv);
+        d = f64x4_mulmod!(d, w2, n, ninv);
+        b = f64x4_mulmod!(b + d, wo2, n, ninv);
+        let u = f64x4_mul_add!(-f2, a, b);
+        write_f64x4!(xs0, i, c - f64x4_reduce_to_pm1n!(u + u, n, ninv));
+        write_f64x4!(xs1, i, a - b);
+    }
+}
+
+// ```
+// k = 2, n = 1, z = 4, f = false
+// [4   -w   -w^2   -w^3]
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_1_4_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_1_4_0(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1, xs2], xs3);
+    let j_r = j & ((usize::power_of_2(j_bits) >> 1) - 1);
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let f1 = f64x8::splat(4.0);
+    let j_bits = usize::exact_from(j_bits);
+    let w2 = f64x8::splat(w2tab!(q, j_bits, j_r));
+    let w = f64x8::splat(if j == 0 {
+        1.0
+    } else {
+        w2tab!(q, 1 + j_bits, j_r << 1)
+    });
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        let b = read_f64x8!(xs1, i);
+        let c = read_f64x8!(xs2, i);
+        let d = read_f64x8!(xs3, i);
+        write_f64x8!(
+            xs0,
+            i,
+            f64x8_reduce_to_pm1n!(a * f1, n, ninv)
+                - f64x8_mulmod!(b, w, n, ninv)
+                - f64x8_mulmod!(c + f64x8_mulmod!(d, w, n, ninv), w2, n, ninv)
+        );
+    }
+}
+
+// ```
+// k = 2, n = 1, z = 1, f = true
+// [4]
+// [1]
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_1_1_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_1_1_1(
+    q: &FFTContext,
+    _j: usize,
+    _j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    fail_on_untested_path("radix_4_moth_inv_trunc_block_1_1_1");
+    let (xs0, xs1) = xs.split_at_mut(gap);
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let f = f64x8::splat(4.0);
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        write_f64x8!(xs0, i, f64x8_reduce_to_pm1n!(f * a, n, ninv));
+        write_f64x8!(xs1, i, f64x8_reduce_to_pm1n!(a, n, ninv));
+    }
+}
+
+// ```
+// k = 2, n = 1, z = 1, f = false
+// [4]
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_1_1_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_1_1_0(
+    q: &FFTContext,
+    _j: usize,
+    _j_bits: u64,
+    xs: &mut [f64],
+    _gap: usize,
+) {
+    fail_on_untested_path("radix_4_moth_inv_trunc_block_1_1_0");
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let f = f64x8::splat(4.0);
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs, i);
+        write_f64x8!(xs, i, f64x8_reduce_to_pm1n!(f * a, n, ninv));
+    }
+}
+
+// ```
+// k = 2, n = 0, z = 4, f = true
+// [1//4   1//4*w   1//4*w^2   1//4*w^3]
+// ```
+//
+// This is radix_4_moth_inv_trunc_block_0_4_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block_0_4_1(
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) {
+    split_into_chunks_mut!(xs, gap, [xs0, xs1, xs2], xs3);
+    let j_r = j & ((usize::power_of_2(j_bits) >> 1) - 1);
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let one4th = f64x8::splat(fma!(-0.25f64, q.p, 0.25));
+    let j_bits = usize::exact_from(j_bits);
+    let w2 = f64x8::splat(w2tab!(q, j_bits, j_r));
+    let w = f64x8::splat(if j == 0 {
+        1.0
+    } else {
+        w2tab!(q, 1 + j_bits, j_r << 1)
+    });
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        let b = read_f64x8!(xs1, i);
+        let c = read_f64x8!(xs2, i);
+        let d = read_f64x8!(xs3, i);
+        write_f64x8!(
+            xs0,
+            i,
+            f64x8_mulmod!(
+                a + f64x8_mulmod!(b, w, n, ninv)
+                    + f64x8_mulmod!(c + f64x8_mulmod!(d, w, n, ninv), w2, n, ninv),
+                one4th,
+                n,
+                ninv
+            )
+        );
+    }
+}
+
+// This is sd_fft_ctx_w2 from fft_small.h, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_ctx_w2(q: &FFTContext, j: usize) -> f64 {
+    set_j_bits_and_j_r!(j, j_bits, j_r);
+    w2tab!(q, usize::exact_from(j_bits), j_r)
+}
+
+// {x0, x1} = {2*x0 - w*x1, x0 - w*x1}
+//
+// This is radix_2_moth_inv_trunc_block_1_2_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_2_moth_inv_trunc_block_1_2_1(q: &FFTContext, j: usize, xs0: &mut [f64], xs1: &mut [f64]) {
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let w = f64x8::splat(sd_fft_ctx_w2(q, j));
+    let c = f64x8::splat(2.0);
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        let mut b = read_f64x8!(xs1, i);
+        b = f64x8_nmulmod!(b, w, n, ninv);
+        write_f64x8!(
+            xs0,
+            i,
+            f64x8_reduce_to_pm1n!(f64x8_mul_add!(c, a, b), n, ninv)
+        );
+        write_f64x8!(xs1, i, f64x8_reduce_to_pm1n!(a + b, n, ninv));
+    }
+}
+
+// {x0} = {2*x0 - w*x1}
+//
+// This is radix_2_moth_inv_trunc_block_1_2_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_2_moth_inv_trunc_block_1_2_0(q: &FFTContext, j: usize, xs0: &mut [f64], xs1: &mut [f64]) {
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let w = f64x8::splat(sd_fft_ctx_w2(q, j));
+    let c = f64x8::splat(2.0);
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        let b = read_f64x8!(xs1, i);
+        write_f64x8!(
+            xs0,
+            i,
+            f64x8_reduce_to_pm1n!(f64x8_mul_add!(c, a, -f64x8_mulmod!(b, w, n, ninv)), n, ninv)
+        );
+    }
+}
+
+// {x0, x1} = {2*x0, x0}
+//
+// This is radix_2_moth_inv_trunc_block_1_1_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_2_moth_inv_trunc_block_1_1_1(q: &FFTContext, _j: usize, xs0: &mut [f64], xs1: &mut [f64]) {
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        let u = a + a;
+        write_f64x8!(xs0, i, f64x8_reduce_to_pm1n!(u, n, ninv));
+        write_f64x8!(xs1, i, a);
+    }
+}
+
+// {x0} = {2*x0}
+//
+// This is radix_2_moth_inv_trunc_block_1_1_0 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_2_moth_inv_trunc_block_1_1_0(
+    q: &FFTContext,
+    _j: usize,
+    xs0: &mut [f64],
+    _xs1: &mut [f64],
+) {
+    fail_on_untested_path("radix_2_moth_inv_trunc_block_1_1_0");
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let mut a = read_f64x8!(xs0, i);
+        a = a + a;
+        write_f64x8!(xs0, i, f64x8_reduce_to_pm1n!(a, n, ninv));
+    }
+}
+
+// {x0} = {(x0 + w*x1)/2}
+//
+// This is radix_2_moth_inv_trunc_block_0_2_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_2_moth_inv_trunc_block_0_2_1(q: &FFTContext, j: usize, xs0: &mut [f64], xs1: &mut [f64]) {
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let w = f64x8::splat(sd_fft_ctx_w2(q, j));
+    let c = f64x8::splat(fma!(-0.5f64, q.p, 0.5));
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        let b = read_f64x8!(xs1, i);
+        write_f64x8!(
+            xs0,
+            i,
+            f64x8_mulmod!(a + f64x8_mulmod!(b, w, n, ninv), c, n, ninv)
+        );
+    }
+}
+
+// {x0} = {(x0)/2}
+//
+// This is radix_2_moth_inv_trunc_block_0_1_1 from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn radix_2_moth_inv_trunc_block_0_1_1(
+    q: &FFTContext,
+    _j: usize,
+    xs0: &mut [f64],
+    _xs1: &mut [f64],
+) {
+    fail_on_untested_path("radix_2_moth_inv_trunc_block_0_1_1");
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    let c = f64x8::splat(fma!(-0.5f64, q.p, 0.5));
+    for i in (0..BLK_SZ).step_by(BIG_N) {
+        let a = read_f64x8!(xs0, i);
+        write_f64x8!(xs0, i, f64x8_mulmod!(a, c, n, ninv));
+    }
+}
+
+// Dispatches to the `radix_4_moth_inv_trunc_block_*` function for the given truncation parameters,
+// replacing FLINT's table of function pointers. Returns whether there is one.
+#[target_feature(enable = "avx2,fma")]
+fn radix_4_moth_inv_trunc_block(
+    n: usize,
+    z: usize,
+    f: bool,
+    q: &FFTContext,
+    j: usize,
+    j_bits: u64,
+    xs: &mut [f64],
+    gap: usize,
+) -> bool {
+    match (n, z, f) {
+        (0, 4, true) => radix_4_moth_inv_trunc_block_0_4_1(q, j, j_bits, xs, gap),
+        (1, 1, false) => radix_4_moth_inv_trunc_block_1_1_0(q, j, j_bits, xs, gap),
+        (1, 1, true) => radix_4_moth_inv_trunc_block_1_1_1(q, j, j_bits, xs, gap),
+        (1, 4, false) => radix_4_moth_inv_trunc_block_1_4_0(q, j, j_bits, xs, gap),
+        (1, 4, true) => radix_4_moth_inv_trunc_block_1_4_1(q, j, j_bits, xs, gap),
+        (2, 2, false) => radix_4_moth_inv_trunc_block_2_2_0(q, j, j_bits, xs, gap),
+        (2, 2, true) => radix_4_moth_inv_trunc_block_2_2_1(q, j, j_bits, xs, gap),
+        (2, 4, false) => radix_4_moth_inv_trunc_block_2_4_0(q, j, j_bits, xs, gap),
+        (2, 4, true) => radix_4_moth_inv_trunc_block_2_4_1(q, j, j_bits, xs, gap),
+        (3, 3, false) => radix_4_moth_inv_trunc_block_3_3_0(q, j, j_bits, xs, gap),
+        (3, 3, true) => radix_4_moth_inv_trunc_block_3_3_1(q, j, j_bits, xs, gap),
+        (3, 4, false) => radix_4_moth_inv_trunc_block_3_4_0(q, j, j_bits, xs, gap),
+        (3, 4, true) => radix_4_moth_inv_trunc_block_3_4_1(q, j, j_bits, xs, gap),
+        _ => return false,
+    }
+    true
+}
+
+// Dispatches to the `radix_2_moth_inv_trunc_block_*` function for the given truncation parameters,
+// replacing FLINT's table of function pointers. Does nothing if there is none.
+#[target_feature(enable = "avx2,fma")]
+fn radix_2_moth_inv_trunc_block(
+    n: usize,
+    z: usize,
+    f: bool,
+    q: &FFTContext,
+    j: usize,
+    xs: &mut [f64],
+    big_s: usize,
+) {
+    match (n, z, f) {
+        (0, 1, true) => {
+            let (xs0, xs1) = xs.split_at_mut(big_s);
+            radix_2_moth_inv_trunc_block_0_1_1(q, j, xs0, xs1);
+        }
+        (0, 2, true) => {
+            let (xs0, xs1) = xs.split_at_mut(big_s);
+            radix_2_moth_inv_trunc_block_0_2_1(q, j, xs0, xs1);
+        }
+        (1, 1, false) => {
+            let (xs0, xs1) = xs.split_at_mut(big_s);
+            radix_2_moth_inv_trunc_block_1_1_0(q, j, xs0, xs1);
+        }
+        (1, 1, true) => {
+            let (xs0, xs1) = xs.split_at_mut(big_s);
+            radix_2_moth_inv_trunc_block_1_1_1(q, j, xs0, xs1);
+        }
+        (1, 2, false) => {
+            let (xs0, xs1) = xs.split_at_mut(big_s);
+            radix_2_moth_inv_trunc_block_1_2_0(q, j, xs0, xs1);
+        }
+        (1, 2, true) => {
+            let (xs0, xs1) = xs.split_at_mut(big_s);
+            radix_2_moth_inv_trunc_block_1_2_1(q, j, xs0, xs1);
+        }
+        _ => {}
+    }
+}
+
+// This is sd_ifft_trunc_block from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_trunc_block(
+    q: &FFTContext,
+    // data + BLK_SZ*I
+    xs: &mut [f64],
+    // stride
+    s: usize,
+    // BLK_SZ transforms each of length 2^k
+    k: u64,
+    j: usize,
+    // actual trunc is z
+    z: usize,
+    // actual trunc is n
+    n: usize,
+    f: bool,
+) {
+    assert!(n <= z);
+    let pow = usize::power_of_2(k);
+    assert!(1 <= z && z <= pow);
+    let sum = n + usize::from(f);
+    assert!(1 <= sum && sum <= pow);
+    if !f && z == n && n == pow {
+        sd_ifft_no_trunc_block(q, xs, s, k, j);
+        return;
+    }
+    let big_s = s << LG_BLK_SZ;
+    if k == 2 && radix_4_moth_inv_trunc_block(n, z, f, q, j, j.significant_bits(), xs, big_s) {
+        return;
+    }
+    if k > 1 {
+        let k1 = k >> 1;
+        let k2 = k - k1;
+        let l2 = usize::power_of_2(k2);
+        let n1 = n >> k2;
+        let mask = l2 - 1;
+        let n2 = n & mask;
+        let z1 = z >> k2;
+        let z2 = z & mask;
+        let fp = f || n2 != 0;
+        let z2p = min(l2, z);
+        let m = min(n2, z2);
+        let mp = max(n2, z2);
+        // complete rows
+        let big_s_2 = s << (k2 + LG_BLK_SZ);
+        let shifted = j << k1;
+        let mut p = 0;
+        for b in 0..n1 {
+            sd_ifft_no_trunc_block(q, &mut xs[p..], s, k2, shifted + b);
+            p += big_s_2;
+        }
+        // rightmost columns
+        let shifted2 = s << k2;
+        let mut p = n2 * big_s;
+        for a in n2..z2p {
+            sd_ifft_trunc_block(
+                q,
+                &mut xs[p..],
+                shifted2,
+                k1,
+                j,
+                z1 + usize::from(a < mp),
+                n1,
+                fp,
+            );
+            p += big_s;
+        }
+        // last partial row
+        if fp {
+            sd_ifft_trunc_block(q, &mut xs[n1 * big_s_2..], s, k2, shifted + n1, z2p, n2, f);
+        }
+        let sum = n1 + 1;
+        let mut p = 0;
+        // leftmost columns
+        for a in 0..n2 {
+            sd_ifft_trunc_block(
+                q,
+                &mut xs[p..],
+                shifted2,
+                k1,
+                j,
+                z1 + usize::from(a < m),
+                sum,
+                false,
+            );
+            p += big_s;
+        }
+        return;
+    }
+    if k == 1 {
+        radix_2_moth_inv_trunc_block(n, z, f, q, j, xs, big_s);
+    }
+}
+
+// This is sd_ifft_trunc_internal from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_trunc_internal(
+    q: &FFTContext,
+    // x = data + BLK_SZ*I  where I = starting index
+    xs: &mut [f64],
+    // stride
+    s: usize,
+    // transform length 2^(k + LG_BLK_SZ)
+    k: u64,
+    j: usize,
+    // actual trunc is z*BLK_SZ
+    z: usize,
+    // actual trunc is n*BLK_SZ
+    n: usize,
+    f: bool,
+) {
+    assert!(n <= z);
+    let big_z = z << LG_BLK_SZ;
+    let pow = usize::power_of_2(k + LG_BLK_SZ);
+    assert!(1 <= big_z && big_z <= pow);
+    let uf = usize::from(f);
+    let big_n = n << LG_BLK_SZ;
+    assert!(1 <= big_n + uf && big_n + uf <= pow);
+    if !f && z == n && n == usize::power_of_2(k) {
+        sd_ifft_no_trunc_internal(q, xs, s, k, j);
+        return;
+    }
+    let big_s = s << LG_BLK_SZ;
+    if k > 2 {
+        let k1 = k >> 1;
+        let k2 = k - k1;
+        let l2 = usize::power_of_2(k2);
+        let n1 = n >> k2;
+        let mask = l2 - 1;
+        let n2 = n & mask;
+        let z1 = z >> k2;
+        let z2 = z & mask;
+        let fp = f || n2 != 0;
+        let z2p = min(l2, z);
+        let m = min(n2, z2);
+        let mp = max(n2, z2);
+        // complete rows
+        let shifted = j << k1;
+        let big_s_2 = s << (k2 + LG_BLK_SZ);
+        let mut p = 0;
+        for b in 0..n1 {
+            sd_ifft_no_trunc_internal(q, &mut xs[p..], s, k2, shifted + b);
+            p += big_s_2;
+        }
+        // rightmost columns
+        let shifted_2 = s << k2;
+        let mut p = n2 * big_s;
+        for a in n2..z2p {
+            sd_ifft_trunc_block(
+                q,
+                &mut xs[p..],
+                shifted_2,
+                k1,
+                j,
+                z1 + usize::from(a < mp),
+                n1,
+                fp,
+            );
+            p += big_s;
+        }
+        // last partial row
+        if fp {
+            sd_ifft_trunc_internal(q, &mut xs[n1 * big_s_2..], s, k2, shifted + n1, z2p, n2, f);
+        }
+        // leftmost columns
+        let sum = n1 + 1;
+        let mut p = 0;
+        for a in 0..n2 {
+            sd_ifft_trunc_block(
+                q,
+                &mut xs[p..],
+                shifted_2,
+                k1,
+                j,
+                z1 + usize::from(a < m),
+                sum,
+                false,
+            );
+            p += big_s;
+        }
+        return;
+    }
+    if k == 2 {
+        let four_j = j << 2;
+        sd_ifft_base_8_1(q, xs, four_j);
+        if n > 1 {
+            sd_ifft_base_8_0(q, &mut xs[big_s..], four_j + 1);
+        }
+        if n > 2 {
+            sd_ifft_base_8_0(q, &mut xs[big_s << 1..], four_j + 2);
+        }
+        if n > 3 {
+            sd_ifft_base_8_0(q, &mut xs[big_s * 3..], four_j + 3);
+        }
+        sd_ifft_trunc_block(q, xs, s, 2, j, z, n, f);
+        if f {
+            sd_ifft_trunc_internal(q, &mut xs[big_s * n..], s, 0, four_j + n, 1, 0, f);
+        }
+    } else if k == 1 {
+        fail_on_untested_path("sd_ifft_trunc_internal, k == 1");
+        let two_j = j << 1;
+        sd_ifft_base_8_1(q, xs, two_j);
+        if n > 1 {
+            sd_ifft_base_8_0(q, &mut xs[big_s..], two_j + 1);
+        }
+        sd_ifft_trunc_block(q, xs, s, 1, j, z, n, f);
+        if f {
+            sd_ifft_trunc_internal(q, &mut xs[big_s * n..], s, 0, two_j + n, 1, 0, f);
+        }
+    } else {
+        assert!(!f);
+        sd_ifft_base_8_1(q, xs, j);
+    }
+}
+
+// This is sd_ifft_trunc from fft_small/sd_ifft.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_ifft_trunc(
+    q: &mut FFTContext,
+    d: &mut [f64],
+    // convolution length 2^L
+    l: u64,
+    trunc: usize,
+) {
+    assert!(trunc <= usize::power_of_2(l));
+    if l > LG_BLK_SZ {
+        let new_trunc = trunc.div_round(BLK_SZ, Ceiling).0;
+        sd_fft_ctx_fit_depth(q, l);
+        sd_ifft_trunc_internal(q, d, 1, l - LG_BLK_SZ, 0, new_trunc, new_trunc, false);
+        return;
+    }
+    // This path is reached by small (< 385-limb balanced) multiplications, reachable since the
+    // mpn_to_ffts context-loading fix (2026-07); verified against the Toom dispatch by
+    // tune_fft_small_check.
+    match l {
+        0 => sd_ifft_basecase_0_1(q, d),
+        1 => sd_ifft_basecase_1_1(q, d),
+        2 => sd_ifft_basecase_2_1(q, d),
+        3 => sd_ifft_basecase_3_1(q, d),
+        4 => sd_ifft_basecase_4_1(q, d),
+        5 => sd_ifft_basecase_5_1(q, d),
+        6 => sd_ifft_basecase_6_1(q, d),
+        7 => sd_ifft_basecase_7_1(q, d),
+        8 => sd_ifft_basecase_8_1(q, d),
+        _ => unreachable!(),
+    }
+}
+
+// pointwise mul of a with b and m
+//
+// This is sd_fft_ctx_point_mul from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_ctx_point_mul(q: &FFTContext, a: &mut [f64], b: &[f64], m_orig: u64, depth: u64) {
+    let m = f64x8::splat(f64_reduce_0n_to_pmhn!(m_orig as f64, q.p));
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    assert!(depth >= LG_BLK_SZ);
+    let mut k = 0;
+    for _ in 0..usize::power_of_2(depth - LG_BLK_SZ) {
+        let ax = &mut a[k..];
+        let bx = &b[k..];
+        for j in (0..BLK_SZ).step_by(16) {
+            let mut x0 = read_f64x8!(ax, j);
+            let mut x1 = read_f64x8!(ax, j + 8);
+            let b0 = read_f64x8!(bx, j);
+            let b1 = read_f64x8!(bx, j + 8);
+            x0 = f64x8_mulmod!(x0, m, n, ninv);
+            x1 = f64x8_mulmod!(x1, m, n, ninv);
+            x0 = f64x8_mulmod!(x0, b0, n, ninv);
+            x1 = f64x8_mulmod!(x1, b1, n, ninv);
+            write_f64x8!(ax, j, x0);
+            write_f64x8!(ax, j + 8, x1);
+        }
+        k += BLK_SZ;
+    }
+}
+
+// This is sd_fft_ctx_point_sqr from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn sd_fft_ctx_point_sqr(q: &FFTContext, a: &mut [f64], m_orig: u64, depth: u64) {
+    let m = f64x8::splat(f64_reduce_0n_to_pmhn!(m_orig as f64, q.p));
+    let n = f64x8::splat(q.p);
+    let ninv = f64x8::splat(q.pinv);
+    assert!(depth >= LG_BLK_SZ);
+    let mut k = 0;
+    for _ in 0..usize::power_of_2(depth - LG_BLK_SZ) {
+        let ax = &mut a[k..];
+        for j in (0..BLK_SZ).step_by(16) {
+            let mut x0 = read_f64x8!(ax, j);
+            let mut x1 = read_f64x8!(ax, j + 8);
+            x0 = f64x8_mulmod!(x0, x0, n, ninv);
+            x1 = f64x8_mulmod!(x1, x1, n, ninv);
+            x0 = f64x8_mulmod!(x0, m, n, ninv);
+            x1 = f64x8_mulmod!(x1, m, n, ninv);
+            write_f64x8!(ax, j, x0);
+            write_f64x8!(ax, j + 8, x1);
+        }
+        k += BLK_SZ;
+    }
+}
+
+// This is mod_worker_func from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn process_mod(
+    to_ffts: MPNToFFTFunc,
+    ffts: &[FFTContext],
+    stride: usize,
+    two_pow_tab: &[f64x4],
+    abuf: &mut [f64],
+    a: &[Limb],
+    atrunc: usize,
+    a_stop_easy: usize,
+    a_start_hard: usize,
+    a_stop_hard: usize,
+    bbuf: &mut [f64],
+    b: &[Limb],
+    btrunc: usize,
+    b_stop_easy: usize,
+    b_start_hard: usize,
+    b_stop_hard: usize,
+    squaring: bool,
+) {
+    macro_rules! apply {
+        ($f: ident) => {{
+            $f(
+                ffts,
+                abuf,
+                stride,
+                a,
+                atrunc,
+                two_pow_tab,
+                a_stop_easy,
+                a_start_hard,
+                a_stop_hard,
+            );
+            if !squaring {
+                $f(
+                    ffts,
+                    bbuf,
+                    stride,
+                    b,
+                    btrunc,
+                    two_pow_tab,
+                    b_stop_easy,
+                    b_start_hard,
+                    b_stop_hard,
+                );
+            }
+        }};
+    }
+    match to_ffts {
+        MPNToFFTFunc { np: 4, bits: 84 } => apply!(apply_mpn_to_fft_func_4_84),
+        MPNToFFTFunc { np: 4, bits: 88 } => apply!(apply_mpn_to_fft_func_4_88),
+        MPNToFFTFunc { np: 4, bits: 92 } => apply!(apply_mpn_to_fft_func_4_92),
+        MPNToFFTFunc { np: 5, bits: 112 } => apply!(apply_mpn_to_fft_func_5_112),
+        MPNToFFTFunc { np: 5, bits: 116 } => apply!(apply_mpn_to_fft_func_5_116),
+        MPNToFFTFunc { np: 5, bits: 120 } => apply!(apply_mpn_to_fft_func_5_120),
+        MPNToFFTFunc { np: 6, bits: 136 } => apply!(apply_mpn_to_fft_func_6_136),
+        MPNToFFTFunc { np: 6, bits: 140 } => apply!(apply_mpn_to_fft_func_6_140),
+        MPNToFFTFunc { np: 6, bits: 144 } => apply!(apply_mpn_to_fft_func_6_144),
+        MPNToFFTFunc { np: 7, bits: 160 } => apply!(apply_mpn_to_fft_func_7_160),
+        MPNToFFTFunc { np: 7, bits: 164 } => apply!(apply_mpn_to_fft_func_7_164),
+        MPNToFFTFunc { np: 7, bits: 168 } => apply!(apply_mpn_to_fft_func_7_168),
+        MPNToFFTFunc { np: 8, bits: 184 } => apply!(apply_mpn_to_fft_func_8_184),
+        MPNToFFTFunc { np: 8, bits: 188 } => apply!(apply_mpn_to_fft_func_8_188),
+        MPNToFFTFunc { np: 8, bits: 192 } => apply!(apply_mpn_to_fft_func_8_192),
+        _ => unreachable!(),
+    }
+}
+
+// This is fft_worker_func from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn process_fft(
+    fctx: &mut FFTContext,
+    cop: u64,
+    depth: u64,
+    ztrunc: usize,
+    abuf: &mut [f64],
+    atrunc: usize,
+    bbuf: &mut [f64],
+    btrunc: usize,
+    squaring: bool,
+) {
+    let q = &mut *fctx;
+    if !squaring {
+        sd_fft_trunc(q, bbuf, depth, btrunc, ztrunc);
+    }
+    sd_fft_trunc(q, abuf, depth, atrunc, ztrunc);
+    let m = nmod_red2!(cop >> (u64::WIDTH - depth), cop << depth, &q.mod_data)
+        .mod_inverse(q.mod_data.n)
+        .unwrap();
+    if squaring {
+        sd_fft_ctx_point_sqr(q, abuf, m, depth);
+    } else {
+        sd_fft_ctx_point_mul(q, abuf, bbuf, m, depth);
+    }
+    sd_ifft_trunc(q, abuf, depth, ztrunc);
+}
+
+// This is mod_fft_worker_func from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+fn process_mod_fft(
+    bits: usize,
+    fctx: &mut FFTContext,
+    two_pow_tab: &[f64],
+    cop: u64,
+    depth: u64,
+    ztrunc: usize,
+    a: &[Limb],
+    abuf: &mut [f64],
+    atrunc: usize,
+    b: &[Limb],
+    bbuf: &mut [f64],
+    btrunc: usize,
+    squaring: bool,
+) {
+    let q = fctx;
+    if !squaring {
+        slow_mpn_to_fft(q, bbuf, btrunc, b, bits, two_pow_tab);
+        sd_fft_trunc(q, bbuf, depth, btrunc, ztrunc);
+    }
+    slow_mpn_to_fft(q, abuf, atrunc, a, bits, two_pow_tab);
+    sd_fft_trunc(q, abuf, depth, atrunc, ztrunc);
+    let m = nmod_red2!(cop >> (u64::WIDTH - depth), cop << depth, &q.mod_data)
+        .mod_inverse(q.mod_data.n)
+        .unwrap();
+    if squaring {
+        sd_fft_ctx_point_sqr(q, abuf, m, depth);
+    } else {
+        sd_fft_ctx_point_mul(q, abuf, bbuf, m, depth);
+    }
+    sd_ifft_trunc(q, abuf, depth, ztrunc);
+}
+
+//  The "n" here is the limb count Rcrts[np-1].coeff_len, which is big enough to hold (product of
+//  primes)*(number of primes), so it can hold the intermediate dot products f[0]*x[0] + ... +
+//  f[np-1]*x[np-1]. The x[i] are single limb and the f[i] are of length "m". The number of primes
+//  is "np".
+//
+//  The coefficient of X^i, 0 <= i < zlen needs to be reconstructed and added to the answer mpn (z,
+//  zn). This involves the limbs
+//
+//  z[floor(i*bits/64)] ... z[floor(i*bits/64)+n]
+//
+//  so is easy if floor(i*bits/64)+n < zn.
+//
+//  The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride
+//
+//  handle output coefficients from [start_easy, zlen) end_easy is still expected to be valid
+//
+// This is _mpn_from_ffts and crt_worker_func from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+macro_rules! process_crt {
+    ($f: ident, $np: expr, $n: expr, $m: expr) => {
+        #[target_feature(enable = "avx2,fma")]
+        fn $f(
+            zs: &mut [Limb],
+            zlen: usize,
+            rffts: &[FFTContext],
+            ds: &[f64],
+            dstride: usize,
+            rcrts: &mut [CRTData],
+            bits: usize,
+            stop_easy: usize,
+        ) {
+            #[cfg(feature = "32_bit_limbs")]
+            let zn_stop = zs.len().shr_round(1, Ceiling).0;
+            #[cfg(not(feature = "32_bit_limbs"))]
+            let zn_stop = zs.len();
+            let rcrt = &mut rcrts[const {$np - 1}];
+            assert_eq!($n, rcrt.coeff_len);
+            if const{$n != $m} {
+                for l in 0..$np {
+                    assert_eq!(rcrt.co_prime(l)[$m], 0);
+                }
+            }
+            zs.fill(0);
+            let mut xs = [0; $np << LG_BLK_SZ];
+            let mut r = [0; $n + 1];
+            let mut t = [0; $n + 1];
+            let mut k = 0;
+            for i in (0..stop_easy).step_by(BLK_SZ) {
+                convert_block!(xs, rffts, ds, dstride, $np, i >> LG_BLK_SZ);
+                for j in 0..BLK_SZ {
+                    big_mul!($n, $m, r, t, rcrt.co_prime(0), xs[j]);
+                    let xs_hi = &xs[j..];
+                    let mut m = BLK_SZ;
+                    for l in 1..$np {
+                        big_add_mul!($n, $m, r, t, rcrt.co_prime(l), xs_hi[m]);
+                        m += BLK_SZ;
+                    }
+                    reduce_big_sum!($n, r, t, rcrt.prod_primes_ref());
+                    let toff = k >> u64::LOG_WIDTH;
+                    let tshift = k & const {u64::WIDTH_MASK as usize};
+                    assert!(zn_stop > $n + toff);
+add_to_answer_easy!($n, zs, r, toff, tshift);
+                    k += bits;
+                }
+            }
+            let mut j = stop_easy * bits;
+            for i in stop_easy..zlen {
+                let ds_hi = &ds[i..];
+                let mut xx = ds_hi[0];
+                let rfft = &rffts[0];
+                let mut x = f64_reduce_to_0n!(xx, rfft.p, rfft.pinv) as u64;
+                big_mul!($n, $m, r, t, rcrt.co_prime(0), x);
+                let mut m = dstride;
+                for l in 1..$np {
+                    xx = ds_hi[m];
+                    let rfft = &rffts[l];
+                    x = f64_reduce_to_0n!(xx, rfft.p, rfft.pinv) as u64;
+                    big_add_mul!($n, $m, r, t, rcrt.co_prime(l), x);
+                    m += dstride;
+                }
+                reduce_big_sum!($n, r, t, rcrt.prod_primes_ref());
+                let toff = j >> u64::LOG_WIDTH;
+                let tshift = j & const {u64::WIDTH_MASK as usize};
+                if toff >= zn_stop {
+                    break;
+                }
+add_to_answer_hard!($n, zs, r, toff, tshift);
+                j += bits;
+            }
+        }
+    }
+}
+
+process_crt!(process_crt_4_4_3, 4, 4, 3);
+
+process_crt!(process_crt_5_4_4, 5, 4, 4);
+
+process_crt!(process_crt_6_5_4, 6, 5, 4);
+
+process_crt!(process_crt_7_6_5, 7, 6, 5);
+
+process_crt!(process_crt_8_7_6, 8, 7, 6);
+
+// This is mpn_ctx_mpn_mul from fft_small/mpn_mul.c, FLINT 3.3.0-dev.
+#[target_feature(enable = "avx2,fma")]
+pub(crate) fn mpn_ctx_mpn_mul(
+    r: &mut Context,
+    z: &mut [Limb],
+    a: &[Limb],
+    b: &[Limb],
+    test_slow: bool,
+) {
+    let squaring = core::ptr::addr_eq(a as *const [Limb], b as *const [Limb]) && a.len() == b.len();
+    let an = a.len();
+    let bn = b.len();
+    #[cfg(feature = "32_bit_limbs")]
+    let an = an.shr_round(1, Ceiling).0;
+    #[cfg(feature = "32_bit_limbs")]
+    let bn = bn.shr_round(1, Ceiling).0;
+    let mut p = ProfileEntry::default();
+    mpn_ctx_best_profile(r, &mut p, an, bn);
+    let zn = an + bn;
+    let alen = usize::exact_from(
+        u64::exact_from(an << u64::LOG_WIDTH)
+            .div_round(p.bits, Ceiling)
+            .0,
+    );
+    let blen = usize::exact_from(
+        u64::exact_from(bn << u64::LOG_WIDTH)
+            .div_round(p.bits, Ceiling)
+            .0,
+    );
+    let zlen = alen + blen - 1;
+    let atrunc = alen.round_to_multiple(BLK_SZ, Ceiling).0;
+    let btrunc = blen.round_to_multiple(BLK_SZ, Ceiling).0;
+    let ztrunc = zlen.round_to_multiple(BLK_SZ, Ceiling).0;
+    let depth = max(LG_BLK_SZ, ztrunc.ceiling_log_base_2());
+    let stride = usize::power_of_2(depth)
+        .round_to_multiple_of_power_of_2(7, Ceiling)
+        .0;
+    assert_ne!(an, 0);
+    assert_ne!(bn, 0);
+    let coeff_len = r.crts[p.np - 1].coeff_len;
+    assert_ne!(
+        flint_mpn_cmp_ui_2exp(
+            &r.crts[p.np - 1].prod_primes_ref()[..coeff_len],
+            blen as u64,
+            p.bits << 1,
+        ),
+        Less
+    );
+    let abuf;
+    // Normally, p.to_ffts is None only for extremely large arguments, which are impractical to
+    // test, so we set a test_slow flag instead
+    if !test_slow && let Some(to_ffts) = p.to_ffts {
+        let bits = p.bits as usize;
+        let an_64 = an << 6;
+        let bn_64 = bn << 6;
+        // if i*bits + 32 < 64*an, then the index into a is always in bounds
+        let mut a_stop_easy = min(atrunc, (an_64 - 33) / bits);
+        // if i*bits >= 64*an, then the index into a is always out of bounds
+        let a_stop_hard = min(atrunc, an_64.div_ceil(bits));
+        // ditto
+        let mut b_stop_easy = min(btrunc, (bn_64 - 33) / bits);
+        let b_stop_hard = min(btrunc, bn_64.div_ceil(bits));
+        let rounding: usize = if bits.divisible_by_power_of_2(3) {
+            4
+        } else if bits.divisible_by_power_of_2(2) {
+            8
+        } else {
+            16
+        };
+        let prod = p.np * stride;
+        mpn_ctx_fit_buffer(r, prod << 4);
+        let bbuf;
+        (abuf, bbuf) = r.buffer.split_at_mut(prod);
+        // some fixups for loop unrollings: round down the easy stops
+        assert!(bits.even());
+        a_stop_easy &= rounding.wrapping_neg();
+        b_stop_easy &= rounding.wrapping_neg();
+        process_mod(
+            to_ffts,
+            &r.ffts,
+            stride,
+            two_pow_slice!(
+                &r.vec_two_pow_tab_backing
+                    [r.vec_two_pow_tab_offsets[p.np.div_round(VEC_SZ, Ceiling).0 - 1]..]
+            ),
+            abuf,
+            a,
+            atrunc,
+            a_stop_easy.round_to_multiple(rounding, Ceiling).0,
+            a_stop_easy,
+            a_stop_hard,
+            bbuf,
+            b,
+            btrunc,
+            b_stop_easy.round_to_multiple(rounding, Ceiling).0,
+            b_stop_easy,
+            b_stop_hard,
+            squaring,
+        );
+        let crt = &r.crts[p.np - 1];
+        let mut m = 0;
+        for l in 0..p.np {
+            process_fft(
+                &mut r.ffts[l],
+                crt.co_prime_red(l),
+                depth,
+                ztrunc,
+                &mut abuf[m..],
+                atrunc,
+                &mut bbuf[m..],
+                btrunc,
+                squaring,
+            );
+            m += stride;
+        }
+    } else {
+        mpn_ctx_fit_buffer(r, ((p.np + 1) * stride) << 3);
+        let crt = &r.crts[p.np - 1];
+        let bbuf;
+        (abuf, bbuf) = r.buffer.split_at_mut(p.np * stride);
+        let mut m = 0;
+        for l in 0..p.np {
+            process_mod_fft(
+                p.bits as usize,
+                &mut r.ffts[l],
+                &r.slow_two_pow_backing[r.slow_two_pow_offsets[l]..],
+                crt.co_prime_red(l),
+                depth,
+                ztrunc,
+                a,
+                &mut abuf[m..],
+                atrunc,
+                b,
+                bbuf,
+                btrunc,
+                squaring,
+            );
+            m += stride;
+        }
+    }
+    let n = r.crts[p.np - 1].coeff_len;
+    let mut end_easy = ((if zn > n { zn - (n + 1) } else { 0 }) << 6) / (p.bits as usize);
+    // this is how much space was statically allocated in each struct
+    assert!(n <= MPN_CTX_NCRTS);
+    end_easy &= BLK_SZ.wrapping_neg();
+    assert!(4 <= p.np && p.np <= 8);
+    let process_crt = match p.np {
+        4 => process_crt_4_4_3,
+        5 => process_crt_5_4_4,
+        6 => process_crt_6_5_4,
+        7 => process_crt_7_6_5,
+        8 => process_crt_8_7_6,
+        _ => unreachable!(),
+    };
+    process_crt(
+        z,
+        zlen,
+        &r.ffts,
+        abuf,
+        stride,
+        &mut r.crts,
+        p.bits as usize,
+        end_easy.round_to_multiple(BLK_SZ, Ceiling).0,
+    );
+}
+
+// Reconstructs the coefficients of $x^i$ for `zi_start` $\leq i <$ `zi_stop` from their residues
+// modulo `np` primes, as integers in the symmetric range around zero, and writes them to `z[i -
+// zl]`. The residues modulo the `l`th prime are at `d[l * dstride..]`.
+//
+// These are _crt_2 through _crt_8 from fft_small/fmpz_poly_mul.c, FLINT 3.6.0.
+macro_rules! fmpz_poly_crt {
+    ($f: ident, $np: expr, $n: expr, $m: expr) => {
+        #[target_feature(enable = "avx2,fma")]
+        fn $f<C: PolynomialCoefficient>(
+            z: &mut [C],
+            zl: usize,
+            zi_start: usize,
+            zi_stop: usize,
+            rffts: &[FFTContext],
+            d: &[f64],
+            dstride: usize,
+            rcrts: &mut [CRTData],
+        ) {
+            let rcrt = &mut rcrts[const { $np - 1 }];
+            assert_eq!($n, rcrt.coeff_len);
+            if const { $n != $m } {
+                for l in 0..$np {
+                    assert_eq!(rcrt.co_prime(l)[$m], 0);
+                }
+            }
+            let mut m_half = [0; $n];
+            m_half.copy_from_slice(&rcrt.prod_primes_ref()[..$n]);
+            limbs_slice_shr_in_place_u64(&mut m_half, 1);
+            let mut xs = [0; $np << LG_BLK_SZ];
+            let start = zi_start.round_to_multiple_of_power_of_2(LG_BLK_SZ, Floor).0;
+            for i in (start..zi_stop).step_by(BLK_SZ) {
+                convert_block!(xs, rffts, d, dstride, $np, i >> LG_BLK_SZ);
+                let j_start = zi_start.saturating_sub(i);
+                let j_stop = min(BLK_SZ, zi_stop - i);
+                for j in j_start..j_stop {
+                    let mut r = [0; $n + 1];
+                    let mut t = [0; $n + 1];
+                    big_mul!($n, $m, r, t, rcrt.co_prime(0), xs[j]);
+                    let mut m = BLK_SZ;
+                    for l in 1..$np {
+                        big_add_mul!($n, $m, r, t, rcrt.co_prime(l), xs[m + j]);
+                        m += BLK_SZ;
+                    }
+                    reduce_big_sum!($n, r, t, rcrt.prod_primes_ref());
+                    z[i + j - zl] = if r[..$n].iter().rev().cmp(m_half.iter().rev()) == Greater {
+                        let mut s = [0; $n];
+                        s.copy_from_slice(&rcrt.prod_primes_ref()[..$n]);
+                        multi_sub::<{ $n }>(&mut s, &r);
+                        // This is fmpz_neg_ui_array from fft_small/fmpz_poly_mul.c, FLINT 3.6.0.
+                        C::from_sign_and_abs(false, natural_from_u64s(&s))
+                    } else {
+                        C::from_sign_and_abs(true, natural_from_u64s(&r[..$n]))
+                    };
+                }
+            }
+        }
+    };
+}
+
+fmpz_poly_crt!(fmpz_poly_crt_2, 2, 2, 1);
+
+fmpz_poly_crt!(fmpz_poly_crt_3, 3, 3, 2);
+
+fmpz_poly_crt!(fmpz_poly_crt_4, 4, 4, 3);
+
+fmpz_poly_crt!(fmpz_poly_crt_5, 5, 4, 4);
+
+fmpz_poly_crt!(fmpz_poly_crt_6, 6, 5, 4);
+
+fmpz_poly_crt!(fmpz_poly_crt_7, 7, 6, 5);
+
+fmpz_poly_crt!(fmpz_poly_crt_8, 8, 7, 6);
+
+// The single-prime case of `fmpz_poly_crt!`: the residue itself, in the symmetric range.
+//
+// This is _crt_1 from fft_small/fmpz_poly_mul.c, FLINT 3.6.0.
+#[target_feature(enable = "avx2,fma")]
+fn fmpz_poly_crt_1<C: PolynomialCoefficient>(
+    z: &mut [C],
+    zl: usize,
+    zi_start: usize,
+    zi_stop: usize,
+    rffts: &[FFTContext],
+    d: &[f64],
+    dstride: usize,
+    _rcrts: &mut [CRTData],
+) {
+    let mut xs = [0; BLK_SZ];
+    let p = rffts[0].mod_data.n;
+    let start = zi_start.round_to_multiple_of_power_of_2(LG_BLK_SZ, Floor).0;
+    for i in (start..zi_stop).step_by(BLK_SZ) {
+        convert_block!(xs, rffts, d, dstride, 1, i >> LG_BLK_SZ);
+        let j_start = zi_start.saturating_sub(i);
+        let j_stop = min(BLK_SZ, zi_stop - i);
+        for j in j_start..j_stop {
+            let x = xs[j];
+            z[i + j - zl] = if x <= p >> 1 {
+                C::from_sign_and_abs(true, Natural::from(x))
+            } else {
+                C::from_sign_and_abs(false, Natural::from(p - x))
+            };
+        }
+    }
+}
+
+// Sets `z` to the coefficients of $x^i$ for `zl` $\leq i <$ `zh` of the product of the polynomials
+// with coefficients `a` and `b`, both nonempty, using the small-prime FFT: the coefficients are
+// reduced modulo up to eight word-sized primes, multiplied by a number-theoretic transform modulo
+// each, and reconstructed by the Chinese remainder theorem. `z` must have length `zh - zl`. Returns
+// `false` if the coefficients of the product are too large for eight primes, in which case the
+// entries of `z` for coefficients of the product are left unchanged (the entries for $x^i$ with $i$
+// at least the product's length are zeroed first).
+//
+// # Worst-case complexity
+// $T(n, m) = O(n(m + \log n))$
+//
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `a.len() + b.len()`, and $m$ is the largest
+// number of significant bits of any element of `a` or `b`.
+//
+// This is _fmpz_poly_mul_mid_mpn_ctx from fft_small/fmpz_poly_mul.c, FLINT 3.6.0, with one thread.
+#[target_feature(enable = "avx2,fma")]
+pub(crate) fn fmpz_poly_mul_mid_mpn_ctx<C: PolynomialCoefficient>(
+    r: &mut Context,
+    z: &mut [C],
+    zl: usize,
+    mut zh: usize,
+    a: &[C],
+    b: &[C],
+) -> bool {
+    let an = a.len();
+    let bn = b.len();
+    assert_ne!(an, 0);
+    assert_ne!(bn, 0);
+    let zn = an + bn - 1;
+    if zl >= zh {
+        return true;
+    }
+    if zh > zn {
+        if zl >= zn {
+            z[..zh - zl].fill(C::ZERO);
+            return true;
+        }
+        z[zn - zl..zh - zl].fill(C::ZERO);
+        zh = zn;
+    }
+    let squaring = core::ptr::eq(a, b);
+    let (bits1, negative1) = vec_max_bits(a);
+    let (bits2, negative2) = if squaring {
+        (bits1, negative1)
+    } else {
+        vec_max_bits(b)
+    };
+    // This should be `+ sign` rather than `+ 1`, but the CRT code does not distinguish the signed
+    // and unsigned cases.
+    let modbits = bits1 + bits2 + 1;
+    // The product of the primes must be at least bn * 2^modbits.
+    let mut np = 1;
+    loop {
+        if np > MPN_CTX_NCRTS {
+            return false;
+        }
+        let crt = &r.crts[np - 1];
+        if flint_mpn_cmp_ui_2exp(
+            &crt.prod_primes_ref()[..crt.coeff_len],
+            u64::exact_from(bn),
+            modbits,
+        ) != Less
+        {
+            break;
+        }
+        np += 1;
+    }
+    let atrunc = an.round_to_multiple(BLK_SZ, Ceiling).0;
+    let btrunc = bn.round_to_multiple(BLK_SZ, Ceiling).0;
+    let mut ztrunc = zn.round_to_multiple(BLK_SZ, Ceiling).0;
+    // If there is a power of two 2^d between zh and zn with good wraparound, that is, with max(an,
+    // bn, zh) <= 2^d <= zn and zn - 2^d <= zl, then d is used as the depth; otherwise the depth is
+    // the usual one, with no wraparound.
+    let mut depth = u64::exact_from(zn).floor_log_base_2();
+    let i = usize::power_of_2(depth);
+    if atrunc <= i && btrunc <= i && zh <= i && i <= zn && zn <= zl + i {
+        ztrunc = i;
+    } else {
+        depth = max(LG_BLK_SZ, u64::exact_from(ztrunc).ceiling_log_base_2());
+    }
+    let stride = usize::power_of_2(depth)
+        .round_to_multiple_of_power_of_2(7, Ceiling)
+        .0;
+    mpn_ctx_fit_buffer(r, ((np + 1) * stride) << 3);
+    let (abufs, bbuf) = r.buffer.split_at_mut(np * stride);
+    for l in 0..np {
+        let q = &mut r.ffts[l];
+        if !squaring {
+            coefficients_to_fft(bbuf, btrunc, b, bits2, negative2, q);
+            sd_fft_trunc(q, bbuf, depth, btrunc, ztrunc);
+        }
+        let abuf = &mut abufs[stride * l..];
+        coefficients_to_fft(abuf, atrunc, a, bits1, negative1, q);
+        sd_fft_trunc(q, abuf, depth, atrunc, ztrunc);
+        let cop = if np == 1 {
+            1
+        } else {
+            r.crts[np - 1].co_prime_red(l)
+        };
+        let m = nmod_red2!(cop >> (u64::WIDTH - depth), cop << depth, &q.mod_data)
+            .mod_inverse(q.mod_data.n)
+            .unwrap();
+        if squaring {
+            sd_fft_ctx_point_sqr(q, abuf, m, depth);
+        } else {
+            sd_fft_ctx_point_mul(q, abuf, bbuf, m, depth);
+        }
+        sd_ifft_trunc(q, abuf, depth, ztrunc);
+    }
+    macro_rules! crt {
+        ($f: ident) => {
+            $f::<C>(z, zl, zl, zh, &r.ffts, abufs, stride, &mut r.crts)
+        };
+    }
+    match np {
+        1 => crt!(fmpz_poly_crt_1),
+        2 => crt!(fmpz_poly_crt_2),
+        3 => crt!(fmpz_poly_crt_3),
+        4 => crt!(fmpz_poly_crt_4),
+        5 => crt!(fmpz_poly_crt_5),
+        6 => crt!(fmpz_poly_crt_6),
+        7 => crt!(fmpz_poly_crt_7),
+        8 => crt!(fmpz_poly_crt_8),
+        _ => unreachable!(),
+    }
+    true
+}

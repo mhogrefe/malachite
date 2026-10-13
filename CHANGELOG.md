@@ -10,6 +10,10 @@ documented by git history.
 
 ### Breaking and behavioral changes
 
+- `malachite-nz` now contains `unsafe` code, in one module: the AVX2 instantiation of the FFT
+  multiplication (`natural/arithmetic/mul/fft/avx2.rs`). The crate-level `forbid(unsafe_code)` has
+  become `deny(unsafe_code)`, with `allow` on that module and on the two functions that enter it
+  after checking the CPU. Everything else is unchanged.
 - `exhaustive_vecs_with_last` and its `_min_length`, `_length_range`, `_length_inclusive_range`,
   and `_from_length_iterator` variants now step through the lengths with a `ruler_sequence`, as
   `exhaustive_vecs` does, instead of a `bit_distributor_sequence`, so the lengths grow
@@ -310,6 +314,21 @@ documented by git history.
 
 ### malachite-nz
 
+- On x86 and x86_64, the FFT multiplication of large `Natural`s (and the FFT multiplication of
+  `IntegerPolynomial`s) now detects AVX2 and FMA at run time and uses kernels compiled for them. The
+  small-prime FFT depends on fused multiply-adds and vector rounding; a default `cargo build` for
+  x86_64 enables neither, so every one of them had been a library call, which made the FFT several
+  times slower than on aarch64. Such builds now run the same code twice compiled: once for the
+  features the crate is built with and once for AVX2 and FMA, selecting the second when the CPU has
+  them. Builds with `-C target-feature=+avx2,+fma` or `-C target-cpu=native`, builds without `std`
+  (which provides the detection), and other architectures are unaffected. The FFT module is split
+  into `fft/mod.rs` (contexts, tables, dispatch), `fft/body.rs` (the kernels), `fft/baseline.rs`
+  and `fft/avx2.rs` (the vector primitives of each backend), and `fft/avx2_body.rs`, a generated
+  copy of `body.rs` with `#[target_feature]` on every function, kept in sync by a test.
+- The FFT's vector reductions into $[-n/2, n/2]$ and $[0, n)$, which had been computed one lane at
+  a time with branches, now use vector compares and selects (`wide`'s `simd_gt`, `simd_lt`, and
+  `select`), as FLINT does. Large multiplications are about 2% faster on aarch64. This raises the
+  minimum `wide` version to 1.7.1, which is where that API appeared.
 - `NaturalVector` and `IntegerVector`, with the same API as `UnsignedVector<T>`: public
   `elements`, the `Vector` trait, `Index`, strings, LaTeX, Typst, serde, `Shortlex*` wrappers, and
   exhaustive, random, and striped random generators.

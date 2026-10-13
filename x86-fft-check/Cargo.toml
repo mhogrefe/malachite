@@ -1,0 +1,17 @@
+[package]
+name = "malachite-x86-fft-check"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+# Standalone, like oracle-test: it is built for x86_64-unknown-linux-musl, which the workspace's
+# test dependencies (rug's GMP) cannot be cross-compiled for.
+[workspace]
+
+[dependencies]
+malachite-base = { path = "../malachite-base" }
+malachite-nz = { path = "../malachite-nz" }
+
+[profile.release]
+lto = true
+codegen-units = 1

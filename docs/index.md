@@ -214,8 +214,8 @@ The `malachite` crate re-exports four sub-crates.
     other kinds of numbers, and to and from strings in any base from 2 to 36 (or up to 62 through
     the lower-level MPFR-style entry points).
 
-  These are not yet feature-complete, but the functions that are implemented are thoroughly tested
-  and documented.
+  These implement all the elementary functions, thoroughly tested and documented; only some special
+  functions, such as the gamma, zeta, and error functions, are still to come.
 
   If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
   `floats` or `malachite-float` feature.

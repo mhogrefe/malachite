@@ -7,7 +7,7 @@ Parts of Malachite are derived from [GMP](https://gmplib.org/),
 
 The documentation for Malachite is [here](https://docs.rs/malachite/latest/malachite/), and its crate is [here](https://crates.io/crates/malachite).
 
-Floats (arbitrary-precision floating-point numbers) are still in development and are not yet feature-complete, but the floating-point functions that *are* implemented are thoroughly tested and documented.
+Floats (arbitrary-precision floating-point numbers) implement all the elementary functions, thoroughly tested and documented; only some special functions, such as the gamma, zeta, and error functions, are still to come.
 
 Malachite is developed by Mikhail Hogrefe. Thanks to 43615, b4D8, Romain Billot, Maxim Biryukov, coolreader18, Dasaav-dsv, Duncan Freeman, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, Kevin Phoenix, probablykasper, shekohex, skycloudd, John Vandenberg, Brandon Weeks, and Will Youmans for additional contributions.
 

@@ -25,7 +25,7 @@ itertools = { version = "0.14.0", default-features = false, features = ["use_all
 libm = { version = "0.2.16", default-features = false }
 malachite-base = { version = "0.13.0", default-features = false, path = "../malachite-base" }
 serde = { version = "1.0.228", optional = true, default-features = false, features = ["alloc", "derive"] }
-wide = { version = "1.1.1", default-features = false }
+wide = { version = "1.7.1", default-features = false }
 
 indoc = { version = "2.0.7", optional = true}
 pyo3 = { version = "0.29.0", optional = true }
@@ -34,6 +34,11 @@ num = { version = "0.4.3", optional = true, features = ["serde"] }
 rug = { version = "1.30.0", default-features = false, optional = true, features = ["integer", "serde"] }
 
 embed-doc-image = { version = "0.1.4", optional = true }
+
+# For the AVX2 instantiation of the FFT multiplication (see natural/arithmetic/mul/fft/avx2.rs). `wide`
+# already depends on it, so this adds no crate to the build.
+[target.'cfg(any(target_arch = "x86", target_arch = "x86_64"))'.dependencies]
+bytemuck = { version = "1.16", default-features = false }
 
 [dev-dependencies]
 malachite-nz = { path = ".", features = ["test_build"] }

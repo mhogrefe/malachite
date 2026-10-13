@@ -8,8 +8,8 @@
 
 //! This crate defines [`Float`]s, which are arbitrary-precision floating-point numbers.
 //!
-//! [`Float`]s are not yet feature-complete, but the functions that are implemented are thoroughly
-//! tested and documented.
+//! [`Float`]s implement all the elementary functions, thoroughly tested and documented; only some
+//! special functions, such as the gamma, zeta, and error functions, are still to come.
 //!
 //! # Complexity conventions
 //! Functions in this crate are documented with worst-case time and additional-memory bounds,

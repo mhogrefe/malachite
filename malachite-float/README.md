@@ -14,8 +14,9 @@ The import path of the `Float` type is shortened to `malachite::Float`.
 # malachite-float
 This crate defines
 [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html)s, which
-are arbitrary-precision floating-point numbers. They are not yet feature-complete, but the
-functions that are implemented are thoroughly tested and documented.
+are arbitrary-precision floating-point numbers. They implement all the elementary functions,
+thoroughly tested and documented; only some special functions, such as the gamma, zeta, and error
+functions, are still to come.
 - A [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html)
   behaves much like a primitive float, except that its precision is chosen per value rather than
   fixed by the type. Like the floats of the IEEE 754 standard, they include NaN, ∞ and -∞,

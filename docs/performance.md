@@ -69,8 +69,11 @@ multiplication for larger inputs, and finally Toom-33 for the largest ones. This
 multiplication takes $$O(n^{\log_3 5}) \approx O(n^{1.465})$$ time.
 
 Malachite also uses a basecase quadratic algorithm, then 13 variants of Toom-Cook multiplication,
-and finally [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/Schonhage-Strassen_algorithm) for the largest inputs, achieving $$O(n \log n \log \log n)$$
-time.
+and finally an [FFT over small primes](https://flintlib.org/doc/fft_small.html) for the largest
+inputs: a port of FLINT's `fft_small`, which carries out number-theoretic transforms modulo 50-bit
+primes in double-precision floating point, achieving essentially $$O(n \log n)$$ time. On x86 and
+x86_64, the FFT detects AVX2 and FMA at run time and uses them when the CPU has them, so a default
+build is as fast as one made with `-C target-cpu=native`.
 
 For numbers of up to 1000 bits, all three libraries are about equally fast:
 

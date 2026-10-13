@@ -119,7 +119,10 @@
 //! - `bin_build`: This feature is used to build the code for demos and benchmarks, which also
 //!   takes a long time to build. Enabling this feature also enables `test_build`.
 
-#![cfg_attr(not(feature = "enable_pyo3"), forbid(unsafe_code))]
+// `deny` rather than `forbid`: the AVX2 instantiation of the FFT
+// (natural/arithmetic/mul/fft/avx2.rs) is the one place that allows `unsafe_code`, for calling
+// intrinsics and for entering code compiled with `#[target_feature]` after checking the CPU.
+#![cfg_attr(not(feature = "enable_pyo3"), deny(unsafe_code))]
 #![allow(
     unstable_name_collisions,
     clippy::assertions_on_constants,

@@ -21,7 +21,7 @@
 //!   enabled by default.)
 //! - [`Float`], arbitrary-precision floating-point numbers, is re-exported from
 //!   [`malachite-float`](https://docs.rs/malachite-float). (Requires the `floats` feature, which is
-//!   enabled by default; floats are not yet feature-complete.)
+//!   enabled by default.)
 //! - The [`base`] module re-exports [`malachite-base`](https://docs.rs/malachite-base), which
 //!   provides the numeric traits (and their implementations for primitive types) used throughout
 //!   Malachite, along with tools for generating values for tests and benchmarks.
