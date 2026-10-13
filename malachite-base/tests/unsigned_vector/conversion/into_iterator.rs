@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::num::arithmetic::traits::WrappingAddAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::unsigned_vector_gen;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -52,11 +53,11 @@ fn into_iterator_properties() {
         // Changing the elements through `&mut` is changing them in `elements`.
         let mut w = v.clone();
         for x in &mut w {
-            *x += 1;
+            x.wrapping_add_assign(1);
         }
         let mut w_alt = v.clone();
         for x in &mut w_alt.elements {
-            *x += 1;
+            x.wrapping_add_assign(1);
         }
         assert_eq!(w, w_alt);
     });

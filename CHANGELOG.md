@@ -24,6 +24,12 @@ documented by git history.
   are summed exactly in one to three words and reduced once, the reversed sum by the same
   accumulator that the polynomial products use; `mod_dot_reversed` is FLINT's `_nmod_vec_dot_rev`.
   Modulo $2^k$ the products are summed in wrapping arithmetic and masked once.
+- `random_ordered_unique_unsigned_vectors_with_dimension`,
+  `striped_random_ordered_unique_unsigned_vectors_with_dimension`, and
+  `random_ordered_unique_unsigned_vectors_with_dimension_from_iterator`, which generate
+  `UnsignedVector`s whose elements are distinct and in ascending order, like FLINT's
+  `_fmpq_vec_randtest_uniq_sorted`; and `exhaustive_ordered_unique_unsigned_vectors_with_dimension`,
+  which generates every such vector once.
 
 ### malachite-nz
 
@@ -37,12 +43,19 @@ documented by git history.
   receiver, the vectors, and a `Natural` modulus by value or by reference. A modulus that fits in a
   limb uses the `UnsignedVector<Limb>` implementation; a larger one reduces the exact dot product
   once. `mod_dot_reversed` is FLINT's `_fmpz_mod_vec_dot_rev`.
+- The same ordered, distinct-element generators, random, striped, and exhaustive, for
+  `NaturalVector` and `IntegerVector`: `random_ordered_unique_natural_vectors_with_dimension`,
+  `exhaustive_ordered_unique_integer_vectors_with_dimension`, and the rest.
 
 ### malachite-q
 
 - `AddDot`, `SubDot`, `AddDotReversed`, `SubDotReversed`, and their `Assign` forms for `Rational`
   with `RationalVector`s, and `DotReversed` for `RationalVector`. Each vector is written over a
   common denominator, so that the products need one integer dot product and one reduction.
+- The same ordered, distinct-element generators, random, striped, and exhaustive, for
+  `RationalVector`: `random_ordered_unique_rational_vectors_with_dimension`,
+  `exhaustive_ordered_unique_rational_vectors_with_dimension`, and the rest. The random ones are the
+  counterparts of FLINT's `_fmpq_vec_randtest_uniq_sorted`.
 
 ## 0.14.0 — 2026-10-13
 

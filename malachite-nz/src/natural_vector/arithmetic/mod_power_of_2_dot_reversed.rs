@@ -42,7 +42,6 @@ impl ModPowerOf2DotReversed<Self> for NaturalVector {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2DotReversed;
-    /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_vector::NaturalVector;
     ///
     /// let v = NaturalVector::from_str("(1, 2, 3)").unwrap();
@@ -86,7 +85,6 @@ impl ModPowerOf2DotReversed<&Self> for NaturalVector {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2DotReversed;
-    /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_vector::NaturalVector;
     ///
     /// let v = NaturalVector::from_str("(1, 2, 3)").unwrap();
@@ -130,7 +128,6 @@ impl ModPowerOf2DotReversed<NaturalVector> for &NaturalVector {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2DotReversed;
-    /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_vector::NaturalVector;
     ///
     /// let v = NaturalVector::from_str("(1, 2, 3)").unwrap();
@@ -175,7 +172,6 @@ impl ModPowerOf2DotReversed<&NaturalVector> for &NaturalVector {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2DotReversed;
-    /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_vector::NaturalVector;
     ///
     /// let v = NaturalVector::from_str("(1, 2, 3)").unwrap();

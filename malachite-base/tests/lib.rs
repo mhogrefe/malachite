@@ -1083,10 +1083,13 @@ pub mod unsigned_vector {
     pub mod set_dimension;
     pub mod set_zero;
     pub mod random {
+        pub mod random_ordered_unique_unsigned_vectors_with_dimension;
+        pub mod random_ordered_unique_unsigned_vectors_with_dimension_from_iterator;
         pub mod random_unsigned_vectors;
         pub mod random_unsigned_vectors_from_iterator;
         pub mod random_unsigned_vectors_with_dimension;
         pub mod random_unsigned_vectors_with_dimension_from_iterator;
+        pub mod striped_random_ordered_unique_unsigned_vectors_with_dimension;
         pub mod striped_random_unsigned_vectors;
         pub mod striped_random_unsigned_vectors_with_dimension;
     }

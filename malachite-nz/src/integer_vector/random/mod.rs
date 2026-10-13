@@ -17,15 +17,20 @@ use malachite_base::num::random::geometric::{
 };
 use malachite_base::random::Seed;
 use malachite_base::vecs::random::{
-    RandomFixedLengthVecsFromSingle, RandomVecs, random_vecs, random_vecs_fixed_length_from_single,
+    RandomFixedLengthVecsFromSingle, RandomOrderedUniqueVecsFixedLength, RandomVecs,
+    random_ordered_unique_vecs_fixed_length, random_vecs, random_vecs_fixed_length_from_single,
 };
 
 /// Generates random [`IntegerVector`]s from an iterator of [`Vec`]s of [`Integer`]s.
 ///
 /// This `struct` is created by [`random_integer_vectors_from_iterator`],
 /// [`random_integer_vectors_with_dimension_from_iterator`], [`random_integer_vectors`],
-/// [`random_integer_vectors_with_dimension`], [`striped_random_integer_vectors`], and
-/// [`striped_random_integer_vectors_with_dimension`]; see their documentation for more.
+/// [`random_integer_vectors_with_dimension`], [`striped_random_integer_vectors`],
+/// [`striped_random_integer_vectors_with_dimension`],
+/// [`random_ordered_unique_integer_vectors_with_dimension_from_iterator`],
+/// [`random_ordered_unique_integer_vectors_with_dimension`], and
+/// [`striped_random_ordered_unique_integer_vectors_with_dimension`]; see their documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub struct RandomIntegerVectors<I: Iterator<Item = Vec<Integer>>>(I);
 
@@ -375,6 +380,178 @@ pub fn striped_random_integer_vectors_with_dimension(
     mean_bits_denominator: u64,
 ) -> RandomIntegerVectors<RandomFixedLengthVecsFromSingle<StripedRandomVectorElements>> {
     random_integer_vectors_with_dimension_from_iterator(
+        dimension,
+        striped_random_integers(
+            seed,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+    )
+}
+
+/// Generates random [`IntegerVector`]s of a given dimension whose elements come from an iterator,
+/// are distinct, and are in ascending order.
+///
+/// Each vector draws elements from `xs` until it has `dimension` distinct ones, and then sorts
+/// them. If `dimension` is 0, the output consists of the 0-dimensional vector, repeated.
+///
+/// `xs` must be infinite, and so is the output. If `xs` generates fewer than `dimension` distinct
+/// values, this function will hang.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(n \log n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $n$ is `dimension`, assuming that `xs`
+/// rarely repeats a value.
+///
+/// # Examples
+/// The elements here are [`Integer`]s from $-8$ to $8$.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::random::uniform_random_integer_inclusive_range;
+/// use malachite_nz::integer_vector::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_ordered_unique_integer_vectors_with_dimension_from_iterator(
+///             3,
+///             uniform_random_integer_inclusive_range(
+///                 EXAMPLE_SEED,
+///                 Integer::from(-8),
+///                 Integer::from(8)
+///             )
+///         ),
+///         5
+///     ),
+///     "[(-1, 0, 1), (-7, 3, 6), (-7, -2, -1), (-3, -2, -1), (-1, 4, 7), ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_ordered_unique_integer_vectors_with_dimension_from_iterator<
+    I: Iterator<Item = Integer>,
+>(
+    dimension: u64,
+    xs: I,
+) -> RandomIntegerVectors<RandomOrderedUniqueVecsFixedLength<I>> {
+    RandomIntegerVectors(random_ordered_unique_vecs_fixed_length(dimension, xs))
+}
+
+/// Generates random [`IntegerVector`]s of a given dimension whose elements are distinct and in
+/// ascending order.
+///
+/// The elements are sampled from [`random_integers`], with a mean bit count of `mean_bits_numerator
+/// / mean_bits_denominator`; each vector draws elements until it has `dimension` distinct ones, and
+/// then sorts them. This is the analog of FLINT's `_fmpq_vec_randtest_uniq_sorted`.
+///
+/// If `dimension` is 0, the output consists of the 0-dimensional vector, repeated.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(nb \log n)$
+///
+/// $M(i) = O(nb)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $n$ is `dimension`,
+/// and $b$ is `mean_bits_numerator / mean_bits_denominator`, provided that $n$ is small compared to
+/// $2^b$.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if, after being reduced
+/// to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_vector::random::random_ordered_unique_integer_vectors_with_dimension;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_ordered_unique_integer_vectors_with_dimension(EXAMPLE_SEED, 3, 4, 1),
+///         5
+///     ),
+///     "[(1, 2, 152), (-62, 0, 5282), (0, 28, 4427344568), (-7330, -11, 79), (-5667523, -1, \
+///     1618), ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_ordered_unique_integer_vectors_with_dimension(
+    seed: Seed,
+    dimension: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerVectors<RandomOrderedUniqueVecsFixedLength<RandomVectorElements>> {
+    random_ordered_unique_integer_vectors_with_dimension_from_iterator(
+        dimension,
+        random_integers(seed, mean_bits_numerator, mean_bits_denominator),
+    )
+}
+
+/// Generates random [`IntegerVector`]s of a given dimension, with striped elements that are
+/// distinct and in ascending order.
+///
+/// The elements are sampled from [`striped_random_integers`], as they are in
+/// [`striped_random_integer_vectors_with_dimension`]; each vector draws elements until it has
+/// `dimension` distinct ones, and then sorts them.
+///
+/// If `dimension` is 0, the output consists of the 0-dimensional vector, repeated.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(nb \log n)$
+///
+/// $M(i) = O(nb)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $n$ is `dimension`,
+/// and $b$ is `mean_bits_numerator / mean_bits_denominator`, provided that $n$ is small compared to
+/// $2^b$.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if,
+/// after being reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_vector::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_ordered_unique_integer_vectors_with_dimension(
+///             EXAMPLE_SEED,
+///             3,
+///             4,
+///             1,
+///             4,
+///             1
+///         ),
+///         5
+///     ),
+///     "[(1, 2, 128), (-32, 0, 4216), (0, 19, 4798218336), (-7207, -14, 127), (-4298752, -1, \
+///     2044), ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_ordered_unique_integer_vectors_with_dimension(
+    seed: Seed,
+    dimension: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerVectors<RandomOrderedUniqueVecsFixedLength<StripedRandomVectorElements>> {
+    random_ordered_unique_integer_vectors_with_dimension_from_iterator(
         dimension,
         striped_random_integers(
             seed,

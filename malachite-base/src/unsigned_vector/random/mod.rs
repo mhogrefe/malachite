@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::random::geometric::GeometricRandomNaturalValues;
 use crate::num::random::striped::{StripedRandomUnsignedBitChunks, striped_random_unsigneds};
@@ -13,7 +14,8 @@ use crate::num::random::{RandomPrimitiveInts, random_primitive_ints};
 use crate::random::Seed;
 use crate::unsigned_vector::UnsignedVector;
 use crate::vecs::random::{
-    RandomFixedLengthVecsFromSingle, RandomVecs, random_vecs, random_vecs_fixed_length_from_single,
+    RandomFixedLengthVecsFromSingle, RandomOrderedUniqueVecsFixedLength, RandomVecs,
+    random_ordered_unique_vecs_fixed_length, random_vecs, random_vecs_fixed_length_from_single,
 };
 use alloc::vec::Vec;
 
@@ -21,8 +23,12 @@ use alloc::vec::Vec;
 ///
 /// This `struct` is created by [`random_unsigned_vectors_from_iterator`],
 /// [`random_unsigned_vectors_with_dimension_from_iterator`], [`random_unsigned_vectors`],
-/// [`random_unsigned_vectors_with_dimension`], [`striped_random_unsigned_vectors`], and
-/// [`striped_random_unsigned_vectors_with_dimension`]; see their documentation for more.
+/// [`random_unsigned_vectors_with_dimension`], [`striped_random_unsigned_vectors`],
+/// [`striped_random_unsigned_vectors_with_dimension`],
+/// [`random_ordered_unique_unsigned_vectors_with_dimension_from_iterator`],
+/// [`random_ordered_unique_unsigned_vectors_with_dimension`], and
+/// [`striped_random_ordered_unique_unsigned_vectors_with_dimension`]; see their documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedVectors<I>(I);
 
@@ -329,6 +335,166 @@ pub fn striped_random_unsigned_vectors_with_dimension<T: PrimitiveUnsigned>(
     mean_stripe_denominator: u64,
 ) -> RandomUnsignedVectors<RandomFixedLengthVecsFromSingle<StripedRandomUnsignedBitChunks<T>>> {
     random_unsigned_vectors_with_dimension_from_iterator(
+        dimension,
+        striped_random_unsigneds(seed, mean_stripe_numerator, mean_stripe_denominator),
+    )
+}
+
+/// Generates random [`UnsignedVector`]s of a given dimension whose elements come from an iterator,
+/// are distinct, and are in ascending order.
+///
+/// Each vector draws elements from `xs` until it has `dimension` distinct ones, and then sorts
+/// them. If `dimension` is 0, the output consists of the 0-dimensional vector, repeated.
+///
+/// `xs` must be infinite, and so is the output. If `xs` generates fewer than `dimension` distinct
+/// values, this function will hang.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(n \log n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $n$ is `dimension`, assuming that `xs`
+/// rarely repeats a value.
+///
+/// # Examples
+/// The elements here are [`u8`]s from 0 to 15.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::unsigned_vector::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_ordered_unique_unsigned_vectors_with_dimension_from_iterator(
+///             3,
+///             random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 0, 15)
+///         ),
+///         5
+///     ),
+///     "[(1, 7, 15), (4, 5, 14), (4, 6, 12), (2, 13, 14), (1, 8, 10), ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_ordered_unique_unsigned_vectors_with_dimension_from_iterator<
+    T: PrimitiveUnsigned,
+    I: Iterator<Item = T>,
+>(
+    dimension: u64,
+    xs: I,
+) -> RandomUnsignedVectors<RandomOrderedUniqueVecsFixedLength<I>> {
+    RandomUnsignedVectors(random_ordered_unique_vecs_fixed_length(dimension, xs))
+}
+
+fn assert_ordered_unique_dimension_possible<T: PrimitiveUnsigned>(dimension: u64) {
+    assert!(
+        T::WIDTH >= u64::WIDTH || dimension <= 1 << T::WIDTH,
+        "a vector of {} distinct {}s does not exist",
+        dimension,
+        T::NAME
+    );
+}
+
+/// Generates random [`UnsignedVector`]s of a given dimension whose elements are distinct and in
+/// ascending order.
+///
+/// The elements are sampled from [`random_primitive_ints`], so each is uniform over its whole
+/// range; each vector draws elements until it has `dimension` distinct ones, and then sorts them.
+/// This is the analog of FLINT's `_fmpq_vec_randtest_uniq_sorted`.
+///
+/// If `dimension` is 0, the output consists of the 0-dimensional vector, repeated.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(n \log n)$
+///
+/// $M(i) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $n$ is
+/// `dimension`, provided that `dimension` is small compared to the number of values of `T`.
+///
+/// # Panics
+/// Panics if `dimension` is greater than the number of values of `T`, since no such vector exists.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::unsigned_vector::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_ordered_unique_unsigned_vectors_with_dimension::<u8>(EXAMPLE_SEED, 3),
+///         5
+///     ),
+///     "[(69, 113, 239), (108, 210, 228), (87, 161, 168), (32, 83, 110), (34, 89, 188), ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_ordered_unique_unsigned_vectors_with_dimension<T: PrimitiveUnsigned>(
+    seed: Seed,
+    dimension: u64,
+) -> RandomUnsignedVectors<RandomOrderedUniqueVecsFixedLength<RandomPrimitiveInts<T>>> {
+    assert_ordered_unique_dimension_possible::<T>(dimension);
+    random_ordered_unique_unsigned_vectors_with_dimension_from_iterator(
+        dimension,
+        random_primitive_ints(seed),
+    )
+}
+
+/// Generates random [`UnsignedVector`]s of a given dimension, with striped elements that are
+/// distinct and in ascending order.
+///
+/// The elements are striped, as they are in [`striped_random_unsigned_vectors`]; each vector draws
+/// elements until it has `dimension` distinct ones, and then sorts them.
+///
+/// If `dimension` is 0, the output consists of the 0-dimensional vector, repeated.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(n \log n)$
+///
+/// $M(i) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $n$ is
+/// `dimension`, provided that `dimension` is small compared to the number of values of `T`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, or if `dimension` is greater than the number of values of `T`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::unsigned_vector::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_ordered_unique_unsigned_vectors_with_dimension::<u8>(
+///             EXAMPLE_SEED,
+///             3,
+///             4,
+///             1
+///         ),
+///         5
+///     ),
+///     "[(1, 76, 127), (0, 128, 195), (0, 15, 118), (248, 253, 255), (0, 121, 240), ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_ordered_unique_unsigned_vectors_with_dimension<T: PrimitiveUnsigned>(
+    seed: Seed,
+    dimension: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> RandomUnsignedVectors<RandomOrderedUniqueVecsFixedLength<StripedRandomUnsignedBitChunks<T>>> {
+    assert_ordered_unique_dimension_possible::<T>(dimension);
+    random_ordered_unique_unsigned_vectors_with_dimension_from_iterator(
         dimension,
         striped_random_unsigneds(seed, mean_stripe_numerator, mean_stripe_denominator),
     )

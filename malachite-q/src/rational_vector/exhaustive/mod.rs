@@ -13,7 +13,8 @@ use alloc::vec::Vec;
 use core::iter::{Chain, Once};
 use malachite_base::num::exhaustive::PrimitiveIntIncreasingRange;
 use malachite_base::vecs::exhaustive::{
-    ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, exhaustive_vecs,
+    ExhaustiveFixedLengthVecs1Input, ExhaustiveOrderedUniqueCollections, ExhaustiveVecs,
+    exhaustive_ordered_unique_vecs_fixed_length, exhaustive_vecs,
     exhaustive_vecs_fixed_length_from_single,
 };
 
@@ -108,6 +109,75 @@ pub fn exhaustive_rational_vectors_with_dimension(
     ExhaustiveFixedLengthVecs1Input<Chain<Once<Rational>, ExhaustiveNonzeroRationals>>,
 > {
     ExhaustiveRationalVectors(exhaustive_vecs_fixed_length_from_single(
+        dimension,
+        exhaustive_rationals(),
+    ))
+}
+
+/// Generates [`RationalVector`]s from an iterator of [`Vec`]s, sorting the elements of each.
+///
+/// This `struct` is created by [`exhaustive_ordered_unique_rational_vectors_with_dimension`]; see
+/// its documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveOrderedUniqueRationalVectors<I: Iterator<Item = Vec<Rational>>>(I);
+
+impl<I: Iterator<Item = Vec<Rational>>> Iterator for ExhaustiveOrderedUniqueRationalVectors<I> {
+    type Item = RationalVector;
+
+    #[inline]
+    fn next(&mut self) -> Option<RationalVector> {
+        self.0.next().map(|mut elements| {
+            elements.sort_unstable();
+            RationalVector { elements }
+        })
+    }
+}
+
+/// Generates all [`RationalVector`]s of a given dimension whose elements are distinct and in
+/// ascending order.
+///
+/// Each set of `dimension` distinct elements is generated once, in ascending order. If `dimension`
+/// is 0, the only output is the 0-dimensional vector; otherwise the output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n \log n \log i)$
+///
+/// $M(i) = O(n \log i)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $n$ is
+/// `dimension`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_q::rational_vector::exhaustive::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         exhaustive_ordered_unique_rational_vectors_with_dimension(0),
+///         10
+///     ),
+///     "[()]"
+/// );
+/// assert_eq!(
+///     prefix_to_string(
+///         exhaustive_ordered_unique_rational_vectors_with_dimension(2),
+///         10
+///     ),
+///     "[(0, 1), (-1, 0), (-1, 1), (0, 1/2), (1/2, 1), (-1, 1/2), (-1/2, 0), (-1/2, 1), (-1, \
+///     -1/2), (-1/2, 1/2), ...]"
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_ordered_unique_rational_vectors_with_dimension(
+    dimension: u64,
+) -> ExhaustiveOrderedUniqueRationalVectors<
+    ExhaustiveOrderedUniqueCollections<
+        Chain<Once<Rational>, ExhaustiveNonzeroRationals>,
+        Vec<Rational>,
+    >,
+> {
+    ExhaustiveOrderedUniqueRationalVectors(exhaustive_ordered_unique_vecs_fixed_length(
         dimension,
         exhaustive_rationals(),
     ))

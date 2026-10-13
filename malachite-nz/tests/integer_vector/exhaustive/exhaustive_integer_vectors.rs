@@ -66,3 +66,53 @@ fn exhaustive_integer_vectors_properties() {
         assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
     }
 }
+
+#[test]
+fn test_exhaustive_ordered_unique_integer_vectors_with_dimension() {
+    // dimension 0: the 0-dimensional vector, and nothing else
+    assert_eq!(
+        exhaustive_ordered_unique_integer_vectors_with_dimension(0)
+            .map(|v| v.to_string())
+            .collect_vec(),
+        &["()"]
+    );
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_ordered_unique_integer_vectors_with_dimension(1),
+            20
+        ),
+        "[(0), (1), (-1), (2), (-2), (3), (-3), (4), (-4), (5), (-5), (6), (-6), (7), (-7), (8), \
+        (-8), (9), (-9), (10), ...]"
+    );
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_ordered_unique_integer_vectors_with_dimension(2),
+            20
+        ),
+        "[(0, 1), (-1, 0), (-1, 1), (0, 2), (1, 2), (-1, 2), (-2, 0), (-2, 1), (-2, -1), (-2, 2), \
+        (0, 3), (1, 3), (-1, 3), (2, 3), (-2, 3), (-3, 0), (-3, 1), (-3, -1), (-3, 2), (-3, -2), \
+        ...]"
+    );
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_ordered_unique_integer_vectors_with_dimension(3),
+            20
+        ),
+        "[(-1, 0, 1), (0, 1, 2), (-1, 0, 2), (-1, 1, 2), (-2, 0, 1), (-2, -1, 0), (-2, -1, 1), \
+        (-2, 0, 2), (-2, 1, 2), (-2, -1, 2), (0, 1, 3), (-1, 0, 3), (-1, 1, 3), (0, 2, 3), (1, 2, \
+        3), (-1, 2, 3), (-2, 0, 3), (-2, 1, 3), (-2, -1, 3), (-2, 2, 3), ...]"
+    );
+}
+
+#[test]
+fn exhaustive_ordered_unique_integer_vectors_with_dimension_properties() {
+    for dimension in 0..5 {
+        let vs: Vec<IntegerVector> =
+            exhaustive_ordered_unique_integer_vectors_with_dimension(dimension)
+                .take(1000)
+                .collect();
+        assert!(vs.iter().all(|v| v.dimension() == dimension));
+        assert!(vs.iter().all(|v| v.elements.is_sorted_by(|x, y| x < y)));
+        assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
+    }
+}
