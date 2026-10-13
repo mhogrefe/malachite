@@ -15,7 +15,7 @@ impl Index<usize> for NaturalVector {
 
     /// Gets a reference to the element of a [`NaturalVector`] at an index.
     ///
-    /// Indices start at 0, as they do for a [`Vec`](alloc::vec::Vec).
+    /// Indices start at 0, as they do for a [`Vec`].
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -41,7 +41,7 @@ impl Index<usize> for NaturalVector {
 impl IndexMut<usize> for NaturalVector {
     /// Gets a mutable reference to the element of a [`NaturalVector`] at an index.
     ///
-    /// Indices start at 0, as they do for a [`Vec`](alloc::vec::Vec).
+    /// Indices start at 0, as they do for a [`Vec`].
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

@@ -11,7 +11,7 @@
 
 The AVX2 instantiation of the FFT multiplication is body.rs with `#[target_feature(enable =
 "avx2,fma")]` on every function, which has to be a separate file because the attribute cannot be
-applied to a whole module. Run this after editing body.rs; the test `fft_avx2_body_is_in_sync` in
+applied to a whole module. Run this after editing body.rs; the test `test_fft_avx2_body_in_sync` in
 tests/natural/arithmetic/mul.rs applies the same transformation and fails when the two files differ.
 """
 
@@ -19,9 +19,10 @@ import pathlib
 import re
 
 ATTRIBUTE = '#[target_feature(enable = "avx2,fma")]'
+# Wrapped as superfmt wraps it, so that formatting leaves the generated file unchanged.
 BANNER = (
-    "// GENERATED FILE: `body.rs` with `#[target_feature(enable = \"avx2,fma\")]` on every function.\n"
-    "// Do not edit; edit `body.rs` and run `python3 gen-fft-avx2-body.py` in malachite-nz.\n\n"
+    "// GENERATED FILE: `body.rs` with `#[target_feature(enable = \"avx2,fma\")]` on every function. Do not\n"
+    "// edit; edit `body.rs` and run `python3 gen-fft-avx2-body.py` in malachite-nz.\n\n"
 )
 # A function header, which may be inside a macro definition (`fn $f(`). Keep in sync with
 # `is_fn_line` in the test.

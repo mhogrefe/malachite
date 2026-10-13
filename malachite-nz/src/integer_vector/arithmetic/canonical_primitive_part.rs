@@ -25,10 +25,11 @@ impl CanonicalPrimitivePart for IntegerVector {
 
     /// Computes the canonical primitive part of an [`IntegerVector`], taking the vector by value.
     ///
-    /// This is the [`primitive_part`](PrimitivePart::primitive_part), negated if its first nonzero
-    /// element is negative, so that the first nonzero element is positive. A vector and its
-    /// negation have the same canonical primitive part. The canonical primitive part of a vector of
-    /// zeros is itself, keeping its dimension.
+    /// This is the
+    /// [`primitive_part`](malachite_base::num::arithmetic::traits::PrimitivePart::primitive_part),
+    /// negated if its first nonzero element is negative, so that the first nonzero element is
+    /// positive. A vector and its negation have the same canonical primitive part. The canonical
+    /// primitive part of a vector of zeros is itself, keeping its dimension.
     ///
     /// $$
     /// v = \pm \operatorname{cont}(v) \operatorname{cpp}(v).
@@ -68,10 +69,11 @@ impl CanonicalPrimitivePart for &IntegerVector {
     /// Computes the canonical primitive part of an [`IntegerVector`], taking the vector by
     /// reference.
     ///
-    /// This is the [`primitive_part`](PrimitivePart::primitive_part), negated if its first nonzero
-    /// element is negative, so that the first nonzero element is positive. A vector and its
-    /// negation have the same canonical primitive part. The canonical primitive part of a vector of
-    /// zeros is itself, keeping its dimension.
+    /// This is the
+    /// [`primitive_part`](malachite_base::num::arithmetic::traits::PrimitivePart::primitive_part),
+    /// negated if its first nonzero element is negative, so that the first nonzero element is
+    /// positive. A vector and its negation have the same canonical primitive part. The canonical
+    /// primitive part of a vector of zeros is itself, keeping its dimension.
     ///
     /// $$
     /// v = \pm \operatorname{cont}(v) \operatorname{cpp}(v).

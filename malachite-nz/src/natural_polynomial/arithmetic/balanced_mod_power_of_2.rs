@@ -22,8 +22,7 @@ impl BalancedModPowerOf2 for NaturalPolynomial {
     /// congruent to the original coefficient modulo $2^k$, which determine it uniquely, as with
     /// [`BalancedModPowerOf2`] for [`Natural`](crate::natural::Natural)s; for $k = 0$ every
     /// coefficient is 0. A remainder of exactly $2^{k-1}$ is positive. Remainders above $2^{k-1}$
-    /// become negative, which is why the result is an
-    /// [`IntegerPolynomial`](crate::integer_polynomial::IntegerPolynomial).
+    /// become negative, which is why the result is an [`IntegerPolynomial`].
     ///
     /// Reducing can lower the degree, and can even give the zero polynomial: a leading coefficient
     /// that is a multiple of $2^k$ becomes zero, and a polynomial does not hold trailing zero

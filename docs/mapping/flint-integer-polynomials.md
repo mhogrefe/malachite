@@ -489,18 +489,21 @@ constant.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_poly_content (fmpz_t res, const fmpz_poly_t poly)` | [`content`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Content.html#tymethod.content) |
-| ✓ | `void fmpz_poly_primitive_part (fmpz_poly_t res, const fmpz_poly_t poly)` | [`primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.PrimitivePart.html#tymethod.primitive_part) |
+| ✓ | `void fmpz_poly_content (fmpz_t res, const fmpz_poly_t poly)` | [`content`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Content.html#tymethod.content) |
+| ✓ | `void fmpz_poly_primitive_part (fmpz_poly_t res, const fmpz_poly_t poly)` | [`canonical_primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CanonicalPrimitivePart.html#tymethod.canonical_primitive_part) |
 
 Malachite's content is a
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html). The
-primitive part follows FLINT's sign convention (non-negative leading coefficient), so for a
-negative leading coefficient the identity is
+canonical primitive part follows FLINT's sign convention (non-negative leading coefficient), so
+for a negative leading coefficient the identity is
 
-$$f = \operatorname{sgn}(\operatorname{lc}(f)) \cdot \operatorname{cont}(f) \cdot \operatorname{pp}(f).$$
+$$f = \operatorname{sgn}(\operatorname{lc}(f)) \cdot \operatorname{cont}(f) \cdot \operatorname{cpp}(f).$$
+
+[`primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PrimitivePart.html#tymethod.primitive_part)
+divides by the content without touching the sign, so $$f = \operatorname{cont}(f) \cdot \operatorname{pp}(f)$$.
 
 Both functions return zero for the zero polynomial.
-[`content_and_primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ContentAndPrimitivePart.html#tymethod.content_and_primitive_part)
+[`content_and_canonical_primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ContentAndCanonicalPrimitivePart.html#tymethod.content_and_canonical_primitive_part)
 replaces a call to both.
 
 ## [Square-free](https://flintlib.org/doc/fmpz_poly.html#square-free) {#square-free}

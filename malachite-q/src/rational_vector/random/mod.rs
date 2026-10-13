@@ -76,6 +76,7 @@ pub type StripedRandomVectorElements = RandomRationalsFromDoubleAndSign<
 /// The elements here are [`Rational`]s in $[-1, 1)$.
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::{NegativeOne, One};
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::Rational;
 /// use malachite_q::rational::random::random_rational_range;
@@ -87,8 +88,8 @@ pub type StripedRandomVectorElements = RandomRationalsFromDoubleAndSign<
 ///             EXAMPLE_SEED,
 ///             &|seed| random_rational_range(
 ///                 seed,
-///                 Rational::from(-1),
-///                 Rational::from(1),
+///                 Rational::NEGATIVE_ONE,
+///                 Rational::ONE,
 ///                 3,
 ///                 1,
 ///                 3,
@@ -138,6 +139,7 @@ pub fn random_rational_vectors_from_iterator<I: Iterator<Item = Rational>>(
 /// The elements here are [`Rational`]s in $[-1, 1)$.
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::{NegativeOne, One};
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::Rational;
 /// use malachite_q::rational::random::random_rational_range;
@@ -149,8 +151,8 @@ pub fn random_rational_vectors_from_iterator<I: Iterator<Item = Rational>>(
 ///             3,
 ///             random_rational_range(
 ///                 EXAMPLE_SEED,
-///                 Rational::from(-1),
-///                 Rational::from(1),
+///                 Rational::NEGATIVE_ONE,
+///                 Rational::ONE,
 ///                 3,
 ///                 1,
 ///                 3,
@@ -252,7 +254,10 @@ pub fn random_rational_vectors(
 /// use malachite_q::rational_vector::random::random_rational_vectors_with_dimension;
 ///
 /// assert_eq!(
-///     prefix_to_string(random_rational_vectors_with_dimension(EXAMPLE_SEED, 3, 4, 1), 5),
+///     prefix_to_string(
+///         random_rational_vectors_with_dimension(EXAMPLE_SEED, 3, 4, 1),
+///         5
+///     ),
 ///     "[(0, -1/3, 1), (4/323, 0, 7/12), (1/17, 7, 1/97), (15/19, 0, -79/21), \
 ///     (7/6, -9912911/5, 0), ...]"
 /// );

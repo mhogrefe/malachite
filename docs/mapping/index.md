@@ -55,6 +55,20 @@ MPFR, so the float mapping belongs with
   machine word — mapped onto
   [`UnsignedPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_polynomial/struct.UnsignedPolynomial.html).
   All 42 sections of `nmod_poly.h` are mapped.
+- [Integer vectors](/mapping/flint-integer-vectors/): the `fmpz_vec.h` module, mapped onto
+  [`IntegerVector`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_vector/struct.IntegerVector.html).
+  All 15 sections of `fmpz_vec.h` are mapped.
+- [Rational vectors](/mapping/flint-rational-vectors/): the `fmpq_vec.h` module, mapped onto
+  [`RationalVector`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/struct.RationalVector.html).
+  All 8 sections of `fmpq_vec.h` are mapped.
+- [Integer vectors mod n](/mapping/flint-integer-vectors-mod-n/): the `fmpz_mod_vec.h` module,
+  mapped onto
+  [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html)
+  with the `Mod*` traits. All 5 sections of `fmpz_mod_vec.h` are mapped.
+- [Word-sized integer vectors mod n](/mapping/flint-word-sized-integer-vectors-mod-n/): the
+  `nmod_vec.h` module, mapped onto
+  [`UnsignedVector`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
+  with the `Mod*` traits. All 7 sections of `nmod_vec.h` are mapped.
 - [Arithmetic functions](/mapping/flint-arithmetic-functions/): the `arith.h` module, which
   computes number-theoretic and combinatorial sequences.
 

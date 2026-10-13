@@ -237,7 +237,10 @@ pub fn random_natural_vectors(
 /// use malachite_nz::natural_vector::random::random_natural_vectors_with_dimension;
 ///
 /// assert_eq!(
-///     prefix_to_string(random_natural_vectors_with_dimension(EXAMPLE_SEED, 3, 4, 1), 5),
+///     prefix_to_string(
+///         random_natural_vectors_with_dimension(EXAMPLE_SEED, 3, 4, 1),
+///         5
+///     ),
 ///     "[(14, 8, 10), (1, 1, 0), (1, 184, 15), (99, 1, 3), (3, 6, 1), ...]"
 /// );
 /// ```

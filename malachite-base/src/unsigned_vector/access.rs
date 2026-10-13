@@ -15,7 +15,7 @@ impl<T: PrimitiveUnsigned> Index<usize> for UnsignedVector<T> {
 
     /// Gets a reference to the element of an [`UnsignedVector`] at an index.
     ///
-    /// Indices start at 0, as they do for a [`Vec`](alloc::vec::Vec).
+    /// Indices start at 0, as they do for a [`Vec`].
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -41,7 +41,7 @@ impl<T: PrimitiveUnsigned> Index<usize> for UnsignedVector<T> {
 impl<T: PrimitiveUnsigned> IndexMut<usize> for UnsignedVector<T> {
     /// Gets a mutable reference to the element of an [`UnsignedVector`] at an index.
     ///
-    /// Indices start at 0, as they do for a [`Vec`](alloc::vec::Vec).
+    /// Indices start at 0, as they do for a [`Vec`].
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

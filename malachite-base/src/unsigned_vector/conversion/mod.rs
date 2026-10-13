@@ -6,8 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-/// Functions for converting an [`UnsignedVector`](super::UnsignedVector) to and from a
-/// [`String`](alloc::string::String).
+/// Functions for converting an [`UnsignedVector`](super::UnsignedVector) to and from a [`String`].
 pub mod from_iterator;
 pub mod into_iterator;
 pub mod string;

@@ -1651,9 +1651,8 @@ where
 ///
 /// Each output is a length paired with one of the [`Vec`]s of that length. At every step,
 /// `index_generator` picks which length to take the next [`Vec`] of: the $k$th value it yields is
-/// an index into the lengths $0, 1, 2, \ldots$, as in
-/// [`exhaustive_dependent_pairs`](crate::tuples::exhaustive::exhaustive_dependent_pairs). So it is
-/// what decides how quickly long [`Vec`]s come out:
+/// an index into the lengths $0, 1, 2, \ldots$, as in [`exhaustive_dependent_pairs`]. So it is what
+/// decides how quickly long [`Vec`]s come out:
 /// - [`ruler_sequence`] picks the first length that still has [`Vec`]s half of the time, so the
 ///   lengths grow logarithmically. [`exhaustive_vecs`] is this function with [`ruler_sequence`].
 /// - [`bit_distributor_sequence`](crate::num::iterators::bit_distributor_sequence) with

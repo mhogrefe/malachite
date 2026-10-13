@@ -20,8 +20,7 @@ impl BalancedModPowerOf2 for NaturalVector {
     /// the original element modulo $2^k$, which determine it uniquely, as with
     /// [`BalancedModPowerOf2`] for [`Natural`](crate::natural::Natural)s; for $k = 0$ every element
     /// is 0. A remainder of exactly $2^{k-1}$ is positive. Remainders above $2^{k-1}$ become
-    /// negative, which is why the result is an
-    /// [`IntegerVector`](crate::integer_vector::IntegerVector).
+    /// negative, which is why the result is an [`IntegerVector`].
     ///
     /// The dimension is unchanged: unlike a polynomial, a vector keeps the elements that reduce to
     /// zero.

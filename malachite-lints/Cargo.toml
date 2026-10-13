@@ -25,5 +25,10 @@ malachite-q = { path = "../malachite-q" }
 version = "1"
 features = ["derive"]
 
+# Accept the `dylint_lib` cfg that `cargo dylint` sets, which the examples use to show the
+# `#[cfg_attr(dylint_lib = "malachite_lints", allow(...))]` opt-out (as in malachite-nz).
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(dylint_lib, values(any()))"] }
+
 [package.metadata.rust-analyzer]
 rustc_private = true

@@ -105,6 +105,7 @@ ring homomorphisms package `ofAzNat` and `ofAzInt` for mapping polynomial coeffi
 | ✓ | `inv (a : AzZMod m) (h : Nat.Coprime a.val.toNat m.toNat) : AzZMod m` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
 | ✓ | `tryInv (x : AzZMod m) : Option (AzZMod m)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
 | ⚙ | `fieldInv [Fact (Nat.Prime p.toNat)] (a : AzZMod p) : AzZMod p` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
+| ≈ | `sqrt? [NeZero m.toNat] (a : AzZMod m) : Option (AzZMod m)` | [`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSqrt.html) |
 | ≈ | `instance instField [Fact (Nat.Prime p.toNat)] : Field (AzZMod p)` | [`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDiv.html), [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
 | — | `instance instCommRing : CommRing (AzZMod m)`, `instance instNeZeroToNatOfPrime` | |
 
@@ -138,9 +139,14 @@ gives `Some(0)` for `a = 0` and `None` for other `a`.
 and
 [`ModShr`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModShr.html),
 multiplication and floor division by a power of 2 modulo `m` with a negative count reversing the
-direction, spelled `ofAzNat m (a.val <<< s)` and `ofAzNat m (a.val >>> s)` in Azurite, and
-[`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSqrt.html),
-a modular square root, which `AzZMod` does not have.
+direction, spelled `ofAzNat m (a.val <<< s)` and `ofAzNat m (a.val >>> s)` in Azurite. `sqrt? a`
+is `a.val.mod_sqrt(&m)`, hence ≈ on two counts. For a prime modulus both return a root exactly
+when one exists, but `sqrt?` returns the smaller of the two roots and `mod_sqrt` either one:
+`sqrt? 12909` modulo 65537 is `14919`, and `Natural::from(12909u32).mod_sqrt(Natural::from(65537u32))`
+is `Some(50618)`, its negation. For other moduli `sqrt?` checks its candidate by squaring, so a
+`some` is always a root, though it may miss one that exists; `mod_sqrt` behaves as FLINT's
+`fmpz_sqrtmod` does there, and may return `None` though a root exists or a value that is not a
+root, so a root it returns for a modulus not known to be prime should be squared to check it.
 
 ## Strings {#strings}
 
@@ -162,6 +168,7 @@ Azurite's typeclass for parsing a coefficient inside a vector, matrix, or polyno
 | | Azurite | Malachite |
 | :---: | --- | --- |
 | — | `QuadT (m : AzNat) (u a : AzZMod m)` and its operations, `NormOne`, `normOneCandidate` | |
+| — | `sqrtCandidate`, `tonelliShanks`, `tonelliShanksLoop`, `squareUntilOne`, `squarePow2`, `findNonResidue`, `atkin`, `canonicalRoot` | |
 | — | `toZMod`, `ofZMod`, `equivZMod`, `ringEquivZMod`, `toZModRingHom` | |
 
 **The quadratic ring.** `AzZMod.QuadT` is the ring $$(\mathbb{Z}/m)[T]/(T^2 - uT - a)$$ used by

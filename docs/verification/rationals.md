@@ -69,6 +69,8 @@ From
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [cmp](https://docs.rs/malachite-q/latest/malachite_q/rational/comparison/cmp/index.html) | `Ord`, `PartialOrd` | ✓ |  | ✓ | ✓ |  |
+| [cmp_product](https://docs.rs/malachite-q/latest/malachite_q/rational/comparison/cmp_product/index.html) | `OrdProduct`, `OrdProductNeg` | ✓ |  |  |  |  |
+| [cmp_products](https://docs.rs/malachite-q/latest/malachite_q/rational/comparison/cmp_products/index.html) | `OrdProducts`, `OrdProductsNeg` | ✓ |  |  |  |  |
 | [eq](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#impl-PartialEq-for-Rational) | `PartialEq`, `Eq` | ✓ |  | ✓ | ✓ |  |
 | [cmp_complexity](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.cmp_complexity) | `cmp_complexity` |  |  |  |  |  |
 | [cmp_abs](https://docs.rs/malachite-q/latest/malachite_q/rational/comparison/cmp_abs/index.html) | `OrdAbs`, `PartialOrdAbs` |  |  | ✓ |  |  |
@@ -112,12 +114,12 @@ The module is large, so its rows are grouped by theme.
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [add](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/add/index.html) | `Add` | ✓ |  | ✓ | ✓ | ✓ |
-| [add](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/add/index.html) | `Sum` |  |  |  |  | ✓ |
+| [add](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/add/index.html) | `Sum` | ✓ |  |  |  | ✓ |
 | [sub](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/sub/index.html) | `Sub` | ✓ |  | ✓ | ✓ | ✓ |
 | [abs_diff](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/abs_diff/index.html) | `AbsDiff` |  |  |  |  |  |
 | [neg](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/neg/index.html) | `Neg` | ✓ |  | ✓ | ✓ |  |
 | [mul](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/mul/index.html) | `Mul` | ✓ |  | ✓ | ✓ | ✓ |
-| [mul](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/mul/index.html) | `Product` |  |  |  |  | ✓ |
+| [mul](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/mul/index.html) | `Product` | ✓ |  |  |  | ✓ |
 | [div](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/div/index.html) | `Div` | ✓ |  | ✓ | ✓ | ✓ |
 | [div](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/div/index.html) | `CheckedDiv` |  |  |  | ✓ |  |
 | [reciprocal](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/reciprocal/index.html) | `Reciprocal` | ✓ |  | ✓ | ✓ |  |
@@ -125,6 +127,8 @@ The module is large, so its rows are grouped by theme.
 | [abs_squared](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/abs_squared/index.html) | `AbsSquared` |  |  |  |  |  |
 | [add_mul](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/add_mul/index.html) | `AddMul` |  |  |  |  | ✓ |
 | [sub_mul](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/sub_mul/index.html) | `SubMul` |  |  |  |  |  |
+| [add_mul_shl](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/add_mul_shl/index.html) | `AddMulShl` |  |  |  |  | ✓ |
+| [sub_mul_shl](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/sub_mul_shl/index.html) | `SubMulShl` |  |  |  |  | ✓ |
 | [mul_add_mul](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/mul_add_mul/index.html) | `MulAddMul` |  |  |  |  |  |
 | [mul_sub_mul](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/mul_sub_mul/index.html) | `MulSubMul` |  |  |  |  |  |
 | [average](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/average/index.html) | `Average` |  |  |  |  |  |
@@ -132,11 +136,13 @@ The module is large, so its rows are grouped by theme.
 The four field operations, negation, and the reciprocal are checked by Azurite (`AzRat.add`,
 `sub`, `mul`, `div`, `neg`, `inv`, each reducing its result to lowest terms with Azurite's GCD), by
 GMP and num, and, for the four operations, by references that combine the fractions by the
-schoolbook formula and reduce once at the end. `Sum` and `Product` are checked against references
-that do the same over a whole sequence, and `add_mul` against a reference that multiplies and adds
+schoolbook formula and reduce once at the end. `Sum` and `Product` are checked by Azurite (`AzRat.sum`
+and `AzRat.product`) and against references that do the same over a whole sequence, and `add_mul` against a reference that multiplies and adds
 in separate canonical steps. `checked_div` is checked against num. `square`, `abs_squared`,
 `abs_diff`, `average`, and the other fused operations are covered by property tests that compare
-them with the unfused combinations, which is a strong check but not an independent one.
+them with the unfused combinations, which is a strong check but not an independent one. `add_mul_shl` and `sub_mul_shl`, which compute
+$$x \pm yz2^k$$, are also checked against a reference that multiplies by $$2^k$$ instead of
+shifting.
 
 ### Shifts {#shifts}
 

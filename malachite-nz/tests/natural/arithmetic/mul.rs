@@ -11587,7 +11587,7 @@ fn test_fft_avx2_body_in_sync() {
             expected.push_str(line);
             expected.push_str(
                 "// GENERATED FILE: `body.rs` with `#[target_feature(enable = \"avx2,fma\")]` on \
-                every function.\n// Do not edit; edit `body.rs` and run `python3 \
+                every function. Do not\n// edit; edit `body.rs` and run `python3 \
                 gen-fft-avx2-body.py` in malachite-nz.\n\n",
             );
             continue;

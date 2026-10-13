@@ -17,7 +17,10 @@ integers](/mapping/flint-gaussian-integers/), [integer
 polynomials](/mapping/flint-integer-polynomials/), [rational
 polynomials](/mapping/flint-rational-polynomials/), [modular
 polynomials](/mapping/flint-modular-polynomials/), [word-sized modular
-polynomials](/mapping/flint-word-sized-modular-polynomials/), and [arithmetic
+polynomials](/mapping/flint-word-sized-modular-polynomials/), [integer
+vectors](/mapping/flint-integer-vectors/), [rational vectors](/mapping/flint-rational-vectors/),
+[integer vectors mod n](/mapping/flint-integer-vectors-mod-n/), [word-sized integer vectors mod
+n](/mapping/flint-word-sized-integer-vectors-mod-n/), and [arithmetic
 functions](/mapping/flint-arithmetic-functions/); MPFR's [floats](/mapping/mpfr-floats/); num's
 [integers](/mapping/num-integers/), [rationals](/mapping/num-rationals/), and
 [traits](/mapping/num-traits/); and the formally verified Lean library Azurite's
@@ -126,20 +129,20 @@ Malachite uses `no_std`, unless the `random`, `test_build`, or `bin_build` featu
 To use Malachite, add the following to your project's `Cargo.toml` file:
 ```yaml
 [dependencies.malachite]
-version = "0.13.0"
+version = "0.14.0"
 ```
 
 By default, Malachite includes `Natural`, `Integer`, and `Rational`. `Float` support is opt-in:
 ```yaml
 [dependencies.malachite]
-version = "0.13.0"
+version = "0.14.0"
 features = [ "floats" ]
 ```
 You can also opt out of the types you don't need. For example, if you want to use `Natural` and
 `Integer` but not `Rational`, you can use
 ```yaml
 [dependencies.malachite]
-version = "0.13.0"
+version = "0.14.0"
 default-features = false
 features = [ "naturals_and_integers" ]
 ```

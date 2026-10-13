@@ -11,7 +11,7 @@ use crate::unsigned_vector::UnsignedVector;
 use core::fmt::{Debug, Display, Formatter, Result};
 
 impl<T: PrimitiveUnsigned> Display for UnsignedVector<T> {
-    /// Converts an [`UnsignedVector`] to a [`String`](alloc::string::String).
+    /// Converts an [`UnsignedVector`] to a [`String`].
     ///
     /// The elements are written in order, as [`Display`] writes them, separated by `, ` and
     /// enclosed in parentheses, as a vector's coordinates are written by hand. The 0-dimensional
@@ -63,7 +63,7 @@ impl<T: PrimitiveUnsigned> Display for UnsignedVector<T> {
 }
 
 impl<T: PrimitiveUnsigned> Debug for UnsignedVector<T> {
-    /// Converts an [`UnsignedVector`] to a [`String`](alloc::string::String).
+    /// Converts an [`UnsignedVector`] to a [`String`].
     ///
     /// This is the same as the [`Display::fmt`] implementation, so that a collection of
     /// [`UnsignedVector`]s is written the same way its elements are displayed.

@@ -67,6 +67,8 @@ From
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [cmp](https://docs.rs/malachite-nz/latest/malachite_nz/integer/comparison/cmp/index.html) | `Ord`, `PartialOrd` | ✓ |  | ✓ | ✓ |  |
+| [cmp_product](https://docs.rs/malachite-nz/latest/malachite_nz/integer/comparison/cmp_product/index.html) | `OrdProduct`, `OrdProductNeg` | ✓ |  |  |  |  |
+| [cmp_products](https://docs.rs/malachite-nz/latest/malachite_nz/integer/comparison/cmp_products/index.html) | `OrdProducts`, `OrdProductsNeg` | ✓ |  |  |  |  |
 | [eq](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#impl-PartialEq-for-Integer) | `PartialEq`, `Eq` | ✓ |  | ✓ | ✓ |  |
 | [cmp_abs](https://docs.rs/malachite-nz/latest/malachite_nz/integer/comparison/cmp_abs/index.html) | `OrdAbs`, `PartialOrdAbs` |  |  | ✓ |  |  |
 | [cmp_abs](https://docs.rs/malachite-nz/latest/malachite_nz/integer/comparison/cmp_abs/index.html) | `OrdAbsDouble`, `PartialOrdAbsDouble` |  |  |  |  |  |
@@ -106,28 +108,33 @@ and no logarithms; those are `Natural` functions.
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [add](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/add/index.html) | `Add` | ✓ |  | ✓ | ✓ |  |
-| [add](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/add/index.html) | `Sum` |  |  |  |  | ✓ |
+| [add](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/add/index.html) | `Sum` | ✓ |  |  |  | ✓ |
 | [sub](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/sub/index.html) | `Sub` | ✓ |  | ✓ | ✓ |  |
 | [abs_diff](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/abs_diff/index.html) | `AbsDiff` |  |  |  |  |  |
 | [neg](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/neg/index.html) | `Neg` | ✓ |  | ✓ | ✓ |  |
 | [mul](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mul/index.html) | `Mul` | ✓ |  | ✓ | ✓ |  |
-| [mul](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mul/index.html) | `Product` |  |  |  |  | ✓ |
+| [mul](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mul/index.html) | `Product` | ✓ |  |  |  | ✓ |
 | [square](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/square/index.html) | `Square` |  |  |  |  |  |
 | [abs_squared](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/abs_squared/index.html) | `AbsSquared` |  |  |  |  |  |
 | [add_mul](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/add_mul/index.html) | `AddMul` |  |  |  |  |  |
 | [sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/sub_mul/index.html) | `SubMul` |  |  |  |  |  |
+| [add_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/add_mul_shl/index.html) | `AddMulShl` |  |  |  |  | ✓ |
+| [sub_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/sub_mul_shl/index.html) | `SubMulShl` |  |  |  |  | ✓ |
 | [mul_add_mul](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mul_add_mul/index.html) | `MulAddMul` |  |  |  |  |  |
 | [mul_sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mul_sub_mul/index.html) | `MulSubMul` |  |  |  |  |  |
 | [average](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/average/index.html) | `Average` |  |  |  |  |  |
 | [average](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/average/index.html) | `AverageRound` |  |  |  |  |  |
 
 Addition, subtraction, multiplication, and negation are checked by Azurite (`AzInt.add`, `sub`,
-`mul`, `neg`) and by GMP and num. `Sum` and `Product` are checked against a reference
-implementation that folds `+` and `*` one term at a time. `AzInt` has no squaring function,
+`mul`, `neg`) and by GMP and num. `Sum` and `Product` are checked by Azurite (`AzInt.sum`
+and `AzInt.product`) and against a reference implementation that folds `+` and `*` one term at a
+time. `AzInt` has no squaring function,
 so `square` is not yet cross-checked, though the `Natural` one is checked by Azurite. The fused operations (`add_mul`,
 `sub_mul`, `mul_add_mul`, `mul_sub_mul`), `abs_diff`, `abs_squared`, and `average` are not yet
 cross-checked: their property tests compare them with the unfused combinations of operations that
-are, which is a strong check but not an independent one.
+are, which is a strong check but not an independent one. `add_mul_shl` and `sub_mul_shl`, which compute
+$$x \pm yz2^k$$, are also checked against a reference that multiplies by $$2^k$$ instead of
+shifting.
 
 ### Shifts {#shifts}
 
@@ -223,7 +230,7 @@ it, and `eq_mod_power_of_2` is checked against GMP's `is_congruent_2pow`.
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [crt](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/crt/index.html) | `BalancedCrt` |  | ✓ |  |  | ✓ |
-| [multi_crt](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/multi_crt/index.html) | `Integer::multi_balanced_crt` |  | ✓ |  |  |  |
+| [multi_crt](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.multi_balanced_crt) | `Integer::multi_balanced_crt` |  | ✓ |  |  |  |
 
 The balanced Chinese remainder functions return the solution in $$(-M/2, M/2]$$ rather than
 $$[0, M)$$. `balanced_crt` is checked against FLINT's `fmpz_CRT` with its sign flag set and a
@@ -364,7 +371,7 @@ non-negative values, and by round trips.
 | [latex](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/string/latex/index.html) | `ToLatex` |  |  |  |  |  |
 | [typst](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/string/typst/index.html) | `ToTypst` |  |  |  |  |  |
 | [serde](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/serde/index.html) | `Serialize`, `Deserialize` |  |  |  |  |  |
-| [pyo3](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/pyo3/index.html) | `FromPyObject`, `IntoPyObject` |  |  |  |  |  |
+| pyo3 | `FromPyObject`, `IntoPyObject` |  |  |  |  |  |
 
 Decimal output is checked by Azurite's `toString`, GMP, and num. Input in every base is checked by
 GMP and num, and by Azurite through a sign around the `Natural` digit rule (an optional `-`, then
@@ -420,7 +427,7 @@ From [`malachite_nz::integer::factorization`](https://docs.rs/malachite-nz/lates
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [is_power](https://docs.rs/malachite-nz/latest/malachite_nz/integer/factorization/is_power/index.html) | `IsPower` |  |  | ✓ |  |  |
 | [is_power](https://docs.rs/malachite-nz/latest/malachite_nz/integer/factorization/is_power/index.html) | `ExpressAsPower` |  |  |  |  |  |
-| [remove_power](https://docs.rs/malachite-nz/latest/malachite_nz/integer/factorization/remove_power/index.html) | `RemovePower` |  |  | ✓ |  |  |
+| [remove_power](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html) | `RemovePower` |  |  | ✓ |  |  |
 
 `is_power`, which for a negative `Integer` asks for an odd power, and `remove_power` are checked
 against GMP. `express_as_power`, which returns a base and exponent rather than a yes or no, is
@@ -487,7 +494,8 @@ only add a sign: the conversions to and from `f32` and `f64` (through `AzFloat.o
 **A few lines of oracle code around Azurite functions.** These need no new Azurite function, but
 the oracle would compose existing ones, so the composition itself is unverified code: `abs` (the
 magnitude as an `AzInt`), `square`, `abs_squared`, `abs_diff`, `average` and `average_round`,
-the fused operations (`add_mul`, `sub_mul`, `mul_add_mul`, `mul_sub_mul`), `shl_round`,
+the fused operations (`add_mul`, `sub_mul`, `add_mul_shl`, `sub_mul_shl`, `mul_add_mul`,
+`mul_sub_mul`), `shl_round`,
 `mul_shr_round`, `round_to_multiple` and `round_to_multiple_of_power_of_2`; the remainders and
 ceiling forms of division (`div_rem`, `rem`, `ceiling_div_mod`, `ceiling_mod`), `divisible_by`,
 `eq_mod`, `balanced_mod`, and `DivModPrecomputed`; `rem_power_of_2`, `ceiling_mod_power_of_2`,

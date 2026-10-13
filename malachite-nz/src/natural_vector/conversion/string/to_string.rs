@@ -10,7 +10,7 @@ use crate::natural_vector::NaturalVector;
 use core::fmt::{Debug, Display, Formatter, Result};
 
 impl Display for NaturalVector {
-    /// Converts a [`NaturalVector`] to a [`String`](alloc::string::String).
+    /// Converts a [`NaturalVector`] to a [`String`].
     ///
     /// The elements are written in order, separated by `, ` and enclosed in parentheses, as a
     /// vector's coordinates are written by hand. The 0-dimensional vector is `()`.
@@ -59,7 +59,7 @@ impl Display for NaturalVector {
 }
 
 impl Debug for NaturalVector {
-    /// Converts a [`NaturalVector`] to a [`String`](alloc::string::String).
+    /// Converts a [`NaturalVector`] to a [`String`].
     ///
     /// This is the same as the [`Display::fmt`] implementation, so that a collection of
     /// [`NaturalVector`]s is written the same way its elements are displayed.

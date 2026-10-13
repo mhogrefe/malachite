@@ -10,8 +10,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-// GENERATED FILE: `body.rs` with `#[target_feature(enable = "avx2,fma")]` on every function.
-// Do not edit; edit `body.rs` and run `python3 gen-fft-avx2-body.py` in malachite-nz.
+// GENERATED FILE: `body.rs` with `#[target_feature(enable = "avx2,fma")]` on every function. Do not
+// edit; edit `body.rs` and run `python3 gen-fft-avx2-body.py` in malachite-nz.
 
 use super::super::*;
 use super::{f64x4, f64x8, u64x4};

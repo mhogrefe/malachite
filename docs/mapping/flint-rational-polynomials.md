@@ -438,7 +438,7 @@ normalisation: `power_sums_to_poly` returns the monic polynomial and `power_sums
 primitive one with positive leading coefficient, so either converts to the other with
 [`make_monic`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MakeMonic.html#tymethod.make_monic)
 or
-[`primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.PrimitivePart.html#tymethod.primitive_part).
+[`canonical_primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CanonicalPrimitivePart.html#tymethod.canonical_primitive_part).
 Both read the degree from the constant term $$p_0$$ without checking that it is a non-negative
 integer.
 
@@ -555,15 +555,17 @@ constant term, for three different reasons:
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpq_poly_content (fmpq_t res, const fmpq_poly_t poly)` | [`content`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Content.html#tymethod.content) |
-| ≈ | `void fmpq_poly_primitive_part (fmpq_poly_t res, const fmpq_poly_t poly)` | [`primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.PrimitivePart.html#tymethod.primitive_part) |
+| ✓ | `void fmpq_poly_content (fmpq_t res, const fmpq_poly_t poly)` | [`content`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Content.html#tymethod.content) |
+| ≈ | `void fmpq_poly_primitive_part (fmpq_poly_t res, const fmpq_poly_t poly)` | [`canonical_primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CanonicalPrimitivePart.html#tymethod.canonical_primitive_part) |
 | ✓ | `int fmpq_poly_is_monic (const fmpq_poly_t poly)` | [`is_monic`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Polynomial.html#tymethod.is_monic) |
 | ✓ | `void fmpq_poly_make_monic (fmpq_poly_t res, const fmpq_poly_t poly)` | [`make_monic`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MakeMonic.html#tymethod.make_monic) |
 
 The content is the non-negative rational $$c$$ for which $$f/c$$ is a primitive integer
-polynomial, $$\operatorname{cont}(A)/d$$ for $$f = A/d$$. The primitive part has non-negative
-leading coefficient, so
-$$f = \operatorname{sgn}(\operatorname{lc}(f)) \cdot \operatorname{cont}(f) \cdot \operatorname{pp}(f)$$.
+polynomial, $$\operatorname{cont}(A)/d$$ for $$f = A/d$$. The canonical primitive part has
+non-negative leading coefficient, so
+$$f = \operatorname{sgn}(\operatorname{lc}(f)) \cdot \operatorname{cont}(f) \cdot \operatorname{cpp}(f)$$;
+[`primitive_part`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PrimitivePart.html#tymethod.primitive_part)
+keeps the sign, so $$f = \operatorname{cont}(f) \cdot \operatorname{pp}(f)$$.
 `primitive_part` is ≈ only in its type: the result always has denominator 1, and Malachite
 returns an [`IntegerPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_polynomial/struct.IntegerPolynomial.html).
 The zero polynomial is not monic, and `make_monic(0) = 0`.

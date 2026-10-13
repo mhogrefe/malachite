@@ -20,10 +20,9 @@ impl EntrywiseDivRound<Natural> for NaturalVector {
     /// Divides every element of a [`NaturalVector`] by a [`Natural`], taking the vector by value
     /// and the scalar by value, and rounds every quotient according to the specified rounding mode.
     ///
-    /// Each quotient is rounded as by
-    /// [`DivRound`](malachite_base::num::arithmetic::traits::DivRound), but no
-    /// [`Ordering`](core::cmp::Ordering) is returned, since with `Nearest` different elements may
-    /// be rounded in different directions. Passing `Floor` or `Down` is equivalent to using `/`.
+    /// Each quotient is rounded as by [`DivRound`], but no [`Ordering`](core::cmp::Ordering) is
+    /// returned, since with `Nearest` different elements may be rounded in different directions.
+    /// Passing `Floor` or `Down` is equivalent to using `/`.
     ///
     /// $f(v, c, r)_i = \operatorname{round}(v_i/c)$, where $\operatorname{round}$ rounds according
     /// to `rm`.
@@ -58,10 +57,9 @@ impl EntrywiseDivRound<&Natural> for NaturalVector {
     /// and the scalar by reference, and rounds every quotient according to the specified rounding
     /// mode.
     ///
-    /// Each quotient is rounded as by
-    /// [`DivRound`](malachite_base::num::arithmetic::traits::DivRound), but no
-    /// [`Ordering`](core::cmp::Ordering) is returned, since with `Nearest` different elements may
-    /// be rounded in different directions. Passing `Floor` or `Down` is equivalent to using `/`.
+    /// Each quotient is rounded as by [`DivRound`], but no [`Ordering`](core::cmp::Ordering) is
+    /// returned, since with `Nearest` different elements may be rounded in different directions.
+    /// Passing `Floor` or `Down` is equivalent to using `/`.
     ///
     /// $f(v, c, r)_i = \operatorname{round}(v_i/c)$, where $\operatorname{round}$ rounds according
     /// to `rm`.
@@ -96,10 +94,9 @@ impl EntrywiseDivRound<Natural> for &NaturalVector {
     /// reference and the scalar by value, and rounds every quotient according to the specified
     /// rounding mode.
     ///
-    /// Each quotient is rounded as by
-    /// [`DivRound`](malachite_base::num::arithmetic::traits::DivRound), but no
-    /// [`Ordering`](core::cmp::Ordering) is returned, since with `Nearest` different elements may
-    /// be rounded in different directions. Passing `Floor` or `Down` is equivalent to using `/`.
+    /// Each quotient is rounded as by [`DivRound`], but no [`Ordering`](core::cmp::Ordering) is
+    /// returned, since with `Nearest` different elements may be rounded in different directions.
+    /// Passing `Floor` or `Down` is equivalent to using `/`.
     ///
     /// $f(v, c, r)_i = \operatorname{round}(v_i/c)$, where $\operatorname{round}$ rounds according
     /// to `rm`.
@@ -133,10 +130,9 @@ impl EntrywiseDivRound<&Natural> for &NaturalVector {
     /// reference and the scalar by reference, and rounds every quotient according to the specified
     /// rounding mode.
     ///
-    /// Each quotient is rounded as by
-    /// [`DivRound`](malachite_base::num::arithmetic::traits::DivRound), but no
-    /// [`Ordering`](core::cmp::Ordering) is returned, since with `Nearest` different elements may
-    /// be rounded in different directions. Passing `Floor` or `Down` is equivalent to using `/`.
+    /// Each quotient is rounded as by [`DivRound`], but no [`Ordering`](core::cmp::Ordering) is
+    /// returned, since with `Nearest` different elements may be rounded in different directions.
+    /// Passing `Floor` or `Down` is equivalent to using `/`.
     ///
     /// $f(v, c, r)_i = \operatorname{round}(v_i/c)$, where $\operatorname{round}$ rounds according
     /// to `rm`.
@@ -172,10 +168,9 @@ impl EntrywiseDivRoundAssign<Natural> for NaturalVector {
     /// Divides every element of a [`NaturalVector`] by a [`Natural`], in place, taking the scalar
     /// by value, and rounds every quotient according to the specified rounding mode.
     ///
-    /// Each quotient is rounded as by
-    /// [`DivRound`](malachite_base::num::arithmetic::traits::DivRound), but no
-    /// [`Ordering`](core::cmp::Ordering) is returned, since with `Nearest` different elements may
-    /// be rounded in different directions. Passing `Floor` or `Down` is equivalent to using `/`.
+    /// Each quotient is rounded as by [`DivRound`], but no [`Ordering`](core::cmp::Ordering) is
+    /// returned, since with `Nearest` different elements may be rounded in different directions.
+    /// Passing `Floor` or `Down` is equivalent to using `/`.
     ///
     /// $v_i \gets \operatorname{round}(v_i/c)$, where $\operatorname{round}$ rounds according to
     /// `rm`.
@@ -206,10 +201,9 @@ impl EntrywiseDivRoundAssign<&Natural> for NaturalVector {
     /// Divides every element of a [`NaturalVector`] by a [`Natural`], in place, taking the scalar
     /// by reference, and rounds every quotient according to the specified rounding mode.
     ///
-    /// Each quotient is rounded as by
-    /// [`DivRound`](malachite_base::num::arithmetic::traits::DivRound), but no
-    /// [`Ordering`](core::cmp::Ordering) is returned, since with `Nearest` different elements may
-    /// be rounded in different directions. Passing `Floor` or `Down` is equivalent to using `/`.
+    /// Each quotient is rounded as by [`DivRound`], but no [`Ordering`](core::cmp::Ordering) is
+    /// returned, since with `Nearest` different elements may be rounded in different directions.
+    /// Passing `Floor` or `Down` is equivalent to using `/`.
     ///
     /// $v_i \gets \operatorname{round}(v_i/c)$, where $\operatorname{round}$ rounds according to
     /// `rm`.

@@ -10,7 +10,7 @@ use crate::rational_vector::RationalVector;
 use core::fmt::{Debug, Display, Formatter, Result};
 
 impl Display for RationalVector {
-    /// Converts a [`RationalVector`] to a [`String`](alloc::string::String).
+    /// Converts a [`RationalVector`] to a [`String`].
     ///
     /// The elements are written in order, separated by `, ` and enclosed in parentheses, as a
     /// vector's coordinates are written by hand. The 0-dimensional vector is `()`.
@@ -59,7 +59,7 @@ impl Display for RationalVector {
 }
 
 impl Debug for RationalVector {
-    /// Converts a [`RationalVector`] to a [`String`](alloc::string::String).
+    /// Converts a [`RationalVector`] to a [`String`].
     ///
     /// This is the same as the [`Display::fmt`] implementation, so that a collection of
     /// [`RationalVector`]s is written the same way its elements are displayed.

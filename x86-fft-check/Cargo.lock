@@ -46,7 +46,7 @@ checksum = "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
 
 [[package]]
 name = "malachite-base"
-version = "0.13.0"
+version = "0.14.0"
 dependencies = [
  "hashbrown",
  "itertools",
@@ -56,7 +56,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.13.0"
+version = "0.14.0"
 dependencies = [
  "bytemuck",
  "itertools",

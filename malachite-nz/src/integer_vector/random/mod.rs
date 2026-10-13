@@ -237,7 +237,10 @@ pub fn random_integer_vectors(
 /// use malachite_nz::integer_vector::random::random_integer_vectors_with_dimension;
 ///
 /// assert_eq!(
-///     prefix_to_string(random_integer_vectors_with_dimension(EXAMPLE_SEED, 3, 4, 1), 5),
+///     prefix_to_string(
+///         random_integer_vectors_with_dimension(EXAMPLE_SEED, 3, 4, 1),
+///         5
+///     ),
 ///     "[(2, 152, 1), (0, -62, 5282), (0, 28, 4427344568), (79, -11, -7330), \
 ///     (-1, -5667523, 1618), ...]"
 /// );

@@ -124,12 +124,29 @@ give the exact, clamped, and flagged alternatives.
 | ✓ | `AzInt.compareAzNat (z : AzInt) (a : AzNat) : Ordering` | [`PartialOrd<Natural>`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/comparison/partial_cmp_natural/index.html) |
 | ✓ | `AzInt.beqUInt64 (z : AzInt) (u : UInt64) : Bool`, `AzInt.beqInt64` | [`PartialEq<u64>`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/comparison/partial_eq_primitive_int/index.html), [`PartialEq<i64>`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/comparison/partial_eq_primitive_int/index.html) |
 | ✓ | `AzInt.beqAzNat (z : AzInt) (a : AzNat) : Bool` | [`PartialEq<Natural>`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/comparison/partial_eq_natural/index.html) |
+| ✓ | `compareProduct (a b c : AzInt) : Ordering` | [`OrdProduct`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProduct.html), [`OrdProductNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProductNeg.html) |
+| ✓ | `compareProducts (a b c d : AzInt) : Ordering` | [`OrdProducts`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProducts.html), [`OrdProductsNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProductsNeg.html) |
 
 **Mixed comparisons.** Azurite compares an `AzInt` against the two 64-bit machine types and
 against `AzNat`; Malachite against every primitive integer and float and against `Natural`, in
 both argument orders. Malachite also orders by magnitude
 ([`OrdAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbs.html)
 and its mixed-type variants), which Azurite spells as a comparison of `natAbs` values.
+
+**`compareProduct`.** `compareProduct a b c` is `Integer::cmp_product(&a, &b, &c)`: both compare
+$$ab$$ with $$c$$, in the same argument order. The signs decide every case except when $$ab$$ and
+$$c$$ are nonzero with the same sign, and then both compare the magnitudes with the natural-number
+`compareProduct` and `Natural::cmp_product`. Azurite compares with $$-c$$ by passing `-c`, a sign
+flip; Malachite has a separate `Integer::cmp_product_neg(&a, &b, &c)`, which flips the sign as it
+reads $$c$$, so that no negated value is allocated.
+
+**`compareProducts`.** `compareProducts a b c d` is `Integer::cmp_products(&a, &b, &c, &d)`: both
+compare $$ab$$ with $$cd$$, deciding by the signs unless both products are nonzero with the same
+sign, and then comparing the magnitudes with the natural-number `compareProducts` and
+`Natural::cmp_products`. As with `compareProduct`, Malachite has a separate
+`Integer::cmp_products_neg(&a, &b, &c, &d)`, which compares $$ab$$ with $$-cd$$, the sign of
+$$ab + cd$$, by flipping the sign of $$cd$$ as it is read; in Azurite that is
+`compareProducts a b (-c) d`.
 
 ## Addition, subtraction, multiplication, and negation {#addition-subtraction-multiplication-and-negation}
 
@@ -142,10 +159,17 @@ and its mixed-type variants), which Azurite spells as a comparison of `natAbs` v
 | ✓ | `mul (a b : AzInt) : AzInt`, `instance : Mul AzInt` | [`Mul`](https://doc.rust-lang.org/nightly/std/ops/trait.Mul.html), [`MulAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.MulAssign.html) |
 | ✓ | `mulUInt64 (z : AzInt) (u : UInt64) : AzInt`, `mulInt64 (z : AzInt) (i : Int64) : AzInt` | [`Mul`](https://doc.rust-lang.org/nightly/std/ops/trait.Mul.html) |
 | ✓ | `neg (z : AzInt) : AzInt`, `instance : Neg AzInt` | [`Neg`](https://doc.rust-lang.org/nightly/std/ops/trait.Neg.html), [`NegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.NegAssign.html) |
+| ✓ | `sum (l : List AzInt) : AzInt`, `sumArray (a : Array AzInt) : AzInt` | [`Sum`](https://doc.rust-lang.org/nightly/std/iter/trait.Sum.html) |
+| ✓ | `product (l : List AzInt) : AzInt`, `productArray (a : Array AzInt) : AzInt` | [`Product`](https://doc.rust-lang.org/nightly/std/iter/trait.Product.html) |
 
 **The machine-word variants.** As [on the GMP page](/mapping/gmp-integers/#conventions), Malachite
 has no mixed `Integer`-and-word arithmetic; `z + Integer::from(i)` is the spelling, and the
 conversion allocates nothing. Subtraction never truncates here, both types being signed.
+
+**Sums and products.** As [for naturals](azurite-naturals.md#addition-subtraction-and-multiplication),
+`sum xs` and `product xs` are `Integer::sum(xs.into_iter())` and `Integer::product(xs.into_iter())`,
+or `xs.iter().sum()` and `xs.iter().product()`; the empty sum is 0 and the empty product 1, and
+both libraries multiply in a balanced tree.
 
 ## Division {#division}
 

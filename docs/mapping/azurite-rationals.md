@@ -102,6 +102,8 @@ as `toNat` is [on the naturals page](/mapping/azurite-naturals/#proofs); it has 
 | ✓ | `deriving DecidableEq` | [`Eq`](https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html), [`PartialEq`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialEq.html) |
 | ✓ | `instance : Max AzRat`, `instance : Min AzRat` | [`Ord::max`](https://doc.rust-lang.org/nightly/std/cmp/trait.Ord.html#method.max), [`Ord::min`](https://doc.rust-lang.org/nightly/std/cmp/trait.Ord.html#method.min) |
 | ✓ | `signOrd (x : AzRat) : Ordering` | [`Sign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Sign.html) |
+| ✓ | `compareProduct (x y z : AzRat) : Ordering` | [`OrdProduct`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProduct.html), [`OrdProductNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProductNeg.html) |
+| ✓ | `compareProducts (w x y z : AzRat) : Ordering` | [`OrdProducts`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProducts.html), [`OrdProductsNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProductsNeg.html) |
 
 **Comparison.** Both compare exactly, Azurite by a staged algorithm (signs, then the position
 relative to 1, then bit lengths, then a cross-multiplication) and Malachite similarly without
@@ -111,6 +113,23 @@ forming the cross products when it can avoid them. Malachite also compares a `Ra
 and siblings), and by magnitude
 ([`OrdAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbs.html));
 Azurite converts the other operand with `toAzRat` and compares, and compares `abs` values.
+
+**`compareProduct`.** `compareProduct x y z` is `Rational::cmp_product(&x, &y, &z)`: both compare
+$$xy$$ with $$z$$, in the same argument order, without reducing a product. The signs decide unless
+$$xy$$ and $$z$$ are nonzero with the same sign; then both compare $$n_xn_yd_z$$ with $$n_zd_xd_y$$,
+with the same checks in the same order: the bit lengths, three factorwise screens, and finally
+$$n_xn_y$$ and $$d_xd_y$$ compared through the natural-number `compareProducts` and
+`Natural::cmp_products`. Malachite also has `Rational::cmp_product_neg(&x, &y, &z)`, which compares
+$$xy$$ with $$-z$$ by flipping the sign of $$z$$ as it is read; in Azurite that is
+`compareProduct x y (-z)`.
+
+**`compareProducts`.** `compareProducts w x y z` is `Rational::cmp_products(&w, &x, &y, &z)`: both
+compare $$wx$$ with $$yz$$ without forming or reducing either product. After the signs, both compare
+$$n_wn_xd_yd_z$$ with $$n_yn_zd_wd_x$$ with the same checks in the same order: the bit lengths, three
+factorwise screens, and finally four two-factor products compared through the natural-number
+`compareProducts` and `Natural::cmp_products`. `Rational::cmp_products_neg(&w, &x, &y, &z)`
+compares $$wx$$ with $$-yz$$, the sign of $$wx + yz$$; in Azurite that is
+`compareProducts w x (-y) z`.
 
 ## Arithmetic {#arithmetic}
 
@@ -127,6 +146,8 @@ Azurite converts the other operand with `toAzRat` and compares, and compares `ab
 | ✓ | `AzRat.zpow (q : AzRat) : ℤ → AzRat`, the `Field` `zpow` | [`Pow<i64>`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) |
 | ✓ | `AzRat.shiftLeft (x : AzRat) (n : Nat) : AzRat`, `instance : HShiftLeft AzRat Nat AzRat` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`ShlAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShlAssign.html) |
 | ✓ | `AzRat.shiftRight (x : AzRat) (n : Nat) : AzRat`, `instance : HShiftRight AzRat Nat AzRat` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`ShrAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShrAssign.html) |
+| ✓ | `sum (l : List AzRat) : AzRat`, `sumArray (a : Array AzRat) : AzRat` | [`Sum`](https://doc.rust-lang.org/nightly/std/iter/trait.Sum.html) |
+| ✓ | `product (l : List AzRat) : AzRat`, `productArray (a : Array AzRat) : AzRat` | [`Product`](https://doc.rust-lang.org/nightly/std/iter/trait.Product.html) |
 | — | `combineSigned (sx sy : Bool) (u v : AzNat) : Bool × AzNat` | |
 | — | `instance : Field AzRat`, `instance : IsStrictOrderedRing AzRat` | |
 
@@ -140,9 +161,15 @@ count may be any primitive integer, a negative count reversing the direction. Ma
 [`AddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMul.html),
 and the other derived operations of the GMP and FLINT pages, which Azurite spells with the ring
 operations, and functions with no Azurite counterpart at all
-([`approximate`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Approximate.html),
+([`approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.Approximate.html),
 [`simplest_rational_in_interval`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.simplest_rational_in_interval),
 continued fractions, roots). `combineSigned` is the sign bookkeeping shared by `add` and `sub`.
+
+**Sums and products.** `sum xs` and `product xs` are `Rational::sum(xs.into_iter())` and
+`Rational::product(xs.into_iter())`, or `xs.iter().sum()` and `xs.iter().product()`; the empty sum
+is 0 and the empty product 1. Unlike for naturals and integers, both libraries add in a balanced
+tree too, since each rational addition multiplies numerators and denominators and takes a GCD, so
+a left fold would keep combining a large running total with small terms.
 
 ## Rounding and logarithms {#rounding-and-logarithms}
 

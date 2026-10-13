@@ -111,7 +111,7 @@ impl ContentAndCanonicalPrimitivePart for RationalPolynomial {
     /// Computes the content and the canonical primitive part of a [`RationalPolynomial`] together,
     /// taking the polynomial by value.
     ///
-    /// See [`content`](Content::content) and
+    /// See [`content`](malachite_base::num::arithmetic::traits::Content::content) and
     /// [`canonical_primitive_part`](CanonicalPrimitivePart::canonical_primitive_part); the content
     /// is found once rather than twice.
     ///
@@ -148,7 +148,7 @@ impl ContentAndCanonicalPrimitivePart for &RationalPolynomial {
     /// Computes the content and the canonical primitive part of a [`RationalPolynomial`] together,
     /// taking the polynomial by reference.
     ///
-    /// See [`content`](Content::content) and
+    /// See [`content`](malachite_base::num::arithmetic::traits::Content::content) and
     /// [`canonical_primitive_part`](CanonicalPrimitivePart::canonical_primitive_part); the content
     /// is found once rather than twice.
     ///

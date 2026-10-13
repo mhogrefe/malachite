@@ -173,6 +173,9 @@ Azurite has no `Float32` conversion. See the
 | ✓ | `AzNat.beqUInt64 (a : AzNat) (u : UInt64) : Bool` | [`PartialEq<u64>`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/partial_eq_primitive_int/index.html) |
 | ✓ | `AzNat.beqInt64 (a : AzNat) (i : Int64) : Bool` | [`PartialEq<i64>`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/partial_eq_primitive_int/index.html) |
 | ✓ | `normalizedCompare (x y : AzNat) : Ordering` | [`cmp_normalized`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.cmp_normalized) |
+| ✓ | `cmpDouble (x y : AzNat) : Ordering` | [`cmp_double`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.cmp_double) |
+| ✓ | `compareProduct (a b c : AzNat) : Ordering` | [`OrdProduct`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProduct.html) |
+| ✓ | `compareProducts (a b c d : AzNat) : Ordering` | [`OrdProducts`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdProducts.html) |
 
 **Mixed comparisons.** Azurite compares against the two 64-bit machine types; Malachite against
 every primitive integer and float, in both argument orders, with `a > 5u8` and `a == -3i64` both
@@ -182,6 +185,21 @@ equals none.
 **`normalizedCompare`.** Both compare the two values with their most significant bits aligned, as
 if each were scaled by a power of 2 into $$[1, 2)$$: `normalizedCompare 5 6` and
 `Natural::from(5u32).cmp_normalized(&Natural::from(6u32))` are both `Less`, since $$1.25 < 1.5$$.
+
+**`cmpDouble`.** Both compare $$x$$ with $$2y$$ without forming $$2y$$: `cmpDouble 5 2` and
+`Natural::from(5u32).cmp_double(&Natural::TWO)` are both `Greater`. Each reads the doubled limbs of
+$$y$$ on the fly. Both libraries use it to weigh a remainder against half a divisor: Azurite in its
+rounding division, Malachite in `balanced_mod` and `round_to_multiple`.
+
+**`compareProduct`.** `compareProduct a b c` is `Natural::cmp_product(&a, &b, &c)`: both compare
+$$ab$$ with $$c$$, in the same argument order, multiplying only when cheaper checks cannot decide. The
+checks are the same and in the same order: a zero factor or $$c = 0$$, a factor of 1, and the bit
+lengths, with the product and one comparison as the last resort.
+
+**`compareProducts`.** `compareProducts a b c d` is `Natural::cmp_products(&a, &b, &c, &d)`: both
+compare $$ab$$ with $$cd$$, in the same argument order, with the same checks before multiplying: a
+zero factor, the bit lengths, the pairing of $$a$$ with $$c$$ and $$b$$ with $$d$$, and the other
+pairing.
 
 ## Addition, subtraction, and multiplication {#addition-subtraction-and-multiplication}
 
@@ -194,6 +212,8 @@ if each were scaled by a power of 2 into $$[1, 2)$$: `normalizedCompare 5 6` and
 | ✓ | `mul (a b : AzNat) : AzNat`, `instance : Mul AzNat` | [`Mul`](https://doc.rust-lang.org/nightly/std/ops/trait.Mul.html), [`MulAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.MulAssign.html) |
 | ✓ | `mulUInt64 (a : AzNat) (b : UInt64) : AzNat` | [`Mul`](https://doc.rust-lang.org/nightly/std/ops/trait.Mul.html) |
 | ✓ | `square (a : AzNat) : AzNat`, `instance : Square AzNat` | [`Square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Square.html) |
+| ✓ | `sum (l : List AzNat) : AzNat`, `sumArray (a : Array AzNat) : AzNat` | [`Sum`](https://doc.rust-lang.org/nightly/std/iter/trait.Sum.html) |
+| ✓ | `product (l : List AzNat) : AzNat`, `productArray (a : Array AzNat) : AzNat` | [`Product`](https://doc.rust-lang.org/nightly/std/iter/trait.Product.html) |
 | — | `mulSchoolbook`, `mulKaratsuba`, `mulToomCook3`, `mulToomCook4`, `fftMul`, `mulWithThresholds`, `MulThresholds` | |
 | — | `squareSchoolbook`, `squareKaratsuba`, `squareToomCook3`, `squareToomCook4`, `fftSquare` | |
 
@@ -206,6 +226,13 @@ returns `None` instead.
 **The `UInt64` variants.** Malachite has no mixed `Natural`-and-`u64` arithmetic; as
 [on the GMP page](/mapping/gmp-integers/#conventions), convert the word first,
 `a + Natural::from(b)`. The conversion allocates nothing.
+
+**Sums and products.** `sum xs` and `product xs` are `Natural::sum(xs.into_iter())` and
+`Natural::product(xs.into_iter())`, or `xs.iter().sum()` and `xs.iter().product()`, which also
+accept references; the empty sum is 0 and the empty product 1 on both sides. Azurite takes a
+`List` or, through `sumArray` and `productArray`, an `Array`; Malachite takes any iterator. Both
+multiply in a balanced tree, so that the operands of each multiplication are of similar size, and
+Malachite's stops early at a zero factor.
 
 **Forced algorithms.** See [Tuning parameters and forced algorithms](#tuning-parameters-and-forced-algorithms).
 `mul` and `square` dispatch across the same ladder Malachite's `*` and `square` use (schoolbook,
@@ -401,6 +428,84 @@ implementations live in its test utilities, so none of these will get a public c
 **`divisors`.** The list of all divisors needs a factorization, which Malachite does not yet have
 for a `Natural`; this is the same gap as `arith_divisors`
 [on the FLINT arithmetic-functions page](/mapping/flint-arithmetic-functions/).
+
+## Combinatorics {#combinatorics}
+
+| | Azurite | Malachite |
+| :---: | --- | --- |
+| ✓ | `factorial (n : Nat) : AzNat` | [`Factorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Factorial.html) |
+| ✓ | `doubleFactorial (n : Nat) : AzNat` | [`DoubleFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DoubleFactorial.html) |
+| ≈ | `multiFactorial (n m : Nat) : AzNat` | [`Multifactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Multifactorial.html) |
+| ✓ | `subfactorial (n : Nat) : AzNat` | [`Subfactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Subfactorial.html) |
+| ✓ | `risingFactorial (x : AzNat) (k : Nat) : AzNat` | [`RisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RisingFactorial.html) |
+| ✓ | `fallingFactorial (x : AzNat) (k : Nat) : AzNat` | [`FallingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FallingFactorial.html) |
+| ⚙ | `factorialQuotient (a b : Nat) : AzNat` | [`FallingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FallingFactorial.html) |
+| ✓ | `binomial (n : AzNat) (k : Nat) : AzNat` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html) |
+| ✓ | `fibonacci (n : Nat) : AzNat` | [`Fibonacci::fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html#tymethod.fibonacci) |
+| ✓ | `fibonacciPair (n : Nat) : AzNat × AzNat` | [`Fibonacci::fibonacci_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html#tymethod.fibonacci_pair) |
+| ✓ | `lucasNumber (n : Nat) : AzNat` | [`LucasNumber::lucas_number`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LucasNumber.html#tymethod.lucas_number) |
+| ≈ | `lucasNumberPair (n : Nat) : AzNat × AzNat` | [`LucasNumber::lucas_number_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LucasNumber.html#tymethod.lucas_number_pair) |
+| ✓ | `primorial (n : Nat) : AzNat` | [`Primorial::primorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Primorial.html#tymethod.primorial) |
+| ✓ | `productOfFirstNPrimes (n : Nat) : AzNat` | [`Primorial::product_of_first_n_primes`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Primorial.html#tymethod.product_of_first_n_primes) |
+| ✓ | `bellNumber (n : Nat) : AzNat` | [`BellNumber`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BellNumber.html) |
+| ✓ | `bellNumbersPrefix (n : Nat) : List AzNat` | [`bell_numbers_prefix`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/bell_number/fn.bell_numbers_prefix.html) |
+| ✓ | `landauFunctionPrefix (n : Nat) : List AzNat` | [`landau_function_prefix`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/landau_function/fn.landau_function_prefix.html) |
+| — | `factorialOdd`, `oddPrimeExps`, `legendreExp`, `prodPrimePowers`, `primesWithBit`, `hornerPow`, `oddDoubleFactorialExps`, `subfactorialSplit`, `factorialQuotientExps`, `binomialExps`, `binomialPrime`, `binomialProduct`, `binomialDenseRatio`, `fibonacciDouble`, `Nat.lucas`, `firstPrimes`, `bellRowNext`, `dobinskiTerms`, `dobinskiSums`, `landauCandidates`, `landauStep` | |
+
+**`factorial`.** `factorial n` is `Natural::factorial(n)`, with a Lean `Nat` argument where
+Malachite takes a `u64`. Both compute the odd part of $$n!$$ and shift it left by the power of 2,
+$$n$$ minus the number of 1 bits of $$n$$. Azurite builds the odd part from the prime
+factorization of $$n!$$, each exponent given by Legendre's formula; Malachite uses tables for
+small $$n$$ and the prime-swing method above them. `factorialOdd` is Azurite's odd part, and the
+other functions are the steps that build it.
+
+**The other factorials.** `doubleFactorial n` is `Natural::double_factorial(n)`, $$n!!$$, and
+`subfactorial n` is `Natural::subfactorial(n)`, the number of derangements of $$n$$ objects.
+`multiFactorial n m` is `Natural::multifactorial(n, m)`, the product $$n(n - m)(n - 2m)\cdots$$ of
+the positive terms, with the arguments in the same order. It is ≈ only at $$m = 0$$: Azurite
+returns 1 by convention, and Malachite panics. Azurite computes an even double factorial as a
+factorial times a power of 2 and an odd one from its prime factorization; the multifactorial as
+the factorial or double factorial for $$m = 1$$ or $$2$$, as $$m^q q!$$ when $$m$$ divides
+$$n = qm$$, and otherwise as a product tree over the progression; and the subfactorial by binary
+splitting of $$\sum_k (-1)^k\, n!/k!$$.
+
+**Rising and falling factorials.** `risingFactorial x k` is `x.rising_factorial(k)`,
+$$x(x + 1)\cdots(x + k - 1)$$, and `fallingFactorial x k` is `x.falling_factorial(k)`,
+$$x(x - 1)\cdots(x - k + 1)$$, which is 0 when $$k > x$$. The count is a Lean `Nat` where Malachite
+takes a `u64`. Azurite computes a rising factorial of a one-limb $$x \le k$$ as the quotient
+$$(x + k - 1)!/(x - 1)!$$, from its prime factorization, and otherwise as a product tree; a falling
+factorial is the rising factorial that starts at $$x - k + 1$$. `factorialQuotient a b` is
+$$a!/b!$$ for $$b \le a$$; Malachite has no function by that name, and the same value is
+`Natural::from(a).falling_factorial(a - b)`. The other functions in the last row are the steps
+that build these values.
+
+**Binomial coefficients.** `binomial n k` is `Natural::binomial_coefficient(n, k)`, which is 0 when
+$$k > n$$. Malachite's second argument is a `Natural` and Azurite's a `Nat`. When $$n$$ fits in one
+limb, Azurite replaces $$k$$ by $$\min(k, n - k)$$ and, if $$n$$ is at most 64 times that, builds
+$$\binom{n}{k}$$ from its prime factorization; otherwise it divides the falling factorial
+$$n(n - 1)\cdots(n - k + 1)$$ by $$k!$$, without the symmetry step when $$n$$ spans several limbs.
+
+**Fibonacci and Lucas numbers.** `fibonacci n` is `Natural::fibonacci(n)`, and `fibonacciPair n`
+is `Natural::fibonacci_pair(n)`, the pair $$(F_n, F_{n-1})$$, which both libraries define as
+$$(0, 1)$$ at $$n = 0$$. `lucasNumber n` is `Natural::lucas_number(n)`, and `lucasNumberPair n` is
+`Natural::lucas_number_pair(n)`, the pair $$(L_n, L_{n-1})$$. That row is ≈ only at $$n = 0$$:
+$$L_{-1} = -1$$ is not a natural number, so Azurite returns $$(2, 0)$$ and Malachite panics.
+Azurite computes the Fibonacci pair by doubling along the binary digits of $$n$$, and the Lucas pair
+from it, using $$L_n = F_n + 2F_{n-1}$$ and $$L_{n-1} = 2F_n - F_{n-1}$$.
+
+**Primorials.** `primorial n` is `Natural::primorial(n)`, the product of the primes at most $$n$$,
+and `productOfFirstNPrimes n` is `Natural::product_of_first_n_primes(n)`, the product of the first
+$$n$$ primes. Azurite sieves the primes (`firstPrimes` doubles its sieve bound until it has enough)
+and multiplies them with a product tree.
+
+**Bell numbers and Landau's function.** `bellNumber n` is `Natural::bell_number(n)`, the number of
+partitions of an $$n$$-element set, and `bellNumbersPrefix n` is `bell_numbers_prefix(n)`, the list
+$$B_0, \ldots, B_{n-1}$$. `landauFunctionPrefix n` is `landau_function_prefix(n)`, the list
+$$g(0), \ldots, g(n - 1)$$ of the largest orders of permutations. The two prefix functions take a
+`u64` length in Malachite and return a `Vec<Natural>` where Azurite returns a `List AzNat`. Azurite
+computes a single Bell number exactly from Dobinski's formula, truncated after enough terms and
+rounded up, the prefix from the Bell triangle, and Landau's function by a table over the primes,
+trying each prime power as a part.
 
 ## Strings and digits {#strings-and-digits}
 

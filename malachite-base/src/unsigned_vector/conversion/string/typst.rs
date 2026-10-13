@@ -53,7 +53,7 @@ impl<T: PrimitiveUnsigned> ToTypst for UnsignedVector<T> {
     /// );
     /// ```
     ///
-    /// The value column holds each vector as [`Display`](core::fmt::Display) writes it.
+    /// The value column holds each vector as [`Display`] writes it.
     ///
     /// | value       | fragment    |
     /// |-------------|-------------|

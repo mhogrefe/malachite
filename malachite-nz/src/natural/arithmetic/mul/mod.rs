@@ -916,9 +916,8 @@ pub mod product_of_limbs;
 #[cfg(not(feature = "test_build"))]
 /// Code for multiplying several limbs together.
 pub(crate) mod product_of_limbs;
-/// Implementations of [`Product`](core::iter::Product) for [`Natural`](crate::natural::Natural)
-/// over iterators of unsigned primitive integers, multiplying machine words together into a
-/// [`Natural`].
+/// Implementations of [`Product`] for [`Natural`] over iterators of unsigned primitive integers,
+/// multiplying machine words together into a [`Natural`].
 ///
 /// # product
 /// ```

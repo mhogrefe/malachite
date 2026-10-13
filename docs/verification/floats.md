@@ -29,12 +29,19 @@ reference implementation of correctly rounded arbitrary-precision arithmetic, th
 | :---: | --- |
 | ✓ | The oracle computes this function and agrees with Malachite on every input tried. |
 | ≈ | The oracle agrees, after an adaptation on the oracle side that is more than a change of spelling. |
+| ◦ | Reference column only: the reference implementation is compared with Malachite in the unit tests, but no longer in the property tests, because Azurite checks the function. The reference is kept for the benchmarks. |
 | | The oracle does not check this function. |
 
 Azurite's `AzFloat` has an unbounded exponent, while a `Float`'s exponent is bounded, so the
 Azurite oracle applies Malachite's documented overflow and underflow rules to Azurite's result
-before comparing; that adaptation is the same for every operation and is not counted as ≈. A
-function with no mark in any column is checked only by Malachite's own unit and property tests;
+before comparing; that adaptation is the same for every operation and is not counted as ≈. A ✓
+in the Reference column can also stand for a second production algorithm rather than a test-only
+reference: `mul_rational_prec_round`, `div_rational_prec_round`, and `rational_div_float_prec_round`
+each dispatch between a "naive" and a "direct" algorithm by operand size, and the property tests
+run both on every input and compare them with each other and with the default, so each algorithm
+is tested beyond the inputs that would select it, which the Azurite oracle, seeing only the default,
+cannot do. A function with no mark in any column is checked only by Malachite's own unit and
+property tests;
 those rows are collected in [What is not yet cross-checked](#not-yet-cross-checked). The internal
 `ExtendedFloat` type, which carries a wider exponent through intermediate computations, is not
 listed.
@@ -175,7 +182,7 @@ precision and rounded in any mode, and the returned `Ordering` says which way it
 | [pi_over_6](https://docs.rs/malachite-float/latest/malachite_float/float/constants/pi_over_6/index.html) | `pi_over_6_prec`, `pi_over_6_prec_round` |  |  |  |
 | [pi_over_8](https://docs.rs/malachite-float/latest/malachite_float/float/constants/pi_over_8/index.html) | `pi_over_8_prec`, `pi_over_8_prec_round` |  |  |  |
 | [prime_constant](https://docs.rs/malachite-float/latest/malachite_float/float/constants/prime_constant/index.html) | `prime_constant_prec`, `prime_constant_prec_round` | ✓ |  |  |
-| [prouhet_thue_morse_constant](https://docs.rs/malachite-float/latest/malachite_float/float/constants/prouhet_thue_morse_constant/index.html) | `prouhet_thue_morse_constant_prec`, `prouhet_thue_morse_constant_prec_round` | ✓ |  | ✓ |
+| [prouhet_thue_morse_constant](https://docs.rs/malachite-float/latest/malachite_float/float/constants/prouhet_thue_morse_constant/index.html) | `prouhet_thue_morse_constant_prec`, `prouhet_thue_morse_constant_prec_round` | ✓ |  | ◦ |
 | [ramanujans_constant](https://docs.rs/malachite-float/latest/malachite_float/float/constants/ramanujans_constant/index.html) | `ramanujans_constant_prec`, `ramanujans_constant_prec_round` |  |  |  |
 | [sqrt_2](https://docs.rs/malachite-float/latest/malachite_float/float/constants/sqrt_2/index.html) | `sqrt_2_prec`, `sqrt_2_prec_round` | ✓ | ✓ |  |
 | [sqrt_2_over_2](https://docs.rs/malachite-float/latest/malachite_float/float/constants/sqrt_2_over_2/index.html) | `sqrt_2_over_2_prec`, `sqrt_2_over_2_prec_round` | ✓ | ✓ |  |
@@ -193,10 +200,10 @@ its functions ($$\pi$$, $$e$$, Euler's and Catalan's constants, $$\ln 2$$, $$\ln
 2$$, $$\log_2 10$$, and the square and cube roots) are compared with MPFR at every precision and
 rounding mode the tests generate. Twelve more are checked against references: the digit-defined
 constants (Champernowne's, Copeland–Erdős, and Liouville's, in any base, and the Prouhet–Thue–Morse
-constant) against a digit-by-digit expansion bracketed by exact `Rational`s, and the constants built
-from others ($$1/\pi$$, $$\pi/3$$, $$\sqrt{\pi}$$, the lemniscate constant, $$\log_2 e$$, and the
-like) against a computation that brackets the inputs at a higher precision and rounds once the
-bracket decides the result. Every constant, those with no oracle included, is also compared with a
+constant, in the unit tests only (◦), since Azurite checks it) against a digit-by-digit expansion
+bracketed by exact `Rational`s, and the constants built from others ($$1/\pi$$, $$\pi/3$$,
+$$\sqrt{\pi}$$, the lemniscate constant, $$\log_2 e$$, and the like) against a computation that
+brackets the inputs at a higher precision and rounds once the bracket decides the result. Every constant, those with no oracle included, is also compared with a
 hard-coded value at precisions 1,000 and 10,000, and its rounding `Ordering`s are checked against
 its neighbors: the `Floor` and `Ceiling` results must be adjacent, with the exact value between
 them. The constants that are $$\pi$$ or $$\tau$$ times a power of 2 ($$\pi/2$$, $$\pi/4$$,
@@ -217,24 +224,24 @@ its rows are grouped by theme.
 
 | Operation | Functions | Azurite | MPFR | Reference |
 | --- | --- | :---: | :---: | :---: |
-| [add](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/add/index.html) | `Add`, `add_prec_round` | ✓ | ✓ | ✓ |
-| [add](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/add/index.html) | `add_rational_prec_round` | ✓ | ✓ | ✓ |
-| [sub](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/sub/index.html) | `Sub`, `sub_prec_round` | ✓ | ✓ | ✓ |
-| [sub](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/sub/index.html) | `sub_rational_prec_round` | ✓ | ✓ | ✓ |
-| [mul](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/mul/index.html) | `Mul`, `mul_prec_round` | ✓ | ✓ | ✓ |
+| [add](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/add/index.html) | `Add`, `add_prec_round` | ✓ | ✓ | ◦ |
+| [add](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/add/index.html) | `add_rational_prec_round` | ✓ | ✓ | ◦ |
+| [sub](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/sub/index.html) | `Sub`, `sub_prec_round` | ✓ | ✓ | ◦ |
+| [sub](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/sub/index.html) | `sub_rational_prec_round` | ✓ | ✓ | ◦ |
+| [mul](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/mul/index.html) | `Mul`, `mul_prec_round` | ✓ | ✓ | ◦ |
 | [mul](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/mul/index.html) | `mul_rational_prec_round` | ✓ | ✓ | ✓ |
-| [div](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/div/index.html) | `Div`, `div_prec_round` | ✓ | ✓ | ✓ |
+| [div](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/div/index.html) | `Div`, `div_prec_round` | ✓ | ✓ | ◦ |
 | [div](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/div/index.html) | `div_rational_prec_round` | ✓ | ✓ | ✓ |
 | [div](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/div/index.html) | `rational_div_float_prec_round` | ✓ | ✓ | ✓ |
 | [neg](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/neg/index.html) | `Neg` | ✓ | ✓ |  |
 | [abs](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/abs/index.html) | `Abs` | ✓ | ✓ |  |
 | [abs](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/abs/index.html) | `abs_negative_zero` |  |  |  |
 | [reciprocal](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/reciprocal/index.html) | `Reciprocal`, `reciprocal_prec_round` |  | ✓ | ✓ |
-| [square](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/square/index.html) | `Square`, `square_prec_round` | ✓ | ✓ | ✓ |
+| [square](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/square/index.html) | `Square`, `square_prec_round` | ✓ | ✓ | ◦ |
 | [abs_squared](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/abs_squared/index.html) | `AbsSquared` |  |  |  |
-| [sum](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/sum/index.html) | `Sum`, `sum_prec_round` |  | ✓ |  |
+| [sum](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/sum/index.html) | `Sum`, `sum_prec_round` | ✓ | ✓ |  |
 | [sum](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/sum/index.html) | `primitive_float_sum` |  |  |  |
-| [product](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/product/index.html) | `Product`, `product_prec_round` |  |  |  |
+| [product](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/product/index.html) | `Product`, `product_prec_round` | ✓ |  |  |
 | [product](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/product/index.html) | `primitive_float_product` |  |  |  |
 | [dot](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/dot/index.html) | `dot_prec_round` |  | ✓ |  |
 | [dot](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/dot/index.html) | `primitive_float_dot` |  |  |  |
@@ -262,18 +269,22 @@ Most operations come in several input forms, each its own row: two `Float`s; a `
 `Rational`, which is used exactly rather than rounded first; and, for the `primitive_float_*`
 functions, `f32` or `f64` inputs with a correctly rounded `f32` or `f64` result. The four field
 operations, squaring, negation, and absolute value are checked by Azurite (`AzFloat.addPrecRound`
-and its siblings) and MPFR, and the four operations and squaring also against references that
-compute the exact result as a `Rational` and round it once. MPFR's operations with a rational
+and its siblings) and MPFR. The four operations and squaring also have references that compute the
+exact result as a `Rational` and round it once; since Azurite checks these functions, the
+references are compared only in the unit tests (◦) and kept for the benchmarks. The `Rational`
+forms of multiplication and division are still compared with their references in the property
+tests. MPFR's operations with a rational
 operand are exact before their single rounding, so the `Rational` forms of the four operations are
 compared with them directly; they are also checked by Azurite (`AzFloat.addRatPrecRound`,
 `subRatPrecRound`, `mulRatPrecRound`, `divRatPrecRound`, `ratSubPrecRound`, and
 `ratDivPrecRound`), including `Rational + Float`, `Rational - Float`, `Rational * Float`, and
 `Rational / Float`. Some of the demos on extreme inputs (those for addition and subtraction, and the
 `_round` and `_prec_round` forms of multiplication and division) take a fiftieth to a tenth of a
-second per line, so they are checked on 300 lines in each generator mode rather than 10,000. Sums, dot products, `hypot`, `positive_difference` (MPFR's
+second per line, so they are checked on 300 lines in each generator mode rather than 10,000. Sums
+and products, in all four forms and on extreme inputs, are checked against Azurite's
+`sumPrecRound` and `productPrecRound`. Sums, dot products, `hypot`, `positive_difference` (MPFR's
 `mpfr_dim`), and the fused operations (MPFR's `mpfr_fma` and `mpfr_fmma` families) are checked
-against MPFR, and the fused operations' `Rational` forms against exact references. `product`,
-`average`, `abs_squared`, `abs_negative_zero`, the `Rational` form of `positive_difference`, and
+against MPFR, and the fused operations' `Rational` forms against exact references. `average`, `abs_squared`, `abs_negative_zero`, the `Rational` form of `positive_difference`, and
 the `primitive_float_*` versions in this section are covered by property tests, which compare the
 primitive versions with the `Float` functions at the primitive type's precision and exponent
 range.
@@ -282,17 +293,18 @@ range.
 
 | Operation | Functions | Azurite | MPFR | Reference |
 | --- | --- | :---: | :---: | :---: |
-| [shl](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/shl/index.html) | `Shl` | ✓ | ✓ | ✓ |
-| [shr](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/shr/index.html) | `Shr` | ✓ | ✓ | ✓ |
+| [shl](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/shl/index.html) | `Shl` | ✓ | ✓ | ◦ |
+| [shr](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/shr/index.html) | `Shr` | ✓ | ✓ | ◦ |
 | [shl_round](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/shl_round/index.html) | `ShlRound`, `shl_prec_round` |  | ✓ | ✓ |
 | [shr_round](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/shr_round/index.html) | `ShrRound`, `shr_prec_round` |  | ✓ | ✓ |
-| [power_of_2](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/power_of_2/index.html) | `PowerOf2`, `power_of_2_prec_round` | ✓ | ✓ | ✓ |
+| [power_of_2](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/power_of_2/index.html) | `PowerOf2`, `power_of_2_prec_round` | ✓ | ✓ | ◦ |
 | [is_power_of_2](https://docs.rs/malachite-float/latest/malachite_float/float/arithmetic/is_power_of_2/index.html) | `IsPowerOf2` | ✓ |  |  |
 
 Shifts multiply by a power of 2 and change only the exponent; they are checked by Azurite and MPFR,
-and against a reference that shifts the exact `Rational` value. `shl_round` and `shr_round`, which
-also round to a new precision, are checked against MPFR and similar references. `power_of_2` is
-checked by Azurite, MPFR, and references for every exponent type, and `is_power_of_2` by Azurite.
+and against a reference that shifts the exact `Rational` value in the unit tests (◦). `shl_round`
+and `shr_round`, which also round to a new precision, are checked against MPFR and similar
+references. `power_of_2` is checked by Azurite and MPFR, and against references for every exponent
+type in the unit tests (◦); `is_power_of_2` is checked by Azurite.
 
 ### Signs and units {#signs-and-units}
 

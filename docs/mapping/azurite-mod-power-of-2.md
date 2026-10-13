@@ -98,6 +98,8 @@ reduced values, and `x.eq_mod_power_of_2(&y, k)` compares two unreduced ones, as
 | ✓ | `isOdd (a : AzZModPow2 k) : Bool` | [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html) |
 | ✓ | `invOdd (a : AzZModPow2 k) (h : a.isOdd = true) : AzZModPow2 k` | [`ModPowerOf2Inverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Inverse.html) |
 | — | `invOddAux (a : AzZModPow2 k) : Nat → AzZModPow2 k` | |
+| ✓ | `sqrt? (a : AzZModPow2 k) : Option (AzZModPow2 k)` | [`ModPowerOf2Sqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Sqrt.html) |
+| — | `invSqrtStep`, `invSqrtAux`, `oddSqrt`, `leastRoot` | |
 | — | `instance instCommRing : CommRing (AzZModPow2 k)` | |
 
 **Ring operations.** `a + b` is `a.mod_power_of_2_add(b, k)`, and likewise `sub`, `mul`, and
@@ -111,6 +113,16 @@ proofs and has no counterpart.
 representative. `invOdd` takes a proof of oddness and returns the inverse, by Newton lifting;
 `mod_power_of_2_inverse` returns `Some(inverse)` for an odd input and `None` for an even one,
 which is the `Option` form of the same function. `invOddAux` is the lifting iteration.
+
+**Square roots.** `sqrt? a` is `a.val.mod_power_of_2_sqrt(k)`: both return the least root, or
+`none`/`None` when `a` is not a square, which for a nonzero `a` means it is not $$4^w u$$ with
+$$u \equiv 1 \pmod 8$$. Both find one root of the odd part by Newton iteration for the 2-adic
+inverse square root, then take the least of its four variants $$\pm s$$ and
+$$\pm s + 2^{n-1}$$: `sqrt? 17` modulo $$2^5$$ and `Natural::from(17u32).mod_power_of_2_sqrt(5)`
+are both 7, the least of 7, 9, 23, and 25. Malachite iterates modulo $$2^{k - v}$$, where $$2^v$$
+is the power of 2 dividing `a`, rather than modulo $$2^k$$, which gives the same root; every
+primitive unsigned type implements it too, for $$k$$ up to its width. `oddSqrt`,
+`invSqrtStep`, `invSqrtAux`, and `leastRoot` are the steps of the algorithm.
 
 **Shifts.** Malachite also has
 [`ModPowerOf2Shl`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Shl.html)

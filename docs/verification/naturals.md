@@ -63,9 +63,11 @@ From
 | [cmp](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/cmp/index.html) | `Ord`, `PartialOrd` | ✓ | | ✓ | ✓ | |
 | [cmp](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/cmp/index.html) | `cmp_normalized` | ✓ | | | | ✓ |
 | [cmp](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/cmp/index.html) | `cmp_normalized_no_shift` | | | | | |
-| [cmp_double](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/cmp_double/index.html) | `OrdDouble`, `PartialOrdDouble` | | | | | |
-| [eq](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/eq/index.html) | `PartialEq`, `Eq` | ✓ | | ✓ | ✓ | |
-| [hash](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/hash/index.html) | `Hash` | | | | | |
+| [cmp_double](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdDouble.html) | `OrdDouble`, `PartialOrdDouble` | ✓ | | | | |
+| [cmp_product](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/cmp_product/index.html) | `OrdProduct` | ✓ | | | | |
+| [cmp_products](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/cmp_products/index.html) | `OrdProducts` | ✓ | | | | |
+| [eq](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) | `PartialEq`, `Eq` | ✓ | | ✓ | ✓ | |
+| [hash](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) | `Hash` | | | | | |
 | [partial_cmp_primitive_int](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/partial_cmp_primitive_int/index.html) | `PartialOrd<u8>`, …, `PartialOrd<isize>`, and the reverse directions | ✓ | | ✓ | ✓ | |
 | [partial_eq_primitive_int](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/partial_eq_primitive_int/index.html) | `PartialEq<u8>`, …, `PartialEq<isize>`, and the reverse directions | ✓ | | ✓ | ✓ | |
 | [partial_cmp_primitive_float](https://docs.rs/malachite-nz/latest/malachite_nz/natural/comparison/partial_cmp_primitive_float/index.html) | `PartialOrd<f32>`, `PartialOrd<f64>`, and the reverse directions | | | ✓ | | |
@@ -98,17 +100,19 @@ The module is large, so its rows are grouped by theme.
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [add](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/add/index.html) | `Add` | ✓ |  | ✓ | ✓ |  |
-| [add](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/add/index.html) | `Sum` |  |  |  |  | ✓ |
+| [add](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/add/index.html) | `Sum` | ✓ |  |  |  | ✓ |
 | [sub](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/sub/index.html) | `Sub` | ✓ |  | ✓ | ✓ |  |
 | [checked_sub](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/checked_sub/index.html) | `CheckedSub` |  |  | ✓ | ✓ |  |
 | [saturating_sub](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/saturating_sub/index.html) | `SaturatingSub` | ✓ |  |  |  |  |
 | [abs_diff](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/abs_diff/index.html) | `AbsDiff` |  |  |  |  |  |
 | [neg](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/neg/index.html) | `Neg` | ✓ |  | ✓ | ✓ |  |
 | [mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mul/index.html) | `Mul` | ✓ |  | ✓ | ✓ |  |
-| [mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mul/index.html) | `Product` |  |  |  |  | ✓ |
+| [mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mul/index.html) | `Product` | ✓ |  |  |  | ✓ |
+| [mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mul/index.html) | `Product` of unsigned primitive integers, `WideningElementProduct` | ✓ | ✓ |  |  | ✓ |
 | [square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/square/index.html) | `Square` | ✓ |  |  |  |  |
 | [abs_squared](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/abs_squared/index.html) | `AbsSquared` |  |  |  |  |  |
 | [add_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/add_mul/index.html) | `AddMul` |  |  |  |  |  |
+| [add_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/add_mul_shl/index.html) | `AddMulShl` |  |  |  |  | ✓ |
 | [sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/sub_mul/index.html) | `SubMul` |  |  |  |  |  |
 | [checked_sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/checked_sub_mul/index.html) | `CheckedSubMul` |  |  |  |  |  |
 | [saturating_sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/saturating_sub_mul/index.html) | `SaturatingSubMul` |  |  |  |  |  |
@@ -122,12 +126,16 @@ The module is large, so its rows are grouped by theme.
 The four basic operations are checked by Azurite (`AzNat.add`, `sub`, `mul`, `square`) and by GMP
 and num, and `saturating_sub` by Azurite, whose subtraction truncates at zero exactly as
 `saturating_sub` does; Malachite's `-` panics where the difference would be negative, so the lines
-it prints are differences that `AzNat.sub` computes exactly. `Sum` and `Product` are checked against
-a reference implementation that folds `+` and `*` one term at a time, and `Neg`, which turns a
-`Natural` into an `Integer`, by Azurite's `AzInt.neg` and against GMP and num. The fused operations
+it prints are differences that `AzNat.sub` computes exactly. `Sum` and `Product` are checked by Azurite
+(`AzNat.sum` and `AzNat.product`) and against a reference implementation that folds `+` and `*`
+one term at a time. So is `Product` over words (`Natural::product` of an iterator of unsigned
+primitive integers, which `WideningElementProduct` calls for an `UnsignedVector`), whose demo also
+feeds FLINT's `_fmpz_ui_vec_prod`. `Neg`, which turns a
+`Natural` into an `Integer`, is checked by Azurite's `AzInt.neg` and against GMP and num. The fused operations
 (`add_mul`, `sub_mul`, `mul_add_mul`, and their checked and saturating forms), `abs_diff`,
 `abs_squared`, and `average` are not yet cross-checked: their property tests compare them with the
-unfused combinations of operations that are, which is a strong check but not an independent one.
+unfused combinations of operations that are, which is a strong check but not an independent one. `add_mul_shl`, which computes $$x + yz2^k$$, is also
+checked against a reference that multiplies by $$2^k$$ instead of shifting.
 
 ### Shifts {#shifts}
 
@@ -200,20 +208,26 @@ The functions that take a modulus $$m$$ and require their inputs to be reduced m
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [mod_is_reduced](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_is_reduced/index.html) | `ModIsReduced` | ✓ |  |  |  |  |
 | [mod_add](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_add/index.html) | `ModAdd` | ✓ |  |  |  |  |
+| [mod_add_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_add_mul/index.html) | `ModAddMul` |  |  |  |  | ✓ |
+| [mod_add_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_add_mul_shl/index.html) | `ModAddMulShl` |  |  |  |  | ✓ |
 | [mod_sub](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sub/index.html) | `ModSub` | ✓ |  |  |  |  |
+| [mod_sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sub_mul/index.html) | `ModSubMul` |  |  |  |  | ✓ |
+| [mod_sub_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sub_mul_shl/index.html) | `ModSubMulShl` |  |  |  |  | ✓ |
+| [mod_sum](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sum/index.html) | `ModSum` |  |  |  |  | ✓ |
 | [mod_neg](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_neg/index.html) | `ModNeg` | ✓ |  |  |  |  |
 | [mod_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_mul/index.html) | `ModMul` | ✓ |  |  |  |  |
 | [mod_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_mul/index.html) | `ModMulPrecomputed` | ✓ |  |  |  |  |
 | [mod_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_square/index.html) | `ModSquare` | ✓ |  |  |  |  |
 | [mod_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_square/index.html) | `ModSquarePrecomputed` | ✓ |  |  |  |  |
 | [mod_pow](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_pow/index.html) | `ModPow` | ✓ |  | ✓ | ✓ | ✓ |
+| [mod_product](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_product/index.html) | `ModProduct` |  |  |  |  | ✓ |
 | [mod_pow](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_pow/index.html) | `ModPowPrecomputed` | ✓ |  |  |  |  |
 | [mod_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_shl/index.html) | `ModShl<u8>`, …, `ModShl<isize>` | ✓ |  |  |  |  |
 | [mod_shr](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_shr/index.html) | `ModShr<i8>`, …, `ModShr<isize>` | ✓ |  |  |  |  |
 | [mod_inverse](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_inverse/index.html) | `ModInverse` | ✓ |  |  |  | ✓ |
 | [mod_div](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_div/index.html) | `ModDiv` | ≈ | ✓ |  |  | ✓ |
 | [mod_div_list](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_div_list/index.html) | `ModDivList` |  | ✓ |  |  | ✓ |
-| [mod_sqrt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sqrt/index.html) | `ModSqrt` |  | ≈ |  |  |  |
+| [mod_sqrt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sqrt/index.html) | `ModSqrt` | ≈ | ≈ |  |  |  |
 | [eq_mod](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/eq_mod/index.html) | `EqMod` | ✓ |  | ✓ |  |  |
 
 Azurite checks the whole family through its residue type `AzZMod m`, whose invariant (a value in
@@ -222,13 +236,22 @@ reduced: addition, subtraction, negation, multiplication, squaring, powers, shif
 the three `_precomputed` variants, which are compared with Azurite's plain operations since the
 precomputed data affects only speed. `mod_pow` is also checked against GMP's and num's modular
 exponentiation and a square-and-multiply reference, and `mod_inverse` against a reference
-extended-Euclid inverse.
+extended-Euclid inverse. `mod_add_mul` and `mod_sub_mul`, and their `_shl` forms, which multiply
+by a further $$2^b$$, have no Azurite counterpart yet; they are checked against a reference that
+computes $$x \pm yz$$ (or $$x \pm yz2^b$$) exactly and reduces it once. `mod_sum` is checked against the exact
+`Sum` (itself checked by Azurite's `AzNat.sum`) reduced once, and against a fold of `mod_add`. `mod_product` is likewise checked against the exact `Product` (checked by
+`AzNat.product`) reduced once, and against a fold of `mod_mul`.
 
 `mod_div` is ≈ for Azurite because the quotient is not unique when the divisor is not a unit:
 Malachite documents that it returns one of the quotients, so the oracle checks the documented
 existence condition ($$\gcd(y, m) \mid x$$) and that the printed quotient $$q$$ satisfies
 $$qy \equiv x \pmod m$$, rather than comparing values. FLINT's `fmpz_mod_divides` makes the same
-choice of quotient as Malachite and is compared exactly. `mod_sqrt` is ≈ for FLINT because for
+choice of quotient as Malachite and is compared exactly. `mod_sqrt` is ≈ for Azurite because
+Malachite documents its result only for a prime modulus, and then as either of the two roots: for
+a prime modulus (decided by Azurite's proven `isPrime`) the oracle checks that a root is printed
+exactly when `sqrt?` finds one and that it is `sqrt?`'s root or its negation, and for any other
+modulus it checks only the documented range of a printed root. About 2,700 of each stage's 30,000
+lines have prime moduli. `mod_sqrt` is ≈ for FLINT because for
 even moduli between 50 and 600 FLINT's `fmpz_sqrtmod` calls a Jacobi symbol routine with an even
 modulus, whose behavior is undefined; that documented window is skipped, and every other input,
 every odd modulus included, is compared exactly.
@@ -242,12 +265,19 @@ every odd modulus included, is compared exactly.
 | [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2/index.html) | `NegModPowerOf2` | ✓ |  |  |  |  |
 | [mod_power_of_2_is_reduced](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_is_reduced/index.html) | `ModPowerOf2IsReduced` | ✓ |  |  |  |  |
 | [mod_power_of_2_add](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_add/index.html) | `ModPowerOf2Add` | ✓ |  |  |  |  |
+| [mod_power_of_2_add_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_add_mul/index.html) | `ModPowerOf2AddMul` |  |  |  |  | ✓ |
+| [mod_power_of_2_add_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_add_mul_shl/index.html) | `ModPowerOf2AddMulShl` |  |  |  |  | ✓ |
 | [mod_power_of_2_sub](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sub/index.html) | `ModPowerOf2Sub` | ✓ |  |  |  |  |
+| [mod_power_of_2_sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sub_mul/index.html) | `ModPowerOf2SubMul` |  |  |  |  | ✓ |
+| [mod_power_of_2_sub_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sub_mul_shl/index.html) | `ModPowerOf2SubMulShl` |  |  |  |  | ✓ |
+| [mod_power_of_2_sum](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sum/index.html) | `ModPowerOf2Sum` |  |  |  |  | ✓ |
 | [mod_power_of_2_neg](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_neg/index.html) | `ModPowerOf2Neg` | ✓ |  |  |  |  |
 | [mod_power_of_2_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_mul/index.html) | `ModPowerOf2Mul` | ✓ |  |  |  |  |
 | [mod_power_of_2_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_square/index.html) | `ModPowerOf2Square` | ✓ |  |  |  |  |
 | [mod_power_of_2_pow](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_pow/index.html) | `ModPowerOf2Pow` | ✓ |  |  |  | ✓ |
+| [mod_power_of_2_product](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_product/index.html) | `ModPowerOf2Product` |  |  |  |  | ✓ |
 | [mod_power_of_2_inverse](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_inverse/index.html) | `ModPowerOf2Inverse` | ✓ |  |  |  |  |
+| [mod_power_of_2_sqrt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sqrt/index.html) | `ModPowerOf2Sqrt` | ✓ |  |  |  | ✓ |
 | [mod_power_of_2_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_shl/index.html) | `ModPowerOf2Shl<u8>`, …, `ModPowerOf2Shl<isize>` | ✓ |  |  |  |  |
 | [mod_power_of_2_shr](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_shr/index.html) | `ModPowerOf2Shr<i8>`, …, `ModPowerOf2Shr<isize>` | ✓ |  |  |  |  |
 | [eq_mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/eq_mod_power_of_2/index.html) | `EqModPowerOf2` | ✓ |  | ✓ |  |  |
@@ -256,18 +286,25 @@ Azurite checks these through its type `AzZModPow2 k`, the residues modulo $$2^k$
 as the general family, and `ModPowerOf2` and `rem_power_of_2` (which coincide on naturals) through
 `AzNat.modPow2`; `neg_mod_power_of_2`, which takes any natural, is checked as the negation in
 `AzZModPow2 k` of its residue. `mod_power_of_2_pow` is also checked against a square-and-multiply
-reference, and `eq_mod_power_of_2` against GMP's `is_congruent_2pow`.
+reference, `mod_power_of_2_sqrt` against a search of every residue for moduli up to $$2^{12}$$,
+and `eq_mod_power_of_2` against GMP's `is_congruent_2pow`. `mod_power_of_2_add_mul` and
+`mod_power_of_2_sub_mul`, and their `_shl` forms, which multiply by a further $$2^b$$, have no
+Azurite counterpart yet; they are checked against a reference that computes $$x \pm yz$$ (or
+$$x \pm yz2^b$$) exactly and reduces it once. `mod_power_of_2_sum` is checked against the exact `Sum`
+(itself checked by Azurite's `AzNat.sum`) reduced once, and against a fold of
+`mod_power_of_2_add`. `mod_power_of_2_product` is likewise checked against the exact
+`Product` (checked by `AzNat.product`) reduced once, and against a fold of `mod_power_of_2_mul`.
 
 ### Chinese remaindering {#chinese-remaindering}
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [crt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/crt/index.html) | `Crt` | ✓ | ✓ |  |  | ✓ |
-| [multi_crt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/multi_crt/index.html) | `Natural::multi_crt`, `MultiCrt::new`, `MultiCrt::apply` | ✓ | ✓ |  |  | ✓ |
-| [multi_crt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/multi_crt/index.html) | `MultiCrt::apply_balanced` |  |  |  |  |  |
-| [crt_comb](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/crt_comb/index.html) | `CrtComb::new`, `CrtComb::reduce` |  | ✓ |  |  |  |
-| [crt_comb](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/crt_comb/index.html) | `CrtComb::combine` |  | ✓ |  |  |  |
-| [crt_comb](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/crt_comb/index.html) | `CrtComb::combine_balanced` |  | ✓ |  |  |  |
+| [multi_crt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.multi_crt) | `Natural::multi_crt`, `MultiCrt::new`, `MultiCrt::apply` | ✓ | ✓ |  |  | ✓ |
+| [multi_crt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.multi_crt) | `MultiCrt::apply_balanced` |  |  |  |  |  |
+| crt_comb | `CrtComb::new`, `CrtComb::reduce` |  | ✓ |  |  |  |
+| crt_comb | `CrtComb::combine` |  | ✓ |  |  |  |
+| crt_comb | `CrtComb::combine_balanced` |  | ✓ |  |  |  |
 
 `crt` is checked by Azurite's Garner algorithm on the two moduli (its `None` being checked as moduli
 that are not coprime), FLINT's `fmpz_CRT`, and a reference that combines the two congruences with an
@@ -327,7 +364,7 @@ three functions by GMP.
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [gcd](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/gcd/index.html) | `Gcd` | ✓ |  | ✓ | ✓ | ✓ |
 | [gcd](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/gcd/extended_gcd/index.html) | `ExtendedGcd` | ≈ |  | ✓ |  | ✓ |
-| [gcd](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/gcd/extended_gcd_partial/index.html) | `extended_gcd_partial` |  | ✓ |  |  |  |
+| gcd | `extended_gcd_partial` |  | ✓ |  |  |  |
 | [lcm](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/lcm/index.html) | `Lcm` |  |  | ✓ | ✓ |  |
 | [coprime_with](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/coprime_with/index.html) | `CoprimeWith` | ✓ |  |  |  |  |
 | [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/kronecker_symbol/index.html) | `JacobiSymbol` | ✓ |  | ✓ |  | ✓ |
@@ -348,25 +385,31 @@ Legendre and Kronecker symbols by GMP.
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `Factorial` |  |  | ✓ |  | ✓ |
-| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `DoubleFactorial` |  |  | ✓ |  | ✓ |
-| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `Multifactorial` |  |  | ✓ |  | ✓ |
-| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `Subfactorial` |  |  |  |  | ✓ |
-| [falling_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/falling_factorial/index.html) | `FallingFactorial` |  |  |  |  | ✓ |
-| [rising_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/rising_factorial/index.html) | `RisingFactorial` |  | ✓ |  |  |  |
-| [binomial_coefficient](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/binomial_coefficient/index.html) | `BinomialCoefficient` |  |  | ✓ |  | ✓ |
-| [fibonacci](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/fibonacci/index.html) | `Fibonacci` (`fibonacci`, `fibonacci_pair`) |  |  | ✓ |  | ✓ |
-| [fibonacci](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/fibonacci/index.html) | `LucasNumber` (`lucas_number`, `lucas_number_pair`) |  |  | ✓ |  | ✓ |
-| [primorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/primorial/index.html) | `Primorial::primorial` |  |  | ✓ |  | ✓ |
-| [primorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/primorial/index.html) | `Primorial::product_of_first_n_primes` |  |  |  |  | ✓ |
-| [bell_number](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/bell_number/index.html) | `BellNumber` |  | ✓ |  |  |  |
-| [bell_number](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/bell_number/index.html) | `bell_numbers_prefix` |  | ✓ |  |  |  |
-| [landau_function](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/landau_function/index.html) | `landau_function_prefix` |  | ✓ |  |  |  |
+| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `Factorial` | ✓ |  | ✓ |  | ✓ |
+| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `DoubleFactorial` | ✓ |  | ✓ |  | ✓ |
+| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `Multifactorial` | ✓ |  | ✓ |  | ✓ |
+| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `Subfactorial` | ✓ |  |  |  | ✓ |
+| [falling_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/falling_factorial/index.html) | `FallingFactorial` | ✓ |  |  |  | ✓ |
+| [rising_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/rising_factorial/index.html) | `RisingFactorial` | ✓ | ✓ |  |  |  |
+| [binomial_coefficient](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/binomial_coefficient/index.html) | `BinomialCoefficient` | ✓ |  | ✓ |  | ✓ |
+| [fibonacci](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/fibonacci/index.html) | `Fibonacci` (`fibonacci`, `fibonacci_pair`) | ✓ |  | ✓ |  | ✓ |
+| [fibonacci](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/fibonacci/index.html) | `LucasNumber` (`lucas_number`, `lucas_number_pair`) | ✓ |  | ✓ |  | ✓ |
+| [primorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/primorial/index.html) | `Primorial::primorial` | ✓ |  | ✓ |  | ✓ |
+| [primorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/primorial/index.html) | `Primorial::product_of_first_n_primes` | ✓ |  |  |  | ✓ |
+| [bell_number](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/bell_number/index.html) | `BellNumber` | ✓ | ✓ |  |  |  |
+| [bell_number](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/bell_number/index.html) | `bell_numbers_prefix` | ✓ | ✓ |  |  |  |
+| [landau_function](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/landau_function/index.html) | `landau_function_prefix` | ✓ | ✓ |  |  |  |
 
-Almost every combinatorial function is compared with a naive reference (the defining product, sum,
-or recurrence), and most with GMP. `rising_factorial`, `bell_number` (with its prefix table), and
-`landau_function_prefix` are checked against FLINT. None has an Azurite counterpart yet, so this
-whole section is open ground for it.
+Every combinatorial function is checked against Azurite's proven implementations. The functions of
+a `u64` index (the factorials, Fibonacci and Lucas numbers, the primorials, and the Bell and Landau
+functions) are checked for every index the exhaustive generator reaches (every $$n < 10000$$, and
+every length below 256 for the Bell and Landau functions) and for random indices; the rising and
+falling factorials and binomial coefficients for exhaustive, random, and special random inputs.
+Almost every one is also compared with a naive reference (the defining product, sum, or
+recurrence), and most with GMP. `rising_factorial`, `bell_number` (with its prefix table), and
+`landau_function_prefix` are also checked against FLINT. Azurite's `binomial` uses the symmetry
+$$\binom{n}{k} = \binom{n}{n - k}$$ only when $$n$$ fits in one limb, so the oracle applies it before
+calling `binomial`; that is a textbook identity, not an adaptation of the specification.
 
 ## Conversion {#conversion}
 
@@ -394,7 +437,7 @@ From
 | [is_integer](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/is_integer/index.html) | `IsInteger` |  |  |  |  |  |
 | [is_real](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/is_real/index.html) | `IsReal` |  |  |  |  |  |
 | [is_gaussian_integer](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/is_gaussian_integer/index.html) | `IsGaussianInteger` |  |  |  |  |  |
-| [clone](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/clone/index.html) | `Clone` |  |  | ✓ | ✓ |  |
+| [clone](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) | `Clone` |  |  | ✓ | ✓ |  |
 
 Conversion from the unsigned primitives is checked by Azurite (`UInt64.toAzNat`), GMP, and num, and
 the clamping conversion from the signed ones by Azurite. Toward the primitives, `wrapping_from`
@@ -446,7 +489,7 @@ convert one digit at a time; the power-of-2 digits by Azurite's `limbDigitsPow2`
 | [latex](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/string/latex/index.html) | `ToLatex` |  |  |  |  |  |
 | [typst](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/string/typst/index.html) | `ToTypst` |  |  |  |  |  |
 | [serde](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/serde/index.html) | `Serialize`, `Deserialize` |  |  |  |  |  |
-| [pyo3](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/pyo3/index.html) | `FromPyObject`, `IntoPyObject` |  |  |  |  |  |
+| pyo3 | `FromPyObject`, `IntoPyObject` |  |  |  |  |  |
 
 Decimal and hexadecimal output and input are checked against GMP and num, and `to_string_base`
 (lower and upper case), `from_str`, and `from_string_base` by Azurite, whose digits for bases above
@@ -502,7 +545,7 @@ From [`malachite_nz::natural::factorization`](https://docs.rs/malachite-nz/lates
 | [is_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/factorization/is_square/index.html) | `IsSquare` | ✓ |  | ✓ |  |  |
 | [is_power](https://docs.rs/malachite-nz/latest/malachite_nz/natural/factorization/is_power/index.html) | `IsPower` |  |  | ✓ |  |  |
 | [is_power](https://docs.rs/malachite-nz/latest/malachite_nz/natural/factorization/is_power/index.html) | `ExpressAsPower` |  |  |  |  |  |
-| [remove_power](https://docs.rs/malachite-nz/latest/malachite_nz/natural/factorization/remove_power/index.html) | `RemovePower` |  |  | ✓ |  |  |
+| [remove_power](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html) | `RemovePower` |  |  | ✓ |  |  |
 | [primes](https://docs.rs/malachite-nz/latest/malachite_nz/natural/factorization/primes/index.html) | `primes_less_than`, `primes_less_than_or_equal_to` | ✓ |  |  |  |  |
 | [primes](https://docs.rs/malachite-nz/latest/malachite_nz/natural/factorization/primes/index.html) | `primes` |  |  |  |  |  |
 
@@ -563,8 +606,10 @@ first.
 **A few lines of oracle code around Azurite functions.** These need no new Azurite function, but
 the oracle would compose existing ones, so the composition itself is unverified code: `checked_sub`
 and `saturating_sub_mul` (a comparison and a subtraction), `abs_diff`, `average` and
-`average_round`, the fused operations (`add_mul`, `sub_mul`, `mul_add_mul`, `mul_sub_mul`, and
-their checked and saturating forms), `shl_round`, `mul_shr_round`, `round_to_multiple` and
+`average_round`, the fused operations (`add_mul`, `add_mul_shl`, `sub_mul`, `mul_add_mul`,
+`mul_sub_mul`, and their checked and saturating forms, and `mod_add_mul`, `mod_sub_mul`, `mod_power_of_2_add_mul`, `mod_power_of_2_sub_mul`, and their
+`_shl` forms from the
+addition, subtraction, and multiplication of `AzZMod` and `AzZModPow2`), `shl_round`, `mul_shr_round`, `round_to_multiple` and
 `round_to_multiple_of_power_of_2` (a rounded division or shift and a multiplication),
 `ceiling_root` and `root_rem` (`rootInt` and a power), `next_power_of_2`, `lcm` (a GCD and a
 division), `div_exact` and `checked_div`, `ceiling_div_neg_mod` and `neg_mod`, `assign_bit` and
@@ -578,15 +623,10 @@ real gap, in rough order of how much of Malachite they would cover:
 1. The bitwise operations `and`, `or`, `xor`, and `not`, and with them the population and Hamming
    counts, the bit scans, bit iteration, conversion to and from bit vectors, and writing a block of
    bits (`assign_bits`).
-2. The combinatorial functions: factorials (single, double, multi-, and sub-), the falling and
-   rising factorials, binomial coefficients, Fibonacci and Lucas numbers, the primorial and the
-   product of the first $$n$$ primes, Bell numbers, and the Landau function. Every one of them is
-   currently checked against a reference implementation and most against GMP, but none against a
-   proven implementation.
-3. The Kronecker symbol (Azurite has the Jacobi symbol) and with it the Legendre symbol, the
-   modular square root, `mod_div_list`, and `MultiCrt::apply_balanced`.
-4. Perfect-power detection and decomposition (`is_power`, `express_as_power`) and `remove_power`.
-5. A primality test on `Natural`, the one place where Azurite is ahead of Malachite: its `isPrime`
+2. The Kronecker symbol (Azurite has the Jacobi symbol) and with it the Legendre symbol,
+   `mod_div_list`, and `MultiCrt::apply_balanced`.
+3. Perfect-power detection and decomposition (`is_power`, `express_as_power`) and `remove_power`.
+4. A primality test on `Natural`, the one place where Azurite is ahead of Malachite: its `isPrime`
    is already proven, and is the oracle for `primes_less_than`.
 
 **Outside the scope of an oracle.** The constants, `Default`, `Named`, `Hash`, the unit functions
