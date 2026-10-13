@@ -2222,6 +2222,22 @@ pub trait ModMulAssign<RHS = Self, M = Self> {
     fn mod_mul_assign(&mut self, other: RHS, m: M);
 }
 
+/// Takes the entrywise product of two values, such as two vectors of the same dimension, modulo a
+/// number $m$: every entry is the product of the corresponding entries, reduced modulo $m$. The
+/// entries must be already reduced modulo $m$.
+pub trait ModEntrywiseMul<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_entrywise_mul(self, other: RHS, m: M) -> Self::Output;
+}
+
+/// Replaces a value, such as a vector, by its entrywise product with another modulo a number $m$:
+/// every entry is multiplied by the corresponding entry of the other value and reduced modulo $m$.
+/// The entries must be already reduced modulo $m$.
+pub trait ModEntrywiseMulAssign<RHS = Self, M = Self> {
+    fn mod_entrywise_mul_assign(&mut self, other: RHS, m: M);
+}
+
 /// Multiplies two numbers modulo a third number $m$. The inputs must be already reduced modulo $m$.
 ///
 /// If multiple modular multiplications with the same modulus are necessary, it can be quicker to
@@ -2523,6 +2539,22 @@ pub trait ModPowerOf2Mul<RHS = Self> {
 /// Multiplies two numbers modulo $2^k$, in place. The inputs must be already reduced modulo $2^k$.
 pub trait ModPowerOf2MulAssign<RHS = Self> {
     fn mod_power_of_2_mul_assign(&mut self, other: RHS, pow: u64);
+}
+
+/// Takes the entrywise product of two values, such as two vectors of the same dimension, modulo
+/// $2^k$: every entry is the product of the corresponding entries, reduced modulo $2^k$. The
+/// entries must be already reduced modulo $2^k$.
+pub trait ModPowerOf2EntrywiseMul<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_2_entrywise_mul(self, other: RHS, pow: u64) -> Self::Output;
+}
+
+/// Replaces a value, such as a vector, by its entrywise product with another modulo $2^k$: every
+/// entry is multiplied by the corresponding entry of the other value and reduced modulo $2^k$. The
+/// entries must be already reduced modulo $2^k$.
+pub trait ModPowerOf2EntrywiseMulAssign<RHS = Self> {
+    fn mod_power_of_2_entrywise_mul_assign(&mut self, other: RHS, pow: u64);
 }
 
 /// Adds a number and the product of two other numbers, modulo $2^k$. All three inputs must be

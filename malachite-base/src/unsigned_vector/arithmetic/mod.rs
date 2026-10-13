@@ -225,6 +225,10 @@ pub mod mod_element_product;
 /// Implementations of [`ModElementSum`](crate::num::arithmetic::traits::ModElementSum), the sum of
 /// the elements modulo a number.
 pub mod mod_element_sum;
+/// Multiplying two vectors element by element modulo $m$, by implementations of
+/// [`ModEntrywiseMul`](crate::num::arithmetic::traits::ModEntrywiseMul) and
+/// [`ModEntrywiseMulAssign`](crate::num::arithmetic::traits::ModEntrywiseMulAssign).
+pub mod mod_entrywise_mul;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;
@@ -287,6 +291,11 @@ pub mod mod_power_of_2_element_product;
 /// [`ModPowerOf2ElementSum`](crate::num::arithmetic::traits::ModPowerOf2ElementSum), the sum of the
 /// elements modulo a power of 2.
 pub mod mod_power_of_2_element_sum;
+/// Multiplying two vectors element by element modulo $2^k$, by implementations of
+/// [`ModPowerOf2EntrywiseMul`](crate::num::arithmetic::traits::ModPowerOf2EntrywiseMul) and
+/// [`ModPowerOf2EntrywiseMulAssign`](
+/// crate::num::arithmetic::traits::ModPowerOf2EntrywiseMulAssign).
+pub mod mod_power_of_2_entrywise_mul;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every element of a vector is less than a given power of 2.

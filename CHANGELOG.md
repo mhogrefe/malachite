@@ -32,6 +32,10 @@ documented by git history.
   which generates every such vector once.
 - `EntrywiseMul` and `EntrywiseMulAssign` traits, for the entrywise (Hadamard) product of two
   values such as vectors: $(v_0w_0, v_1w_1, \ldots, v_{n-1}w_{n-1})$.
+- `ModEntrywiseMul`, `ModEntrywiseMulAssign`, `ModPowerOf2EntrywiseMul`, and
+  `ModPowerOf2EntrywiseMulAssign` traits, for the entrywise product modulo $m$ or $2^k$, and their
+  implementations for `UnsignedVector<T>` with a `T` modulus. Modulo $m$, the data for
+  multiplying is precomputed once and shared by all the elements.
 
 ### malachite-nz
 
@@ -50,6 +54,9 @@ documented by git history.
   `exhaustive_ordered_unique_integer_vectors_with_dimension`, and the rest.
 - `EntrywiseMul` and `EntrywiseMulAssign` for `NaturalVector` and `IntegerVector`, with both
   vectors by value or by reference.
+- `ModEntrywiseMul`, `ModPowerOf2EntrywiseMul`, and their `Assign` forms for `NaturalVector`, with
+  the vectors and a `Natural` modulus by value or by reference. `mod_entrywise_mul` is FLINT's
+  `_fmpz_mod_vec_mul`.
 
 ### malachite-q
 

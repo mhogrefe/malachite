@@ -1008,6 +1008,7 @@ pub mod unsigned_vector {
         pub mod mod_dot_reversed;
         pub mod mod_element_product;
         pub mod mod_element_sum;
+        pub mod mod_entrywise_mul;
         pub mod mod_is_reduced;
         pub mod mod_mul;
         pub mod mod_neg;
@@ -1023,6 +1024,7 @@ pub mod unsigned_vector {
         pub mod mod_power_of_2_dot_reversed;
         pub mod mod_power_of_2_element_product;
         pub mod mod_power_of_2_element_sum;
+        pub mod mod_power_of_2_entrywise_mul;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;
