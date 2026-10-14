@@ -295,6 +295,9 @@ pub mod mod_power_of_2_add_mul;
 /// malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), traits for adding a number
 /// and the product of two other numbers, shifted left, modulo $2^k$.
 pub mod mod_power_of_2_add_mul_shl;
+/// Implementations of [`ModPowerOf2Div`](malachite_base::num::arithmetic::traits::ModPowerOf2Div),
+/// a trait for dividing two numbers modulo $2^k$.
+pub mod mod_power_of_2_div;
 /// Implementations of
 /// [`ModPowerOf2Inverse`](malachite_base::num::arithmetic::traits::ModPowerOf2Inverse), a trait for
 /// finding the multiplicative inverse of a number modulo $2^k$.

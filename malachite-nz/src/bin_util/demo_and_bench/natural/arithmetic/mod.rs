@@ -72,6 +72,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_add::register(runner);
     mod_power_of_2_add_mul::register(runner);
     mod_power_of_2_add_mul_shl::register(runner);
+    mod_power_of_2_div::register(runner);
     mod_power_of_2_inverse::register(runner);
     mod_power_of_2_is_reduced::register(runner);
     mod_power_of_2_mul::register(runner);
@@ -190,6 +191,7 @@ mod mod_power_of_2_abs_squared;
 mod mod_power_of_2_add;
 mod mod_power_of_2_add_mul;
 mod mod_power_of_2_add_mul_shl;
+mod mod_power_of_2_div;
 mod mod_power_of_2_inverse;
 mod mod_power_of_2_is_reduced;
 mod mod_power_of_2_mul;

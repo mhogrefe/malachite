@@ -1,0 +1,11 @@
+().mod_power_of_2_div(0, 0) = Some(())
+().mod_power_of_2_div(3, 4) = Some(())
+(0).mod_power_of_2_div(0, 0) = Some((0))
+(0, 0).mod_power_of_2_div(0, 4) = Some((0, 0))
+(0, 1).mod_power_of_2_div(0, 4) = None
+(1, 2, 3).mod_power_of_2_div(3, 4) = Some((11, 6, 1))
+(2, 4, 0).mod_power_of_2_div(2, 4) = Some((1, 2, 0))
+(2, 3).mod_power_of_2_div(2, 4) = None
+(4, 8, 12).mod_power_of_2_div(4, 4) = Some((1, 2, 3))
+(255, 254).mod_power_of_2_div(255, 8) = Some((1, 2))
+(18446744073709551615, 2, 6).mod_power_of_2_div(3, 64) = Some((6148914691236517205, 6148914691236517206, 2))

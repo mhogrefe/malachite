@@ -2541,6 +2541,18 @@ pub mod mod_power_of_2_add_mul;
 /// assert_eq!(x, 50);
 /// ```
 pub mod mod_power_of_2_add_mul_shl;
+/// [`ModPowerOf2Div`](traits::ModPowerOf2Div), a trait for dividing two numbers modulo $2^k$.
+///
+/// # mod_power_of_2_div
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Div;
+///
+/// assert_eq!(6u8.mod_power_of_2_div(3, 4), Some(2));
+/// assert_eq!(1u32.mod_power_of_2_div(3, 4), Some(11));
+/// assert_eq!(6u16.mod_power_of_2_div(4, 4), None);
+/// assert_eq!(12u64.mod_power_of_2_div(4, 4), Some(3));
+/// ```
+pub mod mod_power_of_2_div;
 /// [`ModPowerOf2Inverse`](traits::ModPowerOf2Inverse), a trait for finding the multiplicative
 /// inverse of a number modulo $2^k$.
 ///

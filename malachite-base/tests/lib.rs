@@ -321,6 +321,7 @@ pub mod num {
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_add_mul_shl;
+        pub mod mod_power_of_2_div;
         pub mod mod_power_of_2_inverse;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
@@ -1004,6 +1005,7 @@ pub mod unsigned_vector {
         pub mod mod_add_dot_reversed;
         pub mod mod_add_mul;
         pub mod mod_add_mul_shl;
+        pub mod mod_div;
         pub mod mod_dot;
         pub mod mod_dot_reversed;
         pub mod mod_element_product;
@@ -1021,6 +1023,7 @@ pub mod unsigned_vector {
         pub mod mod_power_of_2_add_dot_reversed;
         pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_add_mul_shl;
+        pub mod mod_power_of_2_div;
         pub mod mod_power_of_2_dot;
         pub mod mod_power_of_2_dot_reversed;
         pub mod mod_power_of_2_element_product;

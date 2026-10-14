@@ -2124,6 +2124,40 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_nmod_vec_invert");
     }
+    // The generated cases from mod_div_properties and mod_power_of_2_div_properties in
+    // malachite-base's UnsignedVector tests and malachite-nz's NaturalVector tests: (vector,
+    // divisor, modulus or power of 2) triples, by value and by reference, and the same with only
+    // invertible divisors, the case FLINT's function handles.
+    for demo_name in [
+        "demo_unsigned_vector_mod_div",
+        "demo_unsigned_vector_mod_div_ref",
+        "demo_unsigned_vector_mod_div_invertible_divisor",
+        "demo_unsigned_vector_mod_power_of_2_div",
+        "demo_unsigned_vector_mod_power_of_2_div_ref",
+        "demo_unsigned_vector_mod_power_of_2_div_odd_divisor",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "_fmpz_mod_vec_scalar_div_fmpz_mod",
+        );
+    }
+    for demo_name in [
+        "demo_natural_vector_mod_div",
+        "demo_natural_vector_mod_div_ref",
+        "demo_natural_vector_mod_div_invertible_divisor",
+        "demo_natural_vector_mod_power_of_2_div",
+        "demo_natural_vector_mod_power_of_2_div_ref",
+        "demo_natural_vector_mod_power_of_2_div_odd_divisor",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "_fmpz_mod_vec_scalar_div_fmpz_mod",
+        );
+    }
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",

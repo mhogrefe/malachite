@@ -43,6 +43,18 @@ documented by git history.
 - A `ModPowerOf2EntrywiseInverse` trait, for inverting every entry modulo $2^k$, and its
   implementation for `UnsignedVector<T>`, by the same method as `mod_entrywise_inverse`. It
   returns `None` if $k > 0$ and some element is even.
+- `ModDiv` for `UnsignedVector<T>`, dividing every element by a `T` modulo a `T`, like FLINT's
+  `_fmpz_mod_vec_scalar_div_fmpz_mod`: an invertible divisor is inverted once. Unlike FLINT, a
+  divisor that is not invertible is also handled, element by element, and the result is `None` if
+  some element has no quotient.
+- `PrimitiveUnsigned` now requires `ModDiv<Self, Self, Output = Self>`, as it already required
+  `ModInverse`.
+- A `ModPowerOf2Div` trait, for dividing modulo $2^k$, implemented for every unsigned primitive
+  type. A quotient of $x$ by $y$ exists if and only if $x = 0$, or $y \neq 0$ and $x$ has at least
+  as many trailing zeros as $y$; for an even $y$ the smallest quotient is returned.
+  `PrimitiveUnsigned` now requires `ModPowerOf2Div<Self, Output = Self>`.
+- `ModPowerOf2Div` for `UnsignedVector<T>`, dividing every element by a `T`. The inverse that all
+  the quotients share is computed once.
 
 ### malachite-nz
 
@@ -67,6 +79,10 @@ documented by git history.
 - `ModEntrywiseInverse` for `NaturalVector`, with the vector and a `Natural` modulus by value or
   by reference, by the same method.
 - `ModPowerOf2EntrywiseInverse` for `NaturalVector`, with the vector by value or by reference.
+- `ModDiv` for `NaturalVector`, with the vector, the `Natural` divisor, and the modulus by value
+  or by reference. `mod_div` is FLINT's `_fmpz_mod_vec_scalar_div_fmpz_mod`.
+- `ModPowerOf2Div` for `Natural`, with both arguments by value or by reference, and for
+  `NaturalVector`, with the vector and the `Natural` divisor by value or by reference.
 
 ### malachite-q
 

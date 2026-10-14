@@ -2517,6 +2517,17 @@ pub trait ModPowerOf2AddAssign<RHS = Self> {
     fn mod_power_of_2_add_assign(&mut self, other: RHS, pow: u64);
 }
 
+/// Divides a number by another number modulo $2^k$, returning `None` if no quotient exists. The
+/// inputs must be already reduced modulo $2^k$.
+///
+/// If the divisor is even, a quotient may exist without being unique; in that case the smallest
+/// quotient is returned.
+pub trait ModPowerOf2Div<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_2_div(self, other: RHS, pow: u64) -> Option<Self::Output>;
+}
+
 /// Finds the multiplicative inverse of a number modulo $2^k$. The input must be already reduced
 /// modulo $2^k$.
 pub trait ModPowerOf2Inverse {
