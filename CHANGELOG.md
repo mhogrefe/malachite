@@ -89,6 +89,8 @@ documented by git history.
   `fmpz_poly_taylor_shift`: Horner's rule, with word, double-word, and limb-array fast paths for a
   shift by 1, for short polynomials, and divide and conquer for long ones, with cutoffs measured
   for Malachite's multiplication.
+- `TaylorShift` and `TaylorShiftAssign` for `NaturalPolynomial` by a `Natural`, using the same
+  algorithms; a shift by a non-negative number keeps every coefficient non-negative.
 
 ### malachite-q
 

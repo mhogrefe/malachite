@@ -277,6 +277,15 @@ pub fn natural_polynomial_natural_pair_gen() -> Generator<(NaturalPolynomial, Na
     )
 }
 
+pub fn natural_polynomial_natural_natural_triple_gen()
+-> Generator<(NaturalPolynomial, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_natural_triple_gen,
+        &random_natural_polynomial_natural_natural_triple_gen,
+        &special_random_natural_polynomial_natural_natural_triple_gen,
+    )
+}
+
 // The `Natural` is positive.
 pub fn natural_polynomial_natural_pair_gen_var_1() -> Generator<(NaturalPolynomial, Natural)> {
     Generator::new(
@@ -293,6 +302,15 @@ pub fn natural_polynomial_natural_pair_gen_var_2() -> Generator<(NaturalPolynomi
         &exhaustive_natural_polynomial_natural_pair_gen_var_2,
         &random_natural_polynomial_natural_pair_gen_var_2,
         &special_random_natural_polynomial_natural_pair_gen_var_2,
+    )
+}
+
+// The `Natural` is at most 3, so that shifts by 0 and 1, which take their own paths, are common.
+pub fn natural_polynomial_natural_pair_gen_var_3() -> Generator<(NaturalPolynomial, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_pair_gen_var_3,
+        &random_natural_polynomial_natural_pair_gen_var_3,
+        &special_random_natural_polynomial_natural_pair_gen_var_3,
     )
 }
 

@@ -67,7 +67,7 @@ use crate::natural::random::{
     RandomNaturalRangeToInfinity, RandomNaturals, RandomNaturalsLessThan,
     get_random_natural_with_bits, get_random_natural_with_up_to_bits,
     random_natural_range_to_infinity, random_naturals, random_naturals_less_than,
-    random_positive_naturals,
+    random_positive_naturals, uniform_random_natural_inclusive_range,
 };
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::random::{
@@ -645,6 +645,30 @@ pub fn random_natural_polynomial_natural_pair_gen(
     ))
 }
 
+pub fn random_natural_polynomial_natural_natural_triple_gen(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural, Natural)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_natural_polynomial_natural_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, Natural)> {
@@ -691,6 +715,24 @@ pub fn random_natural_polynomial_natural_pair_gen_var_2(
                 config.get_or("mean_bits_d", 1),
             )
         },
+    ))
+}
+
+pub fn random_natural_polynomial_natural_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 32),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| uniform_random_natural_inclusive_range(seed, Natural::ZERO, Natural::from(3u32)),
     ))
 }
 

@@ -76,8 +76,8 @@ use crate::natural::conversion::digits::general_digits::{
     GET_STR_PRECOMPUTE_THRESHOLD, limbs_digit_count, limbs_per_digit_in_base,
 };
 use crate::natural::exhaustive::{
-    ExhaustiveNaturalRange, exhaustive_natural_range, exhaustive_natural_range_to_infinity,
-    exhaustive_naturals, exhaustive_positive_naturals,
+    ExhaustiveNaturalRange, exhaustive_natural_inclusive_range, exhaustive_natural_range,
+    exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural_polynomial::NaturalPolynomial;
@@ -534,6 +534,14 @@ pub fn exhaustive_natural_polynomial_natural_pair_gen() -> It<(NaturalPolynomial
     ))
 }
 
+pub fn exhaustive_natural_polynomial_natural_natural_triple_gen()
+-> It<(NaturalPolynomial, Natural, Natural)> {
+    Box::new(exhaustive_triples_xyy(
+        exhaustive_natural_polynomials(),
+        exhaustive_naturals(),
+    ))
+}
+
 pub fn exhaustive_natural_polynomial_natural_pair_gen_var_1() -> It<(NaturalPolynomial, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_natural_polynomials(),
@@ -545,6 +553,13 @@ pub fn exhaustive_natural_polynomial_natural_pair_gen_var_2() -> It<(NaturalPoly
     Box::new(exhaustive_pairs(
         exhaustive_natural_polynomials_min_degree(50),
         exhaustive_naturals(),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_natural_pair_gen_var_3() -> It<(NaturalPolynomial, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_polynomials(),
+        exhaustive_natural_inclusive_range(Natural::ZERO, Natural::from(3u32)),
     ))
 }
 

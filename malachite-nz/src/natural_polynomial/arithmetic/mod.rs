@@ -551,3 +551,7 @@ pub mod square;
 /// [`SquareTruncatedAssign`](malachite_base::polynomial::SquareTruncatedAssign), for squaring a
 /// polynomial and keeping only the low coefficients of the square.
 pub mod square_truncated;
+/// Implementations of [`TaylorShift`](malachite_base::polynomial::TaylorShift) and
+/// [`TaylorShiftAssign`](malachite_base::polynomial::TaylorShiftAssign), for shifting a polynomial
+/// by a constant.
+pub mod taylor_shift;

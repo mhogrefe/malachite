@@ -885,6 +885,7 @@ pub mod natural_polynomial {
         pub mod shl;
         pub mod square;
         pub mod square_truncated;
+        pub mod taylor_shift;
     }
     pub mod basic {
         pub mod coefficients;

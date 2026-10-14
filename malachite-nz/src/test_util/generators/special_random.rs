@@ -66,6 +66,7 @@ use crate::natural::random::{
     get_striped_random_natural_with_bits, get_striped_random_natural_with_up_to_bits,
     striped_random_natural_range, striped_random_natural_range_to_infinity,
     striped_random_naturals, striped_random_positive_naturals,
+    uniform_random_natural_inclusive_range,
 };
 use crate::natural::{Natural, limb_to_bit_count};
 use crate::natural_polynomial::NaturalPolynomial;
@@ -716,6 +717,34 @@ pub fn special_random_natural_polynomial_natural_pair_gen(
     ))
 }
 
+pub fn special_random_natural_polynomial_natural_natural_triple_gen(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural, Natural)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_natural_polynomial_natural_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, Natural)> {
@@ -770,6 +799,26 @@ pub fn special_random_natural_polynomial_natural_pair_gen_var_2(
                 config.get_or("mean_bits_d", 1),
             )
         },
+    ))
+}
+
+pub fn special_random_natural_polynomial_natural_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 32),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| uniform_random_natural_inclusive_range(seed, Natural::ZERO, Natural::from(3u32)),
     ))
 }
 

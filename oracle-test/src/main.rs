@@ -2124,7 +2124,8 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_nmod_vec_invert");
     }
-    // The generated cases from taylor_shift_properties in malachite-nz's IntegerPolynomial tests:
+    // The generated cases from taylor_shift_properties in malachite-nz's IntegerPolynomial and
+    // NaturalPolynomial tests:
     // by value, by reference, and in place, with long polynomials, and with shifts between -3 and
     // 3, so that the special shifts 0, 1, and -1 are common.
     for demo_name in [
@@ -2133,6 +2134,11 @@ fn test_against_flint() {
         "demo_integer_polynomial_taylor_shift_assign",
         "demo_integer_polynomial_taylor_shift_long",
         "demo_integer_polynomial_taylor_shift_small_shift",
+        "demo_natural_polynomial_taylor_shift",
+        "demo_natural_polynomial_taylor_shift_ref",
+        "demo_natural_polynomial_taylor_shift_assign",
+        "demo_natural_polynomial_taylor_shift_long",
+        "demo_natural_polynomial_taylor_shift_small_shift",
     ] {
         check_demo_against_flint(
             &oracle,
