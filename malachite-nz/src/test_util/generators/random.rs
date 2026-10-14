@@ -540,6 +540,69 @@ pub fn random_natural_polynomial_pair_gen(
     )))
 }
 
+pub fn random_natural_polynomial_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_polynomials_min_degree(
+                seed,
+                4,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 8),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_natural_polynomials_min_degree(
+                seed,
+                2,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_natural_polynomial_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials_min_degree(
+                    seed,
+                    4,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 8),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_positive_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, a, b)| (p, NaturalPolynomial::from_coefficients_asc(vec![a, b]))),
+    )
+}
+
 pub fn random_natural_polynomial_triple_gen(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial)> {

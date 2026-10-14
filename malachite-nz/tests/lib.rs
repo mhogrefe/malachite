@@ -828,6 +828,7 @@ pub mod natural_polynomial {
         pub mod bit_unpack;
         pub mod canonical_primitive_part;
         pub mod canonicalize_unit;
+        pub mod compose;
         pub mod compose_power_of_x;
         pub mod content;
         pub mod deflate_power_of_x;

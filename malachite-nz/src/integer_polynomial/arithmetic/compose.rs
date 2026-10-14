@@ -178,7 +178,9 @@ fn compose_ref(xs: &[Integer], ys: &[Integer]) -> IntegerPolynomial {
     }
 }
 
-fn compose_val(mut xs: Vec<Integer>, ys: &[Integer]) -> IntegerPolynomial {
+// Composes the polynomial with coefficients `xs` with the one with coefficients `ys`, reusing `xs`
+// when `ys` is linear.
+pub(crate) fn compose_val(mut xs: Vec<Integer>, ys: &[Integer]) -> IntegerPolynomial {
     if is_linear_case(&xs, ys) {
         compose_linear_in_place(&mut xs, ys);
         IntegerPolynomial { coefficients: xs }

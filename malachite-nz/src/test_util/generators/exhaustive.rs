@@ -514,6 +514,26 @@ pub fn exhaustive_natural_polynomial_pair_gen() -> It<(NaturalPolynomial, Natura
     ))
 }
 
+pub fn exhaustive_natural_polynomial_pair_gen_var_1() -> It<(NaturalPolynomial, NaturalPolynomial)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_polynomials_min_degree(4),
+        exhaustive_natural_polynomials_min_degree(2),
+    ))
+}
+
+pub fn exhaustive_natural_polynomial_pair_gen_var_2() -> It<(NaturalPolynomial, NaturalPolynomial)>
+{
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials_min_degree(4),
+            exhaustive_naturals(),
+            exhaustive_positive_naturals(),
+        )
+        .map(|(p, a, b)| (p, NaturalPolynomial::from_coefficients_asc(vec![a, b]))),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_triple_gen()
 -> It<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial)> {
     Box::new(exhaustive_triples_from_single(

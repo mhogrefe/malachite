@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     bit_unpack::register(runner);
     canonical_primitive_part::register(runner);
     canonicalize_unit::register(runner);
+    compose::register(runner);
     compose_power_of_x::register(runner);
     content::register(runner);
     derivative::register(runner);
@@ -88,6 +89,7 @@ mod bit_pack;
 mod bit_unpack;
 mod canonical_primitive_part;
 mod canonicalize_unit;
+mod compose;
 mod compose_power_of_x;
 mod content;
 mod deflate_power_of_x;

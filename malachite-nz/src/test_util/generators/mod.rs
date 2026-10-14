@@ -232,6 +232,26 @@ pub fn natural_polynomial_pair_gen() -> Generator<(NaturalPolynomial, NaturalPol
     )
 }
 
+// All pairs of `NaturalPolynomial`s where the first has degree at least 4 and the second has degree
+// at least 2.
+pub fn natural_polynomial_pair_gen_var_1() -> Generator<(NaturalPolynomial, NaturalPolynomial)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_pair_gen_var_1,
+        &random_natural_polynomial_pair_gen_var_1,
+        &special_random_natural_polynomial_pair_gen_var_1,
+    )
+}
+
+// All pairs of `NaturalPolynomial`s where the first has degree at least 4 and the second has degree
+// 1.
+pub fn natural_polynomial_pair_gen_var_2() -> Generator<(NaturalPolynomial, NaturalPolynomial)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_pair_gen_var_2,
+        &random_natural_polynomial_pair_gen_var_2,
+        &special_random_natural_polynomial_pair_gen_var_2,
+    )
+}
+
 pub fn natural_polynomial_triple_gen()
 -> Generator<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial)> {
     Generator::new(
