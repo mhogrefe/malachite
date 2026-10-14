@@ -1436,6 +1436,26 @@ pub fn rational_polynomial_pair_gen() -> Generator<(RationalPolynomial, Rational
     )
 }
 
+// All pairs of `RationalPolynomial`s where the first has degree at least 4 and the second has
+// degree at least 2.
+pub fn rational_polynomial_pair_gen_var_1() -> Generator<(RationalPolynomial, RationalPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_pair_gen_var_1,
+        &random_rational_polynomial_pair_gen_var_1,
+        &special_random_rational_polynomial_pair_gen_var_1,
+    )
+}
+
+// All pairs of `RationalPolynomial`s where the first has degree at least 4 and the second has
+// degree 1.
+pub fn rational_polynomial_pair_gen_var_2() -> Generator<(RationalPolynomial, RationalPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_pair_gen_var_2,
+        &random_rational_polynomial_pair_gen_var_2,
+        &special_random_rational_polynomial_pair_gen_var_2,
+    )
+}
+
 // All `(RationalPolynomial, RationalPolynomial, u64)` where the `u64` is a small length.
 pub fn rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1()
 -> Generator<(RationalPolynomial, RationalPolynomial, u64)> {

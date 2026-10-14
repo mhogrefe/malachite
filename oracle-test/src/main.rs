@@ -2213,6 +2213,20 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_compose");
     }
+    // The generated cases from compose_properties in malachite-q's RationalPolynomial tests: all six
+    // forms, long polynomials, and linear inner polynomials.
+    for demo_name in [
+        "demo_rational_polynomial_compose",
+        "demo_rational_polynomial_compose_val_ref",
+        "demo_rational_polynomial_compose_ref_val",
+        "demo_rational_polynomial_compose_ref_ref",
+        "demo_rational_polynomial_compose_assign",
+        "demo_rational_polynomial_compose_assign_ref",
+        "demo_rational_polynomial_compose_long",
+        "demo_rational_polynomial_compose_linear",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-q", demo_name, "fmpq_poly_compose");
+    }
     // The generated cases from taylor_shift_properties in malachite-q's RationalPolynomial tests:
     // by value, by reference, and in place, with long polynomials, and with integer shifts.
     for demo_name in [

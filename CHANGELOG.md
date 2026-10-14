@@ -122,6 +122,9 @@ documented by git history.
 
 ### malachite-q
 
+- `Compose` and `ComposeAssign` for `RationalPolynomial`, like FLINT's `fmpq_poly_compose`: the
+  outer polynomial is rescaled so that the inner one has an integer numerator, and the work is one
+  integer composition, with reductions to lowest terms before and after it.
 - `AddDot`, `SubDot`, `AddDotReversed`, `SubDotReversed`, and their `Assign` forms for `Rational`
   with `RationalVector`s, and `DotReversed` for `RationalVector`. Each vector is written over a
   common denominator, so that the products need one integer dot product and one reduction.

@@ -53,7 +53,7 @@ use malachite_base::num::random::striped::{
 use malachite_base::num::random::{
     random_finite_primitive_floats, random_nonzero_finite_primitive_floats, random_primitive_floats,
 };
-use malachite_base::polynomial::ComposePowerOfX;
+use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;
@@ -2830,6 +2830,79 @@ pub fn special_random_rational_polynomial_pair_gen(
             config.get_or("mean_length_d", 1),
         ),
     ))
+}
+
+pub fn special_random_rational_polynomial_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, RationalPolynomial)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_polynomials_min_degree(
+                seed,
+                4,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 8),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_rational_polynomials_min_degree(
+                seed,
+                2,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_rational_polynomial_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, RationalPolynomial)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rational_polynomials_min_degree(
+                    seed,
+                    4,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 8),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_nonzero_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, a, b)| (p, RationalPolynomial::from_coefficients_asc(vec![a, b]))),
+    )
 }
 
 pub fn special_random_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1(

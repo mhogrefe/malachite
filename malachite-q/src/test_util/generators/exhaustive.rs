@@ -49,7 +49,7 @@ use malachite_base::num::exhaustive::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::options::exhaustive::exhaustive_options;
-use malachite_base::polynomial::ComposePowerOfX;
+use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};
@@ -1124,6 +1124,26 @@ pub fn exhaustive_rational_polynomial_pair_gen() -> It<(RationalPolynomial, Rati
     Box::new(exhaustive_pairs_from_single(
         exhaustive_rational_polynomials(),
     ))
+}
+
+pub fn exhaustive_rational_polynomial_pair_gen_var_1()
+-> It<(RationalPolynomial, RationalPolynomial)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials_min_degree(4),
+        exhaustive_rational_polynomials_min_degree(2),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_pair_gen_var_2()
+-> It<(RationalPolynomial, RationalPolynomial)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_rational_polynomials_min_degree(4),
+            exhaustive_rationals(),
+            exhaustive_nonzero_rationals(),
+        )
+        .map(|(p, a, b)| (p, RationalPolynomial::from_coefficients_asc(vec![a, b]))),
+    )
 }
 
 pub fn exhaustive_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1()

@@ -280,6 +280,9 @@ int run_mod_power_of_2_taylor_shift(const char * arg);
 /* mod_taylor_shift.c */
 int run_mod_taylor_shift(const char * arg);
 
+/* fmpq_poly_compose.c */
+int run_fmpq_poly_compose(const char * arg);
+
 /* fmpz_poly_compose.c */
 int run_fmpz_poly_compose(const char * arg);
 

@@ -25,6 +25,9 @@ pub mod canonical_primitive_part;
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
 /// which bring a polynomial into canonical unit form.
 pub mod canonicalize_unit;
+/// Implementations of [`Compose`](malachite_base::polynomial::Compose) and
+/// [`ComposeAssign`](malachite_base::polynomial::ComposeAssign), for composing two polynomials.
+pub mod compose;
 /// Implementations of [`ComposePowerOfX`](malachite_base::polynomial::ComposePowerOfX) and
 /// [`ComposePowerOfXAssign`](malachite_base::polynomial::ComposePowerOfXAssign), for substituting a
 /// power of the variable into a polynomial.
