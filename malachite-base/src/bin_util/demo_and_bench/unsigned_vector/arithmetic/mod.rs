@@ -43,6 +43,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_dot_reversed::register(runner);
     mod_power_of_2_element_product::register(runner);
     mod_power_of_2_element_sum::register(runner);
+    mod_power_of_2_entrywise_inverse::register(runner);
     mod_power_of_2_entrywise_mul::register(runner);
     mod_power_of_2_is_reduced::register(runner);
     mod_power_of_2_mul::register(runner);
@@ -99,6 +100,7 @@ mod mod_power_of_2_dot;
 mod mod_power_of_2_dot_reversed;
 mod mod_power_of_2_element_product;
 mod mod_power_of_2_element_sum;
+mod mod_power_of_2_entrywise_inverse;
 mod mod_power_of_2_entrywise_mul;
 mod mod_power_of_2_is_reduced;
 mod mod_power_of_2_mul;

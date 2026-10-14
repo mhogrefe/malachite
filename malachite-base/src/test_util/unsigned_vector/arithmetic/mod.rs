@@ -7,3 +7,4 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod mod_entrywise_inverse;
+pub mod mod_power_of_2_entrywise_inverse;

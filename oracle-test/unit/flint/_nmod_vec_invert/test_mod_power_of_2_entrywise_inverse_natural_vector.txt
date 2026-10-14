@@ -1,0 +1,6 @@
+().mod_power_of_2_entrywise_inverse(0) = Some(())
+(0).mod_power_of_2_entrywise_inverse(0) = Some((0))
+(1, 3, 5, 7).mod_power_of_2_entrywise_inverse(4) = Some((1, 11, 13, 7))
+(1, 2, 3).mod_power_of_2_entrywise_inverse(4) = None
+(1267650600228229401496703205375, 3, 18446744073709551617).mod_power_of_2_entrywise_inverse(100) = Some((1267650600228229401496703205375, 845100400152152934331135470251, 1267650600209782657422993653761))
+(18446744073709551616, 3).mod_power_of_2_entrywise_inverse(100) = None

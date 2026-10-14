@@ -991,6 +991,7 @@ pub mod natural_vector {
         pub mod mod_power_of_2_dot_reversed;
         pub mod mod_power_of_2_element_product;
         pub mod mod_power_of_2_element_sum;
+        pub mod mod_power_of_2_entrywise_inverse;
         pub mod mod_power_of_2_entrywise_mul;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;

@@ -294,6 +294,9 @@ pub mod mod_power_of_2_element_product;
 /// [`ModPowerOf2ElementSum`](crate::num::arithmetic::traits::ModPowerOf2ElementSum), the sum of the
 /// elements modulo a power of 2.
 pub mod mod_power_of_2_element_sum;
+/// Inverting every element of a vector modulo $2^k$, by implementations of
+/// [`ModPowerOf2EntrywiseInverse`](crate::num::arithmetic::traits::ModPowerOf2EntrywiseInverse).
+pub mod mod_power_of_2_entrywise_inverse;
 /// Multiplying two vectors element by element modulo $2^k$, by implementations of
 /// [`ModPowerOf2EntrywiseMul`](crate::num::arithmetic::traits::ModPowerOf2EntrywiseMul) and
 /// [`ModPowerOf2EntrywiseMulAssign`](

@@ -10,8 +10,9 @@
 
     Diffs `V.mod_entrywise_inverse(m) = R` and `(&V).mod_entrywise_inverse(m) = R` lines, where
     `V` is a vector of naturals reduced modulo `m`, `m` (optionally written `&m`) is positive, and
-    `R` is `Some(W)` or `None`, against _nmod_vec_invert. Any other nonempty line is an error, as
-    is an input with no lines at all.
+    `R` is `Some(W)` or `None`, against _nmod_vec_invert. `V.mod_power_of_2_entrywise_inverse(k)`
+    lines, by value or by reference, are checked the same way with `m` = 2^k. Any other nonempty
+    line is an error, as is an input with no lines at all.
 
     _nmod_vec_invert assumes, without checking, that every element is invertible, and its result
     is unspecified otherwise, while Malachite returns `None`. So the oracle first checks, with
@@ -26,6 +27,7 @@
     The counts of lines checked each way are printed, so a demo that never reaches a path shows.
 */
 
+#include <stdlib.h>
 #include <string.h>
 #include <flint/fmpz_vec.h>
 #include <flint/nmod_vec.h>
@@ -37,6 +39,7 @@ static long none_lines;
 static long modulus_one_lines;
 static long word_lines;
 static long multiword_lines;
+static long power_of_2_lines;
 
 static void
 report_mismatch(int line_number, const fmpz * r, slong len)
@@ -99,8 +102,14 @@ check_line(char * line, int line_number)
     char * receiver;
     char * modulus;
     char * expected_str;
-    if (!split_vector_scalar_line(line, "mod_entrywise_inverse", NULL, &receiver, &modulus,
-                                  &expected_str))
+    int power_of_2 = 0;
+    if (split_vector_scalar_line(line, "mod_power_of_2_entrywise_inverse", NULL, &receiver,
+                                 &modulus, &expected_str))
+    {
+        power_of_2 = 1;
+    }
+    else if (!split_vector_scalar_line(line, "mod_entrywise_inverse", NULL, &receiver, &modulus,
+                                       &expected_str))
     {
         if (line[0] == '\0')
         {
@@ -142,8 +151,21 @@ check_line(char * line, int line_number)
     fmpz_t m, g;
     fmpz_init(m);
     fmpz_init(g);
-    if (v == NULL || (expect_some && w == NULL) || fmpz_set_str(m, modulus, 10) != 0
-        || fmpz_sgn(m) <= 0)
+    int unreadable = v == NULL || (expect_some && w == NULL);
+    if (!unreadable && power_of_2)
+    {
+        char * end;
+        ulong pow = strtoul(modulus, &end, 10);
+        unreadable = end == modulus || *end != '\0';
+        fmpz_one(m);
+        fmpz_mul_2exp(m, m, pow);
+        power_of_2_lines++;
+    }
+    else if (!unreadable)
+    {
+        unreadable = fmpz_set_str(m, modulus, 10) != 0 || fmpz_sgn(m) <= 0;
+    }
+    if (unreadable)
     {
         flint_printf("error in _nmod_vec_invert test, line %d: unreadable input\n", line_number);
         result = 1;
@@ -208,12 +230,14 @@ run__nmod_vec_invert(const char * arg)
     modulus_one_lines = 0;
     word_lines = 0;
     multiword_lines = 0;
+    power_of_2_lines = 0;
     int result = for_each_line(arg, check_line);
     if (result == 0)
     {
         flint_printf("_nmod_vec_invert: %ld lines by _nmod_vec_invert, %ld by fmpz_invmod, %ld "
-                     "modulo 1, %ld None\n",
-                     word_lines, multiword_lines, modulus_one_lines, none_lines);
+                     "modulo 1, %ld None; %ld modulo a power of 2\n",
+                     word_lines, multiword_lines, modulus_one_lines, none_lines,
+                     power_of_2_lines);
     }
     return result != 0 ? result : require_some_lines("_nmod_vec_invert", checked);
 }

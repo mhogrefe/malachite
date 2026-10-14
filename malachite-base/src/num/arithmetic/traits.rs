@@ -2566,6 +2566,15 @@ pub trait ModPowerOf2EntrywiseMulAssign<RHS = Self> {
     fn mod_power_of_2_entrywise_mul_assign(&mut self, other: RHS, pow: u64);
 }
 
+/// Finds the multiplicative inverses of all the entries of a value, such as a vector, modulo $2^k$,
+/// returning `None` if any entry is not invertible. The entries must be already reduced modulo
+/// $2^k$.
+pub trait ModPowerOf2EntrywiseInverse {
+    type Output;
+
+    fn mod_power_of_2_entrywise_inverse(self, pow: u64) -> Option<Self::Output>;
+}
+
 /// Adds a number and the product of two other numbers, modulo $2^k$. All three inputs must be
 /// already reduced modulo $2^k$.
 pub trait ModPowerOf2AddMul<Y = Self, Z = Self> {

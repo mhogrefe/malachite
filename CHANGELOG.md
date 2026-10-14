@@ -40,6 +40,9 @@ documented by git history.
   and its implementation for `UnsignedVector<T>`, like FLINT's `_nmod_vec_invert`: the product of
   the elements is inverted once and each inverse is recovered from partial products. It returns
   `None` if some element is not invertible, where FLINT assumes that every element is.
+- A `ModPowerOf2EntrywiseInverse` trait, for inverting every entry modulo $2^k$, and its
+  implementation for `UnsignedVector<T>`, by the same method as `mod_entrywise_inverse`. It
+  returns `None` if $k > 0$ and some element is even.
 
 ### malachite-nz
 
@@ -63,6 +66,7 @@ documented by git history.
   `_fmpz_mod_vec_mul`.
 - `ModEntrywiseInverse` for `NaturalVector`, with the vector and a `Natural` modulus by value or
   by reference, by the same method.
+- `ModPowerOf2EntrywiseInverse` for `NaturalVector`, with the vector by value or by reference.
 
 ### malachite-q
 

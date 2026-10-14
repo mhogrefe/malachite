@@ -2099,14 +2099,18 @@ fn test_against_flint() {
             "_fmpz_vec_multi_CRT_ui",
         );
     }
-    // The generated cases from mod_entrywise_inverse_properties in malachite-base's UnsignedVector
-    // tests and malachite-nz's NaturalVector tests: (vector, modulus) pairs, by value and by
+    // The generated cases from mod_entrywise_inverse_properties and
+    // mod_power_of_2_entrywise_inverse_properties in malachite-base's UnsignedVector tests and
+    // malachite-nz's NaturalVector tests: (vector, modulus or power of 2) pairs, by value and by
     // reference, most of them with a non-invertible element, and the same vectors with only their
     // invertible elements kept.
     for demo_name in [
         "demo_unsigned_vector_mod_entrywise_inverse",
         "demo_unsigned_vector_mod_entrywise_inverse_ref",
         "demo_unsigned_vector_mod_entrywise_inverse_units",
+        "demo_unsigned_vector_mod_power_of_2_entrywise_inverse",
+        "demo_unsigned_vector_mod_power_of_2_entrywise_inverse_ref",
+        "demo_unsigned_vector_mod_power_of_2_entrywise_inverse_odd",
     ] {
         check_demo_against_flint(&oracle, "../malachite-base", demo_name, "_nmod_vec_invert");
     }
@@ -2114,6 +2118,9 @@ fn test_against_flint() {
         "demo_natural_vector_mod_entrywise_inverse",
         "demo_natural_vector_mod_entrywise_inverse_ref",
         "demo_natural_vector_mod_entrywise_inverse_units",
+        "demo_natural_vector_mod_power_of_2_entrywise_inverse",
+        "demo_natural_vector_mod_power_of_2_entrywise_inverse_ref",
+        "demo_natural_vector_mod_power_of_2_entrywise_inverse_odd",
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_nmod_vec_invert");
     }
