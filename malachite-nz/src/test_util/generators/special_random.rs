@@ -1749,6 +1749,79 @@ pub fn special_random_integer_polynomial_pair_gen(
     ))
 }
 
+pub fn special_random_integer_polynomial_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials_min_degree(
+                seed,
+                4,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 8),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integer_polynomials_min_degree(
+                seed,
+                2,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_polynomial_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_polynomials_min_degree(
+                    seed,
+                    4,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 8),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_nonzero_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, a, b)| (p, IntegerPolynomial::from_coefficients_asc(vec![a, b]))),
+    )
+}
+
 pub fn special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, IntegerPolynomial, u64)> {

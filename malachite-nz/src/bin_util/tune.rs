@@ -1563,6 +1563,69 @@ fn tune_poly_mod_taylor_shift_grid() {
     }
 }
 
+// Times the two ways of composing IntegerPolynomials: Horner's rule over whole polynomials against
+// divide and conquer, for outer polynomials of several lengths, inner polynomials of several
+// lengths, and coefficients of several sizes. COMPOSE_HORNER_MAX_LEN should be just below the
+// shortest outer length at which divide and conquer wins. Grids are overridable through
+// COMPOSE_GRID_LENS1, COMPOSE_GRID_LENS2, and COMPOSE_GRID_BITS.
+fn tune_poly_compose_grid() {
+    use malachite_base::num::arithmetic::traits::ModPowerOf2Assign;
+    use malachite_base::num::logic::traits::BitAccess;
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::compose::{
+        compose_divide_and_conquer, compose_horner,
+    };
+    use malachite_nz::natural::Natural;
+    // `n` nonzero Integers with `bits` bits and alternating signs.
+    fn coefficients(seed: &str, n: usize, bits: u64) -> Vec<Integer> {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+        let limb_count = usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap();
+        (0..n)
+            .map(|i| {
+                let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                let mut x = Natural::from_owned_limbs_asc(xs);
+                x.mod_power_of_2_assign(bits - 1);
+                x.set_bit(bits - 1);
+                let x = Integer::from(x);
+                if i % 2 == 0 { x } else { -x }
+            })
+            .collect()
+    }
+    let lens1 = shift_grid(
+        "COMPOSE_GRID_LENS1",
+        &[3, 4, 5, 6, 7, 8, 10, 12, 16, 24, 32],
+    );
+    let lens2 = shift_grid("COMPOSE_GRID_LENS2", &[3, 4, 6, 10, 20]);
+    let bits = shift_grid("COMPOSE_GRID_BITS", &[8, 64, 256, 1024]);
+    println!(
+        "{:>5} {:>5} {:>5} {:>12} {:>12} {:>8}",
+        "bits", "len2", "len1", "Horner", "D&C", "H/D&C"
+    );
+    for &b in &bits {
+        for &len2 in &lens2 {
+            let ys = coefficients(&format!("y{b}_{len2}"), usize::try_from(len2).unwrap(), b);
+            for &len1 in &lens1 {
+                let xs = coefficients(&format!("x{b}_{len1}"), usize::try_from(len1).unwrap(), b);
+                let t_horner = time_shift(&xs, &|xs| {
+                    black_box(compose_horner(xs, &ys));
+                });
+                let t_dc = time_shift(&xs, &|xs| {
+                    black_box(compose_divide_and_conquer(xs, &ys));
+                });
+                println!(
+                    "{:>5} {:>5} {:>5} {:>12.0} {:>12.0} {:>8.2}",
+                    b,
+                    len2,
+                    len1,
+                    t_horner * 1e9,
+                    t_dc * 1e9,
+                    t_horner / t_dc
+                );
+            }
+        }
+    }
+}
+
 // Times the forms of the IntegerPolynomial multinomial powering kernel: the default choice between
 // the two below, the precomputed multiples, the sum split by sign, and FLINT's single signed sum.
 // Grids are overridable through POW_GRID_LENS, POW_GRID_BITS, and POW_GRID_EXPS.
@@ -4169,6 +4232,7 @@ pub fn tune(key: &str) {
         }
         "poly_unsigned_mod_taylor_shift_grid" => tune_poly_unsigned_mod_taylor_shift_grid(),
         "poly_mod_taylor_shift_grid" => tune_poly_mod_taylor_shift_grid(),
+        "poly_compose_grid" => tune_poly_compose_grid(),
         "poly_pow_multinomial_grid" => tune_poly_pow_multinomial_grid(),
         "poly_pow_chain_grid" => tune_poly_pow_chain_grid(),
         "gcd_probe" => tune_gcd_probe(),

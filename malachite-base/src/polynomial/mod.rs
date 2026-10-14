@@ -774,6 +774,28 @@ pub trait DivPowerOfXAssign {
     fn div_power_of_x_assign(&mut self, n: u64);
 }
 
+/// Composes two polynomials, giving $p(q(x))$.
+pub trait Compose<Rhs = Self> {
+    type Output;
+
+    /// Composes two polynomials.
+    ///
+    /// $$
+    /// f(p, q) = p(q(x)).
+    /// $$
+    fn compose(self, other: Rhs) -> Self::Output;
+}
+
+/// Composes two polynomials in place, replacing $p$ with $p(q(x))$.
+pub trait ComposeAssign<Rhs = Self> {
+    /// Composes two polynomials in place.
+    ///
+    /// $$
+    /// p \gets p(q(x)).
+    /// $$
+    fn compose_assign(&mut self, other: Rhs);
+}
+
 /// Composes a polynomial with $x^k$, giving $p(x^k)$: the coefficient of $x^i$ moves to $x^{ik}$.
 ///
 /// When $k$ is 0, the result is the constant $p(1)$, the sum of the coefficients.

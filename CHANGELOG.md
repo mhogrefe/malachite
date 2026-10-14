@@ -57,6 +57,8 @@ documented by git history.
   the quotients share is computed once.
 - `TaylorShift` and `TaylorShiftAssign` traits in `malachite_base::polynomial`, for shifting a
   polynomial by a constant, $p(x + c)$.
+- `Compose` and `ComposeAssign` traits in `malachite_base::polynomial`, for composing two
+  polynomials, $p(q(x))$.
 - `ModPowerOf2TaylorShift` and `ModPowerOf2TaylorShiftAssign` traits in
   `malachite_base::polynomial`, for shifting a polynomial by a constant modulo $2^k$,
   $p(x + c) \bmod 2^k$.
@@ -97,6 +99,10 @@ documented by git history.
   or by reference. `mod_div` is FLINT's `_fmpz_mod_vec_scalar_div_fmpz_mod`.
 - `ModPowerOf2Div` for `Natural`, with both arguments by value or by reference, and for
   `NaturalVector`, with the vector and the `Natural` divisor by value or by reference.
+- `Compose` and `ComposeAssign` for `IntegerPolynomial`, like FLINT's `fmpz_poly_compose`: a
+  Taylor shift and a scaling for a linear inner polynomial, done in place when the outer polynomial
+  is owned; otherwise Horner's rule for short outer polynomials and divide and conquer for longer
+  ones, switching at a length that depends on the size of the coefficients.
 - `TaylorShift` and `TaylorShiftAssign` for `IntegerPolynomial` by an `Integer`, like FLINT's
   `fmpz_poly_taylor_shift`: Horner's rule, with word, double-word, and limb-array fast paths for a
   shift by 1, for short polynomials, and divide and conquer for long ones, with cutoffs measured

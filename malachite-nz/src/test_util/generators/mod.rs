@@ -600,6 +600,26 @@ pub fn integer_polynomial_pair_gen() -> Generator<(IntegerPolynomial, IntegerPol
     )
 }
 
+// All pairs of `IntegerPolynomial`s where the first has degree at least 4 and the second has degree
+// at least 2.
+pub fn integer_polynomial_pair_gen_var_1() -> Generator<(IntegerPolynomial, IntegerPolynomial)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_pair_gen_var_1,
+        &random_integer_polynomial_pair_gen_var_1,
+        &special_random_integer_polynomial_pair_gen_var_1,
+    )
+}
+
+// All pairs of `IntegerPolynomial`s where the first has degree at least 4 and the second has degree
+// 1.
+pub fn integer_polynomial_pair_gen_var_2() -> Generator<(IntegerPolynomial, IntegerPolynomial)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_pair_gen_var_2,
+        &random_integer_polynomial_pair_gen_var_2,
+        &special_random_integer_polynomial_pair_gen_var_2,
+    )
+}
+
 // All `(IntegerPolynomial, IntegerPolynomial, u64)` where the `u64` is a small length.
 pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1()
 -> Generator<(IntegerPolynomial, IntegerPolynomial, u64)> {

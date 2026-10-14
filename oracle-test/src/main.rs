@@ -2182,6 +2182,23 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_taylor_shift");
     }
+    // The generated cases from compose_properties in malachite-nz's IntegerPolynomial tests: all
+    // six forms, long polynomials, linear inner polynomials, and the Horner and divide-and-conquer
+    // kernels.
+    for demo_name in [
+        "demo_integer_polynomial_compose",
+        "demo_integer_polynomial_compose_val_ref",
+        "demo_integer_polynomial_compose_ref_val",
+        "demo_integer_polynomial_compose_ref_ref",
+        "demo_integer_polynomial_compose_assign",
+        "demo_integer_polynomial_compose_assign_ref",
+        "demo_integer_polynomial_compose_long",
+        "demo_integer_polynomial_compose_linear",
+        "demo_integer_polynomial_compose_horner",
+        "demo_integer_polynomial_compose_divide_and_conquer",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_compose");
+    }
     // The generated cases from taylor_shift_properties in malachite-q's RationalPolynomial tests:
     // by value, by reference, and in place, with long polynomials, and with integer shifts.
     for demo_name in [

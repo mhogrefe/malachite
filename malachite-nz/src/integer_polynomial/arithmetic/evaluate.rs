@@ -199,7 +199,7 @@ where
 }
 
 // At `x = -1` the value is the alternating sum of the coefficients, which needs no multiplication.
-fn evaluate_integer(coefficients: &[Integer], x: &Integer) -> Integer {
+pub(crate) fn evaluate_integer(coefficients: &[Integer], x: &Integer) -> Integer {
     if *x == -1i32 {
         coefficients.iter().step_by(2).sum::<Integer>()
             - coefficients.iter().skip(1).step_by(2).sum::<Integer>()

@@ -260,6 +260,26 @@ pub fn exhaustive_integer_polynomial_pair_gen() -> It<(IntegerPolynomial, Intege
     ))
 }
 
+pub fn exhaustive_integer_polynomial_pair_gen_var_1() -> It<(IntegerPolynomial, IntegerPolynomial)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials_min_degree(4),
+        exhaustive_integer_polynomials_min_degree(2),
+    ))
+}
+
+pub fn exhaustive_integer_polynomial_pair_gen_var_2() -> It<(IntegerPolynomial, IntegerPolynomial)>
+{
+    Box::new(
+        exhaustive_triples(
+            exhaustive_integer_polynomials_min_degree(4),
+            exhaustive_integers(),
+            exhaustive_nonzero_integers(),
+        )
+        .map(|(p, a, b)| (p, IntegerPolynomial::from_coefficients_asc(vec![a, b]))),
+    )
+}
+
 pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1()
 -> It<(IntegerPolynomial, IntegerPolynomial, u64)> {
     Box::new(exhaustive_triples_xxy(
