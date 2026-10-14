@@ -55,6 +55,8 @@ documented by git history.
   `PrimitiveUnsigned` now requires `ModPowerOf2Div<Self, Output = Self>`.
 - `ModPowerOf2Div` for `UnsignedVector<T>`, dividing every element by a `T`. The inverse that all
   the quotients share is computed once.
+- `TaylorShift` and `TaylorShiftAssign` traits in `malachite_base::polynomial`, for shifting a
+  polynomial by a constant, $p(x + c)$.
 
 ### malachite-nz
 
@@ -83,6 +85,10 @@ documented by git history.
   or by reference. `mod_div` is FLINT's `_fmpz_mod_vec_scalar_div_fmpz_mod`.
 - `ModPowerOf2Div` for `Natural`, with both arguments by value or by reference, and for
   `NaturalVector`, with the vector and the `Natural` divisor by value or by reference.
+- `TaylorShift` and `TaylorShiftAssign` for `IntegerPolynomial` by an `Integer`, like FLINT's
+  `fmpz_poly_taylor_shift`: Horner's rule, with word, double-word, and limb-array fast paths for a
+  shift by 1, for short polynomials, and divide and conquer for long ones, with cutoffs measured
+  for Malachite's multiplication.
 
 ### malachite-q
 

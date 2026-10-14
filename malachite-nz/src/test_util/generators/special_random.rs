@@ -16,6 +16,7 @@ use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer::random::{
     StripedRandomIntegers, striped_random_integers, striped_random_natural_integers,
     striped_random_negative_integers, striped_random_nonzero_integers,
+    uniform_random_integer_inclusive_range,
 };
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::random::{
@@ -1607,6 +1608,34 @@ pub fn special_random_integer_polynomial_integer_pair_gen(
     ))
 }
 
+pub fn special_random_integer_polynomial_integer_integer_triple_gen(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Integer, Integer)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_integer_polynomial_integer_vec_pair_gen(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, Vec<Integer>)> {
@@ -1713,6 +1742,26 @@ pub fn special_random_integer_polynomial_integer_pair_gen_var_3(
             )
         }),
     )
+}
+
+pub fn special_random_integer_polynomial_integer_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 32),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| uniform_random_integer_inclusive_range(seed, Integer::from(-3), Integer::from(3)),
+    ))
 }
 
 pub fn special_random_integer_polynomial_natural_pair_gen(

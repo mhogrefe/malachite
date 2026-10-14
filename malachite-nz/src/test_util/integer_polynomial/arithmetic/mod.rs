@@ -29,3 +29,4 @@ pub mod square;
 pub mod square_truncated;
 pub mod sub;
 pub mod sub_truncated;
+pub mod taylor_shift;

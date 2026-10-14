@@ -162,6 +162,7 @@ static const oracle_mode modes[] = {
     {"_fmpz_vec_multi_CRT_ui", run__fmpz_vec_multi_CRT_ui},
     {"_fmpz_vec_set_fft", run__fmpz_vec_set_fft},
     {"_fmpz_mod_vec_scalar_div_fmpz_mod", run__fmpz_mod_vec_scalar_div_fmpz_mod},
+    {"fmpz_poly_taylor_shift", run_fmpz_poly_taylor_shift},
     {"_nmod_vec_invert", run__nmod_vec_invert},
 };
 

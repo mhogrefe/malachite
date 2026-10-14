@@ -570,6 +570,15 @@ pub fn integer_polynomial_integer_pair_gen() -> Generator<(IntegerPolynomial, In
     )
 }
 
+pub fn integer_polynomial_integer_integer_triple_gen()
+-> Generator<(IntegerPolynomial, Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_integer_triple_gen,
+        &random_integer_polynomial_integer_integer_triple_gen,
+        &special_random_integer_polynomial_integer_integer_triple_gen,
+    )
+}
+
 pub fn integer_polynomial_integer_vec_pair_gen() -> Generator<(IntegerPolynomial, Vec<Integer>)> {
     Generator::new(
         &exhaustive_integer_polynomial_integer_vec_pair_gen,
@@ -603,6 +612,16 @@ pub fn integer_polynomial_integer_pair_gen_var_3() -> Generator<(IntegerPolynomi
         &exhaustive_integer_polynomial_integer_pair_gen_var_3,
         &random_integer_polynomial_integer_pair_gen_var_3,
         &special_random_integer_polynomial_integer_pair_gen_var_3,
+    )
+}
+
+// The `Integer` is between -3 and 3, inclusive, so that shifts by 0, 1, and -1, which take their
+// own paths, are common.
+pub fn integer_polynomial_integer_pair_gen_var_4() -> Generator<(IntegerPolynomial, Integer)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_pair_gen_var_4,
+        &random_integer_polynomial_integer_pair_gen_var_4,
+        &special_random_integer_polynomial_integer_pair_gen_var_4,
     )
 }
 

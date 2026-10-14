@@ -13,8 +13,8 @@ use crate::gaussian_integer::exhaustive::{
 };
 use crate::integer::Integer;
 use crate::integer::exhaustive::{
-    exhaustive_integers, exhaustive_natural_integers, exhaustive_negative_integers,
-    exhaustive_nonzero_integers,
+    exhaustive_integer_inclusive_range, exhaustive_integers, exhaustive_natural_integers,
+    exhaustive_negative_integers, exhaustive_nonzero_integers,
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer_polynomial::IntegerPolynomial;
@@ -298,6 +298,14 @@ pub fn exhaustive_integer_polynomial_integer_pair_gen() -> It<(IntegerPolynomial
     ))
 }
 
+pub fn exhaustive_integer_polynomial_integer_integer_triple_gen()
+-> It<(IntegerPolynomial, Integer, Integer)> {
+    Box::new(exhaustive_triples_xyy(
+        exhaustive_integer_polynomials(),
+        exhaustive_integers(),
+    ))
+}
+
 pub fn exhaustive_integer_polynomial_integer_vec_pair_gen() -> It<(IntegerPolynomial, Vec<Integer>)>
 {
     Box::new(exhaustive_pairs(
@@ -332,6 +340,13 @@ pub fn exhaustive_integer_polynomial_integer_pair_gen_var_3() -> It<(IntegerPoly
             )
         }),
     )
+}
+
+pub fn exhaustive_integer_polynomial_integer_pair_gen_var_4() -> It<(IntegerPolynomial, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_integer_inclusive_range(Integer::from(-3), Integer::from(3)),
+    ))
 }
 
 pub fn exhaustive_integer_polynomial_natural_pair_gen() -> It<(IntegerPolynomial, Natural)> {

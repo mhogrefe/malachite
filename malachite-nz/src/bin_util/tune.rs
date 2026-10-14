@@ -1148,6 +1148,116 @@ fn tune_poly_pow_grid() {
     }
 }
 
+// Times the two ways of shifting an IntegerPolynomial by a constant at one node of the
+// divide-and-conquer recursion: Horner's rule on the whole polynomial, against one split with the
+// halves shifted by the current policy. For each coefficient size and shift, prints the times over
+// a range of lengths; the cutoff in `taylor_shift_divide_and_conquer` should be near the smallest
+// length from which the split wins. Grids are overridable through TS_GRID_LENS and TS_GRID_BITS.
+fn tune_poly_taylor_shift_grid() {
+    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::basic::traits::{NegativeOne, One};
+    use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::taylor_shift::{
+        taylor_shift_divide_and_conquer_split, taylor_shift_horner,
+    };
+    use malachite_nz::natural::Natural;
+    use std::time::Instant;
+    fn dense(seed: &str, n: usize, bits: u64) -> Vec<Integer> {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+        let mut signs = random_primitive_ints::<u8>(EXAMPLE_SEED.fork(&format!("{seed}s")));
+        let limb_count = usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap();
+        (0..n)
+            .map(|_| {
+                let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                let mut x = Natural::from_owned_limbs_asc(xs).mod_power_of_2(bits);
+                x.set_bit(bits - 1);
+                if signs.next().unwrap().odd() {
+                    -Integer::from(x)
+                } else {
+                    Integer::from(x)
+                }
+            })
+            .collect()
+    }
+    // Seconds per call, cloning the input each time: iterations are doubled (or multiplied by 10)
+    // until a batch takes at least 20 ms, and the best of 3 batches is kept. The clone is timed
+    // too, equally for both algorithms.
+    fn time_one(xs: &[Integer], f: &dyn Fn(&mut [Integer])) -> f64 {
+        let mut iters = 1u64;
+        loop {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                let mut ys = xs.to_vec();
+                f(&mut ys);
+                black_box(ys);
+            }
+            let t = t0.elapsed().as_secs_f64();
+            if t >= 0.02 {
+                break;
+            }
+            iters *= if t < 0.002 { 10 } else { 2 };
+        }
+        let mut best = f64::INFINITY;
+        for _ in 0..3 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                let mut ys = xs.to_vec();
+                f(&mut ys);
+                black_box(ys);
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best
+    }
+    let grid = |var: &str, default: &[u64]| -> Vec<u64> {
+        std::env::var(var).map_or_else(
+            |_| default.to_vec(),
+            |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+        )
+    };
+    let lens = grid(
+        "TS_GRID_LENS",
+        &[24, 32, 48, 64, 80, 96, 128, 160, 192, 256, 320, 384, 512, 768, 1024, 1536, 2048],
+    );
+    let all_bits = grid("TS_GRID_BITS", &[8, 64, 256, 1024, 4096, 16384]);
+    let shifts: [(&str, Integer); 4] = [
+        ("1", Integer::ONE),
+        ("-1", Integer::NEGATIVE_ONE),
+        ("3", Integer::from(3)),
+        ("2^63+1", (Integer::ONE << 63u32) + Integer::ONE),
+    ];
+    // Skip cases whose Horner time would be more than about a second.
+    let max_work: u64 = std::env::var("TS_GRID_MAX_WORK").map_or(1 << 34, |v| v.parse().unwrap());
+    println!(
+        "{:>6} {:>6} {:>5} {:>12} {:>12} {:>8}",
+        "c", "bits", "len", "Horner", "split", "H/split"
+    );
+    for (name, c) in &shifts {
+        for &bits in &all_bits {
+            for &len in &lens {
+                let c_bits = c.significant_bits();
+                if len * len * (bits + len * c_bits) > max_work {
+                    continue;
+                }
+                let n = usize::try_from(len).unwrap();
+                let xs = dense(&format!("t{len}_{bits}"), n, bits);
+                let t_horner = time_one(&xs, &|ys| taylor_shift_horner(ys, c));
+                let t_split = time_one(&xs, &|ys| taylor_shift_divide_and_conquer_split(ys, c));
+                println!(
+                    "{:>6} {:>6} {:>5} {:>12.0} {:>12.0} {:>8.2}",
+                    name,
+                    bits,
+                    len,
+                    t_horner * 1e9,
+                    t_split * 1e9,
+                    t_horner / t_split
+                );
+            }
+        }
+    }
+}
+
 // Times the forms of the IntegerPolynomial multinomial powering kernel: the default choice between
 // the two below, the precomputed multiples, the sum split by sign, and FLINT's single signed sum.
 // Grids are overridable through POW_GRID_LENS, POW_GRID_BITS, and POW_GRID_EXPS.
@@ -3747,6 +3857,7 @@ pub fn tune(key: &str) {
         "poly_mod_evaluate_geometric_grid" => tune_poly_mod_evaluate_geometric_grid(),
         "poly_mod_mul_middle_grid" => tune_poly_mod_mul_middle_grid(),
         "poly_pow_grid" => tune_poly_pow_grid(),
+        "poly_taylor_shift_grid" => tune_poly_taylor_shift_grid(),
         "poly_pow_multinomial_grid" => tune_poly_pow_multinomial_grid(),
         "poly_pow_chain_grid" => tune_poly_pow_chain_grid(),
         "gcd_probe" => tune_gcd_probe(),

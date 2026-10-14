@@ -800,6 +800,32 @@ pub trait ComposePowerOfXAssign {
     fn compose_power_of_x_assign(&mut self, k: u64);
 }
 
+/// Shifts a polynomial by a constant, giving $p(x + c)$.
+///
+/// This is also called a Taylor shift: the coefficient of $x^k$ in $p(x + c)$ is $p^{(k)}(c)/k!$,
+/// the $k$th coefficient of the Taylor expansion of $p$ around $c$. The shift preserves the degree
+/// and the leading coefficient, and shifting by $-c$ undoes it.
+pub trait TaylorShift<C> {
+    type Output;
+
+    /// Shifts a polynomial by a constant.
+    ///
+    /// $$
+    /// f(p, c) = p(x + c).
+    /// $$
+    fn taylor_shift(self, c: C) -> Self::Output;
+}
+
+/// Shifts a polynomial by a constant in place, replacing $p$ with $p(x + c)$.
+pub trait TaylorShiftAssign<C> {
+    /// Shifts a polynomial by a constant in place.
+    ///
+    /// $$
+    /// p \gets p(x + c).
+    /// $$
+    fn taylor_shift_assign(&mut self, c: C);
+}
+
 /// Computes the greatest common divisor of the exponents at which a polynomial has nonzero
 /// coefficients.
 ///

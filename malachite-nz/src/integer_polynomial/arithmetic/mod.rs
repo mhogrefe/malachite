@@ -221,3 +221,7 @@ pub mod sub;
 /// [`SubTruncatedAssign`](malachite_base::polynomial::SubTruncatedAssign), for subtracting one
 /// polynomial from another and keeping only their low coefficients.
 pub mod sub_truncated;
+/// Implementations of [`TaylorShift`](malachite_base::polynomial::TaylorShift) and
+/// [`TaylorShiftAssign`](malachite_base::polynomial::TaylorShiftAssign), for shifting a polynomial
+/// by a constant.
+pub mod taylor_shift;

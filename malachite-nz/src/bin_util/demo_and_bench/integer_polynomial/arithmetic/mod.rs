@@ -46,6 +46,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mul_middle::register(runner);
     square::register(runner);
     square_truncated::register(runner);
+    taylor_shift::register(runner);
 }
 
 mod add;
@@ -85,3 +86,4 @@ mod square;
 mod square_truncated;
 mod sub;
 mod sub_truncated;
+mod taylor_shift;
