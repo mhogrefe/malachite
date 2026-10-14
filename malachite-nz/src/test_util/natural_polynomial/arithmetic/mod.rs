@@ -40,6 +40,7 @@ pub mod mod_power_of_2_square;
 pub mod mod_power_of_2_square_truncated;
 pub mod mod_power_of_2_sub;
 pub mod mod_power_of_2_sub_truncated;
+pub mod mod_power_of_2_taylor_shift;
 pub mod mod_shl;
 pub mod mod_square;
 pub mod mod_square_truncated;

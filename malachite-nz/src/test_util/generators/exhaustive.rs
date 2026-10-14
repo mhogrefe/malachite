@@ -578,6 +578,54 @@ pub fn exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_1()
     )
 }
 
+pub fn exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_2()
+-> It<(NaturalPolynomial, Natural, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials_min_degree(50),
+            exhaustive_naturals(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, x, mut pow)| {
+            pow += max(p.height_significant_bits(), x.significant_bits());
+            (p, x, pow)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_3()
+-> It<(NaturalPolynomial, Natural, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials(),
+            exhaustive_natural_inclusive_range(Natural::ZERO, Natural::from(3u32)),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, x, mut pow)| {
+            pow += max(p.height_significant_bits(), x.significant_bits());
+            (p, x, pow)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_natural_unsigned_quadruple_gen_var_1()
+-> It<(NaturalPolynomial, Natural, Natural, u64)> {
+    Box::new(
+        exhaustive_quadruples_xyyz(
+            exhaustive_natural_polynomials(),
+            exhaustive_naturals(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, x, y, mut pow)| {
+            pow += max(
+                p.height_significant_bits(),
+                max(x.significant_bits(), y.significant_bits()),
+            );
+            (p, x, y, pow)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(NaturalPolynomial, T, u64)> {
     Box::new(

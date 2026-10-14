@@ -83,7 +83,9 @@ use crate::tuples::exhaustive::{
     exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
 };
 use crate::unsigned_polynomial::UnsignedPolynomial;
-use crate::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
+use crate::unsigned_polynomial::exhaustive::{
+    exhaustive_unsigned_polynomials, exhaustive_unsigned_polynomials_min_degree,
+};
 use crate::unsigned_vector::UnsignedVector;
 use crate::unsigned_vector::exhaustive::{
     exhaustive_unsigned_vectors, exhaustive_unsigned_vectors_with_dimension,
@@ -6550,6 +6552,47 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: Prim
             primitive_int_increasing_inclusive_range(0, T::WIDTH),
         )
         .filter(|(p, x, pow)| p.mod_power_of_2_is_reduced(*pow) && x.significant_bits() <= *pow),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_10<T: PrimitiveUnsigned>()
+-> It<(UnsignedPolynomial<T>, T, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_polynomials_min_degree::<T>(50),
+            exhaustive_unsigneds::<T>(),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(p, x, pow)| p.mod_power_of_2_is_reduced(*pow) && x.significant_bits() <= *pow),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>()
+-> It<(UnsignedPolynomial<T>, T, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(T::ZERO, T::exact_from(3u8)),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(p, x, pow)| p.mod_power_of_2_is_reduced(*pow) && x.significant_bits() <= *pow),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_4<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, T, T, u64)> {
+    Box::new(
+        exhaustive_quadruples_xyyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_unsigneds::<T>(),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(p, x, y, pow)| {
+            p.mod_power_of_2_is_reduced(*pow)
+                && x.significant_bits() <= *pow
+                && y.significant_bits() <= *pow
+        }),
     )
 }
 

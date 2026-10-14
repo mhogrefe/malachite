@@ -274,6 +274,9 @@ int run__fmpz_vec_multi_CRT_ui(const char * arg);
 /* fmpq_poly_taylor_shift.c */
 int run_fmpq_poly_taylor_shift(const char * arg);
 
+/* mod_power_of_2_taylor_shift.c */
+int run_mod_power_of_2_taylor_shift(const char * arg);
+
 /* fmpz_poly_taylor_shift.c */
 int run_fmpz_poly_taylor_shift(const char * arg);
 

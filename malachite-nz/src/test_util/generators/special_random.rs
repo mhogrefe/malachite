@@ -863,6 +863,127 @@ pub fn special_random_natural_polynomial_natural_unsigned_triple_gen_var_1(
     )
 }
 
+pub fn special_random_natural_polynomial_natural_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials_min_degree(
+                    seed,
+                    50,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 64),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, x, mut pow)| {
+            pow += max(p.height_significant_bits(), x.significant_bits());
+            (p, x, pow)
+        }),
+    )
+}
+
+pub fn special_random_natural_polynomial_natural_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 32),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                uniform_random_natural_inclusive_range(seed, Natural::ZERO, Natural::from(3u32))
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, x, mut pow)| {
+            pow += max(p.height_significant_bits(), x.significant_bits());
+            (p, x, pow)
+        }),
+    )
+}
+
+pub fn special_random_natural_polynomial_natural_natural_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural, Natural, u64)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, x, y, mut pow)| {
+            pow += max(
+                p.height_significant_bits(),
+                max(x.significant_bits(), y.significant_bits()),
+            );
+            (p, x, y, pow)
+        }),
+    )
+}
+
 pub fn special_random_natural_polynomial_unsigned_unsigned_triple_gen_var_1<
     T: PrimitiveUnsigned,
 >(

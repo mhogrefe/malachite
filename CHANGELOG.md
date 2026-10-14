@@ -57,6 +57,13 @@ documented by git history.
   the quotients share is computed once.
 - `TaylorShift` and `TaylorShiftAssign` traits in `malachite_base::polynomial`, for shifting a
   polynomial by a constant, $p(x + c)$.
+- `ModPowerOf2TaylorShift` and `ModPowerOf2TaylorShiftAssign` traits in
+  `malachite_base::polynomial`, for shifting a polynomial by a constant modulo $2^k$,
+  $p(x + c) \bmod 2^k$.
+- `ModPowerOf2TaylorShift` and `ModPowerOf2TaylorShiftAssign` for `UnsignedPolynomial<T>` by a
+  `T`, in wrapping word arithmetic reduced at the end: Horner's rule for short polynomials, and
+  divide and conquer for long ones, computing the binomial coefficients modulo $2^k$ from their odd
+  parts and powers of 2, without big integers.
 
 ### malachite-nz
 
@@ -91,6 +98,10 @@ documented by git history.
   for Malachite's multiplication.
 - `TaylorShift` and `TaylorShiftAssign` for `NaturalPolynomial` by a `Natural`, using the same
   algorithms; a shift by a non-negative number keeps every coefficient non-negative.
+- `ModPowerOf2TaylorShift` and `ModPowerOf2TaylorShiftAssign` for `NaturalPolynomial`, keeping the
+  coefficients reduced throughout: divide and conquer with modular multiplication for long
+  polynomials, and Horner's rule for short ones, using the exact shift by 1 or wrapping word
+  arithmetic when they apply.
 
 ### malachite-q
 

@@ -1258,6 +1258,101 @@ fn tune_poly_taylor_shift_grid() {
     }
 }
 
+// Times the two ways of shifting a NaturalPolynomial by a constant modulo 2^k at one node of the
+// divide-and-conquer recursion: Horner's rule on the whole polynomial, against one split with the
+// halves shifted by the current policy. For each modulus and shift, prints the times over a range
+// of lengths; MOD_POWER_OF_2_TAYLOR_SHIFT_DC_THRESHOLD should be near the smallest length from
+// which the split wins. Grids are overridable through MTS_GRID_LENS and MTS_GRID_POWS.
+fn tune_poly_mod_power_of_2_taylor_shift_grid() {
+    use malachite_base::num::arithmetic::traits::ModPowerOf2;
+    use malachite_base::num::basic::traits::One;
+    use malachite_nz::natural::Natural;
+    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_taylor_shift::{
+        mod_power_of_2_taylor_shift_divide_and_conquer_split, mod_power_of_2_taylor_shift_horner,
+    };
+    use std::time::Instant;
+    fn reduced(seed: &str, n: usize, pow: u64) -> Vec<Natural> {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+        let limb_count = usize::try_from(pow.div_ceil(Limb::WIDTH)).unwrap();
+        (0..n)
+            .map(|_| {
+                let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                Natural::from_owned_limbs_asc(xs).mod_power_of_2(pow)
+            })
+            .collect()
+    }
+    // Seconds per call, cloning the input each time: iterations are doubled (or multiplied by 10)
+    // until a batch takes at least 20 ms, and the best of 3 batches is kept.
+    fn time_one(xs: &[Natural], f: &dyn Fn(&mut [Natural])) -> f64 {
+        let mut iters = 1u64;
+        loop {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                let mut ys = xs.to_vec();
+                f(&mut ys);
+                black_box(ys);
+            }
+            let t = t0.elapsed().as_secs_f64();
+            if t >= 0.02 {
+                break;
+            }
+            iters *= if t < 0.002 { 10 } else { 2 };
+        }
+        let mut best = f64::INFINITY;
+        for _ in 0..3 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                let mut ys = xs.to_vec();
+                f(&mut ys);
+                black_box(ys);
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best
+    }
+    let grid = |var: &str, default: &[u64]| -> Vec<u64> {
+        std::env::var(var).map_or_else(
+            |_| default.to_vec(),
+            |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+        )
+    };
+    let lens = grid(
+        "MTS_GRID_LENS",
+        &[16, 24, 32, 48, 64, 80, 96, 128, 160, 192, 256, 320, 384, 512, 768, 1024],
+    );
+    let pows = grid("MTS_GRID_POWS", &[8, 32, 64, 128, 256, 1024, 4096]);
+    println!(
+        "{:>7} {:>5} {:>5} {:>12} {:>12} {:>8}",
+        "c", "pow", "len", "Horner", "split", "H/split"
+    );
+    for name in ["1", "3", "random"] {
+        for &pow in &pows {
+            let c = match name {
+                "1" => Natural::ONE.mod_power_of_2(pow),
+                "3" => Natural::from(3u32).mod_power_of_2(pow),
+                _ => reduced(&format!("c{pow}"), 1, pow).pop().unwrap(),
+            };
+            for &len in &lens {
+                let n = usize::try_from(len).unwrap();
+                let xs = reduced(&format!("m{len}_{pow}"), n, pow);
+                let t_horner = time_one(&xs, &|ys| mod_power_of_2_taylor_shift_horner(ys, &c, pow));
+                let t_split = time_one(&xs, &|ys| {
+                    mod_power_of_2_taylor_shift_divide_and_conquer_split(ys, &c, pow);
+                });
+                println!(
+                    "{:>7} {:>5} {:>5} {:>12.0} {:>12.0} {:>8.2}",
+                    name,
+                    pow,
+                    len,
+                    t_horner * 1e9,
+                    t_split * 1e9,
+                    t_horner / t_split
+                );
+            }
+        }
+    }
+}
+
 // Times the forms of the IntegerPolynomial multinomial powering kernel: the default choice between
 // the two below, the precomputed multiples, the sum split by sign, and FLINT's single signed sum.
 // Grids are overridable through POW_GRID_LENS, POW_GRID_BITS, and POW_GRID_EXPS.
@@ -3858,6 +3953,7 @@ pub fn tune(key: &str) {
         "poly_mod_mul_middle_grid" => tune_poly_mod_mul_middle_grid(),
         "poly_pow_grid" => tune_poly_pow_grid(),
         "poly_taylor_shift_grid" => tune_poly_taylor_shift_grid(),
+        "poly_mod_power_of_2_taylor_shift_grid" => tune_poly_mod_power_of_2_taylor_shift_grid(),
         "poly_pow_multinomial_grid" => tune_poly_pow_multinomial_grid(),
         "poly_pow_chain_grid" => tune_poly_pow_chain_grid(),
         "gcd_probe" => tune_gcd_probe(),

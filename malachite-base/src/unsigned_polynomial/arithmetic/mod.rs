@@ -248,6 +248,10 @@ pub mod mod_power_of_2_sub_truncated;
 /// Implementations of [`ModPowerOf2Sum`](crate::num::arithmetic::traits::ModPowerOf2Sum), for
 /// adding up polynomials modulo a power of 2.
 pub mod mod_power_of_2_sum;
+/// Implementations of [`ModPowerOf2TaylorShift`](crate::polynomial::ModPowerOf2TaylorShift) and
+/// [`ModPowerOf2TaylorShiftAssign`](crate::polynomial::ModPowerOf2TaylorShiftAssign), for shifting
+/// a polynomial by a constant modulo $2^k$.
+pub mod mod_power_of_2_taylor_shift;
 /// Implementations of [`ModProduct`](crate::num::arithmetic::traits::ModProduct), for multiplying
 /// polynomials together modulo a number.
 pub mod mod_product;

@@ -325,6 +325,39 @@ pub fn natural_polynomial_natural_unsigned_triple_gen_var_1()
     )
 }
 
+// All `(NaturalPolynomial, Natural, u64)` where the polynomial's coefficients and the `Natural` are
+// less than 2 to the power of the `u64`, and the polynomial has degree at least 50.
+pub fn natural_polynomial_natural_unsigned_triple_gen_var_2()
+-> Generator<(NaturalPolynomial, Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_2,
+        &random_natural_polynomial_natural_unsigned_triple_gen_var_2,
+        &special_random_natural_polynomial_natural_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(NaturalPolynomial, Natural, u64)` where the polynomial's coefficients and the `Natural` are
+// less than 2 to the power of the `u64`, and the `Natural` is at most 3.
+pub fn natural_polynomial_natural_unsigned_triple_gen_var_3()
+-> Generator<(NaturalPolynomial, Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_3,
+        &random_natural_polynomial_natural_unsigned_triple_gen_var_3,
+        &special_random_natural_polynomial_natural_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(NaturalPolynomial, Natural, Natural, u64)` where the polynomial's coefficients and both
+// `Natural`s are less than 2 to the power of the `u64`.
+pub fn natural_polynomial_natural_natural_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalPolynomial, Natural, Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_natural_unsigned_quadruple_gen_var_1,
+        &random_natural_polynomial_natural_natural_unsigned_quadruple_gen_var_1,
+        &special_random_natural_polynomial_natural_natural_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // All `(NaturalPolynomial, T, u64)` where the polynomial's coefficients are less than 2 to the
 // power of the `u64`, and the `T` is small and unsigned.
 pub fn natural_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()

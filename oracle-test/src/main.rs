@@ -2124,6 +2124,39 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_nmod_vec_invert");
     }
+    // The generated cases from mod_power_of_2_taylor_shift_properties in malachite-base's
+    // UnsignedPolynomial tests and malachite-nz's NaturalPolynomial tests: by value, by reference,
+    // and in place, with long polynomials, and with shifts of at most 3.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_taylor_shift_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_taylor_shift_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_taylor_shift_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_taylor_shift_assign_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_taylor_shift_long_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_taylor_shift_long_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_taylor_shift_small_shift_u64",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "mod_power_of_2_taylor_shift",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_taylor_shift",
+        "demo_natural_polynomial_mod_power_of_2_taylor_shift_ref",
+        "demo_natural_polynomial_mod_power_of_2_taylor_shift_assign",
+        "demo_natural_polynomial_mod_power_of_2_taylor_shift_long",
+        "demo_natural_polynomial_mod_power_of_2_taylor_shift_small_shift",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "mod_power_of_2_taylor_shift",
+        );
+    }
     // The generated cases from taylor_shift_properties in malachite-q's RationalPolynomial tests:
     // by value, by reference, and in place, with long polynomials, and with integer shifts.
     for demo_name in [

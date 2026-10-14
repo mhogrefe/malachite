@@ -933,6 +933,7 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_sub_truncated;
         pub mod mod_power_of_2_sum;
+        pub mod mod_power_of_2_taylor_shift;
         pub mod mod_product;
         pub mod mod_shl;
         pub mod mod_square;

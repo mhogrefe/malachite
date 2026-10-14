@@ -96,7 +96,9 @@ use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pa
 use crate::unions::Union2;
 use crate::unions::random::random_union2s;
 use crate::unsigned_polynomial::UnsignedPolynomial;
-use crate::unsigned_polynomial::random::striped_random_unsigned_polynomials;
+use crate::unsigned_polynomial::random::{
+    striped_random_unsigned_polynomials, striped_random_unsigned_polynomials_min_degree,
+};
 use crate::unsigned_vector::UnsignedVector;
 use crate::unsigned_vector::random::{RandomUnsignedVectors, striped_random_unsigned_vectors};
 use crate::vecs::random::{RandomVecs, random_vecs};
@@ -10194,6 +10196,98 @@ pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<
             &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
         )
         .map(|(p, x, pow)| (p.mod_power_of_2(pow), x.mod_power_of_2(pow), pow)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_10<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, T, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials_min_degree::<T>(
+                    seed,
+                    50,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 64),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, x, pow)| (p.mod_power_of_2(pow), x.mod_power_of_2(pow), pow)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_11<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, T, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 32),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, T::ZERO, T::exact_from(3u8)),
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, x, pow)| (p.mod_power_of_2(pow), x.mod_power_of_2(pow), pow)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_4<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, T, T, u64)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, x, y, pow)| {
+            (
+                p.mod_power_of_2(pow),
+                x.mod_power_of_2(pow),
+                y.mod_power_of_2(pow),
+                pow,
+            )
+        }),
     )
 }
 

@@ -826,6 +826,30 @@ pub trait TaylorShiftAssign<C> {
     fn taylor_shift_assign(&mut self, c: C);
 }
 
+/// Shifts a polynomial by a constant modulo $2^k$, giving $p(x + c) \bmod 2^k$. The coefficients
+/// and the constant must be already reduced modulo $2^k$.
+pub trait ModPowerOf2TaylorShift<C> {
+    type Output;
+
+    /// Shifts a polynomial by a constant modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, c, k) = p(x + c) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_taylor_shift(self, c: C, pow: u64) -> Self::Output;
+}
+
+/// Shifts a polynomial by a constant modulo $2^k$ in place, replacing $p$ with $p(x + c) \bmod
+/// 2^k$. The coefficients and the constant must be already reduced modulo $2^k$.
+pub trait ModPowerOf2TaylorShiftAssign<C> {
+    /// Shifts a polynomial by a constant modulo $2^k$ in place.
+    ///
+    /// $$
+    /// p \gets p(x + c) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_taylor_shift_assign(&mut self, c: C, pow: u64);
+}
+
 /// Computes the greatest common divisor of the exponents at which a polynomial has nonzero
 /// coefficients.
 ///
