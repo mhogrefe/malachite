@@ -903,6 +903,7 @@ pub mod unsigned_polynomial {
         pub mod is_unit;
         pub mod mod_add;
         pub mod mod_add_truncated;
+        pub mod mod_compose;
         pub mod mod_derivative;
         pub mod mod_integral;
         pub mod mod_is_reduced;

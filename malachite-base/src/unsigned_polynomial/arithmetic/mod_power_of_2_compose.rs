@@ -19,10 +19,20 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::mem::{swap, take};
 
-// Whether a polynomial with `xs_len` coefficients is composed with Horner's rule rather than divide
-// and conquer. Provisional, to be measured.
-const fn compose_horner_preferred(xs_len: usize) -> bool {
-    xs_len <= 6
+// Whether a polynomial with `xs_len` coefficients is composed with a polynomial with `ys_len`
+// coefficients by Horner's rule rather than divide and conquer, as measured on this machine. In
+// wrapping word arithmetic every product is cheap, and short ones are schoolbook products, so
+// divide and conquer only pays when it saves many of them: from about 24 coefficients when the
+// inner polynomial is short (more for 128-bit words), and from about 12 when it is longer.
+const fn compose_horner_preferred<T: PrimitiveUnsigned>(xs_len: usize, ys_len: usize) -> bool {
+    let max_len = if ys_len > 4 {
+        11
+    } else if T::WIDTH == 128 {
+        31
+    } else {
+        23
+    };
+    xs_len <= max_len
 }
 
 // The coefficients of the composition of the polynomials with coefficients `xs` and `ys`, both
@@ -132,7 +142,7 @@ pub fn mod_power_of_2_compose_vec<T: PrimitiveUnsigned>(
             xs
         }
         _ => {
-            let mut out = if compose_horner_preferred(xs.len()) {
+            let mut out = if compose_horner_preferred::<T>(xs.len(), ys.len()) {
                 mod_power_of_2_compose_horner(&xs, ys)
             } else {
                 mod_power_of_2_compose_divide_and_conquer(&xs, ys)

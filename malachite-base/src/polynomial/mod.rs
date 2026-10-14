@@ -796,6 +796,30 @@ pub trait ComposeAssign<Rhs = Self> {
     fn compose_assign(&mut self, other: Rhs);
 }
 
+/// Composes two polynomials modulo $m$, giving $p(q(x)) \bmod m$. The coefficients of both must
+/// already be reduced modulo $m$.
+pub trait ModCompose<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Composes two polynomials modulo $m$.
+    ///
+    /// $$
+    /// f(p, q, m) = p(q(x)) \bmod m.
+    /// $$
+    fn mod_compose(self, other: Rhs, m: M) -> Self::Output;
+}
+
+/// Composes two polynomials modulo $m$ in place, replacing $p$ with $p(q(x)) \bmod m$. The
+/// coefficients of both must already be reduced modulo $m$.
+pub trait ModComposeAssign<Rhs = Self, M = Self> {
+    /// Composes two polynomials modulo $m$ in place.
+    ///
+    /// $$
+    /// p \gets p(q(x)) \bmod m.
+    /// $$
+    fn mod_compose_assign(&mut self, other: Rhs, m: M);
+}
+
 /// Composes two polynomials modulo $2^k$, giving $p(q(x)) \bmod 2^k$. The coefficients of both must
 /// already be reduced modulo $2^k$.
 pub trait ModPowerOf2Compose<Rhs = Self> {

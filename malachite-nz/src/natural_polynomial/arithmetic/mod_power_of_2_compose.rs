@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::compose::compose_horner_preferred;
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::arithmetic::mod_power_of_2_add::assert_reduced;
@@ -25,6 +24,14 @@ use malachite_base::polynomial::{
     ModPowerOf2Compose, ModPowerOf2ComposeAssign, ModPowerOf2Evaluate,
 };
 use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_compose::*;
+
+// Whether a polynomial with `xs_len` coefficients is composed modulo $2^k$, where $k$ is `pow`,
+// which is larger than a limb, with Horner's rule rather than divide and conquer, as measured on
+// this machine: divide and conquer pays from about 12 coefficients up to a thousand bits or so, and
+// from about 6 beyond.
+const fn compose_horner_preferred(xs_len: usize, pow: u64) -> bool {
+    xs_len <= if pow <= 1024 { 10 } else { 5 }
+}
 
 // The composition, modulo $2^k$, of the polynomial with coefficients `xs`, reduced and with at
 // least two coefficients, with `q`, which is not constant, by Horner's rule over whole polynomials:

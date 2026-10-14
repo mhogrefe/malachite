@@ -56,6 +56,10 @@ pub mod mod_add;
 /// [`ModAddTruncatedAssign`](crate::polynomial::ModAddTruncatedAssign), for adding two polynomials
 /// modulo a value and keeping only their low coefficients.
 pub mod mod_add_truncated;
+/// Implementations of [`ModCompose`](crate::polynomial::ModCompose) and
+/// [`ModComposeAssign`](crate::polynomial::ModComposeAssign), for composing two polynomials modulo
+/// a number.
+pub mod mod_compose;
 /// Implementations of [`ModDerivative`](crate::polynomial::ModDerivative) and
 /// [`ModDerivativeAssign`](crate::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.

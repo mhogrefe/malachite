@@ -96,6 +96,10 @@ pub mod mod_add;
 /// polynomials modulo a [`Natural`](crate::natural::Natural) and keeping only their low
 /// coefficients.
 pub mod mod_add_truncated;
+/// Implementations of [`ModCompose`](malachite_base::polynomial::ModCompose) and
+/// [`ModComposeAssign`](malachite_base::polynomial::ModComposeAssign), for composing two
+/// polynomials modulo a [`Natural`](crate::natural::Natural).
+pub mod mod_compose;
 /// Implementations of [`ModDerivative`](malachite_base::polynomial::ModDerivative) and
 /// [`ModDerivativeAssign`](malachite_base::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.

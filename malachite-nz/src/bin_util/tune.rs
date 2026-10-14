@@ -27,6 +27,7 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::bench::tune::{
     INPUT_SETS, find_crossover_spec, interleaved_min_pair, time_batch,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use malachite_nz::natural::arithmetic::div::{
     limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
@@ -1621,6 +1622,217 @@ fn tune_poly_compose_grid() {
                     t_dc * 1e9,
                     t_horner / t_dc
                 );
+            }
+        }
+    }
+}
+
+// Prints one row of a composition grid: the times of Horner's rule and of divide and conquer, in
+// ns.
+fn print_compose_row(t: &str, size: u64, len2: u64, len1: u64, t_horner: f64, t_dc: f64) {
+    println!(
+        "{:>5} {:>5} {:>5} {:>5} {:>12.0} {:>12.0} {:>8.2}",
+        t,
+        size,
+        len2,
+        len1,
+        t_horner * 1e9,
+        t_dc * 1e9,
+        t_horner / t_dc
+    );
+}
+
+fn print_compose_header(size_name: &str) {
+    println!(
+        "{:>5} {:>5} {:>5} {:>5} {:>12} {:>12} {:>8}",
+        "T", size_name, "len2", "len1", "Horner", "D&C", "H/D&C"
+    );
+}
+
+const COMPOSE_GRID_LENS1: [u64; 11] = [3, 4, 5, 6, 7, 8, 10, 12, 16, 24, 32];
+const COMPOSE_GRID_LENS2: [u64; 4] = [3, 4, 8, 16];
+
+// Times Horner's rule against divide and conquer for composing UnsignedPolynomial<T>s modulo 2^k,
+// for each word type, over outer and inner lengths. The work is wrapping word arithmetic, so the
+// modulus does not matter. Grids are overridable through UMP2C_GRID_LENS1 and UMP2C_GRID_LENS2.
+fn tune_poly_unsigned_mod_power_of_2_compose_grid() {
+    use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_compose::{
+        mod_power_of_2_compose_divide_and_conquer, mod_power_of_2_compose_horner,
+    };
+    fn run<T: PrimitiveUnsigned>(lens1: &[u64], lens2: &[u64]) {
+        for &len2 in lens2 {
+            let mut words = random_primitive_ints::<T>(EXAMPLE_SEED.fork(&format!("y{len2}")));
+            let ys: Vec<T> = (&mut words)
+                .take(usize::try_from(len2).unwrap())
+                .map(|y| y | T::ONE)
+                .collect();
+            for &len1 in lens1 {
+                let xs: Vec<T> = (&mut words)
+                    .take(usize::try_from(len1).unwrap())
+                    .map(|x| x | T::ONE)
+                    .collect();
+                let t_horner = time_shift(&xs, &|xs| {
+                    black_box(mod_power_of_2_compose_horner(xs, &ys));
+                });
+                let t_dc = time_shift(&xs, &|xs| {
+                    black_box(mod_power_of_2_compose_divide_and_conquer(xs, &ys));
+                });
+                print_compose_row(T::NAME, T::WIDTH, len2, len1, t_horner, t_dc);
+            }
+        }
+    }
+    let lens1 = shift_grid("UMP2C_GRID_LENS1", &COMPOSE_GRID_LENS1);
+    let lens2 = shift_grid("UMP2C_GRID_LENS2", &COMPOSE_GRID_LENS2);
+    print_compose_header("pow");
+    run::<u8>(&lens1, &lens2);
+    run::<u16>(&lens1, &lens2);
+    run::<u32>(&lens1, &lens2);
+    run::<u64>(&lens1, &lens2);
+    run::<u128>(&lens1, &lens2);
+}
+
+// Times Horner's rule against divide and conquer for composing UnsignedPolynomial<T>s modulo m, for
+// each word type and odd moduli of several sizes, over outer and inner lengths. Grids are
+// overridable through UMC_GRID_LENS1, UMC_GRID_LENS2, and UMC_GRID_BITS.
+fn tune_poly_unsigned_mod_compose_grid() {
+    use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+    use malachite_base::unsigned_polynomial::arithmetic::mod_compose::{
+        mod_compose_divide_and_conquer, mod_compose_horner,
+    };
+    fn run<T: PrimitiveUnsigned>(lens1: &[u64], lens2: &[u64], bits: &[u64]) {
+        for &b in bits.iter().filter(|&&b| b >= 3 && b <= T::WIDTH) {
+            let m = T::low_mask(b) - T::TWO;
+            for &len2 in lens2 {
+                let mut words =
+                    random_primitive_ints::<T>(EXAMPLE_SEED.fork(&format!("y{b}_{len2}")));
+                let ys: Vec<T> = (&mut words)
+                    .take(usize::try_from(len2).unwrap())
+                    .map(|y| (y % (m - T::ONE)) + T::ONE)
+                    .collect();
+                for &len1 in lens1 {
+                    let xs: Vec<T> = (&mut words)
+                        .take(usize::try_from(len1).unwrap())
+                        .map(|x| (x % (m - T::ONE)) + T::ONE)
+                        .collect();
+                    let t_horner = time_shift(&xs, &|xs| {
+                        black_box(mod_compose_horner(xs, &ys, m));
+                    });
+                    let t_dc = time_shift(&xs, &|xs| {
+                        black_box(mod_compose_divide_and_conquer(xs, &ys, m));
+                    });
+                    print_compose_row(T::NAME, b, len2, len1, t_horner, t_dc);
+                }
+            }
+        }
+    }
+    let lens1 = shift_grid("UMC_GRID_LENS1", &COMPOSE_GRID_LENS1);
+    let lens2 = shift_grid("UMC_GRID_LENS2", &COMPOSE_GRID_LENS2);
+    let bits = shift_grid("UMC_GRID_BITS", &[8, 16, 31, 32, 50, 63, 64, 100, 127, 128]);
+    print_compose_header("bits");
+    run::<u8>(&lens1, &lens2, &bits);
+    run::<u16>(&lens1, &lens2, &bits);
+    run::<u32>(&lens1, &lens2, &bits);
+    run::<u64>(&lens1, &lens2, &bits);
+    run::<u128>(&lens1, &lens2, &bits);
+}
+
+// `n` Naturals below `m`, which has `bits` bits, all nonzero.
+fn naturals_below(seed: &str, n: usize, m: &Natural, bits: u64) -> Vec<Natural> {
+    use malachite_base::num::basic::traits::One;
+    let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+    let limb_count = usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap();
+    (0..n)
+        .map(|_| {
+            let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+            let x = Natural::from_owned_limbs_asc(xs) % m;
+            if x == 0u32 { Natural::ONE } else { x }
+        })
+        .collect()
+}
+
+// Times Horner's rule against divide and conquer for composing NaturalPolynomials modulo 2^k, for k
+// larger than a limb (smaller moduli use the UnsignedPolynomial code), over outer and inner
+// lengths. Grids are overridable through NMP2C_GRID_LENS1, NMP2C_GRID_LENS2, and NMP2C_GRID_POWS.
+fn tune_poly_mod_power_of_2_compose_grid() {
+    use malachite_base::num::arithmetic::traits::PowerOf2;
+    use malachite_base::polynomial::Polynomial;
+    use malachite_nz::natural::Natural;
+    use malachite_nz::natural_polynomial::NaturalPolynomial;
+    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_compose::{
+        mod_power_of_2_compose_divide_and_conquer, mod_power_of_2_compose_horner,
+    };
+    let lens1 = shift_grid("NMP2C_GRID_LENS1", &COMPOSE_GRID_LENS1);
+    let lens2 = shift_grid("NMP2C_GRID_LENS2", &COMPOSE_GRID_LENS2);
+    let pows = shift_grid("NMP2C_GRID_POWS", &[65, 128, 256, 512, 1024, 4096]);
+    print_compose_header("pow");
+    for &pow in &pows {
+        let m = Natural::power_of_2(pow);
+        for &len2 in &lens2 {
+            let q = NaturalPolynomial::from_coefficients_asc(naturals_below(
+                &format!("y{pow}_{len2}"),
+                usize::try_from(len2).unwrap(),
+                &m,
+                pow,
+            ));
+            for &len1 in &lens1 {
+                let xs = naturals_below(
+                    &format!("x{pow}_{len1}"),
+                    usize::try_from(len1).unwrap(),
+                    &m,
+                    pow,
+                );
+                let t_horner = time_shift(&xs, &|xs| {
+                    black_box(mod_power_of_2_compose_horner(xs, &q, pow));
+                });
+                let t_dc = time_shift(&xs, &|xs| {
+                    black_box(mod_power_of_2_compose_divide_and_conquer(xs, &q, pow));
+                });
+                print_compose_row("N", pow, len2, len1, t_horner, t_dc);
+            }
+        }
+    }
+}
+
+// Times Horner's rule against divide and conquer for composing NaturalPolynomials modulo m, for odd
+// m larger than a limb (smaller moduli use the UnsignedPolynomial code), over outer and inner
+// lengths. Grids are overridable through NMC_GRID_LENS1, NMC_GRID_LENS2, and NMC_GRID_BITS.
+fn tune_poly_mod_compose_grid() {
+    use malachite_base::num::arithmetic::traits::PowerOf2;
+    use malachite_base::num::basic::traits::One;
+    use malachite_base::polynomial::Polynomial;
+    use malachite_nz::natural::Natural;
+    use malachite_nz::natural_polynomial::NaturalPolynomial;
+    use malachite_nz::natural_polynomial::arithmetic::mod_compose::{
+        mod_compose_divide_and_conquer, mod_compose_horner,
+    };
+    let lens1 = shift_grid("NMC_GRID_LENS1", &COMPOSE_GRID_LENS1);
+    let lens2 = shift_grid("NMC_GRID_LENS2", &COMPOSE_GRID_LENS2);
+    let bits = shift_grid("NMC_GRID_BITS", &[65, 128, 256, 512, 1024, 4096]);
+    print_compose_header("bits");
+    for &b in &bits {
+        let m = Natural::power_of_2(b - 1) + Natural::power_of_2(b >> 1) + Natural::ONE;
+        for &len2 in &lens2 {
+            let q = NaturalPolynomial::from_coefficients_asc(naturals_below(
+                &format!("y{b}_{len2}"),
+                usize::try_from(len2).unwrap(),
+                &m,
+                b,
+            ));
+            for &len1 in &lens1 {
+                let xs = naturals_below(
+                    &format!("x{b}_{len1}"),
+                    usize::try_from(len1).unwrap(),
+                    &m,
+                    b,
+                );
+                let t_horner = time_shift(&xs, &|xs| {
+                    black_box(mod_compose_horner(xs, &q, &m));
+                });
+                let t_dc = time_shift(&xs, &|xs| {
+                    black_box(mod_compose_divide_and_conquer(xs, &q, &m));
+                });
+                print_compose_row("N", b, len2, len1, t_horner, t_dc);
             }
         }
     }
@@ -4233,6 +4445,12 @@ pub fn tune(key: &str) {
         "poly_unsigned_mod_taylor_shift_grid" => tune_poly_unsigned_mod_taylor_shift_grid(),
         "poly_mod_taylor_shift_grid" => tune_poly_mod_taylor_shift_grid(),
         "poly_compose_grid" => tune_poly_compose_grid(),
+        "poly_unsigned_mod_power_of_2_compose_grid" => {
+            tune_poly_unsigned_mod_power_of_2_compose_grid();
+        }
+        "poly_unsigned_mod_compose_grid" => tune_poly_unsigned_mod_compose_grid(),
+        "poly_mod_power_of_2_compose_grid" => tune_poly_mod_power_of_2_compose_grid(),
+        "poly_mod_compose_grid" => tune_poly_mod_compose_grid(),
         "poly_pow_multinomial_grid" => tune_poly_pow_multinomial_grid(),
         "poly_pow_chain_grid" => tune_poly_pow_chain_grid(),
         "gcd_probe" => tune_gcd_probe(),
