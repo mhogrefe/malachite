@@ -21,7 +21,8 @@ use malachite_base::test_util::generators::{
 use malachite_base::test_util::unsigned_polynomial::arithmetic::mod_power_of_2_taylor_shift::*;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_taylor_shift::{
-    mod_power_of_2_taylor_shift_divide_and_conquer, mod_power_of_2_taylor_shift_horner,
+    mod_power_of_2_taylor_shift_divide_and_conquer,
+    mod_power_of_2_taylor_shift_divide_and_conquer_split, mod_power_of_2_taylor_shift_horner,
 };
 
 fn check<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, c: T, pow: u64) -> UnsignedPolynomial<T> {
@@ -38,6 +39,12 @@ fn check<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, c: T, pow: u64) -> Uns
     let mut xs = p.coefficients_asc().to_vec();
     mod_power_of_2_taylor_shift_divide_and_conquer(&mut xs, c, pow);
     assert_eq!(xs, q.coefficients_asc());
+    if xs.len() > 1 {
+        // One split, whatever the length, with the halves shifted by the default policy.
+        let mut xs = p.coefficients_asc().to_vec();
+        mod_power_of_2_taylor_shift_divide_and_conquer_split(&mut xs, c, pow);
+        assert_eq!(xs, q.coefficients_asc());
+    }
     q
 }
 

@@ -41,4 +41,5 @@ pub mod mod_square;
 pub mod mod_square_truncated;
 pub mod mod_sub;
 pub mod mod_sub_truncated;
+pub mod mod_taylor_shift;
 pub mod mul_power_of_x;

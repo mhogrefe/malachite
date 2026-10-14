@@ -877,6 +877,7 @@ pub mod natural_polynomial {
         pub mod mod_sub;
         pub mod mod_sub_truncated;
         pub mod mod_sum;
+        pub mod mod_taylor_shift;
         pub mod mul;
         pub mod mul_power_of_x;
         pub mod mul_truncated;

@@ -1353,6 +1353,216 @@ fn tune_poly_mod_power_of_2_taylor_shift_grid() {
     }
 }
 
+// Seconds per call of `f` on a fresh copy of `xs`: iterations are doubled (or multiplied by 10)
+// until a batch takes at least 20 ms, and the best of 3 batches is kept.
+fn time_shift<T: Clone>(xs: &[T], f: &dyn Fn(&mut [T])) -> f64 {
+    use std::time::Instant;
+    let mut iters = 1u64;
+    loop {
+        let t0 = Instant::now();
+        for _ in 0..iters {
+            let mut ys = xs.to_vec();
+            f(&mut ys);
+            black_box(ys);
+        }
+        let t = t0.elapsed().as_secs_f64();
+        if t >= 0.02 {
+            break;
+        }
+        iters *= if t < 0.002 { 10 } else { 2 };
+    }
+    let mut best = f64::INFINITY;
+    for _ in 0..3 {
+        let t0 = Instant::now();
+        for _ in 0..iters {
+            let mut ys = xs.to_vec();
+            f(&mut ys);
+            black_box(ys);
+        }
+        best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+    }
+    best
+}
+
+// A comma-separated list of numbers from the environment variable `var`, or `default`.
+fn shift_grid(var: &str, default: &[u64]) -> Vec<u64> {
+    std::env::var(var).map_or_else(
+        |_| default.to_vec(),
+        |v| v.split(',').map(|x| x.trim().parse().unwrap()).collect(),
+    )
+}
+
+// Prints one row of a Taylor-shift grid: the times of Horner's rule and of one split, in ns.
+fn print_shift_row(c: &str, size: u64, len: u64, t_horner: f64, t_split: f64) {
+    println!(
+        "{:>7} {:>5} {:>5} {:>12.0} {:>12.0} {:>8.2}",
+        c,
+        size,
+        len,
+        t_horner * 1e9,
+        t_split * 1e9,
+        t_horner / t_split
+    );
+}
+
+const SHIFT_GRID_LENS: [u64; 16] =
+    [16, 24, 32, 48, 64, 80, 96, 128, 160, 192, 256, 320, 384, 512, 768, 1024];
+
+const LONG_SHIFT_GRID_LENS: [u64; 20] = [
+    16, 24, 32, 48, 64, 80, 96, 128, 160, 192, 256, 320, 384, 512, 768, 1024, 1536, 2048, 3072,
+    4096,
+];
+
+// Times the two ways of shifting an UnsignedPolynomial<T> by a constant modulo 2^k at one node of
+// the divide-and-conquer recursion, for T = u32 and u64: Horner's rule on the whole polynomial,
+// against one split with the halves shifted by the current policy. Grids are overridable through
+// UMTS_GRID_LENS and UMTS_GRID_POWS.
+fn tune_poly_unsigned_mod_power_of_2_taylor_shift_grid() {
+    use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_taylor_shift::{
+        mod_power_of_2_taylor_shift_divide_and_conquer_split, mod_power_of_2_taylor_shift_horner,
+    };
+    fn run<T: PrimitiveUnsigned>(lens: &[u64], pows: &[u64]) {
+        println!("T = {}", T::NAME);
+        println!(
+            "{:>7} {:>5} {:>5} {:>12} {:>12} {:>8}",
+            "c", "pow", "len", "Horner", "split", "H/split"
+        );
+        for name in ["1", "3", "random"] {
+            for &pow in pows.iter().filter(|&&pow| pow <= T::WIDTH) {
+                let mut words = random_primitive_ints::<T>(EXAMPLE_SEED.fork(&format!("{pow}")));
+                let c = match name {
+                    "1" => T::ONE,
+                    "3" => T::from(3u8).mod_power_of_2(pow),
+                    _ => words.next().unwrap().mod_power_of_2(pow),
+                };
+                for &len in lens {
+                    let xs: Vec<T> = (&mut words)
+                        .take(usize::try_from(len).unwrap())
+                        .map(|x| x.mod_power_of_2(pow))
+                        .collect();
+                    let t_horner =
+                        time_shift(&xs, &|ys| mod_power_of_2_taylor_shift_horner(ys, c, pow));
+                    let t_split = time_shift(&xs, &|ys| {
+                        mod_power_of_2_taylor_shift_divide_and_conquer_split(ys, c, pow);
+                    });
+                    print_shift_row(name, pow, len, t_horner, t_split);
+                }
+            }
+        }
+    }
+    let lens = shift_grid("UMTS_GRID_LENS", &LONG_SHIFT_GRID_LENS);
+    let pows = shift_grid("UMTS_GRID_POWS", &[8, 16, 32, 64, 128]);
+    run::<u8>(&lens, &pows);
+    run::<u16>(&lens, &pows);
+    run::<u32>(&lens, &pows);
+    run::<u64>(&lens, &pows);
+    run::<u128>(&lens, &pows);
+}
+
+// Times the two ways of shifting an UnsignedPolynomial<T> by a constant modulo m at one node of the
+// divide-and-conquer recursion, for T = u32 and u64: Horner's rule on the whole polynomial, against
+// one split with the halves shifted by the current policy. The moduli are odd, with the given
+// numbers of bits. Grids are overridable through UMODTS_GRID_LENS and UMODTS_GRID_BITS.
+fn tune_poly_unsigned_mod_taylor_shift_grid() {
+    use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+    use malachite_base::unsigned_polynomial::arithmetic::mod_taylor_shift::{
+        mod_taylor_shift_divide_and_conquer_split, mod_taylor_shift_horner,
+    };
+    fn run<T: PrimitiveUnsigned>(lens: &[u64], bits: &[u64]) {
+        println!("T = {}", T::NAME);
+        println!(
+            "{:>7} {:>5} {:>5} {:>12} {:>12} {:>8}",
+            "c", "bits", "len", "Horner", "split", "H/split"
+        );
+        for name in ["1", "3", "random"] {
+            for &b in bits.iter().filter(|&&b| b >= 3 && b <= T::WIDTH) {
+                let mut words = random_primitive_ints::<T>(EXAMPLE_SEED.fork(&format!("{b}")));
+                // An odd modulus with exactly b bits.
+                let m = T::low_mask(b) - T::TWO;
+                let c = match name {
+                    "1" => T::ONE,
+                    "3" => T::from(3u8),
+                    _ => words.next().unwrap() % m,
+                };
+                for &len in lens {
+                    let xs: Vec<T> = (&mut words)
+                        .take(usize::try_from(len).unwrap())
+                        .map(|x| x % m)
+                        .collect();
+                    let t_horner = time_shift(&xs, &|ys| mod_taylor_shift_horner(ys, c, m));
+                    let t_split = time_shift(&xs, &|ys| {
+                        mod_taylor_shift_divide_and_conquer_split(ys, c, m);
+                    });
+                    print_shift_row(name, b, len, t_horner, t_split);
+                }
+            }
+        }
+    }
+    let lens = shift_grid("UMODTS_GRID_LENS", &LONG_SHIFT_GRID_LENS);
+    let bits = shift_grid(
+        "UMODTS_GRID_BITS",
+        &[8, 15, 16, 31, 32, 50, 63, 64, 100, 127, 128],
+    );
+    run::<u8>(&lens, &bits);
+    run::<u16>(&lens, &bits);
+    run::<u32>(&lens, &bits);
+    run::<u64>(&lens, &bits);
+    run::<u128>(&lens, &bits);
+}
+
+// Times the two ways of shifting a NaturalPolynomial by a constant modulo a Natural m at one node
+// of the divide-and-conquer recursion: Horner's rule on the whole polynomial, against one split
+// with the halves shifted by the current policy. The moduli are odd, with the given numbers of
+// bits. Grids are overridable through MODTS_GRID_LENS and MODTS_GRID_BITS.
+fn tune_poly_mod_taylor_shift_grid() {
+    use malachite_base::num::arithmetic::traits::PowerOf2;
+    use malachite_base::num::basic::traits::One;
+    use malachite_nz::natural::Natural;
+    use malachite_nz::natural_polynomial::arithmetic::mod_taylor_shift::{
+        mod_taylor_shift_divide_and_conquer_split, mod_taylor_shift_horner,
+    };
+    fn random_below(seed: &str, n: usize, m: &Natural, bits: u64) -> Vec<Natural> {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
+        let limb_count = usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap();
+        (0..n)
+            .map(|_| {
+                let xs: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                Natural::from_owned_limbs_asc(xs) % m
+            })
+            .collect()
+    }
+    let lens = shift_grid("MODTS_GRID_LENS", &SHIFT_GRID_LENS);
+    let bits = shift_grid(
+        "MODTS_GRID_BITS",
+        &[8, 32, 63, 64, 65, 128, 256, 1024, 4096],
+    );
+    println!(
+        "{:>7} {:>5} {:>5} {:>12} {:>12} {:>8}",
+        "c", "bits", "len", "Horner", "split", "H/split"
+    );
+    for name in ["1", "3", "random"] {
+        for &b in &bits {
+            // An odd modulus with exactly b bits.
+            let m = Natural::power_of_2(b - 1) + Natural::power_of_2(b >> 1) + Natural::ONE;
+            let c = match name {
+                "1" => Natural::ONE,
+                "3" => Natural::from(3u32),
+                _ => random_below(&format!("c{b}"), 1, &m, b).pop().unwrap(),
+            };
+            for &len in &lens {
+                let n = usize::try_from(len).unwrap();
+                let xs = random_below(&format!("m{len}_{b}"), n, &m, b);
+                let t_horner = time_shift(&xs, &|ys| mod_taylor_shift_horner(ys, &c, &m));
+                let t_split = time_shift(&xs, &|ys| {
+                    mod_taylor_shift_divide_and_conquer_split(ys, &c, &m);
+                });
+                print_shift_row(name, b, len, t_horner, t_split);
+            }
+        }
+    }
+}
+
 // Times the forms of the IntegerPolynomial multinomial powering kernel: the default choice between
 // the two below, the precomputed multiples, the sum split by sign, and FLINT's single signed sum.
 // Grids are overridable through POW_GRID_LENS, POW_GRID_BITS, and POW_GRID_EXPS.
@@ -3954,6 +4164,11 @@ pub fn tune(key: &str) {
         "poly_pow_grid" => tune_poly_pow_grid(),
         "poly_taylor_shift_grid" => tune_poly_taylor_shift_grid(),
         "poly_mod_power_of_2_taylor_shift_grid" => tune_poly_mod_power_of_2_taylor_shift_grid(),
+        "poly_unsigned_mod_power_of_2_taylor_shift_grid" => {
+            tune_poly_unsigned_mod_power_of_2_taylor_shift_grid();
+        }
+        "poly_unsigned_mod_taylor_shift_grid" => tune_poly_unsigned_mod_taylor_shift_grid(),
+        "poly_mod_taylor_shift_grid" => tune_poly_mod_taylor_shift_grid(),
         "poly_pow_multinomial_grid" => tune_poly_pow_multinomial_grid(),
         "poly_pow_chain_grid" => tune_poly_pow_chain_grid(),
         "gcd_probe" => tune_gcd_probe(),

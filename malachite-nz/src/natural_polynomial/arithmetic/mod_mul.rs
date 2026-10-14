@@ -59,7 +59,7 @@ pub(crate) fn word_preferred(windows: &[(u64, usize)], len: usize, m: &Natural) 
 
 // Whether the word kernels are used to multiply factors of lengths `len1` and `len2` modulo `m`:
 // when neither is a constant and the shorter is in the window.
-fn mul_word_preferred(len1: usize, len2: usize, m: &Natural) -> bool {
+pub(crate) fn mul_word_preferred(len1: usize, len2: usize, m: &Natural) -> bool {
     len1 > 1 && len2 > 1 && word_preferred(&MUL_WORD_WINDOWS, min(len1, len2), m)
 }
 

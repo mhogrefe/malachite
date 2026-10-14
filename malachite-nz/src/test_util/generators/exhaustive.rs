@@ -749,6 +749,50 @@ pub fn exhaustive_natural_polynomial_natural_natural_triple_gen_var_1()
     )
 }
 
+pub fn exhaustive_natural_polynomial_natural_natural_triple_gen_var_2()
+-> It<(NaturalPolynomial, Natural, Natural)> {
+    Box::new(
+        exhaustive_triples_xyy(
+            exhaustive_natural_polynomials_min_degree(50),
+            exhaustive_naturals(),
+        )
+        .map(|(p, x, m)| {
+            let m = max(p.height_ref(), &x) + m + Natural::ONE;
+            (p, x, m)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_natural_triple_gen_var_3()
+-> It<(NaturalPolynomial, Natural, Natural)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials(),
+            exhaustive_natural_inclusive_range(Natural::ZERO, Natural::from(3u32)),
+            exhaustive_naturals(),
+        )
+        .map(|(p, x, m)| {
+            let m = max(p.height_ref(), &x) + m + Natural::ONE;
+            (p, x, m)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_natural_natural_quadruple_gen_var_1()
+-> It<(NaturalPolynomial, Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_quadruples_xyyz(
+            exhaustive_natural_polynomials(),
+            exhaustive_naturals(),
+            exhaustive_naturals(),
+        )
+        .map(|(p, x, y, m)| {
+            let m = max(p.height_ref(), max(&x, &y)) + m + Natural::ONE;
+            (p, x, y, m)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(NaturalPolynomial, T, Natural)> {
     Box::new(

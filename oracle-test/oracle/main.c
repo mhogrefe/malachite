@@ -164,6 +164,7 @@ static const oracle_mode modes[] = {
     {"_fmpz_mod_vec_scalar_div_fmpz_mod", run__fmpz_mod_vec_scalar_div_fmpz_mod},
     {"fmpz_poly_taylor_shift", run_fmpz_poly_taylor_shift},
     {"mod_power_of_2_taylor_shift", run_mod_power_of_2_taylor_shift},
+    {"mod_taylor_shift", run_mod_taylor_shift},
     {"fmpq_poly_taylor_shift", run_fmpq_poly_taylor_shift},
     {"_nmod_vec_invert", run__nmod_vec_invert},
 };

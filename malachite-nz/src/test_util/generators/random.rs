@@ -1146,6 +1146,107 @@ pub fn random_natural_polynomial_natural_natural_triple_gen_var_1(
     )
 }
 
+pub fn random_natural_polynomial_natural_natural_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural, Natural)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials_min_degree(
+                    seed,
+                    50,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 64),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, x, m)| {
+            let m = max(p.height_ref(), &x) + m + Natural::ONE;
+            (p, x, m)
+        }),
+    )
+}
+
+pub fn random_natural_polynomial_natural_natural_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural, Natural)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 32),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                uniform_random_natural_inclusive_range(seed, Natural::ZERO, Natural::from(3u32))
+            },
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, x, m)| {
+            let m = max(p.height_ref(), &x) + m + Natural::ONE;
+            (p, x, m)
+        }),
+    )
+}
+
+pub fn random_natural_polynomial_natural_natural_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural, Natural, Natural)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, x, y, m)| {
+            let m = max(p.height_ref(), max(&x, &y)) + m + Natural::ONE;
+            (p, x, y, m)
+        }),
+    )
+}
+
 pub fn random_natural_polynomial_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, T, Natural)> {

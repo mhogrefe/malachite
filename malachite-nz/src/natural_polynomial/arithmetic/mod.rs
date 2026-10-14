@@ -458,6 +458,10 @@ pub mod mod_sub_truncated;
 /// Implementations of [`ModSum`](malachite_base::num::arithmetic::traits::ModSum), for adding up
 /// polynomials modulo a number.
 pub mod mod_sum;
+/// Implementations of [`ModTaylorShift`](malachite_base::polynomial::ModTaylorShift) and
+/// [`ModTaylorShiftAssign`](malachite_base::polynomial::ModTaylorShiftAssign), for shifting a
+/// polynomial by a constant modulo a [`Natural`](crate::natural::Natural).
+pub mod mod_taylor_shift;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying two polynomials.
 pub mod mul;

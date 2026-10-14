@@ -18,7 +18,8 @@ use malachite_base::test_util::generators::unsigned_polynomial_unsigned_unsigned
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_taylor_shift::{
-    mod_power_of_2_taylor_shift_divide_and_conquer, mod_power_of_2_taylor_shift_horner,
+    mod_power_of_2_taylor_shift_divide_and_conquer,
+    mod_power_of_2_taylor_shift_divide_and_conquer_split, mod_power_of_2_taylor_shift_horner,
 };
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
@@ -47,6 +48,12 @@ fn check(p: &NaturalPolynomial, c: &Natural, pow: u64) -> NaturalPolynomial {
     let mut xs = p.coefficients_asc().to_vec();
     mod_power_of_2_taylor_shift_divide_and_conquer(&mut xs, c, pow);
     assert_eq!(xs, q.coefficients_asc());
+    if xs.len() > 1 {
+        // One split, whatever the length, with the halves shifted by the default policy.
+        let mut xs = p.coefficients_asc().to_vec();
+        mod_power_of_2_taylor_shift_divide_and_conquer_split(&mut xs, c, pow);
+        assert_eq!(xs, q.coefficients_asc());
+    }
     q
 }
 

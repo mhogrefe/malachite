@@ -60,10 +60,15 @@ documented by git history.
 - `ModPowerOf2TaylorShift` and `ModPowerOf2TaylorShiftAssign` traits in
   `malachite_base::polynomial`, for shifting a polynomial by a constant modulo $2^k$,
   $p(x + c) \bmod 2^k$.
+- `ModTaylorShift` and `ModTaylorShiftAssign` traits in `malachite_base::polynomial`, for shifting
+  a polynomial by a constant modulo $m$, $p(x + c) \bmod m$.
 - `ModPowerOf2TaylorShift` and `ModPowerOf2TaylorShiftAssign` for `UnsignedPolynomial<T>` by a
   `T`, in wrapping word arithmetic reduced at the end: Horner's rule for short polynomials, and
   divide and conquer for long ones, computing the binomial coefficients modulo $2^k$ from their odd
   parts and powers of 2, without big integers.
+- `ModTaylorShift` and `ModTaylorShiftAssign` for `UnsignedPolynomial<T>` by a `T`, modulo any
+  `T`, prime or not: Horner's rule for short polynomials, and divide and conquer for long ones,
+  computing $(x + c)^k$ modulo $m$ by repeated squaring, so nothing is divided modulo $m$.
 
 ### malachite-nz
 
@@ -102,6 +107,10 @@ documented by git history.
   coefficients reduced throughout: divide and conquer with modular multiplication for long
   polynomials, and Horner's rule for short ones, using the exact shift by 1 or wrapping word
   arithmetic when they apply.
+- `ModTaylorShift` and `ModTaylorShiftAssign` for `NaturalPolynomial` by a `Natural`, modulo any
+  `Natural`, prime or not: divide and conquer for long polynomials, with the binomial coefficients
+  computed exactly and then reduced, so nothing is divided modulo $m$; Horner's rule for short
+  ones, using the exact shift by 1, or precomputed word or `Natural` modular multiplication.
 
 ### malachite-q
 

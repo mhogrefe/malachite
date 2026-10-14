@@ -850,6 +850,30 @@ pub trait ModPowerOf2TaylorShiftAssign<C> {
     fn mod_power_of_2_taylor_shift_assign(&mut self, c: C, pow: u64);
 }
 
+/// Shifts a polynomial by a constant modulo $m$, giving $p(x + c) \bmod m$. The coefficients and
+/// the constant must be already reduced modulo $m$.
+pub trait ModTaylorShift<C, M = C> {
+    type Output;
+
+    /// Shifts a polynomial by a constant modulo $m$.
+    ///
+    /// $$
+    /// f(p, c, m) = p(x + c) \bmod m.
+    /// $$
+    fn mod_taylor_shift(self, c: C, m: M) -> Self::Output;
+}
+
+/// Shifts a polynomial by a constant modulo $m$ in place, replacing $p$ with $p(x + c) \bmod m$.
+/// The coefficients and the constant must be already reduced modulo $m$.
+pub trait ModTaylorShiftAssign<C, M = C> {
+    /// Shifts a polynomial by a constant modulo $m$ in place.
+    ///
+    /// $$
+    /// p \gets p(x + c) \bmod m.
+    /// $$
+    fn mod_taylor_shift_assign(&mut self, c: C, m: M);
+}
+
 /// Computes the greatest common divisor of the exponents at which a polynomial has nonzero
 /// coefficients.
 ///

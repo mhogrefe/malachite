@@ -67,6 +67,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_sub_truncated::register(runner);
     mod_product::register(runner);
     mod_sum::register(runner);
+    mod_taylor_shift::register(runner);
     mul::register(runner);
     mul_power_of_x::register(runner);
     mul_truncated::register(runner);
@@ -137,6 +138,7 @@ mod mod_square_truncated;
 mod mod_sub;
 mod mod_sub_truncated;
 mod mod_sum;
+mod mod_taylor_shift;
 mod mul;
 mod mul_power_of_x;
 mod mul_truncated;

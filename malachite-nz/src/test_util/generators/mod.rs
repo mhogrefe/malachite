@@ -460,6 +460,39 @@ pub fn natural_polynomial_natural_natural_triple_gen_var_1()
     )
 }
 
+// All `(NaturalPolynomial, Natural, Natural)` where the polynomial's coefficients and the first
+// `Natural` are less than the second `Natural`, and the polynomial has degree at least 50.
+pub fn natural_polynomial_natural_natural_triple_gen_var_2()
+-> Generator<(NaturalPolynomial, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_natural_triple_gen_var_2,
+        &random_natural_polynomial_natural_natural_triple_gen_var_2,
+        &special_random_natural_polynomial_natural_natural_triple_gen_var_2,
+    )
+}
+
+// All `(NaturalPolynomial, Natural, Natural)` where the polynomial's coefficients and the first
+// `Natural` are less than the second `Natural`, and the first `Natural` is at most 3.
+pub fn natural_polynomial_natural_natural_triple_gen_var_3()
+-> Generator<(NaturalPolynomial, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_natural_triple_gen_var_3,
+        &random_natural_polynomial_natural_natural_triple_gen_var_3,
+        &special_random_natural_polynomial_natural_natural_triple_gen_var_3,
+    )
+}
+
+// All `(NaturalPolynomial, Natural, Natural, Natural)` where the polynomial's coefficients and the
+// first two `Natural`s are less than the third `Natural`.
+pub fn natural_polynomial_natural_natural_natural_quadruple_gen_var_1()
+-> Generator<(NaturalPolynomial, Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_natural_natural_quadruple_gen_var_1,
+        &random_natural_polynomial_natural_natural_natural_quadruple_gen_var_1,
+        &special_random_natural_polynomial_natural_natural_natural_quadruple_gen_var_1,
+    )
+}
+
 // All `(NaturalPolynomial, T, Natural)` where the polynomial's coefficients are less than the
 // `Natural`, and the `T` is small and unsigned.
 pub fn natural_polynomial_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>()

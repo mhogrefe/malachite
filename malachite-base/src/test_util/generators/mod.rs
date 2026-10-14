@@ -5156,6 +5156,39 @@ pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsign
     )
 }
 
+// All `(UnsignedPolynomial<T>, T, T)` where the last `T` is positive, the polynomial's coefficients
+// and the first `T` are less than it, and the polynomial has degree at least 50.
+pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_12<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_12,
+        &random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_12,
+        &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_12,
+    )
+}
+
+// All `(UnsignedPolynomial<T>, T, T)` where the last `T` is positive, the polynomial's coefficients
+// and the first `T` are less than it, and the first `T` is at most 3.
+pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_13<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_13,
+        &random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_13,
+        &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_13,
+    )
+}
+
+// All `(UnsignedPolynomial<T>, T, T, T)` where the last `T` is positive, and the polynomial's
+// coefficients and the other `T`s are less than it.
+pub fn unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_5<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_5,
+        &random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_5,
+        &special_random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_5,
+    )
+}
+
 // All `(UnsignedPolynomial<T>, U, u64)` where the `u64` is no greater than `T::WIDTH`, the
 // polynomial's coefficients are less than 2 to the power of the `u64`, and the `U` is no greater
 // than `T::WIDTH + 1`.

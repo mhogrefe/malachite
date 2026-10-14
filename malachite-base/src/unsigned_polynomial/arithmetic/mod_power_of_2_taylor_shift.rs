@@ -16,9 +16,26 @@ use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
 use alloc::vec;
 use alloc::vec::Vec;
 
-// The length from which splitting beats Horner's rule. Provisional, to be measured.
-fn split_cutoff<T: PrimitiveUnsigned>(c: T) -> usize {
-    if c == T::ONE { 1024 } else { 512 }
+// The length from which splitting beats Horner's rule, as measured on this machine. Horner's rule
+// is a wrapping multiply-add per step, which the compiler vectorizes for narrow words, so the
+// narrower the word, the longer Horner's rule stays ahead; for 128-bit words, the multiplications
+// in the split are expensive, so it stays ahead longer when c = 1 and it only adds.
+fn split_cutoff<T: PrimitiveUnsigned>(c: T, pow: u64) -> usize {
+    match (T::WIDTH, c == T::ONE) {
+        (8, _) => 3072,
+        (16, _) => {
+            if pow <= 8 {
+                2048
+            } else {
+                6144
+            }
+        }
+        (32, _) => 1536,
+        (64, true) => 768,
+        (64, false) => 192,
+        (_, true) => 2048,
+        (_, false) => 160,
+    }
 }
 
 // Shifts the polynomial with coefficients `xs` by `c` modulo 2^pow, with Horner's rule in wrapping
@@ -96,7 +113,7 @@ crate_test_fn! {mod_power_of_2_taylor_shift_divide_and_conquer<T: PrimitiveUnsig
     c: T,
     pow: u64,
 ) {
-    if c == T::ZERO || xs.len() < split_cutoff(c) {
+    if c == T::ZERO || xs.len() < split_cutoff(c, pow) {
         mod_power_of_2_taylor_shift_horner(xs, c, pow);
     } else {
         mod_power_of_2_taylor_shift_divide_and_conquer_split(xs, c, pow);

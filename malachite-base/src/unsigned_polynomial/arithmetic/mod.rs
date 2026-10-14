@@ -342,6 +342,10 @@ pub mod mod_sub_truncated;
 /// Implementations of [`ModSum`](crate::num::arithmetic::traits::ModSum), for adding up polynomials
 /// modulo a number.
 pub mod mod_sum;
+/// Implementations of [`ModTaylorShift`](crate::polynomial::ModTaylorShift) and
+/// [`ModTaylorShiftAssign`](crate::polynomial::ModTaylorShiftAssign), for shifting a polynomial by
+/// a constant modulo a number.
+pub mod mod_taylor_shift;
 /// Implementations of [`MulPowerOfX`](crate::polynomial::MulPowerOfX) and
 /// [`MulPowerOfXAssign`](crate::polynomial::MulPowerOfXAssign), for multiplying a polynomial by a
 /// power of its variable.
