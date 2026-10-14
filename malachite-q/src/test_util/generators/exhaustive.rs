@@ -17,7 +17,9 @@ use crate::rational::exhaustive::{
     exhaustive_positive_rationals, exhaustive_rationals,
 };
 use crate::rational_polynomial::RationalPolynomial;
-use crate::rational_polynomial::exhaustive::exhaustive_rational_polynomials;
+use crate::rational_polynomial::exhaustive::{
+    exhaustive_rational_polynomials, exhaustive_rational_polynomials_min_degree,
+};
 use crate::rational_vector::RationalVector;
 use crate::rational_vector::exhaustive::{
     exhaustive_rational_vectors, exhaustive_rational_vectors_with_dimension,
@@ -1232,6 +1234,34 @@ pub fn exhaustive_rational_polynomial_gaussian_integer_pair_gen()
 
 pub fn exhaustive_rational_polynomial_rational_pair_gen() -> It<(RationalPolynomial, Rational)> {
     Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_rationals(),
+    ))
+}
+
+// rustfmt keeps a signature of exactly 101 columns on one line, so it is laid out by hand.
+#[rustfmt::skip]
+pub fn exhaustive_rational_polynomial_rational_pair_gen_var_1()
+-> It<(RationalPolynomial, Rational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials_min_degree(50),
+        exhaustive_rationals(),
+    ))
+}
+
+// rustfmt keeps a signature of exactly 101 columns on one line, so it is laid out by hand.
+#[rustfmt::skip]
+pub fn exhaustive_rational_polynomial_rational_pair_gen_var_2()
+-> It<(RationalPolynomial, Rational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_polynomials(),
+        exhaustive_integers().map(Rational::from),
+    ))
+}
+
+pub fn exhaustive_rational_polynomial_rational_rational_triple_gen()
+-> It<(RationalPolynomial, Rational, Rational)> {
+    Box::new(exhaustive_triples_xyy(
         exhaustive_rational_polynomials(),
         exhaustive_rationals(),
     ))

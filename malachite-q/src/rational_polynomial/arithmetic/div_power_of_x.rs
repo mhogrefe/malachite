@@ -6,32 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::rational_polynomial::RationalPolynomial;
+use crate::rational_polynomial::{RationalPolynomial, reduce};
 use core::mem::take;
-use malachite_base::num::arithmetic::traits::DivExactAssign;
 use malachite_base::polynomial::{DivPowerOfX, DivPowerOfXAssign};
-use malachite_nz::integer::Integer;
-use malachite_nz::integer_polynomial::IntegerPolynomial;
-use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
-use malachite_nz::natural::Natural;
-
-// Divides out the common factor of a numerator and denominator after low coefficients were dropped
-// from a canonical pair. A zero numerator reduces to 0/1, since the content of zero is taken to be
-// 0.
-//
-// This is equivalent to the `fmpq_poly_canonicalise` step of `fmpq_poly_shift_right` from
-// `fmpq_poly/shift_right.c`, FLINT 3.6.0, where the denominator is already positive.
-fn reduce(mut numerator: IntegerPolynomial, mut denominator: Natural) -> RationalPolynomial {
-    let g = integers_content_chained(numerator.coefficients_asc(), &denominator);
-    if g != 1u32 {
-        denominator.div_exact_assign(&g);
-        numerator.div_exact_assign(Integer::from(g));
-    }
-    RationalPolynomial {
-        numerator,
-        denominator,
-    }
-}
 
 impl DivPowerOfX for RationalPolynomial {
     type Output = Self;

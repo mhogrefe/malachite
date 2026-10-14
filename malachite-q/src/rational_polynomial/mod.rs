@@ -15,13 +15,16 @@ use core::ops::Deref;
 use malachite_base::named::Named;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::CoprimeWith;
-use malachite_base::num::arithmetic::traits::{DivExact, Gcd, GcdAssign, LcmAssign};
+use malachite_base::num::arithmetic::traits::{
+    DivExact, DivExactAssign, Gcd, GcdAssign, LcmAssign,
+};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::vars::{Var, VarScheme};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
+use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
 use malachite_nz::natural::Natural;
 
 /// Iterators that generate [`RationalPolynomial`]s without repetition.
@@ -100,6 +103,27 @@ impl Default for RationalPolynomial {
     #[inline]
     fn default() -> Self {
         Self::ZERO
+    }
+}
+
+// Divides out the common factor of a numerator and a positive denominator, with a GCD chain that
+// stops as soon as the factor is 1, which for most pairs that need little reduction is after a few
+// coefficients. A zero numerator reduces to 0/1, since the content of zero is taken to be 0.
+//
+// This is equivalent to `_fmpq_poly_canonicalise` from `fmpq_poly/canonicalise.c`, FLINT 3.6.0,
+// where the denominator is already positive.
+pub(crate) fn reduce(
+    mut numerator: IntegerPolynomial,
+    mut denominator: Natural,
+) -> RationalPolynomial {
+    let g = integers_content_chained(numerator.coefficients_asc(), &denominator);
+    if g != 1u32 {
+        denominator.div_exact_assign(&g);
+        numerator.div_exact_assign(Integer::from(g));
+    }
+    RationalPolynomial {
+        numerator,
+        denominator,
     }
 }
 

@@ -103,6 +103,10 @@ documented by git history.
   counterparts of FLINT's `_fmpq_vec_randtest_uniq_sorted`.
 - `EntrywiseMul` and `EntrywiseMulAssign` for `RationalVector`, with both vectors by value or by
   reference.
+- `TaylorShift` and `TaylorShiftAssign` for `RationalPolynomial` by a `Rational`. A shift by $a/b$
+  scales the numerator so that the shift is by the integer $a$, uses the integer Taylor shift, and
+  scales back, followed by one reduction to lowest terms; a shift by an integer shifts only the
+  numerator and needs no reduction.
 
 ## 0.14.0 — 2026-10-13
 

@@ -2124,6 +2124,22 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_nmod_vec_invert");
     }
+    // The generated cases from taylor_shift_properties in malachite-q's RationalPolynomial tests:
+    // by value, by reference, and in place, with long polynomials, and with integer shifts.
+    for demo_name in [
+        "demo_rational_polynomial_taylor_shift",
+        "demo_rational_polynomial_taylor_shift_ref",
+        "demo_rational_polynomial_taylor_shift_assign",
+        "demo_rational_polynomial_taylor_shift_long",
+        "demo_rational_polynomial_taylor_shift_integer_shift",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-q",
+            demo_name,
+            "fmpq_poly_taylor_shift",
+        );
+    }
     // The generated cases from taylor_shift_properties in malachite-nz's IntegerPolynomial and
     // NaturalPolynomial tests:
     // by value, by reference, and in place, with long polynomials, and with shifts between -3 and

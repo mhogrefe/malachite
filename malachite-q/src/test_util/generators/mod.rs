@@ -1563,6 +1563,34 @@ pub fn rational_polynomial_rational_pair_gen() -> Generator<(RationalPolynomial,
     )
 }
 
+// The `RationalPolynomial` has degree at least 50, so that long polynomials, which take the
+// divide-and-conquer path, are common.
+pub fn rational_polynomial_rational_pair_gen_var_1() -> Generator<(RationalPolynomial, Rational)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_rational_pair_gen_var_1,
+        &random_rational_polynomial_rational_pair_gen_var_1,
+        &special_random_rational_polynomial_rational_pair_gen_var_1,
+    )
+}
+
+// The `Rational` is an integer.
+pub fn rational_polynomial_rational_pair_gen_var_2() -> Generator<(RationalPolynomial, Rational)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_rational_pair_gen_var_2,
+        &random_rational_polynomial_rational_pair_gen_var_2,
+        &special_random_rational_polynomial_rational_pair_gen_var_2,
+    )
+}
+
+pub fn rational_polynomial_rational_rational_triple_gen()
+-> Generator<(RationalPolynomial, Rational, Rational)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_rational_rational_triple_gen,
+        &random_rational_polynomial_rational_rational_triple_gen,
+        &special_random_rational_polynomial_rational_rational_triple_gen,
+    )
+}
+
 pub fn rational_polynomial_rational_vec_pair_gen() -> Generator<(RationalPolynomial, Vec<Rational>)>
 {
     Generator::new(

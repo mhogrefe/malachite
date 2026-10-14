@@ -18,7 +18,9 @@ use crate::rational::random::{
     striped_random_positive_rationals, striped_random_rationals,
 };
 use crate::rational_polynomial::RationalPolynomial;
-use crate::rational_polynomial::random::striped_random_rational_polynomials;
+use crate::rational_polynomial::random::{
+    striped_random_rational_polynomials, striped_random_rational_polynomials_min_degree,
+};
 use crate::rational_vector::RationalVector;
 use crate::rational_vector::random::striped_random_rational_vectors;
 use crate::test_util::extra_variadic::{
@@ -3199,6 +3201,92 @@ pub fn special_random_rational_polynomial_rational_pair_gen(
     config: &GenConfig,
 ) -> It<(RationalPolynomial, Rational)> {
     Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_rational_polynomial_rational_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_polynomials_min_degree(
+                seed,
+                50,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 64),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_rational_polynomial_rational_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+            .map(Rational::from)
+        },
+    ))
+}
+
+pub fn special_random_rational_polynomial_rational_rational_triple_gen(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, Rational, Rational)> {
+    Box::new(random_triples_xyy(
         EXAMPLE_SEED,
         &|seed| {
             striped_random_rational_polynomials(

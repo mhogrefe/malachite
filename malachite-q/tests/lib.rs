@@ -194,6 +194,7 @@ pub mod rational_polynomial {
         pub mod square_truncated;
         pub mod sub;
         pub mod sub_truncated;
+        pub mod taylor_shift;
     }
     pub mod basic {
         pub mod coefficients;
