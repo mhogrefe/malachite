@@ -59,6 +59,11 @@ documented by git history.
   polynomial by a constant, $p(x + c)$.
 - `Compose` and `ComposeAssign` traits in `malachite_base::polynomial`, for composing two
   polynomials, $p(q(x))$.
+- `ModPowerOf2Compose` and `ModPowerOf2ComposeAssign` traits in `malachite_base::polynomial`, for
+  composing two polynomials modulo $2^k$.
+- `ModPowerOf2Compose` and `ModPowerOf2ComposeAssign` for `UnsignedPolynomial<T>`, in wrapping word
+  arithmetic reduced at the end: a Taylor shift and a scaling for a linear inner polynomial, and
+  otherwise Horner's rule or divide and conquer.
 - `ModPowerOf2TaylorShift` and `ModPowerOf2TaylorShiftAssign` traits in
   `malachite_base::polynomial`, for shifting a polynomial by a constant modulo $2^k$,
   $p(x + c) \bmod 2^k$.
@@ -103,6 +108,8 @@ documented by git history.
   Taylor shift and a scaling for a linear inner polynomial, done in place when the outer polynomial
   is owned; otherwise Horner's rule for short outer polynomials and divide and conquer for longer
   ones, switching at a length that depends on the size of the coefficients.
+- `ModPowerOf2Compose` and `ModPowerOf2ComposeAssign` for `NaturalPolynomial`, keeping the
+  coefficients reduced throughout, and using wrapping limb arithmetic when $2^k$ fits in a limb.
 - `Compose` and `ComposeAssign` for `NaturalPolynomial`, using the same algorithms; composing
   polynomials with non-negative coefficients keeps every coefficient non-negative.
 - `TaylorShift` and `TaylorShiftAssign` for `IntegerPolynomial` by an `Integer`, like FLINT's

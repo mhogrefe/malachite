@@ -154,6 +154,10 @@ pub mod mod_power_of_2_add;
 /// [`ModPowerOf2AddTruncatedAssign`](malachite_base::polynomial::ModPowerOf2AddTruncatedAssign),
 /// for adding two polynomials modulo $2^k$ and keeping only their low coefficients.
 pub mod mod_power_of_2_add_truncated;
+/// Implementations of [`ModPowerOf2Compose`](malachite_base::polynomial::ModPowerOf2Compose) and
+/// [`ModPowerOf2ComposeAssign`](malachite_base::polynomial::ModPowerOf2ComposeAssign), for
+/// composing two polynomials modulo $2^k$.
+pub mod mod_power_of_2_compose;
 /// Implementations of [`ModPowerOf2Derivative`](malachite_base::polynomial::ModPowerOf2Derivative)
 /// and [`ModPowerOf2DerivativeAssign`](malachite_base::polynomial::ModPowerOf2DerivativeAssign),
 /// for differentiating a polynomial modulo a power of 2.

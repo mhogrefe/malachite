@@ -796,6 +796,30 @@ pub trait ComposeAssign<Rhs = Self> {
     fn compose_assign(&mut self, other: Rhs);
 }
 
+/// Composes two polynomials modulo $2^k$, giving $p(q(x)) \bmod 2^k$. The coefficients of both must
+/// already be reduced modulo $2^k$.
+pub trait ModPowerOf2Compose<Rhs = Self> {
+    type Output;
+
+    /// Composes two polynomials modulo $2^k$.
+    ///
+    /// $$
+    /// f(p, q, k) = p(q(x)) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_compose(self, other: Rhs, pow: u64) -> Self::Output;
+}
+
+/// Composes two polynomials modulo $2^k$ in place, replacing $p$ with $p(q(x)) \bmod 2^k$. The
+/// coefficients of both must already be reduced modulo $2^k$.
+pub trait ModPowerOf2ComposeAssign<Rhs = Self> {
+    /// Composes two polynomials modulo $2^k$ in place.
+    ///
+    /// $$
+    /// p \gets p(q(x)) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_compose_assign(&mut self, other: Rhs, pow: u64);
+}
+
 /// Composes a polynomial with $x^k$, giving $p(x^k)$: the coefficient of $x^i$ moves to $x^{ik}$.
 ///
 /// When $k$ is 0, the result is the constant $p(1)$, the sum of the coefficients.

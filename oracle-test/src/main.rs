@@ -2213,6 +2213,34 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_compose");
     }
+    // The generated cases from mod_power_of_2_compose_properties in malachite-base's
+    // UnsignedPolynomial tests and malachite-nz's NaturalPolynomial tests: by value, by reference,
+    // and in place.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_compose_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_compose_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_compose_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_compose_assign_u64",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "mod_power_of_2_compose",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_compose",
+        "demo_natural_polynomial_mod_power_of_2_compose_ref",
+        "demo_natural_polynomial_mod_power_of_2_compose_assign",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "mod_power_of_2_compose",
+        );
+    }
     // The generated cases from compose_properties in malachite-q's RationalPolynomial tests: all six
     // forms, long polynomials, and linear inner polynomials.
     for demo_name in [

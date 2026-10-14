@@ -45,6 +45,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2::register(runner);
     mod_power_of_2_add::register(runner);
     mod_power_of_2_add_truncated::register(runner);
+    mod_power_of_2_compose::register(runner);
     mod_power_of_2_derivative::register(runner);
     mod_power_of_2_integral::register(runner);
     mod_power_of_2_mul::register(runner);
@@ -117,6 +118,7 @@ mod mod_pow_truncated;
 mod mod_power_of_2;
 mod mod_power_of_2_add;
 mod mod_power_of_2_add_truncated;
+mod mod_power_of_2_compose;
 mod mod_power_of_2_derivative;
 mod mod_power_of_2_integral;
 mod mod_power_of_2_mul;
