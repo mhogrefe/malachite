@@ -61,13 +61,17 @@ impl ModPowerOf2Div<Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Div;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     Natural::from(6u32).mod_power_of_2_div(Natural::from(3u32), 4),
-    ///     Some(Natural::from(2u32))
+    ///     Some(Natural::TWO)
     /// );
-    /// assert_eq!(Natural::from(6u32).mod_power_of_2_div(Natural::from(4u32), 4), None);
+    /// assert_eq!(
+    ///     Natural::from(6u32).mod_power_of_2_div(Natural::from(4u32), 4),
+    ///     None
+    /// );
     /// assert_eq!(
     ///     Natural::from(12u32).mod_power_of_2_div(Natural::from(4u32), 4),
     ///     Some(Natural::from(3u32))
@@ -107,13 +111,17 @@ impl ModPowerOf2Div<&Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Div;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     Natural::from(6u32).mod_power_of_2_div(&Natural::from(3u32), 4),
-    ///     Some(Natural::from(2u32))
+    ///     Some(Natural::TWO)
     /// );
-    /// assert_eq!(Natural::from(6u32).mod_power_of_2_div(&Natural::from(4u32), 4), None);
+    /// assert_eq!(
+    ///     Natural::from(6u32).mod_power_of_2_div(&Natural::from(4u32), 4),
+    ///     None
+    /// );
     /// assert_eq!(
     ///     Natural::from(12u32).mod_power_of_2_div(&Natural::from(4u32), 4),
     ///     Some(Natural::from(3u32))
@@ -153,13 +161,17 @@ impl ModPowerOf2Div<Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Div;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     (&Natural::from(6u32)).mod_power_of_2_div(Natural::from(3u32), 4),
-    ///     Some(Natural::from(2u32))
+    ///     Some(Natural::TWO)
     /// );
-    /// assert_eq!((&Natural::from(6u32)).mod_power_of_2_div(Natural::from(4u32), 4), None);
+    /// assert_eq!(
+    ///     (&Natural::from(6u32)).mod_power_of_2_div(Natural::from(4u32), 4),
+    ///     None
+    /// );
     /// assert_eq!(
     ///     (&Natural::from(12u32)).mod_power_of_2_div(Natural::from(4u32), 4),
     ///     Some(Natural::from(3u32))
@@ -199,13 +211,17 @@ impl ModPowerOf2Div<&Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Div;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     (&Natural::from(6u32)).mod_power_of_2_div(&Natural::from(3u32), 4),
-    ///     Some(Natural::from(2u32))
+    ///     Some(Natural::TWO)
     /// );
-    /// assert_eq!((&Natural::from(6u32)).mod_power_of_2_div(&Natural::from(4u32), 4), None);
+    /// assert_eq!(
+    ///     (&Natural::from(6u32)).mod_power_of_2_div(&Natural::from(4u32), 4),
+    ///     None
+    /// );
     /// assert_eq!(
     ///     (&Natural::from(12u32)).mod_power_of_2_div(&Natural::from(4u32), 4),
     ///     Some(Natural::from(3u32))

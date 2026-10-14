@@ -211,8 +211,7 @@ impl ModPowerOf2Div<Natural> for &NaturalVector {
     ///
     /// let v = NaturalVector::from_str("(1, 2, 3)").unwrap();
     /// assert_eq!(
-    ///     (&v)
-    ///         .mod_power_of_2_div(Natural::from(3u32), 4)
+    ///     (&v).mod_power_of_2_div(Natural::from(3u32), 4)
     ///         .unwrap()
     ///         .to_string(),
     ///     "(11, 6, 1)"
@@ -220,8 +219,7 @@ impl ModPowerOf2Div<Natural> for &NaturalVector {
     /// // 2 is not invertible modulo 16, but every element is even.
     /// let v = NaturalVector::from_str("(2, 4, 0)").unwrap();
     /// assert_eq!(
-    ///     (&v)
-    ///         .mod_power_of_2_div(Natural::TWO, 4)
+    ///     (&v).mod_power_of_2_div(Natural::TWO, 4)
     ///         .unwrap()
     ///         .to_string(),
     ///     "(1, 2, 0)"
@@ -271,8 +269,7 @@ impl ModPowerOf2Div<&Natural> for &NaturalVector {
     ///
     /// let v = NaturalVector::from_str("(1, 2, 3)").unwrap();
     /// assert_eq!(
-    ///     (&v)
-    ///         .mod_power_of_2_div(&Natural::from(3u32), 4)
+    ///     (&v).mod_power_of_2_div(&Natural::from(3u32), 4)
     ///         .unwrap()
     ///         .to_string(),
     ///     "(11, 6, 1)"
@@ -280,8 +277,7 @@ impl ModPowerOf2Div<&Natural> for &NaturalVector {
     /// // 2 is not invertible modulo 16, but every element is even.
     /// let v = NaturalVector::from_str("(2, 4, 0)").unwrap();
     /// assert_eq!(
-    ///     (&v)
-    ///         .mod_power_of_2_div(&Natural::TWO, 4)
+    ///     (&v).mod_power_of_2_div(&Natural::TWO, 4)
     ///         .unwrap()
     ///         .to_string(),
     ///     "(1, 2, 0)"
