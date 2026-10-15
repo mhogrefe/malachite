@@ -6892,6 +6892,17 @@ pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
     )
 }
 
+pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>()
+-> It<(UnsignedVector<T>, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_unsigned_vectors_with_dimension::<T>(3),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(v, pow)| v.mod_power_of_2_is_reduced(*pow)),
+    )
+}
+
 pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, T)> {
     Box::new(
@@ -7039,6 +7050,21 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<
             .map(|((v, w), pow)| (v, w, pow)),
         )
     })
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_3<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, UnsignedVector<T>, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(3)),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|((v, w), pow)| {
+            v.mod_power_of_2_is_reduced(*pow) && w.mod_power_of_2_is_reduced(*pow)
+        })
+        .map(|((v, w), pow)| (v, w, pow)),
+    )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1<
@@ -7194,6 +7220,30 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2<
             .map(|((v, w), m)| (v, w, m)),
         )
     })
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedVector<T>, UnsignedVector<T>, T)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(3)),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|((v, w), m)| v.mod_is_reduced(m) && w.mod_is_reduced(m))
+        .map(|((v, w), m)| (v, w, m)),
+    )
+}
+
+pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_10<T: PrimitiveUnsigned>()
+-> It<(UnsignedVector<T>, T)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_unsigned_vectors_with_dimension::<T>(3),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(v, m)| v.mod_is_reduced(m)),
+    )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2<

@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{Cross, CrossAssign, Dot};
 use malachite_base::vector::Vector;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::test_util::generators::{
-    integer_vector_pair_gen_var_2, integer_vector_triple_gen_var_2,
+    integer_vector_gen_var_1, integer_vector_pair_gen_var_2, integer_vector_triple_gen_var_2,
 };
 use malachite_nz::test_util::integer_vector::arithmetic::cross::integer_vector_cross_naive;
 
@@ -99,8 +99,14 @@ fn cross_properties() {
         // Lagrange's identity: |v x w|^2 = |v|^2 |w|^2 - (v . w)^2.
         let vw = (&v).dot(&w);
         assert_eq!((&r).dot(&r), (&v).dot(&v) * (&w).dot(&w) - &vw * &vw);
-        // A vector's product with itself is zero.
+    });
+
+    integer_vector_gen_var_1().test_properties(|v| {
+        // A vector's product with itself, or with zero, is zero.
+        let zero = IntegerVector::zero(3);
         assert!((&v).cross(&v).is_zero());
+        assert!((&v).cross(&zero).is_zero());
+        assert!((&zero).cross(&v).is_zero());
     });
 
     integer_vector_triple_gen_var_2().test_properties(|(u, v, w)| {

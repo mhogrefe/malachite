@@ -3914,6 +3914,15 @@ pub fn integer_vector_gen() -> Generator<IntegerVector> {
     )
 }
 
+// All 3-dimensional `IntegerVector`s.
+pub fn integer_vector_gen_var_1() -> Generator<IntegerVector> {
+    Generator::new(
+        &exhaustive_integer_vector_gen_var_1,
+        &random_integer_vector_gen_var_1,
+        &special_random_integer_vector_gen_var_1,
+    )
+}
+
 pub fn integer_vector_pair_gen() -> Generator<(IntegerVector, IntegerVector)> {
     Generator::new(
         &exhaustive_integer_vector_pair_gen,
@@ -4239,6 +4248,16 @@ pub fn natural_vector_unsigned_pair_gen_var_3() -> Generator<(NaturalVector, u64
     )
 }
 
+// All `(NaturalVector, u64)` where the vector has dimension 3 and every element of the vector is
+// less than 2 to the power of the `u64`.
+pub fn natural_vector_unsigned_pair_gen_var_5() -> Generator<(NaturalVector, u64)> {
+    Generator::new(
+        &exhaustive_natural_vector_unsigned_pair_gen_var_5,
+        &random_natural_vector_unsigned_pair_gen_var_5,
+        &special_random_natural_vector_unsigned_pair_gen_var_5,
+    )
+}
+
 // All `(NaturalVector, T)` where `T` is unsigned and small.
 pub fn natural_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
 -> Generator<(NaturalVector, T)> {
@@ -4347,6 +4366,17 @@ pub fn natural_vector_natural_vector_unsigned_triple_gen_var_1()
     )
 }
 
+// All `(NaturalVector, NaturalVector, u64)` where the vectors have dimension 3 and every element of
+// both is less than 2 to the power of the `u64`.
+pub fn natural_vector_natural_vector_unsigned_triple_gen_var_2()
+-> Generator<(NaturalVector, NaturalVector, u64)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_vector_unsigned_triple_gen_var_2,
+        &random_natural_vector_natural_vector_unsigned_triple_gen_var_2,
+        &special_random_natural_vector_natural_vector_unsigned_triple_gen_var_2,
+    )
+}
+
 // All `(NaturalVector, NaturalVector, Natural, u64)` where the vectors have the same dimension and
 // every element of both, and the `Natural`, is less than 2 to the power of the `u64`.
 pub fn natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_1()
@@ -4445,6 +4475,27 @@ pub fn natural_vector_natural_vector_natural_triple_gen_var_1()
         &exhaustive_natural_vector_natural_vector_natural_triple_gen_var_1,
         &random_natural_vector_natural_vector_natural_triple_gen_var_1,
         &special_random_natural_vector_natural_vector_natural_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalVector, NaturalVector, Natural)` where the vectors have dimension 3 and every
+// element of both is less than the `Natural`.
+pub fn natural_vector_natural_vector_natural_triple_gen_var_3()
+-> Generator<(NaturalVector, NaturalVector, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_vector_natural_triple_gen_var_3,
+        &random_natural_vector_natural_vector_natural_triple_gen_var_3,
+        &special_random_natural_vector_natural_vector_natural_triple_gen_var_3,
+    )
+}
+
+// All `(NaturalVector, Natural)` where the vector has dimension 3 and every element of it is less
+// than the `Natural`.
+pub fn natural_vector_natural_pair_gen_var_4() -> Generator<(NaturalVector, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vector_natural_pair_gen_var_4,
+        &random_natural_vector_natural_pair_gen_var_4,
+        &special_random_natural_vector_natural_pair_gen_var_4,
     )
 }
 

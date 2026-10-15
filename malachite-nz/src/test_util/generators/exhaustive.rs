@@ -3586,6 +3586,10 @@ pub fn exhaustive_integer_vector_gen() -> It<IntegerVector> {
     Box::new(exhaustive_integer_vectors())
 }
 
+pub fn exhaustive_integer_vector_gen_var_1() -> It<IntegerVector> {
+    Box::new(exhaustive_integer_vectors_with_dimension(3))
+}
+
 pub fn exhaustive_integer_vector_pair_gen() -> It<(IntegerVector, IntegerVector)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_integer_vectors()))
 }
@@ -3884,6 +3888,24 @@ pub fn exhaustive_natural_vector_unsigned_pair_gen_var_3() -> It<(NaturalVector,
     )
 }
 
+pub fn exhaustive_natural_vector_unsigned_pair_gen_var_5() -> It<(NaturalVector, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_vectors_with_dimension(3),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(v, pow)| {
+            let bits = v
+                .elements
+                .iter()
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (v, pow + bits)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
 -> It<(NaturalVector, T)> {
     Box::new(exhaustive_pairs_big_tiny(
@@ -4020,6 +4042,26 @@ pub fn exhaustive_natural_vector_natural_vector_unsigned_triple_gen_var_1()
             }),
         )
     })
+}
+
+pub fn exhaustive_natural_vector_natural_vector_unsigned_triple_gen_var_2()
+-> It<(NaturalVector, NaturalVector, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_pairs_from_single(exhaustive_natural_vectors_with_dimension(3)),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((v, w), pow)| {
+            let bits = v
+                .elements
+                .iter()
+                .chain(&w.elements)
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (v, w, pow + bits)
+        }),
+    )
 }
 
 pub fn exhaustive_natural_vector_natural_vector_natural_unsigned_quadruple_gen_var_1()
@@ -4199,6 +4241,41 @@ pub fn exhaustive_natural_vector_natural_vector_natural_triple_gen_var_1()
             }),
         )
     })
+}
+
+pub fn exhaustive_natural_vector_natural_vector_natural_triple_gen_var_3()
+-> It<(NaturalVector, NaturalVector, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_pairs_from_single(exhaustive_natural_vectors_with_dimension(3)),
+            exhaustive_naturals(),
+        )
+        .map(|((v, w), m)| {
+            let m = v
+                .elements
+                .iter()
+                .chain(&w.elements)
+                .max()
+                .cloned()
+                .unwrap_or_default()
+                + m
+                + Natural::ONE;
+            (v, w, m)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_vector_natural_pair_gen_var_4() -> It<(NaturalVector, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_vectors_with_dimension(3),
+            exhaustive_naturals(),
+        )
+        .map(|(v, m)| {
+            let m = v.elements.iter().max().cloned().unwrap_or_default() + m + Natural::ONE;
+            (v, m)
+        }),
+    )
 }
 
 // The modulus is the largest input plus 1 plus a free `Natural`, so that no quadruple is generated

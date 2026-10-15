@@ -100,7 +100,9 @@ use crate::unsigned_polynomial::random::{
     random_unsigned_polynomials, random_unsigned_polynomials_min_degree,
 };
 use crate::unsigned_vector::UnsignedVector;
-use crate::unsigned_vector::random::{RandomUnsignedVectors, random_unsigned_vectors};
+use crate::unsigned_vector::random::{
+    RandomUnsignedVectors, random_unsigned_vectors, random_unsigned_vectors_with_dimension,
+};
 use crate::vecs::random::{
     RandomVecs, random_vecs, random_vecs_fixed_length_from_single,
     random_vecs_length_inclusive_range, random_vecs_min_length,
@@ -9295,6 +9297,20 @@ pub fn random_unsigned_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
     )
 }
 
+pub fn random_unsigned_vector_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(UnsignedVector<T>, u64)> {
+    Box::new(
+        random_unsigned_vectors_with_dimension::<T>(EXAMPLE_SEED, 3)
+            .zip(random_unsigned_inclusive_range::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                0,
+                T::WIDTH,
+            ))
+            .map(|(v, pow)| (v.mod_power_of_2(pow), pow)),
+    )
+}
+
 pub fn random_unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedVector<T>, T)> {
@@ -9452,6 +9468,20 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<T: Primi
                 pow,
             )
         }),
+    )
+}
+
+pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, u64)> {
+    Box::new(
+        random_pairs_from_single(random_unsigned_vectors_with_dimension::<T>(EXAMPLE_SEED, 3))
+            .zip(random_unsigned_inclusive_range::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                0,
+                T::WIDTH,
+            ))
+            .map(|((v, w), pow)| (v.mod_power_of_2(pow), w.mod_power_of_2(pow), pow)),
     )
 }
 
@@ -9672,6 +9702,26 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2<T: Primi
         random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1::<T>(config)
             .zip(random_positive_unsigneds::<T>(EXAMPLE_SEED.fork("m")))
             .map(|((v, w, _), m)| (v % m, w % m, m)),
+    )
+}
+
+pub fn random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_4<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, T)> {
+    Box::new(
+        random_pairs_from_single(random_unsigned_vectors_with_dimension::<T>(EXAMPLE_SEED, 3))
+            .zip(random_positive_unsigneds::<T>(EXAMPLE_SEED.fork("m")))
+            .map(|((v, w), m)| (v % m, w % m, m)),
+    )
+}
+
+pub fn random_unsigned_vector_unsigned_pair_gen_var_10<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(UnsignedVector<T>, T)> {
+    Box::new(
+        random_unsigned_vectors_with_dimension::<T>(EXAMPLE_SEED, 3)
+            .zip(random_positive_unsigneds::<T>(EXAMPLE_SEED.fork("m")))
+            .map(|(v, m)| (v % m, m)),
     )
 }
 

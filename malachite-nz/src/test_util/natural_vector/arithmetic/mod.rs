@@ -8,8 +8,10 @@
 
 pub mod abs_squared;
 pub mod dot;
+pub mod mod_cross;
 pub mod mod_div;
 pub mod mod_entrywise_inverse;
+pub mod mod_power_of_2_cross;
 pub mod mod_power_of_2_div;
 pub mod mod_power_of_2_entrywise_inverse;
 pub mod multi_crt;

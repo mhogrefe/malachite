@@ -2461,6 +2461,17 @@ pub fn special_random_rational_vector_gen(config: &GenConfig) -> It<RationalVect
     ))
 }
 
+pub fn special_random_rational_vector_gen_var_1(config: &GenConfig) -> It<RationalVector> {
+    Box::new(striped_random_rational_vectors_with_dimension(
+        EXAMPLE_SEED,
+        3,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
 pub fn special_random_rational_vector_pair_gen(
     config: &GenConfig,
 ) -> It<(RationalVector, RationalVector)> {

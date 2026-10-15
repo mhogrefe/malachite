@@ -980,6 +980,7 @@ pub mod natural_vector {
         pub mod mod_add_dot_reversed;
         pub mod mod_add_mul;
         pub mod mod_add_mul_shl;
+        pub mod mod_cross;
         pub mod mod_div;
         pub mod mod_dot;
         pub mod mod_dot_reversed;
@@ -998,6 +999,7 @@ pub mod natural_vector {
         pub mod mod_power_of_2_add_dot_reversed;
         pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_add_mul_shl;
+        pub mod mod_power_of_2_cross;
         pub mod mod_power_of_2_div;
         pub mod mod_power_of_2_dot;
         pub mod mod_power_of_2_dot_reversed;

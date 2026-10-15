@@ -76,7 +76,9 @@ use crate::natural_polynomial::random::{
     random_natural_polynomials, random_natural_polynomials_min_degree,
 };
 use crate::natural_vector::NaturalVector;
-use crate::natural_vector::random::random_natural_vectors;
+use crate::natural_vector::random::{
+    random_natural_vectors, random_natural_vectors_with_dimension,
+};
 use crate::platform::{
     DoubleLimb, Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
@@ -6939,6 +6941,15 @@ pub fn random_integer_vector_gen(config: &GenConfig) -> It<IntegerVector> {
     ))
 }
 
+pub fn random_integer_vector_gen_var_1(config: &GenConfig) -> It<IntegerVector> {
+    Box::new(random_integer_vectors_with_dimension(
+        EXAMPLE_SEED,
+        3,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
 pub fn random_integer_vector_pair_gen(config: &GenConfig) -> It<(IntegerVector, IntegerVector)> {
     Box::new(random_pairs_from_single(random_integer_vectors(
         EXAMPLE_SEED,
@@ -7746,6 +7757,33 @@ pub fn random_natural_vector_unsigned_pair_gen_var_3(
     )
 }
 
+pub fn random_natural_vector_unsigned_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(NaturalVector, u64)> {
+    Box::new(
+        random_natural_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .zip(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            config.get_or("mean_small_n", 64),
+            config.get_or("mean_small_d", 1),
+        ))
+        .map(|(v, pow)| {
+            let bits = v
+                .elements
+                .iter()
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (v, pow + bits)
+        }),
+    )
+}
+
 pub fn random_natural_vector_natural_pair_gen_var_2(
     config: &GenConfig,
 ) -> It<(NaturalVector, Natural)> {
@@ -7892,6 +7930,34 @@ pub fn random_natural_vector_natural_vector_unsigned_triple_gen_var_1(
                     .unwrap_or(0);
                 (v, w, pow + bits)
             }),
+    )
+}
+
+pub fn random_natural_vector_natural_vector_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, u64)> {
+    Box::new(
+        random_pairs_from_single(random_natural_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .zip(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            config.get_or("mean_small_n", 64),
+            config.get_or("mean_small_d", 1),
+        ))
+        .map(|((v, w), pow)| {
+            let bits = v
+                .elements
+                .iter()
+                .chain(&w.elements)
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (v, w, pow + bits)
+        }),
     )
 }
 
@@ -8112,6 +8178,58 @@ pub fn random_natural_vector_natural_vector_natural_triple_gen_var_1(
                     + Natural::ONE;
                 (v, w, m)
             }),
+    )
+}
+
+pub fn random_natural_vector_natural_vector_natural_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalVector, NaturalVector, Natural)> {
+    Box::new(
+        random_pairs_from_single(random_natural_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .zip(random_naturals(
+            EXAMPLE_SEED.fork("m"),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|((v, w), m)| {
+            let m = v
+                .elements
+                .iter()
+                .chain(&w.elements)
+                .max()
+                .cloned()
+                .unwrap_or_default()
+                + m
+                + Natural::ONE;
+            (v, w, m)
+        }),
+    )
+}
+
+pub fn random_natural_vector_natural_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(NaturalVector, Natural)> {
+    Box::new(
+        random_natural_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .zip(random_naturals(
+            EXAMPLE_SEED.fork("m"),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(v, m)| {
+            let m = v.elements.iter().max().cloned().unwrap_or_default() + m + Natural::ONE;
+            (v, m)
+        }),
     )
 }
 

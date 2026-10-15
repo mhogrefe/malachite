@@ -100,7 +100,10 @@ use crate::unsigned_polynomial::random::{
     striped_random_unsigned_polynomials, striped_random_unsigned_polynomials_min_degree,
 };
 use crate::unsigned_vector::UnsignedVector;
-use crate::unsigned_vector::random::{RandomUnsignedVectors, striped_random_unsigned_vectors};
+use crate::unsigned_vector::random::{
+    RandomUnsignedVectors, striped_random_unsigned_vectors,
+    striped_random_unsigned_vectors_with_dimension,
+};
 use crate::vecs::random::{RandomVecs, random_vecs};
 use alloc::collections::{BTreeMap, BTreeSet};
 
@@ -11003,6 +11006,25 @@ pub fn special_random_unsigned_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsign
     )
 }
 
+pub fn special_random_unsigned_vector_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, u64)> {
+    Box::new(
+        striped_random_unsigned_vectors_with_dimension::<T>(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            T::WIDTH,
+        ))
+        .map(|(v, pow)| (v.mod_power_of_2(pow), pow)),
+    )
+}
+
 pub fn special_random_unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedVector<T>, T)> {
@@ -11198,6 +11220,27 @@ pub fn special_random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<
                 pow,
             )
         }),
+    )
+}
+
+pub fn special_random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_3<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, u64)> {
+    Box::new(
+        random_pairs_from_single(striped_random_unsigned_vectors_with_dimension::<T>(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            T::WIDTH,
+        ))
+        .map(|((v, w), pow)| (v.mod_power_of_2(pow), w.mod_power_of_2(pow), pow)),
     )
 }
 
@@ -11480,6 +11523,46 @@ pub fn special_random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2<
                 config.get_or("mean_stripe_d", 1),
             ))
             .map(|((v, w, _), m)| (v % m, w % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, UnsignedVector<T>, T)> {
+    Box::new(
+        random_pairs_from_single(striped_random_unsigned_vectors_with_dimension::<T>(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .zip(striped_random_positive_unsigneds::<T>(
+            EXAMPLE_SEED.fork("m"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .map(|((v, w), m)| (v % m, w % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_vector_unsigned_pair_gen_var_10<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedVector<T>, T)> {
+    Box::new(
+        striped_random_unsigned_vectors_with_dimension::<T>(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .zip(striped_random_positive_unsigneds::<T>(
+            EXAMPLE_SEED.fork("m"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .map(|(v, m)| (v % m, m)),
     )
 }
 

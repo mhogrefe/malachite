@@ -12,6 +12,11 @@ documented by git history.
 
 - `Cross` and `CrossAssign` traits in `malachite_base::num::arithmetic::traits`, for the cross
   product of two 3-dimensional vectors.
+- `ModPowerOf2Cross` and `ModPowerOf2CrossAssign` traits, for the cross product of two
+  3-dimensional vectors modulo $2^k$, and implementations for 3-dimensional `UnsignedVector<T>`s, in
+  wrapping word arithmetic reduced at the end.
+- `ModCross` and `ModCrossAssign` traits, for the cross product of two 3-dimensional vectors modulo
+  $m$, and implementations for 3-dimensional `UnsignedVector<T>`s modulo a `T`.
 - `AddDot`, `AddDotAssign`, `SubDot`, and `SubDotAssign` traits in
   `malachite_base::num::arithmetic::traits`, for adding the dot product of two vectors to a number
   or subtracting it, $x \pm \sum_i v_iw_i$; `DotReversed`, for the dot product of a vector and the
@@ -87,6 +92,10 @@ documented by git history.
 ### malachite-nz
 
 - `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.
+- `ModPowerOf2Cross` and `ModPowerOf2CrossAssign` for 3-dimensional `NaturalVector`s, using limbs when
+  $2^k$ fits in one.
+- `ModCross` and `ModCrossAssign` for 3-dimensional `NaturalVector`s modulo a `Natural`, using limbs
+  when $m$ fits in one.
 - `AddDot`, `SubDot`, `AddDotReversed`, `SubDotReversed`, and their `Assign` forms for `Integer`
   with `IntegerVector`s and `Natural` with `NaturalVector`s, and `DotReversed` for `IntegerVector`
   and `NaturalVector`, like FLINT's `_fmpz_vec_dot_general`: the initial term and the products are

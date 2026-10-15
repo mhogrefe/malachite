@@ -2263,6 +2263,28 @@ pub trait ModEntrywiseMulAssign<RHS = Self, M = Self> {
     fn mod_entrywise_mul_assign(&mut self, other: RHS, m: M);
 }
 
+/// Computes the cross product of two 3-dimensional vectors modulo $m$. The entries must be already
+/// reduced modulo $m$.
+///
+/// $$
+/// v \times w = (v_1w_2 - v_2w_1, v_2w_0 - v_0w_2, v_0w_1 - v_1w_0) \bmod m.
+/// $$
+pub trait ModCross<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_cross(self, other: RHS, m: M) -> Self::Output;
+}
+
+/// Replaces a 3-dimensional vector with its cross product with another, modulo $m$. The entries
+/// must be already reduced modulo $m$.
+///
+/// $$
+/// v \gets v \times w \bmod m.
+/// $$
+pub trait ModCrossAssign<RHS = Self, M = Self> {
+    fn mod_cross_assign(&mut self, other: RHS, m: M);
+}
+
 /// Finds the multiplicative inverses of all the entries of a value, such as a vector, modulo a
 /// number $m$, returning `None` if any entry is not invertible. The entries must be already reduced
 /// modulo $m$.
@@ -2600,6 +2622,28 @@ pub trait ModPowerOf2EntrywiseMul<RHS = Self> {
 /// entries must be already reduced modulo $2^k$.
 pub trait ModPowerOf2EntrywiseMulAssign<RHS = Self> {
     fn mod_power_of_2_entrywise_mul_assign(&mut self, other: RHS, pow: u64);
+}
+
+/// Computes the cross product of two 3-dimensional vectors modulo $2^k$. The entries must be
+/// already reduced modulo $2^k$.
+///
+/// $$
+/// v \times w = (v_1w_2 - v_2w_1, v_2w_0 - v_0w_2, v_0w_1 - v_1w_0) \bmod 2^k.
+/// $$
+pub trait ModPowerOf2Cross<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_2_cross(self, other: RHS, pow: u64) -> Self::Output;
+}
+
+/// Replaces a 3-dimensional vector with its cross product with another, modulo $2^k$. The entries
+/// must be already reduced modulo $2^k$.
+///
+/// $$
+/// v \gets v \times w \bmod 2^k.
+/// $$
+pub trait ModPowerOf2CrossAssign<RHS = Self> {
+    fn mod_power_of_2_cross_assign(&mut self, other: RHS, pow: u64);
 }
 
 /// Finds the multiplicative inverses of all the entries of a value, such as a vector, modulo $2^k$,

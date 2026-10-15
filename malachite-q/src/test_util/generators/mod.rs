@@ -1271,6 +1271,15 @@ pub fn rational_vector_gen() -> Generator<RationalVector> {
     )
 }
 
+// All 3-dimensional `RationalVector`s.
+pub fn rational_vector_gen_var_1() -> Generator<RationalVector> {
+    Generator::new(
+        &exhaustive_rational_vector_gen_var_1,
+        &random_rational_vector_gen_var_1,
+        &special_random_rational_vector_gen_var_1,
+    )
+}
+
 pub fn rational_vector_pair_gen() -> Generator<(RationalVector, RationalVector)> {
     Generator::new(
         &exhaustive_rational_vector_pair_gen,
