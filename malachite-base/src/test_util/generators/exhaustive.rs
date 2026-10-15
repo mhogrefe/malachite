@@ -84,6 +84,7 @@ use crate::tuples::exhaustive::{
     exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
 };
 use crate::unsigned_matrix::UnsignedMatrix;
+use crate::unsigned_matrix::exhaustive::exhaustive_unsigned_matrices;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::exhaustive::{
     exhaustive_unsigned_polynomials, exhaustive_unsigned_polynomials_min_degree,
@@ -6840,33 +6841,8 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_v
 
 // -- UnsignedVector<u64> --
 
-struct UnsignedMatrixGenerator;
-
-impl
-    ExhaustiveDependentPairsYsGenerator<
-        (usize, usize),
-        UnsignedVector<u64>,
-        It<UnsignedVector<u64>>,
-    > for UnsignedMatrixGenerator
-{
-    #[inline]
-    fn get_ys(&self, &(height, width): &(usize, usize)) -> It<UnsignedVector<u64>> {
-        Box::new(exhaustive_unsigned_vectors_with_dimension(u64::exact_from(
-            height * width,
-        )))
-    }
-}
-
-// Every matrix appears once, as its dimensions paired with its elements in row-major order.
 pub fn exhaustive_unsigned_matrix_gen() -> It<UnsignedMatrix<u64>> {
-    Box::new(
-        exhaustive_dependent_pairs(
-            ruler_sequence(),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
-            UnsignedMatrixGenerator,
-        )
-        .map(|((height, width), v)| UnsignedMatrix::from_owned_elements(height, width, v.elements)),
-    )
+    Box::new(exhaustive_unsigned_matrices())
 }
 
 pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen()

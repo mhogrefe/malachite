@@ -96,6 +96,7 @@ use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pa
 use crate::unions::Union2;
 use crate::unions::random::random_union2s;
 use crate::unsigned_matrix::UnsignedMatrix;
+use crate::unsigned_matrix::random::striped_random_unsigned_matrices;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::random::{
     striped_random_unsigned_polynomials, striped_random_unsigned_polynomials_min_degree,
@@ -10897,25 +10898,13 @@ pub fn special_random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_g
 // -- UnsignedVector<u64> --
 
 pub fn special_random_unsigned_matrix_gen(config: &GenConfig) -> It<UnsignedMatrix<u64>> {
-    let mut xs = striped_random_unsigneds::<u64>(
-        EXAMPLE_SEED.fork("elements"),
+    Box::new(striped_random_unsigned_matrices(
+        EXAMPLE_SEED,
         config.get_or("mean_stripe_n", 32),
         config.get_or("mean_stripe_d", 1),
-    );
-    Box::new(
-        random_pairs_from_single(geometric_random_unsigneds::<usize>(
-            EXAMPLE_SEED.fork("dimensions"),
-            config.get_or("mean_dimension_n", 4),
-            config.get_or("mean_dimension_d", 1),
-        ))
-        .map(move |(height, width)| {
-            UnsignedMatrix::from_owned_elements(
-                height,
-                width,
-                (&mut xs).take(height * width).collect(),
-            )
-        }),
-    )
+        config.get_or("mean_dimension_n", 4),
+        config.get_or("mean_dimension_d", 1),
+    ))
 }
 
 pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen(

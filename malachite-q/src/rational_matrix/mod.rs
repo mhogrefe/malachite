@@ -481,5 +481,10 @@ fn common_dimension(vectors: &[RationalVector], what: &str) -> usize {
 pub mod access;
 /// Conversions to and from [`RationalMatrix`].
 pub mod conversion;
+/// Iterators that generate [`RationalMatrix`]s without repetition.
+pub mod exhaustive;
+/// Iterators that generate [`RationalMatrix`]s randomly.
+#[cfg(feature = "random")]
+pub mod random;
 /// The transpose of a [`RationalMatrix`].
 pub mod transpose;

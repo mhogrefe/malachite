@@ -15,6 +15,10 @@ documented by git history.
   `transpose`, `transpose_assign`, `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`,
   `Display`/`Debug`, `FromStr` (elements must fit in a `T`; no `'-'`), `ToLatex`, `ToTypst`, and
   serde support (elements serialize as JSON numbers).
+- `unsigned_matrix::exhaustive` and `unsigned_matrix::random`, with the same generators as
+  malachite-nz's `IntegerMatrix`, including the `_from_iterator` forms; as with `UnsignedVector`,
+  the random elements are uniform (or striped) over the whole type, so there are no bit-count
+  parameters.
 - `Cross` and `CrossAssign` traits in `malachite_base::num::arithmetic::traits`, for the cross
   product of two 3-dimensional vectors.
 - `ModPowerOf2Cross` and `ModPowerOf2CrossAssign` traits, for the cross product of two
@@ -103,6 +107,12 @@ documented by git history.
   `IntegerVector` rows or columns (`from_rows`, `from_owned_rows`, `from_columns`,
   `from_owned_columns`). It also has `height`, `width`, `transpose`, and `transpose_assign`, and
   serde support (dimensions and elements, validated on deserialization).
+- `integer_matrix::exhaustive` and `integer_matrix::random` (likewise `natural_matrix::*`):
+  `exhaustive_integer_matrices` and `exhaustive_integer_matrices_with_dimensions`, each with a
+  `_from_iterator` form taking any cloneable element iterator (so, for example, matrices over $Z/m$
+  can be enumerated directly), and `random_integer_matrices`,
+  `random_integer_matrices_with_dimensions`, and their striped and `_from_iterator` forms. Random
+  shapes have independent geometric heights and widths.
 - `Index<(usize, usize)>` and `IndexMut<(usize, usize)>` for `IntegerMatrix`, so `m[(i, j)]` is the
   element in row `i` and column `j`, and `get(i, j)` and `get_mut(i, j)`, which return `None` instead
   of panicking. Each index is checked against its own dimension.
@@ -182,6 +192,8 @@ documented by git history.
   `get_mut`, `Display`/`Debug` (such as `[1/2, -3/4; 5, 22/7]`), `FromStr` (elements need not be in
   lowest terms), `ToLatex` (elements as `\frac`s), `ToTypst` (elements as `frac`s), and serde
   support.
+- `rational_matrix::exhaustive` and `rational_matrix::random`, with the same generators as
+  `IntegerMatrix`'s, including the `_from_iterator` forms.
 - `Cross` and `CrossAssign` for 3-dimensional `RationalVector`s.
 - `CheckedAbs` for `RationalVector`, returning the Euclidean norm as a `Rational` when it is rational,
   that is, when the numerator and denominator of the sum of the squares are both perfect squares.

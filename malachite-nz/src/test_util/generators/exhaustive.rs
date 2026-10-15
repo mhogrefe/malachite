@@ -18,6 +18,7 @@ use crate::integer::exhaustive::{
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer_matrix::IntegerMatrix;
+use crate::integer_matrix::exhaustive::exhaustive_integer_matrices;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
@@ -82,6 +83,7 @@ use crate::natural::exhaustive::{
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural_matrix::NaturalMatrix;
+use crate::natural_matrix::exhaustive::exhaustive_natural_matrices;
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::exhaustive::{
     exhaustive_natural_polynomials, exhaustive_natural_polynomials_min_degree,
@@ -3584,29 +3586,8 @@ pub fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_5()
 
 // -- IntegerMatrix --
 
-struct IntegerMatrixGenerator;
-
-impl ExhaustiveDependentPairsYsGenerator<(usize, usize), IntegerVector, It<IntegerVector>>
-    for IntegerMatrixGenerator
-{
-    #[inline]
-    fn get_ys(&self, &(height, width): &(usize, usize)) -> It<IntegerVector> {
-        Box::new(exhaustive_integer_vectors_with_dimension(u64::exact_from(
-            height * width,
-        )))
-    }
-}
-
-// Every matrix appears once, as its dimensions paired with its elements in row-major order.
 pub fn exhaustive_integer_matrix_gen() -> It<IntegerMatrix> {
-    Box::new(
-        exhaustive_dependent_pairs(
-            ruler_sequence(),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
-            IntegerMatrixGenerator,
-        )
-        .map(|((height, width), v)| IntegerMatrix::from_owned_elements(height, width, v.elements)),
-    )
+    Box::new(exhaustive_integer_matrices())
 }
 
 pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen() -> It<(IntegerMatrix, usize, usize)>
@@ -3725,29 +3706,8 @@ pub fn exhaustive_integer_vector_triple_gen_var_2()
 
 // -- NaturalMatrix --
 
-struct NaturalMatrixGenerator;
-
-impl ExhaustiveDependentPairsYsGenerator<(usize, usize), NaturalVector, It<NaturalVector>>
-    for NaturalMatrixGenerator
-{
-    #[inline]
-    fn get_ys(&self, &(height, width): &(usize, usize)) -> It<NaturalVector> {
-        Box::new(exhaustive_natural_vectors_with_dimension(u64::exact_from(
-            height * width,
-        )))
-    }
-}
-
-// Every matrix appears once, as its dimensions paired with its elements in row-major order.
 pub fn exhaustive_natural_matrix_gen() -> It<NaturalMatrix> {
-    Box::new(
-        exhaustive_dependent_pairs(
-            ruler_sequence(),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
-            NaturalMatrixGenerator,
-        )
-        .map(|((height, width), v)| NaturalMatrix::from_owned_elements(height, width, v.elements)),
-    )
+    Box::new(exhaustive_natural_matrices())
 }
 
 pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen() -> It<(NaturalMatrix, usize, usize)>

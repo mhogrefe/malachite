@@ -474,5 +474,10 @@ fn common_dimension(vectors: &[IntegerVector], what: &str) -> usize {
 pub mod access;
 /// Conversions to and from [`IntegerMatrix`].
 pub mod conversion;
+/// Iterators that generate [`IntegerMatrix`]s without repetition.
+pub mod exhaustive;
+/// Iterators that generate [`IntegerMatrix`]s randomly.
+#[cfg(feature = "random")]
+pub mod random;
 /// The transpose of an [`IntegerMatrix`].
 pub mod transpose;

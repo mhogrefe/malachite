@@ -906,6 +906,17 @@ pub mod unsigned_matrix {
         }
     }
     pub mod dimensions;
+    pub mod exhaustive {
+        pub mod exhaustive_unsigned_matrices;
+    }
+    pub mod random {
+        pub mod random_unsigned_matrices;
+        pub mod random_unsigned_matrices_from_iterator;
+        pub mod random_unsigned_matrices_with_dimensions;
+        pub mod random_unsigned_matrices_with_dimensions_from_iterator;
+        pub mod striped_random_unsigned_matrices;
+        pub mod striped_random_unsigned_matrices_with_dimensions;
+    }
     pub mod transpose;
 }
 pub mod unsigned_polynomial {

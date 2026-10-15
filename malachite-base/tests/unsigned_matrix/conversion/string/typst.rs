@@ -59,8 +59,8 @@ fn to_typst_string_properties() {
                 typst,
                 format!("mat({})", rows(&m, ", ", u64::to_string).join("; "))
             );
-            // A `u64`'s fragment is its decimal digits, so the fragment is the `Display`
-            // output with `mat(...)` in place of the brackets.
+            // A `u64`'s fragment is its decimal digits, so the fragment is the `Display` output
+            // with `mat(...)` in place of the brackets.
             let s = m.to_string();
             assert_eq!(typst, format!("mat({})", &s[1..s.len() - 1]));
         }

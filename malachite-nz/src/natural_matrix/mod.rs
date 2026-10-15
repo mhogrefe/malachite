@@ -477,5 +477,10 @@ fn common_dimension(vectors: &[NaturalVector], what: &str) -> usize {
 pub mod access;
 /// Conversions to and from [`NaturalMatrix`].
 pub mod conversion;
+/// Iterators that generate [`NaturalMatrix`]s without repetition.
+pub mod exhaustive;
+/// Iterators that generate [`NaturalMatrix`]s randomly.
+#[cfg(feature = "random")]
+pub mod random;
 /// The transpose of a [`NaturalMatrix`].
 pub mod transpose;

@@ -16,6 +16,7 @@ use crate::rational::random::{
     random_nonzero_rationals, random_positive_rationals, random_rationals,
 };
 use crate::rational_matrix::RationalMatrix;
+use crate::rational_matrix::random::random_rational_matrices;
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::random::{
     random_rational_polynomials, random_rational_polynomials_min_degree,
@@ -2221,25 +2222,13 @@ pub fn random_gaussian_rational_vec_gen(config: &GenConfig) -> It<Vec<GaussianRa
 // -- RationalMatrix --
 
 pub fn random_rational_matrix_gen(config: &GenConfig) -> It<RationalMatrix> {
-    let mut xs = random_rationals(
-        EXAMPLE_SEED.fork("elements"),
+    Box::new(random_rational_matrices(
+        EXAMPLE_SEED,
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
-    );
-    Box::new(
-        random_pairs_from_single(geometric_random_unsigneds::<usize>(
-            EXAMPLE_SEED.fork("dimensions"),
-            config.get_or("mean_dimension_n", 4),
-            config.get_or("mean_dimension_d", 1),
-        ))
-        .map(move |(height, width)| {
-            RationalMatrix::from_owned_elements(
-                height,
-                width,
-                (&mut xs).take(height * width).collect(),
-            )
-        }),
-    )
+        config.get_or("mean_dimension_n", 4),
+        config.get_or("mean_dimension_d", 1),
+    ))
 }
 
 pub fn random_rational_matrix_unsigned_unsigned_triple_gen(

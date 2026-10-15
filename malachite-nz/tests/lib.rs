@@ -364,6 +364,17 @@ pub mod integer_matrix {
         }
     }
     pub mod dimensions;
+    pub mod exhaustive {
+        pub mod exhaustive_integer_matrices;
+    }
+    pub mod random {
+        pub mod random_integer_matrices;
+        pub mod random_integer_matrices_from_iterator;
+        pub mod random_integer_matrices_with_dimensions;
+        pub mod random_integer_matrices_with_dimensions_from_iterator;
+        pub mod striped_random_integer_matrices;
+        pub mod striped_random_integer_matrices_with_dimensions;
+    }
     pub mod transpose;
 }
 pub mod integer_vector {
@@ -984,6 +995,17 @@ pub mod natural_matrix {
         }
     }
     pub mod dimensions;
+    pub mod exhaustive {
+        pub mod exhaustive_natural_matrices;
+    }
+    pub mod random {
+        pub mod random_natural_matrices;
+        pub mod random_natural_matrices_from_iterator;
+        pub mod random_natural_matrices_with_dimensions;
+        pub mod random_natural_matrices_with_dimensions_from_iterator;
+        pub mod striped_random_natural_matrices;
+        pub mod striped_random_natural_matrices_with_dimensions;
+    }
     pub mod transpose;
 }
 pub mod natural_vector {

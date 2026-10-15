@@ -17,6 +17,7 @@ use crate::integer::random::{
     random_nonzero_integers, uniform_random_integer_inclusive_range,
 };
 use crate::integer_matrix::IntegerMatrix;
+use crate::integer_matrix::random::random_integer_matrices;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::random::{
     random_integer_polynomials, random_integer_polynomials_min_degree,
@@ -73,6 +74,7 @@ use crate::natural::random::{
     random_positive_naturals, uniform_random_natural_inclusive_range,
 };
 use crate::natural_matrix::NaturalMatrix;
+use crate::natural_matrix::random::random_natural_matrices;
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::random::{
     random_natural_polynomials, random_natural_polynomials_min_degree,
@@ -6934,25 +6936,13 @@ pub fn random_integer_vec_integer_vec_unsigned_triple_gen_var_5(
 // -- IntegerMatrix --
 
 pub fn random_integer_matrix_gen(config: &GenConfig) -> It<IntegerMatrix> {
-    let mut xs = random_integers(
-        EXAMPLE_SEED.fork("elements"),
+    Box::new(random_integer_matrices(
+        EXAMPLE_SEED,
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
-    );
-    Box::new(
-        random_pairs_from_single(geometric_random_unsigneds::<usize>(
-            EXAMPLE_SEED.fork("dimensions"),
-            config.get_or("mean_dimension_n", 4),
-            config.get_or("mean_dimension_d", 1),
-        ))
-        .map(move |(height, width)| {
-            IntegerMatrix::from_owned_elements(
-                height,
-                width,
-                (&mut xs).take(height * width).collect(),
-            )
-        }),
-    )
+        config.get_or("mean_dimension_n", 4),
+        config.get_or("mean_dimension_d", 1),
+    ))
 }
 
 pub fn random_integer_matrix_unsigned_unsigned_triple_gen(
@@ -7196,25 +7186,13 @@ pub fn random_integer_vector_triple_gen_var_2(
 // -- NaturalMatrix --
 
 pub fn random_natural_matrix_gen(config: &GenConfig) -> It<NaturalMatrix> {
-    let mut xs = random_naturals(
-        EXAMPLE_SEED.fork("elements"),
+    Box::new(random_natural_matrices(
+        EXAMPLE_SEED,
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
-    );
-    Box::new(
-        random_pairs_from_single(geometric_random_unsigneds::<usize>(
-            EXAMPLE_SEED.fork("dimensions"),
-            config.get_or("mean_dimension_n", 4),
-            config.get_or("mean_dimension_d", 1),
-        ))
-        .map(move |(height, width)| {
-            NaturalMatrix::from_owned_elements(
-                height,
-                width,
-                (&mut xs).take(height * width).collect(),
-            )
-        }),
-    )
+        config.get_or("mean_dimension_n", 4),
+        config.get_or("mean_dimension_d", 1),
+    ))
 }
 
 pub fn random_natural_matrix_unsigned_unsigned_triple_gen(
