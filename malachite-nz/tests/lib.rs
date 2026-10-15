@@ -360,6 +360,7 @@ pub mod integer_vector {
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
         pub mod canonicalize_sign;
+        pub mod checked_abs;
         pub mod content;
         pub mod content_chained;
         pub mod cross;
@@ -959,6 +960,7 @@ pub mod natural_vector {
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
+        pub mod checked_abs;
         pub mod content;
         pub mod content_chained;
         pub mod div_exact;

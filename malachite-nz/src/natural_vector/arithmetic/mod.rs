@@ -108,6 +108,9 @@ pub mod balanced_mod_power_of_2;
 /// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which, for a vector
 /// with non-negative elements, are the same as the primitive part.
 pub mod canonical_primitive_part;
+/// Implementations of [`CheckedAbs`](malachite_base::num::arithmetic::traits::CheckedAbs), for the
+/// Euclidean norm of a vector when it is exact.
+pub mod checked_abs;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart),
 /// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), and

@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod abs_squared;
+pub mod checked_abs;
 pub mod dot;
 pub mod mod_cross;
 pub mod mod_div;

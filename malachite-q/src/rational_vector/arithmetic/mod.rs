@@ -110,6 +110,9 @@ pub mod canonical_primitive_part;
 /// [`CanonicalizeSignAssign`](malachite_base::num::arithmetic::traits::CanonicalizeSignAssign),
 /// which negate a vector if its pivot is negative.
 pub mod canonicalize_sign;
+/// Implementations of [`CheckedAbs`](malachite_base::num::arithmetic::traits::CheckedAbs), for the
+/// Euclidean norm of a vector when it is exact.
+pub mod checked_abs;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), and
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),

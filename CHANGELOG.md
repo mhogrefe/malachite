@@ -92,6 +92,8 @@ documented by git history.
 ### malachite-nz
 
 - `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.
+- `CheckedAbs` for `NaturalVector` and `IntegerVector`, returning the Euclidean norm as a `Natural`
+  when the sum of the squares of the elements is a perfect square, and `None` otherwise.
 - `ModPowerOf2Cross` and `ModPowerOf2CrossAssign` for 3-dimensional `NaturalVector`s, using limbs when
   $2^k$ fits in one.
 - `ModCross` and `ModCrossAssign` for 3-dimensional `NaturalVector`s modulo a `Natural`, using limbs
@@ -149,6 +151,8 @@ documented by git history.
 ### malachite-q
 
 - `Cross` and `CrossAssign` for 3-dimensional `RationalVector`s.
+- `CheckedAbs` for `RationalVector`, returning the Euclidean norm as a `Rational` when it is rational,
+  that is, when the numerator and denominator of the sum of the squares are both perfect squares.
 - `Compose` and `ComposeAssign` for `RationalPolynomial`, like FLINT's `fmpq_poly_compose`: the
   outer polynomial is rescaled so that the inner one has an integer numerator, and the work is one
   integer composition, with reductions to lowest terms before and after it.

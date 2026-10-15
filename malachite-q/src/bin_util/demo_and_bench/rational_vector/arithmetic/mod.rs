@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add_mul_shl::register(runner);
     canonical_primitive_part::register(runner);
     canonicalize_sign::register(runner);
+    checked_abs::register(runner);
     content::register(runner);
     content_chained::register(runner);
     cross::register(runner);
@@ -50,6 +51,7 @@ mod add_mul;
 mod add_mul_shl;
 mod canonical_primitive_part;
 mod canonicalize_sign;
+mod checked_abs;
 mod content;
 mod content_chained;
 mod cross;

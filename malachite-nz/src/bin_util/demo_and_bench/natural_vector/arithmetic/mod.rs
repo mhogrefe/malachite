@@ -18,6 +18,7 @@ pub(crate) fn register(runner: &mut Runner) {
     balanced_mod::register(runner);
     balanced_mod_power_of_2::register(runner);
     canonical_primitive_part::register(runner);
+    checked_abs::register(runner);
     content::register(runner);
     content_chained::register(runner);
     div_exact::register(runner);
@@ -102,6 +103,7 @@ mod add_mul_shl;
 mod balanced_mod;
 mod balanced_mod_power_of_2;
 mod canonical_primitive_part;
+mod checked_abs;
 mod content;
 mod content_chained;
 mod div_exact;

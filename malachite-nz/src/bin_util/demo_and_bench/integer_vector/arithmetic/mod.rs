@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     balanced_mod_power_of_2::register(runner);
     canonical_primitive_part::register(runner);
     canonicalize_sign::register(runner);
+    checked_abs::register(runner);
     content::register(runner);
     content_chained::register(runner);
     cross::register(runner);
@@ -65,6 +66,7 @@ mod balanced_mod;
 mod balanced_mod_power_of_2;
 mod canonical_primitive_part;
 mod canonicalize_sign;
+mod checked_abs;
 mod content;
 mod content_chained;
 mod cross;

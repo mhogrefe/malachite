@@ -436,6 +436,7 @@ pub mod rational_vector {
         pub mod add_mul_shl;
         pub mod canonical_primitive_part;
         pub mod canonicalize_sign;
+        pub mod checked_abs;
         pub mod content;
         pub mod content_chained;
         pub mod cross;
