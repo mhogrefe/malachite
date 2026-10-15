@@ -234,6 +234,9 @@ pub mod gaussian_integer;
 /// values.
 #[macro_use]
 pub mod integer;
+/// [`IntegerMatrix`](integer_matrix::IntegerMatrix), a type representing matrices whose elements
+/// are [`Integer`](integer::Integer)s.
+pub mod integer_matrix;
 /// [`IntegerPolynomial`](integer_polynomial::IntegerPolynomial), a type representing polynomials in
 /// one variable whose coefficients are [`Integer`](integer::Integer)s.
 pub mod integer_polynomial;

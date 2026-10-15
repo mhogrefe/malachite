@@ -8,6 +8,7 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
+use crate::integer_matrix::IntegerMatrix;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_vector::IntegerVector;
 use crate::natural::Natural;
@@ -236,6 +237,36 @@ pub fn natural_vector_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalVector
         bucketing_function: &|v| {
             usize::exact_from(
                 v.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn integer_matrix_bit_bucketer(var_name: &str) -> Bucketer<'_, IntegerMatrix> {
+    Bucketer {
+        bucketing_function: &|m| {
+            usize::exact_from(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn triple_1_integer_matrix_bit_bucketer<T, U>(
+    var_name: &str,
+) -> Bucketer<'_, (IntegerMatrix, T, U)> {
+    Bucketer {
+        bucketing_function: &|(m, _, _)| {
+            usize::exact_from(
+                m.elements
                     .iter()
                     .map(SignificantBits::significant_bits)
                     .sum::<u64>(),

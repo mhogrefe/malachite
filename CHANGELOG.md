@@ -91,6 +91,23 @@ documented by git history.
 
 ### malachite-nz
 
+- `IntegerMatrix`, a matrix of `Integer`s stored as a public `Vec` of elements in row-major order
+  with private height and width (FLINT's `fmpz_mat_t` layout, without the window stride). It has
+  constructors from elements in row-major order (`from_elements`, `from_owned_elements`) or
+  column-major order (`from_elements_column_major`, `from_owned_elements_column_major`), and from
+  `IntegerVector` rows or columns (`from_rows`, `from_owned_rows`, `from_columns`,
+  `from_owned_columns`). It also has `height`, `width`, `transpose`, and `transpose_assign`, and
+  serde support (dimensions and elements, validated on deserialization).
+- `Index<(usize, usize)>` and `IndexMut<(usize, usize)>` for `IntegerMatrix`, so `m[(i, j)]` is the
+  element in row `i` and column `j`, and `get(i, j)` and `get_mut(i, j)`, which return `None` instead
+  of panicking. Each index is checked against its own dimension.
+- `Display` and `Debug` for `IntegerMatrix` (identical): `[1, 2; 3, 4]`, with rows separated by
+  `; `. A matrix with no rows or no columns is written with its dimensions, as in `[]_{4,0}`.
+- `ToLatex` for `IntegerMatrix`, a `pmatrix` environment such as
+  `\begin{pmatrix}1&2\\3&4\end{pmatrix}` (`\begin{pmatrix}\end{pmatrix}_{4\times 0}` when empty),
+  and `ToTypst`, a `mat` call such as `mat(1, 2; 3, 4)` (`mat()_(4 times 0)` when empty).
+- `FromStr` for `IntegerMatrix`, reading back the `Display` format. `[]_{h,w}` requires at least
+  one of `h` and `w` to be zero, and a bare `[]` is rejected.
 - `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.
 - `CheckedAbs` for `NaturalVector` and `IntegerVector`, returning the Euclidean norm as a `Natural`
   when the sum of the squares of the elements is a perfect square, and `None` otherwise.

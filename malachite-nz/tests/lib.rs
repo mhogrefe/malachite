@@ -347,6 +347,25 @@ pub mod integer {
         pub mod uniform_random_integer_range;
     }
 }
+pub mod integer_matrix {
+    pub mod access;
+    pub mod conversion {
+        pub mod from_columns;
+        pub mod from_elements;
+        pub mod from_elements_column_major;
+        pub mod from_rows;
+        #[cfg(feature = "serde")]
+        pub mod serde;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+    }
+    pub mod dimensions;
+    pub mod transpose;
+}
 pub mod integer_vector {
     pub mod access;
     pub mod arithmetic {

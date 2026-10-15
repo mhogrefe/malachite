@@ -8,6 +8,7 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
+use crate::integer_matrix::IntegerMatrix;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::mul_dispatch::{TinyKernel, tiny_kernel};
 use crate::integer_vector::IntegerVector;
@@ -3901,6 +3902,46 @@ pub fn integer_vec_integer_vec_unsigned_triple_gen_var_5()
         &exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_5,
         &random_integer_vec_integer_vec_unsigned_triple_gen_var_5,
         &special_random_integer_vec_integer_vec_unsigned_triple_gen_var_5,
+    )
+}
+
+// -- IntegerMatrix --
+
+// A matrix paired with each of its positions, row by row.
+pub(crate) fn matrix_positions(
+    m: IntegerMatrix,
+) -> impl Iterator<Item = (IntegerMatrix, usize, usize)> {
+    let (height, width) = (m.height(), m.width());
+    (0..height).flat_map(move |i| {
+        let m = m.clone();
+        (0..width).map(move |j| (m.clone(), i, j))
+    })
+}
+
+pub fn integer_matrix_gen() -> Generator<IntegerMatrix> {
+    Generator::new(
+        &exhaustive_integer_matrix_gen,
+        &random_integer_matrix_gen,
+        &special_random_integer_matrix_gen,
+    )
+}
+
+// All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
+pub fn integer_matrix_unsigned_unsigned_triple_gen() -> Generator<(IntegerMatrix, usize, usize)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_unsigned_triple_gen,
+        &random_integer_matrix_unsigned_unsigned_triple_gen,
+        &special_random_integer_matrix_unsigned_unsigned_triple_gen,
+    )
+}
+
+// All `(m, i, j)` with `i` a row index and `j` a column index of `m`.
+pub fn integer_matrix_unsigned_unsigned_triple_gen_var_1()
+-> Generator<(IntegerMatrix, usize, usize)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_unsigned_triple_gen_var_1,
+        &random_integer_matrix_unsigned_unsigned_triple_gen_var_1,
+        &special_random_integer_matrix_unsigned_unsigned_triple_gen_var_1,
     )
 }
 

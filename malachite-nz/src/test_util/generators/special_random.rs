@@ -18,6 +18,7 @@ use crate::integer::random::{
     striped_random_negative_integers, striped_random_nonzero_integers,
     uniform_random_integer_inclusive_range,
 };
+use crate::integer_matrix::IntegerMatrix;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::random::{
     striped_random_integer_polynomials, striped_random_integer_polynomials_min_degree,
@@ -101,6 +102,7 @@ use crate::test_util::generators::exhaustive::{
     map_helper_1, map_helper_2, map_helper_3, mul_shr_round_valid,
     round_to_multiple_integer_filter_map, round_to_multiple_natural_filter_map,
 };
+use crate::test_util::generators::matrix_positions;
 use crate::test_util::generators::random::{
     integer_vec_pair_len, integer_vec_square_len, random_gmp_format_strings,
     random_integer_vec_mul_pairs, random_integer_vec_mul_singles, random_with_bounded_unsigned,
@@ -7857,6 +7859,54 @@ pub fn special_random_integer_vec_integer_vec_unsigned_triple_gen_var_5(
         )
         .map(|((xs, ys), n)| (xs, ys, n)),
     )
+}
+
+// -- IntegerMatrix --
+
+pub fn special_random_integer_matrix_gen(config: &GenConfig) -> It<IntegerMatrix> {
+    let mut xs = striped_random_integers(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            IntegerMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(height * width).collect(),
+            )
+        }),
+    )
+}
+
+pub fn special_random_integer_matrix_unsigned_unsigned_triple_gen(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, usize, usize)> {
+    Box::new(
+        special_random_integer_matrix_gen(config)
+            .zip(random_pairs_from_single(
+                geometric_random_unsigneds::<usize>(
+                    EXAMPLE_SEED.fork("indices"),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                ),
+            ))
+            .map(|(m, (i, j))| (m, i, j)),
+    )
+}
+
+pub fn special_random_integer_matrix_unsigned_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, usize, usize)> {
+    Box::new(special_random_integer_matrix_gen(config).flat_map(matrix_positions))
 }
 
 // -- IntegerVector --

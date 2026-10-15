@@ -17,6 +17,7 @@ use crate::integer::exhaustive::{
     exhaustive_negative_integers, exhaustive_nonzero_integers,
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
+use crate::integer_matrix::IntegerMatrix;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
@@ -110,7 +111,7 @@ use crate::test_util::generators::common::{
 };
 use crate::test_util::generators::{
     factors_of_limb_max, integer_vecs_mul_is_tiny_1, integer_vecs_mul_is_tiny_2,
-    limbs_odd_factorial_valid,
+    limbs_odd_factorial_valid, matrix_positions,
 };
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
 use itertools::Itertools;
@@ -3578,6 +3579,51 @@ pub fn exhaustive_integer_vec_integer_vec_unsigned_triple_gen_var_5()
         )
         .map(|((xs, ys), n)| (xs, ys, n)),
     )
+}
+
+// -- IntegerMatrix --
+
+struct IntegerMatrixGenerator;
+
+impl ExhaustiveDependentPairsYsGenerator<(usize, usize), IntegerVector, It<IntegerVector>>
+    for IntegerMatrixGenerator
+{
+    #[inline]
+    fn get_ys(&self, &(height, width): &(usize, usize)) -> It<IntegerVector> {
+        Box::new(exhaustive_integer_vectors_with_dimension(u64::exact_from(
+            height * width,
+        )))
+    }
+}
+
+// Every matrix appears once, as its dimensions paired with its elements in row-major order.
+pub fn exhaustive_integer_matrix_gen() -> It<IntegerMatrix> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+            IntegerMatrixGenerator,
+        )
+        .map(|((height, width), v)| IntegerMatrix::from_owned_elements(height, width, v.elements)),
+    )
+}
+
+pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen() -> It<(IntegerMatrix, usize, usize)>
+{
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_integer_matrix_gen(),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+        )
+        .map(|(m, (i, j))| (m, i, j)),
+    )
+}
+
+// Each matrix paired with each of its positions. A matrix has finitely many, so this reaches every
+// triple, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen_var_1()
+-> It<(IntegerMatrix, usize, usize)> {
+    Box::new(exhaustive_integer_matrix_gen().flat_map(matrix_positions))
 }
 
 // -- IntegerVector --
