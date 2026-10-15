@@ -8,6 +8,7 @@
 
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
+use crate::rational_matrix::RationalMatrix;
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_vector::RationalVector;
 use crate::test_util::generators::common::{
@@ -1258,6 +1259,46 @@ pub fn gaussian_rational_vec_gen() -> Generator<Vec<GaussianRational>> {
         &exhaustive_gaussian_rational_vec_gen,
         &random_gaussian_rational_vec_gen,
         &special_random_gaussian_rational_vec_gen,
+    )
+}
+
+// -- RationalMatrix --
+
+// A matrix paired with each of its positions, row by row.
+pub(crate) fn rational_matrix_positions(
+    m: RationalMatrix,
+) -> impl Iterator<Item = (RationalMatrix, usize, usize)> {
+    let (height, width) = (m.height(), m.width());
+    (0..height).flat_map(move |i| {
+        let m = m.clone();
+        (0..width).map(move |j| (m.clone(), i, j))
+    })
+}
+
+pub fn rational_matrix_gen() -> Generator<RationalMatrix> {
+    Generator::new(
+        &exhaustive_rational_matrix_gen,
+        &random_rational_matrix_gen,
+        &special_random_rational_matrix_gen,
+    )
+}
+
+// All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
+pub fn rational_matrix_unsigned_unsigned_triple_gen() -> Generator<(RationalMatrix, usize, usize)> {
+    Generator::new(
+        &exhaustive_rational_matrix_unsigned_unsigned_triple_gen,
+        &random_rational_matrix_unsigned_unsigned_triple_gen,
+        &special_random_rational_matrix_unsigned_unsigned_triple_gen,
+    )
+}
+
+// All `(m, i, j)` with `i` a row index and `j` a column index of `m`.
+pub fn rational_matrix_unsigned_unsigned_triple_gen_var_1()
+-> Generator<(RationalMatrix, usize, usize)> {
+    Generator::new(
+        &exhaustive_rational_matrix_unsigned_unsigned_triple_gen_var_1,
+        &random_rational_matrix_unsigned_unsigned_triple_gen_var_1,
+        &special_random_rational_matrix_unsigned_unsigned_triple_gen_var_1,
     )
 }
 

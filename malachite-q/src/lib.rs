@@ -148,6 +148,9 @@ extern crate rug;
 /// whose real and imaginary parts are both rational.
 pub mod gaussian_rational;
 pub mod rational;
+/// [`RationalMatrix`](rational_matrix::RationalMatrix), a type representing matrices whose elements
+/// are [`Rational`]s.
+pub mod rational_matrix;
 /// [`RationalPolynomial`](rational_polynomial::RationalPolynomial), a type representing polynomials
 /// in one variable whose coefficients are [`Rational`]s.
 pub mod rational_polynomial;

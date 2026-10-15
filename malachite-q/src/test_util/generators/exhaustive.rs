@@ -16,6 +16,7 @@ use crate::rational::exhaustive::{
     exhaustive_negative_rationals, exhaustive_non_negative_rationals, exhaustive_nonzero_rationals,
     exhaustive_positive_rationals, exhaustive_rationals,
 };
+use crate::rational_matrix::RationalMatrix;
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::exhaustive::{
     exhaustive_rational_polynomials, exhaustive_rational_polynomials_min_degree,
@@ -30,6 +31,7 @@ use crate::test_util::extra_variadic::{
     exhaustive_quadruples_xyyy, exhaustive_triples_from_single, exhaustive_triples_xxy,
     exhaustive_triples_xxy_custom_output,
 };
+use crate::test_util::generators::rational_matrix_positions;
 use itertools::Itertools;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
@@ -47,6 +49,7 @@ use malachite_base::num::exhaustive::{
     exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
     exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
+use malachite_base::num::iterators::ruler_sequence;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::options::exhaustive::exhaustive_options;
 use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
@@ -60,6 +63,7 @@ use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
 };
 use malachite_base::tuples::exhaustive::{
+    ExhaustiveDependentPairsYsGenerator, exhaustive_dependent_pairs,
     exhaustive_ordered_unique_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
     exhaustive_triples, exhaustive_triples_custom_output, exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output, lex_pairs,
@@ -992,6 +996,51 @@ pub fn exhaustive_string_triple_gen_var_3() -> It<(String, String, String)> {
 
 pub fn exhaustive_gaussian_rational_vec_gen() -> It<Vec<GaussianRational>> {
     Box::new(exhaustive_vecs(exhaustive_gaussian_rationals()))
+}
+
+// -- RationalMatrix --
+
+struct RationalMatrixGenerator;
+
+impl ExhaustiveDependentPairsYsGenerator<(usize, usize), RationalVector, It<RationalVector>>
+    for RationalMatrixGenerator
+{
+    #[inline]
+    fn get_ys(&self, &(height, width): &(usize, usize)) -> It<RationalVector> {
+        Box::new(exhaustive_rational_vectors_with_dimension(u64::exact_from(
+            height * width,
+        )))
+    }
+}
+
+// Every matrix appears once, as its dimensions paired with its elements in row-major order.
+pub fn exhaustive_rational_matrix_gen() -> It<RationalMatrix> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+            RationalMatrixGenerator,
+        )
+        .map(|((height, width), v)| RationalMatrix::from_owned_elements(height, width, v.elements)),
+    )
+}
+
+pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen()
+-> It<(RationalMatrix, usize, usize)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_rational_matrix_gen(),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+        )
+        .map(|(m, (i, j))| (m, i, j)),
+    )
+}
+
+// Each matrix paired with each of its positions. A matrix has finitely many, so this reaches every
+// triple, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen_var_1()
+-> It<(RationalMatrix, usize, usize)> {
+    Box::new(exhaustive_rational_matrix_gen().flat_map(rational_matrix_positions))
 }
 
 // -- RationalVector --

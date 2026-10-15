@@ -171,6 +171,12 @@ documented by git history.
 
 ### malachite-q
 
+- `RationalMatrix`, a matrix of `Rational`s with the same layout and interface as `IntegerMatrix`
+  (FLINT's `fmpq_mat_t` layout, without the stride): the element and row/column constructors,
+  `height`, `width`, `transpose`, `transpose_assign`, `Index`/`IndexMut` by `(row, column)`, `get`,
+  `get_mut`, `Display`/`Debug` (such as `[1/2, -3/4; 5, 22/7]`), `FromStr` (elements need not be in
+  lowest terms), `ToLatex` (elements as `\frac`s), `ToTypst` (elements as `frac`s), and serde
+  support.
 - `Cross` and `CrossAssign` for 3-dimensional `RationalVector`s.
 - `CheckedAbs` for `RationalVector`, returning the Euclidean norm as a `Rational` when it is rational,
   that is, when the numerator and denominator of the sum of the squares are both perfect squares.

@@ -8,6 +8,7 @@
 
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
+use crate::rational_matrix::RationalMatrix;
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_vector::RationalVector;
 use malachite_base::max;
@@ -733,5 +734,35 @@ pub fn triple_1_rational_polynomial_bit_bucketer<T, U>(
             )
         },
         bucketing_label: format!("{var_name}'s total stored bits"),
+    }
+}
+
+pub fn rational_matrix_bit_bucketer(var_name: &str) -> Bucketer<'_, RationalMatrix> {
+    Bucketer {
+        bucketing_function: &|m| {
+            usize::exact_from(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn triple_1_rational_matrix_bit_bucketer<T, U>(
+    var_name: &str,
+) -> Bucketer<'_, (RationalMatrix, T, U)> {
+    Bucketer {
+        bucketing_function: &|(m, _, _)| {
+            usize::exact_from(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
     }
 }
