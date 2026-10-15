@@ -33,8 +33,7 @@ impl FromStr for IntegerMatrix {
     ///
     /// Each element is read the way [`Integer::from_str`] reads one, so it may have leading zeros
     /// and a single leading `'-'` or `'+'`. The dimensions may have leading zeros but no sign. Any
-    /// other spacing, such as `[1,2]` or `[1, 2;3, 4]`, is rejected, as is an empty element or
-    /// row.
+    /// other spacing, such as `[1,2]` or `[1, 2;3, 4]`, is rejected, as is an empty element or row.
     ///
     /// If the string does not represent an [`IntegerMatrix`], an `Err` is returned.
     ///

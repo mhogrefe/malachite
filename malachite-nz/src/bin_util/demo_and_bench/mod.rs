@@ -52,6 +52,7 @@ pub(crate) fn register(runner: &mut Runner) {
     integer_polynomial::register(runner);
     integer_vector::register(runner);
     natural::register(runner);
+    natural_matrix::register(runner);
     natural_polynomial::register(runner);
     natural_vector::register(runner);
 }
@@ -62,5 +63,6 @@ mod integer_matrix;
 mod integer_polynomial;
 mod integer_vector;
 mod natural;
+mod natural_matrix;
 mod natural_polynomial;
 mod natural_vector;

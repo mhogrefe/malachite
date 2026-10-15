@@ -81,6 +81,7 @@ use crate::natural::exhaustive::{
     exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural_matrix::NaturalMatrix;
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::exhaustive::{
     exhaustive_natural_polynomials, exhaustive_natural_polynomials_min_degree,
@@ -111,7 +112,7 @@ use crate::test_util::generators::common::{
 };
 use crate::test_util::generators::{
     factors_of_limb_max, integer_vecs_mul_is_tiny_1, integer_vecs_mul_is_tiny_2,
-    limbs_odd_factorial_valid, matrix_positions,
+    limbs_odd_factorial_valid, matrix_positions, natural_matrix_positions,
 };
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
 use itertools::Itertools;
@@ -3720,6 +3721,51 @@ pub fn exhaustive_integer_vector_triple_gen_var_2()
     Box::new(exhaustive_triples_from_single(
         exhaustive_integer_vectors_with_dimension(3),
     ))
+}
+
+// -- NaturalMatrix --
+
+struct NaturalMatrixGenerator;
+
+impl ExhaustiveDependentPairsYsGenerator<(usize, usize), NaturalVector, It<NaturalVector>>
+    for NaturalMatrixGenerator
+{
+    #[inline]
+    fn get_ys(&self, &(height, width): &(usize, usize)) -> It<NaturalVector> {
+        Box::new(exhaustive_natural_vectors_with_dimension(u64::exact_from(
+            height * width,
+        )))
+    }
+}
+
+// Every matrix appears once, as its dimensions paired with its elements in row-major order.
+pub fn exhaustive_natural_matrix_gen() -> It<NaturalMatrix> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+            NaturalMatrixGenerator,
+        )
+        .map(|((height, width), v)| NaturalMatrix::from_owned_elements(height, width, v.elements)),
+    )
+}
+
+pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen() -> It<(NaturalMatrix, usize, usize)>
+{
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_matrix_gen(),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+        )
+        .map(|(m, (i, j))| (m, i, j)),
+    )
+}
+
+// Each matrix paired with each of its positions. A matrix has finitely many, so this reaches every
+// triple, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_1()
+-> It<(NaturalMatrix, usize, usize)> {
+    Box::new(exhaustive_natural_matrix_gen().flat_map(natural_matrix_positions))
 }
 
 // -- NaturalVector --

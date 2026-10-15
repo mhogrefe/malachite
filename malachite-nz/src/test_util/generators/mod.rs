@@ -16,6 +16,7 @@ use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
+use crate::natural_matrix::NaturalMatrix;
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_vector::NaturalVector;
 use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
@@ -4132,6 +4133,46 @@ pub fn integer_vector_triple_gen_var_2() -> Generator<(IntegerVector, IntegerVec
         &exhaustive_integer_vector_triple_gen_var_2,
         &random_integer_vector_triple_gen_var_2,
         &special_random_integer_vector_triple_gen_var_2,
+    )
+}
+
+// -- NaturalMatrix --
+
+// A matrix paired with each of its positions, row by row.
+pub(crate) fn natural_matrix_positions(
+    m: NaturalMatrix,
+) -> impl Iterator<Item = (NaturalMatrix, usize, usize)> {
+    let (height, width) = (m.height(), m.width());
+    (0..height).flat_map(move |i| {
+        let m = m.clone();
+        (0..width).map(move |j| (m.clone(), i, j))
+    })
+}
+
+pub fn natural_matrix_gen() -> Generator<NaturalMatrix> {
+    Generator::new(
+        &exhaustive_natural_matrix_gen,
+        &random_natural_matrix_gen,
+        &special_random_natural_matrix_gen,
+    )
+}
+
+// All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
+pub fn natural_matrix_unsigned_unsigned_triple_gen() -> Generator<(NaturalMatrix, usize, usize)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_triple_gen,
+        &random_natural_matrix_unsigned_unsigned_triple_gen,
+        &special_random_natural_matrix_unsigned_unsigned_triple_gen,
+    )
+}
+
+// All `(m, i, j)` with `i` a row index and `j` a column index of `m`.
+pub fn natural_matrix_unsigned_unsigned_triple_gen_var_1()
+-> Generator<(NaturalMatrix, usize, usize)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_1,
+        &random_natural_matrix_unsigned_unsigned_triple_gen_var_1,
+        &special_random_natural_matrix_unsigned_unsigned_triple_gen_var_1,
     )
 }
 

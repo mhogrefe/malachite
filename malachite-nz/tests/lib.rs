@@ -967,6 +967,25 @@ pub mod natural_polynomial {
         pub mod striped_random_natural_polynomials_with_degree;
     }
 }
+pub mod natural_matrix {
+    pub mod access;
+    pub mod conversion {
+        pub mod from_columns;
+        pub mod from_elements;
+        pub mod from_elements_column_major;
+        pub mod from_rows;
+        #[cfg(feature = "serde")]
+        pub mod serde;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+    }
+    pub mod dimensions;
+    pub mod transpose;
+}
 pub mod natural_vector {
     pub mod access;
     pub mod arithmetic {
