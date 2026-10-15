@@ -889,6 +889,25 @@ pub mod vars {
     pub mod var;
     pub mod xyz;
 }
+pub mod unsigned_matrix {
+    pub mod access;
+    pub mod conversion {
+        pub mod from_columns;
+        pub mod from_elements;
+        pub mod from_elements_column_major;
+        pub mod from_rows;
+        #[cfg(feature = "serde")]
+        pub mod serde;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+    }
+    pub mod dimensions;
+    pub mod transpose;
+}
 pub mod unsigned_polynomial {
     pub mod arithmetic {
         pub mod canonical_primitive_part;

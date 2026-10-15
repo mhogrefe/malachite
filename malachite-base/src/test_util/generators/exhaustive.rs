@@ -70,6 +70,7 @@ use crate::test_util::generators::common::{
 use crate::test_util::generators::{
     digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, large_exponent,
     signed_assign_bits_valid, smallest_invalid_value, unsigned_assign_bits_valid,
+    unsigned_matrix_positions,
 };
 use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
@@ -82,6 +83,7 @@ use crate::tuples::exhaustive::{
     exhaustive_quadruples, exhaustive_triples, exhaustive_triples_custom_output,
     exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
 };
+use crate::unsigned_matrix::UnsignedMatrix;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::exhaustive::{
     exhaustive_unsigned_polynomials, exhaustive_unsigned_polynomials_min_degree,
@@ -6837,6 +6839,53 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_v
 }
 
 // -- UnsignedVector<u64> --
+
+struct UnsignedMatrixGenerator;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        (usize, usize),
+        UnsignedVector<u64>,
+        It<UnsignedVector<u64>>,
+    > for UnsignedMatrixGenerator
+{
+    #[inline]
+    fn get_ys(&self, &(height, width): &(usize, usize)) -> It<UnsignedVector<u64>> {
+        Box::new(exhaustive_unsigned_vectors_with_dimension(u64::exact_from(
+            height * width,
+        )))
+    }
+}
+
+// Every matrix appears once, as its dimensions paired with its elements in row-major order.
+pub fn exhaustive_unsigned_matrix_gen() -> It<UnsignedMatrix<u64>> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+            UnsignedMatrixGenerator,
+        )
+        .map(|((height, width), v)| UnsignedMatrix::from_owned_elements(height, width, v.elements)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen()
+-> It<(UnsignedMatrix<u64>, usize, usize)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_unsigned_matrix_gen(),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+        )
+        .map(|(m, (i, j))| (m, i, j)),
+    )
+}
+
+// Each matrix paired with each of its positions. A matrix has finitely many, so this reaches every
+// triple, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_1()
+-> It<(UnsignedMatrix<u64>, usize, usize)> {
+    Box::new(exhaustive_unsigned_matrix_gen().flat_map(unsigned_matrix_positions))
+}
 
 pub fn exhaustive_unsigned_vector_gen() -> It<UnsignedVector<u64>> {
     Box::new(exhaustive_unsigned_vectors::<u64>())

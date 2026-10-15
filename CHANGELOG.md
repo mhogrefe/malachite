@@ -10,6 +10,11 @@ documented by git history.
 
 ### malachite-base
 
+- `UnsignedMatrix<T>`, a matrix of primitive unsigned integers with the same layout and interface
+  as malachite-nz's `IntegerMatrix`: the element and row/column constructors, `height`, `width`,
+  `transpose`, `transpose_assign`, `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`,
+  `Display`/`Debug`, `FromStr` (elements must fit in a `T`; no `'-'`), `ToLatex`, `ToTypst`, and
+  serde support (elements serialize as JSON numbers).
 - `Cross` and `CrossAssign` traits in `malachite_base::num::arithmetic::traits`, for the cross
   product of two 3-dimensional vectors.
 - `ModPowerOf2Cross` and `ModPowerOf2CrossAssign` traits, for the cross product of two

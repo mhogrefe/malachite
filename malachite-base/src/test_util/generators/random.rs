@@ -87,6 +87,7 @@ use crate::test_util::generators::{
     digits_valid, large_exponent, round_to_multiple_of_power_of_2_filter_map,
     round_to_multiple_signed_filter_map, round_to_multiple_unsigned_filter_map,
     signed_assign_bits_valid, smallest_invalid_value, unsigned_assign_bits_valid,
+    unsigned_matrix_positions,
 };
 use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
@@ -95,6 +96,7 @@ use crate::test_util::rounding_modes::ROUNDING_MODE_CHARS;
 use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
 use crate::unions::Union2;
 use crate::unions::random::random_union2s;
+use crate::unsigned_matrix::UnsignedMatrix;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::random::{
     random_unsigned_polynomials, random_unsigned_polynomials_min_degree,
@@ -9197,6 +9199,46 @@ pub fn random_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1
 }
 
 // -- UnsignedVector<u64> --
+
+pub fn random_unsigned_matrix_gen(config: &GenConfig) -> It<UnsignedMatrix<u64>> {
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            UnsignedMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(height * width).collect(),
+            )
+        }),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_unsigned_triple_gen(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, usize, usize)> {
+    Box::new(
+        random_unsigned_matrix_gen(config)
+            .zip(random_pairs_from_single(
+                geometric_random_unsigneds::<usize>(
+                    EXAMPLE_SEED.fork("indices"),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                ),
+            ))
+            .map(|(m, (i, j))| (m, i, j)),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, usize, usize)> {
+    Box::new(random_unsigned_matrix_gen(config).flat_map(unsigned_matrix_positions))
+}
 
 fn random_unsigned_vectors_helper(
     config: &GenConfig,

@@ -1,0 +1,154 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use core::str::FromStr;
+use malachite_base::test_util::generators::{
+    unsigned_matrix_gen, unsigned_matrix_unsigned_unsigned_triple_gen,
+    unsigned_matrix_unsigned_unsigned_triple_gen_var_1,
+};
+use malachite_base::unsigned_matrix::UnsignedMatrix;
+
+#[test]
+fn test_index() {
+    let test = |s, i: usize, j: usize, out: u64| {
+        let m = UnsignedMatrix::<u64>::from_str(s).unwrap();
+        assert_eq!(m[(i, j)], out);
+    };
+    test("[5]", 0, 0, 5);
+    test("[1, 2, 3; 4, 5, 6]", 0, 0, 1);
+    test("[1, 2, 3; 4, 5, 6]", 0, 2, 3);
+    test("[1, 2, 3; 4, 5, 6]", 1, 0, 4);
+    test("[1, 2, 3; 4, 5, 6]", 1, 2, 6);
+    test("[1, 2; 3, 4; 5, 6]", 2, 1, 6);
+    test("[1, 2; 3, 4; 5, 60]", 2, 1, 60);
+}
+
+#[test]
+#[should_panic]
+fn index_fail_1() {
+    let m = UnsignedMatrix::<u64>::from_str("[]_{0,0}").unwrap();
+    let _ = &m[(0, 0)];
+}
+
+#[test]
+#[should_panic]
+fn index_fail_2() {
+    let m = UnsignedMatrix::<u64>::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    let _ = &m[(2, 0)];
+}
+
+// - the column index is out of range, even though i * width + j is a valid position in `elements`
+#[test]
+#[should_panic]
+fn index_fail_3() {
+    let m = UnsignedMatrix::<u64>::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    let _ = &m[(0, 3)];
+}
+
+#[test]
+#[should_panic]
+fn index_fail_4() {
+    let m = UnsignedMatrix::<u64>::from_str("[]_{0,4}").unwrap();
+    let _ = &m[(0, 0)];
+}
+
+#[test]
+fn test_index_mut() {
+    let test = |s, i: usize, j: usize, x: u64, out| {
+        let mut m = UnsignedMatrix::<u64>::from_str(s).unwrap();
+        m[(i, j)] = x;
+        assert_eq!(m.to_string(), out);
+    };
+    test("[5]", 0, 0, 7, "[7]");
+    test("[1, 2, 3; 4, 5, 6]", 0, 1, 10, "[1, 10, 3; 4, 5, 6]");
+    test("[1, 2, 3; 4, 5, 6]", 1, 0, 100, "[1, 2, 3; 100, 5, 6]");
+    test("[1, 2; 3, 4; 5, 6]", 2, 1, 0, "[1, 2; 3, 4; 5, 0]");
+}
+
+#[test]
+#[should_panic]
+fn index_mut_fail_1() {
+    let mut m = UnsignedMatrix::<u64>::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    m[(2, 0)] = 0;
+}
+
+#[test]
+#[should_panic]
+fn index_mut_fail_2() {
+    let mut m = UnsignedMatrix::<u64>::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    m[(0, 3)] = 0;
+}
+
+#[test]
+fn test_get() {
+    let test = |s, i: usize, j: usize, out: Option<u64>| {
+        let mut m = UnsignedMatrix::<u64>::from_str(s).unwrap();
+        assert_eq!(m.get(i, j), out.as_ref());
+        assert_eq!(m.get_mut(i, j).copied(), out);
+    };
+    test("[]_{0,0}", 0, 0, None);
+    test("[]_{0,4}", 0, 0, None);
+    test("[]_{4,0}", 0, 0, None);
+    test("[5]", 0, 0, Some(5));
+    test("[5]", 0, 1, None);
+    test("[5]", 1, 0, None);
+    test("[1, 2, 3; 4, 5, 6]", 1, 2, Some(6));
+    test("[1, 2, 3; 4, 5, 6]", 0, 3, None);
+    test("[1, 2, 3; 4, 5, 6]", 2, 0, None);
+    test("[1, 2, 3; 4, 5, 6]", usize::MAX, usize::MAX, None);
+}
+
+#[test]
+fn index_properties() {
+    unsigned_matrix_unsigned_unsigned_triple_gen_var_1().test_properties(|(m, i, j)| {
+        let x = &m[(i, j)];
+        assert_eq!(x, &m.elements[i * m.width() + j]);
+        assert_eq!(m.get(i, j), Some(x));
+        assert_eq!(&m.transpose()[(j, i)], x);
+
+        // Changing one element through `IndexMut` changes only that element.
+        let mut n = m.clone();
+        n[(i, j)] ^= 1;
+        assert!(n.is_valid());
+        assert_eq!((n.height(), n.width()), (m.height(), m.width()));
+        assert_eq!(n[(i, j)], x ^ 1);
+        for k in 0..m.height() {
+            for l in 0..m.width() {
+                if (k, l) != (i, j) {
+                    assert_eq!(n[(k, l)], m[(k, l)]);
+                }
+            }
+        }
+        *n.get_mut(i, j).unwrap() ^= 1;
+        assert_eq!(n, m);
+    });
+
+    unsigned_matrix_gen().test_properties(|m| {
+        // Indexing every position, row by row, reads back the elements.
+        let mut xs = Vec::new();
+        for i in 0..m.height() {
+            for j in 0..m.width() {
+                xs.push(m[(i, j)]);
+            }
+        }
+        assert_eq!(xs, m.elements);
+    });
+}
+
+#[test]
+fn get_properties() {
+    unsigned_matrix_unsigned_unsigned_triple_gen().test_properties(|(mut m, i, j)| {
+        let x = m.get(i, j).copied();
+        assert_eq!(x.is_some(), i < m.height() && j < m.width());
+        if let Some(x) = &x {
+            assert_eq!(&m[(i, j)], x);
+        }
+        assert_eq!(m.get_mut(i, j).copied(), x);
+        assert_eq!(m.transpose().get(j, i).copied(), x);
+    });
+}

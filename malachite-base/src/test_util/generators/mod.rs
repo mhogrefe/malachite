@@ -28,6 +28,7 @@ use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
 use crate::tuples::exhaustive::{ExhaustivePairs, exhaustive_pairs_custom_output};
+use crate::unsigned_matrix::UnsignedMatrix;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_vector::UnsignedVector;
 use alloc::collections::{BTreeMap, BTreeSet};
@@ -5261,6 +5262,45 @@ pub fn unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1<T: Pri
 }
 
 // -- UnsignedVector<u64> --
+
+// A matrix paired with each of its positions, row by row.
+pub(crate) fn unsigned_matrix_positions(
+    m: UnsignedMatrix<u64>,
+) -> impl Iterator<Item = (UnsignedMatrix<u64>, usize, usize)> {
+    let (height, width) = (m.height(), m.width());
+    (0..height).flat_map(move |i| {
+        let m = m.clone();
+        (0..width).map(move |j| (m.clone(), i, j))
+    })
+}
+
+pub fn unsigned_matrix_gen() -> Generator<UnsignedMatrix<u64>> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_gen,
+        &random_unsigned_matrix_gen,
+        &special_random_unsigned_matrix_gen,
+    )
+}
+
+// All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen()
+-> Generator<(UnsignedMatrix<u64>, usize, usize)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen,
+        &random_unsigned_matrix_unsigned_unsigned_triple_gen,
+        &special_random_unsigned_matrix_unsigned_unsigned_triple_gen,
+    )
+}
+
+// All `(m, i, j)` with `i` a row index and `j` a column index of `m`.
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_1()
+-> Generator<(UnsignedMatrix<u64>, usize, usize)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_1,
+        &random_unsigned_matrix_unsigned_unsigned_triple_gen_var_1,
+        &special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_1,
+    )
+}
 
 pub fn unsigned_vector_gen() -> Generator<UnsignedVector<u64>> {
     Generator::new(

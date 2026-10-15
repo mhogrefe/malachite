@@ -16,6 +16,7 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::SignificantBits;
+use crate::unsigned_matrix::UnsignedMatrix;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_vector::UnsignedVector;
 use std::cmp::{max, min};
@@ -1249,5 +1250,23 @@ pub fn pair_unsigned_vector_max_dimension_bucketer<'a, T: PrimitiveUnsigned>(
     Bucketer {
         bucketing_function: &|(v, w)| max(v.elements.len(), w.elements.len()),
         bucketing_label: format!("max({x_name}.dimension(), {y_name}.dimension())"),
+    }
+}
+
+pub fn unsigned_matrix_size_bucketer<T: PrimitiveUnsigned>(
+    var_name: &str,
+) -> Bucketer<'_, UnsignedMatrix<T>> {
+    Bucketer {
+        bucketing_function: &|m| m.elements.len(),
+        bucketing_label: format!("{var_name}.elements.len()"),
+    }
+}
+
+pub fn triple_1_unsigned_matrix_size_bucketer<T: PrimitiveUnsigned, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (UnsignedMatrix<T>, U, V)> {
+    Bucketer {
+        bucketing_function: &|(m, _, _)| m.elements.len(),
+        bucketing_label: format!("{var_name}.elements.len()"),
     }
 }

@@ -377,6 +377,9 @@ pub mod tuples;
 /// | `Union3::B(5)`     | `"B"(5)`   |
 /// | `Union3::C(false)` | `"C"("F")` |
 pub mod unions;
+/// [`UnsignedMatrix`](unsigned_matrix::UnsignedMatrix), a type representing matrices whose elements
+/// are primitive unsigned integers.
+pub mod unsigned_matrix;
 /// [`UnsignedPolynomial`](unsigned_polynomial::UnsignedPolynomial), a type representing polynomials
 /// in one variable whose coefficients are primitive unsigned integers.
 pub mod unsigned_polynomial;
