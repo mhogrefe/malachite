@@ -1381,6 +1381,25 @@ pub fn rational_vector_triple_gen_var_1()
     )
 }
 
+// All pairs of 3-dimensional `RationalVector`s.
+pub fn rational_vector_pair_gen_var_2() -> Generator<(RationalVector, RationalVector)> {
+    Generator::new(
+        &exhaustive_rational_vector_pair_gen_var_2,
+        &random_rational_vector_pair_gen_var_2,
+        &special_random_rational_vector_pair_gen_var_2,
+    )
+}
+
+// All triples of 3-dimensional `RationalVector`s.
+pub fn rational_vector_triple_gen_var_2()
+-> Generator<(RationalVector, RationalVector, RationalVector)> {
+    Generator::new(
+        &exhaustive_rational_vector_triple_gen_var_2,
+        &random_rational_vector_triple_gen_var_2,
+        &special_random_rational_vector_triple_gen_var_2,
+    )
+}
+
 pub fn rational_vector_rational_pair_gen() -> Generator<(RationalVector, Rational)> {
     Generator::new(
         &exhaustive_rational_vector_rational_pair_gen,

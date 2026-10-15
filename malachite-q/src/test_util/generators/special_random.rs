@@ -22,7 +22,9 @@ use crate::rational_polynomial::random::{
     striped_random_rational_polynomials, striped_random_rational_polynomials_min_degree,
 };
 use crate::rational_vector::RationalVector;
-use crate::rational_vector::random::striped_random_rational_vectors;
+use crate::rational_vector::random::{
+    striped_random_rational_vectors, striped_random_rational_vectors_with_dimension,
+};
 use crate::test_util::extra_variadic::{
     random_ordered_unique_triples, random_quadruples, random_quadruples_from_single,
     random_quadruples_xxxy, random_quadruples_xxyz, random_triples, random_triples_from_single,
@@ -2728,6 +2730,36 @@ pub fn special_random_rational_vector_triple_gen_var_1(
             )
         }),
     )
+}
+
+pub fn special_random_rational_vector_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalVector, RationalVector)> {
+    Box::new(random_pairs_from_single(
+        striped_random_rational_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+    ))
+}
+
+pub fn special_random_rational_vector_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalVector, RationalVector, RationalVector)> {
+    Box::new(random_triples_from_single(
+        striped_random_rational_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+    ))
 }
 
 pub fn special_random_rational_vector_rational_pair_gen(

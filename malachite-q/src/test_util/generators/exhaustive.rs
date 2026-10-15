@@ -1097,6 +1097,19 @@ pub fn exhaustive_rational_vector_triple_gen_var_1()
     })
 }
 
+pub fn exhaustive_rational_vector_pair_gen_var_2() -> It<(RationalVector, RationalVector)> {
+    Box::new(exhaustive_pairs_from_single(
+        exhaustive_rational_vectors_with_dimension(3),
+    ))
+}
+
+pub fn exhaustive_rational_vector_triple_gen_var_2()
+-> It<(RationalVector, RationalVector, RationalVector)> {
+    Box::new(exhaustive_triples_from_single(
+        exhaustive_rational_vectors_with_dimension(3),
+    ))
+}
+
 pub fn exhaustive_rational_vector_rational_pair_gen() -> It<(RationalVector, Rational)> {
     Box::new(exhaustive_pairs(
         exhaustive_rational_vectors(),

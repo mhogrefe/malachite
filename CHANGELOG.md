@@ -10,6 +10,8 @@ documented by git history.
 
 ### malachite-base
 
+- `Cross` and `CrossAssign` traits in `malachite_base::num::arithmetic::traits`, for the cross
+  product of two 3-dimensional vectors.
 - `AddDot`, `AddDotAssign`, `SubDot`, and `SubDotAssign` traits in
   `malachite_base::num::arithmetic::traits`, for adding the dot product of two vectors to a number
   or subtracting it, $x \pm \sum_i v_iw_i$; `DotReversed`, for the dot product of a vector and the
@@ -84,6 +86,7 @@ documented by git history.
 
 ### malachite-nz
 
+- `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.
 - `AddDot`, `SubDot`, `AddDotReversed`, `SubDotReversed`, and their `Assign` forms for `Integer`
   with `IntegerVector`s and `Natural` with `NaturalVector`s, and `DotReversed` for `IntegerVector`
   and `NaturalVector`, like FLINT's `_fmpz_vec_dot_general`: the initial term and the products are
@@ -136,6 +139,7 @@ documented by git history.
 
 ### malachite-q
 
+- `Cross` and `CrossAssign` for 3-dimensional `RationalVector`s.
 - `Compose` and `ComposeAssign` for `RationalPolynomial`, like FLINT's `fmpq_poly_compose`: the
   outer polynomial is rescaled so that the inner one has an integer numerator, and the work is one
   integer composition, with reductions to lowest terms before and after it.

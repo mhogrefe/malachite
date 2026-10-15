@@ -3659,6 +3659,19 @@ pub fn exhaustive_integer_vector_triple_gen_var_1()
     })
 }
 
+pub fn exhaustive_integer_vector_pair_gen_var_2() -> It<(IntegerVector, IntegerVector)> {
+    Box::new(exhaustive_pairs_from_single(
+        exhaustive_integer_vectors_with_dimension(3),
+    ))
+}
+
+pub fn exhaustive_integer_vector_triple_gen_var_2()
+-> It<(IntegerVector, IntegerVector, IntegerVector)> {
+    Box::new(exhaustive_triples_from_single(
+        exhaustive_integer_vectors_with_dimension(3),
+    ))
+}
+
 // -- NaturalVector --
 
 pub fn exhaustive_natural_vector_gen() -> It<NaturalVector> {

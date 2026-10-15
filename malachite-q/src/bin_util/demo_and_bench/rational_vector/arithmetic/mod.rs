@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonicalize_sign::register(runner);
     content::register(runner);
     content_chained::register(runner);
+    cross::register(runner);
     dot::register(runner);
     dot_reversed::register(runner);
     dot_sign::register(runner);
@@ -51,6 +52,7 @@ mod canonical_primitive_part;
 mod canonicalize_sign;
 mod content;
 mod content_chained;
+mod cross;
 mod dot;
 mod dot_reversed;
 mod dot_sign;

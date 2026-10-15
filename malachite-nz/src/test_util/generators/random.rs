@@ -22,7 +22,9 @@ use crate::integer_polynomial::random::{
 };
 use crate::integer_vector::IntegerVector;
 use crate::integer_vector::arithmetic::scalar_mul::integers_mul_scalar;
-use crate::integer_vector::random::random_integer_vectors;
+use crate::integer_vector::random::{
+    random_integer_vectors, random_integer_vectors_with_dimension,
+};
 use crate::natural::Natural;
 use crate::natural::arithmetic::binomial_coefficient::{
     BIN_GOETGHELUCK_THRESHOLD, BIN_UIUI_RECURSIVE_SMALLDC,
@@ -7104,6 +7106,32 @@ pub fn random_integer_vector_triple_gen_var_1(
             )
         }),
     )
+}
+
+pub fn random_integer_vector_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerVector, IntegerVector)> {
+    Box::new(random_pairs_from_single(
+        random_integer_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+    ))
+}
+
+pub fn random_integer_vector_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerVector, IntegerVector, IntegerVector)> {
+    Box::new(random_triples_from_single(
+        random_integer_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+    ))
 }
 
 // -- NaturalVector --

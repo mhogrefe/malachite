@@ -8,6 +8,7 @@
 
 pub mod abs_squared;
 pub mod content_chained;
+pub mod cross;
 pub mod dot;
 pub mod dot_general;
 pub mod max_bits;

@@ -438,6 +438,7 @@ pub mod rational_vector {
         pub mod canonicalize_sign;
         pub mod content;
         pub mod content_chained;
+        pub mod cross;
         pub mod dot;
         pub mod dot_reversed;
         pub mod dot_sign;

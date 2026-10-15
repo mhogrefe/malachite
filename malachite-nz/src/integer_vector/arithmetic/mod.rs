@@ -138,6 +138,10 @@ pub mod content;
 /// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
 /// which computes the GCD of a number and a vector's elements.
 pub mod content_chained;
+/// Implementations of [`Cross`](malachite_base::num::arithmetic::traits::Cross) and
+/// [`CrossAssign`](malachite_base::num::arithmetic::traits::CrossAssign), for computing the cross
+/// product of two 3-dimensional vectors.
+pub mod cross;
 /// Exact division of a vector by a scalar, by implementations of
 /// [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign).

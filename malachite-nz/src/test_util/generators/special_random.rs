@@ -24,7 +24,9 @@ use crate::integer_polynomial::random::{
 };
 use crate::integer_vector::IntegerVector;
 use crate::integer_vector::arithmetic::scalar_mul::integers_mul_scalar;
-use crate::integer_vector::random::striped_random_integer_vectors;
+use crate::integer_vector::random::{
+    striped_random_integer_vectors, striped_random_integer_vectors_with_dimension,
+};
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -8056,6 +8058,36 @@ pub fn special_random_integer_vector_triple_gen_var_1(
             )
         }),
     )
+}
+
+pub fn special_random_integer_vector_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerVector, IntegerVector)> {
+    Box::new(random_pairs_from_single(
+        striped_random_integer_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+    ))
+}
+
+pub fn special_random_integer_vector_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerVector, IntegerVector, IntegerVector)> {
+    Box::new(random_triples_from_single(
+        striped_random_integer_vectors_with_dimension(
+            EXAMPLE_SEED,
+            3,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+    ))
 }
 
 // -- NaturalVector --

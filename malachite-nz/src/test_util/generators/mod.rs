@@ -4066,6 +4066,25 @@ pub fn integer_vector_triple_gen_var_1() -> Generator<(IntegerVector, IntegerVec
     )
 }
 
+// All pairs of 3-dimensional `IntegerVector`s.
+pub fn integer_vector_pair_gen_var_2() -> Generator<(IntegerVector, IntegerVector)> {
+    Generator::new(
+        &exhaustive_integer_vector_pair_gen_var_2,
+        &random_integer_vector_pair_gen_var_2,
+        &special_random_integer_vector_pair_gen_var_2,
+    )
+}
+
+// All triples of 3-dimensional `IntegerVector`s.
+pub fn integer_vector_triple_gen_var_2() -> Generator<(IntegerVector, IntegerVector, IntegerVector)>
+{
+    Generator::new(
+        &exhaustive_integer_vector_triple_gen_var_2,
+        &random_integer_vector_triple_gen_var_2,
+        &special_random_integer_vector_triple_gen_var_2,
+    )
+}
+
 // -- NaturalVector --
 
 pub fn natural_vector_gen() -> Generator<NaturalVector> {

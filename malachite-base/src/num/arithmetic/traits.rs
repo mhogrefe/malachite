@@ -1164,6 +1164,31 @@ pub trait Dot<RHS = Self> {
     fn dot(self, other: RHS) -> Self::Output;
 }
 
+/// Computes the cross product of two 3-dimensional vectors: the vector perpendicular to both whose
+/// length is the area of the parallelogram they span.
+///
+/// $$
+/// v \times w = (v_1w_2 - v_2w_1, v_2w_0 - v_0w_2, v_0w_1 - v_1w_0).
+/// $$
+///
+/// Both vectors must have dimension 3.
+pub trait Cross<RHS = Self> {
+    type Output;
+
+    fn cross(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces a 3-dimensional vector with its cross product with another.
+///
+/// $$
+/// v \gets v \times w.
+/// $$
+///
+/// Both vectors must have dimension 3.
+pub trait CrossAssign<RHS = Self> {
+    fn cross_assign(&mut self, other: RHS);
+}
+
 /// Adds the dot product of two vectors to a number: $x + \sum_i v_iw_i$.
 ///
 /// The vectors must have the same dimension. Computing the sum and the products together can avoid

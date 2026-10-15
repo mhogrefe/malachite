@@ -362,6 +362,7 @@ pub mod integer_vector {
         pub mod canonicalize_sign;
         pub mod content;
         pub mod content_chained;
+        pub mod cross;
         pub mod div_exact;
         pub mod dot;
         pub mod dot_general;
