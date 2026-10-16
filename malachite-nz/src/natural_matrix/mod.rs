@@ -479,6 +479,8 @@ pub mod access;
 pub mod conversion;
 /// Iterators that generate [`NaturalMatrix`]s without repetition.
 pub mod exhaustive;
+/// A function for determining whether a [`NaturalMatrix`] is square.
+pub mod is_square;
 /// Iterators that generate [`NaturalMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;

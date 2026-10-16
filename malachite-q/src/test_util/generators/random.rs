@@ -16,7 +16,7 @@ use crate::rational::random::{
     random_nonzero_rationals, random_positive_rationals, random_rationals,
 };
 use crate::rational_matrix::RationalMatrix;
-use crate::rational_matrix::random::random_rational_matrices;
+use crate::rational_matrix::random::{random_rational_matrices, random_rational_square_matrices};
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::random::{
     random_rational_polynomials, random_rational_polynomials_min_degree,
@@ -2228,6 +2228,16 @@ pub fn random_rational_matrix_gen(config: &GenConfig) -> It<RationalMatrix> {
         config.get_or("mean_bits_d", 1),
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
+    ))
+}
+
+pub fn random_rational_matrix_gen_var_1(config: &GenConfig) -> It<RationalMatrix> {
+    Box::new(random_rational_square_matrices(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_size_n", 4),
+        config.get_or("mean_size_d", 1),
     ))
 }
 

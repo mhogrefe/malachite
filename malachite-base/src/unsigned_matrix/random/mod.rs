@@ -23,7 +23,9 @@ use core::iter::{Repeat, repeat};
 /// This `struct` is created by [`random_unsigned_matrices_from_iterator`],
 /// [`random_unsigned_matrices_with_dimensions_from_iterator`], [`random_unsigned_matrices`],
 /// [`random_unsigned_matrices_with_dimensions`], [`striped_random_unsigned_matrices`], and
-/// [`striped_random_unsigned_matrices_with_dimensions`]; see their documentation for more.
+/// [`striped_random_unsigned_matrices_with_dimensions`],
+/// [`random_unsigned_square_matrices_from_iterator`], [`random_unsigned_square_matrices`], and
+/// [`striped_random_unsigned_square_matrices`]; see their documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedMatrices<
     T: PrimitiveUnsigned,
@@ -365,5 +367,190 @@ pub fn striped_random_unsigned_matrices_with_dimensions<T: PrimitiveUnsigned>(
         height,
         width,
         striped_random_unsigneds(seed, mean_stripe_numerator, mean_stripe_denominator),
+    )
+}
+
+/// Generates the dimensions of random square matrices: each output is $(n, n)$, with $n$ sampled
+/// from a geometric distribution.
+///
+/// This `struct` is used by [`random_unsigned_square_matrices_from_iterator`],
+/// [`random_unsigned_square_matrices`], and [`striped_random_unsigned_square_matrices`]; see their
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomSquareMatrixDimensions(GeometricRandomNaturalValues<usize>);
+
+impl Iterator for RandomSquareMatrixDimensions {
+    type Item = (usize, usize);
+
+    #[inline]
+    fn next(&mut self) -> Option<(usize, usize)> {
+        self.0.next().map(|size| (size, size))
+    }
+}
+
+/// Generates random square [`UnsignedMatrix`]s whose elements come from an iterator.
+///
+/// `xs_gen` is given a seed derived from `seed` and produces the iterator of elements; each matrix
+/// takes its elements, in row-major order, from that iterator. This allows any distribution of
+/// elements, for example the residues modulo some $m$. The size is sampled from a geometric
+/// distribution with mean `mean_size_numerator / mean_size_denominator`, so the 0-by-0 matrix is
+/// generated with the probability that that distribution gives to 0.
+///
+/// The iterator produced by `xs_gen` must be infinite, and so is the output.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterator produced by `xs_gen`, and $n$ is
+/// the number of elements of the $i$th output.
+///
+/// # Panics
+/// Panics if `mean_size_numerator` or `mean_size_denominator` are zero, or if, after being reduced
+/// to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// The elements here are from 0 to 8.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::unsigned_matrix::random::random_unsigned_square_matrices_from_iterator;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_unsigned_square_matrices_from_iterator(
+///             EXAMPLE_SEED,
+///             &|seed| random_unsigned_inclusive_range::<u8>(seed, 0, 8),
+///             3,
+///             2
+///         ),
+///         5
+///     ),
+///     "[[]_{0,0}, []_{0,0}, [4, 4, 5, 7, 1, 6; 1, 1, 0, 1, 4, 3; 1, 1, 4, 4, 0, 6; 7, 1, 1, 1, \
+///     7, 5; 2, 2, 2, 4, 8, 5; 3, 3, 7, 0, 0, 8], []_{0,0}, [4, 0; 3, 7], ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_unsigned_square_matrices_from_iterator<
+    T: PrimitiveUnsigned,
+    I: Iterator<Item = T>,
+>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_size_numerator: u64,
+    mean_size_denominator: u64,
+) -> RandomUnsignedMatrices<T, RandomSquareMatrixDimensions, I> {
+    RandomUnsignedMatrices {
+        dimensions: RandomSquareMatrixDimensions(geometric_random_unsigneds(
+            seed.fork("dimensions"),
+            mean_size_numerator,
+            mean_size_denominator,
+        )),
+        xs: xs_gen(seed.fork("elements")),
+    }
+}
+
+/// Generates random square [`UnsignedMatrix`]s.
+///
+/// The elements are sampled from [`random_primitive_ints`], so each is uniform over its whole
+/// range. The size is sampled from a geometric distribution with mean `mean_size_numerator /
+/// mean_size_denominator`, so the 0-by-0 matrix is generated with the probability that that
+/// distribution gives to 0.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(n)$
+///
+/// $M(i) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $n$ is the number
+/// of elements of the $i$th output.
+///
+/// # Panics
+/// Panics if `mean_size_numerator` or `mean_size_denominator` are zero, or if, after being reduced
+/// to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::unsigned_matrix::random::random_unsigned_square_matrices;
+///
+/// assert_eq!(
+///     prefix_to_string(random_unsigned_square_matrices::<u8>(EXAMPLE_SEED, 3, 2), 5),
+///     "[[]_{0,0}, []_{0,0}, [164, 76, 94, 126, 28, 110; 175, 17, 11, 238, 65, 62; 225, 188, 65, \
+///     75, 96, 154; 151, 17, 31, 199, 37, 162; 235, 226, 74, 140, 91, 207; 254, 63, 63, 190, 7, \
+///     128], []_{0,0}, [4, 115; 222, 72], ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_unsigned_square_matrices<T: PrimitiveUnsigned>(
+    seed: Seed,
+    mean_size_numerator: u64,
+    mean_size_denominator: u64,
+) -> RandomUnsignedMatrices<T, RandomSquareMatrixDimensions, RandomPrimitiveInts<T>> {
+    random_unsigned_square_matrices_from_iterator(
+        seed,
+        &random_primitive_ints,
+        mean_size_numerator,
+        mean_size_denominator,
+    )
+}
+
+/// Generates random square [`UnsignedMatrix`]s with striped elements.
+///
+/// The elements are striped, as they are in [`striped_random_unsigned_matrices`]. The size is
+/// sampled from a geometric distribution with mean `mean_size_numerator / mean_size_denominator`,
+/// so the 0-by-0 matrix is generated with the probability that that distribution gives to 0.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(n)$
+///
+/// $M(i) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $n$ is the number
+/// of elements of the $i$th output.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_size_numerator` or `mean_size_denominator` are zero, or if,
+/// after being reduced to lowest terms, the sum of the last two is greater than or equal to
+/// $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::unsigned_matrix::random::striped_random_unsigned_square_matrices;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_unsigned_square_matrices::<u8>(EXAMPLE_SEED, 4, 1, 3, 2),
+///         5
+///     ),
+///     "[[]_{0,0}, []_{0,0}, [127, 128, 240, 255, 184, 224; 32, 3, 224, 254, 112, 7; 194, 60, 1, \
+///     128, 128, 15; 28, 127, 191, 253, 216, 200; 195, 239, 1, 3, 127, 126; 224, 62, 254, 240, \
+///     120, 128], []_{0,0}, [28, 1; 31, 220], ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_unsigned_square_matrices<T: PrimitiveUnsigned>(
+    seed: Seed,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_size_numerator: u64,
+    mean_size_denominator: u64,
+) -> RandomUnsignedMatrices<T, RandomSquareMatrixDimensions, StripedRandomUnsignedBitChunks<T>> {
+    random_unsigned_square_matrices_from_iterator(
+        seed,
+        &|seed_2| striped_random_unsigneds(seed_2, mean_stripe_numerator, mean_stripe_denominator),
+        mean_size_numerator,
+        mean_size_denominator,
     )
 }

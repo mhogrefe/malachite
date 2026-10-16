@@ -26,7 +26,9 @@ use malachite_base::tuples::random::{RandomPairsFromSingle, random_pairs_from_si
 /// This `struct` is created by [`random_natural_matrices_from_iterator`],
 /// [`random_natural_matrices_with_dimensions_from_iterator`], [`random_natural_matrices`],
 /// [`random_natural_matrices_with_dimensions`], [`striped_random_natural_matrices`], and
-/// [`striped_random_natural_matrices_with_dimensions`]; see their documentation for more.
+/// [`striped_random_natural_matrices_with_dimensions`],
+/// [`random_natural_square_matrices_from_iterator`], [`random_natural_square_matrices`], and
+/// [`striped_random_natural_square_matrices`]; see their documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomNaturalMatrices<D: Iterator<Item = (usize, usize)>, I: Iterator<Item = Natural>> {
     dimensions: D,
@@ -409,5 +411,207 @@ pub fn striped_random_natural_matrices_with_dimensions(
             mean_bits_numerator,
             mean_bits_denominator,
         ),
+    )
+}
+
+/// Generates the dimensions of random square matrices: each output is $(n, n)$, with $n$ sampled
+/// from a geometric distribution.
+///
+/// This `struct` is used by [`random_natural_square_matrices_from_iterator`],
+/// [`random_natural_square_matrices`], and [`striped_random_natural_square_matrices`]; see their
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomSquareMatrixDimensions(GeometricRandomNaturalValues<usize>);
+
+impl Iterator for RandomSquareMatrixDimensions {
+    type Item = (usize, usize);
+
+    #[inline]
+    fn next(&mut self) -> Option<(usize, usize)> {
+        self.0.next().map(|size| (size, size))
+    }
+}
+
+/// Generates random square [`NaturalMatrix`]s whose elements come from an iterator.
+///
+/// `xs_gen` is given a seed derived from `seed` and produces the iterator of elements; each matrix
+/// takes its elements, in row-major order, from that iterator. This allows any distribution of
+/// elements, for example the residues modulo some $m$. The size is sampled from a geometric
+/// distribution with mean `mean_size_numerator / mean_size_denominator`, so the 0-by-0 matrix is
+/// generated with the probability that that distribution gives to 0.
+///
+/// The iterator produced by `xs_gen` must be infinite, and so is the output.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterator produced by `xs_gen`, and $n$ is
+/// the number of elements of the $i$th output.
+///
+/// # Panics
+/// Panics if `mean_size_numerator` or `mean_size_denominator` are zero, or if, after being reduced
+/// to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// The elements here are [`Natural`]s from 0 to 8.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural::random::uniform_random_natural_inclusive_range;
+/// use malachite_nz::natural_matrix::random::random_natural_square_matrices_from_iterator;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_natural_square_matrices_from_iterator(
+///             EXAMPLE_SEED,
+///             &|seed| uniform_random_natural_inclusive_range(
+///                 seed,
+///                 Natural::ZERO,
+///                 Natural::from(8u32)
+///             ),
+///             3,
+///             2
+///         ),
+///         5
+///     ),
+///     "[[]_{0,0}, []_{0,0}, [4, 0, 5, 5, 1, 8; 4, 4, 7, 2, 7, 4; 7, 1, 7, 0, 8, 7; 0, 6, 2, 7, \
+///     2, 0; 6, 3, 1, 6, 2, 8; 3, 3, 5, 2, 4, 3], []_{0,0}, [3, 7; 3, 7], ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_natural_square_matrices_from_iterator<I: Iterator<Item = Natural>>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_size_numerator: u64,
+    mean_size_denominator: u64,
+) -> RandomNaturalMatrices<RandomSquareMatrixDimensions, I> {
+    RandomNaturalMatrices {
+        dimensions: RandomSquareMatrixDimensions(geometric_random_unsigneds(
+            seed.fork("dimensions"),
+            mean_size_numerator,
+            mean_size_denominator,
+        )),
+        xs: xs_gen(seed.fork("elements")),
+    }
+}
+
+/// Generates random square [`NaturalMatrix`]s.
+///
+/// The elements are sampled from [`random_naturals`], with a mean bit count of `mean_bits_numerator
+/// / mean_bits_denominator`. The size is sampled from a geometric distribution with mean
+/// `mean_size_numerator / mean_size_denominator`, so the 0-by-0 matrix is generated with the
+/// probability that that distribution gives to 0.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(nb)$
+///
+/// $M(i) = O(nb)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $n$ is the number of
+/// elements of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if `mean_size_numerator` or
+/// `mean_size_denominator` are zero, or if either ratio, after being reduced to lowest terms, has a
+/// numerator and denominator whose sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural_matrix::random::random_natural_square_matrices;
+///
+/// assert_eq!(
+///     prefix_to_string(random_natural_square_matrices(EXAMPLE_SEED, 4, 1, 3, 2), 5),
+///     "[[]_{0,0}, []_{0,0}, [2, 7229, 18, 7, 0, 3; 0, 1, 1, 0, 0, 6; 4, 0, 129427, 1, 0, 1; 2, \
+///     3, 30, 5, 259, 0; 104, 1, 6, 0, 1, 0; 137, 1556, 6, 740629, 5, 14], []_{0,0}, [4, 15208; \
+///     5, 69], ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_natural_square_matrices(
+    seed: Seed,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_size_numerator: u64,
+    mean_size_denominator: u64,
+) -> RandomNaturalMatrices<RandomSquareMatrixDimensions, RandomMatrixElements> {
+    random_natural_square_matrices_from_iterator(
+        seed,
+        &|seed_2| random_naturals(seed_2, mean_bits_numerator, mean_bits_denominator),
+        mean_size_numerator,
+        mean_size_denominator,
+    )
+}
+
+/// Generates random square [`NaturalMatrix`]s with striped elements.
+///
+/// The elements are striped, as they are in [`striped_random_natural_matrices`]. The size is
+/// sampled from a geometric distribution with mean `mean_size_numerator / mean_size_denominator`,
+/// so the 0-by-0 matrix is generated with the probability that that distribution gives to 0.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(nb)$
+///
+/// $M(i) = O(nb)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $n$ is the number of
+/// elements of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator`, `mean_bits_denominator`,
+/// `mean_size_numerator`, or `mean_size_denominator` are zero, or if either of the last two ratios,
+/// after being reduced to lowest terms, has a numerator and denominator whose sum is greater than
+/// or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural_matrix::random::striped_random_natural_square_matrices;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_natural_square_matrices(EXAMPLE_SEED, 16, 1, 4, 1, 3, 2),
+///         5
+///     ),
+///     "[[]_{0,0}, []_{0,0}, [3, 7999, 24, 7, 0, 2; 0, 1, 1, 0, 0, 4; 4, 0, 65536, 1, 0, 1; 3, 3, \
+///     31, 4, 256, 0; 127, 1, 7, 0, 1, 0; 128, 1024, 4, 524296, 5, 15], []_{0,0}, [4, 8192; 4, \
+///     64], ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_natural_square_matrices(
+    seed: Seed,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_size_numerator: u64,
+    mean_size_denominator: u64,
+) -> RandomNaturalMatrices<RandomSquareMatrixDimensions, StripedRandomMatrixElements> {
+    random_natural_square_matrices_from_iterator(
+        seed,
+        &|seed_2| {
+            striped_random_naturals(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        mean_size_numerator,
+        mean_size_denominator,
     )
 }

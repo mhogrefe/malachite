@@ -909,13 +909,17 @@ pub mod unsigned_matrix {
     pub mod exhaustive {
         pub mod exhaustive_unsigned_matrices;
     }
+    pub mod is_square;
     pub mod random {
         pub mod random_unsigned_matrices;
         pub mod random_unsigned_matrices_from_iterator;
         pub mod random_unsigned_matrices_with_dimensions;
         pub mod random_unsigned_matrices_with_dimensions_from_iterator;
+        pub mod random_unsigned_square_matrices;
+        pub mod random_unsigned_square_matrices_from_iterator;
         pub mod striped_random_unsigned_matrices;
         pub mod striped_random_unsigned_matrices_with_dimensions;
+        pub mod striped_random_unsigned_square_matrices;
     }
     pub mod transpose;
 }

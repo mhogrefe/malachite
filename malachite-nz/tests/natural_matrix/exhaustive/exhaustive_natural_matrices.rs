@@ -155,3 +155,70 @@ fn exhaustive_natural_matrices_properties() {
         }
     }
 }
+
+#[test]
+fn test_exhaustive_natural_square_matrices() {
+    assert_eq!(
+        prefix_to_string(exhaustive_natural_square_matrices(), 30),
+        "[[]_{0,0}, [0], [1], [0, 0, 0; 0, 0, 0; 0, 0, 0], [2], [0, 0; 0, 0], [3], [0, 0, 0, 0; 0, \
+        0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 0], [4], [0, 0; 0, 1], [5], [0, 0, 0; 0, 0, 0; 0, 0, 1], \
+        [6], [0, 0; 1, 0], [7], [0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, \
+        0, 0, 0], [8], [0, 0; 1, 1], [9], [0, 0, 0; 0, 0, 0; 0, 1, 0], [10], [0, 1; 0, 0], [11], \
+        [0, 0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 1], [12], [0, 1; 0, 1], [13], [0, 0, 0; 0, \
+        0, 0; 0, 1, 1], [14], [0, 1; 1, 0], ...]"
+    );
+}
+
+#[test]
+fn test_exhaustive_natural_square_matrices_from_iterator() {
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_natural_square_matrices_from_iterator(zero_or_one()),
+            30
+        ),
+        "[[]_{0,0}, [0], [1], [0, 0, 0; 0, 0, 0; 0, 0, 0], [0, 0; 0, 0], [0, 0, 0; 0, 0, 0; 0, 0, \
+        1], [0, 0; 0, 1], [0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, \
+        0], [0, 0; 1, 0], [0, 0, 0; 0, 0, 0; 0, 1, 0], [0, 0; 1, 1], [0, 0, 0, 0; 0, 0, 0, 0; 0, \
+        0, 0, 0; 0, 0, 0, 0], [0, 1; 0, 0], [0, 0, 0; 0, 0, 0; 0, 1, 1], [0, 1; 0, 1], [0, 0, 0, \
+        0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, \
+        0, 0, 0], [0, 1; 1, 0], [0, 0, 0; 0, 0, 0; 1, 0, 0], [0, 1; 1, 1], [0, 0, 0, 0; 0, 0, 0, \
+        0; 0, 0, 0, 0; 0, 0, 0, 1], [1, 0; 0, 0], [0, 0, 0; 0, 0, 0; 1, 0, 1], [1, 0; 0, 1], [0, \
+        0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 1], [1, 0; 1, 0], [0, \
+        0, 0; 0, 0, 0; 1, 1, 0], [1, 0; 1, 1], [0, 0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 0; 0, 0, 1, 0], \
+        [1, 1; 0, 0], [0, 0, 0; 0, 0, 0; 1, 1, 1], ...]"
+    );
+}
+
+#[test]
+fn exhaustive_natural_square_matrices_properties() {
+    // Every matrix is square, and no matrix is generated twice.
+    let ms = exhaustive_natural_square_matrices()
+        .take(10000)
+        .collect_vec();
+    assert!(ms.iter().all(|m| m.is_valid() && m.is_square()));
+    assert_eq!(ms.iter().collect::<HashSet<_>>().len(), ms.len());
+
+    // With elements from a set, every element is in the set as well.
+    let ms = exhaustive_natural_square_matrices_from_iterator(zero_or_one())
+        .take(10000)
+        .collect_vec();
+    assert!(
+        ms.iter()
+            .all(|m| m.is_valid() && m.is_square() && m.elements.iter().all(|x| *x < 2u32))
+    );
+    assert_eq!(ms.iter().collect::<HashSet<_>>().len(), ms.len());
+
+    // The square matrices of each size are exactly the matrices with those dimensions.
+    for size in 0..3 {
+        let mut ms: Vec<_> = exhaustive_natural_square_matrices_from_iterator(zero_or_one())
+            .filter(|m| m.height() == size)
+            .take(1 << (size * size))
+            .collect();
+        let mut ns: Vec<_> =
+            exhaustive_natural_matrices_with_dimensions_from_iterator(size, size, zero_or_one())
+                .collect();
+        ms.sort_by_key(ToString::to_string);
+        ns.sort_by_key(ToString::to_string);
+        assert_eq!(ms, ns);
+    }
+}

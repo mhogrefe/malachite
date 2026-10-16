@@ -17,7 +17,9 @@ use crate::rational::exhaustive::{
     exhaustive_positive_rationals, exhaustive_rationals,
 };
 use crate::rational_matrix::RationalMatrix;
-use crate::rational_matrix::exhaustive::exhaustive_rational_matrices;
+use crate::rational_matrix::exhaustive::{
+    exhaustive_rational_matrices, exhaustive_rational_square_matrices,
+};
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::exhaustive::{
     exhaustive_rational_polynomials, exhaustive_rational_polynomials_min_degree,
@@ -1001,6 +1003,10 @@ pub fn exhaustive_gaussian_rational_vec_gen() -> It<Vec<GaussianRational>> {
 
 pub fn exhaustive_rational_matrix_gen() -> It<RationalMatrix> {
     Box::new(exhaustive_rational_matrices())
+}
+
+pub fn exhaustive_rational_matrix_gen_var_1() -> It<RationalMatrix> {
+    Box::new(exhaustive_rational_square_matrices())
 }
 
 pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen()

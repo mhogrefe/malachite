@@ -189,13 +189,17 @@ pub mod rational_matrix {
     pub mod exhaustive {
         pub mod exhaustive_rational_matrices;
     }
+    pub mod is_square;
     pub mod random {
         pub mod random_rational_matrices;
         pub mod random_rational_matrices_from_iterator;
         pub mod random_rational_matrices_with_dimensions;
         pub mod random_rational_matrices_with_dimensions_from_iterator;
+        pub mod random_rational_square_matrices;
+        pub mod random_rational_square_matrices_from_iterator;
         pub mod striped_random_rational_matrices;
         pub mod striped_random_rational_matrices_with_dimensions;
+        pub mod striped_random_rational_square_matrices;
     }
     pub mod transpose;
 }

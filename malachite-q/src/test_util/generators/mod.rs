@@ -1283,6 +1283,15 @@ pub fn rational_matrix_gen() -> Generator<RationalMatrix> {
     )
 }
 
+// All square `RationalMatrix`s.
+pub fn rational_matrix_gen_var_1() -> Generator<RationalMatrix> {
+    Generator::new(
+        &exhaustive_rational_matrix_gen_var_1,
+        &random_rational_matrix_gen_var_1,
+        &special_random_rational_matrix_gen_var_1,
+    )
+}
+
 // All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
 pub fn rational_matrix_unsigned_unsigned_triple_gen() -> Generator<(RationalMatrix, usize, usize)> {
     Generator::new(

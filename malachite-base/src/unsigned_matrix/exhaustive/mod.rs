@@ -269,3 +269,158 @@ pub fn exhaustive_unsigned_matrices_with_dimensions<T: PrimitiveUnsigned>(
         exhaustive_unsigneds(),
     )
 }
+
+/// Generates square [`UnsignedMatrix`]s from an iterator of sizes paired with elements in row-major
+/// order.
+///
+/// This `struct` is created by [`exhaustive_unsigned_square_matrices_from_iterator`] and
+/// [`exhaustive_unsigned_square_matrices`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveUnsignedSquareMatrices<
+    T: PrimitiveUnsigned,
+    I: Iterator<Item = (usize, Vec<T>)>,
+>(I);
+
+impl<T: PrimitiveUnsigned, I: Iterator<Item = (usize, Vec<T>)>> Iterator
+    for ExhaustiveUnsignedSquareMatrices<T, I>
+{
+    type Item = UnsignedMatrix<T>;
+
+    #[inline]
+    fn next(&mut self) -> Option<UnsignedMatrix<T>> {
+        self.0
+            .next()
+            .map(|(size, elements)| UnsignedMatrix::from_owned_elements(size, size, elements))
+    }
+}
+
+/// Generates, for a size $n$, every way of filling an $n$-by-$n$ matrix with elements from an
+/// iterator.
+///
+/// This `struct` is used by [`exhaustive_unsigned_square_matrices_from_iterator`] and
+/// [`exhaustive_unsigned_square_matrices`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveUnsignedSquareMatrixElements<I: Clone + Iterator>(I);
+
+impl<T: PrimitiveUnsigned, I: Clone + Iterator<Item = T>>
+    ExhaustiveDependentPairsYsGenerator<usize, Vec<T>, ExhaustiveFixedLengthVecs1Input<I>>
+    for ExhaustiveUnsignedSquareMatrixElements<I>
+{
+    #[inline]
+    fn get_ys(&self, &size: &usize) -> ExhaustiveFixedLengthVecs1Input<I> {
+        exhaustive_vecs_fixed_length_from_single(
+            u64::exact_from(element_count(size, size)),
+            self.0.clone(),
+        )
+    }
+}
+
+/// Generates all square [`UnsignedMatrix`]s whose elements come from an iterator.
+///
+/// Every size, including 0, is generated, and so is every way of filling an $n$-by-$n$ matrix with
+/// elements of `xs`; each matrix is generated once if `xs` generates each element once. This allows
+/// any set of elements, for example the residues modulo some $m$. The sizes are interleaved so that
+/// small matrices of every size come early.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $n$ is the number of elements of the
+/// $i$th output.
+///
+/// # Examples
+/// The elements here are 0 and 1.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::exhaustive::primitive_int_increasing_range;
+/// use malachite_base::unsigned_matrix::exhaustive::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         exhaustive_unsigned_square_matrices_from_iterator(primitive_int_increasing_range(
+///             0u8, 2
+///         )),
+///         20
+///     ),
+///     "[[]_{0,0}, [0], [1], [0, 0, 0; 0, 0, 0; 0, 0, 0], [0, 0; 0, 0], [0, 0, 0; 0, 0, 0; 0, 0, \
+///     1], [0, 0; 0, 1], [0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, \
+///     0], [0, 0; 1, 0], [0, 0, 0; 0, 0, 0; 0, 1, 0], [0, 0; 1, 1], [0, 0, 0, 0; 0, 0, 0, 0; 0, \
+///     0, 0, 0; 0, 0, 0, 0], [0, 1; 0, 0], [0, 0, 0; 0, 0, 0; 0, 1, 1], [0, 1; 0, 1], [0, 0, 0, \
+///     0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, \
+///     0, 0, 0], [0, 1; 1, 0], [0, 0, 0; 0, 0, 0; 1, 0, 0], [0, 1; 1, 1], [0, 0, 0, 0; 0, 0, 0, \
+///     0; 0, 0, 0, 0; 0, 0, 0, 1], ...]"
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_unsigned_square_matrices_from_iterator<
+    T: PrimitiveUnsigned,
+    I: Clone + Iterator<Item = T>,
+>(
+    xs: I,
+) -> ExhaustiveUnsignedSquareMatrices<
+    T,
+    ExhaustiveDependentPairs<
+        usize,
+        Vec<T>,
+        RulerSequence<usize>,
+        ExhaustiveUnsignedSquareMatrixElements<I>,
+        PrimitiveIntIncreasingRange<usize>,
+        ExhaustiveFixedLengthVecs1Input<I>,
+    >,
+> {
+    ExhaustiveUnsignedSquareMatrices(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_unsigneds(),
+        ExhaustiveUnsignedSquareMatrixElements(xs),
+    ))
+}
+
+/// Generates all square [`UnsignedMatrix`]s.
+///
+/// Every square matrix, of every size, is generated once, the 0-by-0 matrix first. The matrices are
+/// generated as they are by [`exhaustive_unsigned_square_matrices_from_iterator`], with
+/// [`exhaustive_unsigneds`] as the elements.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n)$
+///
+/// $M(i) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $n$ is the number
+/// of elements of the $i$th output.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::unsigned_matrix::exhaustive::exhaustive_unsigned_square_matrices;
+///
+/// assert_eq!(
+///     prefix_to_string(exhaustive_unsigned_square_matrices::<u8>(), 20),
+///     "[[]_{0,0}, [0], [1], [0, 0, 0; 0, 0, 0; 0, 0, 0], [2], [0, 0; 0, 0], [3], [0, 0, 0, 0; 0, \
+///     0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 0], [4], [0, 0; 0, 1], [5], [0, 0, 0; 0, 0, 0; 0, 0, 1], \
+///     [6], [0, 0; 1, 0], [7], [0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, \
+///     0, 0, 0], [8], [0, 0; 1, 1], [9], [0, 0, 0; 0, 0, 0; 0, 1, 0], ...]"
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_unsigned_square_matrices<T: PrimitiveUnsigned>()
+-> ExhaustiveUnsignedSquareMatrices<
+    T,
+    ExhaustiveDependentPairs<
+        usize,
+        Vec<T>,
+        RulerSequence<usize>,
+        ExhaustiveUnsignedSquareMatrixElements<PrimitiveIntIncreasingRange<T>>,
+        PrimitiveIntIncreasingRange<usize>,
+        ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
+    >,
+> {
+    exhaustive_unsigned_square_matrices_from_iterator(exhaustive_unsigneds())
+}

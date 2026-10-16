@@ -458,6 +458,8 @@ pub mod access;
 pub mod conversion;
 /// Iterators that generate [`UnsignedMatrix`]s without repetition.
 pub mod exhaustive;
+/// A function for determining whether an [`UnsignedMatrix`] is square.
+pub mod is_square;
 /// Iterators that generate [`UnsignedMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;

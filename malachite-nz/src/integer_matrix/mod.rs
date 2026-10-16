@@ -476,6 +476,8 @@ pub mod access;
 pub mod conversion;
 /// Iterators that generate [`IntegerMatrix`]s without repetition.
 pub mod exhaustive;
+/// A function for determining whether an [`IntegerMatrix`] is square.
+pub mod is_square;
 /// Iterators that generate [`IntegerMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;

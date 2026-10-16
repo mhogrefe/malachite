@@ -27,7 +27,9 @@ use malachite_nz::natural::random::{RandomNaturals, StripedRandomNaturals};
 /// This `struct` is created by [`random_rational_matrices_from_iterator`],
 /// [`random_rational_matrices_with_dimensions_from_iterator`], [`random_rational_matrices`],
 /// [`random_rational_matrices_with_dimensions`], [`striped_random_rational_matrices`], and
-/// [`striped_random_rational_matrices_with_dimensions`]; see their documentation for more.
+/// [`striped_random_rational_matrices_with_dimensions`],
+/// [`random_rational_square_matrices_from_iterator`], [`random_rational_square_matrices`], and
+/// [`striped_random_rational_square_matrices`]; see their documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomRationalMatrices<D: Iterator<Item = (usize, usize)>, I: Iterator<Item = Rational>>
 {
@@ -430,5 +432,212 @@ pub fn striped_random_rational_matrices_with_dimensions(
             mean_bits_numerator,
             mean_bits_denominator,
         ),
+    )
+}
+
+/// Generates the dimensions of random square matrices: each output is $(n, n)$, with $n$ sampled
+/// from a geometric distribution.
+///
+/// This `struct` is used by [`random_rational_square_matrices_from_iterator`],
+/// [`random_rational_square_matrices`], and [`striped_random_rational_square_matrices`]; see their
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomSquareMatrixDimensions(GeometricRandomNaturalValues<usize>);
+
+impl Iterator for RandomSquareMatrixDimensions {
+    type Item = (usize, usize);
+
+    #[inline]
+    fn next(&mut self) -> Option<(usize, usize)> {
+        self.0.next().map(|size| (size, size))
+    }
+}
+
+/// Generates random square [`RationalMatrix`]s whose elements come from an iterator.
+///
+/// `xs_gen` is given a seed derived from `seed` and produces the iterator of elements; each matrix
+/// takes its elements, in row-major order, from that iterator. This allows any distribution of
+/// elements, for example the residues modulo some $m$. The size is sampled from a geometric
+/// distribution with mean `mean_size_numerator / mean_size_denominator`, so the 0-by-0 matrix is
+/// generated with the probability that that distribution gives to 0.
+///
+/// The iterator produced by `xs_gen` must be infinite, and so is the output.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterator produced by `xs_gen`, and $n$ is
+/// the number of elements of the $i$th output.
+///
+/// # Panics
+/// Panics if `mean_size_numerator` or `mean_size_denominator` are zero, or if, after being reduced
+/// to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// The elements here are [`Rational`]s in $[-1, 1)$.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::{NegativeOne, One};
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_range;
+/// use malachite_q::rational_matrix::random::random_rational_square_matrices_from_iterator;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_rational_square_matrices_from_iterator(
+///             EXAMPLE_SEED,
+///             &|seed| random_rational_range(
+///                 seed,
+///                 Rational::NEGATIVE_ONE,
+///                 Rational::ONE,
+///                 3,
+///                 1,
+///                 3,
+///                 1
+///             ),
+///             3,
+///             2
+///         ),
+///         5
+///     ),
+///     "[[]_{0,0}, []_{0,0}, [1/6, 1/11, 1/2, 1/2, 3/5, 1/2; -2/5, -1, 0, -1/5, 2/3, 4/5; -1/6, \
+///     1/2, 1/6, -1/3, -1/9, -3/4; -1/4, -5/6, -19/26, 2/3, 0, 1/3; -1/4, 1/15, -1/4, -2/3, 1/2, \
+///     -1/2; 0, -1/4, -1/9, -1/4, -1/3, 2/5], []_{0,0}, [0, -1/16; -1/8, 1/2], ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_rational_square_matrices_from_iterator<I: Iterator<Item = Rational>>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_size_numerator: u64,
+    mean_size_denominator: u64,
+) -> RandomRationalMatrices<RandomSquareMatrixDimensions, I> {
+    RandomRationalMatrices {
+        dimensions: RandomSquareMatrixDimensions(geometric_random_unsigneds(
+            seed.fork("dimensions"),
+            mean_size_numerator,
+            mean_size_denominator,
+        )),
+        xs: xs_gen(seed.fork("elements")),
+    }
+}
+
+/// Generates random square [`RationalMatrix`]s.
+///
+/// The elements are sampled from [`random_rationals`], with a mean bit count of
+/// `mean_bits_numerator / mean_bits_denominator`. The size is sampled from a geometric distribution
+/// with mean `mean_size_numerator / mean_size_denominator`, so the 0-by-0 matrix is generated with
+/// the probability that that distribution gives to 0.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(nb)$
+///
+/// $M(i) = O(nb)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $n$ is the number of
+/// elements of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if `mean_size_numerator` or
+/// `mean_size_denominator` are zero, or if either ratio, after being reduced to lowest terms, has a
+/// numerator and denominator whose sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::rational_matrix::random::random_rational_square_matrices;
+///
+/// assert_eq!(
+///     prefix_to_string(random_rational_square_matrices(EXAMPLE_SEED, 4, 1, 3, 2), 5),
+///     "[[]_{0,0}, []_{0,0}, [-9/91, 0, 82, -8, 1/3, -5; 47/28, 44, 1979435/4, 4, -3/5, -3; -2, \
+///     3/31, 1/3, -1, -5, 83; -1, 0, 1/243, -8, 19/33, -1/2; -1/7, 0, 23, -4, 0, -7; 2/5, -1, \
+///     3/2, -207, -43/3, 5], []_{0,0}, [-11/5, 0; -61504/49, 4], ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_rational_square_matrices(
+    seed: Seed,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_size_numerator: u64,
+    mean_size_denominator: u64,
+) -> RandomRationalMatrices<RandomSquareMatrixDimensions, RandomMatrixElements> {
+    random_rational_square_matrices_from_iterator(
+        seed,
+        &|seed_2| random_rationals(seed_2, mean_bits_numerator, mean_bits_denominator),
+        mean_size_numerator,
+        mean_size_denominator,
+    )
+}
+
+/// Generates random square [`RationalMatrix`]s with striped elements.
+///
+/// The elements are striped, as they are in [`striped_random_rational_matrices`]. The size is
+/// sampled from a geometric distribution with mean `mean_size_numerator / mean_size_denominator`,
+/// so the 0-by-0 matrix is generated with the probability that that distribution gives to 0.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(nb)$
+///
+/// $M(i) = O(nb)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $n$ is the number of
+/// elements of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator`, `mean_bits_denominator`,
+/// `mean_size_numerator`, or `mean_size_denominator` are zero, or if either of the last two ratios,
+/// after being reduced to lowest terms, has a numerator and denominator whose sum is greater than
+/// or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_q::rational_matrix::random::striped_random_rational_square_matrices;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_rational_square_matrices(EXAMPLE_SEED, 16, 1, 4, 1, 3, 2),
+///         5
+///     ),
+///     "[[]_{0,0}, []_{0,0}, [-1/8, 0, 575/14, -15, 1/4, -4; 63/31, 32, 1677671/3, 31/7, -1/2, \
+///     -4; -2, 1/8, 1/3, -1, -31/7, 64; -3/2, 0, 1/128, -15, 3/4, -1/2; -7/16, 0, 32, -7, 0, -7; \
+///     3/4, -3/2, 3/2, -511/3, -20, 6], []_{0,0}, [-2, 0; -262144/129, 7], ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_rational_square_matrices(
+    seed: Seed,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_size_numerator: u64,
+    mean_size_denominator: u64,
+) -> RandomRationalMatrices<RandomSquareMatrixDimensions, StripedRandomMatrixElements> {
+    random_rational_square_matrices_from_iterator(
+        seed,
+        &|seed_2| {
+            striped_random_rationals(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        mean_size_numerator,
+        mean_size_denominator,
     )
 }

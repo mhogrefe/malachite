@@ -483,6 +483,8 @@ pub mod access;
 pub mod conversion;
 /// Iterators that generate [`RationalMatrix`]s without repetition.
 pub mod exhaustive;
+/// A function for determining whether a [`RationalMatrix`] is square.
+pub mod is_square;
 /// Iterators that generate [`RationalMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;

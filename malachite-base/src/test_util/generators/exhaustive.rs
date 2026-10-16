@@ -85,7 +85,9 @@ use crate::tuples::exhaustive::{
     lex_pairs, lex_pairs_from_single,
 };
 use crate::unsigned_matrix::UnsignedMatrix;
-use crate::unsigned_matrix::exhaustive::exhaustive_unsigned_matrices;
+use crate::unsigned_matrix::exhaustive::{
+    exhaustive_unsigned_matrices, exhaustive_unsigned_square_matrices,
+};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::exhaustive::{
     exhaustive_unsigned_polynomials, exhaustive_unsigned_polynomials_min_degree,
@@ -6842,6 +6844,10 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_v
 
 pub fn exhaustive_unsigned_matrix_gen() -> It<UnsignedMatrix<u64>> {
     Box::new(exhaustive_unsigned_matrices())
+}
+
+pub fn exhaustive_unsigned_matrix_gen_var_1() -> It<UnsignedMatrix<u64>> {
+    Box::new(exhaustive_unsigned_square_matrices())
 }
 
 pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen()

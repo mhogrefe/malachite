@@ -263,3 +263,151 @@ pub fn exhaustive_natural_matrices_with_dimensions(
 > {
     exhaustive_natural_matrices_with_dimensions_from_iterator(height, width, exhaustive_naturals())
 }
+
+/// Generates square [`NaturalMatrix`]s from an iterator of sizes paired with elements in row-major
+/// order.
+///
+/// This `struct` is created by [`exhaustive_natural_square_matrices_from_iterator`] and
+/// [`exhaustive_natural_square_matrices`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveNaturalSquareMatrices<I: Iterator<Item = (usize, Vec<Natural>)>>(I);
+
+impl<I: Iterator<Item = (usize, Vec<Natural>)>> Iterator for ExhaustiveNaturalSquareMatrices<I> {
+    type Item = NaturalMatrix;
+
+    #[inline]
+    fn next(&mut self) -> Option<NaturalMatrix> {
+        self.0
+            .next()
+            .map(|(size, elements)| NaturalMatrix::from_owned_elements(size, size, elements))
+    }
+}
+
+/// Generates, for a size $n$, every way of filling an $n$-by-$n$ matrix with elements from an
+/// iterator.
+///
+/// This `struct` is used by [`exhaustive_natural_square_matrices_from_iterator`] and
+/// [`exhaustive_natural_square_matrices`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveNaturalSquareMatrixElements<I: Clone + Iterator<Item = Natural>>(I);
+
+impl<I: Clone + Iterator<Item = Natural>>
+    ExhaustiveDependentPairsYsGenerator<usize, Vec<Natural>, ExhaustiveFixedLengthVecs1Input<I>>
+    for ExhaustiveNaturalSquareMatrixElements<I>
+{
+    #[inline]
+    fn get_ys(&self, &size: &usize) -> ExhaustiveFixedLengthVecs1Input<I> {
+        exhaustive_vecs_fixed_length_from_single(
+            u64::exact_from(element_count(size, size)),
+            self.0.clone(),
+        )
+    }
+}
+
+/// Generates all square [`NaturalMatrix`]s whose elements come from an iterator.
+///
+/// Every size, including 0, is generated, and so is every way of filling an $n$-by-$n$ matrix with
+/// elements of `xs`; each matrix is generated once if `xs` generates each element once. This allows
+/// any set of elements, for example the residues modulo some $m$. The sizes are interleaved so that
+/// small matrices of every size come early.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $n$ is the number of elements of the
+/// $i$th output.
+///
+/// # Examples
+/// The elements here are 0 and 1.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::{Two, Zero};
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural::exhaustive::exhaustive_natural_range;
+/// use malachite_nz::natural_matrix::exhaustive::exhaustive_natural_square_matrices_from_iterator;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         exhaustive_natural_square_matrices_from_iterator(exhaustive_natural_range(
+///             Natural::ZERO,
+///             Natural::TWO
+///         )),
+///         20
+///     ),
+///     "[[]_{0,0}, [0], [1], [0, 0, 0; 0, 0, 0; 0, 0, 0], [0, 0; 0, 0], [0, 0, 0; 0, 0, 0; 0, 0, \
+///     1], [0, 0; 0, 1], [0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, \
+///     0], [0, 0; 1, 0], [0, 0, 0; 0, 0, 0; 0, 1, 0], [0, 0; 1, 1], [0, 0, 0, 0; 0, 0, 0, 0; 0, \
+///     0, 0, 0; 0, 0, 0, 0], [0, 1; 0, 0], [0, 0, 0; 0, 0, 0; 0, 1, 1], [0, 1; 0, 1], [0, 0, 0, \
+///     0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, \
+///     0, 0, 0], [0, 1; 1, 0], [0, 0, 0; 0, 0, 0; 1, 0, 0], [0, 1; 1, 1], [0, 0, 0, 0; 0, 0, 0, \
+///     0; 0, 0, 0, 0; 0, 0, 0, 1], ...]"
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_natural_square_matrices_from_iterator<I: Clone + Iterator<Item = Natural>>(
+    xs: I,
+) -> ExhaustiveNaturalSquareMatrices<
+    ExhaustiveDependentPairs<
+        usize,
+        Vec<Natural>,
+        RulerSequence<usize>,
+        ExhaustiveNaturalSquareMatrixElements<I>,
+        PrimitiveIntIncreasingRange<usize>,
+        ExhaustiveFixedLengthVecs1Input<I>,
+    >,
+> {
+    ExhaustiveNaturalSquareMatrices(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_unsigneds(),
+        ExhaustiveNaturalSquareMatrixElements(xs),
+    ))
+}
+
+/// Generates all square [`NaturalMatrix`]s.
+///
+/// Every square matrix, of every size, is generated once, the 0-by-0 matrix first. The matrices are
+/// generated as they are by [`exhaustive_natural_square_matrices_from_iterator`], with
+/// [`exhaustive_naturals`] as the elements.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n\ell)$
+///
+/// $M(i) = O(n\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $n$ is the number of
+/// elements of the $i$th output, and $\ell$ is the number of significant bits of its largest
+/// element.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_nz::natural_matrix::exhaustive::exhaustive_natural_square_matrices;
+///
+/// assert_eq!(
+///     prefix_to_string(exhaustive_natural_square_matrices(), 20),
+///     "[[]_{0,0}, [0], [1], [0, 0, 0; 0, 0, 0; 0, 0, 0], [2], [0, 0; 0, 0], [3], [0, 0, 0, 0; 0, \
+///     0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 0], [4], [0, 0; 0, 1], [5], [0, 0, 0; 0, 0, 0; 0, 0, 1], \
+///     [6], [0, 0; 1, 0], [7], [0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, \
+///     0, 0, 0], [8], [0, 0; 1, 1], [9], [0, 0, 0; 0, 0, 0; 0, 1, 0], ...]"
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_natural_square_matrices() -> ExhaustiveNaturalSquareMatrices<
+    ExhaustiveDependentPairs<
+        usize,
+        Vec<Natural>,
+        RulerSequence<usize>,
+        ExhaustiveNaturalSquareMatrixElements<ExhaustiveNaturalRangeToInfinity>,
+        PrimitiveIntIncreasingRange<usize>,
+        ExhaustiveFixedLengthVecs1Input<ExhaustiveNaturalRangeToInfinity>,
+    >,
+> {
+    exhaustive_natural_square_matrices_from_iterator(exhaustive_naturals())
+}

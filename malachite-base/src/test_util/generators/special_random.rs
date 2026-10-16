@@ -96,7 +96,9 @@ use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pa
 use crate::unions::Union2;
 use crate::unions::random::random_union2s;
 use crate::unsigned_matrix::UnsignedMatrix;
-use crate::unsigned_matrix::random::striped_random_unsigned_matrices;
+use crate::unsigned_matrix::random::{
+    striped_random_unsigned_matrices, striped_random_unsigned_square_matrices,
+};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::random::{
     striped_random_unsigned_polynomials, striped_random_unsigned_polynomials_min_degree,
@@ -10904,6 +10906,16 @@ pub fn special_random_unsigned_matrix_gen(config: &GenConfig) -> It<UnsignedMatr
         config.get_or("mean_stripe_d", 1),
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_matrix_gen_var_1(config: &GenConfig) -> It<UnsignedMatrix<u64>> {
+    Box::new(striped_random_unsigned_square_matrices(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_size_n", 4),
+        config.get_or("mean_size_d", 1),
     ))
 }
 

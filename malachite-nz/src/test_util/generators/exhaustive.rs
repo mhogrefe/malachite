@@ -18,7 +18,9 @@ use crate::integer::exhaustive::{
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer_matrix::IntegerMatrix;
-use crate::integer_matrix::exhaustive::exhaustive_integer_matrices;
+use crate::integer_matrix::exhaustive::{
+    exhaustive_integer_matrices, exhaustive_integer_square_matrices,
+};
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
@@ -83,7 +85,9 @@ use crate::natural::exhaustive::{
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural_matrix::NaturalMatrix;
-use crate::natural_matrix::exhaustive::exhaustive_natural_matrices;
+use crate::natural_matrix::exhaustive::{
+    exhaustive_natural_matrices, exhaustive_natural_square_matrices,
+};
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::exhaustive::{
     exhaustive_natural_polynomials, exhaustive_natural_polynomials_min_degree,
@@ -3590,6 +3594,10 @@ pub fn exhaustive_integer_matrix_gen() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_matrices())
 }
 
+pub fn exhaustive_integer_matrix_gen_var_1() -> It<IntegerMatrix> {
+    Box::new(exhaustive_integer_square_matrices())
+}
+
 pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen() -> It<(IntegerMatrix, usize, usize)>
 {
     Box::new(
@@ -3708,6 +3716,10 @@ pub fn exhaustive_integer_vector_triple_gen_var_2()
 
 pub fn exhaustive_natural_matrix_gen() -> It<NaturalMatrix> {
     Box::new(exhaustive_natural_matrices())
+}
+
+pub fn exhaustive_natural_matrix_gen_var_1() -> It<NaturalMatrix> {
+    Box::new(exhaustive_natural_square_matrices())
 }
 
 pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen() -> It<(NaturalMatrix, usize, usize)>

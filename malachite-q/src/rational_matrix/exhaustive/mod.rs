@@ -271,3 +271,149 @@ pub fn exhaustive_rational_matrices_with_dimensions(
         exhaustive_rationals(),
     )
 }
+
+/// Generates square [`RationalMatrix`]s from an iterator of sizes paired with elements in row-major
+/// order.
+///
+/// This `struct` is created by [`exhaustive_rational_square_matrices_from_iterator`] and
+/// [`exhaustive_rational_square_matrices`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveRationalSquareMatrices<I: Iterator<Item = (usize, Vec<Rational>)>>(I);
+
+impl<I: Iterator<Item = (usize, Vec<Rational>)>> Iterator for ExhaustiveRationalSquareMatrices<I> {
+    type Item = RationalMatrix;
+
+    #[inline]
+    fn next(&mut self) -> Option<RationalMatrix> {
+        self.0
+            .next()
+            .map(|(size, elements)| RationalMatrix::from_owned_elements(size, size, elements))
+    }
+}
+
+/// Generates, for a size $n$, every way of filling an $n$-by-$n$ matrix with elements from an
+/// iterator.
+///
+/// This `struct` is used by [`exhaustive_rational_square_matrices_from_iterator`] and
+/// [`exhaustive_rational_square_matrices`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveRationalSquareMatrixElements<I: Clone + Iterator<Item = Rational>>(I);
+
+impl<I: Clone + Iterator<Item = Rational>>
+    ExhaustiveDependentPairsYsGenerator<usize, Vec<Rational>, ExhaustiveFixedLengthVecs1Input<I>>
+    for ExhaustiveRationalSquareMatrixElements<I>
+{
+    #[inline]
+    fn get_ys(&self, &size: &usize) -> ExhaustiveFixedLengthVecs1Input<I> {
+        exhaustive_vecs_fixed_length_from_single(
+            u64::exact_from(element_count(size, size)),
+            self.0.clone(),
+        )
+    }
+}
+
+/// Generates all square [`RationalMatrix`]s whose elements come from an iterator.
+///
+/// Every size, including 0, is generated, and so is every way of filling an $n$-by-$n$ matrix with
+/// elements of `xs`; each matrix is generated once if `xs` generates each element once. This allows
+/// any set of elements, for example the residues modulo some $m$. The sizes are interleaved so that
+/// small matrices of every size come early.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $n$ is the number of elements of the
+/// $i$th output.
+///
+/// # Examples
+/// The elements here are 0 and 1/2.
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::{OneHalf, Zero};
+/// use malachite_q::Rational;
+/// use malachite_q::rational_matrix::exhaustive::exhaustive_rational_square_matrices_from_iterator;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         exhaustive_rational_square_matrices_from_iterator(
+///             [Rational::ZERO, Rational::ONE_HALF].into_iter()
+///         ),
+///         20
+///     ),
+///     "[[]_{0,0}, [0], [1/2], [0, 0, 0; 0, 0, 0; 0, 0, 0], [0, 0; 0, 0], [0, 0, 0; 0, 0, 0; 0, \
+///     0, 1/2], [0, 0; 0, 1/2], [0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, \
+///     0, 0, 0, 0], [0, 0; 1/2, 0], [0, 0, 0; 0, 0, 0; 0, 1/2, 0], [0, 0; 1/2, 1/2], [0, 0, 0, 0; \
+///     0, 0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 0], [0, 1/2; 0, 0], [0, 0, 0; 0, 0, 0; 0, 1/2, 1/2], [0, \
+///     1/2; 0, 1/2], [0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0; 0, \
+///     0, 0, 0, 0, 0; 0, 0, 0, 0, 0, 0], [0, 1/2; 1/2, 0], [0, 0, 0; 0, 0, 0; 1/2, 0, 0], [0, \
+///     1/2; 1/2, 1/2], [0, 0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 1/2], ...]"
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_rational_square_matrices_from_iterator<I: Clone + Iterator<Item = Rational>>(
+    xs: I,
+) -> ExhaustiveRationalSquareMatrices<
+    ExhaustiveDependentPairs<
+        usize,
+        Vec<Rational>,
+        RulerSequence<usize>,
+        ExhaustiveRationalSquareMatrixElements<I>,
+        PrimitiveIntIncreasingRange<usize>,
+        ExhaustiveFixedLengthVecs1Input<I>,
+    >,
+> {
+    ExhaustiveRationalSquareMatrices(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_unsigneds(),
+        ExhaustiveRationalSquareMatrixElements(xs),
+    ))
+}
+
+/// Generates all square [`RationalMatrix`]s.
+///
+/// Every square matrix, of every size, is generated once, the 0-by-0 matrix first. The matrices are
+/// generated as they are by [`exhaustive_rational_square_matrices_from_iterator`], with
+/// [`exhaustive_rationals`] as the elements.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n\ell)$
+///
+/// $M(i) = O(n\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $n$ is the number of
+/// elements of the $i$th output, and $\ell$ is the number of significant bits of its largest
+/// element.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_q::rational_matrix::exhaustive::exhaustive_rational_square_matrices;
+///
+/// assert_eq!(
+///     prefix_to_string(exhaustive_rational_square_matrices(), 20),
+///     "[[]_{0,0}, [0], [1], [0, 0, 0; 0, 0, 0; 0, 0, 0], [-1], [0, 0; 0, 0], [1/2], [0, 0, 0, 0; \
+///     0, 0, 0, 0; 0, 0, 0, 0; 0, 0, 0, 0], [-1/2], [0, 0; 0, 1], [2], [0, 0, 0; 0, 0, 0; 0, 0, \
+///     1], [-2], [0, 0; 1, 0], [1/3], [0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, \
+///     0; 0, 0, 0, 0, 0], [-1/3], [0, 0; 1, 1], [3/2], [0, 0, 0; 0, 0, 0; 0, 1, 0], ...]"
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_rational_square_matrices() -> ExhaustiveRationalSquareMatrices<
+    ExhaustiveDependentPairs<
+        usize,
+        Vec<Rational>,
+        RulerSequence<usize>,
+        ExhaustiveRationalSquareMatrixElements<Chain<Once<Rational>, ExhaustiveNonzeroRationals>>,
+        PrimitiveIntIncreasingRange<usize>,
+        ExhaustiveFixedLengthVecs1Input<Chain<Once<Rational>, ExhaustiveNonzeroRationals>>,
+    >,
+> {
+    exhaustive_rational_square_matrices_from_iterator(exhaustive_rationals())
+}

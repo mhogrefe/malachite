@@ -5282,6 +5282,15 @@ pub fn unsigned_matrix_gen() -> Generator<UnsignedMatrix<u64>> {
     )
 }
 
+// All square `UnsignedMatrix<u64>`s.
+pub fn unsigned_matrix_gen_var_1() -> Generator<UnsignedMatrix<u64>> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_gen_var_1,
+        &random_unsigned_matrix_gen_var_1,
+        &special_random_unsigned_matrix_gen_var_1,
+    )
+}
+
 // All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
 pub fn unsigned_matrix_unsigned_unsigned_triple_gen()
 -> Generator<(UnsignedMatrix<u64>, usize, usize)> {

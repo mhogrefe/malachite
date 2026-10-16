@@ -19,6 +19,11 @@ documented by git history.
   malachite-nz's `IntegerMatrix`, including the `_from_iterator` forms; as with `UnsignedVector`,
   the random elements are uniform (or striped) over the whole type, so there are no bit-count
   parameters.
+- Square matrix generators: `exhaustive_unsigned_square_matrices`, its `_from_iterator` form,
+  `random_unsigned_square_matrices`, its `_from_iterator` form, and
+  `striped_random_unsigned_square_matrices` (malachite-nz and malachite-q gain the same for
+  `IntegerMatrix`, `NaturalMatrix`, and `RationalMatrix`, with bit-count parameters); and
+  `is_square` for every matrix type.
 - `exhaustive_unsigned_vectors_from_iterator` and
   `exhaustive_unsigned_vectors_with_dimension_from_iterator`, which take any cloneable element
   iterator (malachite-nz and malachite-q gain the same for `NaturalVector`, `IntegerVector`, and

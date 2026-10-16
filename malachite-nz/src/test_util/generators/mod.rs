@@ -3927,6 +3927,15 @@ pub fn integer_matrix_gen() -> Generator<IntegerMatrix> {
     )
 }
 
+// All square `IntegerMatrix`s.
+pub fn integer_matrix_gen_var_1() -> Generator<IntegerMatrix> {
+    Generator::new(
+        &exhaustive_integer_matrix_gen_var_1,
+        &random_integer_matrix_gen_var_1,
+        &special_random_integer_matrix_gen_var_1,
+    )
+}
+
 // All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
 pub fn integer_matrix_unsigned_unsigned_triple_gen() -> Generator<(IntegerMatrix, usize, usize)> {
     Generator::new(
@@ -4154,6 +4163,15 @@ pub fn natural_matrix_gen() -> Generator<NaturalMatrix> {
         &exhaustive_natural_matrix_gen,
         &random_natural_matrix_gen,
         &special_random_natural_matrix_gen,
+    )
+}
+
+// All square `NaturalMatrix`s.
+pub fn natural_matrix_gen_var_1() -> Generator<NaturalMatrix> {
+    Generator::new(
+        &exhaustive_natural_matrix_gen_var_1,
+        &random_natural_matrix_gen_var_1,
+        &special_random_natural_matrix_gen_var_1,
     )
 }
 
