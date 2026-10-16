@@ -201,6 +201,8 @@ documented by git history.
   `get_mut`, `Display`/`Debug` (such as `[1/2, -3/4; 5, 22/7]`), `FromStr` (elements need not be in
   lowest terms), `ToLatex` (elements as `\frac`s), `ToTypst` (elements as `frac`s), and serde
   support.
+- `From<UnsignedMatrix<T>>` (for every primitive unsigned `T`), `From<NaturalMatrix>`, and
+  `From<IntegerMatrix>` for `RationalMatrix`.
 - `rational_matrix::exhaustive` and `rational_matrix::random`, with the same generators as
   `IntegerMatrix`'s, including the `_from_iterator` forms.
 - `Cross` and `CrossAssign` for 3-dimensional `RationalVector`s.
