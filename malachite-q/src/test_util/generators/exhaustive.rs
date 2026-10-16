@@ -69,6 +69,8 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples, exhaustive_triples_custom_output, exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output, lex_pairs,
 };
+use malachite_base::unsigned_matrix::UnsignedMatrix;
+use malachite_base::unsigned_matrix::exhaustive::exhaustive_unsigned_matrices;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -78,6 +80,8 @@ use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::gaussian_integer::exhaustive::exhaustive_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
+use malachite_nz::integer_matrix::IntegerMatrix;
+use malachite_nz::integer_matrix::exhaustive::exhaustive_integer_matrices;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
@@ -88,6 +92,8 @@ use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
 };
+use malachite_nz::natural_matrix::NaturalMatrix;
+use malachite_nz::natural_matrix::exhaustive::exhaustive_natural_matrices;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::natural_polynomial::exhaustive::exhaustive_natural_polynomials;
 use malachite_nz::natural_vector::NaturalVector;
@@ -1003,6 +1009,28 @@ pub fn exhaustive_gaussian_rational_vec_gen() -> It<Vec<GaussianRational>> {
 
 pub fn exhaustive_rational_matrix_gen() -> It<RationalMatrix> {
     Box::new(exhaustive_rational_matrices())
+}
+
+pub fn exhaustive_rational_matrix_integer_matrix_pair_gen() -> It<(RationalMatrix, IntegerMatrix)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_matrices(),
+        exhaustive_integer_matrices(),
+    ))
+}
+
+pub fn exhaustive_rational_matrix_natural_matrix_pair_gen() -> It<(RationalMatrix, NaturalMatrix)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_matrices(),
+        exhaustive_natural_matrices(),
+    ))
+}
+
+pub fn exhaustive_rational_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()
+-> It<(RationalMatrix, UnsignedMatrix<T>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_matrices(),
+        exhaustive_unsigned_matrices(),
+    ))
 }
 
 pub fn exhaustive_rational_matrix_gen_var_1() -> It<RationalMatrix> {

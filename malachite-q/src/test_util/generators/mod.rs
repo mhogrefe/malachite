@@ -27,13 +27,16 @@ use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
+use malachite_base::unsigned_matrix::UnsignedMatrix;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
+use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::natural_vector::NaturalVector;
 use num::BigRational;
@@ -1280,6 +1283,31 @@ pub fn rational_matrix_gen() -> Generator<RationalMatrix> {
         &exhaustive_rational_matrix_gen,
         &random_rational_matrix_gen,
         &special_random_rational_matrix_gen,
+    )
+}
+
+pub fn rational_matrix_integer_matrix_pair_gen() -> Generator<(RationalMatrix, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_rational_matrix_integer_matrix_pair_gen,
+        &random_rational_matrix_integer_matrix_pair_gen,
+        &special_random_rational_matrix_integer_matrix_pair_gen,
+    )
+}
+
+pub fn rational_matrix_natural_matrix_pair_gen() -> Generator<(RationalMatrix, NaturalMatrix)> {
+    Generator::new(
+        &exhaustive_rational_matrix_natural_matrix_pair_gen,
+        &random_rational_matrix_natural_matrix_pair_gen,
+        &special_random_rational_matrix_natural_matrix_pair_gen,
+    )
+}
+
+pub fn rational_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(RationalMatrix, UnsignedMatrix<T>)> {
+    Generator::new(
+        &exhaustive_rational_matrix_unsigned_matrix_pair_gen,
+        &random_rational_matrix_unsigned_matrix_pair_gen,
+        &special_random_rational_matrix_unsigned_matrix_pair_gen,
     )
 }
 

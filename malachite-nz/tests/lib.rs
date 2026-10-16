@@ -349,6 +349,10 @@ pub mod integer {
 }
 pub mod integer_matrix {
     pub mod access;
+    pub mod comparison {
+        pub mod partial_eq_natural_matrix;
+        pub mod partial_eq_unsigned_matrix;
+    }
     pub mod conversion {
         pub mod from_columns;
         pub mod from_elements;
@@ -988,6 +992,9 @@ pub mod natural_polynomial {
 }
 pub mod natural_matrix {
     pub mod access;
+    pub mod comparison {
+        pub mod partial_eq_unsigned_matrix;
+    }
     pub mod conversion {
         pub mod from_columns;
         pub mod from_elements;

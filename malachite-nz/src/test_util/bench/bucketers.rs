@@ -261,6 +261,34 @@ pub fn integer_matrix_bit_bucketer(var_name: &str) -> Bucketer<'_, IntegerMatrix
     }
 }
 
+pub fn pair_1_natural_matrix_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (NaturalMatrix, T)> {
+    Bucketer {
+        bucketing_function: &|(m, _)| {
+            usize::exact_from(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn pair_1_integer_matrix_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (IntegerMatrix, T)> {
+    Bucketer {
+        bucketing_function: &|(m, _)| {
+            usize::exact_from(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
 pub fn natural_matrix_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalMatrix> {
     Bucketer {
         bucketing_function: &|m| {

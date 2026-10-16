@@ -176,6 +176,8 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples, exhaustive_triples_custom_output, exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output, lex_pairs,
 };
+use malachite_base::unsigned_matrix::UnsignedMatrix;
+use malachite_base::unsigned_matrix::exhaustive::exhaustive_unsigned_matrices;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -3594,6 +3596,13 @@ pub fn exhaustive_integer_matrix_gen() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_matrices())
 }
 
+pub fn exhaustive_integer_matrix_natural_matrix_pair_gen() -> It<(IntegerMatrix, NaturalMatrix)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_matrices(),
+        exhaustive_natural_matrices(),
+    ))
+}
+
 pub fn exhaustive_integer_matrix_gen_var_1() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_square_matrices())
 }
@@ -3716,6 +3725,22 @@ pub fn exhaustive_integer_vector_triple_gen_var_2()
 
 pub fn exhaustive_natural_matrix_gen() -> It<NaturalMatrix> {
     Box::new(exhaustive_natural_matrices())
+}
+
+pub fn exhaustive_natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()
+-> It<(NaturalMatrix, UnsignedMatrix<T>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_matrices(),
+        exhaustive_unsigned_matrices(),
+    ))
+}
+
+pub fn exhaustive_integer_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()
+-> It<(IntegerMatrix, UnsignedMatrix<T>)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_matrices(),
+        exhaustive_unsigned_matrices(),
+    ))
 }
 
 pub fn exhaustive_natural_matrix_gen_var_1() -> It<NaturalMatrix> {

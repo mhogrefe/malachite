@@ -69,6 +69,8 @@ use malachite_base::tuples::random::{
 };
 use malachite_base::unions::Union2;
 use malachite_base::unions::random::random_union2s;
+use malachite_base::unsigned_matrix::UnsignedMatrix;
+use malachite_base::unsigned_matrix::random::striped_random_unsigned_matrices;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::random::striped_random_unsigned_polynomials;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -78,6 +80,8 @@ use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::gaussian_integer::random::striped_random_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::striped_random_integers;
+use malachite_nz::integer_matrix::IntegerMatrix;
+use malachite_nz::integer_matrix::random::striped_random_integer_matrices;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::random::{
     striped_random_integer_polynomials, striped_random_integer_polynomials_min_degree,
@@ -89,6 +93,8 @@ use malachite_nz::natural::random::{
     striped_random_natural_range_to_infinity, striped_random_naturals,
     striped_random_positive_naturals,
 };
+use malachite_nz::natural_matrix::NaturalMatrix;
+use malachite_nz::natural_matrix::random::striped_random_natural_matrices;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::natural_polynomial::random::striped_random_natural_polynomials;
 use malachite_nz::natural_vector::NaturalVector;
@@ -2462,6 +2468,94 @@ pub fn special_random_rational_matrix_gen(config: &GenConfig) -> It<RationalMatr
         config.get_or("mean_bits_d", 1),
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
+    ))
+}
+
+pub fn special_random_rational_matrix_integer_matrix_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalMatrix, IntegerMatrix)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integer_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_rational_matrix_natural_matrix_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalMatrix, NaturalMatrix)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_natural_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_rational_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(RationalMatrix, UnsignedMatrix<T>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_matrices(
+                seed,
+                config.get_or("mean_unsigned_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_unsigned_stripe_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
     ))
 }
 

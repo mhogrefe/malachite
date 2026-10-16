@@ -166,6 +166,8 @@ use malachite_base::tuples::random::{
 };
 use malachite_base::unions::Union2;
 use malachite_base::unions::random::random_union2s;
+use malachite_base::unsigned_matrix::UnsignedMatrix;
+use malachite_base::unsigned_matrix::random::random_unsigned_matrices;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::random::random_unsigned_polynomials;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -6945,6 +6947,32 @@ pub fn random_integer_matrix_gen(config: &GenConfig) -> It<IntegerMatrix> {
     ))
 }
 
+pub fn random_integer_matrix_natural_matrix_pair_gen(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, NaturalMatrix)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            random_natural_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_integer_matrix_gen_var_1(config: &GenConfig) -> It<IntegerMatrix> {
     Box::new(random_integer_square_matrices(
         EXAMPLE_SEED,
@@ -7202,6 +7230,54 @@ pub fn random_natural_matrix_gen(config: &GenConfig) -> It<NaturalMatrix> {
         config.get_or("mean_bits_d", 1),
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
+    ))
+}
+
+pub fn random_natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, UnsignedMatrix<T>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            random_unsigned_matrices(
+                seed,
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_integer_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, UnsignedMatrix<T>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            random_unsigned_matrices(
+                seed,
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
     ))
 }
 

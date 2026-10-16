@@ -42,6 +42,7 @@ use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
+use malachite_base::unsigned_matrix::UnsignedMatrix;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
@@ -3927,6 +3928,14 @@ pub fn integer_matrix_gen() -> Generator<IntegerMatrix> {
     )
 }
 
+pub fn integer_matrix_natural_matrix_pair_gen() -> Generator<(IntegerMatrix, NaturalMatrix)> {
+    Generator::new(
+        &exhaustive_integer_matrix_natural_matrix_pair_gen,
+        &random_integer_matrix_natural_matrix_pair_gen,
+        &special_random_integer_matrix_natural_matrix_pair_gen,
+    )
+}
+
 // All square `IntegerMatrix`s.
 pub fn integer_matrix_gen_var_1() -> Generator<IntegerMatrix> {
     Generator::new(
@@ -4163,6 +4172,24 @@ pub fn natural_matrix_gen() -> Generator<NaturalMatrix> {
         &exhaustive_natural_matrix_gen,
         &random_natural_matrix_gen,
         &special_random_natural_matrix_gen,
+    )
+}
+
+pub fn natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(NaturalMatrix, UnsignedMatrix<T>)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_matrix_pair_gen,
+        &random_natural_matrix_unsigned_matrix_pair_gen,
+        &special_random_natural_matrix_unsigned_matrix_pair_gen,
+    )
+}
+
+pub fn integer_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(IntegerMatrix, UnsignedMatrix<T>)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_matrix_pair_gen,
+        &random_integer_matrix_unsigned_matrix_pair_gen,
+        &special_random_integer_matrix_unsigned_matrix_pair_gen,
     )
 }
 

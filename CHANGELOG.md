@@ -139,6 +139,10 @@ documented by git history.
   `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`, `Display`/`Debug`, `FromStr` (which
   rejects negative elements, including `-0`), `ToLatex`, `ToTypst`, and serde support.
 - `From<UnsignedMatrix<T>>` for `NaturalMatrix`, for every primitive unsigned `T`.
+- `PartialEq<UnsignedMatrix<T>>` for `NaturalMatrix` and `PartialEq<NaturalMatrix>` for
+  `UnsignedMatrix<T>`: equal when the shapes match and every element is equal.
+- `PartialEq` in both directions between `IntegerMatrix` and `UnsignedMatrix<T>`, and between
+  `IntegerMatrix` and `NaturalMatrix`.
 - `TryFrom<NaturalMatrix>` and `TryFrom<&NaturalMatrix>` for `UnsignedMatrix<T>`, failing with
   `UnsignedMatrixFromNaturalMatrixError` when an element is too large for `T`, and the matching
   `ConvertibleFrom<&NaturalMatrix>`.
@@ -216,6 +220,8 @@ documented by git history.
   support.
 - `From<UnsignedMatrix<T>>` (for every primitive unsigned `T`), `From<NaturalMatrix>`, and
   `From<IntegerMatrix>` for `RationalMatrix`.
+- `PartialEq` in both directions between `RationalMatrix` and each of `UnsignedMatrix<T>`,
+  `NaturalMatrix`, and `IntegerMatrix`.
 - `TryFrom<RationalMatrix>` and `TryFrom<&RationalMatrix>` for `UnsignedMatrix<T>`, `NaturalMatrix`,
   and `IntegerMatrix`, failing (with `UnsignedMatrixFromRationalMatrixError`,
   `NaturalMatrixFromRationalMatrixError`, or `IntegerMatrixFromRationalMatrixError`) when an element

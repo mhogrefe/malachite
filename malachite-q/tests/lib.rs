@@ -165,6 +165,11 @@ pub mod gaussian_rational {
 
 pub mod rational_matrix {
     pub mod access;
+    pub mod comparison {
+        pub mod partial_eq_integer_matrix;
+        pub mod partial_eq_natural_matrix;
+        pub mod partial_eq_unsigned_matrix;
+    }
     pub mod conversion {
         pub mod from_columns;
         pub mod from_elements;

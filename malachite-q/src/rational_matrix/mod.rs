@@ -479,6 +479,8 @@ fn common_dimension(vectors: &[RationalVector], what: &str) -> usize {
 
 /// Indexing a [`RationalMatrix`] by row and column.
 pub mod access;
+/// Comparisons of [`RationalMatrix`]s with other matrices.
+pub mod comparison;
 /// Conversions to and from [`RationalMatrix`].
 pub mod conversion;
 /// Iterators that generate [`RationalMatrix`]s without repetition.

@@ -63,6 +63,8 @@ use malachite_base::tuples::random::{
 };
 use malachite_base::unions::Union2;
 use malachite_base::unions::random::random_union2s;
+use malachite_base::unsigned_matrix::UnsignedMatrix;
+use malachite_base::unsigned_matrix::random::random_unsigned_matrices;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::random::random_unsigned_polynomials;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -72,6 +74,8 @@ use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::gaussian_integer::random::random_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::random_integers;
+use malachite_nz::integer_matrix::IntegerMatrix;
+use malachite_nz::integer_matrix::random::random_integer_matrices;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::random::{
     random_integer_polynomials, random_integer_polynomials_min_degree,
@@ -82,6 +86,8 @@ use malachite_nz::natural::Natural;
 use malachite_nz::natural::random::{
     random_natural_range_to_infinity, random_naturals, random_positive_naturals,
 };
+use malachite_nz::natural_matrix::NaturalMatrix;
+use malachite_nz::natural_matrix::random::random_natural_matrices;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::natural_polynomial::random::random_natural_polynomials;
 use malachite_nz::natural_vector::NaturalVector;
@@ -2228,6 +2234,82 @@ pub fn random_rational_matrix_gen(config: &GenConfig) -> It<RationalMatrix> {
         config.get_or("mean_bits_d", 1),
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
+    ))
+}
+
+pub fn random_rational_matrix_integer_matrix_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalMatrix, IntegerMatrix)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            random_integer_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_matrix_natural_matrix_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalMatrix, NaturalMatrix)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            random_natural_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_rational_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(RationalMatrix, UnsignedMatrix<T>)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rational_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            random_unsigned_matrices(
+                seed,
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
     ))
 }
 
