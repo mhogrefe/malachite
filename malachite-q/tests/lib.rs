@@ -173,6 +173,8 @@ pub mod rational_matrix {
         pub mod from_natural_matrix;
         pub mod from_rows;
         pub mod from_unsigned_matrix;
+        pub mod integer_matrix_from_rational_matrix;
+        pub mod natural_matrix_from_rational_matrix;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
@@ -181,6 +183,7 @@ pub mod rational_matrix {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod unsigned_matrix_from_rational_matrix;
     }
     pub mod dimensions;
     pub mod exhaustive {

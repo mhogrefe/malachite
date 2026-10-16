@@ -139,6 +139,11 @@ documented by git history.
   `ConvertibleFrom<&NaturalMatrix>`.
 - `From<UnsignedMatrix<T>>` for `IntegerMatrix`, for every primitive unsigned `T`, and
   `From<NaturalMatrix>` for `IntegerMatrix`.
+- `TryFrom<IntegerMatrix>` and `TryFrom<&IntegerMatrix>` for `UnsignedMatrix<T>` (failing with
+  `UnsignedMatrixFromIntegerMatrixError` when an element is negative or too large for `T`) and for
+  `NaturalMatrix` (failing with `NaturalMatrixFromIntegerMatrixError` when an element is
+  negative; the by-value form reuses each element's limbs), and the matching
+  `ConvertibleFrom<&IntegerMatrix>` impls.
 - `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.
 - `CheckedAbs` for `NaturalVector` and `IntegerVector`, returning the Euclidean norm as a `Natural`
   when the sum of the squares of the elements is a perfect square, and `None` otherwise.
@@ -206,6 +211,11 @@ documented by git history.
   support.
 - `From<UnsignedMatrix<T>>` (for every primitive unsigned `T`), `From<NaturalMatrix>`, and
   `From<IntegerMatrix>` for `RationalMatrix`.
+- `TryFrom<RationalMatrix>` and `TryFrom<&RationalMatrix>` for `UnsignedMatrix<T>`, `NaturalMatrix`,
+  and `IntegerMatrix`, failing (with `UnsignedMatrixFromRationalMatrixError`,
+  `NaturalMatrixFromRationalMatrixError`, or `IntegerMatrixFromRationalMatrixError`) when an element
+  is not an integer, is negative (for the unsigned targets), or is too large for `T`; and the
+  matching `ConvertibleFrom<&RationalMatrix>` impls.
 - `rational_matrix::exhaustive` and `rational_matrix::random`, with the same generators as
   `IntegerMatrix`'s, including the `_from_iterator` forms.
 - `Cross` and `CrossAssign` for 3-dimensional `RationalVector`s.
