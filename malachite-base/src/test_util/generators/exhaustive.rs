@@ -79,9 +79,10 @@ use crate::test_util::rounding_modes::ROUNDING_MODE_CHARS;
 use crate::tuples::exhaustive::{
     ExhaustiveDependentPairsYsGenerator, ExhaustivePairs, ExhaustivePairs1Input,
     ExhaustiveQuadruples, ExhaustiveTriples, ExhaustiveTriplesXYY, exhaustive_dependent_pairs,
-    exhaustive_ordered_unique_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
-    exhaustive_quadruples, exhaustive_triples, exhaustive_triples_custom_output,
-    exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
+    exhaustive_ordered_unique_pairs, exhaustive_pairs, exhaustive_pairs_custom_output,
+    exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
+    exhaustive_triples_custom_output, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
+    lex_pairs, lex_pairs_from_single,
 };
 use crate::unsigned_matrix::UnsignedMatrix;
 use crate::unsigned_matrix::exhaustive::exhaustive_unsigned_matrices;
@@ -90,9 +91,7 @@ use crate::unsigned_polynomial::exhaustive::{
     exhaustive_unsigned_polynomials, exhaustive_unsigned_polynomials_min_degree,
 };
 use crate::unsigned_vector::UnsignedVector;
-use crate::unsigned_vector::exhaustive::{
-    exhaustive_unsigned_vectors, exhaustive_unsigned_vectors_with_dimension,
-};
+use crate::unsigned_vector::exhaustive::*;
 use crate::vecs::exhaustive::{
     ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, LexFixedLengthVecsFromSingle, ShortlexVecs,
     exhaustive_vecs, exhaustive_vecs_fixed_length_from_single,
@@ -6908,34 +6907,58 @@ pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_3() -> It<(UnsignedVecto
 
 pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, u64)> {
+    fn ys<T: PrimitiveUnsigned>((dimension, pow): (u64, u64)) -> It<UnsignedVector<T>> {
+        Box::new(exhaustive_unsigned_vectors_with_dimension_from_iterator(
+            dimension,
+            residues_mod_power_of_2::<T>(pow),
+        ))
+    }
     Box::new(
-        exhaustive_pairs(
-            exhaustive_unsigned_vectors::<T>(),
-            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )),
+            ys::<T>,
         )
-        .filter(|(v, pow)| v.mod_power_of_2_is_reduced(*pow)),
+        .map(|((_, pow), v)| (v, pow)),
     )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, u64)> {
+    fn ys<T: PrimitiveUnsigned>(pow: u64) -> It<UnsignedVector<T>> {
+        Box::new(exhaustive_unsigned_vectors_with_dimension_from_iterator(
+            3,
+            residues_mod_power_of_2::<T>(pow),
+        ))
+    }
     Box::new(
-        exhaustive_pairs(
-            exhaustive_unsigned_vectors_with_dimension::<T>(3),
-            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(primitive_int_increasing_inclusive_range(0, T::WIDTH)),
+            ys::<T>,
         )
-        .filter(|(v, pow)| v.mod_power_of_2_is_reduced(*pow)),
+        .map(|(pow, v)| (v, pow)),
     )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, T)> {
+    fn ys<T: PrimitiveUnsigned>((dimension, m): (u64, T)) -> It<UnsignedVector<T>> {
+        Box::new(exhaustive_unsigned_vectors_with_dimension_from_iterator(
+            dimension,
+            residues_mod(m),
+        ))
+    }
     Box::new(
-        exhaustive_pairs(
-            exhaustive_unsigned_vectors::<T>(),
-            exhaustive_positive_primitive_ints::<T>(),
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_positive_primitive_ints::<T>(),
+            )),
+            ys::<T>,
         )
-        .filter(|(v, m)| v.mod_is_reduced(m)),
+        .map(|((_, m), v)| (v, m)),
     )
 }
 
@@ -7040,6 +7063,42 @@ impl<T> ExhaustiveDependentPairsYsGenerator<u64, T, It<T>> for TuplesByDimension
     }
 }
 
+struct DependentYsGenerator<X, Y> {
+    ys: fn(X) -> It<Y>,
+}
+
+impl<X: Clone, Y> ExhaustiveDependentPairsYsGenerator<X, Y, It<Y>> for DependentYsGenerator<X, Y> {
+    #[inline]
+    fn get_ys(&self, x: &X) -> It<Y> {
+        (self.ys)(x.clone())
+    }
+}
+
+// Generates `(x, y)` for every `x` from `xs` and every `y` from `ys(x)`. Each pair is generated
+// once if `xs` and each `ys(x)` generate each value once, so this enumerates values constrained by
+// a parameter, such as vectors reduced modulo a modulus, without generating and filtering out the
+// ones that violate the constraint.
+fn exhaustive_dependent_pairs_from_fn<X: Clone + 'static, Y: 'static>(
+    xs: It<X>,
+    ys: fn(X) -> It<Y>,
+) -> It<(X, Y)> {
+    Box::new(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        xs,
+        DependentYsGenerator { ys },
+    ))
+}
+
+// The residues modulo $2^p$, where $p$ is `pow`, in increasing order.
+fn residues_mod_power_of_2<T: PrimitiveUnsigned>(pow: u64) -> PrimitiveIntIncreasingRange<T> {
+    primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(pow))
+}
+
+// The residues modulo `m`, in increasing order.
+fn residues_mod<T: PrimitiveUnsigned>(m: T) -> PrimitiveIntIncreasingRange<T> {
+    primitive_int_increasing_range(T::ZERO, m)
+}
+
 // Every tuple that `tuples_with_dimension` gives for some dimension, each exactly once. The
 // dimensions are selected the way the exhaustive vector generators select them, by the ruler
 // sequence.
@@ -7061,59 +7120,72 @@ pub fn exhaustive_tuples_by_dimension<T: 'static>(
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_1<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, UnsignedVector<T>, u64)> {
-    exhaustive_tuples_by_dimension(|dimension| {
-        Box::new(
-            exhaustive_pairs(
-                exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
-                    dimension,
-                )),
+    fn ys<T: PrimitiveUnsigned>(
+        (dimension, pow): (u64, u64),
+    ) -> It<(UnsignedVector<T>, UnsignedVector<T>)> {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(
+                dimension,
+                residues_mod_power_of_2::<T>(pow),
+            ),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
                 primitive_int_increasing_inclusive_range(0, T::WIDTH),
-            )
-            .filter(|((v, w), pow)| {
-                v.mod_power_of_2_is_reduced(*pow) && w.mod_power_of_2_is_reduced(*pow)
-            })
-            .map(|((v, w), pow)| (v, w, pow)),
+            )),
+            ys::<T>,
         )
-    })
+        .map(|((_, pow), (v, w))| (v, w, pow)),
+    )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_3<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, UnsignedVector<T>, u64)> {
+    fn ys<T: PrimitiveUnsigned>(pow: u64) -> It<(UnsignedVector<T>, UnsignedVector<T>)> {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(
+                3,
+                residues_mod_power_of_2::<T>(pow),
+            ),
+        ))
+    }
     Box::new(
-        exhaustive_pairs(
-            exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(3)),
-            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(primitive_int_increasing_inclusive_range(0, T::WIDTH)),
+            ys::<T>,
         )
-        .filter(|((v, w), pow)| {
-            v.mod_power_of_2_is_reduced(*pow) && w.mod_power_of_2_is_reduced(*pow)
-        })
-        .map(|((v, w), pow)| (v, w, pow)),
+        .map(|(pow, (v, w))| (v, w, pow)),
     )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_1<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, UnsignedVector<T>, T, u64)> {
-    exhaustive_tuples_by_dimension(|dimension| {
-        Box::new(
-            exhaustive_pairs(
-                exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
-                    dimension,
-                )),
-                exhaustive_pairs(
-                    exhaustive_unsigneds::<T>(),
-                    primitive_int_increasing_inclusive_range(0, T::WIDTH),
-                ),
-            )
-            .filter(|((v, w), (c, pow))| {
-                v.mod_power_of_2_is_reduced(*pow)
-                    && w.mod_power_of_2_is_reduced(*pow)
-                    && c.mod_power_of_2_is_reduced(*pow)
-            })
-            .map(|((v, w), (c, pow))| (v, w, c, pow)),
+    fn ys<T: PrimitiveUnsigned>(
+        (dimension, pow): (u64, u64),
+    ) -> It<((UnsignedVector<T>, UnsignedVector<T>), T)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension_from_iterator(
+                dimension,
+                residues_mod_power_of_2::<T>(pow),
+            )),
+            residues_mod_power_of_2::<T>(pow),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )),
+            ys::<T>,
         )
-    })
+        .map(|((_, pow), ((v, w), c))| (v, w, c, pow)),
+    )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_1<
@@ -7130,33 +7202,44 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_qui
 
 pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, T, u64)> {
-    Box::new(
-        exhaustive_pairs(
-            exhaustive_pairs(
-                exhaustive_unsigned_vectors::<T>(),
-                exhaustive_unsigneds::<T>(),
+    fn ys<T: PrimitiveUnsigned>((dimension, pow): (u64, u64)) -> It<(UnsignedVector<T>, T)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(
+                dimension,
+                residues_mod_power_of_2::<T>(pow),
             ),
-            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            residues_mod_power_of_2::<T>(pow),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )),
+            ys::<T>,
         )
-        .filter(|((v, c), pow)| {
-            v.mod_power_of_2_is_reduced(*pow) && c.mod_power_of_2_is_reduced(*pow)
-        })
-        .map(|((v, c), pow)| (v, c, pow)),
+        .map(|((_, pow), (v, c))| (v, c, pow)),
     )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, T, T)> {
+    fn ys<T: PrimitiveUnsigned>((dimension, m): (u64, T)) -> It<(UnsignedVector<T>, T)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(dimension, residues_mod(m)),
+            residues_mod(m),
+        ))
+    }
     Box::new(
-        exhaustive_pairs(
-            exhaustive_pairs(
-                exhaustive_unsigned_vectors::<T>(),
-                exhaustive_unsigneds::<T>(),
-            ),
-            exhaustive_positive_primitive_ints::<T>(),
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_positive_primitive_ints::<T>(),
+            )),
+            ys::<T>,
         )
-        .filter(|((v, c), m)| v.mod_is_reduced(m) && c < m)
-        .map(|((v, c), m)| (v, c, m)),
+        .map(|((_, m), (v, c))| (v, c, m)),
     )
 }
 
@@ -7164,13 +7247,26 @@ pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_3<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, U, u64)> {
-    Box::new(
-        exhaustive_triples(
-            exhaustive_unsigned_vectors::<T>(),
+    fn ys<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+        (dimension, pow): (u64, u64),
+    ) -> It<(UnsignedVector<T>, U)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(
+                dimension,
+                residues_mod_power_of_2::<T>(pow),
+            ),
             primitive_int_increasing_inclusive_range(U::ZERO, U::exact_from(T::WIDTH + 1)),
-            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )),
+            ys::<T, U>,
         )
-        .filter(|(v, _, pow)| v.mod_power_of_2_is_reduced(*pow)),
+        .map(|((_, pow), (v, u))| (v, u, pow)),
     )
 }
 
@@ -7178,16 +7274,25 @@ pub fn exhaustive_unsigned_vector_unsigned_unsigned_triple_gen_var_4<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, U, T)> {
-    Box::new(
-        exhaustive_triples_custom_output(
-            exhaustive_unsigned_vectors::<T>(),
+    fn ys<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+        (dimension, m): (u64, T),
+    ) -> It<(UnsignedVector<T>, U)> {
+        Box::new(exhaustive_pairs_custom_output(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(dimension, residues_mod(m)),
             exhaustive_unsigneds::<U>(),
-            exhaustive_positive_primitive_ints::<T>(),
             BitDistributorOutputType::normal(1),
             BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::normal(1),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_positive_primitive_ints::<T>(),
+            )),
+            ys::<T, U>,
         )
-        .filter(|(v, _, m)| v.mod_is_reduced(m)),
+        .map(|((_, m), (v, u))| (v, u, m)),
     )
 }
 
@@ -7212,83 +7317,108 @@ pub fn exhaustive_unsigned_vector_triple_gen_var_1<T: PrimitiveUnsigned>()
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_1<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, u64)> {
-    exhaustive_tuples_by_dimension(|dimension| {
-        Box::new(
-            exhaustive_pairs(
-                exhaustive_triples_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
-                    dimension,
-                )),
+    fn ys<T: PrimitiveUnsigned>(
+        (dimension, pow): (u64, u64),
+    ) -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>)> {
+        Box::new(exhaustive_triples_from_single(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(
+                dimension,
+                residues_mod_power_of_2::<T>(pow),
+            ),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
                 primitive_int_increasing_inclusive_range(0, T::WIDTH),
-            )
-            .filter(|((u, v, w), pow)| {
-                u.mod_power_of_2_is_reduced(*pow)
-                    && v.mod_power_of_2_is_reduced(*pow)
-                    && w.mod_power_of_2_is_reduced(*pow)
-            })
-            .map(|((u, v, w), pow)| (u, v, w, pow)),
+            )),
+            ys::<T>,
         )
-    })
+        .map(|((_, pow), (u, v, w))| (u, v, w, pow)),
+    )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_2<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, UnsignedVector<T>, T)> {
-    exhaustive_tuples_by_dimension(|dimension| {
-        Box::new(
-            exhaustive_pairs(
-                exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
-                    dimension,
-                )),
+    fn ys<T: PrimitiveUnsigned>(
+        (dimension, m): (u64, T),
+    ) -> It<(UnsignedVector<T>, UnsignedVector<T>)> {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(dimension, residues_mod(m)),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
                 exhaustive_positive_primitive_ints::<T>(),
-            )
-            .filter(|((v, w), m)| v.mod_is_reduced(m) && w.mod_is_reduced(m))
-            .map(|((v, w), m)| (v, w, m)),
+            )),
+            ys::<T>,
         )
-    })
+        .map(|((_, m), (v, w))| (v, w, m)),
+    )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_triple_gen_var_4<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, UnsignedVector<T>, T)> {
+    fn ys<T: PrimitiveUnsigned>(m: T) -> It<(UnsignedVector<T>, UnsignedVector<T>)> {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(3, residues_mod(m)),
+        ))
+    }
     Box::new(
-        exhaustive_pairs(
-            exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(3)),
-            exhaustive_positive_primitive_ints::<T>(),
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_positive_primitive_ints::<T>()),
+            ys::<T>,
         )
-        .filter(|((v, w), m)| v.mod_is_reduced(m) && w.mod_is_reduced(m))
-        .map(|((v, w), m)| (v, w, m)),
+        .map(|(m, (v, w))| (v, w, m)),
     )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_pair_gen_var_10<T: PrimitiveUnsigned>()
 -> It<(UnsignedVector<T>, T)> {
+    fn ys<T: PrimitiveUnsigned>(m: T) -> It<UnsignedVector<T>> {
+        Box::new(exhaustive_unsigned_vectors_with_dimension_from_iterator(
+            3,
+            residues_mod(m),
+        ))
+    }
     Box::new(
-        exhaustive_pairs(
-            exhaustive_unsigned_vectors_with_dimension::<T>(3),
-            exhaustive_positive_primitive_ints::<T>(),
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_positive_primitive_ints::<T>()),
+            ys::<T>,
         )
-        .filter(|(v, m)| v.mod_is_reduced(m)),
+        .map(|(m, v)| (v, m)),
     )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_quadruple_gen_var_2<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, UnsignedVector<T>, T, T)> {
-    exhaustive_tuples_by_dimension(|dimension| {
-        Box::new(
-            exhaustive_pairs(
-                exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
-                    dimension,
-                )),
-                exhaustive_pairs(
-                    exhaustive_unsigneds::<T>(),
-                    exhaustive_positive_primitive_ints::<T>(),
-                ),
-            )
-            .filter(|((v, w), (c, m))| v.mod_is_reduced(m) && w.mod_is_reduced(m) && c < m)
-            .map(|((v, w), (c, m))| (v, w, c, m)),
+    fn ys<T: PrimitiveUnsigned>(
+        (dimension, m): (u64, T),
+    ) -> It<((UnsignedVector<T>, UnsignedVector<T>), T)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_pairs_from_single(exhaustive_unsigned_vectors_with_dimension_from_iterator(
+                dimension,
+                residues_mod(m),
+            )),
+            residues_mod(m),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_positive_primitive_ints::<T>(),
+            )),
+            ys::<T>,
         )
-    })
+        .map(|((_, m), ((v, w), c))| (v, w, c, m)),
+    )
 }
 
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_quintuple_gen_var_2<
@@ -7306,20 +7436,23 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_unsigned_unsigned_qui
 pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple_gen_var_2<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>, T)> {
-    exhaustive_tuples_by_dimension(|dimension| {
-        Box::new(
-            exhaustive_pairs(
-                exhaustive_triples_from_single(exhaustive_unsigned_vectors_with_dimension::<T>(
-                    dimension,
-                )),
+    fn ys<T: PrimitiveUnsigned>(
+        (dimension, m): (u64, T),
+    ) -> It<(UnsignedVector<T>, UnsignedVector<T>, UnsignedVector<T>)> {
+        Box::new(exhaustive_triples_from_single(
+            exhaustive_unsigned_vectors_with_dimension_from_iterator(dimension, residues_mod(m)),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
                 exhaustive_positive_primitive_ints::<T>(),
-            )
-            .filter(|((u, v, w), m)| {
-                u.mod_is_reduced(m) && v.mod_is_reduced(m) && w.mod_is_reduced(m)
-            })
-            .map(|((u, v, w), m)| (u, v, w, m)),
+            )),
+            ys::<T>,
         )
-    })
+        .map(|((_, m), (u, v, w))| (u, v, w, m)),
+    )
 }
 
 pub fn exhaustive_unsigned_pair_gen_var_33() -> It<(u64, u64)> {

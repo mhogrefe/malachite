@@ -8,7 +8,9 @@
 
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::num::basic::traits::{OneHalf, Zero};
 use malachite_base::vector::Vector;
+use malachite_q::Rational;
 use malachite_q::rational_vector::RationalVector;
 use malachite_q::rational_vector::exhaustive::*;
 use std::collections::HashSet;
@@ -116,6 +118,96 @@ fn exhaustive_ordered_unique_rational_vectors_with_dimension_properties() {
                 .collect();
         assert!(vs.iter().all(|v| v.dimension() == dimension));
         assert!(vs.iter().all(|v| v.elements.is_sorted_by(|x, y| x < y)));
+        assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
+    }
+}
+
+fn small_elements() -> impl Clone + Iterator<Item = Rational> {
+    [Rational::ZERO, Rational::ONE_HALF].into_iter()
+}
+
+#[test]
+fn test_exhaustive_rational_vectors_from_iterator() {
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_rational_vectors_from_iterator(small_elements()),
+            50
+        ),
+        "[(), (0), (1/2), (0, 0, 0), (0, 0), (0, 0, 1/2), (0, 1/2), (0, 0, 0, 0, 0), (1/2, 0), (0, \
+        1/2, 0), (1/2, 1/2), (0, 0, 0, 0), (0, 1/2, 1/2), (0, 0, 0, 1/2), (1/2, 0, 0), (0, 0, 0, \
+        0, 0, 0, 0), (1/2, 0, 1/2), (0, 0, 1/2, 0), (1/2, 1/2, 0), (0, 0, 0, 0, 1/2), (1/2, 1/2, \
+        1/2), (0, 0, 1/2, 1/2), (0, 1/2, 0, 0), (0, 0, 0, 0, 0, 0, 1/2), (0, 1/2, 0, 1/2), (0, 0, \
+        0, 1/2, 0), (0, 1/2, 1/2, 0), (0, 0, 0, 0, 0, 0), (0, 1/2, 1/2, 1/2), (0, 0, 0, 1/2, 1/2), \
+        (1/2, 0, 0, 0), (0, 0, 0, 0, 0, 0, 0, 0, 0), (1/2, 0, 0, 1/2), (0, 0, 1/2, 0, 0), (1/2, 0, \
+        1/2, 0), (0, 0, 0, 0, 0, 1/2), (1/2, 0, 1/2, 1/2), (0, 0, 1/2, 0, 1/2), (1/2, 1/2, 0, 0), \
+        (0, 0, 0, 0, 0, 1/2, 0), (1/2, 1/2, 0, 1/2), (0, 0, 1/2, 1/2, 0), (1/2, 1/2, 1/2, 0), (0, \
+        0, 0, 0, 1/2, 0), (1/2, 1/2, 1/2, 1/2), (0, 0, 1/2, 1/2, 1/2), (0, 1/2, 0, 0, 0), (0, 0, \
+        0, 0, 0, 0, 0, 0, 1/2), (0, 1/2, 0, 0, 1/2), (0, 0, 0, 0, 1/2, 1/2), ...]"
+    );
+    // - no elements: the 0-dimensional vector, and nothing else
+    assert_eq!(
+        exhaustive_rational_vectors_from_iterator(Vec::<Rational>::new().into_iter())
+            .take(10)
+            .map(|v| v.to_string())
+            .collect_vec(),
+        &["()"]
+    );
+}
+
+#[test]
+fn test_exhaustive_rational_vectors_with_dimension_from_iterator() {
+    // dimension 0: the 0-dimensional vector, and nothing else
+    assert_eq!(
+        exhaustive_rational_vectors_with_dimension_from_iterator(0, small_elements())
+            .map(|v| v.to_string())
+            .collect_vec(),
+        &["()"]
+    );
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_rational_vectors_with_dimension_from_iterator(1, small_elements()),
+            20
+        ),
+        "[(0), (1/2)]"
+    );
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_rational_vectors_with_dimension_from_iterator(2, small_elements()),
+            20
+        ),
+        "[(0, 0), (0, 1/2), (1/2, 0), (1/2, 1/2)]"
+    );
+    // - no elements and a positive dimension: nothing
+    assert_eq!(
+        exhaustive_rational_vectors_with_dimension_from_iterator(
+            2,
+            Vec::<Rational>::new().into_iter()
+        )
+        .count(),
+        0
+    );
+}
+
+#[test]
+fn exhaustive_rational_vectors_from_iterator_properties() {
+    // Every element is from the set, and no vector is generated twice.
+    let vs = exhaustive_rational_vectors_from_iterator(small_elements())
+        .take(10000)
+        .collect_vec();
+    assert!(vs.iter().all(|v| {
+        v.elements
+            .iter()
+            .all(|x| *x == 0u32 || *x == Rational::ONE_HALF)
+    }));
+    assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
+
+    // With 2 possible elements, there are 2^n vectors of each dimension n.
+    for dimension in 0..6 {
+        let vs =
+            exhaustive_rational_vectors_with_dimension_from_iterator(dimension, small_elements())
+                .collect_vec();
+        assert_eq!(vs.len(), 2usize.pow(u32::try_from(dimension).unwrap()));
+        assert!(vs.iter().all(|v| v.dimension() == dimension));
         assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
     }
 }

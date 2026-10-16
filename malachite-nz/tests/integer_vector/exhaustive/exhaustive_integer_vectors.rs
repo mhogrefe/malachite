@@ -8,7 +8,10 @@
 
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::num::basic::traits::{NegativeOne, Two, Zero};
 use malachite_base::vector::Vector;
+use malachite_nz::integer::Integer;
+use malachite_nz::integer::exhaustive::integer_increasing_range;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::integer_vector::exhaustive::*;
 use std::collections::HashSet;
@@ -113,6 +116,96 @@ fn exhaustive_ordered_unique_integer_vectors_with_dimension_properties() {
                 .collect();
         assert!(vs.iter().all(|v| v.dimension() == dimension));
         assert!(vs.iter().all(|v| v.elements.is_sorted_by(|x, y| x < y)));
+        assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
+    }
+}
+
+fn small_elements() -> impl Clone + Iterator<Item = Integer> {
+    integer_increasing_range(Integer::NEGATIVE_ONE, Integer::TWO)
+}
+
+#[test]
+fn test_exhaustive_integer_vectors_from_iterator() {
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_integer_vectors_from_iterator(small_elements()),
+            50
+        ),
+        "[(), (-1), (0), (-1, -1, -1), (1), (-1, -1), (-1, 0), (-1, -1, -1, -1, -1), (0, -1), (-1, \
+        -1, 0), (0, 0), (-1, -1, -1, -1), (-1, 1), (-1, 0, -1), (0, 1), (-1, -1, -1, -1, -1, -1), \
+        (1, -1), (-1, 0, 0), (1, 0), (-1, -1, -1, 0), (1, 1), (0, -1, -1), (0, -1, 0), (-1, -1, \
+        -1, -1, -1, 0), (0, 0, -1), (-1, -1, 0, -1), (0, 0, 0), (-1, -1, -1, -1, 0), (-1, -1, 1), \
+        (-1, -1, 0, 0), (-1, 0, 1), (-1, -1, -1, -1, -1, -1, -1, -1), (0, -1, 1), (-1, 0, -1, -1), \
+        (0, 0, 1), (-1, -1, -1, 0, -1), (-1, 1, -1), (-1, 0, -1, 0), (-1, 1, 0), (-1, -1, -1, -1, \
+        0, -1), (0, 1, -1), (-1, 0, 0, -1), (0, 1, 0), (-1, -1, -1, 0, 0), (-1, 1, 1), (-1, 0, 0, \
+        0), (0, 1, 1), (-1, -1, -1, -1, -1, -1, -1), (1, -1, -1), (0, -1, -1, -1), ...]"
+    );
+    // - no elements: the 0-dimensional vector, and nothing else
+    assert_eq!(
+        exhaustive_integer_vectors_from_iterator(integer_increasing_range(
+            Integer::ZERO,
+            Integer::ZERO
+        ))
+        .take(10)
+        .map(|v| v.to_string())
+        .collect_vec(),
+        &["()"]
+    );
+}
+
+#[test]
+fn test_exhaustive_integer_vectors_with_dimension_from_iterator() {
+    // dimension 0: the 0-dimensional vector, and nothing else
+    assert_eq!(
+        exhaustive_integer_vectors_with_dimension_from_iterator(0, small_elements())
+            .map(|v| v.to_string())
+            .collect_vec(),
+        &["()"]
+    );
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_integer_vectors_with_dimension_from_iterator(1, small_elements()),
+            20
+        ),
+        "[(-1), (0), (1)]"
+    );
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_integer_vectors_with_dimension_from_iterator(2, small_elements()),
+            20
+        ),
+        "[(-1, -1), (-1, 0), (0, -1), (0, 0), (-1, 1), (0, 1), (1, -1), (1, 0), (1, 1)]"
+    );
+    // - no elements and a positive dimension: nothing
+    assert_eq!(
+        exhaustive_integer_vectors_with_dimension_from_iterator(
+            2,
+            integer_increasing_range(Integer::ZERO, Integer::ZERO)
+        )
+        .count(),
+        0
+    );
+}
+
+#[test]
+fn exhaustive_integer_vectors_from_iterator_properties() {
+    // Every element is from the set, and no vector is generated twice.
+    let vs = exhaustive_integer_vectors_from_iterator(small_elements())
+        .take(10000)
+        .collect_vec();
+    assert!(
+        vs.iter()
+            .all(|v| v.elements.iter().all(|x| *x >= -1i32 && *x <= 1u32))
+    );
+    assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
+
+    // With 3 possible elements, there are 3^n vectors of each dimension n.
+    for dimension in 0..6 {
+        let vs =
+            exhaustive_integer_vectors_with_dimension_from_iterator(dimension, small_elements())
+                .collect_vec();
+        assert_eq!(vs.len(), 3usize.pow(u32::try_from(dimension).unwrap()));
+        assert!(vs.iter().all(|v| v.dimension() == dimension));
         assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
     }
 }

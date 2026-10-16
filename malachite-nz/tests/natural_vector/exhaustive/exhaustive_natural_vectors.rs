@@ -8,7 +8,10 @@
 
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::vector::Vector;
+use malachite_nz::natural::Natural;
+use malachite_nz::natural::exhaustive::exhaustive_natural_range;
 use malachite_nz::natural_vector::NaturalVector;
 use malachite_nz::natural_vector::exhaustive::*;
 use std::collections::HashSet;
@@ -112,6 +115,92 @@ fn exhaustive_ordered_unique_natural_vectors_with_dimension_properties() {
                 .collect();
         assert!(vs.iter().all(|v| v.dimension() == dimension));
         assert!(vs.iter().all(|v| v.elements.is_sorted_by(|x, y| x < y)));
+        assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
+    }
+}
+
+fn small_elements() -> impl Clone + Iterator<Item = Natural> {
+    exhaustive_natural_range(Natural::ZERO, Natural::from(3u32))
+}
+
+#[test]
+fn test_exhaustive_natural_vectors_from_iterator() {
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_natural_vectors_from_iterator(small_elements()),
+            50
+        ),
+        "[(), (0), (1), (0, 0, 0), (2), (0, 0), (0, 1), (0, 0, 0, 0, 0), (1, 0), (0, 0, 1), (1, \
+        1), (0, 0, 0, 0), (0, 2), (0, 1, 0), (1, 2), (0, 0, 0, 0, 0, 0), (2, 0), (0, 1, 1), (2, \
+        1), (0, 0, 0, 1), (2, 2), (1, 0, 0), (1, 0, 1), (0, 0, 0, 0, 0, 1), (1, 1, 0), (0, 0, 1, \
+        0), (1, 1, 1), (0, 0, 0, 0, 1), (0, 0, 2), (0, 0, 1, 1), (0, 1, 2), (0, 0, 0, 0, 0, 0, 0, \
+        0), (1, 0, 2), (0, 1, 0, 0), (1, 1, 2), (0, 0, 0, 1, 0), (0, 2, 0), (0, 1, 0, 1), (0, 2, \
+        1), (0, 0, 0, 0, 1, 0), (1, 2, 0), (0, 1, 1, 0), (1, 2, 1), (0, 0, 0, 1, 1), (0, 2, 2), \
+        (0, 1, 1, 1), (1, 2, 2), (0, 0, 0, 0, 0, 0, 0), (2, 0, 0), (1, 0, 0, 0), ...]"
+    );
+    // - no elements: the 0-dimensional vector, and nothing else
+    assert_eq!(
+        exhaustive_natural_vectors_from_iterator(exhaustive_natural_range(
+            Natural::ZERO,
+            Natural::ZERO
+        ))
+        .take(10)
+        .map(|v| v.to_string())
+        .collect_vec(),
+        &["()"]
+    );
+}
+
+#[test]
+fn test_exhaustive_natural_vectors_with_dimension_from_iterator() {
+    // dimension 0: the 0-dimensional vector, and nothing else
+    assert_eq!(
+        exhaustive_natural_vectors_with_dimension_from_iterator(0, small_elements())
+            .map(|v| v.to_string())
+            .collect_vec(),
+        &["()"]
+    );
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_natural_vectors_with_dimension_from_iterator(1, small_elements()),
+            20
+        ),
+        "[(0), (1), (2)]"
+    );
+    assert_eq!(
+        prefix_to_string(
+            exhaustive_natural_vectors_with_dimension_from_iterator(2, small_elements()),
+            20
+        ),
+        "[(0, 0), (0, 1), (1, 0), (1, 1), (0, 2), (1, 2), (2, 0), (2, 1), (2, 2)]"
+    );
+    // - no elements and a positive dimension: nothing
+    assert_eq!(
+        exhaustive_natural_vectors_with_dimension_from_iterator(
+            2,
+            exhaustive_natural_range(Natural::ZERO, Natural::ZERO)
+        )
+        .count(),
+        0
+    );
+}
+
+#[test]
+fn exhaustive_natural_vectors_from_iterator_properties() {
+    // Every element is from the set, and no vector is generated twice.
+    let vs = exhaustive_natural_vectors_from_iterator(small_elements())
+        .take(10000)
+        .collect_vec();
+    assert!(vs.iter().all(|v| v.elements.iter().all(|x| *x < 3u32)));
+    assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
+
+    // With 3 possible elements, there are 3^n vectors of each dimension n.
+    for dimension in 0..6 {
+        let vs =
+            exhaustive_natural_vectors_with_dimension_from_iterator(dimension, small_elements())
+                .collect_vec();
+        assert_eq!(vs.len(), 3usize.pow(u32::try_from(dimension).unwrap()));
+        assert!(vs.iter().all(|v| v.dimension() == dimension));
         assert_eq!(vs.iter().collect::<HashSet<_>>().len(), vs.len());
     }
 }

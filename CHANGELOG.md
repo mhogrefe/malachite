@@ -19,6 +19,12 @@ documented by git history.
   malachite-nz's `IntegerMatrix`, including the `_from_iterator` forms; as with `UnsignedVector`,
   the random elements are uniform (or striped) over the whole type, so there are no bit-count
   parameters.
+- `exhaustive_unsigned_vectors_from_iterator` and
+  `exhaustive_unsigned_vectors_with_dimension_from_iterator`, which take any cloneable element
+  iterator (malachite-nz and malachite-q gain the same for `NaturalVector`, `IntegerVector`, and
+  `RationalVector`); `exhaustive_unsigned_vectors` and `exhaustive_unsigned_vectors_with_dimension`
+  now delegate to them. The exhaustive test generators for vectors reduced modulo $2^k$ or $m$ now
+  enumerate the residue vectors for each modulus directly instead of filtering all vectors.
 - `Cross` and `CrossAssign` traits in `malachite_base::num::arithmetic::traits`, for the cross
   product of two 3-dimensional vectors.
 - `ModPowerOf2Cross` and `ModPowerOf2CrossAssign` traits, for the cross product of two
