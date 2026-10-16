@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     #[cfg(feature = "serde")]
     serde::register(runner);
     string::register(runner);
+    unsigned_matrix_from_natural_matrix::register(runner);
 }
 
 mod from_columns;
@@ -27,3 +28,4 @@ mod from_unsigned_matrix;
 #[cfg(feature = "serde")]
 mod serde;
 mod string;
+mod unsigned_matrix_from_natural_matrix;

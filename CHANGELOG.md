@@ -134,6 +134,9 @@ documented by git history.
   `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`, `Display`/`Debug`, `FromStr` (which
   rejects negative elements, including `-0`), `ToLatex`, `ToTypst`, and serde support.
 - `From<UnsignedMatrix<T>>` for `NaturalMatrix`, for every primitive unsigned `T`.
+- `TryFrom<NaturalMatrix>` and `TryFrom<&NaturalMatrix>` for `UnsignedMatrix<T>`, failing with
+  `UnsignedMatrixFromNaturalMatrixError` when an element is too large for `T`, and the matching
+  `ConvertibleFrom<&NaturalMatrix>`.
 - `From<UnsignedMatrix<T>>` for `IntegerMatrix`, for every primitive unsigned `T`, and
   `From<NaturalMatrix>` for `IntegerMatrix`.
 - `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.

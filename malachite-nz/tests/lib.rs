@@ -996,6 +996,7 @@ pub mod natural_matrix {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod unsigned_matrix_from_natural_matrix;
     }
     pub mod dimensions;
     pub mod exhaustive {
