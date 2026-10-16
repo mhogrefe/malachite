@@ -133,6 +133,7 @@ documented by git history.
   the element and row/column constructors, `height`, `width`, `transpose`, `transpose_assign`,
   `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`, `Display`/`Debug`, `FromStr` (which
   rejects negative elements, including `-0`), `ToLatex`, `ToTypst`, and serde support.
+- `From<UnsignedMatrix<T>>` for `NaturalMatrix`, for every primitive unsigned `T`.
 - `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.
 - `CheckedAbs` for `NaturalVector` and `IntegerVector`, returning the Euclidean norm as a `Natural`
   when the sum of the squares of the elements is a perfect square, and `None` otherwise.

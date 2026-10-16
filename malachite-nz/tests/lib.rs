@@ -985,6 +985,7 @@ pub mod natural_matrix {
         pub mod from_elements;
         pub mod from_elements_column_major;
         pub mod from_rows;
+        pub mod from_unsigned_matrix;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {

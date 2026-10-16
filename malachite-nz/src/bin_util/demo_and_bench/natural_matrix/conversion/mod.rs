@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     from_elements::register(runner);
     from_elements_column_major::register(runner);
     from_rows::register(runner);
+    from_unsigned_matrix::register(runner);
     #[cfg(feature = "serde")]
     serde::register(runner);
     string::register(runner);
@@ -22,6 +23,7 @@ mod from_columns;
 mod from_elements;
 mod from_elements_column_major;
 mod from_rows;
+mod from_unsigned_matrix;
 #[cfg(feature = "serde")]
 mod serde;
 mod string;
