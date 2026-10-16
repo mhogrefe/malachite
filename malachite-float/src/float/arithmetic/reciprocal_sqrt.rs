@@ -13,248 +13,29 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::sqrt::generic_sqrt_rational;
-use crate::float::conversion::from_natural::{
-    from_natural_prec_round_zero_exponent_ref, from_natural_zero_exponent,
-    from_natural_zero_exponent_ref,
-};
-use crate::float::conversion::from_rational::FROM_RATIONAL_THRESHOLD;
 use crate::{
     Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
-    float_infinity, float_nan, float_zero, significand_bits,
+    float_infinity, float_nan, float_zero,
 };
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, CheckedSqrt, FloorLogBase2, IsPowerOf2, NegAssign, NegModPowerOf2, Parity,
-    PowerOf2, Reciprocal, ReciprocalAssign, ReciprocalSqrt, ReciprocalSqrtAssign,
-    RoundToMultipleOfPowerOf2, Sqrt, UnsignedAbs,
+    IsPowerOf2, Parity, PowerOf2, Reciprocal, ReciprocalSqrt, ReciprocalSqrtAssign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{
-    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
-};
-use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SaturatingFrom};
+use malachite_base::num::basic::traits::Infinity as InfinityTrait;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::integer::Integer;
 use malachite_nz::natural::LIMB_HIGH_BIT;
 use malachite_nz::natural::arithmetic::float::reciprocal_sqrt::limbs_reciprocal_sqrt;
 use malachite_nz::natural::arithmetic::float::round::{
-    float_can_round, limbs_float_can_round, limbs_significand_slice_add_limb_in_place,
+    limbs_float_can_round, limbs_significand_slice_add_limb_in_place,
 };
 use malachite_nz::natural::{Natural, bit_to_limb_count_ceiling, limb_to_bit_count};
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-
-fn from_reciprocal_rational_prec_round_ref_direct(
-    x: &Rational,
-    prec: u64,
-    rm: RoundingMode,
-) -> (Float, Ordering) {
-    assert_ne!(prec, 0);
-    let sign = *x >= 0u32;
-    if let Some(pow) = x.numerator_ref().checked_log_base_2() {
-        let n = x.denominator_ref();
-        let n_bits = n.significant_bits();
-        let (mut y, mut o) =
-            from_natural_prec_round_zero_exponent_ref(n, prec, if sign { rm } else { -rm });
-        o = y.shr_prec_round_assign_helper(
-            i128::from(pow) - i128::from(n_bits),
-            prec,
-            if sign { rm } else { -rm },
-            o,
-        );
-        assert!(
-            rm != Exact || o == Equal,
-            "Inexact conversion from Rational to Float"
-        );
-        if sign { (y, o) } else { (-y, o.reverse()) }
-    } else {
-        let x = x.reciprocal();
-        let mut exponent = i32::saturating_from(x.floor_log_base_2_abs());
-        if exponent >= Float::MAX_EXPONENT {
-            return match (sign, rm) {
-                (true, Up | Ceiling | Nearest) => (Float::INFINITY, Greater),
-                (true, Floor | Down) => (Float::max_finite_value_with_prec(prec), Less),
-                (false, Up | Floor | Nearest) => (Float::NEGATIVE_INFINITY, Less),
-                (false, Ceiling | Down) => (-Float::max_finite_value_with_prec(prec), Greater),
-                (_, Exact) => panic!("Inexact conversion from Rational to Float"),
-            };
-        }
-        let (significand, o) =
-            Integer::rounding_from(x << (i128::exact_from(prec) - i128::from(exponent) - 1), rm);
-        let sign = significand >= 0u32;
-        let mut significand = significand.unsigned_abs();
-        let away_from_0 = if sign { Greater } else { Less };
-        if o == away_from_0 && significand.is_power_of_2() {
-            exponent += 1;
-            if exponent >= Float::MAX_EXPONENT {
-                return if sign {
-                    (Float::INFINITY, Greater)
-                } else {
-                    (Float::NEGATIVE_INFINITY, Less)
-                };
-            }
-        }
-        exponent += 1;
-        if exponent < Float::MIN_EXPONENT {
-            assert!(rm != Exact, "Inexact conversion from Rational to Float");
-            return if rm == Nearest
-                && exponent == Float::MIN_EXPONENT_MINUS_1
-                && (o == away_from_0.reverse() || !significand.is_power_of_2())
-            {
-                if sign {
-                    (Float::min_positive_value_prec(prec), Greater)
-                } else {
-                    (-Float::min_positive_value_prec(prec), Less)
-                }
-            } else {
-                match (sign, rm) {
-                    (true, Up | Ceiling) => (Float::min_positive_value_prec(prec), Greater),
-                    (true, Floor | Down | Nearest) => (Float::ZERO, Less),
-                    (false, Up | Floor) => (-Float::min_positive_value_prec(prec), Less),
-                    (false, Ceiling | Down | Nearest) => (Float::NEGATIVE_ZERO, Greater),
-                    (_, Exact) => unreachable!(),
-                }
-            };
-        }
-        significand <<= significand
-            .significant_bits()
-            .neg_mod_power_of_2(Limb::LOG_WIDTH);
-        let target_bits = prec
-            .round_to_multiple_of_power_of_2(Limb::LOG_WIDTH, Ceiling)
-            .0;
-        let current_bits = significand_bits(&significand);
-        if current_bits > target_bits {
-            significand >>= current_bits - target_bits;
-        }
-        (
-            Float(Finite {
-                sign,
-                exponent,
-                precision: prec,
-                significand,
-            }),
-            o,
-        )
-    }
-}
-
-fn from_reciprocal_rational_prec_round_ref_using_div(
-    x: &Rational,
-    prec: u64,
-    mut rm: RoundingMode,
-) -> (Float, Ordering) {
-    let sign = *x >= 0u32;
-    if !sign {
-        rm.neg_assign();
-    }
-    let (d, n) = x.numerator_and_denominator_ref();
-    let is_zero = *n == 0u32;
-    let (f, o) = match (
-        if is_zero {
-            None
-        } else {
-            n.checked_log_base_2()
-        },
-        d.checked_log_base_2(),
-    ) {
-        (Some(log_n), Some(log_d)) => Float::power_of_2_prec_round(
-            i64::saturating_from(i128::from(log_n) - i128::from(log_d)),
-            prec,
-            rm,
-        ),
-        (None, Some(log_d)) => {
-            let (mut f, mut o) = from_natural_prec_round_zero_exponent_ref(n, prec, rm);
-            o = f.shr_prec_round_assign_helper(
-                i128::from(log_d) - i128::from(n.significant_bits()),
-                prec,
-                rm,
-                o,
-            );
-            (f, o)
-        }
-        (Some(log_n), None) => {
-            let (mut f, mut o) = from_natural_zero_exponent_ref(d).reciprocal_prec_round(prec, rm);
-            o = f.shl_prec_round_assign_helper(
-                i128::from(log_n) - i128::from(d.significant_bits()),
-                prec,
-                rm,
-                o,
-            );
-            (f, o)
-        }
-        (None, None) => {
-            let (mut f, mut o) = from_natural_zero_exponent_ref(n).div_prec_round(
-                from_natural_zero_exponent_ref(d),
-                prec,
-                rm,
-            );
-            o = f.shl_prec_round_assign_helper(
-                i128::from(n.significant_bits()) - i128::from(d.significant_bits()),
-                prec,
-                rm,
-                o,
-            );
-            (f, o)
-        }
-    };
-    if sign { (f, o) } else { (-f, o.reverse()) }
-}
-
-crate_test_fn! {
-#[inline]
-from_reciprocal_rational_prec_round_ref(
-    x: &Rational,
-    prec: u64,
-    rm: RoundingMode,
-) -> (Float, Ordering) {
-    if max(x.significant_bits(), prec) < FROM_RATIONAL_THRESHOLD {
-        from_reciprocal_rational_prec_round_ref_direct(x, prec, rm)
-    } else {
-        from_reciprocal_rational_prec_round_ref_using_div(x, prec, rm)
-    }
-}}
-
-crate_test_fn! {
-generic_reciprocal_sqrt_rational_ref(
-    x: &Rational,
-    prec: u64,
-    rm: RoundingMode
-) -> (Float, Ordering) {
-    let mut working_prec = prec + 10;
-    let mut increment = Limb::WIDTH;
-    let mut end_shift = x.floor_log_base_2();
-    let x2;
-    let reduced_x: &Rational = if end_shift.gt_abs(&0x3fff_0000) {
-        end_shift &= !1;
-        x2 = x >> end_shift;
-        &x2
-    } else {
-        end_shift = 0;
-        x
-    };
-    loop {
-        let sqrt = from_reciprocal_rational_prec_round_ref(reduced_x, working_prec, Floor).0.sqrt();
-        // See algorithms.tex. Since we rounded down when computing fx, the absolute error of the
-        // square root is bounded by (c_sqrt + k_fx)ulp(sqrt) <= 2ulp(sqrt).
-        //
-        // Experiments suggest that `working_prec` is low enough (that is, that the error is at most
-        // 1 ulp), but I can only prove `working_prec - 1`.
-        if float_can_round(sqrt.significand_ref().unwrap(), working_prec - 1, prec, rm) {
-            let (mut sqrt, mut o) = Float::from_float_prec_round(sqrt, prec, rm);
-            if end_shift != 0 {
-                o = sqrt.shr_prec_round_assign_helper(end_shift >> 1, prec, rm, o);
-            }
-            return (sqrt, o);
-        }
-        working_prec += increment;
-        increment = working_prec >> 1;
-    }
-}}
 
 impl Float {
     /// Computes the reciprocal of the square root of a [`Float`], rounding the result to the
@@ -1102,57 +883,16 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     pub fn reciprocal_sqrt_rational_prec_round(
-        mut x: Rational,
+        x: Rational,
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
         assert_ne!(prec, 0);
         if x == 0u32 {
             return (Self::INFINITY, Equal);
-        } else if x < 0u32 {
-            return (Self::NAN, Equal);
         }
-        x.reciprocal_assign();
-        if let Some(sqrt) = (&x).checked_sqrt() {
-            return Self::from_rational_prec_round(sqrt, prec, rm);
-        }
-        let (n, d) = x.numerator_and_denominator_ref();
-        match (n.checked_log_base_2(), d.checked_log_base_2()) {
-            (_, Some(log_d)) if log_d.even() => {
-                let n = x.into_numerator();
-                let n_exp = n.significant_bits();
-                let mut n = from_natural_zero_exponent(n);
-                if n_exp.odd() {
-                    n <<= 1u32;
-                }
-                let (mut sqrt, o) = Self::exact_from(n).sqrt_prec_round(prec, rm);
-                let o = sqrt.shr_prec_round_assign_helper(
-                    i128::from(log_d >> 1) - i128::from(n_exp >> 1),
-                    prec,
-                    rm,
-                    o,
-                );
-                (sqrt, o)
-            }
-            (Some(log_n), _) if log_n.even() => {
-                let d = x.into_denominator();
-                let d_exp = d.significant_bits();
-                let mut d = from_natural_zero_exponent(d);
-                if d_exp.odd() {
-                    d <<= 1u32;
-                }
-                let (mut reciprocal_sqrt, o) =
-                    Self::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
-                let o = reciprocal_sqrt.shl_prec_round_assign_helper(
-                    i128::from(log_n >> 1) - i128::from(d_exp >> 1),
-                    prec,
-                    rm,
-                    o,
-                );
-                (reciprocal_sqrt, o)
-            }
-            _ => generic_sqrt_rational(x, prec, rm),
-        }
+        // Inverting a `Rational` is exact, so this rounds only once.
+        Self::sqrt_rational_prec_round(x.reciprocal(), prec, rm)
     }
 
     /// Computes the reciprocal of the square root of a [`Rational`], rounding the result to the
@@ -1273,47 +1013,9 @@ impl Float {
         assert_ne!(prec, 0);
         if *x == 0u32 {
             return (Self::INFINITY, Equal);
-        } else if *x < 0u32 {
-            return (Self::NAN, Equal);
         }
-        if let Some(sqrt) = x.checked_sqrt() {
-            return Self::from_rational_prec_round(sqrt.reciprocal(), prec, rm);
-        }
-        let (d, n) = x.numerator_and_denominator_ref();
-        match (n.checked_log_base_2(), d.checked_log_base_2()) {
-            (_, Some(log_d)) if log_d.even() => {
-                let n_exp = n.significant_bits();
-                let mut n = from_natural_zero_exponent_ref(n);
-                if n_exp.odd() {
-                    n <<= 1u32;
-                }
-                let (mut sqrt, o) = Self::exact_from(n).sqrt_prec_round(prec, rm);
-                let o = sqrt.shr_prec_round_assign_helper(
-                    i128::from(log_d >> 1) - i128::from(n_exp >> 1),
-                    prec,
-                    rm,
-                    o,
-                );
-                (sqrt, o)
-            }
-            (Some(log_n), _) if log_n.even() => {
-                let d_exp = d.significant_bits();
-                let mut d = from_natural_zero_exponent_ref(d);
-                if d_exp.odd() {
-                    d <<= 1u32;
-                }
-                let (mut reciprocal_sqrt, o) =
-                    Self::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
-                let o = reciprocal_sqrt.shl_prec_round_assign_helper(
-                    i128::from(log_n >> 1) - i128::from(d_exp >> 1),
-                    prec,
-                    rm,
-                    o,
-                );
-                (reciprocal_sqrt, o)
-            }
-            _ => generic_reciprocal_sqrt_rational_ref(x, prec, rm),
-        }
+        // Inverting a `Rational` is exact, so this rounds only once.
+        Self::sqrt_rational_prec_round(x.reciprocal(), prec, rm)
     }
 
     /// Computes the reciprocal of the square root of a [`Rational`], rounding the result to the
