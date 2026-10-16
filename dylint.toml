@@ -7,16 +7,16 @@ max_line_length = 100
 # inside `macro_rules!` bodies (each expansion would need to fulfill the expectation separately).
 # An entry whose line is no longer too long is itself flagged, so this list cannot go stale.
 long_lines_exceptions = [
-    { file = "malachite-base/src/test_util/generators/exhaustive.rs", line = 6507 },
-    { file = "malachite-base/src/test_util/generators/exhaustive.rs", line = 6526 },
-    { file = "malachite-base/src/test_util/generators/exhaustive.rs", line = 6539 },
+    { file = "malachite-base/src/test_util/generators/exhaustive.rs", line = 6508 },
+    { file = "malachite-base/src/test_util/generators/exhaustive.rs", line = 6527 },
+    { file = "malachite-base/src/test_util/generators/exhaustive.rs", line = 6540 },
     { file = "malachite-base/src/test_util/generators/mod.rs", line = 5576 },
     { file = "malachite-base/src/test_util/generators/mod.rs", line = 5634 },
     { file = "malachite-base/src/test_util/generators/mod.rs", line = 5646 },
     { file = "malachite-base/src/test_util/generators/mod.rs", line = 5514 },
-    { file = "malachite-base/src/test_util/generators/special_random.rs", line = 11308 },
-    { file = "malachite-base/src/test_util/generators/special_random.rs", line = 11630 },
-    { file = "malachite-base/src/test_util/generators/special_random.rs", line = 11654 },
+    { file = "malachite-base/src/test_util/generators/special_random.rs", line = 11297 },
+    { file = "malachite-base/src/test_util/generators/special_random.rs", line = 11619 },
+    { file = "malachite-base/src/test_util/generators/special_random.rs", line = 11643 },
     { file = "malachite-base/src/num/arithmetic/primorial.rs", line = 85 },
     { file = "malachite-base/src/num/arithmetic/primorial.rs", line = 244 },
     { file = "malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs", line = 118 },
