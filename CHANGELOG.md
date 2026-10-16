@@ -134,6 +134,8 @@ documented by git history.
   `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`, `Display`/`Debug`, `FromStr` (which
   rejects negative elements, including `-0`), `ToLatex`, `ToTypst`, and serde support.
 - `From<UnsignedMatrix<T>>` for `NaturalMatrix`, for every primitive unsigned `T`.
+- `From<UnsignedMatrix<T>>` for `IntegerMatrix`, for every primitive unsigned `T`, and
+  `From<NaturalMatrix>` for `IntegerMatrix`.
 - `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.
 - `CheckedAbs` for `NaturalVector` and `IntegerVector`, returning the Euclidean norm as a `Natural`
   when the sum of the squares of the elements is a perfect square, and `None` otherwise.
@@ -220,6 +222,12 @@ documented by git history.
   scales the numerator so that the shift is by the integer $a$, uses the integer Taylor shift, and
   scales back, followed by one reduction to lowest terms; a shift by an integer shifts only the
   numerator and needs no reduction.
+
+### malachite-float
+
+- `Float::reciprocal_sqrt_rational_prec_round` and its `_ref` form now compute $\sqrt{1/x}$ with
+  `sqrt_rational_prec_round`, since inverting a `Rational` is exact; results are unchanged, and the
+  duplicated implementation is gone.
 
 ## 0.14.0 — 2026-10-13
 

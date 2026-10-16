@@ -353,7 +353,9 @@ pub mod integer_matrix {
         pub mod from_columns;
         pub mod from_elements;
         pub mod from_elements_column_major;
+        pub mod from_natural_matrix;
         pub mod from_rows;
+        pub mod from_unsigned_matrix;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
