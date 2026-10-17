@@ -920,6 +920,7 @@ pub mod unsigned_matrix {
         pub mod exhaustive_unsigned_matrices;
     }
     pub mod identity;
+    pub mod is_identity;
     pub mod is_square;
     pub mod is_zero;
     pub mod random {
@@ -939,6 +940,7 @@ pub mod unsigned_matrix {
     pub mod set_column;
     pub mod set_row;
     pub mod set_zero;
+    pub mod standard_basis_index;
     pub mod standard_basis_matrix;
     pub mod transpose;
     pub mod zero;

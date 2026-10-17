@@ -60,6 +60,9 @@ fn standard_basis_matrix_properties() {
         assert!(m.is_valid());
         assert_eq!((m.height(), m.width()), (height, width));
         assert!(!m.is_zero());
+        assert_eq!(m.standard_basis_index(), Some((i, j)));
+        // Only the 1-by-1 standard basis matrix is an identity matrix.
+        assert_eq!(m.is_identity(), height == 1 && width == 1);
         assert_eq!(*m.get(i, j).unwrap(), 1);
         // Row `i` is the standard basis vector with its 1 at `j`, and every other row is zero.
         for k in 0..height {

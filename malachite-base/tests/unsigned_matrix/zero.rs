@@ -41,6 +41,10 @@ fn zero_properties() {
         assert!(m.is_valid());
         assert_eq!((m.height(), m.width()), (height, width));
         assert!(m.is_zero());
+        // Only the 0-by-0 zero matrix is an identity matrix, and no zero matrix is a standard basis
+        // matrix.
+        assert_eq!(m.is_identity(), height == 0 && width == 0);
+        assert_eq!(m.standard_basis_index(), None);
         assert_eq!(m.transpose(), UnsignedMatrix::<u64>::zero(width, height));
         assert!((0..height).all(|i| m.row(i) == UnsignedVector::<u64>::zero(width)));
         assert!((0..width).all(|j| m.column(j) == UnsignedVector::<u64>::zero(height)));

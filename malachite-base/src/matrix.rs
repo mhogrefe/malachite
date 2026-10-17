@@ -78,6 +78,20 @@ pub trait Matrix: Sized {
     /// elements.
     fn is_zero(&self) -> bool;
 
+    /// Determines whether a matrix is an identity matrix: a square matrix whose diagonal elements
+    /// are 1 and whose other elements are 0. This includes the 0-by-0 matrix.
+    fn is_identity(&self) -> bool;
+
+    /// Determines whether a matrix is a standard basis matrix, returning the row and column of its
+    /// 1 if it is.
+    ///
+    /// A standard basis matrix has a single element equal to 1 and every other element 0, as
+    /// [`standard_basis_matrix`](Self::standard_basis_matrix) builds. Returns `None` for every
+    /// other matrix, including the zero matrices and the matrices with no elements. When it returns
+    /// `Some((i, j))`, the matrix equals `standard_basis_matrix(self.height(), self.width(), i,
+    /// j)`.
+    fn standard_basis_index(&self) -> Option<(u64, u64)>;
+
     /// Sets every element of a matrix to zero, keeping its height and width.
     fn set_zero(&mut self);
 

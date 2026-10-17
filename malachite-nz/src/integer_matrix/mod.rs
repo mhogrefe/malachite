@@ -13,6 +13,7 @@ use alloc::vec::Vec;
 use core::fmt::{Formatter, Result};
 use core::mem::{swap, take};
 use malachite_base::matrix::Matrix;
+use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -673,6 +674,98 @@ impl Matrix for IntegerMatrix {
     #[inline]
     fn is_zero(&self) -> bool {
         self.elements.iter().all(|x| *x == 0u32)
+    }
+
+    /// Determines whether an [`IntegerMatrix`] is an identity matrix: a square matrix whose
+    /// diagonal elements are 1 and whose other elements are 0. This includes the 0-by-0 matrix.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert!(
+    ///     IntegerMatrix::from_str("[1, 0; 0, 1]")
+    ///         .unwrap()
+    ///         .is_identity()
+    /// );
+    /// assert!(IntegerMatrix::from_str("[]_{0,0}").unwrap().is_identity());
+    /// assert!(
+    ///     !IntegerMatrix::from_str("[1, 0; 1, 1]")
+    ///         .unwrap()
+    ///         .is_identity()
+    /// );
+    /// assert!(!IntegerMatrix::from_str("[1, 0]").unwrap().is_identity());
+    /// ```
+    fn is_identity(&self) -> bool {
+        // The diagonal elements are `width + 1` apart, starting from the first.
+        self.height == self.width
+            && self.elements.iter().enumerate().all(|(k, x)| {
+                if k.divisible_by(self.width + 1) {
+                    *x == 1u32
+                } else {
+                    *x == 0u32
+                }
+            })
+    }
+
+    /// Determines whether an [`IntegerMatrix`] is a standard basis matrix, returning the row and
+    /// column of its 1 if it is.
+    ///
+    /// A standard basis matrix has a single element equal to 1 and every other element 0. Returns
+    /// `None` for every other matrix, including the zero matrices and the matrices with no
+    /// elements.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert_eq!(
+    ///     IntegerMatrix::from_str("[0, 0, 0; 1, 0, 0]")
+    ///         .unwrap()
+    ///         .standard_basis_index(),
+    ///     Some((1, 0))
+    /// );
+    /// assert_eq!(
+    ///     IntegerMatrix::from_str("[0, 2; 0, 0]")
+    ///         .unwrap()
+    ///         .standard_basis_index(),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     IntegerMatrix::from_str("[1, 0; 0, 1]")
+    ///         .unwrap()
+    ///         .standard_basis_index(),
+    ///     None
+    /// );
+    /// ```
+    fn standard_basis_index(&self) -> Option<(u64, u64)> {
+        let k = self.elements.iter().position(|x| *x != 0u32)?;
+        if self.elements[k] == 1u32 && self.elements[k + 1..].iter().all(|x| *x == 0u32) {
+            Some((
+                u64::exact_from(k / self.width),
+                u64::exact_from(k % self.width),
+            ))
+        } else {
+            None
+        }
     }
 
     /// Sets every element of an [`IntegerMatrix`] to zero, keeping its height and width.

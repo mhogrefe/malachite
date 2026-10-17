@@ -42,6 +42,12 @@ fn identity_properties() {
         assert!(m.is_square());
         assert_eq!(m.height(), size);
         assert_eq!(m.is_zero(), size == 0);
+        assert!(m.is_identity());
+        // Only the 1-by-1 identity matrix is a standard basis matrix.
+        assert_eq!(
+            m.standard_basis_index(),
+            if size == 1 { Some((0, 0)) } else { None }
+        );
         assert_eq!(m.transpose(), m);
         // The rows and columns are the standard basis vectors, in order.
         for i in 0..size {

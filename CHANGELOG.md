@@ -13,8 +13,9 @@ documented by git history.
 - The `Matrix` trait (`malachite_base::matrix`), for what every matrix type has in common, as
   `Vector` is for vectors: `from_elements`, `from_owned_elements` and their column-major forms,
   `zero`, `identity`, `standard_basis_matrix` (the matrix units $E_{ij}$), `to_elements`,
-  `into_elements`, `elements_ref`, `height`, `width`, `is_square`, `is_zero`, `set_zero`,
-  `transpose`, and `transpose_assign`. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`,
+  `into_elements`, `elements_ref`, `height`, `width`, `is_square`, `is_zero`, `is_identity`,
+  `standard_basis_index` (the row and column of a standard basis matrix's 1, or `None`),
+  `set_zero`, `transpose`, and `transpose_assign`. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`,
   `IntegerMatrix`, and `RationalMatrix`. Heights, widths, and indices are `u64`s throughout the
   matrix API, as they are for vectors; only `Index`/`IndexMut` take `usize`s.
 - `UnsignedMatrix<T>`, a matrix of primitive unsigned integers with the same layout and interface

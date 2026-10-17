@@ -386,6 +386,7 @@ pub mod integer_matrix {
         pub mod exhaustive_integer_matrices;
     }
     pub mod identity;
+    pub mod is_identity;
     pub mod is_square;
     pub mod is_zero;
     pub mod random {
@@ -405,6 +406,7 @@ pub mod integer_matrix {
     pub mod set_column;
     pub mod set_row;
     pub mod set_zero;
+    pub mod standard_basis_index;
     pub mod standard_basis_matrix;
     pub mod transpose;
     pub mod zero;
@@ -1048,6 +1050,7 @@ pub mod natural_matrix {
         pub mod exhaustive_natural_matrices;
     }
     pub mod identity;
+    pub mod is_identity;
     pub mod is_square;
     pub mod is_zero;
     pub mod random {
@@ -1067,6 +1070,7 @@ pub mod natural_matrix {
     pub mod set_column;
     pub mod set_row;
     pub mod set_zero;
+    pub mod standard_basis_index;
     pub mod standard_basis_matrix;
     pub mod transpose;
     pub mod zero;
