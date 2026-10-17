@@ -1262,6 +1262,16 @@ pub fn unsigned_matrix_size_bucketer<T: PrimitiveUnsigned>(
     }
 }
 
+pub fn pair_unsigned_matrix_max_size_bucketer<'a, T: PrimitiveUnsigned>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (UnsignedMatrix<T>, UnsignedMatrix<T>)> {
+    Bucketer {
+        bucketing_function: &|(m, n)| max(m.elements.len(), n.elements.len()),
+        bucketing_label: format!("max({x_name}.elements.len(), {y_name}.elements.len())"),
+    }
+}
+
 pub fn pair_1_unsigned_matrix_size_bucketer<T: PrimitiveUnsigned, U>(
     var_name: &str,
 ) -> Bucketer<'_, (UnsignedMatrix<T>, U)> {

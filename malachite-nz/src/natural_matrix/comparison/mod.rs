@@ -43,3 +43,9 @@
 /// );
 /// ```
 pub mod partial_eq_unsigned_matrix;
+
+/// Implementations of [`Ord`] and [`PartialOrd`] for
+/// [`ShortlexNaturalMatrix`](super::ShortlexNaturalMatrix) and
+/// [`ShortlexNaturalMatrixRef`](super::ShortlexNaturalMatrixRef), comparing two matrices by number
+/// of elements, then height, then width, and then lexicographically.
+pub mod shortlex_cmp;

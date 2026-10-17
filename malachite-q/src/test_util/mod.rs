@@ -12,5 +12,6 @@ pub mod extra_variadic;
 pub mod gaussian_rational;
 pub mod generators;
 pub mod rational;
+pub mod rational_matrix;
 pub mod rational_polynomial;
 pub mod rational_vector;

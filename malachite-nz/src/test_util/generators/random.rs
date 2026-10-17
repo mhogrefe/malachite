@@ -6984,6 +6984,18 @@ pub fn random_integer_matrix_gen_var_1(config: &GenConfig) -> It<IntegerMatrix> 
     ))
 }
 
+pub fn random_integer_matrix_pair_gen(config: &GenConfig) -> It<(IntegerMatrix, IntegerMatrix)> {
+    Box::new(random_pairs_from_single(random_integer_matrix_gen(config)))
+}
+
+pub fn random_integer_matrix_triple_gen(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, IntegerMatrix, IntegerMatrix)> {
+    Box::new(random_triples_from_single(random_integer_matrix_gen(
+        config,
+    )))
+}
+
 pub fn random_integer_matrix_unsigned_unsigned_triple_gen(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, u64, u64)> {
@@ -7477,6 +7489,18 @@ pub fn random_natural_matrix_gen_var_1(config: &GenConfig) -> It<NaturalMatrix> 
         config.get_or("mean_size_n", 4),
         config.get_or("mean_size_d", 1),
     ))
+}
+
+pub fn random_natural_matrix_pair_gen(config: &GenConfig) -> It<(NaturalMatrix, NaturalMatrix)> {
+    Box::new(random_pairs_from_single(random_natural_matrix_gen(config)))
+}
+
+pub fn random_natural_matrix_triple_gen(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix)> {
+    Box::new(random_triples_from_single(random_natural_matrix_gen(
+        config,
+    )))
 }
 
 pub fn random_natural_matrix_unsigned_unsigned_triple_gen(

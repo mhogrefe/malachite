@@ -12,6 +12,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::{Formatter, Result};
 use core::mem::{swap, take};
+use core::ops::Deref;
 use malachite_base::matrix::Matrix;
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
@@ -1082,6 +1083,98 @@ impl Matrix for RationalMatrix {
 
 // Implements `Named` for `RationalMatrix`.
 impl_named!(RationalMatrix);
+
+/// `ShortlexRationalMatrix` is a wrapper around a [`RationalMatrix`], taking the [`RationalMatrix`]
+/// by value.
+///
+/// [`RationalMatrix`] does not implement [`Ord`], because no order on matrices is canonical.
+/// Wrapping a [`RationalMatrix`] in a `ShortlexRationalMatrix` provides one total order, a shortlex
+/// order: matrices are compared first by their number of elements, then by height, then by width,
+/// and then, in case of a tie, lexicographically, by their elements in row-major order. Its
+/// equality agrees with [`RationalMatrix`] equality.
+///
+/// The number of elements plays the part that the dimension plays in the shortlex order of vectors:
+/// every matrix with fewer elements comes before every matrix with more, so that $[5] < [0, 0]$,
+/// and there are only finitely many shapes with a given number of elements. The width is needed as
+/// well as the height only for the matrices with no elements, such as $[]_{0,2}$ and $[]_{0,5}$,
+/// since otherwise the height and the number of elements determine it. Matrices with one row
+/// compare as their rows do under the shortlex order of vectors. It is not a well-order, since the
+/// [`Rational`](crate::Rational)s are not: $[0] > [-1] > [-2] > \ldots$ descends forever.
+///
+/// `ShortlexRationalMatrix` owns its value. This is useful in many cases, for example if you want
+/// to use [`RationalMatrix`]s as keys in a [`BTreeMap`](alloc::collections::BTreeMap). In other
+/// situations, it is better to use [`ShortlexRationalMatrixRef`], which only has a reference to its
+/// value.
+// Serialized as its inner `RationalMatrix`, since the wrapper adds no data of its own.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub struct ShortlexRationalMatrix(pub RationalMatrix);
+
+/// `ShortlexRationalMatrixRef` is a wrapper around a [`RationalMatrix`], taking the
+/// [`RationalMatrix`] by reference.
+///
+/// See the [`ShortlexRationalMatrix`] documentation for details.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct ShortlexRationalMatrixRef<'a>(pub &'a RationalMatrix);
+
+impl ShortlexRationalMatrix {
+    /// Borrows a [`ShortlexRationalMatrix`] as a [`ShortlexRationalMatrixRef`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_q::rational_matrix::{
+    ///     RationalMatrix, ShortlexRationalMatrix, ShortlexRationalMatrixRef,
+    /// };
+    ///
+    /// let m = RationalMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexRationalMatrix(m.clone());
+    /// assert_eq!(x.as_ref(), ShortlexRationalMatrixRef(&m));
+    /// ```
+    pub const fn as_ref(&self) -> ShortlexRationalMatrixRef<'_> {
+        ShortlexRationalMatrixRef(&self.0)
+    }
+}
+
+impl Deref for ShortlexRationalMatrix {
+    type Target = RationalMatrix;
+
+    /// Allows a [`ShortlexRationalMatrix`] to dereference to a [`RationalMatrix`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_q::rational_matrix::{RationalMatrix, ShortlexRationalMatrix};
+    ///
+    /// let m = RationalMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexRationalMatrix(m.clone());
+    /// assert_eq!(*x, m);
+    /// ```
+    fn deref(&self) -> &RationalMatrix {
+        &self.0
+    }
+}
+
+impl Deref for ShortlexRationalMatrixRef<'_> {
+    type Target = RationalMatrix;
+
+    /// Allows a [`ShortlexRationalMatrixRef`] to dereference to a [`RationalMatrix`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_q::rational_matrix::{RationalMatrix, ShortlexRationalMatrixRef};
+    ///
+    /// let m = RationalMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexRationalMatrixRef(&m);
+    /// assert_eq!(*x, m);
+    /// ```
+    fn deref(&self) -> &RationalMatrix {
+        self.0
+    }
+}
 
 // Moves the elements of a `height`-by-`width` matrix, given in row-major order, into the row-major
 // order of its transpose.

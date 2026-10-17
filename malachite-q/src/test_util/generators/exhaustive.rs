@@ -1038,6 +1038,19 @@ pub fn exhaustive_rational_matrix_gen_var_1() -> It<RationalMatrix> {
     Box::new(exhaustive_rational_square_matrices())
 }
 
+pub fn exhaustive_rational_matrix_pair_gen() -> It<(RationalMatrix, RationalMatrix)> {
+    Box::new(exhaustive_pairs_from_single(
+        exhaustive_rational_matrix_gen(),
+    ))
+}
+
+pub fn exhaustive_rational_matrix_triple_gen()
+-> It<(RationalMatrix, RationalMatrix, RationalMatrix)> {
+    Box::new(exhaustive_triples_from_single(
+        exhaustive_rational_matrix_gen(),
+    ))
+}
+
 pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen() -> It<(RationalMatrix, u64, u64)> {
     Box::new(
         exhaustive_pairs(

@@ -261,6 +261,29 @@ pub fn integer_matrix_bit_bucketer(var_name: &str) -> Bucketer<'_, IntegerMatrix
     }
 }
 
+pub fn pair_integer_matrix_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (IntegerMatrix, IntegerMatrix)> {
+    Bucketer {
+        bucketing_function: &|(m, n)| {
+            usize::exact_from(max(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+                n.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}'s total element bits, {y_name}'s total element bits)"
+        ),
+    }
+}
+
 pub fn pair_1_natural_matrix_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (NaturalMatrix, T)> {
     Bucketer {
         bucketing_function: &|(m, _)| {
@@ -300,6 +323,29 @@ pub fn natural_matrix_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalMatrix
             )
         },
         bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn pair_natural_matrix_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (NaturalMatrix, NaturalMatrix)> {
+    Bucketer {
+        bucketing_function: &|(m, n)| {
+            usize::exact_from(max(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+                n.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}'s total element bits, {y_name}'s total element bits)"
+        ),
     }
 }
 

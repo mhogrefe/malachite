@@ -176,6 +176,7 @@ pub mod rational_matrix {
         pub mod partial_eq_integer_matrix;
         pub mod partial_eq_natural_matrix;
         pub mod partial_eq_unsigned_matrix;
+        pub mod shortlex_cmp;
     }
     pub mod conversion {
         pub mod from_columns;

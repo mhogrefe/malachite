@@ -904,6 +904,9 @@ pub mod unsigned_matrix {
     pub mod column;
     pub mod column_iter;
     pub mod columns;
+    pub mod comparison {
+        pub mod shortlex_cmp;
+    }
     pub mod conversion {
         pub mod from_columns;
         pub mod from_elements;

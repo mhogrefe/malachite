@@ -12,8 +12,10 @@ pub(crate) fn register(runner: &mut Runner) {
     partial_eq_integer_matrix::register(runner);
     partial_eq_natural_matrix::register(runner);
     partial_eq_unsigned_matrix::register(runner);
+    shortlex_cmp::register(runner);
 }
 
 mod partial_eq_integer_matrix;
 mod partial_eq_natural_matrix;
 mod partial_eq_unsigned_matrix;
+mod shortlex_cmp;

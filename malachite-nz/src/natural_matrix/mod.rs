@@ -12,6 +12,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::{Formatter, Result};
 use core::mem::{swap, take};
+use core::ops::Deref;
 use malachite_base::matrix::Matrix;
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
@@ -1072,6 +1073,98 @@ impl Matrix for NaturalMatrix {
 
 // Implements `Named` for `NaturalMatrix`.
 impl_named!(NaturalMatrix);
+
+/// `ShortlexNaturalMatrix` is a wrapper around a [`NaturalMatrix`], taking the [`NaturalMatrix`] by
+/// value.
+///
+/// [`NaturalMatrix`] does not implement [`Ord`], because no order on matrices is canonical.
+/// Wrapping a [`NaturalMatrix`] in a `ShortlexNaturalMatrix` provides one total order, a shortlex
+/// order: matrices are compared first by their number of elements, then by height, then by width,
+/// and then, in case of a tie, lexicographically, by their elements in row-major order. Its
+/// equality agrees with [`NaturalMatrix`] equality.
+///
+/// The number of elements plays the part that the dimension plays in the shortlex order of vectors:
+/// every matrix with fewer elements comes before every matrix with more, so that $[5] < [0, 0]$,
+/// and there are only finitely many shapes with a given number of elements. The width is needed as
+/// well as the height only for the matrices with no elements, such as $[]_{0,2}$ and $[]_{0,5}$,
+/// since otherwise the height and the number of elements determine it. Matrices with one row
+/// compare as their rows do under the shortlex order of vectors. It is a well-order: any nonempty
+/// set of matrices has a least element.
+///
+/// `ShortlexNaturalMatrix` owns its value. This is useful in many cases, for example if you want to
+/// use [`NaturalMatrix`]s as keys in a [`BTreeMap`](alloc::collections::BTreeMap). In other
+/// situations, it is better to use [`ShortlexNaturalMatrixRef`], which only has a reference to its
+/// value.
+// Serialized as its inner `NaturalMatrix`, since the wrapper adds no data of its own.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub struct ShortlexNaturalMatrix(pub NaturalMatrix);
+
+/// `ShortlexNaturalMatrixRef` is a wrapper around a [`NaturalMatrix`], taking the [`NaturalMatrix`]
+/// by reference.
+///
+/// See the [`ShortlexNaturalMatrix`] documentation for details.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct ShortlexNaturalMatrixRef<'a>(pub &'a NaturalMatrix);
+
+impl ShortlexNaturalMatrix {
+    /// Borrows a [`ShortlexNaturalMatrix`] as a [`ShortlexNaturalMatrixRef`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::natural_matrix::{
+    ///     NaturalMatrix, ShortlexNaturalMatrix, ShortlexNaturalMatrixRef,
+    /// };
+    ///
+    /// let m = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexNaturalMatrix(m.clone());
+    /// assert_eq!(x.as_ref(), ShortlexNaturalMatrixRef(&m));
+    /// ```
+    pub const fn as_ref(&self) -> ShortlexNaturalMatrixRef<'_> {
+        ShortlexNaturalMatrixRef(&self.0)
+    }
+}
+
+impl Deref for ShortlexNaturalMatrix {
+    type Target = NaturalMatrix;
+
+    /// Allows a [`ShortlexNaturalMatrix`] to dereference to a [`NaturalMatrix`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::natural_matrix::{NaturalMatrix, ShortlexNaturalMatrix};
+    ///
+    /// let m = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexNaturalMatrix(m.clone());
+    /// assert_eq!(*x, m);
+    /// ```
+    fn deref(&self) -> &NaturalMatrix {
+        &self.0
+    }
+}
+
+impl Deref for ShortlexNaturalMatrixRef<'_> {
+    type Target = NaturalMatrix;
+
+    /// Allows a [`ShortlexNaturalMatrixRef`] to dereference to a [`NaturalMatrix`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::natural_matrix::{NaturalMatrix, ShortlexNaturalMatrixRef};
+    ///
+    /// let m = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexNaturalMatrixRef(&m);
+    /// assert_eq!(*x, m);
+    /// ```
+    fn deref(&self) -> &NaturalMatrix {
+        self.0
+    }
+}
 
 // Moves the elements of a `height`-by-`width` matrix, given in row-major order, into the row-major
 // order of its transpose.

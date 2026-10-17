@@ -2572,6 +2572,22 @@ pub fn special_random_rational_matrix_gen_var_1(config: &GenConfig) -> It<Ration
     ))
 }
 
+pub fn special_random_rational_matrix_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalMatrix)> {
+    Box::new(random_pairs_from_single(
+        special_random_rational_matrix_gen(config),
+    ))
+}
+
+pub fn special_random_rational_matrix_triple_gen(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalMatrix, RationalMatrix)> {
+    Box::new(random_triples_from_single(
+        special_random_rational_matrix_gen(config),
+    ))
+}
+
 pub fn special_random_rational_matrix_unsigned_unsigned_triple_gen(
     config: &GenConfig,
 ) -> It<(RationalMatrix, u64, u64)> {

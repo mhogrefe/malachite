@@ -22,6 +22,11 @@ documented by git history.
   matrix API, as they are for vectors; only `Index`/`IndexMut` take `usize`s.
 - `Named` for every matrix type (`UnsignedMatrix<T>` for each primitive unsigned `T`, with the
   element type spelled out, as for `UnsignedVector<T>`).
+- `ShortlexUnsignedMatrix<T>` and `ShortlexUnsignedMatrixRef` (and, in malachite-nz and malachite-q,
+  `ShortlexNaturalMatrix`, `ShortlexIntegerMatrix`, `ShortlexRationalMatrix` and their `Ref`
+  forms), wrappers giving matrices a total order for ordered collections: by number of elements,
+  then height, then width, then lexicographically by the elements in row-major order. One-row
+  matrices compare as their rows do under the vector shortlex order.
 - `UnsignedMatrix<T>`, a matrix of primitive unsigned integers with the same layout and interface
   as malachite-nz's `IntegerMatrix`: the element and row/column constructors, `height`, `width`,
   `transpose`, `transpose_assign`, `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`,

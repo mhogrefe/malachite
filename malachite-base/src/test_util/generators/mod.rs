@@ -5333,6 +5333,26 @@ pub fn unsigned_matrix_gen_var_1() -> Generator<UnsignedMatrix<u64>> {
     )
 }
 
+pub fn unsigned_matrix_pair_gen() -> Generator<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_pair_gen,
+        &random_unsigned_matrix_pair_gen,
+        &special_random_unsigned_matrix_pair_gen,
+    )
+}
+
+pub fn unsigned_matrix_triple_gen() -> Generator<(
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_triple_gen,
+        &random_unsigned_matrix_triple_gen,
+        &special_random_unsigned_matrix_triple_gen,
+    )
+}
+
 // All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
 pub fn unsigned_matrix_unsigned_unsigned_triple_gen() -> Generator<(UnsignedMatrix<u64>, u64, u64)>
 {

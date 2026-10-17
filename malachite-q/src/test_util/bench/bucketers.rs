@@ -765,6 +765,29 @@ pub fn rational_matrix_bit_bucketer(var_name: &str) -> Bucketer<'_, RationalMatr
     }
 }
 
+pub fn pair_rational_matrix_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (RationalMatrix, RationalMatrix)> {
+    Bucketer {
+        bucketing_function: &|(m, n)| {
+            usize::exact_from(max(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+                n.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}'s total element bits, {y_name}'s total element bits)"
+        ),
+    }
+}
+
 pub fn triple_1_rational_matrix_bit_bucketer<T, U>(
     var_name: &str,
 ) -> Bucketer<'_, (RationalMatrix, T, U)> {

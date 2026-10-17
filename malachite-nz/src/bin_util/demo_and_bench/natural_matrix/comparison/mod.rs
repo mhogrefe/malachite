@@ -10,6 +10,8 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     partial_eq_unsigned_matrix::register(runner);
+    shortlex_cmp::register(runner);
 }
 
 mod partial_eq_unsigned_matrix;
+mod shortlex_cmp;

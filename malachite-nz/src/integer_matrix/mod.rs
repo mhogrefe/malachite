@@ -12,6 +12,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::{Formatter, Result};
 use core::mem::{swap, take};
+use core::ops::Deref;
 use malachite_base::matrix::Matrix;
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
@@ -1075,6 +1076,98 @@ impl Matrix for IntegerMatrix {
 
 // Implements `Named` for `IntegerMatrix`.
 impl_named!(IntegerMatrix);
+
+/// `ShortlexIntegerMatrix` is a wrapper around an [`IntegerMatrix`], taking the [`IntegerMatrix`]
+/// by value.
+///
+/// [`IntegerMatrix`] does not implement [`Ord`], because no order on matrices is canonical.
+/// Wrapping an [`IntegerMatrix`] in a `ShortlexIntegerMatrix` provides one total order, a shortlex
+/// order: matrices are compared first by their number of elements, then by height, then by width,
+/// and then, in case of a tie, lexicographically, by their elements in row-major order. Its
+/// equality agrees with [`IntegerMatrix`] equality.
+///
+/// The number of elements plays the part that the dimension plays in the shortlex order of vectors:
+/// every matrix with fewer elements comes before every matrix with more, so that $[5] < [0, 0]$,
+/// and there are only finitely many shapes with a given number of elements. The width is needed as
+/// well as the height only for the matrices with no elements, such as $[]_{0,2}$ and $[]_{0,5}$,
+/// since otherwise the height and the number of elements determine it. Matrices with one row
+/// compare as their rows do under the shortlex order of vectors. It is not a well-order, since the
+/// [`Integer`](crate::integer::Integer)s are not: $[0] > [-1] > [-2] > \ldots$ descends forever.
+///
+/// `ShortlexIntegerMatrix` owns its value. This is useful in many cases, for example if you want to
+/// use [`IntegerMatrix`]s as keys in a [`BTreeMap`](alloc::collections::BTreeMap). In other
+/// situations, it is better to use [`ShortlexIntegerMatrixRef`], which only has a reference to its
+/// value.
+// Serialized as its inner `IntegerMatrix`, since the wrapper adds no data of its own.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub struct ShortlexIntegerMatrix(pub IntegerMatrix);
+
+/// `ShortlexIntegerMatrixRef` is a wrapper around an [`IntegerMatrix`], taking the
+/// [`IntegerMatrix`] by reference.
+///
+/// See the [`ShortlexIntegerMatrix`] documentation for details.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct ShortlexIntegerMatrixRef<'a>(pub &'a IntegerMatrix);
+
+impl ShortlexIntegerMatrix {
+    /// Borrows a [`ShortlexIntegerMatrix`] as a [`ShortlexIntegerMatrixRef`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_matrix::{
+    ///     IntegerMatrix, ShortlexIntegerMatrix, ShortlexIntegerMatrixRef,
+    /// };
+    ///
+    /// let m = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexIntegerMatrix(m.clone());
+    /// assert_eq!(x.as_ref(), ShortlexIntegerMatrixRef(&m));
+    /// ```
+    pub const fn as_ref(&self) -> ShortlexIntegerMatrixRef<'_> {
+        ShortlexIntegerMatrixRef(&self.0)
+    }
+}
+
+impl Deref for ShortlexIntegerMatrix {
+    type Target = IntegerMatrix;
+
+    /// Allows a [`ShortlexIntegerMatrix`] to dereference to an [`IntegerMatrix`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_matrix::{IntegerMatrix, ShortlexIntegerMatrix};
+    ///
+    /// let m = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexIntegerMatrix(m.clone());
+    /// assert_eq!(*x, m);
+    /// ```
+    fn deref(&self) -> &IntegerMatrix {
+        &self.0
+    }
+}
+
+impl Deref for ShortlexIntegerMatrixRef<'_> {
+    type Target = IntegerMatrix;
+
+    /// Allows a [`ShortlexIntegerMatrixRef`] to dereference to an [`IntegerMatrix`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_matrix::{IntegerMatrix, ShortlexIntegerMatrixRef};
+    ///
+    /// let m = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexIntegerMatrixRef(&m);
+    /// assert_eq!(*x, m);
+    /// ```
+    fn deref(&self) -> &IntegerMatrix {
+        self.0
+    }
+}
 
 // Moves the elements of a `height`-by-`width` matrix, given in row-major order, into the row-major
 // order of its transpose.

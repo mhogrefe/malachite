@@ -16,6 +16,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::{Formatter, Result};
 use core::mem::swap;
+use core::ops::Deref;
 
 /// A matrix whose elements are primitive unsigned integers.
 ///
@@ -1096,6 +1097,98 @@ impl_named_unsigned_matrix!(u64, "UnsignedMatrix<u64>");
 impl_named_unsigned_matrix!(u128, "UnsignedMatrix<u128>");
 impl_named_unsigned_matrix!(usize, "UnsignedMatrix<usize>");
 
+/// `ShortlexUnsignedMatrix` is a wrapper around an [`UnsignedMatrix`], taking the
+/// [`UnsignedMatrix`] by value.
+///
+/// [`UnsignedMatrix`] does not implement [`Ord`], because no order on matrices is canonical.
+/// Wrapping an [`UnsignedMatrix`] in a `ShortlexUnsignedMatrix` provides one total order, a
+/// shortlex order: matrices are compared first by their number of elements, then by height, then by
+/// width, and then, in case of a tie, lexicographically, by their elements in row-major order. Its
+/// equality agrees with [`UnsignedMatrix`] equality.
+///
+/// The number of elements plays the part that the dimension plays in the shortlex order of vectors:
+/// every matrix with fewer elements comes before every matrix with more, so that $[5] < [0, 0]$,
+/// and there are only finitely many shapes with a given number of elements. The width is needed as
+/// well as the height only for the matrices with no elements, such as $[]_{0,2}$ and $[]_{0,5}$,
+/// since otherwise the height and the number of elements determine it. Matrices with one row
+/// compare as their rows do under the shortlex order of vectors. It is a well-order: any nonempty
+/// set of matrices has a least element.
+///
+/// `ShortlexUnsignedMatrix` owns its value. This is useful in many cases, for example if you want
+/// to use [`UnsignedMatrix`]s as keys in a [`BTreeMap`](alloc::collections::BTreeMap). In other
+/// situations, it is better to use [`ShortlexUnsignedMatrixRef`], which only has a reference to its
+/// value.
+// Serialized as its inner `UnsignedMatrix`, since the wrapper adds no data of its own.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub struct ShortlexUnsignedMatrix<T: PrimitiveUnsigned>(pub UnsignedMatrix<T>);
+
+/// `ShortlexUnsignedMatrixRef` is a wrapper around an [`UnsignedMatrix`], taking the
+/// [`UnsignedMatrix`] by reference.
+///
+/// See the [`ShortlexUnsignedMatrix`] documentation for details.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct ShortlexUnsignedMatrixRef<'a, T: PrimitiveUnsigned>(pub &'a UnsignedMatrix<T>);
+
+impl<T: PrimitiveUnsigned> ShortlexUnsignedMatrix<T> {
+    /// Borrows a [`ShortlexUnsignedMatrix`] as a [`ShortlexUnsignedMatrixRef`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_matrix::{
+    ///     ShortlexUnsignedMatrix, ShortlexUnsignedMatrixRef, UnsignedMatrix,
+    /// };
+    ///
+    /// let m = UnsignedMatrix::<u64>::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexUnsignedMatrix(m.clone());
+    /// assert_eq!(x.as_ref(), ShortlexUnsignedMatrixRef(&m));
+    /// ```
+    pub const fn as_ref(&self) -> ShortlexUnsignedMatrixRef<'_, T> {
+        ShortlexUnsignedMatrixRef(&self.0)
+    }
+}
+
+impl<T: PrimitiveUnsigned> Deref for ShortlexUnsignedMatrix<T> {
+    type Target = UnsignedMatrix<T>;
+
+    /// Allows a [`ShortlexUnsignedMatrix`] to dereference to an [`UnsignedMatrix`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_matrix::{ShortlexUnsignedMatrix, UnsignedMatrix};
+    ///
+    /// let m = UnsignedMatrix::<u64>::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexUnsignedMatrix(m.clone());
+    /// assert_eq!(*x, m);
+    /// ```
+    fn deref(&self) -> &UnsignedMatrix<T> {
+        &self.0
+    }
+}
+
+impl<T: PrimitiveUnsigned> Deref for ShortlexUnsignedMatrixRef<'_, T> {
+    type Target = UnsignedMatrix<T>;
+
+    /// Allows a [`ShortlexUnsignedMatrixRef`] to dereference to an [`UnsignedMatrix`].
+    ///
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_matrix::{ShortlexUnsignedMatrixRef, UnsignedMatrix};
+    ///
+    /// let m = UnsignedMatrix::<u64>::from_str("[1, 2; 3, 4]").unwrap();
+    /// let x = ShortlexUnsignedMatrixRef(&m);
+    /// assert_eq!(*x, m);
+    /// ```
+    fn deref(&self) -> &UnsignedMatrix<T> {
+        self.0
+    }
+}
+
 // Copies the elements of a `height`-by-`width` matrix, given in row-major order, into the row-major
 // order of its transpose.
 pub(crate) fn transposed_elements<T: PrimitiveUnsigned>(
@@ -1157,6 +1250,10 @@ pub mod column;
 pub mod column_iter;
 /// Iterators over the columns of an [`UnsignedMatrix`].
 pub mod columns;
+/// Implementations of [`Ord`] and [`PartialOrd`] for [`ShortlexUnsignedMatrix`] and
+/// [`ShortlexUnsignedMatrixRef`], comparing two matrices by number of elements, then height, then
+/// width, and then lexicographically.
+pub mod comparison;
 /// Conversions to and from [`UnsignedMatrix`].
 pub mod conversion;
 /// Iterators that generate [`UnsignedMatrix`]s without repetition.

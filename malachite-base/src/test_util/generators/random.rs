@@ -9250,6 +9250,24 @@ pub fn random_unsigned_matrix_gen_var_1(config: &GenConfig) -> It<UnsignedMatrix
     ))
 }
 
+pub fn random_unsigned_matrix_pair_gen(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+    Box::new(random_pairs_from_single(random_unsigned_matrix_gen(config)))
+}
+
+pub fn random_unsigned_matrix_triple_gen(
+    config: &GenConfig,
+) -> It<(
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+)> {
+    Box::new(random_triples_from_single(random_unsigned_matrix_gen(
+        config,
+    )))
+}
+
 pub fn random_unsigned_matrix_unsigned_unsigned_triple_gen(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64, u64)> {
