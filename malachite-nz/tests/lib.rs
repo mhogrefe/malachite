@@ -356,6 +356,7 @@ pub mod integer_matrix {
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod neg;
+        pub mod scalar_mul;
         pub mod sub;
     }
     pub mod basic {
@@ -1041,6 +1042,7 @@ pub mod natural_matrix {
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_sub;
         pub mod mod_sub;
+        pub mod scalar_mul;
     }
     pub mod basic {
         pub mod named;

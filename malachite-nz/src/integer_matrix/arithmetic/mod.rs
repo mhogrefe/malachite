@@ -35,6 +35,9 @@ pub mod mod_power_of_2;
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;
 
+/// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
+/// multiplying an [`IntegerMatrix`](super::IntegerMatrix) by a scalar on either side.
+pub mod scalar_mul;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;

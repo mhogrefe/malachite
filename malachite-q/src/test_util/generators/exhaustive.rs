@@ -1045,6 +1045,13 @@ pub fn exhaustive_rational_matrix_pair_gen() -> It<(RationalMatrix, RationalMatr
     ))
 }
 
+pub fn exhaustive_rational_matrix_rational_pair_gen() -> It<(RationalMatrix, Rational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rational_matrices(),
+        exhaustive_rationals(),
+    ))
+}
+
 pub fn exhaustive_rational_matrix_triple_gen()
 -> It<(RationalMatrix, RationalMatrix, RationalMatrix)> {
     Box::new(exhaustive_triples_from_single(

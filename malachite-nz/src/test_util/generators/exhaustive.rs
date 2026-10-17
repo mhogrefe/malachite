@@ -3615,6 +3615,13 @@ pub fn exhaustive_integer_matrix_pair_gen() -> It<(IntegerMatrix, IntegerMatrix)
     Box::new(exhaustive_pairs_from_single(exhaustive_integer_matrix_gen()))
 }
 
+pub fn exhaustive_integer_matrix_integer_pair_gen() -> It<(IntegerMatrix, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_matrices(),
+        exhaustive_integers(),
+    ))
+}
+
 pub fn exhaustive_integer_matrix_triple_gen() -> It<(IntegerMatrix, IntegerMatrix, IntegerMatrix)> {
     Box::new(exhaustive_triples_from_single(
         exhaustive_integer_matrix_gen(),
@@ -4029,6 +4036,13 @@ pub fn exhaustive_natural_matrix_gen_var_1() -> It<NaturalMatrix> {
 
 pub fn exhaustive_natural_matrix_pair_gen() -> It<(NaturalMatrix, NaturalMatrix)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_natural_matrix_gen()))
+}
+
+pub fn exhaustive_natural_matrix_natural_pair_gen() -> It<(NaturalMatrix, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_matrices(),
+        exhaustive_naturals(),
+    ))
 }
 
 pub fn exhaustive_natural_matrix_triple_gen() -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix)> {

@@ -13,6 +13,9 @@ pub mod add;
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;
 
+/// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
+/// multiplying a [`RationalMatrix`](super::RationalMatrix) by a scalar on either side.
+pub mod scalar_mul;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;

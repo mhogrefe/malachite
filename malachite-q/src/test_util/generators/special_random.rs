@@ -2580,6 +2580,34 @@ pub fn special_random_rational_matrix_pair_gen(
     ))
 }
 
+pub fn special_random_rational_matrix_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(RationalMatrix, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_rational_matrix_triple_gen(
     config: &GenConfig,
 ) -> It<(RationalMatrix, RationalMatrix, RationalMatrix)> {

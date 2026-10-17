@@ -167,6 +167,9 @@ documented by git history.
 - `Sub` (every by-value/by-reference combination) and `SubAssign` for `IntegerMatrix` (and, in
   malachite-q, `RationalMatrix`), subtracting element by element; matrices of different shapes
   panic.
+- Scalar multiplication on both sides for `NaturalMatrix` and `IntegerMatrix` (and, in malachite-q,
+  `RationalMatrix`): `Mul` of a matrix by an element and of an element by a matrix, in every
+  by-value/by-reference combination, and `MulAssign` by an element.
 - `IntegerMatrix`, a matrix of `Integer`s stored as a public `Vec` of elements in row-major order
   with private height and width (FLINT's `fmpz_mat_t` layout, without the window stride). It has
   constructors from elements in row-major order (`from_elements`, `from_owned_elements`) or

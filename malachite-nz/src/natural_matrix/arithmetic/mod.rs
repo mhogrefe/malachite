@@ -62,3 +62,7 @@ pub mod mod_power_of_2_sub;
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
 pub mod mod_sub;
+
+/// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
+/// multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a scalar on either side.
+pub mod scalar_mul;

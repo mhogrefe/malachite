@@ -1329,6 +1329,14 @@ pub fn rational_matrix_pair_gen() -> Generator<(RationalMatrix, RationalMatrix)>
     )
 }
 
+pub fn rational_matrix_rational_pair_gen() -> Generator<(RationalMatrix, Rational)> {
+    Generator::new(
+        &exhaustive_rational_matrix_rational_pair_gen,
+        &random_rational_matrix_rational_pair_gen,
+        &special_random_rational_matrix_rational_pair_gen,
+    )
+}
+
 pub fn rational_matrix_triple_gen() -> Generator<(RationalMatrix, RationalMatrix, RationalMatrix)> {
     Generator::new(
         &exhaustive_rational_matrix_triple_gen,

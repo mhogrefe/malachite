@@ -7935,6 +7935,34 @@ pub fn special_random_integer_matrix_pair_gen(
     )))
 }
 
+pub fn special_random_integer_matrix_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_integer_matrix_triple_gen(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, IntegerMatrix, IntegerMatrix)> {
@@ -8705,6 +8733,34 @@ pub fn special_random_natural_matrix_pair_gen(
     Box::new(random_pairs_from_single(special_random_natural_matrix_gen(
         config,
     )))
+}
+
+pub fn special_random_natural_matrix_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
 }
 
 pub fn special_random_natural_matrix_triple_gen(

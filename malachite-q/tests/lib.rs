@@ -168,6 +168,7 @@ pub mod rational_matrix {
     pub mod arithmetic {
         pub mod add;
         pub mod neg;
+        pub mod scalar_mul;
         pub mod sub;
     }
     pub mod basic {
