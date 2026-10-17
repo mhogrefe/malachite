@@ -166,6 +166,7 @@ pub mod gaussian_rational {
 pub mod rational_matrix {
     pub mod access;
     pub mod arithmetic {
+        pub mod add;
         pub mod neg;
     }
     pub mod basic {

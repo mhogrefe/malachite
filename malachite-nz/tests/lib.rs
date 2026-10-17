@@ -350,6 +350,7 @@ pub mod integer {
 pub mod integer_matrix {
     pub mod access;
     pub mod arithmetic {
+        pub mod add;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
         pub mod mod_op;
@@ -1026,6 +1027,7 @@ pub mod natural_polynomial {
 pub mod natural_matrix {
     pub mod access;
     pub mod arithmetic {
+        pub mod add;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
         pub mod mod_is_reduced;

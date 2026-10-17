@@ -6,6 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
+/// matrices of the same shape.
+pub mod add;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), which
 /// reduce every element of a [`NaturalMatrix`](super::NaturalMatrix) to the representative closest
 /// to zero modulo a number.

@@ -18,7 +18,8 @@ use crate::rational::exhaustive::{
 };
 use crate::rational_matrix::RationalMatrix;
 use crate::rational_matrix::exhaustive::{
-    exhaustive_rational_matrices, exhaustive_rational_square_matrices,
+    exhaustive_rational_matrices, exhaustive_rational_matrices_with_dimensions,
+    exhaustive_rational_square_matrices,
 };
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::exhaustive::{
@@ -1049,6 +1050,40 @@ pub fn exhaustive_rational_matrix_triple_gen()
     Box::new(exhaustive_triples_from_single(
         exhaustive_rational_matrix_gen(),
     ))
+}
+
+// Pairs of matrices of the same shape: every shape, and for each shape every pair of matrices of
+// that shape.
+pub fn exhaustive_rational_matrix_pair_gen_var_1() -> It<(RationalMatrix, RationalMatrix)> {
+    fn ys((height, width): (u64, u64)) -> It<(RationalMatrix, RationalMatrix)> {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_rational_matrices_with_dimensions(height, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// Triples of matrices of the same shape.
+pub fn exhaustive_rational_matrix_triple_gen_var_1()
+-> It<(RationalMatrix, RationalMatrix, RationalMatrix)> {
+    fn ys((height, width): (u64, u64)) -> It<(RationalMatrix, RationalMatrix, RationalMatrix)> {
+        Box::new(exhaustive_triples_from_single(
+            exhaustive_rational_matrices_with_dimensions(height, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, t)| t),
+    )
 }
 
 pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen() -> It<(RationalMatrix, u64, u64)> {

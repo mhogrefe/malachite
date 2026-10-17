@@ -1337,6 +1337,25 @@ pub fn rational_matrix_triple_gen() -> Generator<(RationalMatrix, RationalMatrix
     )
 }
 
+// All pairs of `RationalMatrix`s of the same shape.
+pub fn rational_matrix_pair_gen_var_1() -> Generator<(RationalMatrix, RationalMatrix)> {
+    Generator::new(
+        &exhaustive_rational_matrix_pair_gen_var_1,
+        &random_rational_matrix_pair_gen_var_1,
+        &special_random_rational_matrix_pair_gen_var_1,
+    )
+}
+
+// All triples of `RationalMatrix`s of the same shape.
+pub fn rational_matrix_triple_gen_var_1()
+-> Generator<(RationalMatrix, RationalMatrix, RationalMatrix)> {
+    Generator::new(
+        &exhaustive_rational_matrix_triple_gen_var_1,
+        &random_rational_matrix_triple_gen_var_1,
+        &special_random_rational_matrix_triple_gen_var_1,
+    )
+}
+
 // All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
 pub fn rational_matrix_unsigned_unsigned_triple_gen() -> Generator<(RationalMatrix, u64, u64)> {
     Generator::new(

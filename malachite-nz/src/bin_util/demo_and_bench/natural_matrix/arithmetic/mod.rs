@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    add::register(runner);
     balanced_mod::register(runner);
     balanced_mod_power_of_2::register(runner);
     mod_is_reduced::register(runner);
@@ -19,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_neg::register(runner);
 }
 
+mod add;
 mod balanced_mod;
 mod balanced_mod_power_of_2;
 mod mod_is_reduced;

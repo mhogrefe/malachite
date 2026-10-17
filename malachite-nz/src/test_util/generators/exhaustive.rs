@@ -19,7 +19,8 @@ use crate::integer::exhaustive::{
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer_matrix::IntegerMatrix;
 use crate::integer_matrix::exhaustive::{
-    exhaustive_integer_matrices, exhaustive_integer_square_matrices,
+    exhaustive_integer_matrices, exhaustive_integer_matrices_with_dimensions,
+    exhaustive_integer_square_matrices,
 };
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::exhaustive::{
@@ -86,7 +87,8 @@ use crate::natural::exhaustive::{
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural_matrix::NaturalMatrix;
 use crate::natural_matrix::exhaustive::{
-    exhaustive_natural_matrices, exhaustive_natural_square_matrices,
+    exhaustive_natural_matrices, exhaustive_natural_matrices_with_dimensions,
+    exhaustive_natural_square_matrices,
 };
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::exhaustive::{
@@ -3619,6 +3621,40 @@ pub fn exhaustive_integer_matrix_triple_gen() -> It<(IntegerMatrix, IntegerMatri
     ))
 }
 
+// Pairs of matrices of the same shape: every shape, and for each shape every pair of matrices of
+// that shape.
+pub fn exhaustive_integer_matrix_pair_gen_var_1() -> It<(IntegerMatrix, IntegerMatrix)> {
+    fn ys((height, width): (u64, u64)) -> It<(IntegerMatrix, IntegerMatrix)> {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_integer_matrices_with_dimensions(height, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// Triples of matrices of the same shape.
+pub fn exhaustive_integer_matrix_triple_gen_var_1()
+-> It<(IntegerMatrix, IntegerMatrix, IntegerMatrix)> {
+    fn ys((height, width): (u64, u64)) -> It<(IntegerMatrix, IntegerMatrix, IntegerMatrix)> {
+        Box::new(exhaustive_triples_from_single(
+            exhaustive_integer_matrices_with_dimensions(height, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, t)| t),
+    )
+}
+
 pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen() -> It<(IntegerMatrix, u64, u64)> {
     Box::new(
         exhaustive_pairs(
@@ -3872,6 +3908,40 @@ pub fn exhaustive_natural_matrix_triple_gen() -> It<(NaturalMatrix, NaturalMatri
     Box::new(exhaustive_triples_from_single(
         exhaustive_natural_matrix_gen(),
     ))
+}
+
+// Pairs of matrices of the same shape: every shape, and for each shape every pair of matrices of
+// that shape.
+pub fn exhaustive_natural_matrix_pair_gen_var_1() -> It<(NaturalMatrix, NaturalMatrix)> {
+    fn ys((height, width): (u64, u64)) -> It<(NaturalMatrix, NaturalMatrix)> {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_natural_matrices_with_dimensions(height, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// Triples of matrices of the same shape.
+pub fn exhaustive_natural_matrix_triple_gen_var_1()
+-> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix)> {
+    fn ys((height, width): (u64, u64)) -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix)> {
+        Box::new(exhaustive_triples_from_single(
+            exhaustive_natural_matrices_with_dimensions(height, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, t)| t),
+    )
 }
 
 pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen() -> It<(NaturalMatrix, u64, u64)> {
