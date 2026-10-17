@@ -6,6 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), a trait for
+/// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
+/// a number.
+pub mod mod_is_reduced;
+/// Implementations of [`Rem`](core::ops::Rem), [`RemAssign`](core::ops::RemAssign),
+/// [`Mod`](crate::num::arithmetic::traits::Mod), and
+/// [`ModAssign`](crate::num::arithmetic::traits::ModAssign), for reducing every element of an
+/// [`UnsignedMatrix`](super::UnsignedMatrix) modulo a number.
+pub mod mod_op;
 /// Implementations of [`ModPowerOf2`](crate::num::arithmetic::traits::ModPowerOf2) and
 /// [`ModPowerOf2Assign`](crate::num::arithmetic::traits::ModPowerOf2Assign), traits for reducing
 /// every element of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a power of 2.

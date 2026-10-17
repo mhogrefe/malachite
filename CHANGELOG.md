@@ -26,6 +26,9 @@ documented by git history.
   `is_square` for every matrix type.
 - `ModPowerOf2IsReduced`, `ModPowerOf2`, and `ModPowerOf2Assign` for `UnsignedMatrix<T>` (and, in
   malachite-nz, for `NaturalMatrix`), reducing every element modulo $2^k$ and keeping the shape.
+- `ModIsReduced`, `%` (`Rem` and `RemAssign`), `Mod`, and `ModAssign` for `UnsignedMatrix<T>` (and, in
+  malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference, plus `NaturalMatrix
+  % T` giving an `UnsignedMatrix<T>`), reducing every element and keeping the shape.
 - `exhaustive_unsigned_vectors_from_iterator` and
   `exhaustive_unsigned_vectors_with_dimension_from_iterator`, which take any cloneable element
   iterator (malachite-nz and malachite-q gain the same for `NaturalVector`, `IntegerVector`, and

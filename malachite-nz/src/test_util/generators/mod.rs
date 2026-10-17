@@ -4184,6 +4184,24 @@ pub fn natural_matrix_unsigned_pair_gen() -> Generator<(NaturalMatrix, u64)> {
     )
 }
 
+pub fn natural_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(NaturalMatrix, T)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_pair_gen_var_1,
+        &random_natural_matrix_unsigned_pair_gen_var_1,
+        &special_random_natural_matrix_unsigned_pair_gen_var_1,
+    )
+}
+
+// The `Natural` is positive.
+pub fn natural_matrix_natural_pair_gen_var_1() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_1,
+        &random_natural_matrix_natural_pair_gen_var_1,
+        &special_random_natural_matrix_natural_pair_gen_var_1,
+    )
+}
+
 pub fn natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()
 -> Generator<(NaturalMatrix, UnsignedMatrix<T>)> {
     Generator::new(

@@ -6853,6 +6853,13 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen() -> It<(UnsignedMatrix<u64>
     ))
 }
 
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_1() -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigned_matrices(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
 pub fn exhaustive_unsigned_matrix_gen_var_1() -> It<UnsignedMatrix<u64>> {
     Box::new(exhaustive_unsigned_square_matrices())
 }

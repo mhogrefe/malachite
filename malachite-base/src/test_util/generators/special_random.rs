@@ -10927,6 +10927,30 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen(
     ))
 }
 
+pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigned_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_unsigned_matrix_gen_var_1(config: &GenConfig) -> It<UnsignedMatrix<u64>> {
     Box::new(striped_random_unsigned_square_matrices(
         EXAMPLE_SEED,

@@ -6,6 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced), a
+/// trait for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
+/// modulo a number.
+pub mod mod_is_reduced;
+/// Implementations of [`Rem`](core::ops::Rem), [`RemAssign`](core::ops::RemAssign),
+/// [`Mod`](malachite_base::num::arithmetic::traits::Mod), and
+/// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), for reducing every element of
+/// a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
+pub mod mod_op;
 /// Implementations of [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2) and
 /// [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign), traits for
 /// reducing every element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a power of 2.

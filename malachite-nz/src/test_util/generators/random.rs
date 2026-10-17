@@ -7249,6 +7249,48 @@ pub fn random_natural_matrix_unsigned_pair_gen(config: &GenConfig) -> It<(Natura
     ))
 }
 
+pub fn random_natural_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+pub fn random_natural_matrix_natural_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_matrices(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            random_positive_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, UnsignedMatrix<T>)> {
