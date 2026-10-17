@@ -9306,6 +9306,44 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_3(
     )
 }
 
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_matrices(
+                    seed,
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, u64::WIDTH),
+        )
+        .map(|(m, pow)| (m.mod_power_of_2(pow), pow)),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_matrices(
+                    seed,
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &random_positive_unsigneds::<u64>,
+        )
+        .map(|(a, m)| (a % m, m)),
+    )
+}
+
 pub fn random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {

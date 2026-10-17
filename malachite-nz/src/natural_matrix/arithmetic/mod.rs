@@ -19,6 +19,10 @@ pub mod balanced_mod_power_of_2;
 /// trait for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
 /// modulo a number.
 pub mod mod_is_reduced;
+/// Implementations of [`ModNeg`](malachite_base::num::arithmetic::traits::ModNeg) and
+/// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), for negating every
+/// element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
+pub mod mod_neg;
 /// Implementations of [`Rem`](core::ops::Rem), [`RemAssign`](core::ops::RemAssign),
 /// [`Mod`](malachite_base::num::arithmetic::traits::Mod), and
 /// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), for reducing every element of
@@ -33,3 +37,7 @@ pub mod mod_power_of_2;
 /// for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
 /// modulo a power of 2.
 pub mod mod_power_of_2_is_reduced;
+/// Implementations of [`ModPowerOf2Neg`](malachite_base::num::arithmetic::traits::ModPowerOf2Neg)
+/// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign), for
+/// negating every element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a power of 2.
+pub mod mod_power_of_2_neg;

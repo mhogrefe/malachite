@@ -8395,6 +8395,40 @@ pub fn special_random_natural_matrix_natural_pair_gen_var_1(
     ))
 }
 
+pub fn special_random_natural_matrix_natural_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, m)| {
+            let m = a.elements.iter().max().cloned().unwrap_or_default() + m + Natural::ONE;
+            (a, m)
+        }),
+    )
+}
+
 pub fn special_random_integer_matrix_natural_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, Natural)> {
@@ -8570,6 +8604,43 @@ pub fn special_random_natural_matrix_unsigned_pair_gen_var_3(
     Box::new(
         special_random_natural_matrix_gen(config)
             .flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
+pub fn special_random_natural_matrix_unsigned_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(m, pow)| {
+            let bits = m
+                .elements
+                .iter()
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (m, pow + bits)
+        }),
     )
 }
 

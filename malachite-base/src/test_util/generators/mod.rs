@@ -5391,6 +5391,26 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_3() -> Generator<(UnsignedMatrix<u6
     )
 }
 
+// All `(UnsignedMatrix<u64>, u64)` where the `u64` is no greater than 64, and the matrix's elements
+// are less than 2 to the power of the `u64`.
+pub fn unsigned_matrix_unsigned_pair_gen_var_4() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_4,
+        &random_unsigned_matrix_unsigned_pair_gen_var_4,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_4,
+    )
+}
+
+// All `(UnsignedMatrix<u64>, u64)` where the `u64` is positive and the matrix's elements are less
+// than it.
+pub fn unsigned_matrix_unsigned_pair_gen_var_5() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_5,
+        &random_unsigned_matrix_unsigned_pair_gen_var_5,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_5,
+    )
+}
+
 // All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
 pub fn unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1()
 -> Generator<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {

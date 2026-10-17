@@ -4276,6 +4276,15 @@ pub fn natural_matrix_natural_pair_gen_var_1() -> Generator<(NaturalMatrix, Natu
     )
 }
 
+// All `(NaturalMatrix, Natural)` where every element of the matrix is less than the `Natural`.
+pub fn natural_matrix_natural_pair_gen_var_2() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_2,
+        &random_natural_matrix_natural_pair_gen_var_2,
+        &special_random_natural_matrix_natural_pair_gen_var_2,
+    )
+}
+
 // The `Natural` is positive.
 pub fn integer_matrix_natural_pair_gen_var_1() -> Generator<(IntegerMatrix, Natural)> {
     Generator::new(
@@ -4371,6 +4380,16 @@ pub fn natural_matrix_unsigned_pair_gen_var_3() -> Generator<(NaturalMatrix, u64
         &exhaustive_natural_matrix_unsigned_pair_gen_var_3,
         &random_natural_matrix_unsigned_pair_gen_var_3,
         &special_random_natural_matrix_unsigned_pair_gen_var_3,
+    )
+}
+
+// All `(NaturalMatrix, u64)` where every element of the matrix is less than 2 to the power of the
+// `u64`.
+pub fn natural_matrix_unsigned_pair_gen_var_4() -> Generator<(NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_pair_gen_var_4,
+        &random_natural_matrix_unsigned_pair_gen_var_4,
+        &special_random_natural_matrix_unsigned_pair_gen_var_4,
     )
 }
 

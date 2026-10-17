@@ -43,6 +43,11 @@ documented by git history.
   `is_square` for every matrix type.
 - `ModPowerOf2IsReduced`, `ModPowerOf2`, and `ModPowerOf2Assign` for `UnsignedMatrix<T>` (and, in
   malachite-nz, for `NaturalMatrix`), reducing every element modulo $2^k$ and keeping the shape.
+- `ModPowerOf2Neg` and `ModPowerOf2NegAssign` for `UnsignedMatrix<T>` (and, in malachite-nz, for
+  `NaturalMatrix`), negating every element modulo $2^k$; the elements must already be reduced.
+- `ModNeg` and `ModNegAssign` for `UnsignedMatrix<T>` (and, in malachite-nz, for `NaturalMatrix`,
+  with the modulus by value or by reference), negating every element modulo $m$; the elements must
+  already be reduced.
 - `ModIsReduced`, `%` (`Rem` and `RemAssign`), `Mod`, and `ModAssign` for `UnsignedMatrix<T>` (and, in
   malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference, plus `NaturalMatrix
   % T` giving an `UnsignedMatrix<T>`), reducing every element and keeping the shape.

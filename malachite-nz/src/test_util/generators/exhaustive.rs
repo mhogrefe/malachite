@@ -3821,6 +3821,15 @@ pub fn exhaustive_natural_matrix_natural_pair_gen_var_1() -> It<(NaturalMatrix, 
     ))
 }
 
+pub fn exhaustive_natural_matrix_natural_pair_gen_var_2() -> It<(NaturalMatrix, Natural)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_natural_matrices(), exhaustive_naturals()).map(|(a, m)| {
+            let m = a.elements.iter().max().cloned().unwrap_or_default() + m + Natural::ONE;
+            (a, m)
+        }),
+    )
+}
+
 pub fn exhaustive_integer_matrix_natural_pair_gen_var_1() -> It<(IntegerMatrix, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_integer_matrices(),
@@ -3895,6 +3904,21 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_2() -> It<(NaturalMatrix,
 pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_3() -> It<(NaturalMatrix, u64)> {
     Box::new(
         exhaustive_natural_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
+pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_4() -> It<(NaturalMatrix, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(exhaustive_natural_matrices(), exhaustive_unsigneds::<u64>())
+            .map(|(m, pow)| {
+                let bits = m
+                    .elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (m, pow + bits)
+            }),
     )
 }
 
