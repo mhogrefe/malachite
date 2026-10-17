@@ -356,6 +356,7 @@ pub mod integer_matrix {
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod neg;
+        pub mod sub;
     }
     pub mod basic {
         pub mod named;

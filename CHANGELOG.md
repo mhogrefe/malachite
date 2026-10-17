@@ -157,6 +157,9 @@ documented by git history.
 - `Add` (every by-value/by-reference combination) and `AddAssign` for `NaturalMatrix` and
   `IntegerMatrix` (and, in malachite-q, `RationalMatrix`), adding element by element; matrices of
   different shapes panic.
+- `Sub` (every by-value/by-reference combination) and `SubAssign` for `IntegerMatrix` (and, in
+  malachite-q, `RationalMatrix`), subtracting element by element; matrices of different shapes
+  panic.
 - `IntegerMatrix`, a matrix of `Integer`s stored as a public `Vec` of elements in row-major order
   with private height and width (FLINT's `fmpz_mat_t` layout, without the window stride). It has
   constructors from elements in row-major order (`from_elements`, `from_owned_elements`) or
