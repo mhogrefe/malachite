@@ -456,6 +456,9 @@ fn common_dimension<T: PrimitiveUnsigned>(vectors: &[UnsignedVector<T>], what: &
 pub mod access;
 /// Arithmetic on [`UnsignedMatrix`]s.
 pub mod arithmetic;
+/// A function for getting a column of an [`UnsignedMatrix`] as an
+/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector).
+pub mod column;
 /// Iterators over the elements in a column of an [`UnsignedMatrix`].
 pub mod column_iter;
 /// Iterators over the columns of an [`UnsignedMatrix`].
@@ -469,6 +472,9 @@ pub mod is_square;
 /// Iterators that generate [`UnsignedMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
+/// A function for getting a row of an [`UnsignedMatrix`] as an
+/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector).
+pub mod row;
 /// Iterators over the elements in a row of an [`UnsignedMatrix`].
 pub mod row_iter;
 /// Iterators over the rows of an [`UnsignedMatrix`].

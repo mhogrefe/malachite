@@ -479,6 +479,9 @@ fn common_dimension(vectors: &[RationalVector], what: &str) -> usize {
 
 /// Indexing a [`RationalMatrix`] by row and column.
 pub mod access;
+/// A function for getting a column of a [`RationalMatrix`] as a
+/// [`RationalVector`](crate::rational_vector::RationalVector).
+pub mod column;
 /// Iterators over the elements in a column of a [`RationalMatrix`].
 pub mod column_iter;
 /// Iterators over the columns of a [`RationalMatrix`].
@@ -494,6 +497,9 @@ pub mod is_square;
 /// Iterators that generate [`RationalMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
+/// A function for getting a row of a [`RationalMatrix`] as a
+/// [`RationalVector`](crate::rational_vector::RationalVector).
+pub mod row;
 /// Iterators over the elements in a row of a [`RationalMatrix`].
 pub mod row_iter;
 /// Iterators over the rows of a [`RationalMatrix`].

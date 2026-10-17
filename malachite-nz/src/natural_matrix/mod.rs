@@ -477,6 +477,9 @@ fn common_dimension(vectors: &[NaturalVector], what: &str) -> usize {
 pub mod access;
 /// Arithmetic on [`NaturalMatrix`]s.
 pub mod arithmetic;
+/// A function for getting a column of a [`NaturalMatrix`] as a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector).
+pub mod column;
 /// Iterators over the elements in a column of a [`NaturalMatrix`].
 pub mod column_iter;
 /// Iterators over the columns of a [`NaturalMatrix`].
@@ -492,6 +495,9 @@ pub mod is_square;
 /// Iterators that generate [`NaturalMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
+/// A function for getting a row of a [`NaturalMatrix`] as a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector).
+pub mod row;
 /// Iterators over the elements in a row of a [`NaturalMatrix`].
 pub mod row_iter;
 /// Iterators over the rows of a [`NaturalMatrix`].

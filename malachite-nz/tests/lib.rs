@@ -355,6 +355,7 @@ pub mod integer_matrix {
         pub mod mod_op;
         pub mod mod_power_of_2;
     }
+    pub mod column;
     pub mod column_iter;
     pub mod columns;
     pub mod comparison {
@@ -395,6 +396,7 @@ pub mod integer_matrix {
         pub mod striped_random_integer_matrices_with_dimensions;
         pub mod striped_random_integer_square_matrices;
     }
+    pub mod row;
     pub mod row_iter;
     pub mod rows;
     pub mod transpose;
@@ -1010,6 +1012,7 @@ pub mod natural_matrix {
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_is_reduced;
     }
+    pub mod column;
     pub mod column_iter;
     pub mod columns;
     pub mod comparison {
@@ -1047,6 +1050,7 @@ pub mod natural_matrix {
         pub mod striped_random_natural_matrices_with_dimensions;
         pub mod striped_random_natural_square_matrices;
     }
+    pub mod row;
     pub mod row_iter;
     pub mod rows;
     pub mod transpose;

@@ -474,6 +474,9 @@ fn common_dimension(vectors: &[IntegerVector], what: &str) -> usize {
 pub mod access;
 /// Arithmetic on [`IntegerMatrix`]s.
 pub mod arithmetic;
+/// A function for getting a column of an [`IntegerMatrix`] as an
+/// [`IntegerVector`](crate::integer_vector::IntegerVector).
+pub mod column;
 /// Iterators over the elements in a column of an [`IntegerMatrix`].
 pub mod column_iter;
 /// Iterators over the columns of an [`IntegerMatrix`].
@@ -489,6 +492,9 @@ pub mod is_square;
 /// Iterators that generate [`IntegerMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
+/// A function for getting a row of an [`IntegerMatrix`] as an
+/// [`IntegerVector`](crate::integer_vector::IntegerVector).
+pub mod row;
 /// Iterators over the elements in a row of an [`IntegerMatrix`].
 pub mod row_iter;
 /// Iterators over the rows of an [`IntegerMatrix`].

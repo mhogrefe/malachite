@@ -38,6 +38,8 @@ documented by git history.
   over the elements needs no indices. They return new iterator types: `UnsignedMatrixRows`,
   `UnsignedMatrixRowsMut`, `UnsignedMatrixColumns`, `UnsignedMatrixColumnsMut`, and likewise for
   `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`.
+- `row` and `column` for every matrix type, copying one row or column into the matching vector
+  type (`UnsignedVector<T>`, `NaturalVector`, `IntegerVector`, or `RationalVector`).
 - `exhaustive_unsigned_vectors_from_iterator` and
   `exhaustive_unsigned_vectors_with_dimension_from_iterator`, which take any cloneable element
   iterator (malachite-nz and malachite-q gain the same for `NaturalVector`, `IntegerVector`, and
