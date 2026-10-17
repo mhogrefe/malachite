@@ -933,6 +933,8 @@ pub mod unsigned_matrix {
     pub mod row;
     pub mod row_iter;
     pub mod rows;
+    pub mod set_column;
+    pub mod set_row;
     pub mod transpose;
 }
 pub mod unsigned_polynomial {

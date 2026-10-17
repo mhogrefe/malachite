@@ -40,6 +40,9 @@ documented by git history.
   `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`.
 - `row` and `column` for every matrix type, copying one row or column into the matching vector
   type (`UnsignedVector<T>`, `NaturalVector`, `IntegerVector`, or `RationalVector`).
+- `set_row`, `set_row_owned`, `set_column`, and `set_column_owned` for every matrix type, replacing
+  one row or column with the elements of a vector of the matching type, taken by reference or by
+  value. They panic if the index is out of range or the vector's dimension doesn't match.
 - `exhaustive_unsigned_vectors_from_iterator` and
   `exhaustive_unsigned_vectors_with_dimension_from_iterator`, which take any cloneable element
   iterator (malachite-nz and malachite-q gain the same for `NaturalVector`, `IntegerVector`, and

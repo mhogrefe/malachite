@@ -212,6 +212,8 @@ pub mod rational_matrix {
     pub mod row;
     pub mod row_iter;
     pub mod rows;
+    pub mod set_column;
+    pub mod set_row;
     pub mod transpose;
 }
 pub mod rational_polynomial {

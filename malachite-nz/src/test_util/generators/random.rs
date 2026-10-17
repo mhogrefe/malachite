@@ -7022,6 +7022,38 @@ pub fn random_integer_matrix_unsigned_pair_gen_var_3(
     )
 }
 
+pub fn random_integer_matrix_unsigned_integer_vector_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, usize, IntegerVector)> {
+    let mut xs = random_integers(
+        EXAMPLE_SEED.fork("vector"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_integer_matrix_unsigned_pair_gen_var_2(config).map(move |(m, i)| {
+            let v = (&mut xs).take(m.width()).collect();
+            (m, i, v)
+        }),
+    )
+}
+
+pub fn random_integer_matrix_unsigned_integer_vector_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, usize, IntegerVector)> {
+    let mut xs = random_integers(
+        EXAMPLE_SEED.fork("vector"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_integer_matrix_unsigned_pair_gen_var_3(config).map(move |(m, i)| {
+            let v = (&mut xs).take(m.height()).collect();
+            (m, i, v)
+        }),
+    )
+}
+
 // -- IntegerVector --
 
 pub fn random_integer_vector_gen(config: &GenConfig) -> It<IntegerVector> {
@@ -7484,6 +7516,38 @@ pub fn random_natural_matrix_unsigned_pair_gen_var_3(
 ) -> It<(NaturalMatrix, usize)> {
     Box::new(
         random_natural_matrix_gen(config).flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
+pub fn random_natural_matrix_unsigned_natural_vector_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, usize, NaturalVector)> {
+    let mut xs = random_naturals(
+        EXAMPLE_SEED.fork("vector"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_natural_matrix_unsigned_pair_gen_var_2(config).map(move |(m, i)| {
+            let v = (&mut xs).take(m.width()).collect();
+            (m, i, v)
+        }),
+    )
+}
+
+pub fn random_natural_matrix_unsigned_natural_vector_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, usize, NaturalVector)> {
+    let mut xs = random_naturals(
+        EXAMPLE_SEED.fork("vector"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_natural_matrix_unsigned_pair_gen_var_3(config).map(move |(m, i)| {
+            let v = (&mut xs).take(m.height()).collect();
+            (m, i, v)
+        }),
     )
 }
 

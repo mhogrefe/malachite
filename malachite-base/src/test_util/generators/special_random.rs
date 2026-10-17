@@ -11001,6 +11001,38 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_3(
     )
 }
 
+pub fn special_random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("vector"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        special_random_unsigned_matrix_unsigned_pair_gen_var_2(config).map(move |(m, i)| {
+            let v = (&mut xs).take(m.width()).collect();
+            (m, i, v)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("vector"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        special_random_unsigned_matrix_unsigned_pair_gen_var_3(config).map(move |(m, i)| {
+            let v = (&mut xs).take(m.height()).collect();
+            (m, i, v)
+        }),
+    )
+}
+
 fn striped_random_unsigned_vectors_helper(
     config: &GenConfig,
     seed: Seed,

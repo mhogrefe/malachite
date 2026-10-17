@@ -499,5 +499,11 @@ pub mod row;
 pub mod row_iter;
 /// Iterators over the rows of an [`IntegerMatrix`].
 pub mod rows;
+/// Functions for replacing a column of an [`IntegerMatrix`] with the elements of an
+/// [`IntegerVector`](crate::integer_vector::IntegerVector).
+pub mod set_column;
+/// Functions for replacing a row of an [`IntegerMatrix`] with the elements of an
+/// [`IntegerVector`](crate::integer_vector::IntegerVector).
+pub mod set_row;
 /// The transpose of an [`IntegerMatrix`].
 pub mod transpose;

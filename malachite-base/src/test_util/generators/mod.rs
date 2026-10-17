@@ -5347,6 +5347,27 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_3() -> Generator<(UnsignedMatrix<u6
     )
 }
 
+// All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
+pub fn unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1()
+-> Generator<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1,
+        &random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1,
+        &special_random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1,
+    )
+}
+
+// All `(m, i, v)` with `i` a column index of `m` and `v` a vector whose dimension is the height of
+// `m`.
+pub fn unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2()
+-> Generator<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2,
+        &random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2,
+        &special_random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2,
+    )
+}
+
 pub fn unsigned_vector_gen() -> Generator<UnsignedVector<u64>> {
     Generator::new(
         &exhaustive_unsigned_vector_gen,

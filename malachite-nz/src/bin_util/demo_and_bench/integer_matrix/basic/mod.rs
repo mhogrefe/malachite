@@ -18,6 +18,8 @@ pub(crate) fn register(runner: &mut Runner) {
     row::register(runner);
     row_iter::register(runner);
     rows::register(runner);
+    set_column::register(runner);
+    set_row::register(runner);
     transpose::register(runner);
 }
 
@@ -30,4 +32,6 @@ mod is_square;
 mod row;
 mod row_iter;
 mod rows;
+mod set_column;
+mod set_row;
 mod transpose;

@@ -504,5 +504,11 @@ pub mod row;
 pub mod row_iter;
 /// Iterators over the rows of a [`RationalMatrix`].
 pub mod rows;
+/// Functions for replacing a column of a [`RationalMatrix`] with the elements of a
+/// [`RationalVector`](crate::rational_vector::RationalVector).
+pub mod set_column;
+/// Functions for replacing a row of a [`RationalMatrix`] with the elements of a
+/// [`RationalVector`](crate::rational_vector::RationalVector).
+pub mod set_row;
 /// The transpose of a [`RationalMatrix`].
 pub mod transpose;

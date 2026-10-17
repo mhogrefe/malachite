@@ -479,5 +479,11 @@ pub mod row;
 pub mod row_iter;
 /// Iterators over the rows of an [`UnsignedMatrix`].
 pub mod rows;
+/// Functions for replacing a column of an [`UnsignedMatrix`] with the elements of an
+/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector).
+pub mod set_column;
+/// Functions for replacing a row of an [`UnsignedMatrix`] with the elements of an
+/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector).
+pub mod set_row;
 /// The transpose of an [`UnsignedMatrix`].
 pub mod transpose;

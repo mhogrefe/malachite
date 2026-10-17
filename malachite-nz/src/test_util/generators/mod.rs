@@ -3982,6 +3982,27 @@ pub fn integer_matrix_unsigned_pair_gen_var_3() -> Generator<(IntegerMatrix, usi
     )
 }
 
+// All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
+pub fn integer_matrix_unsigned_integer_vector_triple_gen_var_1()
+-> Generator<(IntegerMatrix, usize, IntegerVector)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_integer_vector_triple_gen_var_1,
+        &random_integer_matrix_unsigned_integer_vector_triple_gen_var_1,
+        &special_random_integer_matrix_unsigned_integer_vector_triple_gen_var_1,
+    )
+}
+
+// All `(m, i, v)` with `i` a column index of `m` and `v` a vector whose dimension is the height of
+// `m`.
+pub fn integer_matrix_unsigned_integer_vector_triple_gen_var_2()
+-> Generator<(IntegerMatrix, usize, IntegerVector)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_integer_vector_triple_gen_var_2,
+        &random_integer_matrix_unsigned_integer_vector_triple_gen_var_2,
+        &special_random_integer_matrix_unsigned_integer_vector_triple_gen_var_2,
+    )
+}
+
 // -- IntegerVector --
 
 pub fn integer_vector_gen() -> Generator<IntegerVector> {
@@ -4317,6 +4338,27 @@ pub fn natural_matrix_unsigned_pair_gen_var_3() -> Generator<(NaturalMatrix, usi
         &exhaustive_natural_matrix_unsigned_pair_gen_var_3,
         &random_natural_matrix_unsigned_pair_gen_var_3,
         &special_random_natural_matrix_unsigned_pair_gen_var_3,
+    )
+}
+
+// All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
+pub fn natural_matrix_unsigned_natural_vector_triple_gen_var_1()
+-> Generator<(NaturalMatrix, usize, NaturalVector)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_1,
+        &random_natural_matrix_unsigned_natural_vector_triple_gen_var_1,
+        &special_random_natural_matrix_unsigned_natural_vector_triple_gen_var_1,
+    )
+}
+
+// All `(m, i, v)` with `i` a column index of `m` and `v` a vector whose dimension is the height of
+// `m`.
+pub fn natural_matrix_unsigned_natural_vector_triple_gen_var_2()
+-> Generator<(NaturalMatrix, usize, NaturalVector)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_2,
+        &random_natural_matrix_unsigned_natural_vector_triple_gen_var_2,
+        &special_random_natural_matrix_unsigned_natural_vector_triple_gen_var_2,
     )
 }
 

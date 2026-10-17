@@ -6898,6 +6898,36 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_3() -> It<(UnsignedMatri
     )
 }
 
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1()
+-> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            exhaustive_unsigned_matrix_unsigned_pair_gen_var_2(),
+            |(m, _)| {
+                Box::new(exhaustive_unsigned_vectors_with_dimension::<u64>(
+                    u64::exact_from(m.width()),
+                ))
+            },
+        )
+        .map(|((m, i), v)| (m, i, v)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2()
+-> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            exhaustive_unsigned_matrix_unsigned_pair_gen_var_3(),
+            |(m, _)| {
+                Box::new(exhaustive_unsigned_vectors_with_dimension::<u64>(
+                    u64::exact_from(m.height()),
+                ))
+            },
+        )
+        .map(|((m, i), v)| (m, i, v)),
+    )
+}
+
 pub fn exhaustive_unsigned_vector_gen() -> It<UnsignedVector<u64>> {
     Box::new(exhaustive_unsigned_vectors::<u64>())
 }
@@ -7114,7 +7144,7 @@ impl<X: Clone, Y> ExhaustiveDependentPairsYsGenerator<X, Y, It<Y>> for Dependent
 // once if `xs` and each `ys(x)` generate each value once, so this enumerates values constrained by
 // a parameter, such as vectors reduced modulo a modulus, without generating and filtering out the
 // ones that violate the constraint.
-fn exhaustive_dependent_pairs_from_fn<X: Clone + 'static, Y: 'static>(
+pub fn exhaustive_dependent_pairs_from_fn<X: Clone + 'static, Y: 'static>(
     xs: It<X>,
     ys: fn(X) -> It<Y>,
 ) -> It<(X, Y)> {

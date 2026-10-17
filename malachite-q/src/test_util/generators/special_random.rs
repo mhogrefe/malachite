@@ -2611,6 +2611,42 @@ pub fn special_random_rational_matrix_unsigned_pair_gen_var_2(
     )
 }
 
+pub fn special_random_rational_matrix_unsigned_rational_vector_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalMatrix, usize, RationalVector)> {
+    let mut xs = striped_random_rationals(
+        EXAMPLE_SEED.fork("vector"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        special_random_rational_matrix_unsigned_pair_gen_var_1(config).map(move |(m, i)| {
+            let v = (&mut xs).take(m.width()).collect();
+            (m, i, v)
+        }),
+    )
+}
+
+pub fn special_random_rational_matrix_unsigned_rational_vector_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalMatrix, usize, RationalVector)> {
+    let mut xs = striped_random_rationals(
+        EXAMPLE_SEED.fork("vector"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        special_random_rational_matrix_unsigned_pair_gen_var_2(config).map(move |(m, i)| {
+            let v = (&mut xs).take(m.height()).collect();
+            (m, i, v)
+        }),
+    )
+}
+
 // -- RationalVector --
 
 pub fn special_random_rational_vector_gen(config: &GenConfig) -> It<RationalVector> {

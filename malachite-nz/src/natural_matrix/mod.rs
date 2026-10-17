@@ -502,5 +502,11 @@ pub mod row;
 pub mod row_iter;
 /// Iterators over the rows of a [`NaturalMatrix`].
 pub mod rows;
+/// Functions for replacing a column of a [`NaturalMatrix`] with the elements of a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector).
+pub mod set_column;
+/// Functions for replacing a row of a [`NaturalMatrix`] with the elements of a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector).
+pub mod set_row;
 /// The transpose of a [`NaturalMatrix`].
 pub mod transpose;

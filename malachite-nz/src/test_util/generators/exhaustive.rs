@@ -163,9 +163,10 @@ use malachite_base::test_util::generators::common::{
 };
 use malachite_base::test_util::generators::exhaustive::{
     UnsignedVecPairLenGenerator1, UnsignedVecPairLenGenerator2, UnsignedVecQuadrupleLenGenerator1,
-    UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator, exhaustive_index_vecs,
-    exhaustive_tuples_by_dimension, exhaustive_unsigned_pair_gen_var_20,
-    exhaustive_unsigned_pair_gen_var_24, exhaustive_unsigned_vec_unsigned_pair_gen_var_17,
+    UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
+    exhaustive_dependent_pairs_from_fn, exhaustive_index_vecs, exhaustive_tuples_by_dimension,
+    exhaustive_unsigned_pair_gen_var_20, exhaustive_unsigned_pair_gen_var_24,
+    exhaustive_unsigned_vec_unsigned_pair_gen_var_17,
 };
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
@@ -3641,6 +3642,36 @@ pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_3() -> It<(IntegerMatrix,
     )
 }
 
+pub fn exhaustive_integer_matrix_unsigned_integer_vector_triple_gen_var_1()
+-> It<(IntegerMatrix, usize, IntegerVector)> {
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            exhaustive_integer_matrix_unsigned_pair_gen_var_2(),
+            |(m, _)| {
+                Box::new(exhaustive_integer_vectors_with_dimension(u64::exact_from(
+                    m.width(),
+                )))
+            },
+        )
+        .map(|((m, i), v)| (m, i, v)),
+    )
+}
+
+pub fn exhaustive_integer_matrix_unsigned_integer_vector_triple_gen_var_2()
+-> It<(IntegerMatrix, usize, IntegerVector)> {
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            exhaustive_integer_matrix_unsigned_pair_gen_var_3(),
+            |(m, _)| {
+                Box::new(exhaustive_integer_vectors_with_dimension(u64::exact_from(
+                    m.height(),
+                )))
+            },
+        )
+        .map(|((m, i), v)| (m, i, v)),
+    )
+}
+
 // -- IntegerVector --
 
 pub fn exhaustive_integer_vector_gen() -> It<IntegerVector> {
@@ -3845,6 +3876,36 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_2() -> It<(NaturalMatrix,
 pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_3() -> It<(NaturalMatrix, usize)> {
     Box::new(
         exhaustive_natural_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
+pub fn exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_1()
+-> It<(NaturalMatrix, usize, NaturalVector)> {
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            exhaustive_natural_matrix_unsigned_pair_gen_var_2(),
+            |(m, _)| {
+                Box::new(exhaustive_natural_vectors_with_dimension(u64::exact_from(
+                    m.width(),
+                )))
+            },
+        )
+        .map(|((m, i), v)| (m, i, v)),
+    )
+}
+
+pub fn exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_2()
+-> It<(NaturalMatrix, usize, NaturalVector)> {
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            exhaustive_natural_matrix_unsigned_pair_gen_var_3(),
+            |(m, _)| {
+                Box::new(exhaustive_natural_vectors_with_dimension(u64::exact_from(
+                    m.height(),
+                )))
+            },
+        )
+        .map(|((m, i), v)| (m, i, v)),
     )
 }
 

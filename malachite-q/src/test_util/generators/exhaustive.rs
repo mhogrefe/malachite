@@ -59,7 +59,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};
 use malachite_base::test_util::generators::exhaustive::{
-    exhaustive_index_vecs, exhaustive_tuples_by_dimension,
+    exhaustive_dependent_pairs_from_fn, exhaustive_index_vecs, exhaustive_tuples_by_dimension,
 };
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
@@ -1068,6 +1068,36 @@ pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_1() -> It<(RationalMatri
 pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_2() -> It<(RationalMatrix, usize)> {
     Box::new(
         exhaustive_rational_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
+pub fn exhaustive_rational_matrix_unsigned_rational_vector_triple_gen_var_1()
+-> It<(RationalMatrix, usize, RationalVector)> {
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            exhaustive_rational_matrix_unsigned_pair_gen_var_1(),
+            |(m, _)| {
+                Box::new(exhaustive_rational_vectors_with_dimension(u64::exact_from(
+                    m.width(),
+                )))
+            },
+        )
+        .map(|((m, i), v)| (m, i, v)),
+    )
+}
+
+pub fn exhaustive_rational_matrix_unsigned_rational_vector_triple_gen_var_2()
+-> It<(RationalMatrix, usize, RationalVector)> {
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            exhaustive_rational_matrix_unsigned_pair_gen_var_2(),
+            |(m, _)| {
+                Box::new(exhaustive_rational_vectors_with_dimension(u64::exact_from(
+                    m.height(),
+                )))
+            },
+        )
+        .map(|((m, i), v)| (m, i, v)),
     )
 }
 
