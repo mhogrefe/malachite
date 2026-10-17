@@ -24,14 +24,6 @@ use malachite_nz::test_util::generators::{
     integer_matrix_natural_pair_gen_var_1, integer_matrix_unsigned_pair_gen_var_1,
 };
 
-fn neg(a: &IntegerMatrix) -> IntegerMatrix {
-    IntegerMatrix::from_owned_elements(
-        a.height(),
-        a.width(),
-        a.elements.iter().map(|x| -x).collect(),
-    )
-}
-
 #[test]
 fn test_mod_op() {
     let test = |s, m, out| {
@@ -143,7 +135,7 @@ fn mod_op_properties() {
         }
 
         // Negating the matrix gives the negated residues.
-        let neg_w = neg(&a).mod_op(&m);
+        let neg_w = (-&a).mod_op(&m);
         for (x, y) in b.elements.iter().zip(&neg_w.elements) {
             assert!((Integer::from(x) + Integer::from(y)).divisible_by(&m_i));
         }
@@ -354,7 +346,7 @@ fn rem_properties() {
         // The sign of the modulus makes no difference, the result commutes with negation, and
         // reducing again changes nothing.
         assert_eq!(&a % -&m, b);
-        assert_eq!(neg(&a) % &m, neg(&b));
+        assert_eq!(-&a % &m, -&b);
         assert_eq!(&b % &m, b);
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
 

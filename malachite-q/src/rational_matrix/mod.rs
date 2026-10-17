@@ -1228,6 +1228,8 @@ fn common_dimension(vectors: &[RationalVector], what: &str) -> usize {
 
 /// Indexing a [`RationalMatrix`] by row and column.
 pub mod access;
+/// Arithmetic on [`RationalMatrix`]s.
+pub mod arithmetic;
 /// A function for getting a column of a [`RationalMatrix`] as a
 /// [`RationalVector`](crate::rational_vector::RationalVector).
 pub mod column;

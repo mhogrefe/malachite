@@ -14,15 +14,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::{integer_matrix_gen, integer_matrix_gen_var_1};
 
-// The negative of a matrix, element by element.
-fn negative(m: &IntegerMatrix) -> IntegerMatrix {
-    IntegerMatrix::from_owned_elements(
-        m.height(),
-        m.width(),
-        m.elements.iter().map(|x| -x).collect(),
-    )
-}
-
 // The square matrix with the negatives of the elements above the diagonal copied onto the ones
 // below it, and zeros on the diagonal.
 fn skew_symmetrized(m: &IntegerMatrix) -> IntegerMatrix {
@@ -70,9 +61,9 @@ fn test_is_skew_symmetric() {
 fn is_skew_symmetric_properties() {
     integer_matrix_gen().test_properties(|m| {
         let skew = m.is_skew_symmetric();
-        assert_eq!(skew, m.is_square() && m.transpose() == negative(&m));
+        assert_eq!(skew, m.is_square() && m.transpose() == -&m);
         assert_eq!(m.transpose().is_skew_symmetric(), skew);
-        assert_eq!(negative(&m).is_skew_symmetric(), skew);
+        assert_eq!((-&m).is_skew_symmetric(), skew);
         // Only the square zero matrices are both symmetric and skew-symmetric.
         assert_eq!(skew && m.is_symmetric(), m.is_square() && m.is_zero());
     });

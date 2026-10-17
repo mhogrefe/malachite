@@ -27,3 +27,7 @@ pub mod mod_op;
 /// [`RemPowerOf2Assign`](malachite_base::num::arithmetic::traits::RemPowerOf2Assign), for reducing
 /// every element of an [`IntegerMatrix`](super::IntegerMatrix) modulo a power of 2.
 pub mod mod_power_of_2;
+
+/// Implementations of [`Neg`](core::ops::Neg) and
+/// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
+pub mod neg;

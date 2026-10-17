@@ -18,14 +18,6 @@ use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::{integer_matrix_gen, integer_matrix_unsigned_pair_gen};
 
-fn neg(a: &IntegerMatrix) -> IntegerMatrix {
-    IntegerMatrix::from_owned_elements(
-        a.height(),
-        a.width(),
-        a.elements.iter().map(|x| -x).collect(),
-    )
-}
-
 #[test]
 fn test_mod_power_of_2() {
     let test = |s, pow, out| {
@@ -138,7 +130,7 @@ fn rem_power_of_2_properties() {
         }
         // It is `%` with a power-of-2 modulus, and it commutes with negation.
         assert_eq!(&a % Integer::power_of_2(pow), b);
-        assert_eq!(neg(&a).rem_power_of_2(pow), neg(&b));
+        assert_eq!((-&a).rem_power_of_2(pow), -&b);
         // Reducing again changes nothing.
         assert_eq!((&b).rem_power_of_2(pow), b);
     });
