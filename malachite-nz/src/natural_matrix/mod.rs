@@ -13,6 +13,7 @@ use alloc::vec::Vec;
 use core::fmt::{Formatter, Result};
 use core::mem::{swap, take};
 use malachite_base::matrix::Matrix;
+use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -871,6 +872,9 @@ impl Matrix for NaturalMatrix {
         }
     }
 }
+
+// Implements `Named` for `NaturalMatrix`.
+impl_named!(NaturalMatrix);
 
 // Moves the elements of a `height`-by-`width` matrix, given in row-major order, into the row-major
 // order of its transpose.

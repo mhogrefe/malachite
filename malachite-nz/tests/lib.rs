@@ -355,6 +355,10 @@ pub mod integer_matrix {
         pub mod mod_op;
         pub mod mod_power_of_2;
     }
+    pub mod basic {
+        pub mod named;
+        pub mod size;
+    }
     pub mod column;
     pub mod column_iter;
     pub mod columns;
@@ -1021,6 +1025,10 @@ pub mod natural_matrix {
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_is_reduced;
+    }
+    pub mod basic {
+        pub mod named;
+        pub mod size;
     }
     pub mod column;
     pub mod column_iter;

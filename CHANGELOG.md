@@ -18,6 +18,8 @@ documented by git history.
   `set_zero`, `transpose`, and `transpose_assign`. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`,
   `IntegerMatrix`, and `RationalMatrix`. Heights, widths, and indices are `u64`s throughout the
   matrix API, as they are for vectors; only `Index`/`IndexMut` take `usize`s.
+- `Named` for every matrix type (`UnsignedMatrix<T>` for each primitive unsigned `T`, with the
+  element type spelled out, as for `UnsignedVector<T>`).
 - `UnsignedMatrix<T>`, a matrix of primitive unsigned integers with the same layout and interface
   as malachite-nz's `IntegerMatrix`: the element and row/column constructors, `height`, `width`,
   `transpose`, `transpose_assign`, `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`,

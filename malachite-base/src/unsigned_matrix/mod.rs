@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::matrix::Matrix;
+use crate::named::Named;
 use crate::num::arithmetic::traits::DivisibleBy;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
@@ -882,6 +883,21 @@ impl<T: PrimitiveUnsigned> Matrix for UnsignedMatrix<T> {
         }
     }
 }
+
+macro_rules! impl_named_unsigned_matrix {
+    ($t:ident, $name:expr) => {
+        impl Named for UnsignedMatrix<$t> {
+            /// The name of this type, with its element type spelled out.
+            const NAME: &'static str = $name;
+        }
+    };
+}
+impl_named_unsigned_matrix!(u8, "UnsignedMatrix<u8>");
+impl_named_unsigned_matrix!(u16, "UnsignedMatrix<u16>");
+impl_named_unsigned_matrix!(u32, "UnsignedMatrix<u32>");
+impl_named_unsigned_matrix!(u64, "UnsignedMatrix<u64>");
+impl_named_unsigned_matrix!(u128, "UnsignedMatrix<u128>");
+impl_named_unsigned_matrix!(usize, "UnsignedMatrix<usize>");
 
 // Copies the elements of a `height`-by-`width` matrix, given in row-major order, into the row-major
 // order of its transpose.

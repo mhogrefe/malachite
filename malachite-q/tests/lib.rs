@@ -165,6 +165,10 @@ pub mod gaussian_rational {
 
 pub mod rational_matrix {
     pub mod access;
+    pub mod basic {
+        pub mod named;
+        pub mod size;
+    }
     pub mod column;
     pub mod column_iter;
     pub mod columns;
