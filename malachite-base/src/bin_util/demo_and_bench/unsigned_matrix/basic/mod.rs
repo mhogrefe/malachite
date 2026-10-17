@@ -10,16 +10,20 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     column_iter::register(runner);
+    columns::register(runner);
     dimensions::register(runner);
     index::register(runner);
     is_square::register(runner);
     row_iter::register(runner);
+    rows::register(runner);
     transpose::register(runner);
 }
 
 mod column_iter;
+mod columns;
 mod dimensions;
 mod index;
 mod is_square;
 mod row_iter;
+mod rows;
 mod transpose;

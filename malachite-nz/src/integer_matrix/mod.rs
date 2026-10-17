@@ -476,6 +476,8 @@ pub mod access;
 pub mod arithmetic;
 /// Iterators over the elements in a column of an [`IntegerMatrix`].
 pub mod column_iter;
+/// Iterators over the columns of an [`IntegerMatrix`].
+pub mod columns;
 /// Comparisons of [`IntegerMatrix`]s with other matrices.
 pub mod comparison;
 /// Conversions to and from [`IntegerMatrix`].
@@ -489,5 +491,7 @@ pub mod is_square;
 pub mod random;
 /// Iterators over the elements in a row of an [`IntegerMatrix`].
 pub mod row_iter;
+/// Iterators over the rows of an [`IntegerMatrix`].
+pub mod rows;
 /// The transpose of an [`IntegerMatrix`].
 pub mod transpose;

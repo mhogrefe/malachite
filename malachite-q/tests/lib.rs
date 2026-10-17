@@ -166,6 +166,7 @@ pub mod gaussian_rational {
 pub mod rational_matrix {
     pub mod access;
     pub mod column_iter;
+    pub mod columns;
     pub mod comparison {
         pub mod partial_eq_integer_matrix;
         pub mod partial_eq_natural_matrix;
@@ -208,6 +209,7 @@ pub mod rational_matrix {
         pub mod striped_random_rational_square_matrices;
     }
     pub mod row_iter;
+    pub mod rows;
     pub mod transpose;
 }
 pub mod rational_polynomial {

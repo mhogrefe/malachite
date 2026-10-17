@@ -33,6 +33,11 @@ documented by git history.
   malachite-nz and malachite-q, for `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`),
   iterating over the elements of one row or column, immutably or mutably. The iterators are
   double-ended and know their length, and an out-of-range index panics.
+- `rows`, `rows_mut`, `columns`, and `columns_mut` for every matrix type, double-ended iterators
+  over all the rows or columns, each produced as an iterator over its elements, so a double loop
+  over the elements needs no indices. They return new iterator types: `UnsignedMatrixRows`,
+  `UnsignedMatrixRowsMut`, `UnsignedMatrixColumns`, `UnsignedMatrixColumnsMut`, and likewise for
+  `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`.
 - `exhaustive_unsigned_vectors_from_iterator` and
   `exhaustive_unsigned_vectors_with_dimension_from_iterator`, which take any cloneable element
   iterator (malachite-nz and malachite-q gain the same for `NaturalVector`, `IntegerVector`, and

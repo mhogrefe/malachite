@@ -479,6 +479,8 @@ pub mod access;
 pub mod arithmetic;
 /// Iterators over the elements in a column of a [`NaturalMatrix`].
 pub mod column_iter;
+/// Iterators over the columns of a [`NaturalMatrix`].
+pub mod columns;
 /// Comparisons of [`NaturalMatrix`]s with other matrices.
 pub mod comparison;
 /// Conversions to and from [`NaturalMatrix`].
@@ -492,5 +494,7 @@ pub mod is_square;
 pub mod random;
 /// Iterators over the elements in a row of a [`NaturalMatrix`].
 pub mod row_iter;
+/// Iterators over the rows of a [`NaturalMatrix`].
+pub mod rows;
 /// The transpose of a [`NaturalMatrix`].
 pub mod transpose;

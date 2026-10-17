@@ -898,6 +898,7 @@ pub mod unsigned_matrix {
         pub mod mod_power_of_2_is_reduced;
     }
     pub mod column_iter;
+    pub mod columns;
     pub mod conversion {
         pub mod from_columns;
         pub mod from_elements;
@@ -929,6 +930,7 @@ pub mod unsigned_matrix {
         pub mod striped_random_unsigned_square_matrices;
     }
     pub mod row_iter;
+    pub mod rows;
     pub mod transpose;
 }
 pub mod unsigned_polynomial {
