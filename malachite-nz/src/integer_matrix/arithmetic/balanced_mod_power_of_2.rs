@@ -83,6 +83,7 @@ impl BalancedModPowerOf2 for &IntegerMatrix {
     /// let a = IntegerMatrix::from_str("[-8, 7]").unwrap();
     /// assert_eq!((&a).balanced_mod_power_of_2(3).to_string(), "[0, -1]");
     /// ```
+    #[inline]
     fn balanced_mod_power_of_2(self, pow: u64) -> IntegerMatrix {
         IntegerMatrix::from_owned_elements(
             self.height(),

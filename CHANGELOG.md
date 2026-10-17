@@ -29,6 +29,10 @@ documented by git history.
 - `ModIsReduced`, `%` (`Rem` and `RemAssign`), `Mod`, and `ModAssign` for `UnsignedMatrix<T>` (and, in
   malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference, plus `NaturalMatrix
   % T` giving an `UnsignedMatrix<T>`), reducing every element and keeping the shape.
+- `row_iter`, `row_iter_mut`, `column_iter`, and `column_iter_mut` for `UnsignedMatrix<T>` (and, in
+  malachite-nz and malachite-q, for `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`),
+  iterating over the elements of one row or column, immutably or mutably. The iterators are
+  double-ended and know their length, and an out-of-range index panics.
 - `exhaustive_unsigned_vectors_from_iterator` and
   `exhaustive_unsigned_vectors_with_dimension_from_iterator`, which take any cloneable element
   iterator (malachite-nz and malachite-q gain the same for `NaturalVector`, `IntegerVector`, and

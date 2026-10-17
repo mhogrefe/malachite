@@ -456,6 +456,8 @@ fn common_dimension<T: PrimitiveUnsigned>(vectors: &[UnsignedVector<T>], what: &
 pub mod access;
 /// Arithmetic on [`UnsignedMatrix`]s.
 pub mod arithmetic;
+/// Iterators over the elements in a column of an [`UnsignedMatrix`].
+pub mod column_iter;
 /// Conversions to and from [`UnsignedMatrix`].
 pub mod conversion;
 /// Iterators that generate [`UnsignedMatrix`]s without repetition.
@@ -465,5 +467,7 @@ pub mod is_square;
 /// Iterators that generate [`UnsignedMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
+/// Iterators over the elements in a row of an [`UnsignedMatrix`].
+pub mod row_iter;
 /// The transpose of an [`UnsignedMatrix`].
 pub mod transpose;

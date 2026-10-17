@@ -9,13 +9,17 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    column_iter::register(runner);
     dimensions::register(runner);
     index::register(runner);
     is_square::register(runner);
+    row_iter::register(runner);
     transpose::register(runner);
 }
 
+mod column_iter;
 mod dimensions;
 mod index;
 mod is_square;
+mod row_iter;
 mod transpose;

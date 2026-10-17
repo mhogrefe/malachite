@@ -2345,6 +2345,24 @@ pub fn random_rational_matrix_unsigned_unsigned_triple_gen_var_1(
     Box::new(random_rational_matrix_gen(config).flat_map(rational_matrix_positions))
 }
 
+pub fn random_rational_matrix_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalMatrix, usize)> {
+    Box::new(
+        random_rational_matrix_gen(config)
+            .flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
+    )
+}
+
+pub fn random_rational_matrix_unsigned_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalMatrix, usize)> {
+    Box::new(
+        random_rational_matrix_gen(config)
+            .flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
 // -- RationalVector --
 
 pub fn random_rational_vector_gen(config: &GenConfig) -> It<RationalVector> {

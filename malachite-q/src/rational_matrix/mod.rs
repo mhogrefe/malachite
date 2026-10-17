@@ -479,6 +479,8 @@ fn common_dimension(vectors: &[RationalVector], what: &str) -> usize {
 
 /// Indexing a [`RationalMatrix`] by row and column.
 pub mod access;
+/// Iterators over the elements in a column of a [`RationalMatrix`].
+pub mod column_iter;
 /// Comparisons of [`RationalMatrix`]s with other matrices.
 pub mod comparison;
 /// Conversions to and from [`RationalMatrix`].
@@ -490,5 +492,7 @@ pub mod is_square;
 /// Iterators that generate [`RationalMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
+/// Iterators over the elements in a row of a [`RationalMatrix`].
+pub mod row_iter;
 /// The transpose of a [`RationalMatrix`].
 pub mod transpose;

@@ -6882,6 +6882,22 @@ pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_1()
     Box::new(exhaustive_unsigned_matrix_gen().flat_map(unsigned_matrix_positions))
 }
 
+// Each matrix paired with each of its row indices. A matrix has finitely many, so this reaches
+// every pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_2() -> It<(UnsignedMatrix<u64>, usize)> {
+    Box::new(
+        exhaustive_unsigned_matrix_gen().flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
+    )
+}
+
+// Each matrix paired with each of its column indices. A matrix has finitely many, so this reaches
+// every pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_3() -> It<(UnsignedMatrix<u64>, usize)> {
+    Box::new(
+        exhaustive_unsigned_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
 pub fn exhaustive_unsigned_vector_gen() -> It<UnsignedVector<u64>> {
     Box::new(exhaustive_unsigned_vectors::<u64>())
 }

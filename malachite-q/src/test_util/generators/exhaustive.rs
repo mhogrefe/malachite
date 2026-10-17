@@ -1055,6 +1055,22 @@ pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen_var_1()
     Box::new(exhaustive_rational_matrix_gen().flat_map(rational_matrix_positions))
 }
 
+// Each matrix paired with each of its row indices. A matrix has finitely many, so this reaches
+// every pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_1() -> It<(RationalMatrix, usize)> {
+    Box::new(
+        exhaustive_rational_matrix_gen().flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
+    )
+}
+
+// Each matrix paired with each of its column indices. A matrix has finitely many, so this reaches
+// every pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_2() -> It<(RationalMatrix, usize)> {
+    Box::new(
+        exhaustive_rational_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
 // -- RationalVector --
 
 pub fn exhaustive_rational_vector_gen() -> It<RationalVector> {

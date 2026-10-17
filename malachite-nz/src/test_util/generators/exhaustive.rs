@@ -3625,6 +3625,22 @@ pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen_var_1()
     Box::new(exhaustive_integer_matrix_gen().flat_map(matrix_positions))
 }
 
+// Each matrix paired with each of its row indices. A matrix has finitely many, so this reaches
+// every pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_2() -> It<(IntegerMatrix, usize)> {
+    Box::new(
+        exhaustive_integer_matrix_gen().flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
+    )
+}
+
+// Each matrix paired with each of its column indices. A matrix has finitely many, so this reaches
+// every pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_3() -> It<(IntegerMatrix, usize)> {
+    Box::new(
+        exhaustive_integer_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
 // -- IntegerVector --
 
 pub fn exhaustive_integer_vector_gen() -> It<IntegerVector> {
@@ -3814,6 +3830,22 @@ pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen() -> It<(NaturalMa
 pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_1()
 -> It<(NaturalMatrix, usize, usize)> {
     Box::new(exhaustive_natural_matrix_gen().flat_map(natural_matrix_positions))
+}
+
+// Each matrix paired with each of its row indices. A matrix has finitely many, so this reaches
+// every pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_2() -> It<(NaturalMatrix, usize)> {
+    Box::new(
+        exhaustive_natural_matrix_gen().flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
+    )
+}
+
+// Each matrix paired with each of its column indices. A matrix has finitely many, so this reaches
+// every pair, and no index is reduced from an arbitrary integer.
+pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_3() -> It<(NaturalMatrix, usize)> {
+    Box::new(
+        exhaustive_natural_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
 }
 
 // -- NaturalVector --

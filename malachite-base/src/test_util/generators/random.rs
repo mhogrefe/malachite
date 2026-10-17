@@ -9271,6 +9271,24 @@ pub fn random_unsigned_matrix_unsigned_unsigned_triple_gen_var_1(
     Box::new(random_unsigned_matrix_gen(config).flat_map(unsigned_matrix_positions))
 }
 
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, usize)> {
+    Box::new(
+        random_unsigned_matrix_gen(config)
+            .flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, usize)> {
+    Box::new(
+        random_unsigned_matrix_gen(config)
+            .flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
+    )
+}
+
 fn random_unsigned_vectors_helper(
     config: &GenConfig,
     seed: Seed,
