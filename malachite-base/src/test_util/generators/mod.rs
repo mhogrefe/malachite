@@ -5282,6 +5282,15 @@ pub fn unsigned_matrix_gen() -> Generator<UnsignedMatrix<u64>> {
     )
 }
 
+// All `(UnsignedMatrix<u64>, u64)` pairs, where the `u64` is a small power.
+pub fn unsigned_matrix_unsigned_pair_gen() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen,
+        &random_unsigned_matrix_unsigned_pair_gen,
+        &special_random_unsigned_matrix_unsigned_pair_gen,
+    )
+}
+
 // All square `UnsignedMatrix<u64>`s.
 pub fn unsigned_matrix_gen_var_1() -> Generator<UnsignedMatrix<u64>> {
     Generator::new(

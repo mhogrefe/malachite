@@ -9209,6 +9209,22 @@ pub fn random_unsigned_matrix_gen(config: &GenConfig) -> It<UnsignedMatrix<u64>>
     ))
 }
 
+pub fn random_unsigned_matrix_unsigned_pair_gen(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_unsigned_matrices(
+                seed,
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
+}
+
 pub fn random_unsigned_matrix_gen_var_1(config: &GenConfig) -> It<UnsignedMatrix<u64>> {
     Box::new(random_unsigned_square_matrices(
         EXAMPLE_SEED,

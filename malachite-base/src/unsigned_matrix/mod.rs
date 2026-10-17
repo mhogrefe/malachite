@@ -454,6 +454,8 @@ fn common_dimension<T: PrimitiveUnsigned>(vectors: &[UnsignedVector<T>], what: &
 
 /// Indexing an [`UnsignedMatrix`] by row and column.
 pub mod access;
+/// Arithmetic on [`UnsignedMatrix`]s.
+pub mod arithmetic;
 /// Conversions to and from [`UnsignedMatrix`].
 pub mod conversion;
 /// Iterators that generate [`UnsignedMatrix`]s without repetition.

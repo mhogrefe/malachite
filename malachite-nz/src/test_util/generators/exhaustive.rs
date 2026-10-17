@@ -3727,6 +3727,13 @@ pub fn exhaustive_natural_matrix_gen() -> It<NaturalMatrix> {
     Box::new(exhaustive_natural_matrices())
 }
 
+pub fn exhaustive_natural_matrix_unsigned_pair_gen() -> It<(NaturalMatrix, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_matrices(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()
 -> It<(NaturalMatrix, UnsignedMatrix<T>)> {
     Box::new(exhaustive_pairs(

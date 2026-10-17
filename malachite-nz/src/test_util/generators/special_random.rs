@@ -8206,6 +8206,26 @@ pub fn special_random_natural_matrix_gen(config: &GenConfig) -> It<NaturalMatrix
     ))
 }
 
+pub fn special_random_natural_matrix_unsigned_pair_gen(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
+}
+
 pub fn special_random_natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, UnsignedMatrix<T>)> {

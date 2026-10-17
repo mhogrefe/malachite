@@ -24,6 +24,8 @@ documented by git history.
   `striped_random_unsigned_square_matrices` (malachite-nz and malachite-q gain the same for
   `IntegerMatrix`, `NaturalMatrix`, and `RationalMatrix`, with bit-count parameters); and
   `is_square` for every matrix type.
+- `ModPowerOf2IsReduced`, `ModPowerOf2`, and `ModPowerOf2Assign` for `UnsignedMatrix<T>` (and, in
+  malachite-nz, for `NaturalMatrix`), reducing every element modulo $2^k$ and keeping the shape.
 - `exhaustive_unsigned_vectors_from_iterator` and
   `exhaustive_unsigned_vectors_with_dimension_from_iterator`, which take any cloneable element
   iterator (malachite-nz and malachite-q gain the same for `NaturalVector`, `IntegerVector`, and

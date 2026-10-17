@@ -475,6 +475,8 @@ fn common_dimension(vectors: &[NaturalVector], what: &str) -> usize {
 
 /// Indexing a [`NaturalMatrix`] by row and column.
 pub mod access;
+/// Arithmetic on [`NaturalMatrix`]s.
+pub mod arithmetic;
 /// Comparisons of [`NaturalMatrix`]s with other matrices.
 pub mod comparison;
 /// Conversions to and from [`NaturalMatrix`].

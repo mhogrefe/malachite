@@ -891,6 +891,10 @@ pub mod vars {
 }
 pub mod unsigned_matrix {
     pub mod access;
+    pub mod arithmetic {
+        pub mod mod_power_of_2;
+        pub mod mod_power_of_2_is_reduced;
+    }
     pub mod conversion {
         pub mod from_columns;
         pub mod from_elements;

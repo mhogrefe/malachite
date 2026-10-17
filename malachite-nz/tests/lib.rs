@@ -992,6 +992,10 @@ pub mod natural_polynomial {
 }
 pub mod natural_matrix {
     pub mod access;
+    pub mod arithmetic {
+        pub mod mod_power_of_2;
+        pub mod mod_power_of_2_is_reduced;
+    }
     pub mod comparison {
         pub mod partial_eq_unsigned_matrix;
     }

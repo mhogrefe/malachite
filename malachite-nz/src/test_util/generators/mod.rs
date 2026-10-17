@@ -4175,6 +4175,15 @@ pub fn natural_matrix_gen() -> Generator<NaturalMatrix> {
     )
 }
 
+// All `(NaturalMatrix, u64)` pairs, where the `u64` is a small power.
+pub fn natural_matrix_unsigned_pair_gen() -> Generator<(NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_pair_gen,
+        &random_natural_matrix_unsigned_pair_gen,
+        &special_random_natural_matrix_unsigned_pair_gen,
+    )
+}
+
 pub fn natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()
 -> Generator<(NaturalMatrix, UnsignedMatrix<T>)> {
     Generator::new(
