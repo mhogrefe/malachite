@@ -772,6 +772,203 @@ impl Matrix for NaturalMatrix {
         }
     }
 
+    /// Determines whether a [`NaturalMatrix`] is symmetric: square, and equal to its transpose.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    ///
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 2; 2, 3]")
+    ///         .unwrap()
+    ///         .is_symmetric()
+    /// );
+    /// assert!(
+    ///     !NaturalMatrix::from_str("[1, 2; 3, 4]")
+    ///         .unwrap()
+    ///         .is_symmetric()
+    /// );
+    /// assert!(
+    ///     !NaturalMatrix::from_str("[1, 0, 0; 0, 1, 0]")
+    ///         .unwrap()
+    ///         .is_symmetric()
+    /// );
+    /// ```
+    #[inline]
+    fn is_symmetric(&self) -> bool {
+        let n = self.width;
+        self.height == n
+            && (0..n)
+                .all(|i| (i + 1..n).all(|j| self.elements[i * n + j] == self.elements[j * n + i]))
+    }
+
+    /// Determines whether a [`NaturalMatrix`] is skew-symmetric: square, and equal to the negative
+    /// of its transpose.
+    ///
+    /// No element of a [`NaturalMatrix`] can be negative, so it is skew-symmetric only if it is a
+    /// square zero matrix.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    ///
+    /// assert!(
+    ///     NaturalMatrix::from_str("[0, 0; 0, 0]")
+    ///         .unwrap()
+    ///         .is_skew_symmetric()
+    /// );
+    /// assert!(
+    ///     !NaturalMatrix::from_str("[0, 2; 2, 0]")
+    ///         .unwrap()
+    ///         .is_skew_symmetric()
+    /// );
+    /// assert!(
+    ///     NaturalMatrix::from_str("[]_{0,0}")
+    ///         .unwrap()
+    ///         .is_skew_symmetric()
+    /// );
+    /// ```
+    #[inline]
+    fn is_skew_symmetric(&self) -> bool {
+        // No element can be negative, so `x = -y` forces both to be zero.
+        self.height == self.width && self.is_zero()
+    }
+
+    /// Determines whether a [`NaturalMatrix`] is diagonal: every element off the diagonal is zero.
+    /// The matrix need not be square.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    ///
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 0; 0, 2]")
+    ///         .unwrap()
+    ///         .is_diagonal()
+    /// );
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 0, 0; 0, 2, 0]")
+    ///         .unwrap()
+    ///         .is_diagonal()
+    /// );
+    /// assert!(
+    ///     !NaturalMatrix::from_str("[1, 2; 0, 3]")
+    ///         .unwrap()
+    ///         .is_diagonal()
+    /// );
+    /// ```
+    #[inline]
+    fn is_diagonal(&self) -> bool {
+        self.rows()
+            .enumerate()
+            .all(|(i, row)| row.enumerate().all(|(j, x)| i == j || *x == 0u32))
+    }
+
+    /// Determines whether a [`NaturalMatrix`] is upper triangular: every element below the diagonal
+    /// is zero. The matrix need not be square.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    ///
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 2; 0, 3]")
+    ///         .unwrap()
+    ///         .is_upper_triangular()
+    /// );
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 2, 3; 0, 4, 5]")
+    ///         .unwrap()
+    ///         .is_upper_triangular()
+    /// );
+    /// assert!(
+    ///     !NaturalMatrix::from_str("[1, 0; 2, 3]")
+    ///         .unwrap()
+    ///         .is_upper_triangular()
+    /// );
+    /// ```
+    #[inline]
+    fn is_upper_triangular(&self) -> bool {
+        self.rows()
+            .enumerate()
+            .all(|(i, row)| row.take(i).all(|x| *x == 0u32))
+    }
+
+    /// Determines whether a [`NaturalMatrix`] is lower triangular: every element above the diagonal
+    /// is zero. The matrix need not be square.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    ///
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 0; 2, 3]")
+    ///         .unwrap()
+    ///         .is_lower_triangular()
+    /// );
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1; 2; 3]")
+    ///         .unwrap()
+    ///         .is_lower_triangular()
+    /// );
+    /// assert!(
+    ///     !NaturalMatrix::from_str("[1, 2; 0, 3]")
+    ///         .unwrap()
+    ///         .is_lower_triangular()
+    /// );
+    /// ```
+    #[inline]
+    fn is_lower_triangular(&self) -> bool {
+        self.rows()
+            .enumerate()
+            .all(|(i, row)| row.skip(i + 1).all(|x| *x == 0u32))
+    }
+
     /// Sets every element of a [`NaturalMatrix`] to zero, keeping its height and width.
     ///
     /// # Worst-case complexity

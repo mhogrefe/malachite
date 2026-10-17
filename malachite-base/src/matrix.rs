@@ -92,6 +92,26 @@ pub trait Matrix: Sized {
     /// j)`.
     fn standard_basis_index(&self) -> Option<(u64, u64)>;
 
+    /// Determines whether a matrix is symmetric: square, and equal to its transpose.
+    fn is_symmetric(&self) -> bool;
+
+    /// Determines whether a matrix is skew-symmetric: square, and equal to the negative of its
+    /// transpose. The diagonal of a skew-symmetric matrix is zero, and a matrix whose elements
+    /// cannot be negative is skew-symmetric only if it is a square zero matrix.
+    fn is_skew_symmetric(&self) -> bool;
+
+    /// Determines whether a matrix is diagonal: every element off the diagonal, that is, in row $i$
+    /// and column $j$ with $i \neq j$, is zero. The matrix need not be square.
+    fn is_diagonal(&self) -> bool;
+
+    /// Determines whether a matrix is upper triangular: every element below the diagonal, that is,
+    /// in row $i$ and column $j$ with $i > j$, is zero. The matrix need not be square.
+    fn is_upper_triangular(&self) -> bool;
+
+    /// Determines whether a matrix is lower triangular: every element above the diagonal, that is,
+    /// in row $i$ and column $j$ with $i < j$, is zero. The matrix need not be square.
+    fn is_lower_triangular(&self) -> bool;
+
     /// Sets every element of a matrix to zero, keeping its height and width.
     fn set_zero(&mut self);
 

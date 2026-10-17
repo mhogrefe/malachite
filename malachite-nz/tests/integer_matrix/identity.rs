@@ -43,6 +43,11 @@ fn identity_properties() {
         assert_eq!(m.height(), size);
         assert_eq!(m.is_zero(), size == 0);
         assert!(m.is_identity());
+        assert!(m.is_diagonal());
+        assert!(m.is_upper_triangular());
+        assert!(m.is_lower_triangular());
+        assert!(m.is_symmetric());
+        assert_eq!(m.is_skew_symmetric(), size == 0);
         // Only the 1-by-1 identity matrix is a standard basis matrix.
         assert_eq!(
             m.standard_basis_index(),

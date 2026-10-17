@@ -15,7 +15,9 @@ documented by git history.
   `zero`, `identity`, `standard_basis_matrix` (the matrix units $E_{ij}$), `to_elements`,
   `into_elements`, `elements_ref`, `height`, `width`, `is_square`, `is_zero`, `is_identity`,
   `standard_basis_index` (the row and column of a standard basis matrix's 1, or `None`),
-  `set_zero`, `transpose`, and `transpose_assign`. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`,
+  `is_symmetric`, `is_skew_symmetric`, `is_diagonal`, `is_upper_triangular`,
+  `is_lower_triangular` (the last three for any shape), `set_zero`, `transpose`, and
+  `transpose_assign`. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`,
   `IntegerMatrix`, and `RationalMatrix`. Heights, widths, and indices are `u64`s throughout the
   matrix API, as they are for vectors; only `Index`/`IndexMut` take `usize`s.
 - `Named` for every matrix type (`UnsignedMatrix<T>` for each primitive unsigned `T`, with the

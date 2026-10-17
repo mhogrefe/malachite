@@ -203,8 +203,13 @@ pub mod rational_matrix {
         pub mod exhaustive_rational_matrices;
     }
     pub mod identity;
+    pub mod is_diagonal;
     pub mod is_identity;
+    pub mod is_lower_triangular;
+    pub mod is_skew_symmetric;
     pub mod is_square;
+    pub mod is_symmetric;
+    pub mod is_upper_triangular;
     pub mod is_zero;
     pub mod random {
         pub mod random_rational_matrices;

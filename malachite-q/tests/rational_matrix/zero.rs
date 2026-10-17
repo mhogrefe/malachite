@@ -42,6 +42,11 @@ fn zero_properties() {
         assert!(m.is_valid());
         assert_eq!((m.height(), m.width()), (height, width));
         assert!(m.is_zero());
+        assert!(m.is_diagonal());
+        assert!(m.is_upper_triangular());
+        assert!(m.is_lower_triangular());
+        assert_eq!(m.is_symmetric(), height == width);
+        assert_eq!(m.is_skew_symmetric(), height == width);
         // Only the 0-by-0 zero matrix is an identity matrix, and no zero matrix is a standard basis
         // matrix.
         assert_eq!(m.is_identity(), height == 0 && width == 0);
