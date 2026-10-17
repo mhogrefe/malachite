@@ -1031,12 +1031,16 @@ pub mod natural_matrix {
         pub mod add;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
+        pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_2;
+        pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_neg;
+        pub mod mod_power_of_2_sub;
+        pub mod mod_sub;
     }
     pub mod basic {
         pub mod named;

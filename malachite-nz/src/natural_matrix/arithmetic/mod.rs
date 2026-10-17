@@ -18,6 +18,10 @@ pub mod balanced_mod;
 /// reduce every element of a [`NaturalMatrix`](super::NaturalMatrix) to the representative closest
 /// to zero modulo a power of 2.
 pub mod balanced_mod_power_of_2;
+/// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
+/// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding
+/// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
+pub mod mod_add;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced), a
 /// trait for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
 /// modulo a number.
@@ -35,6 +39,10 @@ pub mod mod_op;
 /// [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign), traits for
 /// reducing every element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a power of 2.
 pub mod mod_power_of_2;
+/// Implementations of [`ModPowerOf2Add`](malachite_base::num::arithmetic::traits::ModPowerOf2Add)
+/// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign), for
+/// adding [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a power of 2.
+pub mod mod_power_of_2_add;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), a trait
 /// for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
@@ -44,3 +52,13 @@ pub mod mod_power_of_2_is_reduced;
 /// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign), for
 /// negating every element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a power of 2.
 pub mod mod_power_of_2_neg;
+
+/// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
+/// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
+/// subtracting [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a power of 2.
+pub mod mod_power_of_2_sub;
+
+/// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
+/// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting
+/// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
+pub mod mod_sub;

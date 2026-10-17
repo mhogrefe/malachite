@@ -60,8 +60,8 @@ use crate::num::random::striped::{
 use crate::num::random::{
     RandomPrimitiveFloatInclusiveRange, VariableRangeGenerator, random_finite_primitive_floats,
     random_nonzero_finite_primitive_floats, random_positive_finite_primitive_floats,
-    random_primitive_float_inclusive_range, random_primitive_float_range, random_primitive_floats,
-    random_unsigneds_less_than,
+    random_positive_unsigneds, random_primitive_float_inclusive_range,
+    random_primitive_float_range, random_primitive_floats, random_unsigneds_less_than,
 };
 use crate::polynomial::ComposePowerOfX;
 use crate::random::{EXAMPLE_SEED, Seed};
@@ -11065,6 +11065,101 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_5(
             },
         )
         .map(|(a, m)| (a % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            u64::WIDTH,
+        ))
+        .map(move |((height, width), pow)| {
+            let n = usize::exact_from(height * width);
+            let matrix = |xs: &mut dyn Iterator<Item = u64>| {
+                UnsignedMatrix::<u64>::from_owned_elements(height, width, xs.take(n).collect())
+                    .mod_power_of_2(pow)
+            };
+            let a = matrix(&mut xs);
+            let b = matrix(&mut xs);
+            (a, b, pow)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    u64,
+)> {
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            u64::WIDTH,
+        ))
+        .map(move |((height, width), pow)| {
+            let n = usize::exact_from(height * width);
+            let matrix = |xs: &mut dyn Iterator<Item = u64>| {
+                UnsignedMatrix::<u64>::from_owned_elements(height, width, xs.take(n).collect())
+                    .mod_power_of_2(pow)
+            };
+            let a = matrix(&mut xs);
+            let b = matrix(&mut xs);
+            let c = matrix(&mut xs);
+            (a, b, c, pow)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_1(config)
+            .zip(random_positive_unsigneds::<u64>(EXAMPLE_SEED.fork("m")))
+            .map(|((a, b, _), m)| (a % m, b % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    u64,
+)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_1(config)
+            .zip(random_positive_unsigneds::<u64>(EXAMPLE_SEED.fork("m")))
+            .map(|((a, b, c, _), m)| (a % m, b % m, c % m, m)),
     )
 }
 

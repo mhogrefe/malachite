@@ -3866,6 +3866,133 @@ pub fn exhaustive_natural_matrix_natural_pair_gen_var_2() -> It<(NaturalMatrix, 
     )
 }
 
+// Pairs of matrices of the same shape and a power of 2 that every element is less than.
+pub fn exhaustive_natural_matrix_natural_matrix_unsigned_triple_gen_var_1()
+-> It<(NaturalMatrix, NaturalMatrix, u64)> {
+    fn ys((height, width): (u64, u64)) -> It<(NaturalMatrix, NaturalMatrix, u64)> {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_natural_matrices_with_dimensions(
+                    height, width,
+                )),
+                exhaustive_unsigneds::<u64>(),
+            )
+            .map(|((a, b), pow)| {
+                let bits = a
+                    .elements
+                    .iter()
+                    .chain(&b.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (a, b, pow + bits)
+            }),
+        )
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, t)| t),
+    )
+}
+
+// Triples of matrices of the same shape and a power of 2 that every element is less than.
+pub fn exhaustive_natural_matrix_natural_matrix_natural_matrix_unsigned_quadruple_gen_var_1()
+-> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix, u64)> {
+    fn ys((height, width): (u64, u64)) -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix, u64)> {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_triples_from_single(exhaustive_natural_matrices_with_dimensions(
+                    height, width,
+                )),
+                exhaustive_unsigneds::<u64>(),
+            )
+            .map(|((a, b, c), pow)| {
+                let bits = a
+                    .elements
+                    .iter()
+                    .chain(&b.elements)
+                    .chain(&c.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (a, b, c, pow + bits)
+            }),
+        )
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, t)| t),
+    )
+}
+
+// Pairs of matrices of the same shape and a modulus that every element is less than.
+pub fn exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_1()
+-> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    fn ys((height, width): (u64, u64)) -> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_natural_matrices_with_dimensions(
+                    height, width,
+                )),
+                exhaustive_naturals(),
+            )
+            .map(|((a, b), k)| {
+                let max = a.elements.iter().chain(&b.elements).max().cloned();
+                let m = max.unwrap_or_default() + k + Natural::ONE;
+                (a, b, m)
+            }),
+        )
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, t)| t),
+    )
+}
+
+// Triples of matrices of the same shape and a modulus that every element is less than.
+pub fn exhaustive_natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1()
+-> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)> {
+    fn ys(
+        (height, width): (u64, u64),
+    ) -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)> {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_triples_from_single(exhaustive_natural_matrices_with_dimensions(
+                    height, width,
+                )),
+                exhaustive_naturals(),
+            )
+            .map(|((a, b, c), k)| {
+                let max = a
+                    .elements
+                    .iter()
+                    .chain(&b.elements)
+                    .chain(&c.elements)
+                    .max()
+                    .cloned();
+                let m = max.unwrap_or_default() + k + Natural::ONE;
+                (a, b, c, m)
+            }),
+        )
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, t)| t),
+    )
+}
+
 pub fn exhaustive_integer_matrix_natural_pair_gen_var_1() -> It<(IntegerMatrix, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_integer_matrices(),

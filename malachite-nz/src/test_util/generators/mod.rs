@@ -4304,6 +4304,50 @@ pub fn natural_matrix_natural_pair_gen_var_2() -> Generator<(NaturalMatrix, Natu
     )
 }
 
+// All `(NaturalMatrix, NaturalMatrix, u64)` where the matrices have the same shape and every
+// element is less than 2 to the power of the `u64`.
+pub fn natural_matrix_natural_matrix_unsigned_triple_gen_var_1()
+-> Generator<(NaturalMatrix, NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_unsigned_triple_gen_var_1,
+        &random_natural_matrix_natural_matrix_unsigned_triple_gen_var_1,
+        &special_random_natural_matrix_natural_matrix_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, NaturalMatrix, NaturalMatrix, u64)` where the matrices have the same shape
+// and every element is less than 2 to the power of the `u64`.
+pub fn natural_matrix_natural_matrix_natural_matrix_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, NaturalMatrix, NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_matrix_unsigned_quadruple_gen_var_1,
+        &random_natural_matrix_natural_matrix_natural_matrix_unsigned_quadruple_gen_var_1,
+        &special_random_natural_matrix_natural_matrix_natural_matrix_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, NaturalMatrix, Natural)` where the matrices have the same shape and every
+// element is less than the `Natural`.
+pub fn natural_matrix_natural_matrix_natural_triple_gen_var_1()
+-> Generator<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_1,
+        &random_natural_matrix_natural_matrix_natural_triple_gen_var_1,
+        &special_random_natural_matrix_natural_matrix_natural_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)` where the matrices have the same
+// shape and every element is less than the `Natural`.
+pub fn natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1,
+        &random_natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1,
+        &special_random_natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1,
+    )
+}
+
 // The `Natural` is positive.
 pub fn integer_matrix_natural_pair_gen_var_1() -> Generator<(IntegerMatrix, Natural)> {
     Generator::new(

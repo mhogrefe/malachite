@@ -9344,6 +9344,93 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_5(
     )
 }
 
+pub fn random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            u64::WIDTH,
+        ))
+        .map(move |((height, width), pow)| {
+            let n = usize::exact_from(height * width);
+            let matrix = |xs: &mut dyn Iterator<Item = u64>| {
+                UnsignedMatrix::<u64>::from_owned_elements(height, width, xs.take(n).collect())
+                    .mod_power_of_2(pow)
+            };
+            let a = matrix(&mut xs);
+            let b = matrix(&mut xs);
+            (a, b, pow)
+        }),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    u64,
+)> {
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            u64::WIDTH,
+        ))
+        .map(move |((height, width), pow)| {
+            let n = usize::exact_from(height * width);
+            let matrix = |xs: &mut dyn Iterator<Item = u64>| {
+                UnsignedMatrix::<u64>::from_owned_elements(height, width, xs.take(n).collect())
+                    .mod_power_of_2(pow)
+            };
+            let a = matrix(&mut xs);
+            let b = matrix(&mut xs);
+            let c = matrix(&mut xs);
+            (a, b, c, pow)
+        }),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_1(config)
+            .zip(random_positive_unsigneds::<u64>(EXAMPLE_SEED.fork("m")))
+            .map(|((a, b, _), m)| (a % m, b % m, m)),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    UnsignedMatrix<u64>,
+    u64,
+)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_1(config)
+            .zip(random_positive_unsigneds::<u64>(EXAMPLE_SEED.fork("m")))
+            .map(|((a, b, c, _), m)| (a % m, b % m, c % m, m)),
+    )
+}
+
 pub fn random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {

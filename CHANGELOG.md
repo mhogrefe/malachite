@@ -48,6 +48,13 @@ documented by git history.
 - `ModNeg` and `ModNegAssign` for `UnsignedMatrix<T>` (and, in malachite-nz, for `NaturalMatrix`,
   with the modulus by value or by reference), negating every element modulo $m$; the elements must
   already be reduced.
+- `ModPowerOf2Add`, `ModPowerOf2AddAssign`, `ModPowerOf2Sub`, and `ModPowerOf2SubAssign` for
+  `UnsignedMatrix<T>` (and, in malachite-nz, for `NaturalMatrix`), adding or subtracting
+  element by element modulo $2^k$; the elements must be reduced and the shapes must match.
+- `ModAdd`, `ModAddAssign`, `ModSub`, and `ModSubAssign` for `UnsignedMatrix<T>` (and, in
+  malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference), adding or
+  subtracting element by element modulo $m$; the elements must be reduced and the shapes must
+  match.
 - `ModIsReduced`, `%` (`Rem` and `RemAssign`), `Mod`, and `ModAssign` for `UnsignedMatrix<T>` (and, in
   malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference, plus `NaturalMatrix
   % T` giving an `UnsignedMatrix<T>`), reducing every element and keeping the shape.

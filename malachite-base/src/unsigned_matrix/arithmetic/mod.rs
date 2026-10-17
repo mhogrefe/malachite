@@ -6,6 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`ModAdd`](crate::num::arithmetic::traits::ModAdd) and
+/// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding
+/// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.
+pub mod mod_add;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), a trait for
 /// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
 /// a number.
@@ -23,6 +27,10 @@ pub mod mod_op;
 /// [`ModPowerOf2Assign`](crate::num::arithmetic::traits::ModPowerOf2Assign), traits for reducing
 /// every element of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a power of 2.
 pub mod mod_power_of_2;
+/// Implementations of [`ModPowerOf2Add`](crate::num::arithmetic::traits::ModPowerOf2Add) and
+/// [`ModPowerOf2AddAssign`](crate::num::arithmetic::traits::ModPowerOf2AddAssign), for adding
+/// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a power of 2.
+pub mod mod_power_of_2_add;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), a trait for
 /// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
@@ -32,3 +40,13 @@ pub mod mod_power_of_2_is_reduced;
 /// [`ModPowerOf2NegAssign`](crate::num::arithmetic::traits::ModPowerOf2NegAssign), for negating
 /// every element of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a power of 2.
 pub mod mod_power_of_2_neg;
+
+/// Implementations of [`ModPowerOf2Sub`](crate::num::arithmetic::traits::ModPowerOf2Sub) and
+/// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
+/// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a power of 2.
+pub mod mod_power_of_2_sub;
+
+/// Implementations of [`ModSub`](crate::num::arithmetic::traits::ModSub) and
+/// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting
+/// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.
+pub mod mod_sub;
