@@ -472,6 +472,8 @@ fn common_dimension(vectors: &[IntegerVector], what: &str) -> usize {
 
 /// Indexing an [`IntegerMatrix`] by row and column.
 pub mod access;
+/// Arithmetic on [`IntegerMatrix`]s.
+pub mod arithmetic;
 /// Comparisons of [`IntegerMatrix`]s with other matrices.
 pub mod comparison;
 /// Conversions to and from [`IntegerMatrix`].

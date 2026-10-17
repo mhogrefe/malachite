@@ -349,6 +349,12 @@ pub mod integer {
 }
 pub mod integer_matrix {
     pub mod access;
+    pub mod arithmetic {
+        pub mod balanced_mod;
+        pub mod balanced_mod_power_of_2;
+        pub mod mod_op;
+        pub mod mod_power_of_2;
+    }
     pub mod comparison {
         pub mod partial_eq_natural_matrix;
         pub mod partial_eq_unsigned_matrix;
@@ -993,6 +999,8 @@ pub mod natural_polynomial {
 pub mod natural_matrix {
     pub mod access;
     pub mod arithmetic {
+        pub mod balanced_mod;
+        pub mod balanced_mod_power_of_2;
         pub mod mod_is_reduced;
         pub mod mod_op;
         pub mod mod_power_of_2;

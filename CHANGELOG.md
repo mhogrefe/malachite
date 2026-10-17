@@ -158,6 +158,12 @@ documented by git history.
   `NaturalMatrix` (failing with `NaturalMatrixFromIntegerMatrixError` when an element is
   negative; the by-value form reuses each element's limbs), and the matching
   `ConvertibleFrom<&IntegerMatrix>` impls.
+- `BalancedMod` (by a `Natural`) and `BalancedModPowerOf2` for `NaturalMatrix`, giving an
+  `IntegerMatrix` of the representatives closest to zero, and, for `IntegerMatrix`, `Mod` (by a
+  `Natural`, or by a primitive unsigned `T` giving an `UnsignedMatrix<T>`), `%` (`Rem` and
+  `RemAssign` by an `Integer`), `ModPowerOf2`, `RemPowerOf2`, `RemPowerOf2Assign`, `BalancedMod`,
+  `BalancedModAssign`, `BalancedModPowerOf2`, and `BalancedModPowerOf2Assign`, matching the vector
+  forms. Every element is reduced and the shape is unchanged.
 - `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.
 - `CheckedAbs` for `NaturalVector` and `IntegerVector`, returning the Euclidean norm as a `Natural`
   when the sum of the squares of the elements is a perfect square, and `None` otherwise.

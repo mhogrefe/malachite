@@ -4184,6 +4184,15 @@ pub fn natural_matrix_unsigned_pair_gen() -> Generator<(NaturalMatrix, u64)> {
     )
 }
 
+// All `(IntegerMatrix, u64)` pairs, where the `u64` is a small power.
+pub fn integer_matrix_unsigned_pair_gen() -> Generator<(IntegerMatrix, u64)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_pair_gen,
+        &random_integer_matrix_unsigned_pair_gen,
+        &special_random_integer_matrix_unsigned_pair_gen,
+    )
+}
+
 pub fn natural_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
 -> Generator<(NaturalMatrix, T)> {
     Generator::new(
@@ -4193,12 +4202,39 @@ pub fn natural_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
     )
 }
 
+pub fn integer_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(IntegerMatrix, T)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_pair_gen_var_1,
+        &random_integer_matrix_unsigned_pair_gen_var_1,
+        &special_random_integer_matrix_unsigned_pair_gen_var_1,
+    )
+}
+
 // The `Natural` is positive.
 pub fn natural_matrix_natural_pair_gen_var_1() -> Generator<(NaturalMatrix, Natural)> {
     Generator::new(
         &exhaustive_natural_matrix_natural_pair_gen_var_1,
         &random_natural_matrix_natural_pair_gen_var_1,
         &special_random_natural_matrix_natural_pair_gen_var_1,
+    )
+}
+
+// The `Natural` is positive.
+pub fn integer_matrix_natural_pair_gen_var_1() -> Generator<(IntegerMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_integer_matrix_natural_pair_gen_var_1,
+        &random_integer_matrix_natural_pair_gen_var_1,
+        &special_random_integer_matrix_natural_pair_gen_var_1,
+    )
+}
+
+// The `Integer` is nonzero.
+pub fn integer_matrix_integer_pair_gen_var_1() -> Generator<(IntegerMatrix, Integer)> {
+    Generator::new(
+        &exhaustive_integer_matrix_integer_pair_gen_var_1,
+        &random_integer_matrix_integer_pair_gen_var_1,
+        &special_random_integer_matrix_integer_pair_gen_var_1,
     )
 }
 

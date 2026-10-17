@@ -6,6 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), which
+/// reduce every element of a [`NaturalMatrix`](super::NaturalMatrix) to the representative closest
+/// to zero modulo a number.
+pub mod balanced_mod;
+/// Implementations of
+/// [`BalancedModPowerOf2`](malachite_base::num::arithmetic::traits::BalancedModPowerOf2), which
+/// reduce every element of a [`NaturalMatrix`](super::NaturalMatrix) to the representative closest
+/// to zero modulo a power of 2.
+pub mod balanced_mod_power_of_2;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced), a
 /// trait for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
 /// modulo a number.

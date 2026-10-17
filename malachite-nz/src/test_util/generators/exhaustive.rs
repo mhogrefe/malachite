@@ -3734,6 +3734,13 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen() -> It<(NaturalMatrix, u64)>
     ))
 }
 
+pub fn exhaustive_integer_matrix_unsigned_pair_gen() -> It<(IntegerMatrix, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integer_matrices(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(NaturalMatrix, T)> {
     Box::new(exhaustive_pairs(
@@ -3742,10 +3749,32 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
     ))
 }
 
+pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(IntegerMatrix, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_matrices(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 pub fn exhaustive_natural_matrix_natural_pair_gen_var_1() -> It<(NaturalMatrix, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_natural_matrices(),
         exhaustive_positive_naturals(),
+    ))
+}
+
+pub fn exhaustive_integer_matrix_natural_pair_gen_var_1() -> It<(IntegerMatrix, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_matrices(),
+        exhaustive_positive_naturals(),
+    ))
+}
+
+pub fn exhaustive_integer_matrix_integer_pair_gen_var_1() -> It<(IntegerMatrix, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_matrices(),
+        exhaustive_nonzero_integers(),
     ))
 }
 
