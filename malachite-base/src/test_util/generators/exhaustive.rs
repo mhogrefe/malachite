@@ -14,6 +14,7 @@ use crate::foer_sequences::exhaustive::exhaustive_foer_sequences;
 use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::iterators::iter_windows;
 use crate::maps::exhaustive::{exhaustive_b_tree_maps, exhaustive_hash_maps};
+use crate::matrix::Matrix;
 use crate::max;
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, CheckedNeg, CoprimeWith, DivRound, ModIsReduced, ModPowerOf2IsReduced,
@@ -6865,11 +6866,11 @@ pub fn exhaustive_unsigned_matrix_gen_var_1() -> It<UnsignedMatrix<u64>> {
 }
 
 pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen()
--> It<(UnsignedMatrix<u64>, usize, usize)> {
+-> It<(UnsignedMatrix<u64>, u64, u64)> {
     Box::new(
         exhaustive_pairs(
             exhaustive_unsigned_matrix_gen(),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
         )
         .map(|(m, (i, j))| (m, i, j)),
     )
@@ -6884,7 +6885,7 @@ pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_1()
 
 // Each matrix paired with each of its row indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
-pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_2() -> It<(UnsignedMatrix<u64>, usize)> {
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_2() -> It<(UnsignedMatrix<u64>, u64)> {
     Box::new(
         exhaustive_unsigned_matrix_gen().flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
     )
@@ -6892,35 +6893,31 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_2() -> It<(UnsignedMatri
 
 // Each matrix paired with each of its column indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
-pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_3() -> It<(UnsignedMatrix<u64>, usize)> {
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_3() -> It<(UnsignedMatrix<u64>, u64)> {
     Box::new(
         exhaustive_unsigned_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
     )
 }
 
 pub fn exhaustive_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1()
--> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+-> It<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {
     Box::new(
         exhaustive_dependent_pairs_from_fn(
             exhaustive_unsigned_matrix_unsigned_pair_gen_var_2(),
-            |(m, _)| {
-                Box::new(exhaustive_unsigned_vectors_with_dimension::<u64>(
-                    u64::exact_from(m.width()),
-                ))
-            },
+            |(m, _)| Box::new(exhaustive_unsigned_vectors_with_dimension::<u64>(m.width())),
         )
         .map(|((m, i), v)| (m, i, v)),
     )
 }
 
 pub fn exhaustive_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2()
--> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+-> It<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {
     Box::new(
         exhaustive_dependent_pairs_from_fn(
             exhaustive_unsigned_matrix_unsigned_pair_gen_var_3(),
             |(m, _)| {
                 Box::new(exhaustive_unsigned_vectors_with_dimension::<u64>(
-                    u64::exact_from(m.height()),
+                    m.height(),
                 ))
             },
         )
@@ -7523,6 +7520,27 @@ pub fn exhaustive_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadr
 
 pub fn exhaustive_unsigned_pair_gen_var_33() -> It<(u64, u64)> {
     Box::new(exhaustive_unsigned_primitive_int_gen_var_1::<u64, u64>().map(|(i, k)| (i, i + k)))
+}
+
+// Every `u64` no greater than 64: sizes of square matrices small enough that every element can be
+// visited for each one.
+pub fn exhaustive_unsigned_gen_var_34() -> It<u64> {
+    Box::new(primitive_int_increasing_inclusive_range(0, 64))
+}
+
+// All `(u64, u64)`, as the heights and widths of matrices.
+pub fn exhaustive_unsigned_pair_gen_var_34() -> It<(u64, u64)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds()))
+}
+
+// All `(u64, u64, u64, u64)` where the third is less than the first and the fourth is less than the
+// second: a matrix's height and width, and a position in it. Each shape has finitely many
+// positions, so this reaches every quadruple.
+pub fn exhaustive_unsigned_quadruple_gen_var_14() -> It<(u64, u64, u64, u64)> {
+    Box::new(
+        exhaustive_unsigned_pair_gen_var_34()
+            .flat_map(|(h, w)| (0..h).flat_map(move |i| (0..w).map(move |j| (h, w, i, j)))),
+    )
 }
 
 // Every list of indices less than `dimension`: every way of selecting coordinates of a vector of

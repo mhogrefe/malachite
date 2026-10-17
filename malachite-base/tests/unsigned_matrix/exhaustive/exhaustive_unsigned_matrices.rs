@@ -8,6 +8,7 @@
 
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::exhaustive::primitive_int_increasing_range;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 use malachite_base::unsigned_matrix::exhaustive::*;
@@ -116,14 +117,14 @@ fn test_exhaustive_unsigned_matrices_with_dimensions_from_iterator() {
 #[should_panic]
 fn exhaustive_unsigned_matrices_with_dimensions_fail() {
     // height * width overflows
-    exhaustive_unsigned_matrices_with_dimensions::<u64>(usize::MAX, 2);
+    exhaustive_unsigned_matrices_with_dimensions::<u64>(u64::MAX, 2);
 }
 
 #[test]
 #[should_panic]
 fn exhaustive_unsigned_matrices_with_dimensions_from_iterator_fail() {
     // height * width overflows
-    exhaustive_unsigned_matrices_with_dimensions_from_iterator(usize::MAX, 2, zero_or_one());
+    exhaustive_unsigned_matrices_with_dimensions_from_iterator(u64::MAX, 2, zero_or_one());
 }
 
 #[test]

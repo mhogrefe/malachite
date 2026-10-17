@@ -127,6 +127,7 @@ use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::foer_sequences::exhaustive::exhaustive_foer_sequences;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
     EqModPowerOf2, Height, HeightRef, Parity, PowerOf2, Square,
@@ -3608,12 +3609,11 @@ pub fn exhaustive_integer_matrix_gen_var_1() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_square_matrices())
 }
 
-pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen() -> It<(IntegerMatrix, usize, usize)>
-{
+pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen() -> It<(IntegerMatrix, u64, u64)> {
     Box::new(
         exhaustive_pairs(
             exhaustive_integer_matrix_gen(),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
         )
         .map(|(m, (i, j))| (m, i, j)),
     )
@@ -3628,7 +3628,7 @@ pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen_var_1()
 
 // Each matrix paired with each of its row indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
-pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_2() -> It<(IntegerMatrix, usize)> {
+pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_2() -> It<(IntegerMatrix, u64)> {
     Box::new(
         exhaustive_integer_matrix_gen().flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
     )
@@ -3636,14 +3636,14 @@ pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_2() -> It<(IntegerMatrix,
 
 // Each matrix paired with each of its column indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
-pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_3() -> It<(IntegerMatrix, usize)> {
+pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_3() -> It<(IntegerMatrix, u64)> {
     Box::new(
         exhaustive_integer_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
     )
 }
 
 pub fn exhaustive_integer_matrix_unsigned_integer_vector_triple_gen_var_1()
--> It<(IntegerMatrix, usize, IntegerVector)> {
+-> It<(IntegerMatrix, u64, IntegerVector)> {
     Box::new(
         exhaustive_dependent_pairs_from_fn(
             exhaustive_integer_matrix_unsigned_pair_gen_var_2(),
@@ -3658,7 +3658,7 @@ pub fn exhaustive_integer_matrix_unsigned_integer_vector_triple_gen_var_1()
 }
 
 pub fn exhaustive_integer_matrix_unsigned_integer_vector_triple_gen_var_2()
--> It<(IntegerMatrix, usize, IntegerVector)> {
+-> It<(IntegerMatrix, u64, IntegerVector)> {
     Box::new(
         exhaustive_dependent_pairs_from_fn(
             exhaustive_integer_matrix_unsigned_pair_gen_var_3(),
@@ -3845,12 +3845,11 @@ pub fn exhaustive_natural_matrix_gen_var_1() -> It<NaturalMatrix> {
     Box::new(exhaustive_natural_square_matrices())
 }
 
-pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen() -> It<(NaturalMatrix, usize, usize)>
-{
+pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen() -> It<(NaturalMatrix, u64, u64)> {
     Box::new(
         exhaustive_pairs(
             exhaustive_natural_matrix_gen(),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
         )
         .map(|(m, (i, j))| (m, i, j)),
     )
@@ -3865,7 +3864,7 @@ pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_1()
 
 // Each matrix paired with each of its row indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
-pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_2() -> It<(NaturalMatrix, usize)> {
+pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_2() -> It<(NaturalMatrix, u64)> {
     Box::new(
         exhaustive_natural_matrix_gen().flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
     )
@@ -3873,14 +3872,14 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_2() -> It<(NaturalMatrix,
 
 // Each matrix paired with each of its column indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
-pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_3() -> It<(NaturalMatrix, usize)> {
+pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_3() -> It<(NaturalMatrix, u64)> {
     Box::new(
         exhaustive_natural_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
     )
 }
 
 pub fn exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_1()
--> It<(NaturalMatrix, usize, NaturalVector)> {
+-> It<(NaturalMatrix, u64, NaturalVector)> {
     Box::new(
         exhaustive_dependent_pairs_from_fn(
             exhaustive_natural_matrix_unsigned_pair_gen_var_2(),
@@ -3895,7 +3894,7 @@ pub fn exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_1()
 }
 
 pub fn exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_2()
--> It<(NaturalMatrix, usize, NaturalVector)> {
+-> It<(NaturalMatrix, u64, NaturalVector)> {
     Box::new(
         exhaustive_dependent_pairs_from_fn(
             exhaustive_natural_matrix_unsigned_pair_gen_var_3(),

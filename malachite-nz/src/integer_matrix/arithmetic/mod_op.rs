@@ -12,6 +12,7 @@ use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
 use alloc::vec::Vec;
 use core::ops::{Rem, RemAssign};
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{Mod, NegMod};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;

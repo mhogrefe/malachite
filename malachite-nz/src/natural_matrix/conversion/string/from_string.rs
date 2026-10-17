@@ -48,6 +48,7 @@ impl FromStr for NaturalMatrix {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
     /// use malachite_nz::natural_matrix::NaturalMatrix;
     ///
     /// let m = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();

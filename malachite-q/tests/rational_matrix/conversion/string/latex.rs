@@ -8,6 +8,8 @@
 
 use core::str::FromStr;
 use itertools::Itertools;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::latex::ToLatex;
 use malachite_q::Rational;
 use malachite_q::rational_matrix::RationalMatrix;
@@ -21,7 +23,7 @@ fn rows(
     f: impl Fn(&Rational) -> String,
 ) -> Vec<String> {
     m.elements
-        .chunks(m.width())
+        .chunks(usize::exact_from(m.width()))
         .map(|row| row.iter().map(&f).join(element_separator))
         .collect()
 }

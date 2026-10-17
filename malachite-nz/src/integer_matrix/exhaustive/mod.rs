@@ -8,9 +8,10 @@
 
 use crate::integer::Integer;
 use crate::integer::exhaustive::{IntegerUpDown, exhaustive_integers};
-use crate::integer_matrix::{IntegerMatrix, element_count};
+use crate::integer_matrix::{IntegerMatrix, shape};
 use alloc::vec::Vec;
 use core::iter::{Chain, Once, Repeat, Zip, repeat};
+use malachite_base::matrix::Matrix;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::exhaustive::{PrimitiveIntIncreasingRange, exhaustive_unsigneds};
 use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
@@ -29,9 +30,9 @@ use malachite_base::vecs::exhaustive::{
 /// [`exhaustive_integer_matrices`], [`exhaustive_integer_matrices_with_dimensions_from_iterator`],
 /// and [`exhaustive_integer_matrices_with_dimensions`]; see their documentation for more.
 #[derive(Clone, Debug)]
-pub struct ExhaustiveIntegerMatrices<I: Iterator<Item = ((usize, usize), Vec<Integer>)>>(I);
+pub struct ExhaustiveIntegerMatrices<I: Iterator<Item = ((u64, u64), Vec<Integer>)>>(I);
 
-impl<I: Iterator<Item = ((usize, usize), Vec<Integer>)>> Iterator for ExhaustiveIntegerMatrices<I> {
+impl<I: Iterator<Item = ((u64, u64), Vec<Integer>)>> Iterator for ExhaustiveIntegerMatrices<I> {
     type Item = IntegerMatrix;
 
     #[inline]
@@ -52,15 +53,15 @@ pub struct ExhaustiveIntegerMatrixElements<I: Clone + Iterator<Item = Integer>>(
 
 impl<I: Clone + Iterator<Item = Integer>>
     ExhaustiveDependentPairsYsGenerator<
-        (usize, usize),
+        (u64, u64),
         Vec<Integer>,
         ExhaustiveFixedLengthVecs1Input<I>,
     > for ExhaustiveIntegerMatrixElements<I>
 {
     #[inline]
-    fn get_ys(&self, &(height, width): &(usize, usize)) -> ExhaustiveFixedLengthVecs1Input<I> {
+    fn get_ys(&self, &(height, width): &(u64, u64)) -> ExhaustiveFixedLengthVecs1Input<I> {
         exhaustive_vecs_fixed_length_from_single(
-            u64::exact_from(element_count(height, width)),
+            u64::exact_from(shape(height, width).2),
             self.0.clone(),
         )
     }
@@ -112,11 +113,11 @@ pub fn exhaustive_integer_matrices_from_iterator<I: Clone + Iterator<Item = Inte
     xs: I,
 ) -> ExhaustiveIntegerMatrices<
     ExhaustiveDependentPairs<
-        (usize, usize),
+        (u64, u64),
         Vec<Integer>,
         RulerSequence<usize>,
         ExhaustiveIntegerMatrixElements<I>,
-        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<usize>>,
+        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<u64>>,
         ExhaustiveFixedLengthVecs1Input<I>,
     >,
 > {
@@ -158,11 +159,11 @@ pub fn exhaustive_integer_matrices_from_iterator<I: Clone + Iterator<Item = Inte
 #[inline]
 pub fn exhaustive_integer_matrices() -> ExhaustiveIntegerMatrices<
     ExhaustiveDependentPairs<
-        (usize, usize),
+        (u64, u64),
         Vec<Integer>,
         RulerSequence<usize>,
         ExhaustiveIntegerMatrixElements<Chain<Once<Integer>, IntegerUpDown>>,
-        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<usize>>,
+        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<u64>>,
         ExhaustiveFixedLengthVecs1Input<Chain<Once<Integer>, IntegerUpDown>>,
     >,
 > {
@@ -214,12 +215,13 @@ pub fn exhaustive_integer_matrices() -> ExhaustiveIntegerMatrices<
 pub fn exhaustive_integer_matrices_with_dimensions_from_iterator<
     I: Clone + Iterator<Item = Integer>,
 >(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     xs: I,
-) -> ExhaustiveIntegerMatrices<Zip<Repeat<(usize, usize)>, ExhaustiveFixedLengthVecs1Input<I>>> {
+) -> ExhaustiveIntegerMatrices<Zip<Repeat<(u64, u64)>, ExhaustiveFixedLengthVecs1Input<I>>> {
+    let count = shape(height, width).2;
     ExhaustiveIntegerMatrices(repeat((height, width)).zip(
-        exhaustive_vecs_fixed_length_from_single(u64::exact_from(element_count(height, width)), xs),
+        exhaustive_vecs_fixed_length_from_single(u64::exact_from(count), xs),
     ))
 }
 
@@ -256,13 +258,10 @@ pub fn exhaustive_integer_matrices_with_dimensions_from_iterator<
 /// ```
 #[inline]
 pub fn exhaustive_integer_matrices_with_dimensions(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
 ) -> ExhaustiveIntegerMatrices<
-    Zip<
-        Repeat<(usize, usize)>,
-        ExhaustiveFixedLengthVecs1Input<Chain<Once<Integer>, IntegerUpDown>>,
-    >,
+    Zip<Repeat<(u64, u64)>, ExhaustiveFixedLengthVecs1Input<Chain<Once<Integer>, IntegerUpDown>>>,
 > {
     exhaustive_integer_matrices_with_dimensions_from_iterator(height, width, exhaustive_integers())
 }
@@ -273,9 +272,9 @@ pub fn exhaustive_integer_matrices_with_dimensions(
 /// This `struct` is created by [`exhaustive_integer_square_matrices_from_iterator`] and
 /// [`exhaustive_integer_square_matrices`]; see their documentation for more.
 #[derive(Clone, Debug)]
-pub struct ExhaustiveIntegerSquareMatrices<I: Iterator<Item = (usize, Vec<Integer>)>>(I);
+pub struct ExhaustiveIntegerSquareMatrices<I: Iterator<Item = (u64, Vec<Integer>)>>(I);
 
-impl<I: Iterator<Item = (usize, Vec<Integer>)>> Iterator for ExhaustiveIntegerSquareMatrices<I> {
+impl<I: Iterator<Item = (u64, Vec<Integer>)>> Iterator for ExhaustiveIntegerSquareMatrices<I> {
     type Item = IntegerMatrix;
 
     #[inline]
@@ -295,13 +294,13 @@ impl<I: Iterator<Item = (usize, Vec<Integer>)>> Iterator for ExhaustiveIntegerSq
 pub struct ExhaustiveIntegerSquareMatrixElements<I: Clone + Iterator<Item = Integer>>(I);
 
 impl<I: Clone + Iterator<Item = Integer>>
-    ExhaustiveDependentPairsYsGenerator<usize, Vec<Integer>, ExhaustiveFixedLengthVecs1Input<I>>
+    ExhaustiveDependentPairsYsGenerator<u64, Vec<Integer>, ExhaustiveFixedLengthVecs1Input<I>>
     for ExhaustiveIntegerSquareMatrixElements<I>
 {
     #[inline]
-    fn get_ys(&self, &size: &usize) -> ExhaustiveFixedLengthVecs1Input<I> {
+    fn get_ys(&self, &size: &u64) -> ExhaustiveFixedLengthVecs1Input<I> {
         exhaustive_vecs_fixed_length_from_single(
-            u64::exact_from(element_count(size, size)),
+            u64::exact_from(shape(size, size).2),
             self.0.clone(),
         )
     }
@@ -356,11 +355,11 @@ pub fn exhaustive_integer_square_matrices_from_iterator<I: Clone + Iterator<Item
     xs: I,
 ) -> ExhaustiveIntegerSquareMatrices<
     ExhaustiveDependentPairs<
-        usize,
+        u64,
         Vec<Integer>,
         RulerSequence<usize>,
         ExhaustiveIntegerSquareMatrixElements<I>,
-        PrimitiveIntIncreasingRange<usize>,
+        PrimitiveIntIncreasingRange<u64>,
         ExhaustiveFixedLengthVecs1Input<I>,
     >,
 > {
@@ -404,11 +403,11 @@ pub fn exhaustive_integer_square_matrices_from_iterator<I: Clone + Iterator<Item
 #[inline]
 pub fn exhaustive_integer_square_matrices() -> ExhaustiveIntegerSquareMatrices<
     ExhaustiveDependentPairs<
-        usize,
+        u64,
         Vec<Integer>,
         RulerSequence<usize>,
         ExhaustiveIntegerSquareMatrixElements<Chain<Once<Integer>, IntegerUpDown>>,
-        PrimitiveIntIncreasingRange<usize>,
+        PrimitiveIntIncreasingRange<u64>,
         ExhaustiveFixedLengthVecs1Input<Chain<Once<Integer>, IntegerUpDown>>,
     >,
 > {

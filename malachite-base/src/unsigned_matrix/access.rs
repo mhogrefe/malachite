@@ -6,17 +6,18 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::matrix::Matrix;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::ExactFrom;
 use crate::unsigned_matrix::UnsignedMatrix;
 use core::ops::{Index, IndexMut};
 
 impl<T: PrimitiveUnsigned> UnsignedMatrix<T> {
     // The position in `elements` of the element in row `i` and column `j`, or `None` if either
     // index is out of range.
-    #[inline]
-    const fn element_index(&self, i: usize, j: usize) -> Option<usize> {
-        if i < self.height && j < self.width {
-            Some(i * self.width + j)
+    fn element_index(&self, i: u64, j: u64) -> Option<usize> {
+        if i < self.height() && j < self.width() {
+            Some(usize::exact_from(i) * self.width + usize::exact_from(j))
         } else {
             None
         }
@@ -59,7 +60,7 @@ impl<T: PrimitiveUnsigned> UnsignedMatrix<T> {
     /// assert_eq!(m.get(0, 3), None);
     /// ```
     #[inline]
-    pub fn get(&self, i: usize, j: usize) -> Option<&T> {
+    pub fn get(&self, i: u64, j: u64) -> Option<&T> {
         self.element_index(i, j).map(|k| &self.elements[k])
     }
 
@@ -83,7 +84,7 @@ impl<T: PrimitiveUnsigned> UnsignedMatrix<T> {
     /// assert!(m.get_mut(0, 3).is_none());
     /// ```
     #[inline]
-    pub fn get_mut(&mut self, i: usize, j: usize) -> Option<&mut T> {
+    pub fn get_mut(&mut self, i: u64, j: u64) -> Option<&mut T> {
         self.element_index(i, j).map(|k| &mut self.elements[k])
     }
 }

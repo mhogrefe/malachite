@@ -8,6 +8,7 @@
 
 use crate::rational_matrix::RationalMatrix;
 use alloc::vec::Vec;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;

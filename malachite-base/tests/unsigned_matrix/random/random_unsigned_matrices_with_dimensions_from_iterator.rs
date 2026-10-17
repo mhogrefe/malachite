@@ -12,8 +12,8 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::unsigned_matrix::random::random_unsigned_matrices_with_dimensions_from_iterator;
 
 fn random_unsigned_matrices_with_dimensions_from_iterator_helper(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     bound: u8,
     expected_values: &[&str],
 ) {
@@ -134,7 +134,7 @@ fn test_random_unsigned_matrices_with_dimensions_from_iterator() {
 fn random_unsigned_matrices_with_dimensions_from_iterator_fail_1() {
     // height * width overflows
     let _ = random_unsigned_matrices_with_dimensions_from_iterator(
-        usize::MAX,
+        u64::MAX,
         2,
         random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 0, 8),
     );

@@ -39,7 +39,7 @@ impl IntegerMatrix {
     /// assert_eq!(m.row(1).to_string(), "()");
     /// ```
     #[inline]
-    pub fn row(&self, i: usize) -> IntegerVector {
+    pub fn row(&self, i: u64) -> IntegerVector {
         IntegerVector {
             elements: self.row_iter(i).as_slice().to_vec(),
         }

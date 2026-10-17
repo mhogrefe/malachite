@@ -9,6 +9,7 @@
 use crate::integer::Integer;
 use crate::integer_matrix::IntegerMatrix;
 use alloc::vec::Vec;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::unsigned_matrix::UnsignedMatrix;

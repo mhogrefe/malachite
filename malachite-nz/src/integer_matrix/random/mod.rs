@@ -10,8 +10,9 @@ use crate::integer::Integer;
 use crate::integer::random::{
     RandomIntegers, StripedRandomIntegers, random_integers, striped_random_integers,
 };
-use crate::integer_matrix::{IntegerMatrix, element_count};
+use crate::integer_matrix::{IntegerMatrix, shape};
 use core::iter::{Repeat, repeat};
+use malachite_base::matrix::Matrix;
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, GeometricRandomSigneds, geometric_random_unsigneds,
 };
@@ -30,12 +31,12 @@ use malachite_base::tuples::random::{RandomPairsFromSingle, random_pairs_from_si
 /// [`random_integer_square_matrices_from_iterator`], [`random_integer_square_matrices`], and
 /// [`striped_random_integer_square_matrices`]; see their documentation for more.
 #[derive(Clone, Debug)]
-pub struct RandomIntegerMatrices<D: Iterator<Item = (usize, usize)>, I: Iterator<Item = Integer>> {
+pub struct RandomIntegerMatrices<D: Iterator<Item = (u64, u64)>, I: Iterator<Item = Integer>> {
     dimensions: D,
     xs: I,
 }
 
-impl<D: Iterator<Item = (usize, usize)>, I: Iterator<Item = Integer>> Iterator
+impl<D: Iterator<Item = (u64, u64)>, I: Iterator<Item = Integer>> Iterator
     for RandomIntegerMatrices<D, I>
 {
     type Item = IntegerMatrix;
@@ -45,13 +46,13 @@ impl<D: Iterator<Item = (usize, usize)>, I: Iterator<Item = Integer>> Iterator
         Some(IntegerMatrix::from_owned_elements(
             height,
             width,
-            (&mut self.xs).take(element_count(height, width)).collect(),
+            (&mut self.xs).take(shape(height, width).2).collect(),
         ))
     }
 }
 
 /// The dimensions that the [`IntegerMatrix`] generators of random shape draw on.
-pub type RandomMatrixDimensions = RandomPairsFromSingle<GeometricRandomNaturalValues<usize>>;
+pub type RandomMatrixDimensions = RandomPairsFromSingle<GeometricRandomNaturalValues<u64>>;
 
 /// The elements that the unstriped [`IntegerMatrix`] generators draw on.
 pub type RandomMatrixElements = RandomIntegers<GeometricRandomSigneds<i64>>;
@@ -173,11 +174,11 @@ pub fn random_integer_matrices_from_iterator<I: Iterator<Item = Integer>>(
 /// ```
 #[inline]
 pub fn random_integer_matrices_with_dimensions_from_iterator<I: Iterator<Item = Integer>>(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     xs: I,
-) -> RandomIntegerMatrices<Repeat<(usize, usize)>, I> {
-    element_count(height, width);
+) -> RandomIntegerMatrices<Repeat<(u64, u64)>, I> {
+    shape(height, width);
     RandomIntegerMatrices {
         dimensions: repeat((height, width)),
         xs,
@@ -273,11 +274,11 @@ pub fn random_integer_matrices(
 #[inline]
 pub fn random_integer_matrices_with_dimensions(
     seed: Seed,
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-) -> RandomIntegerMatrices<Repeat<(usize, usize)>, RandomMatrixElements> {
+) -> RandomIntegerMatrices<Repeat<(u64, u64)>, RandomMatrixElements> {
     random_integer_matrices_with_dimensions_from_iterator(
         height,
         width,
@@ -392,13 +393,13 @@ pub fn striped_random_integer_matrices(
 #[inline]
 pub fn striped_random_integer_matrices_with_dimensions(
     seed: Seed,
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-) -> RandomIntegerMatrices<Repeat<(usize, usize)>, StripedRandomMatrixElements> {
+) -> RandomIntegerMatrices<Repeat<(u64, u64)>, StripedRandomMatrixElements> {
     random_integer_matrices_with_dimensions_from_iterator(
         height,
         width,
@@ -419,13 +420,13 @@ pub fn striped_random_integer_matrices_with_dimensions(
 /// [`random_integer_square_matrices`], and [`striped_random_integer_square_matrices`]; see their
 /// documentation for more.
 #[derive(Clone, Debug)]
-pub struct RandomSquareMatrixDimensions(GeometricRandomNaturalValues<usize>);
+pub struct RandomSquareMatrixDimensions(GeometricRandomNaturalValues<u64>);
 
 impl Iterator for RandomSquareMatrixDimensions {
-    type Item = (usize, usize);
+    type Item = (u64, u64);
 
     #[inline]
-    fn next(&mut self) -> Option<(usize, usize)> {
+    fn next(&mut self) -> Option<(u64, u64)> {
         self.0.next().map(|size| (size, size))
     }
 }

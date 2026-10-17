@@ -16,6 +16,7 @@ use crate::foer_sequences::FoerSequence;
 use crate::foer_sequences::random::random_foer_sequences;
 use crate::iterators::{NonzeroValues, with_special_value};
 use crate::maps::random::{random_b_tree_maps, random_hash_maps};
+use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, ModPowerOf2, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
@@ -10963,16 +10964,14 @@ pub fn special_random_unsigned_matrix_gen_var_1(config: &GenConfig) -> It<Unsign
 
 pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize, usize)> {
+) -> It<(UnsignedMatrix<u64>, u64, u64)> {
     Box::new(
         special_random_unsigned_matrix_gen(config)
-            .zip(random_pairs_from_single(
-                geometric_random_unsigneds::<usize>(
-                    EXAMPLE_SEED.fork("indices"),
-                    config.get_or("mean_dimension_n", 4),
-                    config.get_or("mean_dimension_d", 1),
-                ),
-            ))
+            .zip(random_pairs_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("indices"),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )))
             .map(|(m, (i, j))| (m, i, j)),
     )
 }
@@ -10985,7 +10984,7 @@ pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_1(
 
 pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_2(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize)> {
+) -> It<(UnsignedMatrix<u64>, u64)> {
     Box::new(
         special_random_unsigned_matrix_gen(config)
             .flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
@@ -10994,7 +10993,7 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_2(
 
 pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_3(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize)> {
+) -> It<(UnsignedMatrix<u64>, u64)> {
     Box::new(
         special_random_unsigned_matrix_gen(config)
             .flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
@@ -11003,7 +11002,7 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_3(
 
 pub fn special_random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+) -> It<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {
     let mut xs = striped_random_unsigneds::<u64>(
         EXAMPLE_SEED.fork("vector"),
         config.get_or("mean_stripe_n", 32),
@@ -11011,7 +11010,7 @@ pub fn special_random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1(
     );
     Box::new(
         special_random_unsigned_matrix_unsigned_pair_gen_var_2(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.width()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.width())).collect();
             (m, i, v)
         }),
     )
@@ -11019,7 +11018,7 @@ pub fn special_random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1(
 
 pub fn special_random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+) -> It<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {
     let mut xs = striped_random_unsigneds::<u64>(
         EXAMPLE_SEED.fork("vector"),
         config.get_or("mean_stripe_n", 32),
@@ -11027,7 +11026,7 @@ pub fn special_random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2(
     );
     Box::new(
         special_random_unsigned_matrix_unsigned_pair_gen_var_3(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.height()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.height())).collect();
             (m, i, v)
         }),
     )

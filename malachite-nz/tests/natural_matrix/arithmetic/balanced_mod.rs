@@ -8,6 +8,7 @@
 
 use core::cmp::Ordering::*;
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{BalancedMod, DivisibleBy, Mod, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::comparison::traits::OrdDouble;

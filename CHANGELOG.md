@@ -10,6 +10,13 @@ documented by git history.
 
 ### malachite-base
 
+- The `Matrix` trait (`malachite_base::matrix`), for what every matrix type has in common, as
+  `Vector` is for vectors: `from_elements`, `from_owned_elements` and their column-major forms,
+  `zero`, `identity`, `standard_basis_matrix` (the matrix units $E_{ij}$), `to_elements`,
+  `into_elements`, `elements_ref`, `height`, `width`, `is_square`, `is_zero`, `set_zero`,
+  `transpose`, and `transpose_assign`. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`,
+  `IntegerMatrix`, and `RationalMatrix`. Heights, widths, and indices are `u64`s throughout the
+  matrix API, as they are for vectors; only `Index`/`IndexMut` take `usize`s.
 - `UnsignedMatrix<T>`, a matrix of primitive unsigned integers with the same layout and interface
   as malachite-nz's `IntegerMatrix`: the element and row/column constructors, `height`, `width`,
   `transpose`, `transpose_assign`, `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`,
@@ -144,8 +151,8 @@ documented by git history.
   `random_integer_matrices_with_dimensions`, and their striped and `_from_iterator` forms. Random
   shapes have independent geometric heights and widths.
 - `Index<(usize, usize)>` and `IndexMut<(usize, usize)>` for `IntegerMatrix`, so `m[(i, j)]` is the
-  element in row `i` and column `j`, and `get(i, j)` and `get_mut(i, j)`, which return `None` instead
-  of panicking. Each index is checked against its own dimension.
+  element in row `i` and column `j`, and `get(i, j)` and `get_mut(i, j)` (taking `u64`s), which return
+  `None` instead of panicking. Each index is checked against its own dimension.
 - `Display` and `Debug` for `IntegerMatrix` (identical): `[1, 2; 3, 4]`, with rows separated by
   `; `. A matrix with no rows or no columns is written with its dimensions, as in `[]_{4,0}`.
 - `ToLatex` for `IntegerMatrix`, a `pmatrix` environment such as

@@ -15,6 +15,7 @@ use crate::foer_sequences::FoerSequence;
 use crate::foer_sequences::random::random_foer_sequences;
 use crate::iterators::with_special_value;
 use crate::maps::random::{random_b_tree_maps, random_hash_maps};
+use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, CoprimeWith, DivRound, ModPowerOf2, Parity, PowerOf2, ShrRound,
     UnsignedAbs,
@@ -9251,16 +9252,14 @@ pub fn random_unsigned_matrix_gen_var_1(config: &GenConfig) -> It<UnsignedMatrix
 
 pub fn random_unsigned_matrix_unsigned_unsigned_triple_gen(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize, usize)> {
+) -> It<(UnsignedMatrix<u64>, u64, u64)> {
     Box::new(
         random_unsigned_matrix_gen(config)
-            .zip(random_pairs_from_single(
-                geometric_random_unsigneds::<usize>(
-                    EXAMPLE_SEED.fork("indices"),
-                    config.get_or("mean_dimension_n", 4),
-                    config.get_or("mean_dimension_d", 1),
-                ),
-            ))
+            .zip(random_pairs_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("indices"),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )))
             .map(|(m, (i, j))| (m, i, j)),
     )
 }
@@ -9273,7 +9272,7 @@ pub fn random_unsigned_matrix_unsigned_unsigned_triple_gen_var_1(
 
 pub fn random_unsigned_matrix_unsigned_pair_gen_var_2(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize)> {
+) -> It<(UnsignedMatrix<u64>, u64)> {
     Box::new(
         random_unsigned_matrix_gen(config)
             .flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
@@ -9282,7 +9281,7 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_2(
 
 pub fn random_unsigned_matrix_unsigned_pair_gen_var_3(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize)> {
+) -> It<(UnsignedMatrix<u64>, u64)> {
     Box::new(
         random_unsigned_matrix_gen(config)
             .flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
@@ -9291,11 +9290,11 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_3(
 
 pub fn random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+) -> It<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {
     let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("vector"));
     Box::new(
         random_unsigned_matrix_unsigned_pair_gen_var_2(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.width()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.width())).collect();
             (m, i, v)
         }),
     )
@@ -9303,11 +9302,11 @@ pub fn random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1(
 
 pub fn random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2(
     config: &GenConfig,
-) -> It<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+) -> It<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {
     let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("vector"));
     Box::new(
         random_unsigned_matrix_unsigned_pair_gen_var_3(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.height()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.height())).collect();
             (m, i, v)
         }),
     )
@@ -9884,6 +9883,33 @@ pub fn random_unsigned_vector_unsigned_vector_unsigned_vector_unsigned_quadruple
 
 pub fn random_unsigned_pair_gen_var_40(config: &GenConfig) -> It<(u64, u64)> {
     Box::new(random_unsigned_pair_gen_var_9::<u64, u64>(config).map(|(i, k)| (i, i + k)))
+}
+
+pub fn random_unsigned_gen_var_35(config: &GenConfig) -> It<u64> {
+    Box::new(geometric_random_unsigneds(
+        EXAMPLE_SEED,
+        config.get_or("mean_dimension_n", 4),
+        config.get_or("mean_dimension_d", 1),
+    ))
+}
+
+pub fn random_unsigned_pair_gen_var_41(config: &GenConfig) -> It<(u64, u64)> {
+    Box::new(random_pairs_from_single(geometric_random_unsigneds(
+        EXAMPLE_SEED,
+        config.get_or("mean_dimension_n", 4),
+        config.get_or("mean_dimension_d", 1),
+    )))
+}
+
+pub fn random_unsigned_quadruple_gen_var_5(config: &GenConfig) -> It<(u64, u64, u64, u64)> {
+    Box::new(
+        random_unsigned_pair_gen_var_41(config)
+            .filter(|&(h, w)| h != 0 && w != 0)
+            .zip(random_pairs_from_single(random_primitive_ints::<u64>(
+                EXAMPLE_SEED.fork("position"),
+            )))
+            .map(|((h, w), (x, y))| (h, w, x % h, y % w)),
+    )
 }
 
 // Pairs of a vector from `vectors` and a list of indices less than its dimension; the only list for

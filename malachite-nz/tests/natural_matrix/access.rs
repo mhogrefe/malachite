@@ -7,7 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::{
@@ -88,7 +90,7 @@ fn index_mut_fail_2() {
 
 #[test]
 fn test_get() {
-    let test = |s, i: usize, j: usize, out: Option<u32>| {
+    let test = |s, i: u64, j: u64, out: Option<u32>| {
         let mut m = NaturalMatrix::from_str(s).unwrap();
         let out = out.map(Natural::from);
         assert_eq!(m.get(i, j), out.as_ref());
@@ -103,15 +105,15 @@ fn test_get() {
     test("[1, 2, 3; 4, 5, 6]", 1, 2, Some(6));
     test("[1, 2, 3; 4, 5, 6]", 0, 3, None);
     test("[1, 2, 3; 4, 5, 6]", 2, 0, None);
-    test("[1, 2, 3; 4, 5, 6]", usize::MAX, usize::MAX, None);
+    test("[1, 2, 3; 4, 5, 6]", u64::MAX, u64::MAX, None);
 }
 
 #[test]
 fn index_properties() {
     natural_matrix_unsigned_unsigned_triple_gen_var_1().test_properties(|(m, i, j)| {
         let x = &m[(i, j)];
-        assert_eq!(x, &m.elements[i * m.width() + j]);
-        assert_eq!(m.get(i, j), Some(x));
+        assert_eq!(x, &m.elements[i * usize::exact_from(m.width()) + j]);
+        assert_eq!(m.get(u64::exact_from(i), u64::exact_from(j)), Some(x));
         assert_eq!(&m.transpose()[(j, i)], x);
 
         // Changing one element through `IndexMut` changes only that element.
@@ -120,22 +122,22 @@ fn index_properties() {
         assert!(n.is_valid());
         assert_eq!((n.height(), n.width()), (m.height(), m.width()));
         assert_eq!(n[(i, j)], x + Natural::ONE);
-        for k in 0..m.height() {
-            for l in 0..m.width() {
+        for k in 0..usize::exact_from(m.height()) {
+            for l in 0..usize::exact_from(m.width()) {
                 if (k, l) != (i, j) {
                     assert_eq!(n[(k, l)], m[(k, l)]);
                 }
             }
         }
-        *n.get_mut(i, j).unwrap() -= Natural::ONE;
+        *n.get_mut(u64::exact_from(i), u64::exact_from(j)).unwrap() -= Natural::ONE;
         assert_eq!(n, m);
     });
 
     natural_matrix_gen().test_properties(|m| {
         // Indexing every position, row by row, reads back the elements.
         let mut xs = Vec::new();
-        for i in 0..m.height() {
-            for j in 0..m.width() {
+        for i in 0..usize::exact_from(m.height()) {
+            for j in 0..usize::exact_from(m.width()) {
                 xs.push(m[(i, j)].clone());
             }
         }
@@ -149,7 +151,7 @@ fn get_properties() {
         let x = m.get(i, j).cloned();
         assert_eq!(x.is_some(), i < m.height() && j < m.width());
         if let Some(x) = &x {
-            assert_eq!(&m[(i, j)], x);
+            assert_eq!(&m[(usize::exact_from(i), usize::exact_from(j))], x);
         }
         assert_eq!(m.get_mut(i, j).map(|y| y.clone()), x);
         assert_eq!(m.transpose().get(j, i).cloned(), x);

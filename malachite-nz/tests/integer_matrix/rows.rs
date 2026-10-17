@@ -8,7 +8,9 @@
 
 use core::str::FromStr;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::integer_matrix_gen;
@@ -27,7 +29,7 @@ fn test_rows() {
         let m = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(rows_to_string(&m, false), out);
         assert_eq!(rows_to_string(&m, true), out_rev);
-        assert_eq!(m.rows().len(), m.height());
+        assert_eq!(u64::exact_from(m.rows().len()), m.height());
     };
     test("[]_{0,0}", "[]", "[]");
     test("[]_{3,0}", "[[], [], []]", "[[], [], []]");
@@ -88,8 +90,8 @@ fn test_rows_mut() {
 fn rows_properties() {
     integer_matrix_gen().test_properties(|mut m| {
         let n = m.height();
-        assert_eq!(m.rows().len(), n);
-        assert_eq!(m.rows_mut().len(), n);
+        assert_eq!(u64::exact_from(m.rows().len()), n);
+        assert_eq!(u64::exact_from(m.rows_mut().len()), n);
         assert!(m.rows().zip(0..).all(|(xs, k)| xs.eq(m.row_iter(k))));
         assert!(
             m.rows()
@@ -105,7 +107,7 @@ fn rows_properties() {
         let mut k = 0;
         let mut l = n;
         while k < l {
-            assert_eq!(it.len(), l - k);
+            assert_eq!(u64::exact_from(it.len()), l - k);
             if (k + l) % 2 == 0 {
                 assert!(it.next().unwrap().eq(m.row_iter(k)));
                 k += 1;

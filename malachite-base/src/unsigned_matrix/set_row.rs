@@ -38,7 +38,7 @@ impl<T: PrimitiveUnsigned> UnsignedMatrix<T> {
     /// m.set_row(1, &UnsignedVector::<u64>::from_str("(7, 8, 9)").unwrap());
     /// assert_eq!(m.to_string(), "[1, 2, 3; 7, 8, 9]");
     /// ```
-    pub fn set_row(&mut self, i: usize, v: &UnsignedVector<T>) {
+    pub fn set_row(&mut self, i: u64, v: &UnsignedVector<T>) {
         let row = self.row_iter_mut(i).into_slice();
         assert_eq!(
             v.elements.len(),
@@ -75,7 +75,7 @@ impl<T: PrimitiveUnsigned> UnsignedMatrix<T> {
     /// m.set_row_owned(1, UnsignedVector::<u64>::from_str("(7, 8, 9)").unwrap());
     /// assert_eq!(m.to_string(), "[1, 2, 3; 7, 8, 9]");
     /// ```
-    pub fn set_row_owned(&mut self, i: usize, v: UnsignedVector<T>) {
+    pub fn set_row_owned(&mut self, i: u64, v: UnsignedVector<T>) {
         let row = self.row_iter_mut(i).into_slice();
         assert_eq!(
             v.elements.len(),

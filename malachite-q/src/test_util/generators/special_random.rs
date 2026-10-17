@@ -36,6 +36,7 @@ use crate::test_util::extra_variadic::{
 };
 use crate::test_util::generators::{rational_matrix_positions, round_to_multiple_rational_filter};
 use malachite_base::bools::random::random_bools;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -2573,16 +2574,14 @@ pub fn special_random_rational_matrix_gen_var_1(config: &GenConfig) -> It<Ration
 
 pub fn special_random_rational_matrix_unsigned_unsigned_triple_gen(
     config: &GenConfig,
-) -> It<(RationalMatrix, usize, usize)> {
+) -> It<(RationalMatrix, u64, u64)> {
     Box::new(
         special_random_rational_matrix_gen(config)
-            .zip(random_pairs_from_single(
-                geometric_random_unsigneds::<usize>(
-                    EXAMPLE_SEED.fork("indices"),
-                    config.get_or("mean_dimension_n", 4),
-                    config.get_or("mean_dimension_d", 1),
-                ),
-            ))
+            .zip(random_pairs_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("indices"),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )))
             .map(|(m, (i, j))| (m, i, j)),
     )
 }
@@ -2595,7 +2594,7 @@ pub fn special_random_rational_matrix_unsigned_unsigned_triple_gen_var_1(
 
 pub fn special_random_rational_matrix_unsigned_pair_gen_var_1(
     config: &GenConfig,
-) -> It<(RationalMatrix, usize)> {
+) -> It<(RationalMatrix, u64)> {
     Box::new(
         special_random_rational_matrix_gen(config)
             .flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
@@ -2604,7 +2603,7 @@ pub fn special_random_rational_matrix_unsigned_pair_gen_var_1(
 
 pub fn special_random_rational_matrix_unsigned_pair_gen_var_2(
     config: &GenConfig,
-) -> It<(RationalMatrix, usize)> {
+) -> It<(RationalMatrix, u64)> {
     Box::new(
         special_random_rational_matrix_gen(config)
             .flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
@@ -2613,7 +2612,7 @@ pub fn special_random_rational_matrix_unsigned_pair_gen_var_2(
 
 pub fn special_random_rational_matrix_unsigned_rational_vector_triple_gen_var_1(
     config: &GenConfig,
-) -> It<(RationalMatrix, usize, RationalVector)> {
+) -> It<(RationalMatrix, u64, RationalVector)> {
     let mut xs = striped_random_rationals(
         EXAMPLE_SEED.fork("vector"),
         config.get_or("mean_stripe_n", 32),
@@ -2623,7 +2622,7 @@ pub fn special_random_rational_matrix_unsigned_rational_vector_triple_gen_var_1(
     );
     Box::new(
         special_random_rational_matrix_unsigned_pair_gen_var_1(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.width()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.width())).collect();
             (m, i, v)
         }),
     )
@@ -2631,7 +2630,7 @@ pub fn special_random_rational_matrix_unsigned_rational_vector_triple_gen_var_1(
 
 pub fn special_random_rational_matrix_unsigned_rational_vector_triple_gen_var_2(
     config: &GenConfig,
-) -> It<(RationalMatrix, usize, RationalVector)> {
+) -> It<(RationalMatrix, u64, RationalVector)> {
     let mut xs = striped_random_rationals(
         EXAMPLE_SEED.fork("vector"),
         config.get_or("mean_stripe_n", 32),
@@ -2641,7 +2640,7 @@ pub fn special_random_rational_matrix_unsigned_rational_vector_triple_gen_var_2(
     );
     Box::new(
         special_random_rational_matrix_unsigned_pair_gen_var_2(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.height()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.height())).collect();
             (m, i, v)
         }),
     )

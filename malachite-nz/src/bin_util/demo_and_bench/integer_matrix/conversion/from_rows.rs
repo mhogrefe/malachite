@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::matrix::Matrix;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::bench::bucketers::Bucketer;
@@ -28,7 +29,12 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn rows_of(m: &IntegerMatrix) -> Vec<IntegerVector> {
     (0..m.height())
-        .map(|i| IntegerVector::from_elements(&m.elements[i * m.width()..(i + 1) * m.width()]))
+        .map(|i| {
+            IntegerVector::from_elements(
+                &m.elements
+                    [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())],
+            )
+        })
         .collect()
 }
 

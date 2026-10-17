@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::test_util::generators::rational_matrix_natural_matrix_pair_gen;

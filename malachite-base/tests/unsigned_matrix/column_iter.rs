@@ -8,6 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{
     unsigned_matrix_gen, unsigned_matrix_unsigned_pair_gen_var_3,
 };
@@ -15,7 +17,7 @@ use malachite_base::unsigned_matrix::UnsignedMatrix;
 
 #[test]
 fn test_column_iter() {
-    let test = |s, j: usize, out| {
+    let test = |s, j: u64, out| {
         let mut m = UnsignedMatrix::<u64>::from_str(s).unwrap();
         assert_eq!(prefix_to_string(m.column_iter(j), 100), out);
         assert_eq!(prefix_to_string(m.column_iter_mut(j), 100), out);
@@ -31,7 +33,7 @@ fn test_column_iter() {
 
 #[test]
 fn test_column_iter_mut() {
-    let test = |s, j: usize, out| {
+    let test = |s, j: u64, out| {
         let mut m = UnsignedMatrix::<u64>::from_str(s).unwrap();
         for x in m.column_iter_mut(j) {
             *x ^= 1;
@@ -86,18 +88,21 @@ fn column_iter_mut_fail_2() {
 fn column_iter_properties() {
     unsigned_matrix_unsigned_pair_gen_var_3().test_properties(|(mut m, j)| {
         let n = m.height();
-        assert_eq!(m.column_iter(j).len(), n);
-        assert!(m.column_iter(j).eq((0..m.height()).map(|i| &m[(i, j)])));
+        assert_eq!(u64::exact_from(m.column_iter(j).len()), n);
+        assert!(
+            m.column_iter(j)
+                .eq((0..m.height()).map(|i| m.get(i, j).unwrap()))
+        );
         assert!(
             m.column_iter(j)
                 .rev()
-                .eq((0..m.height()).map(|i| &m[(i, j)]).rev())
+                .eq((0..m.height()).map(|i| m.get(i, j).unwrap()).rev())
         );
         assert!(m.column_iter(j).eq(m.transpose().row_iter(j)));
 
         // Changing the elements through `column_iter_mut` changes only that column.
         let old = m.clone();
-        assert_eq!(m.column_iter_mut(j).len(), n);
+        assert_eq!(u64::exact_from(m.column_iter_mut(j).len()), n);
         assert!(m.column_iter_mut(j).map(|x| &*x).eq(old.column_iter(j)));
         for x in m.column_iter_mut(j) {
             *x ^= 1;

@@ -913,12 +913,15 @@ pub mod unsigned_matrix {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod to_elements;
     }
     pub mod dimensions;
     pub mod exhaustive {
         pub mod exhaustive_unsigned_matrices;
     }
+    pub mod identity;
     pub mod is_square;
+    pub mod is_zero;
     pub mod random {
         pub mod random_unsigned_matrices;
         pub mod random_unsigned_matrices_from_iterator;
@@ -935,7 +938,10 @@ pub mod unsigned_matrix {
     pub mod rows;
     pub mod set_column;
     pub mod set_row;
+    pub mod set_zero;
+    pub mod standard_basis_matrix;
     pub mod transpose;
+    pub mod zero;
 }
 pub mod unsigned_polynomial {
     pub mod arithmetic {

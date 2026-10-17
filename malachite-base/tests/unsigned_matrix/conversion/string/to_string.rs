@@ -7,11 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::unsigned_matrix_gen;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 
-fn matrix(height: usize, width: usize, xs: &[u64]) -> UnsignedMatrix<u64> {
+fn matrix(height: u64, width: u64, xs: &[u64]) -> UnsignedMatrix<u64> {
     UnsignedMatrix::from_owned_elements(height, width, xs.to_vec())
 }
 
@@ -23,7 +25,7 @@ fn rows(
     f: impl Fn(&u64) -> String,
 ) -> Vec<String> {
     m.elements
-        .chunks(m.width())
+        .chunks(usize::exact_from(m.width()))
         .map(|row| row.iter().map(&f).join(element_separator))
         .collect()
 }
@@ -63,7 +65,7 @@ fn to_string_properties() {
             );
             // The rows of the transpose are the columns.
             assert_eq!(
-                m.transpose().to_string().matches(';').count() + 1,
+                u64::exact_from(m.transpose().to_string().matches(';').count() + 1),
                 m.width()
             );
         }

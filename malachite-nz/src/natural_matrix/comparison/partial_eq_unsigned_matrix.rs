@@ -8,6 +8,7 @@
 
 use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 
@@ -32,8 +33,8 @@ where
     /// # Examples
     /// See [here](super::partial_eq_unsigned_matrix#partial_eq).
     fn eq(&self, other: &UnsignedMatrix<T>) -> bool {
-        self.height == other.height()
-            && self.width == other.width()
+        self.height() == other.height()
+            && self.width() == other.width()
             && self
                 .elements
                 .iter()

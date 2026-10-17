@@ -39,7 +39,7 @@ impl RationalMatrix {
     /// assert_eq!(m.row(1).to_string(), "()");
     /// ```
     #[inline]
-    pub fn row(&self, i: usize) -> RationalVector {
+    pub fn row(&self, i: u64) -> RationalVector {
         RationalVector {
             elements: self.row_iter(i).as_slice().to_vec(),
         }

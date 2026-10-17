@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Assign};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_matrix::UnsignedMatrix;

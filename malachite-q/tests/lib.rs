@@ -191,13 +191,16 @@ pub mod rational_matrix {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod to_elements;
         pub mod unsigned_matrix_from_rational_matrix;
     }
     pub mod dimensions;
     pub mod exhaustive {
         pub mod exhaustive_rational_matrices;
     }
+    pub mod identity;
     pub mod is_square;
+    pub mod is_zero;
     pub mod random {
         pub mod random_rational_matrices;
         pub mod random_rational_matrices_from_iterator;
@@ -214,7 +217,10 @@ pub mod rational_matrix {
     pub mod rows;
     pub mod set_column;
     pub mod set_row;
+    pub mod set_zero;
+    pub mod standard_basis_matrix;
     pub mod transpose;
+    pub mod zero;
 }
 pub mod rational_polynomial {
     pub mod arithmetic {

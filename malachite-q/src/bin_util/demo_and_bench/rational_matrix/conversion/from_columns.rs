@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::matrix::Matrix;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::bench::bucketers::Bucketer;
@@ -31,7 +32,7 @@ fn columns_of(m: &RationalMatrix) -> Vec<RationalVector> {
         .map(|j| {
             RationalVector::from_owned_elements(
                 (0..m.height())
-                    .map(|i| m.elements[i * m.width() + j].clone())
+                    .map(|i| m.elements[usize::exact_from(i * m.width() + j)].clone())
                     .collect(),
             )
         })

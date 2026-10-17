@@ -8,6 +8,7 @@
 
 use crate::integer_matrix::IntegerMatrix;
 use crate::natural_matrix::NaturalMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, RemPowerOf2, RemPowerOf2Assign};
 
 impl ModPowerOf2 for IntegerMatrix {

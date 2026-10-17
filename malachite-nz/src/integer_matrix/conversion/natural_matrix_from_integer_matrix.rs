@@ -10,6 +10,7 @@ use crate::integer_matrix::IntegerMatrix;
 use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
 use alloc::vec::Vec;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 
 /// The error returned when an [`IntegerMatrix`] with a negative element is converted to a

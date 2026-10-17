@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::unsigned_matrix_gen;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -23,7 +25,7 @@ fn columns_of(m: &UnsignedMatrix<u64>) -> Vec<UnsignedVector<u64>> {
         .map(|j| {
             UnsignedVector::from_owned_elements(
                 (0..m.height())
-                    .map(|i| m.elements[i * m.width() + j])
+                    .map(|i| m.elements[usize::exact_from(i * m.width() + j)])
                     .collect(),
             )
         })

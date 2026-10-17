@@ -9,6 +9,7 @@
 use crate::integer::Integer;
 use crate::integer_matrix::IntegerMatrix;
 use crate::natural_matrix::NaturalMatrix;
+use malachite_base::matrix::Matrix;
 
 impl From<NaturalMatrix> for IntegerMatrix {
     /// Converts a [`NaturalMatrix`] to an [`IntegerMatrix`].
@@ -39,11 +40,10 @@ impl From<NaturalMatrix> for IntegerMatrix {
     /// ```
     #[inline]
     fn from(m: NaturalMatrix) -> Self {
-        let (height, width) = (m.height(), m.width());
-        Self {
-            elements: m.elements.into_iter().map(Integer::from).collect(),
-            height,
-            width,
-        }
+        Self::from_owned_elements(
+            m.height(),
+            m.width(),
+            m.elements.into_iter().map(Integer::from).collect(),
+        )
     }
 }

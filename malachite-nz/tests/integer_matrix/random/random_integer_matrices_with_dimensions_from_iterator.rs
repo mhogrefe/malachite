@@ -13,8 +13,8 @@ use malachite_nz::integer::random::uniform_random_integer_inclusive_range;
 use malachite_nz::integer_matrix::random::random_integer_matrices_with_dimensions_from_iterator;
 
 fn random_integer_matrices_with_dimensions_from_iterator_helper(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     bound: i32,
     expected_values: &[&str],
 ) {
@@ -139,7 +139,7 @@ fn test_random_integer_matrices_with_dimensions_from_iterator() {
 fn random_integer_matrices_with_dimensions_from_iterator_fail_1() {
     // height * width overflows
     let _ = random_integer_matrices_with_dimensions_from_iterator(
-        usize::MAX,
+        u64::MAX,
         2,
         uniform_random_integer_inclusive_range(EXAMPLE_SEED, Integer::from(-8), Integer::from(8)),
     );

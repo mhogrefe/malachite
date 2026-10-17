@@ -7,12 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::natural_matrix_gen;
 
-fn matrix(height: usize, width: usize, xs: &[u32]) -> NaturalMatrix {
+fn matrix(height: u64, width: u64, xs: &[u32]) -> NaturalMatrix {
     NaturalMatrix::from_owned_elements(
         height,
         width,
@@ -24,7 +26,7 @@ fn matrix(height: usize, width: usize, xs: &[u32]) -> NaturalMatrix {
 // elements, joined by `element_separator`.
 fn rows(m: &NaturalMatrix, element_separator: &str, f: impl Fn(&Natural) -> String) -> Vec<String> {
     m.elements
-        .chunks(m.width())
+        .chunks(usize::exact_from(m.width()))
         .map(|row| row.iter().map(&f).join(element_separator))
         .collect()
 }
@@ -64,7 +66,7 @@ fn to_string_properties() {
             );
             // The rows of the transpose are the columns.
             assert_eq!(
-                m.transpose().to_string().matches(';').count() + 1,
+                u64::exact_from(m.transpose().to_string().matches(';').count() + 1),
                 m.width()
             );
         }

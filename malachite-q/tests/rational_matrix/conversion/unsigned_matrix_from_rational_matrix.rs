@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::{One, OneHalf};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::ConvertibleFrom;
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::test_util::generators::{unsigned_matrix_gen, unsigned_vec_gen};
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 use malachite_q::Rational;
@@ -87,7 +88,7 @@ where
 
     unsigned_vec_gen::<T>().test_properties(|xs| {
         // Converting to a `RationalMatrix` and back is the identity.
-        let m = UnsignedMatrix::from_owned_elements(1, xs.len(), xs);
+        let m = UnsignedMatrix::from_owned_elements(1, u64::exact_from(xs.len()), xs);
         assert_eq!(
             UnsignedMatrix::<T>::try_from(RationalMatrix::from(m.clone())),
             Ok(m)

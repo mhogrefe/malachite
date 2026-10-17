@@ -39,7 +39,7 @@ impl IntegerMatrix {
     /// m.set_column(2, &IntegerVector::from_str("(7, 8)").unwrap());
     /// assert_eq!(m.to_string(), "[1, 2, 7; 4, 5, 8]");
     /// ```
-    pub fn set_column(&mut self, j: usize, v: &IntegerVector) {
+    pub fn set_column(&mut self, j: u64, v: &IntegerVector) {
         let column = self.column_iter_mut(j);
         assert_eq!(
             v.elements.len(),
@@ -78,7 +78,7 @@ impl IntegerMatrix {
     /// m.set_column_owned(2, IntegerVector::from_str("(7, 8)").unwrap());
     /// assert_eq!(m.to_string(), "[1, 2, 7; 4, 5, 8]");
     /// ```
-    pub fn set_column_owned(&mut self, j: usize, v: IntegerVector) {
+    pub fn set_column_owned(&mut self, j: u64, v: IntegerVector) {
         let column = self.column_iter_mut(j);
         assert_eq!(
             v.elements.len(),

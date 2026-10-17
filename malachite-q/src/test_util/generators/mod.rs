@@ -19,12 +19,13 @@ use crate::test_util::generators::common::{
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::options::ToSciOptions;
-use malachite_base::num::conversion::traits::ConvertibleFrom;
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
@@ -1271,7 +1272,7 @@ pub fn gaussian_rational_vec_gen() -> Generator<Vec<GaussianRational>> {
 pub(crate) fn rational_matrix_positions(
     m: RationalMatrix,
 ) -> impl Iterator<Item = (RationalMatrix, usize, usize)> {
-    let (height, width) = (m.height(), m.width());
+    let (height, width) = (usize::exact_from(m.height()), usize::exact_from(m.width()));
     (0..height).flat_map(move |i| {
         let m = m.clone();
         (0..width).map(move |j| (m.clone(), i, j))
@@ -1321,7 +1322,7 @@ pub fn rational_matrix_gen_var_1() -> Generator<RationalMatrix> {
 }
 
 // All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
-pub fn rational_matrix_unsigned_unsigned_triple_gen() -> Generator<(RationalMatrix, usize, usize)> {
+pub fn rational_matrix_unsigned_unsigned_triple_gen() -> Generator<(RationalMatrix, u64, u64)> {
     Generator::new(
         &exhaustive_rational_matrix_unsigned_unsigned_triple_gen,
         &random_rational_matrix_unsigned_unsigned_triple_gen,
@@ -1340,7 +1341,7 @@ pub fn rational_matrix_unsigned_unsigned_triple_gen_var_1()
 }
 
 // All `(m, i)` with `i` a row index of `m`.
-pub fn rational_matrix_unsigned_pair_gen_var_1() -> Generator<(RationalMatrix, usize)> {
+pub fn rational_matrix_unsigned_pair_gen_var_1() -> Generator<(RationalMatrix, u64)> {
     Generator::new(
         &exhaustive_rational_matrix_unsigned_pair_gen_var_1,
         &random_rational_matrix_unsigned_pair_gen_var_1,
@@ -1349,7 +1350,7 @@ pub fn rational_matrix_unsigned_pair_gen_var_1() -> Generator<(RationalMatrix, u
 }
 
 // All `(m, i)` with `i` a column index of `m`.
-pub fn rational_matrix_unsigned_pair_gen_var_2() -> Generator<(RationalMatrix, usize)> {
+pub fn rational_matrix_unsigned_pair_gen_var_2() -> Generator<(RationalMatrix, u64)> {
     Generator::new(
         &exhaustive_rational_matrix_unsigned_pair_gen_var_2,
         &random_rational_matrix_unsigned_pair_gen_var_2,
@@ -1359,7 +1360,7 @@ pub fn rational_matrix_unsigned_pair_gen_var_2() -> Generator<(RationalMatrix, u
 
 // All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
 pub fn rational_matrix_unsigned_rational_vector_triple_gen_var_1()
--> Generator<(RationalMatrix, usize, RationalVector)> {
+-> Generator<(RationalMatrix, u64, RationalVector)> {
     Generator::new(
         &exhaustive_rational_matrix_unsigned_rational_vector_triple_gen_var_1,
         &random_rational_matrix_unsigned_rational_vector_triple_gen_var_1,
@@ -1370,7 +1371,7 @@ pub fn rational_matrix_unsigned_rational_vector_triple_gen_var_1()
 // All `(m, i, v)` with `i` a column index of `m` and `v` a vector whose dimension is the height of
 // `m`.
 pub fn rational_matrix_unsigned_rational_vector_triple_gen_var_2()
--> Generator<(RationalMatrix, usize, RationalVector)> {
+-> Generator<(RationalMatrix, u64, RationalVector)> {
     Generator::new(
         &exhaustive_rational_matrix_unsigned_rational_vector_triple_gen_var_2,
         &random_rational_matrix_unsigned_rational_vector_triple_gen_var_2,

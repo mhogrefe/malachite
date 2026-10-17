@@ -7,12 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::integer_matrix_gen;
 
-fn matrix(height: usize, width: usize, xs: &[i32]) -> IntegerMatrix {
+fn matrix(height: u64, width: u64, xs: &[i32]) -> IntegerMatrix {
     IntegerMatrix::from_owned_elements(
         height,
         width,
@@ -24,7 +26,7 @@ fn matrix(height: usize, width: usize, xs: &[i32]) -> IntegerMatrix {
 // elements, joined by `element_separator`.
 fn rows(m: &IntegerMatrix, element_separator: &str, f: impl Fn(&Integer) -> String) -> Vec<String> {
     m.elements
-        .chunks(m.width())
+        .chunks(usize::exact_from(m.width()))
         .map(|row| row.iter().map(&f).join(element_separator))
         .collect()
 }
@@ -64,7 +66,7 @@ fn to_string_properties() {
             );
             // The rows of the transpose are the columns.
             assert_eq!(
-                m.transpose().to_string().matches(';').count() + 1,
+                u64::exact_from(m.transpose().to_string().matches(';').count() + 1),
                 m.width()
             );
         }

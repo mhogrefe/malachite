@@ -39,7 +39,7 @@ impl<T: PrimitiveUnsigned> UnsignedMatrix<T> {
     /// assert_eq!(m.row(1).to_string(), "()");
     /// ```
     #[inline]
-    pub fn row(&self, i: usize) -> UnsignedVector<T> {
+    pub fn row(&self, i: u64) -> UnsignedVector<T> {
         UnsignedVector {
             elements: self.row_iter(i).as_slice().to_vec(),
         }

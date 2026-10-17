@@ -8,6 +8,7 @@
 
 use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 
@@ -43,11 +44,10 @@ where
     /// ```
     #[inline]
     fn from(m: UnsignedMatrix<T>) -> Self {
-        let (height, width) = (m.height(), m.width());
-        Self {
-            elements: m.elements.into_iter().map(Natural::from).collect(),
-            height,
-            width,
-        }
+        Self::from_owned_elements(
+            m.height(),
+            m.width(),
+            m.elements.into_iter().map(Natural::from).collect(),
+        )
     }
 }

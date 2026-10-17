@@ -11,8 +11,8 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_nz::natural_matrix::random::striped_random_natural_matrices_with_dimensions;
 
 fn striped_random_natural_matrices_with_dimensions_helper(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
     mean_bits_numerator: u64,
@@ -141,6 +141,5 @@ fn striped_random_natural_matrices_with_dimensions_fail_3() {
 #[should_panic]
 fn striped_random_natural_matrices_with_dimensions_fail_4() {
     // height * width overflows
-    let _ =
-        striped_random_natural_matrices_with_dimensions(EXAMPLE_SEED, usize::MAX, 2, 4, 1, 4, 1);
+    let _ = striped_random_natural_matrices_with_dimensions(EXAMPLE_SEED, u64::MAX, 2, 4, 1, 4, 1);
 }

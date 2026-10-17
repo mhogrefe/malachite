@@ -107,7 +107,7 @@ fn benchmark_rational_matrix_index_mut(
 
 fn benchmark_rational_matrix_get(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
-        "RationalMatrix.get(usize, usize)",
+        "RationalMatrix.get(u64, u64)",
         BenchmarkType::Single,
         rational_matrix_unsigned_unsigned_triple_gen().get(gm, config),
         gm.name(),
@@ -127,7 +127,7 @@ fn benchmark_rational_matrix_get_mut(
     file_name: &str,
 ) {
     run_benchmark(
-        "RationalMatrix.get_mut(usize, usize)",
+        "RationalMatrix.get_mut(u64, u64)",
         BenchmarkType::Single,
         rational_matrix_unsigned_unsigned_triple_gen().get(gm, config),
         gm.name(),

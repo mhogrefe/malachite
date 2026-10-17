@@ -37,6 +37,7 @@ use crate::test_util::extra_variadic::{
 use crate::test_util::generators::rational_matrix_positions;
 use itertools::Itertools;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -1037,12 +1038,11 @@ pub fn exhaustive_rational_matrix_gen_var_1() -> It<RationalMatrix> {
     Box::new(exhaustive_rational_square_matrices())
 }
 
-pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen()
--> It<(RationalMatrix, usize, usize)> {
+pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen() -> It<(RationalMatrix, u64, u64)> {
     Box::new(
         exhaustive_pairs(
             exhaustive_rational_matrix_gen(),
-            exhaustive_pairs_from_single(exhaustive_unsigneds::<usize>()),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
         )
         .map(|(m, (i, j))| (m, i, j)),
     )
@@ -1057,7 +1057,7 @@ pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen_var_1()
 
 // Each matrix paired with each of its row indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
-pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_1() -> It<(RationalMatrix, usize)> {
+pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_1() -> It<(RationalMatrix, u64)> {
     Box::new(
         exhaustive_rational_matrix_gen().flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
     )
@@ -1065,14 +1065,14 @@ pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_1() -> It<(RationalMatri
 
 // Each matrix paired with each of its column indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
-pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_2() -> It<(RationalMatrix, usize)> {
+pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_2() -> It<(RationalMatrix, u64)> {
     Box::new(
         exhaustive_rational_matrix_gen().flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
     )
 }
 
 pub fn exhaustive_rational_matrix_unsigned_rational_vector_triple_gen_var_1()
--> It<(RationalMatrix, usize, RationalVector)> {
+-> It<(RationalMatrix, u64, RationalVector)> {
     Box::new(
         exhaustive_dependent_pairs_from_fn(
             exhaustive_rational_matrix_unsigned_pair_gen_var_1(),
@@ -1087,7 +1087,7 @@ pub fn exhaustive_rational_matrix_unsigned_rational_vector_triple_gen_var_1()
 }
 
 pub fn exhaustive_rational_matrix_unsigned_rational_vector_triple_gen_var_2()
--> It<(RationalMatrix, usize, RationalVector)> {
+-> It<(RationalMatrix, u64, RationalVector)> {
     Box::new(
         exhaustive_dependent_pairs_from_fn(
             exhaustive_rational_matrix_unsigned_pair_gen_var_2(),

@@ -8,6 +8,7 @@
 
 use crate::integer_matrix::IntegerMatrix;
 use crate::natural_matrix::NaturalMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::BalancedModPowerOf2;
 
 impl BalancedModPowerOf2 for NaturalMatrix {

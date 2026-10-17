@@ -8,6 +8,7 @@
 
 use crate::foer_sequences::FoerSequence;
 use crate::iterators::bit_distributor::BitDistributorOutputType;
+use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -1891,6 +1892,12 @@ pub fn unsigned_gen_var_35<T: PrimitiveUnsigned>() -> Generator<u64> {
     )
 }
 
+// Every `u64` no greater than 64 in exhaustive mode, and small `u64`s otherwise: sizes of square
+// matrices small enough that every element can be visited for each one.
+pub fn unsigned_gen_var_36() -> Generator<u64> {
+    Generator::new_no_special(&exhaustive_unsigned_gen_var_34, &random_unsigned_gen_var_35)
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {
@@ -2449,6 +2456,14 @@ pub fn unsigned_pair_gen_var_52<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     )
 }
 
+// All `(u64, u64)` where both are small: the heights and widths of matrices.
+pub fn unsigned_pair_gen_var_53() -> Generator<(u64, u64)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_34,
+        &random_unsigned_pair_gen_var_41,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 // All `(T, u64, `bool) where `T` is unsigned and either the `bool` is false or the `u64` is smaller
@@ -2867,6 +2882,15 @@ pub fn unsigned_quadruple_gen_var_13<T: PrimitiveUnsigned>() -> Generator<(T, T,
         &exhaustive_unsigned_quadruple_gen_var_13,
         &random_unsigned_quadruple_gen_var_4,
         &special_random_unsigned_quadruple_gen_var_13,
+    )
+}
+
+// All `(u64, u64, u64, u64)` where the first two are small, the third is less than the first, and
+// the fourth is less than the second: a matrix's height and width, and a position in it.
+pub fn unsigned_quadruple_gen_var_14() -> Generator<(u64, u64, u64, u64)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_quadruple_gen_var_14,
+        &random_unsigned_quadruple_gen_var_5,
     )
 }
 
@@ -5267,7 +5291,7 @@ pub fn unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1<T: Pri
 pub(crate) fn unsigned_matrix_positions(
     m: UnsignedMatrix<u64>,
 ) -> impl Iterator<Item = (UnsignedMatrix<u64>, usize, usize)> {
-    let (height, width) = (m.height(), m.width());
+    let (height, width) = (usize::exact_from(m.height()), usize::exact_from(m.width()));
     (0..height).flat_map(move |i| {
         let m = m.clone();
         (0..width).map(move |j| (m.clone(), i, j))
@@ -5310,8 +5334,8 @@ pub fn unsigned_matrix_gen_var_1() -> Generator<UnsignedMatrix<u64>> {
 }
 
 // All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
-pub fn unsigned_matrix_unsigned_unsigned_triple_gen()
--> Generator<(UnsignedMatrix<u64>, usize, usize)> {
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen() -> Generator<(UnsignedMatrix<u64>, u64, u64)>
+{
     Generator::new(
         &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen,
         &random_unsigned_matrix_unsigned_unsigned_triple_gen,
@@ -5330,7 +5354,7 @@ pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_1()
 }
 
 // All `(m, i)` with `i` a row index of `m`.
-pub fn unsigned_matrix_unsigned_pair_gen_var_2() -> Generator<(UnsignedMatrix<u64>, usize)> {
+pub fn unsigned_matrix_unsigned_pair_gen_var_2() -> Generator<(UnsignedMatrix<u64>, u64)> {
     Generator::new(
         &exhaustive_unsigned_matrix_unsigned_pair_gen_var_2,
         &random_unsigned_matrix_unsigned_pair_gen_var_2,
@@ -5339,7 +5363,7 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_2() -> Generator<(UnsignedMatrix<u6
 }
 
 // All `(m, i)` with `i` a column index of `m`.
-pub fn unsigned_matrix_unsigned_pair_gen_var_3() -> Generator<(UnsignedMatrix<u64>, usize)> {
+pub fn unsigned_matrix_unsigned_pair_gen_var_3() -> Generator<(UnsignedMatrix<u64>, u64)> {
     Generator::new(
         &exhaustive_unsigned_matrix_unsigned_pair_gen_var_3,
         &random_unsigned_matrix_unsigned_pair_gen_var_3,
@@ -5349,7 +5373,7 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_3() -> Generator<(UnsignedMatrix<u6
 
 // All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
 pub fn unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1()
--> Generator<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+-> Generator<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {
     Generator::new(
         &exhaustive_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1,
         &random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1,
@@ -5360,7 +5384,7 @@ pub fn unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1()
 // All `(m, i, v)` with `i` a column index of `m` and `v` a vector whose dimension is the height of
 // `m`.
 pub fn unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2()
--> Generator<(UnsignedMatrix<u64>, usize, UnsignedVector<u64>)> {
+-> Generator<(UnsignedMatrix<u64>, u64, UnsignedVector<u64>)> {
     Generator::new(
         &exhaustive_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2,
         &random_unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_2,

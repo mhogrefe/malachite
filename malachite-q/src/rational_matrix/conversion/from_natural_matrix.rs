@@ -8,6 +8,7 @@
 
 use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_nz::natural_matrix::NaturalMatrix;
 
 impl From<NaturalMatrix> for RationalMatrix {
@@ -40,11 +41,10 @@ impl From<NaturalMatrix> for RationalMatrix {
     /// ```
     #[inline]
     fn from(m: NaturalMatrix) -> Self {
-        let (height, width) = (m.height(), m.width());
-        Self {
-            elements: m.elements.into_iter().map(Rational::from).collect(),
-            height,
-            width,
-        }
+        Self::from_owned_elements(
+            m.height(),
+            m.width(),
+            m.elements.into_iter().map(Rational::from).collect(),
+        )
     }
 }

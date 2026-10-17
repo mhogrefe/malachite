@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     #[cfg(feature = "serde")]
     serde::register(runner);
     string::register(runner);
+    to_elements::register(runner);
 }
 
 mod from_columns;
@@ -25,3 +26,4 @@ mod from_rows;
 #[cfg(feature = "serde")]
 mod serde;
 mod string;
+mod to_elements;

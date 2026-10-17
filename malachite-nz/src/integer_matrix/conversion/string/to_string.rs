@@ -27,6 +27,7 @@ impl Display for IntegerMatrix {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::matrix::Matrix;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_matrix::IntegerMatrix;
     ///

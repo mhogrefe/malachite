@@ -6,13 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::matrix::Matrix;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::random::geometric::{GeometricRandomNaturalValues, geometric_random_unsigneds};
 use crate::num::random::striped::{StripedRandomUnsignedBitChunks, striped_random_unsigneds};
 use crate::num::random::{RandomPrimitiveInts, random_primitive_ints};
 use crate::random::Seed;
 use crate::tuples::random::{RandomPairsFromSingle, random_pairs_from_single};
-use crate::unsigned_matrix::{UnsignedMatrix, element_count};
+use crate::unsigned_matrix::{UnsignedMatrix, shape};
 use core::iter::{Repeat, repeat};
 
 /// Generates random [`UnsignedMatrix`]s from an iterator of dimensions and an iterator of elements.
@@ -29,14 +30,14 @@ use core::iter::{Repeat, repeat};
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedMatrices<
     T: PrimitiveUnsigned,
-    D: Iterator<Item = (usize, usize)>,
+    D: Iterator<Item = (u64, u64)>,
     I: Iterator<Item = T>,
 > {
     dimensions: D,
     xs: I,
 }
 
-impl<T: PrimitiveUnsigned, D: Iterator<Item = (usize, usize)>, I: Iterator<Item = T>> Iterator
+impl<T: PrimitiveUnsigned, D: Iterator<Item = (u64, u64)>, I: Iterator<Item = T>> Iterator
     for RandomUnsignedMatrices<T, D, I>
 {
     type Item = UnsignedMatrix<T>;
@@ -46,13 +47,13 @@ impl<T: PrimitiveUnsigned, D: Iterator<Item = (usize, usize)>, I: Iterator<Item 
         Some(UnsignedMatrix::from_owned_elements(
             height,
             width,
-            (&mut self.xs).take(element_count(height, width)).collect(),
+            (&mut self.xs).take(shape(height, width).2).collect(),
         ))
     }
 }
 
 /// The dimensions that the [`UnsignedMatrix`] generators of random shape draw on.
-pub type RandomMatrixDimensions = RandomPairsFromSingle<GeometricRandomNaturalValues<usize>>;
+pub type RandomMatrixDimensions = RandomPairsFromSingle<GeometricRandomNaturalValues<u64>>;
 
 /// Generates random [`UnsignedMatrix`]s whose elements come from an iterator.
 ///
@@ -161,11 +162,11 @@ pub fn random_unsigned_matrices_with_dimensions_from_iterator<
     T: PrimitiveUnsigned,
     I: Iterator<Item = T>,
 >(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     xs: I,
-) -> RandomUnsignedMatrices<T, Repeat<(usize, usize)>, I> {
-    element_count(height, width);
+) -> RandomUnsignedMatrices<T, Repeat<(u64, u64)>, I> {
+    shape(height, width);
     RandomUnsignedMatrices {
         dimensions: repeat((height, width)),
         xs,
@@ -255,9 +256,9 @@ pub fn random_unsigned_matrices<T: PrimitiveUnsigned>(
 #[inline]
 pub fn random_unsigned_matrices_with_dimensions<T: PrimitiveUnsigned>(
     seed: Seed,
-    height: usize,
-    width: usize,
-) -> RandomUnsignedMatrices<T, Repeat<(usize, usize)>, RandomPrimitiveInts<T>> {
+    height: u64,
+    width: u64,
+) -> RandomUnsignedMatrices<T, Repeat<(u64, u64)>, RandomPrimitiveInts<T>> {
     random_unsigned_matrices_with_dimensions_from_iterator(
         height,
         width,
@@ -358,11 +359,11 @@ pub fn striped_random_unsigned_matrices<T: PrimitiveUnsigned>(
 #[inline]
 pub fn striped_random_unsigned_matrices_with_dimensions<T: PrimitiveUnsigned>(
     seed: Seed,
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-) -> RandomUnsignedMatrices<T, Repeat<(usize, usize)>, StripedRandomUnsignedBitChunks<T>> {
+) -> RandomUnsignedMatrices<T, Repeat<(u64, u64)>, StripedRandomUnsignedBitChunks<T>> {
     random_unsigned_matrices_with_dimensions_from_iterator(
         height,
         width,
@@ -377,13 +378,13 @@ pub fn striped_random_unsigned_matrices_with_dimensions<T: PrimitiveUnsigned>(
 /// [`random_unsigned_square_matrices`], and [`striped_random_unsigned_square_matrices`]; see their
 /// documentation for more.
 #[derive(Clone, Debug)]
-pub struct RandomSquareMatrixDimensions(GeometricRandomNaturalValues<usize>);
+pub struct RandomSquareMatrixDimensions(GeometricRandomNaturalValues<u64>);
 
 impl Iterator for RandomSquareMatrixDimensions {
-    type Item = (usize, usize);
+    type Item = (u64, u64);
 
     #[inline]
-    fn next(&mut self) -> Option<(usize, usize)> {
+    fn next(&mut self) -> Option<(u64, u64)> {
         self.0.next().map(|size| (size, size))
     }
 }

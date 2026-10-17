@@ -9,6 +9,7 @@
 use crate::integer_matrix::IntegerMatrix;
 use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::BalancedMod;
 
 impl BalancedMod<Natural> for NaturalMatrix {

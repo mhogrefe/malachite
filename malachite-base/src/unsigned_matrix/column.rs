@@ -39,7 +39,7 @@ impl<T: PrimitiveUnsigned> UnsignedMatrix<T> {
     /// assert_eq!(m.column(1).to_string(), "()");
     /// ```
     #[inline]
-    pub fn column(&self, j: usize) -> UnsignedVector<T> {
+    pub fn column(&self, j: u64) -> UnsignedVector<T> {
         self.column_iter(j).copied().collect()
     }
 }

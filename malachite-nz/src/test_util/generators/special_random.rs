@@ -122,6 +122,7 @@ use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_ma
 use malachite_base::bools::random::{RandomBools, random_bools};
 use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::iterators::with_special_value;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2,
     EqMod, EqModPowerOf2, Height, HeightRef, Mod, ModPowerOf2, Parity, PowerOf2,
@@ -7928,16 +7929,14 @@ pub fn special_random_integer_matrix_gen_var_1(config: &GenConfig) -> It<Integer
 
 pub fn special_random_integer_matrix_unsigned_unsigned_triple_gen(
     config: &GenConfig,
-) -> It<(IntegerMatrix, usize, usize)> {
+) -> It<(IntegerMatrix, u64, u64)> {
     Box::new(
         special_random_integer_matrix_gen(config)
-            .zip(random_pairs_from_single(
-                geometric_random_unsigneds::<usize>(
-                    EXAMPLE_SEED.fork("indices"),
-                    config.get_or("mean_dimension_n", 4),
-                    config.get_or("mean_dimension_d", 1),
-                ),
-            ))
+            .zip(random_pairs_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("indices"),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )))
             .map(|(m, (i, j))| (m, i, j)),
     )
 }
@@ -7950,7 +7949,7 @@ pub fn special_random_integer_matrix_unsigned_unsigned_triple_gen_var_1(
 
 pub fn special_random_integer_matrix_unsigned_pair_gen_var_2(
     config: &GenConfig,
-) -> It<(IntegerMatrix, usize)> {
+) -> It<(IntegerMatrix, u64)> {
     Box::new(
         special_random_integer_matrix_gen(config)
             .flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
@@ -7959,7 +7958,7 @@ pub fn special_random_integer_matrix_unsigned_pair_gen_var_2(
 
 pub fn special_random_integer_matrix_unsigned_pair_gen_var_3(
     config: &GenConfig,
-) -> It<(IntegerMatrix, usize)> {
+) -> It<(IntegerMatrix, u64)> {
     Box::new(
         special_random_integer_matrix_gen(config)
             .flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
@@ -7968,7 +7967,7 @@ pub fn special_random_integer_matrix_unsigned_pair_gen_var_3(
 
 pub fn special_random_integer_matrix_unsigned_integer_vector_triple_gen_var_1(
     config: &GenConfig,
-) -> It<(IntegerMatrix, usize, IntegerVector)> {
+) -> It<(IntegerMatrix, u64, IntegerVector)> {
     let mut xs = striped_random_integers(
         EXAMPLE_SEED.fork("vector"),
         config.get_or("mean_stripe_n", 32),
@@ -7978,7 +7977,7 @@ pub fn special_random_integer_matrix_unsigned_integer_vector_triple_gen_var_1(
     );
     Box::new(
         special_random_integer_matrix_unsigned_pair_gen_var_2(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.width()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.width())).collect();
             (m, i, v)
         }),
     )
@@ -7986,7 +7985,7 @@ pub fn special_random_integer_matrix_unsigned_integer_vector_triple_gen_var_1(
 
 pub fn special_random_integer_matrix_unsigned_integer_vector_triple_gen_var_2(
     config: &GenConfig,
-) -> It<(IntegerMatrix, usize, IntegerVector)> {
+) -> It<(IntegerMatrix, u64, IntegerVector)> {
     let mut xs = striped_random_integers(
         EXAMPLE_SEED.fork("vector"),
         config.get_or("mean_stripe_n", 32),
@@ -7996,7 +7995,7 @@ pub fn special_random_integer_matrix_unsigned_integer_vector_triple_gen_var_2(
     );
     Box::new(
         special_random_integer_matrix_unsigned_pair_gen_var_3(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.height()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.height())).collect();
             (m, i, v)
         }),
     )
@@ -8506,16 +8505,14 @@ pub fn special_random_natural_matrix_gen_var_1(config: &GenConfig) -> It<Natural
 
 pub fn special_random_natural_matrix_unsigned_unsigned_triple_gen(
     config: &GenConfig,
-) -> It<(NaturalMatrix, usize, usize)> {
+) -> It<(NaturalMatrix, u64, u64)> {
     Box::new(
         special_random_natural_matrix_gen(config)
-            .zip(random_pairs_from_single(
-                geometric_random_unsigneds::<usize>(
-                    EXAMPLE_SEED.fork("indices"),
-                    config.get_or("mean_dimension_n", 4),
-                    config.get_or("mean_dimension_d", 1),
-                ),
-            ))
+            .zip(random_pairs_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("indices"),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )))
             .map(|(m, (i, j))| (m, i, j)),
     )
 }
@@ -8528,7 +8525,7 @@ pub fn special_random_natural_matrix_unsigned_unsigned_triple_gen_var_1(
 
 pub fn special_random_natural_matrix_unsigned_pair_gen_var_2(
     config: &GenConfig,
-) -> It<(NaturalMatrix, usize)> {
+) -> It<(NaturalMatrix, u64)> {
     Box::new(
         special_random_natural_matrix_gen(config)
             .flat_map(|m| (0..m.height()).map(move |i| (m.clone(), i))),
@@ -8537,7 +8534,7 @@ pub fn special_random_natural_matrix_unsigned_pair_gen_var_2(
 
 pub fn special_random_natural_matrix_unsigned_pair_gen_var_3(
     config: &GenConfig,
-) -> It<(NaturalMatrix, usize)> {
+) -> It<(NaturalMatrix, u64)> {
     Box::new(
         special_random_natural_matrix_gen(config)
             .flat_map(|m| (0..m.width()).map(move |i| (m.clone(), i))),
@@ -8546,7 +8543,7 @@ pub fn special_random_natural_matrix_unsigned_pair_gen_var_3(
 
 pub fn special_random_natural_matrix_unsigned_natural_vector_triple_gen_var_1(
     config: &GenConfig,
-) -> It<(NaturalMatrix, usize, NaturalVector)> {
+) -> It<(NaturalMatrix, u64, NaturalVector)> {
     let mut xs = striped_random_naturals(
         EXAMPLE_SEED.fork("vector"),
         config.get_or("mean_stripe_n", 32),
@@ -8556,7 +8553,7 @@ pub fn special_random_natural_matrix_unsigned_natural_vector_triple_gen_var_1(
     );
     Box::new(
         special_random_natural_matrix_unsigned_pair_gen_var_2(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.width()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.width())).collect();
             (m, i, v)
         }),
     )
@@ -8564,7 +8561,7 @@ pub fn special_random_natural_matrix_unsigned_natural_vector_triple_gen_var_1(
 
 pub fn special_random_natural_matrix_unsigned_natural_vector_triple_gen_var_2(
     config: &GenConfig,
-) -> It<(NaturalMatrix, usize, NaturalVector)> {
+) -> It<(NaturalMatrix, u64, NaturalVector)> {
     let mut xs = striped_random_naturals(
         EXAMPLE_SEED.fork("vector"),
         config.get_or("mean_stripe_n", 32),
@@ -8574,7 +8571,7 @@ pub fn special_random_natural_matrix_unsigned_natural_vector_triple_gen_var_2(
     );
     Box::new(
         special_random_natural_matrix_unsigned_pair_gen_var_3(config).map(move |(m, i)| {
-            let v = (&mut xs).take(m.height()).collect();
+            let v = (&mut xs).take(usize::exact_from(m.height())).collect();
             (m, i, v)
         }),
     )

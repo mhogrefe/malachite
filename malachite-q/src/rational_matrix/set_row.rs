@@ -39,7 +39,7 @@ impl RationalMatrix {
     /// m.set_row(1, &RationalVector::from_str("(7, 8, 9)").unwrap());
     /// assert_eq!(m.to_string(), "[1, 2, 3; 7, 8, 9]");
     /// ```
-    pub fn set_row(&mut self, i: usize, v: &RationalVector) {
+    pub fn set_row(&mut self, i: u64, v: &RationalVector) {
         let row = self.row_iter_mut(i).into_slice();
         assert_eq!(
             v.elements.len(),
@@ -76,7 +76,7 @@ impl RationalMatrix {
     /// m.set_row_owned(1, RationalVector::from_str("(7, 8, 9)").unwrap());
     /// assert_eq!(m.to_string(), "[1, 2, 3; 7, 8, 9]");
     /// ```
-    pub fn set_row_owned(&mut self, i: usize, v: RationalVector) {
+    pub fn set_row_owned(&mut self, i: u64, v: RationalVector) {
         let row = self.row_iter_mut(i).into_slice();
         assert_eq!(
             v.elements.len(),

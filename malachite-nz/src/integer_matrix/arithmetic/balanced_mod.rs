@@ -8,6 +8,7 @@
 
 use crate::integer::Integer;
 use crate::integer_matrix::IntegerMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{BalancedMod, BalancedModAssign};
 
 impl BalancedMod<Integer> for IntegerMatrix {

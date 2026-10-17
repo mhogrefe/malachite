@@ -27,6 +27,7 @@ impl Display for NaturalMatrix {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::matrix::Matrix;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_matrix::NaturalMatrix;
     ///

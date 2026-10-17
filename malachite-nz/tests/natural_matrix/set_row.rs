@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::natural_vector::NaturalVector;
 use malachite_nz::test_util::generators::{
@@ -15,7 +16,7 @@ use malachite_nz::test_util::generators::{
 
 #[test]
 fn test_set_row() {
-    let test = |s, i: usize, v, out| {
+    let test = |s, i: u64, v, out| {
         let v = NaturalVector::from_str(v).unwrap();
         let mut m = NaturalMatrix::from_str(s).unwrap();
         m.set_row(i, &v);

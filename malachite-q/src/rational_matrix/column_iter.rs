@@ -10,15 +10,18 @@ use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
 use core::iter::StepBy;
 use core::slice::{Iter, IterMut};
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 impl RationalMatrix {
-    // Panics if `j` is not a column index.
-    fn check_column_index(&self, j: usize) {
+    // Converts a column index to a `usize`, panicking if it is out of range.
+    fn column_index(&self, j: u64) -> usize {
         assert!(
-            j < self.width,
+            j < self.width(),
             "column index {j} is out of range for a matrix with {} columns",
             self.width
         );
+        usize::exact_from(j)
     }
 
     /// Returns an iterator over the elements in column `j` of a [`RationalMatrix`], from top to
@@ -46,8 +49,8 @@ impl RationalMatrix {
     /// assert_eq!(prefix_to_string(m.column_iter(1), 10), "[]");
     /// ```
     #[inline]
-    pub fn column_iter(&self, j: usize) -> StepBy<Iter<'_, Rational>> {
-        self.check_column_index(j);
+    pub fn column_iter(&self, j: u64) -> StepBy<Iter<'_, Rational>> {
+        let j = self.column_index(j);
         // With no rows there are no elements, so `j..` would be out of range.
         self.elements
             .get(j..)
@@ -82,8 +85,8 @@ impl RationalMatrix {
     /// assert_eq!(m.to_string(), "[1, 2, 4; 4, 5, 7]");
     /// ```
     #[inline]
-    pub fn column_iter_mut(&mut self, j: usize) -> StepBy<IterMut<'_, Rational>> {
-        self.check_column_index(j);
+    pub fn column_iter_mut(&mut self, j: u64) -> StepBy<IterMut<'_, Rational>> {
+        let j = self.column_index(j);
         let width = self.width;
         self.elements
             .get_mut(j..)

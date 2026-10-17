@@ -8,6 +8,8 @@
 
 use core::str::FromStr;
 use itertools::Itertools;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::typst::ToTypst;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
@@ -17,7 +19,7 @@ use malachite_nz::test_util::generators::integer_matrix_gen;
 // elements, joined by `element_separator`.
 fn rows(m: &IntegerMatrix, element_separator: &str, f: impl Fn(&Integer) -> String) -> Vec<String> {
     m.elements
-        .chunks(m.width())
+        .chunks(usize::exact_from(m.width()))
         .map(|row| row.iter().map(&f).join(element_separator))
         .collect()
 }

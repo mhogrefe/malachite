@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::{integer_matrix_gen, integer_matrix_gen_var_1};
 
@@ -33,7 +35,7 @@ fn is_square_properties() {
         assert_eq!(m.transpose().is_square(), square);
         // A square matrix's element count is a perfect square.
         if square {
-            assert_eq!(m.elements.len(), m.height() * m.height());
+            assert_eq!(u64::exact_from(m.elements.len()), m.height() * m.height());
         }
     });
 

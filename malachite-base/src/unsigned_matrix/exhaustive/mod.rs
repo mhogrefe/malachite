@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::matrix::Matrix;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
 use crate::num::exhaustive::{PrimitiveIntIncreasingRange, exhaustive_unsigneds};
@@ -14,7 +15,7 @@ use crate::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, ExhaustivePairs1Input,
     exhaustive_dependent_pairs, exhaustive_pairs_from_single,
 };
-use crate::unsigned_matrix::{UnsignedMatrix, element_count};
+use crate::unsigned_matrix::{UnsignedMatrix, shape};
 use crate::vecs::exhaustive::{
     ExhaustiveFixedLengthVecs1Input, exhaustive_vecs_fixed_length_from_single,
 };
@@ -31,10 +32,10 @@ use core::iter::{Repeat, Zip, repeat};
 #[derive(Clone, Debug)]
 pub struct ExhaustiveUnsignedMatrices<
     T: PrimitiveUnsigned,
-    I: Iterator<Item = ((usize, usize), Vec<T>)>,
+    I: Iterator<Item = ((u64, u64), Vec<T>)>,
 >(I);
 
-impl<T: PrimitiveUnsigned, I: Iterator<Item = ((usize, usize), Vec<T>)>> Iterator
+impl<T: PrimitiveUnsigned, I: Iterator<Item = ((u64, u64), Vec<T>)>> Iterator
     for ExhaustiveUnsignedMatrices<T, I>
 {
     type Item = UnsignedMatrix<T>;
@@ -56,13 +57,13 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = ((usize, usize), Vec<T>)>> Iterato
 pub struct ExhaustiveUnsignedMatrixElements<I: Clone + Iterator>(I);
 
 impl<T: PrimitiveUnsigned, I: Clone + Iterator<Item = T>>
-    ExhaustiveDependentPairsYsGenerator<(usize, usize), Vec<T>, ExhaustiveFixedLengthVecs1Input<I>>
+    ExhaustiveDependentPairsYsGenerator<(u64, u64), Vec<T>, ExhaustiveFixedLengthVecs1Input<I>>
     for ExhaustiveUnsignedMatrixElements<I>
 {
     #[inline]
-    fn get_ys(&self, &(height, width): &(usize, usize)) -> ExhaustiveFixedLengthVecs1Input<I> {
+    fn get_ys(&self, &(height, width): &(u64, u64)) -> ExhaustiveFixedLengthVecs1Input<I> {
         exhaustive_vecs_fixed_length_from_single(
-            u64::exact_from(element_count(height, width)),
+            u64::exact_from(shape(height, width).2),
             self.0.clone(),
         )
     }
@@ -113,11 +114,11 @@ pub fn exhaustive_unsigned_matrices_from_iterator<
 ) -> ExhaustiveUnsignedMatrices<
     T,
     ExhaustiveDependentPairs<
-        (usize, usize),
+        (u64, u64),
         Vec<T>,
         RulerSequence<usize>,
         ExhaustiveUnsignedMatrixElements<I>,
-        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<usize>>,
+        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<u64>>,
         ExhaustiveFixedLengthVecs1Input<I>,
     >,
 > {
@@ -159,11 +160,11 @@ pub fn exhaustive_unsigned_matrices_from_iterator<
 pub fn exhaustive_unsigned_matrices<T: PrimitiveUnsigned>() -> ExhaustiveUnsignedMatrices<
     T,
     ExhaustiveDependentPairs<
-        (usize, usize),
+        (u64, u64),
         Vec<T>,
         RulerSequence<usize>,
         ExhaustiveUnsignedMatrixElements<PrimitiveIntIncreasingRange<T>>,
-        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<usize>>,
+        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<u64>>,
         ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
     >,
 > {
@@ -214,13 +215,13 @@ pub fn exhaustive_unsigned_matrices_with_dimensions_from_iterator<
     T: PrimitiveUnsigned,
     I: Clone + Iterator<Item = T>,
 >(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     xs: I,
-) -> ExhaustiveUnsignedMatrices<T, Zip<Repeat<(usize, usize)>, ExhaustiveFixedLengthVecs1Input<I>>>
-{
+) -> ExhaustiveUnsignedMatrices<T, Zip<Repeat<(u64, u64)>, ExhaustiveFixedLengthVecs1Input<I>>> {
+    let count = shape(height, width).2;
     ExhaustiveUnsignedMatrices(repeat((height, width)).zip(
-        exhaustive_vecs_fixed_length_from_single(u64::exact_from(element_count(height, width)), xs),
+        exhaustive_vecs_fixed_length_from_single(u64::exact_from(count), xs),
     ))
 }
 
@@ -257,11 +258,11 @@ pub fn exhaustive_unsigned_matrices_with_dimensions_from_iterator<
 /// ```
 #[inline]
 pub fn exhaustive_unsigned_matrices_with_dimensions<T: PrimitiveUnsigned>(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
 ) -> ExhaustiveUnsignedMatrices<
     T,
-    Zip<Repeat<(usize, usize)>, ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>>,
+    Zip<Repeat<(u64, u64)>, ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>>,
 > {
     exhaustive_unsigned_matrices_with_dimensions_from_iterator(
         height,
@@ -276,12 +277,11 @@ pub fn exhaustive_unsigned_matrices_with_dimensions<T: PrimitiveUnsigned>(
 /// This `struct` is created by [`exhaustive_unsigned_square_matrices_from_iterator`] and
 /// [`exhaustive_unsigned_square_matrices`]; see their documentation for more.
 #[derive(Clone, Debug)]
-pub struct ExhaustiveUnsignedSquareMatrices<
-    T: PrimitiveUnsigned,
-    I: Iterator<Item = (usize, Vec<T>)>,
->(I);
+pub struct ExhaustiveUnsignedSquareMatrices<T: PrimitiveUnsigned, I>(I)
+where
+    I: Iterator<Item = (u64, Vec<T>)>;
 
-impl<T: PrimitiveUnsigned, I: Iterator<Item = (usize, Vec<T>)>> Iterator
+impl<T: PrimitiveUnsigned, I: Iterator<Item = (u64, Vec<T>)>> Iterator
     for ExhaustiveUnsignedSquareMatrices<T, I>
 {
     type Item = UnsignedMatrix<T>;
@@ -303,13 +303,13 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = (usize, Vec<T>)>> Iterator
 pub struct ExhaustiveUnsignedSquareMatrixElements<I: Clone + Iterator>(I);
 
 impl<T: PrimitiveUnsigned, I: Clone + Iterator<Item = T>>
-    ExhaustiveDependentPairsYsGenerator<usize, Vec<T>, ExhaustiveFixedLengthVecs1Input<I>>
+    ExhaustiveDependentPairsYsGenerator<u64, Vec<T>, ExhaustiveFixedLengthVecs1Input<I>>
     for ExhaustiveUnsignedSquareMatrixElements<I>
 {
     #[inline]
-    fn get_ys(&self, &size: &usize) -> ExhaustiveFixedLengthVecs1Input<I> {
+    fn get_ys(&self, &size: &u64) -> ExhaustiveFixedLengthVecs1Input<I> {
         exhaustive_vecs_fixed_length_from_single(
-            u64::exact_from(element_count(size, size)),
+            u64::exact_from(shape(size, size).2),
             self.0.clone(),
         )
     }
@@ -365,11 +365,11 @@ pub fn exhaustive_unsigned_square_matrices_from_iterator<
 ) -> ExhaustiveUnsignedSquareMatrices<
     T,
     ExhaustiveDependentPairs<
-        usize,
+        u64,
         Vec<T>,
         RulerSequence<usize>,
         ExhaustiveUnsignedSquareMatrixElements<I>,
-        PrimitiveIntIncreasingRange<usize>,
+        PrimitiveIntIncreasingRange<u64>,
         ExhaustiveFixedLengthVecs1Input<I>,
     >,
 > {
@@ -414,11 +414,11 @@ pub fn exhaustive_unsigned_square_matrices<T: PrimitiveUnsigned>()
 -> ExhaustiveUnsignedSquareMatrices<
     T,
     ExhaustiveDependentPairs<
-        usize,
+        u64,
         Vec<T>,
         RulerSequence<usize>,
         ExhaustiveUnsignedSquareMatrixElements<PrimitiveIntIncreasingRange<T>>,
-        PrimitiveIntIncreasingRange<usize>,
+        PrimitiveIntIncreasingRange<u64>,
         ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
     >,
 > {

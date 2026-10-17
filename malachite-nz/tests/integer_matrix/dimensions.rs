@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::integer_matrix_gen;
 
@@ -28,7 +30,7 @@ fn test_height_and_width() {
 #[test]
 fn dimensions_properties() {
     integer_matrix_gen().test_properties(|m| {
-        assert_eq!(m.height() * m.width(), m.elements.len());
+        assert_eq!(m.height() * m.width(), u64::exact_from(m.elements.len()));
         let t = m.transpose();
         assert_eq!(t.height(), m.width());
         assert_eq!(t.width(), m.height());

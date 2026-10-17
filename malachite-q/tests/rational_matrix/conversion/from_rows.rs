@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vector::Vector;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::rational_vector::RationalVector;
@@ -20,7 +22,12 @@ fn vectors(ss: &[&str]) -> Vec<RationalVector> {
 
 fn rows_of(m: &RationalMatrix) -> Vec<RationalVector> {
     (0..m.height())
-        .map(|i| RationalVector::from_elements(&m.elements[i * m.width()..(i + 1) * m.width()]))
+        .map(|i| {
+            RationalVector::from_elements(
+                &m.elements
+                    [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())],
+            )
+        })
         .collect()
 }
 

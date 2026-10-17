@@ -48,6 +48,7 @@ impl FromStr for RationalMatrix {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
     /// use malachite_q::rational_matrix::RationalMatrix;
     ///
     /// let m = RationalMatrix::from_str("[1/2, 2, 3; -4, 5/7, 6]").unwrap();

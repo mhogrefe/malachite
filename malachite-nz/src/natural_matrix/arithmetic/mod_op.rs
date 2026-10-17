@@ -9,6 +9,7 @@
 use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
 use core::ops::{Rem, RemAssign};
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{Mod, ModAssign};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;

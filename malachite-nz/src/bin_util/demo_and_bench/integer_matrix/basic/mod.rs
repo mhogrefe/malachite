@@ -13,25 +13,35 @@ pub(crate) fn register(runner: &mut Runner) {
     column_iter::register(runner);
     columns::register(runner);
     dimensions::register(runner);
+    identity::register(runner);
     index::register(runner);
     is_square::register(runner);
+    is_zero::register(runner);
     row::register(runner);
     row_iter::register(runner);
     rows::register(runner);
     set_column::register(runner);
     set_row::register(runner);
+    set_zero::register(runner);
+    standard_basis_matrix::register(runner);
     transpose::register(runner);
+    zero::register(runner);
 }
 
 mod column;
 mod column_iter;
 mod columns;
 mod dimensions;
+mod identity;
 mod index;
 mod is_square;
+mod is_zero;
 mod row;
 mod row_iter;
 mod rows;
 mod set_column;
 mod set_row;
+mod set_zero;
+mod standard_basis_matrix;
 mod transpose;
+mod zero;

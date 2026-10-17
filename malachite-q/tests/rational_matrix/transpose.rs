@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::test_util::generators::rational_matrix_gen;
 
@@ -48,8 +50,8 @@ fn transpose_properties() {
         for i in 0..m.height() {
             for j in 0..m.width() {
                 assert_eq!(
-                    t.elements[j * m.height() + i],
-                    m.elements[i * m.width() + j]
+                    t.elements[usize::exact_from(j * m.height() + i)],
+                    m.elements[usize::exact_from(i * m.width() + j)]
                 );
             }
         }

@@ -33,6 +33,7 @@ use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
 use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use malachite_base::foer_sequences::FoerSequence;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -3913,7 +3914,7 @@ pub fn integer_vec_integer_vec_unsigned_triple_gen_var_5()
 pub(crate) fn matrix_positions(
     m: IntegerMatrix,
 ) -> impl Iterator<Item = (IntegerMatrix, usize, usize)> {
-    let (height, width) = (m.height(), m.width());
+    let (height, width) = (usize::exact_from(m.height()), usize::exact_from(m.width()));
     (0..height).flat_map(move |i| {
         let m = m.clone();
         (0..width).map(move |j| (m.clone(), i, j))
@@ -3946,7 +3947,7 @@ pub fn integer_matrix_gen_var_1() -> Generator<IntegerMatrix> {
 }
 
 // All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
-pub fn integer_matrix_unsigned_unsigned_triple_gen() -> Generator<(IntegerMatrix, usize, usize)> {
+pub fn integer_matrix_unsigned_unsigned_triple_gen() -> Generator<(IntegerMatrix, u64, u64)> {
     Generator::new(
         &exhaustive_integer_matrix_unsigned_unsigned_triple_gen,
         &random_integer_matrix_unsigned_unsigned_triple_gen,
@@ -3965,7 +3966,7 @@ pub fn integer_matrix_unsigned_unsigned_triple_gen_var_1()
 }
 
 // All `(m, i)` with `i` a row index of `m`.
-pub fn integer_matrix_unsigned_pair_gen_var_2() -> Generator<(IntegerMatrix, usize)> {
+pub fn integer_matrix_unsigned_pair_gen_var_2() -> Generator<(IntegerMatrix, u64)> {
     Generator::new(
         &exhaustive_integer_matrix_unsigned_pair_gen_var_2,
         &random_integer_matrix_unsigned_pair_gen_var_2,
@@ -3974,7 +3975,7 @@ pub fn integer_matrix_unsigned_pair_gen_var_2() -> Generator<(IntegerMatrix, usi
 }
 
 // All `(m, i)` with `i` a column index of `m`.
-pub fn integer_matrix_unsigned_pair_gen_var_3() -> Generator<(IntegerMatrix, usize)> {
+pub fn integer_matrix_unsigned_pair_gen_var_3() -> Generator<(IntegerMatrix, u64)> {
     Generator::new(
         &exhaustive_integer_matrix_unsigned_pair_gen_var_3,
         &random_integer_matrix_unsigned_pair_gen_var_3,
@@ -3984,7 +3985,7 @@ pub fn integer_matrix_unsigned_pair_gen_var_3() -> Generator<(IntegerMatrix, usi
 
 // All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
 pub fn integer_matrix_unsigned_integer_vector_triple_gen_var_1()
--> Generator<(IntegerMatrix, usize, IntegerVector)> {
+-> Generator<(IntegerMatrix, u64, IntegerVector)> {
     Generator::new(
         &exhaustive_integer_matrix_unsigned_integer_vector_triple_gen_var_1,
         &random_integer_matrix_unsigned_integer_vector_triple_gen_var_1,
@@ -3995,7 +3996,7 @@ pub fn integer_matrix_unsigned_integer_vector_triple_gen_var_1()
 // All `(m, i, v)` with `i` a column index of `m` and `v` a vector whose dimension is the height of
 // `m`.
 pub fn integer_matrix_unsigned_integer_vector_triple_gen_var_2()
--> Generator<(IntegerMatrix, usize, IntegerVector)> {
+-> Generator<(IntegerMatrix, u64, IntegerVector)> {
     Generator::new(
         &exhaustive_integer_matrix_unsigned_integer_vector_triple_gen_var_2,
         &random_integer_matrix_unsigned_integer_vector_triple_gen_var_2,
@@ -4199,7 +4200,7 @@ pub fn integer_vector_triple_gen_var_2() -> Generator<(IntegerVector, IntegerVec
 pub(crate) fn natural_matrix_positions(
     m: NaturalMatrix,
 ) -> impl Iterator<Item = (NaturalMatrix, usize, usize)> {
-    let (height, width) = (m.height(), m.width());
+    let (height, width) = (usize::exact_from(m.height()), usize::exact_from(m.width()));
     (0..height).flat_map(move |i| {
         let m = m.clone();
         (0..width).map(move |j| (m.clone(), i, j))
@@ -4305,7 +4306,7 @@ pub fn natural_matrix_gen_var_1() -> Generator<NaturalMatrix> {
 }
 
 // All `(m, i, j)` with `i` and `j` any small indices, in or out of range.
-pub fn natural_matrix_unsigned_unsigned_triple_gen() -> Generator<(NaturalMatrix, usize, usize)> {
+pub fn natural_matrix_unsigned_unsigned_triple_gen() -> Generator<(NaturalMatrix, u64, u64)> {
     Generator::new(
         &exhaustive_natural_matrix_unsigned_unsigned_triple_gen,
         &random_natural_matrix_unsigned_unsigned_triple_gen,
@@ -4324,7 +4325,7 @@ pub fn natural_matrix_unsigned_unsigned_triple_gen_var_1()
 }
 
 // All `(m, i)` with `i` a row index of `m`.
-pub fn natural_matrix_unsigned_pair_gen_var_2() -> Generator<(NaturalMatrix, usize)> {
+pub fn natural_matrix_unsigned_pair_gen_var_2() -> Generator<(NaturalMatrix, u64)> {
     Generator::new(
         &exhaustive_natural_matrix_unsigned_pair_gen_var_2,
         &random_natural_matrix_unsigned_pair_gen_var_2,
@@ -4333,7 +4334,7 @@ pub fn natural_matrix_unsigned_pair_gen_var_2() -> Generator<(NaturalMatrix, usi
 }
 
 // All `(m, i)` with `i` a column index of `m`.
-pub fn natural_matrix_unsigned_pair_gen_var_3() -> Generator<(NaturalMatrix, usize)> {
+pub fn natural_matrix_unsigned_pair_gen_var_3() -> Generator<(NaturalMatrix, u64)> {
     Generator::new(
         &exhaustive_natural_matrix_unsigned_pair_gen_var_3,
         &random_natural_matrix_unsigned_pair_gen_var_3,
@@ -4343,7 +4344,7 @@ pub fn natural_matrix_unsigned_pair_gen_var_3() -> Generator<(NaturalMatrix, usi
 
 // All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
 pub fn natural_matrix_unsigned_natural_vector_triple_gen_var_1()
--> Generator<(NaturalMatrix, usize, NaturalVector)> {
+-> Generator<(NaturalMatrix, u64, NaturalVector)> {
     Generator::new(
         &exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_1,
         &random_natural_matrix_unsigned_natural_vector_triple_gen_var_1,
@@ -4354,7 +4355,7 @@ pub fn natural_matrix_unsigned_natural_vector_triple_gen_var_1()
 // All `(m, i, v)` with `i` a column index of `m` and `v` a vector whose dimension is the height of
 // `m`.
 pub fn natural_matrix_unsigned_natural_vector_triple_gen_var_2()
--> Generator<(NaturalMatrix, usize, NaturalVector)> {
+-> Generator<(NaturalMatrix, u64, NaturalVector)> {
     Generator::new(
         &exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_2,
         &random_natural_matrix_unsigned_natural_vector_triple_gen_var_2,

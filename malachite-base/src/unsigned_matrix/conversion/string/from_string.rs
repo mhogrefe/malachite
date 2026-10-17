@@ -48,6 +48,7 @@ impl<T: PrimitiveUnsigned> FromStr for UnsignedMatrix<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
     /// use malachite_base::unsigned_matrix::UnsignedMatrix;
     ///
     /// let m = UnsignedMatrix::<u64>::from_str("[1, 2, 3; 4, 5, 6]").unwrap();

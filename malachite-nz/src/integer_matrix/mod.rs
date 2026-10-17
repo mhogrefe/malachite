@@ -8,9 +8,13 @@
 
 use crate::integer::Integer;
 use crate::integer_vector::IntegerVector;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::{Formatter, Result};
-use core::mem::take;
+use core::mem::{swap, take};
+use malachite_base::matrix::Matrix;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 
 /// A matrix whose elements are [`Integer`]s.
 ///
@@ -51,6 +55,15 @@ const fn element_count(height: usize, width: usize) -> usize {
         .expect("the matrix has too many elements to represent")
 }
 
+// The height, width, and number of elements of a matrix with the given dimensions, panicking if any
+// of them does not fit in a `usize`.
+fn shape(height: u64, width: u64) -> (usize, usize, usize) {
+    const TOO_LARGE: &str = "the matrix has too many elements to represent";
+    let height = usize::try_from(height).expect(TOO_LARGE);
+    let width = usize::try_from(width).expect(TOO_LARGE);
+    (height, width, element_count(height, width))
+}
+
 impl IntegerMatrix {
     // Returns true iff `self` is valid.
     //
@@ -59,199 +72,6 @@ impl IntegerMatrix {
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         self.height.checked_mul(self.width) == Some(self.elements.len())
-    }
-
-    /// Returns the number of rows of an [`IntegerMatrix`].
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use core::str::FromStr;
-    /// use malachite_nz::integer_matrix::IntegerMatrix;
-    ///
-    /// assert_eq!(
-    ///     IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6]")
-    ///         .unwrap()
-    ///         .height(),
-    ///     2
-    /// );
-    /// assert_eq!(IntegerMatrix::from_str("[]_{0,4}").unwrap().height(), 0);
-    /// ```
-    #[inline]
-    pub const fn height(&self) -> usize {
-        self.height
-    }
-
-    /// Returns the number of columns of an [`IntegerMatrix`].
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Examples
-    /// ```
-    /// use core::str::FromStr;
-    /// use malachite_nz::integer_matrix::IntegerMatrix;
-    ///
-    /// assert_eq!(
-    ///     IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6]")
-    ///         .unwrap()
-    ///         .width(),
-    ///     3
-    /// );
-    /// assert_eq!(IntegerMatrix::from_str("[]_{0,4}").unwrap().width(), 4);
-    /// ```
-    #[inline]
-    pub const fn width(&self) -> usize {
-        self.width
-    }
-
-    /// Creates an [`IntegerMatrix`] with the given height and width from a slice of its elements in
-    /// row-major order: the first row, then the second, and so on.
-    ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
-    /// elements.
-    ///
-    /// # Panics
-    /// Panics if `xs.len()` is not `height * width`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_nz::integer::Integer;
-    /// use malachite_nz::integer_matrix::IntegerMatrix;
-    ///
-    /// let m = IntegerMatrix::from_elements(2, 3, &[1, 2, 3, 4, 5, 6].map(Integer::from));
-    /// assert_eq!(m.to_string(), "[1, 2, 3; 4, 5, 6]");
-    ///
-    /// // A matrix with no rows can still have columns.
-    /// assert_eq!(
-    ///     IntegerMatrix::from_elements(0, 4, &[]).to_string(),
-    ///     "[]_{0,4}"
-    /// );
-    /// ```
-    #[inline]
-    pub fn from_elements(height: usize, width: usize, xs: &[Integer]) -> Self {
-        Self::from_owned_elements(height, width, xs.to_vec())
-    }
-
-    /// Creates an [`IntegerMatrix`] with the given height and width from a [`Vec`] of its elements
-    /// in row-major order: the first row, then the second, and so on. The [`Vec`] becomes the
-    /// matrix's storage.
-    ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
-    ///
-    /// # Panics
-    /// Panics if `xs.len()` is not `height * width`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_nz::integer::Integer;
-    /// use malachite_nz::integer_matrix::IntegerMatrix;
-    ///
-    /// let m = IntegerMatrix::from_owned_elements(
-    ///     3,
-    ///     2,
-    ///     [1, 2, 3, 4, 5, 6].map(Integer::from).to_vec(),
-    /// );
-    /// assert_eq!(m.to_string(), "[1, 2; 3, 4; 5, 6]");
-    /// ```
-    pub fn from_owned_elements(height: usize, width: usize, xs: Vec<Integer>) -> Self {
-        assert_eq!(
-            xs.len(),
-            element_count(height, width),
-            "the number of elements must be the height times the width"
-        );
-        Self {
-            elements: xs,
-            height,
-            width,
-        }
-    }
-
-    /// Creates an [`IntegerMatrix`] with the given height and width from a slice of its elements in
-    /// column-major order: the first column, then the second, and so on.
-    ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
-    /// elements.
-    ///
-    /// # Panics
-    /// Panics if `xs.len()` is not `height * width`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_nz::integer::Integer;
-    /// use malachite_nz::integer_matrix::IntegerMatrix;
-    ///
-    /// let m =
-    ///     IntegerMatrix::from_elements_column_major(2, 3, &[1, 2, 3, 4, 5, 6].map(Integer::from));
-    /// assert_eq!(m.to_string(), "[1, 3, 5; 2, 4, 6]");
-    /// ```
-    pub fn from_elements_column_major(height: usize, width: usize, xs: &[Integer]) -> Self {
-        assert_eq!(
-            xs.len(),
-            element_count(height, width),
-            "the number of elements must be the height times the width"
-        );
-        let mut elements = Vec::with_capacity(xs.len());
-        for i in 0..height {
-            elements.extend(xs.iter().skip(i).step_by(height).cloned());
-        }
-        Self {
-            elements,
-            height,
-            width,
-        }
-    }
-
-    /// Creates an [`IntegerMatrix`] with the given height and width from a [`Vec`] of its elements
-    /// in column-major order: the first column, then the second, and so on. The elements are moved,
-    /// not copied.
-    ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `height * width`.
-    ///
-    /// # Panics
-    /// Panics if `xs.len()` is not `height * width`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_nz::integer::Integer;
-    /// use malachite_nz::integer_matrix::IntegerMatrix;
-    ///
-    /// let m = IntegerMatrix::from_owned_elements_column_major(
-    ///     2,
-    ///     3,
-    ///     [1, 2, 3, 4, 5, 6].map(Integer::from).to_vec(),
-    /// );
-    /// assert_eq!(m.to_string(), "[1, 3, 5; 2, 4, 6]");
-    /// ```
-    pub fn from_owned_elements_column_major(height: usize, width: usize, xs: Vec<Integer>) -> Self {
-        assert_eq!(
-            xs.len(),
-            element_count(height, width),
-            "the number of elements must be the height times the width"
-        );
-        Self {
-            elements: transposed_elements(xs, width, height),
-            height,
-            width,
-        }
     }
 
     /// Creates an [`IntegerMatrix`] from a slice of its rows, each an [`IntegerVector`]. The height
@@ -420,6 +240,542 @@ impl IntegerMatrix {
     }
 }
 
+impl Matrix for IntegerMatrix {
+    type Element = Integer;
+
+    /// Creates an [`IntegerMatrix`] with the given height and width from a slice of its elements in
+    /// row-major order: the first row, then the second, and so on.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
+    ///
+    /// # Panics
+    /// Panics if `xs.len()` is not `height * width`, or if the number of elements does not fit in a
+    /// [`usize`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let m = IntegerMatrix::from_elements(2, 3, &[1, 2, 3, 4, 5, 6].map(Integer::from));
+    /// assert_eq!(m.to_string(), "[1, 2, 3; 4, 5, 6]");
+    ///
+    /// // A matrix with no rows can still have columns.
+    /// assert_eq!(
+    ///     IntegerMatrix::from_elements(0, 4, &[]).to_string(),
+    ///     "[]_{0,4}"
+    /// );
+    /// ```
+    #[inline]
+    fn from_elements(height: u64, width: u64, xs: &[Integer]) -> Self {
+        Self::from_owned_elements(height, width, xs.to_vec())
+    }
+
+    /// Creates an [`IntegerMatrix`] with the given height and width from a [`Vec`] of its elements
+    /// in row-major order: the first row, then the second, and so on. The [`Vec`] becomes the
+    /// matrix's storage.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `xs.len()` is not `height * width`, or if the number of elements does not fit in a
+    /// [`usize`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let m = IntegerMatrix::from_owned_elements(
+    ///     3,
+    ///     2,
+    ///     [1, 2, 3, 4, 5, 6].map(Integer::from).to_vec(),
+    /// );
+    /// assert_eq!(m.to_string(), "[1, 2; 3, 4; 5, 6]");
+    /// ```
+    fn from_owned_elements(height: u64, width: u64, xs: Vec<Integer>) -> Self {
+        let (height, width, count) = shape(height, width);
+        assert_eq!(
+            xs.len(),
+            count,
+            "the number of elements must be the height times the width"
+        );
+        Self {
+            elements: xs,
+            height,
+            width,
+        }
+    }
+
+    /// Creates an [`IntegerMatrix`] with the given height and width from a slice of its elements in
+    /// column-major order: the first column, then the second, and so on.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
+    ///
+    /// # Panics
+    /// Panics if `xs.len()` is not `height * width`, or if the number of elements does not fit in a
+    /// [`usize`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let m =
+    ///     IntegerMatrix::from_elements_column_major(2, 3, &[1, 2, 3, 4, 5, 6].map(Integer::from));
+    /// assert_eq!(m.to_string(), "[1, 3, 5; 2, 4, 6]");
+    /// ```
+    fn from_elements_column_major(height: u64, width: u64, xs: &[Integer]) -> Self {
+        let (height, width, count) = shape(height, width);
+        assert_eq!(
+            xs.len(),
+            count,
+            "the number of elements must be the height times the width"
+        );
+        let mut elements = Vec::with_capacity(xs.len());
+        for i in 0..height {
+            elements.extend(xs.iter().skip(i).step_by(height).cloned());
+        }
+        Self {
+            elements,
+            height,
+            width,
+        }
+    }
+
+    /// Creates an [`IntegerMatrix`] with the given height and width from a [`Vec`] of its elements
+    /// in column-major order: the first column, then the second, and so on. The elements are moved,
+    /// not copied.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `height * width`.
+    ///
+    /// # Panics
+    /// Panics if `xs.len()` is not `height * width`, or if the number of elements does not fit in a
+    /// [`usize`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let m = IntegerMatrix::from_owned_elements_column_major(
+    ///     2,
+    ///     3,
+    ///     [1, 2, 3, 4, 5, 6].map(Integer::from).to_vec(),
+    /// );
+    /// assert_eq!(m.to_string(), "[1, 3, 5; 2, 4, 6]");
+    /// ```
+    fn from_owned_elements_column_major(height: u64, width: u64, xs: Vec<Integer>) -> Self {
+        let (height, width, count) = shape(height, width);
+        assert_eq!(
+            xs.len(),
+            count,
+            "the number of elements must be the height times the width"
+        );
+        Self {
+            elements: transposed_elements(xs, width, height),
+            height,
+            width,
+        }
+    }
+
+    /// Returns the zero matrix of a given height and width: every element is 0.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `height * width`.
+    ///
+    /// # Panics
+    /// Panics if the number of elements does not fit in a [`usize`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert_eq!(IntegerMatrix::zero(2, 3).to_string(), "[0, 0, 0; 0, 0, 0]");
+    /// assert_eq!(IntegerMatrix::zero(0, 3).to_string(), "[]_{0,3}");
+    /// ```
+    fn zero(height: u64, width: u64) -> Self {
+        let (height, width, count) = shape(height, width);
+        Self {
+            elements: vec![Integer::ZERO; count],
+            height,
+            width,
+        }
+    }
+
+    /// Returns the identity matrix of a given size: the square matrix whose diagonal elements are 1
+    /// and whose other elements are 0.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `size * size`.
+    ///
+    /// # Panics
+    /// Panics if the number of elements does not fit in a [`usize`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert_eq!(
+    ///     IntegerMatrix::identity(3).to_string(),
+    ///     "[1, 0, 0; 0, 1, 0; 0, 0, 1]"
+    /// );
+    /// assert_eq!(IntegerMatrix::identity(0).to_string(), "[]_{0,0}");
+    /// ```
+    fn identity(size: u64) -> Self {
+        let mut m = Self::zero(size, size);
+        // The diagonal elements are `size + 1` apart.
+        for x in m.elements.iter_mut().step_by(m.width + 1) {
+            *x = Integer::ONE;
+        }
+        m
+    }
+
+    /// Returns a standard basis matrix $E_{ij}$, also called a matrix unit: the matrix of a given
+    /// height and width whose element in row `i` and column `j` is 1 and whose other elements are
+    /// 0.
+    ///
+    /// Indices start at 0. The standard basis matrices of a given shape form a basis of the
+    /// matrices of that shape, as the standard basis vectors do for vectors.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `height * width`.
+    ///
+    /// # Panics
+    /// Panics if `i` is greater than or equal to `height`, if `j` is greater than or equal to
+    /// `width`, or if the number of elements does not fit in a [`usize`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert_eq!(
+    ///     IntegerMatrix::standard_basis_matrix(2, 3, 1, 0).to_string(),
+    ///     "[0, 0, 0; 1, 0, 0]"
+    /// );
+    /// assert_eq!(
+    ///     IntegerMatrix::standard_basis_matrix(1, 1, 0, 0).to_string(),
+    ///     "[1]"
+    /// );
+    /// ```
+    fn standard_basis_matrix(height: u64, width: u64, i: u64, j: u64) -> Self {
+        assert!(
+            i < height,
+            "row index {i} is out of range for a matrix with {height} rows"
+        );
+        assert!(
+            j < width,
+            "column index {j} is out of range for a matrix with {width} columns"
+        );
+        let mut m = Self::zero(height, width);
+        let position = usize::exact_from(i) * m.width + usize::exact_from(j);
+        m.elements[position] = Integer::ONE;
+        m
+    }
+
+    /// Returns the elements of an [`IntegerMatrix`] in row-major order as a [`Vec`], cloning them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits in the
+    /// elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let m = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// assert_eq!(m.to_elements(), &[1u32, 2, 3, 4]);
+    /// ```
+    #[inline]
+    fn to_elements(&self) -> Vec<Integer> {
+        self.elements.clone()
+    }
+
+    /// Returns the elements of an [`IntegerMatrix`] in row-major order as a [`Vec`], taking
+    /// ownership of the matrix. Nothing is copied.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let m = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// assert_eq!(m.into_elements(), &[1u32, 2, 3, 4]);
+    /// ```
+    #[inline]
+    fn into_elements(self) -> Vec<Integer> {
+        self.elements
+    }
+
+    /// Returns a reference to the elements of an [`IntegerMatrix`] in row-major order, as a slice.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let m = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// assert_eq!(m.elements_ref(), &[1u32, 2, 3, 4]);
+    /// ```
+    #[inline]
+    fn elements_ref(&self) -> &[Integer] {
+        &self.elements
+    }
+
+    /// Returns the number of rows of an [`IntegerMatrix`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert_eq!(
+    ///     IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6]")
+    ///         .unwrap()
+    ///         .height(),
+    ///     2
+    /// );
+    /// assert_eq!(IntegerMatrix::from_str("[]_{0,4}").unwrap().height(), 0);
+    /// ```
+    #[inline]
+    fn height(&self) -> u64 {
+        u64::exact_from(self.height)
+    }
+
+    /// Returns the number of columns of an [`IntegerMatrix`].
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert_eq!(
+    ///     IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6]")
+    ///         .unwrap()
+    ///         .width(),
+    ///     3
+    /// );
+    /// assert_eq!(IntegerMatrix::from_str("[]_{0,4}").unwrap().width(), 4);
+    /// ```
+    #[inline]
+    fn width(&self) -> u64 {
+        u64::exact_from(self.width)
+    }
+
+    /// Determines whether an [`IntegerMatrix`] is square, that is, whether its height equals its
+    /// width.
+    ///
+    /// The 0-by-0 matrix is square; the other matrices with no elements, such as a 3-by-0 matrix,
+    /// are not.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert!(IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap().is_square());
+    /// assert!(
+    ///     !IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6]")
+    ///         .unwrap()
+    ///         .is_square()
+    /// );
+    /// assert!(IntegerMatrix::from_str("[]_{0,0}").unwrap().is_square());
+    /// assert!(!IntegerMatrix::from_str("[]_{3,0}").unwrap().is_square());
+    /// ```
+    #[inline]
+    fn is_square(&self) -> bool {
+        self.height == self.width
+    }
+
+    /// Determines whether every element of an [`IntegerMatrix`] is zero. This includes every matrix
+    /// with no elements.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert!(IntegerMatrix::from_str("[0, 0; 0, 0]").unwrap().is_zero());
+    /// assert!(IntegerMatrix::from_str("[]_{3,0}").unwrap().is_zero());
+    /// assert!(!IntegerMatrix::from_str("[0, 0; 1, 0]").unwrap().is_zero());
+    /// ```
+    #[inline]
+    fn is_zero(&self) -> bool {
+        self.elements.iter().all(|x| *x == 0u32)
+    }
+
+    /// Sets every element of an [`IntegerMatrix`] to zero, keeping its height and width.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let mut m = IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    /// m.set_zero();
+    /// assert_eq!(m.to_string(), "[0, 0, 0; 0, 0, 0]");
+    /// ```
+    #[inline]
+    fn set_zero(&mut self) {
+        self.elements.fill(Integer::ZERO);
+    }
+
+    /// Returns the transpose of an [`IntegerMatrix`], whose rows are the columns of the original,
+    /// taking the matrix by reference.
+    ///
+    /// $$
+    /// f(A)_{ij} = A_{ji}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let m = IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    /// let t = m.transpose();
+    /// assert_eq!(t.to_string(), "[1, 4; 2, 5; 3, 6]");
+    /// ```
+    fn transpose(&self) -> Self {
+        let mut elements = Vec::with_capacity(self.elements.len());
+        for j in 0..self.width {
+            elements.extend(self.elements.iter().skip(j).step_by(self.width).cloned());
+        }
+        Self {
+            elements,
+            height: self.width,
+            width: self.height,
+        }
+    }
+
+    /// Replaces an [`IntegerMatrix`] with its transpose, whose rows are the columns of the
+    /// original. The elements are moved, not copied: a square matrix is transposed in place by
+    /// swapping elements, and any other matrix by moving each element once.
+    ///
+    /// $$
+    /// A \gets A^T.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let mut m = IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    /// m.transpose_assign();
+    /// assert_eq!(m.to_string(), "[1, 4; 2, 5; 3, 6]");
+    /// ```
+    fn transpose_assign(&mut self) {
+        let (height, width) = (self.height, self.width);
+        if height == width {
+            for i in 0..height {
+                for j in i + 1..width {
+                    self.elements.swap(i * width + j, j * width + i);
+                }
+            }
+        } else {
+            self.elements = transposed_elements(take(&mut self.elements), height, width);
+            swap(&mut self.height, &mut self.width);
+        }
+    }
+}
+
 // Moves the elements of a `height`-by-`width` matrix, given in row-major order, into the row-major
 // order of its transpose.
 pub(crate) fn transposed_elements(
@@ -487,8 +843,6 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`IntegerMatrix`]s without repetition.
 pub mod exhaustive;
-/// A function for determining whether an [`IntegerMatrix`] is square.
-pub mod is_square;
 /// Iterators that generate [`IntegerMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
@@ -505,5 +859,3 @@ pub mod set_column;
 /// Functions for replacing a row of an [`IntegerMatrix`] with the elements of an
 /// [`IntegerVector`](crate::integer_vector::IntegerVector).
 pub mod set_row;
-/// The transpose of an [`IntegerMatrix`].
-pub mod transpose;

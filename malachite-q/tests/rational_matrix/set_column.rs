@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::rational_vector::RationalVector;
 use malachite_q::test_util::generators::{
@@ -16,7 +17,7 @@ use malachite_q::test_util::generators::{
 
 #[test]
 fn test_set_column() {
-    let test = |s, j: usize, v, out| {
+    let test = |s, j: u64, v, out| {
         let v = RationalVector::from_str(v).unwrap();
         let mut m = RationalMatrix::from_str(s).unwrap();
         m.set_column(j, &v);

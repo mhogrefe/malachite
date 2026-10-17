@@ -8,9 +8,10 @@
 
 use crate::Rational;
 use crate::rational::exhaustive::{ExhaustiveNonzeroRationals, exhaustive_rationals};
-use crate::rational_matrix::{RationalMatrix, element_count};
+use crate::rational_matrix::{RationalMatrix, shape};
 use alloc::vec::Vec;
 use core::iter::{Chain, Once, Repeat, Zip, repeat};
+use malachite_base::matrix::Matrix;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::exhaustive::{PrimitiveIntIncreasingRange, exhaustive_unsigneds};
 use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
@@ -30,11 +31,9 @@ use malachite_base::vecs::exhaustive::{
 /// [`exhaustive_rational_matrices_with_dimensions_from_iterator`], and
 /// [`exhaustive_rational_matrices_with_dimensions`]; see their documentation for more.
 #[derive(Clone, Debug)]
-pub struct ExhaustiveRationalMatrices<I: Iterator<Item = ((usize, usize), Vec<Rational>)>>(I);
+pub struct ExhaustiveRationalMatrices<I: Iterator<Item = ((u64, u64), Vec<Rational>)>>(I);
 
-impl<I: Iterator<Item = ((usize, usize), Vec<Rational>)>> Iterator
-    for ExhaustiveRationalMatrices<I>
-{
+impl<I: Iterator<Item = ((u64, u64), Vec<Rational>)>> Iterator for ExhaustiveRationalMatrices<I> {
     type Item = RationalMatrix;
 
     #[inline]
@@ -55,15 +54,15 @@ pub struct ExhaustiveRationalMatrixElements<I: Clone + Iterator<Item = Rational>
 
 impl<I: Clone + Iterator<Item = Rational>>
     ExhaustiveDependentPairsYsGenerator<
-        (usize, usize),
+        (u64, u64),
         Vec<Rational>,
         ExhaustiveFixedLengthVecs1Input<I>,
     > for ExhaustiveRationalMatrixElements<I>
 {
     #[inline]
-    fn get_ys(&self, &(height, width): &(usize, usize)) -> ExhaustiveFixedLengthVecs1Input<I> {
+    fn get_ys(&self, &(height, width): &(u64, u64)) -> ExhaustiveFixedLengthVecs1Input<I> {
         exhaustive_vecs_fixed_length_from_single(
-            u64::exact_from(element_count(height, width)),
+            u64::exact_from(shape(height, width).2),
             self.0.clone(),
         )
     }
@@ -113,11 +112,11 @@ pub fn exhaustive_rational_matrices_from_iterator<I: Clone + Iterator<Item = Rat
     xs: I,
 ) -> ExhaustiveRationalMatrices<
     ExhaustiveDependentPairs<
-        (usize, usize),
+        (u64, u64),
         Vec<Rational>,
         RulerSequence<usize>,
         ExhaustiveRationalMatrixElements<I>,
-        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<usize>>,
+        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<u64>>,
         ExhaustiveFixedLengthVecs1Input<I>,
     >,
 > {
@@ -159,11 +158,11 @@ pub fn exhaustive_rational_matrices_from_iterator<I: Clone + Iterator<Item = Rat
 #[inline]
 pub fn exhaustive_rational_matrices() -> ExhaustiveRationalMatrices<
     ExhaustiveDependentPairs<
-        (usize, usize),
+        (u64, u64),
         Vec<Rational>,
         RulerSequence<usize>,
         ExhaustiveRationalMatrixElements<Chain<Once<Rational>, ExhaustiveNonzeroRationals>>,
-        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<usize>>,
+        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<u64>>,
         ExhaustiveFixedLengthVecs1Input<Chain<Once<Rational>, ExhaustiveNonzeroRationals>>,
     >,
 > {
@@ -215,12 +214,13 @@ pub fn exhaustive_rational_matrices() -> ExhaustiveRationalMatrices<
 pub fn exhaustive_rational_matrices_with_dimensions_from_iterator<
     I: Clone + Iterator<Item = Rational>,
 >(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     xs: I,
-) -> ExhaustiveRationalMatrices<Zip<Repeat<(usize, usize)>, ExhaustiveFixedLengthVecs1Input<I>>> {
+) -> ExhaustiveRationalMatrices<Zip<Repeat<(u64, u64)>, ExhaustiveFixedLengthVecs1Input<I>>> {
+    let count = shape(height, width).2;
     ExhaustiveRationalMatrices(repeat((height, width)).zip(
-        exhaustive_vecs_fixed_length_from_single(u64::exact_from(element_count(height, width)), xs),
+        exhaustive_vecs_fixed_length_from_single(u64::exact_from(count), xs),
     ))
 }
 
@@ -257,11 +257,11 @@ pub fn exhaustive_rational_matrices_with_dimensions_from_iterator<
 /// ```
 #[inline]
 pub fn exhaustive_rational_matrices_with_dimensions(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
 ) -> ExhaustiveRationalMatrices<
     Zip<
-        Repeat<(usize, usize)>,
+        Repeat<(u64, u64)>,
         ExhaustiveFixedLengthVecs1Input<Chain<Once<Rational>, ExhaustiveNonzeroRationals>>,
     >,
 > {
@@ -278,9 +278,9 @@ pub fn exhaustive_rational_matrices_with_dimensions(
 /// This `struct` is created by [`exhaustive_rational_square_matrices_from_iterator`] and
 /// [`exhaustive_rational_square_matrices`]; see their documentation for more.
 #[derive(Clone, Debug)]
-pub struct ExhaustiveRationalSquareMatrices<I: Iterator<Item = (usize, Vec<Rational>)>>(I);
+pub struct ExhaustiveRationalSquareMatrices<I: Iterator<Item = (u64, Vec<Rational>)>>(I);
 
-impl<I: Iterator<Item = (usize, Vec<Rational>)>> Iterator for ExhaustiveRationalSquareMatrices<I> {
+impl<I: Iterator<Item = (u64, Vec<Rational>)>> Iterator for ExhaustiveRationalSquareMatrices<I> {
     type Item = RationalMatrix;
 
     #[inline]
@@ -300,13 +300,13 @@ impl<I: Iterator<Item = (usize, Vec<Rational>)>> Iterator for ExhaustiveRational
 pub struct ExhaustiveRationalSquareMatrixElements<I: Clone + Iterator<Item = Rational>>(I);
 
 impl<I: Clone + Iterator<Item = Rational>>
-    ExhaustiveDependentPairsYsGenerator<usize, Vec<Rational>, ExhaustiveFixedLengthVecs1Input<I>>
+    ExhaustiveDependentPairsYsGenerator<u64, Vec<Rational>, ExhaustiveFixedLengthVecs1Input<I>>
     for ExhaustiveRationalSquareMatrixElements<I>
 {
     #[inline]
-    fn get_ys(&self, &size: &usize) -> ExhaustiveFixedLengthVecs1Input<I> {
+    fn get_ys(&self, &size: &u64) -> ExhaustiveFixedLengthVecs1Input<I> {
         exhaustive_vecs_fixed_length_from_single(
-            u64::exact_from(element_count(size, size)),
+            u64::exact_from(shape(size, size).2),
             self.0.clone(),
         )
     }
@@ -359,11 +359,11 @@ pub fn exhaustive_rational_square_matrices_from_iterator<I: Clone + Iterator<Ite
     xs: I,
 ) -> ExhaustiveRationalSquareMatrices<
     ExhaustiveDependentPairs<
-        usize,
+        u64,
         Vec<Rational>,
         RulerSequence<usize>,
         ExhaustiveRationalSquareMatrixElements<I>,
-        PrimitiveIntIncreasingRange<usize>,
+        PrimitiveIntIncreasingRange<u64>,
         ExhaustiveFixedLengthVecs1Input<I>,
     >,
 > {
@@ -407,11 +407,11 @@ pub fn exhaustive_rational_square_matrices_from_iterator<I: Clone + Iterator<Ite
 #[inline]
 pub fn exhaustive_rational_square_matrices() -> ExhaustiveRationalSquareMatrices<
     ExhaustiveDependentPairs<
-        usize,
+        u64,
         Vec<Rational>,
         RulerSequence<usize>,
         ExhaustiveRationalSquareMatrixElements<Chain<Once<Rational>, ExhaustiveNonzeroRationals>>,
-        PrimitiveIntIncreasingRange<usize>,
+        PrimitiveIntIncreasingRange<u64>,
         ExhaustiveFixedLengthVecs1Input<Chain<Once<Rational>, ExhaustiveNonzeroRationals>>,
     >,
 > {

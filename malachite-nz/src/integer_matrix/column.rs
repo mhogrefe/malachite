@@ -39,7 +39,7 @@ impl IntegerMatrix {
     /// assert_eq!(m.column(1).to_string(), "()");
     /// ```
     #[inline]
-    pub fn column(&self, j: usize) -> IntegerVector {
+    pub fn column(&self, j: u64) -> IntegerVector {
         self.column_iter(j).cloned().collect()
     }
 }

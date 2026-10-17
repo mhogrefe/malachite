@@ -14,8 +14,8 @@ use malachite_nz::natural::random::uniform_random_natural_inclusive_range;
 use malachite_nz::natural_matrix::random::random_natural_matrices_with_dimensions_from_iterator;
 
 fn random_natural_matrices_with_dimensions_from_iterator_helper(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     bound: u32,
     expected_values: &[&str],
 ) {
@@ -140,7 +140,7 @@ fn test_random_natural_matrices_with_dimensions_from_iterator() {
 fn random_natural_matrices_with_dimensions_from_iterator_fail_1() {
     // height * width overflows
     let _ = random_natural_matrices_with_dimensions_from_iterator(
-        usize::MAX,
+        u64::MAX,
         2,
         uniform_random_natural_inclusive_range(EXAMPLE_SEED, Natural::ZERO, Natural::from(8u32)),
     );

@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
 use malachite_base::test_util::generators::{
     unsigned_matrix_unsigned_pair_gen_var_2,
     unsigned_matrix_unsigned_unsigned_vector_triple_gen_var_1,
@@ -16,7 +17,7 @@ use malachite_base::unsigned_vector::UnsignedVector;
 
 #[test]
 fn test_set_row() {
-    let test = |s, i: usize, v, out| {
+    let test = |s, i: u64, v, out| {
         let v = UnsignedVector::<u64>::from_str(v).unwrap();
         let mut m = UnsignedMatrix::<u64>::from_str(s).unwrap();
         m.set_row(i, &v);

@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_matrix::IntegerMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{BalancedModPowerOf2, BalancedModPowerOf2Assign};
 
 impl BalancedModPowerOf2 for IntegerMatrix {

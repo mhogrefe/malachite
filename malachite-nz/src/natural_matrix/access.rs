@@ -9,14 +9,15 @@
 use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
 use core::ops::{Index, IndexMut};
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 impl NaturalMatrix {
     // The position in `elements` of the element in row `i` and column `j`, or `None` if either
     // index is out of range.
-    #[inline]
-    const fn element_index(&self, i: usize, j: usize) -> Option<usize> {
-        if i < self.height && j < self.width {
-            Some(i * self.width + j)
+    fn element_index(&self, i: u64, j: u64) -> Option<usize> {
+        if i < self.height() && j < self.width() {
+            Some(usize::exact_from(i) * self.width + usize::exact_from(j))
         } else {
             None
         }
@@ -59,7 +60,7 @@ impl NaturalMatrix {
     /// assert_eq!(m.get(0, 3), None);
     /// ```
     #[inline]
-    pub fn get(&self, i: usize, j: usize) -> Option<&Natural> {
+    pub fn get(&self, i: u64, j: u64) -> Option<&Natural> {
         self.element_index(i, j).map(|k| &self.elements[k])
     }
 
@@ -84,7 +85,7 @@ impl NaturalMatrix {
     /// assert!(m.get_mut(0, 3).is_none());
     /// ```
     #[inline]
-    pub fn get_mut(&mut self, i: usize, j: usize) -> Option<&mut Natural> {
+    pub fn get_mut(&mut self, i: u64, j: u64) -> Option<&mut Natural> {
         self.element_index(i, j).map(|k| &mut self.elements[k])
     }
 }

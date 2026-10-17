@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_matrix::RationalMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_nz::natural_matrix::NaturalMatrix;
 
 impl PartialEq<NaturalMatrix> for RationalMatrix {
@@ -28,8 +29,8 @@ impl PartialEq<NaturalMatrix> for RationalMatrix {
     /// # Examples
     /// See [here](super::partial_eq_natural_matrix#partial_eq).
     fn eq(&self, other: &NaturalMatrix) -> bool {
-        self.height == other.height()
-            && self.width == other.width()
+        self.height() == other.height()
+            && self.width() == other.width()
             && self
                 .elements
                 .iter()

@@ -39,7 +39,7 @@ impl RationalMatrix {
     /// assert_eq!(m.column(1).to_string(), "()");
     /// ```
     #[inline]
-    pub fn column(&self, j: usize) -> RationalVector {
+    pub fn column(&self, j: u64) -> RationalVector {
         self.column_iter(j).cloned().collect()
     }
 }

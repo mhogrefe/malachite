@@ -105,7 +105,7 @@ fn benchmark_unsigned_matrix_index_mut(
 
 fn benchmark_unsigned_matrix_get(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
-        "UnsignedMatrix.get(usize, usize)",
+        "UnsignedMatrix.get(u64, u64)",
         BenchmarkType::Single,
         unsigned_matrix_unsigned_unsigned_triple_gen().get(gm, config),
         gm.name(),
@@ -125,7 +125,7 @@ fn benchmark_unsigned_matrix_get_mut(
     file_name: &str,
 ) {
     run_benchmark(
-        "UnsignedMatrix.get_mut(usize, usize)",
+        "UnsignedMatrix.get_mut(u64, u64)",
         BenchmarkType::Single,
         unsigned_matrix_unsigned_unsigned_triple_gen().get(gm, config),
         gm.name(),

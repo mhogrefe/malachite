@@ -28,6 +28,7 @@ impl<T: PrimitiveUnsigned> Display for UnsignedMatrix<T> {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::matrix::Matrix;
     /// use malachite_base::unsigned_matrix::UnsignedMatrix;
     ///
     /// let m = UnsignedMatrix::from_elements(2, 3, &[1u64, 2, 3, 4, 5, 6]);

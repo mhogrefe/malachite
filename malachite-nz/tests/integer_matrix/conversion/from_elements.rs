@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::matrix::Matrix;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::integer_matrix_gen;
@@ -46,7 +47,7 @@ fn from_elements_fail_2() {
 #[test]
 #[should_panic]
 fn from_elements_fail_3() {
-    IntegerMatrix::from_elements(usize::MAX, 2, &[]);
+    IntegerMatrix::from_elements(u64::MAX, 2, &[]);
 }
 
 #[test]

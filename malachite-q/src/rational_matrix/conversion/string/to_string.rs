@@ -27,6 +27,7 @@ impl Display for RationalMatrix {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::matrix::Matrix;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_matrix::RationalMatrix;
     ///

@@ -8,7 +8,9 @@
 
 use core::str::FromStr;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::{
@@ -17,7 +19,7 @@ use malachite_nz::test_util::generators::{
 
 #[test]
 fn test_row_iter() {
-    let test = |s, i: usize, out| {
+    let test = |s, i: u64, out| {
         let mut m = NaturalMatrix::from_str(s).unwrap();
         assert_eq!(prefix_to_string(m.row_iter(i), 100), out);
         assert_eq!(prefix_to_string(m.row_iter_mut(i), 100), out);
@@ -33,7 +35,7 @@ fn test_row_iter() {
 
 #[test]
 fn test_row_iter_mut() {
-    let test = |s, i: usize, out| {
+    let test = |s, i: u64, out| {
         let mut m = NaturalMatrix::from_str(s).unwrap();
         for x in m.row_iter_mut(i) {
             *x += Natural::ONE;
@@ -88,22 +90,26 @@ fn row_iter_mut_fail_2() {
 fn row_iter_properties() {
     natural_matrix_unsigned_pair_gen_var_2().test_properties(|(mut m, i)| {
         let n = m.width();
-        assert_eq!(m.row_iter(i).len(), n);
-        assert!(m.row_iter(i).eq((0..m.width()).map(|j| &m[(i, j)])));
+        assert_eq!(u64::exact_from(m.row_iter(i).len()), n);
         assert!(
             m.row_iter(i)
-                .eq(m.elements[i * m.width()..(i + 1) * m.width()].iter())
+                .eq((0..m.width()).map(|j| m.get(i, j).unwrap()))
+        );
+        assert!(
+            m.row_iter(i).eq(m.elements
+                [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())]
+                .iter())
         );
         assert!(
             m.row_iter(i)
                 .rev()
-                .eq((0..m.width()).map(|j| &m[(i, j)]).rev())
+                .eq((0..m.width()).map(|j| m.get(i, j).unwrap()).rev())
         );
         assert!(m.row_iter(i).eq(m.transpose().column_iter(i)));
 
         // Changing the elements through `row_iter_mut` changes only that row.
         let old = m.clone();
-        assert_eq!(m.row_iter_mut(i).len(), n);
+        assert_eq!(u64::exact_from(m.row_iter_mut(i).len()), n);
         assert!(m.row_iter_mut(i).map(|x| &*x).eq(old.row_iter(i)));
         for x in m.row_iter_mut(i) {
             *x += Natural::ONE;

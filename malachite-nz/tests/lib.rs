@@ -378,13 +378,16 @@ pub mod integer_matrix {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod to_elements;
         pub mod unsigned_matrix_from_integer_matrix;
     }
     pub mod dimensions;
     pub mod exhaustive {
         pub mod exhaustive_integer_matrices;
     }
+    pub mod identity;
     pub mod is_square;
+    pub mod is_zero;
     pub mod random {
         pub mod random_integer_matrices;
         pub mod random_integer_matrices_from_iterator;
@@ -401,7 +404,10 @@ pub mod integer_matrix {
     pub mod rows;
     pub mod set_column;
     pub mod set_row;
+    pub mod set_zero;
+    pub mod standard_basis_matrix;
     pub mod transpose;
+    pub mod zero;
 }
 pub mod integer_vector {
     pub mod access;
@@ -1034,13 +1040,16 @@ pub mod natural_matrix {
             pub mod to_string;
             pub mod typst;
         }
+        pub mod to_elements;
         pub mod unsigned_matrix_from_natural_matrix;
     }
     pub mod dimensions;
     pub mod exhaustive {
         pub mod exhaustive_natural_matrices;
     }
+    pub mod identity;
     pub mod is_square;
+    pub mod is_zero;
     pub mod random {
         pub mod random_natural_matrices;
         pub mod random_natural_matrices_from_iterator;
@@ -1057,7 +1066,10 @@ pub mod natural_matrix {
     pub mod rows;
     pub mod set_column;
     pub mod set_row;
+    pub mod set_zero;
+    pub mod standard_basis_matrix;
     pub mod transpose;
+    pub mod zero;
 }
 pub mod natural_vector {
     pub mod access;

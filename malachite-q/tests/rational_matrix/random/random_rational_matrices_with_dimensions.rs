@@ -11,8 +11,8 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_q::rational_matrix::random::random_rational_matrices_with_dimensions;
 
 fn random_rational_matrices_with_dimensions_helper(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
     expected_values: &[&str],
@@ -153,5 +153,5 @@ fn random_rational_matrices_with_dimensions_fail_2() {
 #[should_panic]
 fn random_rational_matrices_with_dimensions_fail_3() {
     // height * width overflows
-    let _ = random_rational_matrices_with_dimensions(EXAMPLE_SEED, usize::MAX, 2, 4, 1);
+    let _ = random_rational_matrices_with_dimensions(EXAMPLE_SEED, u64::MAX, 2, 4, 1);
 }

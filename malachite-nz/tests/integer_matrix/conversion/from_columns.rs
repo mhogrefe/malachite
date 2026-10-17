@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vector::Vector;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_vector::IntegerVector;
@@ -23,7 +25,7 @@ fn columns_of(m: &IntegerMatrix) -> Vec<IntegerVector> {
         .map(|j| {
             IntegerVector::from_owned_elements(
                 (0..m.height())
-                    .map(|i| m.elements[i * m.width() + j].clone())
+                    .map(|i| m.elements[usize::exact_from(i * m.width() + j)].clone())
                     .collect(),
             )
         })

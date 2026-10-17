@@ -39,7 +39,7 @@ impl NaturalMatrix {
     /// assert_eq!(m.row(1).to_string(), "()");
     /// ```
     #[inline]
-    pub fn row(&self, i: usize) -> NaturalVector {
+    pub fn row(&self, i: u64) -> NaturalVector {
         NaturalVector {
             elements: self.row_iter(i).as_slice().to_vec(),
         }

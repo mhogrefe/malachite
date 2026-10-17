@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vector::Vector;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::natural_vector::NaturalVector;
@@ -20,7 +22,12 @@ fn vectors(ss: &[&str]) -> Vec<NaturalVector> {
 
 fn rows_of(m: &NaturalMatrix) -> Vec<NaturalVector> {
     (0..m.height())
-        .map(|i| NaturalVector::from_elements(&m.elements[i * m.width()..(i + 1) * m.width()]))
+        .map(|i| {
+            NaturalVector::from_elements(
+                &m.elements
+                    [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())],
+            )
+        })
         .collect()
 }
 

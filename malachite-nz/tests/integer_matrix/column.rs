@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::{
     integer_matrix_gen, integer_matrix_unsigned_pair_gen_var_3,
@@ -14,7 +16,7 @@ use malachite_nz::test_util::generators::{
 
 #[test]
 fn test_column() {
-    let test = |s, j: usize, out| {
+    let test = |s, j: u64, out| {
         let m = IntegerMatrix::from_str(s).unwrap();
         let v = m.column(j);
         assert_eq!(v.to_string(), out);
@@ -58,7 +60,7 @@ fn column_fail_3() {
 fn column_properties() {
     integer_matrix_unsigned_pair_gen_var_3().test_properties(|(m, j)| {
         let v = m.column(j);
-        assert_eq!(v.elements.len(), m.height());
+        assert_eq!(u64::exact_from(v.elements.len()), m.height());
         assert!(v.elements.iter().eq(m.column_iter(j)));
         assert_eq!(m.transpose().row(j), v);
     });

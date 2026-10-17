@@ -47,6 +47,7 @@ impl FromStr for IntegerMatrix {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
     /// use malachite_nz::integer_matrix::IntegerMatrix;
     ///
     /// let m = IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();

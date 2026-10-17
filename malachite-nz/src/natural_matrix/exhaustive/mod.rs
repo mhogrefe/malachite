@@ -8,9 +8,10 @@
 
 use crate::natural::Natural;
 use crate::natural::exhaustive::{ExhaustiveNaturalRangeToInfinity, exhaustive_naturals};
-use crate::natural_matrix::{NaturalMatrix, element_count};
+use crate::natural_matrix::{NaturalMatrix, shape};
 use alloc::vec::Vec;
 use core::iter::{Repeat, Zip, repeat};
+use malachite_base::matrix::Matrix;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::exhaustive::{PrimitiveIntIncreasingRange, exhaustive_unsigneds};
 use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
@@ -29,9 +30,9 @@ use malachite_base::vecs::exhaustive::{
 /// [`exhaustive_natural_matrices`], [`exhaustive_natural_matrices_with_dimensions_from_iterator`],
 /// and [`exhaustive_natural_matrices_with_dimensions`]; see their documentation for more.
 #[derive(Clone, Debug)]
-pub struct ExhaustiveNaturalMatrices<I: Iterator<Item = ((usize, usize), Vec<Natural>)>>(I);
+pub struct ExhaustiveNaturalMatrices<I: Iterator<Item = ((u64, u64), Vec<Natural>)>>(I);
 
-impl<I: Iterator<Item = ((usize, usize), Vec<Natural>)>> Iterator for ExhaustiveNaturalMatrices<I> {
+impl<I: Iterator<Item = ((u64, u64), Vec<Natural>)>> Iterator for ExhaustiveNaturalMatrices<I> {
     type Item = NaturalMatrix;
 
     #[inline]
@@ -52,15 +53,15 @@ pub struct ExhaustiveNaturalMatrixElements<I: Clone + Iterator<Item = Natural>>(
 
 impl<I: Clone + Iterator<Item = Natural>>
     ExhaustiveDependentPairsYsGenerator<
-        (usize, usize),
+        (u64, u64),
         Vec<Natural>,
         ExhaustiveFixedLengthVecs1Input<I>,
     > for ExhaustiveNaturalMatrixElements<I>
 {
     #[inline]
-    fn get_ys(&self, &(height, width): &(usize, usize)) -> ExhaustiveFixedLengthVecs1Input<I> {
+    fn get_ys(&self, &(height, width): &(u64, u64)) -> ExhaustiveFixedLengthVecs1Input<I> {
         exhaustive_vecs_fixed_length_from_single(
-            u64::exact_from(element_count(height, width)),
+            u64::exact_from(shape(height, width).2),
             self.0.clone(),
         )
     }
@@ -112,11 +113,11 @@ pub fn exhaustive_natural_matrices_from_iterator<I: Clone + Iterator<Item = Natu
     xs: I,
 ) -> ExhaustiveNaturalMatrices<
     ExhaustiveDependentPairs<
-        (usize, usize),
+        (u64, u64),
         Vec<Natural>,
         RulerSequence<usize>,
         ExhaustiveNaturalMatrixElements<I>,
-        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<usize>>,
+        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<u64>>,
         ExhaustiveFixedLengthVecs1Input<I>,
     >,
 > {
@@ -158,11 +159,11 @@ pub fn exhaustive_natural_matrices_from_iterator<I: Clone + Iterator<Item = Natu
 #[inline]
 pub fn exhaustive_natural_matrices() -> ExhaustiveNaturalMatrices<
     ExhaustiveDependentPairs<
-        (usize, usize),
+        (u64, u64),
         Vec<Natural>,
         RulerSequence<usize>,
         ExhaustiveNaturalMatrixElements<ExhaustiveNaturalRangeToInfinity>,
-        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<usize>>,
+        ExhaustivePairs1Input<PrimitiveIntIncreasingRange<u64>>,
         ExhaustiveFixedLengthVecs1Input<ExhaustiveNaturalRangeToInfinity>,
     >,
 > {
@@ -214,12 +215,13 @@ pub fn exhaustive_natural_matrices() -> ExhaustiveNaturalMatrices<
 pub fn exhaustive_natural_matrices_with_dimensions_from_iterator<
     I: Clone + Iterator<Item = Natural>,
 >(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     xs: I,
-) -> ExhaustiveNaturalMatrices<Zip<Repeat<(usize, usize)>, ExhaustiveFixedLengthVecs1Input<I>>> {
+) -> ExhaustiveNaturalMatrices<Zip<Repeat<(u64, u64)>, ExhaustiveFixedLengthVecs1Input<I>>> {
+    let count = shape(height, width).2;
     ExhaustiveNaturalMatrices(repeat((height, width)).zip(
-        exhaustive_vecs_fixed_length_from_single(u64::exact_from(element_count(height, width)), xs),
+        exhaustive_vecs_fixed_length_from_single(u64::exact_from(count), xs),
     ))
 }
 
@@ -256,10 +258,10 @@ pub fn exhaustive_natural_matrices_with_dimensions_from_iterator<
 /// ```
 #[inline]
 pub fn exhaustive_natural_matrices_with_dimensions(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
 ) -> ExhaustiveNaturalMatrices<
-    Zip<Repeat<(usize, usize)>, ExhaustiveFixedLengthVecs1Input<ExhaustiveNaturalRangeToInfinity>>,
+    Zip<Repeat<(u64, u64)>, ExhaustiveFixedLengthVecs1Input<ExhaustiveNaturalRangeToInfinity>>,
 > {
     exhaustive_natural_matrices_with_dimensions_from_iterator(height, width, exhaustive_naturals())
 }
@@ -270,9 +272,9 @@ pub fn exhaustive_natural_matrices_with_dimensions(
 /// This `struct` is created by [`exhaustive_natural_square_matrices_from_iterator`] and
 /// [`exhaustive_natural_square_matrices`]; see their documentation for more.
 #[derive(Clone, Debug)]
-pub struct ExhaustiveNaturalSquareMatrices<I: Iterator<Item = (usize, Vec<Natural>)>>(I);
+pub struct ExhaustiveNaturalSquareMatrices<I: Iterator<Item = (u64, Vec<Natural>)>>(I);
 
-impl<I: Iterator<Item = (usize, Vec<Natural>)>> Iterator for ExhaustiveNaturalSquareMatrices<I> {
+impl<I: Iterator<Item = (u64, Vec<Natural>)>> Iterator for ExhaustiveNaturalSquareMatrices<I> {
     type Item = NaturalMatrix;
 
     #[inline]
@@ -292,13 +294,13 @@ impl<I: Iterator<Item = (usize, Vec<Natural>)>> Iterator for ExhaustiveNaturalSq
 pub struct ExhaustiveNaturalSquareMatrixElements<I: Clone + Iterator<Item = Natural>>(I);
 
 impl<I: Clone + Iterator<Item = Natural>>
-    ExhaustiveDependentPairsYsGenerator<usize, Vec<Natural>, ExhaustiveFixedLengthVecs1Input<I>>
+    ExhaustiveDependentPairsYsGenerator<u64, Vec<Natural>, ExhaustiveFixedLengthVecs1Input<I>>
     for ExhaustiveNaturalSquareMatrixElements<I>
 {
     #[inline]
-    fn get_ys(&self, &size: &usize) -> ExhaustiveFixedLengthVecs1Input<I> {
+    fn get_ys(&self, &size: &u64) -> ExhaustiveFixedLengthVecs1Input<I> {
         exhaustive_vecs_fixed_length_from_single(
-            u64::exact_from(element_count(size, size)),
+            u64::exact_from(shape(size, size).2),
             self.0.clone(),
         )
     }
@@ -353,11 +355,11 @@ pub fn exhaustive_natural_square_matrices_from_iterator<I: Clone + Iterator<Item
     xs: I,
 ) -> ExhaustiveNaturalSquareMatrices<
     ExhaustiveDependentPairs<
-        usize,
+        u64,
         Vec<Natural>,
         RulerSequence<usize>,
         ExhaustiveNaturalSquareMatrixElements<I>,
-        PrimitiveIntIncreasingRange<usize>,
+        PrimitiveIntIncreasingRange<u64>,
         ExhaustiveFixedLengthVecs1Input<I>,
     >,
 > {
@@ -401,11 +403,11 @@ pub fn exhaustive_natural_square_matrices_from_iterator<I: Clone + Iterator<Item
 #[inline]
 pub fn exhaustive_natural_square_matrices() -> ExhaustiveNaturalSquareMatrices<
     ExhaustiveDependentPairs<
-        usize,
+        u64,
         Vec<Natural>,
         RulerSequence<usize>,
         ExhaustiveNaturalSquareMatrixElements<ExhaustiveNaturalRangeToInfinity>,
-        PrimitiveIntIncreasingRange<usize>,
+        PrimitiveIntIncreasingRange<u64>,
         ExhaustiveFixedLengthVecs1Input<ExhaustiveNaturalRangeToInfinity>,
     >,
 > {

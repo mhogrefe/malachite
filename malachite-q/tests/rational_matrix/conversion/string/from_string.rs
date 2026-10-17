@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::string_gen;
 use malachite_q::Rational;
@@ -42,7 +44,7 @@ fn test_from_str() {
     // - the largest height
     let s = format!("[]_{{{},0}}", usize::MAX);
     let m = RationalMatrix::from_str(&s).unwrap();
-    assert_eq!((m.height(), m.width()), (usize::MAX, 0));
+    assert_eq!((m.height(), m.width()), (u64::exact_from(usize::MAX), 0));
     assert_eq!(m.to_string(), s);
     // - an element is read the way `Rational::from_str` reads one
     test("[007, +8; -0, -009]", 2, 2, "[7, 8; 0, -9]");

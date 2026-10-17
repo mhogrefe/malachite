@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::matrix::Matrix;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::natural_matrix_gen;
@@ -45,7 +46,7 @@ fn from_elements_column_major_fail_1() {
 #[test]
 #[should_panic]
 fn from_elements_column_major_fail_2() {
-    NaturalMatrix::from_elements_column_major(usize::MAX, 2, &[]);
+    NaturalMatrix::from_elements_column_major(u64::MAX, 2, &[]);
 }
 
 #[test]

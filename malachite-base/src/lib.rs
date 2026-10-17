@@ -173,6 +173,8 @@ pub const fn fail_on_untested_path(_message: &str) {}
 /// Functions for working with [`HashMap`](std::collections::HashMap)s and
 /// [`BTreeMap`](std::collections::BTreeMap)s.
 pub mod maps;
+/// The [`Matrix`](matrix::Matrix) trait, for what every matrix type has in common.
+pub mod matrix;
 /// The [`Named`](named::Named) trait, for getting a type's name.
 #[macro_use]
 pub mod named;

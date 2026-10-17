@@ -11,8 +11,8 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::unsigned_matrix::random::random_unsigned_matrices_with_dimensions;
 
 fn random_unsigned_matrices_with_dimensions_helper(
-    height: usize,
-    width: usize,
+    height: u64,
+    width: u64,
     expected_values: &[&str],
 ) {
     assert_eq!(
@@ -123,5 +123,5 @@ fn test_random_unsigned_matrices_with_dimensions() {
 #[should_panic]
 fn random_unsigned_matrices_with_dimensions_fail_1() {
     // height * width overflows
-    let _ = random_unsigned_matrices_with_dimensions::<u8>(EXAMPLE_SEED, usize::MAX, 2);
+    let _ = random_unsigned_matrices_with_dimensions::<u8>(EXAMPLE_SEED, u64::MAX, 2);
 }

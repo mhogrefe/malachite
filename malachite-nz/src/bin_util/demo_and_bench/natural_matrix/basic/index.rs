@@ -106,7 +106,7 @@ fn benchmark_natural_matrix_index_mut(
 
 fn benchmark_natural_matrix_get(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
-        "NaturalMatrix.get(usize, usize)",
+        "NaturalMatrix.get(u64, u64)",
         BenchmarkType::Single,
         natural_matrix_unsigned_unsigned_triple_gen().get(gm, config),
         gm.name(),
@@ -126,7 +126,7 @@ fn benchmark_natural_matrix_get_mut(
     file_name: &str,
 ) {
     run_benchmark(
-        "NaturalMatrix.get_mut(usize, usize)",
+        "NaturalMatrix.get_mut(u64, u64)",
         BenchmarkType::Single,
         natural_matrix_unsigned_unsigned_triple_gen().get(gm, config),
         gm.name(),

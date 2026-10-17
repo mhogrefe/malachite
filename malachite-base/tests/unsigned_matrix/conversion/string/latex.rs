@@ -8,6 +8,8 @@
 
 use core::str::FromStr;
 use itertools::Itertools;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::latex::ToLatex;
 use malachite_base::test_util::generators::unsigned_matrix_gen;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
@@ -20,7 +22,7 @@ fn rows(
     f: impl Fn(&u64) -> String,
 ) -> Vec<String> {
     m.elements
-        .chunks(m.width())
+        .chunks(usize::exact_from(m.width()))
         .map(|row| row.iter().map(&f).join(element_separator))
         .collect()
 }

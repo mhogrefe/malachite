@@ -8,6 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::unsigned_matrix_gen;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 
@@ -25,7 +27,7 @@ fn test_columns() {
         let m = UnsignedMatrix::<u64>::from_str(s).unwrap();
         assert_eq!(columns_to_string(&m, false), out);
         assert_eq!(columns_to_string(&m, true), out_rev);
-        assert_eq!(m.columns().len(), m.width());
+        assert_eq!(u64::exact_from(m.columns().len()), m.width());
     };
     test("[]_{0,0}", "[]", "[]");
     test("[]_{3,0}", "[]", "[]");
@@ -84,8 +86,8 @@ fn test_columns_mut() {
 fn columns_properties() {
     unsigned_matrix_gen().test_properties(|mut m| {
         let n = m.width();
-        assert_eq!(m.columns().len(), n);
-        assert_eq!(m.columns_mut().len(), n);
+        assert_eq!(u64::exact_from(m.columns().len()), n);
+        assert_eq!(u64::exact_from(m.columns_mut().len()), n);
         assert!(m.columns().zip(0..).all(|(xs, k)| xs.eq(m.column_iter(k))));
         assert!(
             m.columns()
@@ -101,7 +103,7 @@ fn columns_properties() {
         let mut k = 0;
         let mut l = n;
         while k < l {
-            assert_eq!(it.len(), l - k);
+            assert_eq!(u64::exact_from(it.len()), l - k);
             if (k + l) % 2 == 0 {
                 assert!(it.next().unwrap().eq(m.column_iter(k)));
                 k += 1;

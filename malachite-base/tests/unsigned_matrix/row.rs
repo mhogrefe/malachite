@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::generators::{
     unsigned_matrix_gen, unsigned_matrix_unsigned_pair_gen_var_2,
 };
@@ -14,7 +16,7 @@ use malachite_base::unsigned_matrix::UnsignedMatrix;
 
 #[test]
 fn test_row() {
-    let test = |s, i: usize, out| {
+    let test = |s, i: u64, out| {
         let m = UnsignedMatrix::<u64>::from_str(s).unwrap();
         let v = m.row(i);
         assert_eq!(v.to_string(), out);
@@ -55,7 +57,7 @@ fn row_fail_3() {
 fn row_properties() {
     unsigned_matrix_unsigned_pair_gen_var_2().test_properties(|(m, i)| {
         let v = m.row(i);
-        assert_eq!(v.elements.len(), m.width());
+        assert_eq!(u64::exact_from(v.elements.len()), m.width());
         assert!(v.elements.iter().eq(m.row_iter(i)));
         assert_eq!(m.transpose().column(i), v);
     });

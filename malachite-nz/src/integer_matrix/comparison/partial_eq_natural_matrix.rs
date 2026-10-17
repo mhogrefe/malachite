@@ -8,6 +8,7 @@
 
 use crate::integer_matrix::IntegerMatrix;
 use crate::natural_matrix::NaturalMatrix;
+use malachite_base::matrix::Matrix;
 
 impl PartialEq<NaturalMatrix> for IntegerMatrix {
     /// Determines whether an [`IntegerMatrix`] is equal to a [`NaturalMatrix`].
@@ -27,8 +28,8 @@ impl PartialEq<NaturalMatrix> for IntegerMatrix {
     /// # Examples
     /// See [here](super::partial_eq_natural_matrix#partial_eq).
     fn eq(&self, other: &NaturalMatrix) -> bool {
-        self.height == other.height()
-            && self.width == other.width()
+        self.height() == other.height()
+            && self.width() == other.width()
             && self
                 .elements
                 .iter()

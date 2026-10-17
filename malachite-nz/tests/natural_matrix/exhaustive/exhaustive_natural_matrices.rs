@@ -8,6 +8,7 @@
 
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::{Two, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::exhaustive_natural_range;
@@ -105,14 +106,14 @@ fn test_exhaustive_natural_matrices_with_dimensions_from_iterator() {
 #[should_panic]
 fn exhaustive_natural_matrices_with_dimensions_fail() {
     // height * width overflows
-    exhaustive_natural_matrices_with_dimensions(usize::MAX, 2);
+    exhaustive_natural_matrices_with_dimensions(u64::MAX, 2);
 }
 
 #[test]
 #[should_panic]
 fn exhaustive_natural_matrices_with_dimensions_from_iterator_fail() {
     // height * width overflows
-    exhaustive_natural_matrices_with_dimensions_from_iterator(usize::MAX, 2, zero_or_one());
+    exhaustive_natural_matrices_with_dimensions_from_iterator(u64::MAX, 2, zero_or_one());
 }
 
 #[test]

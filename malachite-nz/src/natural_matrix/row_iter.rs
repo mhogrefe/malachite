@@ -10,15 +10,18 @@ use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
 use core::ops::Range;
 use core::slice::{Iter, IterMut};
+use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 impl NaturalMatrix {
     // The range of positions in `elements` that row `i` occupies, panicking if `i` is out of range.
-    fn row_range(&self, i: usize) -> Range<usize> {
+    fn row_range(&self, i: u64) -> Range<usize> {
         assert!(
-            i < self.height,
+            i < self.height(),
             "row index {i} is out of range for a matrix with {} rows",
             self.height
         );
+        let i = usize::exact_from(i);
         i * self.width..(i + 1) * self.width
     }
 
@@ -46,7 +49,7 @@ impl NaturalMatrix {
     /// assert_eq!(prefix_to_string(m.row_iter(1), 10), "[]");
     /// ```
     #[inline]
-    pub fn row_iter(&self, i: usize) -> Iter<'_, Natural> {
+    pub fn row_iter(&self, i: u64) -> Iter<'_, Natural> {
         self.elements[self.row_range(i)].iter()
     }
 
@@ -76,7 +79,7 @@ impl NaturalMatrix {
     /// assert_eq!(m.to_string(), "[1, 2, 3; 5, 6, 7]");
     /// ```
     #[inline]
-    pub fn row_iter_mut(&mut self, i: usize) -> IterMut<'_, Natural> {
+    pub fn row_iter_mut(&mut self, i: u64) -> IterMut<'_, Natural> {
         let range = self.row_range(i);
         self.elements[range].iter_mut()
     }
