@@ -28,6 +28,7 @@ pub(crate) fn register(runner: &mut Runner) {
     rows::register(runner);
     set_column::register(runner);
     set_row::register(runner);
+    set_window::register(runner);
     set_zero::register(runner);
     standard_basis_index::register(runner);
     standard_basis_matrix::register(runner);
@@ -55,6 +56,7 @@ mod row_iter;
 mod rows;
 mod set_column;
 mod set_row;
+mod set_window;
 mod set_zero;
 mod standard_basis_index;
 mod standard_basis_matrix;

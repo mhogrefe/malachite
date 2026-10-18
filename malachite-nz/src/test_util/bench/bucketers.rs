@@ -314,6 +314,22 @@ pub fn quintuple_1_natural_matrix_bit_bucketer<T, U, V, W>(
     }
 }
 
+pub fn quadruple_1_natural_matrix_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (NaturalMatrix, T, U, V)> {
+    Bucketer {
+        bucketing_function: &|(m, _, _, _)| {
+            usize::exact_from(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
 pub fn pair_1_integer_matrix_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (IntegerMatrix, T)> {
     Bucketer {
         bucketing_function: &|(m, _)| {
@@ -333,6 +349,22 @@ pub fn quintuple_1_integer_matrix_bit_bucketer<T, U, V, W>(
 ) -> Bucketer<'_, (IntegerMatrix, T, U, V, W)> {
     Bucketer {
         bucketing_function: &|(m, _, _, _, _)| {
+            usize::exact_from(
+                m.elements
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn quadruple_1_integer_matrix_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (IntegerMatrix, T, U, V)> {
+    Bucketer {
+        bucketing_function: &|(m, _, _, _)| {
             usize::exact_from(
                 m.elements
                     .iter()

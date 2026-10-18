@@ -1298,6 +1298,16 @@ pub fn rational_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
     )
 }
 
+// All `(m, w, i, j)` such that `w` fits in `m` with its top-left element in row `i` and column `j`.
+pub fn rational_matrix_rational_matrix_unsigned_unsigned_quadruple_gen_var_1()
+-> Generator<(RationalMatrix, RationalMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_rational_matrix_rational_matrix_unsigned_unsigned_quadruple_gen_var_1,
+        &random_rational_matrix_rational_matrix_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_rational_matrix_rational_matrix_unsigned_unsigned_quadruple_gen_var_1,
+    )
+}
+
 pub fn rational_matrix_integer_matrix_pair_gen() -> Generator<(RationalMatrix, IntegerMatrix)> {
     Generator::new(
         &exhaustive_rational_matrix_integer_matrix_pair_gen,

@@ -3610,6 +3610,26 @@ pub fn exhaustive_integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_g
     }))
 }
 
+// Each pair of matrices with each position at which the second fits in the first. A pair has
+// finitely many, so this reaches every tuple exactly once.
+pub fn exhaustive_integer_matrix_integer_matrix_unsigned_unsigned_quadruple_gen_var_1()
+-> It<(IntegerMatrix, IntegerMatrix, u64, u64)> {
+    Box::new(exhaustive_integer_matrix_pair_gen().flat_map(|(m, w)| {
+        let (height, width) = (m.height(), m.width());
+        let (window_height, window_width) = (w.height(), w.width());
+        let positions: Vec<(u64, u64)> = if window_height <= height && window_width <= width {
+            (0..=height - window_height)
+                .flat_map(|i| (0..=width - window_width).map(move |j| (i, j)))
+                .collect()
+        } else {
+            Vec::new()
+        };
+        positions
+            .into_iter()
+            .map(move |(i, j)| (m.clone(), w.clone(), i, j))
+    }))
+}
+
 pub fn exhaustive_integer_matrix_natural_matrix_pair_gen() -> It<(IntegerMatrix, NaturalMatrix)> {
     Box::new(exhaustive_pairs(
         exhaustive_integer_matrices(),
@@ -3880,6 +3900,26 @@ pub fn exhaustive_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_g
     Box::new(exhaustive_natural_matrix_gen().flat_map(|m| {
         exhaustive_window_bounds(m.height(), m.width())
             .map(move |(r1, r2, c1, c2)| (m.clone(), r1, r2, c1, c2))
+    }))
+}
+
+// Each pair of matrices with each position at which the second fits in the first. A pair has
+// finitely many, so this reaches every tuple exactly once.
+pub fn exhaustive_natural_matrix_natural_matrix_unsigned_unsigned_quadruple_gen_var_1()
+-> It<(NaturalMatrix, NaturalMatrix, u64, u64)> {
+    Box::new(exhaustive_natural_matrix_pair_gen().flat_map(|(m, w)| {
+        let (height, width) = (m.height(), m.width());
+        let (window_height, window_width) = (w.height(), w.width());
+        let positions: Vec<(u64, u64)> = if window_height <= height && window_width <= width {
+            (0..=height - window_height)
+                .flat_map(|i| (0..=width - window_width).map(move |j| (i, j)))
+                .collect()
+        } else {
+            Vec::new()
+        };
+        positions
+            .into_iter()
+            .map(move |(i, j)| (m.clone(), w.clone(), i, j))
     }))
 }
 

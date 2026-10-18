@@ -240,6 +240,7 @@ pub mod rational_matrix {
     pub mod rows;
     pub mod set_column;
     pub mod set_row;
+    pub mod set_window;
     pub mod set_zero;
     pub mod standard_basis_index;
     pub mod standard_basis_matrix;

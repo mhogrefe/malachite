@@ -5317,6 +5317,16 @@ pub fn unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
     )
 }
 
+// All `(m, w, i, j)` such that `w` fits in `m` with its top-left element in row `i` and column `j`.
+pub fn unsigned_matrix_unsigned_matrix_unsigned_unsigned_quadruple_gen_var_1()
+-> Generator<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_matrix_unsigned_unsigned_quadruple_gen_var_1,
+        &random_unsigned_matrix_unsigned_matrix_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_unsigned_matrix_unsigned_matrix_unsigned_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, u64)` pairs, where the `u64` is a small power.
 pub fn unsigned_matrix_unsigned_pair_gen() -> Generator<(UnsignedMatrix<u64>, u64)> {
     Generator::new(

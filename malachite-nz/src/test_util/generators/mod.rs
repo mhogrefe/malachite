@@ -3940,6 +3940,16 @@ pub fn integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
     )
 }
 
+// All `(m, w, i, j)` such that `w` fits in `m` with its top-left element in row `i` and column `j`.
+pub fn integer_matrix_integer_matrix_unsigned_unsigned_quadruple_gen_var_1()
+-> Generator<(IntegerMatrix, IntegerMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_matrix_integer_matrix_unsigned_unsigned_quadruple_gen_var_1,
+        &random_integer_matrix_integer_matrix_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_integer_matrix_integer_matrix_unsigned_unsigned_quadruple_gen_var_1,
+    )
+}
+
 pub fn integer_matrix_natural_matrix_pair_gen() -> Generator<(IntegerMatrix, NaturalMatrix)> {
     Generator::new(
         &exhaustive_integer_matrix_natural_matrix_pair_gen,
@@ -4295,6 +4305,16 @@ pub fn natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
         &exhaustive_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
         &random_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
         &special_random_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+    )
+}
+
+// All `(m, w, i, j)` such that `w` fits in `m` with its top-left element in row `i` and column `j`.
+pub fn natural_matrix_natural_matrix_unsigned_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, NaturalMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_unsigned_unsigned_quadruple_gen_var_1,
+        &random_natural_matrix_natural_matrix_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_natural_matrix_natural_matrix_unsigned_unsigned_quadruple_gen_var_1,
     )
 }
 

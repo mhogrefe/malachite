@@ -98,6 +98,28 @@ fn window_ranges(
     )
 }
 
+// Converts the position of a window with the given shape in a matrix with the given dimensions to
+// `usize` ranges of rows and columns, panicking if the window does not fit.
+fn set_window_ranges(
+    height: usize,
+    width: usize,
+    i: u64,
+    j: u64,
+    window_height: usize,
+    window_width: usize,
+) -> (Range<usize>, Range<usize>) {
+    assert!(
+        i <= u64::exact_from(height) && window_height <= height - usize::exact_from(i),
+        "a window of {window_height} rows from row {i} does not fit in a matrix with {height} rows"
+    );
+    assert!(
+        j <= u64::exact_from(width) && window_width <= width - usize::exact_from(j),
+        "a window of {window_width} columns from column {j} does not fit in {width} columns"
+    );
+    let (i, j) = (usize::exact_from(i), usize::exact_from(j));
+    (i..i + window_height, j..j + window_width)
+}
+
 impl RationalMatrix {
     // Returns true iff `self` is valid.
     //
@@ -1213,6 +1235,96 @@ impl Matrix for RationalMatrix {
         self.height = rows.len();
         self.width = width;
         self
+    }
+
+    /// Overwrites a window of a [`RationalMatrix`] with the elements of another [`RationalMatrix`],
+    /// cloning them.
+    ///
+    /// The window starts in row `i` and column `j` and has the shape of `w`: the element in row `i`
+    /// $+ k$ and column `j` $+ l$ becomes the element of `w` in row $k$ and column $l$, and the
+    /// other elements are unchanged. Writing back a window taken with [`window`](Self::window)
+    /// restores the matrix. `w` may have no elements.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm)$
+    ///
+    /// $M(n, m) = O(nm)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the number of elements of `w`, and $m$
+    /// is the maximum bit length of its elements.
+    ///
+    /// # Panics
+    /// Panics if `i + w.height() > self.height()` or `j + w.width() > self.width()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let mut m = RationalMatrix::from_str("[1/2, 2, 3; 4, 5/3, 6; 7, 8, -9]").unwrap();
+    /// m.set_window(
+    ///     1,
+    ///     1,
+    ///     &RationalMatrix::from_str("[0, -1/2; 1/3, 0]").unwrap(),
+    /// );
+    /// assert_eq!(m.to_string(), "[1/2, 2, 3; 4, 0, -1/2; 7, 1/3, 0]");
+    ///
+    /// let mut m = RationalMatrix::from_str("[1/2, 2, 3; 4, 5/3, 6; 7, 8, -9]").unwrap();
+    /// m.set_window(1, 0, &RationalMatrix::from_str("[10, -1/20, 30]").unwrap());
+    /// assert_eq!(m.to_string(), "[1/2, 2, 3; 10, -1/20, 30; 7, 8, -9]");
+    /// ```
+    fn set_window(&mut self, i: u64, j: u64, w: &Self) {
+        let (rows, columns) = set_window_ranges(self.height, self.width, i, j, w.height, w.width);
+        let width = columns.len();
+        for (k, r) in rows.enumerate() {
+            let start = r * self.width + columns.start;
+            self.elements[start..start + width]
+                .clone_from_slice(&w.elements[k * width..(k + 1) * width]);
+        }
+    }
+
+    /// Overwrites a window of a [`RationalMatrix`] with the elements of another [`RationalMatrix`],
+    /// taking ownership of the other matrix.
+    ///
+    /// The result equals what [`set_window`](Self::set_window) produces. No element is cloned.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements of `w`.
+    ///
+    /// # Panics
+    /// Panics if `i + w.height() > self.height()` or `j + w.width() > self.width()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let mut m = RationalMatrix::from_str("[1/2, 2, 3; 4, 5/3, 6; 7, 8, -9]").unwrap();
+    /// m.set_window_owned(1, 1, RationalMatrix::from_str("[0, -1/2; 1/3, 0]").unwrap());
+    /// assert_eq!(m.to_string(), "[1/2, 2, 3; 4, 0, -1/2; 7, 1/3, 0]");
+    ///
+    /// let mut m = RationalMatrix::from_str("[1/2, 2, 3; 4, 5/3, 6; 7, 8, -9]").unwrap();
+    /// m.set_window_owned(1, 0, RationalMatrix::from_str("[10, -1/20, 30]").unwrap());
+    /// assert_eq!(m.to_string(), "[1/2, 2, 3; 10, -1/20, 30; 7, 8, -9]");
+    /// ```
+    fn set_window_owned(&mut self, i: u64, j: u64, w: Self) {
+        let (rows, columns) = set_window_ranges(self.height, self.width, i, j, w.height, w.width);
+        let mut xs = w.elements.into_iter();
+        for r in rows {
+            let start = r * self.width + columns.start;
+            for (y, x) in self.elements[start..start + columns.len()]
+                .iter_mut()
+                .zip(&mut xs)
+            {
+                *y = x;
+            }
+        }
     }
 }
 

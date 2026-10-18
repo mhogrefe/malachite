@@ -136,4 +136,19 @@ pub trait Matrix: Sized {
     ///
     /// The result equals what [`window`](Self::window) returns.
     fn into_window(self, rows: Range<u64>, columns: Range<u64>) -> Self;
+
+    /// Overwrites a window of a matrix with the elements of another matrix, cloning them.
+    ///
+    /// The window starts in row `i` and column `j` and has the shape of `w`: the element of the
+    /// matrix in row `i` $+ k$ and column `j` $+ l$ becomes the element of `w` in row $k$ and
+    /// column $l$. This is the inverse of [`window`](Self::window).
+    fn set_window(&mut self, i: u64, j: u64, w: &Self)
+    where
+        Self::Element: Clone;
+
+    /// Overwrites a window of a matrix with the elements of another matrix, taking ownership of the
+    /// other matrix.
+    ///
+    /// The result equals what [`set_window`](Self::set_window) produces.
+    fn set_window_owned(&mut self, i: u64, j: u64, w: Self);
 }

@@ -2485,6 +2485,35 @@ pub fn special_random_rational_matrix_unsigned_unsigned_unsigned_unsigned_quintu
     }))
 }
 
+// A random matrix, a random shape that fits in it, a random position for that shape, and a matrix
+// of that shape whose elements come from a separate stream.
+pub fn special_random_rational_matrix_rational_matrix_unsigned_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalMatrix, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("windows"));
+    let mut xs = striped_random_rationals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(special_random_rational_matrix_gen(config).map(move |m| {
+        let (height, width) = (m.height(), m.width());
+        let window_height = ranges.next_in_inclusive_range(0, height);
+        let window_width = ranges.next_in_inclusive_range(0, width);
+        let i = ranges.next_in_inclusive_range(0, height - window_height);
+        let j = ranges.next_in_inclusive_range(0, width - window_width);
+        let n = usize::exact_from(window_height * window_width);
+        let w = RationalMatrix::from_owned_elements(
+            window_height,
+            window_width,
+            (&mut xs).take(n).collect(),
+        );
+        (m, w, i, j)
+    }))
+}
+
 pub fn special_random_rational_matrix_integer_matrix_pair_gen(
     config: &GenConfig,
 ) -> It<(RationalMatrix, IntegerMatrix)> {

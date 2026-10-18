@@ -9220,6 +9220,29 @@ pub fn random_unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_
     }))
 }
 
+// A random matrix, a random shape that fits in it, a random position for that shape, and a matrix
+// of that shape whose elements come from a separate stream.
+pub fn random_unsigned_matrix_unsigned_matrix_unsigned_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("windows"));
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(random_unsigned_matrix_gen(config).map(move |m| {
+        let (height, width) = (m.height(), m.width());
+        let window_height = ranges.next_in_inclusive_range(0, height);
+        let window_width = ranges.next_in_inclusive_range(0, width);
+        let i = ranges.next_in_inclusive_range(0, height - window_height);
+        let j = ranges.next_in_inclusive_range(0, width - window_width);
+        let n = usize::exact_from(window_height * window_width);
+        let w = UnsignedMatrix::from_owned_elements(
+            window_height,
+            window_width,
+            (&mut xs).take(n).collect(),
+        );
+        (m, w, i, j)
+    }))
+}
+
 // A random window of a matrix with the given height and width, as `(r1, r2, c1, c2)` with `r1 <= r2
 // <= height` and `c1 <= c2 <= width`: each range is the sorted pair of two endpoints drawn
 // uniformly from `0..=height` or `0..=width`.
