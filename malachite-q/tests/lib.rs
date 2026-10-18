@@ -170,6 +170,8 @@ pub mod rational_matrix {
         pub mod mul_vector;
         pub mod neg;
         pub mod scalar_mul;
+        pub mod shl;
+        pub mod shr;
         pub mod sub;
         pub mod vector_mul;
     }

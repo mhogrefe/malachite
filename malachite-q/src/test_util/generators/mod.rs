@@ -1421,6 +1421,26 @@ pub fn rational_matrix_unsigned_pair_gen_var_2() -> Generator<(RationalMatrix, u
     )
 }
 
+// All `(RationalMatrix, T)` where `T` is small and signed.
+pub fn rational_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(RationalMatrix, T)>
+{
+    Generator::new(
+        &exhaustive_rational_matrix_signed_pair_gen_var_1,
+        &random_rational_matrix_signed_pair_gen_var_1,
+        &special_random_rational_matrix_signed_pair_gen_var_1,
+    )
+}
+
+// All `(RationalMatrix, T)` where `T` is unsigned and small.
+pub fn rational_matrix_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
+-> Generator<(RationalMatrix, T)> {
+    Generator::new(
+        &exhaustive_rational_matrix_unsigned_pair_gen_var_3,
+        &random_rational_matrix_unsigned_pair_gen_var_3,
+        &special_random_rational_matrix_unsigned_pair_gen_var_3,
+    )
+}
+
 // All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
 pub fn rational_matrix_unsigned_rational_vector_triple_gen_var_1()
 -> Generator<(RationalMatrix, u64, RationalVector)> {

@@ -1162,6 +1162,22 @@ pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_2() -> It<(RationalMatri
     )
 }
 
+pub fn exhaustive_rational_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> It<(RationalMatrix, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_rational_matrices(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_rational_matrix_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
+-> It<(RationalMatrix, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_rational_matrices(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 pub fn exhaustive_rational_matrix_unsigned_rational_vector_triple_gen_var_1()
 -> It<(RationalMatrix, u64, RationalVector)> {
     Box::new(
