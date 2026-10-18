@@ -7124,6 +7124,64 @@ pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_3()
     )
 }
 
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, U, u64)> {
+    fn ys<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+        ((height, width), pow): ((u64, u64), u64),
+    ) -> It<(UnsignedMatrix<T>, U)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                height,
+                width,
+                residues_mod_power_of_2::<T>(pow),
+            ),
+            primitive_int_increasing_inclusive_range(U::ZERO, U::exact_from(T::WIDTH + 1)),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )),
+            ys::<T, U>,
+        )
+        .map(|((_, pow), (a, u))| (a, u, pow)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_5<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, U, T)> {
+    fn ys<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+        ((height, width), m): ((u64, u64), T),
+    ) -> It<(UnsignedMatrix<T>, U)> {
+        Box::new(exhaustive_pairs_custom_output(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                height,
+                width,
+                residues_mod(m),
+            ),
+            exhaustive_unsigneds::<U>(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_positive_primitive_ints::<T>(),
+            )),
+            ys::<T, U>,
+        )
+        .map(|((_, m), (a, u))| (a, u, m)),
+    )
+}
+
 // Pairs of matrices of the same shape, with their elements reduced modulo 2^pow, and pow.
 pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_1()
 -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {

@@ -34,7 +34,7 @@ fn mod_mul_assign_helper(a: &mut NaturalMatrix, c: &Natural, m: &Natural) {
 }
 
 // As `mod_mul_assign_helper`, for elements and `c` already known to be reduced modulo `m`.
-fn mod_mul_assign_unchecked(a: &mut NaturalMatrix, c: &Natural, m: &Natural) {
+pub(crate) fn mod_mul_assign_unchecked(a: &mut NaturalMatrix, c: &Natural, m: &Natural) {
     match *c {
         Natural::ZERO => a.elements.fill(Natural::ZERO),
         Natural::ONE => {}
@@ -54,7 +54,7 @@ fn mod_mul_ref_helper(a: &NaturalMatrix, c: &Natural, m: &Natural) -> NaturalMat
 }
 
 // As `mod_mul_ref_helper`, for elements and `c` already known to be reduced modulo `m`.
-fn mod_mul_unchecked(a: &NaturalMatrix, c: &Natural, m: &Natural) -> NaturalMatrix {
+pub(crate) fn mod_mul_unchecked(a: &NaturalMatrix, c: &Natural, m: &Natural) -> NaturalMatrix {
     NaturalMatrix::from_owned_elements(
         a.height(),
         a.width(),

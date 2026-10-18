@@ -5423,6 +5423,33 @@ pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_3()
     )
 }
 
+// All `(UnsignedMatrix<T>, U, u64)` where the `u64` is no greater than `T::WIDTH`, the matrix's
+// elements are less than 2 to the power of the `u64`, and the `U` is no greater than `T::WIDTH +
+// 1`.
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(UnsignedMatrix<T>, U, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_4::<T, U>,
+        &random_unsigned_matrix_unsigned_unsigned_triple_gen_var_4::<T, U>,
+        &special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_4::<T, U>,
+    )
+}
+
+// All `(UnsignedMatrix<T>, U, T)` where the last `T` is positive, the matrix's elements are less
+// than it, and the `U` is small.
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_5<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(UnsignedMatrix<T>, U, T)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_5::<T, U>,
+        &random_unsigned_matrix_unsigned_unsigned_triple_gen_var_5::<T, U>,
+        &special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_5::<T, U>,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, u64)` where the `u64` is positive and the matrix's elements are less
 // than it.
 pub fn unsigned_matrix_unsigned_pair_gen_var_5() -> Generator<(UnsignedMatrix<u64>, u64)> {

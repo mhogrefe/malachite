@@ -4586,6 +4586,28 @@ pub fn natural_matrix_unsigned_unsigned_triple_gen_var_1()
     )
 }
 
+// All `(NaturalMatrix, T, u64)` where the matrix's elements are less than 2 to the power of the
+// `u64`, and the `T` is small and unsigned.
+pub fn natural_matrix_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(NaturalMatrix, T, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_2,
+        &random_natural_matrix_unsigned_unsigned_triple_gen_var_2,
+        &special_random_natural_matrix_unsigned_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(NaturalMatrix, T, Natural)` where the matrix's elements are less than the `Natural`, and
+// the `T` is small and unsigned.
+pub fn natural_matrix_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(NaturalMatrix, T, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_natural_triple_gen_var_1,
+        &random_natural_matrix_unsigned_natural_triple_gen_var_1,
+        &special_random_natural_matrix_unsigned_natural_triple_gen_var_1,
+    )
+}
+
 // All `(m, i)` with `i` a row index of `m`.
 pub fn natural_matrix_unsigned_pair_gen_var_2() -> Generator<(NaturalMatrix, u64)> {
     Generator::new(

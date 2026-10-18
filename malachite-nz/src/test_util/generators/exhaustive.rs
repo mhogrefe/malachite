@@ -4305,6 +4305,47 @@ pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_1()
     Box::new(exhaustive_natural_matrix_gen().flat_map(natural_matrix_positions))
 }
 
+pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> It<(NaturalMatrix, T, u64)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_natural_matrices(),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_unsigneds::<u64>(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(a, bits, mut pow)| {
+            pow += a
+                .elements
+                .iter()
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (a, bits, pow)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_matrix_unsigned_natural_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(NaturalMatrix, T, Natural)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_natural_matrices(),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_naturals(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::normal(1),
+        )
+        .map(|(a, bits, k)| {
+            let m = a.elements.iter().max().cloned().unwrap_or_default() + k + Natural::ONE;
+            (a, bits, m)
+        }),
+    )
+}
+
 // Each matrix paired with each of its row indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
 pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_2() -> It<(NaturalMatrix, u64)> {

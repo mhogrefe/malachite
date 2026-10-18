@@ -70,6 +70,12 @@ documented by git history.
 - `<<` and `>>` (`Shl`, `ShlAssign`, `Shr`, and `ShrAssign`) by any primitive unsigned or signed
   type for malachite-q's `RationalMatrix`, with the matrix by value or by reference, multiplying or
   dividing every element by a power of 2 exactly; a negative amount shifts the other way.
+- `ModPowerOf2Shl` and `ModPowerOf2ShlAssign` by any primitive unsigned type for
+  `UnsignedMatrix<T>` (and, in malachite-nz, for `NaturalMatrix`), left-shifting every element
+  modulo $2^k$ and keeping the shape; the elements must already be reduced.
+- `ModShl` and `ModShlAssign` by any primitive unsigned type for `UnsignedMatrix<T>` (and, in
+  malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference), left-shifting every
+  element modulo $m$ and keeping the shape; the elements must already be reduced.
 - `ModMul` and `ModMulAssign` by a scalar for `UnsignedMatrix<T>` (and, in malachite-nz, for
   `NaturalMatrix`, with the scalar and the modulus each by value or by reference), multiplying every
   element modulo $m$ with the modulus's precomputed data computed once; the elements and the scalar

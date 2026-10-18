@@ -69,11 +69,101 @@ pub mod mod_power_of_2_mul_vector;
 /// negating every element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a power of 2.
 pub mod mod_power_of_2_neg;
 
+/// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
+/// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign), for
+/// left-shifting a matrix (multiplying it by a power of 2) modulo another power of 2.
+///
+/// # mod_power_of_2_shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
+/// use malachite_nz::natural_matrix::NaturalMatrix;
+///
+/// let a = NaturalMatrix::from_str("[5, 1; 3, 7]").unwrap();
+/// assert_eq!(
+///     a.clone().mod_power_of_2_shl(1u8, 3).to_string(),
+///     "[2, 2; 6, 6]"
+/// );
+/// // Shifting by at least the power zeroes every element, keeping the shape.
+/// assert_eq!(a.mod_power_of_2_shl(3u32, 3).to_string(), "[0, 0; 0, 0]");
+/// assert_eq!(
+///     (&NaturalMatrix::from_str("[1, 128, 1]").unwrap())
+///         .mod_power_of_2_shl(1u64, 8)
+///         .to_string(),
+///     "[2, 0, 2]"
+/// );
+/// assert_eq!(
+///     (&NaturalMatrix::from_str("[1, 1]").unwrap())
+///         .mod_power_of_2_shl(100u128, 101)
+///         .to_string(),
+///     "[1267650600228229401496703205376, 1267650600228229401496703205376]"
+/// );
+/// ```
+///
+/// # mod_power_of_2_shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
+/// use malachite_nz::natural_matrix::NaturalMatrix;
+///
+/// let mut a = NaturalMatrix::from_str("[5, 1; 3, 7]").unwrap();
+/// a.mod_power_of_2_shl_assign(1u8, 3);
+/// assert_eq!(a.to_string(), "[2, 2; 6, 6]");
+///
+/// let mut a = NaturalMatrix::from_str("[5, 1; 3, 7]").unwrap();
+/// a.mod_power_of_2_shl_assign(3u32, 3);
+/// assert_eq!(a.to_string(), "[0, 0; 0, 0]");
+/// ```
+pub mod mod_power_of_2_shl;
 /// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a power of 2.
 pub mod mod_power_of_2_sub;
 
+/// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
+/// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
+/// vector (multiplying it by a power of 2) modulo a number.
+///
+/// # mod_shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModShl;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::NaturalMatrix;
+///
+/// let a = NaturalMatrix::from_str("[5, 1, 3]").unwrap();
+/// assert_eq!(
+///     a.clone().mod_shl(1u8, Natural::from(7u32)).to_string(),
+///     "[3, 2, 6]"
+/// );
+/// // The modulus need not be odd, so elements can become zero, keeping the shape.
+/// assert_eq!(
+///     a.mod_shl(3u32, Natural::from(8u32)).to_string(),
+///     "[0, 0, 0]"
+/// );
+/// assert_eq!(
+///     (&NaturalMatrix::from_str("[1, 1]").unwrap())
+///         .mod_shl(
+///             100u64,
+///             Natural::from_str("1000000000000000000000000000000").unwrap()
+///         )
+///         .to_string(),
+///     "[267650600228229401496703205376, 267650600228229401496703205376]"
+/// );
+/// ```
+///
+/// # mod_shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModShlAssign;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::NaturalMatrix;
+///
+/// let mut a = NaturalMatrix::from_str("[5, 1, 3]").unwrap();
+/// a.mod_shl_assign(1u8, Natural::from(7u32));
+/// assert_eq!(a.to_string(), "[3, 2, 6]");
+/// ```
+pub mod mod_shl;
 /// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.

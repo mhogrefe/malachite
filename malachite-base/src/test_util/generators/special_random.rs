@@ -11070,6 +11070,68 @@ pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_3(
     )
 }
 
+pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, U, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_matrices::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, U::ZERO, U::exact_from(T::WIDTH + 1)),
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(a, bits, pow)| (a.mod_power_of_2(pow), bits, pow)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_5<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, U, T)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_matrices::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(a, bits, m)| (a % m, bits, m)),
+    )
+}
+
 pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_5(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64)> {
