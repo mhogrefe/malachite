@@ -18,7 +18,7 @@ use crate::iterators::{NonzeroValues, with_special_value};
 use crate::maps::random::{random_b_tree_maps, random_hash_maps};
 use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, ModPowerOf2, Parity, PowerOf2, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, DivRound, Mod, ModPowerOf2, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -110,6 +110,7 @@ use crate::unsigned_vector::random::{
     striped_random_unsigned_vectors_with_dimension,
 };
 use crate::vecs::random::{RandomVecs, random_vecs};
+use crate::vector::Vector;
 use alloc::collections::{BTreeMap, BTreeSet};
 
 #[cfg(not(feature = "std"))]
@@ -11093,6 +11094,150 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_5(
             },
         )
         .map(|(a, m)| (a % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_vector_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedVector<u64>, u64)> {
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            u64::WIDTH,
+        ))
+        .map(move |((height, width), pow)| {
+            let n = usize::exact_from(height * width);
+            let a = UnsignedMatrix::<u64>::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(n).collect(),
+            )
+            .mod_power_of_2(pow);
+            let v = UnsignedVector::<u64>::from_owned_elements(
+                (&mut xs).take(usize::exact_from(height)).collect(),
+            )
+            .mod_power_of_2(pow);
+            (a, v, pow)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_vector_unsigned_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedVector<u64>, u64)> {
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .zip(striped_random_positive_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("m"),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .map(move |((height, width), m)| {
+            let n = usize::exact_from(height * width);
+            let a = UnsignedMatrix::<u64>::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(n).collect(),
+            )
+            .mod_op(m);
+            let v = UnsignedVector::<u64>::from_owned_elements(
+                (&mut xs).take(usize::exact_from(height)).collect(),
+            )
+            .mod_op(m);
+            (a, v, m)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_vector_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedVector<u64>, u64)> {
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .zip(random_unsigned_inclusive_range::<u64>(
+            EXAMPLE_SEED.fork("pow"),
+            0,
+            u64::WIDTH,
+        ))
+        .map(move |((height, width), pow)| {
+            let n = usize::exact_from(height * width);
+            let a = UnsignedMatrix::<u64>::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(n).collect(),
+            )
+            .mod_power_of_2(pow);
+            let v = UnsignedVector::<u64>::from_owned_elements(
+                (&mut xs).take(usize::exact_from(width)).collect(),
+            )
+            .mod_power_of_2(pow);
+            (a, v, pow)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_vector_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedVector<u64>, u64)> {
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .zip(striped_random_positive_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("m"),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .map(move |((height, width), m)| {
+            let n = usize::exact_from(height * width);
+            let a = UnsignedMatrix::<u64>::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(n).collect(),
+            )
+            .mod_op(m);
+            let v = UnsignedVector::<u64>::from_owned_elements(
+                (&mut xs).take(usize::exact_from(width)).collect(),
+            )
+            .mod_op(m);
+            (a, v, m)
+        }),
     )
 }
 

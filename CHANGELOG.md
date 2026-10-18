@@ -54,6 +54,16 @@ documented by git history.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` by a scalar for `UnsignedMatrix<T>` (and, in
   malachite-nz, for `NaturalMatrix`, with the scalar by value or by reference), multiplying every
   element modulo $2^k$; the elements and the scalar must be reduced.
+- `ModPowerOf2Mul` between `UnsignedMatrix<T>` and `UnsignedVector<T>` (and, in malachite-nz,
+  between `NaturalMatrix` and `NaturalVector`), in both orders and with each operand by value or by
+  reference: the matrix-vector product $Av$ and the vector-matrix product $vA$ modulo $2^k$. The
+  elements must be reduced, and the vector's dimension must be the width (for $Av$) or the height
+  (for $vA$) of the matrix.
+- `ModMul` between `UnsignedMatrix<T>` and `UnsignedVector<T>` (and, in malachite-nz, between
+  `NaturalMatrix` and `NaturalVector`, with the modulus by value or by reference), in both orders
+  and with each operand by value or by reference: the matrix-vector product $Av$ and the
+  vector-matrix product $vA$ modulo $m$. The elements must be reduced, and the vector's dimension
+  must be the width (for $Av$) or the height (for $vA$) of the matrix.
 - `ModMul` and `ModMulAssign` by a scalar for `UnsignedMatrix<T>` (and, in malachite-nz, for
   `NaturalMatrix`, with the scalar and the modulus each by value or by reference), multiplying every
   element modulo $m$ with the modulus's precomputed data computed once; the elements and the scalar

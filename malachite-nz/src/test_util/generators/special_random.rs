@@ -8925,6 +8925,49 @@ pub fn special_random_natural_matrix_natural_vector_pair_gen_var_2(
     )
 }
 
+pub fn special_random_natural_matrix_natural_vector_natural_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalVector, Natural)> {
+    Box::new(
+        special_random_natural_matrix_natural_vector_pair_gen_var_2(config)
+            .zip(striped_random_naturals(
+                EXAMPLE_SEED.fork("m"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((a, v), k)| {
+                let max = a.elements.iter().chain(&v.elements).max().cloned();
+                let m = max.unwrap_or_default() + k + Natural::ONE;
+                (a, v, m)
+            }),
+    )
+}
+
+pub fn special_random_natural_matrix_natural_vector_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalVector, u64)> {
+    Box::new(
+        special_random_natural_matrix_natural_vector_pair_gen_var_2(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((a, v), pow)| {
+                let bits = a
+                    .elements
+                    .iter()
+                    .chain(&v.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (a, v, pow + bits)
+            }),
+    )
+}
+
 // A matrix of random shape and a vector whose dimension is the width of the matrix.
 pub fn special_random_natural_matrix_natural_vector_pair_gen_var_1(
     config: &GenConfig,
@@ -8950,6 +8993,49 @@ pub fn special_random_natural_matrix_natural_vector_pair_gen_var_1(
             );
             (a, v)
         }),
+    )
+}
+
+pub fn special_random_natural_matrix_natural_vector_natural_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalVector, Natural)> {
+    Box::new(
+        special_random_natural_matrix_natural_vector_pair_gen_var_1(config)
+            .zip(striped_random_naturals(
+                EXAMPLE_SEED.fork("m"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((a, v), k)| {
+                let max = a.elements.iter().chain(&v.elements).max().cloned();
+                let m = max.unwrap_or_default() + k + Natural::ONE;
+                (a, v, m)
+            }),
+    )
+}
+
+pub fn special_random_natural_matrix_natural_vector_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalVector, u64)> {
+    Box::new(
+        special_random_natural_matrix_natural_vector_pair_gen_var_1(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((a, v), pow)| {
+                let bits = a
+                    .elements
+                    .iter()
+                    .chain(&v.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (a, v, pow + bits)
+            }),
     )
 }
 

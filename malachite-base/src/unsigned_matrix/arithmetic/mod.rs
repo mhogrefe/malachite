@@ -18,6 +18,10 @@ pub mod mod_is_reduced;
 /// [`ModMulAssign`](crate::num::arithmetic::traits::ModMulAssign), for multiplying an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) by a scalar modulo a number.
 pub mod mod_mul;
+/// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) for multiplying an
+/// [`UnsignedMatrix`](super::UnsignedMatrix) by an
+/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector) on the right modulo a number.
+pub mod mod_mul_vector;
 /// Implementations of [`ModNeg`](crate::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](crate::num::arithmetic::traits::ModNegAssign), for negating every element of an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) modulo a number.
@@ -44,6 +48,10 @@ pub mod mod_power_of_2_is_reduced;
 /// [`ModPowerOf2MulAssign`](crate::num::arithmetic::traits::ModPowerOf2MulAssign), for multiplying
 /// an [`UnsignedMatrix`](super::UnsignedMatrix) by a scalar modulo a power of 2.
 pub mod mod_power_of_2_mul;
+/// Implementations of [`ModPowerOf2Mul`](crate::num::arithmetic::traits::ModPowerOf2Mul) for
+/// multiplying an [`UnsignedMatrix`](super::UnsignedMatrix) by an
+/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector) on the right modulo a power of 2.
+pub mod mod_power_of_2_mul_vector;
 /// Implementations of [`ModPowerOf2Neg`](crate::num::arithmetic::traits::ModPowerOf2Neg) and
 /// [`ModPowerOf2NegAssign`](crate::num::arithmetic::traits::ModPowerOf2NegAssign), for negating
 /// every element of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a power of 2.
@@ -58,3 +66,12 @@ pub mod mod_power_of_2_sub;
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.
 pub mod mod_sub;
+
+/// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) for multiplying an
+/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector) by an
+/// [`UnsignedMatrix`](super::UnsignedMatrix) on the right modulo a number.
+pub mod vector_mod_mul;
+/// Implementations of [`ModPowerOf2Mul`](crate::num::arithmetic::traits::ModPowerOf2Mul) for
+/// multiplying an [`UnsignedVector`](crate::unsigned_vector::UnsignedVector) by an
+/// [`UnsignedMatrix`](super::UnsignedMatrix) on the right modulo a power of 2.
+pub mod vector_mod_power_of_2_mul;

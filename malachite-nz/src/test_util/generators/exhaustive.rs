@@ -4159,6 +4159,45 @@ pub fn exhaustive_natural_matrix_natural_vector_pair_gen_var_2()
     )
 }
 
+// A matrix, a vector whose dimension is the height of the matrix, and a modulus that every element
+// is less than.
+pub fn exhaustive_natural_matrix_natural_vector_natural_triple_gen_var_2()
+-> It<(NaturalMatrix, NaturalVector, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_matrix_natural_vector_pair_gen_var_2(),
+            exhaustive_naturals(),
+        )
+        .map(|((a, v), k)| {
+            let max = a.elements.iter().chain(&v.elements).max().cloned();
+            let m = max.unwrap_or_default() + k + Natural::ONE;
+            (a, v, m)
+        }),
+    )
+}
+
+// A matrix, a vector whose dimension is the height of the matrix, and a power of 2 that every
+// element is less than.
+pub fn exhaustive_natural_matrix_natural_vector_unsigned_triple_gen_var_2()
+-> It<(NaturalMatrix, NaturalVector, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_matrix_natural_vector_pair_gen_var_2(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((a, v), pow)| {
+            let bits = a
+                .elements
+                .iter()
+                .chain(&v.elements)
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (a, v, pow + bits)
+        }),
+    )
+}
+
 // A matrix and a vector whose dimension is the width of the matrix.
 pub fn exhaustive_natural_matrix_natural_vector_pair_gen_var_1()
 -> It<(NaturalMatrix, NaturalVector)> {
@@ -4174,6 +4213,45 @@ pub fn exhaustive_natural_matrix_natural_vector_pair_gen_var_1()
             ys,
         )
         .map(|(_, p)| p),
+    )
+}
+
+// A matrix, a vector whose dimension is the width of the matrix, and a modulus that every element
+// is less than.
+pub fn exhaustive_natural_matrix_natural_vector_natural_triple_gen_var_1()
+-> It<(NaturalMatrix, NaturalVector, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_matrix_natural_vector_pair_gen_var_1(),
+            exhaustive_naturals(),
+        )
+        .map(|((a, v), k)| {
+            let max = a.elements.iter().chain(&v.elements).max().cloned();
+            let m = max.unwrap_or_default() + k + Natural::ONE;
+            (a, v, m)
+        }),
+    )
+}
+
+// A matrix, a vector whose dimension is the width of the matrix, and a power of 2 that every
+// element is less than.
+pub fn exhaustive_natural_matrix_natural_vector_unsigned_triple_gen_var_1()
+-> It<(NaturalMatrix, NaturalVector, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_matrix_natural_vector_pair_gen_var_1(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((a, v), pow)| {
+            let bits = a
+                .elements
+                .iter()
+                .chain(&v.elements)
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (a, v, pow + bits)
+        }),
     )
 }
 

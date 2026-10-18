@@ -1,0 +1,53 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::natural::Natural;
+use crate::natural_matrix::NaturalMatrix;
+use crate::natural_vector::NaturalVector;
+use malachite_base::matrix::Matrix;
+use malachite_base::num::arithmetic::traits::{ModAdd, ModMul};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::vector::Vector;
+
+/// The product $Av$ modulo $m$, one modular operation at a time.
+pub fn natural_matrix_mod_mul_vector_naive(
+    a: &NaturalMatrix,
+    v: &NaturalVector,
+    m: &Natural,
+) -> NaturalVector {
+    NaturalVector::from_owned_elements(
+        (0..a.height())
+            .map(|i| {
+                let mut sum = Natural::ZERO;
+                for (x, y) in a.row_iter(i).zip(&v.elements) {
+                    sum = sum.mod_add(x.mod_mul(y, m), m);
+                }
+                sum
+            })
+            .collect(),
+    )
+}
+
+/// The product $vA$ modulo $m$, one modular operation at a time, down each column.
+pub fn natural_vector_mod_mul_natural_matrix_naive(
+    v: &NaturalVector,
+    a: &NaturalMatrix,
+    m: &Natural,
+) -> NaturalVector {
+    NaturalVector::from_owned_elements(
+        (0..a.width())
+            .map(|j| {
+                let mut sum = Natural::ZERO;
+                for (x, y) in v.elements.iter().zip(a.column_iter(j)) {
+                    sum = sum.mod_add(x.mod_mul(y, m), m);
+                }
+                sum
+            })
+            .collect(),
+    )
+}

@@ -4484,12 +4484,56 @@ pub fn natural_matrix_natural_vector_pair_gen_var_2() -> Generator<(NaturalMatri
     )
 }
 
+// All `(NaturalMatrix, NaturalVector, Natural)` where the vector's dimension is the height of the
+// matrix and every element is less than the `Natural`.
+pub fn natural_matrix_natural_vector_natural_triple_gen_var_2()
+-> Generator<(NaturalMatrix, NaturalVector, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_vector_natural_triple_gen_var_2,
+        &random_natural_matrix_natural_vector_natural_triple_gen_var_2,
+        &special_random_natural_matrix_natural_vector_natural_triple_gen_var_2,
+    )
+}
+
+// All `(NaturalMatrix, NaturalVector, u64)` where the vector's dimension is the height of the
+// matrix and every element is less than 2 to the power of the `u64`.
+pub fn natural_matrix_natural_vector_unsigned_triple_gen_var_2()
+-> Generator<(NaturalMatrix, NaturalVector, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_vector_unsigned_triple_gen_var_2,
+        &random_natural_matrix_natural_vector_unsigned_triple_gen_var_2,
+        &special_random_natural_matrix_natural_vector_unsigned_triple_gen_var_2,
+    )
+}
+
 // All `(NaturalMatrix, NaturalVector)` where the vector's dimension is the width of the matrix.
 pub fn natural_matrix_natural_vector_pair_gen_var_1() -> Generator<(NaturalMatrix, NaturalVector)> {
     Generator::new(
         &exhaustive_natural_matrix_natural_vector_pair_gen_var_1,
         &random_natural_matrix_natural_vector_pair_gen_var_1,
         &special_random_natural_matrix_natural_vector_pair_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, NaturalVector, Natural)` where the vector's dimension is the width of the
+// matrix and every element is less than the `Natural`.
+pub fn natural_matrix_natural_vector_natural_triple_gen_var_1()
+-> Generator<(NaturalMatrix, NaturalVector, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_vector_natural_triple_gen_var_1,
+        &random_natural_matrix_natural_vector_natural_triple_gen_var_1,
+        &special_random_natural_matrix_natural_vector_natural_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, NaturalVector, u64)` where the vector's dimension is the width of the matrix
+// and every element is less than 2 to the power of the `u64`.
+pub fn natural_matrix_natural_vector_unsigned_triple_gen_var_1()
+-> Generator<(NaturalMatrix, NaturalVector, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_vector_unsigned_triple_gen_var_1,
+        &random_natural_matrix_natural_vector_unsigned_triple_gen_var_1,
+        &special_random_natural_matrix_natural_vector_unsigned_triple_gen_var_1,
     )
 }
 

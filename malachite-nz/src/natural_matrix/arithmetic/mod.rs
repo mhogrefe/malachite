@@ -30,6 +30,10 @@ pub mod mod_is_reduced;
 /// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign), for multiplying a
 /// [`NaturalMatrix`](super::NaturalMatrix) by a scalar modulo a number.
 pub mod mod_mul;
+/// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) for multiplying a
+/// [`NaturalMatrix`](super::NaturalMatrix) by a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector) on the right modulo a number.
+pub mod mod_mul_vector;
 /// Implementations of [`ModNeg`](malachite_base::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), for negating every
 /// element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
@@ -56,6 +60,10 @@ pub mod mod_power_of_2_is_reduced;
 /// and [`ModPowerOf2MulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign), for
 /// multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a scalar modulo a power of 2.
 pub mod mod_power_of_2_mul;
+/// Implementations of [`ModPowerOf2Mul`](malachite_base::num::arithmetic::traits::ModPowerOf2Mul)
+/// for multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector) on the right modulo a power of 2.
+pub mod mod_power_of_2_mul_vector;
 /// Implementations of [`ModPowerOf2Neg`](malachite_base::num::arithmetic::traits::ModPowerOf2Neg)
 /// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign), for
 /// negating every element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a power of 2.
@@ -79,6 +87,14 @@ pub mod mul_vector;
 /// multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a scalar on either side.
 pub mod scalar_mul;
 
+/// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) for multiplying a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector) by a
+/// [`NaturalMatrix`](super::NaturalMatrix) on the right modulo a number.
+pub mod vector_mod_mul;
+/// Implementations of [`ModPowerOf2Mul`](malachite_base::num::arithmetic::traits::ModPowerOf2Mul)
+/// for multiplying a [`NaturalVector`](crate::natural_vector::NaturalVector) by a
+/// [`NaturalMatrix`](super::NaturalMatrix) on the right modulo a power of 2.
+pub mod vector_mod_power_of_2_mul;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying a
 /// [`NaturalVector`](crate::natural_vector::NaturalVector) by a
 /// [`NaturalMatrix`](super::NaturalMatrix) on the right.

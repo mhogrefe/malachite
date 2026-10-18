@@ -1037,17 +1037,21 @@ pub mod natural_matrix {
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_mul;
+        pub mod mod_mul_vector;
         pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
+        pub mod mod_power_of_2_mul_vector;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_sub;
         pub mod mod_sub;
         pub mod mul_vector;
         pub mod scalar_mul;
+        pub mod vector_mod_mul;
+        pub mod vector_mod_power_of_2_mul;
         pub mod vector_mul;
     }
     pub mod basic {
