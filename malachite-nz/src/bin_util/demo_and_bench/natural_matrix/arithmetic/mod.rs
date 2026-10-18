@@ -24,7 +24,9 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_neg::register(runner);
     mod_power_of_2_sub::register(runner);
     mod_sub::register(runner);
+    mul_vector::register(runner);
     scalar_mul::register(runner);
+    vector_mul::register(runner);
 }
 
 mod add;
@@ -42,4 +44,6 @@ mod mod_power_of_2_mul;
 mod mod_power_of_2_neg;
 mod mod_power_of_2_sub;
 mod mod_sub;
+mod mul_vector;
 mod scalar_mul;
+mod vector_mul;

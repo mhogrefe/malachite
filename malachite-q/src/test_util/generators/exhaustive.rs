@@ -1076,6 +1076,42 @@ pub fn exhaustive_rational_matrix_pair_gen_var_1() -> It<(RationalMatrix, Ration
     )
 }
 
+// A matrix and a vector whose dimension is the height of the matrix.
+pub fn exhaustive_rational_matrix_rational_vector_pair_gen_var_2()
+-> It<(RationalMatrix, RationalVector)> {
+    fn ys((height, width): (u64, u64)) -> It<(RationalMatrix, RationalVector)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_rational_matrices_with_dimensions(height, width),
+            exhaustive_rational_vectors_with_dimension(height),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// A matrix and a vector whose dimension is the width of the matrix.
+pub fn exhaustive_rational_matrix_rational_vector_pair_gen_var_1()
+-> It<(RationalMatrix, RationalVector)> {
+    fn ys((height, width): (u64, u64)) -> It<(RationalMatrix, RationalVector)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_rational_matrices_with_dimensions(height, width),
+            exhaustive_rational_vectors_with_dimension(width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
 // Triples of matrices of the same shape.
 pub fn exhaustive_rational_matrix_triple_gen_var_1()
 -> It<(RationalMatrix, RationalMatrix, RationalMatrix)> {

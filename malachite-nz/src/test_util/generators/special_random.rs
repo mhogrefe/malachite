@@ -185,6 +185,7 @@ use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::unsigned_vector::random::striped_random_unsigned_vectors;
 use malachite_base::vecs::random::{random_vecs, random_vecs_min_length};
 use malachite_base::vecs::{RandomValuesFromVec, random_values_from_vec};
+use malachite_base::vector::Vector;
 use num::{BigInt, BigUint};
 use std::cmp::{Ordering::*, max};
 use std::collections::HashMap;
@@ -7997,6 +7998,62 @@ pub fn special_random_integer_matrix_pair_gen_var_1(
     )
 }
 
+// A matrix of random shape and a vector whose dimension is the height of the matrix.
+pub fn special_random_integer_matrix_integer_vector_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, IntegerVector)> {
+    let mut xs = striped_random_integers(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let n = usize::exact_from(height * width);
+            let a = IntegerMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
+            let v = IntegerVector::from_owned_elements(
+                (&mut xs).take(usize::exact_from(height)).collect(),
+            );
+            (a, v)
+        }),
+    )
+}
+
+// A matrix of random shape and a vector whose dimension is the width of the matrix.
+pub fn special_random_integer_matrix_integer_vector_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, IntegerVector)> {
+    let mut xs = striped_random_integers(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let n = usize::exact_from(height * width);
+            let a = IntegerMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
+            let v = IntegerVector::from_owned_elements(
+                (&mut xs).take(usize::exact_from(width)).collect(),
+            );
+            (a, v)
+        }),
+    )
+}
+
 // Triples of matrices of the same random shape.
 pub fn special_random_integer_matrix_triple_gen_var_1(
     config: &GenConfig,
@@ -8836,6 +8893,62 @@ pub fn special_random_natural_matrix_pair_gen_var_1(
             let a = NaturalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
             let b = NaturalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
             (a, b)
+        }),
+    )
+}
+
+// A matrix of random shape and a vector whose dimension is the height of the matrix.
+pub fn special_random_natural_matrix_natural_vector_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalVector)> {
+    let mut xs = striped_random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let n = usize::exact_from(height * width);
+            let a = NaturalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
+            let v = NaturalVector::from_owned_elements(
+                (&mut xs).take(usize::exact_from(height)).collect(),
+            );
+            (a, v)
+        }),
+    )
+}
+
+// A matrix of random shape and a vector whose dimension is the width of the matrix.
+pub fn special_random_natural_matrix_natural_vector_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalVector)> {
+    let mut xs = striped_random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let n = usize::exact_from(height * width);
+            let a = NaturalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
+            let v = NaturalVector::from_owned_elements(
+                (&mut xs).take(usize::exact_from(width)).collect(),
+            );
+            (a, v)
         }),
     )
 }

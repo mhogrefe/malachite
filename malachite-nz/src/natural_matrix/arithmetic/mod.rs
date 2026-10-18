@@ -71,6 +71,15 @@ pub mod mod_power_of_2_sub;
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
 pub mod mod_sub;
 
+/// Implementations of [`Mul`](core::ops::Mul) for multiplying a
+/// [`NaturalMatrix`](super::NaturalMatrix) by a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector) on the right.
+pub mod mul_vector;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a scalar on either side.
 pub mod scalar_mul;
+
+/// Implementations of [`Mul`](core::ops::Mul) for multiplying a
+/// [`NaturalVector`](crate::natural_vector::NaturalVector) by a
+/// [`NaturalMatrix`](super::NaturalMatrix) on the right.
+pub mod vector_mul;

@@ -1354,6 +1354,26 @@ pub fn rational_matrix_pair_gen_var_1() -> Generator<(RationalMatrix, RationalMa
     )
 }
 
+// All `(RationalMatrix, RationalVector)` where the vector's dimension is the height of the matrix.
+pub fn rational_matrix_rational_vector_pair_gen_var_2()
+-> Generator<(RationalMatrix, RationalVector)> {
+    Generator::new(
+        &exhaustive_rational_matrix_rational_vector_pair_gen_var_2,
+        &random_rational_matrix_rational_vector_pair_gen_var_2,
+        &special_random_rational_matrix_rational_vector_pair_gen_var_2,
+    )
+}
+
+// All `(RationalMatrix, RationalVector)` where the vector's dimension is the width of the matrix.
+pub fn rational_matrix_rational_vector_pair_gen_var_1()
+-> Generator<(RationalMatrix, RationalVector)> {
+    Generator::new(
+        &exhaustive_rational_matrix_rational_vector_pair_gen_var_1,
+        &random_rational_matrix_rational_vector_pair_gen_var_1,
+        &special_random_rational_matrix_rational_vector_pair_gen_var_1,
+    )
+}
+
 // All triples of `RationalMatrix`s of the same shape.
 pub fn rational_matrix_triple_gen_var_1()
 -> Generator<(RationalMatrix, RationalMatrix, RationalMatrix)> {

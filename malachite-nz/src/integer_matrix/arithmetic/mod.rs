@@ -31,6 +31,10 @@ pub mod mod_op;
 /// every element of an [`IntegerMatrix`](super::IntegerMatrix) modulo a power of 2.
 pub mod mod_power_of_2;
 
+/// Implementations of [`Mul`](core::ops::Mul) for multiplying an
+/// [`IntegerMatrix`](super::IntegerMatrix) by an
+/// [`IntegerVector`](crate::integer_vector::IntegerVector) on the right.
+pub mod mul_vector;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;
@@ -41,3 +45,8 @@ pub mod scalar_mul;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;
+
+/// Implementations of [`Mul`](core::ops::Mul) for multiplying an
+/// [`IntegerVector`](crate::integer_vector::IntegerVector) by an
+/// [`IntegerMatrix`](super::IntegerMatrix) on the right.
+pub mod vector_mul;

@@ -9,6 +9,10 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// matrices of the same shape.
 pub mod add;
+/// Implementations of [`Mul`](core::ops::Mul) for multiplying a
+/// [`RationalMatrix`](super::RationalMatrix) by a
+/// [`RationalVector`](crate::rational_vector::RationalVector) on the right.
+pub mod mul_vector;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;
@@ -19,3 +23,8 @@ pub mod scalar_mul;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;
+
+/// Implementations of [`Mul`](core::ops::Mul) for multiplying a
+/// [`RationalVector`](crate::rational_vector::RationalVector) by a
+/// [`RationalMatrix`](super::RationalMatrix) on the right.
+pub mod vector_mul;

@@ -10,12 +10,16 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
+    mul_vector::register(runner);
     neg::register(runner);
     scalar_mul::register(runner);
     sub::register(runner);
+    vector_mul::register(runner);
 }
 
 mod add;
+mod mul_vector;
 mod neg;
 mod scalar_mul;
 mod sub;
+mod vector_mul;

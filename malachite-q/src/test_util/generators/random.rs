@@ -71,6 +71,7 @@ use malachite_base::unsigned_polynomial::random::random_unsigned_polynomials;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::unsigned_vector::random::random_unsigned_vectors;
 use malachite_base::vecs::random::random_vecs;
+use malachite_base::vector::Vector;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::gaussian_integer::random::random_gaussian_integers;
 use malachite_nz::integer::Integer;
@@ -2380,6 +2381,58 @@ pub fn random_rational_matrix_pair_gen_var_1(
             let a = RationalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
             let b = RationalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
             (a, b)
+        }),
+    )
+}
+
+// A matrix of random shape and a vector whose dimension is the height of the matrix.
+pub fn random_rational_matrix_rational_vector_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalVector)> {
+    let mut xs = random_rationals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let n = usize::exact_from(height * width);
+            let a = RationalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
+            let v = RationalVector::from_owned_elements(
+                (&mut xs).take(usize::exact_from(height)).collect(),
+            );
+            (a, v)
+        }),
+    )
+}
+
+// A matrix of random shape and a vector whose dimension is the width of the matrix.
+pub fn random_rational_matrix_rational_vector_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalVector)> {
+    let mut xs = random_rationals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let n = usize::exact_from(height * width);
+            let a = RationalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
+            let v = RationalVector::from_owned_elements(
+                (&mut xs).take(usize::exact_from(width)).collect(),
+            );
+            (a, v)
         }),
     )
 }

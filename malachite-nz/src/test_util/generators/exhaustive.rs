@@ -3645,6 +3645,42 @@ pub fn exhaustive_integer_matrix_pair_gen_var_1() -> It<(IntegerMatrix, IntegerM
     )
 }
 
+// A matrix and a vector whose dimension is the height of the matrix.
+pub fn exhaustive_integer_matrix_integer_vector_pair_gen_var_2()
+-> It<(IntegerMatrix, IntegerVector)> {
+    fn ys((height, width): (u64, u64)) -> It<(IntegerMatrix, IntegerVector)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_integer_matrices_with_dimensions(height, width),
+            exhaustive_integer_vectors_with_dimension(height),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// A matrix and a vector whose dimension is the width of the matrix.
+pub fn exhaustive_integer_matrix_integer_vector_pair_gen_var_1()
+-> It<(IntegerMatrix, IntegerVector)> {
+    fn ys((height, width): (u64, u64)) -> It<(IntegerMatrix, IntegerVector)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_integer_matrices_with_dimensions(height, width),
+            exhaustive_integer_vectors_with_dimension(width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
 // Triples of matrices of the same shape.
 pub fn exhaustive_integer_matrix_triple_gen_var_1()
 -> It<(IntegerMatrix, IntegerMatrix, IntegerMatrix)> {
@@ -4094,6 +4130,42 @@ pub fn exhaustive_natural_matrix_pair_gen_var_1() -> It<(NaturalMatrix, NaturalM
     fn ys((height, width): (u64, u64)) -> It<(NaturalMatrix, NaturalMatrix)> {
         Box::new(exhaustive_pairs_from_single(
             exhaustive_natural_matrices_with_dimensions(height, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// A matrix and a vector whose dimension is the height of the matrix.
+pub fn exhaustive_natural_matrix_natural_vector_pair_gen_var_2()
+-> It<(NaturalMatrix, NaturalVector)> {
+    fn ys((height, width): (u64, u64)) -> It<(NaturalMatrix, NaturalVector)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_natural_matrices_with_dimensions(height, width),
+            exhaustive_natural_vectors_with_dimension(height),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// A matrix and a vector whose dimension is the width of the matrix.
+pub fn exhaustive_natural_matrix_natural_vector_pair_gen_var_1()
+-> It<(NaturalMatrix, NaturalVector)> {
+    fn ys((height, width): (u64, u64)) -> It<(NaturalMatrix, NaturalVector)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_natural_matrices_with_dimensions(height, width),
+            exhaustive_natural_vectors_with_dimension(width),
         ))
     }
     Box::new(

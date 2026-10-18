@@ -3979,6 +3979,24 @@ pub fn integer_matrix_pair_gen_var_1() -> Generator<(IntegerMatrix, IntegerMatri
     )
 }
 
+// All `(IntegerMatrix, IntegerVector)` where the vector's dimension is the height of the matrix.
+pub fn integer_matrix_integer_vector_pair_gen_var_2() -> Generator<(IntegerMatrix, IntegerVector)> {
+    Generator::new(
+        &exhaustive_integer_matrix_integer_vector_pair_gen_var_2,
+        &random_integer_matrix_integer_vector_pair_gen_var_2,
+        &special_random_integer_matrix_integer_vector_pair_gen_var_2,
+    )
+}
+
+// All `(IntegerMatrix, IntegerVector)` where the vector's dimension is the width of the matrix.
+pub fn integer_matrix_integer_vector_pair_gen_var_1() -> Generator<(IntegerMatrix, IntegerVector)> {
+    Generator::new(
+        &exhaustive_integer_matrix_integer_vector_pair_gen_var_1,
+        &random_integer_matrix_integer_vector_pair_gen_var_1,
+        &special_random_integer_matrix_integer_vector_pair_gen_var_1,
+    )
+}
+
 // All triples of `IntegerMatrix`s of the same shape.
 pub fn integer_matrix_triple_gen_var_1() -> Generator<(IntegerMatrix, IntegerMatrix, IntegerMatrix)>
 {
@@ -4454,6 +4472,24 @@ pub fn natural_matrix_pair_gen_var_1() -> Generator<(NaturalMatrix, NaturalMatri
         &exhaustive_natural_matrix_pair_gen_var_1,
         &random_natural_matrix_pair_gen_var_1,
         &special_random_natural_matrix_pair_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, NaturalVector)` where the vector's dimension is the height of the matrix.
+pub fn natural_matrix_natural_vector_pair_gen_var_2() -> Generator<(NaturalMatrix, NaturalVector)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_vector_pair_gen_var_2,
+        &random_natural_matrix_natural_vector_pair_gen_var_2,
+        &special_random_natural_matrix_natural_vector_pair_gen_var_2,
+    )
+}
+
+// All `(NaturalMatrix, NaturalVector)` where the vector's dimension is the width of the matrix.
+pub fn natural_matrix_natural_vector_pair_gen_var_1() -> Generator<(NaturalMatrix, NaturalVector)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_vector_pair_gen_var_1,
+        &random_natural_matrix_natural_vector_pair_gen_var_1,
+        &special_random_natural_matrix_natural_vector_pair_gen_var_1,
     )
 }
 

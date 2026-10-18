@@ -177,6 +177,12 @@ documented by git history.
 - Scalar multiplication on both sides for `NaturalMatrix` and `IntegerMatrix` (and, in malachite-q,
   `RationalMatrix`): `Mul` of a matrix by an element and of an element by a matrix, in every
   by-value/by-reference combination, and `MulAssign` by an element.
+- Matrix-vector and vector-matrix products for `NaturalMatrix` and `IntegerMatrix` (and, in
+  malachite-q, `RationalMatrix`): `A * v`, the vector of dot products of the rows of `A` with `v`,
+  and `v * A`, in every by-value/by-reference combination. A vector whose dimension doesn't match
+  panics. Matrix-vector products use the same dot-product kernel as vectors; vector-matrix products
+  accumulate the rows in storage order; the rational versions clear denominators so the product is
+  computed over the integers and each result element is reduced once.
 - `IntegerMatrix`, a matrix of `Integer`s stored as a public `Vec` of elements in row-major order
   with private height and width (FLINT's `fmpz_mat_t` layout, without the window stride). It has
   constructors from elements in row-major order (`from_elements`, `from_owned_elements`) or

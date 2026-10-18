@@ -167,9 +167,11 @@ pub mod rational_matrix {
     pub mod access;
     pub mod arithmetic {
         pub mod add;
+        pub mod mul_vector;
         pub mod neg;
         pub mod scalar_mul;
         pub mod sub;
+        pub mod vector_mul;
     }
     pub mod basic {
         pub mod named;
