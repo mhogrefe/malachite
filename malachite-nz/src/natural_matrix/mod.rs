@@ -1084,12 +1084,12 @@ impl_named!(NaturalMatrix);
 /// equality agrees with [`NaturalMatrix`] equality.
 ///
 /// The number of elements plays the part that the dimension plays in the shortlex order of vectors:
-/// every matrix with fewer elements comes before every matrix with more, so that $[5] < [0, 0]$,
-/// and there are only finitely many shapes with a given number of elements. The width is needed as
-/// well as the height only for the matrices with no elements, such as $[]_{0,2}$ and $[]_{0,5}$,
-/// since otherwise the height and the number of elements determine it. Matrices with one row
-/// compare as their rows do under the shortlex order of vectors. It is a well-order: any nonempty
-/// set of matrices has a least element.
+/// every matrix with fewer elements comes before every matrix with more, so that $\[5\] < \[0,
+/// 0\]$, and there are only finitely many shapes with a given number of elements. The width is
+/// needed as well as the height only for the matrices with no elements, such as $[]_{0,2}$ and
+/// $[]_{0,5}$, since otherwise the height and the number of elements determine it. Matrices with
+/// one row compare as their rows do under the shortlex order of vectors. It is a well-order: any
+/// nonempty set of matrices has a least element.
 ///
 /// `ShortlexNaturalMatrix` owns its value. This is useful in many cases, for example if you want to
 /// use [`NaturalMatrix`]s as keys in a [`BTreeMap`](alloc::collections::BTreeMap). In other
@@ -1220,8 +1220,7 @@ fn common_dimension(vectors: &[NaturalVector], what: &str) -> usize {
 pub mod access;
 /// Arithmetic on [`NaturalMatrix`]s.
 pub mod arithmetic;
-/// A function for getting a column of a [`NaturalMatrix`] as a
-/// [`NaturalVector`](crate::natural_vector::NaturalVector).
+/// A function for getting a column of a [`NaturalMatrix`] as a [`NaturalVector`].
 pub mod column;
 /// Iterators over the elements in a column of a [`NaturalMatrix`].
 pub mod column_iter;
@@ -1236,16 +1235,14 @@ pub mod exhaustive;
 /// Iterators that generate [`NaturalMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
-/// A function for getting a row of a [`NaturalMatrix`] as a
-/// [`NaturalVector`](crate::natural_vector::NaturalVector).
+/// A function for getting a row of a [`NaturalMatrix`] as a [`NaturalVector`].
 pub mod row;
 /// Iterators over the elements in a row of a [`NaturalMatrix`].
 pub mod row_iter;
 /// Iterators over the rows of a [`NaturalMatrix`].
 pub mod rows;
 /// Functions for replacing a column of a [`NaturalMatrix`] with the elements of a
-/// [`NaturalVector`](crate::natural_vector::NaturalVector).
+/// [`NaturalVector`].
 pub mod set_column;
-/// Functions for replacing a row of a [`NaturalMatrix`] with the elements of a
-/// [`NaturalVector`](crate::natural_vector::NaturalVector).
+/// Functions for replacing a row of a [`NaturalMatrix`] with the elements of a [`NaturalVector`].
 pub mod set_row;

@@ -1107,12 +1107,12 @@ impl_named_unsigned_matrix!(usize, "UnsignedMatrix<usize>");
 /// equality agrees with [`UnsignedMatrix`] equality.
 ///
 /// The number of elements plays the part that the dimension plays in the shortlex order of vectors:
-/// every matrix with fewer elements comes before every matrix with more, so that $[5] < [0, 0]$,
-/// and there are only finitely many shapes with a given number of elements. The width is needed as
-/// well as the height only for the matrices with no elements, such as $[]_{0,2}$ and $[]_{0,5}$,
-/// since otherwise the height and the number of elements determine it. Matrices with one row
-/// compare as their rows do under the shortlex order of vectors. It is a well-order: any nonempty
-/// set of matrices has a least element.
+/// every matrix with fewer elements comes before every matrix with more, so that $\[5\] < \[0,
+/// 0\]$, and there are only finitely many shapes with a given number of elements. The width is
+/// needed as well as the height only for the matrices with no elements, such as $[]_{0,2}$ and
+/// $[]_{0,5}$, since otherwise the height and the number of elements determine it. Matrices with
+/// one row compare as their rows do under the shortlex order of vectors. It is a well-order: any
+/// nonempty set of matrices has a least element.
 ///
 /// `ShortlexUnsignedMatrix` owns its value. This is useful in many cases, for example if you want
 /// to use [`UnsignedMatrix`]s as keys in a [`BTreeMap`](alloc::collections::BTreeMap). In other
@@ -1243,8 +1243,7 @@ fn common_dimension<T: PrimitiveUnsigned>(vectors: &[UnsignedVector<T>], what: &
 pub mod access;
 /// Arithmetic on [`UnsignedMatrix`]s.
 pub mod arithmetic;
-/// A function for getting a column of an [`UnsignedMatrix`] as an
-/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector).
+/// A function for getting a column of an [`UnsignedMatrix`] as an [`UnsignedVector`].
 pub mod column;
 /// Iterators over the elements in a column of an [`UnsignedMatrix`].
 pub mod column_iter;
@@ -1261,16 +1260,15 @@ pub mod exhaustive;
 /// Iterators that generate [`UnsignedMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
-/// A function for getting a row of an [`UnsignedMatrix`] as an
-/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector).
+/// A function for getting a row of an [`UnsignedMatrix`] as an [`UnsignedVector`].
 pub mod row;
 /// Iterators over the elements in a row of an [`UnsignedMatrix`].
 pub mod row_iter;
 /// Iterators over the rows of an [`UnsignedMatrix`].
 pub mod rows;
 /// Functions for replacing a column of an [`UnsignedMatrix`] with the elements of an
-/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector).
+/// [`UnsignedVector`].
 pub mod set_column;
 /// Functions for replacing a row of an [`UnsignedMatrix`] with the elements of an
-/// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector).
+/// [`UnsignedVector`].
 pub mod set_row;

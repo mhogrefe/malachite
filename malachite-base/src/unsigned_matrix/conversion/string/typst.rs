@@ -17,7 +17,7 @@ impl<T: PrimitiveUnsigned> ToTypst for UnsignedMatrix<T> {
     /// The matrix is a call to Typst's `mat` function, with `, ` between the elements of a row and
     /// `; ` between rows, which Typst draws in parentheses. A matrix with no rows or no columns is
     /// an empty `mat()` subscripted with its dimensions, such as `mat()_(4 times 0)`, matching the
-    /// way [`Display`](core::fmt::Display) writes it.
+    /// way [`Display`] writes it.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -46,7 +46,7 @@ impl<T: PrimitiveUnsigned> ToTypst for UnsignedMatrix<T> {
     /// );
     /// ```
     ///
-    /// The value column holds each matrix as [`Display`](core::fmt::Display) writes it.
+    /// The value column holds each matrix as [`Display`] writes it.
     ///
     /// | value          | fragment            |
     /// |----------------|---------------------|

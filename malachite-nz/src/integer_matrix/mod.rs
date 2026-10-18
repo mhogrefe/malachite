@@ -1087,12 +1087,12 @@ impl_named!(IntegerMatrix);
 /// equality agrees with [`IntegerMatrix`] equality.
 ///
 /// The number of elements plays the part that the dimension plays in the shortlex order of vectors:
-/// every matrix with fewer elements comes before every matrix with more, so that $[5] < [0, 0]$,
-/// and there are only finitely many shapes with a given number of elements. The width is needed as
-/// well as the height only for the matrices with no elements, such as $[]_{0,2}$ and $[]_{0,5}$,
-/// since otherwise the height and the number of elements determine it. Matrices with one row
-/// compare as their rows do under the shortlex order of vectors. It is not a well-order, since the
-/// [`Integer`](crate::integer::Integer)s are not: $[0] > [-1] > [-2] > \ldots$ descends forever.
+/// every matrix with fewer elements comes before every matrix with more, so that $\[5\] < \[0,
+/// 0\]$, and there are only finitely many shapes with a given number of elements. The width is
+/// needed as well as the height only for the matrices with no elements, such as $[]_{0,2}$ and
+/// $[]_{0,5}$, since otherwise the height and the number of elements determine it. Matrices with
+/// one row compare as their rows do under the shortlex order of vectors. It is not a well-order,
+/// since the [`Integer`]s are not: $\[0\] > \[-1\] > \[-2\] > \ldots$ descends forever.
 ///
 /// `ShortlexIntegerMatrix` owns its value. This is useful in many cases, for example if you want to
 /// use [`IntegerMatrix`]s as keys in a [`BTreeMap`](alloc::collections::BTreeMap). In other
@@ -1223,8 +1223,7 @@ fn common_dimension(vectors: &[IntegerVector], what: &str) -> usize {
 pub mod access;
 /// Arithmetic on [`IntegerMatrix`]s.
 pub mod arithmetic;
-/// A function for getting a column of an [`IntegerMatrix`] as an
-/// [`IntegerVector`](crate::integer_vector::IntegerVector).
+/// A function for getting a column of an [`IntegerMatrix`] as an [`IntegerVector`].
 pub mod column;
 /// Iterators over the elements in a column of an [`IntegerMatrix`].
 pub mod column_iter;
@@ -1239,16 +1238,14 @@ pub mod exhaustive;
 /// Iterators that generate [`IntegerMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;
-/// A function for getting a row of an [`IntegerMatrix`] as an
-/// [`IntegerVector`](crate::integer_vector::IntegerVector).
+/// A function for getting a row of an [`IntegerMatrix`] as an [`IntegerVector`].
 pub mod row;
 /// Iterators over the elements in a row of an [`IntegerMatrix`].
 pub mod row_iter;
 /// Iterators over the rows of an [`IntegerMatrix`].
 pub mod rows;
 /// Functions for replacing a column of an [`IntegerMatrix`] with the elements of an
-/// [`IntegerVector`](crate::integer_vector::IntegerVector).
+/// [`IntegerVector`].
 pub mod set_column;
-/// Functions for replacing a row of an [`IntegerMatrix`] with the elements of an
-/// [`IntegerVector`](crate::integer_vector::IntegerVector).
+/// Functions for replacing a row of an [`IntegerMatrix`] with the elements of an [`IntegerVector`].
 pub mod set_row;

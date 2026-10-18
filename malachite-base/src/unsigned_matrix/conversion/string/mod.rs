@@ -9,12 +9,12 @@
 /// An implementation of [`FromStr`](core::str::FromStr) for
 /// [`UnsignedMatrix`](super::super::UnsignedMatrix).
 pub mod from_string;
-/// An implementation of [`ToLatex`](malachite_base::strings::latex::ToLatex) for
+/// An implementation of [`ToLatex`](crate::strings::latex::ToLatex) for
 /// [`UnsignedMatrix`](super::super::UnsignedMatrix).
 pub mod latex;
 /// Implementations of [`Display`](core::fmt::Display) and [`Debug`](core::fmt::Debug) for
 /// [`UnsignedMatrix`](super::super::UnsignedMatrix).
 pub mod to_string;
-/// An implementation of [`ToTypst`](malachite_base::strings::typst::ToTypst) for
+/// An implementation of [`ToTypst`](crate::strings::typst::ToTypst) for
 /// [`UnsignedMatrix`](super::super::UnsignedMatrix).
 pub mod typst;

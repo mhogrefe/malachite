@@ -17,7 +17,7 @@ impl<T: PrimitiveUnsigned> ToLatex for UnsignedMatrix<T> {
     /// The matrix is a `pmatrix` environment (from the `amsmath` package), with `&` between the
     /// elements of a row and `\\` between rows. A matrix with no rows or no columns is an empty
     /// `pmatrix` subscripted with its dimensions, such as `\begin{pmatrix}\end{pmatrix}_{4\times
-    /// 0}`, matching the way [`Display`](core::fmt::Display) writes it.
+    /// 0}`, matching the way [`Display`] writes it.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -49,8 +49,8 @@ impl<T: PrimitiveUnsigned> ToLatex for UnsignedMatrix<T> {
     /// );
     /// ```
     ///
-    /// The value column holds each matrix as [`Display`](core::fmt::Display) writes it, and the
-    /// other column shows the fragments from the examples above, rendered.
+    /// The value column holds each matrix as [`Display`] writes it, and the other column shows the
+    /// fragments from the examples above, rendered.
     ///
     /// | value          | renders as                                   |
     /// |----------------|----------------------------------------------|
