@@ -22,6 +22,9 @@ impl Reciprocal for Rational {
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
+    /// # Panics
+    /// Panics if `self` is zero.
+    ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Reciprocal;
@@ -59,6 +62,9 @@ impl Reciprocal for &Rational {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
+    /// # Panics
+    /// Panics if `self` is zero.
+    ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Reciprocal;
@@ -92,6 +98,9 @@ impl ReciprocalAssign for Rational {
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `self` is zero.
     ///
     /// # Examples
     /// ```

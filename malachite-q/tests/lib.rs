@@ -194,6 +194,7 @@ pub mod rational_matrix {
         pub mod from_elements_column_major;
         pub mod from_integer_matrix;
         pub mod from_natural_matrix;
+        pub mod from_numerators_and_denominator;
         pub mod from_rows;
         pub mod from_unsigned_matrix;
         pub mod integer_matrix_from_rational_matrix;
@@ -207,6 +208,7 @@ pub mod rational_matrix {
             pub mod typst;
         }
         pub mod to_elements;
+        pub mod to_numerators_and_denominator;
         pub mod unsigned_matrix_from_rational_matrix;
     }
     pub mod dimensions;

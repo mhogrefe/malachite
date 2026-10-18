@@ -10,37 +10,11 @@ use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
 use crate::rational_vector::RationalVector;
 use core::ops::Mul;
-use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{DivExact, LcmAssign};
-use malachite_base::num::basic::traits::One;
 use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;
-
-// The elements of a matrix written as integers over a common denominator, the least common multiple
-// of the elements' denominators.
-pub(crate) fn numerators_and_denominator(a: &RationalMatrix) -> (IntegerMatrix, Natural) {
-    let mut d = Natural::ONE;
-    for x in &a.elements {
-        d.lcm_assign(x.denominator_ref());
-    }
-    let numerators = a
-        .elements
-        .iter()
-        .map(|x| {
-            Integer::from_sign_and_abs(
-                *x >= 0u32,
-                (&d).div_exact(x.denominator_ref()) * x.numerator_ref(),
-            )
-        })
-        .collect();
-    (
-        IntegerMatrix::from_owned_elements(a.height(), a.width(), numerators),
-        d,
-    )
-}
 
 // A product of integers over denominators `d` and `e`, as rationals: one integer product and one
 // reduction per element of the result.
@@ -221,7 +195,7 @@ impl Mul<&RationalVector> for &RationalMatrix {
     fn mul(self, other: &RationalVector) -> RationalVector {
         assert_matrix_vector_compatible(self, other);
         mul_over_denominators(
-            numerators_and_denominator(self),
+            self.to_numerators_and_denominator(),
             other.to_numerators_and_denominator(),
         )
     }

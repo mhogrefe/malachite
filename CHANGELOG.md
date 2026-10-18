@@ -76,6 +76,10 @@ documented by git history.
 - `ModShl` and `ModShlAssign` by any primitive unsigned type for `UnsignedMatrix<T>` (and, in
   malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference), left-shifting every
   element modulo $m$ and keeping the shape; the elements must already be reduced.
+- `RationalMatrix::to_numerators_and_denominator`, `into_numerators_and_denominator`, and
+  `from_numerators_and_denominator` in malachite-q, converting between a `RationalMatrix` and an
+  `IntegerMatrix` of numerators over a single `Natural` denominator (the least common multiple of
+  the elements' denominators), as the `RationalVector` functions of the same names do.
 - `ModMul` and `ModMulAssign` by a scalar for `UnsignedMatrix<T>` (and, in malachite-nz, for
   `NaturalMatrix`, with the scalar and the modulus each by value or by reference), multiplying every
   element modulo $m$ with the modulus's precomputed data computed once; the elements and the scalar

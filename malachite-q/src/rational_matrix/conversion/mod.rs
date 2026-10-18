@@ -14,6 +14,9 @@ pub mod from_integer_matrix;
 /// [`NaturalMatrix`](malachite_nz::natural_matrix::NaturalMatrix) to a
 /// [`RationalMatrix`](super::RationalMatrix).
 pub mod from_natural_matrix;
+/// A function for building a [`RationalMatrix`](super::RationalMatrix) from a matrix of numerators
+/// and a single denominator.
+pub mod from_numerators_and_denominator;
 /// An implementation of [`From`] for converting an
 /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix) to a
 /// [`RationalMatrix`](super::RationalMatrix).
@@ -128,6 +131,9 @@ pub mod natural_matrix_from_rational_matrix;
 pub mod serde;
 /// Conversions between [`RationalMatrix`](super::RationalMatrix)s and strings.
 pub mod string;
+/// Functions for clearing the denominators of a [`RationalMatrix`](super::RationalMatrix), giving a
+/// matrix of numerators and a single denominator.
+pub mod to_numerators_and_denominator;
 /// Implementations of traits for converting a [`RationalMatrix`](super::RationalMatrix) to an
 /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix).
 ///

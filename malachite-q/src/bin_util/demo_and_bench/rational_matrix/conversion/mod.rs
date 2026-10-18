@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     from_elements_column_major::register(runner);
     from_integer_matrix::register(runner);
     from_natural_matrix::register(runner);
+    from_numerators_and_denominator::register(runner);
     from_rows::register(runner);
     from_unsigned_matrix::register(runner);
     integer_matrix_from_rational_matrix::register(runner);
@@ -22,6 +23,7 @@ pub(crate) fn register(runner: &mut Runner) {
     serde::register(runner);
     string::register(runner);
     to_elements::register(runner);
+    to_numerators_and_denominator::register(runner);
     unsigned_matrix_from_rational_matrix::register(runner);
 }
 
@@ -30,6 +32,7 @@ mod from_elements;
 mod from_elements_column_major;
 mod from_integer_matrix;
 mod from_natural_matrix;
+mod from_numerators_and_denominator;
 mod from_rows;
 mod from_unsigned_matrix;
 mod integer_matrix_from_rational_matrix;
@@ -38,4 +41,5 @@ mod natural_matrix_from_rational_matrix;
 mod serde;
 mod string;
 mod to_elements;
+mod to_numerators_and_denominator;
 mod unsigned_matrix_from_rational_matrix;

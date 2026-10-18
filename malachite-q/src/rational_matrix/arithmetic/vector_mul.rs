@@ -8,7 +8,6 @@
 
 use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
-use crate::rational_matrix::arithmetic::mul_vector::numerators_and_denominator;
 use crate::rational_vector::RationalVector;
 use core::ops::Mul;
 use malachite_base::vector::Vector;
@@ -197,7 +196,7 @@ impl Mul<&RationalMatrix> for &RationalVector {
         assert_vector_matrix_compatible(self, other);
         mul_over_denominators(
             self.to_numerators_and_denominator(),
-            numerators_and_denominator(other),
+            other.to_numerators_and_denominator(),
         )
     }
 }
