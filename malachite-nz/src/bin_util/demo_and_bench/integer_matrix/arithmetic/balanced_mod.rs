@@ -34,8 +34,8 @@ fn demo_integer_matrix_balanced_mod(gm: GenMode, config: &GenConfig, limit: usiz
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
-        println!("{v_old}.balanced_mod({m}) = {}", a.balanced_mod(&m));
+        let a_old = a.clone();
+        println!("{a_old}.balanced_mod({m}) = {}", a.balanced_mod(&m));
     }
 }
 
@@ -53,9 +53,9 @@ fn demo_integer_matrix_balanced_mod_assign(gm: GenMode, config: &GenConfig, limi
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a.balanced_mod_assign(&m);
-        println!("a := {v_old}; a.balanced_mod_assign({m}); a = {a}");
+        println!("a := {a_old}; a.balanced_mod_assign({m}); a = {a}");
     }
 }
 

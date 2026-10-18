@@ -36,9 +36,9 @@ fn demo_natural_matrix_set_column_owned(gm: GenMode, config: &GenConfig, limit: 
         .take(limit)
     {
         let old = m.clone();
-        let v_old = v.clone();
+        let a_old = v.clone();
         m.set_column_owned(j, v);
-        println!("m := {old}; m.set_column_owned({j}, {v_old}); m = {m}");
+        println!("m := {old}; m.set_column_owned({j}, {a_old}); m = {m}");
     }
 }
 

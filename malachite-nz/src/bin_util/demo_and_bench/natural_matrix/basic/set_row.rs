@@ -36,9 +36,9 @@ fn demo_natural_matrix_set_row_owned(gm: GenMode, config: &GenConfig, limit: usi
         .take(limit)
     {
         let old = m.clone();
-        let v_old = v.clone();
+        let a_old = v.clone();
         m.set_row_owned(i, v);
-        println!("m := {old}; m.set_row_owned({i}, {v_old}); m = {m}");
+        println!("m := {old}; m.set_row_owned({i}, {a_old}); m = {m}");
     }
 }
 

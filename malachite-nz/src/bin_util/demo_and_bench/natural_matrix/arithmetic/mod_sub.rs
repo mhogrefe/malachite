@@ -25,8 +25,8 @@ fn demo_natural_matrix_mod_sub(gm: GenMode, config: &GenConfig, limit: usize) {
         .get(gm, config)
         .take(limit)
     {
-        let (v_old, w_old) = (a.clone(), b.clone());
-        println!("{v_old}.mod_sub({w_old}, {m}) = {}", a.mod_sub(b, &m));
+        let (a_old, b_old) = (a.clone(), b.clone());
+        println!("{a_old}.mod_sub({b_old}, {m}) = {}", a.mod_sub(b, &m));
     }
 }
 
@@ -44,9 +44,9 @@ fn demo_natural_matrix_mod_sub_assign(gm: GenMode, config: &GenConfig, limit: us
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a.mod_sub_assign(&b, &m);
-        println!("a := {v_old}; a.mod_sub_assign(&{b}, {m}); a = {a}");
+        println!("a := {a_old}; a.mod_sub_assign(&{b}, {m}); a = {a}");
     }
 }
 

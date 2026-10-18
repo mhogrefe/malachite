@@ -5401,6 +5401,28 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_4() -> Generator<(UnsignedMatrix<u6
     )
 }
 
+// All `(UnsignedMatrix<u64>, u64, u64)` where the last `u64` is no greater than 64, and every
+// element of the matrix, and the first `u64`, is less than 2 to the power of the last `u64`.
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_2()
+-> Generator<(UnsignedMatrix<u64>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_2,
+        &random_unsigned_matrix_unsigned_unsigned_triple_gen_var_2,
+        &special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(UnsignedMatrix<u64>, u64, u64)` where the last `u64` is positive and every element of the
+// matrix, and the first `u64`, is less than it.
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_3()
+-> Generator<(UnsignedMatrix<u64>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_3,
+        &random_unsigned_matrix_unsigned_unsigned_triple_gen_var_3,
+        &special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_3,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, u64)` where the `u64` is positive and the matrix's elements are less
 // than it.
 pub fn unsigned_matrix_unsigned_pair_gen_var_5() -> Generator<(UnsignedMatrix<u64>, u64)> {

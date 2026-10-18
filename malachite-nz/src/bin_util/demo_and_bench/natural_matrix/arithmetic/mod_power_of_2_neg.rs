@@ -29,9 +29,9 @@ fn demo_natural_matrix_mod_power_of_2_neg(gm: GenMode, config: &GenConfig, limit
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         println!(
-            "({v_old}).mod_power_of_2_neg({pow}) = {}",
+            "({a_old}).mod_power_of_2_neg({pow}) = {}",
             a.mod_power_of_2_neg(pow)
         );
     }
@@ -54,9 +54,9 @@ fn demo_natural_matrix_mod_power_of_2_neg_assign(gm: GenMode, config: &GenConfig
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a.mod_power_of_2_neg_assign(pow);
-        println!("a := {v_old}; a.mod_power_of_2_neg_assign({pow}); a = {a}");
+        println!("a := {a_old}; a.mod_power_of_2_neg_assign({pow}); a = {a}");
     }
 }
 

@@ -29,8 +29,8 @@ fn demo_integer_matrix_mul_scalar(gm: GenMode, config: &GenConfig, limit: usize)
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
-        println!("{v_old} * {c} = {}", a * &c);
+        let a_old = a.clone();
+        println!("{a_old} * {c} = {}", a * &c);
     }
 }
 
@@ -57,9 +57,9 @@ fn demo_integer_matrix_mul_scalar_assign(gm: GenMode, config: &GenConfig, limit:
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a *= &c;
-        println!("a := {v_old}; a *= {c}; a = {a}");
+        println!("a := {a_old}; a *= {c}; a = {a}");
     }
 }
 

@@ -35,8 +35,8 @@ fn demo_integer_matrix_mod_power_of_2(gm: GenMode, config: &GenConfig, limit: us
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
-        println!("{v_old}.mod_power_of_2({pow}) = {}", a.mod_power_of_2(pow));
+        let a_old = a.clone();
+        println!("{a_old}.mod_power_of_2({pow}) = {}", a.mod_power_of_2(pow));
     }
 }
 
@@ -57,8 +57,8 @@ fn demo_integer_matrix_rem_power_of_2(gm: GenMode, config: &GenConfig, limit: us
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
-        println!("{v_old}.rem_power_of_2({pow}) = {}", a.rem_power_of_2(pow));
+        let a_old = a.clone();
+        println!("{a_old}.rem_power_of_2({pow}) = {}", a.rem_power_of_2(pow));
     }
 }
 
@@ -79,9 +79,9 @@ fn demo_integer_matrix_rem_power_of_2_assign(gm: GenMode, config: &GenConfig, li
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a.rem_power_of_2_assign(pow);
-        println!("a := {v_old}; a.rem_power_of_2_assign({pow}); a = {a}");
+        println!("a := {a_old}; a.rem_power_of_2_assign({pow}); a = {a}");
     }
 }
 

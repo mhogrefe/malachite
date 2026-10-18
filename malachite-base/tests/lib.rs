@@ -894,11 +894,13 @@ pub mod unsigned_matrix {
     pub mod arithmetic {
         pub mod mod_add;
         pub mod mod_is_reduced;
+        pub mod mod_mul;
         pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_is_reduced;
+        pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_sub;
         pub mod mod_sub;

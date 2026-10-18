@@ -25,22 +25,22 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_rational_matrix_sub(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b) in rational_matrix_pair_gen_var_1().get(gm, config).take(limit) {
-        let (v_old, w_old) = (a.clone(), b.clone());
-        println!("{v_old} - {w_old} = {}", a - b);
+        let (a_old, b_old) = (a.clone(), b.clone());
+        println!("{a_old} - {b_old} = {}", a - b);
     }
 }
 
 fn demo_rational_matrix_sub_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b) in rational_matrix_pair_gen_var_1().get(gm, config).take(limit) {
-        let v_old = a.clone();
-        println!("{v_old} - &{b} = {}", a - &b);
+        let a_old = a.clone();
+        println!("{a_old} - &{b} = {}", a - &b);
     }
 }
 
 fn demo_rational_matrix_sub_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b) in rational_matrix_pair_gen_var_1().get(gm, config).take(limit) {
-        let w_old = b.clone();
-        println!("&{a} - {w_old} = {}", &a - b);
+        let b_old = b.clone();
+        println!("&{a} - {b_old} = {}", &a - b);
     }
 }
 
@@ -52,17 +52,17 @@ fn demo_rational_matrix_sub_ref_ref(gm: GenMode, config: &GenConfig, limit: usiz
 
 fn demo_rational_matrix_sub_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut a, b) in rational_matrix_pair_gen_var_1().get(gm, config).take(limit) {
-        let (v_old, w_old) = (a.clone(), b.clone());
+        let (a_old, b_old) = (a.clone(), b.clone());
         a -= b;
-        println!("a := {v_old}; a -= {w_old}; a = {a}");
+        println!("a := {a_old}; a -= {b_old}; a = {a}");
     }
 }
 
 fn demo_rational_matrix_sub_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut a, b) in rational_matrix_pair_gen_var_1().get(gm, config).take(limit) {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a -= &b;
-        println!("a := {v_old}; a -= &{b}; a = {a}");
+        println!("a := {a_old}; a -= &{b}; a = {a}");
     }
 }
 

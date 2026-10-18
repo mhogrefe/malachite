@@ -6956,6 +6956,56 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_5() -> It<(UnsignedMatri
     )
 }
 
+// A matrix and a scalar, both reduced modulo 2^pow, and pow.
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_2()
+-> It<(UnsignedMatrix<u64>, u64, u64)> {
+    fn ys(((height, width), pow): ((u64, u64), u64)) -> It<(UnsignedMatrix<u64>, u64)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                height,
+                width,
+                residues_mod_power_of_2::<u64>(pow),
+            ),
+            residues_mod_power_of_2::<u64>(pow),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                primitive_int_increasing_inclusive_range(0, u64::WIDTH),
+            )),
+            ys,
+        )
+        .map(|((_, pow), (a, c))| (a, c, pow)),
+    )
+}
+
+// A matrix and a scalar, both reduced modulo a positive m, and m.
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_3()
+-> It<(UnsignedMatrix<u64>, u64, u64)> {
+    fn ys(((height, width), m): ((u64, u64), u64)) -> It<(UnsignedMatrix<u64>, u64)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                height,
+                width,
+                residues_mod(m),
+            ),
+            residues_mod(m),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_positive_primitive_ints::<u64>(),
+            )),
+            ys,
+        )
+        .map(|((_, m), (a, c))| (a, c, m)),
+    )
+}
+
 // Pairs of matrices of the same shape, with their elements reduced modulo 2^pow, and pow.
 pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_1()
 -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {

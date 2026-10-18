@@ -29,9 +29,9 @@ fn demo_natural_matrix_balanced_mod_power_of_2(gm: GenMode, config: &GenConfig, 
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         println!(
-            "{v_old}.balanced_mod_power_of_2({pow}) = {}",
+            "{a_old}.balanced_mod_power_of_2({pow}) = {}",
             a.balanced_mod_power_of_2(pow)
         );
     }

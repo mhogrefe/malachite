@@ -28,8 +28,8 @@ fn demo_unsigned_matrix_mod_neg(gm: GenMode, config: &GenConfig, limit: usize) {
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
-        println!("({v_old}).mod_neg({m}) = {}", a.mod_neg(m));
+        let a_old = a.clone();
+        println!("({a_old}).mod_neg({m}) = {}", a.mod_neg(m));
     }
 }
 
@@ -47,9 +47,9 @@ fn demo_unsigned_matrix_mod_neg_assign(gm: GenMode, config: &GenConfig, limit: u
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a.mod_neg_assign(m);
-        println!("a := {v_old}; a.mod_neg_assign({m}); a = {a}");
+        println!("a := {a_old}; a.mod_neg_assign({m}); a = {a}");
     }
 }
 

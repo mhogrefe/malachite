@@ -4417,6 +4417,29 @@ pub fn natural_matrix_natural_pair_gen() -> Generator<(NaturalMatrix, Natural)> 
     )
 }
 
+// All `(NaturalMatrix, Natural, u64)` where every element of the matrix, and the `Natural`, is less
+// than 2 to the power of the `u64`.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn natural_matrix_natural_unsigned_triple_gen_var_1() -> Generator<(NaturalMatrix, Natural, u64)>
+{
+    Generator::new(
+        &exhaustive_natural_matrix_natural_unsigned_triple_gen_var_1,
+        &random_natural_matrix_natural_unsigned_triple_gen_var_1,
+        &special_random_natural_matrix_natural_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, Natural, Natural)` where every element of the matrix, and the first
+// `Natural`, is less than the second.
+pub fn natural_matrix_natural_natural_triple_gen_var_1()
+-> Generator<(NaturalMatrix, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_natural_triple_gen_var_1,
+        &random_natural_matrix_natural_natural_triple_gen_var_1,
+        &special_random_natural_matrix_natural_natural_triple_gen_var_1,
+    )
+}
+
 pub fn natural_matrix_triple_gen() -> Generator<(NaturalMatrix, NaturalMatrix, NaturalMatrix)> {
     Generator::new(
         &exhaustive_natural_matrix_triple_gen,

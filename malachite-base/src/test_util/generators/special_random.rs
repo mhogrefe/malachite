@@ -11041,6 +11041,34 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_4(
     )
 }
 
+pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64, u64)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_pair_gen_var_4(config)
+            .zip(striped_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("scalar"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            ))
+            .map(|((a, pow), c)| (a, c.mod_power_of_2(pow), pow)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64, u64)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_pair_gen_var_5(config)
+            .zip(striped_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("scalar"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            ))
+            .map(|((a, m), c)| (a, c % m, m)),
+    )
+}
+
 pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_5(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64)> {

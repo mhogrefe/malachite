@@ -36,8 +36,8 @@ fn demo_natural_matrix_mod_op(gm: GenMode, config: &GenConfig, limit: usize) {
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
-        println!("({v_old}).mod_op({m}) = {}", a.mod_op(&m));
+        let a_old = a.clone();
+        println!("({a_old}).mod_op({m}) = {}", a.mod_op(&m));
     }
 }
 
@@ -46,9 +46,9 @@ fn demo_natural_matrix_mod_assign(gm: GenMode, config: &GenConfig, limit: usize)
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a.mod_assign(&m);
-        println!("a := {v_old}; a.mod_assign({m}); a = {a}");
+        println!("a := {a_old}; a.mod_assign({m}); a = {a}");
     }
 }
 
@@ -57,8 +57,8 @@ fn demo_natural_matrix_rem(gm: GenMode, config: &GenConfig, limit: usize) {
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
-        println!("{v_old} % {m} = {}", a % &m);
+        let a_old = a.clone();
+        println!("{a_old} % {m} = {}", a % &m);
     }
 }
 
@@ -76,9 +76,9 @@ fn demo_natural_matrix_rem_assign(gm: GenMode, config: &GenConfig, limit: usize)
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a %= &m;
-        println!("a := {v_old}; a %= {m}; a = {a}");
+        println!("a := {a_old}; a %= {m}; a = {a}");
     }
 }
 

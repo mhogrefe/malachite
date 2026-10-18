@@ -28,9 +28,9 @@ fn demo_unsigned_matrix_mod_power_of_2_add(gm: GenMode, config: &GenConfig, limi
         .get(gm, config)
         .take(limit)
     {
-        let (v_old, w_old) = (a.clone(), b.clone());
+        let (a_old, b_old) = (a.clone(), b.clone());
         println!(
-            "{v_old}.mod_power_of_2_add({w_old}, {pow}) = {}",
+            "{a_old}.mod_power_of_2_add({b_old}, {pow}) = {}",
             a.mod_power_of_2_add(b, pow)
         );
     }
@@ -53,9 +53,9 @@ fn demo_unsigned_matrix_mod_power_of_2_add_assign(gm: GenMode, config: &GenConfi
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
+        let a_old = a.clone();
         a.mod_power_of_2_add_assign(&b, pow);
-        println!("a := {v_old}; a.mod_power_of_2_add_assign(&{b}, {pow}); a = {a}");
+        println!("a := {a_old}; a.mod_power_of_2_add_assign(&{b}, {pow}); a = {a}");
     }
 }
 

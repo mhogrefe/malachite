@@ -28,8 +28,8 @@ fn demo_natural_matrix_balanced_mod(gm: GenMode, config: &GenConfig, limit: usiz
         .get(gm, config)
         .take(limit)
     {
-        let v_old = a.clone();
-        println!("{v_old}.balanced_mod({m}) = {}", a.balanced_mod(&m));
+        let a_old = a.clone();
+        println!("{a_old}.balanced_mod({m}) = {}", a.balanced_mod(&m));
     }
 }
 

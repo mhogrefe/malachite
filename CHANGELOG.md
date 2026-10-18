@@ -51,6 +51,13 @@ documented by git history.
 - `ModPowerOf2Add`, `ModPowerOf2AddAssign`, `ModPowerOf2Sub`, and `ModPowerOf2SubAssign` for
   `UnsignedMatrix<T>` (and, in malachite-nz, for `NaturalMatrix`), adding or subtracting
   element by element modulo $2^k$; the elements must be reduced and the shapes must match.
+- `ModPowerOf2Mul` and `ModPowerOf2MulAssign` by a scalar for `UnsignedMatrix<T>` (and, in
+  malachite-nz, for `NaturalMatrix`, with the scalar by value or by reference), multiplying every
+  element modulo $2^k$; the elements and the scalar must be reduced.
+- `ModMul` and `ModMulAssign` by a scalar for `UnsignedMatrix<T>` (and, in malachite-nz, for
+  `NaturalMatrix`, with the scalar and the modulus each by value or by reference), multiplying every
+  element modulo $m$ with the modulus's precomputed data computed once; the elements and the scalar
+  must be reduced.
 - `ModAdd`, `ModAddAssign`, `ModSub`, and `ModSubAssign` for `UnsignedMatrix<T>` (and, in
   malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference), adding or
   subtracting element by element modulo $m$; the elements must be reduced and the shapes must

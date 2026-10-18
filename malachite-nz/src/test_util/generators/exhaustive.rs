@@ -3873,6 +3873,43 @@ pub fn exhaustive_natural_matrix_natural_pair_gen_var_2() -> It<(NaturalMatrix, 
     )
 }
 
+// A matrix, a scalar, and a power of 2 that every element and the scalar are less than.
+pub fn exhaustive_natural_matrix_natural_unsigned_triple_gen_var_1()
+-> It<(NaturalMatrix, Natural, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_pairs(exhaustive_natural_matrices(), exhaustive_naturals()),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((a, c), pow)| {
+            let bits = a
+                .elements
+                .iter()
+                .chain(core::iter::once(&c))
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (a, c, pow + bits)
+        }),
+    )
+}
+
+// A matrix, a scalar, and a modulus that every element and the scalar are less than.
+pub fn exhaustive_natural_matrix_natural_natural_triple_gen_var_1()
+-> It<(NaturalMatrix, Natural, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_pairs(exhaustive_natural_matrices(), exhaustive_naturals()),
+            exhaustive_naturals(),
+        )
+        .map(|((a, c), k)| {
+            let max = a.elements.iter().chain(core::iter::once(&c)).max().cloned();
+            let m = max.unwrap_or_default() + k + Natural::ONE;
+            (a, c, m)
+        }),
+    )
+}
+
 // Pairs of matrices of the same shape and a power of 2 that every element is less than.
 pub fn exhaustive_natural_matrix_natural_matrix_unsigned_triple_gen_var_1()
 -> It<(NaturalMatrix, NaturalMatrix, u64)> {

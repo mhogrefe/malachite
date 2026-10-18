@@ -14,6 +14,10 @@ pub mod mod_add;
 /// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
 /// a number.
 pub mod mod_is_reduced;
+/// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) and
+/// [`ModMulAssign`](crate::num::arithmetic::traits::ModMulAssign), for multiplying an
+/// [`UnsignedMatrix`](super::UnsignedMatrix) by a scalar modulo a number.
+pub mod mod_mul;
 /// Implementations of [`ModNeg`](crate::num::arithmetic::traits::ModNeg) and
 /// [`ModNegAssign`](crate::num::arithmetic::traits::ModNegAssign), for negating every element of an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) modulo a number.
@@ -36,6 +40,10 @@ pub mod mod_power_of_2_add;
 /// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
 /// a power of 2.
 pub mod mod_power_of_2_is_reduced;
+/// Implementations of [`ModPowerOf2Mul`](crate::num::arithmetic::traits::ModPowerOf2Mul) and
+/// [`ModPowerOf2MulAssign`](crate::num::arithmetic::traits::ModPowerOf2MulAssign), for multiplying
+/// an [`UnsignedMatrix`](super::UnsignedMatrix) by a scalar modulo a power of 2.
+pub mod mod_power_of_2_mul;
 /// Implementations of [`ModPowerOf2Neg`](crate::num::arithmetic::traits::ModPowerOf2Neg) and
 /// [`ModPowerOf2NegAssign`](crate::num::arithmetic::traits::ModPowerOf2NegAssign), for negating
 /// every element of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a power of 2.
