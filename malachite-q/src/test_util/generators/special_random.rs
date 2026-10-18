@@ -48,6 +48,7 @@ use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, IsInteger, ToSci};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::random::VariableRangeGenerator;
 use malachite_base::num::random::geometric::{
     geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
     geometric_random_signeds, geometric_random_unsigned_inclusive_range,
@@ -65,6 +66,7 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::test_util::generators::common::{GenConfig, It};
+use malachite_base::test_util::generators::random::random_window_bounds;
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
 };
@@ -2471,6 +2473,16 @@ pub fn special_random_rational_matrix_gen(config: &GenConfig) -> It<RationalMatr
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
     ))
+}
+
+pub fn special_random_rational_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalMatrix, u64, u64, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("windows"));
+    Box::new(special_random_rational_matrix_gen(config).map(move |m| {
+        let (r1, r2, c1, c2) = random_window_bounds(&mut ranges, m.height(), m.width());
+        (m, r1, r2, c1, c2)
+    }))
 }
 
 pub fn special_random_rational_matrix_integer_matrix_pair_gen(

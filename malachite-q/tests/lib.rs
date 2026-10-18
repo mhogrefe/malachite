@@ -244,6 +244,7 @@ pub mod rational_matrix {
     pub mod standard_basis_index;
     pub mod standard_basis_matrix;
     pub mod transpose;
+    pub mod window;
     pub mod zero;
 }
 pub mod rational_polynomial {

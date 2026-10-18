@@ -62,6 +62,7 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};
 use malachite_base::test_util::generators::exhaustive::{
     exhaustive_dependent_pairs_from_fn, exhaustive_index_vecs, exhaustive_tuples_by_dimension,
+    exhaustive_window_bounds,
 };
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
@@ -1011,6 +1012,16 @@ pub fn exhaustive_gaussian_rational_vec_gen() -> It<Vec<GaussianRational>> {
 
 pub fn exhaustive_rational_matrix_gen() -> It<RationalMatrix> {
     Box::new(exhaustive_rational_matrices())
+}
+
+// Each matrix paired with each of its windows. A matrix has finitely many, so this reaches every
+// tuple exactly once.
+pub fn exhaustive_rational_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
+-> It<(RationalMatrix, u64, u64, u64, u64)> {
+    Box::new(exhaustive_rational_matrix_gen().flat_map(|m| {
+        exhaustive_window_bounds(m.height(), m.width())
+            .map(move |(r1, r2, c1, c2)| (m.clone(), r1, r2, c1, c2))
+    }))
 }
 
 pub fn exhaustive_rational_matrix_integer_matrix_pair_gen() -> It<(RationalMatrix, IntegerMatrix)> {

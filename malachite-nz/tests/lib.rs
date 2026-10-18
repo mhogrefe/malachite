@@ -426,6 +426,7 @@ pub mod integer_matrix {
     pub mod standard_basis_index;
     pub mod standard_basis_matrix;
     pub mod transpose;
+    pub mod window;
     pub mod zero;
 }
 pub mod integer_vector {
@@ -1119,6 +1120,7 @@ pub mod natural_matrix {
     pub mod standard_basis_index;
     pub mod standard_basis_matrix;
     pub mod transpose;
+    pub mod window;
     pub mod zero;
 }
 pub mod natural_vector {

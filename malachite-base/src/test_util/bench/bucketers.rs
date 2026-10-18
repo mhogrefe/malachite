@@ -1289,3 +1289,12 @@ pub fn triple_1_unsigned_matrix_size_bucketer<T: PrimitiveUnsigned, U, V>(
         bucketing_label: format!("{var_name}.elements.len()"),
     }
 }
+
+pub fn quintuple_1_unsigned_matrix_size_bucketer<T: PrimitiveUnsigned, U, V, W, X>(
+    var_name: &str,
+) -> Bucketer<'_, (UnsignedMatrix<T>, U, V, W, X)> {
+    Bucketer {
+        bucketing_function: &|(m, _, _, _, _)| m.elements.len(),
+        bucketing_label: format!("{var_name}.elements.len()"),
+    }
+}

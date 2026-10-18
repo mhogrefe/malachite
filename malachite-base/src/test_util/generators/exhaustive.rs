@@ -6848,6 +6848,32 @@ pub fn exhaustive_unsigned_matrix_gen() -> It<UnsignedMatrix<u64>> {
     Box::new(exhaustive_unsigned_matrices())
 }
 
+// Each matrix paired with each of its windows. A matrix has finitely many, so this reaches every
+// tuple exactly once.
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
+-> It<(UnsignedMatrix<u64>, u64, u64, u64, u64)> {
+    Box::new(exhaustive_unsigned_matrix_gen().flat_map(|m| {
+        exhaustive_window_bounds(m.height(), m.width())
+            .map(move |(r1, r2, c1, c2)| (m.clone(), r1, r2, c1, c2))
+    }))
+}
+
+// Every window of a matrix with the given height and width, as `(r1, r2, c1, c2)` with `r1 <= r2 <=
+// height` and `c1 <= c2 <= width`, each exactly once.
+pub fn exhaustive_window_bounds(height: u64, width: u64) -> It<(u64, u64, u64, u64)> {
+    let mut bounds = Vec::new();
+    for r1 in 0..=height {
+        for r2 in r1..=height {
+            for c1 in 0..=width {
+                for c2 in c1..=width {
+                    bounds.push((r1, r2, c1, c2));
+                }
+            }
+        }
+    }
+    Box::new(bounds.into_iter())
+}
+
 pub fn exhaustive_unsigned_matrix_unsigned_pair_gen() -> It<(UnsignedMatrix<u64>, u64)> {
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_unsigned_matrices(),

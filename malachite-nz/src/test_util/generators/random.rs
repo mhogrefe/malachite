@@ -161,6 +161,7 @@ use malachite_base::test_util::generators::random::{
     PrimitiveIntVecQuadrupleLenGenerator1, PrimitiveIntVecTripleLenGenerator1,
     PrimitiveIntVecTripleXYYLenGenerator, get_two_highest,
     random_primitive_int_vec_unsigned_pair_gen_var_10, random_vector_index_vec_pairs,
+    random_window_bounds,
 };
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
@@ -6949,6 +6950,16 @@ pub fn random_integer_matrix_gen(config: &GenConfig) -> It<IntegerMatrix> {
     ))
 }
 
+pub fn random_integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, u64, u64, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("windows"));
+    Box::new(random_integer_matrix_gen(config).map(move |m| {
+        let (r1, r2, c1, c2) = random_window_bounds(&mut ranges, m.height(), m.width());
+        (m, r1, r2, c1, c2)
+    }))
+}
+
 pub fn random_integer_matrix_natural_matrix_pair_gen(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, NaturalMatrix)> {
@@ -7415,6 +7426,16 @@ pub fn random_natural_matrix_gen(config: &GenConfig) -> It<NaturalMatrix> {
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
     ))
+}
+
+pub fn random_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, u64, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("windows"));
+    Box::new(random_natural_matrix_gen(config).map(move |m| {
+        let (r1, r2, c1, c2) = random_window_bounds(&mut ranges, m.height(), m.width());
+        (m, r1, r2, c1, c2)
+    }))
 }
 
 pub fn random_natural_matrix_unsigned_pair_gen(config: &GenConfig) -> It<(NaturalMatrix, u64)> {

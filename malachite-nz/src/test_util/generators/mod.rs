@@ -3929,6 +3929,17 @@ pub fn integer_matrix_gen() -> Generator<IntegerMatrix> {
     )
 }
 
+// All `(m, r1, r2, c1, c2)` such that `r1..r2` and `c1..c2` are the row and column ranges of a
+// window of `m`.
+pub fn integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
+-> Generator<(IntegerMatrix, u64, u64, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+        &random_integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+        &special_random_integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+    )
+}
+
 pub fn integer_matrix_natural_matrix_pair_gen() -> Generator<(IntegerMatrix, NaturalMatrix)> {
     Generator::new(
         &exhaustive_integer_matrix_natural_matrix_pair_gen,
@@ -4273,6 +4284,17 @@ pub fn natural_matrix_gen() -> Generator<NaturalMatrix> {
         &exhaustive_natural_matrix_gen,
         &random_natural_matrix_gen,
         &special_random_natural_matrix_gen,
+    )
+}
+
+// All `(m, r1, r2, c1, c2)` such that `r1..r2` and `c1..c2` are the row and column ranges of a
+// window of `m`.
+pub fn natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
+-> Generator<(NaturalMatrix, u64, u64, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+        &random_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+        &special_random_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
     )
 }
 

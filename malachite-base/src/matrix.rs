@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use alloc::vec::Vec;
+use core::ops::Range;
 
 /// What every matrix type has in common: a matrix of a fixed height and width, stored as its
 /// elements in row-major order.
@@ -120,4 +121,19 @@ pub trait Matrix: Sized {
 
     /// Replaces a matrix with its transpose, whose rows are the columns of the original.
     fn transpose_assign(&mut self);
+
+    /// Returns the window of a matrix made of the given ranges of rows and columns, as a new
+    /// matrix, cloning its elements.
+    ///
+    /// The element of the window in row $i$ and column $j$ is the element of the matrix in row
+    /// `rows.start` $+ i$ and column `columns.start` $+ j$.
+    fn window(&self, rows: Range<u64>, columns: Range<u64>) -> Self
+    where
+        Self::Element: Clone;
+
+    /// Returns the window of a matrix made of the given ranges of rows and columns, as a new
+    /// matrix, taking ownership of the matrix and reusing its storage.
+    ///
+    /// The result equals what [`window`](Self::window) returns.
+    fn into_window(self, rows: Range<u64>, columns: Range<u64>) -> Self;
 }

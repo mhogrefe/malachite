@@ -113,6 +113,7 @@ use crate::vecs::random::{RandomVecs, random_vecs};
 use crate::vector::Vector;
 use alloc::collections::{BTreeMap, BTreeSet};
 
+use crate::test_util::generators::random::random_window_bounds;
 #[cfg(not(feature = "std"))]
 use hashbrown::{HashMap, HashSet};
 use itertools::{Itertools, repeat_n};
@@ -10909,6 +10910,16 @@ pub fn special_random_unsigned_matrix_gen(config: &GenConfig) -> It<UnsignedMatr
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
     ))
+}
+
+pub fn special_random_unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64, u64, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("windows"));
+    Box::new(special_random_unsigned_matrix_gen(config).map(move |m| {
+        let (r1, r2, c1, c2) = random_window_bounds(&mut ranges, m.height(), m.width());
+        (m, r1, r2, c1, c2)
+    }))
 }
 
 pub fn special_random_unsigned_matrix_unsigned_pair_gen(

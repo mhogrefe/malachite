@@ -141,6 +141,7 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
+use malachite_base::num::random::VariableRangeGenerator;
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
     geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_signeds,
@@ -166,7 +167,7 @@ use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::test_util::generators::common::{
     GenConfig, It, permute_1_3_2, reshape_1_3_to_4, reshape_2_1_to_3, reshape_2_2_to_4,
 };
-use malachite_base::test_util::generators::random::get_two_highest;
+use malachite_base::test_util::generators::random::{get_two_highest, random_window_bounds};
 use malachite_base::test_util::generators::special_random::{
     UnsignedVecPairLenGenerator1, UnsignedVecPairLenGenerator2, UnsignedVecQuadrupleLenGenerator1,
     UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
@@ -7886,6 +7887,16 @@ pub fn special_random_integer_matrix_gen(config: &GenConfig) -> It<IntegerMatrix
     ))
 }
 
+pub fn special_random_integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, u64, u64, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("windows"));
+    Box::new(special_random_integer_matrix_gen(config).map(move |m| {
+        let (r1, r2, c1, c2) = random_window_bounds(&mut ranges, m.height(), m.width());
+        (m, r1, r2, c1, c2)
+    }))
+}
+
 pub fn special_random_integer_matrix_natural_matrix_pair_gen(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, NaturalMatrix)> {
@@ -8411,6 +8422,16 @@ pub fn special_random_natural_matrix_gen(config: &GenConfig) -> It<NaturalMatrix
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
     ))
+}
+
+pub fn special_random_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, u64, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("windows"));
+    Box::new(special_random_natural_matrix_gen(config).map(move |m| {
+        let (r1, r2, c1, c2) = random_window_bounds(&mut ranges, m.height(), m.width());
+        (m, r1, r2, c1, c2)
+    }))
 }
 
 pub fn special_random_natural_matrix_unsigned_pair_gen(

@@ -12,7 +12,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::{Formatter, Result};
 use core::mem::{swap, take};
-use core::ops::Deref;
+use core::ops::{Deref, Range};
 use malachite_base::matrix::Matrix;
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
@@ -66,6 +66,36 @@ fn shape(height: u64, width: u64) -> (usize, usize, usize) {
     let height = usize::try_from(height).expect(TOO_LARGE);
     let width = usize::try_from(width).expect(TOO_LARGE);
     (height, width, element_count(height, width))
+}
+
+// Converts the row and column ranges of a window of a matrix with the given dimensions to `usize`
+// ranges, panicking if either range is decreasing or extends past the matrix.
+fn window_ranges(
+    height: usize,
+    width: usize,
+    rows: &Range<u64>,
+    columns: &Range<u64>,
+) -> (Range<usize>, Range<usize>) {
+    assert!(
+        rows.start <= rows.end,
+        "the row range {rows:?} of a window is decreasing"
+    );
+    assert!(
+        rows.end <= u64::exact_from(height),
+        "the row range {rows:?} of a window extends past a matrix with {height} rows"
+    );
+    assert!(
+        columns.start <= columns.end,
+        "the column range {columns:?} of a window is decreasing"
+    );
+    assert!(
+        columns.end <= u64::exact_from(width),
+        "the column range {columns:?} of a window extends past a matrix with {width} columns"
+    );
+    (
+        usize::exact_from(rows.start)..usize::exact_from(rows.end),
+        usize::exact_from(columns.start)..usize::exact_from(columns.end),
+    )
 }
 
 impl RationalMatrix {
@@ -1078,6 +1108,111 @@ impl Matrix for RationalMatrix {
             self.elements = transposed_elements(take(&mut self.elements), height, width);
             swap(&mut self.height, &mut self.width);
         }
+    }
+
+    /// Returns the window of a [`RationalMatrix`] made of the given ranges of rows and columns, as
+    /// a new [`RationalMatrix`], cloning its elements.
+    ///
+    /// The element of the window in row $i$ and column $j$ is the element of the matrix in row
+    /// `rows.start` $+ i$ and column `columns.start` $+ j$, so the window's height is the length of
+    /// `rows` and its width is the length of `columns`. Either range may be empty.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm)$
+    ///
+    /// $M(n, m) = O(nm)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the number of elements of the window,
+    /// and $m$ is the maximum bit length of its elements.
+    ///
+    /// # Panics
+    /// Panics if `rows.start > rows.end`, `rows.end > self.height()`, `columns.start >
+    /// columns.end`, or `columns.end > self.width()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let m = RationalMatrix::from_str("[1/2, 2, 3; 4, 5/3, 6; 7, 8, -9]").unwrap();
+    /// assert_eq!(m.window(1..3, 0..2).to_string(), "[4, 5/3; 7, 8]");
+    /// assert_eq!(m.window(0..2, 0..3).to_string(), "[1/2, 2, 3; 4, 5/3, 6]");
+    /// assert_eq!(m.window(1..1, 0..3).to_string(), "[]_{0,3}");
+    /// ```
+    fn window(&self, rows: Range<u64>, columns: Range<u64>) -> Self {
+        let (rows, columns) = window_ranges(self.height, self.width, &rows, &columns);
+        let width = columns.len();
+        let mut elements = Vec::with_capacity(rows.len() * width);
+        for i in rows.clone() {
+            let start = i * self.width + columns.start;
+            elements.extend_from_slice(&self.elements[start..start + width]);
+        }
+        Self {
+            elements,
+            height: rows.len(),
+            width,
+        }
+    }
+
+    /// Returns the window of a [`RationalMatrix`] made of the given ranges of rows and columns, as
+    /// a new [`RationalMatrix`], taking ownership of the matrix and reusing its storage.
+    ///
+    /// The result equals what [`window`](Self::window) returns, but no element is cloned. When the
+    /// window has every column, its elements are contiguous, and the element [`Vec`] is truncated
+    /// and its leading rows removed; in particular, a prefix of the rows only truncates it.
+    /// Otherwise each element of the window is swapped into its place in the front of the [`Vec`]
+    /// before truncating it.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements of the
+    /// matrix.
+    ///
+    /// # Panics
+    /// Panics if `rows.start > rows.end`, `rows.end > self.height()`, `columns.start >
+    /// columns.end`, or `columns.end > self.width()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let m = RationalMatrix::from_str("[1/2, 2, 3; 4, 5/3, 6; 7, 8, -9]").unwrap();
+    /// assert_eq!(
+    ///     m.clone().into_window(1..3, 0..2).to_string(),
+    ///     "[4, 5/3; 7, 8]"
+    /// );
+    /// assert_eq!(
+    ///     m.clone().into_window(0..2, 0..3).to_string(),
+    ///     "[1/2, 2, 3; 4, 5/3, 6]"
+    /// );
+    /// assert_eq!(m.into_window(1..1, 0..3).to_string(), "[]_{0,3}");
+    /// ```
+    fn into_window(mut self, rows: Range<u64>, columns: Range<u64>) -> Self {
+        let (rows, columns) = window_ranges(self.height, self.width, &rows, &columns);
+        let width = columns.len();
+        if width == self.width {
+            self.elements.truncate(rows.end * width);
+            self.elements.drain(..rows.start * width);
+        } else {
+            let mut k = 0;
+            for i in rows.clone() {
+                let start = i * self.width + columns.start;
+                for j in start..start + width {
+                    self.elements.swap(k, j);
+                    k += 1;
+                }
+            }
+            self.elements.truncate(k);
+        }
+        self.height = rows.len();
+        self.width = width;
+        self
     }
 }
 

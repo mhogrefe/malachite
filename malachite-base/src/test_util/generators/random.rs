@@ -9210,6 +9210,35 @@ pub fn random_unsigned_matrix_gen(config: &GenConfig) -> It<UnsignedMatrix<u64>>
     ))
 }
 
+pub fn random_unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64, u64, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("windows"));
+    Box::new(random_unsigned_matrix_gen(config).map(move |m| {
+        let (r1, r2, c1, c2) = random_window_bounds(&mut ranges, m.height(), m.width());
+        (m, r1, r2, c1, c2)
+    }))
+}
+
+// A random window of a matrix with the given height and width, as `(r1, r2, c1, c2)` with `r1 <= r2
+// <= height` and `c1 <= c2 <= width`: each range is the sorted pair of two endpoints drawn
+// uniformly from `0..=height` or `0..=width`.
+pub fn random_window_bounds(
+    ranges: &mut VariableRangeGenerator,
+    height: u64,
+    width: u64,
+) -> (u64, u64, u64, u64) {
+    let (r1, r2) = (
+        ranges.next_in_inclusive_range(0, height),
+        ranges.next_in_inclusive_range(0, height),
+    );
+    let (c1, c2) = (
+        ranges.next_in_inclusive_range(0, width),
+        ranges.next_in_inclusive_range(0, width),
+    );
+    (r1.min(r2), r1.max(r2), c1.min(c2), c1.max(c2))
+}
+
 pub fn random_unsigned_matrix_unsigned_pair_gen(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64)> {

@@ -169,7 +169,7 @@ use malachite_base::test_util::generators::exhaustive::{
     UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
     exhaustive_dependent_pairs_from_fn, exhaustive_index_vecs, exhaustive_tuples_by_dimension,
     exhaustive_unsigned_pair_gen_var_20, exhaustive_unsigned_pair_gen_var_24,
-    exhaustive_unsigned_vec_unsigned_pair_gen_var_17,
+    exhaustive_unsigned_vec_unsigned_pair_gen_var_17, exhaustive_window_bounds,
 };
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
@@ -3600,6 +3600,16 @@ pub fn exhaustive_integer_matrix_gen() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_matrices())
 }
 
+// Each matrix paired with each of its windows. A matrix has finitely many, so this reaches every
+// tuple exactly once.
+pub fn exhaustive_integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
+-> It<(IntegerMatrix, u64, u64, u64, u64)> {
+    Box::new(exhaustive_integer_matrix_gen().flat_map(|m| {
+        exhaustive_window_bounds(m.height(), m.width())
+            .map(move |(r1, r2, c1, c2)| (m.clone(), r1, r2, c1, c2))
+    }))
+}
+
 pub fn exhaustive_integer_matrix_natural_matrix_pair_gen() -> It<(IntegerMatrix, NaturalMatrix)> {
     Box::new(exhaustive_pairs(
         exhaustive_integer_matrices(),
@@ -3861,6 +3871,16 @@ pub fn exhaustive_integer_vector_triple_gen_var_2()
 
 pub fn exhaustive_natural_matrix_gen() -> It<NaturalMatrix> {
     Box::new(exhaustive_natural_matrices())
+}
+
+// Each matrix paired with each of its windows. A matrix has finitely many, so this reaches every
+// tuple exactly once.
+pub fn exhaustive_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
+-> It<(NaturalMatrix, u64, u64, u64, u64)> {
+    Box::new(exhaustive_natural_matrix_gen().flat_map(|m| {
+        exhaustive_window_bounds(m.height(), m.width())
+            .map(move |(r1, r2, c1, c2)| (m.clone(), r1, r2, c1, c2))
+    }))
 }
 
 pub fn exhaustive_natural_matrix_unsigned_pair_gen() -> It<(NaturalMatrix, u64)> {

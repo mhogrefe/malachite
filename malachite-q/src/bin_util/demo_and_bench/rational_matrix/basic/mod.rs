@@ -32,6 +32,7 @@ pub(crate) fn register(runner: &mut Runner) {
     standard_basis_index::register(runner);
     standard_basis_matrix::register(runner);
     transpose::register(runner);
+    window::register(runner);
     zero::register(runner);
 }
 
@@ -58,4 +59,5 @@ mod set_zero;
 mod standard_basis_index;
 mod standard_basis_matrix;
 mod transpose;
+mod window;
 mod zero;

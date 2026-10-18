@@ -969,6 +969,7 @@ pub mod unsigned_matrix {
     pub mod standard_basis_index;
     pub mod standard_basis_matrix;
     pub mod transpose;
+    pub mod window;
     pub mod zero;
 }
 pub mod unsigned_polynomial {

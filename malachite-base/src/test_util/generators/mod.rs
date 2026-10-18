@@ -5306,6 +5306,17 @@ pub fn unsigned_matrix_gen() -> Generator<UnsignedMatrix<u64>> {
     )
 }
 
+// All `(m, r1, r2, c1, c2)` such that `r1..r2` and `c1..c2` are the row and column ranges of a
+// window of `m`.
+pub fn unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
+-> Generator<(UnsignedMatrix<u64>, u64, u64, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+        &random_unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+        &special_random_unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, u64)` pairs, where the `u64` is a small power.
 pub fn unsigned_matrix_unsigned_pair_gen() -> Generator<(UnsignedMatrix<u64>, u64)> {
     Generator::new(
