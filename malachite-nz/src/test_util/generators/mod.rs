@@ -4303,12 +4303,32 @@ pub fn natural_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(NaturalMatrix, T)` where `T` is unsigned and small.
+pub fn natural_matrix_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>()
+-> Generator<(NaturalMatrix, T)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_pair_gen_var_5,
+        &random_natural_matrix_unsigned_pair_gen_var_5,
+        &special_random_natural_matrix_unsigned_pair_gen_var_5,
+    )
+}
+
 pub fn integer_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
 -> Generator<(IntegerMatrix, T)> {
     Generator::new(
         &exhaustive_integer_matrix_unsigned_pair_gen_var_1,
         &random_integer_matrix_unsigned_pair_gen_var_1,
         &special_random_integer_matrix_unsigned_pair_gen_var_1,
+    )
+}
+
+// All `(IntegerMatrix, T)` where `T` is unsigned and small.
+pub fn integer_matrix_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
+-> Generator<(IntegerMatrix, T)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_pair_gen_var_4,
+        &random_integer_matrix_unsigned_pair_gen_var_4,
+        &special_random_integer_matrix_unsigned_pair_gen_var_4,
     )
 }
 

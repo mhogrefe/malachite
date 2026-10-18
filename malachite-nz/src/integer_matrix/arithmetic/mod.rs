@@ -42,6 +42,42 @@ pub mod neg;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying an [`IntegerMatrix`](super::IntegerMatrix) by a scalar on either side.
 pub mod scalar_mul;
+/// Left-shifting a matrix (multiplying it by a power of 2), by implementations of
+/// [`Shl`](core::ops::Shl) and [`ShlAssign`](core::ops::ShlAssign).
+///
+/// # shl
+/// ```
+/// use core::str::FromStr;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[]_{0,0}").unwrap() << 10u8).to_string(),
+///     "[]_{0,0}"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[1, -2; 3, 4]").unwrap() << 0u16).to_string(),
+///     "[1, -2; 3, 4]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[1, -2; 3, 4]").unwrap() << 2u32).to_string(),
+///     "[4, -8; 12, 16]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[-3; 0]").unwrap() << 100u64).to_string(),
+///     "[-3802951800684688204490109616128; 0]"
+/// );
+/// ```
+///
+/// # shl_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// let mut a = IntegerMatrix::from_str("[1, -2; 3, 4]").unwrap();
+/// a <<= 2u32;
+/// assert_eq!(a.to_string(), "[4, -8; 12, 16]");
+/// ```
+pub mod shl;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;

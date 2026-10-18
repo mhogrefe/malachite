@@ -3885,9 +3885,25 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
     ))
 }
 
+pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>()
+-> It<(NaturalMatrix, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_matrices(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(IntegerMatrix, T)> {
     Box::new(exhaustive_pairs(
+        exhaustive_integer_matrices(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
+-> It<(IntegerMatrix, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
         exhaustive_integer_matrices(),
         exhaustive_unsigneds(),
     ))

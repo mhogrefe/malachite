@@ -358,6 +358,7 @@ pub mod integer_matrix {
         pub mod mul_vector;
         pub mod neg;
         pub mod scalar_mul;
+        pub mod shl;
         pub mod sub;
         pub mod vector_mul;
     }
@@ -1050,6 +1051,7 @@ pub mod natural_matrix {
         pub mod mod_sub;
         pub mod mul_vector;
         pub mod scalar_mul;
+        pub mod shl;
         pub mod vector_mod_mul;
         pub mod vector_mod_power_of_2_mul;
         pub mod vector_mul;
