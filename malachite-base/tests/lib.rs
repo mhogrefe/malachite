@@ -945,6 +945,7 @@ pub mod unsigned_matrix {
     }
     pub mod identity;
     pub mod is_diagonal;
+    pub mod is_empty;
     pub mod is_identity;
     pub mod is_lower_triangular;
     pub mod is_rectangular_identity;
@@ -953,6 +954,7 @@ pub mod unsigned_matrix {
     pub mod is_symmetric;
     pub mod is_upper_triangular;
     pub mod is_zero;
+    pub mod is_zero_row;
     pub mod random {
         pub mod properties;
         pub mod random_unsigned_lower_triangular_matrices_mod;

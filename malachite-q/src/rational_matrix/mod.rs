@@ -790,6 +790,71 @@ impl Matrix for RationalMatrix {
         self.elements.iter().all(|x| *x == 0u32)
     }
 
+    /// Determines whether an [`RationalMatrix`] is empty, that is, whether it has no elements. A
+    /// matrix is empty exactly when its height or its width is zero.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// assert!(RationalMatrix::from_str("[]_{0,0}").unwrap().is_empty());
+    /// assert!(RationalMatrix::from_str("[]_{3,0}").unwrap().is_empty());
+    /// assert!(RationalMatrix::from_str("[]_{0,3}").unwrap().is_empty());
+    /// assert!(!RationalMatrix::from_str("[0, 0; 0, 0]").unwrap().is_empty());
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_is_empty` from `fmpz_mat.h`, FLINT 3.6.0.
+    #[inline]
+    fn is_empty(&self) -> bool {
+        self.elements.is_empty()
+    }
+
+    /// Determines whether every element in row `i` of an [`RationalMatrix`] is zero. Every row of a
+    /// matrix with no columns qualifies.
+    ///
+    /// Indices start at 0.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.width()`.
+    ///
+    /// # Panics
+    /// Panics if `i` is greater than or equal to the height of the matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// assert!(
+    ///     RationalMatrix::from_str("[1, 2; 0, 0]")
+    ///         .unwrap()
+    ///         .is_zero_row(1)
+    /// );
+    /// assert!(
+    ///     !RationalMatrix::from_str("[1, 2; 0, 0]")
+    ///         .unwrap()
+    ///         .is_zero_row(0)
+    /// );
+    /// assert!(RationalMatrix::from_str("[]_{3,0}").unwrap().is_zero_row(2));
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_is_zero_row` from `fmpz_mat/is_zero.c`, FLINT 3.6.0, except
+    /// that it panics if the row index is out of range.
+    #[inline]
+    fn is_zero_row(&self, i: u64) -> bool {
+        self.row_iter(i).all(|x| *x == 0u32)
+    }
+
     /// Determines whether a [`RationalMatrix`] is an identity matrix: a square matrix whose
     /// diagonal elements are 1 and whose other elements are 0. This includes the 0-by-0 matrix.
     ///

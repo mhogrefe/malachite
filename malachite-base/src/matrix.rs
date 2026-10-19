@@ -86,6 +86,14 @@ pub trait Matrix: Sized {
     /// elements.
     fn is_zero(&self) -> bool;
 
+    /// Determines whether a matrix is empty, that is, whether it has no elements. A matrix is empty
+    /// exactly when its height or its width is zero.
+    fn is_empty(&self) -> bool;
+
+    /// Determines whether every element in row `i` of a matrix is zero. Every row of a matrix with
+    /// no columns qualifies.
+    fn is_zero_row(&self, i: u64) -> bool;
+
     /// Determines whether a matrix is an identity matrix: a square matrix whose diagonal elements
     /// are 1 and whose other elements are 0. This includes the 0-by-0 matrix.
     fn is_identity(&self) -> bool;

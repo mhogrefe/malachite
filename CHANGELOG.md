@@ -14,12 +14,13 @@ documented by git history.
   `Vector` is for vectors: `from_elements`, `from_owned_elements` and their column-major forms,
   `zero`, `identity`, `rectangular_identity` (ones in positions $(i, i)$ of a matrix of any shape,
   as FLINT's `*_mat_one` gives), `standard_basis_matrix` (the matrix units $E_{ij}$), `to_elements`,
-  `into_elements`, `elements_ref`, `height`, `width`, `is_square`, `is_zero`, `is_identity`,
-  `is_rectangular_identity`, `standard_basis_index` (the row and column of a standard basis matrix's
-  1, or `None`), `is_symmetric`, `is_skew_symmetric`, `is_diagonal`, `is_upper_triangular`,
-  `is_lower_triangular` (the last three for any shape), `set_zero`, `transpose`, `transpose_assign`,
-  `swap_rows` and `swap_columns` (FLINT's `fmpz_mat_swap_rows` and `fmpz_mat_swap_cols`, without the
-  permutation array), `reverse_rows` and `reverse_columns` (FLINT's `fmpz_mat_invert_rows` and
+  `into_elements`, `elements_ref`, `height`, `width`, `is_square`, `is_empty`, `is_zero`,
+  `is_zero_row` (whether a row is all zeros), `is_identity`, `is_rectangular_identity`,
+  `standard_basis_index` (the row and column of a standard basis matrix's 1, or `None`),
+  `is_symmetric`, `is_skew_symmetric`, `is_diagonal`, `is_upper_triangular`, `is_lower_triangular`
+  (the last three for any shape), `set_zero`, `transpose`, `transpose_assign`, `swap_rows` and
+  `swap_columns` (FLINT's `fmpz_mat_swap_rows` and `fmpz_mat_swap_cols`, without the permutation
+  array), `reverse_rows` and `reverse_columns` (FLINT's `fmpz_mat_invert_rows` and
   `fmpz_mat_invert_cols`), `window` and `into_window`, which copy the submatrix in given ranges of
   rows and columns into a new matrix (`into_window` reuses the matrix's storage, only truncating it
   for a prefix of the rows), and `set_window` and `set_window_owned`, which write a matrix into
