@@ -240,6 +240,9 @@ pub mod scalar_mul;
 /// assert_eq!(a.to_string(), "[4, 8; 12, 16]");
 /// ```
 pub mod shl;
+/// An implementation of [`Trace`](malachite_base::num::arithmetic::traits::Trace), the sum of the
+/// diagonal elements of a square matrix.
+pub mod trace;
 /// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) for multiplying a
 /// [`NaturalVector`](crate::natural_vector::NaturalVector) by a
 /// [`NaturalMatrix`](super::NaturalMatrix) on the right modulo a number.

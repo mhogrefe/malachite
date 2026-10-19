@@ -110,6 +110,9 @@ pub mod shl;
 /// subtracting matrices of the same shape.
 pub mod sub;
 
+/// An implementation of [`Trace`](malachite_base::num::arithmetic::traits::Trace), the sum of the
+/// diagonal elements of a square matrix.
+pub mod trace;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying an
 /// [`IntegerVector`](crate::integer_vector::IntegerVector) by an
 /// [`IntegerMatrix`](super::IntegerMatrix) on the right.

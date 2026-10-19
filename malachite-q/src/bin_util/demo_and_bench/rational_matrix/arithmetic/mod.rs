@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     shl::register(runner);
     shr::register(runner);
     sub::register(runner);
+    trace::register(runner);
     vector_mul::register(runner);
 }
 
@@ -32,4 +33,5 @@ mod scalar_mul;
 mod shl;
 mod shr;
 mod sub;
+mod trace;
 mod vector_mul;

@@ -366,6 +366,7 @@ pub mod integer_matrix {
         pub mod scalar_mul;
         pub mod shl;
         pub mod sub;
+        pub mod trace;
         pub mod vector_mul;
     }
     pub mod basic {
@@ -1086,6 +1087,7 @@ pub mod natural_matrix {
         pub mod multi_mod;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod trace;
         pub mod vector_mod_mul;
         pub mod vector_mod_power_of_2_mul;
         pub mod vector_mul;

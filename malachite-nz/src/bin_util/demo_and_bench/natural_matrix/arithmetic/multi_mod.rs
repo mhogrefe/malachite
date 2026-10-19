@@ -47,7 +47,9 @@ fn benchmark_natural_matrix_multi_mod_algorithms(
         file_name,
         &pair_1_vec_len_bucketer("moduli"),
         &mut [
-            ("default", &mut |(moduli, v)| no_out!(v.multi_mod(&moduli))),
+            ("default", &mut |(moduli, v)| {
+                no_out!(v.multi_mod(&moduli));
+            }),
             ("one modulus at a time", &mut |(moduli, v)| {
                 no_out!(natural_matrix_multi_mod_naive(&v, &moduli));
             }),

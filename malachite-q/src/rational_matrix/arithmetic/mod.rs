@@ -136,6 +136,9 @@ pub mod shr;
 /// subtracting matrices of the same shape.
 pub mod sub;
 
+/// An implementation of [`Trace`](malachite_base::num::arithmetic::traits::Trace), the sum of the
+/// diagonal elements of a square matrix.
+pub mod trace;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying a
 /// [`RationalVector`](crate::rational_vector::RationalVector) by a
 /// [`RationalMatrix`](super::RationalMatrix) on the right.

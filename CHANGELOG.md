@@ -357,6 +357,9 @@ documented by git history.
   modulo a `Natural` with an `UnsignedMatrix<Limb>` of residues modulo a `Limb`, in every
   combination of value and reference, like FLINT's `fmpz_mat_CRT_ui`. The inverse of the first
   modulus is computed once, and `None` is returned if the moduli are not coprime.
+- `Trace`, a new trait with `to_trace` (by reference) and `into_trace` (by value), the sum of the
+  diagonal elements of a square matrix, for `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`,
+  like FLINT's `fmpz_mat_trace` and `fmpq_mat_trace`. It panics if the matrix is not square.
 
 ### malachite-q
 

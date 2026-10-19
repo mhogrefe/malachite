@@ -176,6 +176,7 @@ pub mod rational_matrix {
         pub mod shl;
         pub mod shr;
         pub mod sub;
+        pub mod trace;
         pub mod vector_mul;
     }
     pub mod basic {

@@ -1467,6 +1467,15 @@ pub trait ElementSum {
     fn into_element_sum(self) -> Self::Output;
 }
 
+/// Calculates the trace of a square matrix: the sum of its diagonal elements.
+pub trait Trace {
+    type Output;
+
+    fn to_trace(&self) -> Self::Output;
+
+    fn into_trace(self) -> Self::Output;
+}
+
 /// Determines whether a number is an integer power of 2.
 pub trait IsPowerOf2 {
     fn is_power_of_2(&self) -> bool;
