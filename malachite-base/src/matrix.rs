@@ -193,4 +193,30 @@ pub trait Matrix: Sized {
     ///
     /// The result equals what [`set_window`](Self::set_window) produces.
     fn set_window_owned(&mut self, i: u64, j: u64, w: Self);
+
+    /// Returns the vertical concatenation of two matrices of the same width, cloning their
+    /// elements: the rows of `self` followed by the rows of `other`.
+    fn concat_vertical(&self, other: &Self) -> Self
+    where
+        Self::Element: Clone;
+
+    /// Returns the vertical concatenation of two matrices of the same width, taking ownership of
+    /// both: the rows of `self` followed by the rows of `other`.
+    ///
+    /// The result equals what [`concat_vertical`](Self::concat_vertical) returns.
+    fn into_concat_vertical(self, other: Self) -> Self;
+
+    /// Returns the horizontal concatenation of two matrices of the same height, cloning their
+    /// elements: each row of the result is the corresponding row of `self` followed by the
+    /// corresponding row of `other`.
+    fn concat_horizontal(&self, other: &Self) -> Self
+    where
+        Self::Element: Clone;
+
+    /// Returns the horizontal concatenation of two matrices of the same height, taking ownership of
+    /// both: each row of the result is the corresponding row of `self` followed by the
+    /// corresponding row of `other`.
+    ///
+    /// The result equals what [`concat_horizontal`](Self::concat_horizontal) returns.
+    fn into_concat_horizontal(self, other: Self) -> Self;
 }

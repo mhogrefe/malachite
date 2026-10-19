@@ -4026,6 +4026,24 @@ pub fn integer_matrix_pair_gen_var_1() -> Generator<(IntegerMatrix, IntegerMatri
     )
 }
 
+// All pairs of `IntegerMatrix`s of the same width.
+pub fn integer_matrix_pair_gen_var_2() -> Generator<(IntegerMatrix, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_integer_matrix_pair_gen_var_2,
+        &random_integer_matrix_pair_gen_var_2,
+        &special_random_integer_matrix_pair_gen_var_2,
+    )
+}
+
+// All pairs of `IntegerMatrix`s of the same height.
+pub fn integer_matrix_pair_gen_var_3() -> Generator<(IntegerMatrix, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_integer_matrix_pair_gen_var_3,
+        &random_integer_matrix_pair_gen_var_3,
+        &special_random_integer_matrix_pair_gen_var_3,
+    )
+}
+
 // All `(IntegerMatrix, IntegerVector)` where the vector's dimension is the height of the matrix.
 pub fn integer_matrix_integer_vector_pair_gen_var_2() -> Generator<(IntegerMatrix, IntegerVector)> {
     Generator::new(
@@ -4578,6 +4596,24 @@ pub fn natural_matrix_pair_gen_var_1() -> Generator<(NaturalMatrix, NaturalMatri
         &exhaustive_natural_matrix_pair_gen_var_1,
         &random_natural_matrix_pair_gen_var_1,
         &special_random_natural_matrix_pair_gen_var_1,
+    )
+}
+
+// All pairs of `NaturalMatrix`s of the same width.
+pub fn natural_matrix_pair_gen_var_2() -> Generator<(NaturalMatrix, NaturalMatrix)> {
+    Generator::new(
+        &exhaustive_natural_matrix_pair_gen_var_2,
+        &random_natural_matrix_pair_gen_var_2,
+        &special_random_natural_matrix_pair_gen_var_2,
+    )
+}
+
+// All pairs of `NaturalMatrix`s of the same height.
+pub fn natural_matrix_pair_gen_var_3() -> Generator<(NaturalMatrix, NaturalMatrix)> {
+    Generator::new(
+        &exhaustive_natural_matrix_pair_gen_var_3,
+        &random_natural_matrix_pair_gen_var_3,
+        &special_random_natural_matrix_pair_gen_var_3,
     )
 }
 

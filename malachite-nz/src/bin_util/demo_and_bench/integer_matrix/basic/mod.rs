@@ -12,6 +12,8 @@ pub(crate) fn register(runner: &mut Runner) {
     column::register(runner);
     column_iter::register(runner);
     columns::register(runner);
+    concat_horizontal::register(runner);
+    concat_vertical::register(runner);
     dimensions::register(runner);
     equal_columns::register(runner);
     equal_rows::register(runner);
@@ -50,6 +52,8 @@ pub(crate) fn register(runner: &mut Runner) {
 mod column;
 mod column_iter;
 mod columns;
+mod concat_horizontal;
+mod concat_vertical;
 mod dimensions;
 mod equal_columns;
 mod equal_rows;

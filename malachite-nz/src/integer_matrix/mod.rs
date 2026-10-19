@@ -1747,6 +1747,216 @@ impl Matrix for IntegerMatrix {
             }
         }
     }
+
+    /// Returns the vertical concatenation of two [`IntegerMatrix`]s of the same width, cloning
+    /// their elements: the rows of `self` followed by the rows of `other`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements of the
+    /// result.
+    ///
+    /// # Panics
+    /// Panics if `self` and `other` have different widths.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, -4]").unwrap();
+    /// let b = IntegerMatrix::from_str("[5, 6]").unwrap();
+    /// assert_eq!(a.concat_vertical(&b).to_string(), "[1, 2; 3, -4; 5, 6]");
+    /// let a = IntegerMatrix::from_str("[1, 2]").unwrap();
+    /// let b = IntegerMatrix::from_str("[]_{0,2}").unwrap();
+    /// assert_eq!(a.concat_vertical(&b).to_string(), "[1, 2]");
+    /// let a = IntegerMatrix::from_str("[]_{2,0}").unwrap();
+    /// let b = IntegerMatrix::from_str("[]_{3,0}").unwrap();
+    /// assert_eq!(a.concat_vertical(&b).to_string(), "[]_{5,0}");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_concat_vertical` from `fmpz_mat/concat.c`, FLINT 3.6.0,
+    /// except that it panics if the widths differ.
+    fn concat_vertical(&self, other: &Self) -> Self {
+        assert_eq!(
+            self.width, other.width,
+            "the widths of the matrices, {} and {}, must be equal",
+            self.width, other.width
+        );
+        let mut elements = Vec::with_capacity(self.elements.len() + other.elements.len());
+        elements.extend_from_slice(&self.elements);
+        elements.extend_from_slice(&other.elements);
+        Self {
+            elements,
+            height: self.height + other.height,
+            width: self.width,
+        }
+    }
+
+    /// Returns the vertical concatenation of two [`IntegerMatrix`]s of the same width, taking
+    /// ownership of both: the rows of `self` followed by the rows of `other`.
+    ///
+    /// The result equals what [`concat_vertical`](Self::concat_vertical) returns. The elements of
+    /// `other` are moved onto the end of the element [`Vec`] of `self`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements of the
+    /// result.
+    ///
+    /// # Panics
+    /// Panics if `self` and `other` have different widths.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, -4]").unwrap();
+    /// let b = IntegerMatrix::from_str("[5, 6]").unwrap();
+    /// assert_eq!(a.into_concat_vertical(b).to_string(), "[1, 2; 3, -4; 5, 6]");
+    /// let a = IntegerMatrix::from_str("[1, 2]").unwrap();
+    /// let b = IntegerMatrix::from_str("[]_{0,2}").unwrap();
+    /// assert_eq!(a.into_concat_vertical(b).to_string(), "[1, 2]");
+    /// let a = IntegerMatrix::from_str("[]_{2,0}").unwrap();
+    /// let b = IntegerMatrix::from_str("[]_{3,0}").unwrap();
+    /// assert_eq!(a.into_concat_vertical(b).to_string(), "[]_{5,0}");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_concat_vertical` from `fmpz_mat/concat.c`, FLINT 3.6.0,
+    /// except that it panics if the widths differ.
+    fn into_concat_vertical(mut self, mut other: Self) -> Self {
+        assert_eq!(
+            self.width, other.width,
+            "the widths of the matrices, {} and {}, must be equal",
+            self.width, other.width
+        );
+        self.elements.append(&mut other.elements);
+        self.height += other.height;
+        self
+    }
+
+    /// Returns the horizontal concatenation of two [`IntegerMatrix`]s of the same height, cloning
+    /// their elements: each row of the result is the corresponding row of `self` followed by the
+    /// corresponding row of `other`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements of the
+    /// result.
+    ///
+    /// # Panics
+    /// Panics if `self` and `other` have different heights.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, -4]").unwrap();
+    /// let b = IntegerMatrix::from_str("[5; 6]").unwrap();
+    /// assert_eq!(a.concat_horizontal(&b).to_string(), "[1, 2, 5; 3, -4, 6]");
+    /// let a = IntegerMatrix::from_str("[1; 2]").unwrap();
+    /// let b = IntegerMatrix::from_str("[]_{2,0}").unwrap();
+    /// assert_eq!(a.concat_horizontal(&b).to_string(), "[1; 2]");
+    /// let a = IntegerMatrix::from_str("[]_{0,2}").unwrap();
+    /// let b = IntegerMatrix::from_str("[]_{0,3}").unwrap();
+    /// assert_eq!(a.concat_horizontal(&b).to_string(), "[]_{0,5}");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_concat_horizontal` from `fmpz_mat/concat.c`, FLINT 3.6.0,
+    /// except that it panics if the heights differ.
+    fn concat_horizontal(&self, other: &Self) -> Self {
+        assert_eq!(
+            self.height, other.height,
+            "the heights of the matrices, {} and {}, must be equal",
+            self.height, other.height
+        );
+        let width = self.width + other.width;
+        let mut elements = Vec::with_capacity(self.height * width);
+        for i in 0..self.height {
+            elements.extend_from_slice(&self.elements[i * self.width..(i + 1) * self.width]);
+            elements.extend_from_slice(&other.elements[i * other.width..(i + 1) * other.width]);
+        }
+        Self {
+            elements,
+            height: self.height,
+            width,
+        }
+    }
+
+    /// Returns the horizontal concatenation of two [`IntegerMatrix`]s of the same height, taking
+    /// ownership of both: each row of the result is the corresponding row of `self` followed by the
+    /// corresponding row of `other`.
+    ///
+    /// The result equals what [`concat_horizontal`](Self::concat_horizontal) returns. The elements
+    /// are moved, not cloned, into a new element [`Vec`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements of the
+    /// result.
+    ///
+    /// # Panics
+    /// Panics if `self` and `other` have different heights.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, -4]").unwrap();
+    /// let b = IntegerMatrix::from_str("[5; 6]").unwrap();
+    /// assert_eq!(
+    ///     a.into_concat_horizontal(b).to_string(),
+    ///     "[1, 2, 5; 3, -4, 6]"
+    /// );
+    /// let a = IntegerMatrix::from_str("[1; 2]").unwrap();
+    /// let b = IntegerMatrix::from_str("[]_{2,0}").unwrap();
+    /// assert_eq!(a.into_concat_horizontal(b).to_string(), "[1; 2]");
+    /// let a = IntegerMatrix::from_str("[]_{0,2}").unwrap();
+    /// let b = IntegerMatrix::from_str("[]_{0,3}").unwrap();
+    /// assert_eq!(a.into_concat_horizontal(b).to_string(), "[]_{0,5}");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_concat_horizontal` from `fmpz_mat/concat.c`, FLINT 3.6.0,
+    /// except that it panics if the heights differ.
+    fn into_concat_horizontal(self, other: Self) -> Self {
+        assert_eq!(
+            self.height, other.height,
+            "the heights of the matrices, {} and {}, must be equal",
+            self.height, other.height
+        );
+        let width = self.width + other.width;
+        let mut elements = Vec::with_capacity(self.height * width);
+        let mut xs = self.elements.into_iter();
+        let mut ys = other.elements.into_iter();
+        for _ in 0..self.height {
+            elements.extend((&mut xs).take(self.width));
+            elements.extend((&mut ys).take(other.width));
+        }
+        Self {
+            elements,
+            height: self.height,
+            width,
+        }
+    }
 }
 
 // Implements `Named` for `IntegerMatrix`.

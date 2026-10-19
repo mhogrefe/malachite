@@ -377,6 +377,8 @@ pub mod integer_matrix {
         pub mod partial_eq_unsigned_matrix;
         pub mod shortlex_cmp;
     }
+    pub mod concat_horizontal;
+    pub mod concat_vertical;
     pub mod conversion {
         pub mod from_columns;
         pub mod from_elements;
@@ -1092,6 +1094,8 @@ pub mod natural_matrix {
         pub mod partial_eq_unsigned_matrix;
         pub mod shortlex_cmp;
     }
+    pub mod concat_horizontal;
+    pub mod concat_vertical;
     pub mod conversion {
         pub mod from_columns;
         pub mod from_elements;

@@ -1395,6 +1395,24 @@ pub fn rational_matrix_pair_gen_var_1() -> Generator<(RationalMatrix, RationalMa
     )
 }
 
+// All pairs of `RationalMatrix`s of the same width.
+pub fn rational_matrix_pair_gen_var_2() -> Generator<(RationalMatrix, RationalMatrix)> {
+    Generator::new(
+        &exhaustive_rational_matrix_pair_gen_var_2,
+        &random_rational_matrix_pair_gen_var_2,
+        &special_random_rational_matrix_pair_gen_var_2,
+    )
+}
+
+// All pairs of `RationalMatrix`s of the same height.
+pub fn rational_matrix_pair_gen_var_3() -> Generator<(RationalMatrix, RationalMatrix)> {
+    Generator::new(
+        &exhaustive_rational_matrix_pair_gen_var_3,
+        &random_rational_matrix_pair_gen_var_3,
+        &special_random_rational_matrix_pair_gen_var_3,
+    )
+}
+
 // All `(RationalMatrix, RationalVector)` where the vector's dimension is the height of the matrix.
 pub fn rational_matrix_rational_vector_pair_gen_var_2()
 -> Generator<(RationalMatrix, RationalVector)> {

@@ -2459,6 +2459,56 @@ pub fn random_rational_matrix_pair_gen_var_1(
     )
 }
 
+// Pairs of matrices of the same random width, with random heights.
+pub fn random_rational_matrix_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalMatrix)> {
+    let mut xs = random_rationals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(h1, h2, width)| {
+            let n = usize::exact_from(h1 * width);
+            let a = RationalMatrix::from_owned_elements(h1, width, (&mut xs).take(n).collect());
+            let n = usize::exact_from(h2 * width);
+            let b = RationalMatrix::from_owned_elements(h2, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+// Pairs of matrices of the same random height, with random widths.
+pub fn random_rational_matrix_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalMatrix)> {
+    let mut xs = random_rationals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, w1, w2)| {
+            let n = usize::exact_from(height * w1);
+            let a = RationalMatrix::from_owned_elements(height, w1, (&mut xs).take(n).collect());
+            let n = usize::exact_from(height * w2);
+            let b = RationalMatrix::from_owned_elements(height, w2, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
 // A matrix of random shape and a vector whose dimension is the height of the matrix.
 pub fn random_rational_matrix_rational_vector_pair_gen_var_2(
     config: &GenConfig,

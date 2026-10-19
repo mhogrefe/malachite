@@ -5382,6 +5382,24 @@ pub fn unsigned_matrix_pair_gen() -> Generator<(UnsignedMatrix<u64>, UnsignedMat
     )
 }
 
+// All pairs of `UnsignedMatrix<u64>`s of the same width.
+pub fn unsigned_matrix_pair_gen_var_1() -> Generator<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_pair_gen_var_1,
+        &random_unsigned_matrix_pair_gen_var_1,
+        &special_random_unsigned_matrix_pair_gen_var_1,
+    )
+}
+
+// All pairs of `UnsignedMatrix<u64>`s of the same height.
+pub fn unsigned_matrix_pair_gen_var_2() -> Generator<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_pair_gen_var_2,
+        &random_unsigned_matrix_pair_gen_var_2,
+        &special_random_unsigned_matrix_pair_gen_var_2,
+    )
+}
+
 pub fn unsigned_matrix_triple_gen() -> Generator<(
     UnsignedMatrix<u64>,
     UnsignedMatrix<u64>,

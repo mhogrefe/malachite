@@ -87,7 +87,8 @@ use crate::tuples::exhaustive::{
 };
 use crate::unsigned_matrix::UnsignedMatrix;
 use crate::unsigned_matrix::exhaustive::{
-    exhaustive_unsigned_matrices, exhaustive_unsigned_matrices_with_dimensions_from_iterator,
+    exhaustive_unsigned_matrices, exhaustive_unsigned_matrices_with_dimensions,
+    exhaustive_unsigned_matrices_with_dimensions_from_iterator,
     exhaustive_unsigned_square_matrices,
 };
 use crate::unsigned_polynomial::UnsignedPolynomial;
@@ -6945,6 +6946,44 @@ pub fn exhaustive_unsigned_matrix_pair_gen() -> It<(UnsignedMatrix<u64>, Unsigne
     Box::new(exhaustive_pairs_from_single(
         exhaustive_unsigned_matrix_gen(),
     ))
+}
+
+// Pairs of matrices of the same width: every triple of two heights and a width, and for each triple
+// every pair of matrices of those shapes.
+pub fn exhaustive_unsigned_matrix_pair_gen_var_1() -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)>
+{
+    fn ys((h1, h2, width): (u64, u64, u64)) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions::<u64>(h1, width),
+            exhaustive_unsigned_matrices_with_dimensions::<u64>(h2, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// Pairs of matrices of the same height: every triple of a height and two widths, and for each
+// triple every pair of matrices of those shapes.
+pub fn exhaustive_unsigned_matrix_pair_gen_var_2() -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)>
+{
+    fn ys((height, w1, w2): (u64, u64, u64)) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions::<u64>(height, w1),
+            exhaustive_unsigned_matrices_with_dimensions::<u64>(height, w2),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
 }
 
 pub fn exhaustive_unsigned_matrix_triple_gen() -> It<(

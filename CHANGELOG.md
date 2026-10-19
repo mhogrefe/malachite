@@ -25,9 +25,11 @@ documented by git history.
   `into_window`, which copy the submatrix in given ranges of rows and columns into a new matrix
   (`into_window` reuses the matrix's storage, only truncating it for a prefix of the rows), and
   `set_window` and `set_window_owned`, which write a matrix into another with its top-left element
-  at a given position. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`, `IntegerMatrix`,
-  and `RationalMatrix`. Heights, widths, and indices are `u64`s throughout the matrix API, as they
-  are for vectors; only `Index`/`IndexMut` take `usize`s.
+  at a given position, and `concat_vertical`, `concat_horizontal`, `into_concat_vertical`, and
+  `into_concat_horizontal` (FLINT's `fmpz_mat_concat_vertical` and `fmpz_mat_concat_horizontal`; the
+  `into_` forms take both matrices by value). It is implemented by `UnsignedMatrix<T>`,
+  `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`. Heights, widths, and indices are `u64`s
+  throughout the matrix API, as they are for vectors; only `Index`/`IndexMut` take `usize`s.
 - `Named` for every matrix type (`UnsignedMatrix<T>` for each primitive unsigned `T`, with the
   element type spelled out, as for `UnsignedVector<T>`).
 - `ShortlexUnsignedMatrix<T>` and `ShortlexUnsignedMatrixRef` (and, in malachite-nz and malachite-q,
