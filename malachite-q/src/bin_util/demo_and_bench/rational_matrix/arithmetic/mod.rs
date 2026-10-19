@@ -10,6 +10,9 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
+    canonical_primitive_part::register(runner);
+    content::register(runner);
+    content_chained::register(runner);
     mul_vector::register(runner);
     neg::register(runner);
     scalar_mul::register(runner);
@@ -20,6 +23,9 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod add;
+mod canonical_primitive_part;
+mod content;
+mod content_chained;
 mod mul_vector;
 mod neg;
 mod scalar_mul;

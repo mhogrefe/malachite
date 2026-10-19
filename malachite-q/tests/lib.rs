@@ -167,6 +167,9 @@ pub mod rational_matrix {
     pub mod access;
     pub mod arithmetic {
         pub mod add;
+        pub mod canonical_primitive_part;
+        pub mod content;
+        pub mod content_chained;
         pub mod mul_vector;
         pub mod neg;
         pub mod scalar_mul;

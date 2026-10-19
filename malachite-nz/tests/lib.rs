@@ -353,6 +353,9 @@ pub mod integer_matrix {
         pub mod add;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
+        pub mod canonical_primitive_part;
+        pub mod content;
+        pub mod content_chained;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mul_vector;
@@ -1039,6 +1042,9 @@ pub mod natural_matrix {
         pub mod add;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
+        pub mod canonical_primitive_part;
+        pub mod content;
+        pub mod content_chained;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_mul;

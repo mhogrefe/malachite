@@ -7887,6 +7887,34 @@ pub fn special_random_integer_matrix_gen(config: &GenConfig) -> It<IntegerMatrix
     ))
 }
 
+pub fn special_random_integer_matrix_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, u64, u64, u64, u64)> {

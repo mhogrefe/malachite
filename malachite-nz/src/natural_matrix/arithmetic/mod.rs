@@ -18,6 +18,23 @@ pub mod balanced_mod;
 /// reduce every element of a [`NaturalMatrix`](super::NaturalMatrix) to the representative closest
 /// to zero modulo a power of 2.
 pub mod balanced_mod_power_of_2;
+/// Implementations of [`CanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart),
+/// [`CanonicalPrimitivePartAssign`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePartAssign), and
+/// [`ContentAndCanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which, for a matrix
+/// with non-negative elements, are the same as the primitive part.
+pub mod canonical_primitive_part;
+/// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
+/// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart),
+/// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), and
+/// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
+/// which compute the GCD of a matrix's elements and the matrix divided by it.
+pub mod content;
+/// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
+/// which computes the GCD of a number and a matrix's elements.
+pub mod content_chained;
 /// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.

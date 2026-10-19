@@ -9,6 +9,20 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// matrices of the same shape.
 pub mod add;
+/// Implementations of [`CanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart) and
+/// [`ContentAndCanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which compute the
+/// primitive part of a matrix with its first nonzero element, in row-major order, made positive.
+pub mod canonical_primitive_part;
+/// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
+/// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), and
+/// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
+/// which split a matrix into a rational scalar and a matrix of coprime integers.
+pub mod content;
+/// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
+/// which computes the GCD of a number and a matrix's elements.
+pub mod content_chained;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying a
 /// [`RationalMatrix`](super::RationalMatrix) by a
 /// [`RationalVector`](crate::rational_vector::RationalVector) on the right.

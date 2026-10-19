@@ -21,6 +21,23 @@ pub mod balanced_mod;
 /// of an [`IntegerMatrix`](super::IntegerMatrix) to the representative closest to zero modulo a
 /// power of 2.
 pub mod balanced_mod_power_of_2;
+/// Implementations of [`CanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart),
+/// [`CanonicalPrimitivePartAssign`](
+/// malachite_base::num::arithmetic::traits::CanonicalPrimitivePartAssign), and
+/// [`ContentAndCanonicalPrimitivePart`](
+/// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which compute the
+/// primitive part of a matrix with its first nonzero element, in row-major order, made positive.
+pub mod canonical_primitive_part;
+/// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
+/// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart),
+/// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), and
+/// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
+/// which compute the GCD of a matrix's elements and the matrix divided by it.
+pub mod content;
+/// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
+/// which computes the GCD of a number and a matrix's elements.
+pub mod content_chained;
 /// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
 /// [`Rem`](core::ops::Rem), and [`RemAssign`](core::ops::RemAssign), for reducing every element of
 /// an [`IntegerMatrix`](super::IntegerMatrix) modulo a number.

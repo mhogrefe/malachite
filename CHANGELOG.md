@@ -193,6 +193,13 @@ documented by git history.
 - `ModTaylorShift` and `ModTaylorShiftAssign` for `UnsignedPolynomial<T>` by a `T`, modulo any
   `T`, prime or not: Horner's rule for short polynomials, and divide and conquer for long ones,
   computing $(x + c)^k$ modulo $m$ by repeated squaring, so nothing is divided modulo $m$.
+- `Content`, `PrimitivePart`, `PrimitivePartAssign`, `ContentAndPrimitivePart`,
+  `CanonicalPrimitivePart`, `CanonicalPrimitivePartAssign`, `ContentAndCanonicalPrimitivePart`, and
+  `ContentChained` for `UnsignedMatrix<T>` (and, in malachite-nz, for `NaturalMatrix` and
+  `IntegerMatrix`, and in malachite-q, for `RationalMatrix`, whose content is a `Rational` and whose
+  primitive parts are `IntegerMatrix`s, without the `Assign` forms). They agree with the vector
+  versions applied to the elements in row-major order: the canonical primitive part makes the first
+  nonzero element in that order positive. `IntegerMatrix`'s content is FLINT's `fmpz_mat_content`.
 
 ### malachite-nz
 

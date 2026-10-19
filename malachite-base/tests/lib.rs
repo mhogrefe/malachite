@@ -892,6 +892,9 @@ pub mod vars {
 pub mod unsigned_matrix {
     pub mod access;
     pub mod arithmetic {
+        pub mod canonical_primitive_part;
+        pub mod content;
+        pub mod content_chained;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_mul;

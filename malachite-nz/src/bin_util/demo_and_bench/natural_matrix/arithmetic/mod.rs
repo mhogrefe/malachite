@@ -12,6 +12,9 @@ pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     balanced_mod::register(runner);
     balanced_mod_power_of_2::register(runner);
+    canonical_primitive_part::register(runner);
+    content::register(runner);
+    content_chained::register(runner);
     mod_add::register(runner);
     mod_is_reduced::register(runner);
     mod_mul::register(runner);
@@ -39,6 +42,9 @@ pub(crate) fn register(runner: &mut Runner) {
 mod add;
 mod balanced_mod;
 mod balanced_mod_power_of_2;
+mod canonical_primitive_part;
+mod content;
+mod content_chained;
 mod mod_add;
 mod mod_is_reduced;
 mod mod_mul;

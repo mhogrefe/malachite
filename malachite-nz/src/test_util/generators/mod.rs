@@ -3975,6 +3975,14 @@ pub fn integer_matrix_pair_gen() -> Generator<(IntegerMatrix, IntegerMatrix)> {
     )
 }
 
+pub fn integer_matrix_natural_pair_gen() -> Generator<(IntegerMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_integer_matrix_natural_pair_gen,
+        &random_integer_matrix_natural_pair_gen,
+        &special_random_integer_matrix_natural_pair_gen,
+    )
+}
+
 pub fn integer_matrix_integer_pair_gen() -> Generator<(IntegerMatrix, Integer)> {
     Generator::new(
         &exhaustive_integer_matrix_integer_pair_gen,

@@ -3645,6 +3645,13 @@ pub fn exhaustive_integer_matrix_pair_gen() -> It<(IntegerMatrix, IntegerMatrix)
     Box::new(exhaustive_pairs_from_single(exhaustive_integer_matrix_gen()))
 }
 
+pub fn exhaustive_integer_matrix_natural_pair_gen() -> It<(IntegerMatrix, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_matrices(),
+        exhaustive_naturals(),
+    ))
+}
+
 pub fn exhaustive_integer_matrix_integer_pair_gen() -> It<(IntegerMatrix, Integer)> {
     Box::new(exhaustive_pairs(
         exhaustive_integer_matrices(),
