@@ -35,6 +35,10 @@ pub mod content;
 /// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
 /// which computes the GCD of a number and a matrix's elements.
 pub mod content_chained;
+/// Implementations of [`Crt`](malachite_base::num::arithmetic::traits::Crt), which combine a matrix
+/// of residues modulo any number with one modulo a word-sized number by the Chinese remainder
+/// theorem.
+pub mod crt;
 /// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
@@ -190,6 +194,12 @@ pub mod mod_sub;
 /// [`NaturalMatrix`](super::NaturalMatrix) by a
 /// [`NaturalVector`](crate::natural_vector::NaturalVector) on the right.
 pub mod mul_vector;
+/// [`NaturalMatrix::multi_crt`](super::NaturalMatrix::multi_crt), which combines matrices of
+/// residues modulo many word-sized moduli by the Chinese remainder theorem.
+pub mod multi_crt;
+/// [`NaturalMatrix::multi_mod`](super::NaturalMatrix::multi_mod), which reduces a matrix modulo
+/// many word-sized moduli.
+pub mod multi_mod;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a scalar on either side.
 pub mod scalar_mul;

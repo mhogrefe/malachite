@@ -345,6 +345,18 @@ documented by git history.
   `Natural`, prime or not: divide and conquer for long polynomials, with the binomial coefficients
   computed exactly and then reduced, so nothing is divided modulo $m$; Horner's rule for short
   ones, using the exact shift by 1, or precomputed word or `Natural` modular multiplication.
+- `NaturalVector::multi_mod`, `IntegerVector::multi_mod`, `NaturalMatrix::multi_mod`, and
+  `IntegerMatrix::multi_mod`, which reduce a vector or matrix modulo several word-sized moduli,
+  returning one `UnsignedVector<Limb>` or `UnsignedMatrix<Limb>` of residues per modulus, like
+  FLINT's `fmpz_mat_multi_mod_ui`. With more than 200 pairwise-coprime moduli, each element is
+  reduced through a comb; otherwise modulo each modulus separately.
+- `NaturalMatrix::multi_crt` and `IntegerMatrix::multi_balanced_crt`, which combine one matrix of
+  residues per word-sized modulus into the matrix of canonical or balanced representatives, like
+  FLINT's `fmpz_mat_multi_CRT_ui`, with the conventions of the vector functions.
+- `Crt` for `NaturalMatrix` and `BalancedCrt` for `IntegerMatrix`, combining a matrix of residues
+  modulo a `Natural` with an `UnsignedMatrix<Limb>` of residues modulo a `Limb`, in every
+  combination of value and reference, like FLINT's `fmpz_mat_CRT_ui`. The inverse of the first
+  modulus is computed once, and `None` is returned if the moduli are not coprime.
 
 ### malachite-q
 

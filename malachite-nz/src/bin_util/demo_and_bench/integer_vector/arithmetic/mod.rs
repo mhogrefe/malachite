@@ -43,6 +43,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_op::register(runner);
     mod_power_of_2::register(runner);
     multi_crt::register(runner);
+    multi_mod::register(runner);
     neg::register(runner);
     scalar_div::register(runner);
     scalar_mul::register(runner);
@@ -90,6 +91,7 @@ mod max_limbs;
 mod mod_op;
 mod mod_power_of_2;
 mod multi_crt;
+mod multi_mod;
 mod neg;
 mod scalar_div;
 mod scalar_mul;

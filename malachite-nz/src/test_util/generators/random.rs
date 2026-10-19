@@ -10696,6 +10696,208 @@ pub fn random_unsigned_vec_natural_vector_pair_gen_var_1(
     )
 }
 
+pub fn random_unsigned_vec_integer_vector_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, IntegerVector)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &random_primitive_ints::<Limb>,
+                    config.get_or("mean_length_n", 6),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_integer_vectors(
+                    seed,
+                    config.get_or("mean_bits_n", 256),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+        )
+        .map(|(ms, v): (Vec<Limb>, IntegerVector)| {
+            let mut moduli = Vec::new();
+            for a in ms {
+                let m = a.max(2);
+                if moduli.iter().all(|&prev: &Limb| m.coprime_with(prev)) {
+                    moduli.push(m);
+                }
+            }
+            (moduli, v)
+        }),
+    )
+}
+
+pub fn random_unsigned_vec_natural_matrix_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, NaturalMatrix)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &random_primitive_ints::<Limb>,
+                    config.get_or("mean_length_n", 6),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_natural_matrices(
+                    seed,
+                    config.get_or("mean_bits_n", 256),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+        )
+        .map(|(ms, v): (Vec<Limb>, NaturalMatrix)| {
+            let mut moduli = Vec::new();
+            for a in ms {
+                let m = a.max(2);
+                if moduli.iter().all(|&prev: &Limb| m.coprime_with(prev)) {
+                    moduli.push(m);
+                }
+            }
+            (moduli, v)
+        }),
+    )
+}
+
+pub fn random_unsigned_vec_integer_matrix_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, IntegerMatrix)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &random_primitive_ints::<Limb>,
+                    config.get_or("mean_length_n", 6),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_integer_matrices(
+                    seed,
+                    config.get_or("mean_bits_n", 256),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+        )
+        .map(|(ms, v): (Vec<Limb>, IntegerMatrix)| {
+            let mut moduli = Vec::new();
+            for a in ms {
+                let m = a.max(2);
+                if moduli.iter().all(|&prev: &Limb| m.coprime_with(prev)) {
+                    moduli.push(m);
+                }
+            }
+            (moduli, v)
+        }),
+    )
+}
+
+// A random shape and random positive moduli, with matrices of that shape whose elements are random
+// values reduced into the moduli's ranges.
+pub fn random_natural_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural, UnsignedMatrix<Limb>, Limb)> {
+    let mut m1s = random_positive_naturals(
+        EXAMPLE_SEED.fork("m1"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    let mut m2s = random_positive_unsigneds::<Limb>(EXAMPLE_SEED.fork("m2"));
+    let mut xs = random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    let mut ys = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork("residues"));
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let m1 = m1s.next().unwrap();
+            let m2 = m2s.next().unwrap();
+            let n = usize::exact_from(height * width);
+            let a = NaturalMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(n).map(|x| x % &m1).collect(),
+            );
+            let b = UnsignedMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut ys).take(n).map(|y| y % m2).collect(),
+            );
+            (a, m1, b, m2)
+        }),
+    )
+}
+
+// A random shape and random positive moduli, with matrices of that shape whose elements are random
+// values reduced into the moduli's ranges.
+pub fn random_integer_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, Natural, UnsignedMatrix<Limb>, Limb)> {
+    let mut m1s = random_positive_naturals(
+        EXAMPLE_SEED.fork("m1"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    let mut m2s = random_positive_unsigneds::<Limb>(EXAMPLE_SEED.fork("m2"));
+    let mut xs = random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    let mut ys = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork("residues"));
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let m1 = m1s.next().unwrap();
+            let m2 = m2s.next().unwrap();
+            let two_m1 = &m1 << 1u32;
+            let n = usize::exact_from(height * width);
+            let a = IntegerMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs)
+                    .take(n)
+                    .map(|x| Integer::from(x % &two_m1) - Integer::from(&m1))
+                    .collect(),
+            );
+            let b = UnsignedMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut ys).take(n).map(|y| y % m2).collect(),
+            );
+            (a, m1, b, m2)
+        }),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // vars 1 through 7 are in malachite-base

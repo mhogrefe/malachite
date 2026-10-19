@@ -684,6 +684,9 @@ pub mod mod_sum;
 /// [`NaturalVector::multi_crt`](super::NaturalVector::multi_crt), which combines vectors of
 /// residues modulo many word-sized moduli by the Chinese remainder theorem.
 pub mod multi_crt;
+/// [`NaturalVector::multi_mod`](super::NaturalVector::multi_mod), which reduces a vector modulo
+/// many word-sized moduli.
+pub mod multi_mod;
 /// Implementations of [`Div`](core::ops::Div) and [`DivAssign`](core::ops::DivAssign), for dividing
 /// a vector by a scalar.
 ///

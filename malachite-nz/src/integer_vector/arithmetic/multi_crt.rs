@@ -9,10 +9,34 @@
 use crate::integer::Integer;
 use crate::integer_vector::IntegerVector;
 use crate::natural_vector::arithmetic::multi_crt::{
-    ElementCombiner, map_columns, multi_crt_combiner,
+    ElementCombiner, map_columns, multi_crt_combiner, vector_residue_slices,
 };
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use malachite_base::unsigned_vector::UnsignedVector;
+
+// Combines residues, one slice of equal length per modulus, into the balanced representatives of
+// the elements whose residues they are; `None` if the moduli are unusable.
+pub(crate) fn multi_balanced_crt_elements(
+    moduli: &[Limb],
+    residues: &[&[Limb]],
+) -> Option<Vec<Integer>> {
+    Some(match multi_crt_combiner(moduli, residues)? {
+        // A residue above half the modulus is closer to zero once the modulus is subtracted; at
+        // exactly half, it stays positive.
+        ElementCombiner::Single(m) => residues[0]
+            .iter()
+            .map(|&r| {
+                if r > m >> 1 {
+                    -Integer::from(m - r)
+                } else {
+                    Integer::from(r)
+                }
+            })
+            .collect(),
+        ElementCombiner::Comb(comb) => map_columns(residues, |rs| comb.combine_balanced(rs)),
+    })
+}
 
 impl IntegerVector {
     /// Combines vectors of residues modulo pairwise-coprime word-sized moduli into the vector whose
@@ -71,24 +95,10 @@ impl IntegerVector {
     /// with sign = 1 and the residues required to be reduced.
     pub fn multi_balanced_crt(moduli: &[Limb], residues: &[UnsignedVector<Limb>]) -> Option<Self> {
         Some(Self {
-            elements: match multi_crt_combiner(moduli, residues)? {
-                // A residue above half the modulus is closer to zero once the modulus is
-                // subtracted; at exactly half, it stays positive.
-                ElementCombiner::Single(m) => residues[0]
-                    .elements
-                    .iter()
-                    .map(|&r| {
-                        if r > m >> 1 {
-                            -Integer::from(m - r)
-                        } else {
-                            Integer::from(r)
-                        }
-                    })
-                    .collect(),
-                ElementCombiner::Comb(comb) => {
-                    map_columns(residues, |rs| comb.combine_balanced(rs))
-                }
-            },
+            elements: multi_balanced_crt_elements(
+                moduli,
+                &vector_residue_slices(moduli, residues),
+            )?,
         })
     }
 }

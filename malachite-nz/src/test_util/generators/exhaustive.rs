@@ -13,14 +13,14 @@ use crate::gaussian_integer::exhaustive::{
 };
 use crate::integer::Integer;
 use crate::integer::exhaustive::{
-    exhaustive_integer_inclusive_range, exhaustive_integers, exhaustive_natural_integers,
-    exhaustive_negative_integers, exhaustive_nonzero_integers,
+    exhaustive_integer_inclusive_range, exhaustive_integer_range, exhaustive_integers,
+    exhaustive_natural_integers, exhaustive_negative_integers, exhaustive_nonzero_integers,
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer_matrix::IntegerMatrix;
 use crate::integer_matrix::exhaustive::{
     exhaustive_integer_matrices, exhaustive_integer_matrices_with_dimensions,
-    exhaustive_integer_square_matrices,
+    exhaustive_integer_matrices_with_dimensions_from_iterator, exhaustive_integer_square_matrices,
 };
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::exhaustive::{
@@ -88,7 +88,7 @@ use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural_matrix::NaturalMatrix;
 use crate::natural_matrix::exhaustive::{
     exhaustive_natural_matrices, exhaustive_natural_matrices_with_dimensions,
-    exhaustive_natural_square_matrices,
+    exhaustive_natural_matrices_with_dimensions_from_iterator, exhaustive_natural_square_matrices,
 };
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::exhaustive::{
@@ -177,11 +177,13 @@ use malachite_base::test_util::generators::{
 use malachite_base::tuples::exhaustive::{
     ExhaustiveDependentPairsYsGenerator, exhaustive_dependent_pairs,
     exhaustive_ordered_unique_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
-    exhaustive_triples, exhaustive_triples_custom_output, exhaustive_triples_xyy,
-    exhaustive_triples_xyy_custom_output, lex_pairs,
+    exhaustive_quadruples, exhaustive_triples, exhaustive_triples_custom_output,
+    exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output, lex_pairs,
 };
 use malachite_base::unsigned_matrix::UnsignedMatrix;
-use malachite_base::unsigned_matrix::exhaustive::exhaustive_unsigned_matrices;
+use malachite_base::unsigned_matrix::exhaustive::{
+    exhaustive_unsigned_matrices, exhaustive_unsigned_matrices_with_dimensions_from_iterator,
+};
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::exhaustive::exhaustive_unsigned_polynomials;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -5460,6 +5462,116 @@ pub fn exhaustive_unsigned_vec_natural_vector_pair_gen_var_1() -> It<(Vec<Limb>,
         }),
         exhaustive_natural_vectors(),
     ))
+}
+
+// The moduli lists are filtered rather than repaired, so that no pair is generated twice.
+pub fn exhaustive_unsigned_vec_integer_vector_pair_gen_var_1() -> It<(Vec<Limb>, IntegerVector)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()).filter(|ms| {
+            ms.iter()
+                .enumerate()
+                .all(|(i, &m)| m >= 2 && ms[..i].iter().all(|&prev| m.coprime_with(prev)))
+        }),
+        exhaustive_integer_vectors(),
+    ))
+}
+
+// The moduli lists are filtered rather than repaired, so that no pair is generated twice.
+pub fn exhaustive_unsigned_vec_natural_matrix_pair_gen_var_1() -> It<(Vec<Limb>, NaturalMatrix)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()).filter(|ms| {
+            ms.iter()
+                .enumerate()
+                .all(|(i, &m)| m >= 2 && ms[..i].iter().all(|&prev| m.coprime_with(prev)))
+        }),
+        exhaustive_natural_matrices(),
+    ))
+}
+
+// The moduli lists are filtered rather than repaired, so that no pair is generated twice.
+pub fn exhaustive_unsigned_vec_integer_matrix_pair_gen_var_1() -> It<(Vec<Limb>, IntegerMatrix)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()).filter(|ms| {
+            ms.iter()
+                .enumerate()
+                .all(|(i, &m)| m >= 2 && ms[..i].iter().all(|&prev| m.coprime_with(prev)))
+        }),
+        exhaustive_integer_matrices(),
+    ))
+}
+
+// Every shape and pair of positive moduli, and for each every pair of matrices of that shape with
+// elements in the moduli's ranges.
+pub fn exhaustive_natural_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1()
+-> It<(NaturalMatrix, Natural, UnsignedMatrix<Limb>, Limb)> {
+    fn ys(
+        (height, width, m1, m2): (u64, u64, Natural, Limb),
+    ) -> It<(NaturalMatrix, Natural, UnsignedMatrix<Limb>, Limb)> {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_natural_matrices_with_dimensions_from_iterator(
+                    height,
+                    width,
+                    exhaustive_natural_range(Natural::ZERO, m1.clone()),
+                ),
+                exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                    height,
+                    width,
+                    primitive_int_increasing_range(0, m2),
+                ),
+            )
+            .map(move |(a, b)| (a, m1.clone(), b, m2)),
+        )
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_quadruples(
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_positive_naturals(),
+                exhaustive_positive_primitive_ints::<Limb>(),
+            )),
+            ys,
+        )
+        .map(|(_, q)| q),
+    )
+}
+
+// Every shape and pair of positive moduli, and for each every pair of matrices of that shape with
+// elements in the moduli's ranges.
+pub fn exhaustive_integer_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1()
+-> It<(IntegerMatrix, Natural, UnsignedMatrix<Limb>, Limb)> {
+    fn ys(
+        (height, width, m1, m2): (u64, u64, Natural, Limb),
+    ) -> It<(IntegerMatrix, Natural, UnsignedMatrix<Limb>, Limb)> {
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_integer_matrices_with_dimensions_from_iterator(
+                    height,
+                    width,
+                    exhaustive_integer_range(-Integer::from(&m1), Integer::from(&m1)),
+                ),
+                exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                    height,
+                    width,
+                    primitive_int_increasing_range(0, m2),
+                ),
+            )
+            .map(move |(a, b)| (a, m1.clone(), b, m2)),
+        )
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_quadruples(
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_positive_naturals(),
+                exhaustive_positive_primitive_ints::<Limb>(),
+            )),
+            ys,
+        )
+        .map(|(_, q)| q),
+    )
 }
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned)

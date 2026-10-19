@@ -38,6 +38,10 @@ pub mod content;
 /// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
 /// which computes the GCD of a number and a matrix's elements.
 pub mod content_chained;
+/// Implementations of [`BalancedCrt`](malachite_base::num::arithmetic::traits::BalancedCrt), which
+/// combine a matrix of residues modulo any number with one modulo a word-sized number into balanced
+/// representatives by the Chinese remainder theorem.
+pub mod crt;
 /// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
 /// [`Rem`](core::ops::Rem), and [`RemAssign`](core::ops::RemAssign), for reducing every element of
 /// an [`IntegerMatrix`](super::IntegerMatrix) modulo a number.
@@ -52,6 +56,13 @@ pub mod mod_power_of_2;
 /// [`IntegerMatrix`](super::IntegerMatrix) by an
 /// [`IntegerVector`](crate::integer_vector::IntegerVector) on the right.
 pub mod mul_vector;
+/// [`IntegerMatrix::multi_balanced_crt`](super::IntegerMatrix::multi_balanced_crt), which combines
+/// matrices of residues modulo many word-sized moduli into balanced representatives by the Chinese
+/// remainder theorem.
+pub mod multi_crt;
+/// [`IntegerMatrix::multi_mod`](super::IntegerMatrix::multi_mod), which reduces a matrix modulo
+/// many word-sized moduli.
+pub mod multi_mod;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;

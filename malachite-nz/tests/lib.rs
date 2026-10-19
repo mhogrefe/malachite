@@ -356,9 +356,12 @@ pub mod integer_matrix {
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod content_chained;
+        pub mod crt;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mul_vector;
+        pub mod multi_crt;
+        pub mod multi_mod;
         pub mod neg;
         pub mod scalar_mul;
         pub mod shl;
@@ -487,6 +490,7 @@ pub mod integer_vector {
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod multi_crt;
+        pub mod multi_mod;
         pub mod neg;
         pub mod scalar_div;
         pub mod scalar_mul;
@@ -1060,6 +1064,7 @@ pub mod natural_matrix {
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod content_chained;
+        pub mod crt;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_mul;
@@ -1077,6 +1082,8 @@ pub mod natural_matrix {
         pub mod mod_shl;
         pub mod mod_sub;
         pub mod mul_vector;
+        pub mod multi_crt;
+        pub mod multi_mod;
         pub mod scalar_mul;
         pub mod shl;
         pub mod vector_mod_mul;
@@ -1245,6 +1252,7 @@ pub mod natural_vector {
         pub mod mod_sub_mul_shl;
         pub mod mod_sum;
         pub mod multi_crt;
+        pub mod multi_mod;
         pub mod scalar_div;
         pub mod scalar_mul;
         pub mod shl;

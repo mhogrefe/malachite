@@ -15,20 +15,18 @@ use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::unsigned_vector::UnsignedVector;
 
-// How the vector CRT functions combine the residues of one element.
+// How the vector and matrix CRT functions combine the residues of one element.
 pub(crate) enum ElementCombiner {
     // There is one modulus, so an element's only residue is already its canonical value.
     Single(Limb),
     Comb(Box<CrtComb>),
 }
 
-// Checks the arguments of the vector CRT functions and prepares to combine them, returning `None`
-// if the moduli are unusable: with one modulus, if it is 0; with more, if any is less than 2 or two
-// are not coprime. These are the conditions of `Natural::multi_crt`.
-pub(crate) fn multi_crt_combiner(
+// Checks the arguments of the vector CRT functions, returning each residue vector's elements.
+pub(crate) fn vector_residue_slices<'a>(
     moduli: &[Limb],
-    residues: &[UnsignedVector<Limb>],
-) -> Option<ElementCombiner> {
+    residues: &'a [UnsignedVector<Limb>],
+) -> Vec<&'a [Limb]> {
     assert!(!moduli.is_empty(), "moduli must be nonempty");
     assert_eq!(
         residues.len(),
@@ -40,6 +38,14 @@ pub(crate) fn multi_crt_combiner(
         residues.iter().all(|rs| rs.elements.len() == dimension),
         "the residue vectors must all have the same dimension"
     );
+    residues.iter().map(|rs| rs.elements.as_slice()).collect()
+}
+
+// Prepares to combine residues, one slice of equal length per modulus, returning `None` if the
+// moduli are unusable: with one modulus, if it is 0; with more, if any is less than 2 or two are
+// not coprime. These are the conditions of `Natural::multi_crt`. The caller checks that there is
+// one slice per modulus, and that there is at least one.
+pub(crate) fn multi_crt_combiner(moduli: &[Limb], residues: &[&[Limb]]) -> Option<ElementCombiner> {
     let combiner = if let [m] = *moduli {
         if m == 0 {
             return None;
@@ -49,7 +55,7 @@ pub(crate) fn multi_crt_combiner(
         ElementCombiner::Comb(Box::new(CrtComb::new(moduli)?))
     };
     for (rs, &m) in residues.iter().zip(moduli) {
-        for &r in &rs.elements {
+        for &r in *rs {
             assert!(
                 r < m,
                 "residues must be reduced modulo the moduli, but {r} >= {m}"
@@ -61,19 +67,25 @@ pub(crate) fn multi_crt_combiner(
 
 // Applies `f` to the residues of each element in turn, one residue per modulus, collecting the
 // results.
-pub(crate) fn map_columns<T>(
-    residues: &[UnsignedVector<Limb>],
-    mut f: impl FnMut(&[Limb]) -> T,
-) -> Vec<T> {
+pub(crate) fn map_columns<T>(residues: &[&[Limb]], mut f: impl FnMut(&[Limb]) -> T) -> Vec<T> {
     let mut column = vec![0; residues.len()];
-    (0..residues[0].elements.len())
+    (0..residues[0].len())
         .map(|i| {
             for (c, rs) in column.iter_mut().zip(residues) {
-                *c = rs.elements[i];
+                *c = rs[i];
             }
             f(&column)
         })
         .collect()
+}
+
+// Combines residues, one slice of equal length per modulus, into the elements whose residues they
+// are, each below the moduli product; `None` if the moduli are unusable.
+pub(crate) fn multi_crt_elements(moduli: &[Limb], residues: &[&[Limb]]) -> Option<Vec<Natural>> {
+    Some(match multi_crt_combiner(moduli, residues)? {
+        ElementCombiner::Single(_) => residues[0].iter().copied().map(Natural::from).collect(),
+        ElementCombiner::Comb(comb) => map_columns(residues, |rs| comb.combine(rs)),
+    })
 }
 
 impl NaturalVector {
@@ -132,15 +144,7 @@ impl NaturalVector {
     /// with sign = 0 and the residues required to be reduced.
     pub fn multi_crt(moduli: &[Limb], residues: &[UnsignedVector<Limb>]) -> Option<Self> {
         Some(Self {
-            elements: match multi_crt_combiner(moduli, residues)? {
-                ElementCombiner::Single(_) => residues[0]
-                    .elements
-                    .iter()
-                    .copied()
-                    .map(Natural::from)
-                    .collect(),
-                ElementCombiner::Comb(comb) => map_columns(residues, |rs| comb.combine(rs)),
-            },
+            elements: multi_crt_elements(moduli, &vector_residue_slices(moduli, residues))?,
         })
     }
 }

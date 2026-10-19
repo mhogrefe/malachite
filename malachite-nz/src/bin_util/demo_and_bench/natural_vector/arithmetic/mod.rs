@@ -85,6 +85,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_sub_mul_shl::register(runner);
     mod_sum::register(runner);
     multi_crt::register(runner);
+    multi_mod::register(runner);
     scalar_div::register(runner);
     scalar_mul::register(runner);
     shl::register(runner);
@@ -170,6 +171,7 @@ mod mod_sub_mul;
 mod mod_sub_mul_shl;
 mod mod_sum;
 mod multi_crt;
+mod multi_mod;
 mod scalar_div;
 mod scalar_mul;
 mod shl;

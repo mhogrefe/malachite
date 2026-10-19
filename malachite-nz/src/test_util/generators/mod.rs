@@ -5370,6 +5370,61 @@ pub fn unsigned_vec_natural_vector_pair_gen_var_1() -> Generator<(Vec<Limb>, Nat
     )
 }
 
+// All `(Vec<Limb>, IntegerVector)` where the `Limb`s are pairwise-coprime moduli that are at least
+// 2, so that the vector's elements can be reduced modulo them and combined again.
+pub fn unsigned_vec_integer_vector_pair_gen_var_1() -> Generator<(Vec<Limb>, IntegerVector)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_integer_vector_pair_gen_var_1,
+        &random_unsigned_vec_integer_vector_pair_gen_var_1,
+        &special_random_unsigned_vec_integer_vector_pair_gen_var_1,
+    )
+}
+
+// All `(Vec<Limb>, NaturalMatrix)` where the `Limb`s are pairwise-coprime moduli that are at least
+// 2, so that the matrix's elements can be reduced modulo them and combined again.
+pub fn unsigned_vec_natural_matrix_pair_gen_var_1() -> Generator<(Vec<Limb>, NaturalMatrix)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_natural_matrix_pair_gen_var_1,
+        &random_unsigned_vec_natural_matrix_pair_gen_var_1,
+        &special_random_unsigned_vec_natural_matrix_pair_gen_var_1,
+    )
+}
+
+// All `(Vec<Limb>, IntegerMatrix)` where the `Limb`s are pairwise-coprime moduli that are at least
+// 2, so that the matrix's elements can be reduced modulo them and combined again.
+pub fn unsigned_vec_integer_matrix_pair_gen_var_1() -> Generator<(Vec<Limb>, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_integer_matrix_pair_gen_var_1,
+        &random_unsigned_vec_integer_matrix_pair_gen_var_1,
+        &special_random_unsigned_vec_integer_matrix_pair_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, Natural, UnsignedMatrix<Limb>, Limb)` where the matrices have the same
+// shape, the moduli are positive, the first matrix's elements are reduced modulo the `Natural`, and
+// the second matrix's elements are less than the `Limb`. The moduli need not be coprime.
+pub fn natural_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, Natural, UnsignedMatrix<Limb>, Limb)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1,
+        &random_natural_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1,
+        &special_random_natural_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// All `(IntegerMatrix, Natural, UnsignedMatrix<Limb>, Limb)` where the matrices have the same
+// shape, the moduli are positive, the first matrix's elements are at least the negative of the
+// `Natural` and less than it, and the second matrix's elements are less than the `Limb`. The moduli
+// need not be coprime.
+pub fn integer_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1()
+-> Generator<(IntegerMatrix, Natural, UnsignedMatrix<Limb>, Limb)> {
+    Generator::new(
+        &exhaustive_integer_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1,
+        &random_integer_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1,
+        &special_random_integer_matrix_natural_unsigned_matrix_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // vars 1 through 3 are in malachite-base

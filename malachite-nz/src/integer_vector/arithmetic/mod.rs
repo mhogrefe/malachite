@@ -468,6 +468,9 @@ pub mod mod_power_of_2;
 /// vectors of residues modulo many word-sized moduli into balanced representatives by the Chinese
 /// remainder theorem.
 pub mod multi_crt;
+/// [`IntegerVector::multi_mod`](super::IntegerVector::multi_mod), which reduces a vector modulo
+/// many word-sized moduli.
+pub mod multi_mod;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;
