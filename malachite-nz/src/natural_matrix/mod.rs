@@ -850,6 +850,96 @@ impl Matrix for NaturalMatrix {
         self.row_iter(i).all(|x| *x == 0u32)
     }
 
+    /// Determines whether rows `i` and `j` of an [`NaturalMatrix`] are equal. A row always equals
+    /// itself.
+    ///
+    /// Indices start at 0.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.width()`.
+    ///
+    /// # Panics
+    /// Panics if `i` or `j` is greater than or equal to the height of the matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    ///
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 7; 3, 4; 1, 7]")
+    ///         .unwrap()
+    ///         .equal_rows(0, 2)
+    /// );
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 7; 3, 4; 1, 7]")
+    ///         .unwrap()
+    ///         .equal_rows(1, 1)
+    /// );
+    /// assert!(
+    ///     !NaturalMatrix::from_str("[1, 7; 3, 4; 1, 7]")
+    ///         .unwrap()
+    ///         .equal_rows(0, 1)
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_equal_row` from `fmpz_mat/equal.c`, FLINT 3.6.0, except that
+    /// it panics if an index is out of range.
+    #[inline]
+    fn equal_rows(&self, i: u64, j: u64) -> bool {
+        self.row_iter(i).eq(self.row_iter(j))
+    }
+
+    /// Determines whether columns `i` and `j` of an [`NaturalMatrix`] are equal. A column always
+    /// equals itself.
+    ///
+    /// Indices start at 0.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height()`.
+    ///
+    /// # Panics
+    /// Panics if `i` or `j` is greater than or equal to the width of the matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    ///
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 3, 1; 7, 4, 7]")
+    ///         .unwrap()
+    ///         .equal_columns(0, 2)
+    /// );
+    /// assert!(
+    ///     NaturalMatrix::from_str("[1, 3, 1; 7, 4, 7]")
+    ///         .unwrap()
+    ///         .equal_columns(1, 1)
+    /// );
+    /// assert!(
+    ///     !NaturalMatrix::from_str("[1, 3, 1; 7, 4, 7]")
+    ///         .unwrap()
+    ///         .equal_columns(0, 1)
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_equal_col` from `fmpz_mat/equal.c`, FLINT 3.6.0, except that
+    /// it panics if an index is out of range.
+    #[inline]
+    fn equal_columns(&self, i: u64, j: u64) -> bool {
+        self.column_iter(i).eq(self.column_iter(j))
+    }
+
     /// Determines whether a [`NaturalMatrix`] is an identity matrix: a square matrix whose diagonal
     /// elements are 1 and whose other elements are 0. This includes the 0-by-0 matrix.
     ///

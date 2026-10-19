@@ -94,6 +94,12 @@ pub trait Matrix: Sized {
     /// no columns qualifies.
     fn is_zero_row(&self, i: u64) -> bool;
 
+    /// Determines whether rows `i` and `j` of a matrix are equal. A row always equals itself.
+    fn equal_rows(&self, i: u64, j: u64) -> bool;
+
+    /// Determines whether columns `i` and `j` of a matrix are equal. A column always equals itself.
+    fn equal_columns(&self, i: u64, j: u64) -> bool;
+
     /// Determines whether a matrix is an identity matrix: a square matrix whose diagonal elements
     /// are 1 and whose other elements are 0. This includes the 0-by-0 matrix.
     fn is_identity(&self) -> bool;

@@ -215,6 +215,8 @@ pub mod rational_matrix {
         pub mod unsigned_matrix_from_rational_matrix;
     }
     pub mod dimensions;
+    pub mod equal_columns;
+    pub mod equal_rows;
     pub mod exhaustive {
         pub mod exhaustive_rational_matrices;
     }

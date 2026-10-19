@@ -940,6 +940,8 @@ pub mod unsigned_matrix {
         pub mod to_elements;
     }
     pub mod dimensions;
+    pub mod equal_columns;
+    pub mod equal_rows;
     pub mod exhaustive {
         pub mod exhaustive_unsigned_matrices;
     }

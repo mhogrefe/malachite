@@ -397,6 +397,8 @@ pub mod integer_matrix {
         pub mod unsigned_matrix_from_integer_matrix;
     }
     pub mod dimensions;
+    pub mod equal_columns;
+    pub mod equal_rows;
     pub mod exhaustive {
         pub mod exhaustive_integer_matrices;
     }
@@ -1108,6 +1110,8 @@ pub mod natural_matrix {
         pub mod unsigned_matrix_from_natural_matrix;
     }
     pub mod dimensions;
+    pub mod equal_columns;
+    pub mod equal_rows;
     pub mod exhaustive {
         pub mod exhaustive_natural_matrices;
     }

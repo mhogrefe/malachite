@@ -13,6 +13,8 @@ pub(crate) fn register(runner: &mut Runner) {
     column_iter::register(runner);
     columns::register(runner);
     dimensions::register(runner);
+    equal_columns::register(runner);
+    equal_rows::register(runner);
     identity::register(runner);
     index::register(runner);
     is_diagonal::register(runner);
@@ -49,6 +51,8 @@ mod column;
 mod column_iter;
 mod columns;
 mod dimensions;
+mod equal_columns;
+mod equal_rows;
 mod identity;
 mod index;
 mod is_diagonal;
