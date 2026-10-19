@@ -19,7 +19,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::float::NiceFloat;
 use crate::num::iterators::{IteratorToBitChunks, iterator_to_bit_chunks};
-use crate::num::logic::traits::{BitAccess, SignificantBits};
+use crate::num::logic::traits::{BitAccess, NotAssign, SignificantBits};
 use crate::num::random::geometric::{
     GeometricRandomNaturalValues, GeometricRandomSignedRange,
     geometric_random_signed_inclusive_range, geometric_random_unsigned_inclusive_range,
@@ -28,6 +28,7 @@ use crate::num::random::geometric::{
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::*;
 use crate::vecs::{RandomValuesFromVec, random_values_from_vec};
+use alloc::vec::Vec;
 use itertools::Itertools;
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
@@ -2851,3 +2852,23 @@ pub mod geometric;
 /// bits are forced; they must be 0 or 1 in order for the final integer to be within the specified
 /// range. If a bit is _not_ forced, it is different from the preceding bit with probability $1/m$.
 pub mod striped;
+
+// Returns a uniformly random permutation of `0..n`, by a Fisher–Yates shuffle, together with its
+// parity: `true` when the permutation is odd. Each swap of two distinct positions changes the
+// parity.
+#[doc(hidden)]
+pub fn random_permutation_with_parity(
+    ranges: &mut VariableRangeGenerator,
+    n: usize,
+) -> (Vec<usize>, bool) {
+    let mut permutation: Vec<usize> = (0..n).collect();
+    let mut odd = false;
+    for i in (1..n).rev() {
+        let j = ranges.next_less_than(i + 1);
+        if i != j {
+            permutation.swap(i, j);
+            odd.not_assign();
+        }
+    }
+    (permutation, odd)
+}

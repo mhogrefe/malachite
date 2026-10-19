@@ -202,9 +202,24 @@ documented by git history.
   primitive parts are `IntegerMatrix`s, without the `Assign` forms). They agree with the vector
   versions applied to the elements in row-major order: the canonical primitive part makes the first
   nonzero element in that order positive. `IntegerMatrix`'s content is FLINT's `fmpz_mat_content`.
-
-### malachite-nz
-
+- Generators of `UnsignedMatrix<T>`s with a given structure, in `unsigned_matrix::random` (and, in
+  malachite-nz, the same for `NaturalMatrix`, with a `Natural` modulus):
+  `random_unsigned_matrices_with_permuted_diagonal`, which places a given diagonal at random
+  positions and yields the parity of the permutation; `random_unsigned_matrices_with_rank_mod`;
+  `random_unsigned_lower_triangular_matrices_mod` and
+  `random_unsigned_upper_triangular_matrices_mod`, with a unit or random nonzero diagonal; and
+  `random_unsigned_matrices_from_elementary_operations_mod`, which applies random row and column
+  additions and subtractions modulo $m$ to the matrices of another iterator. They are the
+  counterparts of FLINT's `nmod_mat_randpermdiag`, `randrank`, `randtril`, `randtriu`, and
+  `randops`.  ### malachite-nz
+- Generators of `IntegerMatrix`s with a given structure, in `integer_matrix::random`:
+  `random_integer_matrices_with_permuted_diagonal` (FLINT's `fmpz_mat_randpermdiag`),
+  `random_integer_matrices_with_rank`, whose nonzero elements have exactly the given number of bits
+  (`fmpz_mat_randrank`), `random_integer_matrices_with_determinant`, for determinants whose absolute
+  value fits in a `u64` (`fmpz_mat_randdet`), and
+  `random_integer_matrices_from_elementary_operations`, which applies random row and column
+  additions and subtractions to the matrices of another iterator (`fmpz_mat_randops`), preserving
+  their rank and determinant.
 - `Neg` (by value and by reference) and `NegAssign` for `IntegerMatrix` (and, in malachite-q, for
   `RationalMatrix`), negating every element, like FLINT's `fmpz_mat_neg` and `fmpq_mat_neg`.
 - `Add` (every by-value/by-reference combination) and `AddAssign` for `NaturalMatrix` and

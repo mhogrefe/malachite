@@ -411,10 +411,15 @@ pub mod integer_matrix {
     pub mod is_upper_triangular;
     pub mod is_zero;
     pub mod random {
+        pub mod properties;
         pub mod random_integer_matrices;
+        pub mod random_integer_matrices_from_elementary_operations;
         pub mod random_integer_matrices_from_iterator;
+        pub mod random_integer_matrices_with_determinant;
         pub mod random_integer_matrices_with_dimensions;
         pub mod random_integer_matrices_with_dimensions_from_iterator;
+        pub mod random_integer_matrices_with_permuted_diagonal;
+        pub mod random_integer_matrices_with_rank;
         pub mod random_integer_square_matrices;
         pub mod random_integer_square_matrices_from_iterator;
         pub mod striped_random_integer_matrices;
@@ -1115,12 +1120,18 @@ pub mod natural_matrix {
     pub mod is_upper_triangular;
     pub mod is_zero;
     pub mod random {
+        pub mod properties;
+        pub mod random_natural_lower_triangular_matrices_mod;
         pub mod random_natural_matrices;
+        pub mod random_natural_matrices_from_elementary_operations_mod;
         pub mod random_natural_matrices_from_iterator;
         pub mod random_natural_matrices_with_dimensions;
         pub mod random_natural_matrices_with_dimensions_from_iterator;
+        pub mod random_natural_matrices_with_permuted_diagonal;
+        pub mod random_natural_matrices_with_rank_mod;
         pub mod random_natural_square_matrices;
         pub mod random_natural_square_matrices_from_iterator;
+        pub mod random_natural_upper_triangular_matrices_mod;
         pub mod striped_random_natural_matrices;
         pub mod striped_random_natural_matrices_with_dimensions;
         pub mod striped_random_natural_square_matrices;

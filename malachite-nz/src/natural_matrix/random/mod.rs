@@ -8,13 +8,23 @@
 
 use crate::natural::Natural;
 use crate::natural::random::{
-    RandomNaturals, StripedRandomNaturals, random_naturals, striped_random_naturals,
+    RandomNaturals, StripedRandomNaturals, get_random_natural_less_than, random_naturals,
+    striped_random_naturals,
 };
 use crate::natural_matrix::{NaturalMatrix, shape};
+use alloc::vec::Vec;
+use core::cmp::min;
 use core::iter::{Repeat, repeat};
 use malachite_base::matrix::Matrix;
+use malachite_base::num::arithmetic::traits::{ModAddAssign, ModIsReduced, ModSubAssign};
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, geometric_random_unsigneds,
+};
+use malachite_base::num::random::{
+    RandomPrimitiveInts, VariableRangeGenerator, random_permutation_with_parity,
+    random_primitive_ints,
 };
 use malachite_base::random::Seed;
 use malachite_base::tuples::random::{RandomPairsFromSingle, random_pairs_from_single};
@@ -88,8 +98,8 @@ pub type StripedRandomMatrixElements = StripedRandomNaturals<GeometricRandomNatu
 /// The elements here are [`Natural`]s from 0 to 8.
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::uniform_random_natural_inclusive_range;
 /// use malachite_nz::natural_matrix::random::random_natural_matrices_from_iterator;
@@ -152,8 +162,8 @@ pub fn random_natural_matrices_from_iterator<I: Iterator<Item = Natural>>(
 /// The elements here are [`Natural`]s from 0 to 8.
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::uniform_random_natural_inclusive_range;
 /// use malachite_nz::natural_matrix::random::random_natural_matrices_with_dimensions_from_iterator;
@@ -615,4 +625,533 @@ pub fn striped_random_natural_square_matrices(
         mean_size_numerator,
         mean_size_denominator,
     )
+}
+
+// Places `diagonal` at random positions in a zero matrix of the given shape: element `i` goes to
+// row `rows[i]` and column `columns[i]`, for uniformly random permutations `rows` of the rows and
+// `columns` of the columns. Returns the matrix and whether the two permutations together are odd.
+fn place_permuted_diagonal(
+    ranges: &mut VariableRangeGenerator,
+    height: u64,
+    width: u64,
+    diagonal: Vec<Natural>,
+) -> (NaturalMatrix, bool) {
+    let (h, w, _) = shape(height, width);
+    let (rows, rows_odd) = random_permutation_with_parity(ranges, h);
+    let (columns, columns_odd) = random_permutation_with_parity(ranges, w);
+    let mut m = NaturalMatrix::zero(height, width);
+    for (i, x) in diagonal.into_iter().enumerate() {
+        m[(rows[i], columns[i])] = x;
+    }
+    (m, rows_odd != columns_odd)
+}
+
+/// Generates random [`NaturalMatrix`]s with a given diagonal, placed at random positions.
+///
+/// This `struct` is created by [`random_natural_matrices_with_permuted_diagonal`]; see its
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomNaturalMatricesWithPermutedDiagonal {
+    ranges: VariableRangeGenerator,
+    height: u64,
+    width: u64,
+    diagonal: Vec<Natural>,
+}
+
+impl Iterator for RandomNaturalMatricesWithPermutedDiagonal {
+    type Item = (NaturalMatrix, bool);
+
+    fn next(&mut self) -> Option<(NaturalMatrix, bool)> {
+        Some(place_permuted_diagonal(
+            &mut self.ranges,
+            self.height,
+            self.width,
+            self.diagonal.clone(),
+        ))
+    }
+}
+
+/// Generates random [`NaturalMatrix`]s of a given shape whose nonzero elements are a given
+/// diagonal, with its rows and columns permuted at random, together with the parity of the
+/// permutation.
+///
+/// Each output starts as the zero matrix with `diagonal[i]` in row $i$ and column $i$, and its rows
+/// and columns are then permuted by independent uniformly random permutations. The `bool` is `true`
+/// when the two permutations together are odd. For a square matrix whose diagonal has an element
+/// for every row, the determinant is then the product of the diagonal elements, negated if the
+/// `bool` is `true`.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `height * width`.
+///
+/// # Panics
+/// Panics if `diagonal` has more elements than the smaller of `height` and `width`, or if the
+/// number of elements does not fit in a [`usize`].
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::random::random_natural_matrices_with_permuted_diagonal;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_natural_matrices_with_permuted_diagonal(
+///             EXAMPLE_SEED,
+///             3,
+///             4,
+///             vec![Natural::from(2u32), Natural::from(3u32), Natural::from(5u32)]
+///         )
+///         .map(|(m, odd)| format!("({m}, {odd})")),
+///         3
+///     ),
+///     "[([0, 3, 0, 0; 0, 0, 0, 5; 2, 0, 0, 0], true), ([0, 2, 0, 0; 3, 0, 0, 0; 0, 0, 5, 0], \
+///     true), ([0, 0, 5, 0; 0, 3, 0, 0; 0, 0, 0, 2], false), ...]"
+/// );
+/// ```
+pub fn random_natural_matrices_with_permuted_diagonal(
+    seed: Seed,
+    height: u64,
+    width: u64,
+    diagonal: Vec<Natural>,
+) -> RandomNaturalMatricesWithPermutedDiagonal {
+    assert!(
+        u64::exact_from(diagonal.len()) <= min(height, width),
+        "a diagonal of {} elements does not fit in a {height}-by-{width} matrix",
+        diagonal.len()
+    );
+    shape(height, width);
+    RandomNaturalMatricesWithPermutedDiagonal {
+        ranges: VariableRangeGenerator::new(seed),
+        height,
+        width,
+        diagonal,
+    }
+}
+
+/// Generates random [`NaturalMatrix`]s of a given rank modulo a number.
+///
+/// This `struct` is created by [`random_natural_matrices_with_rank_mod`]; see its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct RandomNaturalMatricesWithRankMod {
+    ranges: VariableRangeGenerator,
+    limbs: RandomPrimitiveInts<u64>,
+    height: u64,
+    width: u64,
+    rank: u64,
+    m_minus_1: Natural,
+}
+
+impl Iterator for RandomNaturalMatricesWithRankMod {
+    type Item = NaturalMatrix;
+
+    fn next(&mut self) -> Option<NaturalMatrix> {
+        let diagonal = (0..self.rank)
+            .map(|_| get_random_natural_less_than(&mut self.limbs, &self.m_minus_1) + Natural::ONE)
+            .collect();
+        Some(place_permuted_diagonal(&mut self.ranges, self.height, self.width, diagonal).0)
+    }
+}
+
+/// Generates random sparse [`NaturalMatrix`]s of a given shape whose elements are reduced modulo
+/// `m`, with a given number of nonzero elements, no two in the same row or column.
+///
+/// Each nonzero element is uniformly distributed on $[1, m)$, and they are placed as
+/// [`random_natural_matrices_with_permuted_diagonal`] places a diagonal. When $m$ is prime, the
+/// rank of every output is `rank`. To turn the outputs into dense matrices of the same rank, pass
+/// them to [`random_natural_matrices_from_elementary_operations_mod`].
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `height * width`.
+///
+/// # Panics
+/// Panics if `rank` is greater than the smaller of `height` and `width`, if `m` is zero, if `rank`
+/// is positive and `m` is 1, since then there are no nonzero residues, or if the number of elements
+/// does not fit in a [`usize`].
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::random::random_natural_matrices_with_rank_mod;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_natural_matrices_with_rank_mod(EXAMPLE_SEED, 3, 4, 2, Natural::from(7u32)),
+///         3
+///     ),
+///     "[[0, 0, 0, 0; 3, 0, 0, 0; 0, 0, 0, 1], [3, 0, 0, 0; 0, 0, 0, 0; 0, 0, 5, 0], [0, 0, 0, \
+///     0; 0, 4, 0, 0; 0, 0, 0, 1], ...]"
+/// );
+/// ```
+///
+/// This is equivalent to `fmpz_mod_mat_randrank` from `fmpz_mod_mat/randrank.c`, FLINT 3.6.0,
+/// except that the modulus 1 is rejected for a positive rank rather than giving the zero matrix.
+pub fn random_natural_matrices_with_rank_mod(
+    seed: Seed,
+    height: u64,
+    width: u64,
+    rank: u64,
+    m: Natural,
+) -> RandomNaturalMatricesWithRankMod {
+    assert!(
+        rank <= min(height, width),
+        "a {height}-by-{width} matrix cannot have rank {rank}"
+    );
+    assert!(!(m == 0u32), "the modulus must be positive");
+    assert!(
+        rank == 0 || !(m <= 1u32),
+        "there are no nonzero residues modulo {m}, so the rank must be 0"
+    );
+    shape(height, width);
+    RandomNaturalMatricesWithRankMod {
+        ranges: VariableRangeGenerator::new(seed.fork("ranges")),
+        limbs: random_primitive_ints(seed.fork("limbs")),
+        height,
+        width,
+        rank,
+        m_minus_1: m - Natural::ONE,
+    }
+}
+
+/// Generates random triangular [`NaturalMatrix`]s modulo a number.
+///
+/// This `struct` is created by [`random_natural_lower_triangular_matrices_mod`] and
+/// [`random_natural_upper_triangular_matrices_mod`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomNaturalTriangularMatricesMod {
+    limbs: RandomPrimitiveInts<u64>,
+    height: u64,
+    width: u64,
+    unit: bool,
+    lower: bool,
+    m: Natural,
+    m_minus_1: Natural,
+}
+
+impl Iterator for RandomNaturalTriangularMatricesMod {
+    type Item = NaturalMatrix;
+
+    fn next(&mut self) -> Option<NaturalMatrix> {
+        let mut elements = Vec::with_capacity(shape(self.height, self.width).2);
+        for i in 0..self.height {
+            for j in 0..self.width {
+                elements.push(if i == j {
+                    if self.unit {
+                        Natural::ONE
+                    } else {
+                        get_random_natural_less_than(&mut self.limbs, &self.m_minus_1)
+                            + Natural::ONE
+                    }
+                } else if (j < i) == self.lower {
+                    get_random_natural_less_than(&mut self.limbs, &self.m)
+                } else {
+                    Natural::ZERO
+                });
+            }
+        }
+        Some(NaturalMatrix::from_owned_elements(
+            self.height,
+            self.width,
+            elements,
+        ))
+    }
+}
+
+/// Generates random lower triangular [`NaturalMatrix`]s of a given shape whose elements are reduced
+/// modulo `m`.
+///
+/// The elements below the diagonal are uniformly distributed on $[0, m)$, and those above it are 0.
+/// If `unit` is `true`, every diagonal element is 1; otherwise each is uniformly distributed on
+/// $[1, m)$, so it is nonzero. The matrix need not be square.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `height * width`.
+///
+/// # Panics
+/// Panics if `m` is zero, if `m` is 1 and the matrix has a diagonal element, since then neither 1
+/// nor a nonzero residue is reduced, or if the number of elements does not fit in a [`usize`].
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::random::random_natural_lower_triangular_matrices_mod;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_natural_lower_triangular_matrices_mod(
+///             EXAMPLE_SEED,
+///             3,
+///             3,
+///             false,
+///             Natural::from(7u32)
+///         ),
+///         3
+///     ),
+///     "[[2, 0, 0; 5, 6, 0; 1, 2, 1], [3, 0, 0; 3, 5, 0; 3, 6, 6], [4, 0, 0; 1, 4, 0; 5, 1, 1], \
+///     ...]"
+/// );
+/// ```
+///
+/// This is equivalent to `fmpz_mod_mat_randtril` from `fmpz_mod_mat/randtril.c`, FLINT 3.6.0,
+/// except that a random diagonal element is uniform on $[1, m)$, where FLINT replaces a 0 by 1, and
+/// that the modulus 1 is rejected.
+pub fn random_natural_lower_triangular_matrices_mod(
+    seed: Seed,
+    height: u64,
+    width: u64,
+    unit: bool,
+    m: Natural,
+) -> RandomNaturalTriangularMatricesMod {
+    assert!(!(m == 0u32), "the modulus must be positive");
+    assert!(
+        min(height, width) == 0 || !(m <= 1u32),
+        "no diagonal element can be reduced modulo {m}"
+    );
+    shape(height, width);
+    RandomNaturalTriangularMatricesMod {
+        limbs: random_primitive_ints(seed),
+        height,
+        width,
+        unit,
+        lower: true,
+        m_minus_1: &m - Natural::ONE,
+        m,
+    }
+}
+
+/// Generates random upper triangular [`NaturalMatrix`]s of a given shape whose elements are reduced
+/// modulo `m`.
+///
+/// The elements above the diagonal are uniformly distributed on $[0, m)$, and those below it are 0.
+/// If `unit` is `true`, every diagonal element is 1; otherwise each is uniformly distributed on
+/// $[1, m)$, so it is nonzero. The matrix need not be square.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `height * width`.
+///
+/// # Panics
+/// Panics if `m` is zero, if `m` is 1 and the matrix has a diagonal element, since then neither 1
+/// nor a nonzero residue is reduced, or if the number of elements does not fit in a [`usize`].
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::random::random_natural_upper_triangular_matrices_mod;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_natural_upper_triangular_matrices_mod(
+///             EXAMPLE_SEED,
+///             3,
+///             3,
+///             false,
+///             Natural::from(7u32)
+///         ),
+///         3
+///     ),
+///     "[[2, 5, 5; 0, 2, 2; 0, 0, 1], [3, 3, 4; 0, 4, 6; 0, 0, 6], [4, 1, 3; 0, 6, 1; 0, 0, 1], \
+///     ...]"
+/// );
+/// ```
+///
+/// This is equivalent to `fmpz_mod_mat_randtriu` from `fmpz_mod_mat/randtriu.c`, FLINT 3.6.0,
+/// except that a random diagonal element is uniform on $[1, m)$, where FLINT replaces a 0 by 1, and
+/// that the modulus 1 is rejected.
+pub fn random_natural_upper_triangular_matrices_mod(
+    seed: Seed,
+    height: u64,
+    width: u64,
+    unit: bool,
+    m: Natural,
+) -> RandomNaturalTriangularMatricesMod {
+    assert!(!(m == 0u32), "the modulus must be positive");
+    assert!(
+        min(height, width) == 0 || !(m <= 1u32),
+        "no diagonal element can be reduced modulo {m}"
+    );
+    shape(height, width);
+    RandomNaturalTriangularMatricesMod {
+        limbs: random_primitive_ints(seed),
+        height,
+        width,
+        unit,
+        lower: false,
+        m_minus_1: &m - Natural::ONE,
+        m,
+    }
+}
+
+/// Applies random elementary row and column operations modulo a number to [`NaturalMatrix`]s.
+///
+/// This `struct` is created by [`random_natural_matrices_from_elementary_operations_mod`]; see its
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomNaturalMatricesFromElementaryOperationsMod<I: Iterator<Item = NaturalMatrix>> {
+    ranges: VariableRangeGenerator,
+    xs: I,
+    count: u64,
+    m: Natural,
+}
+
+impl<I: Iterator<Item = NaturalMatrix>> Iterator
+    for RandomNaturalMatricesFromElementaryOperationsMod<I>
+{
+    type Item = NaturalMatrix;
+
+    fn next(&mut self) -> Option<NaturalMatrix> {
+        let mut m = self.xs.next()?;
+        assert!(
+            m.mod_is_reduced(&self.m),
+            "every element of the matrix must be reduced modulo {}",
+            self.m
+        );
+        let (height, width) = (m.height(), m.width());
+        if height == 0 || width == 0 {
+            return Some(m);
+        }
+        for _ in 0..self.count {
+            if self.ranges.next_bool() {
+                let (i, j) = (
+                    self.ranges.next_less_than(height),
+                    self.ranges.next_less_than(height),
+                );
+                if i == j {
+                    continue;
+                }
+                let row_i: Vec<Natural> = m.row_iter(i).cloned().collect();
+                if self.ranges.next_bool() {
+                    for (y, x) in m.row_iter_mut(j).zip(row_i) {
+                        y.mod_add_assign(x, &self.m);
+                    }
+                } else {
+                    for (y, x) in m.row_iter_mut(j).zip(row_i) {
+                        y.mod_sub_assign(x, &self.m);
+                    }
+                }
+            } else {
+                let (i, j) = (
+                    self.ranges.next_less_than(width),
+                    self.ranges.next_less_than(width),
+                );
+                if i == j {
+                    continue;
+                }
+                let column_i: Vec<Natural> = m.column_iter(i).cloned().collect();
+                if self.ranges.next_bool() {
+                    for (y, x) in m.column_iter_mut(j).zip(column_i) {
+                        y.mod_add_assign(x, &self.m);
+                    }
+                } else {
+                    for (y, x) in m.column_iter_mut(j).zip(column_i) {
+                        y.mod_sub_assign(x, &self.m);
+                    }
+                }
+            }
+        }
+        Some(m)
+    }
+}
+
+/// Applies `count` random elementary row and column operations modulo `m` to each [`NaturalMatrix`]
+/// that an iterator generates.
+///
+/// Each operation chooses, with equal probability, rows or columns, then two of them, $i$ and $j$,
+/// uniformly and independently; if they are distinct, it adds row (or column) $i$ to row (or
+/// column) $j$ modulo `m`, or subtracts it, with equal probability. An operation that picks the
+/// same row or column twice is skipped, so at most `count` operations are applied. Such operations
+/// preserve the rank modulo a prime, and for a square matrix the determinant, so this turns the
+/// sparse outputs of [`random_natural_matrices_with_rank_mod`] into dense matrices with the same
+/// rank. Matrices with no elements are passed through unchanged.
+///
+/// The output has the same length as `xs`.
+///
+/// # Worst-case complexity per iteration
+/// $T(n, c) = O(n + cl)$
+///
+/// $M(n, c) = O(n + cl)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ is the number of elements of the $i$th output,
+/// $c$ is `count`, and $l$ is the larger of its height and width.
+///
+/// # Panics
+/// Panics if `m` is zero, and, when an output is generated, if any element of the matrix that `xs`
+/// generated is greater than or equal to `m`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::random::{
+///     random_natural_matrices_from_elementary_operations_mod,
+///     random_natural_matrices_with_rank_mod,
+/// };
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_natural_matrices_from_elementary_operations_mod(
+///             EXAMPLE_SEED,
+///             random_natural_matrices_with_rank_mod(
+///                 EXAMPLE_SEED.fork("rank"),
+///                 3,
+///                 3,
+///                 2,
+///                 Natural::from(7u32)
+///             ),
+///             10,
+///             Natural::from(7u32)
+///         ),
+///         3
+///     ),
+///     "[[0, 0, 0; 4, 0, 3; 5, 5, 4], [0, 0, 0; 5, 5, 4; 0, 0, 3], [0, 4, 6; 0, 0, 6; 0, 6, 6], \
+///     ...]"
+/// );
+/// ```
+///
+/// This is equivalent to `fmpz_mod_mat_randops` from `fmpz_mod_mat/randops.c`, FLINT 3.6.0.
+pub fn random_natural_matrices_from_elementary_operations_mod<I: Iterator<Item = NaturalMatrix>>(
+    seed: Seed,
+    xs: I,
+    count: u64,
+    m: Natural,
+) -> RandomNaturalMatricesFromElementaryOperationsMod<I> {
+    assert!(!(m == 0u32), "the modulus must be positive");
+    RandomNaturalMatricesFromElementaryOperationsMod {
+        ranges: VariableRangeGenerator::new(seed),
+        xs,
+        count,
+        m,
+    }
 }

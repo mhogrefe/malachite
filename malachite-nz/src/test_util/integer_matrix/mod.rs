@@ -8,3 +8,5 @@
 
 pub mod arithmetic;
 pub mod comparison;
+pub mod determinant;
+pub mod rank;
