@@ -422,6 +422,8 @@ pub mod integer_matrix {
         pub mod striped_random_integer_square_matrices;
     }
     pub mod rectangular_identity;
+    pub mod reverse_columns;
+    pub mod reverse_rows;
     pub mod row;
     pub mod row_iter;
     pub mod rows;
@@ -1124,6 +1126,8 @@ pub mod natural_matrix {
         pub mod striped_random_natural_square_matrices;
     }
     pub mod rectangular_identity;
+    pub mod reverse_columns;
+    pub mod reverse_rows;
     pub mod row;
     pub mod row_iter;
     pub mod rows;

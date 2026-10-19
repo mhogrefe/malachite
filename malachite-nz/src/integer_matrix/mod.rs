@@ -1326,6 +1326,82 @@ impl Matrix for IntegerMatrix {
         }
     }
 
+    /// Reverses the order of the rows of an [`IntegerMatrix`]: row $i$ of an $h$-row matrix becomes
+    /// row $h - 1 - i$.
+    ///
+    /// Rows $i$ and $h - 1 - i$ are swapped for each $i < h/2$. FLINT calls this operation
+    /// `invert_rows`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let mut a = IntegerMatrix::from_str("[1, -2, 3; 4, 5, -6; 7, -8, 9]").unwrap();
+    /// a.reverse_rows();
+    /// assert_eq!(a.to_string(), "[7, -8, 9; 4, 5, -6; 1, -2, 3]");
+    ///
+    /// let mut a = IntegerMatrix::from_str("[1, -2, 3, -4; 5, 6, -7, 8]").unwrap();
+    /// a.reverse_rows();
+    /// assert_eq!(a.to_string(), "[5, 6, -7, 8; 1, -2, 3, -4]");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_invert_rows` from `fmpz_mat/invert.c`, FLINT 3.6.0, with a
+    /// null permutation.
+    fn reverse_rows(&mut self) {
+        let (height, width) = (self.height, self.width);
+        for i in 0..height >> 1 {
+            let (front, back) = self.elements.split_at_mut((height - 1 - i) * width);
+            front[i * width..(i + 1) * width].swap_with_slice(&mut back[..width]);
+        }
+    }
+
+    /// Reverses the order of the columns of an [`IntegerMatrix`]: column $j$ of a $w$-column matrix
+    /// becomes column $w - 1 - j$.
+    ///
+    /// Each row is reversed in place. FLINT calls this operation `invert_cols`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let mut a = IntegerMatrix::from_str("[1, -2, 3; 4, 5, -6; 7, -8, 9]").unwrap();
+    /// a.reverse_columns();
+    /// assert_eq!(a.to_string(), "[3, -2, 1; -6, 5, 4; 9, -8, 7]");
+    ///
+    /// let mut a = IntegerMatrix::from_str("[1, -2, 3, -4; 5, 6, -7, 8]").unwrap();
+    /// a.reverse_columns();
+    /// assert_eq!(a.to_string(), "[-4, 3, -2, 1; 8, -7, 6, 5]");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_invert_cols` from `fmpz_mat/invert.c`, FLINT 3.6.0, with a
+    /// null permutation.
+    fn reverse_columns(&mut self) {
+        // A matrix with no columns has no elements, and nothing to reverse.
+        if self.width != 0 {
+            for row in self.elements.chunks_exact_mut(self.width) {
+                row.reverse();
+            }
+        }
+    }
+
     /// Returns the window of an [`IntegerMatrix`] made of the given ranges of rows and columns, as
     /// a new [`IntegerMatrix`], cloning its elements.
     ///

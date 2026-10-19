@@ -25,6 +25,8 @@ pub(crate) fn register(runner: &mut Runner) {
     is_upper_triangular::register(runner);
     is_zero::register(runner);
     rectangular_identity::register(runner);
+    reverse_columns::register(runner);
+    reverse_rows::register(runner);
     row::register(runner);
     row_iter::register(runner);
     rows::register(runner);
@@ -57,6 +59,8 @@ mod is_symmetric;
 mod is_upper_triangular;
 mod is_zero;
 mod rectangular_identity;
+mod reverse_columns;
+mod reverse_rows;
 mod row;
 mod row_iter;
 mod rows;

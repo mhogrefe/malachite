@@ -142,6 +142,14 @@ pub trait Matrix: Sized {
     /// Swaps two columns of a matrix. Swapping a column with itself does nothing.
     fn swap_columns(&mut self, i: u64, j: u64);
 
+    /// Reverses the order of the rows of a matrix: row $i$ of an $h$-row matrix becomes row $h - 1
+    /// - i$.
+    fn reverse_rows(&mut self);
+
+    /// Reverses the order of the columns of a matrix: column $j$ of a $w$-column matrix becomes
+    /// column $w - 1 - j$.
+    fn reverse_columns(&mut self);
+
     /// Returns the window of a matrix made of the given ranges of rows and columns, as a new
     /// matrix, cloning its elements.
     ///
