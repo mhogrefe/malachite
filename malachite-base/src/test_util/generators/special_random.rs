@@ -11188,6 +11188,27 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_4(
     )
 }
 
+pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_7(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_square_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, u64::WIDTH),
+        )
+        .map(|(m, pow)| (m.mod_power_of_2(pow), pow)),
+    )
+}
+
 pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_2(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64, u64)> {
@@ -11286,6 +11307,33 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_5(
             EXAMPLE_SEED,
             &|seed| {
                 striped_random_unsigned_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(a, m)| (a % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_8(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_square_matrices(
                     seed,
                     config.get_or("mean_stripe_n", 32),
                     config.get_or("mean_stripe_d", 1),

@@ -124,6 +124,9 @@ pub mod mod_power_of_2_shl;
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a power of 2.
 pub mod mod_power_of_2_sub;
 
+/// An implementation of [`ModPowerOf2Trace`](crate::num::arithmetic::traits::ModPowerOf2Trace), the
+/// sum of the diagonal elements of a square matrix modulo a power of 2.
+pub mod mod_power_of_2_trace;
 /// Implementations of [`ModShl`](crate::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](crate::num::arithmetic::traits::ModShlAssign), for left-shifting a matrix
 /// (multiplying it by a power of 2) modulo a number.
@@ -162,6 +165,9 @@ pub mod mod_shl;
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.
 pub mod mod_sub;
 
+/// Implementations of [`ModTrace`](crate::num::arithmetic::traits::ModTrace), the sum of the
+/// diagonal elements of a square matrix modulo a number.
+pub mod mod_trace;
 /// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) for multiplying an
 /// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector) by an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) on the right modulo a number.

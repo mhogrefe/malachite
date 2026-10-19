@@ -4454,6 +4454,16 @@ pub fn natural_matrix_natural_pair_gen_var_2() -> Generator<(NaturalMatrix, Natu
     )
 }
 
+// All `(NaturalMatrix, Natural)` where the matrix is square and every element of the matrix is less
+// than the `Natural`.
+pub fn natural_matrix_natural_pair_gen_var_3() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_3,
+        &random_natural_matrix_natural_pair_gen_var_3,
+        &special_random_natural_matrix_natural_pair_gen_var_3,
+    )
+}
+
 // All `(NaturalMatrix, NaturalMatrix, u64)` where the matrices have the same shape and every
 // element is less than 2 to the power of the `u64`.
 pub fn natural_matrix_natural_matrix_unsigned_triple_gen_var_1()
@@ -4755,6 +4765,16 @@ pub fn natural_matrix_unsigned_pair_gen_var_4() -> Generator<(NaturalMatrix, u64
         &exhaustive_natural_matrix_unsigned_pair_gen_var_4,
         &random_natural_matrix_unsigned_pair_gen_var_4,
         &special_random_natural_matrix_unsigned_pair_gen_var_4,
+    )
+}
+
+// All `(NaturalMatrix, u64)` where the matrix is square and every element is less than 2 to the
+// power of the `u64`.
+pub fn natural_matrix_unsigned_pair_gen_var_6() -> Generator<(NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_pair_gen_var_6,
+        &random_natural_matrix_unsigned_pair_gen_var_6,
+        &special_random_natural_matrix_unsigned_pair_gen_var_6,
     )
 }
 

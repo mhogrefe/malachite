@@ -26,8 +26,10 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_neg::register(runner);
     mod_power_of_2_shl::register(runner);
     mod_power_of_2_sub::register(runner);
+    mod_power_of_2_trace::register(runner);
     mod_shl::register(runner);
     mod_sub::register(runner);
+    mod_trace::register(runner);
     vector_mod_mul::register(runner);
     vector_mod_power_of_2_mul::register(runner);
 }
@@ -49,7 +51,9 @@ mod mod_power_of_2_mul_vector;
 mod mod_power_of_2_neg;
 mod mod_power_of_2_shl;
 mod mod_power_of_2_sub;
+mod mod_power_of_2_trace;
 mod mod_shl;
 mod mod_sub;
+mod mod_trace;
 mod vector_mod_mul;
 mod vector_mod_power_of_2_mul;

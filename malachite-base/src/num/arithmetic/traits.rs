@@ -1476,6 +1476,30 @@ pub trait Trace {
     fn into_trace(self) -> Self::Output;
 }
 
+/// Calculates the trace of a square matrix modulo $2^k$: the sum of its diagonal elements modulo
+/// $2^k$.
+///
+/// The elements must already be reduced modulo $2^k$.
+pub trait ModPowerOf2Trace {
+    type Output;
+
+    fn to_mod_power_of_2_trace(&self, pow: u64) -> Self::Output;
+
+    fn into_mod_power_of_2_trace(self, pow: u64) -> Self::Output;
+}
+
+/// Calculates the trace of a square matrix modulo another number $m$: the sum of its diagonal
+/// elements modulo $m$.
+///
+/// The elements must already be reduced modulo $m$.
+pub trait ModTrace<M> {
+    type Output;
+
+    fn to_mod_trace(&self, m: M) -> Self::Output;
+
+    fn into_mod_trace(self, m: M) -> Self::Output;
+}
+
 /// Determines whether a number is an integer power of 2.
 pub trait IsPowerOf2 {
     fn is_power_of_2(&self) -> bool;

@@ -360,6 +360,13 @@ documented by git history.
 - `Trace`, a new trait with `to_trace` (by reference) and `into_trace` (by value), the sum of the
   diagonal elements of a square matrix, for `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`,
   like FLINT's `fmpz_mat_trace` and `fmpq_mat_trace`. It panics if the matrix is not square.
+- `ModPowerOf2Trace`, a new trait with `to_mod_power_of_2_trace` and `into_mod_power_of_2_trace`,
+  the trace modulo $2^k$, for `UnsignedMatrix<T>` and `NaturalMatrix`. Every element must be reduced
+  modulo $2^k$, and the matrix must be square.
+- `ModTrace`, a new trait with `to_mod_trace` and `into_mod_trace`, the trace modulo $m$, for
+  `UnsignedMatrix<T>` and for `NaturalMatrix` with the modulus by value or by reference, like FLINT's
+  `nmod_mat_trace` and `fmpz_mod_mat_trace`. Every element must be reduced modulo $m$, and the
+  matrix must be square.
 
 ### malachite-q
 

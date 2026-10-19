@@ -141,6 +141,10 @@ pub mod mod_power_of_2_shl;
 /// subtracting [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a power of 2.
 pub mod mod_power_of_2_sub;
 
+/// An implementation of
+/// [`ModPowerOf2Trace`](malachite_base::num::arithmetic::traits::ModPowerOf2Trace), the sum of the
+/// diagonal elements of a square matrix modulo a power of 2.
+pub mod mod_power_of_2_trace;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
 /// vector (multiplying it by a power of 2) modulo a number.
@@ -190,6 +194,9 @@ pub mod mod_shl;
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
 pub mod mod_sub;
 
+/// Implementations of [`ModTrace`](malachite_base::num::arithmetic::traits::ModTrace), the sum of
+/// the diagonal elements of a square matrix modulo a number.
+pub mod mod_trace;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying a
 /// [`NaturalMatrix`](super::NaturalMatrix) by a
 /// [`NaturalVector`](crate::natural_vector::NaturalVector) on the right.

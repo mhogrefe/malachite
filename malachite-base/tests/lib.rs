@@ -909,8 +909,10 @@ pub mod unsigned_matrix {
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_sub;
+        pub mod mod_power_of_2_trace;
         pub mod mod_shl;
         pub mod mod_sub;
+        pub mod mod_trace;
         pub mod vector_mod_mul;
         pub mod vector_mod_power_of_2_mul;
     }
