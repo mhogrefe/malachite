@@ -10,6 +10,7 @@ use crate::integer::Integer;
 use crate::integer_vector::IntegerVector;
 use alloc::vec;
 use alloc::vec::Vec;
+use core::cmp::min;
 use core::fmt::{Formatter, Result};
 use core::mem::{swap, take};
 use core::ops::{Deref, Range};
@@ -519,6 +520,57 @@ impl Matrix for IntegerMatrix {
         m
     }
 
+    /// Returns the rectangular identity matrix of a given height and width: the [`IntegerMatrix`]
+    /// whose element in row $i$ and column $j$ is 1 if $i = j$ and 0 otherwise.
+    ///
+    /// It is the identity matrix of the smaller dimension, padded with zero rows or columns, and
+    /// the matrix that FLINT's `*_mat_one` functions produce for a matrix of that shape. When the
+    /// height equals the width it is [`identity`](Self::identity).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `height * width`.
+    ///
+    /// # Panics
+    /// Panics if the number of elements does not fit in a [`usize`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert_eq!(
+    ///     IntegerMatrix::rectangular_identity(2, 3).to_string(),
+    ///     "[1, 0, 0; 0, 1, 0]"
+    /// );
+    /// assert_eq!(
+    ///     IntegerMatrix::rectangular_identity(3, 2).to_string(),
+    ///     "[1, 0; 0, 1; 0, 0]"
+    /// );
+    /// assert_eq!(
+    ///     IntegerMatrix::rectangular_identity(0, 3).to_string(),
+    ///     "[]_{0,3}"
+    /// );
+    /// ```
+    fn rectangular_identity(height: u64, width: u64) -> Self {
+        let mut m = Self::zero(height, width);
+        // The diagonal elements are `width + 1` apart, and there are as many as the smaller
+        // dimension.
+        let diagonal_length = min(m.height, m.width);
+        for x in m
+            .elements
+            .iter_mut()
+            .step_by(m.width + 1)
+            .take(diagonal_length)
+        {
+            *x = Integer::ONE;
+        }
+        m
+    }
+
     /// Returns a standard basis matrix $E_{ij}$, also called a matrix unit: the matrix of a given
     /// height and width whose element in row `i` and column `j` is 1 and whose other elements are
     /// 0.
@@ -770,6 +822,65 @@ impl Matrix for IntegerMatrix {
                     *x == 0u32
                 }
             })
+    }
+
+    /// Determines whether an [`IntegerMatrix`] is a rectangular identity matrix: whether its
+    /// element in row $i$ and column $j$ is 1 if $i = j$ and 0 otherwise.
+    ///
+    /// The matrix need not be square, and every matrix with no elements qualifies. These are the
+    /// matrices that FLINT's `*_mat_is_one` functions accept. A matrix is an identity matrix
+    /// exactly when it is square and a rectangular identity matrix.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// assert!(
+    ///     IntegerMatrix::from_str("[1, 0, 0; 0, 1, 0]")
+    ///         .unwrap()
+    ///         .is_rectangular_identity()
+    /// );
+    /// assert!(
+    ///     IntegerMatrix::from_str("[1, 0; 0, 1; 0, 0]")
+    ///         .unwrap()
+    ///         .is_rectangular_identity()
+    /// );
+    /// assert!(
+    ///     IntegerMatrix::from_str("[]_{0,3}")
+    ///         .unwrap()
+    ///         .is_rectangular_identity()
+    /// );
+    /// assert!(
+    ///     !IntegerMatrix::from_str("[1, 0; 0, 1; 0, 1]")
+    ///         .unwrap()
+    ///         .is_rectangular_identity()
+    /// );
+    /// assert!(
+    ///     !IntegerMatrix::from_str("[1, 1]")
+    ///         .unwrap()
+    ///         .is_rectangular_identity()
+    /// );
+    /// ```
+    #[inline]
+    fn is_rectangular_identity(&self) -> bool {
+        // The element at index `k` is in row `k / width` and column `k % width`. A matrix with no
+        // columns has no elements, so the closure never divides by zero.
+        self.elements.iter().enumerate().all(|(k, x)| {
+            if k / self.width == k % self.width {
+                *x == 1u32
+            } else {
+                *x == 0u32
+            }
+        })
     }
 
     /// Determines whether an [`IntegerMatrix`] is a standard basis matrix, returning the row and

@@ -48,6 +48,13 @@ pub trait Matrix: Sized {
     /// and whose other elements are 0.
     fn identity(size: u64) -> Self;
 
+    /// Returns the rectangular identity matrix of a given height and width: the matrix whose
+    /// element in row $i$ and column $j$ is 1 if $i = j$ and 0 otherwise.
+    ///
+    /// It is the identity matrix of the smaller dimension, padded with zero rows or columns; when
+    /// the height equals the width it is [`identity`](Self::identity).
+    fn rectangular_identity(height: u64, width: u64) -> Self;
+
     /// Returns a standard basis matrix, also called a matrix unit: the matrix of a given height and
     /// width whose element in row `i` and column `j` is 1 and whose other elements are 0.
     fn standard_basis_matrix(height: u64, width: u64, i: u64, j: u64) -> Self;
@@ -82,6 +89,13 @@ pub trait Matrix: Sized {
     /// Determines whether a matrix is an identity matrix: a square matrix whose diagonal elements
     /// are 1 and whose other elements are 0. This includes the 0-by-0 matrix.
     fn is_identity(&self) -> bool;
+
+    /// Determines whether a matrix is a rectangular identity matrix: whether its element in row $i$
+    /// and column $j$ is 1 if $i = j$ and 0 otherwise. The matrix need not be square, and every
+    /// matrix with no elements qualifies.
+    ///
+    /// A matrix is an identity matrix exactly when it is square and a rectangular identity matrix.
+    fn is_rectangular_identity(&self) -> bool;
 
     /// Determines whether a matrix is a standard basis matrix, returning the row and column of its
     /// 1 if it is.

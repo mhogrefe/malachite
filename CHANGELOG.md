@@ -12,15 +12,16 @@ documented by git history.
 
 - The `Matrix` trait (`malachite_base::matrix`), for what every matrix type has in common, as
   `Vector` is for vectors: `from_elements`, `from_owned_elements` and their column-major forms,
-  `zero`, `identity`, `standard_basis_matrix` (the matrix units $E_{ij}$), `to_elements`,
+  `zero`, `identity`, `rectangular_identity` (ones in positions $(i, i)$ of a matrix of any shape,
+  as FLINT's `*_mat_one` gives), `standard_basis_matrix` (the matrix units $E_{ij}$), `to_elements`,
   `into_elements`, `elements_ref`, `height`, `width`, `is_square`, `is_zero`, `is_identity`,
-  `standard_basis_index` (the row and column of a standard basis matrix's 1, or `None`),
-  `is_symmetric`, `is_skew_symmetric`, `is_diagonal`, `is_upper_triangular`,
-  `is_lower_triangular` (the last three for any shape), `set_zero`, `transpose`,
-  `transpose_assign`, `window` and `into_window`, which copy the submatrix in given ranges of rows
-  and columns into a new matrix (`into_window` reuses the matrix's storage, only truncating it for
-  a prefix of the rows), and `set_window` and `set_window_owned`, which write a matrix into another
-  with its top-left element at a given position. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`,
+  `is_rectangular_identity`, `standard_basis_index` (the row and column of a standard basis matrix's
+  1, or `None`), `is_symmetric`, `is_skew_symmetric`, `is_diagonal`, `is_upper_triangular`,
+  `is_lower_triangular` (the last three for any shape), `set_zero`, `transpose`, `transpose_assign`,
+  `window` and `into_window`, which copy the submatrix in given ranges of rows and columns into a
+  new matrix (`into_window` reuses the matrix's storage, only truncating it for a prefix of the
+  rows), and `set_window` and `set_window_owned`, which write a matrix into another with its
+  top-left element at a given position. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`,
   `IntegerMatrix`, and `RationalMatrix`. Heights, widths, and indices are `u64`s throughout the
   matrix API, as they are for vectors; only `Index`/`IndexMut` take `usize`s.
 - `Named` for every matrix type (`UnsignedMatrix<T>` for each primitive unsigned `T`, with the
