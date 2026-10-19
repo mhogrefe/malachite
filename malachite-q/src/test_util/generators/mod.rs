@@ -1287,6 +1287,26 @@ pub fn rational_matrix_gen() -> Generator<RationalMatrix> {
     )
 }
 
+// All `(m, i, j)` with `i` and `j` column indices of `m`.
+pub fn rational_matrix_unsigned_unsigned_triple_gen_var_3() -> Generator<(RationalMatrix, u64, u64)>
+{
+    Generator::new(
+        &exhaustive_rational_matrix_unsigned_unsigned_triple_gen_var_3,
+        &random_rational_matrix_unsigned_unsigned_triple_gen_var_3,
+        &special_random_rational_matrix_unsigned_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(m, i, j)` with `i` and `j` row indices of `m`.
+pub fn rational_matrix_unsigned_unsigned_triple_gen_var_2() -> Generator<(RationalMatrix, u64, u64)>
+{
+    Generator::new(
+        &exhaustive_rational_matrix_unsigned_unsigned_triple_gen_var_2,
+        &random_rational_matrix_unsigned_unsigned_triple_gen_var_2,
+        &special_random_rational_matrix_unsigned_unsigned_triple_gen_var_2,
+    )
+}
+
 // All `(m, r1, r2, c1, c2)` such that `r1..r2` and `c1..c2` are the row and column ranges of a
 // window of `m`.
 pub fn rational_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()

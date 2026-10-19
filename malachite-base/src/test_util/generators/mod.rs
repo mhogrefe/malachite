@@ -5306,6 +5306,26 @@ pub fn unsigned_matrix_gen() -> Generator<UnsignedMatrix<u64>> {
     )
 }
 
+// All `(m, i, j)` with `i` and `j` column indices of `m`.
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_7()
+-> Generator<(UnsignedMatrix<u64>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_7,
+        &random_unsigned_matrix_unsigned_unsigned_triple_gen_var_7,
+        &special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_7,
+    )
+}
+
+// All `(m, i, j)` with `i` and `j` row indices of `m`.
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_6()
+-> Generator<(UnsignedMatrix<u64>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_6,
+        &random_unsigned_matrix_unsigned_unsigned_triple_gen_var_6,
+        &special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_6,
+    )
+}
+
 // All `(m, r1, r2, c1, c2)` such that `r1..r2` and `c1..c2` are the row and column ranges of a
 // window of `m`.
 pub fn unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()

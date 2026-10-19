@@ -136,6 +136,12 @@ pub trait Matrix: Sized {
     /// Replaces a matrix with its transpose, whose rows are the columns of the original.
     fn transpose_assign(&mut self);
 
+    /// Swaps two rows of a matrix. Swapping a row with itself does nothing.
+    fn swap_rows(&mut self, i: u64, j: u64);
+
+    /// Swaps two columns of a matrix. Swapping a column with itself does nothing.
+    fn swap_columns(&mut self, i: u64, j: u64);
+
     /// Returns the window of a matrix made of the given ranges of rows and columns, as a new
     /// matrix, cloning its elements.
     ///

@@ -6848,6 +6848,28 @@ pub fn exhaustive_unsigned_matrix_gen() -> It<UnsignedMatrix<u64>> {
     Box::new(exhaustive_unsigned_matrices())
 }
 
+// Each matrix paired with each pair of its column indices. A matrix has finitely many, so this
+// reaches every triple exactly once.
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_7()
+-> It<(UnsignedMatrix<u64>, u64, u64)> {
+    Box::new(exhaustive_unsigned_matrix_gen().flat_map(|m| {
+        let n = m.width();
+        let pairs: Vec<(u64, u64)> = (0..n).flat_map(|i| (0..n).map(move |j| (i, j))).collect();
+        pairs.into_iter().map(move |(i, j)| (m.clone(), i, j))
+    }))
+}
+
+// Each matrix paired with each pair of its row indices. A matrix has finitely many, so this reaches
+// every triple exactly once.
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_6()
+-> It<(UnsignedMatrix<u64>, u64, u64)> {
+    Box::new(exhaustive_unsigned_matrix_gen().flat_map(|m| {
+        let n = m.height();
+        let pairs: Vec<(u64, u64)> = (0..n).flat_map(|i| (0..n).map(move |j| (i, j))).collect();
+        pairs.into_iter().map(move |(i, j)| (m.clone(), i, j))
+    }))
+}
+
 // Each matrix paired with each of its windows. A matrix has finitely many, so this reaches every
 // tuple exactly once.
 pub fn exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()

@@ -974,6 +974,8 @@ pub mod unsigned_matrix {
     pub mod set_zero;
     pub mod standard_basis_index;
     pub mod standard_basis_matrix;
+    pub mod swap_columns;
+    pub mod swap_rows;
     pub mod transpose;
     pub mod window;
     pub mod zero;

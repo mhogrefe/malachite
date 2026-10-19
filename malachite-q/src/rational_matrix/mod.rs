@@ -10,7 +10,7 @@ use crate::Rational;
 use crate::rational_vector::RationalVector;
 use alloc::vec;
 use alloc::vec::Vec;
-use core::cmp::min;
+use core::cmp::{max, min};
 use core::fmt::{Formatter, Result};
 use core::mem::{swap, take};
 use core::ops::{Deref, Range};
@@ -1240,6 +1240,96 @@ impl Matrix for RationalMatrix {
         } else {
             self.elements = transposed_elements(take(&mut self.elements), height, width);
             swap(&mut self.height, &mut self.width);
+        }
+    }
+
+    /// Swaps two rows of a [`RationalMatrix`]. Swapping a row with itself does nothing.
+    ///
+    /// Each row is a contiguous run of the elements, so the two runs are exchanged in place.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.width()`.
+    ///
+    /// # Panics
+    /// Panics if `i` or `j` is greater than or equal to the height of the matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let mut a = RationalMatrix::from_str("[1/2, 2, 3; 4, 5/3, 6; 7, 8, -9]").unwrap();
+    /// a.swap_rows(0, 2);
+    /// assert_eq!(a.to_string(), "[7, 8, -9; 4, 5/3, 6; 1/2, 2, 3]");
+    ///
+    /// let mut a = RationalMatrix::from_str("[1, -1/2, 3, 4; 5, 6, 7/8, 8]").unwrap();
+    /// a.swap_rows(1, 1);
+    /// assert_eq!(a.to_string(), "[1, -1/2, 3, 4; 5, 6, 7/8, 8]");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_swap_rows` from `fmpz_mat/swap_rows.c`, FLINT 3.6.0, with a
+    /// null permutation.
+    fn swap_rows(&mut self, i: u64, j: u64) {
+        let height = u64::exact_from(self.height);
+        assert!(
+            i < height && j < height,
+            "row indices {i} and {j} must be less than the height of the matrix, {height}"
+        );
+        let (i, j) = (usize::exact_from(i), usize::exact_from(j));
+        if i != j {
+            let width = self.width;
+            let (low, high) = (min(i, j), max(i, j));
+            let (front, back) = self.elements.split_at_mut(high * width);
+            front[low * width..(low + 1) * width].swap_with_slice(&mut back[..width]);
+        }
+    }
+
+    /// Swaps two columns of a [`RationalMatrix`]. Swapping a column with itself does nothing.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height()`.
+    ///
+    /// # Panics
+    /// Panics if `i` or `j` is greater than or equal to the width of the matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let mut a = RationalMatrix::from_str("[1/2, 2, 3; 4, 5/3, 6; 7, 8, -9]").unwrap();
+    /// a.swap_columns(0, 2);
+    /// assert_eq!(a.to_string(), "[3, 2, 1/2; 6, 5/3, 4; -9, 8, 7]");
+    ///
+    /// let mut a = RationalMatrix::from_str("[1, -1/2, 3, 4; 5, 6, 7/8, 8]").unwrap();
+    /// a.swap_columns(1, 3);
+    /// assert_eq!(a.to_string(), "[1, 4, 3, -1/2; 5, 8, 7/8, 6]");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_swap_cols` from `fmpz_mat/swap.c`, FLINT 3.6.0, with a null
+    /// permutation.
+    fn swap_columns(&mut self, i: u64, j: u64) {
+        let width = u64::exact_from(self.width);
+        assert!(
+            i < width && j < width,
+            "column indices {i} and {j} must be less than the width of the matrix, {width}"
+        );
+        let (i, j) = (usize::exact_from(i), usize::exact_from(j));
+        if i != j {
+            // The width is positive, since it exceeds `i`.
+            for row in self.elements.chunks_exact_mut(self.width) {
+                row.swap(i, j);
+            }
         }
     }
 

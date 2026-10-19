@@ -18,12 +18,13 @@ documented by git history.
   `is_rectangular_identity`, `standard_basis_index` (the row and column of a standard basis matrix's
   1, or `None`), `is_symmetric`, `is_skew_symmetric`, `is_diagonal`, `is_upper_triangular`,
   `is_lower_triangular` (the last three for any shape), `set_zero`, `transpose`, `transpose_assign`,
-  `window` and `into_window`, which copy the submatrix in given ranges of rows and columns into a
-  new matrix (`into_window` reuses the matrix's storage, only truncating it for a prefix of the
-  rows), and `set_window` and `set_window_owned`, which write a matrix into another with its
-  top-left element at a given position. It is implemented by `UnsignedMatrix<T>`, `NaturalMatrix`,
-  `IntegerMatrix`, and `RationalMatrix`. Heights, widths, and indices are `u64`s throughout the
-  matrix API, as they are for vectors; only `Index`/`IndexMut` take `usize`s.
+  `swap_rows` and `swap_columns` (FLINT's `fmpz_mat_swap_rows` and `fmpz_mat_swap_cols`, without the
+  permutation array), `window` and `into_window`, which copy the submatrix in given ranges of rows
+  and columns into a new matrix (`into_window` reuses the matrix's storage, only truncating it for a
+  prefix of the rows), and `set_window` and `set_window_owned`, which write a matrix into another
+  with its top-left element at a given position. It is implemented by `UnsignedMatrix<T>`,
+  `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`. Heights, widths, and indices are `u64`s
+  throughout the matrix API, as they are for vectors; only `Index`/`IndexMut` take `usize`s.
 - `Named` for every matrix type (`UnsignedMatrix<T>` for each primitive unsigned `T`, with the
   element type spelled out, as for `UnsignedVector<T>`).
 - `ShortlexUnsignedMatrix<T>` and `ShortlexUnsignedMatrixRef` (and, in malachite-nz and malachite-q,

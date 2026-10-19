@@ -7887,6 +7887,40 @@ pub fn special_random_integer_matrix_gen(config: &GenConfig) -> It<IntegerMatrix
     ))
 }
 
+// A random matrix with at least one column, and two of its column indices drawn uniformly.
+pub fn special_random_integer_matrix_unsigned_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("indices"));
+    Box::new(
+        special_random_integer_matrix_gen(config)
+            .filter(|m| m.width() != 0)
+            .map(move |m| {
+                let n = m.width();
+                let i = ranges.next_less_than(n);
+                let j = ranges.next_less_than(n);
+                (m, i, j)
+            }),
+    )
+}
+
+// A random matrix with at least one row, and two of its row indices drawn uniformly.
+pub fn special_random_integer_matrix_unsigned_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("indices"));
+    Box::new(
+        special_random_integer_matrix_gen(config)
+            .filter(|m| m.height() != 0)
+            .map(move |m| {
+                let n = m.height();
+                let i = ranges.next_less_than(n);
+                let j = ranges.next_less_than(n);
+                (m, i, j)
+            }),
+    )
+}
+
 pub fn special_random_integer_matrix_natural_pair_gen(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, Natural)> {
@@ -8479,6 +8513,40 @@ pub fn special_random_natural_matrix_gen(config: &GenConfig) -> It<NaturalMatrix
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
     ))
+}
+
+// A random matrix with at least one column, and two of its column indices drawn uniformly.
+pub fn special_random_natural_matrix_unsigned_unsigned_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("indices"));
+    Box::new(
+        special_random_natural_matrix_gen(config)
+            .filter(|m| m.width() != 0)
+            .map(move |m| {
+                let n = m.width();
+                let i = ranges.next_less_than(n);
+                let j = ranges.next_less_than(n);
+                (m, i, j)
+            }),
+    )
+}
+
+// A random matrix with at least one row, and two of its row indices drawn uniformly.
+pub fn special_random_natural_matrix_unsigned_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, u64)> {
+    let mut ranges = VariableRangeGenerator::new(EXAMPLE_SEED.fork("indices"));
+    Box::new(
+        special_random_natural_matrix_gen(config)
+            .filter(|m| m.height() != 0)
+            .map(move |m| {
+                let n = m.height();
+                let i = ranges.next_less_than(n);
+                let j = ranges.next_less_than(n);
+                (m, i, j)
+            }),
+    )
 }
 
 pub fn special_random_natural_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1(

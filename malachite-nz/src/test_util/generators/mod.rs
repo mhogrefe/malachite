@@ -3929,6 +3929,24 @@ pub fn integer_matrix_gen() -> Generator<IntegerMatrix> {
     )
 }
 
+// All `(m, i, j)` with `i` and `j` column indices of `m`.
+pub fn integer_matrix_unsigned_unsigned_triple_gen_var_3() -> Generator<(IntegerMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_unsigned_triple_gen_var_3,
+        &random_integer_matrix_unsigned_unsigned_triple_gen_var_3,
+        &special_random_integer_matrix_unsigned_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(m, i, j)` with `i` and `j` row indices of `m`.
+pub fn integer_matrix_unsigned_unsigned_triple_gen_var_2() -> Generator<(IntegerMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_unsigned_triple_gen_var_2,
+        &random_integer_matrix_unsigned_unsigned_triple_gen_var_2,
+        &special_random_integer_matrix_unsigned_unsigned_triple_gen_var_2,
+    )
+}
+
 // All `(m, r1, r2, c1, c2)` such that `r1..r2` and `c1..c2` are the row and column ranges of a
 // window of `m`.
 pub fn integer_matrix_unsigned_unsigned_unsigned_unsigned_quintuple_gen_var_1()
@@ -4302,6 +4320,24 @@ pub fn natural_matrix_gen() -> Generator<NaturalMatrix> {
         &exhaustive_natural_matrix_gen,
         &random_natural_matrix_gen,
         &special_random_natural_matrix_gen,
+    )
+}
+
+// All `(m, i, j)` with `i` and `j` column indices of `m`.
+pub fn natural_matrix_unsigned_unsigned_triple_gen_var_4() -> Generator<(NaturalMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_4,
+        &random_natural_matrix_unsigned_unsigned_triple_gen_var_4,
+        &special_random_natural_matrix_unsigned_unsigned_triple_gen_var_4,
+    )
+}
+
+// All `(m, i, j)` with `i` and `j` row indices of `m`.
+pub fn natural_matrix_unsigned_unsigned_triple_gen_var_3() -> Generator<(NaturalMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_3,
+        &random_natural_matrix_unsigned_unsigned_triple_gen_var_3,
+        &special_random_natural_matrix_unsigned_unsigned_triple_gen_var_3,
     )
 }
 
