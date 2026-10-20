@@ -9,9 +9,19 @@
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::test_util::bench::bucketers::pair_integer_matrix_max_bit_bucketer;
-use malachite_nz::test_util::generators::integer_matrix_pair_gen_var_4;
-use malachite_nz::test_util::integer_matrix::arithmetic::mul::integer_matrix_mul_naive;
+use malachite_nz::integer_matrix::arithmetic::mul::classical::matrix_mul_classical;
+use malachite_nz::integer_matrix::arithmetic::mul::double_word::matrix_mul_double_word;
+use malachite_nz::integer_matrix::arithmetic::mul::small::matrix_mul_small;
+use malachite_nz::test_util::bench::bucketers::{
+    pair_integer_matrix_max_bit_bucketer, pair_integer_matrix_product_size_bucketer,
+};
+use malachite_nz::test_util::generators::{
+    integer_matrix_pair_gen_var_4, integer_matrix_pair_gen_var_5, integer_matrix_pair_gen_var_6,
+};
+use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
+    integer_matrix_mul_naive, integer_matrix_mul_with, matrix_mul_small_unblocked,
+    matrix_mul_small_unblocked_column_reads,
+};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_matrix_mul);
@@ -23,6 +33,18 @@ pub(crate) fn register(runner: &mut Runner) {
 
     register_bench!(runner, benchmark_integer_matrix_mul_evaluation_strategy);
     register_bench!(runner, benchmark_integer_matrix_mul_algorithms);
+    register_bench!(
+        runner,
+        benchmark_integer_matrix_mul_small_elements_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_integer_matrix_mul_double_word_elements_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_integer_matrix_mul_small_unblocked_algorithms
+    );
 }
 
 fn demo_integer_matrix_mul(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -122,6 +144,103 @@ fn benchmark_integer_matrix_mul_algorithms(
             }),
             ("naive", &mut |(a, b)| {
                 no_out!(integer_matrix_mul_naive(&a, &b));
+            }),
+        ],
+    );
+}
+
+fn benchmark_integer_matrix_mul_small_elements_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "&IntegerMatrix * &IntegerMatrix",
+        BenchmarkType::Algorithms,
+        integer_matrix_pair_gen_var_5().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_integer_matrix_max_bit_bucketer("a", "b"),
+        &mut [
+            ("default", &mut |(a, b)| {
+                no_out!(&a * &b);
+            }),
+            ("classical", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_classical));
+            }),
+            ("small", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_small));
+            }),
+            ("small, unblocked", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_small_unblocked));
+            }),
+            ("naive", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_naive(&a, &b));
+            }),
+        ],
+    );
+}
+
+fn benchmark_integer_matrix_mul_double_word_elements_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "&IntegerMatrix * &IntegerMatrix",
+        BenchmarkType::Algorithms,
+        integer_matrix_pair_gen_var_6().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_integer_matrix_max_bit_bucketer("a", "b"),
+        &mut [
+            ("default", &mut |(a, b)| {
+                no_out!(&a * &b);
+            }),
+            ("classical", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_classical));
+            }),
+            ("double word", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_double_word));
+            }),
+            ("naive", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_naive(&a, &b));
+            }),
+        ],
+    );
+}
+
+// Compares the unblocked kernels for small elements, which read a transposed copy of the second
+// matrix, with FLINT's, which read it down its columns. Both include the conversion of the second
+// matrix to words.
+fn benchmark_integer_matrix_mul_small_unblocked_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "&IntegerMatrix * &IntegerMatrix",
+        BenchmarkType::Algorithms,
+        integer_matrix_pair_gen_var_5().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_integer_matrix_product_size_bucketer("a", "b"),
+        &mut [
+            ("transposed second matrix", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_small_unblocked));
+            }),
+            ("column reads, as in FLINT", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(
+                    &a,
+                    &b,
+                    matrix_mul_small_unblocked_column_reads
+                ));
             }),
         ],
     );

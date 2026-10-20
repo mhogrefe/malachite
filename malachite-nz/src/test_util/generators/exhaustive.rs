@@ -3741,6 +3741,53 @@ pub fn exhaustive_integer_matrix_pair_gen_var_4() -> It<(IntegerMatrix, IntegerM
     )
 }
 
+// Pairs of matrices that can be multiplied, where every element fits in a small `fmpz`: it has at
+// most `Limb::WIDTH - 2` significant bits.
+pub fn exhaustive_integer_matrix_pair_gen_var_5() -> It<(IntegerMatrix, IntegerMatrix)> {
+    fn ys((height, inner, width): (u64, u64, u64)) -> It<(IntegerMatrix, IntegerMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_integer_matrices_with_dimensions(height, inner),
+            exhaustive_integer_matrices_with_dimensions(inner, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p)
+        .filter(|(a, b)| {
+            a.elements
+                .iter()
+                .chain(&b.elements)
+                .all(|x| x.significant_bits() <= Limb::WIDTH - 2)
+        }),
+    )
+}
+
+// Pairs of matrices that can be multiplied, where every element fits in a signed double limb.
+pub fn exhaustive_integer_matrix_pair_gen_var_6() -> It<(IntegerMatrix, IntegerMatrix)> {
+    fn ys((height, inner, width): (u64, u64, u64)) -> It<(IntegerMatrix, IntegerMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_integer_matrices_with_dimensions(height, inner),
+            exhaustive_integer_matrices_with_dimensions(inner, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p)
+        .filter(|(a, b)| {
+            a.elements
+                .iter()
+                .chain(&b.elements)
+                .all(|x| x.significant_bits() < Limb::WIDTH << 1)
+        }),
+    )
+}
+
 // Pairs of matrices of the same height: every triple of a height and two widths, and for each
 // triple every pair of matrices of those shapes.
 pub fn exhaustive_integer_matrix_pair_gen_var_3() -> It<(IntegerMatrix, IntegerMatrix)> {
@@ -4366,6 +4413,53 @@ pub fn exhaustive_natural_matrix_pair_gen_var_4() -> It<(NaturalMatrix, NaturalM
             ys,
         )
         .map(|(_, p)| p),
+    )
+}
+
+// Pairs of matrices that can be multiplied, where every element fits in a small `fmpz`: it has at
+// most `Limb::WIDTH - 2` significant bits.
+pub fn exhaustive_natural_matrix_pair_gen_var_5() -> It<(NaturalMatrix, NaturalMatrix)> {
+    fn ys((height, inner, width): (u64, u64, u64)) -> It<(NaturalMatrix, NaturalMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_natural_matrices_with_dimensions(height, inner),
+            exhaustive_natural_matrices_with_dimensions(inner, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p)
+        .filter(|(a, b)| {
+            a.elements
+                .iter()
+                .chain(&b.elements)
+                .all(|x| x.significant_bits() <= Limb::WIDTH - 2)
+        }),
+    )
+}
+
+// Pairs of matrices that can be multiplied, where every element fits in a double limb.
+pub fn exhaustive_natural_matrix_pair_gen_var_6() -> It<(NaturalMatrix, NaturalMatrix)> {
+    fn ys((height, inner, width): (u64, u64, u64)) -> It<(NaturalMatrix, NaturalMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_natural_matrices_with_dimensions(height, inner),
+            exhaustive_natural_matrices_with_dimensions(inner, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p)
+        .filter(|(a, b)| {
+            a.elements
+                .iter()
+                .chain(&b.elements)
+                .all(|x| x.significant_bits() <= Limb::WIDTH << 1)
+        }),
     )
 }
 

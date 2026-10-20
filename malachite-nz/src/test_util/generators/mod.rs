@@ -4054,6 +4054,26 @@ pub fn integer_matrix_pair_gen_var_4() -> Generator<(IntegerMatrix, IntegerMatri
     )
 }
 
+// All pairs of `IntegerMatrix`s that can be multiplied, where every element fits in a small `fmpz`
+// (has at most 62 significant bits).
+pub fn integer_matrix_pair_gen_var_5() -> Generator<(IntegerMatrix, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_integer_matrix_pair_gen_var_5,
+        &random_integer_matrix_pair_gen_var_5,
+        &special_random_integer_matrix_pair_gen_var_5,
+    )
+}
+
+// All pairs of `IntegerMatrix`s that can be multiplied, where every element has at most 127
+// significant bits, so that it fits in a signed double word.
+pub fn integer_matrix_pair_gen_var_6() -> Generator<(IntegerMatrix, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_integer_matrix_pair_gen_var_6,
+        &random_integer_matrix_pair_gen_var_6,
+        &special_random_integer_matrix_pair_gen_var_6,
+    )
+}
+
 // All `(IntegerMatrix, IntegerVector)` where the vector's dimension is the height of the matrix.
 pub fn integer_matrix_integer_vector_pair_gen_var_2() -> Generator<(IntegerMatrix, IntegerVector)> {
     Generator::new(
@@ -4644,6 +4664,26 @@ pub fn natural_matrix_pair_gen_var_4() -> Generator<(NaturalMatrix, NaturalMatri
         &exhaustive_natural_matrix_pair_gen_var_4,
         &random_natural_matrix_pair_gen_var_4,
         &special_random_natural_matrix_pair_gen_var_4,
+    )
+}
+
+// All pairs of `NaturalMatrix`s that can be multiplied, where every element fits in a small `fmpz`
+// (has at most 62 significant bits).
+pub fn natural_matrix_pair_gen_var_5() -> Generator<(NaturalMatrix, NaturalMatrix)> {
+    Generator::new(
+        &exhaustive_natural_matrix_pair_gen_var_5,
+        &random_natural_matrix_pair_gen_var_5,
+        &special_random_natural_matrix_pair_gen_var_5,
+    )
+}
+
+// All pairs of `NaturalMatrix`s that can be multiplied, where every element has at most 128
+// significant bits, so that it fits in a double word.
+pub fn natural_matrix_pair_gen_var_6() -> Generator<(NaturalMatrix, NaturalMatrix)> {
+    Generator::new(
+        &exhaustive_natural_matrix_pair_gen_var_6,
+        &random_natural_matrix_pair_gen_var_6,
+        &special_random_natural_matrix_pair_gen_var_6,
     )
 }
 

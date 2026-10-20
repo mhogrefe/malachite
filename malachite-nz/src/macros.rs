@@ -134,3 +134,35 @@ macro_rules! crate_test_trait {
         pub(crate) trait $name $( $body )*
     };
 }
+
+#[cfg(feature = "test_build")]
+macro_rules! crate_test_struct {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub struct $name $( $body )*
+    };
+}
+
+#[cfg(not(feature = "test_build"))]
+macro_rules! crate_test_struct {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub(crate) struct $name $( $body )*
+    };
+}
+
+#[cfg(feature = "test_build")]
+macro_rules! crate_test_enum {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub enum $name $( $body )*
+    };
+}
+
+#[cfg(not(feature = "test_build"))]
+macro_rules! crate_test_enum {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub(crate) enum $name $( $body )*
+    };
+}

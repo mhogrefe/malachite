@@ -7187,6 +7187,59 @@ pub fn random_integer_matrix_pair_gen_var_4(
     )
 }
 
+// Pairs of matrices that can be multiplied, where every element fits in a small `fmpz`: it has at
+// most `Limb::WIDTH - 2` significant bits.
+pub fn random_integer_matrix_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, IntegerMatrix)> {
+    let mut xs = random_integers(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 16),
+        config.get_or("mean_bits_d", 1),
+    )
+    .filter(|x| x.significant_bits() <= Limb::WIDTH - 2);
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, inner, width)| {
+            let n = usize::exact_from(height * inner);
+            let a = IntegerMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
+            let n = usize::exact_from(inner * width);
+            let b = IntegerMatrix::from_owned_elements(inner, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+// Pairs of matrices that can be multiplied, where every element fits in a signed double limb.
+pub fn random_integer_matrix_pair_gen_var_6(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, IntegerMatrix)> {
+    let mut xs = random_integers(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 80),
+        config.get_or("mean_bits_d", 1),
+    )
+    .filter(|x| x.significant_bits() < Limb::WIDTH << 1);
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, inner, width)| {
+            let n = usize::exact_from(height * inner);
+            let a = IntegerMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
+            let n = usize::exact_from(inner * width);
+            let b = IntegerMatrix::from_owned_elements(inner, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
 // Pairs of matrices of the same random height, with random widths.
 pub fn random_integer_matrix_pair_gen_var_3(
     config: &GenConfig,
@@ -8185,6 +8238,59 @@ pub fn random_natural_matrix_pair_gen_var_4(
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, inner, width)| {
+            let n = usize::exact_from(height * inner);
+            let a = NaturalMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
+            let n = usize::exact_from(inner * width);
+            let b = NaturalMatrix::from_owned_elements(inner, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+// Pairs of matrices that can be multiplied, where every element fits in a small `fmpz`: it has at
+// most `Limb::WIDTH - 2` significant bits.
+pub fn random_natural_matrix_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix)> {
+    let mut xs = random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 16),
+        config.get_or("mean_bits_d", 1),
+    )
+    .filter(|x| x.significant_bits() <= Limb::WIDTH - 2);
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, inner, width)| {
+            let n = usize::exact_from(height * inner);
+            let a = NaturalMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
+            let n = usize::exact_from(inner * width);
+            let b = NaturalMatrix::from_owned_elements(inner, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+// Pairs of matrices that can be multiplied, where every element fits in a double limb.
+pub fn random_natural_matrix_pair_gen_var_6(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix)> {
+    let mut xs = random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 80),
+        config.get_or("mean_bits_d", 1),
+    )
+    .filter(|x| x.significant_bits() <= Limb::WIDTH << 1);
     Box::new(
         random_triples_from_single(geometric_random_unsigneds::<u64>(
             EXAMPLE_SEED.fork("dimensions"),

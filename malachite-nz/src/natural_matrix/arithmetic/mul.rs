@@ -10,7 +10,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_matrix::arithmetic::mul::{matrix_mul, matrix_mul_assign};
+use crate::integer_matrix::arithmetic::mul::{ProductShape, matrix_mul, matrix_mul_assign};
 use crate::natural_matrix::NaturalMatrix;
 use core::ops::{Mul, MulAssign};
 
@@ -21,10 +21,18 @@ fn assert_mul_compatible(a: &NaturalMatrix, b: &NaturalMatrix) {
     );
 }
 
+const fn product_shape(a: &NaturalMatrix, b: &NaturalMatrix) -> ProductShape {
+    ProductShape {
+        ar: a.height,
+        br: b.height,
+        bc: b.width,
+    }
+}
+
 fn mul_helper(a: &NaturalMatrix, b: &NaturalMatrix) -> NaturalMatrix {
     assert_mul_compatible(a, b);
     NaturalMatrix {
-        elements: matrix_mul(&a.elements, &b.elements, a.height, b.height, b.width),
+        elements: matrix_mul(&a.elements, &b.elements, product_shape(a, b)),
         height: a.height,
         width: b.width,
     }
@@ -32,7 +40,8 @@ fn mul_helper(a: &NaturalMatrix, b: &NaturalMatrix) -> NaturalMatrix {
 
 fn mul_assign_helper(a: &mut NaturalMatrix, b: &NaturalMatrix) {
     assert_mul_compatible(a, b);
-    matrix_mul_assign(&mut a.elements, &b.elements, a.height, b.height, b.width);
+    let shape = product_shape(a, b);
+    matrix_mul_assign(&mut a.elements, &b.elements, shape);
     a.width = b.width;
 }
 
@@ -224,9 +233,11 @@ impl MulAssign<Self> for NaturalMatrix {
     /// Multiplies a [`NaturalMatrix`] by another [`NaturalMatrix`] in place, taking the second by
     /// value.
     ///
-    /// The product is computed one row at a time and written back into the storage of `self`, so
-    /// when the product is no wider than `self`, and in particular when the second matrix is
-    /// square, the only additional memory is one row.
+    /// The product is written back into the storage of `self`. When every element fits in two
+    /// limbs, the elements of `self` are first copied out as words, and the product is written
+    /// directly; otherwise the product is computed one row at a time, so when it is no wider than
+    /// `self`, and in particular when the second matrix is square, the only additional memory is
+    /// one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of
@@ -277,9 +288,11 @@ impl MulAssign<&Self> for NaturalMatrix {
     /// Multiplies a [`NaturalMatrix`] by another [`NaturalMatrix`] in place, taking the second by
     /// reference.
     ///
-    /// The product is computed one row at a time and written back into the storage of `self`, so
-    /// when the product is no wider than `self`, and in particular when the second matrix is
-    /// square, the only additional memory is one row.
+    /// The product is written back into the storage of `self`. When every element fits in two
+    /// limbs, the elements of `self` are first copied out as words, and the product is written
+    /// directly; otherwise the product is computed one row at a time, so when it is no wider than
+    /// `self`, and in particular when the second matrix is square, the only additional memory is
+    /// one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of

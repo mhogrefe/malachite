@@ -368,11 +368,12 @@ documented by git history.
   `nmod_mat_trace` and `fmpz_mod_mat_trace`. Every element must be reduced modulo $m$, and the
   matrix must be square.
 - `Mul` and `MulAssign` for `IntegerMatrix` and `NaturalMatrix`, the matrix product, with each
-  operand by value or by reference, like FLINT's `fmpz_mat_mul`. So far only FLINT's classical
-  algorithm is used: inner dimensions of 1 and 2 directly, and otherwise a dot product of each row
-  with each column, read in place at a stride. `MulAssign` writes the product back into the first
-  matrix's storage a row at a time, so multiplying by a square matrix needs only one row of
-  additional memory. Both panic unless the width of the first matrix is the height of the second.
+  operand by value or by reference, like FLINT's `fmpz_mat_mul`, choosing among FLINT's kernels for
+  elements that fit in one or two words and the classical algorithm, which handles inner dimensions
+  of 1 and 2 directly and otherwise takes a dot product of each row with each column, read in place
+  at a stride. `MulAssign` writes the product back into the first matrix's storage, so multiplying
+  by a square matrix needs at most one row of additional memory beyond word copies of the
+  elements. Both panic unless the width of the first matrix is the height of the second.
 
 ### malachite-q
 

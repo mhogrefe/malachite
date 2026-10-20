@@ -8,9 +8,26 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
+use malachite_base::num::arithmetic::traits::{Parity, PowerOf2};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
+use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
-use malachite_nz::test_util::generators::{integer_matrix_gen, integer_matrix_pair_gen_var_4};
-use malachite_nz::test_util::integer_matrix::arithmetic::mul::integer_matrix_mul_naive;
+use malachite_nz::integer_matrix::arithmetic::mul::ProductShape;
+use malachite_nz::integer_matrix::arithmetic::mul::classical::{
+    matrix_mul_classical, matrix_mul_classical_assign,
+};
+use malachite_nz::integer_matrix::arithmetic::mul::double_word::matrix_mul_double_word;
+use malachite_nz::integer_matrix::arithmetic::mul::small::matrix_mul_small;
+use malachite_nz::platform::Limb;
+use malachite_nz::test_util::generators::{
+    integer_matrix_gen, integer_matrix_pair_gen_var_4, integer_matrix_pair_gen_var_5,
+    integer_matrix_pair_gen_var_6,
+};
+use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
+    integer_matrix_mul_naive, integer_matrix_mul_with, matrix_mul_small_unblocked,
+    matrix_mul_small_unblocked_column_reads,
+};
 
 #[test]
 fn test_mul() {
@@ -89,6 +106,134 @@ fn test_mul() {
     );
 }
 
+// A matrix whose elements are built from a fixed pseudorandom sequence: each has a pseudorandom
+// number of significant bits, at most `bits`, and is negative about half of the time if `signed`.
+fn pseudorandom_matrix(
+    height: u64,
+    width: u64,
+    bits: u64,
+    signed: bool,
+    seed: u64,
+) -> IntegerMatrix {
+    let mut state = seed.wrapping_mul(0x9e37_79b9_7f4a_7c15) | 1;
+    let mut next = || {
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
+        state
+    };
+    let mut elements = Vec::new();
+    for _ in 0..height * width {
+        let len = next() % (bits + 1);
+        let mut x = Integer::ZERO;
+        let mut remaining = len;
+        while remaining != 0 {
+            let chunk = remaining.min(32);
+            x <<= chunk;
+            x += Integer::from(next() >> (64 - chunk));
+            remaining -= chunk;
+        }
+        if len != 0 {
+            // Make the element have exactly `len` significant bits.
+            x |= Integer::power_of_2(len - 1);
+        }
+        let state = next();
+        let x = if signed && (state >> 7).odd() { -x } else { x };
+        elements.push(x);
+    }
+    IntegerMatrix::from_owned_elements(height, width, elements)
+}
+
+// Checks every algorithm that applies to the product against the naive one.
+fn check_kernels(a: &IntegerMatrix, b: &IntegerMatrix, bits: u64, signed: bool) {
+    let expected = integer_matrix_mul_naive(a, b);
+    assert_eq!(a * b, expected);
+    let mut c = a.clone();
+    c *= b;
+    assert_eq!(c, expected);
+    assert_eq!(
+        integer_matrix_mul_with(a, b, matrix_mul_classical),
+        expected
+    );
+    if bits <= Limb::WIDTH - 2 {
+        assert_eq!(integer_matrix_mul_with(a, b, matrix_mul_small), expected);
+        assert_eq!(
+            integer_matrix_mul_with(a, b, matrix_mul_small_unblocked),
+            expected
+        );
+        assert_eq!(
+            integer_matrix_mul_with(a, b, matrix_mul_small_unblocked_column_reads),
+            expected
+        );
+    }
+    if bits + u64::from(signed) <= Limb::WIDTH << 1 {
+        assert_eq!(
+            integer_matrix_mul_with(a, b, matrix_mul_double_word),
+            expected
+        );
+    }
+}
+
+#[test]
+fn test_mul_kernels() {
+    let test = |height, inner, width, bits, signed| {
+        for seed in 0..4 {
+            let a = pseudorandom_matrix(height, inner, bits, signed, seed);
+            let b = pseudorandom_matrix(inner, width, bits, signed, seed + 100);
+            check_kernels(&a, &b, bits, signed);
+        }
+    };
+    for signed in [false, true] {
+        // Small dimensions: the products fit in one, two, and three words.
+        test(5, 7, 6, 10, signed);
+        test(5, 7, 6, 40, signed);
+        test(5, 7, 6, 62, signed);
+        // Larger dimensions, with at most 128 columns in the first matrix, so no blocking.
+        test(10, 20, 7, 10, signed);
+        test(10, 20, 7, 40, signed);
+        test(10, 20, 7, 62, signed);
+        // More than 128 columns in the first matrix: blocks of 16 rows, with a partial last block,
+        // and blocks of 128 columns, with a last block of even and of odd length.
+        test(20, 300, 5, 10, signed);
+        test(20, 300, 5, 40, signed);
+        test(17, 301, 3, 62, signed);
+        test(33, 257, 2, 30, signed);
+        // Double-word elements, with fewer than 16 columns in the first matrix and with more, and
+        // products that fit in four and in five words.
+        test(3, 5, 4, 100, signed);
+        test(3, 5, 4, 127, signed);
+        test(3, 20, 4, 100, signed);
+        test(3, 20, 4, 127, signed);
+        test(12, 9, 11, 120, signed);
+        // Elements that are too large for the word algorithms.
+        test(4, 5, 3, 200, signed);
+    }
+    // Non-negative double-word elements up to 128 bits.
+    test(3, 5, 4, 128, false);
+    test(3, 20, 4, 128, false);
+}
+
+#[test]
+fn test_mul_classical_empty() {
+    // The classical kernels handle every empty shape themselves, although the dispatcher handles
+    // empty shapes before reaching them.
+    let test = |ar: usize, br: usize, bc: usize| {
+        let xs = vec![Integer::from(3u32); ar * br];
+        let ys = vec![Integer::from(5u32); br * bc];
+        let expected = vec![Integer::ZERO; ar * bc];
+        let shape = ProductShape { ar, br, bc };
+        assert_eq!(matrix_mul_classical(&xs, &ys, shape), expected);
+        let mut zs = xs.clone();
+        matrix_mul_classical_assign(&mut zs, &ys, shape);
+        assert_eq!(zs, expected);
+    };
+    test(0, 0, 0);
+    test(0, 3, 2);
+    test(2, 3, 0);
+    test(2, 0, 3);
+    test(0, 0, 3);
+}
+
 #[test]
 #[should_panic]
 fn mul_fail_1() {
@@ -155,5 +300,38 @@ fn mul_properties() {
         assert_eq!(IntegerMatrix::zero(3, h) * &a, IntegerMatrix::zero(3, w));
         // A matrix times its transpose is symmetric.
         assert!((&a * a.transpose()).is_symmetric());
+    });
+
+    integer_matrix_pair_gen_var_4().test_properties(|(a, b)| {
+        assert_eq!(
+            integer_matrix_mul_with(&a, &b, matrix_mul_classical),
+            &a * &b
+        );
+    });
+
+    integer_matrix_pair_gen_var_5().test_properties(|(a, b)| {
+        let c = integer_matrix_mul_naive(&a, &b);
+        assert_eq!(&a * &b, c);
+        assert_eq!(integer_matrix_mul_with(&a, &b, matrix_mul_small), c);
+        assert_eq!(
+            integer_matrix_mul_with(&a, &b, matrix_mul_small_unblocked),
+            c
+        );
+        assert_eq!(
+            integer_matrix_mul_with(&a, &b, matrix_mul_small_unblocked_column_reads),
+            c
+        );
+        let mut d = a.clone();
+        d *= &b;
+        assert_eq!(d, c);
+    });
+
+    integer_matrix_pair_gen_var_6().test_properties(|(a, b)| {
+        let c = integer_matrix_mul_naive(&a, &b);
+        assert_eq!(&a * &b, c);
+        assert_eq!(integer_matrix_mul_with(&a, &b, matrix_mul_double_word), c);
+        let mut d = a.clone();
+        d *= &b;
+        assert_eq!(d, c);
     });
 }

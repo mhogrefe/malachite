@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer_matrix::arithmetic::mul::ProductShape;
 use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
 use alloc::vec::Vec;
@@ -30,4 +31,19 @@ pub fn natural_matrix_mul_naive(a: &NaturalMatrix, b: &NaturalMatrix) -> Natural
         }
     }
     NaturalMatrix::from_owned_elements(a.height(), b.width(), elements)
+}
+
+// Multiplies two `NaturalMatrix`s with the given kernel, which takes the elements and the shape.
+pub fn natural_matrix_mul_with(
+    a: &NaturalMatrix,
+    b: &NaturalMatrix,
+    f: impl Fn(&[Natural], &[Natural], ProductShape) -> Vec<Natural>,
+) -> NaturalMatrix {
+    assert_eq!(a.width(), b.height());
+    let shape = ProductShape {
+        ar: usize::exact_from(a.height()),
+        br: usize::exact_from(a.width()),
+        bc: usize::exact_from(b.width()),
+    };
+    NaturalMatrix::from_owned_elements(a.height(), b.width(), f(&a.elements, &b.elements, shape))
 }

@@ -98,7 +98,11 @@ const fn mpn_norm(xs: &[Limb], xn: &mut usize) {
 // The `Integer` whose two's complement representation is the three limbs `(x2, x1, x0)`.
 //
 // This is equivalent to `fmpz_set_signed_uiuiui` from `fmpz.h`, FLINT 3.6.0.
-fn coefficient_from_signed_triple<C: PolynomialCoefficient>(x2: Limb, x1: Limb, x0: Limb) -> C {
+pub(crate) fn coefficient_from_signed_triple<C: PolynomialCoefficient>(
+    x2: Limb,
+    x1: Limb,
+    x0: Limb,
+) -> C {
     if x2.get_highest_bit() {
         let (y2, y1, y0) = Limb::xxx_sub_yyy_to_zzz(0, 0, 0, x2, x1, x0);
         C::from_sign_and_abs(false, Natural::from_owned_limbs_asc(vec![y0, y1, y2]))
