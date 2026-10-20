@@ -13,12 +13,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_vector::arithmetic::dot_general::vec_dot_general;
+use crate::integer_vector::arithmetic::dot_general::{
+    DotScratch, vec_dot_general_strided_with_scratch,
+};
 use core::cmp::min;
 
 // The coefficient of $x^i$ in the product of the polynomials with coefficients `xs` and `ys`, both
 // nonempty, where `i < xs.len() + ys.len() - 1`: the dot product of the coefficients of $x^j$ in
-// the first and of $x^{i-j}$ in the second, over the $j$ for which both exist.
+// the first and of $x^{i-j}$ in the second, over the $j$ for which both exist. The dot product sums
+// in `buffers`.
 //
 // # Worst-case complexity
 // $T(n, m) = O(nm \log m \log\log m)$
@@ -27,16 +30,23 @@ use core::cmp::min;
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `min(xs.len(), ys.len())`, and $m$ is the
 // largest number of significant bits of any element of `xs` or `ys`.
-pub(crate) fn product_coefficient<C: PolynomialCoefficient>(xs: &[C], ys: &[C], i: usize) -> C {
+pub(crate) fn product_coefficient<C: PolynomialCoefficient>(
+    xs: &[C],
+    ys: &[C],
+    i: usize,
+    buffers: &mut DotScratch,
+) -> C {
     let top1 = min(xs.len() - 1, i);
     let top2 = min(ys.len() - 1, i);
     let n = top1 + top2 + 1 - i;
-    vec_dot_general(
+    vec_dot_general_strided_with_scratch(
         None,
         false,
         &xs[i - top2..i - top2 + n],
         &ys[i - top1..i - top1 + n],
+        1,
         true,
+        buffers,
     )
 }
 
@@ -67,8 +77,9 @@ crate_test_fn! {mul_truncated_to_out_classical<C: PolynomialCoefficient>(
     } else if ys.len() == 1 {
         C::vec_mul_scalar_to_out(out, xs, &ys[0]);
     } else {
+        let mut buffers = DotScratch::default();
         for (i, o) in out.iter_mut().enumerate() {
-            *o = product_coefficient(xs, ys, i);
+            *o = product_coefficient(xs, ys, i, &mut buffers);
         }
     }
 }}

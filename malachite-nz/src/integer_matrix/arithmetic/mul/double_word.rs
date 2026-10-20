@@ -19,7 +19,7 @@ use crate::integer_matrix::arithmetic::mul::small::sign_extension;
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::arithmetic::neg::limbs_neg_in_place;
-use crate::natural::{Natural, TWICE_WIDTH, WIDTH_MINUS_1};
+use crate::natural::{TWICE_WIDTH, WIDTH_MINUS_1};
 use crate::platform::{DoubleLimb, Limb, SignedDoubleLimb};
 use alloc::vec;
 use alloc::vec::Vec;
@@ -57,24 +57,26 @@ fn get_signed_uiui<C: PolynomialCoefficient>(x: &C) -> (Limb, Limb) {
     }
 }
 
-// The element whose two's complement is the limbs `xs`, least significant first. `xs` is negated in
-// place if it is negative.
+// Sets `x` to the element whose two's complement is the limbs `xs`, least significant first,
+// reusing the limb vector of `x` when it has one, as FLINT reuses an `fmpz`'s `mpz`. `xs` is
+// negated in place if it is negative.
 //
 // This is equivalent to `fmpz_set_signed_ui_array` from `fmpz.h`, FLINT 3.6.0.
-fn coefficient_from_signed_limbs<C: PolynomialCoefficient>(xs: &mut [Limb]) -> C {
+fn set_signed_limbs<C: PolynomialCoefficient>(x: &mut C, xs: &mut [Limb]) {
     if xs.last().unwrap() >> WIDTH_MINUS_1 == 0 {
-        C::from_sign_and_abs(true, Natural::from_limbs_asc(xs))
+        x.assign_sign_and_limbs(true, xs);
     } else {
         limbs_neg_in_place(xs);
-        C::from_sign_and_abs(false, Natural::from_limbs_asc(xs))
+        x.assign_sign_and_limbs(false, xs);
     }
 }
 
-// The element whose absolute value is the limbs `xs`, least significant first.
+// Sets `x` to the element whose absolute value is the limbs `xs`, least significant first, reusing
+// the limb vector of `x` when it has one.
 //
 // This is equivalent to `fmpz_set_ui_array` from `fmpz.h`, FLINT 3.6.0.
-fn coefficient_from_limbs<C: PolynomialCoefficient>(xs: &[Limb]) -> C {
-    C::from_sign_and_abs(true, Natural::from_limbs_asc(xs))
+fn set_limbs<C: PolynomialCoefficient>(x: &mut C, xs: &[Limb]) {
+    x.assign_sign_and_limbs(true, xs);
 }
 
 // The product of two limbs read as signed words, as the high and low limbs of its two's complement.
@@ -111,13 +113,17 @@ fn do_row_22_4_signed_branchy<C: PolynomialCoefficient>(
     br: usize,
     bc: usize,
 ) {
-    let mut l = 0;
-    for out_j in out.iter_mut().take(bc) {
+    for (out_j, b) in out.iter_mut().take(bc).zip(b.chunks_exact(br << 1)) {
         let (mut t_3, mut t_2, mut t_1): (Limb, Limb, Limb) = (0, 0, 0);
         let (mut u_2, mut u_1, mut u_0): (Limb, Limb, Limb) = (0, 0, 0);
-        for k in 0..br {
-            let (a_0, a_1) = (ar[k << 1], ar[(k << 1) + 1]);
-            let (b_0, b_1) = (b[l << 1], b[(l << 1) + 1]);
+        for (a, b) in ar[..br << 1]
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .zip(b.as_chunks::<2>().0)
+        {
+            let (a_0, a_1) = (a[0], a[1]);
+            let (b_0, b_1) = (b[0], b[1]);
             if sign_extension(a_0) == a_1 && sign_extension(b_0) == b_1 {
                 let (w_1, w_0) = signed_mul_limbs(b_0, a_0);
                 (u_2, u_1, u_0) =
@@ -134,11 +140,10 @@ fn do_row_22_4_signed_branchy<C: PolynomialCoefficient>(
                 let (w_2, w_1) = Limb::x_mul_y_to_zz(b_1, a_0);
                 (t_3, t_2, t_1) = Limb::xxx_add_yyy_to_zzz(t_3, t_2, t_1, 0, w_2, w_1);
             }
-            l += 1;
         }
         let (s_3, s_2, s_1, s_0) =
             Limb::xxxx_add_yyyy_to_zzzz(t_3, t_2, t_1, 0, sign_extension(u_2), u_2, u_1, u_0);
-        *out_j = coefficient_from_signed_limbs(&mut [s_0, s_1, s_2, s_3]);
+        set_signed_limbs(out_j, &mut [s_0, s_1, s_2, s_3]);
     }
 }
 
@@ -153,14 +158,18 @@ fn do_row_22_4_signed<C: PolynomialCoefficient>(
     br: usize,
     bc: usize,
 ) {
-    let mut l = 0;
-    for out_j in out.iter_mut().take(bc) {
+    for (out_j, b) in out.iter_mut().take(bc).zip(b.chunks_exact(br << 1)) {
         let (mut t_3, mut t_2, mut t_1, mut t_0): (Limb, Limb, Limb, Limb) = (0, 0, 0, 0);
         let (mut u_2, mut u_1, mut u_0): (Limb, Limb, Limb) = (0, 0, 0);
         let (mut v_3, mut v_2): (Limb, Limb) = (0, 0);
-        for k in 0..br {
-            let (a_0, a_1) = (ar[k << 1], ar[(k << 1) + 1]);
-            let (b_0, b_1) = (b[l << 1], b[(l << 1) + 1]);
+        for (a, b) in ar[..br << 1]
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .zip(b.as_chunks::<2>().0)
+        {
+            let (a_0, a_1) = (a[0], a[1]);
+            let (b_0, b_1) = (b[0], b[1]);
             (t_3, t_2) = Limb::xx_sub_yy_to_zz(t_3, t_2, 0, sign_extension(a_1) & b_0);
             (t_3, t_2) = Limb::xx_sub_yy_to_zz(t_3, t_2, 0, sign_extension(b_1) & a_0);
             let (w_3, w_2) = signed_mul_limbs(b_1, a_1);
@@ -171,12 +180,11 @@ fn do_row_22_4_signed<C: PolynomialCoefficient>(
             (t_3, t_2, t_1) = Limb::xxx_add_yyy_to_zzz(t_3, t_2, t_1, 0, w_2, w_1);
             let (w_2, w_1) = Limb::x_mul_y_to_zz(b_1, a_0);
             (v_3, v_2, t_1) = Limb::xxx_add_yyy_to_zzz(v_3, v_2, t_1, 0, w_2, w_1);
-            l += 1;
         }
         (t_3, t_2, t_1, t_0) =
             Limb::xxxx_add_yyyy_to_zzzz(t_3, t_2, t_1, t_0, sign_extension(u_2), u_2, u_1, u_0);
         (t_3, t_2) = Limb::xx_add_yy_to_zz(t_3, t_2, v_3, v_2);
-        *out_j = coefficient_from_signed_limbs(&mut [t_0, t_1, t_2, t_3]);
+        set_signed_limbs(out_j, &mut [t_0, t_1, t_2, t_3]);
     }
 }
 
@@ -191,15 +199,19 @@ fn do_row_22_5_signed<C: PolynomialCoefficient>(
     br: usize,
     bc: usize,
 ) {
-    let mut l = 0;
-    for out_j in out.iter_mut().take(bc) {
+    for (out_j, b) in out.iter_mut().take(bc).zip(b.chunks_exact(br << 1)) {
         let (mut s_4, mut s_3, mut s_2, mut s_1, mut s_0): (Limb, Limb, Limb, Limb, Limb) =
             (0, 0, 0, 0, 0);
         let (mut u_3, mut u_2): (Limb, Limb) = (0, 0);
         let mut v_2: Limb = 0;
-        for k in 0..br {
-            let (a_0, a_1) = (ar[k << 1], ar[(k << 1) + 1]);
-            let (b_0, b_1) = (b[l << 1], b[(l << 1) + 1]);
+        for (a, b) in ar[..br << 1]
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .zip(b.as_chunks::<2>().0)
+        {
+            let (a_0, a_1) = (a[0], a[1]);
+            let (b_0, b_1) = (b[0], b[1]);
             (u_3, u_2) = Limb::xx_sub_yy_to_zz(u_3, u_2, 0, sign_extension(a_1) & b_0);
             (u_3, u_2) = Limb::xx_sub_yy_to_zz(u_3, u_2, 0, sign_extension(b_1) & a_0);
             let (p_3, p_2) = signed_mul_limbs(b_1, a_1);
@@ -211,11 +223,10 @@ fn do_row_22_5_signed<C: PolynomialCoefficient>(
             (v_2, s_1, s_0) = Limb::xxx_add_yyy_to_zzz(v_2, s_1, s_0, 0, p_1, p_0);
             let (p_2, p_1) = Limb::x_mul_y_to_zz(b_1, a_0);
             (u_3, u_2, s_1) = Limb::xxx_add_yyy_to_zzz(u_3, u_2, s_1, 0, p_2, p_1);
-            l += 1;
         }
         (s_4, s_3, s_2) = Limb::xxx_add_yyy_to_zzz(s_4, s_3, s_2, sign_extension(u_3), u_3, u_2);
         (s_4, s_3, s_2) = Limb::xxx_add_yyy_to_zzz(s_4, s_3, s_2, 0, 0, v_2);
-        *out_j = coefficient_from_signed_limbs(&mut [s_0, s_1, s_2, s_3, s_4]);
+        set_signed_limbs(out_j, &mut [s_0, s_1, s_2, s_3, s_4]);
     }
 }
 
@@ -230,14 +241,18 @@ fn do_row_22_4_unsigned<C: PolynomialCoefficient>(
     br: usize,
     bc: usize,
 ) {
-    let mut l = 0;
-    for out_j in out.iter_mut().take(bc) {
+    for (out_j, b) in out.iter_mut().take(bc).zip(b.chunks_exact(br << 1)) {
         let (mut s_3, mut s_2, mut s_1, mut s_0): (Limb, Limb, Limb, Limb) = (0, 0, 0, 0);
         let (mut u_3, mut u_2, mut u_1): (Limb, Limb, Limb) = (0, 0, 0);
         let (mut v_3, mut v_2): (Limb, Limb) = (0, 0);
-        for k in 0..br {
-            let (a_0, a_1) = (ar[k << 1], ar[(k << 1) + 1]);
-            let (b_0, b_1) = (b[l << 1], b[(l << 1) + 1]);
+        for (a, b) in ar[..br << 1]
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .zip(b.as_chunks::<2>().0)
+        {
+            let (a_0, a_1) = (a[0], a[1]);
+            let (b_0, b_1) = (b[0], b[1]);
             let (p_2, p_1) = Limb::x_mul_y_to_zz(a_1, b_0);
             (u_3, u_2, u_1) = Limb::xxx_add_yyy_to_zzz(u_3, u_2, u_1, 0, p_2, p_1);
             let (p_3, p_2) = Limb::x_mul_y_to_zz(a_1, b_1);
@@ -246,11 +261,10 @@ fn do_row_22_4_unsigned<C: PolynomialCoefficient>(
                 Limb::xxxx_add_yyyy_to_zzzz(s_3, s_2, s_1, s_0, p_3, p_2, p_1, p_0);
             let (p_2, p_1) = Limb::x_mul_y_to_zz(a_0, b_1);
             (v_3, v_2, u_1) = Limb::xxx_add_yyy_to_zzz(v_3, v_2, u_1, 0, p_2, p_1);
-            l += 1;
         }
         (u_3, u_2) = Limb::xx_add_yy_to_zz(u_3, u_2, v_3, v_2);
         (s_3, s_2, s_1) = Limb::xxx_add_yyy_to_zzz(s_3, s_2, s_1, u_3, u_2, u_1);
-        *out_j = coefficient_from_limbs(&[s_0, s_1, s_2, s_3]);
+        set_limbs(out_j, &[s_0, s_1, s_2, s_3]);
     }
 }
 
@@ -265,15 +279,19 @@ fn do_row_22_5_unsigned<C: PolynomialCoefficient>(
     br: usize,
     bc: usize,
 ) {
-    let mut l = 0;
-    for out_j in out.iter_mut().take(bc) {
+    for (out_j, b) in out.iter_mut().take(bc).zip(b.chunks_exact(br << 1)) {
         let (mut s_4, mut s_3, mut s_2, mut s_1, mut s_0): (Limb, Limb, Limb, Limb, Limb) =
             (0, 0, 0, 0, 0);
         let (mut u_2, mut u_1): (Limb, Limb) = (0, 0);
         let (mut v_3, mut v_2): (Limb, Limb) = (0, 0);
-        for k in 0..br {
-            let (a_0, a_1) = (ar[k << 1], ar[(k << 1) + 1]);
-            let (b_0, b_1) = (b[l << 1], b[(l << 1) + 1]);
+        for (a, b) in ar[..br << 1]
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .zip(b.as_chunks::<2>().0)
+        {
+            let (a_0, a_1) = (a[0], a[1]);
+            let (b_0, b_1) = (b[0], b[1]);
             let (p_2, p_1) = Limb::x_mul_y_to_zz(a_1, b_0);
             (s_3, s_2, s_1) = Limb::xxx_add_yyy_to_zzz(s_3, s_2, s_1, 0, p_2, p_1);
             let (p_1, p_0) = Limb::x_mul_y_to_zz(b_0, a_0);
@@ -282,12 +300,11 @@ fn do_row_22_5_unsigned<C: PolynomialCoefficient>(
             (s_3, s_2, s_1) = Limb::xxx_add_yyy_to_zzz(s_3, s_2, s_1, 0, p_2, p_1);
             let (p_3, p_2) = Limb::x_mul_y_to_zz(b_1, a_1);
             (s_4, v_3, v_2) = Limb::xxx_add_yyy_to_zzz(s_4, v_3, v_2, 0, p_3, p_2);
-            l += 1;
         }
         // `s_3` is small, so this doesn't overflow.
         (s_3, s_2, s_1) = Limb::xxx_add_yyy_to_zzz(s_3, s_2, s_1, 0, u_2, u_1);
         (s_4, s_3, s_2) = Limb::xxx_add_yyy_to_zzz(s_4, s_3, s_2, 0, v_3, v_2);
-        *out_j = coefficient_from_limbs(&[s_0, s_1, s_2, s_3, s_4]);
+        set_limbs(out_j, &[s_0, s_1, s_2, s_3, s_4]);
     }
 }
 

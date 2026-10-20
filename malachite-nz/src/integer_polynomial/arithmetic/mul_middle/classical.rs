@@ -15,6 +15,7 @@
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul_truncated::classical::product_coefficient;
 use crate::integer_polynomial::arithmetic::square_truncated::classical::square_coefficient;
+use crate::integer_vector::arithmetic::dot_general::DotScratch;
 use core::ptr;
 
 // Sets `out` to the coefficients of $x^i$ for `nlo` $\leq i <$ `nhi` of the product of the
@@ -47,12 +48,14 @@ crate_test_fn! {mul_middle_to_out_classical<C: PolynomialCoefficient>(
     } else if ys.len() == 1 {
         C::vec_mul_scalar_to_out(out, &xs[nlo..nhi], &ys[0]);
     } else if ptr::eq(xs, ys) {
+        let mut buffers = DotScratch::default();
         for (o, i) in out.iter_mut().zip(nlo..nhi) {
-            *o = square_coefficient(xs, i);
+            *o = square_coefficient(xs, i, &mut buffers);
         }
     } else {
+        let mut buffers = DotScratch::default();
         for (o, i) in out.iter_mut().zip(nlo..nhi) {
-            *o = product_coefficient(xs, ys, i);
+            *o = product_coefficient(xs, ys, i, &mut buffers);
         }
     }
 }}

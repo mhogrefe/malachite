@@ -237,7 +237,7 @@ fn test_mul_multi_mod_dispatch() {
     let test = |height, inner, width, bits, signed| {
         let a = pseudorandom_integer_matrix(height, inner, bits, signed, 1);
         let b = pseudorandom_integer_matrix(inner, width, bits, signed, 2);
-        let expected = if bits <= 127 {
+        let expected = if bits < Limb::WIDTH << 1 {
             integer_matrix_mul_with(&a, &b, matrix_mul_double_word)
         } else {
             integer_matrix_mul_with(&a, &b, matrix_mul_classical)

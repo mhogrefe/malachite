@@ -9,7 +9,9 @@
 use crate::integer_matrix::IntegerMatrix;
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_vector::IntegerVector;
-use crate::integer_vector::arithmetic::dot_general::vec_dot_general;
+use crate::integer_vector::arithmetic::dot_general::{
+    DotScratch, vec_dot_general_strided_with_scratch,
+};
 use alloc::vec::Vec;
 use core::ops::Mul;
 
@@ -24,8 +26,19 @@ pub(crate) fn matrix_vector_mul<C: PolynomialCoefficient>(
     width: usize,
     ys: &[C],
 ) -> Vec<C> {
+    let mut buffers = DotScratch::default();
     (0..height)
-        .map(|i| vec_dot_general(None, false, &xs[i * width..(i + 1) * width], ys, false))
+        .map(|i| {
+            vec_dot_general_strided_with_scratch(
+                None,
+                false,
+                &xs[i * width..(i + 1) * width],
+                ys,
+                1,
+                false,
+                &mut buffers,
+            )
+        })
         .collect()
 }
 

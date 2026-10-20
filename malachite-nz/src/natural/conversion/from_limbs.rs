@@ -29,6 +29,21 @@ fn limbs_significant_length(xs: &[Limb]) -> usize {
 }
 
 impl Natural {
+    // Sets `self` to the `Natural` whose limbs, in ascending order, are `xs`, reusing the limb
+    // vector of `self` when it has one and the result needs more than one limb.
+    pub(crate) fn assign_limbs_asc(&mut self, xs: &[Limb]) {
+        let significant_length = limbs_significant_length(xs);
+        match (significant_length, &mut *self) {
+            (0, _) => *self = Self::ZERO,
+            (1, _) => *self = Self(Small(xs[0])),
+            (n, Self(Large(limbs))) => {
+                limbs.clear();
+                limbs.extend_from_slice(&xs[..n]);
+            }
+            (n, _) => *self = Self(Large(xs[..n].to_vec())),
+        }
+    }
+
     /// Converts a slice of [limbs](crate#limbs) to a [`Natural`].
     ///
     /// The limbs are in ascending order, so that less-significant limbs have lower indices in the

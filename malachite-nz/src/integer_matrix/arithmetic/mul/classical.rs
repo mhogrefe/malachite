@@ -12,13 +12,22 @@
 
 use crate::integer_matrix::arithmetic::mul::ProductShape;
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_vector::arithmetic::dot_general::vec_dot_general_strided;
+use crate::integer_vector::arithmetic::dot_general::{
+    DotScratch, vec_dot_general_strided_with_scratch,
+};
 use alloc::vec;
 use alloc::vec::Vec;
 
 // Appends to `out` the product of `row`, a row of `br` elements, and the `br` by `bc` matrix with
-// elements `ys` in row-major order: one row of a matrix product. `br` must be positive.
-fn mul_row<C: PolynomialCoefficient>(row: &[C], ys: &[C], bc: usize, out: &mut Vec<C>) {
+// elements `ys` in row-major order: one row of a matrix product. `br` must be positive. The dot
+// products sum in `buffers`.
+fn mul_row<C: PolynomialCoefficient>(
+    row: &[C],
+    ys: &[C],
+    bc: usize,
+    out: &mut Vec<C>,
+    buffers: &mut DotScratch,
+) {
     match *row {
         [ref x] => {
             for y in ys {
@@ -37,13 +46,14 @@ fn mul_row<C: PolynomialCoefficient>(row: &[C], ys: &[C], bc: usize, out: &mut V
             // Column `j` of the second matrix starts at element `j` and continues every `bc`
             // elements.
             for j in 0..bc {
-                out.push(vec_dot_general_strided(
+                out.push(vec_dot_general_strided_with_scratch(
                     None,
                     false,
                     row,
                     &ys[j..],
                     bc,
                     false,
+                    buffers,
                 ));
             }
         }
@@ -66,8 +76,9 @@ crate_test_fn! {matrix_mul_classical<C: PolynomialCoefficient>(
         return vec![C::ZERO; ar * bc];
     }
     let mut out = Vec::with_capacity(ar * bc);
+    let mut buffers = DotScratch::default();
     for row in xs.chunks_exact(br) {
-        mul_row(row, ys, bc, &mut out);
+        mul_row(row, ys, bc, &mut out, &mut buffers);
     }
     out
 }}
@@ -99,8 +110,9 @@ crate_test_fn! {matrix_mul_classical_assign<C: PolynomialCoefficient>(
         return;
     }
     let mut row = Vec::with_capacity(bc);
+    let mut buffers = DotScratch::default();
     let mut write_row = |xs: &mut Vec<C>, i: usize| {
-        mul_row(&xs[i * br..(i + 1) * br], ys, bc, &mut row);
+        mul_row(&xs[i * br..(i + 1) * br], ys, bc, &mut row, &mut buffers);
         for (x, y) in xs[i * bc..(i + 1) * bc].iter_mut().zip(row.drain(..)) {
             *x = y;
         }

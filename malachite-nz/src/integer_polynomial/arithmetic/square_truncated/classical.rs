@@ -13,14 +13,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_vector::arithmetic::dot_general::vec_dot_general;
+use crate::integer_vector::arithmetic::dot_general::{
+    DotScratch, vec_dot_general_strided_with_scratch,
+};
 use core::cmp::min;
 use malachite_base::num::arithmetic::traits::Parity;
 
 // The coefficient of $x^i$ in the square of the polynomial with coefficients `xs`, which is
 // nonempty, where `i < 2 * xs.len() - 1`: twice the dot product of the coefficients of $x^j$ and
 // $x^{i-j}$ over the $j < i / 2$ for which both exist, plus the square of the coefficient of
-// $x^{i/2}$ if `i` is even.
+// $x^{i/2}$ if `i` is even. The dot product sums in `buffers`.
 //
 // # Worst-case complexity
 // $T(n, m) = O(nm \log m \log\log m)$
@@ -29,15 +31,21 @@ use malachite_base::num::arithmetic::traits::Parity;
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is the largest number of
 // significant bits of any element of `xs`.
-pub(crate) fn square_coefficient<C: PolynomialCoefficient>(xs: &[C], i: usize) -> C {
+pub(crate) fn square_coefficient<C: PolynomialCoefficient>(
+    xs: &[C],
+    i: usize,
+    buffers: &mut DotScratch,
+) -> C {
     let start = (i + 1).saturating_sub(xs.len());
     let stop = min(xs.len(), (i + 1) >> 1);
-    let mut c = vec_dot_general(
+    let mut c = vec_dot_general_strided_with_scratch(
         None,
         false,
         &xs[start..stop],
         &xs[i + 1 - stop..=i - start],
+        1,
         true,
+        buffers,
     );
     c.double_assign();
     if i.even() {
@@ -65,7 +73,8 @@ crate_test_fn! {square_truncated_to_out_classical<C: PolynomialCoefficient>(
     xs: &[C],
 ) {
     let xs = &xs[..min(xs.len(), out.len())];
+    let mut buffers = DotScratch::default();
     for (i, o) in out.iter_mut().enumerate() {
-        *o = square_coefficient(xs, i);
+        *o = square_coefficient(xs, i, &mut buffers);
     }
 }}

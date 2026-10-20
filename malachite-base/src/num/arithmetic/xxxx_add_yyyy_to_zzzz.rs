@@ -18,7 +18,7 @@
 use crate::num::arithmetic::traits::XXXXAddYYYYToZZZZ;
 use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::WrappingFrom;
+use crate::num::conversion::traits::{JoinHalves, SplitInHalf, WrappingFrom};
 
 // A single folded chain per word ((flag_a | flag_b), with the previous flag folded in before the
 // next word) lets LLVM fuse the whole sequence into branchless adds/adcs (or subs/sbcs) on aarch64
@@ -48,8 +48,29 @@ fn xxxx_add_yyyy_to_zzzz<T: PrimitiveUnsigned>(
     (z_3, z_2, z_1, z_0)
 }
 
+// For types with a double-width type, the values are added as two double-width values; see
+// `impl_xxx_add_yyy_to_zzz`.
 macro_rules! impl_xxxx_add_yyyy_to_zzzz {
-    ($t:ident) => {
+    ($t:ident, $dt:ident) => {
+        impl_xxxx_add_yyyy_to_zzzz!($t, |x_3: $t,
+                                         x_2: $t,
+                                         x_1,
+                                         x_0,
+                                         y_3: $t,
+                                         y_2: $t,
+                                         y_1,
+                                         y_0| {
+            let (lo, carry) =
+                $dt::join_halves(x_1, x_0).overflowing_add($dt::join_halves(y_1, y_0));
+            let hi = $dt::join_halves(x_3, x_2)
+                .wrapping_add($dt::join_halves(y_3, y_2))
+                .wrapping_add($dt::from(carry));
+            let (z_3, z_2) = hi.split_in_half();
+            let (z_1, z_0) = lo.split_in_half();
+            (z_3, z_2, z_1, z_0)
+        });
+    };
+    ($t:ident, $f:expr) => {
         impl XXXXAddYYYYToZZZZ for $t {
             /// Adds two numbers, each composed of four `Self` values, returning the sum as a
             /// quadruple of `Self` values.
@@ -87,17 +108,17 @@ macro_rules! impl_xxxx_add_yyyy_to_zzzz {
                 y_1: $t,
                 y_0: $t,
             ) -> ($t, $t, $t, $t) {
-                xxxx_add_yyyy_to_zzzz::<$t>(x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0)
+                $f(x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0)
             }
         }
     };
 }
 
-impl_xxxx_add_yyyy_to_zzzz!(u8);
-impl_xxxx_add_yyyy_to_zzzz!(u16);
-impl_xxxx_add_yyyy_to_zzzz!(u32);
-impl_xxxx_add_yyyy_to_zzzz!(u64);
-impl_xxxx_add_yyyy_to_zzzz!(u128);
+impl_xxxx_add_yyyy_to_zzzz!(u8, u16);
+impl_xxxx_add_yyyy_to_zzzz!(u16, u32);
+impl_xxxx_add_yyyy_to_zzzz!(u32, u64);
+impl_xxxx_add_yyyy_to_zzzz!(u64, u128);
+impl_xxxx_add_yyyy_to_zzzz!(u128, xxxx_add_yyyy_to_zzzz::<u128>);
 
 impl XXXXAddYYYYToZZZZ for usize {
     /// Adds two numbers, each composed of four [`usize`] values, returning the sum as a quadruple

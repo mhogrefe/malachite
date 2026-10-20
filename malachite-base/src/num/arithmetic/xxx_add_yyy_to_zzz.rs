@@ -18,7 +18,7 @@
 use crate::num::arithmetic::traits::XXXAddYYYToZZZ;
 use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::WrappingFrom;
+use crate::num::conversion::traits::{JoinHalves, SplitInHalf, WrappingFrom};
 
 // A single folded chain per word ((flag_a | flag_b), with the previous flag folded in before the
 // next word) lets LLVM fuse the whole sequence into branchless adds/adcs (or subs/sbcs) on aarch64
@@ -40,8 +40,23 @@ private_test_fn! {xxx_add_yyy_to_zzz<T: PrimitiveUnsigned>(
     (z_2, z_1, z_0)
 }}
 
+// For types with a double-width type, the low two values are added as one double-width value, so
+// that their carry is a single overflow flag. Combining two overflow flags, as `xxx_add_yyy_to_zzz`
+// does, keeps the compiler from chaining add-with-carry instructions on some targets, such as
+// aarch64.
 macro_rules! impl_xxx_add_yyy_to_zzz {
-    ($t:ident) => {
+    ($t:ident, $dt:ident) => {
+        impl_xxx_add_yyy_to_zzz!($t, |x_2: $t, x_1, x_0, y_2: $t, y_1, y_0| {
+            let (z, carry) = $dt::join_halves(x_1, x_0).overflowing_add($dt::join_halves(y_1, y_0));
+            let (z_1, z_0) = z.split_in_half();
+            (
+                x_2.wrapping_add(y_2).wrapping_add($t::from(carry)),
+                z_1,
+                z_0,
+            )
+        });
+    };
+    ($t:ident, $f:expr) => {
         impl XXXAddYYYToZZZ for $t {
             /// Adds two numbers, each composed of three `Self` values, returning the sum as a
             /// triple of `Self` values.
@@ -77,17 +92,17 @@ macro_rules! impl_xxx_add_yyy_to_zzz {
                 y_1: $t,
                 y_0: $t,
             ) -> ($t, $t, $t) {
-                xxx_add_yyy_to_zzz::<$t>(x_2, x_1, x_0, y_2, y_1, y_0)
+                $f(x_2, x_1, x_0, y_2, y_1, y_0)
             }
         }
     };
 }
 
-impl_xxx_add_yyy_to_zzz!(u8);
-impl_xxx_add_yyy_to_zzz!(u16);
-impl_xxx_add_yyy_to_zzz!(u32);
-impl_xxx_add_yyy_to_zzz!(u64);
-impl_xxx_add_yyy_to_zzz!(u128);
+impl_xxx_add_yyy_to_zzz!(u8, u16);
+impl_xxx_add_yyy_to_zzz!(u16, u32);
+impl_xxx_add_yyy_to_zzz!(u32, u64);
+impl_xxx_add_yyy_to_zzz!(u64, u128);
+impl_xxx_add_yyy_to_zzz!(u128, xxx_add_yyy_to_zzz::<u128>);
 
 impl XXXAddYYYToZZZ for usize {
     /// Adds two numbers, each composed of three [`usize`] values, returning the sum as a triple of

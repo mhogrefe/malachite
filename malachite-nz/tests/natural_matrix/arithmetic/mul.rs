@@ -201,7 +201,7 @@ fn test_mul_multi_mod_dispatch() {
     let test = |height, inner, width, bits| {
         let a = pseudorandom_natural_matrix(height, inner, bits, 1);
         let b = pseudorandom_natural_matrix(inner, width, bits, 2);
-        let expected = if bits <= 127 {
+        let expected = if bits < Limb::WIDTH << 1 {
             natural_matrix_mul_with(&a, &b, matrix_mul_double_word)
         } else {
             natural_matrix_mul_with(&a, &b, matrix_mul_classical)

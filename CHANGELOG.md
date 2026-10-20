@@ -385,6 +385,19 @@ documented by git history.
   classical algorithm (which packs several elements into a word when the modulus is small enough)
   and Strassen–Winograd multiplication as FLINT does with one thread. The elements must be reduced,
   and the width of the first matrix must be the height of the second.
+- Performance: `XXXAddYYYToZZZ` and `XXXXAddYYYYToZZZZ` for `u8` through `u64` and `usize` now add
+  the low two values as one double-width value, so that on aarch64 the carries chain through
+  add-with-carry instructions instead of being recombined from two overflow flags. With the bounds
+  checks removed from its inner loops, this makes the double-word kernel of `IntegerMatrix` and
+  `NaturalMatrix` multiplication 1.4 to 1.7 times faster for dimensions 16 to 64; the small-element
+  kernels that sum in three words are about 18% faster, and `ModDot` for `UnsignedVector<u64>` about
+  14%.
+- Performance: the dot products behind the classical multiplication of `IntegerMatrix`es and
+  `NaturalMatrix`es, matrix-vector multiplication, and classical truncated and middle polynomial
+  multiplication reuse their summing buffers across the dot products of one product, instead of
+  allocating them for each, which makes classical matrix multiplication of large elements 1.3 to 2.2
+  times faster. `MulAssign` for matrices whose elements fit in two words writes each element of the
+  product into the old element's limbs where it can, which is up to 35% faster.
 
 ### malachite-q
 

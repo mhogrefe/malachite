@@ -63,6 +63,11 @@ PolynomialCoefficient:
     // coefficient cannot be negative, so for `Natural`s `sign` must be `true` unless `abs` is zero.
     fn from_sign_and_abs(sign: bool, abs: Natural) -> Self;
 
+    // Sets a coefficient to the one whose absolute value has the limbs `xs`, in ascending order,
+    // and which is negative unless `sign` or it is zero, reusing the coefficient's limb vector when
+    // it has one. A `Natural` coefficient cannot be negative.
+    fn assign_sign_and_limbs(&mut self, sign: bool, xs: &[Limb]);
+
     // The negative of a coefficient. A `Natural` coefficient cannot be negative, so for `Natural`s
     // the coefficient must be zero.
     fn negate(self) -> Self;
@@ -122,6 +127,11 @@ impl PolynomialCoefficient for Integer {
     #[inline]
     fn from_sign_and_abs(sign: bool, abs: Natural) -> Self {
         Self::from_sign_and_abs(sign, abs)
+    }
+
+    fn assign_sign_and_limbs(&mut self, sign: bool, xs: &[Limb]) {
+        self.abs.assign_limbs_asc(xs);
+        self.sign = sign || self.abs == 0u32;
     }
 
     #[inline]
@@ -208,6 +218,14 @@ impl PolynomialCoefficient for Natural {
             "a Natural coefficient cannot be negative"
         );
         abs
+    }
+
+    fn assign_sign_and_limbs(&mut self, sign: bool, xs: &[Limb]) {
+        self.assign_limbs_asc(xs);
+        assert!(
+            sign || *self == 0u32,
+            "a Natural coefficient cannot be negative"
+        );
     }
 
     #[inline]

@@ -158,6 +158,39 @@ crate_test_fn! {vec_dot_general_strided<C: PolynomialCoefficient>(
     stride: usize,
     reverse: bool,
 ) -> C {
+    vec_dot_general_strided_with_scratch(
+        initial,
+        subtract,
+        xs,
+        ys,
+        stride,
+        reverse,
+        &mut DotScratch::default(),
+    )
+}}
+
+// The buffers that `vec_dot_general_strided_with_scratch` sums in. Reusing them across dot
+// products, as the classical matrix product does, avoids allocating them for each one; FLINT
+// allocates them on the stack.
+#[derive(Default)]
+pub(crate) struct DotScratch {
+    pos: Vec<Limb>,
+    neg: Vec<Limb>,
+    t: Vec<Limb>,
+    scratch: Vec<Limb>,
+}
+
+// Like `vec_dot_general_strided`, but summing in the buffers of `buffers`, whose contents are
+// ignored.
+pub(crate) fn vec_dot_general_strided_with_scratch<C: PolynomialCoefficient>(
+    initial: Option<&C>,
+    subtract: bool,
+    xs: &[C],
+    ys: &[C],
+    stride: usize,
+    reverse: bool,
+    buffers: &mut DotScratch,
+) -> C {
     let len = xs.len();
     assert!(len == 0 || ys.len() > (len - 1) * stride);
     if len <= 1 {
@@ -181,13 +214,14 @@ crate_test_fn! {vec_dot_general_strided<C: PolynomialCoefficient>(
     let mut s0: Limb = 0;
     let mut s1: Limb = 0;
     let mut s2: Limb = 0;
-    let mut neg: Vec<Limb> = Vec::new();
-    let mut pos: Vec<Limb> = Vec::new();
+    let DotScratch {
+        pos,
+        neg,
+        t,
+        scratch,
+    } = buffers;
     let mut posn = 0;
     let mut negn = 0;
-    let mut t: Vec<Limb> = Vec::new();
-    // Scratch space for the products, reused and grown as needed.
-    let mut scratch: Vec<Limb> = Vec::new();
     if let Some(initial) = initial {
         let ap = initial.unsigned_abs_ref().as_limbs_asc();
         let an = ap.len();
@@ -201,10 +235,12 @@ crate_test_fn! {vec_dot_general_strided<C: PolynomialCoefficient>(
                 (s2, s1, s0) = Limb::xxx_sub_yyy_to_zzz(0, 0, 0, 0, s1, s0);
             }
         } else if aneg ^ subtract {
-            neg = ap.to_vec();
+            neg.clear();
+            neg.extend_from_slice(ap);
             negn = an;
         } else {
-            pos = ap.to_vec();
+            pos.clear();
+            pos.extend_from_slice(ap);
             posn = an;
         }
     }
@@ -241,9 +277,9 @@ crate_test_fn! {vec_dot_general_strided<C: PolynomialCoefficient>(
         if bn == 1 {
             let b0 = bp[0];
             if aneg ^ bneg {
-                mpn_addmul_1(&mut neg, &mut negn, ap, b0);
+                mpn_addmul_1(neg, &mut negn, ap, b0);
             } else {
-                mpn_addmul_1(&mut pos, &mut posn, ap, b0);
+                mpn_addmul_1(pos, &mut posn, ap, b0);
             }
             continue;
         }
@@ -267,9 +303,9 @@ crate_test_fn! {vec_dot_general_strided<C: PolynomialCoefficient>(
         };
         tn -= usize::from(carry == 0);
         if aneg ^ bneg {
-            mpn_add(&mut neg, &mut negn, &mut t, tn);
+            mpn_add(neg, &mut negn, t, tn);
         } else {
-            mpn_add(&mut pos, &mut posn, &mut t, tn);
+            mpn_add(pos, &mut posn, t, tn);
         }
     }
     // There are only small terms.
@@ -279,22 +315,27 @@ crate_test_fn! {vec_dot_general_strided<C: PolynomialCoefficient>(
         }
         return coefficient_from_signed_triple(s2, s1, s0);
     }
-    // Add the small terms to the large ones.
-    if s2.get_highest_bit() {
-        let (d2, d1, d0) = Limb::xxx_sub_yyy_to_zzz(0, 0, 0, s2, s1, s0);
-        let mut small = vec![d0, d1, d2];
-        mpn_add(&mut neg, &mut negn, &mut small, 3);
-    } else {
-        let mut small = vec![s0, s1, s2];
-        mpn_add(&mut pos, &mut posn, &mut small, 3);
+    // Add the small terms to the large ones, through `t`, which is free here. FLINT adds them even
+    // when they are zero.
+    if s2 != 0 || s1 != 0 || s0 != 0 {
+        if t.len() < 3 {
+            t.resize(3, 0);
+        }
+        if s2.get_highest_bit() {
+            (t[2], t[1], t[0]) = Limb::xxx_sub_yyy_to_zzz(0, 0, 0, s2, s1, s0);
+            mpn_add(neg, &mut negn, t, 3);
+        } else {
+            (t[2], t[1], t[0]) = (s2, s1, s0);
+            mpn_add(pos, &mut posn, t, 3);
+        }
     }
 
-    mpn_norm(&pos, &mut posn);
-    mpn_norm(&neg, &mut negn);
+    mpn_norm(pos, &mut posn);
+    mpn_norm(neg, &mut negn);
     if negn == 0 {
-        coefficient_from_limbs(&pos, posn, subtract)
+        coefficient_from_limbs(pos, posn, subtract)
     } else if posn == 0 {
-        coefficient_from_limbs(&neg, negn, !subtract)
+        coefficient_from_limbs(neg, negn, !subtract)
     } else {
         // Do the subtraction.
         let mut tneg = false;
@@ -315,7 +356,7 @@ crate_test_fn! {vec_dot_general_strided<C: PolynomialCoefficient>(
         } else {
             limbs_sub_greater_to_out(&mut t[..tn], &pos[..posn], &neg[..negn]);
         }
-        mpn_norm(&t, &mut tn);
-        coefficient_from_limbs(&t, tn, tneg ^ subtract)
+        mpn_norm(t, &mut tn);
+        coefficient_from_limbs(t, tn, tneg ^ subtract)
     }
-}}
+}
