@@ -21,6 +21,8 @@ use crate::integer_matrix::arithmetic::mul::small::{
     matrix_mul_small_1, matrix_mul_small_2a, matrix_mul_small_2b, matrix_mul_small_internal,
     small_words, small_words_transposed,
 };
+use crate::integer_matrix::arithmetic::mul::strassen::matrix_mul_strassen;
+use crate::integer_matrix::arithmetic::mul::waksman::matrix_mul_waksman;
 use crate::integer_polynomial::arithmetic::coefficient::{
     PolynomialCoefficient, SMALL_FMPZ_BITCOUNT_MAX,
 };
@@ -39,6 +41,15 @@ pub mod classical;
 pub mod double_word;
 /// FLINT's algorithms for elements that fit in small `fmpz`s.
 pub mod small;
+/// Strassen's algorithm.
+pub mod strassen;
+/// Waksman's algorithm.
+pub mod waksman;
+
+// Above this smallest dimension, a product whose elements fit in small `fmpz`s uses Strassen's
+// algorithm: `1000 + 300 * flint_get_num_threads()` in `fmpz_mat/mul.c`, FLINT 3.6.0, with one
+// thread.
+const STRASSEN_SMALL_DIMENSION_MIN: usize = 1300;
 
 // The shape of a matrix product: the first factor is `ar` by `br`, and the second is `br` by `bc`.
 crate_test_struct! {
@@ -79,15 +90,16 @@ pub(crate) enum MatrixMulAlgorithm {
     // The product is a zero matrix.
     Zero,
     Classical,
+    Waksman,
+    Strassen,
     Word(WordMulAlgorithm),
 }
 
 // Chooses the algorithm for the product of the matrices with elements `xs` and `ys`.
 //
 // This is the choice that `fmpz_mat_mul` from `fmpz_mat/mul.c`, FLINT 3.6.0, makes with one thread
-// and without BLAS, restricted to the algorithms ported so far: where FLINT would choose Strassen's
-// algorithm or the multimodular one, this falls back to the algorithm FLINT uses for smaller
-// dimensions.
+// and without BLAS, restricted to the algorithms ported so far: where FLINT would choose the
+// multimodular algorithm, this makes the choice FLINT makes when it does not.
 pub(crate) fn choose_matrix_mul_algorithm<C: PolynomialCoefficient>(
     xs: &[C],
     ys: &[C],
@@ -108,30 +120,50 @@ pub(crate) fn choose_matrix_mul_algorithm<C: PolynomialCoefficient>(
         return MatrixMulAlgorithm::Zero;
     }
     let c_bits = a_bits + b_bits + u64::exact_from(br).significant_bits();
-    MatrixMulAlgorithm::Word(
-        if a_bits <= SMALL_FMPZ_BITCOUNT_MAX && b_bits <= SMALL_FMPZ_BITCOUNT_MAX {
-            WordMulAlgorithm::Small(if ar < 9 || ar + br < 20 {
-                if c_bits <= SMALL_FMPZ_BITCOUNT_MAX {
-                    SmallMulKind::One
-                } else if c_bits < TWICE_WIDTH {
-                    SmallMulKind::TwoA
-                } else {
-                    SmallMulKind::TwoB
-                }
+    let dim = ar.min(bc).min(br);
+    if a_bits <= SMALL_FMPZ_BITCOUNT_MAX && b_bits <= SMALL_FMPZ_BITCOUNT_MAX {
+        // Strassen's algorithm and the multimodular one are effective at large dimensions.
+        let kind = if ar < 9 || ar + br < 20 {
+            if c_bits <= SMALL_FMPZ_BITCOUNT_MAX {
+                SmallMulKind::One
+            } else if c_bits < TWICE_WIDTH {
+                SmallMulKind::TwoA
             } else {
-                // FLINT uses Strassen's algorithm or the multimodular one for large dimensions.
-                SmallMulKind::Internal(c_bits)
-            })
-        } else if a_bits + u64::from(sign) <= TWICE_WIDTH && b_bits + u64::from(sign) <= TWICE_WIDTH
-        {
-            // FLINT uses the multimodular algorithm for large dimensions.
-            WordMulAlgorithm::DoubleWord(sign, c_bits)
+                SmallMulKind::TwoB
+            }
         } else {
-            // FLINT uses the multimodular algorithm, Waksman's, or Strassen's for some dimensions
-            // and sizes.
-            return MatrixMulAlgorithm::Classical;
-        },
-    )
+            // With one thread, FLINT's limit is 300. Strassen's algorithm avoids large intermediate
+            // values when the product fits in a small `fmpz`; otherwise FLINT uses the multimodular
+            // algorithm above a dimension of 4300, which is not yet ported.
+            if c_bits <= SMALL_FMPZ_BITCOUNT_MAX && dim > STRASSEN_SMALL_DIMENSION_MIN {
+                return MatrixMulAlgorithm::Strassen;
+            }
+            SmallMulKind::Internal(c_bits)
+        };
+        MatrixMulAlgorithm::Word(WordMulAlgorithm::Small(kind))
+    } else if a_bits + u64::from(sign) <= TWICE_WIDTH && b_bits + u64::from(sign) <= TWICE_WIDTH {
+        // FLINT uses the multimodular algorithm for large dimensions, which is not yet ported.
+        MatrixMulAlgorithm::Word(WordMulAlgorithm::DoubleWord(sign, c_bits))
+    } else {
+        // Waksman's algorithm wants elements of similar sizes. FLINT uses the multimodular
+        // algorithm when `dim >= 3 * c_bits.significant_bits()`; it is not yet ported, so the next
+        // choices are made instead.
+        let min_bits = a_bits.min(b_bits);
+        let max_bits = a_bits.max(b_bits);
+        if dim < 20
+            && ((dim == 2 && min_bits >= 5000 && max_bits * 10 <= min_bits * 11)
+                || (max_bits * 5 <= min_bits << 3
+                    && ((dim == 3 && min_bits >= 3000)
+                        || (dim >= 4 && min_bits >= 1000)
+                        || (dim >= 12 && min_bits >= 500))))
+        {
+            MatrixMulAlgorithm::Waksman
+        } else if a_bits >= 500 && b_bits >= 500 && dim >= 8 {
+            MatrixMulAlgorithm::Strassen
+        } else {
+            MatrixMulAlgorithm::Classical
+        }
+    }
 }
 
 // A word algorithm, together with the first matrix in the form that it reads.
@@ -203,6 +235,12 @@ crate_test_fn! {matrix_mul<C: PolynomialCoefficient>(
     match choose_matrix_mul_algorithm(xs, ys, shape) {
         MatrixMulAlgorithm::Zero => vec![C::ZERO; shape.ar * shape.bc],
         MatrixMulAlgorithm::Classical => matrix_mul_classical(xs, ys, shape),
+        MatrixMulAlgorithm::Waksman => {
+            C::from_integers(matrix_mul_waksman(&C::as_integers(xs), &C::as_integers(ys), shape))
+        }
+        MatrixMulAlgorithm::Strassen => {
+            C::from_integers(matrix_mul_strassen(&C::as_integers(xs), &C::as_integers(ys), shape))
+        }
         MatrixMulAlgorithm::Word(algorithm) => {
             let mut out = vec![C::ZERO; shape.ar * shape.bc];
             WordMul::borrowing(algorithm, xs).run(&mut out, ys, shape);
@@ -212,8 +250,10 @@ crate_test_fn! {matrix_mul<C: PolynomialCoefficient>(
 }}
 
 // Replaces the elements `xs` of the first factor of a product with those of the product, choosing
-// an algorithm and reusing the storage of `xs`. The algorithms for small elements read the first
-// matrix as words, which are copied out first, so the product can be written directly into `xs`.
+// an algorithm. The classical algorithm reuses the storage of `xs`, a row at a time; the algorithms
+// for small elements read the first matrix as words, which are copied out first, so the product can
+// be written directly into `xs`; Waksman's and Strassen's algorithms compute the product
+// separately.
 //
 // This is equivalent to `fmpz_mat_mul` from `fmpz_mat/mul.c`, FLINT 3.6.0, with one thread, without
 // BLAS, and with the output the same as the first input, restricted to the algorithms ported so
@@ -229,6 +269,18 @@ crate_test_fn! {matrix_mul_assign<C: PolynomialCoefficient>(
             xs.resize(shape.ar * shape.bc, C::ZERO);
         }
         MatrixMulAlgorithm::Classical => matrix_mul_classical_assign(xs, ys, shape),
+        MatrixMulAlgorithm::Waksman => {
+            let product = matrix_mul_waksman(&C::as_integers(xs), &C::as_integers(ys), shape);
+            // Keep the storage of `xs`.
+            xs.clear();
+            xs.append(&mut C::from_integers(product));
+        }
+        MatrixMulAlgorithm::Strassen => {
+            let product = matrix_mul_strassen(&C::as_integers(xs), &C::as_integers(ys), shape);
+            // Keep the storage of `xs`.
+            xs.clear();
+            xs.append(&mut C::from_integers(product));
+        }
         MatrixMulAlgorithm::Word(algorithm) => {
             let product = WordMul::converting(algorithm, xs);
             xs.resize(shape.ar * shape.bc, C::ZERO);
@@ -454,9 +506,10 @@ impl MulAssign<Self> for IntegerMatrix {
     ///
     /// The product is written back into the storage of `self`. When every element fits in two
     /// limbs, the elements of `self` are first copied out as words, and the product is written
-    /// directly; otherwise the product is computed one row at a time, so when it is no wider than
-    /// `self`, and in particular when the second matrix is square, the only additional memory is
-    /// one row.
+    /// directly. For large matrices with large elements, Waksman's or Strassen's algorithm computes
+    /// the product separately, and it is then moved into the storage of `self`. Otherwise the
+    /// product is computed one row at a time, so when it is no wider than `self`, and in particular
+    /// when the second matrix is square, the only additional memory is one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of
@@ -508,9 +561,10 @@ impl MulAssign<&Self> for IntegerMatrix {
     ///
     /// The product is written back into the storage of `self`. When every element fits in two
     /// limbs, the elements of `self` are first copied out as words, and the product is written
-    /// directly; otherwise the product is computed one row at a time, so when it is no wider than
-    /// `self`, and in particular when the second matrix is square, the only additional memory is
-    /// one row.
+    /// directly. For large matrices with large elements, Waksman's or Strassen's algorithm computes
+    /// the product separately, and it is then moved into the storage of `self`. Otherwise the
+    /// product is computed one row at a time, so when it is no wider than `self`, and in particular
+    /// when the second matrix is square, the only additional memory is one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of

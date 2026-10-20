@@ -235,9 +235,10 @@ impl MulAssign<Self> for NaturalMatrix {
     ///
     /// The product is written back into the storage of `self`. When every element fits in two
     /// limbs, the elements of `self` are first copied out as words, and the product is written
-    /// directly; otherwise the product is computed one row at a time, so when it is no wider than
-    /// `self`, and in particular when the second matrix is square, the only additional memory is
-    /// one row.
+    /// directly. For large matrices with large elements, Waksman's or Strassen's algorithm computes
+    /// the product separately, and it is then moved into the storage of `self`. Otherwise the
+    /// product is computed one row at a time, so when it is no wider than `self`, and in particular
+    /// when the second matrix is square, the only additional memory is one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of
@@ -290,9 +291,10 @@ impl MulAssign<&Self> for NaturalMatrix {
     ///
     /// The product is written back into the storage of `self`. When every element fits in two
     /// limbs, the elements of `self` are first copied out as words, and the product is written
-    /// directly; otherwise the product is computed one row at a time, so when it is no wider than
-    /// `self`, and in particular when the second matrix is square, the only additional memory is
-    /// one row.
+    /// directly. For large matrices with large elements, Waksman's or Strassen's algorithm computes
+    /// the product separately, and it is then moved into the storage of `self`. Otherwise the
+    /// product is computed one row at a time, so when it is no wider than `self`, and in particular
+    /// when the second matrix is square, the only additional memory is one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of

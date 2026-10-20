@@ -13,6 +13,8 @@ use crate::integer_matrix::arithmetic::mul::small::{
     matrix_mul_small_1, matrix_mul_small_2a, matrix_mul_small_2b, sign_extension, signed_mul,
     small_words, small_words_transposed,
 };
+use crate::integer_matrix::arithmetic::mul::strassen::matrix_mul_strassen;
+use crate::integer_matrix::arithmetic::mul::waksman::matrix_mul_waksman;
 use crate::integer_polynomial::arithmetic::coefficient::{
     PolynomialCoefficient, SMALL_FMPZ_BITCOUNT_MAX,
 };
@@ -191,4 +193,30 @@ pub fn integer_matrix_mul_with(
         bc: usize::exact_from(b.width()),
     };
     IntegerMatrix::from_owned_elements(a.height(), b.width(), f(&a.elements, &b.elements, shape))
+}
+
+// Waksman's algorithm for any coefficients, through `Integer`s.
+pub fn matrix_mul_waksman_any<C: PolynomialCoefficient>(
+    xs: &[C],
+    ys: &[C],
+    shape: ProductShape,
+) -> Vec<C> {
+    C::from_integers(matrix_mul_waksman(
+        &C::as_integers(xs),
+        &C::as_integers(ys),
+        shape,
+    ))
+}
+
+// Strassen's algorithm for any coefficients, through `Integer`s.
+pub fn matrix_mul_strassen_any<C: PolynomialCoefficient>(
+    xs: &[C],
+    ys: &[C],
+    shape: ProductShape,
+) -> Vec<C> {
+    C::from_integers(matrix_mul_strassen(
+        &C::as_integers(xs),
+        &C::as_integers(ys),
+        shape,
+    ))
 }

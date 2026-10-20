@@ -26,7 +26,7 @@ use malachite_nz::test_util::generators::{
 };
 use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
     integer_matrix_mul_naive, integer_matrix_mul_with, matrix_mul_small_unblocked,
-    matrix_mul_small_unblocked_column_reads,
+    matrix_mul_small_unblocked_column_reads, matrix_mul_strassen_any, matrix_mul_waksman_any,
 };
 
 #[test]
@@ -155,6 +155,14 @@ fn check_kernels(a: &IntegerMatrix, b: &IntegerMatrix, bits: u64, signed: bool) 
         integer_matrix_mul_with(a, b, matrix_mul_classical),
         expected
     );
+    assert_eq!(
+        integer_matrix_mul_with(a, b, matrix_mul_waksman_any),
+        expected
+    );
+    assert_eq!(
+        integer_matrix_mul_with(a, b, matrix_mul_strassen_any),
+        expected
+    );
     if bits <= Limb::WIDTH - 2 {
         assert_eq!(integer_matrix_mul_with(a, b, matrix_mul_small), expected);
         assert_eq!(
@@ -207,6 +215,15 @@ fn test_mul_kernels() {
         test(12, 9, 11, 120, signed);
         // Elements that are too large for the word algorithms.
         test(4, 5, 3, 200, signed);
+        // Large elements: Waksman's algorithm for dimensions 2, 3, at least 4, and at least 12, and
+        // Strassen's for dimensions of at least 8, with odd dimensions in each position.
+        test(2, 3, 2, 6000, signed);
+        test(3, 4, 3, 3500, signed);
+        test(5, 5, 5, 1200, signed);
+        test(12, 13, 12, 600, signed);
+        test(8, 8, 8, 600, signed);
+        test(9, 11, 7, 600, signed);
+        test(20, 21, 23, 520, signed);
     }
     // Non-negative double-word elements up to 128 bits.
     test(3, 5, 4, 128, false);
@@ -232,6 +249,16 @@ fn test_mul_classical_empty() {
     test(2, 3, 0);
     test(2, 0, 3);
     test(0, 0, 3);
+}
+
+#[test]
+fn test_mul_strassen_small_elements() {
+    // Every dimension is above 1300 and every element of the product fits in a small `fmpz`, so the
+    // product uses Strassen's algorithm. The naive product would be too slow, so the result is
+    // compared with that of the blocked algorithm for small elements.
+    let a = pseudorandom_matrix(1301, 1301, 10, true, 1);
+    let b = pseudorandom_matrix(1301, 1301, 10, true, 2);
+    assert_eq!(&a * &b, integer_matrix_mul_with(&a, &b, matrix_mul_small));
 }
 
 #[test]
@@ -303,10 +330,10 @@ fn mul_properties() {
     });
 
     integer_matrix_pair_gen_var_4().test_properties(|(a, b)| {
-        assert_eq!(
-            integer_matrix_mul_with(&a, &b, matrix_mul_classical),
-            &a * &b
-        );
+        let c = &a * &b;
+        assert_eq!(integer_matrix_mul_with(&a, &b, matrix_mul_classical), c);
+        assert_eq!(integer_matrix_mul_with(&a, &b, matrix_mul_waksman_any), c);
+        assert_eq!(integer_matrix_mul_with(&a, &b, matrix_mul_strassen_any), c);
     });
 
     integer_matrix_pair_gen_var_5().test_properties(|(a, b)| {

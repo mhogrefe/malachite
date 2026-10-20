@@ -13,6 +13,7 @@ use crate::integer_vector::arithmetic::scalar_mul::{
 use crate::natural::InnerNatural::Small;
 use crate::natural::{LIMB_MAX_QUARTER, Natural, WIDTH_MINUS_2};
 use crate::platform::{Limb, SignedDoubleLimb, SignedLimb};
+use alloc::borrow::Cow;
 use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::ops::{AddAssign, MulAssign, SubAssign};
@@ -83,6 +84,14 @@ PolynomialCoefficient:
 
     // Multiplies each element of `xs` by `c`.
     fn vec_mul_scalar_assign(xs: &mut [Self], c: &Self);
+
+    // The coefficients as `Integer`s, for algorithms whose intermediate values may be negative:
+    // borrowed for `Integer`s, and copied for `Natural`s.
+    fn as_integers(xs: &[Self]) -> Cow<'_, [Integer]>;
+
+    // Coefficients from the results of such an algorithm, which must be non-negative for
+    // `Natural`s.
+    fn from_integers(xs: Vec<Integer>) -> Vec<Self>;
 }}
 
 impl PolynomialCoefficient for Integer {
@@ -144,6 +153,16 @@ impl PolynomialCoefficient for Integer {
     #[inline]
     fn vec_mul_scalar_assign(xs: &mut [Self], c: &Self) {
         integers_mul_scalar_assign(xs, c);
+    }
+
+    #[inline]
+    fn as_integers(xs: &[Self]) -> Cow<'_, [Integer]> {
+        Cow::Borrowed(xs)
+    }
+
+    #[inline]
+    fn from_integers(xs: Vec<Integer>) -> Vec<Self> {
+        xs
     }
 }
 
@@ -226,6 +245,16 @@ impl PolynomialCoefficient for Natural {
                 }
             }
         }
+    }
+
+    #[inline]
+    fn as_integers(xs: &[Self]) -> Cow<'_, [Integer]> {
+        Cow::Owned(xs.iter().map(Integer::from).collect())
+    }
+
+    #[inline]
+    fn from_integers(xs: Vec<Integer>) -> Vec<Self> {
+        xs.into_iter().map(Self::exact_from).collect()
     }
 }
 

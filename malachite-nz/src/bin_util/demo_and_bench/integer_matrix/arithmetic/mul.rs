@@ -20,7 +20,7 @@ use malachite_nz::test_util::generators::{
 };
 use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
     integer_matrix_mul_naive, integer_matrix_mul_with, matrix_mul_small_unblocked,
-    matrix_mul_small_unblocked_column_reads,
+    matrix_mul_small_unblocked_column_reads, matrix_mul_strassen_any, matrix_mul_waksman_any,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -44,6 +44,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_integer_matrix_mul_small_unblocked_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_integer_matrix_mul_large_elements_algorithms
     );
 }
 
@@ -241,6 +245,42 @@ fn benchmark_integer_matrix_mul_small_unblocked_algorithms(
                     &b,
                     matrix_mul_small_unblocked_column_reads
                 ));
+            }),
+        ],
+    );
+}
+
+// Compares the algorithms for large elements. Set `mean_bits_n` to a large value, such as 1000, to
+// reach the sizes where FLINT chooses Waksman's or Strassen's algorithm.
+fn benchmark_integer_matrix_mul_large_elements_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "&IntegerMatrix * &IntegerMatrix",
+        BenchmarkType::Algorithms,
+        integer_matrix_pair_gen_var_4().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_integer_matrix_product_size_bucketer("a", "b"),
+        &mut [
+            ("default", &mut |(a, b)| {
+                no_out!(&a * &b);
+            }),
+            ("classical", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_classical));
+            }),
+            ("Waksman", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_waksman_any));
+            }),
+            ("Strassen", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_strassen_any));
+            }),
+            ("naive", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_naive(&a, &b));
             }),
         ],
     );

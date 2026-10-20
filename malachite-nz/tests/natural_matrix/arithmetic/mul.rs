@@ -22,7 +22,8 @@ use malachite_nz::test_util::generators::{
     natural_matrix_pair_gen_var_6,
 };
 use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
-    matrix_mul_small_unblocked, matrix_mul_small_unblocked_column_reads,
+    matrix_mul_small_unblocked, matrix_mul_small_unblocked_column_reads, matrix_mul_strassen_any,
+    matrix_mul_waksman_any,
 };
 use malachite_nz::test_util::natural_matrix::arithmetic::mul::{
     natural_matrix_mul_naive, natural_matrix_mul_with,
@@ -151,6 +152,14 @@ fn check_kernels(a: &NaturalMatrix, b: &NaturalMatrix, bits: u64, signed: bool) 
         natural_matrix_mul_with(a, b, matrix_mul_classical),
         expected
     );
+    assert_eq!(
+        natural_matrix_mul_with(a, b, matrix_mul_waksman_any),
+        expected
+    );
+    assert_eq!(
+        natural_matrix_mul_with(a, b, matrix_mul_strassen_any),
+        expected
+    );
     if bits <= Limb::WIDTH - 2 {
         assert_eq!(natural_matrix_mul_with(a, b, matrix_mul_small), expected);
         assert_eq!(
@@ -203,6 +212,15 @@ fn test_mul_kernels() {
     test(12, 9, 11, 120, signed);
     // Elements that are too large for the word algorithms.
     test(4, 5, 3, 200, signed);
+    // Large elements: Waksman's algorithm for dimensions 2, 3, at least 4, and at least 12, and
+    // Strassen's for dimensions of at least 8, with odd dimensions in each position.
+    test(2, 3, 2, 6000, signed);
+    test(3, 4, 3, 3500, signed);
+    test(5, 5, 5, 1200, signed);
+    test(12, 13, 12, 600, signed);
+    test(8, 8, 8, 600, signed);
+    test(9, 11, 7, 600, signed);
+    test(20, 21, 23, 520, signed);
     // Non-negative double-word elements up to 128 bits.
     test(3, 5, 4, 128, false);
     test(3, 20, 4, 128, false);
@@ -274,10 +292,10 @@ fn mul_properties() {
     });
 
     natural_matrix_pair_gen_var_4().test_properties(|(a, b)| {
-        assert_eq!(
-            natural_matrix_mul_with(&a, &b, matrix_mul_classical),
-            &a * &b
-        );
+        let c = &a * &b;
+        assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_classical), c);
+        assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_waksman_any), c);
+        assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_strassen_any), c);
     });
 
     natural_matrix_pair_gen_var_5().test_properties(|(a, b)| {
