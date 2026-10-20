@@ -127,6 +127,10 @@ pub mod mod_power_of_2_neg;
 /// assert_eq!(a.to_string(), "[0, 0; 0, 0]");
 /// ```
 pub mod mod_power_of_2_shl;
+/// Implementations of [`ModPowerOf2Square`](crate::num::arithmetic::traits::ModPowerOf2Square) and
+/// [`ModPowerOf2SquareAssign`](crate::num::arithmetic::traits::ModPowerOf2SquareAssign), for
+/// squaring a square matrix modulo a power of 2.
+pub mod mod_power_of_2_square;
 /// Implementations of [`ModPowerOf2Sub`](crate::num::arithmetic::traits::ModPowerOf2Sub) and
 /// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a power of 2.

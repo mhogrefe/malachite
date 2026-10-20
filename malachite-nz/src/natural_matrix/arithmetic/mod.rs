@@ -140,6 +140,11 @@ pub mod mod_power_of_2_neg;
 /// assert_eq!(a.to_string(), "[0, 0; 0, 0]");
 /// ```
 pub mod mod_power_of_2_shl;
+/// Implementations of
+/// [`ModPowerOf2Square`](malachite_base::num::arithmetic::traits::ModPowerOf2Square) and
+/// [`ModPowerOf2SquareAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign),
+/// for squaring a square matrix modulo a power of 2.
+pub mod mod_power_of_2_square;
 /// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a power of 2.
