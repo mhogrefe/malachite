@@ -8,4 +8,5 @@
 
 pub mod arithmetic;
 pub mod comparison;
+pub mod pseudorandom;
 pub mod rank_mod;

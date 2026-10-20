@@ -9,4 +9,5 @@
 pub mod arithmetic;
 pub mod comparison;
 pub mod determinant;
+pub mod pseudorandom;
 pub mod rank;

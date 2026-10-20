@@ -24,7 +24,12 @@ use malachite_base::num::basic::traits::Zero;
 // A copy of the block of the matrix with elements `xs` and width `width` made of the given rows and
 // columns. This stands in for `fmpz_mat_window_init`, since Malachite's matrices own their
 // elements.
-fn block(xs: &[Integer], width: usize, rows: Range<usize>, columns: Range<usize>) -> Vec<Integer> {
+pub(crate) fn block(
+    xs: &[Integer],
+    width: usize,
+    rows: Range<usize>,
+    columns: Range<usize>,
+) -> Vec<Integer> {
     let mut out = Vec::with_capacity(rows.len() * columns.len());
     for i in rows {
         out.extend_from_slice(&xs[i * width + columns.start..i * width + columns.end]);
@@ -35,7 +40,7 @@ fn block(xs: &[Integer], width: usize, rows: Range<usize>, columns: Range<usize>
 // Moves the elements of a block with `block_width` columns into the matrix with elements `xs` and
 // width `width`, with its top-left element in row `row` and column `column`. This writes back what
 // FLINT would compute in place through a window.
-fn set_block(
+pub(crate) fn set_block(
     xs: &mut [Integer],
     width: usize,
     row: usize,
@@ -59,7 +64,7 @@ fn set_block(
 
 // Adds a block with `block_width` columns to the matrix with elements `xs` and width `width`, with
 // its top-left element in row `row` and column `column`.
-fn add_block(
+pub(crate) fn add_block(
     xs: &mut [Integer],
     width: usize,
     row: usize,
@@ -79,16 +84,16 @@ fn add_block(
 // A block of a matrix, referenced in place: the matrix's elements and width, and the row and column
 // of the block's top-left element.
 #[derive(Clone, Copy)]
-struct BlockRef<'a> {
-    xs: &'a [Integer],
-    width: usize,
-    row: usize,
-    column: usize,
+pub(crate) struct BlockRef<'a> {
+    pub(crate) xs: &'a [Integer],
+    pub(crate) width: usize,
+    pub(crate) row: usize,
+    pub(crate) column: usize,
 }
 
 impl BlockRef<'_> {
     // Row `i` of the block, `columns` elements long.
-    fn row(&self, i: usize, columns: usize) -> &[Integer] {
+    pub(crate) fn row(&self, i: usize, columns: usize) -> &[Integer] {
         let start = (self.row + i) * self.width + self.column;
         &self.xs[start..start + columns]
     }
@@ -96,7 +101,13 @@ impl BlockRef<'_> {
 
 // Sets `out`, a matrix with `columns` columns, to the element-by-element sum, or if `subtract`
 // difference, of two blocks of its shape, reusing the storage of `out`'s elements.
-fn set_sum(out: &mut [Integer], columns: usize, x: BlockRef, y: BlockRef, subtract: bool) {
+pub(crate) fn set_sum(
+    out: &mut [Integer],
+    columns: usize,
+    x: BlockRef,
+    y: BlockRef,
+    subtract: bool,
+) {
     if columns == 0 {
         return;
     }
@@ -118,7 +129,7 @@ fn set_sum(out: &mut [Integer], columns: usize, x: BlockRef, y: BlockRef, subtra
 
 // Adds a block of its shape to `out`, a matrix with `columns` columns, or if `subtract`, subtracts
 // it.
-fn add_assign_block(out: &mut [Integer], columns: usize, y: BlockRef, subtract: bool) {
+pub(crate) fn add_assign_block(out: &mut [Integer], columns: usize, y: BlockRef, subtract: bool) {
     if columns == 0 {
         return;
     }
@@ -132,7 +143,7 @@ fn add_assign_block(out: &mut [Integer], columns: usize, y: BlockRef, subtract: 
 }
 
 // Replaces each element `z` of `zs` with `x - z`, where `x` is the corresponding element of `xs`.
-fn reverse_sub_assign(zs: &mut [Integer], xs: &[Integer]) {
+pub(crate) fn reverse_sub_assign(zs: &mut [Integer], xs: &[Integer]) {
     for (z, x) in zs.iter_mut().zip(xs) {
         z.neg_assign();
         *z += x;

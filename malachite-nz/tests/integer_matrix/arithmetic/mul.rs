@@ -8,7 +8,6 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{Parity, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
@@ -29,6 +28,7 @@ use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
     integer_matrix_mul_naive, integer_matrix_mul_with, matrix_mul_small_unblocked,
     matrix_mul_small_unblocked_column_reads, matrix_mul_strassen_any, matrix_mul_waksman_any,
 };
+use malachite_nz::test_util::integer_matrix::pseudorandom::pseudorandom_integer_matrix;
 
 #[test]
 fn test_mul() {
@@ -107,44 +107,6 @@ fn test_mul() {
     );
 }
 
-// A matrix whose elements are built from a fixed pseudorandom sequence: each has a pseudorandom
-// number of significant bits, at most `bits`, and is negative about half of the time if `signed`.
-fn pseudorandom_matrix(
-    height: u64,
-    width: u64,
-    bits: u64,
-    signed: bool,
-    seed: u64,
-) -> IntegerMatrix {
-    let mut state = seed.wrapping_mul(0x9e37_79b9_7f4a_7c15) | 1;
-    let mut next = || {
-        state ^= state << 13;
-        state ^= state >> 7;
-        state ^= state << 17;
-        state
-    };
-    let mut elements = Vec::new();
-    for _ in 0..height * width {
-        let len = next() % (bits + 1);
-        let mut x = Integer::ZERO;
-        let mut remaining = len;
-        while remaining != 0 {
-            let chunk = remaining.min(32);
-            x <<= chunk;
-            x += Integer::from(next() >> (64 - chunk));
-            remaining -= chunk;
-        }
-        if len != 0 {
-            // Make the element have exactly `len` significant bits.
-            x |= Integer::power_of_2(len - 1);
-        }
-        let state = next();
-        let x = if signed && (state >> 7).odd() { -x } else { x };
-        elements.push(x);
-    }
-    IntegerMatrix::from_owned_elements(height, width, elements)
-}
-
 // Checks every algorithm that applies to the product against the naive one.
 fn check_kernels(a: &IntegerMatrix, b: &IntegerMatrix, bits: u64, signed: bool) {
     let expected = integer_matrix_mul_naive(a, b);
@@ -191,8 +153,8 @@ fn check_kernels(a: &IntegerMatrix, b: &IntegerMatrix, bits: u64, signed: bool) 
 fn test_mul_kernels() {
     let test = |height, inner, width, bits, signed| {
         for seed in 0..4 {
-            let a = pseudorandom_matrix(height, inner, bits, signed, seed);
-            let b = pseudorandom_matrix(inner, width, bits, signed, seed + 100);
+            let a = pseudorandom_integer_matrix(height, inner, bits, signed, seed);
+            let b = pseudorandom_integer_matrix(inner, width, bits, signed, seed + 100);
             check_kernels(&a, &b, bits, signed);
         }
     };
@@ -261,8 +223,8 @@ fn test_mul_strassen_small_elements() {
     // Every dimension is above 1300 and every element of the product fits in a small `fmpz`, so the
     // product uses Strassen's algorithm. The naive product would be too slow, so the result is
     // compared with that of the blocked algorithm for small elements.
-    let a = pseudorandom_matrix(1301, 1301, 10, true, 1);
-    let b = pseudorandom_matrix(1301, 1301, 10, true, 2);
+    let a = pseudorandom_integer_matrix(1301, 1301, 10, true, 1);
+    let b = pseudorandom_integer_matrix(1301, 1301, 10, true, 2);
     assert_eq!(&a * &b, integer_matrix_mul_with(&a, &b, matrix_mul_small));
 }
 
@@ -271,8 +233,8 @@ fn test_mul_multi_mod_dispatch() {
     // At these sizes the product uses the multimodular algorithm. The results are compared with
     // those of algorithms that the product does not choose.
     let test = |height, inner, width, bits, signed| {
-        let a = pseudorandom_matrix(height, inner, bits, signed, 1);
-        let b = pseudorandom_matrix(inner, width, bits, signed, 2);
+        let a = pseudorandom_integer_matrix(height, inner, bits, signed, 1);
+        let b = pseudorandom_integer_matrix(inner, width, bits, signed, 2);
         let expected = if bits <= 127 {
             integer_matrix_mul_with(&a, &b, matrix_mul_double_word)
         } else {

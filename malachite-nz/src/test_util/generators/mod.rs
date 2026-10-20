@@ -4419,12 +4419,30 @@ pub fn natural_matrix_unsigned_pair_gen() -> Generator<(NaturalMatrix, u64)> {
     )
 }
 
+// All `(NaturalMatrix, u64)` pairs, where the matrix is square and the `u64` is a small power.
+pub fn natural_matrix_unsigned_pair_gen_var_7() -> Generator<(NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_pair_gen_var_7,
+        &random_natural_matrix_unsigned_pair_gen_var_7,
+        &special_random_natural_matrix_unsigned_pair_gen_var_7,
+    )
+}
+
 // All `(IntegerMatrix, u64)` pairs, where the `u64` is a small power.
 pub fn integer_matrix_unsigned_pair_gen() -> Generator<(IntegerMatrix, u64)> {
     Generator::new(
         &exhaustive_integer_matrix_unsigned_pair_gen,
         &random_integer_matrix_unsigned_pair_gen,
         &special_random_integer_matrix_unsigned_pair_gen,
+    )
+}
+
+// All `(IntegerMatrix, u64)` pairs, where the matrix is square and the `u64` is a small power.
+pub fn integer_matrix_unsigned_pair_gen_var_5() -> Generator<(IntegerMatrix, u64)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_pair_gen_var_5,
+        &random_integer_matrix_unsigned_pair_gen_var_5,
+        &special_random_integer_matrix_unsigned_pair_gen_var_5,
     )
 }
 

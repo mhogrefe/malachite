@@ -375,6 +375,11 @@ documented by git history.
   writes the product back into the first matrix's storage; with the classical algorithm, multiplying
   by a square matrix needs only one row of additional memory. Both panic unless the width of the
   first matrix is the height of the second.
+- `Square` and `SquareAssign`, and `Pow<u64>` and `PowAssign<u64>`, for `IntegerMatrix` and
+  `NaturalMatrix`, with the matrix by value or by reference, like FLINT's `fmpz_mat_sqr` and
+  `fmpz_mat_pow`. Squaring chooses as FLINT does between Bodrato's algorithm and multiplying the
+  matrix by itself; powers use left-to-right binary powering and stop early at a zero power. Both
+  panic unless the matrix is square.
 - `ModMul` and `ModMulAssign` between two `UnsignedMatrix<T>`s, with each operand by value or by
   reference: the matrix product modulo $m$, like FLINT's `nmod_mat_mul`, choosing between the
   classical algorithm (which packs several elements into a word when the modulus is small enough)

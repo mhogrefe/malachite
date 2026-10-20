@@ -11,3 +11,5 @@ pub mod mul;
 pub mod mul_vector;
 pub mod multi_crt;
 pub mod multi_mod;
+pub mod pow;
+pub mod square;

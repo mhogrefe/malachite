@@ -364,8 +364,10 @@ pub mod integer_matrix {
         pub mod multi_crt;
         pub mod multi_mod;
         pub mod neg;
+        pub mod pow;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod square;
         pub mod sub;
         pub mod trace;
         pub mod vector_mul;
@@ -1089,8 +1091,10 @@ pub mod natural_matrix {
         pub mod mul_vector;
         pub mod multi_crt;
         pub mod multi_mod;
+        pub mod pow;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod square;
         pub mod trace;
         pub mod vector_mod_mul;
         pub mod vector_mod_power_of_2_mul;

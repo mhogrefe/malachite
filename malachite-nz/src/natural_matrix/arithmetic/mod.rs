@@ -210,6 +210,10 @@ pub mod multi_crt;
 /// [`NaturalMatrix::multi_mod`](super::NaturalMatrix::multi_mod), which reduces a matrix modulo
 /// many word-sized moduli.
 pub mod multi_mod;
+/// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
+/// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square matrix
+/// to a power.
+pub mod pow;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a scalar on either side.
 pub mod scalar_mul;
@@ -250,6 +254,10 @@ pub mod scalar_mul;
 /// assert_eq!(a.to_string(), "[4, 8; 12, 16]");
 /// ```
 pub mod shl;
+/// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
+/// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a square
+/// matrix.
+pub mod square;
 /// An implementation of [`Trace`](malachite_base::num::arithmetic::traits::Trace), the sum of the
 /// diagonal elements of a square matrix.
 pub mod trace;

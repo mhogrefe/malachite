@@ -70,6 +70,10 @@ pub mod multi_mod;
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;
 
+/// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
+/// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square matrix
+/// to a power.
+pub mod pow;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying an [`IntegerMatrix`](super::IntegerMatrix) by a scalar on either side.
 pub mod scalar_mul;
@@ -109,6 +113,10 @@ pub mod scalar_mul;
 /// assert_eq!(a.to_string(), "[4, -8; 12, 16]");
 /// ```
 pub mod shl;
+/// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
+/// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a square
+/// matrix.
+pub mod square;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;

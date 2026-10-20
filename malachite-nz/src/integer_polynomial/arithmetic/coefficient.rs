@@ -20,7 +20,7 @@ use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::ops::{AddAssign, MulAssign, SubAssign};
 use malachite_base::num::arithmetic::traits::{
-    AddMulAssign, DivExactAssign, Pow, Square, SubMulAssign,
+    AddMul, AddMulAssign, DivExactAssign, Pow, Square, SubMulAssign,
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -43,6 +43,7 @@ PolynomialCoefficient:
     + for<'a> SubAssign<&'a Self>
     + for<'a> MulAssign<&'a Self>
     + for<'a> DivExactAssign<&'a Self>
+    + for<'a> AddMul<&'a Self, &'a Self, Output = Self>
     + for<'a> AddMulAssign<&'a Self, &'a Self>
     + for<'a> SubMulAssign<&'a Self, &'a Self>
     + ExactFrom<SignedLimb>

@@ -8,14 +8,11 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer_matrix::arithmetic::mul::classical::matrix_mul_classical;
 use malachite_nz::integer_matrix::arithmetic::mul::double_word::matrix_mul_double_word;
 use malachite_nz::integer_matrix::arithmetic::mul::multi_mod::matrix_mul_multi_mod_any;
 use malachite_nz::integer_matrix::arithmetic::mul::small::matrix_mul_small;
-use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
@@ -29,6 +26,7 @@ use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
 use malachite_nz::test_util::natural_matrix::arithmetic::mul::{
     natural_matrix_mul_naive, natural_matrix_mul_with,
 };
+use malachite_nz::test_util::natural_matrix::pseudorandom::pseudorandom_natural_matrix;
 
 #[test]
 fn test_mul() {
@@ -106,42 +104,6 @@ fn test_mul() {
     );
 }
 
-// A matrix whose elements are built from a fixed pseudorandom sequence: each has a pseudorandom
-// number of significant bits, at most `bits`.
-fn pseudorandom_matrix(
-    height: u64,
-    width: u64,
-    bits: u64,
-    _signed: bool,
-    seed: u64,
-) -> NaturalMatrix {
-    let mut state = seed.wrapping_mul(0x9e37_79b9_7f4a_7c15) | 1;
-    let mut next = || {
-        state ^= state << 13;
-        state ^= state >> 7;
-        state ^= state << 17;
-        state
-    };
-    let mut elements = Vec::new();
-    for _ in 0..height * width {
-        let len = next() % (bits + 1);
-        let mut x = Natural::ZERO;
-        let mut remaining = len;
-        while remaining != 0 {
-            let chunk = remaining.min(32);
-            x <<= chunk;
-            x += Natural::from(next() >> (64 - chunk));
-            remaining -= chunk;
-        }
-        if len != 0 {
-            // Make the element have exactly `len` significant bits.
-            x |= Natural::power_of_2(len - 1);
-        }
-        elements.push(x);
-    }
-    NaturalMatrix::from_owned_elements(height, width, elements)
-}
-
 // Checks every algorithm that applies to the product against the naive one.
 fn check_kernels(a: &NaturalMatrix, b: &NaturalMatrix, bits: u64, signed: bool) {
     let expected = natural_matrix_mul_naive(a, b);
@@ -188,8 +150,8 @@ fn check_kernels(a: &NaturalMatrix, b: &NaturalMatrix, bits: u64, signed: bool) 
 fn test_mul_kernels() {
     let test = |height, inner, width, bits, signed| {
         for seed in 0..4 {
-            let a = pseudorandom_matrix(height, inner, bits, signed, seed);
-            let b = pseudorandom_matrix(inner, width, bits, signed, seed + 100);
+            let a = pseudorandom_natural_matrix(height, inner, bits, seed);
+            let b = pseudorandom_natural_matrix(inner, width, bits, seed + 100);
             check_kernels(&a, &b, bits, signed);
         }
     };
@@ -236,8 +198,8 @@ fn test_mul_multi_mod_dispatch() {
     // At these sizes the product uses the multimodular algorithm. The results are compared with
     // those of algorithms that the product does not choose.
     let test = |height, inner, width, bits| {
-        let a = pseudorandom_matrix(height, inner, bits, false, 1);
-        let b = pseudorandom_matrix(inner, width, bits, false, 2);
+        let a = pseudorandom_natural_matrix(height, inner, bits, 1);
+        let b = pseudorandom_natural_matrix(inner, width, bits, 2);
         let expected = if bits <= 127 {
             natural_matrix_mul_with(&a, &b, matrix_mul_double_word)
         } else {

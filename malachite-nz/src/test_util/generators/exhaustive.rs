@@ -4083,9 +4083,23 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen() -> It<(NaturalMatrix, u64)>
     ))
 }
 
+pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_7() -> It<(NaturalMatrix, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_square_matrices(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_integer_matrix_unsigned_pair_gen() -> It<(IntegerMatrix, u64)> {
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_integer_matrices(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
+pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_5() -> It<(IntegerMatrix, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integer_square_matrices(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
 }
