@@ -530,3 +530,51 @@ fn test_fft_mfa_truncate_sqrt2_outer_odd_w() {
     test(n, 1, 8, (n << 1) + 48);
     test(n, 1, 8, n << 2);
 }
+
+#[test]
+fn fft_mfa_truncate_sqrt2_properties() {
+    // The full transform followed by its inverse multiplies by the transform length, `4 * n`.
+    large_type_gen_var_46().test_properties(|(mut ii, n, w, n1, trunc)| {
+        let limbs = ii[0].len() - 1;
+        for x in &mut ii[trunc..] {
+            x.fill(0);
+        }
+        let xs = residues_mod(&ii, limbs);
+        let mut t1 = vec![0; limbs + 1];
+        let mut t2 = vec![0; limbs + 1];
+        let mut temp = vec![0; limbs + 1];
+        fft_mfa_truncate_sqrt2(&mut ii, n, w, &mut t1, &mut t2, &mut temp, n1, trunc);
+        ifft_mfa_truncate_sqrt2(&mut ii, n, w, &mut t1, &mut t2, &mut temp, n1, trunc);
+        let e = u64::from((n << 2).trailing_zeros());
+        for (x, y) in xs[..trunc].iter().zip(ii.iter()) {
+            assert_eq!(fermat_div_power_of_2(&residue_mod(y, limbs), e, limbs), *x);
+        }
+    });
+}
+
+// With `n >= Limb::WIDTH`, `w` may be odd, which takes the square-root-of-2 paths of the full
+// transform and its inverse.
+#[test]
+fn test_fft_mfa_truncate_sqrt2_odd_w() {
+    let test = |n: usize, w: u64, n1: usize, trunc: usize| {
+        let limbs = usize::try_from((u64::try_from(n).unwrap() * w) >> Limb::LOG_WIDTH).unwrap();
+        let mut ii = pseudorandom_residues(n << 2, limbs, 3);
+        for x in &mut ii[trunc..] {
+            x.fill(0);
+        }
+        let xs = residues_mod(&ii, limbs);
+        let mut t1 = vec![0; limbs + 1];
+        let mut t2 = vec![0; limbs + 1];
+        let mut temp = vec![0; limbs + 1];
+        fft_mfa_truncate_sqrt2(&mut ii, n, w, &mut t1, &mut t2, &mut temp, n1, trunc);
+        ifft_mfa_truncate_sqrt2(&mut ii, n, w, &mut t1, &mut t2, &mut temp, n1, trunc);
+        let e = u64::from((n << 2).trailing_zeros());
+        for (x, y) in xs.iter().zip(ii[..trunc].iter()) {
+            assert_eq!(fermat_div_power_of_2(&residue_mod(y, limbs), e, limbs), *x);
+        }
+    };
+    let n = Limb::WIDTH as usize;
+    test(n, 1, 8, (n << 1) + 48);
+    test(n, 1, 8, n << 2);
+    test(n, 2, 8, (n << 1) + 16);
+}

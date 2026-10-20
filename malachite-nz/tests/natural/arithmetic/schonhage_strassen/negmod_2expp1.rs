@@ -50,5 +50,8 @@ fn limbs_neg_mod_2expp1_to_out_properties() {
         let mut a_alt = vec![0; limbs + 1];
         limbs_neg_mod_2expp1_to_out(&mut a_alt, &z, limbs);
         assert_eq!(a_alt, a);
+        let mut z_alt = a.clone();
+        limbs_neg_mod_2expp1_in_place(&mut z_alt, limbs);
+        assert_eq!(z_alt, z);
     });
 }

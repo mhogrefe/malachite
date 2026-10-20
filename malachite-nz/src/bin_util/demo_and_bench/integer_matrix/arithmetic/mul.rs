@@ -22,6 +22,7 @@ use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
     integer_matrix_mul_naive, integer_matrix_mul_with, matrix_mul_small_unblocked,
     matrix_mul_small_unblocked_column_reads, matrix_mul_strassen_any, matrix_mul_waksman_any,
 };
+use malachite_nz::test_util::integer_matrix::arithmetic::mul_fft::matrix_mul_fft;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_matrix_mul);
@@ -251,7 +252,8 @@ fn benchmark_integer_matrix_mul_small_unblocked_algorithms(
 }
 
 // Compares the algorithms for large elements. Set `mean_bits_n` to a large value, such as 1000, to
-// reach the sizes where FLINT chooses Waksman's or Strassen's algorithm.
+// reach the sizes where FLINT chooses Waksman's or Strassen's algorithm. The FFT algorithm, which
+// FLINT does not choose, was slower than the default at every size measured.
 fn benchmark_integer_matrix_mul_large_elements_algorithms(
     gm: GenMode,
     config: &GenConfig,
@@ -278,6 +280,9 @@ fn benchmark_integer_matrix_mul_large_elements_algorithms(
             }),
             ("Strassen", &mut |(a, b)| {
                 no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_strassen_any));
+            }),
+            ("FFT", &mut |(a, b)| {
+                no_out!(integer_matrix_mul_with(&a, &b, matrix_mul_fft));
             }),
             ("naive", &mut |(a, b)| {
                 no_out!(integer_matrix_mul_naive(&a, &b));

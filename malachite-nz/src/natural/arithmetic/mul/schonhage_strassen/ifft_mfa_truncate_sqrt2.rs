@@ -17,7 +17,9 @@ use crate::natural::arithmetic::mul::schonhage_strassen::adjust_sqrt2::*;
 use crate::natural::arithmetic::mul::schonhage_strassen::butterfly_rsh_b::limbs_butterfly_rsh_b;
 use crate::natural::arithmetic::mul::schonhage_strassen::div_2expmod_2expp1::*;
 use crate::natural::arithmetic::mul::schonhage_strassen::fft_radix2::fft_limbs;
-use crate::natural::arithmetic::mul::schonhage_strassen::ifft_radix2::limbs_ifft_butterfly;
+use crate::natural::arithmetic::mul::schonhage_strassen::ifft_radix2::{
+    ifft_radix2, limbs_ifft_butterfly,
+};
 use crate::natural::arithmetic::mul::schonhage_strassen::ifft_truncate_sqrt2::*;
 use crate::natural::arithmetic::mul::schonhage_strassen::normmod_2expp1::limbs_norm_mod_2expp1;
 use crate::natural::arithmetic::neg::limbs_neg_in_place;
@@ -183,14 +185,13 @@ crate_test_fn! {ifft_truncate1_twiddle(
     }
 }}
 
-// The inverse of the matrix Fourier transform that `fft_mfa_truncate_sqrt2_outer` and the row
-// transforms of `fft_mfa_truncate_sqrt2_inner` make up, whose inverse row transforms
-// `fft_mfa_truncate_sqrt2_inner` has already applied. The first `trunc` residues are left
-// normalized and divided by the transform length.
+// The column transforms of the inverse matrix Fourier transform, with the relevant butterflies of
+// the final sqrt2 layer, but without the division by the transform length: the part that
+// `ifft_mfa_truncate_sqrt2` and `ifft_mfa_truncate_sqrt2_outer` share.
 //
-// This is ifft_mfa_truncate_sqrt2_outer from fft/ifft_mfa_truncate_sqrt2.c, FLINT 3.6.0, without
-// the threading.
-crate_test_fn! {ifft_mfa_truncate_sqrt2_outer(
+// This is the column part of ifft_mfa_truncate_sqrt2 from fft/ifft_mfa_truncate_sqrt2.c, FLINT
+// 3.6.0.
+fn ifft_mfa_truncate_sqrt2_columns(
     ii: &mut [Vec<Limb>],
     n: usize,
     w: u64,
@@ -204,7 +205,6 @@ crate_test_fn! {ifft_mfa_truncate_sqrt2_outer(
     let n2 = two_n / n1;
     let trunc2 = (trunc - two_n) / n1;
     let depth = n2.ceiling_log_base_2();
-    let depth2 = n1.ceiling_log_base_2();
     let limbs = fft_limbs(n, w);
     let wn1 = w * u64::exact_from(n1);
     // first half mfa IFFT : n2 rows, n1 cols
@@ -239,7 +239,19 @@ crate_test_fn! {ifft_mfa_truncate_sqrt2_outer(
         }
         // IFFT of length n2 on column i, applying z^{r*i} for rows going up in steps of 1 starting
         // at row 0, where z => w bits
-        ifft_truncate1_twiddle(&mut ii[two_n + i..], n1, n2 >> 1, wn1, t1, t2, w, 0, i, 1, trunc2);
+        ifft_truncate1_twiddle(
+            &mut ii[two_n + i..],
+            n1,
+            n2 >> 1,
+            wn1,
+            t1,
+            t2,
+            w,
+            0,
+            i,
+            1,
+            trunc2,
+        );
         // relevant components of final sqrt2 layer of IFFT
         let mut j = i;
         let (ii_lo, ii_hi) = ii.split_at_mut(two_n);
@@ -263,6 +275,35 @@ crate_test_fn! {ifft_mfa_truncate_sqrt2_outer(
             limbs_slice_shl_in_place(&mut ii[j][..=limbs], 1);
             j += n1;
         }
+    }
+}
+
+// The inverse of the matrix Fourier transform that `fft_mfa_truncate_sqrt2_outer` and the row
+// transforms of `fft_mfa_truncate_sqrt2_inner` make up, whose inverse row transforms
+// `fft_mfa_truncate_sqrt2_inner` has already applied. The first `trunc` residues are left
+// normalized and divided by the transform length.
+//
+// This is ifft_mfa_truncate_sqrt2_outer from fft/ifft_mfa_truncate_sqrt2.c, FLINT 3.6.0, without
+// the threading. FLINT divides the residues of each column after that column's transforms; they
+// touch no other column, so the divisions are done after all of them.
+crate_test_fn! {ifft_mfa_truncate_sqrt2_outer(
+    ii: &mut [Vec<Limb>],
+    n: usize,
+    w: u64,
+    t1: &mut Vec<Limb>,
+    t2: &mut Vec<Limb>,
+    temp: &mut [Limb],
+    n1: usize,
+    trunc: usize,
+) {
+    ifft_mfa_truncate_sqrt2_columns(ii, n, w, t1, t2, temp, n1, trunc);
+    let two_n = n << 1;
+    let n2 = two_n / n1;
+    let trunc2 = (trunc - two_n) / n1;
+    let depth = n2.ceiling_log_base_2();
+    let depth2 = n1.ceiling_log_base_2();
+    let limbs = fft_limbs(n, w);
+    for i in 0..n1 {
         for j in 0..trunc2 {
             let t = two_n + j * n1 + i;
             limbs_div_2exp_mod_2expp1_in_place(&mut ii[t], limbs, depth + depth2 + 1);
@@ -274,4 +315,46 @@ crate_test_fn! {ifft_mfa_truncate_sqrt2_outer(
             limbs_norm_mod_2expp1(&mut ii[t], limbs);
         }
     }
+}}
+
+// The inverse of `fft_mfa_truncate_sqrt2`: from its first `trunc` outputs, recovers the first
+// `trunc` inputs, times `4 * n`.
+//
+// This is ifft_mfa_truncate_sqrt2 from fft/ifft_mfa_truncate_sqrt2.c, FLINT 3.6.0. FLINT applies
+// the inverse transforms on the rows of the second matrix after the column transforms of the first;
+// they touch no residue that those do, so all the row transforms are applied first.
+crate_test_fn! {ifft_mfa_truncate_sqrt2(
+    ii: &mut [Vec<Limb>],
+    n: usize,
+    w: u64,
+    t1: &mut Vec<Limb>,
+    t2: &mut Vec<Limb>,
+    temp: &mut [Limb],
+    n1: usize,
+    trunc: usize,
+) {
+    let two_n = n << 1;
+    let n2 = two_n / n1;
+    let trunc2 = (trunc - two_n) / n1;
+    let depth = n2.ceiling_log_base_2();
+    let depth2 = n1.ceiling_log_base_2();
+    let wn2 = w * u64::exact_from(n2);
+    let mut row_ifft = |ii: &mut [Vec<Limb>], i: usize| {
+        for j in 0..n1 {
+            let s = revbin(j, depth2);
+            if j < s {
+                ii.swap(i * n1 + j, i * n1 + s);
+            }
+        }
+        ifft_radix2(&mut ii[i * n1..], n1 >> 1, wn2, t1, t2);
+    };
+    // first half mfa IFFT: row IFFTs
+    for i in 0..n2 {
+        row_ifft(ii, i);
+    }
+    // second half IFFT: row IFFTs
+    for s in 0..trunc2 {
+        row_ifft(&mut ii[two_n..], revbin(s, depth));
+    }
+    ifft_mfa_truncate_sqrt2_columns(ii, n, w, t1, t2, temp, n1, trunc);
 }}

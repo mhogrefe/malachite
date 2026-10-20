@@ -235,3 +235,49 @@ crate_test_fn! {fft_mfa_truncate_sqrt2_outer(
         }
     }
 }}
+
+// Applies a matrix Fourier version of `fft_truncate_sqrt2` to the residues `ii`: a transform of
+// length `4 * n` whose inputs past the first `trunc` are zero, computing only the first `trunc`
+// outputs. The residues are viewed as two matrices of `2 * n / n1` rows and `n1` columns. The first
+// `2 * n` outputs are in order; of the second `2 * n`, the rows are in bit-reversed order.
+//
+// This is fft_mfa_truncate_sqrt2 from fft/fft_mfa_truncate_sqrt2.c, FLINT 3.6.0. FLINT's column
+// transforms are those of `fft_mfa_truncate_sqrt2_outer`; the transforms on the rows of the first
+// matrix, which FLINT applies before the column transforms of the second, touch no residue that
+// those do, so they are applied after.
+crate_test_fn! {fft_mfa_truncate_sqrt2(
+    ii: &mut [Vec<Limb>],
+    n: usize,
+    w: u64,
+    t1: &mut Vec<Limb>,
+    t2: &mut Vec<Limb>,
+    temp: &mut [Limb],
+    n1: usize,
+    trunc: usize,
+) {
+    fft_mfa_truncate_sqrt2_outer(ii, n, w, t1, t2, temp, n1, trunc);
+    let two_n = n << 1;
+    let n2 = two_n / n1;
+    let trunc2 = (trunc - two_n) / n1;
+    let depth = n2.ceiling_log_base_2();
+    let depth2 = n1.ceiling_log_base_2();
+    let wn2 = w * u64::exact_from(n2);
+    let mut row_fft = |ii: &mut [Vec<Limb>], i: usize| {
+        fft_radix2(&mut ii[i * n1..], n1 >> 1, wn2, t1, t2);
+        for j in 0..n1 {
+            let t = revbin(j, depth2);
+            if j < t {
+                ii.swap(i * n1 + j, i * n1 + t);
+            }
+        }
+    };
+    // first half matrix fourier FFT: FFTs on rows
+    for i in 0..n2 {
+        row_fft(ii, i);
+    }
+    // second half matrix fourier FFT: FFTs on relevant rows
+    let ii = &mut ii[two_n..];
+    for s in 0..trunc2 {
+        row_fft(ii, revbin(s, depth));
+    }
+}}

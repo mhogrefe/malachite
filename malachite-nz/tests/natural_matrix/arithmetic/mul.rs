@@ -23,6 +23,7 @@ use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
     matrix_mul_small_unblocked, matrix_mul_small_unblocked_column_reads, matrix_mul_strassen_any,
     matrix_mul_waksman_any,
 };
+use malachite_nz::test_util::integer_matrix::arithmetic::mul_fft::matrix_mul_fft;
 use malachite_nz::test_util::natural_matrix::arithmetic::mul::{
     natural_matrix_mul_naive, natural_matrix_mul_with,
 };
@@ -225,6 +226,38 @@ fn test_mul_multi_mod_dispatch() {
 }
 
 #[test]
+fn test_mul_fft() {
+    // Small dimensions with elements of up to 99999 bits, as in FLINT's test of `fmpz_mat_mul_fft`.
+    for bits in [1, 10, 64, 100, 2000, 5000, 31488, 99999] {
+        for height in 1..4 {
+            for inner in 1..4 {
+                for width in 1..4 {
+                    let a = pseudorandom_natural_matrix(height, inner, bits, bits);
+                    let b = pseudorandom_natural_matrix(inner, width, bits, bits + 1);
+                    assert_eq!(
+                        natural_matrix_mul_with(&a, &b, matrix_mul_fft),
+                        natural_matrix_mul_with(&a, &b, matrix_mul_classical)
+                    );
+                }
+            }
+        }
+    }
+    // A zero matrix, and empty shapes.
+    let test = |a: &str, b: &str, out| {
+        let a = NaturalMatrix::from_str(a).unwrap();
+        let b = NaturalMatrix::from_str(b).unwrap();
+        assert_eq!(
+            natural_matrix_mul_with(&a, &b, matrix_mul_fft).to_string(),
+            out
+        );
+    };
+    test("[0, 0; 0, 0]", "[1, 2; 3, 4]", "[0, 0; 0, 0]");
+    test("[1, 2; 3, 4]", "[0; 0]", "[0; 0]");
+    test("[]_{0,2}", "[1; 2]", "[]_{0,1}");
+    test("[]_{2,0}", "[]_{0,3}", "[0, 0, 0; 0, 0, 0]");
+}
+
+#[test]
 #[should_panic]
 fn mul_fail_1() {
     let _ = NaturalMatrix::from_str("[1, 2]").unwrap() * NaturalMatrix::from_str("[1, 2]").unwrap();
@@ -295,6 +328,7 @@ fn mul_properties() {
         assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_waksman_any), c);
         assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_multi_mod_any), c);
         assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_strassen_any), c);
+        assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_fft), c);
     });
 
     natural_matrix_pair_gen_var_5().test_properties(|(a, b)| {

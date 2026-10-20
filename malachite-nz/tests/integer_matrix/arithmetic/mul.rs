@@ -8,8 +8,9 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
+use malachite_base::num::arithmetic::traits::{Pow, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::arithmetic::mul::ProductShape;
@@ -28,6 +29,7 @@ use malachite_nz::test_util::integer_matrix::arithmetic::mul::{
     integer_matrix_mul_naive, integer_matrix_mul_with, matrix_mul_small_unblocked,
     matrix_mul_small_unblocked_column_reads, matrix_mul_strassen_any, matrix_mul_waksman_any,
 };
+use malachite_nz::test_util::integer_matrix::arithmetic::mul_fft::matrix_mul_fft;
 use malachite_nz::test_util::integer_matrix::pseudorandom::pseudorandom_integer_matrix;
 
 #[test]
@@ -260,6 +262,90 @@ fn test_mul_multi_mod_dispatch() {
 }
 
 #[test]
+fn test_mul_fft() {
+    // Small dimensions with elements of up to 99999 bits, as in FLINT's test of `fmpz_mat_mul_fft`.
+    for signed in [false, true] {
+        for bits in [1, 10, 64, 100, 2000, 5000, 31488, 99999] {
+            for height in 1..4 {
+                for inner in 1..4 {
+                    for width in 1..4 {
+                        let a = pseudorandom_integer_matrix(height, inner, bits, signed, bits);
+                        let b = pseudorandom_integer_matrix(inner, width, bits, signed, bits + 1);
+                        assert_eq!(
+                            integer_matrix_mul_with(&a, &b, matrix_mul_fft),
+                            integer_matrix_mul_with(&a, &b, matrix_mul_classical)
+                        );
+                    }
+                }
+            }
+        }
+    }
+    // A zero matrix, and empty shapes.
+    let test = |a: &str, b: &str, out| {
+        let a = IntegerMatrix::from_str(a).unwrap();
+        let b = IntegerMatrix::from_str(b).unwrap();
+        assert_eq!(
+            integer_matrix_mul_with(&a, &b, matrix_mul_fft).to_string(),
+            out
+        );
+    };
+    test("[0, 0; 0, 0]", "[1, 2; 3, 4]", "[0, 0; 0, 0]");
+    test("[1, 2; 3, 4]", "[0; 0]", "[0; 0]");
+    test("[]_{0,2}", "[1; 2]", "[]_{0,1}");
+    test("[]_{2,0}", "[]_{0,3}", "[0, 0, 0; 0, 0, 0]");
+    // Elements of 28294 and 64 bits split into coefficients of 123 bits, wider than a limb, so the
+    // coefficients past the end of the product's 444 limbs start at limb 445 and are skipped
+    // without one starting at limb 444.
+    let a = IntegerMatrix::from_owned_elements(
+        1,
+        1,
+        vec![-(Integer::power_of_2(28293) + Integer::from(12345u32))],
+    );
+    let b = IntegerMatrix::from_owned_elements(1, 1, vec![Integer::power_of_2(63) + Integer::ONE]);
+    assert_eq!(
+        integer_matrix_mul_with(&a, &b, matrix_mul_fft),
+        integer_matrix_mul_with(&a, &b, matrix_mul_classical)
+    );
+}
+
+#[test]
+fn test_mul_fft_large_negative_coefficient() {
+    // With elements of 31488 bits and an inner dimension of 2, the transforms have length 512 and
+    // residues of 256 bits, and the elements split into 256 coefficients of 123 bits each. The
+    // middle coefficient of the product of these all-ones elements, -2 * 256 * (2^123 - 1)^2, is
+    // within 2^192 of -2^255, where FLINT 3.6.0 misreads it as positive.
+    let x = Integer::power_of_2(31488) - Integer::ONE;
+    let a = IntegerMatrix::from_owned_elements(1, 2, vec![-&x, -&x]);
+    let b = IntegerMatrix::from_owned_elements(2, 1, vec![x.clone(), x]);
+    assert_eq!(
+        integer_matrix_mul_with(&a, &b, matrix_mul_fft),
+        integer_matrix_mul_with(&a, &b, matrix_mul_classical)
+    );
+}
+
+#[test]
+fn test_mul_fft_matrix_fourier() {
+    // Elements of about 2.2 million bits need transforms of depth 11, which use the matrix Fourier
+    // algorithm.
+    let x = Integer::from(3u32).pow(1388090);
+    let y = -Integer::from(7u32).pow(784000);
+    let test = |a: IntegerMatrix, b: IntegerMatrix| {
+        assert_eq!(
+            integer_matrix_mul_with(&a, &b, matrix_mul_fft),
+            integer_matrix_mul_with(&a, &b, matrix_mul_classical)
+        );
+    };
+    test(
+        IntegerMatrix::from_owned_elements(1, 1, vec![x.clone()]),
+        IntegerMatrix::from_owned_elements(1, 1, vec![y.clone()]),
+    );
+    test(
+        IntegerMatrix::from_owned_elements(1, 2, vec![x.clone(), y.clone()]),
+        IntegerMatrix::from_owned_elements(2, 1, vec![y, x]),
+    );
+}
+
+#[test]
 #[should_panic]
 fn mul_fail_1() {
     let _ = IntegerMatrix::from_str("[1, 2]").unwrap() * IntegerMatrix::from_str("[1, 2]").unwrap();
@@ -333,6 +419,7 @@ fn mul_properties() {
         assert_eq!(integer_matrix_mul_with(&a, &b, matrix_mul_waksman_any), c);
         assert_eq!(integer_matrix_mul_with(&a, &b, matrix_mul_multi_mod_any), c);
         assert_eq!(integer_matrix_mul_with(&a, &b, matrix_mul_strassen_any), c);
+        assert_eq!(integer_matrix_mul_with(&a, &b, matrix_mul_fft), c);
     });
 
     integer_matrix_pair_gen_var_5().test_properties(|(a, b)| {
