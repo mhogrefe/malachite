@@ -52,6 +52,9 @@ pub mod mod_op;
 /// every element of an [`IntegerMatrix`](super::IntegerMatrix) modulo a power of 2.
 pub mod mod_power_of_2;
 
+/// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
+/// multiplying two matrices.
+pub mod mul;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying an
 /// [`IntegerMatrix`](super::IntegerMatrix) by an
 /// [`IntegerVector`](crate::integer_vector::IntegerVector) on the right.

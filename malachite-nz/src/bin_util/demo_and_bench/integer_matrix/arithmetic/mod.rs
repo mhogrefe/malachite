@@ -18,6 +18,7 @@ pub(crate) fn register(runner: &mut Runner) {
     crt::register(runner);
     mod_op::register(runner);
     mod_power_of_2::register(runner);
+    mul::register(runner);
     mul_vector::register(runner);
     multi_crt::register(runner);
     multi_mod::register(runner);
@@ -38,6 +39,7 @@ mod content_chained;
 mod crt;
 mod mod_op;
 mod mod_power_of_2;
+mod mul;
 mod mul_vector;
 mod multi_crt;
 mod multi_mod;

@@ -8127,6 +8127,33 @@ pub fn special_random_integer_matrix_pair_gen_var_2(
     )
 }
 
+// Pairs of matrices that can be multiplied: the width of the first is the height of the second.
+pub fn special_random_integer_matrix_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, IntegerMatrix)> {
+    let mut xs = striped_random_integers(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, inner, width)| {
+            let n = usize::exact_from(height * inner);
+            let a = IntegerMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
+            let n = usize::exact_from(inner * width);
+            let b = IntegerMatrix::from_owned_elements(inner, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
 // Pairs of matrices of the same random height, with random widths.
 pub fn special_random_integer_matrix_pair_gen_var_3(
     config: &GenConfig,
@@ -9234,6 +9261,33 @@ pub fn special_random_natural_matrix_pair_gen_var_2(
             let a = NaturalMatrix::from_owned_elements(h1, width, (&mut xs).take(n).collect());
             let n = usize::exact_from(h2 * width);
             let b = NaturalMatrix::from_owned_elements(h2, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+// Pairs of matrices that can be multiplied: the width of the first is the height of the second.
+pub fn special_random_natural_matrix_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix)> {
+    let mut xs = striped_random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, inner, width)| {
+            let n = usize::exact_from(height * inner);
+            let a = NaturalMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
+            let n = usize::exact_from(inner * width);
+            let b = NaturalMatrix::from_owned_elements(inner, width, (&mut xs).take(n).collect());
             (a, b)
         }),
     )

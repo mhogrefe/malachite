@@ -197,6 +197,9 @@ pub mod mod_sub;
 /// Implementations of [`ModTrace`](malachite_base::num::arithmetic::traits::ModTrace), the sum of
 /// the diagonal elements of a square matrix modulo a number.
 pub mod mod_trace;
+/// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
+/// multiplying two matrices.
+pub mod mul;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying a
 /// [`NaturalMatrix`](super::NaturalMatrix) by a
 /// [`NaturalVector`](crate::natural_vector::NaturalVector) on the right.

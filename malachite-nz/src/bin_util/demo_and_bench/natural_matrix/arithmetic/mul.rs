@@ -1,0 +1,128 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
+use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::runner::Runner;
+use malachite_nz::test_util::bench::bucketers::pair_natural_matrix_max_bit_bucketer;
+use malachite_nz::test_util::generators::natural_matrix_pair_gen_var_4;
+use malachite_nz::test_util::natural_matrix::arithmetic::mul::natural_matrix_mul_naive;
+
+pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_natural_matrix_mul);
+    register_demo!(runner, demo_natural_matrix_mul_val_ref);
+    register_demo!(runner, demo_natural_matrix_mul_ref_val);
+    register_demo!(runner, demo_natural_matrix_mul_ref_ref);
+    register_demo!(runner, demo_natural_matrix_mul_assign);
+    register_demo!(runner, demo_natural_matrix_mul_assign_ref);
+
+    register_bench!(runner, benchmark_natural_matrix_mul_evaluation_strategy);
+    register_bench!(runner, benchmark_natural_matrix_mul_algorithms);
+}
+
+fn demo_natural_matrix_mul(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b) in natural_matrix_pair_gen_var_4().get(gm, config).take(limit) {
+        let (a_old, b_old) = (a.clone(), b.clone());
+        println!("{a_old} * {b_old} = {}", a * b);
+    }
+}
+
+fn demo_natural_matrix_mul_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b) in natural_matrix_pair_gen_var_4().get(gm, config).take(limit) {
+        let a_old = a.clone();
+        println!("{a_old} * &{b} = {}", a * &b);
+    }
+}
+
+fn demo_natural_matrix_mul_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b) in natural_matrix_pair_gen_var_4().get(gm, config).take(limit) {
+        let b_old = b.clone();
+        println!("&{a} * {b_old} = {}", &a * b);
+    }
+}
+
+fn demo_natural_matrix_mul_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b) in natural_matrix_pair_gen_var_4().get(gm, config).take(limit) {
+        println!("&{a} * &{b} = {}", &a * &b);
+    }
+}
+
+fn demo_natural_matrix_mul_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut a, b) in natural_matrix_pair_gen_var_4().get(gm, config).take(limit) {
+        let (a_old, b_old) = (a.clone(), b.clone());
+        a *= b;
+        println!("a := {a_old}; a *= {b_old}; a = {a}");
+    }
+}
+
+fn demo_natural_matrix_mul_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut a, b) in natural_matrix_pair_gen_var_4().get(gm, config).take(limit) {
+        let a_old = a.clone();
+        a *= &b;
+        println!("a := {a_old}; a *= &{b}; a = {a}");
+    }
+}
+
+#[allow(clippy::no_effect, unused_must_use)]
+fn benchmark_natural_matrix_mul_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "NaturalMatrix * NaturalMatrix",
+        BenchmarkType::EvaluationStrategy,
+        natural_matrix_pair_gen_var_4().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_natural_matrix_max_bit_bucketer("a", "b"),
+        &mut [
+            ("NaturalMatrix * NaturalMatrix", &mut |(a, b)| {
+                no_out!(a * b);
+            }),
+            ("NaturalMatrix * &NaturalMatrix", &mut |(a, b)| {
+                no_out!(a * &b);
+            }),
+            ("&NaturalMatrix * NaturalMatrix", &mut |(a, b)| {
+                no_out!(&a * b);
+            }),
+            ("&NaturalMatrix * &NaturalMatrix", &mut |(a, b)| {
+                no_out!(&a * &b);
+            }),
+            ("NaturalMatrix *= NaturalMatrix", &mut |(mut a, b)| a *= b),
+            ("NaturalMatrix *= &NaturalMatrix", &mut |(mut a, b)| a *= &b),
+        ],
+    );
+}
+
+fn benchmark_natural_matrix_mul_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "&NaturalMatrix * &NaturalMatrix",
+        BenchmarkType::Algorithms,
+        natural_matrix_pair_gen_var_4().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_natural_matrix_max_bit_bucketer("a", "b"),
+        &mut [
+            ("default", &mut |(a, b)| {
+                no_out!(&a * &b);
+            }),
+            ("naive", &mut |(a, b)| {
+                no_out!(natural_matrix_mul_naive(&a, &b));
+            }),
+        ],
+    );
+}

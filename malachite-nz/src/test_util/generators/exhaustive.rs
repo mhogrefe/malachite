@@ -3724,6 +3724,23 @@ pub fn exhaustive_integer_matrix_pair_gen_var_2() -> It<(IntegerMatrix, IntegerM
     )
 }
 
+// Pairs of matrices that can be multiplied: the width of the first is the height of the second.
+pub fn exhaustive_integer_matrix_pair_gen_var_4() -> It<(IntegerMatrix, IntegerMatrix)> {
+    fn ys((height, inner, width): (u64, u64, u64)) -> It<(IntegerMatrix, IntegerMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_integer_matrices_with_dimensions(height, inner),
+            exhaustive_integer_matrices_with_dimensions(inner, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
 // Pairs of matrices of the same height: every triple of a height and two widths, and for each
 // triple every pair of matrices of those shapes.
 pub fn exhaustive_integer_matrix_pair_gen_var_3() -> It<(IntegerMatrix, IntegerMatrix)> {
@@ -4324,6 +4341,23 @@ pub fn exhaustive_natural_matrix_pair_gen_var_2() -> It<(NaturalMatrix, NaturalM
         Box::new(exhaustive_pairs(
             exhaustive_natural_matrices_with_dimensions(h1, width),
             exhaustive_natural_matrices_with_dimensions(h2, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// Pairs of matrices that can be multiplied: the width of the first is the height of the second.
+pub fn exhaustive_natural_matrix_pair_gen_var_4() -> It<(NaturalMatrix, NaturalMatrix)> {
+    fn ys((height, inner, width): (u64, u64, u64)) -> It<(NaturalMatrix, NaturalMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_natural_matrices_with_dimensions(height, inner),
+            exhaustive_natural_matrices_with_dimensions(inner, width),
         ))
     }
     Box::new(

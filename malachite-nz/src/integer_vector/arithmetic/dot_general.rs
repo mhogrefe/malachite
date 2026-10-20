@@ -136,8 +136,26 @@ crate_test_fn! {vec_dot_general<C: PolynomialCoefficient>(
     ys: &[C],
     reverse: bool,
 ) -> C {
+    assert_eq!(ys.len(), xs.len());
+    vec_dot_general_strided(initial, subtract, xs, ys, 1, reverse)
+}}
+
+// Like `vec_dot_general`, but the elements of the second vector are `stride` apart in `ys`: element
+// `i` is `ys[i * stride]`, so a column of a row-major matrix can be passed without copying it. `ys`
+// must reach the last of them.
+//
+// This is equivalent to `_fmpz_vec_dot_general` from `fmpz_vec/dot.c`, FLINT 3.6.0, with the second
+// vector read at a stride.
+crate_test_fn! {vec_dot_general_strided<C: PolynomialCoefficient>(
+    initial: Option<&C>,
+    subtract: bool,
+    xs: &[C],
+    ys: &[C],
+    stride: usize,
+    reverse: bool,
+) -> C {
     let len = xs.len();
-    assert_eq!(ys.len(), len);
+    assert!(len == 0 || ys.len() > (len - 1) * stride);
     if len <= 1 {
         return if let Some(initial) = initial {
             let mut result = initial.clone();
@@ -191,7 +209,11 @@ crate_test_fn! {vec_dot_general<C: PolynomialCoefficient>(
         if ca.is_zero() {
             continue;
         }
-        let cb = if reverse { &ys[len - 1 - i] } else { &ys[i] };
+        let cb = if reverse {
+            &ys[(len - 1 - i) * stride]
+        } else {
+            &ys[i * stride]
+        };
         if cb.is_zero() {
             continue;
         }

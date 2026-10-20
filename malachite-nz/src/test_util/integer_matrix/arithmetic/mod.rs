@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod crt;
+pub mod mul;
 pub mod mul_vector;
 pub mod multi_crt;
 pub mod multi_mod;

@@ -8,7 +8,9 @@
 
 use core::str::FromStr;
 use malachite_nz::integer::Integer;
-use malachite_nz::integer_vector::arithmetic::dot_general::vec_dot_general;
+use malachite_nz::integer_vector::arithmetic::dot_general::{
+    vec_dot_general, vec_dot_general_strided,
+};
 use malachite_nz::test_util::generators::{
     integer_vec_integer_pair_gen, integer_vec_integer_vec_integer_triple_gen_var_1,
 };
@@ -156,6 +158,59 @@ fn test_vec_dot_general() {
     );
 }
 
+// The elements of `ys` with `filler` placed between them, so that element `i` is at `i * stride`.
+fn strided(ys: &[Integer], stride: usize, filler: &Integer) -> Vec<Integer> {
+    let mut out = Vec::new();
+    for (i, y) in ys.iter().enumerate() {
+        if i != 0 {
+            for _ in 1..stride {
+                out.push(filler.clone());
+            }
+        }
+        out.push(y.clone());
+    }
+    out
+}
+
+#[test]
+fn test_vec_dot_general_strided() {
+    let test = |xs: &[&str], ys: &[&str], stride, reverse, out| {
+        let xs = parse(xs);
+        let ys = parse(ys);
+        let result = vec_dot_general_strided(None, false, &xs, &ys, stride, reverse);
+        assert!(result.is_valid());
+        assert_eq!(result.to_string(), out);
+    };
+    test(&[], &[], 3, false, "0");
+    test(&["2"], &["5"], 3, false, "10");
+    // The second vector is (1, 3, 5), with the 100s skipped.
+    test(
+        &["1", "2", "3"],
+        &["1", "100", "3", "100", "5"],
+        2,
+        false,
+        "22",
+    );
+    test(
+        &["1", "2", "3"],
+        &["1", "100", "3", "100", "5"],
+        2,
+        true,
+        "14",
+    );
+    // Trailing elements past the last one read are ignored.
+    test(&["1", "2"], &["1", "100", "3", "100", "100"], 2, false, "7");
+}
+
+#[test]
+#[should_panic]
+fn vec_dot_general_strided_fail() {
+    // The second vector's last element would be at index 4, but there are only 4 elements.
+    let xs = parse(&["1", "2", "3"]);
+    let ys = parse(&["1", "100", "3", "100"]);
+    let _ = vec_dot_general_strided(None, false, &xs, &ys, 2, false);
+}
+
 #[test]
 fn vec_dot_general_properties() {
     integer_vec_integer_vec_integer_triple_gen_var_1().test_properties(|(xs, ys, initial)| {
@@ -168,6 +223,21 @@ fn vec_dot_general_properties() {
                         vec_dot_general_naive(initial, subtract, &xs, &ys, reverse),
                         result
                     );
+                }
+            }
+        }
+        // Reading the second vector at a stride, with other elements in between, gives the same
+        // result as reading it contiguously.
+        for stride in 1..=3 {
+            let zs = strided(&ys, stride, &initial);
+            for initial in [None, Some(&initial)] {
+                for subtract in [false, true] {
+                    for reverse in [false, true] {
+                        assert_eq!(
+                            vec_dot_general_strided(initial, subtract, &xs, &zs, stride, reverse),
+                            vec_dot_general(initial, subtract, &xs, &ys, reverse)
+                        );
+                    }
                 }
             }
         }

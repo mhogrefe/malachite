@@ -4044,6 +4044,16 @@ pub fn integer_matrix_pair_gen_var_3() -> Generator<(IntegerMatrix, IntegerMatri
     )
 }
 
+// All pairs of `IntegerMatrix`s that can be multiplied: the width of the first is the height of the
+// second.
+pub fn integer_matrix_pair_gen_var_4() -> Generator<(IntegerMatrix, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_integer_matrix_pair_gen_var_4,
+        &random_integer_matrix_pair_gen_var_4,
+        &special_random_integer_matrix_pair_gen_var_4,
+    )
+}
+
 // All `(IntegerMatrix, IntegerVector)` where the vector's dimension is the height of the matrix.
 pub fn integer_matrix_integer_vector_pair_gen_var_2() -> Generator<(IntegerMatrix, IntegerVector)> {
     Generator::new(
@@ -4624,6 +4634,16 @@ pub fn natural_matrix_pair_gen_var_3() -> Generator<(NaturalMatrix, NaturalMatri
         &exhaustive_natural_matrix_pair_gen_var_3,
         &random_natural_matrix_pair_gen_var_3,
         &special_random_natural_matrix_pair_gen_var_3,
+    )
+}
+
+// All pairs of `NaturalMatrix`s that can be multiplied: the width of the first is the height of the
+// second.
+pub fn natural_matrix_pair_gen_var_4() -> Generator<(NaturalMatrix, NaturalMatrix)> {
+    Generator::new(
+        &exhaustive_natural_matrix_pair_gen_var_4,
+        &random_natural_matrix_pair_gen_var_4,
+        &special_random_natural_matrix_pair_gen_var_4,
     )
 }
 
