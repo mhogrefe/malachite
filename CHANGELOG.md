@@ -369,11 +369,17 @@ documented by git history.
   matrix must be square.
 - `Mul` and `MulAssign` for `IntegerMatrix` and `NaturalMatrix`, the matrix product, with each
   operand by value or by reference, like FLINT's `fmpz_mat_mul`, choosing among FLINT's kernels for
-  elements that fit in one or two words, Waksman's and Strassen's algorithms, and the classical
-  algorithm, which handles inner dimensions of 1 and 2 directly and otherwise takes a dot product
-  of each row with each column, read in place at a stride. `MulAssign` writes the product back into the first matrix's storage, so multiplying
-  by a square matrix needs at most one row of additional memory beyond word copies of the
-  elements. Both panic unless the width of the first matrix is the height of the second.
+  elements that fit in one or two words, Waksman's and Strassen's algorithms, a multimodular
+  algorithm, and the classical algorithm, which handles inner dimensions of 1 and 2 directly and
+  otherwise takes a dot product of each row with each column, read in place at a stride. `MulAssign`
+  writes the product back into the first matrix's storage; with the classical algorithm, multiplying
+  by a square matrix needs only one row of additional memory. Both panic unless the width of the
+  first matrix is the height of the second.
+- `ModMul` and `ModMulAssign` between two `UnsignedMatrix<T>`s, with each operand by value or by
+  reference: the matrix product modulo $m$, like FLINT's `nmod_mat_mul`, choosing between the
+  classical algorithm (which packs several elements into a word when the modulus is small enough)
+  and Strassen–Winograd multiplication as FLINT does with one thread. The elements must be reduced,
+  and the width of the first matrix must be the height of the second.
 
 ### malachite-q
 

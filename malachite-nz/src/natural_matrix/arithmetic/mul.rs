@@ -233,12 +233,13 @@ impl MulAssign<Self> for NaturalMatrix {
     /// Multiplies a [`NaturalMatrix`] by another [`NaturalMatrix`] in place, taking the second by
     /// value.
     ///
-    /// The product is written back into the storage of `self`. When every element fits in two
-    /// limbs, the elements of `self` are first copied out as words, and the product is written
-    /// directly. For large matrices with large elements, Waksman's or Strassen's algorithm computes
-    /// the product separately, and it is then moved into the storage of `self`. Otherwise the
-    /// product is computed one row at a time, so when it is no wider than `self`, and in particular
-    /// when the second matrix is square, the only additional memory is one row.
+    /// The product is written back into the storage of `self`. When every element fits in two limbs
+    /// and the matrices are not too large, the elements of `self` are first copied out as words,
+    /// and the product is written directly. For large matrices, Waksman's algorithm, Strassen's
+    /// algorithm, or a multimodular algorithm computes the product separately, and it is then moved
+    /// into the storage of `self`. Otherwise the product is computed one row at a time, so when it
+    /// is no wider than `self`, and in particular when the second matrix is square, the only
+    /// additional memory is one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of
@@ -289,12 +290,13 @@ impl MulAssign<&Self> for NaturalMatrix {
     /// Multiplies a [`NaturalMatrix`] by another [`NaturalMatrix`] in place, taking the second by
     /// reference.
     ///
-    /// The product is written back into the storage of `self`. When every element fits in two
-    /// limbs, the elements of `self` are first copied out as words, and the product is written
-    /// directly. For large matrices with large elements, Waksman's or Strassen's algorithm computes
-    /// the product separately, and it is then moved into the storage of `self`. Otherwise the
-    /// product is computed one row at a time, so when it is no wider than `self`, and in particular
-    /// when the second matrix is square, the only additional memory is one row.
+    /// The product is written back into the storage of `self`. When every element fits in two limbs
+    /// and the matrices are not too large, the elements of `self` are first copied out as words,
+    /// and the product is written directly. For large matrices, Waksman's algorithm, Strassen's
+    /// algorithm, or a multimodular algorithm computes the product separately, and it is then moved
+    /// into the storage of `self`. Otherwise the product is computed one row at a time, so when it
+    /// is no wider than `self`, and in particular when the second matrix is square, the only
+    /// additional memory is one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of

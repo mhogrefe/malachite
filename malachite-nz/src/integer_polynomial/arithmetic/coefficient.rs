@@ -7,11 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::integer_vector::arithmetic::multi_mod::integers_multi_mod;
 use crate::integer_vector::arithmetic::scalar_mul::{
     integers_mul_scalar_assign, integers_mul_scalar_to_out,
 };
 use crate::natural::InnerNatural::Small;
 use crate::natural::{LIMB_MAX_QUARTER, Natural, WIDTH_MINUS_2};
+use crate::natural_vector::arithmetic::multi_mod::naturals_multi_mod;
 use crate::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use alloc::borrow::Cow;
 use alloc::vec::Vec;
@@ -92,6 +94,12 @@ PolynomialCoefficient:
     // Coefficients from the results of such an algorithm, which must be non-negative for
     // `Natural`s.
     fn from_integers(xs: Vec<Integer>) -> Vec<Self>;
+
+    // Coefficients from `Natural`s.
+    fn from_naturals(xs: Vec<Natural>) -> Vec<Self>;
+
+    // The residues of the coefficients modulo each of `moduli`, one `Vec` per modulus.
+    fn vec_multi_mod(xs: &[Self], moduli: &[Limb]) -> Vec<Vec<Limb>>;
 }}
 
 impl PolynomialCoefficient for Integer {
@@ -163,6 +171,16 @@ impl PolynomialCoefficient for Integer {
     #[inline]
     fn from_integers(xs: Vec<Integer>) -> Vec<Self> {
         xs
+    }
+
+    #[inline]
+    fn from_naturals(xs: Vec<Natural>) -> Vec<Self> {
+        xs.into_iter().map(Self::from).collect()
+    }
+
+    #[inline]
+    fn vec_multi_mod(xs: &[Self], moduli: &[Limb]) -> Vec<Vec<Limb>> {
+        integers_multi_mod(xs, moduli)
     }
 }
 
@@ -255,6 +273,16 @@ impl PolynomialCoefficient for Natural {
     #[inline]
     fn from_integers(xs: Vec<Integer>) -> Vec<Self> {
         xs.into_iter().map(Self::exact_from).collect()
+    }
+
+    #[inline]
+    fn from_naturals(xs: Vec<Natural>) -> Vec<Self> {
+        xs
+    }
+
+    #[inline]
+    fn vec_multi_mod(xs: &[Self], moduli: &[Limb]) -> Vec<Vec<Limb>> {
+        naturals_multi_mod(xs, moduli)
     }
 }
 

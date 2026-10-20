@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::mod_mul::{limbs_invert_limb_u64, mod_preinverted_double};
-use crate::num::arithmetic::traits::{ModDot, ModIsReduced};
+use crate::num::arithmetic::traits::{DivisibleBy, ModDot, ModIsReduced};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::logic::traits::LeadingZeros;
@@ -209,6 +209,48 @@ pub(crate) fn dot_sum<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], d: &ModData<T>) 
                 for (&x, &y) in x_chunk.iter().zip(y_chunk) {
                     accumulate(&mut acc, x, y);
                 }
+            }
+            acc
+        }
+    }
+}
+
+// The sum of the products of `xs[i]` and `ys[i * stride]`, for `i` less than `xs.len()`, as a
+// three-word value: `dot_sum` with the second vector read at a stride, so that a column of a
+// row-major matrix can be read in place.
+//
+// This is equivalent to the sum in `_nmod_vec_dot_strided` from `nmod_vec.h`, FLINT 3.6.0, with the
+// first vector read contiguously.
+pub(crate) fn dot_sum_strided<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    stride: usize,
+    d: &ModData<T>,
+) -> (T, T, T) {
+    let ys = ys.iter().step_by(stride);
+    match d.words {
+        1 => {
+            let mut sum = T::ZERO;
+            for (&x, &y) in xs.iter().zip(ys) {
+                sum.wrapping_add_assign(x.wrapping_mul(y));
+            }
+            (T::ZERO, T::ZERO, sum)
+        }
+        2 => {
+            let (mut hi, mut lo) = (T::ZERO, T::ZERO);
+            for (&x, &y) in xs.iter().zip(ys) {
+                let (p_hi, p_lo) = T::x_mul_y_to_zz(x, y);
+                (hi, lo) = T::xx_add_yy_to_zz(hi, lo, p_hi, p_lo);
+            }
+            (T::ZERO, hi, lo)
+        }
+        _ => {
+            let mut acc = (T::ZERO, T::ZERO, T::ZERO);
+            for (i, (&x, &y)) in xs.iter().zip(ys).enumerate() {
+                if i != 0 && i.divisible_by(d.max_terms) {
+                    acc = (T::ZERO, T::ZERO, d.reduce(acc.0, acc.1, acc.2));
+                }
+                accumulate(&mut acc, x, y);
             }
             acc
         }

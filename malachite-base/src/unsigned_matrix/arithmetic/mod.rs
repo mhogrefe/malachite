@@ -34,6 +34,10 @@ pub mod mod_is_reduced;
 /// [`ModMulAssign`](crate::num::arithmetic::traits::ModMulAssign), for multiplying an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) by a scalar modulo a number.
 pub mod mod_mul;
+/// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) and
+/// [`ModMulAssign`](crate::num::arithmetic::traits::ModMulAssign), for multiplying two matrices
+/// modulo a number.
+pub mod mod_mul_matrix;
 /// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) for multiplying an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) by an
 /// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector) on the right modulo a number.

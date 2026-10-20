@@ -17,6 +17,7 @@ use crate::integer_matrix::arithmetic::mul::classical::{
 use crate::integer_matrix::arithmetic::mul::double_word::{
     DoubleWordRows, double_words, matrix_mul_double_word_internal,
 };
+use crate::integer_matrix::arithmetic::mul::multi_mod::matrix_mul_multi_mod;
 use crate::integer_matrix::arithmetic::mul::small::{
     matrix_mul_small_1, matrix_mul_small_2a, matrix_mul_small_2b, matrix_mul_small_internal,
     small_words, small_words_transposed,
@@ -32,6 +33,7 @@ use crate::platform::SignedLimb;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::{Mul, MulAssign};
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
@@ -39,6 +41,8 @@ use malachite_base::num::logic::traits::SignificantBits;
 pub mod classical;
 /// FLINT's algorithm for elements that fit in two limbs.
 pub mod double_word;
+/// The multimodular algorithm.
+pub mod multi_mod;
 /// FLINT's algorithms for elements that fit in small `fmpz`s.
 pub mod small;
 /// Strassen's algorithm.
@@ -50,6 +54,11 @@ pub mod waksman;
 // algorithm: `1000 + 300 * flint_get_num_threads()` in `fmpz_mat/mul.c`, FLINT 3.6.0, with one
 // thread.
 const STRASSEN_SMALL_DIMENSION_MIN: usize = 1300;
+
+// Above this smallest dimension, a product whose elements fit in small `fmpz`s but whose result
+// does not uses the multimodular algorithm: `4000 + 300 * flint_get_num_threads()` in
+// `fmpz_mat/mul.c`, FLINT 3.6.0, with one thread.
+const MULTI_MOD_SMALL_DIMENSION_MIN: usize = 4300;
 
 // The shape of a matrix product: the first factor is `ar` by `br`, and the second is `br` by `bc`.
 crate_test_struct! {
@@ -92,14 +101,16 @@ pub(crate) enum MatrixMulAlgorithm {
     Classical,
     Waksman,
     Strassen,
+    // Whether some element is negative, and the number of significant bits that every element of
+    // the product fits in.
+    MultiMod(bool, u64),
     Word(WordMulAlgorithm),
 }
 
 // Chooses the algorithm for the product of the matrices with elements `xs` and `ys`.
 //
 // This is the choice that `fmpz_mat_mul` from `fmpz_mat/mul.c`, FLINT 3.6.0, makes with one thread
-// and without BLAS, restricted to the algorithms ported so far: where FLINT would choose the
-// multimodular algorithm, this makes the choice FLINT makes when it does not.
+// and without BLAS.
 pub(crate) fn choose_matrix_mul_algorithm<C: PolynomialCoefficient>(
     xs: &[C],
     ys: &[C],
@@ -133,21 +144,40 @@ pub(crate) fn choose_matrix_mul_algorithm<C: PolynomialCoefficient>(
             }
         } else {
             // With one thread, FLINT's limit is 300. Strassen's algorithm avoids large intermediate
-            // values when the product fits in a small `fmpz`; otherwise FLINT uses the multimodular
-            // algorithm above a dimension of 4300, which is not yet ported.
-            if c_bits <= SMALL_FMPZ_BITCOUNT_MAX && dim > STRASSEN_SMALL_DIMENSION_MIN {
-                return MatrixMulAlgorithm::Strassen;
+            // values when the product fits in a small `fmpz`; otherwise the multimodular algorithm
+            // is used at even larger dimensions.
+            if c_bits <= SMALL_FMPZ_BITCOUNT_MAX {
+                if dim > STRASSEN_SMALL_DIMENSION_MIN {
+                    return MatrixMulAlgorithm::Strassen;
+                }
+            } else if dim > MULTI_MOD_SMALL_DIMENSION_MIN {
+                // Every dimension would have to exceed 4300, too large for the tests.
+                fail_on_untested_path("choose_matrix_mul_algorithm, small elements, multimodular");
+                return MatrixMulAlgorithm::MultiMod(sign, c_bits);
             }
             SmallMulKind::Internal(c_bits)
         };
         MatrixMulAlgorithm::Word(WordMulAlgorithm::Small(kind))
     } else if a_bits + u64::from(sign) <= TWICE_WIDTH && b_bits + u64::from(sign) <= TWICE_WIDTH {
-        // FLINT uses the multimodular algorithm for large dimensions, which is not yet ported.
+        // The double-word algorithm's cost hardly depends on `c_bits`, so it does better as
+        // `c_bits` grows, but the multimodular algorithm eventually wins at large dimensions. The
+        // double-word algorithm handles unsigned elements better than signed ones.
+        let dim = if sign { dim << 1 } else { dim };
+        if dim > 300 {
+            // FLINT computes `(c_bits - 2 * FLINT_BITS) / 8` in unsigned arithmetic, so when
+            // `c_bits` is less than `2 * FLINT_BITS` the difference wraps around and the squared
+            // limit overflows; the evident intent, a limit of 0, is used instead.
+            let limit = usize::exact_from(c_bits.saturating_sub(TWICE_WIDTH) >> 3).pow(2);
+            if dim - 300 > limit {
+                return MatrixMulAlgorithm::MultiMod(sign, c_bits);
+            }
+        }
         MatrixMulAlgorithm::Word(WordMulAlgorithm::DoubleWord(sign, c_bits))
     } else {
-        // Waksman's algorithm wants elements of similar sizes. FLINT uses the multimodular
-        // algorithm when `dim >= 3 * c_bits.significant_bits()`; it is not yet ported, so the next
-        // choices are made instead.
+        // Waksman's algorithm wants elements of similar sizes.
+        if u64::exact_from(dim) >= 3 * c_bits.significant_bits() {
+            return MatrixMulAlgorithm::MultiMod(sign, c_bits);
+        }
         let min_bits = a_bits.min(b_bits);
         let max_bits = a_bits.max(b_bits);
         if dim < 20
@@ -226,7 +256,7 @@ impl<'a, C: PolynomialCoefficient> WordMul<'a, C> {
 // row-major order, choosing an algorithm.
 //
 // This is equivalent to `fmpz_mat_mul` from `fmpz_mat/mul.c`, FLINT 3.6.0, with one thread and
-// without BLAS, restricted to the algorithms ported so far.
+// without BLAS.
 crate_test_fn! {matrix_mul<C: PolynomialCoefficient>(
     xs: &[C],
     ys: &[C],
@@ -240,6 +270,9 @@ crate_test_fn! {matrix_mul<C: PolynomialCoefficient>(
         }
         MatrixMulAlgorithm::Strassen => {
             C::from_integers(matrix_mul_strassen(&C::as_integers(xs), &C::as_integers(ys), shape))
+        }
+        MatrixMulAlgorithm::MultiMod(sign, c_bits) => {
+            matrix_mul_multi_mod(xs, ys, shape, sign, c_bits)
         }
         MatrixMulAlgorithm::Word(algorithm) => {
             let mut out = vec![C::ZERO; shape.ar * shape.bc];
@@ -256,8 +289,7 @@ crate_test_fn! {matrix_mul<C: PolynomialCoefficient>(
 // separately.
 //
 // This is equivalent to `fmpz_mat_mul` from `fmpz_mat/mul.c`, FLINT 3.6.0, with one thread, without
-// BLAS, and with the output the same as the first input, restricted to the algorithms ported so
-// far.
+// BLAS, and with the output the same as the first input.
 crate_test_fn! {matrix_mul_assign<C: PolynomialCoefficient>(
     xs: &mut Vec<C>,
     ys: &[C],
@@ -280,6 +312,12 @@ crate_test_fn! {matrix_mul_assign<C: PolynomialCoefficient>(
             // Keep the storage of `xs`.
             xs.clear();
             xs.append(&mut C::from_integers(product));
+        }
+        MatrixMulAlgorithm::MultiMod(sign, c_bits) => {
+            let mut product = matrix_mul_multi_mod(xs, ys, shape, sign, c_bits);
+            // Keep the storage of `xs`.
+            xs.clear();
+            xs.append(&mut product);
         }
         MatrixMulAlgorithm::Word(algorithm) => {
             let product = WordMul::converting(algorithm, xs);
@@ -504,12 +542,13 @@ impl MulAssign<Self> for IntegerMatrix {
     /// Multiplies an [`IntegerMatrix`] by another [`IntegerMatrix`] in place, taking the second by
     /// value.
     ///
-    /// The product is written back into the storage of `self`. When every element fits in two
-    /// limbs, the elements of `self` are first copied out as words, and the product is written
-    /// directly. For large matrices with large elements, Waksman's or Strassen's algorithm computes
-    /// the product separately, and it is then moved into the storage of `self`. Otherwise the
-    /// product is computed one row at a time, so when it is no wider than `self`, and in particular
-    /// when the second matrix is square, the only additional memory is one row.
+    /// The product is written back into the storage of `self`. When every element fits in two limbs
+    /// and the matrices are not too large, the elements of `self` are first copied out as words,
+    /// and the product is written directly. For large matrices, Waksman's algorithm, Strassen's
+    /// algorithm, or a multimodular algorithm computes the product separately, and it is then moved
+    /// into the storage of `self`. Otherwise the product is computed one row at a time, so when it
+    /// is no wider than `self`, and in particular when the second matrix is square, the only
+    /// additional memory is one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of
@@ -559,12 +598,13 @@ impl MulAssign<&Self> for IntegerMatrix {
     /// Multiplies an [`IntegerMatrix`] by another [`IntegerMatrix`] in place, taking the second by
     /// reference.
     ///
-    /// The product is written back into the storage of `self`. When every element fits in two
-    /// limbs, the elements of `self` are first copied out as words, and the product is written
-    /// directly. For large matrices with large elements, Waksman's or Strassen's algorithm computes
-    /// the product separately, and it is then moved into the storage of `self`. Otherwise the
-    /// product is computed one row at a time, so when it is no wider than `self`, and in particular
-    /// when the second matrix is square, the only additional memory is one row.
+    /// The product is written back into the storage of `self`. When every element fits in two limbs
+    /// and the matrices are not too large, the elements of `self` are first copied out as words,
+    /// and the product is written directly. For large matrices, Waksman's algorithm, Strassen's
+    /// algorithm, or a multimodular algorithm computes the product separately, and it is then moved
+    /// into the storage of `self`. Otherwise the product is computed one row at a time, so when it
+    /// is no wider than `self`, and in particular when the second matrix is square, the only
+    /// additional memory is one row.
     ///
     /// The product $AB$ of an $h \times k$ matrix $A$ and a $k \times w$ matrix $B$ is the $h
     /// \times w$ matrix whose element in row $i$ and column $j$ is the dot product of row $i$ of

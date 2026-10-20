@@ -13,6 +13,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer_matrix::arithmetic::mul::classical::matrix_mul_classical;
 use malachite_nz::integer_matrix::arithmetic::mul::double_word::matrix_mul_double_word;
+use malachite_nz::integer_matrix::arithmetic::mul::multi_mod::matrix_mul_multi_mod_any;
 use malachite_nz::integer_matrix::arithmetic::mul::small::matrix_mul_small;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
@@ -157,6 +158,10 @@ fn check_kernels(a: &NaturalMatrix, b: &NaturalMatrix, bits: u64, signed: bool) 
         expected
     );
     assert_eq!(
+        natural_matrix_mul_with(a, b, matrix_mul_multi_mod_any),
+        expected
+    );
+    assert_eq!(
         natural_matrix_mul_with(a, b, matrix_mul_strassen_any),
         expected
     );
@@ -224,6 +229,37 @@ fn test_mul_kernels() {
     // Non-negative double-word elements up to 128 bits.
     test(3, 5, 4, 128, false);
     test(3, 20, 4, 128, false);
+}
+
+#[test]
+fn test_mul_multi_mod_dispatch() {
+    // At these sizes the product uses the multimodular algorithm. The results are compared with
+    // those of algorithms that the product does not choose.
+    let test = |height, inner, width, bits| {
+        let a = pseudorandom_matrix(height, inner, bits, false, 1);
+        let b = pseudorandom_matrix(inner, width, bits, false, 2);
+        let expected = if bits <= 127 {
+            natural_matrix_mul_with(&a, &b, matrix_mul_double_word)
+        } else {
+            natural_matrix_mul_with(&a, &b, matrix_mul_classical)
+        };
+        assert_eq!(&a * &b, expected);
+        let mut c = a.clone();
+        c *= &b;
+        assert_eq!(c, expected);
+        if height == inner && inner == width {
+            // A matrix times itself is reduced only once.
+            assert_eq!(
+                &a * &a,
+                natural_matrix_mul_with(&a, &a, matrix_mul_classical)
+            );
+        }
+    };
+    // Large elements at a dimension of at least 3 times the bit length of the product's bit count.
+    test(33, 33, 33, 600);
+    // Non-negative double-word elements; the dimension, 310, exceeds 300 by more than the limit,
+    // ((148 - 128) / 8)^2 = 4.
+    test(310, 310, 310, 70);
 }
 
 #[test]
@@ -295,6 +331,7 @@ fn mul_properties() {
         let c = &a * &b;
         assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_classical), c);
         assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_waksman_any), c);
+        assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_multi_mod_any), c);
         assert_eq!(natural_matrix_mul_with(&a, &b, matrix_mul_strassen_any), c);
     });
 
