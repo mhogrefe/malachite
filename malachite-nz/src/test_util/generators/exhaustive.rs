@@ -4609,6 +4609,26 @@ pub fn exhaustive_natural_matrix_natural_vector_unsigned_triple_gen_var_1()
     )
 }
 
+pub fn exhaustive_natural_matrix_natural_matrix_unsigned_triple_gen_var_2()
+-> It<(NaturalMatrix, NaturalMatrix, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_matrix_pair_gen_var_4(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((a, b), pow)| {
+            let bits = a
+                .elements
+                .iter()
+                .chain(&b.elements)
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (a, b, pow + bits)
+        }),
+    )
+}
+
 // Triples of matrices of the same shape.
 pub fn exhaustive_natural_matrix_triple_gen_var_1()
 -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix)> {

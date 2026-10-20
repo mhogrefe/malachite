@@ -7455,6 +7455,38 @@ pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_3()
     )
 }
 
+// Pairs of matrices that can be multiplied, with their elements less than 2 to the power of a `u64`
+// no greater than 64, and the `u64`.
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_4()
+-> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    fn ys(
+        ((height, inner, width), pow): ((u64, u64, u64), u64),
+    ) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                height,
+                inner,
+                residues_mod_power_of_2::<u64>(pow),
+            ),
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                inner,
+                width,
+                residues_mod_power_of_2::<u64>(pow),
+            ),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()),
+                primitive_int_increasing_inclusive_range(0, u64::WIDTH),
+            )),
+            ys,
+        )
+        .map(|((_, pow), (a, b))| (a, b, pow)),
+    )
+}
+
 // Triples of matrices of the same shape, with their elements less than m, and m.
 pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_2()
 -> It<(

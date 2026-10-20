@@ -4767,6 +4767,17 @@ pub fn natural_matrix_natural_vector_unsigned_triple_gen_var_1()
     )
 }
 
+// All `(NaturalMatrix, NaturalMatrix, u64)` where the matrices can be multiplied (the width of the
+// first is the height of the second) and every element is less than 2 to the power of the `u64`.
+pub fn natural_matrix_natural_matrix_unsigned_triple_gen_var_2()
+-> Generator<(NaturalMatrix, NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_unsigned_triple_gen_var_2,
+        &random_natural_matrix_natural_matrix_unsigned_triple_gen_var_2,
+        &special_random_natural_matrix_natural_matrix_unsigned_triple_gen_var_2,
+    )
+}
+
 // All triples of `NaturalMatrix`s of the same shape.
 pub fn natural_matrix_triple_gen_var_1() -> Generator<(NaturalMatrix, NaturalMatrix, NaturalMatrix)>
 {

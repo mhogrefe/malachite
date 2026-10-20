@@ -385,6 +385,13 @@ documented by git history.
   classical algorithm (which packs several elements into a word when the modulus is small enough)
   and Strassen–Winograd multiplication as FLINT does with one thread. The elements must be reduced,
   and the width of the first matrix must be the height of the second.
+- `ModPowerOf2Mul` and `ModPowerOf2MulAssign` between two `UnsignedMatrix<T>`s, and between two
+  `NaturalMatrix`es in malachite-nz, with each operand by value or by reference: the matrix product
+  modulo $2^k$. `UnsignedMatrix`es are multiplied in wrapping arithmetic, with Strassen's algorithm
+  above a dimension that depends on the width of `T` (48 for 64-bit elements), and all but the
+  lowest $k$ bits are cleared at the end; `NaturalMatrix`es use the same product when $2^k$ fits in
+  a limb and otherwise reduce the exact product. The elements must be reduced, and the width of the
+  first matrix must be the height of the second.
 - Performance: `XXXAddYYYToZZZ` and `XXXXAddYYYYToZZZZ` for `u8` through `u64` and `usize` now add
   the low two values as one double-width value, so that on aarch64 the carries chain through
   add-with-carry instructions instead of being recombined from two overflow flags. With the bounds

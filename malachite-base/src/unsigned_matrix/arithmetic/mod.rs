@@ -68,6 +68,10 @@ pub mod mod_power_of_2_is_reduced;
 /// [`ModPowerOf2MulAssign`](crate::num::arithmetic::traits::ModPowerOf2MulAssign), for multiplying
 /// an [`UnsignedMatrix`](super::UnsignedMatrix) by a scalar modulo a power of 2.
 pub mod mod_power_of_2_mul;
+/// Implementations of [`ModPowerOf2Mul`](crate::num::arithmetic::traits::ModPowerOf2Mul) and
+/// [`ModPowerOf2MulAssign`](crate::num::arithmetic::traits::ModPowerOf2MulAssign), for multiplying
+/// two matrices modulo a power of 2.
+pub mod mod_power_of_2_mul_matrix;
 /// Implementations of [`ModPowerOf2Mul`](crate::num::arithmetic::traits::ModPowerOf2Mul) for
 /// multiplying an [`UnsignedMatrix`](super::UnsignedMatrix) by an
 /// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector) on the right modulo a power of 2.

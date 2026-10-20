@@ -906,6 +906,7 @@ pub mod unsigned_matrix {
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
+        pub mod mod_power_of_2_mul_matrix;
         pub mod mod_power_of_2_mul_vector;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_shl;

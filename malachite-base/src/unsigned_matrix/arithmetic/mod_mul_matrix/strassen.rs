@@ -24,7 +24,7 @@ use core::ops::Range;
 // A copy of the block of the matrix with elements `xs` and width `width` made of the given rows and
 // columns. This stands in for `nmod_mat_window_init`, since Malachite's matrices own their
 // elements.
-fn block<T: PrimitiveUnsigned>(
+pub(crate) fn block<T: PrimitiveUnsigned>(
     xs: &[T],
     width: usize,
     rows: Range<usize>,
@@ -39,7 +39,7 @@ fn block<T: PrimitiveUnsigned>(
 
 // Copies a block with `block_width` columns into the matrix with elements `xs` and width `width`,
 // with its top-left element in row `row` and column `column`.
-fn set_block<T: PrimitiveUnsigned>(
+pub(crate) fn set_block<T: PrimitiveUnsigned>(
     xs: &mut [T],
     width: usize,
     row: usize,
@@ -59,16 +59,16 @@ fn set_block<T: PrimitiveUnsigned>(
 // A block of a matrix, referenced in place: the matrix's elements and width, and the row and column
 // of the block's top-left element.
 #[derive(Clone, Copy)]
-struct BlockRef<'a, T> {
-    xs: &'a [T],
-    width: usize,
-    row: usize,
-    column: usize,
+pub(crate) struct BlockRef<'a, T> {
+    pub(crate) xs: &'a [T],
+    pub(crate) width: usize,
+    pub(crate) row: usize,
+    pub(crate) column: usize,
 }
 
 impl<T> BlockRef<'_, T> {
     // Row `i` of the block, `columns` elements long.
-    fn row(&self, i: usize, columns: usize) -> &[T] {
+    pub(crate) fn row(&self, i: usize, columns: usize) -> &[T] {
         let start = (self.row + i) * self.width + self.column;
         &self.xs[start..start + columns]
     }

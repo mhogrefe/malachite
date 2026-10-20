@@ -9616,6 +9616,29 @@ pub fn special_random_natural_matrix_natural_vector_unsigned_triple_gen_var_1(
     )
 }
 
+pub fn special_random_natural_matrix_natural_matrix_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix, u64)> {
+    Box::new(
+        special_random_natural_matrix_pair_gen_var_4(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((a, b), pow)| {
+                let bits = a
+                    .elements
+                    .iter()
+                    .chain(&b.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (a, b, pow + bits)
+            }),
+    )
+}
+
 // Triples of matrices of the same random shape.
 pub fn special_random_natural_matrix_triple_gen_var_1(
     config: &GenConfig,

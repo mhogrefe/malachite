@@ -82,6 +82,10 @@ pub mod mod_power_of_2_is_reduced;
 /// multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a scalar modulo a power of 2.
 pub mod mod_power_of_2_mul;
 /// Implementations of [`ModPowerOf2Mul`](malachite_base::num::arithmetic::traits::ModPowerOf2Mul)
+/// and [`ModPowerOf2MulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign), for
+/// multiplying two matrices modulo a power of 2.
+pub mod mod_power_of_2_mul_matrix;
+/// Implementations of [`ModPowerOf2Mul`](malachite_base::num::arithmetic::traits::ModPowerOf2Mul)
 /// for multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a
 /// [`NaturalVector`](crate::natural_vector::NaturalVector) on the right modulo a power of 2.
 pub mod mod_power_of_2_mul_vector;
