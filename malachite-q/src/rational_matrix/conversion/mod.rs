@@ -131,9 +131,17 @@ pub mod natural_matrix_from_rational_matrix;
 pub mod serde;
 /// Conversions between [`RationalMatrix`](super::RationalMatrix)s and strings.
 pub mod string;
+/// Functions for clearing the denominators of each column of a
+/// [`RationalMatrix`](super::RationalMatrix), giving a matrix of numerators and one denominator for
+/// each column.
+pub mod to_numerators_and_column_denominators;
 /// Functions for clearing the denominators of a [`RationalMatrix`](super::RationalMatrix), giving a
 /// matrix of numerators and a single denominator.
 pub mod to_numerators_and_denominator;
+/// Functions for clearing the denominators of each row of a
+/// [`RationalMatrix`](super::RationalMatrix), giving a matrix of numerators and one denominator for
+/// each row.
+pub mod to_numerators_and_row_denominators;
 /// Implementations of traits for converting a [`RationalMatrix`](super::RationalMatrix) to an
 /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix).
 ///

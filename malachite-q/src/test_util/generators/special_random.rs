@@ -2772,6 +2772,101 @@ pub fn special_random_rational_matrix_pair_gen_var_3(
     )
 }
 
+// Pairs of matrices of random shapes that can be multiplied.
+pub fn special_random_rational_matrix_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalMatrix)> {
+    let mut xs = striped_random_rationals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, inner, width)| {
+            let n = usize::exact_from(height * inner);
+            let a = RationalMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
+            let n = usize::exact_from(inner * width);
+            let b = RationalMatrix::from_owned_elements(inner, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+// Pairs of matrices of random shapes that can be multiplied.
+pub fn special_random_integer_matrix_rational_matrix_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, RationalMatrix)> {
+    let mut xs = striped_random_integers(
+        EXAMPLE_SEED.fork("xs"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    let mut ys = striped_random_rationals(
+        EXAMPLE_SEED.fork("ys"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, inner, width)| {
+            let n = usize::exact_from(height * inner);
+            let a = IntegerMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
+            let n = usize::exact_from(inner * width);
+            let b = RationalMatrix::from_owned_elements(inner, width, (&mut ys).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+// Pairs of matrices of random shapes that can be multiplied.
+pub fn special_random_rational_matrix_integer_matrix_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalMatrix, IntegerMatrix)> {
+    let mut xs = striped_random_rationals(
+        EXAMPLE_SEED.fork("xs"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    let mut ys = striped_random_integers(
+        EXAMPLE_SEED.fork("ys"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, inner, width)| {
+            let n = usize::exact_from(height * inner);
+            let a = RationalMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
+            let n = usize::exact_from(inner * width);
+            let b = IntegerMatrix::from_owned_elements(inner, width, (&mut ys).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
 // A matrix of random shape and a vector whose dimension is the height of the matrix.
 pub fn special_random_rational_matrix_rational_vector_pair_gen_var_2(
     config: &GenConfig,

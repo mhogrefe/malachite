@@ -6,4 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+pub mod to_numerators_and_column_denominators;
 pub mod to_numerators_and_denominator;
+pub mod to_numerators_and_row_denominators;

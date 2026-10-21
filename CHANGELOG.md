@@ -402,6 +402,22 @@ documented by git history.
   left-to-right binary powering that stops early at a zero power; $A^0$ is the identity reduced
   modulo $m$. `NaturalMatrix`es use the `UnsignedMatrix<Limb>` power when the modulus fits in a
   limb. The elements must be reduced, and the matrix must be square.
+- `Mul` and `MulAssign` between two `RationalMatrix`es in malachite-q, with each operand by value
+  or by reference: the matrix product, like FLINT's `fmpq_mat_mul`. Each row of the first matrix
+  and each column of the second is cleared of denominators (in place for an operand taken by
+  value), the integer matrices are multiplied, and each element is divided by its row's and
+  column's denominators and reduced once; when the inner dimension is 1, the product is computed
+  in rational arithmetic instead, as by FLINT's `fmpq_mat_mul_direct`. The width of the first
+  matrix must be the height of the second.
+- `Mul` between a `RationalMatrix` and an `IntegerMatrix`, in either order, and `MulAssign` of a
+  `RationalMatrix` by an `IntegerMatrix`, with each operand by value or by reference, like FLINT's
+  `fmpq_mat_mul_fmpz_mat` and `fmpq_mat_mul_r_fmpz_mat`: only the rational factor's denominators
+  are cleared.
+- `RationalMatrix::to_numerators_and_row_denominators`, `into_numerators_and_row_denominators`,
+  `to_numerators_and_column_denominators`, and `into_numerators_and_column_denominators`, which
+  clear the denominators of each row, or each column, returning an `IntegerMatrix` and a
+  `NaturalVector` of denominators, like FLINT's `fmpq_mat_get_fmpz_mat_rowwise` and
+  `fmpq_mat_get_fmpz_mat_colwise`.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` between two `UnsignedMatrix<T>`s, and between two
   `NaturalMatrix`es in malachite-nz, with each operand by value or by reference: the matrix product
   modulo $2^k$. `UnsignedMatrix`es are multiplied in wrapping arithmetic, with Strassen's algorithm

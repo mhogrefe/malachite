@@ -1413,6 +1413,38 @@ pub fn rational_matrix_pair_gen_var_3() -> Generator<(RationalMatrix, RationalMa
     )
 }
 
+// All pairs of `RationalMatrix`s that can be multiplied: the width of the first is the height of
+// the second.
+pub fn rational_matrix_pair_gen_var_4() -> Generator<(RationalMatrix, RationalMatrix)> {
+    Generator::new(
+        &exhaustive_rational_matrix_pair_gen_var_4,
+        &random_rational_matrix_pair_gen_var_4,
+        &special_random_rational_matrix_pair_gen_var_4,
+    )
+}
+
+// All `(IntegerMatrix, RationalMatrix)` that can be multiplied: the width of the first is the
+// height of the second.
+pub fn integer_matrix_rational_matrix_pair_gen_var_1() -> Generator<(IntegerMatrix, RationalMatrix)>
+{
+    Generator::new(
+        &exhaustive_integer_matrix_rational_matrix_pair_gen_var_1,
+        &random_integer_matrix_rational_matrix_pair_gen_var_1,
+        &special_random_integer_matrix_rational_matrix_pair_gen_var_1,
+    )
+}
+
+// All `(RationalMatrix, IntegerMatrix)` that can be multiplied: the width of the first is the
+// height of the second.
+pub fn rational_matrix_integer_matrix_pair_gen_var_1() -> Generator<(RationalMatrix, IntegerMatrix)>
+{
+    Generator::new(
+        &exhaustive_rational_matrix_integer_matrix_pair_gen_var_1,
+        &random_rational_matrix_integer_matrix_pair_gen_var_1,
+        &special_random_rational_matrix_integer_matrix_pair_gen_var_1,
+    )
+}
+
 // All `(RationalMatrix, RationalVector)` where the vector's dimension is the height of the matrix.
 pub fn rational_matrix_rational_vector_pair_gen_var_2()
 -> Generator<(RationalMatrix, RationalVector)> {

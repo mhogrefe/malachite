@@ -170,6 +170,9 @@ pub mod rational_matrix {
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod content_chained;
+        pub mod integer_matrix_mul;
+        pub mod mul;
+        pub mod mul_integer_matrix;
         pub mod mul_vector;
         pub mod neg;
         pub mod scalar_mul;
@@ -214,7 +217,9 @@ pub mod rational_matrix {
             pub mod typst;
         }
         pub mod to_elements;
+        pub mod to_numerators_and_column_denominators;
         pub mod to_numerators_and_denominator;
+        pub mod to_numerators_and_row_denominators;
         pub mod unsigned_matrix_from_rational_matrix;
     }
     pub mod dimensions;

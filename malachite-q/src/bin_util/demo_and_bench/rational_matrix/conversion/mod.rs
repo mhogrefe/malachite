@@ -24,6 +24,8 @@ pub(crate) fn register(runner: &mut Runner) {
     string::register(runner);
     to_elements::register(runner);
     to_numerators_and_denominator::register(runner);
+    to_numerators_and_column_denominators::register(runner);
+    to_numerators_and_row_denominators::register(runner);
     unsigned_matrix_from_rational_matrix::register(runner);
 }
 
@@ -41,5 +43,7 @@ mod natural_matrix_from_rational_matrix;
 mod serde;
 mod string;
 mod to_elements;
+mod to_numerators_and_column_denominators;
 mod to_numerators_and_denominator;
+mod to_numerators_and_row_denominators;
 mod unsigned_matrix_from_rational_matrix;

@@ -84,7 +84,9 @@ use malachite_nz::gaussian_integer::exhaustive::exhaustive_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::integer_matrix::IntegerMatrix;
-use malachite_nz::integer_matrix::exhaustive::exhaustive_integer_matrices;
+use malachite_nz::integer_matrix::exhaustive::{
+    exhaustive_integer_matrices, exhaustive_integer_matrices_with_dimensions,
+};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::exhaustive::{
     exhaustive_integer_polynomials, exhaustive_integer_polynomials_min_degree,
@@ -1154,6 +1156,59 @@ pub fn exhaustive_rational_matrix_pair_gen_var_3() -> It<(RationalMatrix, Ration
         Box::new(exhaustive_pairs(
             exhaustive_rational_matrices_with_dimensions(height, w1),
             exhaustive_rational_matrices_with_dimensions(height, w2),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// Pairs of matrices that can be multiplied: the width of the first is the height of the second.
+pub fn exhaustive_rational_matrix_pair_gen_var_4() -> It<(RationalMatrix, RationalMatrix)> {
+    fn ys((height, inner, width): (u64, u64, u64)) -> It<(RationalMatrix, RationalMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_rational_matrices_with_dimensions(height, inner),
+            exhaustive_rational_matrices_with_dimensions(inner, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// Pairs of matrices that can be multiplied: the width of the first is the height of the second.
+pub fn exhaustive_integer_matrix_rational_matrix_pair_gen_var_1()
+-> It<(IntegerMatrix, RationalMatrix)> {
+    fn ys((height, inner, width): (u64, u64, u64)) -> It<(IntegerMatrix, RationalMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_integer_matrices_with_dimensions(height, inner),
+            exhaustive_rational_matrices_with_dimensions(inner, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
+// Pairs of matrices that can be multiplied: the width of the first is the height of the second.
+pub fn exhaustive_rational_matrix_integer_matrix_pair_gen_var_1()
+-> It<(RationalMatrix, IntegerMatrix)> {
+    fn ys((height, inner, width): (u64, u64, u64)) -> It<(RationalMatrix, IntegerMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_rational_matrices_with_dimensions(height, inner),
+            exhaustive_integer_matrices_with_dimensions(inner, width),
         ))
     }
     Box::new(
