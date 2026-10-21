@@ -41,6 +41,10 @@ pub mod mul_vector;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;
+/// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
+/// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square
+/// [`RationalMatrix`](super::RationalMatrix) to a power.
+pub mod pow;
 
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a [`RationalMatrix`](super::RationalMatrix) by a scalar on either side.

@@ -10,4 +10,5 @@ pub mod integer_matrix_mul;
 pub mod mul;
 pub mod mul_integer_matrix;
 pub mod mul_vector;
+pub mod pow;
 pub mod square;

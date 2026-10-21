@@ -417,6 +417,11 @@ documented by git history.
   or by reference. FLINT has no `fmpq_mat_sqr`: the square is the product of the matrix with
   itself, except that when every row and column has the same denominator $d$, the integer matrix
   $N = dA$ is squared (with Bodrato's algorithm for small matrices) and divided by $d^2$.
+- `Pow<u64>` and `PowAssign<u64>` for square `RationalMatrix`es in malachite-q, with the matrix by
+  value or by reference. FLINT has no `fmpq_mat_pow`: when the common denominator $d$ of all the
+  elements is not much larger than the rows' own denominators, the integer matrix $N = dA$ is
+  raised to the power and $N^k/d^k$ is reduced once; otherwise the matrix is raised to the power by
+  binary powering in rational arithmetic.
 - `RationalMatrix::to_numerators_and_row_denominators`, `into_numerators_and_row_denominators`,
   `to_numerators_and_column_denominators`, and `into_numerators_and_column_denominators`, which
   clear the denominators of each row, or each column, returning an `IntegerMatrix` and a

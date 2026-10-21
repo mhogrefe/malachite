@@ -2648,6 +2648,26 @@ pub fn special_random_rational_matrix_gen_var_1(config: &GenConfig) -> It<Ration
     ))
 }
 
+pub fn special_random_rational_matrix_unsigned_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(RationalMatrix, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rational_square_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 16),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_size_n", 2),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 12),
+    ))
+}
+
 pub fn special_random_rational_matrix_pair_gen(
     config: &GenConfig,
 ) -> It<(RationalMatrix, RationalMatrix)> {
