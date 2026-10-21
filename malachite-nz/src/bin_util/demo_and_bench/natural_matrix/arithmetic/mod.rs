@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_add::register(runner);
     mod_is_reduced::register(runner);
     mod_mul::register(runner);
+    mod_mul_matrix::register(runner);
     mod_mul_vector::register(runner);
     mod_neg::register(runner);
     mod_op::register(runner);
@@ -61,6 +62,7 @@ mod crt;
 mod mod_add;
 mod mod_is_reduced;
 mod mod_mul;
+mod mod_mul_matrix;
 mod mod_mul_vector;
 mod mod_neg;
 mod mod_op;

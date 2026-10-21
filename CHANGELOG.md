@@ -385,6 +385,11 @@ documented by git history.
   classical algorithm (which packs several elements into a word when the modulus is small enough)
   and Strassen–Winograd multiplication as FLINT does with one thread. The elements must be reduced,
   and the width of the first matrix must be the height of the second.
+- `ModMul` and `ModMulAssign` between two `NaturalMatrix`es and a `Natural` modulus, with each
+  operand by value or by reference: the matrix product modulo $m$, like FLINT's `fmpz_mod_mat_mul`.
+  When the modulus fits in a limb the product is the `UnsignedMatrix<Limb>` one; otherwise the exact
+  product is computed and each element reduced. The elements must be reduced, and the width of the
+  first matrix must be the height of the second.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` between two `UnsignedMatrix<T>`s, and between two
   `NaturalMatrix`es in malachite-nz, with each operand by value or by reference: the matrix product
   modulo $2^k$. `UnsignedMatrix`es are multiplied in wrapping arithmetic, with Strassen's algorithm

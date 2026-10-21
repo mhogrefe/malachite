@@ -4545,6 +4545,17 @@ pub fn natural_matrix_natural_matrix_natural_triple_gen_var_1()
     )
 }
 
+// All `(NaturalMatrix, NaturalMatrix, Natural)` where the matrices can be multiplied (the width of
+// the first is the height of the second) and every element is less than the `Natural`.
+pub fn natural_matrix_natural_matrix_natural_triple_gen_var_2()
+-> Generator<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_2,
+        &random_natural_matrix_natural_matrix_natural_triple_gen_var_2,
+        &special_random_natural_matrix_natural_matrix_natural_triple_gen_var_2,
+    )
+}
+
 // All `(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)` where the matrices have the same
 // shape and every element is less than the `Natural`.
 pub fn natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1()

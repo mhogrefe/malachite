@@ -51,6 +51,10 @@ pub mod mod_is_reduced;
 /// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign), for multiplying a
 /// [`NaturalMatrix`](super::NaturalMatrix) by a scalar modulo a number.
 pub mod mod_mul;
+/// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) and
+/// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign), for multiplying two
+/// matrices modulo a number.
+pub mod mod_mul_matrix;
 /// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) for multiplying a
 /// [`NaturalMatrix`](super::NaturalMatrix) by a
 /// [`NaturalVector`](crate::natural_vector::NaturalVector) on the right modulo a number.

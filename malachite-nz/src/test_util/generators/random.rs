@@ -8015,6 +8015,24 @@ pub fn random_natural_matrix_natural_matrix_natural_triple_gen_var_1(
     )
 }
 
+pub fn random_natural_matrix_natural_matrix_natural_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Box::new(
+        random_natural_matrix_pair_gen_var_4(config)
+            .zip(random_naturals(
+                EXAMPLE_SEED.fork("m"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((a, b), k)| {
+                let max = a.elements.iter().chain(&b.elements).max().cloned();
+                let m = max.unwrap_or_default() + k + Natural::ONE;
+                (a, b, m)
+            }),
+    )
+}
+
 pub fn random_natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)> {
