@@ -392,6 +392,11 @@ documented by git history.
   lowest $k$ bits are cleared at the end; `NaturalMatrix`es use the same product when $2^k$ fits in
   a limb and otherwise reduce the exact product. The elements must be reduced, and the width of the
   first matrix must be the height of the second.
+- `ModPowerOf2Square` and `ModPowerOf2SquareAssign` for square `UnsignedMatrix<T>`s, and for square
+  `NaturalMatrix`es in malachite-nz, with the matrix by value or by reference: the square modulo
+  $2^k$, computed as the product of the matrix with itself (with Strassen's algorithm for large
+  `UnsignedMatrix`es); `NaturalMatrix`es whose modulus does not fit in a limb reduce the exact
+  square. The elements must be reduced, and the matrix must be square.
 - Performance: `XXXAddYYYToZZZ` and `XXXXAddYYYYToZZZZ` for `u8` through `u64` and `usize` now add
   the low two values as one double-width value, so that on aarch64 the carries chain through
   add-with-carry instructions instead of being recombined from two overflow flags. With the bounds

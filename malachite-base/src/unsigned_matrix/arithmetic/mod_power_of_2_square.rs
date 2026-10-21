@@ -89,7 +89,10 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Square for UnsignedMatrix<T> {
     /// assert_eq!(a.mod_power_of_2_square(4).to_string(), "[7, 10; 15, 6]");
     ///
     /// let a = UnsignedMatrix::<u8>::from_str("[2, 0, 1; 1, 3, 0; 0, 1, 1]").unwrap();
-    /// assert_eq!(a.mod_power_of_2_square(3).to_string(), "[4, 1, 3; 5, 1, 1; 1, 4, 1]");
+    /// assert_eq!(
+    ///     a.mod_power_of_2_square(3).to_string(),
+    ///     "[4, 1, 3; 5, 1, 1; 1, 4, 1]"
+    /// );
     /// ```
     #[inline]
     fn mod_power_of_2_square(self, pow: u64) -> Self {
@@ -125,7 +128,10 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Square for &UnsignedMatrix<T> {
     /// assert_eq!((&a).mod_power_of_2_square(4).to_string(), "[7, 10; 15, 6]");
     ///
     /// let a = UnsignedMatrix::<u8>::from_str("[2, 0, 1; 1, 3, 0; 0, 1, 1]").unwrap();
-    /// assert_eq!((&a).mod_power_of_2_square(3).to_string(), "[4, 1, 3; 5, 1, 1; 1, 4, 1]");
+    /// assert_eq!(
+    ///     (&a).mod_power_of_2_square(3).to_string(),
+    ///     "[4, 1, 3; 5, 1, 1; 1, 4, 1]"
+    /// );
     /// ```
     fn mod_power_of_2_square(self, pow: u64) -> UnsignedMatrix<T> {
         UnsignedMatrix {
