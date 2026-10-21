@@ -390,6 +390,12 @@ documented by git history.
   When the modulus fits in a limb the product is the `UnsignedMatrix<Limb>` one; otherwise the exact
   product is computed and each element reduced. The elements must be reduced, and the width of the
   first matrix must be the height of the second.
+- `ModSquare` and `ModSquareAssign` for square `UnsignedMatrix<T>`s, and for square
+  `NaturalMatrix`es with a `Natural` modulus in malachite-nz, with the matrix (and modulus) by value
+  or by reference: the square modulo $m$. `UnsignedMatrix`es are multiplied by themselves as by
+  `ModMul` (FLINT has no `nmod_mat_sqr`); `NaturalMatrix`es use the `UnsignedMatrix<Limb>` square
+  when the modulus fits in a limb and otherwise reduce the exact square, like FLINT's
+  `fmpz_mod_mat_sqr`. The elements must be reduced, and the matrix must be square.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` between two `UnsignedMatrix<T>`s, and between two
   `NaturalMatrix`es in malachite-nz, with each operand by value or by reference: the matrix product
   modulo $2^k$. `UnsignedMatrix`es are multiplied in wrapping arithmetic, with Strassen's algorithm

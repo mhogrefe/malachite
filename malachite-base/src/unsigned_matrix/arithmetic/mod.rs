@@ -176,6 +176,10 @@ pub mod mod_power_of_2_trace;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of [`ModSquare`](crate::num::arithmetic::traits::ModSquare) and
+/// [`ModSquareAssign`](crate::num::arithmetic::traits::ModSquareAssign), for squaring a square
+/// matrix modulo a number.
+pub mod mod_square;
 /// Implementations of [`ModSub`](crate::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.

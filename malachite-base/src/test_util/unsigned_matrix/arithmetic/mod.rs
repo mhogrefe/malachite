@@ -12,3 +12,4 @@ pub mod mod_power_of_2_mul_matrix;
 pub mod mod_power_of_2_mul_vector;
 pub mod mod_power_of_2_pow;
 pub mod mod_power_of_2_square;
+pub mod mod_square;

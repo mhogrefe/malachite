@@ -206,6 +206,10 @@ pub mod mod_power_of_2_trace;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of [`ModSquare`](malachite_base::num::arithmetic::traits::ModSquare) and
+/// [`ModSquareAssign`](malachite_base::num::arithmetic::traits::ModSquareAssign), for squaring a
+/// square [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
+pub mod mod_square;
 /// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
