@@ -39,6 +39,11 @@ pub mod content_chained;
 /// of residues modulo any number with one modulo a word-sized number by the Chinese remainder
 /// theorem.
 pub mod crt;
+/// Implementations of
+/// [`KroneckerProduct`](malachite_base::num::arithmetic::traits::KroneckerProduct) and
+/// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
+/// computing the Kronecker product of two [`NaturalMatrix`](super::NaturalMatrix)s.
+pub mod kronecker_product;
 /// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.

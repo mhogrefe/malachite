@@ -357,6 +357,7 @@ pub mod integer_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod crt;
+        pub mod kronecker_product;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mul;
@@ -1069,6 +1070,7 @@ pub mod natural_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod crt;
+        pub mod kronecker_product;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_mul;

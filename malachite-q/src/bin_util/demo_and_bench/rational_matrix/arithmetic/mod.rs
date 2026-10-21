@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content::register(runner);
     content_chained::register(runner);
     integer_matrix_mul::register(runner);
+    kronecker_product::register(runner);
     mul::register(runner);
     mul_integer_matrix::register(runner);
     mul_vector::register(runner);
@@ -33,6 +34,7 @@ mod canonical_primitive_part;
 mod content;
 mod content_chained;
 mod integer_matrix_mul;
+mod kronecker_product;
 mod mul;
 mod mul_integer_matrix;
 mod mul_vector;

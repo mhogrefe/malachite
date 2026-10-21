@@ -27,6 +27,11 @@ pub mod content_chained;
 /// [`IntegerMatrix`](malachite_nz::integer_matrix::IntegerMatrix) by a
 /// [`RationalMatrix`](super::RationalMatrix).
 pub mod integer_matrix_mul;
+/// Implementations of
+/// [`KroneckerProduct`](malachite_base::num::arithmetic::traits::KroneckerProduct) and
+/// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
+/// computing the Kronecker product of two [`RationalMatrix`](super::RationalMatrix)s.
+pub mod kronecker_product;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying two [`RationalMatrix`](super::RationalMatrix)s.
 pub mod mul;

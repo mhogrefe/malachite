@@ -171,6 +171,7 @@ pub mod rational_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod integer_matrix_mul;
+        pub mod kronecker_product;
         pub mod mul;
         pub mod mul_integer_matrix;
         pub mod mul_vector;

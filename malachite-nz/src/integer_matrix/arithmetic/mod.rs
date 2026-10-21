@@ -42,6 +42,11 @@ pub mod content_chained;
 /// combine a matrix of residues modulo any number with one modulo a word-sized number into balanced
 /// representatives by the Chinese remainder theorem.
 pub mod crt;
+/// Implementations of
+/// [`KroneckerProduct`](malachite_base::num::arithmetic::traits::KroneckerProduct) and
+/// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
+/// computing the Kronecker product of two [`IntegerMatrix`](super::IntegerMatrix)s.
+pub mod kronecker_product;
 /// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
 /// [`Rem`](core::ops::Rem), and [`RemAssign`](core::ops::RemAssign), for reducing every element of
 /// an [`IntegerMatrix`](super::IntegerMatrix) modulo a number.

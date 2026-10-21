@@ -2034,6 +2034,25 @@ pub trait JacobiSymbol<RHS = Self> {
     fn jacobi_symbol(self, other: RHS) -> i8;
 }
 
+/// Computes the Kronecker product of two matrices: the block matrix whose block in row $i$ and
+/// column $j$ is the second matrix multiplied by the element of the first in row $i$ and column
+/// $j$.
+///
+/// The Kronecker product of an $m \times n$ matrix and a $p \times q$ matrix is an $mp \times nq$
+/// matrix.
+pub trait KroneckerProduct<RHS = Self> {
+    type Output;
+
+    fn kronecker_product(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces a matrix with its Kronecker product with another matrix: the block matrix whose block
+/// in row $i$ and column $j$ is the second matrix multiplied by the element of the first in row $i$
+/// and column $j$.
+pub trait KroneckerProductAssign<RHS = Self> {
+    fn kronecker_product_assign(&mut self, other: RHS);
+}
+
 /// Calculates the Kronecker symbol of two numbers.
 pub trait KroneckerSymbol<RHS = Self> {
     fn kronecker_symbol(self, other: RHS) -> i8;

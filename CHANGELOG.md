@@ -422,6 +422,11 @@ documented by git history.
   elements is not much larger than the rows' own denominators, the integer matrix $N = dA$ is
   raised to the power and $N^k/d^k$ is reduced once; otherwise the matrix is raised to the power by
   binary powering in rational arithmetic.
+- New `KroneckerProduct` and `KroneckerProductAssign` traits in malachite-base, implemented for
+  `NaturalMatrix` and `IntegerMatrix` in malachite-nz and `RationalMatrix` in malachite-q, with
+  each operand by value or by reference: the Kronecker product $A \otimes B$, the block matrix whose
+  block $(i, j)$ is $A_{ij}B$, like FLINT's `fmpz_mat_kronecker_product` and
+  `fmpq_mat_kronecker_product`. The product is written one row at a time, in storage order.
 - `RationalMatrix::to_numerators_and_row_denominators`, `into_numerators_and_row_denominators`,
   `to_numerators_and_column_denominators`, and `into_numerators_and_column_denominators`, which
   clear the denominators of each row, or each column, returning an `IntegerMatrix` and a

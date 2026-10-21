@@ -249,7 +249,10 @@ impl Pow<u64> for &RationalMatrix {
     /// assert_eq!((&a).pow(5).to_string(), "[65/32, 29/16; 29/16, 9/8]");
     ///
     /// let a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
-    /// assert_eq!((&a).pow(3).to_string(), "[-25/24, 25/144; -25/24, -175/192]");
+    /// assert_eq!(
+    ///     (&a).pow(3).to_string(),
+    ///     "[-25/24, 25/144; -25/24, -175/192]"
+    /// );
     ///
     /// let a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
     /// assert_eq!((&a).pow(0).to_string(), "[1, 0; 0, 1]");
