@@ -18,6 +18,7 @@
 
 #include <flint/flint.h>
 #include <flint/fmpz.h>
+#include <flint/fmpz_mat.h>
 #include <flint/fmpq.h>
 #include <flint/fmpq_poly.h>
 #include <flint/fmpz_poly.h>
@@ -76,6 +77,11 @@ void fmpz_vec_print_malachite(const fmpz * vec, slong len);
    `*receiver` keeping its parentheses, and 0 if the line has none of the shapes. */
 int split_vector_scalar_line(char * line, const char * method, const char * assign_method,
                              char ** receiver, char ** arg, char ** result);
+
+/* Parses a matrix as Malachite displays it, such as `[1, -2; 3, 4]`, or `[]_{0,3}` for one with
+   no elements, initializing `mat` to it. Returns 1 on success and 0, with `mat` still initialized,
+   if the text is not exactly in that form. */
+int fmpz_mat_init_set_str_malachite(fmpz_mat_t mat, const char * s);
 
 /* Returns 0 if `checked` is positive, and otherwise reports that no line of the input had the
    shape the mode `name` looks for and returns 1. A mode skips lines it cannot parse, so without
@@ -300,5 +306,9 @@ int run__fmpz_mod_vec_scalar_div_fmpz_mod(const char * arg);
 
 /* nmod_vec_invert.c */
 int run__nmod_vec_invert(const char * arg);
+
+/* matrix_mul.c */
+int run_fmpz_mat_mul(const char * arg);
+int run_nmod_mat_mul(const char * arg);
 
 #endif

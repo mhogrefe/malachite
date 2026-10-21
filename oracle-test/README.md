@@ -111,6 +111,8 @@ string in a unit file is printed bare, exactly as the demo would print it.
 | `fmpz_poly_bit_pack` | `fmpz_poly_bit_pack`, or `fmpz_poly_evaluate_fmpz` at $2^b$ when $b = 0$ or a coefficient is wider than its field | `demo_integer_polynomial_bit_pack`, `_ref`, and `_small_bits`, and the same three for `natural_polynomial` (malachite-nz), plus unit rows |
 | `fmpz_poly_bit_unpack` | `fmpz_poly_bit_unpack` | `demo_integer_polynomial_bit_unpack` and `_ref` (malachite-nz), plus unit rows |
 | `fmpz_poly_bit_unpack_unsigned` | `fmpz_poly_bit_unpack_unsigned` | `demo_natural_polynomial_bit_unpack` and `_ref` (malachite-nz), plus unit rows |
+| `fmpz_mat_mul` | `fmpz_mat_mul` | `demo_integer_matrix_mul` and its `_val_ref`, `_ref_val`, `_ref_ref`, `_assign`, and `_assign_ref` versions, and the same six `natural_matrix` demos (malachite-nz), plus unit rows; and, in the random modes with fewer lines, `_large_dimensions_small_elements`, `_large_dimensions_double_word_elements`, `_large_elements`, and `_large_dimensions_and_elements`, which enlarge the random sizes to reach the blocked and double-word kernels, Waksman's and Strassen's algorithms, and the multimodular algorithm. Matrices are read by `fmpz_mat_init_set_str_malachite` in `oracle/util.c` |
+| `nmod_mat_mul` | `nmod_mat_mul` | `demo_unsigned_matrix_mod_mul_matrix`, `_assign`, and `_small_moduli` (malachite-base), plus unit rows; and, in the random modes with 5 lines, `_large_dimensions`, which reaches Strassen's algorithm |
 | `sqrtmod_stress` | `fmpz_sqrtmod` | none — a memory-stress diagnostic, run manually |
 
 The `sqrtmod` modes skip documented divergence windows, noted in comments in

@@ -31,6 +31,19 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_matrix_mul_ref_ref);
     register_demo!(runner, demo_integer_matrix_mul_assign);
     register_demo!(runner, demo_integer_matrix_mul_assign_ref);
+    register_demo!(
+        runner,
+        demo_integer_matrix_mul_large_dimensions_small_elements
+    );
+    register_demo!(
+        runner,
+        demo_integer_matrix_mul_large_dimensions_double_word_elements
+    );
+    register_demo!(runner, demo_integer_matrix_mul_large_elements);
+    register_demo!(
+        runner,
+        demo_integer_matrix_mul_large_dimensions_and_elements
+    );
 
     register_bench!(runner, benchmark_integer_matrix_mul_evaluation_strategy);
     register_bench!(runner, benchmark_integer_matrix_mul_algorithms);
@@ -93,6 +106,58 @@ fn demo_integer_matrix_mul_assign_ref(gm: GenMode, config: &GenConfig, limit: us
         a *= &b;
         println!("a := {a_old}; a *= &{b}; a = {a}");
     }
+}
+
+// Demos the product with the generator's means for the dimensions and the element sizes replaced,
+// so that random inputs reach the large-input algorithms. Their lines are long.
+fn demo_integer_matrix_mul_with_means(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    mean_dimension: u64,
+    mean_bits: u64,
+) {
+    let mut config = config.clone();
+    config.insert("mean_dimension_n", mean_dimension);
+    config.insert("mean_bits_n", mean_bits);
+    for (a, b) in integer_matrix_pair_gen_var_4().get(gm, &config).take(limit) {
+        println!("&{a} * &{b} = {}", &a * &b);
+    }
+}
+
+// Large dimensions with elements small enough that the largest usually fits in a small `fmpz`,
+// which reach FLINT's blocked kernel for small elements. The element sizes are geometric, so the
+// largest of many is several times the mean.
+fn demo_integer_matrix_mul_large_dimensions_small_elements(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    demo_integer_matrix_mul_with_means(gm, config, limit, 40, 6);
+}
+
+// Large dimensions with elements whose largest usually fits in two words but not in a small `fmpz`,
+// which reach FLINT's double-word kernel.
+fn demo_integer_matrix_mul_large_dimensions_double_word_elements(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    demo_integer_matrix_mul_with_means(gm, config, limit, 40, 14);
+}
+
+// Large elements at moderate dimensions, which reach Waksman's and Strassen's algorithms.
+fn demo_integer_matrix_mul_large_elements(gm: GenMode, config: &GenConfig, limit: usize) {
+    demo_integer_matrix_mul_with_means(gm, config, limit, 10, 1500);
+}
+
+// Large dimensions with large elements, which reach the multimodular algorithm.
+fn demo_integer_matrix_mul_large_dimensions_and_elements(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    demo_integer_matrix_mul_with_means(gm, config, limit, 40, 600);
 }
 
 #[allow(clippy::no_effect, unused_must_use)]

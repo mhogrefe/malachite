@@ -153,6 +153,22 @@ fn check_demo_against_flint_with_limit(
     }
 }
 
+// Like `check_demo_against_flint_with_limit`, but only in the random modes, for demos that enlarge
+// their generators' random sizes, which the exhaustive mode ignores.
+fn check_demo_against_flint_random_modes_with_limit(
+    oracle: &Path,
+    crate_dir: &str,
+    demo_name: &str,
+    flint_mode: &str,
+    limit: usize,
+) {
+    for mode in &MODES[1..] {
+        println!("testing {demo_name} in mode {mode}");
+        run_demo_with_limit(crate_dir, demo_name, mode, limit);
+        run_oracle(oracle, flint_mode, Some(TEST_OUT));
+    }
+}
+
 // For demos whose generators do not support the special_random mode, such as those built on
 // primitive-integer generators declared with new_no_special.
 fn check_demo_against_flint_no_special(
@@ -3615,4 +3631,58 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, flint_mode);
     }
+
+    // The products of IntegerMatrixes and NaturalMatrixes, against fmpz_mat_mul. The `_large_*`
+    // demos enlarge the random dimensions and element sizes to reach the dispatcher's algorithms for
+    // large inputs (the blocked and double-word kernels, Waksman's and Strassen's algorithms, and
+    // the multimodular algorithm); their lines are long, so they print fewer.
+    for matrix in ["integer_matrix", "natural_matrix"] {
+        for suffix in [
+            "",
+            "_val_ref",
+            "_ref_val",
+            "_ref_ref",
+            "_assign",
+            "_assign_ref",
+        ] {
+            check_demo_against_flint(
+                &oracle,
+                "../malachite-nz",
+                &format!("demo_{matrix}_mul{suffix}"),
+                "fmpz_mat_mul",
+            );
+        }
+        for (suffix, limit) in [
+            ("_large_dimensions_small_elements", 200),
+            ("_large_dimensions_double_word_elements", 200),
+            ("_large_elements", 100),
+            ("_large_dimensions_and_elements", 20),
+        ] {
+            check_demo_against_flint_random_modes_with_limit(
+                &oracle,
+                "../malachite-nz",
+                &format!("demo_{matrix}_mul{suffix}"),
+                "fmpz_mat_mul",
+                limit,
+            );
+        }
+    }
+
+    // The modular products of UnsignedMatrixes, against nmod_mat_mul. The small-moduli demo reaches
+    // the packed classical algorithm, and the large-dimension demo, whose lines are very long,
+    // Strassen's algorithm.
+    for demo_name in [
+        "demo_unsigned_matrix_mod_mul_matrix",
+        "demo_unsigned_matrix_mod_mul_matrix_assign",
+        "demo_unsigned_matrix_mod_mul_matrix_small_moduli",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "nmod_mat_mul");
+    }
+    check_demo_against_flint_random_modes_with_limit(
+        &oracle,
+        "../malachite-base",
+        "demo_unsigned_matrix_mod_mul_matrix_large_dimensions",
+        "nmod_mat_mul",
+        5,
+    );
 }

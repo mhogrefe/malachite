@@ -171,6 +171,8 @@ static const oracle_mode modes[] = {
     {"mod_taylor_shift", run_mod_taylor_shift},
     {"fmpq_poly_taylor_shift", run_fmpq_poly_taylor_shift},
     {"_nmod_vec_invert", run__nmod_vec_invert},
+    {"fmpz_mat_mul", run_fmpz_mat_mul},
+    {"nmod_mat_mul", run_nmod_mat_mul},
 };
 
 int
