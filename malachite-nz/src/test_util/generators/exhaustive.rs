@@ -4313,6 +4313,19 @@ pub fn exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_2()
     )
 }
 
+pub fn exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_3()
+-> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_natural_matrix_pair_gen(), exhaustive_naturals()).map(
+            |((a, b), k)| {
+                let max = a.elements.iter().chain(&b.elements).max().cloned();
+                let m = max.unwrap_or_default() + k + Natural::ONE;
+                (a, b, m)
+            },
+        ),
+    )
+}
+
 // Triples of matrices of the same shape and a modulus that every element is less than.
 pub fn exhaustive_natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1()
 -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)> {
@@ -4635,6 +4648,26 @@ pub fn exhaustive_natural_matrix_natural_matrix_unsigned_triple_gen_var_2()
     Box::new(
         exhaustive_pairs_big_tiny(
             exhaustive_natural_matrix_pair_gen_var_4(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((a, b), pow)| {
+            let bits = a
+                .elements
+                .iter()
+                .chain(&b.elements)
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (a, b, pow + bits)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_matrix_natural_matrix_unsigned_triple_gen_var_3()
+-> It<(NaturalMatrix, NaturalMatrix, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_matrix_pair_gen(),
             exhaustive_unsigneds::<u64>(),
         )
         .map(|((a, b), pow)| {

@@ -7512,6 +7512,65 @@ pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_4()
     )
 }
 
+// Two matrices of any shapes, with elements less than 2 to the power of a `u64` no greater than 64,
+// and the `u64`.
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_5()
+-> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    fn ys(
+        (((h1, w1), (h2, w2)), pow): (((u64, u64), (u64, u64)), u64),
+    ) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                h1,
+                w1,
+                residues_mod_power_of_2::<u64>(pow),
+            ),
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                h2,
+                w2,
+                residues_mod_power_of_2::<u64>(pow),
+            ),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_pairs_from_single(exhaustive_unsigneds::<
+                    u64,
+                >())),
+                primitive_int_increasing_inclusive_range(0, u64::WIDTH),
+            )),
+            ys,
+        )
+        .map(|((_, pow), (a, b))| (a, b, pow)),
+    )
+}
+
+// Two matrices of any shapes, with elements less than a positive `u64`, and the `u64`.
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_6()
+-> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    fn ys(
+        (((h1, w1), (h2, w2)), m): (((u64, u64), (u64, u64)), u64),
+    ) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(h1, w1, residues_mod(m)),
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(h2, w2, residues_mod(m)),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_pairs_from_single(exhaustive_unsigneds::<
+                    u64,
+                >())),
+                exhaustive_positive_primitive_ints::<u64>(),
+            )),
+            ys,
+        )
+        .map(|((_, m), (a, b))| (a, b, m)),
+    )
+}
+
 // Triples of matrices of the same shape, with their elements less than m, and m.
 pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_2()
 -> It<(

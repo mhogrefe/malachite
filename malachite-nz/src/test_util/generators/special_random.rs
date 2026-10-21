@@ -9097,6 +9097,26 @@ pub fn special_random_natural_matrix_natural_matrix_natural_triple_gen_var_2(
     )
 }
 
+pub fn special_random_natural_matrix_natural_matrix_natural_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Box::new(
+        special_random_natural_matrix_pair_gen(config)
+            .zip(striped_random_naturals(
+                EXAMPLE_SEED.fork("m"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((a, b), k)| {
+                let max = a.elements.iter().chain(&b.elements).max().cloned();
+                let m = max.unwrap_or_default() + k + Natural::ONE;
+                (a, b, m)
+            }),
+    )
+}
+
 pub fn special_random_natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)> {
@@ -9645,6 +9665,29 @@ pub fn special_random_natural_matrix_natural_matrix_unsigned_triple_gen_var_2(
 ) -> It<(NaturalMatrix, NaturalMatrix, u64)> {
     Box::new(
         special_random_natural_matrix_pair_gen_var_4(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((a, b), pow)| {
+                let bits = a
+                    .elements
+                    .iter()
+                    .chain(&b.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0);
+                (a, b, pow + bits)
+            }),
+    )
+}
+
+pub fn special_random_natural_matrix_natural_matrix_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix, u64)> {
+    Box::new(
+        special_random_natural_matrix_pair_gen(config)
             .zip(geometric_random_unsigneds::<u64>(
                 EXAMPLE_SEED.fork("pow"),
                 config.get_or("mean_small_n", 64),

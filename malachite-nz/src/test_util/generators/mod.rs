@@ -4556,6 +4556,17 @@ pub fn natural_matrix_natural_matrix_natural_triple_gen_var_2()
     )
 }
 
+// All `(NaturalMatrix, NaturalMatrix, Natural)` where the matrices may have any shapes and every
+// element is less than the `Natural`.
+pub fn natural_matrix_natural_matrix_natural_triple_gen_var_3()
+-> Generator<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_3,
+        &random_natural_matrix_natural_matrix_natural_triple_gen_var_3,
+        &special_random_natural_matrix_natural_matrix_natural_triple_gen_var_3,
+    )
+}
+
 // All `(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)` where the matrices have the same
 // shape and every element is less than the `Natural`.
 pub fn natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1()
@@ -4786,6 +4797,17 @@ pub fn natural_matrix_natural_matrix_unsigned_triple_gen_var_2()
         &exhaustive_natural_matrix_natural_matrix_unsigned_triple_gen_var_2,
         &random_natural_matrix_natural_matrix_unsigned_triple_gen_var_2,
         &special_random_natural_matrix_natural_matrix_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(NaturalMatrix, NaturalMatrix, u64)` where every element of the matrices, which may have any
+// shapes, is less than 2 to the power of the `u64`.
+pub fn natural_matrix_natural_matrix_unsigned_triple_gen_var_3()
+-> Generator<(NaturalMatrix, NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_unsigned_triple_gen_var_3,
+        &random_natural_matrix_natural_matrix_unsigned_triple_gen_var_3,
+        &special_random_natural_matrix_natural_matrix_unsigned_triple_gen_var_3,
     )
 }
 

@@ -427,6 +427,17 @@ documented by git history.
   each operand by value or by reference: the Kronecker product $A \otimes B$, the block matrix whose
   block $(i, j)$ is $A_{ij}B$, like FLINT's `fmpz_mat_kronecker_product` and
   `fmpq_mat_kronecker_product`. The product is written one row at a time, in storage order.
+- New `ModKroneckerProduct` and `ModKroneckerProductAssign` traits in malachite-base, implemented
+  for `UnsignedMatrix<T>` with a `T` modulus and, in malachite-nz, `NaturalMatrix` with a `Natural`
+  modulus, with each operand by value or by reference: the Kronecker product modulo $m$ of two
+  matrices whose elements are reduced. `UnsignedMatrix` products share one precomputation of the
+  modular-multiplication data; `NaturalMatrix`es use the `UnsignedMatrix<Limb>` product when $m$
+  fits in a limb.
+- New `ModPowerOf2KroneckerProduct` and `ModPowerOf2KroneckerProductAssign` traits in
+  malachite-base, implemented for `UnsignedMatrix<T>` and, in malachite-nz, `NaturalMatrix`, with
+  each operand by value or by reference: the Kronecker product modulo $2^k$ of two matrices whose
+  elements are reduced. `UnsignedMatrix` elements are wrapping products with the high bits
+  cleared; `NaturalMatrix`es use the `UnsignedMatrix<Limb>` product when $2^k$ fits in a limb.
 - `RationalMatrix::to_numerators_and_row_denominators`, `into_numerators_and_row_denominators`,
   `to_numerators_and_column_denominators`, and `into_numerators_and_column_denominators`, which
   clear the denominators of each row, or each column, returning an `IntegerMatrix` and a

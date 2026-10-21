@@ -9880,6 +9880,70 @@ pub fn random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_4(
     )
 }
 
+// Two matrices of random shapes, with elements less than 2 to the power of a random `u64` no
+// greater than 64, and the `u64`.
+pub fn random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    let mut pows = random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("pow"), 0, u64::WIDTH);
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(
+        random_pairs_from_single(random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 3),
+            config.get_or("mean_dimension_d", 1),
+        )))
+        .map(move |((h1, w1), (h2, w2))| {
+            let pow = pows.next().unwrap();
+            let n = usize::exact_from(h1 * w1);
+            let a = UnsignedMatrix::from_owned_elements(
+                h1,
+                w1,
+                (&mut xs).take(n).map(|x| x.mod_power_of_2(pow)).collect(),
+            );
+            let n = usize::exact_from(h2 * w2);
+            let b = UnsignedMatrix::from_owned_elements(
+                h2,
+                w2,
+                (&mut xs).take(n).map(|x| x.mod_power_of_2(pow)).collect(),
+            );
+            (a, b, pow)
+        }),
+    )
+}
+
+// Two matrices of random shapes, with elements less than 2 to the power of a random `u64` no
+// greater than 64, and the `u64`.
+pub fn random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_6(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    let mut ms = random_positive_unsigneds::<u64>(EXAMPLE_SEED.fork("m"));
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(
+        random_pairs_from_single(random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 3),
+            config.get_or("mean_dimension_d", 1),
+        )))
+        .map(move |((h1, w1), (h2, w2))| {
+            let m = ms.next().unwrap();
+            let n = usize::exact_from(h1 * w1);
+            let a = UnsignedMatrix::from_owned_elements(
+                h1,
+                w1,
+                (&mut xs).take(n).map(|x| x % m).collect(),
+            );
+            let n = usize::exact_from(h2 * w2);
+            let b = UnsignedMatrix::from_owned_elements(
+                h2,
+                w2,
+                (&mut xs).take(n).map(|x| x % m).collect(),
+            );
+            (a, b, m)
+        }),
+    )
+}
+
 pub fn random_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_2(
     config: &GenConfig,
 ) -> It<(

@@ -30,6 +30,11 @@ pub mod mod_add;
 /// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
 /// a number.
 pub mod mod_is_reduced;
+/// Implementations of [`ModKroneckerProduct`](crate::num::arithmetic::traits::ModKroneckerProduct)
+/// and [`ModKroneckerProductAssign`](crate::num::arithmetic::traits::ModKroneckerProductAssign),
+/// for computing the Kronecker product of two [`UnsignedMatrix`](super::UnsignedMatrix)s modulo a
+/// number.
+pub mod mod_kronecker_product;
 /// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) and
 /// [`ModMulAssign`](crate::num::arithmetic::traits::ModMulAssign), for multiplying an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) by a scalar modulo a number.
@@ -68,6 +73,14 @@ pub mod mod_power_of_2_add;
 /// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
 /// a power of 2.
 pub mod mod_power_of_2_is_reduced;
+/// Implementations of [`ModPowerOf2KroneckerProduct`][kp] and
+/// [`ModPowerOf2KroneckerProductAssign`][kpa], for computing the Kronecker product of two
+/// [`UnsignedMatrix`](super::UnsignedMatrix)s modulo a power of 2.
+///
+/// [kp]: crate::num::arithmetic::traits::ModPowerOf2KroneckerProduct
+///
+/// [kpa]: crate::num::arithmetic::traits::ModPowerOf2KroneckerProductAssign
+pub mod mod_power_of_2_kronecker_product;
 /// Implementations of [`ModPowerOf2Mul`](crate::num::arithmetic::traits::ModPowerOf2Mul) and
 /// [`ModPowerOf2MulAssign`](crate::num::arithmetic::traits::ModPowerOf2MulAssign), for multiplying
 /// an [`UnsignedMatrix`](super::UnsignedMatrix) by a scalar modulo a power of 2.

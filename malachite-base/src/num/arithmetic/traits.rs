@@ -2053,6 +2053,38 @@ pub trait KroneckerProductAssign<RHS = Self> {
     fn kronecker_product_assign(&mut self, other: RHS);
 }
 
+/// Computes the Kronecker product of two matrices modulo $2^k$: the block matrix whose block in row
+/// $i$ and column $j$ is the second matrix multiplied by the element of the first in row $i$ and
+/// column $j$, with every element reduced modulo $2^k$. The elements of both matrices must already
+/// be reduced modulo $2^k$.
+pub trait ModPowerOf2KroneckerProduct<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_2_kronecker_product(self, other: RHS, pow: u64) -> Self::Output;
+}
+
+/// Replaces a matrix with its Kronecker product with another matrix modulo $2^k$. The elements of
+/// both matrices must already be reduced modulo $2^k$.
+pub trait ModPowerOf2KroneckerProductAssign<RHS = Self> {
+    fn mod_power_of_2_kronecker_product_assign(&mut self, other: RHS, pow: u64);
+}
+
+/// Computes the Kronecker product of two matrices modulo another number $m$: the block matrix whose
+/// block in row $i$ and column $j$ is the second matrix multiplied by the element of the first in
+/// row $i$ and column $j$, with every element reduced modulo $m$. The elements of both matrices
+/// must already be reduced modulo $m$.
+pub trait ModKroneckerProduct<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_kronecker_product(self, other: RHS, m: M) -> Self::Output;
+}
+
+/// Replaces a matrix with its Kronecker product with another matrix modulo another number $m$. The
+/// elements of both matrices must already be reduced modulo $m$.
+pub trait ModKroneckerProductAssign<RHS = Self, M = Self> {
+    fn mod_kronecker_product_assign(&mut self, other: RHS, m: M);
+}
+
 /// Calculates the Kronecker symbol of two numbers.
 pub trait KroneckerSymbol<RHS = Self> {
     fn kronecker_symbol(self, other: RHS) -> i8;

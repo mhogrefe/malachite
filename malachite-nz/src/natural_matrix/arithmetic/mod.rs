@@ -52,6 +52,13 @@ pub mod mod_add;
 /// trait for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
 /// modulo a number.
 pub mod mod_is_reduced;
+/// Implementations of [`ModKroneckerProduct`][kp] and [`ModKroneckerProductAssign`][kpa], for
+/// computing the Kronecker product of two [`NaturalMatrix`](super::NaturalMatrix)s modulo a number.
+///
+/// [kp]: malachite_base::num::arithmetic::traits::ModKroneckerProduct
+///
+/// [kpa]: malachite_base::num::arithmetic::traits::ModKroneckerProductAssign
+pub mod mod_kronecker_product;
 /// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) and
 /// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign), for multiplying a
 /// [`NaturalMatrix`](super::NaturalMatrix) by a scalar modulo a number.
@@ -90,6 +97,14 @@ pub mod mod_power_of_2_add;
 /// for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
 /// modulo a power of 2.
 pub mod mod_power_of_2_is_reduced;
+/// Implementations of [`ModPowerOf2KroneckerProduct`][kp] and
+/// [`ModPowerOf2KroneckerProductAssign`][kpa], for computing the Kronecker product of two
+/// [`NaturalMatrix`](super::NaturalMatrix)s modulo a power of 2.
+///
+/// [kp]: malachite_base::num::arithmetic::traits::ModPowerOf2KroneckerProduct
+///
+/// [kpa]: malachite_base::num::arithmetic::traits::ModPowerOf2KroneckerProductAssign
+pub mod mod_power_of_2_kronecker_product;
 /// Implementations of [`ModPowerOf2Mul`](malachite_base::num::arithmetic::traits::ModPowerOf2Mul)
 /// and [`ModPowerOf2MulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign), for
 /// multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a scalar modulo a power of 2.
