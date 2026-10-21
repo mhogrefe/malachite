@@ -570,7 +570,7 @@ fn benchmark_float_square_algorithms(
             ("default", &mut |x| no_out!(x.square())),
             ("naive", &mut |x| {
                 let xsb = x.significant_bits();
-                no_out!(square_prec_round_naive(x, xsb, Nearest).0);
+                no_out!(square_prec_round_naive(&x, xsb, Nearest).0);
             }),
         ],
     );
@@ -656,7 +656,7 @@ fn benchmark_float_square_prec_algorithms(
         &mut [
             ("default", &mut |(x, prec)| no_out!(x.square_prec(prec))),
             ("naive", &mut |(x, prec)| {
-                no_out!(square_prec_round_naive(x, prec, Nearest));
+                no_out!(square_prec_round_naive(&x, prec, Nearest));
             }),
         ],
     );
@@ -748,7 +748,7 @@ fn benchmark_float_square_round_algorithms(
             ("default", &mut |(x, rm)| no_out!(x.square_round(rm))),
             ("naive", &mut |(x, rm)| {
                 let xsb = x.significant_bits();
-                square_prec_round_naive(x, xsb, rm);
+                square_prec_round_naive(&x, xsb, rm);
             }),
         ],
     );
@@ -848,7 +848,7 @@ fn benchmark_float_square_prec_round_algorithms(
                 no_out!(x.square_prec_round(prec, rm));
             }),
             ("naive", &mut |(x, prec, rm)| {
-                no_out!(square_prec_round_naive(x, prec, rm));
+                no_out!(square_prec_round_naive(&x, prec, rm));
             }),
         ],
     );

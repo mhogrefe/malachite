@@ -10,7 +10,7 @@ use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
 use crate::natural_vector::NaturalVector;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2Add, ModPowerOf2Mul};
+use malachite_base::num::arithmetic::traits::{ModPowerOf2AddAssign, ModPowerOf2Mul};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::vector::Vector;
 
@@ -25,7 +25,7 @@ pub fn natural_matrix_mod_power_of_2_mul_vector_naive(
             .map(|i| {
                 let mut sum = Natural::ZERO;
                 for (x, y) in a.row_iter(i).zip(&v.elements) {
-                    sum = sum.mod_power_of_2_add(x.mod_power_of_2_mul(y, pow), pow);
+                    sum.mod_power_of_2_add_assign(x.mod_power_of_2_mul(y, pow), pow);
                 }
                 sum
             })
@@ -44,7 +44,7 @@ pub fn natural_vector_mod_power_of_2_mul_natural_matrix_naive(
             .map(|j| {
                 let mut sum = Natural::ZERO;
                 for (x, y) in v.elements.iter().zip(a.column_iter(j)) {
-                    sum = sum.mod_power_of_2_add(x.mod_power_of_2_mul(y, pow), pow);
+                    sum.mod_power_of_2_add_assign(x.mod_power_of_2_mul(y, pow), pow);
                 }
                 sum
             })

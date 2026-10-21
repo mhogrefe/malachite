@@ -25,7 +25,7 @@ use crate::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::XXXAddYYYToZZZ;
+use malachite_base::num::arithmetic::traits::{AddMulAssign, XXXAddYYYToZZZ};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -41,7 +41,7 @@ pub fn integer_matrix_mul_naive(a: &IntegerMatrix, b: &IntegerMatrix) -> Integer
         for j in 0..width {
             let mut sum = Integer::ZERO;
             for k in 0..inner {
-                sum += &a.elements[i * inner + k] * &b.elements[k * width + j];
+                sum.add_mul_assign(&a.elements[i * inner + k], &b.elements[k * width + j]);
             }
             elements.push(sum);
         }

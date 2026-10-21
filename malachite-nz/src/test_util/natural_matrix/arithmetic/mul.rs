@@ -11,6 +11,7 @@ use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
 use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
+use malachite_base::num::arithmetic::traits::AddMulAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -25,7 +26,7 @@ pub fn natural_matrix_mul_naive(a: &NaturalMatrix, b: &NaturalMatrix) -> Natural
         for j in 0..width {
             let mut sum = Natural::ZERO;
             for k in 0..inner {
-                sum += &a.elements[i * inner + k] * &b.elements[k * width + j];
+                sum.add_mul_assign(&a.elements[i * inner + k], &b.elements[k * width + j]);
             }
             elements.push(sum);
         }

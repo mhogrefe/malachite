@@ -9,7 +9,7 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{Mod, Pow};
+use malachite_base::num::arithmetic::traits::{AddMulAssign, Mod, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -19,7 +19,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 pub fn evaluate_naive(p: &IntegerPolynomial, x: &Integer) -> Integer {
     let mut sum = Integer::ZERO;
     for (i, c) in p.coefficients_asc().iter().enumerate() {
-        sum += c * x.pow(u64::exact_from(i));
+        sum.add_mul_assign(c, x.pow(u64::exact_from(i)));
     }
     sum
 }

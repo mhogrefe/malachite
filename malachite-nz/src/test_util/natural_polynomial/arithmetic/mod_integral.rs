@@ -9,14 +9,15 @@
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{Gcd, ModInverse, ModMul};
+use malachite_base::num::arithmetic::traits::{CoprimeWith, DivModPrecomputed, ModInverse, ModMul};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
 
 // Whether the integral modulo `m` of `p` is defined: whether every k for which the coefficient of
-// x^(k-1) is nonzero is a unit modulo `m`, checked one at a time with a GCD.
+// x^(k-1) is nonzero is a unit modulo `m`, checked one at a time with `coprime_with`.
 pub fn mod_integral_is_defined(p: &NaturalPolynomial, m: &Natural) -> bool {
-    (2..=p.len()).all(|k| *p.coefficient(k - 1) == 0u32 || (Natural::from(k) % m).gcd(m) == 1u32)
+    (2..=p.len()).all(|k| *p.coefficient(k - 1) == 0u32 || (Natural::from(k) % m).coprime_with(m))
 }
 
 // Integrates a polynomial modulo `m` coefficient by coefficient, inverting each index separately.
@@ -25,8 +26,9 @@ pub fn mod_integral_naive(p: &NaturalPolynomial, m: &Natural) -> Option<NaturalP
     if p.len() == 0 {
         return Some(NaturalPolynomial::ZERO);
     }
-    let mut coefficients = Vec::with_capacity(usize::try_from(p.len()).unwrap() + 1);
+    let mut coefficients = Vec::with_capacity(usize::exact_from(p.len()) + 1);
     coefficients.push(Natural::ZERO);
+    let data = <Natural as DivModPrecomputed<&Natural>>::precompute_div_mod_data(&m);
     for i in 0..p.len() {
         let c = p.coefficient(i);
         // A zero coefficient stays zero, whether or not its index is a unit.
@@ -34,7 +36,7 @@ pub fn mod_integral_naive(p: &NaturalPolynomial, m: &Natural) -> Option<NaturalP
             coefficients.push(Natural::ZERO);
             continue;
         }
-        let k = Natural::from(i + 1) % m;
+        let k = Natural::from(i + 1).div_mod_precomputed(m, &data).1;
         let inverse = if *m == 1u32 {
             Natural::ZERO
         } else if k == 0u32 {

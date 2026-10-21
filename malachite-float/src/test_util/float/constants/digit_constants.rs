@@ -8,6 +8,7 @@
 
 use crate::Float;
 use crate::test_util::float::conversion::from_digits::non_dyadic_from_digits_prec_round_naive;
+use malachite_base::num::arithmetic::traits::SaturatingMulAssign;
 use malachite_base::num::conversion::traits::Digits;
 use malachite_base::num::factorization::traits::Primes;
 use malachite_base::rounding_modes::RoundingMode;
@@ -21,7 +22,7 @@ pub fn liouvilles_digits_naive() -> impl Iterator<Item = u64> {
         position += 1;
         Some(if position == factorial {
             index += 1;
-            factorial = factorial.saturating_mul(index);
+            factorial.saturating_mul_assign(index);
             1
         } else {
             0

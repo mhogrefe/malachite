@@ -7,12 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 // The largest number of limbs of the absolute value of any element of `xs`, found by converting
 // each absolute value to a `Vec` of limbs.
 pub fn vec_max_limbs_naive(xs: &[Integer]) -> u64 {
     xs.iter()
-        .map(|x| u64::try_from(x.unsigned_abs_ref().to_limbs_asc().len()).unwrap())
+        .map(|x| u64::exact_from(x.unsigned_abs_ref().to_limbs_asc().len()))
         .max()
         .unwrap_or(0)
 }

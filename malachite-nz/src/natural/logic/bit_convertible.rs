@@ -11,11 +11,10 @@ use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::platform::{LIMB_WIDTH_USIZE, Limb};
 use alloc::vec::Vec;
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
+use malachite_base::num::logic::traits::{BitAccess, BitConvertible, BitIterable};
 
 impl BitConvertible for Natural {
     /// Returns a [`Vec`] containing the bits of a [`Natural`] in ascending order: least- to
@@ -50,16 +49,13 @@ impl BitConvertible for Natural {
         }
         let limbs = self.limbs();
         let last_index = usize::exact_from(self.limb_count()) - 1;
-        let mut last = limbs[last_index];
+        let last = limbs[last_index];
         for limb in limbs.take(last_index) {
             for i in 0..Limb::WIDTH {
                 bits.push(limb.get_bit(i));
             }
         }
-        while last != 0 {
-            bits.push(last.odd());
-            last >>= 1;
-        }
+        bits.extend(last.bits());
         bits
     }
 

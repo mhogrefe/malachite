@@ -10,7 +10,7 @@ use crate::Float;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
@@ -38,7 +38,7 @@ where
     Rational: Shr<T, Output = Rational>,
 {
     if x.is_normal() {
-        Float::from_rational_prec_round(Rational::exact_from(x) >> bits, prec, Nearest)
+        Float::from_rational_prec(Rational::exact_from(x) >> bits, prec)
     } else {
         (x, Equal)
     }

@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::arithmetic::traits::DivisibleBy;
 use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::polynomial::Polynomial;
@@ -30,7 +31,7 @@ pub fn compose_power_of_x_naive<T: PrimitiveUnsigned>(
     UnsignedPolynomial::from_coefficients_asc(
         (0..=(p.len() - 1) * k)
             .map(|i| {
-                if i % k == 0 {
+                if i.divisible_by(k) {
                     p.coefficient(i / k)
                 } else {
                     T::ZERO

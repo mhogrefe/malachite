@@ -10,7 +10,7 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{BinomialCoefficient, Pow};
+use malachite_base::num::arithmetic::traits::{AddMulAssign, BinomialCoefficient, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
@@ -26,11 +26,13 @@ pub fn taylor_shift_naive(p: &IntegerPolynomial, c: &Integer) -> IntegerPolynomi
             .map(|k| {
                 let mut sum = Integer::ZERO;
                 for (i, x) in xs.iter().enumerate().skip(k) {
-                    sum +=
+                    sum.add_mul_assign(
                         x * Integer::from(Natural::binomial_coefficient(
                             Natural::from(i),
                             Natural::from(k),
-                        )) * c.pow(u64::exact_from(i - k));
+                        )),
+                        c.pow(u64::exact_from(i - k)),
+                    );
                 }
                 sum
             })

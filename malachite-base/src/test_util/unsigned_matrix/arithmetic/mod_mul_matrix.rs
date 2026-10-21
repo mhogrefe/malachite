@@ -29,7 +29,7 @@ pub fn unsigned_matrix_mod_mul_matrix_naive<T: PrimitiveUnsigned>(
             let mut sum = T::ZERO;
             for (k, &x) in a.row_iter(i).enumerate() {
                 let y = b.elements[k * usize::exact_from(b.width()) + usize::exact_from(j)];
-                sum = sum.mod_add(x.mod_mul(y, m), m);
+                sum.mod_add_assign(x.mod_mul(y, m), m);
             }
             elements.push(sum);
         }

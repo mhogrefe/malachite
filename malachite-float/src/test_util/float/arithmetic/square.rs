@@ -14,8 +14,8 @@ use malachite_base::rounding_modes::RoundingMode;
 use rug::float::Round;
 use rug::ops::AssignRound;
 
-pub fn square_prec_round_naive(x: Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    x.clone().mul_prec_round(x, prec, rm)
+pub fn square_prec_round_naive(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    x.mul_prec_round_ref_ref(x, prec, rm)
 }
 
 pub fn rug_square_prec_round(x: &rug::Float, prec: u64, rm: Round) -> (rug::Float, Ordering) {

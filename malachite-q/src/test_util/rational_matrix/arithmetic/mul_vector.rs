@@ -10,6 +10,7 @@ use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
 use crate::rational_vector::RationalVector;
 use malachite_base::matrix::Matrix;
+use malachite_base::num::arithmetic::traits::AddMulAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::vector::Vector;
 
@@ -21,7 +22,7 @@ pub fn rational_matrix_mul_vector_naive(a: &RationalMatrix, v: &RationalVector) 
             .map(|i| {
                 let mut sum = Rational::ZERO;
                 for (x, y) in a.row_iter(i).zip(&v.elements) {
-                    sum += x * y;
+                    sum.add_mul_assign(x, y);
                 }
                 sum
             })
@@ -39,7 +40,7 @@ pub fn rational_vector_mul_rational_matrix_naive(
             .map(|j| {
                 let mut sum = Rational::ZERO;
                 for (x, y) in v.elements.iter().zip(a.column_iter(j)) {
-                    sum += x * y;
+                    sum.add_mul_assign(x, y);
                 }
                 sum
             })

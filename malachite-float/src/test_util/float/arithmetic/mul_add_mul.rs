@@ -8,6 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
@@ -66,7 +67,7 @@ pub(crate) fn mul_add_mul_prec_round_naive_helper(
     }
     let mut p2 = Rational::exact_from(c) * Rational::exact_from(d);
     if neg {
-        p2 = -p2;
+        p2.neg_assign();
     }
     let r = Rational::exact_from(a) * Rational::exact_from(b) + p2;
     if r == 0u32 {
@@ -138,7 +139,7 @@ pub(crate) fn mul_add_mul_rational_prec_round_naive_helper(
     }
     let mut p2 = Rational::exact_from(z) * w;
     if neg {
-        p2 = -p2;
+        p2.neg_assign();
     }
     let r = Rational::exact_from(x) * Rational::exact_from(y) + p2;
     if r == 0u32 {

@@ -47,7 +47,7 @@ pub fn gaussian_rational_checked_roots_naive(
         .into_iter()
         .map(|root| GaussianRational {
             real: Rational::from_integers_ref(&root.real, &l),
-            imaginary: Rational::from_integers(root.imaginary, l.clone()),
+            imaginary: Rational::from_integers_ref(&root.imaginary, &l),
         })
         .collect()
 }

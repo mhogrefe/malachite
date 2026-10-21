@@ -8,7 +8,7 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::DivMod;
+use malachite_base::num::arithmetic::traits::{DivMod, MulAddMul, MulSubMul, Square};
 use malachite_base::num::basic::traits::One;
 
 // Rounds t / n to the nearest integer, rounding ties up: the floor, plus one when the remainder is
@@ -25,14 +25,20 @@ pub fn gaussian_integer_div_rem_naive(
     y: &GaussianInteger,
 ) -> (GaussianInteger, GaussianInteger) {
     assert!(y.real != 0u32 || y.imaginary != 0u32, "division by zero");
-    let norm: Integer = &y.real * &y.real + &y.imaginary * &y.imaginary;
+    let norm: Integer = (&y.real).square() + (&y.imaginary).square();
     let q = GaussianInteger {
-        real: round_half_up(&x.real * &y.real + &x.imaginary * &y.imaginary, &norm),
-        imaginary: round_half_up(&x.imaginary * &y.real - &x.real * &y.imaginary, &norm),
+        real: round_half_up(
+            (&x.real).mul_add_mul(&y.real, &x.imaginary, &y.imaginary),
+            &norm,
+        ),
+        imaginary: round_half_up(
+            (&x.imaginary).mul_sub_mul(&y.real, &x.real, &y.imaginary),
+            &norm,
+        ),
     };
     let r = GaussianInteger {
-        real: &x.real - (&q.real * &y.real - &q.imaginary * &y.imaginary),
-        imaginary: &x.imaginary - (&q.real * &y.imaginary + &q.imaginary * &y.real),
+        real: &x.real - (&q.real).mul_sub_mul(&y.real, &q.imaginary, &y.imaginary),
+        imaginary: &x.imaginary - (&q.real).mul_add_mul(&y.imaginary, &q.imaginary, &y.real),
     };
     (q, r)
 }

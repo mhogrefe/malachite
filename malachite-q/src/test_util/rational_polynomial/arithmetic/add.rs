@@ -10,6 +10,7 @@ use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
 use alloc::vec::Vec;
 use core::cmp::max;
+use malachite_base::num::arithmetic::traits::MulAddMul;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer::Integer;
@@ -35,7 +36,11 @@ pub fn add_cross_multiply(p: &RationalPolynomial, q: &RationalPolynomial) -> Rat
     let ys = q.numerator_ref().coefficients_asc();
     let numerator = (0..max(xs.len(), ys.len()))
         .map(|i| {
-            xs.get(i).unwrap_or(&Integer::ZERO) * &b + ys.get(i).unwrap_or(&Integer::ZERO) * &a
+            xs.get(i).unwrap_or(&Integer::ZERO).mul_add_mul(
+                &b,
+                ys.get(i).unwrap_or(&Integer::ZERO),
+                &a,
+            )
         })
         .collect::<Vec<Integer>>();
     RationalPolynomial::from_numerator_and_denominator(

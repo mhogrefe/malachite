@@ -13,6 +13,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Inverse, ModPowerOf2Mul, Parity,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
 
 // Whether the integral modulo 2^pow of `p` is defined: whether every nonzero coefficient belongs to
@@ -24,7 +25,7 @@ pub fn mod_power_of_2_integral_is_defined(p: &NaturalPolynomial, pow: u64) -> bo
 // Integrates a polynomial modulo 2^pow coefficient by coefficient, inverting each index separately.
 // It returns `None` if the integral is not defined. Nothing is shared with the implementation.
 pub fn mod_power_of_2_integral_naive(p: &NaturalPolynomial, pow: u64) -> Option<NaturalPolynomial> {
-    let mut coefficients = Vec::with_capacity(usize::try_from(p.len()).unwrap() + 1);
+    let mut coefficients = Vec::with_capacity(usize::exact_from(p.len()) + 1);
     if p.len() != 0 {
         coefficients.push(Natural::ZERO);
     }

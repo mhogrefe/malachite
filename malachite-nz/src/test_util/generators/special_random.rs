@@ -124,15 +124,16 @@ use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::iterators::with_special_value;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2,
-    EqMod, EqModPowerOf2, Height, HeightRef, Mod, ModPowerOf2, Parity, PowerOf2,
-    RoundToMultipleOfPowerOf2Assign, Square,
+    AddMul, ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy,
+    DivisibleByPowerOf2, EqMod, EqModPowerOf2, Height, HeightRef, Mod, ModPowerOf2, Parity,
+    PowerOf2, RoundToMultipleOfPowerOf2Assign, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::comparison::traits::OrdProducts;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::traits::{
@@ -3263,7 +3264,7 @@ pub fn special_random_integer_integer_natural_triple_gen_var_1(
                 )
             },
         )
-        .map(|(x, y, m)| (x * Integer::from(&m) + &y, y, m)),
+        .map(|(x, y, m)| ((&y).add_mul(&x, &Integer::from(&m)), y, m)),
     )
 }
 
@@ -5193,7 +5194,7 @@ pub fn special_random_natural_triple_gen_var_1(
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         ))
-        .map(|(x, y, m)| (x * &m + &y, y, m)),
+        .map(|(x, y, m)| ((&y).add_mul(&x, &m), y, m)),
     )
 }
 
@@ -5318,7 +5319,7 @@ pub fn special_random_natural_triple_gen_var_7(
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         ))
-        .map(|(x, y, z)| (x + &y * &z, y, z)),
+        .map(|(x, y, z)| (x.add_mul(&y, &z), y, z)),
     )
 }
 
@@ -5437,7 +5438,10 @@ pub fn special_random_natural_quadruple_gen_var_3(
 pub fn special_random_natural_quadruple_gen_var_4(
     config: &GenConfig,
 ) -> It<(Natural, Natural, Natural, Natural)> {
-    Box::new(special_random_natural_quadruple_gen(config).filter(|(x, y, z, w)| x * y >= z * w))
+    Box::new(
+        special_random_natural_quadruple_gen(config)
+            .filter(|(x, y, z, w)| Natural::cmp_products(x, y, z, w) != Less),
+    )
 }
 
 pub fn special_random_natural_quadruple_gen_var_5(

@@ -8,13 +8,14 @@
 
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
+use malachite_base::num::arithmetic::traits::{MulAddMul, MulSubMul, Square};
 
 // Schoolbook: (a + bi) / (c + di) = ((ac + bd) + (bc - ad)i) / (c^2 + d^2).
 pub fn gaussian_rational_div_naive(x: &GaussianRational, y: &GaussianRational) -> GaussianRational {
     assert!(y.real != 0u32 || y.imaginary != 0u32, "division by zero");
-    let norm: Rational = &y.real * &y.real + &y.imaginary * &y.imaginary;
+    let norm: Rational = (&y.real).square() + (&y.imaginary).square();
     GaussianRational {
-        real: (&x.real * &y.real + &x.imaginary * &y.imaginary) / &norm,
-        imaginary: (&x.imaginary * &y.real - &x.real * &y.imaginary) / norm,
+        real: (&x.real).mul_add_mul(&y.real, &x.imaginary, &y.imaginary) / &norm,
+        imaginary: (&x.imaginary).mul_sub_mul(&y.real, &x.real, &y.imaginary) / norm,
     }
 }

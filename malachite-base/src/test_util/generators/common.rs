@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::conversion::traits::WrappingFrom;
+use crate::num::logic::traits::BitAccess;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 
@@ -264,7 +266,7 @@ pub fn gmp_spec_string_from_parts(
 ) -> String {
     let mut s = vec![b'%'];
     for (i, &c) in GMP_SPEC_FLAG_CHARS.iter().enumerate() {
-        if flags & (1 << i) != 0 {
+        if flags.get_bit(u64::wrapping_from(i)) {
             s.push(c);
         }
     }

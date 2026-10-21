@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_vector::RationalVector;
-use malachite_base::num::arithmetic::traits::{DivExact, Gcd};
+use malachite_base::num::arithmetic::traits::{DivExact, GcdAssign};
 use malachite_base::num::basic::traits::One;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::IntegerVector;
@@ -33,7 +33,7 @@ pub fn rational_vector_to_numerators_and_denominator_naive(
         .collect();
     let mut g = product.clone();
     for n in &scaled {
-        g = g.gcd(n.unsigned_abs_ref());
+        g.gcd_assign(n.unsigned_abs_ref());
     }
     let numerators = scaled
         .into_iter()

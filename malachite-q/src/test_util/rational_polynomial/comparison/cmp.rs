@@ -9,7 +9,7 @@
 use crate::rational_polynomial::RationalPolynomial;
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::Sign;
+use malachite_base::num::arithmetic::traits::{MulSubMul, Sign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 use std::vec::Vec;
@@ -61,7 +61,7 @@ pub fn rational_polynomial_difference_numerator(
     for i in 0..max(ps.len(), qs.len()) {
         let x = ps.get(i).map_or_else(|| Integer::ZERO, Clone::clone);
         let y = qs.get(i).map_or_else(|| Integer::ZERO, Clone::clone);
-        ds.push(&b * x - &a * y);
+        ds.push((&b).mul_sub_mul(&x, &a, &y));
     }
     while ds.last() == Some(&Integer::ZERO) {
         ds.pop();

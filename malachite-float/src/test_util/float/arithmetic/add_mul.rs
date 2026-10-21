@@ -10,6 +10,7 @@ use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::test_util::common::rug_float_significant_bits;
 use malachite_base::max;
+use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_q::Rational;
@@ -68,7 +69,7 @@ pub(crate) fn add_mul_prec_round_naive_helper(
     }
     let mut p = Rational::exact_from(y) * Rational::exact_from(z);
     if neg_p {
-        p = -p;
+        p.neg_assign();
     }
     let r = Rational::exact_from(x) + p;
     if r == 0u32 {
@@ -139,7 +140,7 @@ pub(crate) fn add_mul_rational_prec_round_naive_helper(
     }
     let mut p = Rational::exact_from(y) * z;
     if neg_p {
-        p = -p;
+        p.neg_assign();
     }
     let r = Rational::exact_from(x) + p;
     if r == 0u32 {

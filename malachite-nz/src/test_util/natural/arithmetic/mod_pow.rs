@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::ModMulAssign;
+use malachite_base::num::arithmetic::traits::{ModMulAssign, ModSquareAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::BitIterable;
 
@@ -17,7 +17,7 @@ pub fn simple_binary_mod_pow(x: &Natural, exp: &Natural, m: &Natural) -> Natural
     }
     let mut out = Natural::ONE;
     for bit in exp.bits().rev() {
-        out.mod_mul_assign(out.clone(), m);
+        out.mod_square_assign(m);
         if bit {
             out.mod_mul_assign(x, m);
         }

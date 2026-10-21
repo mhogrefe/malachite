@@ -361,7 +361,7 @@ pub fn initialize_context() -> Context {
     {
         let len = MPN_CTX_TWO_POWER_TAB_SIZE;
         let max_nvs = MPN_CTX_NCRTS.div_round(VEC_SZ, Ceiling).0;
-        let x = vec![f64x4::ZERO; max_nvs * (max_nvs + 1) / 2 * len];
+        let x = vec![f64x4::ZERO; ((max_nvs * (max_nvs + 1)) >> 1) * len];
         r.vec_two_pow_tab_backing = Cow::Owned(x);
         let mut offset = 0;
         for nvs in 1..=max_nvs {
@@ -565,9 +565,9 @@ fn limbs_mul_greater_to_out_old_slow(
             let (scratch_lo, scratch_hi) = scratch.split_at(ys_len);
             out[ys_len..ys_len + xs_len].copy_from_slice(&scratch_hi[..xs_len]);
             assert!(!limbs_slice_add_greater_in_place_left(out, scratch_lo));
-        } else if 4 * xs_len < 5 * ys_len {
+        } else if (xs_len << 2) < 5 * ys_len {
             limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
-        } else if 4 * xs_len < 7 * ys_len {
+        } else if (xs_len << 2) < 7 * ys_len {
             limbs_mul_greater_to_out_toom_32(out, xs, ys, scratch);
         } else {
             limbs_mul_greater_to_out_toom_42(out, xs, ys, scratch);

@@ -70,22 +70,20 @@ fn simplest_rational_helper(
     }
     let x_len = cf_x.len();
     let y_len = cf_y.len();
-    Rational::from_continued_fraction(
-        floor.clone(),
-        match x_len.cmp(&y_len) {
-            Equal => panic!(),
-            Greater => {
-                let mut cf = cf_y.to_vec();
-                cf.push(cf_x[y_len].clone() + Natural::ONE);
-                cf.into_iter()
-            }
-            Less => {
-                let mut cf = cf_x.to_vec();
-                cf.push(cf_y[x_len].clone() + Natural::ONE);
-                cf.into_iter()
-            }
-        },
-    )
+    let cf = match x_len.cmp(&y_len) {
+        Equal => panic!(),
+        Greater => {
+            let mut cf = cf_y.to_vec();
+            cf.push(&cf_x[y_len] + Natural::ONE);
+            cf
+        }
+        Less => {
+            let mut cf = cf_x.to_vec();
+            cf.push(&cf_y[x_len] + Natural::ONE);
+            cf
+        }
+    };
+    Rational::from_continued_fraction_ref(floor, cf.iter())
 }
 
 fn cf_variants(x: &Rational) -> (Integer, Integer, Vec<Natural>, Vec<Natural>) {

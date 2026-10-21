@@ -13,16 +13,19 @@ use crate::integer_vector::arithmetic::max_limbs::vec_max_limbs;
 use crate::natural::Natural;
 use crate::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1::*;
 use crate::platform::{Limb, SignedLimb};
+use core::cmp::Ordering::*;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, FloorLogBase, Parity, Pow, PowerOf2,
+    CeilingLogBase2, DivisibleBy, FloorLogBase, ModPowerOf2, Parity, Pow, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::comparison::traits::OrdDouble;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::exhaustive::{
     exhaustive_signed_inclusive_range, exhaustive_unsigneds, primitive_int_increasing_range,
 };
 use malachite_base::num::iterators::bit_distributor_sequence;
+use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, geometric_random_unsigneds,
 };
@@ -312,8 +315,8 @@ pub fn get_str_aux_inputs(
     // leading base-b0 digit is 1, i.e. `N < 2 * b0 ^ (m0 - 1)` — that case exercises the carry
     // loop.
     let m = if m0 >= 2
-        && (v1 ^ v2 ^ v3) & 1 == 1
-        && big_n < (Natural::from(b0).pow(u64::exact_from(m0 - 1)) << 1u32)
+        && (v1 ^ v2 ^ v3).odd()
+        && big_n.cmp_double(&Natural::from(b0).pow(u64::exact_from(m0 - 1))) == Less
     {
         m0 - 1
     } else {
@@ -324,7 +327,7 @@ pub fn get_str_aux_inputs(
     // `mpfr_round_p`) reads out of bounds when the claimed error is so small that `n_width - e`
     // reaches the full precision, which never happens for a genuine approximation. Larger values
     // exercise both the roundable and non-roundable (MPFR_ROUND_FAILED) outcomes.
-    let e = if v2 % 4 == 0 {
+    let e = if v2.divisible_by(4) {
         -1
     } else {
         i64::exact_from(3 + v2 % n_width)
@@ -346,11 +349,11 @@ pub const GMP_FORMAT_COMBO_COUNT: u16 = 64 * 6;
 // field width and precision. Every output parses as a valid `%Z` integer conversion, so none of the
 // `format_natural_str` failure paths can be reached.
 pub fn gmp_format_string_from_parts(combo: u16, width: Option<u64>, prec: Option<u64>) -> String {
-    let flags = combo & 0x3f;
+    let flags = combo.mod_power_of_2(6);
     let conv = usize::from(combo >> 6); // in 0..6
     let mut s = vec![b'%'];
     for (i, &c) in GMP_FORMAT_FLAG_CHARS.iter().enumerate() {
-        if flags & (1 << i) != 0 {
+        if flags.get_bit(u64::exact_from(i)) {
             s.push(c);
         }
     }
@@ -719,7 +722,7 @@ fn random_adjust_params(r: &mut SsRng, count: usize) -> (usize, u64, usize, usiz
 fn sqrt2_params(count: usize) -> Vec<(usize, u64, usize, usize)> {
     let mut ps = Vec::new();
     for log_n in LW..=LW + 1 {
-        let n = 1usize << log_n;
+        let n = usize::power_of_2(log_n);
         for w in (1..=5).step_by(2) {
             for i in (1..n << 1).step_by(2) {
                 ps.push((n, w, i, count));
@@ -730,7 +733,7 @@ fn sqrt2_params(count: usize) -> Vec<(usize, u64, usize, usize)> {
 }
 
 fn random_sqrt2_params(r: &mut SsRng, count: usize) -> (usize, u64, usize, usize) {
-    let n = 1usize << (LW + r.below(2));
+    let n = usize::power_of_2(LW + r.below(2));
     let w = (r.small() << 1) + 1;
     let i = (usize::exact_from(r.below(u64::exact_from(n))) << 1) + 1;
     (n, w, i, count)
@@ -892,7 +895,7 @@ pub(crate) fn ss_spec_var_40() -> SsSpec<impl Clone + 'static, (Vec<Vec<Limb>>, 
         build: |(log_n, limbs), lows, tops| {
             (
                 residues(lows, tops, 2 << log_n, limbs),
-                1 << log_n,
+                usize::power_of_2(log_n),
                 transform_w(log_n, limbs),
             )
         },
@@ -909,20 +912,20 @@ pub(crate) fn ss_spec_var_41() -> SsSpec<impl Clone + 'static, (Vec<Vec<Limb>>, 
             transform_params(0, 4, 3)
                 .into_iter()
                 .flat_map(|(log_n, limbs)| {
-                    (1..=1usize << log_n).map(move |k| (log_n, limbs, k << 1))
+                    (1..=usize::power_of_2(log_n)).map(move |k| (log_n, limbs, k << 1))
                 })
                 .collect()
         },
         random_params: |r| {
             let (log_n, limbs) = random_transform_params(r, 0, 5)?;
-            let trunc = usize::exact_from(r.below(1 << log_n) + 1) << 1;
+            let trunc = usize::exact_from(r.below(u64::power_of_2(log_n)) + 1) << 1;
             Some((log_n, limbs, trunc))
         },
         lens: |&(log_n, limbs, _)| (limbs << (log_n + 1), 2 << log_n),
         build: |(log_n, limbs, trunc), lows, tops| {
             (
                 residues(lows, tops, 2 << log_n, limbs),
-                1 << log_n,
+                usize::power_of_2(log_n),
                 transform_w(log_n, limbs),
                 trunc,
             )
@@ -940,14 +943,14 @@ pub(crate) fn ss_spec_var_42() -> SsSpec<impl Clone + 'static, (Vec<Vec<Limb>>, 
             transform_params(0, LW, 2)
                 .into_iter()
                 .flat_map(|(log_n, limbs)| {
-                    let n = 1usize << log_n;
+                    let n = usize::power_of_2(log_n);
                     (1..=n).map(move |k| (log_n, limbs, (n + k) << 1))
                 })
                 .collect()
         },
         random_params: |r| {
             let (log_n, limbs) = random_transform_params(r, 0, LW)?;
-            let n = 1usize << log_n;
+            let n = usize::power_of_2(log_n);
             let trunc = (n + usize::exact_from(r.below(u64::exact_from(n))) + 1) << 1;
             Some((log_n, limbs, trunc))
         },
@@ -955,7 +958,7 @@ pub(crate) fn ss_spec_var_42() -> SsSpec<impl Clone + 'static, (Vec<Vec<Limb>>, 
         build: |(log_n, limbs, trunc), lows, tops| {
             (
                 residues(lows, tops, 4 << log_n, limbs),
-                1 << log_n,
+                usize::power_of_2(log_n),
                 transform_w(log_n, limbs),
                 trunc,
             )
@@ -974,7 +977,7 @@ pub(crate) fn ss_spec_var_43() -> SsSpec<impl Clone + 'static, (Vec<Vec<Limb>>, 
         build: |(log_n, limbs), lows, tops| {
             (
                 residues(lows, tops, 2 << log_n, limbs),
-                1 << log_n,
+                usize::power_of_2(log_n),
                 transform_w(log_n, limbs),
             )
         },
@@ -1023,21 +1026,26 @@ pub(crate) fn ss_spec_var_44()
             matrix_params(0, 4, 2)
                 .into_iter()
                 .flat_map(|(log_n1, log_n2, limbs)| {
-                    (0..1usize << log_n1).map(move |c| (log_n1, log_n2, limbs, c, 0))
+                    (0..usize::power_of_2(log_n1)).map(move |c| (log_n1, log_n2, limbs, c, 0))
                 })
                 .collect()
         },
         random_params: |r| {
             let (log_n1, log_n2, limbs) = random_matrix_params(r, 0, 5)?;
-            let c = usize::exact_from(r.below(1 << log_n1));
+            let c = usize::exact_from(r.below(u64::power_of_2(log_n1)));
             Some((log_n1, log_n2, limbs, c, 0))
         },
-        lens: |&(log_n1, log_n2, limbs, _, _)| (limbs << (log_n1 + log_n2), 1 << (log_n1 + log_n2)),
+        lens: |&(log_n1, log_n2, limbs, _, _)| {
+            (
+                limbs << (log_n1 + log_n2),
+                usize::power_of_2(log_n1 + log_n2),
+            )
+        },
         build: |(log_n1, log_n2, limbs, c, _), lows, tops| {
             (
-                residues(lows, tops, 1 << (log_n1 + log_n2), limbs),
-                1 << log_n1,
-                1 << log_n2,
+                residues(lows, tops, usize::power_of_2(log_n1 + log_n2), limbs),
+                usize::power_of_2(log_n1),
+                usize::power_of_2(log_n2),
                 transform_w(log_n1 + log_n2 - 1, limbs),
                 c,
             )
@@ -1055,8 +1063,8 @@ pub(crate) fn ss_spec_var_45()
             matrix_params(0, 4, 2)
                 .into_iter()
                 .flat_map(|(log_n1, log_n2, limbs)| {
-                    (0..1usize << log_n1).flat_map(move |c| {
-                        (1..=1usize << (log_n2 - 1))
+                    (0..usize::power_of_2(log_n1)).flat_map(move |c| {
+                        (1..=usize::power_of_2(log_n2 - 1))
                             .map(move |k| (log_n1, log_n2, limbs, c, k << 1))
                     })
                 })
@@ -1064,16 +1072,21 @@ pub(crate) fn ss_spec_var_45()
         },
         random_params: |r| {
             let (log_n1, log_n2, limbs) = random_matrix_params(r, 0, 5)?;
-            let c = usize::exact_from(r.below(1 << log_n1));
-            let trunc = usize::exact_from(r.below(1 << (log_n2 - 1)) + 1) << 1;
+            let c = usize::exact_from(r.below(u64::power_of_2(log_n1)));
+            let trunc = usize::exact_from(r.below(u64::power_of_2(log_n2 - 1)) + 1) << 1;
             Some((log_n1, log_n2, limbs, c, trunc))
         },
-        lens: |&(log_n1, log_n2, limbs, _, _)| (limbs << (log_n1 + log_n2), 1 << (log_n1 + log_n2)),
+        lens: |&(log_n1, log_n2, limbs, _, _)| {
+            (
+                limbs << (log_n1 + log_n2),
+                usize::power_of_2(log_n1 + log_n2),
+            )
+        },
         build: |(log_n1, log_n2, limbs, c, trunc), lows, tops| {
             (
-                residues(lows, tops, 1 << (log_n1 + log_n2), limbs),
-                1 << log_n1,
-                1 << log_n2,
+                residues(lows, tops, usize::power_of_2(log_n1 + log_n2), limbs),
+                usize::power_of_2(log_n1),
+                usize::power_of_2(log_n2),
                 transform_w(log_n1 + log_n2 - 1, limbs),
                 c,
                 trunc,
@@ -1087,8 +1100,8 @@ pub(crate) fn ss_spec_var_45()
 fn mfa_params(max_log_n: u64, max_limbs: usize) -> Vec<(u64, u64, usize, usize, bool)> {
     let mut ps = Vec::new();
     for (log_n1, log_n2, limbs) in matrix_params(1, max_log_n, max_limbs) {
-        let n = 1usize << (log_n1 + log_n2 - 1);
-        for k in 1..=1usize << (log_n2 - 1) {
+        let n = usize::power_of_2(log_n1 + log_n2 - 1);
+        for k in 1..=usize::power_of_2(log_n2 - 1) {
             let trunc = (n << 1) + (k << (log_n1 + 1));
             ps.push((log_n1, log_n2, limbs, trunc, false));
             ps.push((log_n1, log_n2, limbs, trunc, true));
@@ -1099,8 +1112,8 @@ fn mfa_params(max_log_n: u64, max_limbs: usize) -> Vec<(u64, u64, usize, usize, 
 
 fn random_mfa_params(r: &mut SsRng) -> Option<(u64, u64, usize, usize, bool)> {
     let (log_n1, log_n2, limbs) = random_matrix_params(r, 1, LW)?;
-    let n = 1usize << (log_n1 + log_n2 - 1);
-    let k = usize::exact_from(r.below(1 << (log_n2 - 1)) + 1);
+    let n = usize::power_of_2(log_n1 + log_n2 - 1);
+    let k = usize::exact_from(r.below(u64::power_of_2(log_n2 - 1)) + 1);
     Some((
         log_n1,
         log_n2,
@@ -1125,9 +1138,9 @@ pub(crate) fn ss_spec_var_46()
             let log_n = log_n1 + log_n2 - 1;
             (
                 residues(lows, tops, 4 << log_n, limbs),
-                1 << log_n,
+                usize::power_of_2(log_n),
                 transform_w(log_n, limbs),
-                1 << log_n1,
+                usize::power_of_2(log_n1),
                 trunc,
             )
         },
@@ -1168,9 +1181,9 @@ pub(crate) fn ss_spec_var_47() -> SsSpec<
             (
                 ii,
                 jj,
-                1 << log_n,
+                usize::power_of_2(log_n),
                 transform_w(log_n, limbs),
-                1 << log_n1,
+                usize::power_of_2(log_n1),
                 trunc,
             )
         },
@@ -1207,8 +1220,8 @@ const fn basecase_sizes(b: u64) -> (usize, u64) {
 }
 
 // Which inputs are nonmaximal.
-const fn basecase_free(c: Limb, square: bool) -> (bool, bool) {
-    (c & 2 == 0, !square && c & 1 == 0)
+fn basecase_free(c: Limb, square: bool) -> (bool, bool) {
+    (c & 2 == 0, !square && c.even())
 }
 
 struct BasecaseDataGenerator;
@@ -1220,7 +1233,11 @@ impl ExhaustiveDependentPairsYsGenerator<(u64, Limb, bool), Vec<Limb>, It<Vec<Li
         let (n, top_bits) = basecase_sizes(b);
         let (x_free, y_free) = basecase_free(c, square);
         let free = usize::from(x_free) + usize::from(y_free);
-        let top_bound = if top_bits == W { 0 } else { 1 << top_bits };
+        let top_bound = if top_bits == W {
+            0
+        } else {
+            Limb::power_of_2(top_bits)
+        };
         let tops: It<Limb> = if top_bound == 0 {
             Box::new(exhaustive_unsigneds::<Limb>())
         } else {
@@ -1365,7 +1382,7 @@ pub(crate) fn ss_spec_var_49()
             } else {
                 Some(normalized_residue(&mut lows, limbs, y_max))
             };
-            (r, i2, (limbs << LW) >> log_w, 1 << log_w)
+            (r, i2, (limbs << LW) >> log_w, u64::power_of_2(log_w))
         },
     }
 }
@@ -1552,7 +1569,7 @@ fn convolution_params(
 ) -> Vec<(u64, usize, usize, Option<usize>)> {
     let mut ps = Vec::new();
     for (depth, limbs) in transform_params(min_depth, max_depth, max_limbs) {
-        let n = 1usize << depth;
+        let n = usize::power_of_2(depth);
         for len1 in 1..=n << 2 {
             for len2 in 1..=n << 2 {
                 let trunc = len1 + len2 - 1;
@@ -1575,7 +1592,7 @@ fn random_convolution_params(
     max_depth: u64,
 ) -> Option<(u64, usize, usize, Option<usize>)> {
     let (depth, limbs) = random_transform_params(r, min_depth, max_depth)?;
-    let n = 1usize << depth;
+    let n = usize::power_of_2(depth);
     let len1 = usize::exact_from(r.below(u64::exact_from(n << 2))) + 1;
     if r.one_in(4) {
         let trunc = (len1 << 1) - 1;
@@ -1705,7 +1722,7 @@ fn set_fft_params() -> Vec<(usize, bool, Vec<bool>)> {
     for count in 0..=4usize {
         for limbs in 1..=3 {
             for sign in [false, true] {
-                for mask in 0..1usize << count {
+                for mask in 0..usize::power_of_2(u64::exact_from(count)) {
                     let maxes = (0..count).map(|i| (mask >> i).odd()).collect();
                     ps.push((limbs, sign, maxes));
                 }

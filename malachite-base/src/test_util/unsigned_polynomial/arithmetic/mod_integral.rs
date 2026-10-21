@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::ExactFrom;
 use crate::polynomial::Polynomial;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec::Vec;
@@ -20,7 +21,7 @@ fn index_mod_u128<T: PrimitiveUnsigned>(k: u64, m: T) -> T {
 // Whether the integral modulo `m` of `p` is defined: whether every k for which the coefficient of
 // x^(k-1) is nonzero is a unit modulo `m`, checked one at a time with a GCD.
 pub fn mod_integral_is_defined<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, m: T) -> bool {
-    (2..=p.len()).all(|k| p.coefficient(k - 1) == T::ZERO || index_mod_u128(k, m).gcd(m) == T::ONE)
+    (2..=p.len()).all(|k| p.coefficient(k - 1) == T::ZERO || index_mod_u128(k, m).coprime_with(m))
 }
 
 // Integrates a polynomial modulo `m` coefficient by coefficient, inverting each index separately.
@@ -32,7 +33,7 @@ pub fn mod_integral_naive<T: PrimitiveUnsigned>(
     if p.len() == 0 {
         return Some(UnsignedPolynomial::from_coefficients_asc(Vec::new()));
     }
-    let mut coefficients = Vec::with_capacity(usize::try_from(p.len()).unwrap() + 1);
+    let mut coefficients = Vec::with_capacity(usize::exact_from(p.len()) + 1);
     coefficients.push(T::ZERO);
     for i in 0..p.len() {
         let c = p.coefficient(i);

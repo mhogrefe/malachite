@@ -7,11 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use malachite_base::num::arithmetic::traits::{Abs, Ceiling, Floor};
+use malachite_base::num::arithmetic::traits::{Abs, Ceiling, Floor, SubMul};
 
 pub fn mod_op_naive(x: Rational, y: Rational) -> Rational {
     let q = &x / &y;
-    x - y * Rational::from(q.floor())
+    x.sub_mul(y, Rational::from(q.floor()))
 }
 
 pub fn rem_naive(x: Rational, y: Rational) -> Rational {
@@ -23,5 +23,5 @@ pub fn rem_naive(x: Rational, y: Rational) -> Rational {
 
 pub fn ceiling_mod_naive(x: Rational, y: Rational) -> Rational {
     let q = &x / &y;
-    x - y * Rational::from(q.ceiling())
+    x.sub_mul(y, Rational::from(q.ceiling()))
 }

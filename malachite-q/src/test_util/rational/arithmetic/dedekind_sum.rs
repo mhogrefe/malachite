@@ -11,7 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use malachite_base::num::arithmetic::traits::{Mod, Square};
+use malachite_base::num::arithmetic::traits::{AddMulAssign, Mod, Square};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::Integer;
 
@@ -30,7 +30,7 @@ pub fn dedekind_sum_naive(h: &Integer, k: &Integer) -> Rational {
         if r2 != 0u32 {
             let a = (((&i).mod_op(k)) << 1u32) - k;
             let b = (r2 << 1u32) - k;
-            num += a * b;
+            num.add_mul_assign(a, b);
         }
         i += Integer::ONE;
     }

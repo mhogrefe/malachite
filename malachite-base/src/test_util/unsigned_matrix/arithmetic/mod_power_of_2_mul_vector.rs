@@ -23,7 +23,7 @@ pub fn unsigned_matrix_mod_power_of_2_mul_vector_naive<T: PrimitiveUnsigned>(
             .map(|i| {
                 let mut sum = T::ZERO;
                 for (&x, &y) in a.row_iter(i).zip(&v.elements) {
-                    sum = sum.mod_power_of_2_add(x.mod_power_of_2_mul(y, pow), pow);
+                    sum.mod_power_of_2_add_assign(x.mod_power_of_2_mul(y, pow), pow);
                 }
                 sum
             })
@@ -42,7 +42,7 @@ pub fn unsigned_vector_mod_power_of_2_mul_unsigned_matrix_naive<T: PrimitiveUnsi
             .map(|j| {
                 let mut sum = T::ZERO;
                 for (&x, &y) in v.elements.iter().zip(a.column_iter(j)) {
-                    sum = sum.mod_power_of_2_add(x.mod_power_of_2_mul(y, pow), pow);
+                    sum.mod_power_of_2_add_assign(x.mod_power_of_2_mul(y, pow), pow);
                 }
                 sum
             })

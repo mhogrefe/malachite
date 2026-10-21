@@ -9,7 +9,7 @@
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{BinomialCoefficient, Pow};
+use malachite_base::num::arithmetic::traits::{AddMulAssign, BinomialCoefficient, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::natural::Natural;
@@ -24,12 +24,13 @@ pub fn taylor_shift_naive(p: &RationalPolynomial, c: &Rational) -> RationalPolyn
             .map(|k| {
                 let mut sum = Rational::ZERO;
                 for i in k..n {
-                    sum += p.coefficient(i)
-                        * Rational::from(Natural::binomial_coefficient(
+                    sum.add_mul_assign(
+                        p.coefficient(i),
+                        Rational::from(Natural::binomial_coefficient(
                             Natural::from(i),
                             Natural::from(k),
-                        ))
-                        * c.pow(i - k);
+                        )) * c.pow(i - k),
+                    );
                 }
                 sum
             })

@@ -22,7 +22,7 @@ pub fn mod_power_of_2_evaluate_naive<T: PrimitiveUnsigned>(
     let mut sum = T::ZERO;
     for (i, &c) in p.coefficients_asc().iter().enumerate() {
         let term = c.mod_power_of_2_mul(x.mod_power_of_2_pow(u64::exact_from(i), pow), pow);
-        sum = sum.mod_power_of_2_add(term, pow);
+        sum.mod_power_of_2_add_assign(term, pow);
     }
     sum
 }

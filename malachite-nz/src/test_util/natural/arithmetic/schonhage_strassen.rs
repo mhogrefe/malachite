@@ -16,11 +16,13 @@ use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::platform::{Limb, SignedLimb};
 use malachite_base::num::arithmetic::traits::{
-    Mod, ModAddAssign, ModMul, ModNeg, ModPowerOf2, ModSub, PowerOf2,
+    Mod, ModAddAssign, ModMul, ModNeg, ModPowerOf2, ModSub, Parity, PowerOf2, WrappingAddAssign,
+    WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::slices::slice_test_zero;
 
 // $N$, the number of bits below the overflow limb.
 pub fn fermat_bits(limbs: usize) -> u64 {
@@ -42,7 +44,7 @@ pub fn residue_mod(r: &[Limb], limbs: usize) -> Natural {
 // Whether the residue `r[..=limbs]` is normalized: less than $p$, so either its top limb is zero or
 // it is $2^N$.
 pub fn residue_is_normalized(r: &[Limb], limbs: usize) -> bool {
-    r[limbs] == 0 || (r[limbs] == 1 && r[..limbs].iter().all(|&x| x == 0))
+    r[limbs] == 0 || (r[limbs] == 1 && slice_test_zero(&r[..limbs]))
 }
 
 // The normalized residue of `limbs + 1` limbs that represents `x`, which must be less than $p$.
@@ -80,7 +82,7 @@ pub fn fermat_div_power_of_2(x: &Natural, e: u64, limbs: usize) -> Natural {
 // A square root of 2 modulo $p$: $2^{3N/4} - 2^{N/4}$. $N$ must be divisible by 4.
 pub fn fermat_sqrt_2(limbs: usize) -> Natural {
     let n = fermat_bits(limbs);
-    assert_eq!(n & 3, 0);
+    assert_eq!(n.mod_power_of_2(2), 0);
     let p = fermat_modulus(limbs);
     Natural::power_of_2((3 * n) >> 2).mod_sub(Natural::power_of_2(n >> 2), p)
 }
@@ -88,7 +90,7 @@ pub fn fermat_sqrt_2(limbs: usize) -> Natural {
 // $x \sqrt{2}^e \bmod p$, for any `e`, with $\sqrt{2}$ as in `fermat_sqrt_2`.
 pub fn fermat_mul_sqrt_2_power(x: &Natural, e: u64, limbs: usize) -> Natural {
     let y = fermat_mul_power_of_2(x, e >> 1, limbs);
-    if e & 1 == 0 {
+    if e.even() {
         y
     } else {
         y.mod_mul(fermat_sqrt_2(limbs), fermat_modulus(limbs))
@@ -151,9 +153,9 @@ pub fn limbs_negacyclic_convolution_naive(xs: &[Limb], ys: &[Limb]) -> Vec<Limb>
         for (j, &y) in ys.iter().enumerate() {
             let product = x.wrapping_mul(y);
             if i + j < m {
-                out[i + j] = out[i + j].wrapping_add(product);
+                out[i + j].wrapping_add_assign(product);
             } else {
-                out[i + j - m] = out[i + j - m].wrapping_sub(product);
+                out[i + j - m].wrapping_sub_assign(product);
             }
         }
     }

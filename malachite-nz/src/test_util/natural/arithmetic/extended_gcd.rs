@@ -8,8 +8,12 @@
 
 use crate::integer::Integer;
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{DivExact, DivMod, DivRound, NegAssign};
+use core::cmp::Ordering::*;
+use malachite_base::num::arithmetic::traits::{
+    AddMulAssign, DivExact, DivMod, DivRound, NegAssign, SubMul, SubMulAssign,
+};
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::comparison::traits::OrdDouble;
 use malachite_base::rounding_modes::RoundingMode::*;
 use std::mem::swap;
 
@@ -36,7 +40,7 @@ pub fn extended_gcd_euclidean_natural(
     }
     for q in stack.into_iter().rev() {
         swap(&mut x, &mut y);
-        x -= Integer::from(q) * &y;
+        x.sub_mul_assign(Integer::from(q), &y);
     }
     (gcd, x, y)
 }
@@ -80,7 +84,7 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
                 v2.neg_assign();
                 v1 = t2;
                 d
-            } else if d < (&v3 << 1u32) {
+            } else if d.cmp_double(&v3) == Less {
                 // quot = 2
                 t1 = u2.clone();
                 u2 = u1 - (&u2 << 1u32);
@@ -93,11 +97,11 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
             } else {
                 // quot = 3
                 t1 = u2.clone();
-                u2 = u1 - Integer::from(3u32) * &u2;
+                u2 = u1.sub_mul(Integer::from(3u32), &u2);
                 u1 = t1;
                 u3 = v3;
                 t2 = v2.clone();
-                v2 = v1 - Integer::from(3u32) * &v2;
+                v2 = v1.sub_mul(Integer::from(3u32), &v2);
                 v1 = t2;
                 d - (&u3 << 1u32)
             }
@@ -105,11 +109,11 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
             let (quot, rem) = u3.div_mod(&v3);
             let quot = Integer::from(quot);
             t1 = u2.clone();
-            u2 = u1 - &quot * &u2;
+            u2 = u1.sub_mul(&quot, &u2);
             u1 = t1;
             u3 = v3.clone();
             t2 = v2.clone();
-            v2 = v1 - quot * &v2;
+            v2 = v1.sub_mul(quot, &v2);
             v1 = t2;
             rem
         };
@@ -123,8 +127,8 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
     let limit_b = &two_limit_b >> 1u32;
     if x > limit_b {
         let k = (&x - limit_b).div_round(&two_limit_b, Ceiling).0;
-        x -= two_limit_b * &k;
-        y += two_limit_a * k;
+        x.sub_mul_assign(two_limit_b, &k);
+        y.add_mul_assign(two_limit_a, k);
     }
     if swapped {
         swap(&mut x, &mut y);

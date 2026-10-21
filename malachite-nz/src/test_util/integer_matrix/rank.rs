@@ -9,6 +9,7 @@
 use crate::integer_matrix::IntegerMatrix;
 use crate::test_util::integer_matrix::determinant::rows;
 use malachite_base::matrix::Matrix;
+use malachite_base::num::arithmetic::traits::MulSubMulAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 // The rank of a matrix, by fraction-free Gaussian elimination: a row below a pivot is replaced by a
@@ -27,7 +28,7 @@ pub fn naive_rank(a: &IntegerMatrix) -> u64 {
                 let pivot_row = m[rank].clone();
                 let (pivot, x) = (&pivot_row[column], m[i][column].clone());
                 for (y, z) in m[i][column..].iter_mut().zip(&pivot_row[column..]) {
-                    *y = &*y * pivot - z * &x;
+                    y.mul_sub_mul_assign(pivot, z, &x);
                 }
             }
         }

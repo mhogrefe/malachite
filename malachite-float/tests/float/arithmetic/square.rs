@@ -72,7 +72,7 @@ fn test_square() {
             ComparableFloatRef(&square)
         );
 
-        let square_alt = square_prec_round_naive(x.clone(), x.significant_bits(), Nearest).0;
+        let square_alt = square_prec_round_naive(&x, x.significant_bits(), Nearest).0;
         assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
     };
     test("NaN", "NaN", "NaN", "NaN");
@@ -321,7 +321,7 @@ fn test_square_prec() {
         assert_eq!(ComparableFloatRef(&square), ComparableFloatRef(&square_alt));
         assert_eq!(o_alt, o_out);
 
-        let (square_alt, o_alt) = square_prec_round_naive(x.clone(), prec, Nearest);
+        let (square_alt, o_alt) = square_prec_round_naive(&x, prec, Nearest);
         assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
         assert_eq!(o_alt, o);
 
@@ -802,7 +802,7 @@ fn test_square_round() {
             assert_eq!(rug_o, o);
         }
 
-        let (square_alt, o_alt) = square_prec_round_naive(x.clone(), x.significant_bits(), rm);
+        let (square_alt, o_alt) = square_prec_round_naive(&x, x.significant_bits(), rm);
         assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
         assert_eq!(o_alt, o);
     };
@@ -1559,7 +1559,7 @@ fn test_square_prec_round() {
         assert_eq!(ComparableFloatRef(&square), ComparableFloatRef(&square_alt));
         assert_eq!(o_alt, o_out);
 
-        let (square_alt, o_alt) = square_prec_round_naive(x.clone(), prec, rm);
+        let (square_alt, o_alt) = square_prec_round_naive(&x, prec, rm);
         assert_eq!(ComparableFloatRef(&square_alt), ComparableFloatRef(&square));
         assert_eq!(o_alt, o);
 

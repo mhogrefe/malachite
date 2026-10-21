@@ -1,0 +1,27 @@
+error: this loop walks the bits of an integer by testing the low bit and shifting right
+  --> $DIR/use_bits.rs:8:5
+   |
+LL |     while x != 0 {
+   |     ^^^^^^^^^^^^
+   |
+   = help: iterate over the bits instead, with `for bit in x.bits()` (`BitIterable`), using `bit` where the loop tests the low bit
+   = note: `#[deny(use_bits)]` on by default
+
+error: this loop walks the bits of an integer by testing the low bit and shifting right
+  --> $DIR/use_bits.rs:20:5
+   |
+LL |     while exp > 0 {
+   |     ^^^^^^^^^^^^^
+   |
+   = help: iterate over the bits instead, with `for bit in x.bits()` (`BitIterable`), using `bit` where the loop tests the low bit
+
+error: this loop walks the bits of an integer by testing the low bit and shifting right
+  --> $DIR/use_bits.rs:34:5
+   |
+LL |     while 0 != x {
+   |     ^^^^^^^^^^^^
+   |
+   = help: iterate over the bits instead, with `for bit in x.bits()` (`BitIterable`), using `bit` where the loop tests the low bit
+
+error: aborting due to 3 previous errors
+

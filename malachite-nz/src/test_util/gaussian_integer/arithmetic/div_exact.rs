@@ -8,7 +8,7 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::DivExact;
+use malachite_base::num::arithmetic::traits::{DivExact, MulAddMul, MulSubMul, Square};
 
 // Schoolbook: (a + bi) / (c + di) = ((ac + bd) + (bc - ad)i) / (c^2 + d^2), with exact integer
 // divisions.
@@ -17,9 +17,13 @@ pub fn gaussian_integer_div_exact_naive(
     y: &GaussianInteger,
 ) -> GaussianInteger {
     assert!(y.real != 0u32 || y.imaginary != 0u32, "division by zero");
-    let norm: Integer = &y.real * &y.real + &y.imaginary * &y.imaginary;
+    let norm: Integer = (&y.real).square() + (&y.imaginary).square();
     GaussianInteger {
-        real: (&x.real * &y.real + &x.imaginary * &y.imaginary).div_exact(&norm),
-        imaginary: (&x.imaginary * &y.real - &x.real * &y.imaginary).div_exact(norm),
+        real: (&x.real)
+            .mul_add_mul(&y.real, &x.imaginary, &y.imaginary)
+            .div_exact(&norm),
+        imaginary: (&x.imaginary)
+            .mul_sub_mul(&y.real, &x.real, &y.imaginary)
+            .div_exact(norm),
     }
 }

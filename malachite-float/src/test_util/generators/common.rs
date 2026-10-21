@@ -12,10 +12,12 @@ use crate::float::conversion::string::strtofr::strtofr;
 use crate::test_util::common::rug_round_exact_from_rounding_mode;
 use alloc::string::{String, ToString};
 use core::cmp::Ordering::Equal;
+use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::It;
 use malachite_nz::integer::Integer;
@@ -135,8 +137,9 @@ pub const STRTOFR_STRING_CHARS: &str = "+-.0123456789abfinxzABFINXZ@epP()_ \t";
 // The number of distinct `combo` values for `strtofr_string_from_parts`. The fields are ordered so
 // that the fastest-varying ones are the most syntactically distinctive, and index 0 of each is the
 // least usual choice: exhaustive generators only reach small values, so a low `combo` must still
-// vary the shape of the string rather than only its decoration.
-pub const STRTOFR_COMBO_COUNT: u32 = 8 * 5 * 4 * 6 * 3 * 4;
+// vary the shape of the string rather than only its decoration. It is the product of the field
+// sizes 8, 6, 4, 5, 3, and 4.
+pub const STRTOFR_COMBO_COUNT: u32 = (6 * 5 * 3) << 7;
 
 // Assembles a valid `strtofr` input string from its parts, so that generators can build valid
 // numbers by construction rather than by filtering. `strtofr` always consumes the whole output, so
@@ -161,7 +164,7 @@ pub fn strtofr_string_from_parts(
 ) -> String {
     // 0 is a NaN and 1 an infinity; 2 through 7 are numbers.
     let kind = combo % 8;
-    let marker = (combo / 8) % 6;
+    let marker = (combo >> 3) % 6;
     let variant = usize::exact_from((combo / 48) % 4);
     let point = usize::exact_from((combo / 192) % 5);
     let sign = ["", "-", "+"][usize::exact_from((combo / 960) % 3)];
@@ -275,13 +278,13 @@ pub fn format_string_output_is_bounded(fmt: &str) -> bool {
 // output parses as a valid Float conversion, so no rounding mode is `Exact` (there is no format
 // character for it) and none of the `format_float_str` failure paths can be reached.
 pub fn format_string_from_parts(combo: u16, width: Option<u64>, prec: Option<u64>) -> String {
-    let flags = combo & 0x3f;
+    let flags = combo.mod_power_of_2(6);
     let selector = combo >> 6; // in 0..54
     let conv = usize::from(selector % 9);
     let rnd = selector / 9; // in 0..6; 0 means no rounding character
     let mut s = vec![b'%'];
-    for (i, &c) in FLOAT_FORMAT_FLAG_CHARS.iter().enumerate() {
-        if flags & (1 << i) != 0 {
+    for (i, &c) in (0..).zip(FLOAT_FORMAT_FLAG_CHARS.iter()) {
+        if flags.get_bit(i) {
             s.push(c);
         }
     }

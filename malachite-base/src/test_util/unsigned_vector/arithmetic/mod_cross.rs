@@ -41,8 +41,8 @@ pub fn unsigned_vector_mod_cross_naive<T: PrimitiveUnsigned>(
                     for (k, &y) in ys.iter().enumerate() {
                         let product = x.mod_mul(y, m);
                         match levi_civita(i, j, k) {
-                            1 => sum = sum.mod_add(product, m),
-                            -1 => sum = sum.mod_sub(product, m),
+                            1 => sum.mod_add_assign(product, m),
+                            -1 => sum.mod_sub_assign(product, m),
                             _ => {}
                         }
                     }

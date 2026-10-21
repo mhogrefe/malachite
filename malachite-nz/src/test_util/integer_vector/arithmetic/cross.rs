@@ -9,6 +9,7 @@
 use crate::integer::Integer;
 use crate::integer_vector::IntegerVector;
 use alloc::vec::Vec;
+use malachite_base::num::arithmetic::traits::{AddMulAssign, SubMulAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::vector::Vector;
 
@@ -38,8 +39,8 @@ pub fn integer_vector_cross_naive(v: &IntegerVector, w: &IntegerVector) -> Integ
                 for (j, x) in xs.iter().enumerate() {
                     for (k, y) in ys.iter().enumerate() {
                         match levi_civita(i, j, k) {
-                            1 => sum += x * y,
-                            -1 => sum -= x * y,
+                            1 => sum.add_mul_assign(x, y),
+                            -1 => sum.sub_mul_assign(x, y),
                             _ => {}
                         }
                     }

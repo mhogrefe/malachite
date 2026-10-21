@@ -10,7 +10,7 @@ use crate::integer::Integer;
 use crate::integer_matrix::IntegerMatrix;
 use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::DivExact;
+use malachite_base::num::arithmetic::traits::{DivExactAssign, MulSubMulAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::NotAssign;
 
@@ -44,7 +44,8 @@ pub fn naive_determinant(a: &IntegerMatrix) -> Integer {
         for row in &mut m[k + 1..] {
             let x = row[k].clone();
             for (y, z) in row[k + 1..].iter_mut().zip(&pivot_row[k + 1..]) {
-                *y = (&*y * &pivot_row[k] - &x * z).div_exact(&previous);
+                y.mul_sub_mul_assign(&pivot_row[k], &x, z);
+                y.div_exact_assign(&previous);
             }
         }
         previous = m[k][k].clone();

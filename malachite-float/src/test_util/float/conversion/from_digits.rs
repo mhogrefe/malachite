@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
-use malachite_base::num::arithmetic::traits::Pow;
+use malachite_base::num::arithmetic::traits::{AddMul, Pow};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
@@ -29,19 +29,20 @@ pub fn non_dyadic_from_digits_prec_round_naive<I: Iterator<Item = u64>>(
 ) -> (Float, Ordering) {
     let mut ds: Vec<u64> = Vec::new();
     let mut count = prec + 64;
+    let natural_base = Natural::from(base);
     loop {
         while u64::exact_from(ds.len()) < count {
             ds.push(digits.next().unwrap());
         }
         let mut num = Natural::ZERO;
         for &d in &ds {
-            num = num * Natural::from(base) + Natural::from(d);
+            num = Natural::from(d).add_mul(num, &natural_base);
         }
-        let den = Natural::from(base).pow(count);
-        let lo = Rational::from_naturals(num.clone(), den.clone());
+        let den = (&natural_base).pow(count);
+        let lo = Rational::from_naturals_ref(&num, &den);
         let hi = Rational::from_naturals(num + Natural::ONE, den);
-        let f_lo = Float::from_rational_prec_round(lo.clone(), prec, rm).0;
-        let f_hi = Float::from_rational_prec_round(hi.clone(), prec, rm).0;
+        let f_lo = Float::from_rational_prec_round_ref(&lo, prec, rm).0;
+        let f_hi = Float::from_rational_prec_round_ref(&hi, prec, rm).0;
         if f_lo == f_hi {
             let q = Rational::exact_from(&f_lo);
             if q <= lo {
@@ -51,7 +52,7 @@ pub fn non_dyadic_from_digits_prec_round_naive<I: Iterator<Item = u64>>(
                 return (f_lo, Greater);
             }
         }
-        count *= 2;
+        count <<= 1;
     }
 }
 
@@ -106,7 +107,7 @@ pub const fn sparse_bits() -> SparseBits {
 pub fn non_dyadic_fraction(q: &Rational) -> Rational {
     let (n, d) = q.numerator_and_denominator_ref();
     Rational::from_naturals(
-        n * Natural::from(3u32) + Natural::ONE,
+        Natural::ONE.add_mul(n, Natural::from(3u32)),
         (n + d) * Natural::from(3u32),
     )
 }

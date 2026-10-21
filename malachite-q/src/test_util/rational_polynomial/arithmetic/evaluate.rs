@@ -9,7 +9,7 @@
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::Pow;
+use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;
@@ -22,7 +22,7 @@ use malachite_nz::integer_polynomial::IntegerPolynomial;
 pub fn evaluate_integer_polynomial_naive(p: &IntegerPolynomial, x: &Rational) -> Rational {
     let mut sum = Rational::ZERO;
     for (i, c) in p.coefficients_asc().iter().enumerate() {
-        sum += Rational::from(c) * x.pow(u64::exact_from(i));
+        sum.add_mul_assign(Rational::from(c), x.pow(u64::exact_from(i)));
     }
     sum
 }
@@ -33,7 +33,7 @@ pub fn evaluate_integer_polynomial_naive(p: &IntegerPolynomial, x: &Rational) ->
 pub fn evaluate_rational_polynomial_naive(p: &RationalPolynomial, x: &Rational) -> Rational {
     let mut sum = Rational::ZERO;
     for (i, c) in p.to_coefficients_asc().into_iter().enumerate() {
-        sum += c * x.pow(u64::exact_from(i));
+        sum.add_mul_assign(c, x.pow(u64::exact_from(i)));
     }
     sum
 }

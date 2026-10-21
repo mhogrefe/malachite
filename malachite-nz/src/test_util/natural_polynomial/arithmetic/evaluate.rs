@@ -9,7 +9,7 @@
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, Pow};
+use malachite_base::num::arithmetic::traits::{AddMulAssign, ModPowerOf2, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -19,7 +19,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 pub fn evaluate_naive(p: &NaturalPolynomial, x: &Natural) -> Natural {
     let mut sum = Natural::ZERO;
     for (i, c) in p.coefficients_asc().iter().enumerate() {
-        sum += c * x.pow(u64::exact_from(i));
+        sum.add_mul_assign(c, x.pow(u64::exact_from(i)));
     }
     sum
 }

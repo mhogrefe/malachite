@@ -9,7 +9,9 @@
 use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::test_util::natural::arithmetic::crt::crt_simple;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{Mod, UnsignedAbs};
+use malachite_base::num::comparison::traits::OrdDouble;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 // A simple reference implementation of `BalancedCrt`: the canonical solution from `crt_simple`,
@@ -19,7 +21,7 @@ pub fn balanced_crt_simple(r1: Integer, m1: Natural, r2: Natural, m2: Natural) -
     let m = &m1 * &m2;
     let r1n = Natural::exact_from(r1.mod_op(Integer::from(&m1)));
     let x = crt_simple(r1n, m1, r2, m2)?;
-    Some(if &x << 1u32 > m {
+    Some(if m.cmp_double(&x) == Less {
         Integer::from(x) - Integer::from(m)
     } else {
         Integer::from(x)

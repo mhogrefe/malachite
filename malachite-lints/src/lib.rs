@@ -55,6 +55,7 @@ mod runtime_literal_conversion;
 mod shift_of_one;
 mod use_abs_comparison;
 mod use_assign_variant;
+mod use_bits;
 mod use_checked_log_base_2;
 mod use_cmp_double;
 mod use_cmp_product;
@@ -501,11 +502,20 @@ fn in_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> boo
 
 // Whether the span lies in test-oriented code that spells out a discouraged form on purpose:
 // property tests cross-check a dedicated function against its spelled-out equivalent (`square`
-// against `&x * &x`, shifts against multiplication by a power of 2), test utilities keep naive
-// reference implementations independent of the optimized code they check, and tests call the
+// against `&x * &x`, shifts against multiplication by a power of 2), and tests and demos call the
 // by-value, in-place, and rounding variants they are testing. Rewriting any of these would remove
-// what the code exists to check.
+// what the code exists to check. Test utilities are not exempt: their reference implementations
+// and helpers are shared by tests and benchmarks, and are written like library code; a reference
+// stays independent of the code it checks by using a different algorithm, not a discouraged
+// spelling.
 fn in_cross_check_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> bool {
+    use rustc_lint::LintContext;
+    if let rustc_span::FileName::Real(real) = cx.sess().source_map().span_to_filename(span)
+        && let Some(path) = real.local_path()
+        && path.to_string_lossy().replace('\\', "/").contains("/test_util/")
+    {
+        return false;
+    }
     in_test_code(cx, span)
 }
 
@@ -582,6 +592,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         runtime_literal_conversion::RUNTIME_LITERAL_CONVERSION,
         shift_of_one::SHIFT_OF_ONE,
         use_assign_variant::USE_ASSIGN_VARIANT,
+        use_bits::USE_BITS,
         use_checked_log_base_2::USE_CHECKED_LOG_BASE_2,
         use_cmp_double::USE_CMP_DOUBLE,
         use_cmp_product::USE_CMP_PRODUCT,
@@ -667,6 +678,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(clone_with_ref_variant::CloneWithRefVariant));
     lint_store.register_early_pass(|| Box::new(collapse_adjacent_imports::CollapseAdjacentImports));
     lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
+    lint_store.register_late_pass(|_| Box::new(use_bits::UseBits));
     lint_store.register_late_pass(|_| Box::new(use_checked_log_base_2::UseCheckedLogBase2));
     lint_store.register_late_pass(|_| Box::new(use_cmp_double::UseCmpDouble));
     lint_store.register_late_pass(|_| Box::new(use_cmp_product::UseCmpProduct));

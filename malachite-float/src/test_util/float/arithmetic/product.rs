@@ -8,10 +8,10 @@
 
 use crate::Float;
 use crate::InnerFloat::Finite;
-use malachite_base::num::arithmetic::traits::ShlRoundAssign;
+use malachite_base::num::arithmetic::traits::{NegAssign, ShlRoundAssign};
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use std::cmp::Ordering::{self, *};
 
@@ -33,7 +33,7 @@ pub fn naive_product_prec_round(xs: &[Float], prec: u64, rm: RoundingMode) -> (F
             return (Float::NAN, Equal);
         }
         if x.is_sign_negative() {
-            sign = !sign;
+            sign.not_assign();
         }
         if x.is_infinite() {
             any_inf = true;
@@ -84,7 +84,7 @@ pub fn naive_product_prec_round(xs: &[Float], prec: u64, rm: RoundingMode) -> (F
         acc = normalize(acc);
     }
     if !sign {
-        acc = -acc;
+        acc.neg_assign();
     }
     let (mut f, mut o) = Float::from_float_prec_round(acc, prec, rm);
     let o_shift = f.shl_round_assign(i64::exact_from(drift.clamp(-(1 << 40), 1 << 40)), rm);

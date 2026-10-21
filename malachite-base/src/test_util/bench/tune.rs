@@ -48,7 +48,7 @@ pub fn calibrate(f: &mut dyn FnMut()) -> u64 {
         if ns >= MIN_BATCH_NS {
             return iters;
         }
-        iters = if ns == 0 { iters * 100 } else { iters * 2 };
+        iters = if ns == 0 { iters * 100 } else { iters << 1 };
     }
 }
 

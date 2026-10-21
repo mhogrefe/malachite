@@ -131,7 +131,7 @@ use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
+    AddMul, ArithmeticCheckedShl, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
     EqModPowerOf2, Height, HeightRef, Parity, PowerOf2, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -139,6 +139,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::comparison::traits::OrdProducts;
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
@@ -1279,7 +1280,7 @@ pub fn exhaustive_integer_integer_natural_triple_gen() -> It<(Integer, Integer, 
 pub fn exhaustive_integer_integer_natural_triple_gen_var_1() -> It<(Integer, Integer, Natural)> {
     Box::new(
         exhaustive_triples_xxy(exhaustive_integers(), exhaustive_naturals())
-            .map(|(x, y, m)| (x * Integer::from(&m) + &y, y, m)),
+            .map(|(x, y, m)| ((&y).add_mul(&x, &Integer::from(&m)), y, m)),
     )
 }
 
@@ -2175,7 +2176,8 @@ pub fn exhaustive_natural_quadruple_gen() -> It<(Natural, Natural, Natural, Natu
 
 pub fn exhaustive_natural_triple_gen_var_1() -> It<(Natural, Natural, Natural)> {
     Box::new(
-        exhaustive_triples_from_single(exhaustive_naturals()).map(|(x, y, m)| (x * &m + &y, y, m)),
+        exhaustive_triples_from_single(exhaustive_naturals())
+            .map(|(x, y, m)| ((&y).add_mul(&x, &m), y, m)),
     )
 }
 
@@ -2228,7 +2230,8 @@ pub fn exhaustive_natural_triple_gen_var_6() -> It<(Natural, Natural, Natural)> 
 
 pub fn exhaustive_natural_triple_gen_var_7() -> It<(Natural, Natural, Natural)> {
     Box::new(
-        exhaustive_triples_from_single(exhaustive_naturals()).map(|(x, y, z)| (x + &y * &z, y, z)),
+        exhaustive_triples_from_single(exhaustive_naturals())
+            .map(|(x, y, z)| (x.add_mul(&y, &z), y, z)),
     )
 }
 
@@ -2289,7 +2292,10 @@ pub fn exhaustive_natural_quadruple_gen_var_3() -> It<(Natural, Natural, Natural
 }
 
 pub fn exhaustive_natural_quadruple_gen_var_4() -> It<(Natural, Natural, Natural, Natural)> {
-    Box::new(exhaustive_natural_quadruple_gen().filter(|(x, y, z, w)| x * y >= z * w))
+    Box::new(
+        exhaustive_natural_quadruple_gen()
+            .filter(|(x, y, z, w)| Natural::cmp_products(x, y, z, w) != Less),
+    )
 }
 
 pub fn exhaustive_natural_quadruple_gen_var_5() -> It<(Natural, Natural, Natural, Natural)> {

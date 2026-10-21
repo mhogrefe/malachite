@@ -49,15 +49,17 @@ your project. Notes:
 - `long_lines` enforces Malachite's 100-column house style and is configured through a
   `dylint.toml` at your workspace root; if you don't want it, allow it at crate level with
   `#![cfg_attr(dylint_lib = "malachite_lints", allow(long_lines))]`.
-- Most lints stand down in test-oriented code: under `tests/`, `bin_util/`, or `test_util/`
-  directories, and in test-harness builds. There are two reasons, and each lint's source says
+- Most lints stand down in test-oriented code, for one of two reasons, and each lint's source says
   which applies by the helper it calls (`in_cross_check_code` or
-  `in_performance_insensitive_code`). A **cross-check** lint rewrites a spelling that such code
-  writes on purpose: property tests check a dedicated function against its spelled-out equivalent,
-  test utilities keep naive reference implementations independent of the code they check, and
-  tests call the by-value, in-place, and rounding variants they are testing. A
-  **performance-only** lint (evaluating at compile time, inlining, avoiding an allocation) has
-  nothing to protect there. Lints that are purely about readability and structure, such as
+  `in_performance_insensitive_code`). A **cross-check** lint rewrites a spelling that tests and
+  demos write on purpose: property tests check a dedicated function against its spelled-out
+  equivalent, and tests call the by-value, in-place, and rounding variants they are testing. These
+  lints stand down under `tests/` and `bin_util/` directories and in test-harness builds, but not
+  under `test_util/`: its reference implementations and helpers are shared by tests and
+  benchmarks and are written like library code, and a reference stays independent of the code it
+  checks by using a different algorithm, not a discouraged spelling. A **performance-only** lint
+  (evaluating at compile time, inlining, avoiding an allocation) has nothing to protect in any
+  test-oriented code, `test_util/` included. Lints that are purely about readability and structure, such as
   `let_tuple_underscore_to_field`, `collapse_adjacent_ifs`, `duplicate_const`,
   `factor_out_assignment`, `assign_then_returned`, and `use_split_into_chunks`, apply everywhere,
   as do `long_lines`, `collapse_adjacent_imports`, `bignum_literal_suffix`, `fully_qualified_path`,
@@ -95,8 +97,8 @@ exercise every primitive type on purpose.
 Flags calls like `x.foo_prec_round(.., Nearest)` (in both method-call and associated-function
 form) when a `foo_prec` shorthand exists on the same type. Exempt: the shorthand's own defining
 delegation, everything inside trait impls (operators, `*Assign`, `LogBase`, ..., which delegate
-via the explicit form by convention), and code under `tests/`, `bin_util/`, or `test_util/`,
-which exercises both spellings on purpose.
+via the explicit form by convention), and code under `tests/` or `bin_util/`, which exercises
+both spellings on purpose.
 
 ### `use_abs_comparison`
 
@@ -118,8 +120,7 @@ against it is wasteful (for large powers it allocates a huge number); comparing 
 exponent with the power is direct and cheap. The advice is type-specific: `Natural` has
 `floor_log_base_2`, `ceiling_log_base_2`, and `checked_log_base_2`; an `Integer` can use them
 through `unsigned_abs_ref()`; `Rational` additionally has the `_abs` variants; and for a `Float`,
-`get_exponent()` gives 1 more than the floor of the log. Tests, demos, and test utilities are
-exempt: they compare against `power_of_2` on purpose, to cross-check the log functions
+`get_exponent()` gives 1 more than the floor of the log. Tests and demos are exempt: they compare against `power_of_2` on purpose, to cross-check the log functions
 themselves. For the Gaussian types the advice is to check that the imaginary part is zero and
 compare the real part's exponent.
 
@@ -130,8 +131,8 @@ shifting is more direct and cheaper, so `x << k` rather than `x * T::power_of_2(
 rather than `x / T::power_of_2(k)`. Signed shifts accept negative counts (reversing direction),
 so a signed `power_of_2` argument needs no special treatment. One case needs care, and gets its
 own message: `Integer` division truncates while `>>` takes the floor, so dividing an `Integer`
-converts to `shr_round` with `Down` (or `>>` if the floor is really what's wanted). Tests, demos,
-and test utilities are exempt: they multiply by `power_of_2` on purpose, to cross-check the shift
+converts to `shr_round` with `Down` (or `>>` if the floor is really what's wanted). Tests and demos
+are exempt: they multiply by `power_of_2` on purpose, to cross-check the shift
 operators themselves. `GaussianInteger` division is not flagged: it rounds to the nearest Gaussian
 integer and has no right shift. The rounding forms are covered too: `n.div_round(T::power_of_2(k),
 rm)` and `div_round_assign` on a `Natural` or `Integer` become `shr_round(k, rm)` and
@@ -470,6 +471,15 @@ optional `counter += 1` — and suggests `x.trailing_zeros()`, which computes th
 directly. The loop body may do the `x >>= 1` and at most one counter update on a different place;
 anything else (a `let`, a second shift) bails.
 
+
+### `use_bits`
+
+Flags a `while` loop that walks the bits of an unsigned primitive or a `Natural` from the lowest up:
+the condition is `x != 0` or `x > 0`, the body ends by shifting `x` right one bit (`x >>= 1` or
+`x /= 2`), and every other use of `x` in the body reads its low bit (`x & 1`, `x % 2`, `odd()`,
+`even()`, or `get_bit(0)`). Such a loop re-implements `bits()`, which says what it is doing:
+`for bit in x.bits() { if bit { .. } .. }`. Signed primitives are not flagged, since an arithmetic
+right shift never takes a negative value to zero.
 ### `use_exact_from`
 
 Flags `T::try_from(x).unwrap()` for an integer target `T`: use `T::exact_from(x)`, Malachite's

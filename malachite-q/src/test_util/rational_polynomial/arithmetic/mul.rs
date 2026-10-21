@@ -9,7 +9,9 @@
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
 use alloc::vec;
+use malachite_base::num::arithmetic::traits::AddMulAssign;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
 
 // Multiplies two polynomials by schoolbook multiplication, as `Rational`s, reading each coefficient
@@ -19,11 +21,11 @@ pub fn mul_naive(p: &RationalPolynomial, q: &RationalPolynomial) -> RationalPoly
     if n == 0 || m == 0 {
         return RationalPolynomial::ZERO;
     }
-    let mut out = vec![Rational::ZERO; usize::try_from(n + m - 1).unwrap()];
+    let mut out = vec![Rational::ZERO; usize::exact_from(n + m - 1)];
     for i in 0..n {
         let c = p.coefficient(i);
         for j in 0..m {
-            out[usize::try_from(i + j).unwrap()] += &c * q.coefficient(j);
+            out[usize::exact_from(i + j)].add_mul_assign(&c, q.coefficient(j));
         }
     }
     RationalPolynomial::from_coefficients_asc(out)

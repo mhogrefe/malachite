@@ -7,9 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::PowerOf2;
 
-// Multiplies by $2^k$ instead of shifting.
+// Forms the product and shifts it, and then adds or subtracts it, instead of fusing the steps.
 pub fn add_mul_shl_naive(x: &Integer, y: &Integer, z: &Integer, bits: u64) -> Integer {
-    x + y * z * Integer::power_of_2(bits)
+    x + ((y * z) << bits)
 }

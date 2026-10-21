@@ -6,8 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::Parity;
+use crate::num::arithmetic::traits::{Parity, PowerOf2};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::ExactFrom;
 use crate::polynomial::Polynomial;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec::Vec;
@@ -27,7 +28,7 @@ pub fn mod_power_of_2_integral_naive<T: PrimitiveUnsigned>(
     p: &UnsignedPolynomial<T>,
     pow: u64,
 ) -> Option<UnsignedPolynomial<T>> {
-    let mut coefficients = Vec::with_capacity(usize::try_from(p.len()).unwrap() + 1);
+    let mut coefficients = Vec::with_capacity(usize::exact_from(p.len()) + 1);
     if p.len() != 0 {
         coefficients.push(T::ZERO);
     }
@@ -37,7 +38,7 @@ pub fn mod_power_of_2_integral_naive<T: PrimitiveUnsigned>(
             coefficients.push(T::ZERO);
             continue;
         }
-        let k: u128 = u128::from(i + 1) % (1u128 << pow.min(127));
+        let k: u128 = u128::from(i + 1) % u128::power_of_2(pow.min(127));
         let k = T::wrapping_from(k).mod_power_of_2(pow);
         if k == T::ZERO {
             return None;

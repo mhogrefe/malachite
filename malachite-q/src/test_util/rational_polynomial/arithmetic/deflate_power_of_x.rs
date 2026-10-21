@@ -9,6 +9,7 @@
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
 use alloc::vec::Vec;
+use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::polynomial::Polynomial;
 
 // Returns `None` when some exponent with a nonzero coefficient is not a multiple of `n`, checking
@@ -16,12 +17,12 @@ use malachite_base::polynomial::Polynomial;
 // at a time through `coefficient`. Nothing is shared with the implementation.
 pub fn deflate_power_of_x_naive(p: &RationalPolynomial, n: u64) -> Option<RationalPolynomial> {
     assert_ne!(n, 0);
-    if (0..p.len()).any(|i| i % n != 0 && p.coefficient(i) != 0u32) {
+    if (0..p.len()).any(|i| !i.divisible_by(n) && p.coefficient(i) != 0u32) {
         return None;
     }
     Some(RationalPolynomial::from_coefficients_asc(
         (0..p.len())
-            .filter(|i| i % n == 0)
+            .filter(|&i| i.divisible_by(n))
             .map(|i| p.coefficient(i))
             .collect::<Vec<Rational>>(),
     ))

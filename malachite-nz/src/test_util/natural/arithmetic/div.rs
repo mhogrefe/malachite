@@ -68,8 +68,7 @@ fn limbs_div_limb_normalized_in_place(ns: &mut [Limb], ns_high: Limb, d: Limb, d
         let sum;
         (sum, big_carry) = DoubleLimb::join_halves(sum_low, ns[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
-        sum_high = sum.upper_half();
-        sum_low = sum.lower_half();
+        (sum_high, sum_low) = sum.split_in_half();
     }
     let mut q_high = 0;
     if big_carry {
@@ -135,8 +134,7 @@ fn limbs_div_limb_normalized_to_out(
         let sum;
         (sum, big_carry) = DoubleLimb::join_halves(sum_low, ns[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
-        sum_high = sum.upper_half();
-        sum_low = sum.lower_half();
+        (sum_high, sum_low) = sum.split_in_half();
     }
     let mut q_high = 0;
     if big_carry {

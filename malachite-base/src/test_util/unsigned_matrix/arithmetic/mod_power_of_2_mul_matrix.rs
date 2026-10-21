@@ -28,7 +28,7 @@ pub fn unsigned_matrix_mod_power_of_2_mul_matrix_naive<T: PrimitiveUnsigned>(
             let mut sum = T::ZERO;
             for (k, &x) in a.row_iter(i).enumerate() {
                 let y = b.elements[k * usize::exact_from(b.width()) + usize::exact_from(j)];
-                sum = sum.mod_power_of_2_add(x.mod_power_of_2_mul(y, pow), pow);
+                sum.mod_power_of_2_add_assign(x.mod_power_of_2_mul(y, pow), pow);
             }
             elements.push(sum);
         }

@@ -8,6 +8,7 @@
 use crate::num::arithmetic::traits::ModPowerOf2;
 use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::num::conversion::traits::JoinHalves;
 use crate::polynomial::Polynomial;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec;
@@ -42,7 +43,7 @@ pub fn mod_power_of_2_generated_coefficients<T: PrimitiveUnsigned>(
             state = state
                 .wrapping_mul(6364136223846793005)
                 .wrapping_add(1442695040888963407);
-            let x = (u128::from(high) << 64) | u128::from(state);
+            let x = u128::join_halves(high, state);
             T::wrapping_from(x.mod_power_of_2(pow))
         })
         .collect()

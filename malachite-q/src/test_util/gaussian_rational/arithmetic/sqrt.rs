@@ -8,7 +8,7 @@
 
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
-use malachite_base::num::arithmetic::traits::{DivExact, Lcm, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{DivExact, Lcm, Square, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
@@ -21,7 +21,7 @@ pub fn gaussian_rational_checked_sqrt_naive(z: &GaussianRational) -> Option<Gaus
         return Some(GaussianRational::ZERO);
     }
     let l = Integer::from(z.real.denominator_ref().lcm(z.imaginary.denominator_ref()));
-    let l_squared = (&l) * (&l);
+    let l_squared = (&l).square();
     let scaled = GaussianInteger {
         real: Integer::from_sign_and_abs(
             z.real >= 0u32,

@@ -707,7 +707,7 @@ pub fn exhaustive_float_float_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
 pub(crate) fn average_prec_round_valid(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> bool {
     // Rounding toward negative infinity reports whether the average is exactly representable, and
     // unlike a rational recomputation it stays cheap for extreme exponents.
-    rm != Exact || x.clone().average_prec_round(y.clone(), prec, Floor).1 == Equal
+    rm != Exact || x.average_prec_round_ref_ref(y, prec, Floor).1 == Equal
 }
 
 pub(crate) fn add_prec_round_valid(
@@ -3997,7 +3997,7 @@ pub fn log_base_prec_round_valid(x: &Float, base: u64, prec: u64, rm: RoundingMo
         return log_base_power_of_2_prec_round_valid(x, i64::from(base.trailing_zeros()), prec, rm);
     }
     match rational_log_base(x, base) {
-        Some(q) => Float::from_rational_prec_round(q, prec, Nearest).1 == Equal,
+        Some(q) => Float::from_rational_prec(q, prec).1 == Equal,
         None => false,
     }
 }
@@ -5953,7 +5953,7 @@ pub(crate) fn log_base_round_valid(x: &Float, base: u64, rm: RoundingMode) -> bo
         return log_base_power_of_2_round_valid(x, i64::from(base.trailing_zeros()), rm);
     }
     match rational_log_base(x, base) {
-        Some(q) => Float::from_rational_prec_round(q, x.significant_bits(), Nearest).1 == Equal,
+        Some(q) => Float::from_rational_prec(q, x.significant_bits()).1 == Equal,
         None => false,
     }
 }
@@ -6035,7 +6035,7 @@ pub fn log_base_10_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> b
     // rm == Exact and x is finite, positive, and not 1: exact only when x = 10^n and the integer n
     // is representable at the target precision.
     match float_is_power_of_10(x) {
-        Some(n) => Float::from_unsigned_prec_round(n, prec, Nearest).1 == Equal,
+        Some(n) => Float::from_unsigned_prec(n, prec).1 == Equal,
         None => false,
     }
 }
@@ -6136,7 +6136,7 @@ pub(crate) fn log_base_10_round_valid(x: &Float, rm: RoundingMode) -> bool {
         return true;
     }
     match float_is_power_of_10(x) {
-        Some(n) => Float::from_unsigned_prec_round(n, x.significant_bits(), Nearest).1 == Equal,
+        Some(n) => Float::from_unsigned_prec(n, x.significant_bits()).1 == Equal,
         None => false,
     }
 }
@@ -7993,7 +7993,7 @@ fn exhaustive_strtofr_quadruples(rug_compatible: bool) -> It<(String, u8, u64, R
     let combos = (0..3u32).flat_map(|kind| {
         (0..6).flat_map(move |marker| {
             (0..4).flat_map(move |variant| {
-                (0..3).map(move |sign| kind + 8 * marker + 48 * variant + 960 * sign)
+                (0..3).map(move |sign| kind + (marker << 3) + 48 * variant + 960 * sign)
             })
         })
     });

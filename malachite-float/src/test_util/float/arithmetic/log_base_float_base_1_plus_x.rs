@@ -12,6 +12,7 @@ use crate::test_util::common::{rounding_mode_from_rug_round, rug_float_significa
 use crate::test_util::float::arithmetic::log_base::simplest_dyadic_in;
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
+use malachite_base::num::arithmetic::traits::Reciprocal;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -43,7 +44,7 @@ fn rug_log_base_float_base_1_plus_x_exact(
     if br > 1u32 {
         rational_log_base_rational_rational_base(&one_plus_x, &br)
     } else {
-        rational_log_base_rational_rational_base(&one_plus_x, &(Rational::ONE / br)).map(|q| -q)
+        rational_log_base_rational_rational_base(&one_plus_x, &br.reciprocal()).map(|q| -q)
     }
 }
 

@@ -10,6 +10,7 @@ use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec;
 use alloc::vec::Vec;
+use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::polynomial::Polynomial;
 
@@ -29,7 +30,7 @@ pub fn compose_power_of_x_naive(p: &NaturalPolynomial, k: u64) -> NaturalPolynom
     NaturalPolynomial::from_coefficients_asc(
         (0..=(p.len() - 1) * k)
             .map(|i| {
-                if i % k == 0 {
+                if i.divisible_by(k) {
                     p.coefficient(i / k).clone()
                 } else {
                     Natural::ZERO

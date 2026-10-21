@@ -41,8 +41,8 @@ pub fn unsigned_vector_mod_power_of_2_cross_naive<T: PrimitiveUnsigned>(
                     for (k, &y) in ys.iter().enumerate() {
                         let product = x.mod_power_of_2_mul(y, pow);
                         match levi_civita(i, j, k) {
-                            1 => sum = sum.mod_power_of_2_add(product, pow),
-                            -1 => sum = sum.mod_power_of_2_sub(product, pow),
+                            1 => sum.mod_power_of_2_add_assign(product, pow),
+                            -1 => sum.mod_power_of_2_sub_assign(product, pow),
                             _ => {}
                         }
                     }
