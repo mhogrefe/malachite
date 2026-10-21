@@ -4753,6 +4753,19 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_6() -> It<(NaturalMatrix,
     )
 }
 
+// A square matrix with its elements less than 2 to the power of a `u64`, an exponent, and the
+// `u64`.
+pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_5()
+-> It<(NaturalMatrix, u64, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_matrix_unsigned_pair_gen_var_6(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((a, pow), exp)| (a, exp, pow)),
+    )
+}
+
 pub fn exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_1()
 -> It<(NaturalMatrix, u64, NaturalVector)> {
     Box::new(

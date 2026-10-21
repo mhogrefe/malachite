@@ -11209,6 +11209,20 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_7(
     )
 }
 
+pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_8(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64, u64)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_pair_gen_var_7(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("exp"),
+                config.get_or("mean_small_n", 16),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((a, pow), exp)| (a, exp, pow)),
+    )
+}
+
 pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_2(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64, u64)> {

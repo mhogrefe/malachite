@@ -397,6 +397,11 @@ documented by git history.
   $2^k$, computed as the product of the matrix with itself (with Strassen's algorithm for large
   `UnsignedMatrix`es); `NaturalMatrix`es whose modulus does not fit in a limb reduce the exact
   square. The elements must be reduced, and the matrix must be square.
+- `ModPowerOf2Pow<u64>` and `ModPowerOf2PowAssign<u64>` for square `UnsignedMatrix<T>`s, and for
+  square `NaturalMatrix`es in malachite-nz, with the matrix by value or by reference: the power
+  modulo $2^k$, by left-to-right binary powering with every product reduced, stopping early if a
+  power is the zero matrix. The 0th power is the identity matrix reduced modulo $2^k$. The elements
+  must be reduced, and the matrix must be square.
 - Performance: `XXXAddYYYToZZZ` and `XXXXAddYYYYToZZZZ` for `u8` through `u64` and `usize` now add
   the low two values as one double-width value, so that on aarch64 the carries chain through
   add-with-carry instructions instead of being recombined from two overflow flags. With the bounds

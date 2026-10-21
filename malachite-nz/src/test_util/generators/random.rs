@@ -8736,6 +8736,20 @@ pub fn random_natural_matrix_unsigned_pair_gen_var_6(
     )
 }
 
+pub fn random_natural_matrix_unsigned_unsigned_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, u64)> {
+    Box::new(
+        random_natural_matrix_unsigned_pair_gen_var_6(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("exp"),
+                config.get_or("mean_small_n", 16),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((a, pow), exp)| (a, exp, pow)),
+    )
+}
+
 pub fn random_natural_matrix_unsigned_natural_vector_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, u64, NaturalVector)> {

@@ -4867,6 +4867,16 @@ pub fn natural_matrix_unsigned_pair_gen_var_6() -> Generator<(NaturalMatrix, u64
     )
 }
 
+// All `(NaturalMatrix, u64, u64)` where the matrix is square and its elements are less than 2 to
+// the power of the last `u64`.
+pub fn natural_matrix_unsigned_unsigned_triple_gen_var_5() -> Generator<(NaturalMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_5,
+        &random_natural_matrix_unsigned_unsigned_triple_gen_var_5,
+        &special_random_natural_matrix_unsigned_unsigned_triple_gen_var_5,
+    )
+}
+
 // All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
 pub fn natural_matrix_unsigned_natural_vector_triple_gen_var_1()
 -> Generator<(NaturalMatrix, u64, NaturalVector)> {

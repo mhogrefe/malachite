@@ -81,6 +81,10 @@ pub mod mod_power_of_2_mul_vector;
 /// every element of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a power of 2.
 pub mod mod_power_of_2_neg;
 
+/// Implementations of [`ModPowerOf2Pow`](crate::num::arithmetic::traits::ModPowerOf2Pow) and
+/// [`ModPowerOf2PowAssign`](crate::num::arithmetic::traits::ModPowerOf2PowAssign), for raising a
+/// square matrix to a power modulo a power of 2.
+pub mod mod_power_of_2_pow;
 /// Implementations of [`ModPowerOf2Shl`](crate::num::arithmetic::traits::ModPowerOf2Shl) and
 /// [`ModPowerOf2ShlAssign`](crate::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a matrix (multiplying it by a power of 2) modulo another power of 2.

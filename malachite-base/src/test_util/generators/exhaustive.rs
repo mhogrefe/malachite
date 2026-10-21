@@ -7070,6 +7070,19 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_7() -> It<(UnsignedMatri
     )
 }
 
+// A square matrix with its elements less than 2 to the power of a `u64` no greater than 64, an
+// exponent, and the `u64`.
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_8()
+-> It<(UnsignedMatrix<u64>, u64, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_unsigned_matrix_unsigned_pair_gen_var_7(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((a, pow), exp)| (a, exp, pow)),
+    )
+}
+
 pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_5() -> It<(UnsignedMatrix<u64>, u64)> {
     fn ys(((height, width), m): ((u64, u64), u64)) -> It<UnsignedMatrix<u64>> {
         Box::new(exhaustive_unsigned_matrices_with_dimensions_from_iterator(
