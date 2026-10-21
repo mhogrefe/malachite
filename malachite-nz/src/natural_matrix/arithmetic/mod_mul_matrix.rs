@@ -131,11 +131,17 @@ impl ModMul<Self, Natural> for NaturalMatrix {
     ///
     /// let a = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
     /// let b = NaturalMatrix::from_str("[5, 6; 7, 8]").unwrap();
-    /// assert_eq!(a.mod_mul(b, Natural::from(9u32)).to_string(), "[1, 4; 7, 5]");
+    /// assert_eq!(
+    ///     a.mod_mul(b, Natural::from(9u32)).to_string(),
+    ///     "[1, 4; 7, 5]"
+    /// );
     ///
     /// let a = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
     /// let b = NaturalMatrix::from_str("[1, 0; 2, 1; 0, 3]").unwrap();
-    /// assert_eq!(a.mod_mul(b, Natural::from(7u32)).to_string(), "[5, 4; 0, 2]");
+    /// assert_eq!(
+    ///     a.mod_mul(b, Natural::from(7u32)).to_string(),
+    ///     "[5, 4; 0, 2]"
+    /// );
     ///
     /// let a =
     ///     NaturalMatrix::from_str("[10000000000000000000, 3; 7, 10000000000000000001]").unwrap();
@@ -184,11 +190,17 @@ impl ModMul<Self, &Natural> for NaturalMatrix {
     ///
     /// let a = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
     /// let b = NaturalMatrix::from_str("[5, 6; 7, 8]").unwrap();
-    /// assert_eq!(a.mod_mul(b, &Natural::from(9u32)).to_string(), "[1, 4; 7, 5]");
+    /// assert_eq!(
+    ///     a.mod_mul(b, &Natural::from(9u32)).to_string(),
+    ///     "[1, 4; 7, 5]"
+    /// );
     ///
     /// let a = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
     /// let b = NaturalMatrix::from_str("[1, 0; 2, 1; 0, 3]").unwrap();
-    /// assert_eq!(a.mod_mul(b, &Natural::from(7u32)).to_string(), "[5, 4; 0, 2]");
+    /// assert_eq!(
+    ///     a.mod_mul(b, &Natural::from(7u32)).to_string(),
+    ///     "[5, 4; 0, 2]"
+    /// );
     ///
     /// let a =
     ///     NaturalMatrix::from_str("[10000000000000000000, 3; 7, 10000000000000000001]").unwrap();
@@ -237,11 +249,17 @@ impl ModMul<&Self, Natural> for NaturalMatrix {
     ///
     /// let a = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
     /// let b = NaturalMatrix::from_str("[5, 6; 7, 8]").unwrap();
-    /// assert_eq!(a.mod_mul(&b, Natural::from(9u32)).to_string(), "[1, 4; 7, 5]");
+    /// assert_eq!(
+    ///     a.mod_mul(&b, Natural::from(9u32)).to_string(),
+    ///     "[1, 4; 7, 5]"
+    /// );
     ///
     /// let a = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
     /// let b = NaturalMatrix::from_str("[1, 0; 2, 1; 0, 3]").unwrap();
-    /// assert_eq!(a.mod_mul(&b, Natural::from(7u32)).to_string(), "[5, 4; 0, 2]");
+    /// assert_eq!(
+    ///     a.mod_mul(&b, Natural::from(7u32)).to_string(),
+    ///     "[5, 4; 0, 2]"
+    /// );
     ///
     /// let a =
     ///     NaturalMatrix::from_str("[10000000000000000000, 3; 7, 10000000000000000001]").unwrap();
@@ -290,11 +308,17 @@ impl ModMul<&Self, &Natural> for NaturalMatrix {
     ///
     /// let a = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
     /// let b = NaturalMatrix::from_str("[5, 6; 7, 8]").unwrap();
-    /// assert_eq!(a.mod_mul(&b, &Natural::from(9u32)).to_string(), "[1, 4; 7, 5]");
+    /// assert_eq!(
+    ///     a.mod_mul(&b, &Natural::from(9u32)).to_string(),
+    ///     "[1, 4; 7, 5]"
+    /// );
     ///
     /// let a = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
     /// let b = NaturalMatrix::from_str("[1, 0; 2, 1; 0, 3]").unwrap();
-    /// assert_eq!(a.mod_mul(&b, &Natural::from(7u32)).to_string(), "[5, 4; 0, 2]");
+    /// assert_eq!(
+    ///     a.mod_mul(&b, &Natural::from(7u32)).to_string(),
+    ///     "[5, 4; 0, 2]"
+    /// );
     ///
     /// let a =
     ///     NaturalMatrix::from_str("[10000000000000000000, 3; 7, 10000000000000000001]").unwrap();
@@ -343,11 +367,17 @@ impl ModMul<NaturalMatrix, Natural> for &NaturalMatrix {
     ///
     /// let a = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
     /// let b = NaturalMatrix::from_str("[5, 6; 7, 8]").unwrap();
-    /// assert_eq!((&a).mod_mul(b, Natural::from(9u32)).to_string(), "[1, 4; 7, 5]");
+    /// assert_eq!(
+    ///     (&a).mod_mul(b, Natural::from(9u32)).to_string(),
+    ///     "[1, 4; 7, 5]"
+    /// );
     ///
     /// let a = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
     /// let b = NaturalMatrix::from_str("[1, 0; 2, 1; 0, 3]").unwrap();
-    /// assert_eq!((&a).mod_mul(b, Natural::from(7u32)).to_string(), "[5, 4; 0, 2]");
+    /// assert_eq!(
+    ///     (&a).mod_mul(b, Natural::from(7u32)).to_string(),
+    ///     "[5, 4; 0, 2]"
+    /// );
     ///
     /// let a =
     ///     NaturalMatrix::from_str("[10000000000000000000, 3; 7, 10000000000000000001]").unwrap();
@@ -394,11 +424,17 @@ impl ModMul<NaturalMatrix, &Natural> for &NaturalMatrix {
     ///
     /// let a = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
     /// let b = NaturalMatrix::from_str("[5, 6; 7, 8]").unwrap();
-    /// assert_eq!((&a).mod_mul(b, &Natural::from(9u32)).to_string(), "[1, 4; 7, 5]");
+    /// assert_eq!(
+    ///     (&a).mod_mul(b, &Natural::from(9u32)).to_string(),
+    ///     "[1, 4; 7, 5]"
+    /// );
     ///
     /// let a = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
     /// let b = NaturalMatrix::from_str("[1, 0; 2, 1; 0, 3]").unwrap();
-    /// assert_eq!((&a).mod_mul(b, &Natural::from(7u32)).to_string(), "[5, 4; 0, 2]");
+    /// assert_eq!(
+    ///     (&a).mod_mul(b, &Natural::from(7u32)).to_string(),
+    ///     "[5, 4; 0, 2]"
+    /// );
     ///
     /// let a =
     ///     NaturalMatrix::from_str("[10000000000000000000, 3; 7, 10000000000000000001]").unwrap();
@@ -445,11 +481,17 @@ impl ModMul<&NaturalMatrix, Natural> for &NaturalMatrix {
     ///
     /// let a = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
     /// let b = NaturalMatrix::from_str("[5, 6; 7, 8]").unwrap();
-    /// assert_eq!((&a).mod_mul(&b, Natural::from(9u32)).to_string(), "[1, 4; 7, 5]");
+    /// assert_eq!(
+    ///     (&a).mod_mul(&b, Natural::from(9u32)).to_string(),
+    ///     "[1, 4; 7, 5]"
+    /// );
     ///
     /// let a = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
     /// let b = NaturalMatrix::from_str("[1, 0; 2, 1; 0, 3]").unwrap();
-    /// assert_eq!((&a).mod_mul(&b, Natural::from(7u32)).to_string(), "[5, 4; 0, 2]");
+    /// assert_eq!(
+    ///     (&a).mod_mul(&b, Natural::from(7u32)).to_string(),
+    ///     "[5, 4; 0, 2]"
+    /// );
     ///
     /// let a =
     ///     NaturalMatrix::from_str("[10000000000000000000, 3; 7, 10000000000000000001]").unwrap();
@@ -496,11 +538,17 @@ impl ModMul<&NaturalMatrix, &Natural> for &NaturalMatrix {
     ///
     /// let a = NaturalMatrix::from_str("[1, 2; 3, 4]").unwrap();
     /// let b = NaturalMatrix::from_str("[5, 6; 7, 8]").unwrap();
-    /// assert_eq!((&a).mod_mul(&b, &Natural::from(9u32)).to_string(), "[1, 4; 7, 5]");
+    /// assert_eq!(
+    ///     (&a).mod_mul(&b, &Natural::from(9u32)).to_string(),
+    ///     "[1, 4; 7, 5]"
+    /// );
     ///
     /// let a = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
     /// let b = NaturalMatrix::from_str("[1, 0; 2, 1; 0, 3]").unwrap();
-    /// assert_eq!((&a).mod_mul(&b, &Natural::from(7u32)).to_string(), "[5, 4; 0, 2]");
+    /// assert_eq!(
+    ///     (&a).mod_mul(&b, &Natural::from(7u32)).to_string(),
+    ///     "[5, 4; 0, 2]"
+    /// );
     ///
     /// let a =
     ///     NaturalMatrix::from_str("[10000000000000000000, 3; 7, 10000000000000000001]").unwrap();

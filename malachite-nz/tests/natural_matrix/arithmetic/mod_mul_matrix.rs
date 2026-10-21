@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, ModIsReduced, ModMul, ModMulAssign, ModPowerOf2Mul,
 };
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::generators::*;
 use malachite_nz::natural::Natural;
@@ -111,7 +112,7 @@ fn test_mod_mul_matrix() {
 fn mod_mul_matrix_fail_1() {
     // The modulus is zero.
     let a = NaturalMatrix::from_str("[]_{0,0}").unwrap();
-    let _ = (&a).mod_mul(&a, Natural::from(0u32));
+    let _ = (&a).mod_mul(&a, Natural::ZERO);
 }
 
 #[test]
