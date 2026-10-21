@@ -310,5 +310,9 @@ int run__nmod_vec_invert(const char * arg);
 /* matrix_mul.c */
 int run_fmpz_mat_mul(const char * arg);
 int run_nmod_mat_mul(const char * arg);
+int run_nmod_mat_howell_form(const char * arg);
+int run_nmod_mat_strong_echelon_form(const char * arg);
+int run_fmpz_mod_mat_howell_form(const char * arg);
+int run_fmpz_mod_mat_strong_echelon_form(const char * arg);
 
 #endif

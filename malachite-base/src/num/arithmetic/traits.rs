@@ -2085,6 +2085,36 @@ pub trait ModKroneckerProductAssign<RHS = Self, M = Self> {
     fn mod_kronecker_product_assign(&mut self, other: RHS, m: M);
 }
 
+/// Computes the Howell form of a matrix modulo $m$: the unique matrix whose rows span the same
+/// module over $\mathbb{Z}/m\mathbb{Z}$ as the rows of the original, in a canonical upper echelon
+/// form with its zero rows last. The elements of the matrix must already be reduced modulo $m$.
+pub trait ModHowellForm<M = Self> {
+    type Output;
+
+    fn mod_howell_form(self, m: M) -> Self::Output;
+}
+
+/// Replaces a matrix with its Howell form modulo $m$. The elements of the matrix must already be
+/// reduced modulo $m$.
+pub trait ModHowellFormAssign<M = Self> {
+    fn mod_howell_form_assign(&mut self, m: M);
+}
+
+/// Computes the strong echelon form of a matrix modulo $m$: the Howell form, but with each nonzero
+/// row in the row whose index is the column of its pivot. The elements of the matrix must already
+/// be reduced modulo $m$.
+pub trait ModStrongEchelonForm<M = Self> {
+    type Output;
+
+    fn mod_strong_echelon_form(self, m: M) -> Self::Output;
+}
+
+/// Replaces a matrix with its strong echelon form modulo $m$. The elements of the matrix must
+/// already be reduced modulo $m$.
+pub trait ModStrongEchelonFormAssign<M = Self> {
+    fn mod_strong_echelon_form_assign(&mut self, m: M);
+}
+
 /// Calculates the Kronecker symbol of two numbers.
 pub trait KroneckerSymbol<RHS = Self> {
     fn kronecker_symbol(self, other: RHS) -> i8;

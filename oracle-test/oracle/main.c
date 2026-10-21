@@ -173,6 +173,10 @@ static const oracle_mode modes[] = {
     {"_nmod_vec_invert", run__nmod_vec_invert},
     {"fmpz_mat_mul", run_fmpz_mat_mul},
     {"nmod_mat_mul", run_nmod_mat_mul},
+    {"nmod_mat_howell_form", run_nmod_mat_howell_form},
+    {"nmod_mat_strong_echelon_form", run_nmod_mat_strong_echelon_form},
+    {"fmpz_mod_mat_howell_form", run_fmpz_mod_mat_howell_form},
+    {"fmpz_mod_mat_strong_echelon_form", run_fmpz_mod_mat_strong_echelon_form},
 };
 
 int

@@ -120,7 +120,7 @@ use malachite_base::iterators::with_special_value;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
     AddMul, ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy,
-    DivisibleByPowerOf2, EqMod, EqModPowerOf2, Height, HeightRef, Mod, ModPowerOf2, Parity,
+    DivisibleByPowerOf2, EqMod, EqModPowerOf2, Height, HeightRef, Mod, ModPowerOf2, Parity, Pow,
     PowerOf2, RoundToMultipleOfPowerOf2Assign, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -8205,6 +8205,47 @@ pub fn random_natural_matrix_natural_pair_gen(config: &GenConfig) -> It<(Natural
             )
         },
     ))
+}
+
+// A matrix of random shape with elements less than a random smooth `Natural`, and the `Natural`.
+pub fn random_natural_matrix_natural_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    let mut exponents = geometric_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("exponents"),
+        config.get_or("mean_exponent_n", 24),
+        config.get_or("mean_exponent_d", 1),
+    );
+    let mut cofactors = geometric_random_positive_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("cofactors"),
+        config.get_or("mean_cofactor_n", 4),
+        config.get_or("mean_cofactor_d", 1),
+    );
+    let mut xs = random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_bits_n", 128),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let mut m = Natural::from(cofactors.next().unwrap());
+            for p in [2u32, 3, 5] {
+                m *= Natural::from(p).pow(exponents.next().unwrap());
+            }
+            let n = usize::exact_from(height * width);
+            let a = NaturalMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(n).map(|x| x % &m).collect(),
+            );
+            (a, m)
+        }),
+    )
 }
 
 pub fn random_natural_matrix_natural_unsigned_triple_gen_var_1(

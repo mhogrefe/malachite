@@ -438,6 +438,14 @@ documented by git history.
   each operand by value or by reference: the Kronecker product modulo $2^k$ of two matrices whose
   elements are reduced. `UnsignedMatrix` elements are wrapping products with the high bits
   cleared; `NaturalMatrix`es use the `UnsignedMatrix<Limb>` product when $2^k$ fits in a limb.
+- New `ModStrongEchelonForm`, `ModStrongEchelonFormAssign`, `ModHowellForm`, and
+  `ModHowellFormAssign` traits in malachite-base, implemented for `UnsignedMatrix<T>` and, in
+  malachite-nz, `NaturalMatrix`, with the matrix by value or by reference: the strong echelon form
+  and the Howell form modulo $m$ of a matrix whose elements are reduced, like FLINT's
+  `nmod_mat_strong_echelon_form`, `nmod_mat_howell_form`, `fmpz_mat_strong_echelon_form_mod`, and
+  `fmpz_mat_howell_form_mod`. Both forms are canonical, so they work for composite $m$. A matrix
+  with fewer rows than columns is first given zero rows until it is square. `NaturalMatrix`es use
+  the `UnsignedMatrix<Limb>` kernel when $m$ fits in a limb.
 - `RationalMatrix::to_numerators_and_row_denominators`, `into_numerators_and_row_denominators`,
   `to_numerators_and_column_denominators`, and `into_numerators_and_column_denominators`, which
   clear the denominators of each row, or each column, returning an `IntegerMatrix` and a

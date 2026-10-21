@@ -11751,6 +11751,39 @@ pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_6(
     )
 }
 
+// A matrix of random shape with elements less than a small random positive `u64`, and the `u64`.
+pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_9(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    let mut ms = geometric_random_positive_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("m"),
+        config.get_or("mean_m_n", 32),
+        config.get_or("mean_m_d", 1),
+    );
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let m = ms.next().unwrap();
+            let n = usize::exact_from(height * width);
+            let a = UnsignedMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(n).map(|x| x % m).collect(),
+            );
+            (a, m)
+        }),
+    )
+}
+
 pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_2(
     config: &GenConfig,
 ) -> It<(

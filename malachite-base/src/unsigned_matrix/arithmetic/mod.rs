@@ -26,6 +26,46 @@ pub mod content_chained;
 /// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.
 pub mod mod_add;
+/// Implementations of [`ModHowellForm`](crate::num::arithmetic::traits::ModHowellForm) and
+/// [`ModHowellFormAssign`](crate::num::arithmetic::traits::ModHowellFormAssign), for computing the
+/// Howell form of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a number.
+///
+/// # mod_howell_form
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModHowellForm;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// let a = UnsignedMatrix::<u8>::from_str("[4, 2; 2, 0]").unwrap();
+/// assert_eq!(a.mod_howell_form(8).to_string(), "[2, 0; 0, 2]");
+///
+/// // A matrix with fewer rows than columns may gain nonzero rows: here 2 * [2, 1] = [0, 2].
+/// let a = UnsignedMatrix::<u8>::from_str("[2, 1]").unwrap();
+/// assert_eq!(a.mod_howell_form(4).to_string(), "[2, 1; 0, 2]");
+///
+/// // The zero rows come last.
+/// let a = UnsignedMatrix::<u8>::from_str("[0, 2; 0, 0; 0, 0]").unwrap();
+/// assert_eq!(a.mod_howell_form(4).to_string(), "[0, 2; 0, 0; 0, 0]");
+///
+/// let a = UnsignedMatrix::<u8>::from_str("[3, 6; 6, 3]").unwrap();
+/// assert_eq!(a.mod_howell_form(9).to_string(), "[3, 6; 0, 0]");
+/// ```
+///
+/// # mod_howell_form_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModHowellFormAssign;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// let mut a = UnsignedMatrix::<u8>::from_str("[4, 2; 2, 0]").unwrap();
+/// a.mod_howell_form_assign(8);
+/// assert_eq!(a.to_string(), "[2, 0; 0, 2]");
+///
+/// let mut a = UnsignedMatrix::<u8>::from_str("[2, 1]").unwrap();
+/// a.mod_howell_form_assign(4);
+/// assert_eq!(a.to_string(), "[2, 1; 0, 2]");
+/// ```
+pub mod mod_howell_form;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), a trait for
 /// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
 /// a number.
@@ -197,6 +237,53 @@ pub mod mod_shl;
 /// [`ModSquareAssign`](crate::num::arithmetic::traits::ModSquareAssign), for squaring a square
 /// matrix modulo a number.
 pub mod mod_square;
+/// Implementations of [`ModStrongEchelonForm`][sef] and [`ModStrongEchelonFormAssign`][sefa], for
+/// computing the strong echelon form of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a
+/// number.
+///
+/// [sef]: crate::num::arithmetic::traits::ModStrongEchelonForm
+///
+/// [sefa]: crate::num::arithmetic::traits::ModStrongEchelonFormAssign
+///
+/// # mod_strong_echelon_form
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModStrongEchelonForm;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// let a = UnsignedMatrix::<u8>::from_str("[4, 2; 2, 0]").unwrap();
+/// assert_eq!(a.mod_strong_echelon_form(8).to_string(), "[2, 0; 0, 2]");
+///
+/// // A matrix with fewer rows than columns may gain nonzero rows: here 2 * [2, 1] = [0, 2].
+/// let a = UnsignedMatrix::<u8>::from_str("[2, 1]").unwrap();
+/// assert_eq!(a.mod_strong_echelon_form(4).to_string(), "[2, 1; 0, 2]");
+///
+/// // Each nonzero row is in the row whose index is the column of its pivot.
+/// let a = UnsignedMatrix::<u8>::from_str("[0, 2; 0, 0; 0, 0]").unwrap();
+/// assert_eq!(
+///     a.mod_strong_echelon_form(4).to_string(),
+///     "[0, 0; 0, 2; 0, 0]"
+/// );
+///
+/// let a = UnsignedMatrix::<u8>::from_str("[3, 6; 6, 3]").unwrap();
+/// assert_eq!(a.mod_strong_echelon_form(9).to_string(), "[3, 6; 0, 0]");
+/// ```
+///
+/// # mod_strong_echelon_form_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::ModStrongEchelonFormAssign;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// let mut a = UnsignedMatrix::<u8>::from_str("[4, 2; 2, 0]").unwrap();
+/// a.mod_strong_echelon_form_assign(8);
+/// assert_eq!(a.to_string(), "[2, 0; 0, 2]");
+///
+/// let mut a = UnsignedMatrix::<u8>::from_str("[2, 1]").unwrap();
+/// a.mod_strong_echelon_form_assign(4);
+/// assert_eq!(a.to_string(), "[2, 1; 0, 2]");
+/// ```
+pub mod mod_strong_echelon_form;
 /// Implementations of [`ModSub`](crate::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](crate::num::arithmetic::traits::ModSubAssign), for subtracting
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.

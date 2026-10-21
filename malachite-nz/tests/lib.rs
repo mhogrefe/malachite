@@ -1072,6 +1072,7 @@ pub mod natural_matrix {
         pub mod crt;
         pub mod kronecker_product;
         pub mod mod_add;
+        pub mod mod_howell_form;
         pub mod mod_is_reduced;
         pub mod mod_kronecker_product;
         pub mod mod_mul;
@@ -1095,6 +1096,7 @@ pub mod natural_matrix {
         pub mod mod_power_of_2_trace;
         pub mod mod_shl;
         pub mod mod_square;
+        pub mod mod_strong_echelon_form;
         pub mod mod_sub;
         pub mod mod_trace;
         pub mod mul;

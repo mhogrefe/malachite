@@ -48,6 +48,13 @@ pub mod kronecker_product;
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
 pub mod mod_add;
+/// Implementations of [`ModHowellForm`][hf] and [`ModHowellFormAssign`][hfa], for computing the
+/// Howell form of a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
+///
+/// [hf]: malachite_base::num::arithmetic::traits::ModHowellForm
+///
+/// [hfa]: malachite_base::num::arithmetic::traits::ModHowellFormAssign
+pub mod mod_howell_form;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced), a
 /// trait for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
 /// modulo a number.
@@ -234,6 +241,13 @@ pub mod mod_shl;
 /// [`ModSquareAssign`](malachite_base::num::arithmetic::traits::ModSquareAssign), for squaring a
 /// square [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
 pub mod mod_square;
+/// Implementations of [`ModStrongEchelonForm`][sef] and [`ModStrongEchelonFormAssign`][sefa], for
+/// computing the strong echelon form of a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
+///
+/// [sef]: malachite_base::num::arithmetic::traits::ModStrongEchelonForm
+///
+/// [sefa]: malachite_base::num::arithmetic::traits::ModStrongEchelonFormAssign
+pub mod mod_strong_echelon_form;
 /// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
 /// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.

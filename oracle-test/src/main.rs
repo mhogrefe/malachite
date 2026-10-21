@@ -3685,4 +3685,27 @@ fn test_against_flint() {
         "nmod_mat_mul",
         5,
     );
+
+    // The Howell and strong echelon forms of UnsignedMatrixes and NaturalMatrixes, against
+    // nmod_mat_howell_form, nmod_mat_strong_echelon_form, fmpz_mat_howell_form_mod, and
+    // fmpz_mat_strong_echelon_form_mod. The NaturalMatrix demos' moduli are products of powers of
+    // small primes, so most have more than 64 bits and every case has zero divisors.
+    for (crate_dir, matrix, flint_prefix) in [
+        ("../malachite-base", "unsigned_matrix", "nmod_mat"),
+        ("../malachite-nz", "natural_matrix", "fmpz_mod_mat"),
+    ] {
+        for (op, flint_op) in [
+            ("mod_howell_form", "howell_form"),
+            ("mod_strong_echelon_form", "strong_echelon_form"),
+        ] {
+            for suffix in ["", "_ref", "_assign"] {
+                check_demo_against_flint(
+                    &oracle,
+                    crate_dir,
+                    &format!("demo_{matrix}_{op}{suffix}"),
+                    &format!("{flint_prefix}_{flint_op}"),
+                );
+            }
+        }
+    }
 }

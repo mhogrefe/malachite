@@ -4512,6 +4512,17 @@ pub fn natural_matrix_natural_pair_gen_var_3() -> Generator<(NaturalMatrix, Natu
     )
 }
 
+// All `(NaturalMatrix, Natural)` where every element of the matrix is less than the `Natural`, with
+// the random modes choosing moduli of the form `2^a * 3^b * 5^c * k` for small `k`, which have
+// repeated prime factors and often more than 64 bits.
+pub fn natural_matrix_natural_pair_gen_var_4() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_2,
+        &random_natural_matrix_natural_pair_gen_var_4,
+        &special_random_natural_matrix_natural_pair_gen_var_4,
+    )
+}
+
 // All `(NaturalMatrix, NaturalMatrix, u64)` where the matrices have the same shape and every
 // element is less than 2 to the power of the `u64`.
 pub fn natural_matrix_natural_matrix_unsigned_triple_gen_var_1()
