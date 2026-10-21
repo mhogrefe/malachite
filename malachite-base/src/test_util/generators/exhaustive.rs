@@ -7083,6 +7083,18 @@ pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_8()
     )
 }
 
+// A square matrix with its elements less than a positive `u64`, an exponent, and the `u64`.
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_9()
+-> It<(UnsignedMatrix<u64>, u64, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_unsigned_matrix_unsigned_pair_gen_var_8(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((a, m), exp)| (a, exp, m)),
+    )
+}
+
 pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_5() -> It<(UnsignedMatrix<u64>, u64)> {
     fn ys(((height, width), m): ((u64, u64), u64)) -> It<UnsignedMatrix<u64>> {
         Box::new(exhaustive_unsigned_matrices_with_dimensions_from_iterator(

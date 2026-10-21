@@ -4888,6 +4888,18 @@ pub fn natural_matrix_unsigned_unsigned_triple_gen_var_5() -> Generator<(Natural
     )
 }
 
+// All `(NaturalMatrix, u64, Natural)` where the matrix is square and its elements are less than the
+// `Natural`.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn natural_matrix_unsigned_natural_triple_gen_var_2() -> Generator<(NaturalMatrix, u64, Natural)>
+{
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_natural_triple_gen_var_2,
+        &random_natural_matrix_unsigned_natural_triple_gen_var_2,
+        &special_random_natural_matrix_unsigned_natural_triple_gen_var_2,
+    )
+}
+
 // All `(m, i, v)` with `i` a row index of `m` and `v` a vector whose dimension is the width of `m`.
 pub fn natural_matrix_unsigned_natural_vector_triple_gen_var_1()
 -> Generator<(NaturalMatrix, u64, NaturalVector)> {

@@ -4787,6 +4787,18 @@ pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_5()
     )
 }
 
+// A square matrix with its elements less than a `Natural`, an exponent, and the `Natural`.
+pub fn exhaustive_natural_matrix_unsigned_natural_triple_gen_var_2()
+-> It<(NaturalMatrix, u64, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_matrix_natural_pair_gen_var_3(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((a, m), exp)| (a, exp, m)),
+    )
+}
+
 pub fn exhaustive_natural_matrix_unsigned_natural_vector_triple_gen_var_1()
 -> It<(NaturalMatrix, u64, NaturalVector)> {
     Box::new(

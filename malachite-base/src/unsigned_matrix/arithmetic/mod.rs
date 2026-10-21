@@ -51,6 +51,10 @@ pub mod mod_neg;
 /// [`ModAssign`](crate::num::arithmetic::traits::ModAssign), for reducing every element of an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) modulo a number.
 pub mod mod_op;
+/// Implementations of [`ModPow`](crate::num::arithmetic::traits::ModPow) and
+/// [`ModPowAssign`](crate::num::arithmetic::traits::ModPowAssign), for raising a square matrix to a
+/// power modulo a number.
+pub mod mod_pow;
 /// Implementations of [`ModPowerOf2`](crate::num::arithmetic::traits::ModPowerOf2) and
 /// [`ModPowerOf2Assign`](crate::num::arithmetic::traits::ModPowerOf2Assign), traits for reducing
 /// every element of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a power of 2.

@@ -5549,6 +5549,17 @@ pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_8()
     )
 }
 
+// All `(UnsignedMatrix<u64>, u64, u64)` where the matrix is square, the last `u64` is positive, and
+// the matrix's elements are less than it.
+pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_9()
+-> Generator<(UnsignedMatrix<u64>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_9,
+        &random_unsigned_matrix_unsigned_unsigned_triple_gen_var_9,
+        &special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_9,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, u64)` where the matrix is square, the `u64` is positive, and the
 // matrix's elements are less than it.
 pub fn unsigned_matrix_unsigned_pair_gen_var_8() -> Generator<(UnsignedMatrix<u64>, u64)> {

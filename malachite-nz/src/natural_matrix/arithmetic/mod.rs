@@ -68,6 +68,10 @@ pub mod mod_neg;
 /// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), for reducing every element of
 /// a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
 pub mod mod_op;
+/// Implementations of [`ModPow`](malachite_base::num::arithmetic::traits::ModPow) and
+/// [`ModPowAssign`](malachite_base::num::arithmetic::traits::ModPowAssign), for raising a square
+/// [`NaturalMatrix`](super::NaturalMatrix) to a power modulo a number.
+pub mod mod_pow;
 /// Implementations of [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2) and
 /// [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign), traits for
 /// reducing every element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a power of 2.

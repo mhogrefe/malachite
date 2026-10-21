@@ -396,6 +396,12 @@ documented by git history.
   `ModMul` (FLINT has no `nmod_mat_sqr`); `NaturalMatrix`es use the `UnsignedMatrix<Limb>` square
   when the modulus fits in a limb and otherwise reduce the exact square, like FLINT's
   `fmpz_mod_mat_sqr`. The elements must be reduced, and the matrix must be square.
+- `ModPow<u64>` and `ModPowAssign<u64>` for square `UnsignedMatrix<T>`s, and for square
+  `NaturalMatrix`es with a `Natural` modulus in malachite-nz, with the matrix (and modulus) by value
+  or by reference: the power modulo $m$, like FLINT's `nmod_mat_pow` and `fmpz_mod_mat_pow_ui`, by
+  left-to-right binary powering that stops early at a zero power; $A^0$ is the identity reduced
+  modulo $m$. `NaturalMatrix`es use the `UnsignedMatrix<Limb>` power when the modulus fits in a
+  limb. The elements must be reduced, and the matrix must be square.
 - `ModPowerOf2Mul` and `ModPowerOf2MulAssign` between two `UnsignedMatrix<T>`s, and between two
   `NaturalMatrix`es in malachite-nz, with each operand by value or by reference: the matrix product
   modulo $2^k$. `UnsignedMatrix`es are multiplied in wrapping arithmetic, with Strassen's algorithm
