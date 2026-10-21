@@ -84,6 +84,21 @@ pub(crate) fn divide_columns(
     )
 }
 
+// Divides every element of `numerators` by `denominator`, and reduces it.
+pub(crate) fn divide_all(
+    numerators: IntegerMatrix,
+    height: usize,
+    width: usize,
+    denominator: &Natural,
+) -> RationalMatrix {
+    divide_by_denominators(
+        numerators,
+        height,
+        width,
+        repeat_n(denominator, height * width).cloned(),
+    )
+}
+
 pub(crate) fn assert_product_compatible(a_width: usize, b_height: usize) {
     assert_eq!(
         a_width, b_height,
@@ -107,7 +122,7 @@ pub(crate) fn take_matrix(a: &mut RationalMatrix) -> RationalMatrix {
 // This is equivalent to `fmpq_mat_mul_cleared` from `fmpq_mat/mul_cleared.c`, FLINT 3.6.0, where
 // `fmpq_mat_get_fmpz_mat_rowwise` and `fmpq_mat_get_fmpz_mat_colwise` have already cleared the
 // denominators.
-fn mul_cleared(
+pub(crate) fn mul_cleared(
     (a_numerators, a_denominators): (IntegerMatrix, NaturalVector),
     (b_numerators, b_denominators): (IntegerMatrix, NaturalVector),
 ) -> RationalMatrix {
@@ -129,7 +144,7 @@ fn mul_cleared(
 //
 // This is equivalent to `fmpq_mat_mul_direct` from `fmpq_mat/mul_direct.c`, FLINT 3.6.0, for an
 // inner dimension of 1.
-private_test_fn! {mul_outer(a: &RationalMatrix, b: &RationalMatrix) -> RationalMatrix {
+crate_test_fn! {mul_outer(a: &RationalMatrix, b: &RationalMatrix) -> RationalMatrix {
     assert_eq!(a.width, 1);
     assert_eq!(b.height, 1);
     RationalMatrix {

@@ -413,6 +413,10 @@ documented by git history.
   `RationalMatrix` by an `IntegerMatrix`, with each operand by value or by reference, like FLINT's
   `fmpq_mat_mul_fmpz_mat` and `fmpq_mat_mul_r_fmpz_mat`: only the rational factor's denominators
   are cleared.
+- `Square` and `SquareAssign` for square `RationalMatrix`es in malachite-q, with the matrix by value
+  or by reference. FLINT has no `fmpq_mat_sqr`: the square is the product of the matrix with
+  itself, except that when every row and column has the same denominator $d$, the integer matrix
+  $N = dA$ is squared (with Bodrato's algorithm for small matrices) and divided by $d^2$.
 - `RationalMatrix::to_numerators_and_row_denominators`, `into_numerators_and_row_denominators`,
   `to_numerators_and_column_denominators`, and `into_numerators_and_column_denominators`, which
   clear the denominators of each row, or each column, returning an `IntegerMatrix` and a

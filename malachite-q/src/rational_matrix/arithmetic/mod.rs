@@ -143,6 +143,10 @@ pub mod shl;
 /// assert_eq!(a.to_string(), "[2, -3, 12]");
 /// ```
 pub mod shr;
+/// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
+/// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a square
+/// [`RationalMatrix`](super::RationalMatrix).
+pub mod square;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;

@@ -10,6 +10,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
 use alloc::vec::Vec;
 use core::iter::repeat_n;
@@ -73,29 +74,10 @@ impl RationalMatrix {
     /// assert_eq!(ds.to_string(), "()");
     /// ```
     pub fn to_numerators_and_row_denominators(&self) -> (IntegerMatrix, NaturalVector) {
-        let mut denominators = Vec::with_capacity(self.height);
-        for i in 0..self.height() {
-            let mut d = Natural::ONE;
-            for x in self.row_iter(i) {
-                d.lcm_assign(x.denominator_ref());
-            }
-            denominators.push(d);
-        }
-        let numerators = self
-            .elements
-            .iter()
-            .zip(denominators.iter().flat_map(|d| repeat_n(d, self.width)))
-            .map(|(x, d)| {
-                let n = if *d == 1u32 {
-                    x.numerator_ref().clone()
-                } else {
-                    d.div_exact(x.denominator_ref()) * x.numerator_ref()
-                };
-                Integer::from_sign_and_abs(*x >= 0u32, n)
-            })
-            .collect();
+        let denominators = self.row_denominators();
+        let numerators = self.scale_by_row_denominators(&denominators);
         (
-            IntegerMatrix::from_owned_elements(self.height(), self.width(), numerators),
+            numerators,
             NaturalVector {
                 elements: denominators,
             },
@@ -144,34 +126,91 @@ impl RationalMatrix {
     /// assert_eq!(ds.to_string(), "()");
     /// ```
     pub fn into_numerators_and_row_denominators(self) -> (IntegerMatrix, NaturalVector) {
-        let mut denominators = Vec::with_capacity(self.height);
-        for i in 0..self.height() {
-            let mut d = Natural::ONE;
-            for x in self.row_iter(i) {
-                d.lcm_assign(x.denominator_ref());
-            }
-            denominators.push(d);
-        }
-        let (height, width) = (self.height(), self.width());
-        let width_usize = self.width;
-        let numerators = self
-            .elements
-            .into_iter()
-            .zip(denominators.iter().flat_map(|d| repeat_n(d, width_usize)))
-            .map(|(x, d)| {
-                let sign = x >= 0u32;
-                let (mut n, x_d) = x.into_numerator_and_denominator();
-                if x_d != *d {
-                    n *= d.div_exact(x_d);
-                }
-                Integer::from_sign_and_abs(sign, n)
-            })
-            .collect();
+        let denominators = self.row_denominators();
+        let numerators = self.into_scaled_by_row_denominators(&denominators);
         (
-            IntegerMatrix::from_owned_elements(height, width, numerators),
+            numerators,
             NaturalVector {
                 elements: denominators,
             },
         )
     }
+
+    // The least common multiple of the denominators in each row.
+    pub(crate) fn row_denominators(&self) -> Vec<Natural> {
+        (0..self.height())
+            .map(|i| {
+                let mut d = Natural::ONE;
+                for x in self.row_iter(i) {
+                    d.lcm_assign(x.denominator_ref());
+                }
+                d
+            })
+            .collect()
+    }
+
+    // The elements times the denominators of their rows, each a multiple of its elements'
+    // denominators.
+    pub(crate) fn scale_by_row_denominators(&self, denominators: &[Natural]) -> IntegerMatrix {
+        IntegerMatrix::from_owned_elements(
+            self.height(),
+            self.width(),
+            scaled_numerators(
+                &self.elements,
+                denominators.iter().flat_map(|d| repeat_n(d, self.width)),
+            ),
+        )
+    }
+
+    // The elements times the denominators of their rows, taking the matrix by value.
+    pub(crate) fn into_scaled_by_row_denominators(self, denominators: &[Natural]) -> IntegerMatrix {
+        let (height, width) = (self.height(), self.width());
+        IntegerMatrix::from_owned_elements(
+            height,
+            width,
+            into_scaled_numerators(
+                self.elements,
+                denominators.iter().flat_map(|d| repeat_n(d, self.width)),
+            ),
+        )
+    }
+}
+
+// The numerators of `xs` over the corresponding `denominators`, each a multiple of its element's
+// denominator.
+pub(crate) fn scaled_numerators<'a>(
+    xs: &[Rational],
+    denominators: impl Iterator<Item = &'a Natural>,
+) -> Vec<Integer> {
+    xs.iter()
+        .zip(denominators)
+        .map(|(x, d)| {
+            let n = if *d == 1u32 {
+                x.numerator_ref().clone()
+            } else {
+                d.div_exact(x.denominator_ref()) * x.numerator_ref()
+            };
+            Integer::from_sign_and_abs(*x >= 0u32, n)
+        })
+        .collect()
+}
+
+// The numerators of `xs` over the corresponding `denominators`, taking `xs` by value, so that each
+// numerator is scaled in place, and moved over unchanged when its denominator is already the
+// corresponding one.
+pub(crate) fn into_scaled_numerators<'a>(
+    xs: Vec<Rational>,
+    denominators: impl Iterator<Item = &'a Natural>,
+) -> Vec<Integer> {
+    xs.into_iter()
+        .zip(denominators)
+        .map(|(x, d)| {
+            let sign = x >= 0u32;
+            let (mut n, x_d) = x.into_numerator_and_denominator();
+            if x_d != *d {
+                n *= d.div_exact(x_d);
+            }
+            Integer::from_sign_and_abs(sign, n)
+        })
+        .collect()
 }
