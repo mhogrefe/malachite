@@ -3736,4 +3736,44 @@ fn test_against_flint() {
             100,
         );
     }
+    // Solutions of linear systems and inverses of UnsignedMatrixes, against nmod_mat_can_solve and
+    // nmod_mat_inv. Both libraries return the solution whose elements in the rows of the non-pivot
+    // columns are zero, so the solutions must match exactly.
+    for (op, flint_mode) in [
+        ("mod_solve", "nmod_mat_can_solve"),
+        ("mod_solve_solvable", "nmod_mat_can_solve"),
+        ("mod_solve_vector", "nmod_mat_can_solve_vec"),
+        ("mod_inverse", "nmod_mat_inv"),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            &format!("demo_unsigned_matrix_{op}"),
+            flint_mode,
+        );
+    }
+    // Reduced row echelon forms and nullspaces of UnsignedMatrixes, against nmod_mat_rref,
+    // nmod_mat_nullspace, and nmod_mat_left_nullspace. Both forms are unique, and the nullspace bases
+    // are built from them in the same way, so the results must match exactly.
+    for (op, flint_mode) in [
+        ("mod_reduced_row_echelon_form", "nmod_mat_rref"),
+        ("mod_reduced_row_echelon_form_ref", "nmod_mat_rref"),
+        ("mod_reduced_row_echelon_form_assign", "nmod_mat_rref"),
+        ("mod_nullspace", "nmod_mat_nullspace"),
+        ("mod_left_nullspace", "nmod_mat_left_nullspace"),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            &format!("demo_unsigned_matrix_{op}"),
+            flint_mode,
+        );
+    }
+    check_demo_against_flint_random_modes_with_limit(
+        &oracle,
+        "../malachite-base",
+        "demo_unsigned_matrix_mod_reduced_row_echelon_form_large_dimensions",
+        "nmod_mat_rref",
+        100,
+    );
 }

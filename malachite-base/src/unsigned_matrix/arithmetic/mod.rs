@@ -69,6 +69,9 @@ pub mod mod_determinant;
 /// assert_eq!(a.to_string(), "[2, 1; 0, 2]");
 /// ```
 pub mod mod_howell_form;
+/// Implementations of [`ModInverse`](crate::num::arithmetic::traits::ModInverse), for inverting a
+/// square matrix modulo a prime.
+pub mod mod_inverse;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), a trait for
 /// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
 /// a number.
@@ -78,6 +81,9 @@ pub mod mod_is_reduced;
 /// for computing the Kronecker product of two [`UnsignedMatrix`](super::UnsignedMatrix)s modulo a
 /// number.
 pub mod mod_kronecker_product;
+/// Implementations of [`ModLeftNullspace`](crate::num::arithmetic::traits::ModLeftNullspace), for
+/// computing a basis of the left nullspace of a matrix modulo a prime.
+pub mod mod_left_nullspace;
 /// Implementations of [`ModLuDecomposition`](crate::num::arithmetic::traits::ModLuDecomposition),
 /// for computing an LU decomposition of a matrix modulo a prime.
 pub mod mod_lu_decomposition;
@@ -97,6 +103,9 @@ pub mod mod_mul_vector;
 /// [`ModNegAssign`](crate::num::arithmetic::traits::ModNegAssign), for negating every element of an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) modulo a number.
 pub mod mod_neg;
+/// Implementations of [`ModNullspace`](crate::num::arithmetic::traits::ModNullspace), for computing
+/// a basis of the right nullspace of a matrix modulo a prime.
+pub mod mod_nullspace;
 /// Implementations of [`Rem`](core::ops::Rem), [`RemAssign`](core::ops::RemAssign),
 /// [`Mod`](crate::num::arithmetic::traits::Mod), and
 /// [`ModAssign`](crate::num::arithmetic::traits::ModAssign), for reducing every element of an
@@ -209,6 +218,14 @@ pub mod mod_power_of_2_trace;
 /// Implementations of [`ModRank`](crate::num::arithmetic::traits::ModRank), for computing the rank
 /// of a matrix modulo a prime.
 pub mod mod_rank;
+/// Implementations of [`ModReducedRowEchelonForm`][rref] and
+/// [`ModReducedRowEchelonFormAssign`][rrefa], for computing the reduced row echelon form of a
+/// matrix modulo a prime.
+///
+/// [rref]: crate::num::arithmetic::traits::ModReducedRowEchelonForm
+///
+/// [rrefa]: crate::num::arithmetic::traits::ModReducedRowEchelonFormAssign
+pub mod mod_reduced_row_echelon_form;
 /// Implementations of [`ModShl`](crate::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](crate::num::arithmetic::traits::ModShlAssign), for left-shifting a matrix
 /// (multiplying it by a power of 2) modulo a number.
@@ -242,6 +259,9 @@ pub mod mod_rank;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of [`ModSolve`](crate::num::arithmetic::traits::ModSolve), for solving a system
+/// of linear equations modulo a prime.
+pub mod mod_solve;
 /// Implementations of
 /// [`ModSolveLowerTriangular`](crate::num::arithmetic::traits::ModSolveLowerTriangular), for
 /// solving a lower triangular system of equations modulo a number.

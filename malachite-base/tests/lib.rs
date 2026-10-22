@@ -898,6 +898,7 @@ pub mod unsigned_matrix {
         pub mod mod_add;
         pub mod mod_determinant;
         pub mod mod_howell_form;
+        pub mod mod_inverse;
         pub mod mod_is_reduced;
         pub mod mod_kronecker_product;
         pub mod mod_lu_decomposition;
@@ -905,6 +906,7 @@ pub mod unsigned_matrix {
         pub mod mod_mul_matrix;
         pub mod mod_mul_vector;
         pub mod mod_neg;
+        pub mod mod_nullspace;
         pub mod mod_op;
         pub mod mod_pow;
         pub mod mod_power_of_2;
@@ -921,7 +923,9 @@ pub mod unsigned_matrix {
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_trace;
         pub mod mod_rank;
+        pub mod mod_reduced_row_echelon_form;
         pub mod mod_shl;
+        pub mod mod_solve;
         pub mod mod_solve_lower_triangular;
         pub mod mod_solve_upper_triangular;
         pub mod mod_square;

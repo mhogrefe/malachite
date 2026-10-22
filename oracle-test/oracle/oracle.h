@@ -320,4 +320,14 @@ int run_nmod_mat_lu(const char * arg);
 int run_nmod_mat_rank(const char * arg);
 int run_nmod_mat_det(const char * arg);
 
+/* solve.c */
+int run_nmod_mat_can_solve(const char * arg);
+int run_nmod_mat_can_solve_vec(const char * arg);
+int run_nmod_mat_inv(const char * arg);
+
+/* rref.c */
+int run_nmod_mat_rref(const char * arg);
+int run_nmod_mat_nullspace(const char * arg);
+int run_nmod_mat_left_nullspace(const char * arg);
+
 #endif

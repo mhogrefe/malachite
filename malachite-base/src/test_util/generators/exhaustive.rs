@@ -77,6 +77,7 @@ use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
 use crate::test_util::num::float::PRIMITIVE_FLOAT_CHARS;
 use crate::test_util::rounding_modes::ROUNDING_MODE_CHARS;
+use crate::test_util::unsigned_matrix::arithmetic::mod_solve::unsigned_matrix_mod_solve_naive;
 use crate::tuples::exhaustive::{
     ExhaustiveDependentPairsYsGenerator, ExhaustivePairs, ExhaustivePairs1Input,
     ExhaustiveQuadruples, ExhaustiveTriples, ExhaustiveTriplesXYY, exhaustive_dependent_pairs,
@@ -7680,6 +7681,46 @@ pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7()
             DependentYsGenerator { ys },
         )
         .map(|((_, m), (a, b))| (a, b, m)),
+    )
+}
+
+// Pairs of matrices of the same height, with their elements less than a prime m, and m.
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_8()
+-> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    fn ys(
+        ((h, w, k), m): ((u64, u64, u64), u64),
+    ) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(h, w, residues_mod(m)),
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(h, k, residues_mod(m)),
+        ))
+    }
+    Box::new(
+        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
+        // appear.
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            Box::new(exhaustive_pairs(
+                exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_unsigned_gen_var_28::<u64>(),
+            )),
+            DependentYsGenerator { ys },
+        )
+        .map(|((_, m), (a, b))| (a, b, m)),
+    )
+}
+
+// Pairs of matrices of the same height, with their elements less than a prime m, such that the
+// system with the first as its matrix and the second as its right-hand side has a solution modulo
+// m, and m.
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_9()
+-> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_8()
+            .filter(|(a, b, m)| unsigned_matrix_mod_solve_naive(a, b, *m).is_some()),
     )
 }
 

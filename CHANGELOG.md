@@ -459,6 +459,16 @@ documented by git history.
   `nmod_mat_det`, with closed formulas, Berkowitz's algorithm, LU decomposition, or Euclidean row
   operations depending on the size and the modulus. A composite modulus makes the LU decomposition
   and the rank panic only at a non-invertible pivot.
+- New `ModSolve` trait in malachite-base, implemented for `UnsignedMatrix<T>` with matrix and
+  `UnsignedVector<T>` right-hand sides, each operand by value or by reference: a solution of $AX =
+  B$ or $Ax = b$ modulo a prime for any shape and rank, or `None`, matching FLINT's
+  `nmod_mat_can_solve`; and `ModInverse` for `UnsignedMatrix<T>`, the inverse modulo a prime, or
+  `None` for a singular matrix, like `nmod_mat_inv`.
+- New `ModReducedRowEchelonForm`, `ModReducedRowEchelonFormAssign`, `ModNullspace`, and
+  `ModLeftNullspace` traits in malachite-base, implemented for `UnsignedMatrix<T>` with the matrix
+  by value or by reference: the reduced row echelon form modulo a prime, like FLINT's
+  `nmod_mat_rref`, and bases of the right and left nullspaces, like `nmod_mat_nullspace` and
+  `nmod_mat_left_nullspace`, with exactly as many basis vectors as the nullity.
 - `RationalMatrix::to_numerators_and_row_denominators`, `into_numerators_and_row_denominators`,
   `to_numerators_and_column_denominators`, and `into_numerators_and_column_denominators`, which
   clear the denominators of each row, or each column, returning an `IntegerMatrix` and a

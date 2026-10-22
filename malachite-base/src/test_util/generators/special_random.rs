@@ -18,7 +18,8 @@ use crate::iterators::{NonzeroValues, with_special_value};
 use crate::maps::random::{random_b_tree_maps, random_hash_maps};
 use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, Mod, ModPowerOf2, Parity, PowerOf2, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, DivRound, Mod, ModMul, ModPowerOf2, Parity, PowerOf2, ShrRound,
+    UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -11800,6 +11801,103 @@ pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7(
                 k,
                 (&mut xs).take(len).map(|x| x % m).collect(),
             );
+            (a, b, m)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_8(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 2, u64::WIDTH);
+    let mut candidates = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("m"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(h, w, k)| {
+            // A prime with a random number of bits, at least 2.
+            let bits = bit_lengths.next().unwrap();
+            let m = loop {
+                let x =
+                    (candidates.next().unwrap() >> (u64::WIDTH - bits)) | u64::power_of_2(bits - 1);
+                if x.is_prime() {
+                    break x;
+                }
+            };
+            let len = usize::exact_from(h * w);
+            let a = UnsignedMatrix::from_owned_elements(
+                h,
+                w,
+                (&mut xs).take(len).map(|x| x % m).collect(),
+            );
+            let len = usize::exact_from(h * k);
+            let b = UnsignedMatrix::from_owned_elements(
+                h,
+                k,
+                (&mut xs).take(len).map(|x| x % m).collect(),
+            );
+            (a, b, m)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_9(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 2, u64::WIDTH);
+    let mut candidates = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("m"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    let mut xs = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(h, w, k)| {
+            // A prime with a random number of bits, at least 2.
+            let bits = bit_lengths.next().unwrap();
+            let m = loop {
+                let x =
+                    (candidates.next().unwrap() >> (u64::WIDTH - bits)) | u64::power_of_2(bits - 1);
+                if x.is_prime() {
+                    break x;
+                }
+            };
+            let len = usize::exact_from(h * w);
+            let a = UnsignedMatrix::from_owned_elements(
+                h,
+                w,
+                (&mut xs).take(len).map(|x| x % m).collect(),
+            );
+            let len = usize::exact_from(w * k);
+            let x = UnsignedMatrix::from_owned_elements(
+                w,
+                k,
+                (&mut xs).take(len).map(|x| x % m).collect(),
+            );
+            let b = (&a).mod_mul(x, m);
             (a, b, m)
         }),
     )

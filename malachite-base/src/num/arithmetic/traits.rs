@@ -2139,6 +2139,46 @@ pub trait ModDeterminant<M = Self> {
     fn mod_determinant(self, m: M) -> Self::Output;
 }
 
+/// Computes the reduced row echelon form of a matrix modulo a prime $m$. The elements of the matrix
+/// must already be reduced modulo $m$.
+pub trait ModReducedRowEchelonForm<M = Self> {
+    type Output;
+
+    fn mod_reduced_row_echelon_form(self, m: M) -> Self::Output;
+}
+
+/// Replaces a matrix with its reduced row echelon form modulo a prime $m$. The elements of the
+/// matrix must already be reduced modulo $m$.
+pub trait ModReducedRowEchelonFormAssign<M = Self> {
+    fn mod_reduced_row_echelon_form_assign(&mut self, m: M);
+}
+
+/// Computes a basis of the right nullspace of a matrix modulo a prime $m$: the vectors $x$ with $Ax
+/// = 0$. The basis vectors are the columns of the result. The elements of the matrix must already
+/// be reduced modulo $m$.
+pub trait ModNullspace<M = Self> {
+    type Output;
+
+    fn mod_nullspace(self, m: M) -> Self::Output;
+}
+
+/// Computes a basis of the left nullspace of a matrix modulo a prime $m$: the vectors $x$ with $xA
+/// = 0$. The basis vectors are the rows of the result. The elements of the matrix must already be
+/// reduced modulo $m$.
+pub trait ModLeftNullspace<M = Self> {
+    type Output;
+
+    fn mod_left_nullspace(self, m: M) -> Self::Output;
+}
+
+/// Solves $AX = B$ (or $Ax = b$) modulo a prime $m$ for $X$, returning a solution if there is one
+/// and `None` otherwise. The elements of $A$ and $B$ must already be reduced modulo $m$.
+pub trait ModSolve<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_solve(self, b: RHS, m: M) -> Option<Self::Output>;
+}
+
 /// Solves $LX = B$ modulo $m$ for $X$, where $L$ is a square lower triangular matrix. Only the
 /// elements of $L$ on and below its diagonal are used; if `unit_diagonal` is `true`, the diagonal
 /// elements are taken to be 1 and are not used either.

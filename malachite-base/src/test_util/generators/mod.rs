@@ -5751,6 +5751,29 @@ pub fn unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7()
     )
 }
 
+// All `(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)` where the matrices have the same height,
+// the `u64` is prime, and every element is less than it.
+pub fn unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_8()
+-> Generator<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_8,
+        &random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_8,
+        &special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_8,
+    )
+}
+
+// All `(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)` where the matrices have the same height,
+// the `u64` is prime, every element is less than it, and the second matrix is the product of the
+// first and some matrix modulo the `u64`, so that a solution of the system exists.
+pub fn unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_9()
+-> Generator<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_9,
+        &random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_9,
+        &special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_9,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)` where the matrices
 // have the same shape, the `u64` is positive, and every element is less than it.
 pub fn unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_2() -> Generator<

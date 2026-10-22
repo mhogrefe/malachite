@@ -180,6 +180,12 @@ static const oracle_mode modes[] = {
     {"nmod_mat_lu", run_nmod_mat_lu},
     {"nmod_mat_rank", run_nmod_mat_rank},
     {"nmod_mat_det", run_nmod_mat_det},
+    {"nmod_mat_can_solve", run_nmod_mat_can_solve},
+    {"nmod_mat_can_solve_vec", run_nmod_mat_can_solve_vec},
+    {"nmod_mat_inv", run_nmod_mat_inv},
+    {"nmod_mat_rref", run_nmod_mat_rref},
+    {"nmod_mat_nullspace", run_nmod_mat_nullspace},
+    {"nmod_mat_left_nullspace", run_nmod_mat_left_nullspace},
 };
 
 int
