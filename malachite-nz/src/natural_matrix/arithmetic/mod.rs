@@ -73,6 +73,10 @@ pub mod mod_is_reduced;
 /// [kpa]: malachite_base::num::arithmetic::traits::ModKroneckerProductAssign
 pub mod mod_kronecker_product;
 /// Implementations of
+/// [`ModLeftNullspace`](malachite_base::num::arithmetic::traits::ModLeftNullspace), for computing a
+/// basis of the left nullspace of a matrix modulo a prime.
+pub mod mod_left_nullspace;
+/// Implementations of
 /// [`ModLuDecomposition`](malachite_base::num::arithmetic::traits::ModLuDecomposition), for
 /// computing an LU decomposition of a matrix modulo a prime.
 pub mod mod_lu_decomposition;
@@ -92,6 +96,9 @@ pub mod mod_mul_vector;
 /// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), for negating every
 /// element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
 pub mod mod_neg;
+/// Implementations of [`ModNullspace`](malachite_base::num::arithmetic::traits::ModNullspace), for
+/// computing a basis of the right nullspace of a matrix modulo a prime.
+pub mod mod_nullspace;
 /// Implementations of [`Rem`](core::ops::Rem), [`RemAssign`](core::ops::RemAssign),
 /// [`Mod`](malachite_base::num::arithmetic::traits::Mod), and
 /// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), for reducing every element of
@@ -206,6 +213,14 @@ pub mod mod_power_of_2_trace;
 /// Implementations of [`ModRank`](malachite_base::num::arithmetic::traits::ModRank), for computing
 /// the rank of a matrix modulo a prime.
 pub mod mod_rank;
+/// Implementations of [`ModReducedRowEchelonForm`][rref] and
+/// [`ModReducedRowEchelonFormAssign`][rrefa], for computing the reduced row echelon form of a
+/// matrix modulo a prime.
+///
+/// [rref]: malachite_base::num::arithmetic::traits::ModReducedRowEchelonForm
+///
+/// [rrefa]: malachite_base::num::arithmetic::traits::ModReducedRowEchelonFormAssign
+pub mod mod_reduced_row_echelon_form;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
 /// vector (multiplying it by a power of 2) modulo a number.

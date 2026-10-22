@@ -3813,19 +3813,36 @@ fn test_against_flint() {
             flint_mode,
         );
     }
-    // Solutions of linear systems and inverses of NaturalMatrixes, against fmpz_mod_mat_can_solve
-    // and fmpz_mod_mat_inv.
+    // Solutions of linear systems, inverses, reduced row echelon forms, and nullspaces of
+    // NaturalMatrixes, against fmpz_mod_mat_can_solve, fmpz_mod_mat_inv, fmpz_mod_mat_rref, and
+    // fmpz_mod_mat_nullspace.
     for (op, flint_mode) in [
         ("mod_solve", "fmpz_mod_mat_can_solve"),
         ("mod_solve_solvable", "fmpz_mod_mat_can_solve"),
         ("mod_solve_vector", "fmpz_mod_mat_can_solve_vec"),
         ("mod_inverse", "fmpz_mod_mat_inv"),
+        ("mod_reduced_row_echelon_form", "fmpz_mod_mat_rref"),
+        ("mod_nullspace", "fmpz_mod_mat_nullspace"),
     ] {
         check_demo_against_flint(
             &oracle,
             "../malachite-nz",
             &format!("demo_natural_matrix_{op}"),
             flint_mode,
+        );
+    }
+    // The `_large_dimensions` demos enlarge the random dimensions to reach the recursive LU
+    // decomposition and triangular solving; their lines are long, so they print fewer.
+    for (op, flint_mode) in [
+        ("mod_reduced_row_echelon_form", "fmpz_mod_mat_rref"),
+        ("mod_nullspace", "fmpz_mod_mat_nullspace"),
+    ] {
+        check_demo_against_flint_with_limit(
+            &oracle,
+            "../malachite-nz",
+            &format!("demo_natural_matrix_{op}_large_dimensions"),
+            flint_mode,
+            300,
         );
     }
 }

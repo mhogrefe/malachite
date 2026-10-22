@@ -470,10 +470,12 @@ documented by git history.
   `NaturalMatrix`, the inverse modulo a prime, or
   `None` for a singular matrix, like `nmod_mat_inv`.
 - New `ModReducedRowEchelonForm`, `ModReducedRowEchelonFormAssign`, `ModNullspace`, and
-  `ModLeftNullspace` traits in malachite-base, implemented for `UnsignedMatrix<T>` with the matrix
-  by value or by reference: the reduced row echelon form modulo a prime, like FLINT's
-  `nmod_mat_rref`, and bases of the right and left nullspaces, like `nmod_mat_nullspace` and
-  `nmod_mat_left_nullspace`, with exactly as many basis vectors as the nullity.
+  `ModLeftNullspace` traits in malachite-base, implemented for `UnsignedMatrix<T>` and, in
+  malachite-nz, `NaturalMatrix` (with the modulus by value or by reference), with the matrix by
+  value or by reference: the reduced row echelon form modulo a prime, like FLINT's `nmod_mat_rref`
+  and `fmpz_mod_mat_rref`, and bases of the right and left nullspaces, like `nmod_mat_nullspace`,
+  `fmpz_mod_mat_nullspace`, and `nmod_mat_left_nullspace`, with exactly as many basis vectors as the
+  nullity.
 - `RationalMatrix::to_numerators_and_row_denominators`, `into_numerators_and_row_denominators`,
   `to_numerators_and_column_denominators`, and `into_numerators_and_column_denominators`, which
   clear the denominators of each row, or each column, returning an `IntegerMatrix` and a

@@ -291,8 +291,7 @@ impl ModSolve<Self, Natural> for NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, k, b) = O(\min(h, w)(hw + (h + w)k) b \log b \log \log b)$
@@ -351,8 +350,7 @@ impl ModSolve<Self, &Natural> for NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, k, b) = O(\min(h, w)(hw + (h + w)k) b \log b \log \log b)$
@@ -411,8 +409,7 @@ impl ModSolve<&Self, Natural> for NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, k, b) = O(\min(h, w)(hw + (h + w)k) b \log b \log \log b)$
@@ -471,8 +468,7 @@ impl ModSolve<&Self, &Natural> for NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, k, b) = O(\min(h, w)(hw + (h + w)k) b \log b \log \log b)$
@@ -532,8 +528,7 @@ impl ModSolve<NaturalVector, Natural> for NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, b) = O(hw\min(h, w) b \log b \log \log b)$
@@ -594,8 +589,7 @@ impl ModSolve<NaturalVector, &Natural> for NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, b) = O(hw\min(h, w) b \log b \log \log b)$
@@ -656,8 +650,7 @@ impl ModSolve<&NaturalVector, Natural> for NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, b) = O(hw\min(h, w) b \log b \log \log b)$
@@ -718,8 +711,7 @@ impl ModSolve<&NaturalVector, &Natural> for NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, b) = O(hw\min(h, w) b \log b \log \log b)$
@@ -779,8 +771,7 @@ impl ModSolve<NaturalMatrix, Natural> for &NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, k, b) = O(\min(h, w)(hw + (h + w)k) b \log b \log \log b)$
@@ -839,8 +830,7 @@ impl ModSolve<NaturalMatrix, &Natural> for &NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, k, b) = O(\min(h, w)(hw + (h + w)k) b \log b \log \log b)$
@@ -899,8 +889,7 @@ impl ModSolve<&NaturalMatrix, Natural> for &NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, k, b) = O(\min(h, w)(hw + (h + w)k) b \log b \log \log b)$
@@ -960,8 +949,7 @@ impl ModSolve<&NaturalMatrix, &Natural> for &NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, k, b) = O(\min(h, w)(hw + (h + w)k) b \log b \log \log b)$
@@ -1023,8 +1011,7 @@ impl ModSolve<NaturalVector, Natural> for &NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, b) = O(hw\min(h, w) b \log b \log \log b)$
@@ -1085,8 +1072,7 @@ impl ModSolve<NaturalVector, &Natural> for &NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, b) = O(hw\min(h, w) b \log b \log \log b)$
@@ -1147,8 +1133,7 @@ impl ModSolve<&NaturalVector, Natural> for &NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, b) = O(hw\min(h, w) b \log b \log \log b)$
@@ -1209,8 +1194,7 @@ impl ModSolve<&NaturalVector, &Natural> for &NaturalMatrix {
     ///
     /// The modulus must be prime. Elimination only ever divides by a pivot, so if $m$ is composite
     /// but every pivot is a unit modulo $m$, the result is still correct. When $m$ fits in a limb,
-    /// the solution is computed as for
-    /// [`UnsignedMatrix`](malachite_base::unsigned_matrix::UnsignedMatrix)es of limbs.
+    /// the solution is computed as for [`UnsignedMatrix`]es of limbs.
     ///
     /// # Worst-case complexity
     /// $T(h, w, b) = O(hw\min(h, w) b \log b \log \log b)$

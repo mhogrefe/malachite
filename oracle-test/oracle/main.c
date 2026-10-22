@@ -194,6 +194,8 @@ static const oracle_mode modes[] = {
     {"fmpz_mod_mat_can_solve", run_fmpz_mod_mat_can_solve},
     {"fmpz_mod_mat_can_solve_vec", run_fmpz_mod_mat_can_solve_vec},
     {"fmpz_mod_mat_inv", run_fmpz_mod_mat_inv},
+    {"fmpz_mod_mat_rref", run_fmpz_mod_mat_rref},
+    {"fmpz_mod_mat_nullspace", run_fmpz_mod_mat_nullspace},
 };
 
 int

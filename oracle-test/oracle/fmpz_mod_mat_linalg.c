@@ -21,6 +21,12 @@
     does, and the `fmpz_mod_mat_rank` and `fmpz_mod_mat_det` modes recompute the result with
     `fmpz_mod_mat_rank` and `fmpz_mod_mat_det`.
 
+    The reduced row echelon form and nullspace demos print `A.mod_reduced_row_echelon_form(m) = R`
+    and `A.mod_nullspace(m) = X`. The `fmpz_mod_mat_rref` mode recomputes `R` with
+    `fmpz_mod_mat_rref`, in place, since when `A` is zero FLINT does not write a separate output.
+    The `fmpz_mod_mat_nullspace` mode recomputes the basis with `fmpz_mod_mat_nullspace`, which
+    writes it into the first columns of a square matrix, and keeps only those columns.
+
     The solving and inverse demos print `A.mod_solve(B, m) = R` and `A.mod_inverse(m) = R`, where `R`
     is `None` or `Some(X)`, and `B` and `X` are matrices, or, in the `fmpz_mod_mat_can_solve_vec`
     mode, vectors. The solving modes recompute the solution with `fmpz_mod_mat_can_solve`, treating
@@ -49,7 +55,8 @@ static const char * current_name;
 static const char * current_op;
 static int current_kind;
 
-enum { KIND_TRIL, KIND_TRIU, KIND_LU, KIND_RANK, KIND_DET, KIND_SOLVE, KIND_SOLVE_VEC, KIND_INV };
+enum { KIND_TRIL, KIND_TRIU, KIND_LU, KIND_RANK, KIND_DET, KIND_SOLVE, KIND_SOLVE_VEC, KIND_INV,
+       KIND_RREF, KIND_NULLSPACE };
 
 static int
 report(const fmpz_mat_t actual, const fmpz_mat_t expected, int line_number)
@@ -323,6 +330,43 @@ check_unary_line(char * line, int line_number)
             }
         }
     }
+    else if (current_kind == KIND_RREF || current_kind == KIND_NULLSPACE)
+    {
+        fmpz_mat_t actual, expected;
+        if (current_kind == KIND_RREF)
+        {
+            fmpz_mod_mat_rref(am, am, ctx);
+            fmpz_mat_init(actual, h, w);
+            fmpz_mod_mat_get_fmpz_mat(actual, am, ctx);
+        }
+        else
+        {
+            fmpz_mod_mat_t x;
+            fmpz_mod_mat_init(x, w, w, ctx);
+            slong nullity = fmpz_mod_mat_nullspace(x, am, ctx);
+            fmpz_mat_init(actual, w, nullity);
+            for (slong i = 0; i < w; i++)
+            {
+                for (slong j = 0; j < nullity; j++)
+                {
+                    fmpz_set(fmpz_mat_entry(actual, i, j), fmpz_mod_mat_entry(x, i, j));
+                }
+            }
+            fmpz_mod_mat_clear(x, ctx);
+        }
+        if (!fmpz_mat_init_set_str_malachite(expected, rest))
+        {
+            flint_printf("error in %s test, line %d: unreadable result\n", current_name,
+                         line_number);
+            result = 1;
+        }
+        else
+        {
+            result = report(actual, expected, line_number);
+        }
+        fmpz_mat_clear(actual);
+        fmpz_mat_clear(expected);
+    }
     else
     {
         fmpz_t actual, expected;
@@ -578,4 +622,17 @@ int
 run_fmpz_mod_mat_inv(const char * arg)
 {
     return run(arg, "fmpz_mod_mat_inv", "mod_inverse", KIND_INV, check_solve_line);
+}
+
+int
+run_fmpz_mod_mat_rref(const char * arg)
+{
+    return run(arg, "fmpz_mod_mat_rref", "mod_reduced_row_echelon_form", KIND_RREF,
+               check_unary_line);
+}
+
+int
+run_fmpz_mod_mat_nullspace(const char * arg)
+{
+    return run(arg, "fmpz_mod_mat_nullspace", "mod_nullspace", KIND_NULLSPACE, check_unary_line);
 }

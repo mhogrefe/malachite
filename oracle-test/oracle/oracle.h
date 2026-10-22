@@ -339,5 +339,7 @@ int run_fmpz_mod_mat_det(const char * arg);
 int run_fmpz_mod_mat_can_solve(const char * arg);
 int run_fmpz_mod_mat_can_solve_vec(const char * arg);
 int run_fmpz_mod_mat_inv(const char * arg);
+int run_fmpz_mod_mat_rref(const char * arg);
+int run_fmpz_mod_mat_nullspace(const char * arg);
 
 #endif
