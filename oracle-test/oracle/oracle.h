@@ -315,4 +315,9 @@ int run_nmod_mat_strong_echelon_form(const char * arg);
 int run_fmpz_mod_mat_howell_form(const char * arg);
 int run_fmpz_mod_mat_strong_echelon_form(const char * arg);
 
+/* lu.c */
+int run_nmod_mat_lu(const char * arg);
+int run_nmod_mat_rank(const char * arg);
+int run_nmod_mat_det(const char * arg);
+
 #endif

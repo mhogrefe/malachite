@@ -3708,4 +3708,32 @@ fn test_against_flint() {
             }
         }
     }
+    // The LU decompositions, ranks, and determinants of UnsignedMatrixes, against nmod_mat_lu,
+    // nmod_mat_rank, and nmod_mat_det. LU decomposition chooses its pivots as FLINT does, so the
+    // permutation and both factors must match exactly. The large-dimension demos exercise the
+    // delayed-reduction and recursive algorithms, and the determinant's LU and Howell methods.
+    for (op, flint_mode) in [
+        ("mod_lu_decomposition", "nmod_mat_lu"),
+        ("mod_rank", "nmod_mat_rank"),
+        ("mod_determinant", "nmod_mat_det"),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            &format!("demo_unsigned_matrix_{op}"),
+            flint_mode,
+        );
+    }
+    for (op, flint_mode) in [
+        ("mod_lu_decomposition", "nmod_mat_lu"),
+        ("mod_determinant", "nmod_mat_det"),
+    ] {
+        check_demo_against_flint_random_modes_with_limit(
+            &oracle,
+            "../malachite-base",
+            &format!("demo_unsigned_matrix_{op}_large_dimensions"),
+            flint_mode,
+            100,
+        );
+    }
 }

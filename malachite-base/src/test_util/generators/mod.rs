@@ -5580,6 +5580,35 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_9() -> Generator<(UnsignedMatrix<u6
     )
 }
 
+// All `(UnsignedMatrix<u64>, u64)` where the `u64` is prime, and every element is less than it.
+pub fn unsigned_matrix_unsigned_pair_gen_var_10() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_10,
+        &random_unsigned_matrix_unsigned_pair_gen_var_10,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_10,
+    )
+}
+
+// All `(UnsignedMatrix<u64>, u64)` where the matrix is square, the `u64` is positive, and every
+// element is less than it.
+pub fn unsigned_matrix_unsigned_pair_gen_var_11() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_11,
+        &random_unsigned_matrix_unsigned_pair_gen_var_11,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_11,
+    )
+}
+
+// All `(UnsignedMatrix<u64>, u64)` where the matrix is square, the `u64` is prime, and every
+// element is less than it.
+pub fn unsigned_matrix_unsigned_pair_gen_var_12() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_12,
+        &random_unsigned_matrix_unsigned_pair_gen_var_12,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_12,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, UnsignedVector<u64>, u64)` where the vector's dimension is the height
 // of the matrix, the `u64` is no greater than 64, and every element is less than 2 to its power.
 pub fn unsigned_matrix_unsigned_vector_unsigned_triple_gen_var_2()
@@ -5707,6 +5736,18 @@ pub fn unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_6()
         &exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_6,
         &random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_6,
         &special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_6,
+    )
+}
+
+// All `(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)` where the first matrix is square, the
+// second has the same height, the `u64` is prime, every element is less than it, and the diagonal
+// elements of the first matrix are nonzero.
+pub fn unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7()
+-> Generator<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7,
+        &random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7,
+        &special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7,
     )
 }
 

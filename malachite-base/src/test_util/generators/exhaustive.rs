@@ -7571,6 +7571,118 @@ pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_6()
     )
 }
 
+// Matrices with their elements less than a prime m, and m.
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_10() -> It<(UnsignedMatrix<u64>, u64)> {
+    fn ys(((height, width), m): ((u64, u64), u64)) -> It<UnsignedMatrix<u64>> {
+        Box::new(exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+            height,
+            width,
+            residues_mod(m),
+        ))
+    }
+    Box::new(
+        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
+        // appear.
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_unsigned_gen_var_28::<u64>(),
+            )),
+            DependentYsGenerator { ys },
+        )
+        .map(|((_, m), a)| (a, m)),
+    )
+}
+
+// Square matrices with their elements less than a positive m, and m.
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_11() -> It<(UnsignedMatrix<u64>, u64)> {
+    fn ys((n, m): (u64, u64)) -> It<UnsignedMatrix<u64>> {
+        Box::new(exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+            n,
+            n,
+            residues_mod(m),
+        ))
+    }
+    Box::new(
+        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
+        // appear.
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_positive_primitive_ints::<u64>(),
+            )),
+            DependentYsGenerator { ys },
+        )
+        .map(|((_, m), a)| (a, m)),
+    )
+}
+
+// Square matrices with their elements less than a prime m, and m.
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_12() -> It<(UnsignedMatrix<u64>, u64)> {
+    fn ys((n, m): (u64, u64)) -> It<UnsignedMatrix<u64>> {
+        Box::new(exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+            n,
+            n,
+            residues_mod(m),
+        ))
+    }
+    Box::new(
+        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
+        // appear.
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_unsigned_gen_var_28::<u64>(),
+            )),
+            DependentYsGenerator { ys },
+        )
+        .map(|((_, m), a)| (a, m)),
+    )
+}
+
+// Square matrices with nonzero diagonal elements, matrices with the same height, all with their
+// elements less than a prime m, and m.
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7()
+-> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    fn ys(((n, k), m): ((u64, u64), u64)) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>)> {
+        let step = usize::exact_from(n) + 1;
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(n, n, residues_mod(m))
+                .filter(move |a| a.elements.iter().step_by(step).all(|&x| x != 0)),
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(n, k, residues_mod(m)),
+        ))
+    }
+    Box::new(
+        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
+        // appear: with the ruler sequence, each successive dimension and modulus gets half as many
+        // matrices as the one before.
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_unsigned_gen_var_28::<u64>(),
+            )),
+            DependentYsGenerator { ys },
+        )
+        .map(|((_, m), (a, b))| (a, b, m)),
+    )
+}
+
 // Triples of matrices of the same shape, with their elements less than m, and m.
 pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_matrix_unsigned_quadruple_gen_var_2()
 -> It<(

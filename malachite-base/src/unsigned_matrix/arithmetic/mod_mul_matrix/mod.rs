@@ -18,8 +18,12 @@ use crate::num::arithmetic::traits::{ModIsReduced, ModMul, ModMulAssign};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_matrix::UnsignedMatrix;
-use crate::unsigned_matrix::arithmetic::mod_mul_matrix::classical::matrix_mod_mul_classical_op;
-use crate::unsigned_matrix::arithmetic::mod_mul_matrix::strassen::matrix_mod_mul_strassen;
+use crate::unsigned_matrix::arithmetic::mod_mul_matrix::classical::{
+    Strides, matrix_mod_mul_classical_op, matrix_mod_mul_classical_op_strided,
+};
+use crate::unsigned_matrix::arithmetic::mod_mul_matrix::strassen::{
+    block, matrix_mod_mul_strassen,
+};
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -37,13 +41,14 @@ ProductShape {
     pub bc: usize,
 }}
 
-// What the classical algorithm does with a product: sets the output to it, or adds it to the
-// elements already in the output.
+// What the classical algorithm does with a product: sets the output to it, adds it to the elements
+// already in the output, or subtracts it from them.
 crate_test_enum! {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 ModMulOp {
     Set,
     Add,
+    Sub,
 }}
 
 // The smallest dimension at which the product of two matrices modulo `m` uses Strassen's algorithm
@@ -78,6 +83,38 @@ crate_test_fn! {matrix_mod_mul<T: PrimitiveUnsigned>(
         matrix_mod_mul_strassen(xs, ys, shape, m)
     }
 }}
+
+// Subtracts the product of the matrices with elements `xs` and `ys` from the matrix with elements
+// `out`, all reduced modulo `m`, which must be positive. The output and the first matrix may be
+// blocks of larger matrices, with the row strides `strides`. Below the cutoff for Strassen's
+// algorithm, the classical algorithm subtracts each dot product as it is computed, reading and
+// writing the blocks in place; otherwise, the first matrix is copied, and the product is computed
+// and then subtracted.
+//
+// This is equivalent to `nmod_mat_submul` from `nmod_mat/submul.c`, FLINT 3.6.0, with one thread
+// and with the output the same as the matrix that is subtracted from.
+pub(crate) fn matrix_mod_sub_mul<T: PrimitiveUnsigned>(
+    out: &mut [T],
+    xs: &[T],
+    strides: Strides,
+    ys: &[T],
+    shape: ProductShape,
+    m: T,
+) {
+    let ProductShape { ar, br, bc } = shape;
+    if ar.min(br).min(bc) < classical_cutoff(m) {
+        matrix_mod_mul_classical_op_strided(out, ModMulOp::Sub, xs, strides, ys, shape, m);
+    } else {
+        let xs = block(xs, strides.xs, 0..ar, 0..br);
+        let product = matrix_mod_mul(&xs, ys, shape, m);
+        for (i, p_row) in product.chunks_exact(bc).enumerate() {
+            let out_row = &mut out[i * strides.out..i * strides.out + bc];
+            for (z, &p) in out_row.iter_mut().zip(p_row) {
+                z.mod_sub_assign(p, m);
+            }
+        }
+    }
+}
 
 // Checks the arguments of a matrix product modulo `m`: `m` is positive, the width of the first
 // matrix is the height of the second, and the elements of both are reduced.

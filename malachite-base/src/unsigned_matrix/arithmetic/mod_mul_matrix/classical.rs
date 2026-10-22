@@ -22,12 +22,22 @@ use alloc::vec;
 // This is `NMOD_MAT_MUL_TRANSPOSE_CUTOFF` from `nmod_mat.h`, FLINT 3.6.0.
 const NMOD_MAT_MUL_TRANSPOSE_CUTOFF: usize = 20;
 
-// Writes the reduced dot product `c` to `z`, adding it to the value already there if `ADD`. Making
-// `ADD` a constant parameter compiles each kernel once for each case, so the inner loops do not
-// test it.
+// The values of the constant parameter `OP` of the kernels below, standing for the cases of
+// `ModMulOp`.
+const SET: u8 = 0;
+const ADD: u8 = 1;
+const SUB: u8 = 2;
+
+// Writes the reduced dot product `c` to `z`, adding it to the value already there if `OP` is `ADD`,
+// and subtracting it if `OP` is `SUB`. Making `OP` a constant parameter compiles each kernel once
+// for each case, so the inner loops do not test it.
 #[inline]
-fn write<T: PrimitiveUnsigned, const ADD: bool>(z: &mut T, c: T, m: T) {
-    *z = if ADD { z.mod_add(c, m) } else { c };
+fn write<T: PrimitiveUnsigned, const OP: u8>(z: &mut T, c: T, m: T) {
+    match OP {
+        ADD => z.mod_add_assign(c, m),
+        SUB => z.mod_sub_assign(c, m),
+        _ => *z = c,
+    }
 }
 
 // Applies `op` to `out` and the product of the matrices with elements `xs` and `ys` modulo `m`,
@@ -35,18 +45,21 @@ fn write<T: PrimitiveUnsigned, const ADD: bool>(z: &mut T, c: T, m: T) {
 //
 // This is equivalent to `_nmod_mat_addmul_basic_op` from `nmod_mat/mul_classical.c`, FLINT 3.6.0,
 // with the output the same as the matrix that is added to.
-fn mod_mul_basic<T: PrimitiveUnsigned, const ADD: bool>(
+fn mod_mul_basic<T: PrimitiveUnsigned, const OP: u8>(
     out: &mut [T],
     xs: &[T],
+    strides: Strides,
     ys: &[T],
     shape: ProductShape,
     m: T,
     d: &ModData<T>,
 ) {
     let ProductShape { br: k, bc: n, .. } = shape;
-    for (row, out_row) in xs.chunks_exact(k).zip(out.chunks_exact_mut(n)) {
+    for i in 0..shape.ar {
+        let row = &xs[i * strides.xs..i * strides.xs + k];
+        let out_row = &mut out[i * strides.out..i * strides.out + n];
         for (j, z) in out_row.iter_mut().enumerate() {
-            write::<T, ADD>(z, d.reduce_sum(dot_sum_strided(row, &ys[j..], n, d)), m);
+            write::<T, OP>(z, d.reduce_sum(dot_sum_strided(row, &ys[j..], n, d)), m);
         }
     }
 }
@@ -56,9 +69,10 @@ fn mod_mul_basic<T: PrimitiveUnsigned, const ADD: bool>(
 //
 // This is equivalent to `_nmod_mat_addmul_transpose_op` from `nmod_mat/mul_classical.c`, FLINT
 // 3.6.0, with the output the same as the matrix that is added to.
-fn mod_mul_transposed<T: PrimitiveUnsigned, const ADD: bool>(
+fn mod_mul_transposed<T: PrimitiveUnsigned, const OP: u8>(
     out: &mut [T],
     xs: &[T],
+    strides: Strides,
     ys: &[T],
     shape: ProductShape,
     m: T,
@@ -71,9 +85,11 @@ fn mod_mul_transposed<T: PrimitiveUnsigned, const ADD: bool>(
             tmp[j * k + i] = ys[i * n + j];
         }
     }
-    for (row, out_row) in xs.chunks_exact(k).zip(out.chunks_exact_mut(n)) {
+    for i in 0..shape.ar {
+        let row = &xs[i * strides.xs..i * strides.xs + k];
+        let out_row = &mut out[i * strides.out..i * strides.out + n];
         for (column, z) in tmp.chunks_exact(k).zip(out_row.iter_mut()) {
-            write::<T, ADD>(z, d.reduce_sum(dot_sum(row, column, d)), m);
+            write::<T, OP>(z, d.reduce_sum(dot_sum(row, column, d)), m);
         }
     }
 }
@@ -85,9 +101,10 @@ fn mod_mul_transposed<T: PrimitiveUnsigned, const ADD: bool>(
 //
 // This is equivalent to `_nmod_mat_addmul_packed_op` from `nmod_mat/mul_classical.c`, FLINT 3.6.0,
 // with the output the same as the matrix that is added to.
-fn mod_mul_packed<T: PrimitiveUnsigned, const ADD: bool>(
+fn mod_mul_packed<T: PrimitiveUnsigned, const OP: u8>(
     out: &mut [T],
     xs: &[T],
+    strides: Strides,
     ys: &[T],
     shape: ProductShape,
     m: T,
@@ -120,7 +137,7 @@ fn mod_mul_packed<T: PrimitiveUnsigned, const ADD: bool>(
     }
     // Multiply.
     for i in 0..big_m {
-        let a_row = &xs[i * big_n..(i + 1) * big_n];
+        let a_row = &xs[i * strides.xs..i * strides.xs + big_n];
         for j in 0..k_pack {
             let t_row = &tmp[j * big_n..(j + 1) * big_n];
             let mut c = T::ZERO;
@@ -133,17 +150,18 @@ fn mod_mul_packed<T: PrimitiveUnsigned, const ADD: bool>(
                     break;
                 }
                 let d = ((c >> (u64::exact_from(k) * pack_bits)) & mask) % m;
-                write::<T, ADD>(&mut out[i * big_k + j * pack + k], d, m);
+                write::<T, OP>(&mut out[i * strides.out + j * pack + k], d, m);
             }
         }
     }
 }
 
 // Applies `op` to `out` and the product of the matrices with elements `xs` and `ys`, all reduced
-// modulo `m`: with `ModMulOp::Set`, sets `out` to the product, and with `ModMulOp::Add`, adds the
-// product to the elements already in `out`. The algorithm reads the second matrix's columns in
-// place for small dimensions, transposes the second matrix first for larger ones, and packs several
-// of its elements into each word when the dot products are small enough.
+// modulo `m`: with `ModMulOp::Set`, sets `out` to the product, with `ModMulOp::Add`, adds the
+// product to the elements already in `out`, and with `ModMulOp::Sub`, subtracts it from them. The
+// algorithm reads the second matrix's columns in place for small dimensions, transposes the second
+// matrix first for larger ones, and packs several of its elements into each word when the dot
+// products are small enough.
 //
 // This is equivalent to `_nmod_mat_mul_classical_op` from `nmod_mat/mul_classical.c`, FLINT 3.6.0,
 // with the output the same as the matrix that is added to.
@@ -155,6 +173,39 @@ crate_test_fn! {matrix_mod_mul_classical_op<T: PrimitiveUnsigned>(
     shape: ProductShape,
     m: T,
 ) {
+    matrix_mod_mul_classical_op_strided(
+        out,
+        op,
+        xs,
+        Strides {
+            out: shape.bc,
+            xs: shape.br,
+        },
+        ys,
+        shape,
+        m,
+    );
+}}
+
+// The distances between the starts of consecutive rows of the output and of the first matrix of a
+// product, so that either may be a block of a larger matrix, read or written in place.
+#[derive(Clone, Copy)]
+pub(crate) struct Strides {
+    pub(crate) out: usize,
+    pub(crate) xs: usize,
+}
+
+// `matrix_mod_mul_classical_op`, with the output and the first matrix possibly blocks of larger
+// matrices, with the row strides `strides`.
+pub(crate) fn matrix_mod_mul_classical_op_strided<T: PrimitiveUnsigned>(
+    out: &mut [T],
+    op: ModMulOp,
+    xs: &[T],
+    strides: Strides,
+    ys: &[T],
+    shape: ProductShape,
+    m: T,
+) {
     let ProductShape { ar, br: k, bc: n } = shape;
     if ar == 0 || n == 0 {
         // The product has no elements.
@@ -162,21 +213,25 @@ crate_test_fn! {matrix_mod_mul_classical_op<T: PrimitiveUnsigned>(
     }
     if k == 0 || m == T::ONE {
         if op == ModMulOp::Set {
-            out.fill(T::ZERO);
+            for i in 0..ar {
+                out[i * strides.out..i * strides.out + n].fill(T::ZERO);
+            }
         }
         return;
     }
     match op {
-        ModMulOp::Set => mod_mul_classical::<T, false>(out, xs, ys, shape, m),
-        ModMulOp::Add => mod_mul_classical::<T, true>(out, xs, ys, shape, m),
+        ModMulOp::Set => mod_mul_classical::<T, SET>(out, xs, strides, ys, shape, m),
+        ModMulOp::Add => mod_mul_classical::<T, ADD>(out, xs, strides, ys, shape, m),
+        ModMulOp::Sub => mod_mul_classical::<T, SUB>(out, xs, strides, ys, shape, m),
     }
-}}
+}
 
-// The body of `matrix_mod_mul_classical_op`, for nonempty products with a positive inner dimension
-// and a modulus greater than 1, adding to `out` if `ADD`.
-fn mod_mul_classical<T: PrimitiveUnsigned, const ADD: bool>(
+// The body of `matrix_mod_mul_classical_op_strided`, for nonempty products with a positive inner
+// dimension and a modulus greater than 1, applying `OP` as `write` does.
+fn mod_mul_classical<T: PrimitiveUnsigned, const OP: u8>(
     out: &mut [T],
     xs: &[T],
+    strides: Strides,
     ys: &[T],
     shape: ProductShape,
     m: T,
@@ -184,13 +239,13 @@ fn mod_mul_classical<T: PrimitiveUnsigned, const ADD: bool>(
     let ProductShape { ar, br: k, bc: n } = shape;
     let d = ModData::new(m, k);
     if d.words == 1 && ar > 10 && k > 10 && n > 10 {
-        mod_mul_packed::<T, ADD>(out, xs, ys, shape, m);
+        mod_mul_packed::<T, OP>(out, xs, strides, ys, shape, m);
     } else if ar < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
     {
-        mod_mul_basic::<T, ADD>(out, xs, ys, shape, m, &d);
+        mod_mul_basic::<T, OP>(out, xs, strides, ys, shape, m, &d);
     } else {
-        mod_mul_transposed::<T, ADD>(out, xs, ys, shape, m, &d);
+        mod_mul_transposed::<T, OP>(out, xs, strides, ys, shape, m, &d);
     }
 }

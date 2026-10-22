@@ -26,6 +26,9 @@ pub mod content_chained;
 /// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.
 pub mod mod_add;
+/// Implementations of [`ModDeterminant`](crate::num::arithmetic::traits::ModDeterminant), for
+/// computing the determinant of a square matrix modulo a number.
+pub mod mod_determinant;
 /// Implementations of [`ModHowellForm`](crate::num::arithmetic::traits::ModHowellForm) and
 /// [`ModHowellFormAssign`](crate::num::arithmetic::traits::ModHowellFormAssign), for computing the
 /// Howell form of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a number.
@@ -75,6 +78,9 @@ pub mod mod_is_reduced;
 /// for computing the Kronecker product of two [`UnsignedMatrix`](super::UnsignedMatrix)s modulo a
 /// number.
 pub mod mod_kronecker_product;
+/// Implementations of [`ModLuDecomposition`](crate::num::arithmetic::traits::ModLuDecomposition),
+/// for computing an LU decomposition of a matrix modulo a prime.
+pub mod mod_lu_decomposition;
 /// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) and
 /// [`ModMulAssign`](crate::num::arithmetic::traits::ModMulAssign), for multiplying an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) by a scalar modulo a number.
@@ -200,6 +206,9 @@ pub mod mod_power_of_2_sub;
 /// An implementation of [`ModPowerOf2Trace`](crate::num::arithmetic::traits::ModPowerOf2Trace), the
 /// sum of the diagonal elements of a square matrix modulo a power of 2.
 pub mod mod_power_of_2_trace;
+/// Implementations of [`ModRank`](crate::num::arithmetic::traits::ModRank), for computing the rank
+/// of a matrix modulo a prime.
+pub mod mod_rank;
 /// Implementations of [`ModShl`](crate::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](crate::num::arithmetic::traits::ModShlAssign), for left-shifting a matrix
 /// (multiplying it by a power of 2) modulo a number.
@@ -233,6 +242,14 @@ pub mod mod_power_of_2_trace;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of
+/// [`ModSolveLowerTriangular`](crate::num::arithmetic::traits::ModSolveLowerTriangular), for
+/// solving a lower triangular system of equations modulo a number.
+pub mod mod_solve_lower_triangular;
+/// Implementations of
+/// [`ModSolveUpperTriangular`](crate::num::arithmetic::traits::ModSolveUpperTriangular), for
+/// solving a upper triangular system of equations modulo a number.
+pub mod mod_solve_upper_triangular;
 /// Implementations of [`ModSquare`](crate::num::arithmetic::traits::ModSquare) and
 /// [`ModSquareAssign`](crate::num::arithmetic::traits::ModSquareAssign), for squaring a square
 /// matrix modulo a number.

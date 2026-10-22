@@ -446,6 +446,19 @@ documented by git history.
   `fmpz_mat_howell_form_mod`. Both forms are canonical, so they work for composite $m$. A matrix
   with fewer rows than columns is first given zero rows until it is square. `NaturalMatrix`es use
   the `UnsignedMatrix<Limb>` kernel when $m$ fits in a limb.
+- New `ModSolveLowerTriangular` and `ModSolveUpperTriangular` traits in malachite-base,
+  implemented for `UnsignedMatrix<T>` with each matrix by value or by reference: the solution modulo
+  $m$ of $LX = B$ or $UX = B$ for a square triangular matrix, reading only its triangle, with a
+  `unit_diagonal` flag, like FLINT's `nmod_mat_solve_tril` and `nmod_mat_solve_triu`. Large systems
+  are split in half recursively; small ones are solved by substitution, one row at a time.
+- New `ModLuDecomposition`, `ModRank`, and `ModDeterminant` traits in malachite-base, implemented
+  for `UnsignedMatrix<T>` with the matrix by value or by reference. `mod_lu_decomposition` returns
+  a permutation $P$, a unit lower triangular $L$, and a row echelon $U$ with $PA = LU$ modulo a
+  prime, choosing pivots as FLINT's `nmod_mat_lu` does; `mod_rank` is the rank modulo a prime,
+  like `nmod_mat_rank`; and `mod_determinant` is the determinant modulo any modulus, like
+  `nmod_mat_det`, with closed formulas, Berkowitz's algorithm, LU decomposition, or Euclidean row
+  operations depending on the size and the modulus. A composite modulus makes the LU decomposition
+  and the rank panic only at a non-invertible pivot.
 - `RationalMatrix::to_numerators_and_row_denominators`, `into_numerators_and_row_denominators`,
   `to_numerators_and_column_denominators`, and `into_numerators_and_column_denominators`, which
   clear the denominators of each row, or each column, returning an `IntegerMatrix` and a

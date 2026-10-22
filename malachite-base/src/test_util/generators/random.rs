@@ -9945,6 +9945,51 @@ pub fn random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_6(
 }
 
 // A matrix of random shape with elements less than a small random positive `u64`, and the `u64`.
+pub fn random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, UnsignedMatrix<u64>, u64)> {
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 2, u64::WIDTH);
+    let mut candidates = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("m"));
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(n, k)| {
+            // A prime with a random number of bits, at least 2.
+            let bits = bit_lengths.next().unwrap();
+            let m = loop {
+                let x =
+                    (candidates.next().unwrap() >> (u64::WIDTH - bits)) | u64::power_of_2(bits - 1);
+                if x.is_prime() {
+                    break x;
+                }
+            };
+            let len = usize::exact_from(n * n);
+            let mut a = UnsignedMatrix::from_owned_elements(
+                n,
+                n,
+                (&mut xs).take(len).map(|x| x % m).collect(),
+            );
+            for x in a.elements.iter_mut().step_by(usize::exact_from(n) + 1) {
+                if *x == 0 {
+                    *x = 1;
+                }
+            }
+            let len = usize::exact_from(n * k);
+            let b = UnsignedMatrix::from_owned_elements(
+                n,
+                k,
+                (&mut xs).take(len).map(|x| x % m).collect(),
+            );
+            (a, b, m)
+        }),
+    )
+}
+
 pub fn random_unsigned_matrix_unsigned_pair_gen_var_9(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64)> {
@@ -9967,6 +10012,104 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_9(
                 height,
                 width,
                 (&mut xs).take(n).map(|x| x % m).collect(),
+            );
+            (a, m)
+        }),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_10(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 2, u64::WIDTH);
+    let mut candidates = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("m"));
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            // A prime with a random number of bits, at least 2.
+            let bits = bit_lengths.next().unwrap();
+            let m = loop {
+                let x =
+                    (candidates.next().unwrap() >> (u64::WIDTH - bits)) | u64::power_of_2(bits - 1);
+                if x.is_prime() {
+                    break x;
+                }
+            };
+            let len = usize::exact_from(height * width);
+            let a = UnsignedMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(len).map(|x| x % m).collect(),
+            );
+            (a, m)
+        }),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_11(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 1, u64::WIDTH);
+    let mut candidates = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("m"));
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(
+        geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        )
+        .map(move |n| {
+            let (height, width) = (n, n);
+            // A positive number with a random number of bits.
+            let bits = bit_lengths.next().unwrap();
+            let m = (candidates.next().unwrap() >> (u64::WIDTH - bits)) | u64::power_of_2(bits - 1);
+            let len = usize::exact_from(height * width);
+            let a = UnsignedMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(len).map(|x| x % m).collect(),
+            );
+            (a, m)
+        }),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_12(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 2, u64::WIDTH);
+    let mut candidates = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("m"));
+    let mut xs = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("elements"));
+    Box::new(
+        geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        )
+        .map(move |n| {
+            let (height, width) = (n, n);
+            // A prime with a random number of bits, at least 2.
+            let bits = bit_lengths.next().unwrap();
+            let m = loop {
+                let x =
+                    (candidates.next().unwrap() >> (u64::WIDTH - bits)) | u64::power_of_2(bits - 1);
+                if x.is_prime() {
+                    break x;
+                }
+            };
+            let len = usize::exact_from(height * width);
+            let a = UnsignedMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(len).map(|x| x % m).collect(),
             );
             (a, m)
         }),

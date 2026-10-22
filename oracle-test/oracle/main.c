@@ -177,6 +177,9 @@ static const oracle_mode modes[] = {
     {"nmod_mat_strong_echelon_form", run_nmod_mat_strong_echelon_form},
     {"fmpz_mod_mat_howell_form", run_fmpz_mod_mat_howell_form},
     {"fmpz_mod_mat_strong_echelon_form", run_fmpz_mod_mat_strong_echelon_form},
+    {"nmod_mat_lu", run_nmod_mat_lu},
+    {"nmod_mat_rank", run_nmod_mat_rank},
+    {"nmod_mat_det", run_nmod_mat_det},
 };
 
 int

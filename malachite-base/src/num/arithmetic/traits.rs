@@ -2115,6 +2115,48 @@ pub trait ModStrongEchelonFormAssign<M = Self> {
     fn mod_strong_echelon_form_assign(&mut self, m: M);
 }
 
+/// Computes an LU decomposition of a matrix modulo a prime $m$: a permutation $P$, a lower
+/// triangular matrix $L$ with ones on its diagonal, and an upper triangular matrix $U$ in row
+/// echelon form, such that $PA = LU$. The elements of the matrix must already be reduced modulo
+/// $m$.
+pub trait ModLuDecomposition<M = Self> {
+    type Output;
+
+    fn mod_lu_decomposition(self, m: M) -> Self::Output;
+}
+
+/// Computes the rank of a matrix modulo a prime $m$. The elements of the matrix must already be
+/// reduced modulo $m$.
+pub trait ModRank<M = Self> {
+    fn mod_rank(self, m: M) -> u64;
+}
+
+/// Computes the determinant of a square matrix modulo $m$. The elements of the matrix must already
+/// be reduced modulo $m$.
+pub trait ModDeterminant<M = Self> {
+    type Output;
+
+    fn mod_determinant(self, m: M) -> Self::Output;
+}
+
+/// Solves $LX = B$ modulo $m$ for $X$, where $L$ is a square lower triangular matrix. Only the
+/// elements of $L$ on and below its diagonal are used; if `unit_diagonal` is `true`, the diagonal
+/// elements are taken to be 1 and are not used either.
+pub trait ModSolveLowerTriangular<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_solve_lower_triangular(self, b: RHS, m: M, unit_diagonal: bool) -> Self::Output;
+}
+
+/// Solves $UX = B$ modulo $m$ for $X$, where $U$ is a square upper triangular matrix. Only the
+/// elements of $U$ on and above its diagonal are used; if `unit_diagonal` is `true`, the diagonal
+/// elements are taken to be 1 and are not used either.
+pub trait ModSolveUpperTriangular<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_solve_upper_triangular(self, b: RHS, m: M, unit_diagonal: bool) -> Self::Output;
+}
+
 /// Calculates the Kronecker symbol of two numbers.
 pub trait KroneckerSymbol<RHS = Self> {
     fn kronecker_symbol(self, other: RHS) -> i8;

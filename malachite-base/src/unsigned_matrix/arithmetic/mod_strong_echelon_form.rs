@@ -99,7 +99,10 @@ fn unit<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned + WrappingFro
 // Returns `Some(q)` with `qa = b` modulo `m` if there is such a `q`, and `None` otherwise.
 //
 // This is equivalent to `_n_is_divisible` from `nmod_mat/strong_echelon_form.c`, FLINT 3.6.0.
-fn is_divisible<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned + WrappingFrom<U>>(
+pub(crate) fn is_divisible<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
     b: U,
     a: U,
     m: U,
@@ -114,7 +117,10 @@ fn is_divisible<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned + Wra
 
 // The residue modulo `m` of a cofactor `x` of the extended GCD of two elements less than `m`, which
 // therefore has absolute value less than `m`.
-fn signed_to_residue<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned>(x: S, m: U) -> U {
+pub(crate) fn signed_to_residue<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned>(
+    x: S,
+    m: U,
+) -> U {
     if x >= S::ZERO {
         U::wrapping_from(x)
     } else {
