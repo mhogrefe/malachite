@@ -4631,6 +4631,31 @@ pub fn natural_matrix_natural_matrix_natural_triple_gen_var_4()
     )
 }
 
+// All `(NaturalMatrix, NaturalMatrix, Natural)` where the matrices have the same height, the
+// `Natural` is prime, and every element is less than it. The large primes are those of
+// `LARGE_PRIMES`.
+pub fn natural_matrix_natural_matrix_natural_triple_gen_var_5()
+-> Generator<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_5,
+        &random_natural_matrix_natural_matrix_natural_triple_gen_var_5,
+        &special_random_natural_matrix_natural_matrix_natural_triple_gen_var_5,
+    )
+}
+
+// All `(NaturalMatrix, NaturalMatrix, Natural)` where the matrices have the same height, the
+// `Natural` is prime, every element is less than it, and the second matrix is the product of the
+// first and some matrix modulo the `Natural`, so that a solution of the system exists. The large
+// primes are those of `LARGE_PRIMES`.
+pub fn natural_matrix_natural_matrix_natural_triple_gen_var_6()
+-> Generator<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_6,
+        &random_natural_matrix_natural_matrix_natural_triple_gen_var_6,
+        &special_random_natural_matrix_natural_matrix_natural_triple_gen_var_6,
+    )
+}
+
 // All `(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)` where the matrices have the same
 // shape and every element is less than the `Natural`.
 pub fn natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1()

@@ -58,6 +58,9 @@ pub mod mod_determinant;
 ///
 /// [hfa]: malachite_base::num::arithmetic::traits::ModHowellFormAssign
 pub mod mod_howell_form;
+/// Implementations of [`ModInverse`](malachite_base::num::arithmetic::traits::ModInverse), for
+/// inverting a square matrix modulo a prime.
+pub mod mod_inverse;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced), a
 /// trait for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
 /// modulo a number.
@@ -247,6 +250,9 @@ pub mod mod_rank;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of [`ModSolve`](malachite_base::num::arithmetic::traits::ModSolve), for solving
+/// a system of linear equations modulo a prime.
+pub mod mod_solve;
 /// Implementations of
 /// [`ModSolveLowerTriangular`](malachite_base::num::arithmetic::traits::ModSolveLowerTriangular),
 /// for solving a lower triangular system of equations modulo a number.

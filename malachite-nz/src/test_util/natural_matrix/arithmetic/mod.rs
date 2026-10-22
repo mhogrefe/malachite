@@ -21,6 +21,7 @@ pub mod mod_power_of_2_mul_vector;
 pub mod mod_power_of_2_pow;
 pub mod mod_power_of_2_square;
 pub mod mod_rank;
+pub mod mod_solve;
 pub mod mod_solve_lower_triangular;
 pub mod mod_solve_upper_triangular;
 pub mod mod_square;

@@ -462,9 +462,12 @@ documented by git history.
   operations depending on the size and the modulus. A composite modulus makes the LU decomposition
   and the rank panic only at a non-invertible pivot.
 - New `ModSolve` trait in malachite-base, implemented for `UnsignedMatrix<T>` with matrix and
-  `UnsignedVector<T>` right-hand sides, each operand by value or by reference: a solution of $AX =
+  `UnsignedVector<T>` right-hand sides and, in malachite-nz, `NaturalMatrix` with matrix and
+  `NaturalVector` right-hand sides (and moduli by value or by reference), each operand by value or
+  by reference: a solution of $AX =
   B$ or $Ax = b$ modulo a prime for any shape and rank, or `None`, matching FLINT's
-  `nmod_mat_can_solve`; and `ModInverse` for `UnsignedMatrix<T>`, the inverse modulo a prime, or
+  `nmod_mat_can_solve` and `fmpz_mod_mat_can_solve`; and `ModInverse` for `UnsignedMatrix<T>` and
+  `NaturalMatrix`, the inverse modulo a prime, or
   `None` for a singular matrix, like `nmod_mat_inv`.
 - New `ModReducedRowEchelonForm`, `ModReducedRowEchelonFormAssign`, `ModNullspace`, and
   `ModLeftNullspace` traits in malachite-base, implemented for `UnsignedMatrix<T>` with the matrix

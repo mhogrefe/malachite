@@ -1074,6 +1074,7 @@ pub mod natural_matrix {
         pub mod mod_add;
         pub mod mod_determinant;
         pub mod mod_howell_form;
+        pub mod mod_inverse;
         pub mod mod_is_reduced;
         pub mod mod_kronecker_product;
         pub mod mod_lu_decomposition;
@@ -1098,6 +1099,7 @@ pub mod natural_matrix {
         pub mod mod_power_of_2_trace;
         pub mod mod_rank;
         pub mod mod_shl;
+        pub mod mod_solve;
         pub mod mod_solve_lower_triangular;
         pub mod mod_solve_upper_triangular;
         pub mod mod_square;

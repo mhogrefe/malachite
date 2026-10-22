@@ -124,6 +124,7 @@ use crate::test_util::generators::{
     limbs_odd_factorial_valid, matrix_positions, natural_matrix_positions,
 };
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
+use crate::test_util::natural_matrix::arithmetic::mod_solve::natural_matrix_mod_solve_naive;
 use core::str::FromStr;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::{ExhaustiveBools, exhaustive_bools};
@@ -4378,6 +4379,46 @@ pub fn exhaustive_natural_matrix_natural_pair_gen_var_6() -> It<(NaturalMatrix, 
             ys,
         )
         .map(|((_, m), a)| (a, m)),
+    )
+}
+
+// Pairs of matrices of the same height, with their elements less than a prime m, and m.
+pub fn exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_5()
+-> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    fn ys(((h, w, k), m): ((u64, u64, u64), Natural)) -> It<(NaturalMatrix, NaturalMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_natural_matrices_with_dimensions_from_iterator(
+                h,
+                w,
+                exhaustive_natural_range(Natural::ZERO, m.clone()),
+            ),
+            exhaustive_natural_matrices_with_dimensions_from_iterator(
+                h,
+                k,
+                exhaustive_natural_range(Natural::ZERO, m),
+            ),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn_balanced(
+            Box::new(exhaustive_pairs(
+                exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_prime_naturals(),
+            )),
+            ys,
+        )
+        .map(|((_, m), (a, b))| (a, b, m)),
+    )
+}
+
+// Pairs of matrices of the same height, with their elements less than a prime m, such that the
+// system with the first as its matrix and the second as its right-hand side has a solution modulo
+// m, and m.
+pub fn exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_6()
+-> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Box::new(
+        exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_5()
+            .filter(|(a, b, m)| natural_matrix_mod_solve_naive(a, b, m).is_some()),
     )
 }
 

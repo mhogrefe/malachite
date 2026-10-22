@@ -21,6 +21,13 @@
     does, and the `fmpz_mod_mat_rank` and `fmpz_mod_mat_det` modes recompute the result with
     `fmpz_mod_mat_rank` and `fmpz_mod_mat_det`.
 
+    The solving and inverse demos print `A.mod_solve(B, m) = R` and `A.mod_inverse(m) = R`, where `R`
+    is `None` or `Some(X)`, and `B` and `X` are matrices, or, in the `fmpz_mod_mat_can_solve_vec`
+    mode, vectors. The solving modes recompute the solution with `fmpz_mod_mat_can_solve`, treating
+    a vector as a matrix with one column; like Malachite, FLINT returns the solution whose elements
+    in the rows of the non-pivot columns are zero. The `fmpz_mod_mat_inv` mode recomputes the
+    inverse with `fmpz_mod_mat_inv`.
+
     Matrices are read by fmpz_mat_init_set_str_malachite in util.c. Each mode treats any other
     nonempty line as an error, and an input with no lines at all.
 */
@@ -31,6 +38,7 @@
 
 #include <flint/fmpz.h>
 #include <flint/fmpz_mat.h>
+#include <flint/fmpz_vec.h>
 #include <flint/fmpz_mod.h>
 #include <flint/fmpz_mod_mat.h>
 
@@ -41,7 +49,7 @@ static const char * current_name;
 static const char * current_op;
 static int current_kind;
 
-enum { KIND_TRIL, KIND_TRIU, KIND_LU, KIND_RANK, KIND_DET };
+enum { KIND_TRIL, KIND_TRIU, KIND_LU, KIND_RANK, KIND_DET, KIND_SOLVE, KIND_SOLVE_VEC, KIND_INV };
 
 static int
 report(const fmpz_mat_t actual, const fmpz_mat_t expected, int line_number)
@@ -353,6 +361,163 @@ check_unary_line(char * line, int line_number)
     return result;
 }
 
+/* Reads a matrix, or, if `vector`, a vector as a matrix with one column. */
+static int
+read_matrix_or_vector(fmpz_mat_t mat, const char * s, int vector)
+{
+    if (!vector)
+    {
+        return fmpz_mat_init_set_str_malachite(mat, s);
+    }
+    slong len;
+    fmpz * vec = fmpz_vec_set_str_malachite(&len, s);
+    if (vec == NULL)
+    {
+        fmpz_mat_init(mat, 0, 1);
+        return 0;
+    }
+    fmpz_mat_init(mat, len, 1);
+    for (slong i = 0; i < len; i++)
+    {
+        fmpz_set(fmpz_mat_entry(mat, i, 0), vec + i);
+    }
+    _fmpz_vec_clear(vec, len);
+    return 1;
+}
+
+static int
+check_solve_line(char * line, int line_number)
+{
+    line[strcspn(line, "\r\n")] = '\0';
+    int inverse = current_kind == KIND_INV;
+    int vector = current_kind == KIND_SOLVE_VEC;
+    const char * needle = inverse ? ".mod_inverse(" : ".mod_solve(";
+    char * at = strstr(line, needle);
+    if (at == NULL)
+    {
+        if (line[0] == '\0')
+        {
+            return 0;
+        }
+        flint_printf("error in %s test, line %d: unrecognized line\n", current_name, line_number);
+        return 1;
+    }
+    *at = '\0';
+    char * a_str = line;
+    char * args = at + strlen(needle);
+    char * eq = strstr(args, ") = ");
+    if (eq == NULL)
+    {
+        flint_printf("error in %s test, line %d: unrecognized line\n", current_name, line_number);
+        return 1;
+    }
+    *eq = '\0';
+    char * r_str = eq + 4;
+    char * b_str = NULL;
+    char * m_str = args;
+    if (!inverse)
+    {
+        char * comma = strrchr(args, ',');
+        if (comma == NULL || comma[1] != ' ')
+        {
+            flint_printf("error in %s test, line %d: unrecognized line\n", current_name,
+                         line_number);
+            return 1;
+        }
+        *comma = '\0';
+        b_str = args;
+        m_str = comma + 2;
+    }
+    checked++;
+    int result = 0;
+    int some = 0;
+    fmpz_t m;
+    fmpz_init(m);
+    fmpz_mat_t a, b, expected;
+    int ok = fmpz_mat_init_set_str_malachite(a, a_str);
+    if (inverse)
+    {
+        fmpz_mat_init(b, 0, 0);
+    }
+    else
+    {
+        ok &= read_matrix_or_vector(b, b_str, vector);
+    }
+    if (strcmp(r_str, "None") == 0)
+    {
+        fmpz_mat_init(expected, 0, 0);
+    }
+    else
+    {
+        size_t len = strlen(r_str);
+        if (strncmp(r_str, "Some(", 5) != 0 || len < 6 || r_str[len - 1] != ')')
+        {
+            fmpz_mat_init(expected, 0, 0);
+            ok = 0;
+        }
+        else
+        {
+            r_str[len - 1] = '\0';
+            some = 1;
+            ok &= read_matrix_or_vector(expected, r_str + 5, vector);
+        }
+    }
+    ok &= fmpz_set_str(m, m_str, 10) == 0 && fmpz_sgn(m) > 0;
+    if (!ok)
+    {
+        flint_printf("error in %s test, line %d: unreadable line\n", current_name, line_number);
+        result = 1;
+    }
+    else
+    {
+        fmpz_mod_ctx_t ctx;
+        fmpz_mod_ctx_init(ctx, m);
+        slong h = fmpz_mat_nrows(a), w = fmpz_mat_ncols(a);
+        fmpz_mod_mat_t am, xm;
+        fmpz_mod_mat_init(am, h, w, ctx);
+        fmpz_mod_mat_set_fmpz_mat(am, a, ctx);
+        int solvable;
+        if (inverse)
+        {
+            fmpz_mod_mat_init(xm, h, w, ctx);
+            solvable = fmpz_mod_mat_inv(xm, am, ctx);
+        }
+        else
+        {
+            slong k = fmpz_mat_ncols(b);
+            fmpz_mod_mat_t bm;
+            fmpz_mod_mat_init(bm, fmpz_mat_nrows(b), k, ctx);
+            fmpz_mod_mat_set_fmpz_mat(bm, b, ctx);
+            fmpz_mod_mat_init(xm, w, k, ctx);
+            solvable = fmpz_mod_mat_can_solve(xm, am, bm, ctx);
+            fmpz_mod_mat_clear(bm, ctx);
+        }
+        if (solvable != some)
+        {
+            flint_printf("error in %s test, line %d: FLINT %s a solution, but Malachite %s\n",
+                         current_name, line_number, solvable ? "finds" : "does not find",
+                         some ? "does" : "does not");
+            result = 1;
+        }
+        else if (solvable)
+        {
+            fmpz_mat_t actual;
+            fmpz_mat_init(actual, fmpz_mod_mat_nrows(xm, ctx), fmpz_mod_mat_ncols(xm, ctx));
+            fmpz_mod_mat_get_fmpz_mat(actual, xm, ctx);
+            result = report(actual, expected, line_number);
+            fmpz_mat_clear(actual);
+        }
+        fmpz_mod_mat_clear(xm, ctx);
+        fmpz_mod_mat_clear(am, ctx);
+        fmpz_mod_ctx_clear(ctx);
+    }
+    fmpz_clear(m);
+    fmpz_mat_clear(a);
+    fmpz_mat_clear(b);
+    fmpz_mat_clear(expected);
+    return result;
+}
+
 static int
 run(const char * arg, const char * name, const char * op, int kind,
     int (*check)(char *, int))
@@ -395,4 +560,22 @@ int
 run_fmpz_mod_mat_det(const char * arg)
 {
     return run(arg, "fmpz_mod_mat_det", "mod_determinant", KIND_DET, check_unary_line);
+}
+
+int
+run_fmpz_mod_mat_can_solve(const char * arg)
+{
+    return run(arg, "fmpz_mod_mat_can_solve", "mod_solve", KIND_SOLVE, check_solve_line);
+}
+
+int
+run_fmpz_mod_mat_can_solve_vec(const char * arg)
+{
+    return run(arg, "fmpz_mod_mat_can_solve_vec", "mod_solve", KIND_SOLVE_VEC, check_solve_line);
+}
+
+int
+run_fmpz_mod_mat_inv(const char * arg)
+{
+    return run(arg, "fmpz_mod_mat_inv", "mod_inverse", KIND_INV, check_solve_line);
 }

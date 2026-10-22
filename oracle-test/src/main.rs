@@ -3813,4 +3813,19 @@ fn test_against_flint() {
             flint_mode,
         );
     }
+    // Solutions of linear systems and inverses of NaturalMatrixes, against fmpz_mod_mat_can_solve
+    // and fmpz_mod_mat_inv.
+    for (op, flint_mode) in [
+        ("mod_solve", "fmpz_mod_mat_can_solve"),
+        ("mod_solve_solvable", "fmpz_mod_mat_can_solve"),
+        ("mod_solve_vector", "fmpz_mod_mat_can_solve_vec"),
+        ("mod_inverse", "fmpz_mod_mat_inv"),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            &format!("demo_natural_matrix_{op}"),
+            flint_mode,
+        );
+    }
 }
