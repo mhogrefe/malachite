@@ -137,7 +137,7 @@ pub(crate) fn charpoly_berkowitz(cp: &mut [Natural], xs: &[Natural], n: usize, m
 // Whether the permutation `perm` of `0..perm.len()` is odd.
 //
 // This is equivalent to `_perm_parity` from `perm/parity.c`, FLINT 3.6.0.
-fn permutation_is_odd(perm: &[usize]) -> bool {
+pub(crate) fn permutation_is_odd(perm: &[usize]) -> bool {
     let mut visited = vec![false; perm.len()];
     let mut odd = false;
     for start in 0..perm.len() {

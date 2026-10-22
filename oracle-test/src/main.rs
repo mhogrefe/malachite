@@ -3845,4 +3845,42 @@ fn test_against_flint() {
             300,
         );
     }
+    // Hadamard bounds for IntegerMatrixes, against fmpz_mat_det_bound, fmpz_mat_det_bound_submatrix,
+    // and fmpz_mat_solve_bound.
+    for (op, flint_mode) in [
+        ("determinant_bound", "fmpz_mat_det_bound"),
+        (
+            "submatrix_determinant_bound",
+            "fmpz_mat_det_bound_submatrix",
+        ),
+        ("solve_bounds", "fmpz_mat_solve_bound"),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            &format!("demo_integer_matrix_{op}"),
+            flint_mode,
+        );
+    }
+    // Fraction-free LU decompositions, determinants, and fraction-free reduced row echelon form
+    // checks for IntegerMatrixes, against fmpz_mat_fflu, fmpz_mat_det_bareiss, fmpz_mat_det_cofactor,
+    // and fmpz_mat_is_in_rref_with_rank. The `_low_rank` demo multiplies matrices to get many of less
+    // than full rank.
+    for (op, flint_mode) in [
+        ("fraction_free_lu_decomposition", "fmpz_mat_fflu"),
+        ("fraction_free_lu_decomposition_low_rank", "fmpz_mat_fflu"),
+        ("determinant_bareiss", "fmpz_mat_det_bareiss"),
+        ("determinant_cofactor", "fmpz_mat_det_cofactor"),
+        (
+            "is_in_reduced_row_echelon_form_with_rank",
+            "fmpz_mat_is_in_rref_with_rank",
+        ),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            &format!("demo_integer_matrix_{op}"),
+            flint_mode,
+        );
+    }
 }

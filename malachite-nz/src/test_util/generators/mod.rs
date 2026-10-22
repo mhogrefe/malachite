@@ -3985,6 +3985,15 @@ pub fn integer_matrix_gen_var_1() -> Generator<IntegerMatrix> {
     )
 }
 
+// All square `IntegerMatrix`s of dimension at most 4.
+pub fn integer_matrix_gen_var_2() -> Generator<IntegerMatrix> {
+    Generator::new(
+        &exhaustive_integer_matrix_gen_var_2,
+        &random_integer_matrix_gen_var_2,
+        &special_random_integer_matrix_gen_var_2,
+    )
+}
+
 pub fn integer_matrix_pair_gen() -> Generator<(IntegerMatrix, IntegerMatrix)> {
     Generator::new(
         &exhaustive_integer_matrix_pair_gen,
@@ -4071,6 +4080,16 @@ pub fn integer_matrix_pair_gen_var_6() -> Generator<(IntegerMatrix, IntegerMatri
         &exhaustive_integer_matrix_pair_gen_var_6,
         &random_integer_matrix_pair_gen_var_6,
         &special_random_integer_matrix_pair_gen_var_6,
+    )
+}
+
+// All pairs of `IntegerMatrix`s where the first is square and the second has the same height, as
+// for the coefficient matrix and right-hand side of a linear system.
+pub fn integer_matrix_pair_gen_var_7() -> Generator<(IntegerMatrix, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_integer_matrix_pair_gen_var_7,
+        &random_integer_matrix_pair_gen_var_7,
+        &special_random_integer_matrix_pair_gen_var_7,
     )
 }
 
@@ -4564,6 +4583,15 @@ pub fn natural_matrix_natural_pair_gen_var_6() -> Generator<(NaturalMatrix, Natu
     )
 }
 
+// The `Natural` is positive and divides every element of the matrix.
+pub fn natural_matrix_natural_pair_gen_var_7() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_7,
+        &random_natural_matrix_natural_pair_gen_var_7,
+        &special_random_natural_matrix_natural_pair_gen_var_7,
+    )
+}
+
 // All `(NaturalMatrix, NaturalMatrix, u64)` where the matrices have the same shape and every
 // element is less than 2 to the power of the `u64`.
 pub fn natural_matrix_natural_matrix_unsigned_triple_gen_var_1()
@@ -4682,6 +4710,15 @@ pub fn integer_matrix_integer_pair_gen_var_1() -> Generator<(IntegerMatrix, Inte
         &exhaustive_integer_matrix_integer_pair_gen_var_1,
         &random_integer_matrix_integer_pair_gen_var_1,
         &special_random_integer_matrix_integer_pair_gen_var_1,
+    )
+}
+
+// The `Integer` is nonzero and divides every element of the matrix.
+pub fn integer_matrix_integer_pair_gen_var_2() -> Generator<(IntegerMatrix, Integer)> {
+    Generator::new(
+        &exhaustive_integer_matrix_integer_pair_gen_var_2,
+        &random_integer_matrix_integer_pair_gen_var_2,
+        &special_random_integer_matrix_integer_pair_gen_var_2,
     )
 }
 

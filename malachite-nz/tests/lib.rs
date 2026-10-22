@@ -357,6 +357,11 @@ pub mod integer_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod crt;
+        pub mod determinant;
+        pub mod determinant_bound;
+        pub mod div_exact;
+        pub mod fraction_free_lu_decomposition;
+        pub mod is_in_reduced_row_echelon_form_with_rank;
         pub mod kronecker_product;
         pub mod mod_op;
         pub mod mod_power_of_2;
@@ -368,8 +373,10 @@ pub mod integer_matrix {
         pub mod pow;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod solve_bounds;
         pub mod square;
         pub mod sub;
+        pub mod submatrix_determinant_bound;
         pub mod trace;
         pub mod vector_mul;
     }
@@ -1070,6 +1077,7 @@ pub mod natural_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod crt;
+        pub mod div_exact;
         pub mod kronecker_product;
         pub mod mod_add;
         pub mod mod_determinant;

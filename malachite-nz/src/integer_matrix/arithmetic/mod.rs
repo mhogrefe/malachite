@@ -42,6 +42,84 @@ pub mod content_chained;
 /// combine a matrix of residues modulo any number with one modulo a word-sized number into balanced
 /// representatives by the Chinese remainder theorem.
 pub mod crt;
+crate_test_mod! {
+    /// Algorithms for the determinant: cofactor expansion and Bareiss's fraction-free elimination.
+    /// Internal machinery for a future determinant, public only under `test_build`.
+    determinant
+}
+/// The method [`determinant_bound`](super::IntegerMatrix::determinant_bound), an upper bound for
+/// the absolute value of the determinant from Hadamard's inequality.
+pub mod determinant_bound;
+/// Exact division of a matrix by a scalar, by implementations of
+/// [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
+/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign).
+///
+/// # div_exact
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExact;
+/// use malachite_base::num::basic::traits::{NegativeOne, One};
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// assert_eq!(
+///     IntegerMatrix::from_str("[]_{2,0}")
+///         .unwrap()
+///         .div_exact(Integer::from(5))
+///         .to_string(),
+///     "[]_{2,0}"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[0, -6; -255, -3]")
+///         .unwrap()
+///         .div_exact(Integer::ONE)
+///         .to_string(),
+///     "[0, -6; -255, -3]"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[0, -6; -255, -3]")
+///         .unwrap()
+///         .div_exact(Integer::NEGATIVE_ONE)
+///         .to_string(),
+///     "[0, 6; 255, 3]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[0, -6; -255, -3]").unwrap())
+///         .div_exact(&Integer::from(-3))
+///         .to_string(),
+///     "[0, 2; 85, 1]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[-3802951800684688204490109616128, 6; 0, 3]").unwrap())
+///         .div_exact(Integer::from(3))
+///         .to_string(),
+///     "[-1267650600228229401496703205376, 2; 0, 1]"
+/// );
+/// ```
+///
+/// # div_exact_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExactAssign;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// let mut a = IntegerMatrix::from_str("[0, -6; -255, -3]").unwrap();
+/// a.div_exact_assign(Integer::from(-3));
+/// assert_eq!(a.to_string(), "[0, 2; 85, 1]");
+/// ```
+pub mod div_exact;
+/// Implementations of [`FractionFreeLuDecomposition`][fflu], for computing a fraction-free LU
+/// decomposition of a matrix.
+///
+/// [fflu]: malachite_base::num::arithmetic::traits::FractionFreeLuDecomposition
+pub mod fraction_free_lu_decomposition;
+crate_test_mod! {
+    /// A check of whether a matrix is in fraction-free reduced row echelon form with a given
+    /// denominator and rank. Internal machinery for a future reduced row echelon form, public only
+    /// under `test_build`.
+    is_in_reduced_row_echelon_form_with_rank
+}
 /// Implementations of
 /// [`KroneckerProduct`](malachite_base::num::arithmetic::traits::KroneckerProduct) and
 /// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
@@ -118,6 +196,9 @@ pub mod scalar_mul;
 /// assert_eq!(a.to_string(), "[4, -8; 12, 16]");
 /// ```
 pub mod shl;
+/// The method [`solve_bounds`](super::IntegerMatrix::solve_bounds), upper bounds for the numerators
+/// and denominators of the solution of a linear system.
+pub mod solve_bounds;
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a square
 /// matrix.
@@ -125,6 +206,10 @@ pub mod square;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;
+/// The method [`submatrix_determinant_bound`](super::IntegerMatrix::submatrix_determinant_bound),
+/// an upper bound for the absolute values of the determinants of the square submatrices of a
+/// matrix.
+pub mod submatrix_determinant_bound;
 
 /// An implementation of [`Trace`](malachite_base::num::arithmetic::traits::Trace), the sum of the
 /// diagonal elements of a square matrix.

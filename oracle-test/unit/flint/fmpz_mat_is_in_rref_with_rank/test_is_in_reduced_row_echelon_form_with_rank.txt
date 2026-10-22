@@ -1,0 +1,15 @@
+is_in_reduced_row_echelon_form_with_rank([]_{0,0}, 1, 0) = true
+is_in_reduced_row_echelon_form_with_rank([]_{2,0}, 5, 0) = true
+is_in_reduced_row_echelon_form_with_rank([0, 0; 0, 0], 3, 0) = true
+is_in_reduced_row_echelon_form_with_rank([0, 0; 0, 1], 1, 0) = false
+is_in_reduced_row_echelon_form_with_rank([2, 0, 4; 0, 2, 6], 2, 2) = true
+is_in_reduced_row_echelon_form_with_rank([2, 0, 4; 0, 2, 6], 2, 1) = false
+is_in_reduced_row_echelon_form_with_rank([2, 0, 4; 0, 3, 6], 2, 2) = false
+is_in_reduced_row_echelon_form_with_rank([0, 2, 4; 2, 0, 6], 2, 2) = false
+is_in_reduced_row_echelon_form_with_rank([2, 1, 4; 0, 2, 6], 2, 2) = false
+is_in_reduced_row_echelon_form_with_rank([0, 5, 0, 1; 0, 0, 5, 2; 0, 0, 0, 0], 5, 2) = true
+is_in_reduced_row_echelon_form_with_rank([0, 5, 0, 1; 0, 0, 5, 2; 0, 0, 0, 1], 5, 2) = false
+is_in_reduced_row_echelon_form_with_rank([-3, 0; 0, -3], -3, 2) = true
+is_in_reduced_row_echelon_form_with_rank([-3, 0; 0, -3], 3, 2) = false
+is_in_reduced_row_echelon_form_with_rank([1, 2, 3], 1, 1) = true
+is_in_reduced_row_echelon_form_with_rank([0, 0, 0], 1, 1) = true

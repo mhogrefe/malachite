@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonical_primitive_part::register(runner);
     content::register(runner);
     content_chained::register(runner);
+    div_exact::register(runner);
     mod_add::register(runner);
     mod_determinant::register(runner);
     mod_howell_form::register(runner);
@@ -57,6 +58,7 @@ pub(crate) fn register(runner: &mut Runner) {
 mod canonical_primitive_part;
 mod content;
 mod content_chained;
+mod div_exact;
 mod mod_add;
 mod mod_determinant;
 mod mod_howell_form;

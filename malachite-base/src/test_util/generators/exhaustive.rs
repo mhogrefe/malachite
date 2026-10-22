@@ -88,7 +88,8 @@ use crate::tuples::exhaustive::{
 };
 use crate::unsigned_matrix::UnsignedMatrix;
 use crate::unsigned_matrix::exhaustive::{
-    exhaustive_unsigned_matrices, exhaustive_unsigned_matrices_with_dimensions,
+    exhaustive_unsigned_matrices, exhaustive_unsigned_matrices_from_iterator,
+    exhaustive_unsigned_matrices_with_dimensions,
     exhaustive_unsigned_matrices_with_dimensions_from_iterator,
     exhaustive_unsigned_square_matrices,
 };
@@ -7632,6 +7633,22 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_12() -> It<(UnsignedMatr
             ys,
         )
         .map(|((_, m), a)| (a, m)),
+    )
+}
+
+// The matrices whose elements are the multiples of a positive c that fit in a u64, and c.
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_13() -> It<(UnsignedMatrix<u64>, u64)> {
+    fn ys(c: u64) -> It<UnsignedMatrix<u64>> {
+        Box::new(exhaustive_unsigned_matrices_from_iterator(
+            primitive_int_increasing_inclusive_range(0, u64::MAX / c).map(move |k| k * c),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn_balanced(
+            Box::new(exhaustive_positive_primitive_ints()),
+            ys,
+        )
+        .map(|(c, a)| (a, c)),
     )
 }
 

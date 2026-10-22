@@ -153,8 +153,9 @@ const fn splitmix64(seed: &mut u64) -> u64 {
 
 // A pseudorandom element less than `m`, made of several outputs of the SplitMix64 generator.
 fn pseudorandom_natural(m: &Natural, seed: &mut u64) -> Natural {
-    let limbs: Vec<u64> = (0..3).map(|_| splitmix64(seed)).collect();
-    Natural::from_owned_limbs_asc(limbs) % m
+    (0..3).fold(Natural::ZERO, |x, _| {
+        (x << 64u32) + Natural::from(splitmix64(seed))
+    }) % m
 }
 
 // A matrix with pseudorandom elements less than `m`, with diagonal elements that are units if it is

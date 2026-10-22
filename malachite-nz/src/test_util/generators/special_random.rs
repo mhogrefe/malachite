@@ -8037,6 +8037,10 @@ pub fn special_random_integer_matrix_gen_var_1(config: &GenConfig) -> It<Integer
     ))
 }
 
+pub fn special_random_integer_matrix_gen_var_2(config: &GenConfig) -> It<IntegerMatrix> {
+    Box::new(special_random_integer_matrix_gen_var_1(config).filter(|a| a.height() <= 4))
+}
+
 pub fn special_random_integer_matrix_pair_gen(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, IntegerMatrix)> {
@@ -8213,6 +8217,32 @@ pub fn special_random_integer_matrix_pair_gen_var_6(
             let a = IntegerMatrix::from_owned_elements(height, inner, (&mut xs).take(n).collect());
             let n = usize::exact_from(inner * width);
             let b = IntegerMatrix::from_owned_elements(inner, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+pub fn special_random_integer_matrix_pair_gen_var_7(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, IntegerMatrix)> {
+    let mut xs = striped_random_integers(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(n, width)| {
+            let len = usize::exact_from(n * n);
+            let a = IntegerMatrix::from_owned_elements(n, n, (&mut xs).take(len).collect());
+            let len = usize::exact_from(n * width);
+            let b = IntegerMatrix::from_owned_elements(n, width, (&mut xs).take(len).collect());
             (a, b)
         }),
     )
@@ -8945,6 +8975,12 @@ pub fn special_random_natural_matrix_natural_pair_gen_var_1(
     ))
 }
 
+pub fn special_random_natural_matrix_natural_pair_gen_var_7(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    Box::new(special_random_natural_matrix_natural_pair_gen_var_1(config).map(|(a, c)| (a * &c, c)))
+}
+
 pub fn special_random_natural_matrix_natural_pair_gen_var_2(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, Natural)> {
@@ -9367,6 +9403,12 @@ pub fn special_random_integer_matrix_integer_pair_gen_var_1(
             )
         },
     ))
+}
+
+pub fn special_random_integer_matrix_integer_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, Integer)> {
+    Box::new(special_random_integer_matrix_integer_pair_gen_var_1(config).map(|(a, c)| (a * &c, c)))
 }
 
 pub fn special_random_natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>(

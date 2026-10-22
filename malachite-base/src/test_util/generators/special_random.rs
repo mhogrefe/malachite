@@ -18,8 +18,8 @@ use crate::iterators::{NonzeroValues, with_special_value};
 use crate::maps::random::{random_b_tree_maps, random_hash_maps};
 use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, Mod, ModMul, ModPowerOf2, Parity, PowerOf2, ShrRound,
-    UnsignedAbs,
+    ArithmeticCheckedShl, DivRound, Mod, ModMul, ModPowerOf2, Parity, PowerOf2, RoundToMultiple,
+    ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -11024,6 +11024,19 @@ pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_1(
             )
         },
     ))
+}
+
+pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_13(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_pair_gen_var_1(config).map(|(mut a, c)| {
+            for x in &mut a.elements {
+                *x = x.round_to_multiple(c, Down).0;
+            }
+            (a, c)
+        }),
+    )
 }
 
 pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_6(

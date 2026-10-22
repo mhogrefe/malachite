@@ -22,6 +22,55 @@ pub mod content;
 /// Implementations of [`ContentChained`](crate::num::arithmetic::traits::ContentChained), which
 /// computes the GCD of a number and a matrix's elements.
 pub mod content_chained;
+/// Exact division of a matrix by a scalar, by implementations of
+/// [`DivExact`](crate::num::arithmetic::traits::DivExact) and
+/// [`DivExactAssign`](crate::num::arithmetic::traits::DivExactAssign).
+///
+/// # div_exact
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExact;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// assert_eq!(
+///     UnsignedMatrix::<u8>::from_str("[]_{2,0}")
+///         .unwrap()
+///         .div_exact(5)
+///         .to_string(),
+///     "[]_{2,0}"
+/// );
+/// assert_eq!(
+///     UnsignedMatrix::<u8>::from_str("[0, 6; 255, 3]")
+///         .unwrap()
+///         .div_exact(1)
+///         .to_string(),
+///     "[0, 6; 255, 3]"
+/// );
+/// assert_eq!(
+///     (&UnsignedMatrix::<u8>::from_str("[0, 6; 255, 3]").unwrap())
+///         .div_exact(3)
+///         .to_string(),
+///     "[0, 2; 85, 1]"
+/// );
+/// assert_eq!(
+///     (&UnsignedMatrix::<u64>::from_str("[18446744073709551614, 4]").unwrap())
+///         .div_exact(2)
+///         .to_string(),
+///     "[9223372036854775807, 2]"
+/// );
+/// ```
+///
+/// # div_exact_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExactAssign;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// let mut a = UnsignedMatrix::<u8>::from_str("[0, 6; 255, 3]").unwrap();
+/// a.div_exact_assign(3);
+/// assert_eq!(a.to_string(), "[0, 2; 85, 1]");
+/// ```
+pub mod div_exact;
 /// Implementations of [`ModAdd`](crate::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.

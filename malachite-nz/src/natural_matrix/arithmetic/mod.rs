@@ -39,6 +39,58 @@ pub mod content_chained;
 /// of residues modulo any number with one modulo a word-sized number by the Chinese remainder
 /// theorem.
 pub mod crt;
+/// Exact division of a matrix by a scalar, by implementations of
+/// [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
+/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign).
+///
+/// # div_exact
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExact;
+/// use malachite_base::num::basic::traits::One;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::NaturalMatrix;
+///
+/// assert_eq!(
+///     NaturalMatrix::from_str("[]_{2,0}")
+///         .unwrap()
+///         .div_exact(Natural::from(5u32))
+///         .to_string(),
+///     "[]_{2,0}"
+/// );
+/// assert_eq!(
+///     NaturalMatrix::from_str("[0, 6; 255, 3]")
+///         .unwrap()
+///         .div_exact(Natural::ONE)
+///         .to_string(),
+///     "[0, 6; 255, 3]"
+/// );
+/// assert_eq!(
+///     (&NaturalMatrix::from_str("[0, 6; 255, 3]").unwrap())
+///         .div_exact(&Natural::from(3u32))
+///         .to_string(),
+///     "[0, 2; 85, 1]"
+/// );
+/// assert_eq!(
+///     (&NaturalMatrix::from_str("[3802951800684688204490109616128, 6; 0, 3]").unwrap())
+///         .div_exact(Natural::from(3u32))
+///         .to_string(),
+///     "[1267650600228229401496703205376, 2; 0, 1]"
+/// );
+/// ```
+///
+/// # div_exact_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::DivExactAssign;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::NaturalMatrix;
+///
+/// let mut a = NaturalMatrix::from_str("[0, 6; 255, 3]").unwrap();
+/// a.div_exact_assign(Natural::from(3u32));
+/// assert_eq!(a.to_string(), "[0, 2; 85, 1]");
+/// ```
+pub mod div_exact;
 /// Implementations of
 /// [`KroneckerProduct`](malachite_base::num::arithmetic::traits::KroneckerProduct) and
 /// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for

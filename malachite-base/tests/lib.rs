@@ -895,6 +895,7 @@ pub mod unsigned_matrix {
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod content_chained;
+        pub mod div_exact;
         pub mod mod_add;
         pub mod mod_determinant;
         pub mod mod_howell_form;

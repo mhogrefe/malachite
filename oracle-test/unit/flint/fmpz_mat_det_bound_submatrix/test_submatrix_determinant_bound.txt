@@ -1,0 +1,12 @@
+[]_{0,0}.submatrix_determinant_bound() = 1
+[]_{2,0}.submatrix_determinant_bound() = 1
+[]_{0,3}.submatrix_determinant_bound() = 1
+[0, 0].submatrix_determinant_bound() = 2
+[0].submatrix_determinant_bound() = 2
+[5].submatrix_determinant_bound() = 6
+[1, 2, 3].submatrix_determinant_bound() = 4
+[1; 2; 3].submatrix_determinant_bound() = 4
+[1, 2; 0, 0].submatrix_determinant_bound() = 3
+[0, 0; 0, 7].submatrix_determinant_bound() = 8
+[1267650600228229401496703205376, 1, 0; 1, 1267650600228229401496703205376, 0].submatrix_determinant_bound() = 1606938068204233101571475504190334901745783987825591619420160
+[1, 2; 3, 4].submatrix_determinant_bound() = 12

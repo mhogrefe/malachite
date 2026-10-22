@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content::register(runner);
     content_chained::register(runner);
     crt::register(runner);
+    div_exact::register(runner);
     kronecker_product::register(runner);
     mod_add::register(runner);
     mod_determinant::register(runner);
@@ -76,6 +77,7 @@ mod canonical_primitive_part;
 mod content;
 mod content_chained;
 mod crt;
+mod div_exact;
 mod kronecker_product;
 mod mod_add;
 mod mod_determinant;

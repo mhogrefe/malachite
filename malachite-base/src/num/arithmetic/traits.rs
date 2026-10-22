@@ -2125,6 +2125,15 @@ pub trait ModLuDecomposition<M = Self> {
     fn mod_lu_decomposition(self, m: M) -> Self::Output;
 }
 
+/// Computes a fraction-free LU decomposition of an integer matrix $A$: a permutation $P$, a lower
+/// triangular matrix $L$, an upper triangular matrix $U$ in row echelon form, and a denominator,
+/// such that $PA = LD^{-1}U$, where $D$ is a diagonal matrix formed from the pivots.
+pub trait FractionFreeLuDecomposition {
+    type Output;
+
+    fn fraction_free_lu_decomposition(self) -> Self::Output;
+}
+
 /// Computes the rank of a matrix modulo a prime $m$. The elements of the matrix must already be
 /// reduced modulo $m$.
 pub trait ModRank<M = Self> {

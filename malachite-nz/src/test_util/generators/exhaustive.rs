@@ -3675,6 +3675,10 @@ pub fn exhaustive_integer_matrix_gen_var_1() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_square_matrices())
 }
 
+pub fn exhaustive_integer_matrix_gen_var_2() -> It<IntegerMatrix> {
+    Box::new(exhaustive_integer_matrix_gen_var_1().filter(|a| a.height() <= 4))
+}
+
 pub fn exhaustive_integer_matrix_pair_gen() -> It<(IntegerMatrix, IntegerMatrix)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_integer_matrix_gen()))
 }
@@ -3795,6 +3799,22 @@ pub fn exhaustive_integer_matrix_pair_gen_var_6() -> It<(IntegerMatrix, IntegerM
                 .chain(&b.elements)
                 .all(|x| x.significant_bits() < Limb::WIDTH << 1)
         }),
+    )
+}
+
+pub fn exhaustive_integer_matrix_pair_gen_var_7() -> It<(IntegerMatrix, IntegerMatrix)> {
+    fn ys((n, width): (u64, u64)) -> It<(IntegerMatrix, IntegerMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_integer_matrices_with_dimensions(n, n),
+            exhaustive_integer_matrices_with_dimensions(n, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn_balanced(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
     )
 }
 
@@ -4153,6 +4173,10 @@ pub fn exhaustive_natural_matrix_natural_pair_gen_var_1() -> It<(NaturalMatrix, 
     ))
 }
 
+pub fn exhaustive_natural_matrix_natural_pair_gen_var_7() -> It<(NaturalMatrix, Natural)> {
+    Box::new(exhaustive_natural_matrix_natural_pair_gen_var_1().map(|(a, c)| (a * &c, c)))
+}
+
 pub fn exhaustive_natural_matrix_natural_pair_gen_var_2() -> It<(NaturalMatrix, Natural)> {
     Box::new(
         exhaustive_pairs(exhaustive_natural_matrices(), exhaustive_naturals()).map(|(a, m)| {
@@ -4500,6 +4524,10 @@ pub fn exhaustive_integer_matrix_integer_pair_gen_var_1() -> It<(IntegerMatrix, 
         exhaustive_integer_matrices(),
         exhaustive_nonzero_integers(),
     ))
+}
+
+pub fn exhaustive_integer_matrix_integer_pair_gen_var_2() -> It<(IntegerMatrix, Integer)> {
+    Box::new(exhaustive_integer_matrix_integer_pair_gen_var_1().map(|(a, c)| (a * &c, c)))
 }
 
 pub fn exhaustive_natural_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>()

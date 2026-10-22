@@ -1,0 +1,11 @@
+determinant_cofactor([]_{0,0}) = 1
+determinant_cofactor([0]) = 0
+determinant_cofactor([-7]) = -7
+determinant_cofactor([1, 2; 3, 4]) = -2
+determinant_cofactor([0, 1; 1, 0]) = -1
+determinant_cofactor([2, 4; 1, 2]) = 0
+determinant_cofactor([1, 2, 3; 4, 5, 6; 7, 8, 10]) = -3
+determinant_cofactor([0, 0, 1; 0, 1, 0; 1, 0, 0]) = -1
+determinant_cofactor([2, 0, 0, 0; 0, 3, 0, 0; 0, 0, 5, 0; 0, 0, 0, 7]) = 210
+determinant_cofactor([1, 2, 3, 4; 5, 6, 7, 8; 2, 6, 4, 8; 3, 1, 1, 2]) = 72
+determinant_cofactor([1267650600228229401496703205376, 1; 1, 1267650600228229401496703205376]) = 1606938044258990275541962092341162602522202993782792835301375

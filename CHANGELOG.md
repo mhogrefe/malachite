@@ -461,6 +461,11 @@ documented by git history.
   `nmod_mat_det`, with closed formulas, Berkowitz's algorithm, LU decomposition, or Euclidean row
   operations depending on the size and the modulus. A composite modulus makes the LU decomposition
   and the rank panic only at a non-invertible pivot.
+- New `FractionFreeLuDecomposition` trait in malachite-base, implemented in malachite-nz for
+  `IntegerMatrix`, by value or by reference: a permutation $P$, a lower triangular $L$, a row
+  echelon $U$, and the last pivot $d$, with $PA = LD^{-1}U$ for the diagonal matrix $D$ of products of
+  consecutive pivots, computed by Bareiss's fraction-free elimination with FLINT's pivots, like
+  `fmpz_mat_fflu`.
 - New `ModSolve` trait in malachite-base, implemented for `UnsignedMatrix<T>` with matrix and
   `UnsignedVector<T>` right-hand sides and, in malachite-nz, `NaturalMatrix` with matrix and
   `NaturalVector` right-hand sides (and moduli by value or by reference), each operand by value or
@@ -859,6 +864,8 @@ documented by git history.
   `RoundingMode`.
 - `DivExact` (by value and by reference) and `DivExactAssign` of `UnsignedVector<T>` by a `T`,
   dividing every element by a scalar that divides it exactly.
+- `DivExact` (by value and by reference) and `DivExactAssign` of `UnsignedMatrix<T>` by a `T`,
+  dividing every element by a scalar that divides it exactly.
 - `Div` (by value and by reference) and `DivAssign` of `UnsignedVector<T>` by a `T`, rounding every
   quotient down, and `EntrywiseDivRound` (by value and by reference) and `EntrywiseDivRoundAssign`
   by a `T`, rounding every quotient according to a `RoundingMode`.
@@ -1105,6 +1112,15 @@ documented by git history.
 - `DivExact` and `DivExactAssign` of `NaturalVector` by `Natural` and of `IntegerVector` by
   `Integer`, in every combination of value and reference, dividing every element by a scalar that
   divides it exactly, like FLINT's `_fmpz_vec_scalar_divexact_fmpz`.
+- `DivExact` and `DivExactAssign` of `NaturalMatrix` by `Natural` and of `IntegerMatrix` by
+  `Integer`, in every combination of value and reference, dividing every element by a scalar that
+  divides it exactly, like FLINT's `fmpz_mat_scalar_divexact_fmpz`.
+- `IntegerMatrix::determinant_bound`, `submatrix_determinant_bound`, and `solve_bounds`: Hadamard
+  bounds for the determinant of a square matrix, for the determinants of all square submatrices of
+  a matrix of any shape, and for the numerators and denominators of the solution of a linear
+  system, identical to FLINT's `fmpz_mat_det_bound`, `fmpz_mat_det_bound_submatrix`, and
+  `fmpz_mat_solve_bound` (computed, as in FLINT, with upper-bounding 30-bit floating-point
+  magnitudes).
 - `Div` and `DivAssign` of `NaturalVector` by `Natural` and of `IntegerVector` by `Integer`, in
   every combination of value and reference, rounding every quotient as the scalar `/` does (down for
   `Natural`, toward zero for `Integer`), like FLINT's `_fmpz_vec_scalar_tdiv_q_fmpz`.

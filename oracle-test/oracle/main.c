@@ -196,6 +196,13 @@ static const oracle_mode modes[] = {
     {"fmpz_mod_mat_inv", run_fmpz_mod_mat_inv},
     {"fmpz_mod_mat_rref", run_fmpz_mod_mat_rref},
     {"fmpz_mod_mat_nullspace", run_fmpz_mod_mat_nullspace},
+    {"fmpz_mat_det_bound", run_fmpz_mat_det_bound},
+    {"fmpz_mat_det_bound_submatrix", run_fmpz_mat_det_bound_submatrix},
+    {"fmpz_mat_solve_bound", run_fmpz_mat_solve_bound},
+    {"fmpz_mat_fflu", run_fmpz_mat_fflu},
+    {"fmpz_mat_det_bareiss", run_fmpz_mat_det_bareiss},
+    {"fmpz_mat_det_cofactor", run_fmpz_mat_det_cofactor},
+    {"fmpz_mat_is_in_rref_with_rank", run_fmpz_mat_is_in_rref_with_rank},
 };
 
 int
