@@ -330,4 +330,11 @@ int run_nmod_mat_rref(const char * arg);
 int run_nmod_mat_nullspace(const char * arg);
 int run_nmod_mat_left_nullspace(const char * arg);
 
+/* fmpz_mod_mat_linalg.c */
+int run_fmpz_mod_mat_solve_tril(const char * arg);
+int run_fmpz_mod_mat_solve_triu(const char * arg);
+int run_fmpz_mod_mat_lu(const char * arg);
+int run_fmpz_mod_mat_rank(const char * arg);
+int run_fmpz_mod_mat_det(const char * arg);
+
 #endif

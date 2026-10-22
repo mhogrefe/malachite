@@ -7582,18 +7582,12 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_10() -> It<(UnsignedMatr
         ))
     }
     Box::new(
-        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
-        // appear.
-        exhaustive_dependent_pairs(
-            bit_distributor_sequence(
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(1),
-            ),
+        exhaustive_dependent_pairs_from_fn_balanced(
             Box::new(exhaustive_pairs(
                 exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
                 exhaustive_unsigned_gen_var_28::<u64>(),
             )),
-            DependentYsGenerator { ys },
+            ys,
         )
         .map(|((_, m), a)| (a, m)),
     )
@@ -7609,18 +7603,12 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_11() -> It<(UnsignedMatr
         ))
     }
     Box::new(
-        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
-        // appear.
-        exhaustive_dependent_pairs(
-            bit_distributor_sequence(
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(1),
-            ),
+        exhaustive_dependent_pairs_from_fn_balanced(
             Box::new(exhaustive_pairs(
                 exhaustive_unsigneds::<u64>(),
                 exhaustive_positive_primitive_ints::<u64>(),
             )),
-            DependentYsGenerator { ys },
+            ys,
         )
         .map(|((_, m), a)| (a, m)),
     )
@@ -7636,18 +7624,12 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_12() -> It<(UnsignedMatr
         ))
     }
     Box::new(
-        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
-        // appear.
-        exhaustive_dependent_pairs(
-            bit_distributor_sequence(
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(1),
-            ),
+        exhaustive_dependent_pairs_from_fn_balanced(
             Box::new(exhaustive_pairs(
                 exhaustive_unsigneds::<u64>(),
                 exhaustive_unsigned_gen_var_28::<u64>(),
             )),
-            DependentYsGenerator { ys },
+            ys,
         )
         .map(|((_, m), a)| (a, m)),
     )
@@ -7666,19 +7648,12 @@ pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7()
         ))
     }
     Box::new(
-        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
-        // appear: with the ruler sequence, each successive dimension and modulus gets half as many
-        // matrices as the one before.
-        exhaustive_dependent_pairs(
-            bit_distributor_sequence(
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(1),
-            ),
+        exhaustive_dependent_pairs_from_fn_balanced(
             Box::new(exhaustive_pairs(
                 exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
                 exhaustive_unsigned_gen_var_28::<u64>(),
             )),
-            DependentYsGenerator { ys },
+            ys,
         )
         .map(|((_, m), (a, b))| (a, b, m)),
     )
@@ -7696,18 +7671,12 @@ pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_8()
         ))
     }
     Box::new(
-        // A bit-distributor sequence rather than the ruler sequence, so that larger matrices
-        // appear.
-        exhaustive_dependent_pairs(
-            bit_distributor_sequence(
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(1),
-            ),
+        exhaustive_dependent_pairs_from_fn_balanced(
             Box::new(exhaustive_pairs(
                 exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()),
                 exhaustive_unsigned_gen_var_28::<u64>(),
             )),
-            DependentYsGenerator { ys },
+            ys,
         )
         .map(|((_, m), (a, b))| (a, b, m)),
     )
@@ -8007,6 +7976,25 @@ pub fn exhaustive_dependent_pairs_from_fn<X: Clone + 'static, Y: 'static>(
 ) -> It<(X, Y)> {
     Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
+        xs,
+        DependentYsGenerator { ys },
+    ))
+}
+
+// `exhaustive_dependent_pairs_from_fn` with a bit-distributor sequence rather than the ruler
+// sequence choosing the `x` of each pair. With the ruler sequence, each successive `x` gets half as
+// many pairs as the one before, so that when the `x`s are, say, dimensions and moduli, the larger
+// matrices practically never appear; with the bit-distributor sequence, the numbers of pairs
+// decrease only polynomially.
+pub fn exhaustive_dependent_pairs_from_fn_balanced<X: Clone + 'static, Y: 'static>(
+    xs: It<X>,
+    ys: fn(X) -> It<Y>,
+) -> It<(X, Y)> {
+    Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
         xs,
         DependentYsGenerator { ys },
     ))

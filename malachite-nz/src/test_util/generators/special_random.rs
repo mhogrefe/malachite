@@ -94,6 +94,7 @@ use crate::test_util::extra_variadic::{
     random_quintuples_xyyyz, random_sextuples_from_single, random_triples,
     random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
 };
+use crate::test_util::generators::LARGE_PRIMES;
 use crate::test_util::generators::common::{
     random_adjust_limbs, random_basecase, random_get_fft, random_ss, ss_spec_var_29,
     ss_spec_var_30, ss_spec_var_31, ss_spec_var_32, ss_spec_var_33, ss_spec_var_34, ss_spec_var_35,
@@ -119,6 +120,7 @@ use crate::test_util::generators::{
     matrix_positions, natural_matrix_positions,
 };
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
+use core::str::FromStr;
 use malachite_base::bools::random::{RandomBools, random_bools};
 use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::iterators::with_special_value;
@@ -139,6 +141,7 @@ use malachite_base::num::conversion::string::options::random::random_to_sci_opti
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, ToSci, WrappingFrom,
 };
+use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
@@ -158,7 +161,7 @@ use malachite_base::num::random::striped::{
 };
 use malachite_base::num::random::{
     RandomUnsignedRange, RandomUnsignedsLessThan, random_primitive_floats, random_primitive_ints,
-    random_unsigned_inclusive_range, random_unsigneds_less_than,
+    random_unsigned_inclusive_range, random_unsigned_range, random_unsigneds_less_than,
 };
 use malachite_base::options::random::{RandomOptions, random_options};
 use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
@@ -9117,6 +9120,48 @@ pub fn special_random_natural_matrix_natural_matrix_natural_triple_gen_var_3(
     )
 }
 
+pub fn special_random_natural_matrix_natural_matrix_natural_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    let mut xs = striped_random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    let mut ks = striped_random_naturals(
+        EXAMPLE_SEED.fork("m"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(n, k)| {
+            let len = usize::exact_from(n * n);
+            let mut a = NaturalMatrix::from_owned_elements(n, n, (&mut xs).take(len).collect());
+            let len = usize::exact_from(n * k);
+            let b = NaturalMatrix::from_owned_elements(n, k, (&mut xs).take(len).collect());
+            let max = a.elements.iter().chain(&b.elements).max().cloned();
+            let m = max.unwrap_or_default() + ks.next().unwrap() + Natural::ONE;
+            // A diagonal element that is not coprime to m is replaced by 1, which is, since m is
+            // then greater than 1.
+            for x in a.elements.iter_mut().step_by(usize::exact_from(n) + 1) {
+                if !(&*x).coprime_with(&m) {
+                    *x = Natural::ONE;
+                }
+            }
+            (a, b, m)
+        }),
+    )
+}
+
 pub fn special_random_natural_matrix_natural_matrix_natural_matrix_natural_quadruple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, NaturalMatrix, NaturalMatrix, Natural)> {
@@ -9340,6 +9385,119 @@ pub fn special_random_natural_matrix_natural_pair_gen_var_4(
                 height,
                 width,
                 (&mut xs).take(n).map(|x| x % &m).collect(),
+            );
+            (a, m)
+        }),
+    )
+}
+
+pub fn special_random_natural_matrix_natural_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    let large_primes: Vec<Natural> = LARGE_PRIMES
+        .iter()
+        .map(|p| Natural::from_str(p).unwrap())
+        .collect();
+    let mut use_large = random_bools(EXAMPLE_SEED.fork("use_large"));
+    let mut indices =
+        random_unsigned_range::<usize>(EXAMPLE_SEED.fork("indices"), 0, LARGE_PRIMES.len());
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 2, u64::WIDTH);
+    let mut candidates = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("candidates"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    let mut xs = striped_random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 512),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            // A large prime from the list half the time, and otherwise a prime that fits in a
+            // `u64`, with a random number of bits.
+            let m = if use_large.next().unwrap() {
+                large_primes[indices.next().unwrap()].clone()
+            } else {
+                let bits = bit_lengths.next().unwrap();
+                Natural::from(loop {
+                    let x = (candidates.next().unwrap() >> (u64::WIDTH - bits))
+                        | u64::power_of_2(bits - 1);
+                    if x.is_prime() {
+                        break x;
+                    }
+                })
+            };
+            let len = usize::exact_from(height * width);
+            let a = NaturalMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(len).map(|x| x % &m).collect(),
+            );
+            (a, m)
+        }),
+    )
+}
+
+pub fn special_random_natural_matrix_natural_pair_gen_var_6(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    let large_primes: Vec<Natural> = LARGE_PRIMES
+        .iter()
+        .map(|p| Natural::from_str(p).unwrap())
+        .collect();
+    let mut use_large = random_bools(EXAMPLE_SEED.fork("use_large"));
+    let mut indices =
+        random_unsigned_range::<usize>(EXAMPLE_SEED.fork("indices"), 0, LARGE_PRIMES.len());
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 2, u64::WIDTH);
+    let mut candidates = striped_random_unsigneds::<u64>(
+        EXAMPLE_SEED.fork("candidates"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+    );
+    let mut xs = striped_random_naturals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 512),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        )
+        .map(move |n| {
+            let (height, width) = (n, n);
+            // A large prime from the list half the time, and otherwise a prime that fits in a
+            // `u64`, with a random number of bits.
+            let m = if use_large.next().unwrap() {
+                large_primes[indices.next().unwrap()].clone()
+            } else {
+                let bits = bit_lengths.next().unwrap();
+                Natural::from(loop {
+                    let x = (candidates.next().unwrap() >> (u64::WIDTH - bits))
+                        | u64::power_of_2(bits - 1);
+                    if x.is_prime() {
+                        break x;
+                    }
+                })
+            };
+            let len = usize::exact_from(height * width);
+            let a = NaturalMatrix::from_owned_elements(
+                height,
+                width,
+                (&mut xs).take(len).map(|x| x % &m).collect(),
             );
             (a, m)
         }),

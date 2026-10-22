@@ -3776,4 +3776,41 @@ fn test_against_flint() {
         "nmod_mat_rref",
         100,
     );
+    // Triangular solving with NaturalMatrixes, against fmpz_mod_mat_solve_tril and
+    // fmpz_mod_mat_solve_triu.
+    for (op, flint_mode) in [
+        ("mod_solve_lower_triangular", "fmpz_mod_mat_solve_tril"),
+        (
+            "mod_solve_lower_triangular_unit_diagonal",
+            "fmpz_mod_mat_solve_tril",
+        ),
+        ("mod_solve_upper_triangular", "fmpz_mod_mat_solve_triu"),
+        (
+            "mod_solve_upper_triangular_unit_diagonal",
+            "fmpz_mod_mat_solve_triu",
+        ),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            &format!("demo_natural_matrix_{op}"),
+            flint_mode,
+        );
+    }
+    // LU decompositions, ranks, and determinants of NaturalMatrixes, against fmpz_mod_mat_lu,
+    // fmpz_mod_mat_rank, and fmpz_mod_mat_det. The LU and rank demos' moduli are prime, half of them
+    // with more than 64 bits; the determinant demo's moduli are mostly composite, so that LU
+    // decomposition often meets a pivot that is not invertible and Berkowitz's algorithm is used.
+    for (op, flint_mode) in [
+        ("mod_lu_decomposition", "fmpz_mod_mat_lu"),
+        ("mod_rank", "fmpz_mod_mat_rank"),
+        ("mod_determinant", "fmpz_mod_mat_det"),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            &format!("demo_natural_matrix_{op}"),
+            flint_mode,
+        );
+    }
 }

@@ -75,15 +75,17 @@ fn verify_lu<T: PrimitiveUnsigned>(
     let checked = unsigned_matrix_mod_lu_packed(a, m, true);
     // With the rank check, the decomposition succeeds only if no column is skipped before the rank
     // reaches its maximum, which means that every pivot is on the diagonal.
-    if r == h.min(w)
-        && pivots
-            .iter()
-            .enumerate()
-            .all(|(i, &j)| j == u64::exact_from(i))
-    {
-        assert_eq!(checked, packed);
-    } else {
-        assert_eq!(checked.1, 0);
+    if h >= w {
+        if r == w
+            && pivots
+                .iter()
+                .enumerate()
+                .all(|(i, &j)| j == u64::exact_from(i))
+        {
+            assert_eq!(checked, packed);
+        } else {
+            assert_eq!(checked.1, 0);
+        }
     }
 }
 

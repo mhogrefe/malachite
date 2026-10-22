@@ -4523,6 +4523,47 @@ pub fn natural_matrix_natural_pair_gen_var_4() -> Generator<(NaturalMatrix, Natu
     )
 }
 
+// Primes of more than 64 bits, for generating moduli for operations that need a prime modulus: the
+// first prime above 2^k for k in 64, 65, 70, 80, 96, 100, 127, 128, 160, 192, 200, 256, and 300,
+// and the Mersenne prime 2^127 - 1. (Malachite cannot test `Natural`s for primality, so random
+// large primes cannot be generated.)
+pub const LARGE_PRIMES: [&str; 14] = [
+    "18446744073709551629",
+    "36893488147419103363",
+    "1180591620717411303449",
+    "1208925819614629174706189",
+    "79228162514264337593543950397",
+    "1267650600228229401496703205653",
+    "170141183460469231731687303715884105727",
+    "170141183460469231731687303715884105757",
+    "340282366920938463463374607431768211507",
+    "1461501637330902918203684832716283019655932542983",
+    "6277101735386680763835789423207666416102355444464034513029",
+    "1606938044258990275541962092341162602522202993782792835301611",
+    "115792089237316195423570985008687907853269984665640564039457584007913129640233",
+    "2037035976334486086268445688409378161051468393665936250636140449354381299763336706183397533",
+];
+
+// All `(NaturalMatrix, Natural)` where the `Natural` is prime and every element of the matrix is
+// less than it. The large primes are those of `LARGE_PRIMES`.
+pub fn natural_matrix_natural_pair_gen_var_5() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_5,
+        &random_natural_matrix_natural_pair_gen_var_5,
+        &special_random_natural_matrix_natural_pair_gen_var_5,
+    )
+}
+
+// All `(NaturalMatrix, Natural)` where the matrix is square, the `Natural` is prime, and every
+// element of the matrix is less than it. The large primes are those of `LARGE_PRIMES`.
+pub fn natural_matrix_natural_pair_gen_var_6() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_6,
+        &random_natural_matrix_natural_pair_gen_var_6,
+        &special_random_natural_matrix_natural_pair_gen_var_6,
+    )
+}
+
 // All `(NaturalMatrix, NaturalMatrix, u64)` where the matrices have the same shape and every
 // element is less than 2 to the power of the `u64`.
 pub fn natural_matrix_natural_matrix_unsigned_triple_gen_var_1()
@@ -4575,6 +4616,18 @@ pub fn natural_matrix_natural_matrix_natural_triple_gen_var_3()
         &exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_3,
         &random_natural_matrix_natural_matrix_natural_triple_gen_var_3,
         &special_random_natural_matrix_natural_matrix_natural_triple_gen_var_3,
+    )
+}
+
+// All `(NaturalMatrix, NaturalMatrix, Natural)` where the first matrix is square, the second has
+// the same height, every element is less than the `Natural`, and the diagonal elements of the first
+// matrix are coprime to the `Natural`.
+pub fn natural_matrix_natural_matrix_natural_triple_gen_var_4()
+-> Generator<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_4,
+        &random_natural_matrix_natural_matrix_natural_triple_gen_var_4,
+        &special_random_natural_matrix_natural_matrix_natural_triple_gen_var_4,
     )
 }
 

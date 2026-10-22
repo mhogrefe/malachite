@@ -109,6 +109,7 @@ use crate::test_util::extra_variadic::{
     exhaustive_quintuples_xyyyz, exhaustive_sextuples_from_single, exhaustive_triples_from_single,
     exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
 };
+use crate::test_util::generators::LARGE_PRIMES;
 use crate::test_util::generators::common::{
     GMP_FORMAT_COMBO_COUNT, exhaustive_ss, exhaustive_ss_var_48, exhaustive_ss_var_57,
     exhaustive_ss_var_59, gmp_format_string_from_parts, ss_spec_var_29, ss_spec_var_30,
@@ -123,6 +124,7 @@ use crate::test_util::generators::{
     limbs_odd_factorial_valid, matrix_positions, natural_matrix_positions,
 };
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
+use core::str::FromStr;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::{ExhaustiveBools, exhaustive_bools};
 use malachite_base::foer_sequences::FoerSequence;
@@ -168,7 +170,8 @@ use malachite_base::test_util::generators::common::{
 use malachite_base::test_util::generators::exhaustive::{
     UnsignedVecPairLenGenerator1, UnsignedVecPairLenGenerator2, UnsignedVecQuadrupleLenGenerator1,
     UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
-    exhaustive_dependent_pairs_from_fn, exhaustive_index_vecs, exhaustive_tuples_by_dimension,
+    exhaustive_dependent_pairs_from_fn, exhaustive_dependent_pairs_from_fn_balanced,
+    exhaustive_index_vecs, exhaustive_tuples_by_dimension, exhaustive_unsigned_gen_var_28,
     exhaustive_unsigned_pair_gen_var_20, exhaustive_unsigned_pair_gen_var_24,
     exhaustive_unsigned_vec_unsigned_pair_gen_var_17, exhaustive_window_bounds,
 };
@@ -4323,6 +4326,89 @@ pub fn exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_3()
                 (a, b, m)
             },
         ),
+    )
+}
+
+// The large primes of `LARGE_PRIMES`, interleaved with the primes that fit in a `u64`.
+fn exhaustive_prime_naturals() -> It<Natural> {
+    Box::new(
+        LARGE_PRIMES
+            .iter()
+            .map(|p| Natural::from_str(p).unwrap())
+            .interleave(exhaustive_unsigned_gen_var_28::<u64>().map(Natural::from)),
+    )
+}
+
+// Matrices with their elements less than a prime m, and m.
+pub fn exhaustive_natural_matrix_natural_pair_gen_var_5() -> It<(NaturalMatrix, Natural)> {
+    fn ys(((height, width), m): ((u64, u64), Natural)) -> It<NaturalMatrix> {
+        Box::new(exhaustive_natural_matrices_with_dimensions_from_iterator(
+            height,
+            width,
+            exhaustive_natural_range(Natural::ZERO, m),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn_balanced(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_prime_naturals(),
+            )),
+            ys,
+        )
+        .map(|((_, m), a)| (a, m)),
+    )
+}
+
+// Square matrices with their elements less than a prime m, and m.
+pub fn exhaustive_natural_matrix_natural_pair_gen_var_6() -> It<(NaturalMatrix, Natural)> {
+    fn ys((n, m): (u64, Natural)) -> It<NaturalMatrix> {
+        Box::new(exhaustive_natural_matrices_with_dimensions_from_iterator(
+            n,
+            n,
+            exhaustive_natural_range(Natural::ZERO, m),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn_balanced(
+            Box::new(exhaustive_pairs(
+                exhaustive_unsigneds::<u64>(),
+                exhaustive_prime_naturals(),
+            )),
+            ys,
+        )
+        .map(|((_, m), a)| (a, m)),
+    )
+}
+
+// Square matrices, matrices of the same height, and a modulus that every element is less than and
+// that the diagonal elements of the square matrix are coprime to.
+pub fn exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_4()
+-> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    fn ys((n, k): (u64, u64)) -> It<(NaturalMatrix, NaturalMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_natural_matrices_with_dimensions(n, n),
+            exhaustive_natural_matrices_with_dimensions(n, k),
+        ))
+    }
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_dependent_pairs_from_fn_balanced(
+                Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+                ys,
+            ),
+            exhaustive_naturals(),
+        )
+        .filter_map(|((_, (a, b)), k)| {
+            let max = a.elements.iter().chain(&b.elements).max().cloned();
+            let m = max.unwrap_or_default() + k + Natural::ONE;
+            let n = usize::exact_from(a.height());
+            if a.elements.iter().step_by(n + 1).all(|x| x.coprime_with(&m)) {
+                Some((a, b, m))
+            } else {
+                None
+            }
+        }),
     )
 }
 

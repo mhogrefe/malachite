@@ -48,6 +48,9 @@ pub mod kronecker_product;
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
 pub mod mod_add;
+/// Implementations of [`ModDeterminant`](malachite_base::num::arithmetic::traits::ModDeterminant),
+/// for computing the determinant of a square matrix modulo a number.
+pub mod mod_determinant;
 /// Implementations of [`ModHowellForm`][hf] and [`ModHowellFormAssign`][hfa], for computing the
 /// Howell form of a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
 ///
@@ -66,6 +69,10 @@ pub mod mod_is_reduced;
 ///
 /// [kpa]: malachite_base::num::arithmetic::traits::ModKroneckerProductAssign
 pub mod mod_kronecker_product;
+/// Implementations of
+/// [`ModLuDecomposition`](malachite_base::num::arithmetic::traits::ModLuDecomposition), for
+/// computing an LU decomposition of a matrix modulo a prime.
+pub mod mod_lu_decomposition;
 /// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) and
 /// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign), for multiplying a
 /// [`NaturalMatrix`](super::NaturalMatrix) by a scalar modulo a number.
@@ -193,6 +200,9 @@ pub mod mod_power_of_2_sub;
 /// [`ModPowerOf2Trace`](malachite_base::num::arithmetic::traits::ModPowerOf2Trace), the sum of the
 /// diagonal elements of a square matrix modulo a power of 2.
 pub mod mod_power_of_2_trace;
+/// Implementations of [`ModRank`](malachite_base::num::arithmetic::traits::ModRank), for computing
+/// the rank of a matrix modulo a prime.
+pub mod mod_rank;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
 /// vector (multiplying it by a power of 2) modulo a number.
@@ -237,6 +247,14 @@ pub mod mod_power_of_2_trace;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of
+/// [`ModSolveLowerTriangular`](malachite_base::num::arithmetic::traits::ModSolveLowerTriangular),
+/// for solving a lower triangular system of equations modulo a number.
+pub mod mod_solve_lower_triangular;
+/// Implementations of
+/// [`ModSolveUpperTriangular`](malachite_base::num::arithmetic::traits::ModSolveUpperTriangular),
+/// for solving a upper triangular system of equations modulo a number.
+pub mod mod_solve_upper_triangular;
 /// Implementations of [`ModSquare`](malachite_base::num::arithmetic::traits::ModSquare) and
 /// [`ModSquareAssign`](malachite_base::num::arithmetic::traits::ModSquareAssign), for squaring a
 /// square [`NaturalMatrix`](super::NaturalMatrix) modulo a number.

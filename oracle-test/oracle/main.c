@@ -186,6 +186,11 @@ static const oracle_mode modes[] = {
     {"nmod_mat_rref", run_nmod_mat_rref},
     {"nmod_mat_nullspace", run_nmod_mat_nullspace},
     {"nmod_mat_left_nullspace", run_nmod_mat_left_nullspace},
+    {"fmpz_mod_mat_solve_tril", run_fmpz_mod_mat_solve_tril},
+    {"fmpz_mod_mat_solve_triu", run_fmpz_mod_mat_solve_triu},
+    {"fmpz_mod_mat_lu", run_fmpz_mod_mat_lu},
+    {"fmpz_mod_mat_rank", run_fmpz_mod_mat_rank},
+    {"fmpz_mod_mat_det", run_fmpz_mod_mat_det},
 };
 
 int

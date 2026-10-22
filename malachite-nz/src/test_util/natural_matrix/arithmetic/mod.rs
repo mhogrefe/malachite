@@ -8,8 +8,10 @@
 
 pub mod crt;
 pub mod kronecker_product;
+pub mod mod_determinant;
 pub mod mod_howell_form;
 pub mod mod_kronecker_product;
+pub mod mod_lu_decomposition;
 pub mod mod_mul_matrix;
 pub mod mod_mul_vector;
 pub mod mod_pow;
@@ -18,6 +20,9 @@ pub mod mod_power_of_2_mul_matrix;
 pub mod mod_power_of_2_mul_vector;
 pub mod mod_power_of_2_pow;
 pub mod mod_power_of_2_square;
+pub mod mod_rank;
+pub mod mod_solve_lower_triangular;
+pub mod mod_solve_upper_triangular;
 pub mod mod_square;
 pub mod mod_strong_echelon_form;
 pub mod mul;
