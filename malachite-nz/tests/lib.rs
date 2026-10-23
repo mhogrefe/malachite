@@ -354,7 +354,9 @@ pub mod integer_matrix {
         pub mod add_mul_unsigned_matrix;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
+        pub mod can_solve_multi_mod;
         pub mod canonical_primitive_part;
+        pub mod certify_lu_mod_p;
         pub mod content;
         pub mod content_chained;
         pub mod crt;
@@ -362,6 +364,8 @@ pub mod integer_matrix {
         pub mod determinant_bound;
         pub mod div_exact;
         pub mod fraction_free_lu_decomposition;
+        pub mod fraction_matrix;
+        pub mod inverse;
         pub mod is_in_reduced_row_echelon_form_with_rank;
         pub mod kronecker_product;
         pub mod mod_op;
@@ -376,11 +380,14 @@ pub mod integer_matrix {
         pub mod shl;
         pub mod solve;
         pub mod solve_bounds;
+        pub mod solve_dixon;
+        pub mod solve_multi_mod;
         pub mod square;
         pub mod sub;
         pub mod submatrix_determinant_bound;
         pub mod trace;
         pub mod vector_mul;
+        pub mod word_lu;
     }
     pub mod basic {
         pub mod named;

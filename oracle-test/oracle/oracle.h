@@ -351,6 +351,14 @@ int run_fmpz_mat_is_in_rref_with_rank(const char * arg);
 int run_fmpz_mat_solve_fflu(const char * arg);
 int run_fmpz_mat_solve_cramer(const char * arg);
 int run_fmpz_mat_solve_fflu_precomp(const char * arg);
+int run_fmpz_mat_solve(const char * arg);
+int run_fmpz_mat_solve_dixon_den(const char * arg);
+int run_fmpz_mat_solve_multi_mod_den(const char * arg);
+int run_fmpz_mat_can_solve_fflu(const char * arg);
+int run_fmpz_mat_can_solve_multi_mod_den(const char * arg);
+int run_fmpz_mat_can_solve(const char * arg);
+int run_fmpz_mat_inv(const char * arg);
+int run_fmpz_mat_rref_upper_certify_lu_mod_p(const char * arg);
 int run_fmpq_mat_set_fmpz_mat_mod_fmpz(const char * arg);
 
 #endif

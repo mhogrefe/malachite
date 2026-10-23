@@ -37,6 +37,8 @@
 
 #include <flint/fmpz.h>
 #include <flint/fmpz_mat.h>
+#include <flint/nmod_mat.h>
+#include <flint/perm.h>
 
 #include "oracle.h"
 
@@ -46,7 +48,9 @@ static const char * current_op;
 static int current_kind;
 
 enum { KIND_FFLU, KIND_DET_BAREISS, KIND_DET_COFACTOR, KIND_IS_IN_RREF, KIND_SOLVE_FFLU,
-       KIND_SOLVE_CRAMER, KIND_SOLVE_FFLU_PRECOMP };
+       KIND_SOLVE_CRAMER, KIND_SOLVE_FFLU_PRECOMP, KIND_SOLVE, KIND_SOLVE_DIXON_DEN,
+       KIND_SOLVE_MULTI_MOD_DEN, KIND_CAN_SOLVE_FFLU, KIND_CAN_SOLVE_MULTI_MOD_DEN, KIND_CAN_SOLVE,
+       KIND_INV, KIND_RREF_CERTIFY };
 
 static int
 unrecognized(int line_number)
@@ -230,7 +234,9 @@ static int
 check_solve(char * args, char * rest, int line_number)
 {
     size_t a_len = matrix_length(args);
-    if (a_len == 0 || strncmp(args + a_len, ", ", 2) != 0)
+    int single = current_kind == KIND_INV;
+    int certify = current_kind == KIND_RREF_CERTIFY;
+    if (a_len == 0 || (single ? args[a_len] != '\0' : strncmp(args + a_len, ", ", 2) != 0))
     {
         return unrecognized(line_number);
     }
@@ -242,7 +248,11 @@ check_solve(char * args, char * rest, int line_number)
         flint_printf("error in %s test, line %d: unreadable input\n", current_name, line_number);
         return 1;
     }
-    if (!fmpz_mat_init_set_str_malachite(b, b_str))
+    if (single || certify)
+    {
+        fmpz_mat_init(b, fmpz_mat_nrows(a), single ? fmpz_mat_nrows(a) : 0);
+    }
+    else if (!fmpz_mat_init_set_str_malachite(b, b_str))
     {
         fmpz_mat_clear(a);
         flint_printf("error in %s test, line %d: unreadable input\n", current_name, line_number);
@@ -251,10 +261,28 @@ check_solve(char * args, char * rest, int line_number)
     slong h = fmpz_mat_nrows(a), w = fmpz_mat_ncols(a), k = fmpz_mat_ncols(b);
     fmpz_mat_t x;
     fmpz_t den;
-    fmpz_mat_init(x, w, k);
     fmpz_init(den);
     int success;
-    if (current_kind == KIND_SOLVE_FFLU_PRECOMP)
+    if (!certify)
+    {
+        fmpz_mat_init(x, w, k);
+    }
+    if (certify)
+    {
+        ulong p = strtoul(b_str, NULL, 10);
+        nmod_mat_t amod;
+        nmod_mat_init(amod, h, w, p);
+        fmpz_mat_get_nmod_mat(amod, a);
+        slong * perm = _perm_init(FLINT_MAX(h, 1));
+        slong * pivs = flint_malloc(sizeof(slong) * FLINT_MAX(w, 1));
+        slong rank = nmod_mat_lu_with_pivots(perm, pivs, amod);
+        fmpz_mat_init(x, rank, w);
+        success = fmpz_mat_rref_upper_certify_lu_mod_p(x, den, a, rank, perm, pivs);
+        nmod_mat_clear(amod);
+        _perm_clear(perm);
+        flint_free(pivs);
+    }
+    else if (current_kind == KIND_SOLVE_FFLU_PRECOMP)
     {
         fmpz_mat_t lu;
         fmpz_mat_init(lu, h, w);
@@ -272,9 +300,42 @@ check_solve(char * args, char * rest, int line_number)
     {
         success = fmpz_mat_solve_fflu(x, den, a, b);
     }
-    else
+    else if (current_kind == KIND_SOLVE_CRAMER)
     {
         success = fmpz_mat_solve_cramer(x, den, a, b);
+    }
+    else if (current_kind == KIND_SOLVE)
+    {
+        success = h == w && fmpz_mat_solve(x, den, a, b);
+        if (!success)
+        {
+            fmpz_mat_zero(x);
+            success = fmpz_mat_can_solve(x, den, a, b);
+        }
+    }
+    else if (current_kind == KIND_SOLVE_DIXON_DEN)
+    {
+        success = fmpz_mat_solve_dixon_den(x, den, a, b);
+    }
+    else if (current_kind == KIND_SOLVE_MULTI_MOD_DEN)
+    {
+        success = fmpz_mat_solve_multi_mod_den(x, den, a, b);
+    }
+    else if (current_kind == KIND_CAN_SOLVE_FFLU)
+    {
+        success = fmpz_mat_can_solve_fflu(x, den, a, b);
+    }
+    else if (current_kind == KIND_CAN_SOLVE_MULTI_MOD_DEN)
+    {
+        success = fmpz_mat_can_solve_multi_mod_den(x, den, a, b);
+    }
+    else if (current_kind == KIND_CAN_SOLVE)
+    {
+        success = fmpz_mat_can_solve(x, den, a, b);
+    }
+    else
+    {
+        success = fmpz_mat_inv(x, den, a);
     }
     int result = 0;
     if (strcmp(rest, "None") == 0)
@@ -371,8 +432,7 @@ check_line(char * line, int line_number)
     char * rest = eq + 4;
     checked++;
     int result = 0;
-    if (current_kind == KIND_SOLVE_FFLU || current_kind == KIND_SOLVE_CRAMER
-        || current_kind == KIND_SOLVE_FFLU_PRECOMP)
+    if (current_kind >= KIND_SOLVE_FFLU)
     {
         return check_solve(args, rest, line_number);
     }
@@ -490,4 +550,55 @@ int
 run_fmpz_mat_solve_fflu_precomp(const char * arg)
 {
     return run(arg, "fmpz_mat_solve_fflu_precomp", "solve_fflu_precomp", KIND_SOLVE_FFLU_PRECOMP);
+}
+
+int
+run_fmpz_mat_solve(const char * arg)
+{
+    return run(arg, "fmpz_mat_solve", "solve", KIND_SOLVE);
+}
+
+int
+run_fmpz_mat_solve_dixon_den(const char * arg)
+{
+    return run(arg, "fmpz_mat_solve_dixon_den", "solve_dixon_den", KIND_SOLVE_DIXON_DEN);
+}
+
+int
+run_fmpz_mat_solve_multi_mod_den(const char * arg)
+{
+    return run(arg, "fmpz_mat_solve_multi_mod_den", "solve_multi_mod_den",
+               KIND_SOLVE_MULTI_MOD_DEN);
+}
+
+int
+run_fmpz_mat_can_solve_fflu(const char * arg)
+{
+    return run(arg, "fmpz_mat_can_solve_fflu", "can_solve_fflu", KIND_CAN_SOLVE_FFLU);
+}
+
+int
+run_fmpz_mat_can_solve_multi_mod_den(const char * arg)
+{
+    return run(arg, "fmpz_mat_can_solve_multi_mod_den", "can_solve_multi_mod_den",
+               KIND_CAN_SOLVE_MULTI_MOD_DEN);
+}
+
+int
+run_fmpz_mat_can_solve(const char * arg)
+{
+    return run(arg, "fmpz_mat_can_solve", "can_solve", KIND_CAN_SOLVE);
+}
+
+int
+run_fmpz_mat_inv(const char * arg)
+{
+    return run(arg, "fmpz_mat_inv", "inverse", KIND_INV);
+}
+
+int
+run_fmpz_mat_rref_upper_certify_lu_mod_p(const char * arg)
+{
+    return run(arg, "fmpz_mat_rref_upper_certify_lu_mod_p", "rref_upper_certify_lu_mod_p",
+               KIND_RREF_CERTIFY);
 }

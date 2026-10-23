@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::rational::arithmetic::cfrac_helpers::{Ball, Mat22, ball_get_cfrac};
 use crate::rational::arithmetic::traits::SimplestRationalInInterval;
 use crate::rational::conversion::continued_fraction::to_continued_fraction::*;
 use crate::rational::conversion::traits::ContinuedFraction;
@@ -23,6 +22,7 @@ use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::IsInteger;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::cfrac_helpers::{Ball, Mat22, ball_get_cfrac};
 
 const THREE: Natural = Natural::const_from(3);
 

@@ -11,12 +11,34 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::One;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
+use malachite_nz::integer_matrix::arithmetic::fraction_matrix::{
+    Fraction, is_solution as is_fraction_solution,
+};
 use malachite_nz::integer_matrix::arithmetic::solve::solve_fflu;
 use malachite_nz::test_util::generators::integer_matrix_pair_gen_var_7;
 use malachite_q::Rational;
 use malachite_q::rational_matrix::RationalMatrix;
-use malachite_q::rational_matrix::arithmetic::is_solution::is_solution;
 use std::panic::catch_unwind;
+
+// Whether the rational matrix `x` solves AX = B, by malachite-nz's check on its fractions.
+fn is_solution(x: &RationalMatrix, a: &IntegerMatrix, b: &IntegerMatrix) -> bool {
+    let fractions: Vec<Fraction> = x
+        .elements
+        .iter()
+        .map(|y| Fraction {
+            sign: *y >= 0u32,
+            numerator: y.numerator_ref().clone(),
+            denominator: y.denominator_ref().clone(),
+        })
+        .collect();
+    is_fraction_solution(
+        &fractions,
+        usize::try_from(x.height()).unwrap(),
+        usize::try_from(x.width()).unwrap(),
+        a,
+        b,
+    )
+}
 
 #[test]
 fn test_is_solution() {

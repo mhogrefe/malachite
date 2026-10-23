@@ -14,33 +14,25 @@ use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
 use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{DivModPrecomputed, ModIsReduced};
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::arithmetic::traits::ModIsReduced;
+use malachite_nz::integer_matrix::arithmetic::fraction_matrix::{Fraction, reconstruct_fractions};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 
-// Reconstructs the `height` by `width` matrix with residues `residues`, in row-major order.
-//
-// This is `fmpq_mat_set_fmpz_mat_mod_fmpz` from `fmpq_mat/set_fmpz_mat_mod_fmpz.c`, FLINT 3.6.0.
-fn reconstruct_helper(
-    residues: impl Iterator<Item = Natural>,
-    height: u64,
-    width: u64,
-    m: &Natural,
-) -> Option<RationalMatrix> {
-    let data = Natural::precompute_div_mod_data(m);
-    // The product of the denominators reconstructed so far.
-    let mut d = Natural::ONE;
-    let mut elements = Vec::new();
-    for r in residues {
-        let t = (r * &d).div_mod_precomputed(m, &data).1;
-        let x = Rational::reconstruct_ref(&t, m)?;
-        let sign = x >= 0u32;
-        let (n, x_d) = x.into_numerator_and_denominator();
-        d *= x_d;
-        elements.push(Rational::from_sign_and_naturals_ref(sign, &n, &d));
-    }
-    Some(RationalMatrix::from_owned_elements(height, width, elements))
+// The rational matrix with the given fractions.
+fn from_fractions(height: u64, width: u64, fractions: Vec<Fraction>) -> RationalMatrix {
+    RationalMatrix::from_owned_elements(
+        height,
+        width,
+        fractions
+            .into_iter()
+            .map(|f| Rational {
+                sign: f.sign,
+                numerator: f.numerator,
+                denominator: f.denominator,
+            })
+            .collect(),
+    )
 }
 
 fn assert_reconstruct_arguments(a: &NaturalMatrix, m: &Natural) {
@@ -111,7 +103,7 @@ impl RationalMatrix {
     pub fn reconstruct(a: NaturalMatrix, m: &Natural) -> Option<Self> {
         assert_reconstruct_arguments(&a, m);
         let (height, width) = (a.height(), a.width());
-        reconstruct_helper(a.elements.into_iter(), height, width, m)
+        reconstruct_fractions(a.elements.into_iter(), m).map(|x| from_fractions(height, width, x))
     }
 
     /// Recovers a [`RationalMatrix`] from a matrix of residues modulo $m$ by rational
@@ -175,6 +167,7 @@ impl RationalMatrix {
     /// reduced or $m < 3$, where FLINT reduces the residues and reconstructs only zeros.
     pub fn reconstruct_ref(a: &NaturalMatrix, m: &Natural) -> Option<Self> {
         assert_reconstruct_arguments(a, m);
-        reconstruct_helper(a.elements.iter().cloned(), a.height(), a.width(), m)
+        reconstruct_fractions(a.elements.iter(), m)
+            .map(|x| from_fractions(a.height(), a.width(), x))
     }
 }

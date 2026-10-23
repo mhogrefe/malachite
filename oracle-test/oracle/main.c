@@ -206,6 +206,14 @@ static const oracle_mode modes[] = {
     {"fmpz_mat_solve_fflu", run_fmpz_mat_solve_fflu},
     {"fmpz_mat_solve_cramer", run_fmpz_mat_solve_cramer},
     {"fmpz_mat_solve_fflu_precomp", run_fmpz_mat_solve_fflu_precomp},
+    {"fmpz_mat_solve", run_fmpz_mat_solve},
+    {"fmpz_mat_solve_dixon_den", run_fmpz_mat_solve_dixon_den},
+    {"fmpz_mat_solve_multi_mod_den", run_fmpz_mat_solve_multi_mod_den},
+    {"fmpz_mat_can_solve_fflu", run_fmpz_mat_can_solve_fflu},
+    {"fmpz_mat_can_solve_multi_mod_den", run_fmpz_mat_can_solve_multi_mod_den},
+    {"fmpz_mat_can_solve", run_fmpz_mat_can_solve},
+    {"fmpz_mat_inv", run_fmpz_mat_inv},
+    {"fmpz_mat_rref_upper_certify_lu_mod_p", run_fmpz_mat_rref_upper_certify_lu_mod_p},
     {"fmpq_mat_set_fmpz_mat_mod_fmpz", run_fmpq_mat_set_fmpz_mat_mod_fmpz},
 };
 

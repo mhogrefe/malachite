@@ -27,6 +27,21 @@ fn integer_mod_natural(x: &Integer, m: &Natural) -> Natural {
     }
 }
 
+// The remainders of the elements of `xs` modulo the nonzero `m`, in $[0, m)$.
+pub(crate) fn integers_mod_word<T: PrimitiveUnsigned + for<'a> ExactFrom<&'a Natural>>(
+    xs: &[Integer],
+    m: T,
+) -> Vec<T>
+where
+    Natural: From<T>,
+{
+    assert_ne!(m, T::ZERO, "division by zero");
+    let m = Natural::from(m);
+    xs.iter()
+        .map(|x| T::exact_from(&integer_mod_natural(x, &m)))
+        .collect()
+}
+
 impl Mod<Natural> for IntegerMatrix {
     type Output = NaturalMatrix;
 
@@ -271,16 +286,12 @@ where
     /// ```
     ///
     /// This is equivalent to `_fmpz_vec_get_nmod_vec` from `fmpz_vec/get_nmod_vec.c`, FLINT 3.6.0.
+    #[inline]
     fn mod_op(self, m: T) -> UnsignedMatrix<T> {
-        assert_ne!(m, T::ZERO, "division by zero");
-        let m = Natural::from(m);
         UnsignedMatrix::from_owned_elements(
             self.height(),
             self.width(),
-            self.elements
-                .iter()
-                .map(|x| T::exact_from(&integer_mod_natural(x, &m)))
-                .collect::<Vec<_>>(),
+            integers_mod_word(&self.elements, m),
         )
     }
 }

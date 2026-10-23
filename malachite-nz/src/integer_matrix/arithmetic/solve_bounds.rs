@@ -12,6 +12,7 @@
 
 use crate::integer_matrix::IntegerMatrix;
 use crate::integer_matrix::arithmetic::determinant_bound::determinant_bound_helper;
+use crate::integer_matrix::arithmetic::fraction_matrix::RightHandSide;
 use crate::natural::Natural;
 use alloc::vec;
 use malachite_base::num::arithmetic::traits::{CeilingSqrt, Square};
@@ -53,23 +54,28 @@ impl IntegerMatrix {
     ///
     /// This is equivalent to `fmpz_mat_solve_bound` from `fmpz_mat/solve_bound.c`, FLINT 3.6.0,
     /// except that it panics if the dimensions are incompatible.
+    #[inline]
     pub fn solve_bounds(&self, b: &Self) -> (Natural, Natural) {
-        assert!(self.height == self.width, "the matrix must be square");
-        assert_eq!(
-            self.height, b.height,
-            "the height of the matrix must equal the height of the right-hand side"
-        );
-        let denominator_bound = determinant_bound_helper(self, true);
-        // The squared Euclidean norms of the columns of `b`, accumulated row by row.
-        let mut norms = vec![Natural::ZERO; b.width];
-        if b.width != 0 {
-            for row in b.elements.chunks_exact(b.width) {
-                for (norm, x) in norms.iter_mut().zip(row) {
-                    *norm += x.unsigned_abs_ref().square();
-                }
+        solve_bounds_helper(self, b.into())
+    }
+}
+
+pub(crate) fn solve_bounds_helper(a: &IntegerMatrix, b: RightHandSide<'_>) -> (Natural, Natural) {
+    assert!(a.height == a.width, "the matrix must be square");
+    assert_eq!(
+        a.height, b.height,
+        "the height of the matrix must equal the height of the right-hand side"
+    );
+    let denominator_bound = determinant_bound_helper(a, true);
+    // The squared Euclidean norms of the columns of `b`, accumulated row by row.
+    let mut norms = vec![Natural::ZERO; b.width];
+    if b.width != 0 {
+        for row in b.elements.chunks_exact(b.width) {
+            for (norm, x) in norms.iter_mut().zip(row) {
+                *norm += x.unsigned_abs_ref().square();
             }
         }
-        let max = norms.into_iter().max().unwrap_or_default();
-        (&denominator_bound * max.ceiling_sqrt(), denominator_bound)
     }
+    let max = norms.into_iter().max().unwrap_or_default();
+    (&denominator_bound * max.ceiling_sqrt(), denominator_bound)
 }

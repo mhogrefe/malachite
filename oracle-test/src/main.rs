@@ -3900,6 +3900,47 @@ fn test_against_flint() {
             flint_mode,
         );
     }
+    // Solutions of linear systems with IntegerMatrixes by the public `Solve`, Dixon's p-adic
+    // lifting, the multimodular algorithms, and fraction-free LU decomposition for any shape,
+    // inverses, and rank certificates from LU decompositions modulo small primes, against
+    // fmpz_mat_solve (falling back to fmpz_mat_can_solve), fmpz_mat_solve_dixon_den,
+    // fmpz_mat_solve_multi_mod_den, fmpz_mat_can_solve_fflu, fmpz_mat_can_solve_multi_mod_den,
+    // fmpz_mat_can_solve, fmpz_mat_inv, and fmpz_mat_rref_upper_certify_lu_mod_p. The `_low_rank`
+    // demos make many systems singular.
+    for (op, flint_mode) in [
+        ("solve", "fmpz_mat_solve"),
+        ("solve_low_rank", "fmpz_mat_solve"),
+        ("solve_dixon_den", "fmpz_mat_solve_dixon_den"),
+        ("solve_dixon_den_low_rank", "fmpz_mat_solve_dixon_den"),
+        ("solve_multi_mod_den", "fmpz_mat_solve_multi_mod_den"),
+        ("solve_multi_mod_den_low_rank", "fmpz_mat_solve_multi_mod_den"),
+        ("can_solve_fflu", "fmpz_mat_can_solve_fflu"),
+        ("can_solve_fflu_low_rank", "fmpz_mat_can_solve_fflu"),
+        ("can_solve_multi_mod_den", "fmpz_mat_can_solve_multi_mod_den"),
+        (
+            "can_solve_multi_mod_den_low_rank",
+            "fmpz_mat_can_solve_multi_mod_den",
+        ),
+        ("can_solve", "fmpz_mat_can_solve"),
+        ("can_solve_low_rank", "fmpz_mat_can_solve"),
+        ("inverse", "fmpz_mat_inv"),
+        ("inverse_low_rank", "fmpz_mat_inv"),
+        (
+            "rref_upper_certify_lu_mod_p",
+            "fmpz_mat_rref_upper_certify_lu_mod_p",
+        ),
+        (
+            "rref_upper_certify_lu_mod_p_low_rank",
+            "fmpz_mat_rref_upper_certify_lu_mod_p",
+        ),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            &format!("demo_integer_matrix_{op}"),
+            flint_mode,
+        );
+    }
     // Rational reconstruction of RationalMatrixes, against fmpq_mat_set_fmpz_mat_mod_fmpz. The
     // `_round_trip` demo reconstructs the residues of generated rational matrices modulo a modulus
     // large enough to recover them.

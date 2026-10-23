@@ -53,12 +53,6 @@ pub mod canonicalize_unit;
 /// [`CeilingAssign`](malachite_base::num::arithmetic::traits::CeilingAssign), traits for taking the
 /// ceiling of a number.
 pub mod ceiling;
-/// The shared continued-fraction and half-gcd machinery, adopted from FLINT.
-#[cfg(feature = "test_build")]
-pub mod cfrac_helpers;
-/// The shared continued-fraction and half-gcd machinery, adopted from FLINT.
-#[cfg(not(feature = "test_build"))]
-pub(crate) mod cfrac_helpers;
 /// Implementations of [`Conjugate`](malachite_base::num::arithmetic::traits::Conjugate) and
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number. A real number is its own conjugate.

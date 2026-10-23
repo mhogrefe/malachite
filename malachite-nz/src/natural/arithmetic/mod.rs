@@ -58,6 +58,10 @@ pub mod canonicalize_gaussian_unit;
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
 /// traits for bringing a number into canonical unit form.
 pub mod canonicalize_unit;
+/// The continued-fraction and half-gcd machinery, adopted from FLINT, shared by rational
+/// reconstruction and, in malachite-q, the simplest rational in an interval.
+#[doc(hidden)]
+pub mod cfrac_helpers;
 pub mod checked_mul_sub_mul;
 /// Implementations of [`CheckedSub`](malachite_base::num::arithmetic::traits::CheckedSub), a trait
 /// for subtracting two numbers and checking whether the result is representable.
@@ -734,6 +738,10 @@ pub mod power_of_2;
 /// An implementation of [`Primorial`](malachite_base::num::arithmetic::traits::Primorial), a trait
 /// for computing the primorial of a number.
 pub mod primorial;
+/// The kernel of rational reconstruction, adopted from FLINT, used by malachite-q's
+/// `Rational::reconstruct` and by the integer matrix solvers.
+#[doc(hidden)]
+pub mod reconstruct;
 /// Implementations of
 /// [`RisingFactorial`](malachite_base::num::arithmetic::traits::RisingFactorial), a trait for
 /// computing the rising factorial of a number.

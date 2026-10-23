@@ -9,8 +9,8 @@
 use malachite_base::num::arithmetic::traits::{Abs, Floor, Reciprocal};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::cfrac_helpers::ball_get_cfrac_for_testing;
 use malachite_q::Rational;
-use malachite_q::rational::arithmetic::cfrac_helpers::ball_get_cfrac_for_testing;
 use malachite_q::test_util::generators::rational_pair_gen;
 
 // The common prefix of the two endpoints' continued fractions, expanded one term at a time. The

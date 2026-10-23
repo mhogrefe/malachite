@@ -8,13 +8,19 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{FractionFreeLuDecomposition, Parity};
+use malachite_base::num::arithmetic::traits::{FractionFreeLuDecomposition, Gcd, Parity, Solve};
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
+use malachite_nz::integer_matrix::arithmetic::can_solve_multi_mod::can_solve_multi_mod_den;
 use malachite_nz::integer_matrix::arithmetic::determinant::determinant_bareiss;
-use malachite_nz::integer_matrix::arithmetic::solve::{solve_cramer, solve_fflu};
+use malachite_nz::integer_matrix::arithmetic::solve::{
+    can_solve, can_solve_fflu, solve_cramer, solve_fflu, solve_nonsingular,
+};
+use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::test_util::generators::{
-    integer_matrix_pair_gen_var_3, integer_matrix_pair_gen_var_7, integer_matrix_pair_gen_var_8,
+    integer_matrix_integer_vector_pair_gen_var_2, integer_matrix_pair_gen_var_3,
+    integer_matrix_pair_gen_var_7, integer_matrix_pair_gen_var_8,
 };
 use malachite_nz::test_util::integer_matrix::arithmetic::solve::*;
 use std::panic::catch_unwind;
@@ -259,6 +265,254 @@ fn test_solve_small_and_large_elements() {
     }
 }
 
+// Checks that `result`, if it is some (X, d), solves AX = dB: d is nonzero, X has the right shape,
+// and AX = dB.
+fn check_solution(a: &IntegerMatrix, b: &IntegerMatrix, result: &Option<(IntegerMatrix, Integer)>) {
+    if let Some((x, den)) = result {
+        assert!(x.is_valid());
+        assert_eq!(x.height(), a.width());
+        assert_eq!(x.width(), b.width());
+        assert_ne!(*den, 0u32);
+        assert_eq!(a * x, b * den);
+    }
+}
+
+// Whether the solutions (X, d) and (Y, e) are equal as rational matrices: Xe = Yd.
+fn same_rational_solution(x: &(IntegerMatrix, Integer), y: &(IntegerMatrix, Integer)) -> bool {
+    &x.0 * &y.1 == &y.0 * &x.1
+}
+
+// Checks `can_solve_fflu`, `can_solve_multi_mod_den`, and `can_solve` for AX = dB: their results
+// are solutions, they agree on whether there is one, and `can_solve` is one of the others. Returns
+// the result of `can_solve`.
+fn verify_can_solve(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatrix, Integer)> {
+    let fflu = can_solve_fflu(a, b);
+    let multi_mod = can_solve_multi_mod_den(a, b);
+    check_solution(a, b, &fflu);
+    check_solution(a, b, &multi_mod);
+    assert_eq!(fflu.is_some(), multi_mod.is_some());
+    if let Some((x, den)) = &multi_mod {
+        assert!(*den > 0u32);
+        // The denominator is the least common denominator of the solution.
+        let g = x
+            .elements
+            .iter()
+            .fold(den.unsigned_abs_ref().clone(), |g, y| {
+                g.gcd(y.unsigned_abs_ref())
+            });
+        assert_eq!(g, 1u32);
+    }
+    let result = can_solve(a, b);
+    assert_eq!(result, if a.height() <= 15 { fflu } else { multi_mod });
+    result
+}
+
+// Checks the public `Solve` for AX = dB: the four ways of passing the arguments agree, and the
+// result is that of `solve_nonsingular` when A is square and nonsingular, and that of `can_solve`
+// otherwise. Returns the result.
+fn verify_public_solve(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatrix, Integer)> {
+    let result = a.clone().solve(b.clone());
+    assert_eq!(a.clone().solve(b), result);
+    assert_eq!(a.solve(b.clone()), result);
+    assert_eq!(a.solve(b), result);
+    let can = verify_can_solve(a, b);
+    if a.height() == a.width()
+        && let Some(x) = solve_nonsingular(a, b)
+    {
+        check_solution(a, b, &Some(x.clone()));
+        assert_eq!(result, Some(x.clone()));
+        if let Some(y) = &can {
+            assert!(same_rational_solution(&x, y));
+        }
+    } else {
+        assert_eq!(result, can);
+    }
+    result
+}
+
+#[test]
+fn test_solve() {
+    let test = |a, b, out| {
+        let a = IntegerMatrix::from_str(a).unwrap();
+        let b = IntegerMatrix::from_str(b).unwrap();
+        assert_eq!(format_solution(&verify_public_solve(&a, &b)), out);
+    };
+    test("[]_{0,0}", "[]_{0,2}", "Some(([]_{0,2}, 1))");
+    test("[]_{0,3}", "[]_{0,2}", "Some(([0, 0; 0, 0; 0, 0], 1))");
+    test("[]_{2,0}", "[0; 0]", "Some(([]_{0,1}, 1))");
+    test("[]_{2,0}", "[0; 1]", "None");
+    test("[2, 1; 1, 3]", "[]_{2,0}", "Some(([]_{2,0}, 1))");
+    test("[0, 0; 0, 0]", "[]_{2,0}", "Some(([]_{2,0}, 1))");
+    test("[3]", "[6]", "Some(([6], 3))");
+    test("[0]", "[0]", "Some(([0], 1))");
+    test("[0]", "[1]", "None");
+    test("[1, 2; 3, 4]", "[5; 6]", "Some(([8; -9], -2))");
+    test("[2, 4; 1, 2]", "[2; 1]", "Some(([2; 0], 2))");
+    test("[2, 4; 1, 2]", "[1; 1]", "None");
+    test(
+        "[1, 2, 3; 4, 5, 6; 7, 8, 10]",
+        "[1; 1; 1]",
+        "Some(([3; -3; 0], -3))",
+    );
+    test(
+        "[1, 2, 3; 4, 5, 6; 7, 8, 9]",
+        "[1; 1; 1]",
+        "Some(([3; -3; 0], -3))",
+    );
+    test("[1, 2, 3; 4, 5, 6; 7, 8, 9]", "[1; 0; 0]", "None");
+    test(
+        "[1, 2, 3, 4; 5, 6, 7, 8; 2, 6, 4, 8; 3, 1, 1, 2]",
+        "[1; 0; 0; 0]",
+        "Some(([-12; -60; 12; 42], 72))",
+    );
+    test(
+        "[1, 2, 3, 4; 2, 4, 6, 8; 2, 6, 4, 8; 3, 1, 1, 2]",
+        "[1; 2; 0; 0]",
+        "Some(([2; 10; -16; 0], -26))",
+    );
+    test("[1, 2, 3]", "[6]", "Some(([6; 0; 0], 1))");
+    test("[0, 2, 3]", "[6]", "Some(([0; 6; 0], 2))");
+    test("[1, 2, 3; 2, 4, 6]", "[1; 2]", "Some(([1; 0; 0], 1))");
+    test("[1, 2, 3; 2, 4, 6]", "[1; 3]", "None");
+    test("[1; 2; 3]", "[2; 4; 6]", "Some(([2], 1))");
+    test("[1; 2; 3]", "[2; 4; 7]", "None");
+    test("[2, 1; 4, 2; 6, 3]", "[1; 2; 3]", "Some(([1; 0], 2))");
+    test("[2, 1; 1, 1; 1, 2]", "[3; 2; 3]", "Some(([1; 1], 1))");
+    test("[2, 1; 1, 1; 1, 2]", "[3; 2; 4]", "None");
+    test(
+        "[1267650600228229401496703205376, 1; 1, 1267650600228229401496703205376]",
+        "[1267650600228229401496703205376; 0]",
+        "Some(([1606938044258990275541962092341162602522202993782792835301376; -1267650600228229401\
+        496703205376], 1606938044258990275541962092341162602522202993782792835301375))",
+    );
+}
+
+#[test]
+fn test_solve_vector() {
+    let test = |a, b, out| {
+        let a = IntegerMatrix::from_str(a).unwrap();
+        let b = IntegerVector::from_str(b).unwrap();
+        let result = a.clone().solve(b.clone());
+        assert_eq!(a.clone().solve(&b), result);
+        assert_eq!((&a).solve(b.clone()), result);
+        assert_eq!((&a).solve(&b), result);
+        assert_eq!(
+            result.as_ref().map_or_else(
+                || "None".to_string(),
+                |(x, den)| format!("Some(({x}, {den}))")
+            ),
+            out
+        );
+    };
+    test("[]_{0,2}", "()", "Some(((0, 0), 1))");
+    test("[3]", "(6)", "Some(((6), 3))");
+    test("[1, 2; 3, 4]", "(5, 6)", "Some(((8, -9), -2))");
+    test("[2, 4; 1, 2]", "(1, 1)", "None");
+    test("[1, 2, 3; 2, 4, 6]", "(1, 2)", "Some(((1, 0, 0), 1))");
+}
+
+#[test]
+fn test_can_solve_fflu() {
+    let test = |a, b, out| {
+        let a = IntegerMatrix::from_str(a).unwrap();
+        let b = IntegerMatrix::from_str(b).unwrap();
+        let result = can_solve_fflu(&a, &b);
+        check_solution(&a, &b, &result);
+        assert_eq!(format_solution(&result), out);
+    };
+    test("[]_{0,3}", "[]_{0,2}", "Some(([0, 0; 0, 0; 0, 0], 1))");
+    test("[]_{2,0}", "[0; 0]", "Some(([]_{0,1}, 1))");
+    test("[]_{2,0}", "[0; 1]", "None");
+    test("[0, 0; 0, 0]", "[]_{2,0}", "Some(([]_{2,0}, 1))");
+    test("[0]", "[0]", "Some(([0], 1))");
+    test("[0]", "[1]", "None");
+    test("[1, 2; 3, 4]", "[5; 6]", "Some(([8; -9], -2))");
+    test("[2, 4; 1, 2]", "[2; 1]", "Some(([2; 0], 2))");
+    test("[2, 4; 1, 2]", "[1; 1]", "None");
+    test(
+        "[1, 2, 3; 4, 5, 6; 7, 8, 9]",
+        "[1; 1; 1]",
+        "Some(([3; -3; 0], -3))",
+    );
+    test("[1, 2, 3; 4, 5, 6; 7, 8, 9]", "[1; 0; 0]", "None");
+    test("[0, 2, 3]", "[6]", "Some(([0; 6; 0], 2))");
+    test("[1, 2, 3; 2, 4, 6]", "[1; 2]", "Some(([1; 0; 0], 1))");
+    test("[1, 2, 3; 2, 4, 6]", "[1; 3]", "None");
+    test("[2, 1; 4, 2; 6, 3]", "[1; 2; 3]", "Some(([1; 0], 2))");
+    test("[2, 1; 1, 1; 1, 2]", "[3; 2; 3]", "Some(([1; 1], 1))");
+    test("[2, 1; 1, 1; 1, 2]", "[3; 2; 4]", "None");
+    test(
+        "[0, 1; 1, 0; 0, 0]",
+        "[1, 2; 3, 4; 0, 0]",
+        "Some(([-3, -4; -1, -2], -1))",
+    );
+    // - the forward substitution finds a division that is not exact
+    test(
+        "[-2, -1, -1; 1, -1, 2; -1, -1, 0; 0, -2, 2]",
+        "[-2; 0; -1; 1]",
+        "None",
+    );
+    test(
+        "[2, 2, -2; 0, 0, 0; -1, 2, 1; -1, -1, 1]",
+        "[1; -1; 2; 2]",
+        "None",
+    );
+}
+
+#[test]
+fn test_can_solve() {
+    let test = |a, b, out| {
+        let a = IntegerMatrix::from_str(a).unwrap();
+        let b = IntegerMatrix::from_str(b).unwrap();
+        assert_eq!(format_solution(&verify_can_solve(&a, &b)), out);
+    };
+    test("[]_{0,3}", "[]_{0,2}", "Some(([0, 0; 0, 0; 0, 0], 1))");
+    test("[]_{2,0}", "[0; 1]", "None");
+    test("[1, 2; 3, 4]", "[5; 6]", "Some(([8; -9], -2))");
+    test("[2, 4; 1, 2]", "[2; 1]", "Some(([2; 0], 2))");
+    test("[2, 4; 1, 2]", "[1; 1]", "None");
+    test("[1, 2, 3; 2, 4, 6]", "[1; 2]", "Some(([1; 0; 0], 1))");
+    test("[2, 1; 1, 1; 1, 2]", "[3; 2; 4]", "None");
+}
+
+#[test]
+fn test_solve_large() {
+    let mut seed = 1;
+    // Square systems of dimension above 15, solved by Dixon's p-adic lifting when the right-hand
+    // side has at most 32 columns and with the multimodular algorithm otherwise, and general
+    // systems of height above 15, solved with the multimodular algorithm.
+    for (n, k, bits) in [(16, 1, 10), (17, 3, 64), (20, 33, 5), (16, 40, 63)] {
+        let a = pseudorandom_matrix_with_bits(n, n, bits, &mut seed);
+        let b = pseudorandom_matrix_with_bits(n, k, bits, &mut seed);
+        let x = verify_public_solve(&a, &b).unwrap();
+        assert!(same_rational_solution(&x, &solve_fflu(&a, &b).unwrap()));
+        // A singular matrix of the same dimension, whose last row is the sum of the others.
+        let mut a = a;
+        let sum = (0..n - 1).fold(
+            vec![Integer::ZERO; usize::try_from(n).unwrap()],
+            |mut s, i| {
+                for (t, y) in s.iter_mut().zip(a.window(i..i + 1, 0..n).into_elements()) {
+                    *t += y;
+                }
+                s
+            },
+        );
+        let last = usize::try_from((n - 1) * n).unwrap();
+        a.elements[last..].clone_from_slice(&sum);
+        verify_public_solve(&a, &b);
+        // A consistent system with that matrix.
+        let b = &a * pseudorandom_matrix_with_bits(n, k, bits, &mut seed);
+        assert!(verify_public_solve(&a, &b).is_some());
+    }
+    for (h, w, k, bits) in [(16, 10, 2, 10), (18, 30, 1, 40), (20, 20, 3, 3)] {
+        let a = pseudorandom_matrix_with_bits(h, w, bits, &mut seed);
+        let b = pseudorandom_matrix_with_bits(h, k, bits, &mut seed);
+        verify_public_solve(&a, &b);
+        let b = &a * pseudorandom_matrix_with_bits(w, k, bits, &mut seed);
+        assert!(verify_public_solve(&a, &b).is_some());
+    }
+}
+
 #[test]
 fn solve_fail() {
     let a = IntegerMatrix::from_str("[1, 2]").unwrap();
@@ -269,6 +523,11 @@ fn solve_fail() {
     let b = IntegerMatrix::from_str("[1; 2; 3]").unwrap();
     assert_panic!(solve_fflu(&a, &b));
     assert_panic!(solve_cramer(&a, &b));
+    assert_panic!(a.clone().solve(b.clone()));
+    assert_panic!(can_solve_fflu(&a, &b));
+    assert_panic!(can_solve(&a, &b));
+    let b = IntegerVector::from_str("(1, 2, 3)").unwrap();
+    assert_panic!(a.solve(b));
     let a = IntegerMatrix::from_str("[1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 0, 0, 1]").unwrap();
     let b = IntegerMatrix::from_str("[1; 2; 3; 4]").unwrap();
     assert_panic!(solve_cramer(&a, &b));
@@ -286,5 +545,42 @@ fn solve_properties() {
 
     integer_matrix_pair_gen_var_3().test_properties(|(a, b)| {
         verify_precomp(&a, &b);
+    });
+}
+
+// A matrix of `a`'s shape with rank at most `b`'s width, if that is smaller than its height and
+// width: `b` times the first `b.width()` rows of `a`.
+fn low_rank(a: &IntegerMatrix, b: &IntegerMatrix) -> IntegerMatrix {
+    let (h, w) = (a.height(), a.width());
+    let k = b.width();
+    if k >= h.min(w) {
+        return a.clone();
+    }
+    b * a.window(0..k, 0..w)
+}
+
+#[test]
+fn solve_public_properties() {
+    integer_matrix_pair_gen_var_3().test_properties(|(a, b)| {
+        verify_public_solve(&a, &b);
+        let a = low_rank(&a, &b);
+        verify_public_solve(&a, &b);
+        // A consistent system: B = A A^T B is in the column space of A.
+        let b = &a * (a.transpose() * &b);
+        assert!(verify_public_solve(&a, &b).is_some());
+    });
+
+    integer_matrix_integer_vector_pair_gen_var_2().test_properties(|(a, b)| {
+        let result = (&a).solve(&b);
+        let column = IntegerMatrix::from_owned_elements(a.height(), 1, b.elements.clone());
+        assert_eq!(
+            result,
+            (&a).solve(&column).map(|(x, den)| (
+                IntegerVector {
+                    elements: x.into_elements()
+                },
+                den
+            ))
+        );
     });
 }

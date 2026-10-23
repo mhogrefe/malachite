@@ -541,6 +541,24 @@ pub(crate) fn lu_in_place<T: PrimitiveUnsigned>(
     (perm, rank)
 }
 
+/// The LU decomposition of `a` modulo the prime `m`, packed into one matrix, as computed for
+/// [`mod_lu_decomposition`](crate::num::arithmetic::traits::ModLuDecomposition): if `a` has rank
+/// $r$, the elements of $L$ other than its unit diagonal are below the diagonal of the first $r$
+/// columns, and those of $U$ are on and above the diagonal of the first $r$ rows. Returns the
+/// permutation, the rank, and the packed matrix. The elements of `a` must be reduced modulo `m`.
+///
+/// This is for malachite-nz's multimodular linear algebra, which needs the factors without
+/// copying them out.
+#[doc(hidden)]
+pub fn mod_lu_decomposition_packed<T: PrimitiveUnsigned>(
+    mut a: UnsignedMatrix<T>,
+    m: T,
+) -> (Vec<usize>, usize, UnsignedMatrix<T>) {
+    assert_reduced(&a, m);
+    let (perm, rank) = lu_in_place(&mut a, m, false);
+    (perm, rank, a)
+}
+
 fn mod_lu_decomposition_helper<T: PrimitiveUnsigned>(
     mut a: UnsignedMatrix<T>,
     m: T,

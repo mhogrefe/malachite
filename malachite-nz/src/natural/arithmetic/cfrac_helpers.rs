@@ -15,6 +15,12 @@
 // reconstruction and the simplest fraction in an interval. The word-level kernels and the `Mat22`
 // matrix of accumulated quotients are here too, since both consumers use them.
 
+use crate::integer::Integer;
+use crate::integer_matrix::arithmetic::mul::double_word::QUADRUPLE_WIDTH;
+use crate::natural::Natural;
+use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
+use crate::platform::{DoubleLimb, Limb};
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::Ordering;
@@ -27,24 +33,19 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, WrappingFrom};
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
-use malachite_nz::integer::Integer;
-use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
-use malachite_nz::platform::{DoubleLimb, Limb};
 
 // This is _hgcd_uiui_no_write from fmpq/reconstruct_fmpz_2.c, FLINT 3.6.0: a half-gcd on two-limb
 // values, accumulating quotients into a word matrix whose determinant sign is tracked as `det_pos`.
 // Returns the number of quotients applied; zero means no progress and the matrix is meaningless.
-pub(super) struct WordMat {
-    pub(super) m11: Limb,
-    pub(super) m12: Limb,
-    pub(super) m21: Limb,
-    pub(super) m22: Limb,
-    pub(super) det_pos: bool,
+pub(crate) struct WordMat {
+    pub(crate) m11: Limb,
+    pub(crate) m12: Limb,
+    pub(crate) m21: Limb,
+    pub(crate) m22: Limb,
+    pub(crate) det_pos: bool,
 }
 
-pub(super) fn hgcd_word(mut a: DoubleLimb, mut b: DoubleLimb) -> (usize, WordMat) {
+pub(crate) fn hgcd_word(mut a: DoubleLimb, mut b: DoubleLimb) -> (usize, WordMat) {
     let mut m = WordMat {
         m11: 1,
         m12: 0,
@@ -107,7 +108,7 @@ pub(super) fn hgcd_word(mut a: DoubleLimb, mut b: DoubleLimb) -> (usize, WordMat
 
 // res = x * a - y * b over n limbs. The result must be nonnegative; returns its normalized length.
 // This is flint_mpn_fmms1 from mpn_extras.h, FLINT 3.6.0.
-pub(super) fn fmms1(res: &mut [Limb], x: Limb, a: &[Limb], y: Limb, b: &[Limb], n: usize) -> usize {
+pub(crate) fn fmms1(res: &mut [Limb], x: Limb, a: &[Limb], y: Limb, b: &[Limb], n: usize) -> usize {
     fmms1_checked(res, x, a, y, b, n).expect("fmms1 result must be nonnegative")
 }
 
@@ -136,12 +137,12 @@ fn fmms1_checked(
 }
 
 // Whether the number in the normalized ascending limb slice `x` is at most the one in `bound`.
-pub(super) fn limbs_at_most(x: &[Limb], bound: &[Limb]) -> bool {
+pub(crate) fn limbs_at_most(x: &[Limb], bound: &[Limb]) -> bool {
     limbs_cmp(x, bound) != Ordering::Greater
 }
 
 // Compares two normalized ascending limb slices as numbers.
-pub(super) fn limbs_cmp(a: &[Limb], b: &[Limb]) -> Ordering {
+pub(crate) fn limbs_cmp(a: &[Limb], b: &[Limb]) -> Ordering {
     a.len()
         .cmp(&b.len())
         .then_with(|| a.iter().rev().cmp(b.iter().rev()))
@@ -149,7 +150,7 @@ pub(super) fn limbs_cmp(a: &[Limb], b: &[Limb]) -> Ordering {
 
 // (hi << shift) | (lo >> (W - shift)), with the zero-shift case guarded. This is MPN_LEFT_SHIFT_HI
 // from mpn_extras.h, FLINT 3.6.0.
-pub(super) const fn left_shift_hi(hi: Limb, lo: Limb, shift: u32) -> Limb {
+pub(crate) const fn left_shift_hi(hi: Limb, lo: Limb, shift: u32) -> Limb {
     if shift == 0 {
         hi
     } else {
@@ -159,28 +160,28 @@ pub(super) const fn left_shift_hi(hi: Limb, lo: Limb, shift: u32) -> Limb {
 
 // This is FMPQ_RECONSTRUCT_HGCD_CUTOFF from fmpq.h, FLINT 3.6.0: the limb gap between the operand
 // and the bound above which the subquadratic splitter is used.
-pub(super) const RECONSTRUCT_HGCD_CUTOFF: u64 = 500;
+pub(crate) const RECONSTRUCT_HGCD_CUTOFF: u64 = 500;
 
 // The same cutoff in bits, which is how both engines compare it.
 const HGCD_CUTOFF_BITS: u64 = RECONSTRUCT_HGCD_CUTOFF << Limb::LOG_WIDTH;
 
 // The floor below which a word window cannot pay for itself, FLINT's `4*FLINT_BITS`.
-const LEHMER_FLOOR_BITS: u64 = Limb::WIDTH << 2;
+const LEHMER_FLOOR_BITS: u64 = QUADRUPLE_WIDTH;
 
 // This is _fmpz_mat22_t and its operations from fmpq/mat22.c, FLINT 3.6.0. Throughout the half-gcd
 // the entries are nonnegative, so they are [`Natural`]s, and the subtractions below all
 // reconstitute earlier nonnegative values. The determinant, always 1 or -1, is tracked as
 // `det_pos`.
-pub(super) struct Mat22 {
-    pub(super) m11: Natural,
-    pub(super) m12: Natural,
-    pub(super) m21: Natural,
-    pub(super) m22: Natural,
-    pub(super) det_pos: bool,
+pub struct Mat22 {
+    pub m11: Natural,
+    pub m12: Natural,
+    pub m21: Natural,
+    pub m22: Natural,
+    pub det_pos: bool,
 }
 
 impl Mat22 {
-    pub(super) const fn one() -> Self {
+    pub const fn one() -> Self {
         Self {
             m11: Natural::ONE,
             m12: Natural::ZERO,
@@ -190,11 +191,11 @@ impl Mat22 {
         }
     }
 
-    pub(super) fn is_one(&self) -> bool {
+    pub(crate) fn is_one(&self) -> bool {
         self.m11 == 1u32 && self.m12 == 0u32 && self.m21 == 0u32 && self.m22 == 1u32
     }
 
-    pub(super) fn bits(&self) -> u64 {
+    pub(crate) fn bits(&self) -> u64 {
         self.m11
             .significant_bits()
             .max(self.m12.significant_bits())
@@ -203,7 +204,7 @@ impl Mat22 {
     }
 
     // M = M * N
-    pub(super) fn rmul(&mut self, n: &Self) {
+    pub fn rmul(&mut self, n: &Self) {
         let a = (&self.m11 * &n.m11).add_mul(&self.m12, &n.m21);
         let b = (&self.m11 * &n.m12).add_mul(&self.m12, &n.m22);
         let c = (&self.m21 * &n.m11).add_mul(&self.m22, &n.m21);
@@ -218,7 +219,7 @@ impl Mat22 {
     }
 
     // M = M * n, where n is a word matrix
-    pub(super) fn rmul_word(&mut self, n: &WordMat) {
+    pub(crate) fn rmul_word(&mut self, n: &WordMat) {
         let a = (&self.m11 * Natural::from(n.m11)).add_mul(&self.m12, Natural::from(n.m21));
         self.m12 *= Natural::from(n.m22);
         self.m12.add_mul_assign(&self.m11, Natural::from(n.m12));
@@ -234,7 +235,7 @@ impl Mat22 {
 
     // M = M * n^-1, undoing an rmul_word; every difference is an entry that existed before that
     // multiplication, so none goes negative
-    pub(super) fn rmul_inv_word(&mut self, n: &WordMat) {
+    pub(crate) fn rmul_inv_word(&mut self, n: &WordMat) {
         let (a, b) = if n.det_pos {
             (
                 (&self.m11 * Natural::from(n.m22)).sub_mul(&self.m12, &Natural::from(n.m21)),
@@ -267,7 +268,7 @@ impl Mat22 {
     }
 
     // M = M * [q 1; 1 0]
-    pub(super) fn rmul_elem(&mut self, q: &Natural) {
+    pub fn rmul_elem(&mut self, q: &Natural) {
         self.m12.add_mul_assign(&self.m11, q);
         self.m22.add_mul_assign(&self.m21, q);
         swap(&mut self.m11, &mut self.m12);
@@ -276,7 +277,7 @@ impl Mat22 {
     }
 
     // M = M * [q 1; 1 0]^-1 = M * [0 1; 1 -q], undoing an rmul_elem
-    pub(super) fn rmul_inv_elem(&mut self, q: &Natural) {
+    pub(crate) fn rmul_inv_elem(&mut self, q: &Natural) {
         self.m11.sub_mul_assign(&self.m12, q);
         self.m21.sub_mul_assign(&self.m22, q);
         swap(&mut self.m11, &mut self.m12);
@@ -286,7 +287,7 @@ impl Mat22 {
 
     // (ya, yb) += N^-1 * (xa, xb); the results are remainders in the half-gcd, so the subtractions
     // do not go negative when performed after the additions
-    pub(super) fn addmul_inv_vec(
+    pub(crate) fn addmul_inv_vec(
         &self,
         ya: &mut Natural,
         yb: &mut Natural,
@@ -308,7 +309,7 @@ impl Mat22 {
 
     // (ya, yb) += N^-1 * (xa, xb) where the right-hand side may be negative, as it is in the split
     // reassembly. The results are ball endpoints and so are nonnegative.
-    pub(super) fn addmul_inv_vec_signed(
+    pub(crate) fn addmul_inv_vec_signed(
         &self,
         ya: &mut Natural,
         yb: &mut Natural,
@@ -587,7 +588,7 @@ fn hgcd_step(
 // continued-fraction terms valid for every real in the open interval M^-1(a/(b+1), (a+1)/b),
 // appending the terms to s and multiplying M on the right. Subquadratic: large operands are
 // truncated, recursed on, and stitched back with hgcd_step.
-pub(super) fn fmpq_hgcd(
+pub(crate) fn fmpq_hgcd(
     mut s: Option<&mut Vec<Natural>>,
     m: &mut Mat22,
     xa: &mut Natural,
@@ -641,11 +642,11 @@ pub(super) fn fmpq_hgcd(
 // of rationals with both endpoints greater than one, so all four components are positive. FLINT's
 // `exact` flag distinguishes a degenerate ball, which is what fmpq_get_cfrac needs; nothing here
 // does.
-pub(super) struct Ball {
-    pub(super) left_num: Natural,
-    pub(super) left_den: Natural,
-    pub(super) right_num: Natural,
-    pub(super) right_den: Natural,
+pub struct Ball {
+    pub left_num: Natural,
+    pub left_den: Natural,
+    pub right_num: Natural,
+    pub right_den: Natural,
 }
 
 impl Ball {
@@ -695,7 +696,7 @@ fn tail_bits(a: &Natural, b: &Natural) -> u64 {
 // The Lehmer tier is not yet ported, so sizes between the gauss and split thresholds take the gauss
 // loop.
 #[allow(dead_code)]
-pub(super) fn ball_get_cfrac(m: &mut Mat22, x: &mut Ball) {
+pub fn ball_get_cfrac(m: &mut Mat22, x: &mut Ball) {
     ball_get_cfrac_with_cutoff(m, x, HGCD_CUTOFF_BITS);
 }
 

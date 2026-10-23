@@ -79,16 +79,27 @@ where
     }
     for x in options.generator.take(options.limit) {
         let size = (options.bucketing_function)(&x);
-        for (i, series) in options.series_options.iter_mut().enumerate() {
-            let mut durations_vec = Vec::new();
-            for _ in 0..reps {
+        // The series take turns, one call each per round, and the series that goes first rotates
+        // from round to round, after an untimed call. Without this, when each series made all of
+        // its calls in a row, the first series was timed about 10% slower than an identical later
+        // one.
+        let mut durations_vecs = vec![Vec::with_capacity(reps); options.series_options.len()];
+        if let Some(series) = options.series_options.first_mut() {
+            (series.function)(x.clone());
+        }
+        let series_count = options.series_options.len();
+        for rep in 0..reps {
+            for j in 0..series_count {
+                let i = (rep + j) % series_count;
                 let x = x.clone();
                 let now = Instant::now();
-                (series.function)(x);
-                durations_vec.push(u64::exact_from(now.elapsed().as_nanos()));
+                (options.series_options[i].function)(x);
+                durations_vecs[i].push(u64::exact_from(now.elapsed().as_nanos()));
             }
+        }
+        for (durations_map, mut durations_vec) in durations_maps.iter_mut().zip(durations_vecs) {
             let median_duration = quick_median(&mut durations_vec);
-            durations_maps[i]
+            durations_map
                 .entry(size)
                 .or_insert_with(Vec::new)
                 .push(median_duration);

@@ -285,6 +285,15 @@ pub fn pair_integer_matrix_max_bit_bucketer<'a>(
     }
 }
 
+pub fn pair_1_integer_matrix_height_bucketer<'a>(
+    x_name: &'a str,
+) -> Bucketer<'a, (IntegerMatrix, IntegerMatrix)> {
+    Bucketer {
+        bucketing_function: &|(m, _)| usize::exact_from(m.height()),
+        bucketing_label: format!("{x_name}.height()"),
+    }
+}
+
 pub fn pair_integer_matrix_product_size_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,

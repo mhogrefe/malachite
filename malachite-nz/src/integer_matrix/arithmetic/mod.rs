@@ -10,8 +10,8 @@
 /// matrices of the same shape.
 pub mod add;
 crate_test_mod! {
-    /// Adding a multiple of a matrix of words to an `IntegerMatrix`. Internal machinery for a
-    /// future solver, public only under `test_build`.
+    /// Adding a multiple of a matrix of words to an `IntegerMatrix`. Internal machinery for
+    /// [`Solve`](malachite_base::num::arithmetic::traits::Solve), public only under `test_build`.
     add_mul_unsigned_matrix
 }
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod) and
@@ -26,6 +26,17 @@ pub mod balanced_mod;
 /// of an [`IntegerMatrix`](super::IntegerMatrix) to the representative closest to zero modulo a
 /// power of 2.
 pub mod balanced_mod_power_of_2;
+crate_test_mod! {
+    /// Solving a linear system of any shape with the multimodular algorithm. Internal machinery for
+    /// [`Solve`](malachite_base::num::arithmetic::traits::Solve), public only under `test_build`.
+    can_solve_multi_mod
+}
+crate_test_mod! {
+    /// Certifying, from an LU decomposition modulo a prime, the rank of an integer matrix. Internal
+    /// machinery for [`Solve`](malachite_base::num::arithmetic::traits::Solve), public only under
+    /// `test_build`.
+    certify_lu_mod_p
+}
 /// Implementations of [`CanonicalPrimitivePart`](
 /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart),
 /// [`CanonicalPrimitivePartAssign`](
@@ -119,10 +130,16 @@ pub mod div_exact;
 ///
 /// [fflu]: malachite_base::num::arithmetic::traits::FractionFreeLuDecomposition
 pub mod fraction_free_lu_decomposition;
+#[doc(hidden)]
+pub mod fraction_matrix;
+/// Implementations of [`Inverse`](malachite_base::num::arithmetic::traits::Inverse), for inverting
+/// square integer matrices.
+pub mod inverse;
 crate_test_mod! {
     /// A check of whether a matrix is in fraction-free reduced row echelon form with a given
-    /// denominator and rank. Internal machinery for a future reduced row echelon form, public only
-    /// under `test_build`.
+    /// denominator and rank. Internal machinery for the rank certificates of
+    /// [`Solve`](malachite_base::num::arithmetic::traits::Solve) and a future reduced row echelon
+    /// form, public only under `test_build`.
     is_in_reduced_row_echelon_form_with_rank
 }
 /// Implementations of
@@ -201,15 +218,22 @@ pub mod scalar_mul;
 /// assert_eq!(a.to_string(), "[4, -8; 12, 16]");
 /// ```
 pub mod shl;
-crate_test_mod! {
-    /// Algorithms for solving linear systems: fraction-free LU decomposition with forward and back
-    /// substitution, and Cramer's rule. Internal machinery for a future solver, public only under
-    /// `test_build`.
-    solve
-}
+/// Implementations of [`Solve`](malachite_base::num::arithmetic::traits::Solve), for solving linear
+/// systems over the rationals with integer matrices.
+pub mod solve;
 /// The method [`solve_bounds`](super::IntegerMatrix::solve_bounds), upper bounds for the numerators
 /// and denominators of the solution of a linear system.
 pub mod solve_bounds;
+crate_test_mod! {
+    /// Solving a square linear system by Dixon's p-adic lifting. Internal machinery for
+    /// [`Solve`](malachite_base::num::arithmetic::traits::Solve), public only under `test_build`.
+    solve_dixon
+}
+crate_test_mod! {
+    /// Solving a square linear system with the multimodular algorithm. Internal machinery for
+    /// [`Solve`](malachite_base::num::arithmetic::traits::Solve), public only under `test_build`.
+    solve_multi_mod
+}
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a square
 /// matrix.
@@ -229,3 +253,9 @@ pub mod trace;
 /// [`IntegerVector`](crate::integer_vector::IntegerVector) by an
 /// [`IntegerMatrix`](super::IntegerMatrix) on the right.
 pub mod vector_mul;
+crate_test_mod! {
+    /// LU decompositions of integer matrices modulo word-sized primes, and the solving of systems
+    /// with them. Internal machinery for [`Solve`](malachite_base::num::arithmetic::traits::Solve),
+    /// public only under `test_build`.
+    word_lu
+}

@@ -22,6 +22,7 @@ use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{ModMul, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -34,16 +35,16 @@ use malachite_base::unsigned_matrix::UnsignedMatrix;
 const NMOD_MAT_OPTIMAL_MODULUS_BITS: u64 = Limb::WIDTH - 5;
 
 // The primes other than the first modulus are the primes just above this.
-const OPTIMAL_MODULUS_MIN: Limb = 1 << NMOD_MAT_OPTIMAL_MODULUS_BITS;
+pub(crate) const OPTIMAL_MODULUS_MIN: Limb = 1 << NMOD_MAT_OPTIMAL_MODULUS_BITS;
 
 // The smallest prime greater than `n`.
 //
 // This is equivalent to `n_nextprime` from `ulong_extras/nextprime.c`, FLINT 3.6.0, with `proved =
 // 0`.
-fn next_prime(n: Limb) -> Limb {
-    let mut p = n + 1;
+pub(crate) fn next_prime<T: PrimitiveUnsigned + IsPrime>(n: T) -> T {
+    let mut p = n + T::ONE;
     while !p.is_prime() {
-        p += 1;
+        p += T::ONE;
     }
     p
 }

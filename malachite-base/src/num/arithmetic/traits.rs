@@ -2180,6 +2180,21 @@ pub trait ModLeftNullspace<M = Self> {
     fn mod_left_nullspace(self, m: M) -> Self::Output;
 }
 
+/// Solves $AX = B$ (or $Ax = b$) for $X$, returning a solution if there is one and `None`
+/// otherwise.
+pub trait Solve<RHS = Self> {
+    type Output;
+
+    fn solve(self, b: RHS) -> Option<Self::Output>;
+}
+
+/// Finds the inverse of a square matrix, returning `None` if the matrix is singular.
+pub trait Inverse {
+    type Output;
+
+    fn inverse(self) -> Option<Self::Output>;
+}
+
 /// Solves $AX = B$ (or $Ax = b$) modulo a prime $m$ for $X$, returning a solution if there is one
 /// and `None` otherwise. The elements of $A$ and $B$ must already be reduced modulo $m$.
 pub trait ModSolve<RHS = Self, M = Self> {

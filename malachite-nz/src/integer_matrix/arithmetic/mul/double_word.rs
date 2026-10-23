@@ -97,7 +97,7 @@ fn signed_mul_limbs(x: Limb, y: Limb) -> (Limb, Limb) {
 const FMPZ_MAT_MUL_4_BRANCHLESS_CUTOFF: usize = 16;
 
 // The number of bits in four limbs.
-const QUADRUPLE_WIDTH: u64 = Limb::WIDTH << 2;
+pub(crate) const QUADRUPLE_WIDTH: u64 = Limb::WIDTH << 2;
 
 // Sets `out` to the product of a row `ar` of signed double-word elements, each stored as its low
 // limb and then its high limb, and the matrix whose transpose is `b` in the same format, where

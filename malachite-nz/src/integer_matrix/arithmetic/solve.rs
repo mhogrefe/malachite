@@ -14,13 +14,18 @@
 
 use crate::integer::Integer;
 use crate::integer_matrix::IntegerMatrix;
+use crate::integer_matrix::arithmetic::can_solve_multi_mod::can_solve_multi_mod_den;
 use crate::integer_matrix::arithmetic::fraction_free_lu_decomposition::*;
+use crate::integer_matrix::arithmetic::fraction_matrix::RightHandSide;
+use crate::integer_matrix::arithmetic::solve_dixon::solve_dixon_den;
+use crate::integer_matrix::arithmetic::solve_multi_mod::solve_multi_mod_den;
+use crate::integer_vector::IntegerVector;
 use crate::natural_matrix::arithmetic::mod_determinant::permutation_is_odd;
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
     AddMulAssign, DivExactAssign, DivRem, DivisibleBy, ModPowerOf2Inverse, MulSubMul,
-    MulSubMulAssign, NegAssign, SubMulAssign,
+    MulSubMulAssign, NegAssign, Solve, SubMulAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -197,8 +202,16 @@ fn forward_small(s: &Substitution<'_>, lu: &[i64], ys: &mut [i64]) -> SmallForwa
     let mut large = Vec::new();
     for i in 0..s.height.saturating_sub(1) {
         let (has_pivot, divide) = s.step(i);
-        let pivot = if has_pivot { lu[i * width + s.pivots[i]] } else { 0 };
-        let den = if divide { lu[(i - 1) * width + s.pivots[i - 1]] } else { 1 };
+        let pivot = if has_pivot {
+            lu[i * width + s.pivots[i]]
+        } else {
+            0
+        };
+        let den = if divide {
+            lu[(i - 1) * width + s.pivots[i - 1]]
+        } else {
+            1
+        };
         let (top, bottom) = ys.split_at_mut((i + 1) * k);
         let y_i = &top[i * k..];
         for (j, y_j) in bottom.chunks_exact_mut(k).enumerate() {
@@ -280,7 +293,8 @@ fn small_path_is_promising(last_pivot: &Integer, b: &[Integer], width: usize) ->
     let width_bits = u64::wrapping_from(width).significant_bits();
     let pivot_bits = last_pivot.significant_bits();
     pivot_bits + width_bits <= SMALL_BITS
-        && b.iter().all(|x| pivot_bits + x.significant_bits() + width_bits <= SMALL_BITS)
+        && b.iter()
+            .all(|x| pivot_bits + x.significant_bits() + width_bits <= SMALL_BITS)
 }
 
 // Solves PAX = d PB, where `fflu` is the packed fraction-free LU decomposition of the
@@ -378,7 +392,11 @@ solve_fflu_precomp(
 }}
 
 crate_test_fn! {
-solve_fflu(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatrix, Integer)> {
+solve_fflu<'a>(
+    a: &IntegerMatrix,
+    b: impl Into<RightHandSide<'a>>,
+) -> Option<(IntegerMatrix, Integer)> {
+    let b = b.into();
     assert_eq!(a.height, a.width, "the matrix must be square");
     assert_eq!(
         a.height, b.height,
@@ -402,7 +420,7 @@ solve_fflu(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatrix, Integ
     if rank != n {
         return None;
     }
-    let mut x = solve_fflu_precomp(&perm, &lu, n, n, &b.elements, k).unwrap();
+    let mut x = solve_fflu_precomp(&perm, &lu, n, n, b.elements, k).unwrap();
     if permutation_is_odd(&perm) {
         den.neg_assign();
         for y in &mut x {
@@ -424,7 +442,11 @@ solve_fflu(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatrix, Integ
 //
 // This is equivalent to `fmpz_mat_solve_cramer` from `fmpz_mat/solve_cramer.c`, FLINT 3.6.0.
 crate_test_fn! {
-solve_cramer(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatrix, Integer)> {
+solve_cramer<'a>(
+    a: &IntegerMatrix,
+    b: impl Into<RightHandSide<'a>>,
+) -> Option<(IntegerMatrix, Integer)> {
+    let b = b.into();
     assert_eq!(a.height, a.width, "the matrix must be square");
     assert_eq!(
         a.height, b.height,
@@ -443,7 +465,7 @@ solve_cramer(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatrix, Int
             if den == 0u32 {
                 return None;
             }
-            x.clone_from_slice(&b.elements);
+            x.clone_from_slice(b.elements);
             den
         }
         2 => {
@@ -497,3 +519,722 @@ solve_cramer(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatrix, Int
         den,
     ))
 }}
+
+// The largest dimension of a square system solved by Cramer's rule.
+const CRAMER_MAX_DIMENSION: usize = 3;
+
+// The largest dimension of a square system, or height of a general one, solved by fraction-free LU
+// decomposition.
+const FFLU_MAX_DIMENSION: usize = 15;
+
+// The largest width of the right-hand side of a larger square system solved by Dixon's p-adic
+// lifting; wider ones are solved with the multimodular algorithm.
+const DIXON_MAX_WIDTH: usize = 32;
+
+// Solves AX = dB for a square matrix A, returning X and d, or `None` if A is singular. The
+// denominator d is the determinant of A, up to sign, when A has dimension at most 15, and the
+// positive least common denominator of the solution otherwise.
+//
+// This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0.
+crate_test_fn! {
+solve_nonsingular<'a>(
+    a: &IntegerMatrix,
+    b: impl Into<RightHandSide<'a>>,
+) -> Option<(IntegerMatrix, Integer)> {
+    let b = b.into();
+    let n = a.height;
+    if n <= CRAMER_MAX_DIMENSION {
+        solve_cramer(a, b)
+    } else if n <= FFLU_MAX_DIMENSION {
+        solve_fflu(a, b)
+    } else if b.width <= DIXON_MAX_WIDTH {
+        solve_dixon_den(a, b)
+    } else {
+        solve_multi_mod_den(a, b)
+    }
+}}
+
+// Solves AX = dB for a matrix A of any shape by fraction-free LU decomposition, returning a
+// solution X and d, or `None` if there is none.
+//
+// This is equivalent to `fmpz_mat_can_solve_fflu` from `fmpz_mat/can_solve_fflu.c`, FLINT 3.6.0,
+// except that it panics if the dimensions are incompatible.
+crate_test_fn! {
+can_solve_fflu<'a>(
+    a: &IntegerMatrix,
+    b: impl Into<RightHandSide<'a>>,
+) -> Option<(IntegerMatrix, Integer)> {
+    let b = b.into();
+    assert_eq!(
+        a.height, b.height,
+        "the height of the matrix must equal the height of the right-hand side"
+    );
+    let (h, w, k) = (a.height, a.width, b.width);
+    let zero = || IntegerMatrix {
+        elements: vec![Integer::ZERO; w * k],
+        height: w,
+        width: k,
+    };
+    if h == 0 {
+        return Some((zero(), Integer::ONE));
+    }
+    if w == 0 {
+        return if b.is_zero() {
+            Some((zero(), Integer::ONE))
+        } else {
+            None
+        };
+    }
+    let mut lu = a.elements.clone();
+    let mut perm: Vec<usize> = (0..h).collect();
+    // FLINT also checks that the denominator is nonzero, but without the rank check, it is the last
+    // pivot, or 1 if there is none.
+    let (rank, mut den) = fflu_in_place_with_options(&mut lu, h, w, &mut perm, false, true);
+    let mut x = solve_fflu_precomp(&perm, &lu, h, w, b.elements, k)?;
+    if permutation_is_odd(&perm) {
+        den.neg_assign();
+        for y in &mut x {
+            y.neg_assign();
+        }
+    }
+    let x = IntegerMatrix {
+        elements: x,
+        height: w,
+        width: k,
+    };
+    if rank < h {
+        // The rows of PA and PB from the rank on must satisfy PAX = d PB too.
+        let mut a_rest = Vec::with_capacity((h - rank) * w);
+        let mut b_rest = Vec::with_capacity((h - rank) * k);
+        for &i in &perm[rank..] {
+            a_rest.extend_from_slice(&a.elements[i * w..(i + 1) * w]);
+            b_rest.extend(b.elements[i * k..(i + 1) * k].iter().map(|y| y * &den));
+        }
+        let a_rest = IntegerMatrix {
+            elements: a_rest,
+            height: h - rank,
+            width: w,
+        };
+        if (a_rest * &x).elements != b_rest {
+            return None;
+        }
+    }
+    Some((x, den))
+}}
+
+// Solves AX = dB for a matrix A of any shape, returning a solution X and d, or `None` if there is
+// none.
+//
+// This is equivalent to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c`, FLINT 3.6.0, except that
+// it panics if the dimensions are incompatible.
+crate_test_fn! {
+can_solve<'a>(
+    a: &IntegerMatrix,
+    b: impl Into<RightHandSide<'a>>,
+) -> Option<(IntegerMatrix, Integer)> {
+    let b = b.into();
+    if a.height <= FFLU_MAX_DIMENSION {
+        can_solve_fflu(a, b)
+    } else {
+        can_solve_multi_mod_den(a, b)
+    }
+}}
+
+// Solves AX = dB, using the method of `solve_nonsingular` when A is square and nonsingular, and
+// that of `can_solve` otherwise.
+fn solve_helper(a: &IntegerMatrix, b: RightHandSide<'_>) -> Option<(IntegerMatrix, Integer)> {
+    assert_eq!(
+        a.height, b.height,
+        "the height of the matrix must equal the height of the right-hand side"
+    );
+    let n = a.height;
+    if n == a.width {
+        if b.width == 0 {
+            return Some((
+                IntegerMatrix {
+                    elements: Vec::new(),
+                    height: n,
+                    width: 0,
+                },
+                Integer::ONE,
+            ));
+        }
+        if n > CRAMER_MAX_DIMENSION && n <= FFLU_MAX_DIMENSION {
+            // For a nonsingular matrix, `can_solve_fflu` computes the decomposition and solution
+            // that `solve_fflu` does, and for a singular one it is what `can_solve` falls back to,
+            // so calling it directly saves decomposing a singular matrix twice.
+            return can_solve_fflu(a, b);
+        }
+        if let Some(solution) = solve_nonsingular(a, b) {
+            return Some(solution);
+        }
+    }
+    can_solve(a, b)
+}
+
+fn solve_vector_helper(a: &IntegerMatrix, b: &IntegerVector) -> Option<(IntegerVector, Integer)> {
+    solve_helper(a, b.into()).map(|(x, den)| {
+        (
+            IntegerVector {
+                elements: x.elements,
+            },
+            den,
+        )
+    })
+}
+
+impl Solve<Self> for IntegerMatrix {
+    type Output = (Self, Integer);
+
+    /// Solves $AX = dB$ for $X$ and $d$, where $A$ and $B$ are [`IntegerMatrix`]es, taking the
+    /// matrix by value and the right-hand side by value.
+    ///
+    /// If $A$ is $h \times w$ and $B$ is $h \times k$, a solution is a $w \times k$ matrix $X$ and
+    /// a nonzero [`Integer`] $d$ with $AX = dB$, so that $X/d$ solves $AY = B$ over the rationals;
+    /// `None` is returned if there is none. When there are several, one of them is returned. When
+    /// $A$ is square and nonsingular, the solution is unique, and $d$ is $\det A$ if $A$ has
+    /// dimension at most 15 and the least positive common denominator of $A^{-1}B$ otherwise; if
+    /// $B$ has no columns, $d$ is 1. In general, $X$ and $d$ may have a common factor, and $d$ may
+    /// be negative.
+    ///
+    /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
+    /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
+    /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
+    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
+    ///
+    /// $M(n, b) = O(n^3 (b + \log n))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the maximum of the height and width of
+    /// $A$ and the width of $B$, and $b$ is the maximum number of significant bits of the elements
+    /// of $A$ and $B$: the elements of the solution have $O(n(b + \log n))$ bits, and the
+    /// multimodular and $p$-adic algorithms use $O(n(b + \log n))$ word-sized primes or lifting
+    /// steps, each costing $O(n^3)$ word operations and $O(n^2)$ updates of numbers of that many
+    /// bits, with $O(\log (nb))$ checks of candidate solutions.
+    ///
+    /// # Panics
+    /// Panics if the height of the matrix is not the height of the right-hand side.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Solve;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// // The solution is (-4, 9/2).
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let b = IntegerMatrix::from_str("[5; 6]").unwrap();
+    /// let (x, d) = a.solve(b).unwrap();
+    /// assert_eq!(x.to_string(), "[8; -9]");
+    /// assert_eq!(d.to_string(), "-2");
+    ///
+    /// // A system with infinitely many solutions
+    /// let a = IntegerMatrix::from_str("[1, 2, 3; 2, 4, 6]").unwrap();
+    /// let b = IntegerMatrix::from_str("[1; 2]").unwrap();
+    /// let (x, d) = a.solve(b).unwrap();
+    /// assert_eq!(x.to_string(), "[1; 0; 0]");
+    /// assert_eq!(d.to_string(), "1");
+    ///
+    /// // A system with no solution
+    /// let a = IntegerMatrix::from_str("[2, 4; 1, 2]").unwrap();
+    /// let b = IntegerMatrix::from_str("[1; 1]").unwrap();
+    /// assert_eq!(a.solve(b), None);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0, when $A$ is
+    /// square and nonsingular, and to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c` otherwise,
+    /// except that it panics if the dimensions are incompatible.
+    #[inline]
+    fn solve(self, b: Self) -> Option<(Self, Integer)> {
+        solve_helper(&self, (&b).into())
+    }
+}
+
+impl Solve<&Self> for IntegerMatrix {
+    type Output = (Self, Integer);
+
+    /// Solves $AX = dB$ for $X$ and $d$, where $A$ and $B$ are [`IntegerMatrix`]es, taking the
+    /// matrix by value and the right-hand side by reference.
+    ///
+    /// If $A$ is $h \times w$ and $B$ is $h \times k$, a solution is a $w \times k$ matrix $X$ and
+    /// a nonzero [`Integer`] $d$ with $AX = dB$, so that $X/d$ solves $AY = B$ over the rationals;
+    /// `None` is returned if there is none. When there are several, one of them is returned. When
+    /// $A$ is square and nonsingular, the solution is unique, and $d$ is $\det A$ if $A$ has
+    /// dimension at most 15 and the least positive common denominator of $A^{-1}B$ otherwise; if
+    /// $B$ has no columns, $d$ is 1. In general, $X$ and $d$ may have a common factor, and $d$ may
+    /// be negative.
+    ///
+    /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
+    /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
+    /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
+    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
+    ///
+    /// $M(n, b) = O(n^3 (b + \log n))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the maximum of the height and width of
+    /// $A$ and the width of $B$, and $b$ is the maximum number of significant bits of the elements
+    /// of $A$ and $B$: the elements of the solution have $O(n(b + \log n))$ bits, and the
+    /// multimodular and $p$-adic algorithms use $O(n(b + \log n))$ word-sized primes or lifting
+    /// steps, each costing $O(n^3)$ word operations and $O(n^2)$ updates of numbers of that many
+    /// bits, with $O(\log (nb))$ checks of candidate solutions.
+    ///
+    /// # Panics
+    /// Panics if the height of the matrix is not the height of the right-hand side.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Solve;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// // The solution is (-4, 9/2).
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let b = IntegerMatrix::from_str("[5; 6]").unwrap();
+    /// let (x, d) = a.solve(&b).unwrap();
+    /// assert_eq!(x.to_string(), "[8; -9]");
+    /// assert_eq!(d.to_string(), "-2");
+    ///
+    /// // A system with infinitely many solutions
+    /// let a = IntegerMatrix::from_str("[1, 2, 3; 2, 4, 6]").unwrap();
+    /// let b = IntegerMatrix::from_str("[1; 2]").unwrap();
+    /// let (x, d) = a.solve(&b).unwrap();
+    /// assert_eq!(x.to_string(), "[1; 0; 0]");
+    /// assert_eq!(d.to_string(), "1");
+    ///
+    /// // A system with no solution
+    /// let a = IntegerMatrix::from_str("[2, 4; 1, 2]").unwrap();
+    /// let b = IntegerMatrix::from_str("[1; 1]").unwrap();
+    /// assert_eq!(a.solve(&b), None);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0, when $A$ is
+    /// square and nonsingular, and to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c` otherwise,
+    /// except that it panics if the dimensions are incompatible.
+    #[inline]
+    fn solve(self, b: &Self) -> Option<(Self, Integer)> {
+        solve_helper(&self, b.into())
+    }
+}
+
+impl Solve<IntegerMatrix> for &IntegerMatrix {
+    type Output = (IntegerMatrix, Integer);
+
+    /// Solves $AX = dB$ for $X$ and $d$, where $A$ and $B$ are [`IntegerMatrix`]es, taking the
+    /// matrix by reference and the right-hand side by value.
+    ///
+    /// If $A$ is $h \times w$ and $B$ is $h \times k$, a solution is a $w \times k$ matrix $X$ and
+    /// a nonzero [`Integer`] $d$ with $AX = dB$, so that $X/d$ solves $AY = B$ over the rationals;
+    /// `None` is returned if there is none. When there are several, one of them is returned. When
+    /// $A$ is square and nonsingular, the solution is unique, and $d$ is $\det A$ if $A$ has
+    /// dimension at most 15 and the least positive common denominator of $A^{-1}B$ otherwise; if
+    /// $B$ has no columns, $d$ is 1. In general, $X$ and $d$ may have a common factor, and $d$ may
+    /// be negative.
+    ///
+    /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
+    /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
+    /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
+    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
+    ///
+    /// $M(n, b) = O(n^3 (b + \log n))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the maximum of the height and width of
+    /// $A$ and the width of $B$, and $b$ is the maximum number of significant bits of the elements
+    /// of $A$ and $B$: the elements of the solution have $O(n(b + \log n))$ bits, and the
+    /// multimodular and $p$-adic algorithms use $O(n(b + \log n))$ word-sized primes or lifting
+    /// steps, each costing $O(n^3)$ word operations and $O(n^2)$ updates of numbers of that many
+    /// bits, with $O(\log (nb))$ checks of candidate solutions.
+    ///
+    /// # Panics
+    /// Panics if the height of the matrix is not the height of the right-hand side.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Solve;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// // The solution is (-4, 9/2).
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let b = IntegerMatrix::from_str("[5; 6]").unwrap();
+    /// let (x, d) = (&a).solve(b).unwrap();
+    /// assert_eq!(x.to_string(), "[8; -9]");
+    /// assert_eq!(d.to_string(), "-2");
+    ///
+    /// // A system with infinitely many solutions
+    /// let a = IntegerMatrix::from_str("[1, 2, 3; 2, 4, 6]").unwrap();
+    /// let b = IntegerMatrix::from_str("[1; 2]").unwrap();
+    /// let (x, d) = (&a).solve(b).unwrap();
+    /// assert_eq!(x.to_string(), "[1; 0; 0]");
+    /// assert_eq!(d.to_string(), "1");
+    ///
+    /// // A system with no solution
+    /// let a = IntegerMatrix::from_str("[2, 4; 1, 2]").unwrap();
+    /// let b = IntegerMatrix::from_str("[1; 1]").unwrap();
+    /// assert_eq!((&a).solve(b), None);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0, when $A$ is
+    /// square and nonsingular, and to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c` otherwise,
+    /// except that it panics if the dimensions are incompatible.
+    #[inline]
+    fn solve(self, b: IntegerMatrix) -> Option<(IntegerMatrix, Integer)> {
+        solve_helper(self, (&b).into())
+    }
+}
+
+impl Solve<&IntegerMatrix> for &IntegerMatrix {
+    type Output = (IntegerMatrix, Integer);
+
+    /// Solves $AX = dB$ for $X$ and $d$, where $A$ and $B$ are [`IntegerMatrix`]es, taking the
+    /// matrix by reference and the right-hand side by reference.
+    ///
+    /// If $A$ is $h \times w$ and $B$ is $h \times k$, a solution is a $w \times k$ matrix $X$ and
+    /// a nonzero [`Integer`] $d$ with $AX = dB$, so that $X/d$ solves $AY = B$ over the rationals;
+    /// `None` is returned if there is none. When there are several, one of them is returned. When
+    /// $A$ is square and nonsingular, the solution is unique, and $d$ is $\det A$ if $A$ has
+    /// dimension at most 15 and the least positive common denominator of $A^{-1}B$ otherwise; if
+    /// $B$ has no columns, $d$ is 1. In general, $X$ and $d$ may have a common factor, and $d$ may
+    /// be negative.
+    ///
+    /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
+    /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
+    /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
+    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
+    ///
+    /// $M(n, b) = O(n^3 (b + \log n))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the maximum of the height and width of
+    /// $A$ and the width of $B$, and $b$ is the maximum number of significant bits of the elements
+    /// of $A$ and $B$: the elements of the solution have $O(n(b + \log n))$ bits, and the
+    /// multimodular and $p$-adic algorithms use $O(n(b + \log n))$ word-sized primes or lifting
+    /// steps, each costing $O(n^3)$ word operations and $O(n^2)$ updates of numbers of that many
+    /// bits, with $O(\log (nb))$ checks of candidate solutions.
+    ///
+    /// # Panics
+    /// Panics if the height of the matrix is not the height of the right-hand side.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Solve;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// // The solution is (-4, 9/2).
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let b = IntegerMatrix::from_str("[5; 6]").unwrap();
+    /// let (x, d) = (&a).solve(&b).unwrap();
+    /// assert_eq!(x.to_string(), "[8; -9]");
+    /// assert_eq!(d.to_string(), "-2");
+    ///
+    /// // A system with infinitely many solutions
+    /// let a = IntegerMatrix::from_str("[1, 2, 3; 2, 4, 6]").unwrap();
+    /// let b = IntegerMatrix::from_str("[1; 2]").unwrap();
+    /// let (x, d) = (&a).solve(&b).unwrap();
+    /// assert_eq!(x.to_string(), "[1; 0; 0]");
+    /// assert_eq!(d.to_string(), "1");
+    ///
+    /// // A system with no solution
+    /// let a = IntegerMatrix::from_str("[2, 4; 1, 2]").unwrap();
+    /// let b = IntegerMatrix::from_str("[1; 1]").unwrap();
+    /// assert_eq!((&a).solve(&b), None);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0, when $A$ is
+    /// square and nonsingular, and to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c` otherwise,
+    /// except that it panics if the dimensions are incompatible.
+    #[inline]
+    fn solve(self, b: &IntegerMatrix) -> Option<(IntegerMatrix, Integer)> {
+        solve_helper(self, b.into())
+    }
+}
+
+impl Solve<IntegerVector> for IntegerMatrix {
+    type Output = (IntegerVector, Integer);
+
+    /// Solves $Ax = db$ for $x$ and $d$, where $A$ is an [`IntegerMatrix`] and $b$ is an
+    /// [`IntegerVector`], taking the matrix by value and the vector by value.
+    ///
+    /// If $A$ is $h \times w$ and $b$ has length $h$, a solution is a vector $x$ of length $w$ and
+    /// a nonzero [`Integer`] $d$ with $Ax = db$, so that $x/d$ solves $Ay = b$ over the rationals;
+    /// `None` is returned if there is none. When there are several, one of them is returned. When
+    /// $A$ is square and nonsingular, the solution is unique, and $d$ is $\det A$ if $A$ has
+    /// dimension at most 15 and the least positive common denominator of $A^{-1}b$ otherwise. In
+    /// general, $x$ and $d$ may have a common factor, and $d$ may be negative.
+    ///
+    /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
+    /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
+    /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
+    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
+    ///
+    /// $M(n, b) = O(n^3 (b + \log n))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the maximum of the height and width of
+    /// $A$, and $b$ is the maximum number of significant bits of the elements of $A$ and $b$: the
+    /// elements of the solution have $O(n(b + \log n))$ bits, and the multimodular and $p$-adic
+    /// algorithms use $O(n(b + \log n))$ word-sized primes or lifting steps, each costing $O(n^3)$
+    /// word operations and $O(n^2)$ updates of numbers of that many bits, with $O(\log (nb))$
+    /// checks of candidate solutions.
+    ///
+    /// # Panics
+    /// Panics if the height of the matrix is not the length of the vector.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Solve;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// // The solution is (-4, 9/2).
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let b = IntegerVector::from_str("(5, 6)").unwrap();
+    /// let (x, d) = a.solve(b).unwrap();
+    /// assert_eq!(x.to_string(), "(8, -9)");
+    /// assert_eq!(d.to_string(), "-2");
+    ///
+    /// // A system with infinitely many solutions
+    /// let a = IntegerMatrix::from_str("[1, 2, 3; 2, 4, 6]").unwrap();
+    /// let b = IntegerVector::from_str("(1, 2)").unwrap();
+    /// let (x, d) = a.solve(b).unwrap();
+    /// assert_eq!(x.to_string(), "(1, 0, 0)");
+    /// assert_eq!(d.to_string(), "1");
+    ///
+    /// // A system with no solution
+    /// let a = IntegerMatrix::from_str("[2, 4; 1, 2]").unwrap();
+    /// let b = IntegerVector::from_str("(1, 1)").unwrap();
+    /// assert_eq!(a.solve(b), None);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0, when $A$ is
+    /// square and nonsingular, and to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c` otherwise,
+    /// with a right-hand side of one column, except that it panics if the dimensions are
+    /// incompatible.
+    #[inline]
+    fn solve(self, b: IntegerVector) -> Option<(IntegerVector, Integer)> {
+        solve_vector_helper(&self, &b)
+    }
+}
+
+impl Solve<&IntegerVector> for IntegerMatrix {
+    type Output = (IntegerVector, Integer);
+
+    /// Solves $Ax = db$ for $x$ and $d$, where $A$ is an [`IntegerMatrix`] and $b$ is an
+    /// [`IntegerVector`], taking the matrix by value and the vector by reference.
+    ///
+    /// If $A$ is $h \times w$ and $b$ has length $h$, a solution is a vector $x$ of length $w$ and
+    /// a nonzero [`Integer`] $d$ with $Ax = db$, so that $x/d$ solves $Ay = b$ over the rationals;
+    /// `None` is returned if there is none. When there are several, one of them is returned. When
+    /// $A$ is square and nonsingular, the solution is unique, and $d$ is $\det A$ if $A$ has
+    /// dimension at most 15 and the least positive common denominator of $A^{-1}b$ otherwise. In
+    /// general, $x$ and $d$ may have a common factor, and $d$ may be negative.
+    ///
+    /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
+    /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
+    /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
+    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
+    ///
+    /// $M(n, b) = O(n^3 (b + \log n))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the maximum of the height and width of
+    /// $A$, and $b$ is the maximum number of significant bits of the elements of $A$ and $b$: the
+    /// elements of the solution have $O(n(b + \log n))$ bits, and the multimodular and $p$-adic
+    /// algorithms use $O(n(b + \log n))$ word-sized primes or lifting steps, each costing $O(n^3)$
+    /// word operations and $O(n^2)$ updates of numbers of that many bits, with $O(\log (nb))$
+    /// checks of candidate solutions.
+    ///
+    /// # Panics
+    /// Panics if the height of the matrix is not the length of the vector.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Solve;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// // The solution is (-4, 9/2).
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let b = IntegerVector::from_str("(5, 6)").unwrap();
+    /// let (x, d) = a.solve(&b).unwrap();
+    /// assert_eq!(x.to_string(), "(8, -9)");
+    /// assert_eq!(d.to_string(), "-2");
+    ///
+    /// // A system with infinitely many solutions
+    /// let a = IntegerMatrix::from_str("[1, 2, 3; 2, 4, 6]").unwrap();
+    /// let b = IntegerVector::from_str("(1, 2)").unwrap();
+    /// let (x, d) = a.solve(&b).unwrap();
+    /// assert_eq!(x.to_string(), "(1, 0, 0)");
+    /// assert_eq!(d.to_string(), "1");
+    ///
+    /// // A system with no solution
+    /// let a = IntegerMatrix::from_str("[2, 4; 1, 2]").unwrap();
+    /// let b = IntegerVector::from_str("(1, 1)").unwrap();
+    /// assert_eq!(a.solve(&b), None);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0, when $A$ is
+    /// square and nonsingular, and to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c` otherwise,
+    /// with a right-hand side of one column, except that it panics if the dimensions are
+    /// incompatible.
+    #[inline]
+    fn solve(self, b: &IntegerVector) -> Option<(IntegerVector, Integer)> {
+        solve_vector_helper(&self, b)
+    }
+}
+
+impl Solve<IntegerVector> for &IntegerMatrix {
+    type Output = (IntegerVector, Integer);
+
+    /// Solves $Ax = db$ for $x$ and $d$, where $A$ is an [`IntegerMatrix`] and $b$ is an
+    /// [`IntegerVector`], taking the matrix by reference and the vector by value.
+    ///
+    /// If $A$ is $h \times w$ and $b$ has length $h$, a solution is a vector $x$ of length $w$ and
+    /// a nonzero [`Integer`] $d$ with $Ax = db$, so that $x/d$ solves $Ay = b$ over the rationals;
+    /// `None` is returned if there is none. When there are several, one of them is returned. When
+    /// $A$ is square and nonsingular, the solution is unique, and $d$ is $\det A$ if $A$ has
+    /// dimension at most 15 and the least positive common denominator of $A^{-1}b$ otherwise. In
+    /// general, $x$ and $d$ may have a common factor, and $d$ may be negative.
+    ///
+    /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
+    /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
+    /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
+    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
+    ///
+    /// $M(n, b) = O(n^3 (b + \log n))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the maximum of the height and width of
+    /// $A$, and $b$ is the maximum number of significant bits of the elements of $A$ and $b$: the
+    /// elements of the solution have $O(n(b + \log n))$ bits, and the multimodular and $p$-adic
+    /// algorithms use $O(n(b + \log n))$ word-sized primes or lifting steps, each costing $O(n^3)$
+    /// word operations and $O(n^2)$ updates of numbers of that many bits, with $O(\log (nb))$
+    /// checks of candidate solutions.
+    ///
+    /// # Panics
+    /// Panics if the height of the matrix is not the length of the vector.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Solve;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// // The solution is (-4, 9/2).
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let b = IntegerVector::from_str("(5, 6)").unwrap();
+    /// let (x, d) = (&a).solve(b).unwrap();
+    /// assert_eq!(x.to_string(), "(8, -9)");
+    /// assert_eq!(d.to_string(), "-2");
+    ///
+    /// // A system with infinitely many solutions
+    /// let a = IntegerMatrix::from_str("[1, 2, 3; 2, 4, 6]").unwrap();
+    /// let b = IntegerVector::from_str("(1, 2)").unwrap();
+    /// let (x, d) = (&a).solve(b).unwrap();
+    /// assert_eq!(x.to_string(), "(1, 0, 0)");
+    /// assert_eq!(d.to_string(), "1");
+    ///
+    /// // A system with no solution
+    /// let a = IntegerMatrix::from_str("[2, 4; 1, 2]").unwrap();
+    /// let b = IntegerVector::from_str("(1, 1)").unwrap();
+    /// assert_eq!((&a).solve(b), None);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0, when $A$ is
+    /// square and nonsingular, and to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c` otherwise,
+    /// with a right-hand side of one column, except that it panics if the dimensions are
+    /// incompatible.
+    #[inline]
+    fn solve(self, b: IntegerVector) -> Option<(IntegerVector, Integer)> {
+        solve_vector_helper(self, &b)
+    }
+}
+
+impl Solve<&IntegerVector> for &IntegerMatrix {
+    type Output = (IntegerVector, Integer);
+
+    /// Solves $Ax = db$ for $x$ and $d$, where $A$ is an [`IntegerMatrix`] and $b$ is an
+    /// [`IntegerVector`], taking the matrix by reference and the vector by reference.
+    ///
+    /// If $A$ is $h \times w$ and $b$ has length $h$, a solution is a vector $x$ of length $w$ and
+    /// a nonzero [`Integer`] $d$ with $Ax = db$, so that $x/d$ solves $Ay = b$ over the rationals;
+    /// `None` is returned if there is none. When there are several, one of them is returned. When
+    /// $A$ is square and nonsingular, the solution is unique, and $d$ is $\det A$ if $A$ has
+    /// dimension at most 15 and the least positive common denominator of $A^{-1}b$ otherwise. In
+    /// general, $x$ and $d$ may have a common factor, and $d$ may be negative.
+    ///
+    /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
+    /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
+    /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
+    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
+    ///
+    /// $M(n, b) = O(n^3 (b + \log n))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the maximum of the height and width of
+    /// $A$, and $b$ is the maximum number of significant bits of the elements of $A$ and $b$: the
+    /// elements of the solution have $O(n(b + \log n))$ bits, and the multimodular and $p$-adic
+    /// algorithms use $O(n(b + \log n))$ word-sized primes or lifting steps, each costing $O(n^3)$
+    /// word operations and $O(n^2)$ updates of numbers of that many bits, with $O(\log (nb))$
+    /// checks of candidate solutions.
+    ///
+    /// # Panics
+    /// Panics if the height of the matrix is not the length of the vector.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Solve;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// // The solution is (-4, 9/2).
+    /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
+    /// let b = IntegerVector::from_str("(5, 6)").unwrap();
+    /// let (x, d) = (&a).solve(&b).unwrap();
+    /// assert_eq!(x.to_string(), "(8, -9)");
+    /// assert_eq!(d.to_string(), "-2");
+    ///
+    /// // A system with infinitely many solutions
+    /// let a = IntegerMatrix::from_str("[1, 2, 3; 2, 4, 6]").unwrap();
+    /// let b = IntegerVector::from_str("(1, 2)").unwrap();
+    /// let (x, d) = (&a).solve(&b).unwrap();
+    /// assert_eq!(x.to_string(), "(1, 0, 0)");
+    /// assert_eq!(d.to_string(), "1");
+    ///
+    /// // A system with no solution
+    /// let a = IntegerMatrix::from_str("[2, 4; 1, 2]").unwrap();
+    /// let b = IntegerVector::from_str("(1, 1)").unwrap();
+    /// assert_eq!((&a).solve(&b), None);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0, when $A$ is
+    /// square and nonsingular, and to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c` otherwise,
+    /// with a right-hand side of one column, except that it panics if the dimensions are
+    /// incompatible.
+    #[inline]
+    fn solve(self, b: &IntegerVector) -> Option<(IntegerVector, Integer)> {
+        solve_vector_helper(self, b)
+    }
+}
