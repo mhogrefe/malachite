@@ -35,6 +35,12 @@ use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 
+pub use crate::integer_matrix::arithmetic::can_solve_dixon::can_solve_dixon;
+pub use crate::integer_matrix::arithmetic::can_solve_multi_mod::can_solve_multi_mod;
+pub use crate::integer_matrix::arithmetic::solve::{can_solve_fflu, solve_nonsingular};
+pub use crate::integer_matrix::arithmetic::solve_dixon::solve_dixon;
+pub use crate::integer_matrix::arithmetic::solve_multi_mod::solve_multi_mod;
+
 /// The right-hand side $B$ of a linear system $AX = B$, borrowed: the elements of a matrix in
 /// row-major order, with its height and width. A vector is borrowed as a matrix with one column, so
 /// that systems with either kind of right-hand side are solved without copying it.

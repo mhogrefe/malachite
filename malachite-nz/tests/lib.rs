@@ -354,6 +354,7 @@ pub mod integer_matrix {
         pub mod add_mul_unsigned_matrix;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
+        pub mod can_solve_dixon;
         pub mod can_solve_multi_mod;
         pub mod canonical_primitive_part;
         pub mod certify_lu_mod_p;

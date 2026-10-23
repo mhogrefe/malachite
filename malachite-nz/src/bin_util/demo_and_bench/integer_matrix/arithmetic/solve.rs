@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::Solve;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -67,7 +66,7 @@ fn demo_integer_matrix_solve(gm: GenMode, config: &GenConfig, limit: usize) {
 // its height and width, so that many have no unique solution, and some have none.
 fn demo_integer_matrix_solve_low_rank(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b) in integer_matrix_pair_gen_var_3().get(gm, config).take(limit) {
-        let a = low_rank(&a, &b);
+        let a = integer_matrix_low_rank(&a, &b);
         println!("solve({a}, {b}) = {}", format_solution((&a).solve(&b)));
     }
 }
@@ -100,7 +99,7 @@ fn demo_integer_matrix_can_solve_fflu(gm: GenMode, config: &GenConfig, limit: us
 
 fn demo_integer_matrix_can_solve_fflu_low_rank(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b) in integer_matrix_pair_gen_var_3().get(gm, config).take(limit) {
-        let a = low_rank(&a, &b);
+        let a = integer_matrix_low_rank(&a, &b);
         println!(
             "can_solve_fflu({a}, {b}) = {}",
             format_solution(can_solve_fflu(&a, &b))
@@ -119,7 +118,7 @@ fn demo_integer_matrix_can_solve(gm: GenMode, config: &GenConfig, limit: usize) 
 
 fn demo_integer_matrix_can_solve_low_rank(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b) in integer_matrix_pair_gen_var_3().get(gm, config).take(limit) {
-        let a = low_rank(&a, &b);
+        let a = integer_matrix_low_rank(&a, &b);
         println!(
             "can_solve({a}, {b}) = {}",
             format_solution(can_solve(&a, &b))
@@ -140,23 +139,12 @@ fn demo_integer_matrix_solve_fflu(gm: GenMode, config: &GenConfig, limit: usize)
 // its dimension, so that many are singular.
 fn demo_integer_matrix_solve_fflu_low_rank(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b) in integer_matrix_pair_gen_var_7().get(gm, config).take(limit) {
-        let a = low_rank(&a, &b);
+        let a = integer_matrix_low_rank(&a, &b);
         println!(
             "solve_fflu({a}, {b}) = {}",
             format_solution(solve_fflu(&a, &b))
         );
     }
-}
-
-// A matrix of `a`'s shape with rank at most `b`'s width, if that is smaller than its height and
-// width: `b` times the first `b.width()` rows of `a`.
-pub(crate) fn low_rank(a: &IntegerMatrix, b: &IntegerMatrix) -> IntegerMatrix {
-    let (h, w) = (a.height(), a.width());
-    let k = b.width();
-    if k >= h.min(w) {
-        return a.clone();
-    }
-    b * a.window(0..k, 0..w)
 }
 
 fn demo_integer_matrix_solve_cramer(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -180,7 +168,7 @@ fn demo_integer_matrix_solve_fflu_precomp(gm: GenMode, config: &GenConfig, limit
 
 fn demo_integer_matrix_solve_fflu_precomp_low_rank(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b) in integer_matrix_pair_gen_var_7().get(gm, config).take(limit) {
-        let a = low_rank(&a, &b);
+        let a = integer_matrix_low_rank(&a, &b);
         let x = integer_matrix_solve_fflu_precomp_from_matrix(&a, &b);
         println!(
             "solve_fflu_precomp({a}, {b}) = {}",

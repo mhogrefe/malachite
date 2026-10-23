@@ -2792,6 +2792,34 @@ pub fn special_random_rational_matrix_pair_gen_var_3(
     )
 }
 
+// Pairs of a square matrix of random dimension and a matrix of the same height, with small
+// elements, for linear algebra.
+pub fn special_random_rational_matrix_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalMatrix)> {
+    let mut xs = striped_random_rationals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 8),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(n, width)| {
+            let len = usize::exact_from(n * n);
+            let a = RationalMatrix::from_owned_elements(n, n, (&mut xs).take(len).collect());
+            let len = usize::exact_from(n * width);
+            let b = RationalMatrix::from_owned_elements(n, width, (&mut xs).take(len).collect());
+            (a, b)
+        }),
+    )
+}
+
 // Pairs of matrices of random shapes that can be multiplied.
 pub fn special_random_rational_matrix_pair_gen_var_4(
     config: &GenConfig,
@@ -4451,4 +4479,73 @@ pub fn special_random_rational_polynomial_signed_pair_gen_var_1<T: PrimitiveSign
             )
         },
     ))
+}
+
+// Square matrices with small elements, for linear algebra.
+pub fn special_random_rational_matrix_gen_var_2(config: &GenConfig) -> It<RationalMatrix> {
+    Box::new(striped_random_rational_square_matrices(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 8),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_size_n", 4),
+        config.get_or("mean_size_d", 1),
+    ))
+}
+
+// Pairs of matrices with the same height and small elements, for linear algebra.
+pub fn special_random_rational_matrix_pair_gen_var_6(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalMatrix)> {
+    let mut xs = striped_random_rationals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 8),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_triples_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, w1, w2)| {
+            let n = usize::exact_from(height * w1);
+            let a = RationalMatrix::from_owned_elements(height, w1, (&mut xs).take(n).collect());
+            let n = usize::exact_from(height * w2);
+            let b = RationalMatrix::from_owned_elements(height, w2, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+// Pairs of a matrix and a vector whose dimension is its height, with small elements, for linear
+// algebra.
+pub fn special_random_rational_matrix_rational_vector_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalVector)> {
+    let mut xs = striped_random_rationals(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 8),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let n = usize::exact_from(height * width);
+            let a = RationalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
+            let v = RationalVector::from_owned_elements(
+                (&mut xs).take(usize::exact_from(height)).collect(),
+            );
+            (a, v)
+        }),
+    )
 }

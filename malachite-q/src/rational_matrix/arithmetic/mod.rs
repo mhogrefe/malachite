@@ -27,6 +27,9 @@ pub mod content_chained;
 /// [`IntegerMatrix`](malachite_nz::integer_matrix::IntegerMatrix) by a
 /// [`RationalMatrix`](super::RationalMatrix).
 pub mod integer_matrix_mul;
+/// Implementations of [`Inverse`](malachite_base::num::arithmetic::traits::Inverse), for inverting
+/// square rational matrices.
+pub mod inverse;
 /// Implementations of
 /// [`KroneckerProduct`](malachite_base::num::arithmetic::traits::KroneckerProduct) and
 /// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
@@ -156,6 +159,9 @@ pub mod shl;
 /// assert_eq!(a.to_string(), "[2, -3, 12]");
 /// ```
 pub mod shr;
+/// Implementations of [`Solve`](malachite_base::num::arithmetic::traits::Solve), for solving linear
+/// systems with rational matrices.
+pub mod solve;
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a square
 /// [`RationalMatrix`](super::RationalMatrix).

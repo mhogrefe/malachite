@@ -11,6 +11,7 @@ use crate::gaussian_rational::GaussianRational;
 use crate::rational_matrix::RationalMatrix;
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_vector::RationalVector;
+use malachite_base::matrix::Matrix;
 use malachite_base::max;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -794,6 +795,15 @@ pub fn rational_matrix_bit_bucketer(var_name: &str) -> Bucketer<'_, RationalMatr
             )
         },
         bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn pair_1_rational_matrix_height_bucketer<'a>(
+    x_name: &'a str,
+) -> Bucketer<'a, (RationalMatrix, RationalMatrix)> {
+    Bucketer {
+        bucketing_function: &|(m, _)| usize::exact_from(m.height()),
+        bucketing_label: format!("{x_name}.height()"),
     }
 }
 

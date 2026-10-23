@@ -62,8 +62,8 @@ fn compare_permutations_and_pivots(
 // This is equivalent to `fmpq_mat_can_solve_fmpz_mat_multi_mod` from
 // `fmpq_mat/can_solve_multi_mod.c`, FLINT 3.6.0, except that it panics if the dimensions are
 // incompatible.
-crate_test_fn! {
-can_solve_multi_mod<'a>(
+#[doc(hidden)]
+pub fn can_solve_multi_mod<'a>(
     a: &IntegerMatrix,
     b: impl Into<RightHandSide<'a>>,
 ) -> Option<Vec<Fraction>> {
@@ -78,11 +78,7 @@ can_solve_multi_mod<'a>(
         return Some(vec![Fraction::ZERO; w * k]);
     }
     if w == 0 {
-        return if b.is_zero() {
-            Some(Vec::new())
-        } else {
-            None
-        };
+        return if b.is_zero() { Some(Vec::new()) } else { None };
     }
     let det_bound = a.submatrix_determinant_bound();
     let mut product = Natural::ONE;
@@ -118,8 +114,7 @@ can_solve_multi_mod<'a>(
                 }
                 continue;
             };
-            let ordering =
-                compare_permutations_and_pivots(&perm, &best_perm, pivots, best_pivots);
+            let ordering = compare_permutations_and_pivots(&perm, &best_perm, pivots, best_pivots);
             if best_rank == Some(rank) && ordering == Equal {
                 // Everything is the same: accept.
                 break x_mod;
@@ -141,7 +136,7 @@ can_solve_multi_mod<'a>(
         x = x.crt(&product, &x_mod, p).unwrap();
         product *= Natural::from(p);
     }
-}}
+}
 
 // Solves AX = dB with the multimodular algorithm, for a matrix A of any shape, returning a solution
 // X and the positive d, the least common denominator of the solution, or `None` if there is none.

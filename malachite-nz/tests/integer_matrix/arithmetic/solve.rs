@@ -548,22 +548,11 @@ fn solve_properties() {
     });
 }
 
-// A matrix of `a`'s shape with rank at most `b`'s width, if that is smaller than its height and
-// width: `b` times the first `b.width()` rows of `a`.
-fn low_rank(a: &IntegerMatrix, b: &IntegerMatrix) -> IntegerMatrix {
-    let (h, w) = (a.height(), a.width());
-    let k = b.width();
-    if k >= h.min(w) {
-        return a.clone();
-    }
-    b * a.window(0..k, 0..w)
-}
-
 #[test]
 fn solve_public_properties() {
     integer_matrix_pair_gen_var_3().test_properties(|(a, b)| {
         verify_public_solve(&a, &b);
-        let a = low_rank(&a, &b);
+        let a = integer_matrix_low_rank(&a, &b);
         verify_public_solve(&a, &b);
         // A consistent system: B = A A^T B is in the column space of A.
         let b = &a * (a.transpose() * &b);

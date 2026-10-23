@@ -1174,6 +1174,23 @@ pub fn exhaustive_rational_matrix_pair_gen_var_3() -> It<(RationalMatrix, Ration
     )
 }
 
+// Pairs of a square matrix and a matrix of the same height.
+pub fn exhaustive_rational_matrix_pair_gen_var_5() -> It<(RationalMatrix, RationalMatrix)> {
+    fn ys((n, width): (u64, u64)) -> It<(RationalMatrix, RationalMatrix)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_rational_matrices_with_dimensions(n, n),
+            exhaustive_rational_matrices_with_dimensions(n, width),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>())),
+            ys,
+        )
+        .map(|(_, p)| p),
+    )
+}
+
 // Pairs of matrices that can be multiplied: the width of the first is the height of the second.
 pub fn exhaustive_rational_matrix_pair_gen_var_4() -> It<(RationalMatrix, RationalMatrix)> {
     fn ys((height, inner, width): (u64, u64, u64)) -> It<(RationalMatrix, RationalMatrix)> {
@@ -1790,4 +1807,17 @@ pub fn exhaustive_rational_vector_unsigned_vec_pair_gen_var_1() -> It<(RationalV
             exhaustive_index_vecs(dimension),
         ))
     })
+}
+
+pub fn exhaustive_rational_matrix_gen_var_2() -> It<RationalMatrix> {
+    exhaustive_rational_matrix_gen_var_1()
+}
+
+pub fn exhaustive_rational_matrix_pair_gen_var_6() -> It<(RationalMatrix, RationalMatrix)> {
+    exhaustive_rational_matrix_pair_gen_var_3()
+}
+
+pub fn exhaustive_rational_matrix_rational_vector_pair_gen_var_3()
+-> It<(RationalMatrix, RationalVector)> {
+    exhaustive_rational_matrix_rational_vector_pair_gen_var_2()
 }

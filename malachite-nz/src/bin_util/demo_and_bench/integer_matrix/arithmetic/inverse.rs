@@ -15,6 +15,7 @@ use malachite_nz::test_util::bench::bucketers::integer_matrix_bit_bucketer;
 use malachite_nz::test_util::generators::{
     integer_matrix_gen_var_1, integer_matrix_pair_gen_var_7,
 };
+use malachite_nz::test_util::integer_matrix::arithmetic::solve::integer_matrix_low_rank;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_matrix_inverse);
@@ -40,7 +41,7 @@ fn demo_integer_matrix_inverse_ref(gm: GenMode, config: &GenConfig, limit: usize
 // dimension, so that many are singular.
 fn demo_integer_matrix_inverse_low_rank(gm: GenMode, config: &GenConfig, limit: usize) {
     for (a, b) in integer_matrix_pair_gen_var_7().get(gm, config).take(limit) {
-        let a = super::solve::low_rank(&a, &b);
+        let a = integer_matrix_low_rank(&a, &b);
         println!("inverse({a}) = {}", format_solution((&a).inverse()));
     }
 }

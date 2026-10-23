@@ -536,8 +536,8 @@ const DIXON_MAX_WIDTH: usize = 32;
 // positive least common denominator of the solution otherwise.
 //
 // This is equivalent to `fmpz_mat_solve` from `fmpz_mat/solve.c`, FLINT 3.6.0.
-crate_test_fn! {
-solve_nonsingular<'a>(
+#[doc(hidden)]
+pub fn solve_nonsingular<'a>(
     a: &IntegerMatrix,
     b: impl Into<RightHandSide<'a>>,
 ) -> Option<(IntegerMatrix, Integer)> {
@@ -552,15 +552,15 @@ solve_nonsingular<'a>(
     } else {
         solve_multi_mod_den(a, b)
     }
-}}
+}
 
 // Solves AX = dB for a matrix A of any shape by fraction-free LU decomposition, returning a
 // solution X and d, or `None` if there is none.
 //
 // This is equivalent to `fmpz_mat_can_solve_fflu` from `fmpz_mat/can_solve_fflu.c`, FLINT 3.6.0,
 // except that it panics if the dimensions are incompatible.
-crate_test_fn! {
-can_solve_fflu<'a>(
+#[doc(hidden)]
+pub fn can_solve_fflu<'a>(
     a: &IntegerMatrix,
     b: impl Into<RightHandSide<'a>>,
 ) -> Option<(IntegerMatrix, Integer)> {
@@ -620,7 +620,7 @@ can_solve_fflu<'a>(
         }
     }
     Some((x, den))
-}}
+}
 
 // Solves AX = dB for a matrix A of any shape, returning a solution X and d, or `None` if there is
 // none.

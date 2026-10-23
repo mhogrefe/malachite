@@ -33,8 +33,8 @@ use malachite_base::num::arithmetic::traits::Crt;
 //
 // This is equivalent to `fmpq_mat_solve_fmpz_mat_multi_mod` from `fmpq_mat/solve_multi_mod.c`,
 // FLINT 3.6.0, except that it panics if the dimensions are incompatible.
-crate_test_fn! {
-solve_multi_mod<'a>(
+#[doc(hidden)]
+pub fn solve_multi_mod<'a>(
     a: &IntegerMatrix,
     b: impl Into<RightHandSide<'a>>,
 ) -> Option<Vec<Fraction>> {
@@ -77,7 +77,7 @@ solve_multi_mod<'a>(
         product *= Natural::from(p);
     }
     Some(reconstruct_fractions(x.elements.iter(), &product).unwrap())
-}}
+}
 
 // Solves AX = dB for a square matrix A with the multimodular algorithm, returning X and the
 // positive d, the least common denominator of the solution, or `None` if A is singular.

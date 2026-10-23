@@ -3941,6 +3941,31 @@ fn test_against_flint() {
             flint_mode,
         );
     }
+    // Solutions of linear systems with RationalMatrixes and inverses, against fmpq_mat_solve and its
+    // fraction-free, Dixon, and multimodular forms, fmpq_mat_can_solve and its fraction-free,
+    // multimodular, and Dixon forms, fmpq_mat_inv, and, for the public `Solve`, fmpq_mat_solve
+    // falling back to fmpq_mat_can_solve. The `_low_rank` demos make many systems singular.
+    for (op, flint_mode) in [
+        ("solve_fraction_free", "fmpq_mat_solve_fraction_free"),
+        ("solve_dixon", "fmpq_mat_solve_dixon"),
+        ("solve_multi_mod", "fmpq_mat_solve_multi_mod"),
+        ("solve_nonsingular", "fmpq_mat_solve"),
+        ("can_solve_fraction_free", "fmpq_mat_can_solve_fraction_free"),
+        ("can_solve_multi_mod", "fmpq_mat_can_solve_multi_mod"),
+        ("can_solve_dixon", "fmpq_mat_can_solve_dixon"),
+        ("can_solve", "fmpq_mat_can_solve"),
+        ("solve", "fmpq_mat_solve_or_can_solve"),
+        ("inverse", "fmpq_mat_inv"),
+    ] {
+        for suffix in ["", "_low_rank"] {
+            check_demo_against_flint(
+                &oracle,
+                "../malachite-q",
+                &format!("demo_rational_matrix_{op}{suffix}"),
+                flint_mode,
+            );
+        }
+    }
     // Rational reconstruction of RationalMatrixes, against fmpq_mat_set_fmpz_mat_mod_fmpz. The
     // `_round_trip` demo reconstructs the residues of generated rational matrices modulo a modulus
     // large enough to recover them.

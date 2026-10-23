@@ -19,6 +19,7 @@
 #include <flint/flint.h>
 #include <flint/fmpz.h>
 #include <flint/fmpz_mat.h>
+#include <flint/fmpq_mat.h>
 #include <flint/fmpq.h>
 #include <flint/fmpq_poly.h>
 #include <flint/fmpz_poly.h>
@@ -82,6 +83,9 @@ int split_vector_scalar_line(char * line, const char * method, const char * assi
    no elements, initializing `mat` to it. Returns 1 on success and 0, with `mat` still initialized,
    if the text is not exactly in that form. */
 int fmpz_mat_init_set_str_malachite(fmpz_mat_t mat, const char * s);
+
+/* Reads a rational matrix written by Malachite into `mat`, returning 0 if it is malformed. */
+int fmpq_mat_init_set_str_malachite(fmpq_mat_t mat, const char * s);
 
 /* Returns 0 if `checked` is positive, and otherwise reports that no line of the input had the
    shape the mode `name` looks for and returns 1. A mode skips lines it cannot parse, so without
@@ -352,6 +356,16 @@ int run_fmpz_mat_solve_fflu(const char * arg);
 int run_fmpz_mat_solve_cramer(const char * arg);
 int run_fmpz_mat_solve_fflu_precomp(const char * arg);
 int run_fmpz_mat_solve(const char * arg);
+int run_fmpq_mat_solve_fraction_free(const char * arg);
+int run_fmpq_mat_solve_dixon(const char * arg);
+int run_fmpq_mat_solve_multi_mod(const char * arg);
+int run_fmpq_mat_solve(const char * arg);
+int run_fmpq_mat_can_solve_fraction_free(const char * arg);
+int run_fmpq_mat_can_solve_multi_mod(const char * arg);
+int run_fmpq_mat_can_solve_dixon(const char * arg);
+int run_fmpq_mat_can_solve(const char * arg);
+int run_fmpq_mat_solve_or_can_solve(const char * arg);
+int run_fmpq_mat_inv(const char * arg);
 int run_fmpz_mat_solve_dixon_den(const char * arg);
 int run_fmpz_mat_solve_multi_mod_den(const char * arg);
 int run_fmpz_mat_can_solve_fflu(const char * arg);

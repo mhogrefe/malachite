@@ -584,6 +584,13 @@ documented by git history.
 - `RationalMatrix::reconstruct` and `reconstruct_ref`, which recover a rational matrix from a
   `NaturalMatrix` of residues modulo a `Natural` by rational reconstruction with a running
   denominator, like FLINT's `fmpq_mat_set_fmpz_mat_mod_fmpz`.
+- `Solve` and `Inverse` for `RationalMatrix`, with the matrix by value or by reference. `solve`
+  takes a `RationalMatrix` or `RationalVector` right-hand side, by value or by reference, and
+  returns a solution of $AX = B$ or $Ax = b$, or `None` if there is none, for a matrix of any shape
+  and rank: the denominators of each row are cleared and the integer system is solved as for
+  `IntegerMatrix`, giving the unique solution when $A$ is square and nonsingular, as FLINT's
+  `fmpq_mat_solve` does, and `fmpq_mat_can_solve`'s otherwise. `inverse` returns the inverse, or
+  `None` for a singular matrix, like `fmpq_mat_inv`.
 
 ### malachite-float
 

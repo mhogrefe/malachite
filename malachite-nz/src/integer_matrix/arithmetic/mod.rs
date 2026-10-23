@@ -27,6 +27,11 @@ pub mod balanced_mod;
 /// power of 2.
 pub mod balanced_mod_power_of_2;
 crate_test_mod! {
+    /// Solving a linear system of any shape by Dixon's p-adic lifting. Internal machinery for
+    /// malachite-q's `RationalMatrix` solvers, public only under `test_build`.
+    can_solve_dixon
+}
+crate_test_mod! {
     /// Solving a linear system of any shape with the multimodular algorithm. Internal machinery for
     /// [`Solve`](malachite_base::num::arithmetic::traits::Solve), public only under `test_build`.
     can_solve_multi_mod

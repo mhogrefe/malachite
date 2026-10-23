@@ -17,6 +17,7 @@ use core::iter::repeat_n;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{DivExact, LcmAssign};
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::natural::Natural;
@@ -189,18 +190,38 @@ to_numerators_and_row_denominators_2(
     b: &RationalMatrix,
 ) -> (IntegerMatrix, IntegerMatrix, NaturalVector) {
     assert_eq!(a.height(), b.height(), "the matrices must have the same height");
-    let mut denominators = a.row_denominators();
-    for (d, e) in denominators.iter_mut().zip(b.row_denominators()) {
-        d.lcm_assign(e);
-    }
+    let (a, b, denominators) = numerators_over_common_row_denominators(a, &b.elements, b.width);
     (
-        a.scale_by_row_denominators(&denominators),
-        b.scale_by_row_denominators(&denominators),
+        a,
+        b,
         NaturalVector {
             elements: denominators,
         },
     )
 }}
+
+// `to_numerators_and_row_denominators_2` for a second matrix given by its elements and width, with
+// as many rows as `a`.
+pub(crate) fn numerators_over_common_row_denominators(
+    a: &RationalMatrix,
+    b: &[Rational],
+    width: usize,
+) -> (IntegerMatrix, IntegerMatrix, Vec<Natural>) {
+    let mut denominators = a.row_denominators();
+    if width != 0 {
+        for (d, row) in denominators.iter_mut().zip(b.chunks_exact(width)) {
+            for x in row {
+                d.lcm_assign(x.denominator_ref());
+            }
+        }
+    }
+    let b = IntegerMatrix::from_owned_elements(
+        a.height(),
+        u64::exact_from(width),
+        scaled_numerators(b, denominators.iter().flat_map(|d| repeat_n(d, width))),
+    );
+    (a.scale_by_row_denominators(&denominators), b, denominators)
+}
 
 // The numerators of `xs` over the corresponding `denominators`, each a multiple of its element's
 // denominator.

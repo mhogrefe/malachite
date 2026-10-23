@@ -17,8 +17,8 @@ use crate::integer_matrix::IntegerMatrix;
 use crate::integer_matrix::arithmetic::add_mul_unsigned_matrix::add_mul_unsigned_matrix_assign;
 use crate::integer_matrix::arithmetic::certify_lu_mod_p::rank_certify_lu_mod_p;
 use crate::integer_matrix::arithmetic::fraction_matrix::*;
-use crate::integer_matrix::arithmetic::solve_bounds::solve_bounds_helper;
 use crate::integer_matrix::arithmetic::mul::multi_mod::{OPTIMAL_MODULUS_MIN, next_prime};
+use crate::integer_matrix::arithmetic::solve_bounds::solve_bounds_helper;
 use crate::integer_matrix::arithmetic::word_lu::WordLu;
 use crate::natural::Natural;
 use crate::platform::Limb;
@@ -138,8 +138,11 @@ fn solve_dixon_with_inverse(
 //
 // This is equivalent to `fmpq_mat_solve_fmpz_mat_dixon` from `fmpq_mat/solve_dixon.c`, FLINT 3.6.0,
 // except that it panics if the dimensions are incompatible.
-crate_test_fn! {
-solve_dixon<'a>(a: &IntegerMatrix, b: impl Into<RightHandSide<'a>>) -> Option<Vec<Fraction>> {
+#[doc(hidden)]
+pub fn solve_dixon<'a>(
+    a: &IntegerMatrix,
+    b: impl Into<RightHandSide<'a>>,
+) -> Option<Vec<Fraction>> {
     let b = b.into();
     assert_eq!(a.height, a.width, "the matrix must be square");
     assert_eq!(
@@ -159,7 +162,7 @@ solve_dixon<'a>(a: &IntegerMatrix, b: impl Into<RightHandSide<'a>>) -> Option<Ve
         p,
         (num_bound, den_bound),
     ))
-}}
+}
 
 // Solves AX = dB for a square matrix A by Dixon's p-adic lifting, returning X and the positive d,
 // the least common denominator of the solution, or `None` if A is singular.

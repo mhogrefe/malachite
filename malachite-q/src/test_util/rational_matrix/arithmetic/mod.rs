@@ -13,4 +13,5 @@ pub mod mul_integer_matrix;
 pub mod mul_vector;
 pub mod pow;
 pub mod reconstruct;
+pub mod solve;
 pub mod square;

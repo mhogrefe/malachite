@@ -171,6 +171,7 @@ pub mod rational_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod integer_matrix_mul;
+        pub mod inverse;
         pub mod is_solution;
         pub mod kronecker_product;
         pub mod mul;
@@ -182,6 +183,7 @@ pub mod rational_matrix {
         pub mod scalar_mul;
         pub mod shl;
         pub mod shr;
+        pub mod solve;
         pub mod square;
         pub mod sub;
         pub mod trace;

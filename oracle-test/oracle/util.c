@@ -24,6 +24,7 @@
 
 #include <flint/fmpz_poly.h>
 #include <flint/fmpz_mat.h>
+#include <flint/fmpq_mat.h>
 #include <flint/fmpz_vec.h>
 
 #include "oracle.h"
@@ -613,6 +614,71 @@ fmpz_mat_init_set_str_malachite(fmpz_mat_t mat, const char * s)
             char saved = cursor[token_len];
             cursor[token_len] = '\0';
             ok = fmpz_set_str(fmpz_mat_entry(mat, i, j), cursor, 10) == 0;
+            cursor[token_len] = saved;
+            int last = i == height - 1 && j == width - 1;
+            char expected = last ? '\0' : (j == width - 1 ? ';' : ',');
+            if (ok && saved != expected)
+            {
+                ok = 0;
+            }
+            cursor += token_len + (saved != '\0');
+        }
+    }
+    flint_free(buffer);
+    return ok;
+}
+
+/* Reads a rational matrix written by Malachite into `mat`, returning 0 if it is malformed. */
+int
+fmpq_mat_init_set_str_malachite(fmpq_mat_t mat, const char * s)
+{
+    slong height;
+    slong width;
+    char tail;
+    if (sscanf(s, "[]_{%ld,%ld}%c", &height, &width, &tail) == 2)
+    {
+        fmpq_mat_init(mat, height, width);
+        return 1;
+    }
+    size_t len = strlen(s);
+    if (len < 2 || s[0] != '[' || s[len - 1] != ']')
+    {
+        fmpq_mat_init(mat, 0, 0);
+        return 0;
+    }
+    height = 1;
+    width = 1;
+    int first_row = 1;
+    for (size_t i = 1; i + 1 < len; i++)
+    {
+        if (s[i] == ';')
+        {
+            height++;
+            first_row = 0;
+        }
+        else if (s[i] == ',' && first_row)
+        {
+            width++;
+        }
+    }
+    fmpq_mat_init(mat, height, width);
+    char * buffer = flint_malloc(len);
+    memcpy(buffer, s + 1, len - 2);
+    buffer[len - 2] = '\0';
+    char * cursor = buffer;
+    int ok = 1;
+    for (slong i = 0; i < height && ok; i++)
+    {
+        for (slong j = 0; j < width && ok; j++)
+        {
+            while (*cursor == ' ')
+            {
+                cursor++;
+            }
+            size_t token_len = strcspn(cursor, ",;");
+            char saved = cursor[token_len];
+            cursor[token_len] = '\0';
+            ok = fmpq_set_str(fmpq_mat_entry(mat, i, j), cursor, 10) == 0;
             cursor[token_len] = saved;
             int last = i == height - 1 && j == width - 1;
             char expected = last ? '\0' : (j == width - 1 ? ';' : ',');

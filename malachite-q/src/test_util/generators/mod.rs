@@ -1413,6 +1413,47 @@ pub fn rational_matrix_pair_gen_var_3() -> Generator<(RationalMatrix, RationalMa
     )
 }
 
+// All square `RationalMatrix`s, with small elements in the random modes, for linear algebra.
+pub fn rational_matrix_gen_var_2() -> Generator<RationalMatrix> {
+    Generator::new(
+        &exhaustive_rational_matrix_gen_var_2,
+        &random_rational_matrix_gen_var_2,
+        &special_random_rational_matrix_gen_var_2,
+    )
+}
+
+// All pairs of `RationalMatrix`s of the same height, with small elements in the random modes, for
+// linear algebra.
+pub fn rational_matrix_pair_gen_var_6() -> Generator<(RationalMatrix, RationalMatrix)> {
+    Generator::new(
+        &exhaustive_rational_matrix_pair_gen_var_6,
+        &random_rational_matrix_pair_gen_var_6,
+        &special_random_rational_matrix_pair_gen_var_6,
+    )
+}
+
+// All `(RationalMatrix, RationalVector)` where the vector's dimension is the height of the matrix,
+// with small elements in the random modes, for linear algebra.
+pub fn rational_matrix_rational_vector_pair_gen_var_3()
+-> Generator<(RationalMatrix, RationalVector)> {
+    Generator::new(
+        &exhaustive_rational_matrix_rational_vector_pair_gen_var_3,
+        &random_rational_matrix_rational_vector_pair_gen_var_3,
+        &special_random_rational_matrix_rational_vector_pair_gen_var_3,
+    )
+}
+
+// All pairs of `RationalMatrix`s where the first is square and the second has the same height, as
+// for the coefficient matrix and right-hand side of a linear system. The random modes generate
+// small elements, since solving clears the denominators of whole rows.
+pub fn rational_matrix_pair_gen_var_5() -> Generator<(RationalMatrix, RationalMatrix)> {
+    Generator::new(
+        &exhaustive_rational_matrix_pair_gen_var_5,
+        &random_rational_matrix_pair_gen_var_5,
+        &special_random_rational_matrix_pair_gen_var_5,
+    )
+}
+
 // All pairs of `RationalMatrix`s that can be multiplied: the width of the first is the height of
 // the second.
 pub fn rational_matrix_pair_gen_var_4() -> Generator<(RationalMatrix, RationalMatrix)> {

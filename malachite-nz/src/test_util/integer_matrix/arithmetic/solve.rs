@@ -142,3 +142,15 @@ pub fn integer_matrix_solve_fflu_general(
         den,
     ))
 }
+
+/// A matrix of `a`'s shape with rank at most `b`'s width, if that is smaller than its height and
+/// width: `b` times the first `b.width()` rows of `a`. Systems with this matrix and the right-hand
+/// side `b` often have no unique solution, and some have none.
+pub fn integer_matrix_low_rank(a: &IntegerMatrix, b: &IntegerMatrix) -> IntegerMatrix {
+    let (h, w) = (a.height(), a.width());
+    let k = b.width();
+    if k >= h.min(w) {
+        return a.clone();
+    }
+    b * a.window(0..k, 0..w)
+}
