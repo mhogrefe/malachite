@@ -351,6 +351,7 @@ pub mod integer_matrix {
     pub mod access;
     pub mod arithmetic {
         pub mod add;
+        pub mod add_mul_unsigned_matrix;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
@@ -373,6 +374,7 @@ pub mod integer_matrix {
         pub mod pow;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod solve;
         pub mod solve_bounds;
         pub mod square;
         pub mod sub;

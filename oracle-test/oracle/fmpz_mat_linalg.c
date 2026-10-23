@@ -21,6 +21,12 @@
     `b` is `true` or `false`; the modes recompute the results with `fmpz_mat_det_bareiss`,
     `fmpz_mat_det_cofactor`, and `fmpz_mat_is_in_rref_with_rank`.
 
+    The solving demos print `solve_fflu(A, B) = R`, `solve_cramer(A, B) = R`, and
+    `solve_fflu_precomp(A, B) = R`, where `R` is `None`, `Some((X, den))` for the first two, or
+    `Some(X)` for the third. The modes recompute the results with `fmpz_mat_solve_fflu`,
+    `fmpz_mat_solve_cramer`, and, from the decomposition of `A` by `fmpz_mat_fflu` without the
+    rank check, `fmpz_mat_solve_fflu_precomp`.
+
     Matrices are read by fmpz_mat_init_set_str_malachite in util.c. Each mode treats any other
     nonempty line as an error, and an input with no lines at all.
 */
@@ -39,7 +45,8 @@ static const char * current_name;
 static const char * current_op;
 static int current_kind;
 
-enum { KIND_FFLU, KIND_DET_BAREISS, KIND_DET_COFACTOR, KIND_IS_IN_RREF };
+enum { KIND_FFLU, KIND_DET_BAREISS, KIND_DET_COFACTOR, KIND_IS_IN_RREF, KIND_SOLVE_FFLU,
+       KIND_SOLVE_CRAMER, KIND_SOLVE_FFLU_PRECOMP };
 
 static int
 unrecognized(int line_number)
@@ -220,6 +227,118 @@ check_fflu(char * a_str, char * rest, int line_number)
 }
 
 static int
+check_solve(char * args, char * rest, int line_number)
+{
+    size_t a_len = matrix_length(args);
+    if (a_len == 0 || strncmp(args + a_len, ", ", 2) != 0)
+    {
+        return unrecognized(line_number);
+    }
+    args[a_len] = '\0';
+    char * b_str = args + a_len + 2;
+    fmpz_mat_t a, b;
+    if (!fmpz_mat_init_set_str_malachite(a, args))
+    {
+        flint_printf("error in %s test, line %d: unreadable input\n", current_name, line_number);
+        return 1;
+    }
+    if (!fmpz_mat_init_set_str_malachite(b, b_str))
+    {
+        fmpz_mat_clear(a);
+        flint_printf("error in %s test, line %d: unreadable input\n", current_name, line_number);
+        return 1;
+    }
+    slong h = fmpz_mat_nrows(a), w = fmpz_mat_ncols(a), k = fmpz_mat_ncols(b);
+    fmpz_mat_t x;
+    fmpz_t den;
+    fmpz_mat_init(x, w, k);
+    fmpz_init(den);
+    int success;
+    if (current_kind == KIND_SOLVE_FFLU_PRECOMP)
+    {
+        fmpz_mat_t lu;
+        fmpz_mat_init(lu, h, w);
+        slong * perm = flint_malloc(sizeof(slong) * FLINT_MAX(h, 1));
+        for (slong i = 0; i < h; i++)
+        {
+            perm[i] = i;
+        }
+        fmpz_mat_fflu(lu, den, perm, a, 0);
+        success = fmpz_mat_solve_fflu_precomp(x, perm, lu, b);
+        flint_free(perm);
+        fmpz_mat_clear(lu);
+    }
+    else if (current_kind == KIND_SOLVE_FFLU)
+    {
+        success = fmpz_mat_solve_fflu(x, den, a, b);
+    }
+    else
+    {
+        success = fmpz_mat_solve_cramer(x, den, a, b);
+    }
+    int result = 0;
+    if (strcmp(rest, "None") == 0)
+    {
+        if (success)
+        {
+            flint_printf("error in %s test, line %d: Malachite gives None, but FLINT succeeds\n",
+                         current_name, line_number);
+            result = 1;
+        }
+    }
+    else
+    {
+        size_t len = strlen(rest);
+        int pair = current_kind != KIND_SOLVE_FFLU_PRECOMP;
+        size_t prefix = pair ? 6 : 5;
+        if (len < prefix + 1 || strncmp(rest, pair ? "Some((" : "Some(", prefix) != 0
+            || rest[len - 1] != ')' || (pair && rest[len - 2] != ')'))
+        {
+            result = unrecognized(line_number);
+        }
+        else if (!success)
+        {
+            flint_printf("error in %s test, line %d: Malachite succeeds, but FLINT does not\n",
+                         current_name, line_number);
+            result = 1;
+        }
+        else
+        {
+            rest[len - (pair ? 2 : 1)] = '\0';
+            char * x_str = rest + prefix;
+            size_t x_len = matrix_length(x_str);
+            fmpz_mat_t x_expected;
+            if (x_len == 0 || (pair && strncmp(x_str + x_len, ", ", 2) != 0))
+            {
+                result = unrecognized(line_number);
+            }
+            else
+            {
+                char * den_str = x_str + x_len + 2;
+                x_str[x_len] = '\0';
+                if (!fmpz_mat_init_set_str_malachite(x_expected, x_str))
+                {
+                    flint_printf("error in %s test, line %d: unreadable result\n", current_name,
+                                 line_number);
+                    result = 1;
+                }
+                else
+                {
+                    result = report_mat(x, x_expected, line_number)
+                        || (pair && compare_fmpz(den, den_str, line_number));
+                    fmpz_mat_clear(x_expected);
+                }
+            }
+        }
+    }
+    fmpz_clear(den);
+    fmpz_mat_clear(x);
+    fmpz_mat_clear(a);
+    fmpz_mat_clear(b);
+    return result;
+}
+
+static int
 check_line(char * line, int line_number)
 {
     line[strcspn(line, "\r\n")] = '\0';
@@ -252,6 +371,11 @@ check_line(char * line, int line_number)
     char * rest = eq + 4;
     checked++;
     int result = 0;
+    if (current_kind == KIND_SOLVE_FFLU || current_kind == KIND_SOLVE_CRAMER
+        || current_kind == KIND_SOLVE_FFLU_PRECOMP)
+    {
+        return check_solve(args, rest, line_number);
+    }
     if (current_kind == KIND_IS_IN_RREF)
     {
         size_t a_len = matrix_length(args);
@@ -348,4 +472,22 @@ run_fmpz_mat_is_in_rref_with_rank(const char * arg)
 {
     return run(arg, "fmpz_mat_is_in_rref_with_rank", "is_in_reduced_row_echelon_form_with_rank",
                KIND_IS_IN_RREF);
+}
+
+int
+run_fmpz_mat_solve_fflu(const char * arg)
+{
+    return run(arg, "fmpz_mat_solve_fflu", "solve_fflu", KIND_SOLVE_FFLU);
+}
+
+int
+run_fmpz_mat_solve_cramer(const char * arg)
+{
+    return run(arg, "fmpz_mat_solve_cramer", "solve_cramer", KIND_SOLVE_CRAMER);
+}
+
+int
+run_fmpz_mat_solve_fflu_precomp(const char * arg)
+{
+    return run(arg, "fmpz_mat_solve_fflu_precomp", "solve_fflu_precomp", KIND_SOLVE_FFLU_PRECOMP);
 }

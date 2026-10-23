@@ -9,6 +9,11 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// matrices of the same shape.
 pub mod add;
+crate_test_mod! {
+    /// Adding a multiple of a matrix of words to an `IntegerMatrix`. Internal machinery for a
+    /// future solver, public only under `test_build`.
+    add_mul_unsigned_matrix
+}
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod) and
 /// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
 /// every element of an [`IntegerMatrix`](super::IntegerMatrix) to the representative closest to
@@ -196,6 +201,12 @@ pub mod scalar_mul;
 /// assert_eq!(a.to_string(), "[4, -8; 12, 16]");
 /// ```
 pub mod shl;
+crate_test_mod! {
+    /// Algorithms for solving linear systems: fraction-free LU decomposition with forward and back
+    /// substitution, and Cramer's rule. Internal machinery for a future solver, public only under
+    /// `test_build`.
+    solve
+}
 /// The method [`solve_bounds`](super::IntegerMatrix::solve_bounds), upper bounds for the numerators
 /// and denominators of the solution of a linear system.
 pub mod solve_bounds;

@@ -4093,6 +4093,16 @@ pub fn integer_matrix_pair_gen_var_7() -> Generator<(IntegerMatrix, IntegerMatri
     )
 }
 
+// All pairs of `IntegerMatrix`s where the first is square with dimension at most 3 and the second
+// has the same height.
+pub fn integer_matrix_pair_gen_var_8() -> Generator<(IntegerMatrix, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_integer_matrix_pair_gen_var_8,
+        &random_integer_matrix_pair_gen_var_8,
+        &special_random_integer_matrix_pair_gen_var_8,
+    )
+}
+
 // All `(IntegerMatrix, IntegerVector)` where the vector's dimension is the height of the matrix.
 pub fn integer_matrix_integer_vector_pair_gen_var_2() -> Generator<(IntegerMatrix, IntegerVector)> {
     Generator::new(
@@ -4589,6 +4599,16 @@ pub fn natural_matrix_natural_pair_gen_var_7() -> Generator<(NaturalMatrix, Natu
         &exhaustive_natural_matrix_natural_pair_gen_var_7,
         &random_natural_matrix_natural_pair_gen_var_7,
         &special_random_natural_matrix_natural_pair_gen_var_7,
+    )
+}
+
+// All `(NaturalMatrix, Natural)` where the `Natural` is greater than 2 and every element of the
+// matrix is less than it.
+pub fn natural_matrix_natural_pair_gen_var_8() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_8,
+        &random_natural_matrix_natural_pair_gen_var_8,
+        &special_random_natural_matrix_natural_pair_gen_var_8,
     )
 }
 

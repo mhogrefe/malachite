@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mul_vector::register(runner);
     neg::register(runner);
     pow::register(runner);
+    reconstruct::register(runner);
     scalar_mul::register(runner);
     shl::register(runner);
     shr::register(runner);
@@ -40,6 +41,7 @@ mod mul_integer_matrix;
 mod mul_vector;
 mod neg;
 mod pow;
+mod reconstruct;
 mod scalar_mul;
 mod shl;
 mod shr;

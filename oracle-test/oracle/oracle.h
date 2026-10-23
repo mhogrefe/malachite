@@ -348,5 +348,9 @@ int run_fmpz_mat_fflu(const char * arg);
 int run_fmpz_mat_det_bareiss(const char * arg);
 int run_fmpz_mat_det_cofactor(const char * arg);
 int run_fmpz_mat_is_in_rref_with_rank(const char * arg);
+int run_fmpz_mat_solve_fflu(const char * arg);
+int run_fmpz_mat_solve_cramer(const char * arg);
+int run_fmpz_mat_solve_fflu_precomp(const char * arg);
+int run_fmpq_mat_set_fmpz_mat_mod_fmpz(const char * arg);
 
 #endif

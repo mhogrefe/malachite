@@ -3818,6 +3818,10 @@ pub fn exhaustive_integer_matrix_pair_gen_var_7() -> It<(IntegerMatrix, IntegerM
     )
 }
 
+pub fn exhaustive_integer_matrix_pair_gen_var_8() -> It<(IntegerMatrix, IntegerMatrix)> {
+    Box::new(exhaustive_integer_matrix_pair_gen_var_7().filter(|(a, _)| a.height() <= 3))
+}
+
 // Pairs of matrices of the same height: every triple of a height and two widths, and for each
 // triple every pair of matrices of those shapes.
 pub fn exhaustive_integer_matrix_pair_gen_var_3() -> It<(IntegerMatrix, IntegerMatrix)> {
@@ -4184,6 +4188,10 @@ pub fn exhaustive_natural_matrix_natural_pair_gen_var_2() -> It<(NaturalMatrix, 
             (a, m)
         }),
     )
+}
+
+pub fn exhaustive_natural_matrix_natural_pair_gen_var_8() -> It<(NaturalMatrix, Natural)> {
+    Box::new(exhaustive_natural_matrix_natural_pair_gen_var_2().filter(|(_, m)| *m > 2u32))
 }
 
 pub fn exhaustive_natural_matrix_natural_pair_gen_var_3() -> It<(NaturalMatrix, Natural)> {

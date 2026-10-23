@@ -171,12 +171,14 @@ pub mod rational_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod integer_matrix_mul;
+        pub mod is_solution;
         pub mod kronecker_product;
         pub mod mul;
         pub mod mul_integer_matrix;
         pub mod mul_vector;
         pub mod neg;
         pub mod pow;
+        pub mod reconstruct;
         pub mod scalar_mul;
         pub mod shl;
         pub mod shr;
@@ -223,6 +225,7 @@ pub mod rational_matrix {
         pub mod to_numerators_and_column_denominators;
         pub mod to_numerators_and_denominator;
         pub mod to_numerators_and_row_denominators;
+        pub mod to_numerators_and_row_denominators_2;
         pub mod unsigned_matrix_from_rational_matrix;
     }
     pub mod dimensions;

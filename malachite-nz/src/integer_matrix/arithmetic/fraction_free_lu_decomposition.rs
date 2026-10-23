@@ -124,11 +124,14 @@ fn fflu_general(
 
 // The largest absolute value of an element on the small-element path: FLINT's `COEFF_MAX`, the
 // largest absolute value of a small `fmpz`.
-const SMALL_MAX: i64 = (1 << 62) - 1;
+pub(crate) const SMALL_MAX: i64 = (1 << 62) - 1;
+
+// `SMALL_MAX` as a `u128`, for comparing with the absolute values of double-word products.
+pub(crate) const SMALL_MAX_U128: u128 = SMALL_MAX.unsigned_abs() as u128;
 
 // The smallest height and width of a matrix for which the elimination starts on the small-element
 // path; for smaller matrices, converting the elements costs more than the path saves.
-const SMALL_PATH_MIN_DIMENSION: usize = 3;
+pub(crate) const SMALL_PATH_MIN_DIMENSION: usize = 3;
 
 // The smallest dimension of a matrix for which the determinant starts on the small-element path.
 // Below it the path is slower, and determinants of such matrices are better computed by cofactor
@@ -154,7 +157,7 @@ enum SmallOutcome {
 }
 
 // The elements of `xs` as `i64`s, if they are all at most `SMALL_MAX` in absolute value.
-fn small_elements(xs: &[Integer]) -> Option<Vec<i64>> {
+pub(crate) fn small_elements(xs: &[Integer]) -> Option<Vec<i64>> {
     xs.iter()
         .map(|x| {
             i64::try_from(x)
@@ -235,7 +238,7 @@ fn fflu_small(
                 let product =
                     i128::from(*x) * i128::from(pivot) - i128::from(multiplier) * i128::from(y);
                 if !divide {
-                    if product.unsigned_abs() <= const { SMALL_MAX.unsigned_abs() as u128 } {
+                    if product.unsigned_abs() <= SMALL_MAX_U128 {
                         *x = i64::wrapping_from(product);
                     } else {
                         *x = 0;

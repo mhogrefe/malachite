@@ -27,6 +27,11 @@ pub mod content_chained;
 /// [`IntegerMatrix`](malachite_nz::integer_matrix::IntegerMatrix) by a
 /// [`RationalMatrix`](super::RationalMatrix).
 pub mod integer_matrix_mul;
+crate_test_mod! {
+    /// A check of whether a rational matrix solves a linear system with integer matrices. Internal
+    /// machinery for a future solver, public only under `test_build`.
+    is_solution
+}
 /// Implementations of
 /// [`KroneckerProduct`](malachite_base::num::arithmetic::traits::KroneckerProduct) and
 /// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
@@ -50,6 +55,10 @@ pub mod neg;
 /// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square
 /// [`RationalMatrix`](super::RationalMatrix) to a power.
 pub mod pow;
+/// The methods [`reconstruct`](super::RationalMatrix::reconstruct) and
+/// [`reconstruct_ref`](super::RationalMatrix::reconstruct_ref), for recovering a rational matrix
+/// from its residues by rational reconstruction.
+pub mod reconstruct;
 
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a [`RationalMatrix`](super::RationalMatrix) by a scalar on either side.

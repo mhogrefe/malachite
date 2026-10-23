@@ -32,6 +32,7 @@ pub(crate) fn register(runner: &mut Runner) {
     neg::register(runner);
     scalar_mul::register(runner);
     shl::register(runner);
+    solve::register(runner);
     solve_bounds::register(runner);
     square::register(runner);
     sub::register(runner);
@@ -63,6 +64,7 @@ mod neg;
 mod pow;
 mod scalar_mul;
 mod shl;
+mod solve;
 mod solve_bounds;
 mod square;
 mod sub;

@@ -51,3 +51,20 @@ macro_rules! crate_test_fn {
         pub(crate) fn $name $( $body )*
     };
 }
+
+#[cfg(feature = "test_build")]
+macro_rules! crate_test_mod {
+    ($( #[$meta:meta] )* $name:ident) => {
+        $( #[$meta] )*
+        pub mod $name;
+    };
+}
+
+#[cfg(not(feature = "test_build"))]
+macro_rules! crate_test_mod {
+    ($( #[$meta:meta] )* $name:ident) => {
+        $( #[$meta] )*
+        #[allow(dead_code)]
+        pub(crate) mod $name;
+    };
+}

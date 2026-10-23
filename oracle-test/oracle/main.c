@@ -203,6 +203,10 @@ static const oracle_mode modes[] = {
     {"fmpz_mat_det_bareiss", run_fmpz_mat_det_bareiss},
     {"fmpz_mat_det_cofactor", run_fmpz_mat_det_cofactor},
     {"fmpz_mat_is_in_rref_with_rank", run_fmpz_mat_is_in_rref_with_rank},
+    {"fmpz_mat_solve_fflu", run_fmpz_mat_solve_fflu},
+    {"fmpz_mat_solve_cramer", run_fmpz_mat_solve_cramer},
+    {"fmpz_mat_solve_fflu_precomp", run_fmpz_mat_solve_fflu_precomp},
+    {"fmpq_mat_set_fmpz_mat_mod_fmpz", run_fmpq_mat_set_fmpz_mat_mod_fmpz},
 };
 
 int

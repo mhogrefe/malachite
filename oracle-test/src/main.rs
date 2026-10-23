@@ -3883,4 +3883,35 @@ fn test_against_flint() {
             flint_mode,
         );
     }
+    // Solutions of linear systems with IntegerMatrixes, against fmpz_mat_solve_fflu,
+    // fmpz_mat_solve_cramer, and fmpz_mat_solve_fflu_precomp. The `_low_rank` demos make many systems
+    // singular.
+    for (op, flint_mode) in [
+        ("solve_fflu", "fmpz_mat_solve_fflu"),
+        ("solve_fflu_low_rank", "fmpz_mat_solve_fflu"),
+        ("solve_cramer", "fmpz_mat_solve_cramer"),
+        ("solve_fflu_precomp", "fmpz_mat_solve_fflu_precomp"),
+        ("solve_fflu_precomp_low_rank", "fmpz_mat_solve_fflu_precomp"),
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            &format!("demo_integer_matrix_{op}"),
+            flint_mode,
+        );
+    }
+    // Rational reconstruction of RationalMatrixes, against fmpq_mat_set_fmpz_mat_mod_fmpz. The
+    // `_round_trip` demo reconstructs the residues of generated rational matrices modulo a modulus
+    // large enough to recover them.
+    for demo in [
+        "demo_rational_matrix_reconstruct",
+        "demo_rational_matrix_reconstruct_round_trip",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-q",
+            demo,
+            "fmpq_mat_set_fmpz_mat_mod_fmpz",
+        );
+    }
 }

@@ -7275,6 +7275,12 @@ pub fn random_integer_matrix_pair_gen_var_7(
     )
 }
 
+pub fn random_integer_matrix_pair_gen_var_8(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, IntegerMatrix)> {
+    Box::new(random_integer_matrix_pair_gen_var_7(config).filter(|(a, _)| a.height() <= 3))
+}
+
 // Pairs of matrices of the same random height, with random widths.
 pub fn random_integer_matrix_pair_gen_var_3(
     config: &GenConfig,
@@ -7955,6 +7961,12 @@ pub fn random_natural_matrix_natural_pair_gen_var_2(
             (a, m)
         }),
     )
+}
+
+pub fn random_natural_matrix_natural_pair_gen_var_8(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    Box::new(random_natural_matrix_natural_pair_gen_var_2(config).filter(|(_, m)| *m > 2u32))
 }
 
 pub fn random_natural_matrix_natural_pair_gen_var_3(

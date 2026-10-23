@@ -555,6 +555,9 @@ documented by git history.
   scales the numerator so that the shift is by the integer $a$, uses the integer Taylor shift, and
   scales back, followed by one reduction to lowest terms; a shift by an integer shifts only the
   numerator and needs no reduction.
+- `RationalMatrix::reconstruct` and `reconstruct_ref`, which recover a rational matrix from a
+  `NaturalMatrix` of residues modulo a `Natural` by rational reconstruction with a running
+  denominator, like FLINT's `fmpq_mat_set_fmpz_mat_mod_fmpz`.
 
 ### malachite-float
 

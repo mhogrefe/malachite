@@ -1,0 +1,15 @@
+RationalMatrix::reconstruct([]_{0,0}, 101) = Some([]_{0,0})
+RationalMatrix::reconstruct([]_{2,0}, 101) = Some([]_{2,0})
+RationalMatrix::reconstruct([]_{0,3}, 101) = Some([]_{0,3})
+RationalMatrix::reconstruct([51, 68; 0, 100], 101) = Some([1/2, 2/3; 0, -1])
+RationalMatrix::reconstruct([50002, 33335; 0, 100002], 100003) = Some([1/2, 2/3; 0, -1])
+RationalMatrix::reconstruct([1430; 4288; 4289], 10007) = Some([3/7; -5/7; 2/7])
+RationalMatrix::reconstruct([1, 2, 3], 11) = None
+RationalMatrix::reconstruct([50], 101) = Some([-1/2])
+RationalMatrix::reconstruct([5, 6], 13) = None
+RationalMatrix::reconstruct([3, 4; 5, 6], 1000003) = Some([3, 4; 5, 6])
+RationalMatrix::reconstruct([1308289358842929716364031448206762441342], 1361129467683753853853498429727072845819) = Some([-13717421/109739369])
+RationalMatrix::reconstruct([61, 71], 73) = Some([1/6, 1/36])
+RationalMatrix::reconstruct([71], 73) = Some([-2])
+RationalMatrix::reconstruct([51, 68; 0, 100], 101) = Some([1/2, 2/3; 0, -1])
+RationalMatrix::reconstruct([1, 2, 3], 11) = None

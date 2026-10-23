@@ -176,6 +176,32 @@ impl RationalMatrix {
     }
 }
 
+// The numerators of two matrices with the same height, over common row denominators: each row's
+// denominator is the least common multiple of the denominators in that row of both matrices, as if
+// they were placed side by side.
+//
+// This is equivalent to `fmpq_mat_get_fmpz_mat_rowwise_2` from `fmpq_mat/get_fmpz_mat_rowwise.c`,
+// FLINT 3.6.0, except that it also works when the first matrix has no elements, where FLINT writes
+// nothing.
+crate_test_fn! {
+to_numerators_and_row_denominators_2(
+    a: &RationalMatrix,
+    b: &RationalMatrix,
+) -> (IntegerMatrix, IntegerMatrix, NaturalVector) {
+    assert_eq!(a.height(), b.height(), "the matrices must have the same height");
+    let mut denominators = a.row_denominators();
+    for (d, e) in denominators.iter_mut().zip(b.row_denominators()) {
+        d.lcm_assign(e);
+    }
+    (
+        a.scale_by_row_denominators(&denominators),
+        b.scale_by_row_denominators(&denominators),
+        NaturalVector {
+            elements: denominators,
+        },
+    )
+}}
+
 // The numerators of `xs` over the corresponding `denominators`, each a multiple of its element's
 // denominator.
 pub(crate) fn scaled_numerators<'a>(
