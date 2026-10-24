@@ -362,6 +362,20 @@ int run_fmpz_mat_rref_mul(const char * arg);
 int run_fmpz_mat_rank(const char * arg);
 int run_fmpz_mat_rank_small_inplace(const char * arg);
 int run_fmpz_mat_nullspace(const char * arg);
+
+/* fmpz_mat_hnf.c */
+int run_fmpz_mat_hnf(const char * arg);
+int run_fmpz_mat_hnf_classical(const char * arg);
+int run_fmpz_mat_hnf_xgcd(const char * arg);
+int run_fmpz_mat_hnf_minors(const char * arg);
+int run_fmpz_mat_hnf_pernet_stein(const char * arg);
+int run_fmpz_mat_hnf_modular(const char * arg);
+int run_fmpz_mat_hnf_modular_eldiv(const char * arg);
+int run_fmpz_mat_hnf_transform(const char * arg);
+int run_fmpz_mat_hnf_minors_transform(const char * arg);
+int run_fmpz_mat_hnf_transform_naive(const char * arg);
+int run_fmpz_mat_is_in_hnf(const char * arg);
+int run_fmpz_xgcd(const char * arg);
 int run_fmpq_mat_rref(const char * arg);
 int run_fmpq_mat_rref_classical(const char * arg);
 int run_fmpq_mat_rref_fraction_free(const char * arg);

@@ -2171,6 +2171,28 @@ pub trait Nullspace {
     fn nullspace(self) -> Self::Output;
 }
 
+/// Computes the (row) Hermite normal form of a matrix: the unique matrix in row echelon form whose
+/// rows span the same lattice, with positive pivots and with the elements above each pivot
+/// nonnegative and less than it.
+pub trait HermiteNormalForm {
+    type Output;
+
+    fn hermite_normal_form(self) -> Self::Output;
+}
+
+/// Replaces a matrix with its (row) Hermite normal form.
+pub trait HermiteNormalFormAssign {
+    fn hermite_normal_form_assign(&mut self);
+}
+
+/// Computes the (row) Hermite normal form $H$ of a matrix $A$, together with a unimodular matrix
+/// $U$ such that $UA = H$.
+pub trait HermiteNormalFormAndTransform {
+    type Output;
+
+    fn hermite_normal_form_and_transform(self) -> Self::Output;
+}
+
 /// Computes the rank of a matrix modulo a prime $m$. The elements of the matrix must already be
 /// reduced modulo $m$.
 pub trait ModRank<M = Self> {

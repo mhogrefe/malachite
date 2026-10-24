@@ -9,14 +9,16 @@
 use crate::integer::Integer;
 use crate::integer::exhaustive::exhaustive_integers;
 use crate::integer::random::{random_integers, striped_random_integers};
+use crate::integer_matrix::IntegerMatrix;
 use crate::integer_vector::arithmetic::max_limbs::vec_max_limbs;
 use crate::natural::Natural;
 use crate::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1::*;
 use crate::platform::{Limb, SignedLimb};
 use core::cmp::Ordering::*;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, DivisibleBy, FloorLogBase, ModPowerOf2, Parity, Pow, PowerOf2,
+    CeilingLogBase2, DivisibleBy, FloorLogBase, ModPowerOf2, Parity, Pow, PowerOf2, Rank,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::comparison::traits::OrdDouble;
@@ -1772,4 +1774,9 @@ pub(crate) fn random_adjust_limbs(config: &GenConfig) -> It<usize> {
         .filter(|&limbs| limbs <= 1 << 40)
         .map(usize::exact_from),
     )
+}
+
+// Whether `a` has full column rank: at least as many rows as columns, and rank equal to the width.
+pub fn has_full_column_rank(a: &IntegerMatrix) -> bool {
+    a.height() >= a.width() && a.rank() == a.width()
 }

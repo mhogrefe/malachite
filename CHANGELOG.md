@@ -545,6 +545,14 @@ documented by git history.
   reduced row echelon form is `fmpq_mat_rref`'s, the rank is that of the matrix cleared of row
   denominators, and the nullspace basis is read off the reduced row echelon form, with 1 in each
   free variable's position.
+- New `HermiteNormalForm`, `HermiteNormalFormAssign`, and `HermiteNormalFormAndTransform` traits
+  in malachite-base, implemented in malachite-nz for `IntegerMatrix`, with the matrix by value or
+  by reference, and `IntegerMatrix::is_in_hermite_normal_form`. The Hermite normal form is found as
+  FLINT's `fmpz_mat_hnf` finds it, by the classical algorithm for matrices with few rows and the
+  algorithm of Pernet and Stein (or, for full column rank, that of Kannan and Bachem) otherwise,
+  with cutoffs measured for Malachite and with primes tried in increasing order rather than at
+  random. `hermite_normal_form_and_transform` also returns a unimodular $U$ with $UA = H$, as
+  `fmpz_mat_hnf_transform` does, with FLINT's choice of $U$ when it is not unique.
 - In `test_util`, `run_benchmark` now interleaves the timed calls of its series, rotating which
   series goes first in each round, after an untimed call; the first series of a benchmark had been
   timed about 10% slower than an identical later one.

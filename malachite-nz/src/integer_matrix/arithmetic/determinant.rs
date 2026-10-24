@@ -110,7 +110,7 @@ const MODULAR_MAX_DIMENSION: usize = 59;
 //
 // This is equivalent to `fmpz_CRT_ui` from `fmpz/CRT.c`, FLINT 3.6.0, with `sign = 1`, computed
 // with word-sized residues.
-fn balanced_crt_word(x: &Integer, product: &Natural, r: Limb, p: Limb) -> Integer {
+pub(crate) fn balanced_crt_word(x: &Integer, product: &Natural, r: Limb, p: Limb) -> Integer {
     let x_mod = x.abs.rem_limb_ref(p);
     let x_mod = if x.sign { x_mod } else { x_mod.mod_neg(p) };
     let s = r

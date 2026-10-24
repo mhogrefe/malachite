@@ -142,9 +142,28 @@ pub mod div_exact;
 pub mod fraction_free_lu_decomposition;
 #[doc(hidden)]
 pub mod fraction_matrix;
+/// Implementations of
+/// [`HermiteNormalForm`](malachite_base::num::arithmetic::traits::HermiteNormalForm) and
+/// [`HermiteNormalFormAssign`](malachite_base::num::arithmetic::traits::HermiteNormalFormAssign),
+/// for computing the Hermite normal forms of integer matrices.
+pub mod hermite_normal_form;
+/// Implementations of [`HermiteNormalFormAndTransform`][hnft], for computing the Hermite normal
+/// forms of integer matrices together with transformation matrices.
+///
+/// [hnft]: malachite_base::num::arithmetic::traits::HermiteNormalFormAndTransform
+pub mod hermite_normal_form_and_transform;
+crate_test_mod! {
+    /// The algorithm of Pernet and Stein for computing Hermite normal forms. Internal machinery for
+    /// [`HermiteNormalForm`](malachite_base::num::arithmetic::traits::HermiteNormalForm), public
+    /// only under `test_build`.
+    hermite_normal_form_pernet_stein
+}
 /// Implementations of [`Inverse`](malachite_base::num::arithmetic::traits::Inverse), for inverting
 /// square integer matrices.
 pub mod inverse;
+/// The method [`is_in_hermite_normal_form`](super::IntegerMatrix::is_in_hermite_normal_form), which
+/// checks whether a matrix is in Hermite normal form.
+pub mod is_in_hermite_normal_form;
 crate_test_mod! {
     /// A check of whether a matrix is in fraction-free reduced row echelon form with a given
     /// denominator and rank. Internal machinery for the rank certificates of

@@ -96,12 +96,12 @@ use crate::test_util::extra_variadic::{
 };
 use crate::test_util::generators::LARGE_PRIMES;
 use crate::test_util::generators::common::{
-    random_adjust_limbs, random_basecase, random_get_fft, random_ss, ss_spec_var_29,
-    ss_spec_var_30, ss_spec_var_31, ss_spec_var_32, ss_spec_var_33, ss_spec_var_34, ss_spec_var_35,
-    ss_spec_var_36, ss_spec_var_37, ss_spec_var_38, ss_spec_var_39, ss_spec_var_40, ss_spec_var_41,
-    ss_spec_var_42, ss_spec_var_43, ss_spec_var_44, ss_spec_var_45, ss_spec_var_46, ss_spec_var_47,
-    ss_spec_var_49, ss_spec_var_50, ss_spec_var_51, ss_spec_var_52, ss_spec_var_53, ss_spec_var_54,
-    ss_spec_var_55, ss_spec_var_56, ss_spec_var_58,
+    has_full_column_rank, random_adjust_limbs, random_basecase, random_get_fft, random_ss,
+    ss_spec_var_29, ss_spec_var_30, ss_spec_var_31, ss_spec_var_32, ss_spec_var_33, ss_spec_var_34,
+    ss_spec_var_35, ss_spec_var_36, ss_spec_var_37, ss_spec_var_38, ss_spec_var_39, ss_spec_var_40,
+    ss_spec_var_41, ss_spec_var_42, ss_spec_var_43, ss_spec_var_44, ss_spec_var_45, ss_spec_var_46,
+    ss_spec_var_47, ss_spec_var_49, ss_spec_var_50, ss_spec_var_51, ss_spec_var_52, ss_spec_var_53,
+    ss_spec_var_54, ss_spec_var_55, ss_spec_var_56, ss_spec_var_58,
 };
 use crate::test_util::generators::exhaustive::{
     filter_helper_1, filter_helper_2, filter_helper_3, filter_helper_4, filter_helper_5,
@@ -8039,6 +8039,10 @@ pub fn special_random_integer_matrix_gen_var_1(config: &GenConfig) -> It<Integer
 
 pub fn special_random_integer_matrix_gen_var_2(config: &GenConfig) -> It<IntegerMatrix> {
     Box::new(special_random_integer_matrix_gen_var_1(config).filter(|a| a.height() <= 4))
+}
+
+pub fn special_random_integer_matrix_gen_var_3(config: &GenConfig) -> It<IntegerMatrix> {
+    Box::new(special_random_integer_matrix_gen(config).filter(has_full_column_rank))
 }
 
 pub fn special_random_integer_matrix_pair_gen(

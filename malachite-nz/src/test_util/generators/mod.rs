@@ -3994,6 +3994,16 @@ pub fn integer_matrix_gen_var_2() -> Generator<IntegerMatrix> {
     )
 }
 
+// All `IntegerMatrix`s with full column rank: at least as many rows as columns, and rank equal to
+// the width.
+pub fn integer_matrix_gen_var_3() -> Generator<IntegerMatrix> {
+    Generator::new(
+        &exhaustive_integer_matrix_gen_var_3,
+        &random_integer_matrix_gen_var_3,
+        &special_random_integer_matrix_gen_var_3,
+    )
+}
+
 pub fn integer_matrix_pair_gen() -> Generator<(IntegerMatrix, IntegerMatrix)> {
     Generator::new(
         &exhaustive_integer_matrix_pair_gen,

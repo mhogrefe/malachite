@@ -4004,6 +4004,36 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, crate_dir, &format!("demo_{demo}"), flint_mode);
     }
+    // Hermite normal forms of IntegerMatrixes, against fmpz_mat_hnf and its classical, xgcd,
+    // minors, Pernet-Stein, and modular forms, fmpz_mat_hnf_transform and its minors and naive
+    // forms (U is not unique for matrices with more rows than columns, and matches FLINT's because
+    // the extended GCDs do), and fmpz_mat_is_in_hnf. The `_low_rank` demos make many matrices rank
+    // deficient. Also the extended GCD used throughout, against fmpz_xgcd.
+    for (demo, flint_mode) in [
+        ("integer_matrix_hermite_normal_form", "fmpz_mat_hnf"),
+        ("integer_matrix_hermite_normal_form_low_rank", "fmpz_mat_hnf"),
+        ("integer_matrix_hnf_classical", "fmpz_mat_hnf_classical"),
+        ("integer_matrix_hnf_classical_low_rank", "fmpz_mat_hnf_classical"),
+        ("integer_matrix_hnf_xgcd", "fmpz_mat_hnf_xgcd"),
+        ("integer_matrix_hnf_xgcd_low_rank", "fmpz_mat_hnf_xgcd"),
+        ("integer_matrix_hnf_minors", "fmpz_mat_hnf_minors"),
+        ("integer_matrix_hnf_modular", "fmpz_mat_hnf_modular"),
+        ("integer_matrix_hnf_modular_eldiv", "fmpz_mat_hnf_modular_eldiv"),
+        ("integer_matrix_hnf_pernet_stein", "fmpz_mat_hnf_pernet_stein"),
+        ("integer_matrix_hnf_pernet_stein_low_rank", "fmpz_mat_hnf_pernet_stein"),
+        ("integer_matrix_hermite_normal_form_and_transform", "fmpz_mat_hnf_transform"),
+        (
+            "integer_matrix_hermite_normal_form_and_transform_low_rank",
+            "fmpz_mat_hnf_transform",
+        ),
+        ("integer_matrix_hnf_minors_transform", "fmpz_mat_hnf_minors_transform"),
+        ("integer_matrix_hnf_transform_naive", "fmpz_mat_hnf_transform_naive"),
+        ("integer_matrix_is_in_hermite_normal_form", "fmpz_mat_is_in_hnf"),
+        ("integer_matrix_is_in_hermite_normal_form_of_form", "fmpz_mat_is_in_hnf"),
+        ("extended_gcd_reduced_cofactor", "fmpz_xgcd"),
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", &format!("demo_{demo}"), flint_mode);
+    }
     // Rational reconstruction of RationalMatrixes, against fmpq_mat_set_fmpz_mat_mod_fmpz. The
     // `_round_trip` demo reconstructs the residues of generated rational matrices modulo a modulus
     // large enough to recover them.
