@@ -47,7 +47,8 @@ static const char * current_name;
 static const char * current_op;
 static int current_kind;
 
-enum { KIND_FFLU, KIND_DET_BAREISS, KIND_DET_COFACTOR, KIND_IS_IN_RREF, KIND_SOLVE_FFLU,
+enum { KIND_FFLU, KIND_DET_BAREISS, KIND_DET_COFACTOR, KIND_DET, KIND_DET_MODULAR,
+       KIND_DET_MODULAR_ACCELERATED, KIND_DET_DIVISOR, KIND_IS_IN_RREF, KIND_SOLVE_FFLU,
        KIND_SOLVE_CRAMER, KIND_SOLVE_FFLU_PRECOMP, KIND_SOLVE, KIND_SOLVE_DIXON_DEN,
        KIND_SOLVE_MULTI_MOD_DEN, KIND_CAN_SOLVE_FFLU, KIND_CAN_SOLVE_MULTI_MOD_DEN, KIND_CAN_SOLVE,
        KIND_INV, KIND_RREF_CERTIFY };
@@ -476,6 +477,21 @@ check_line(char * line, int line_number)
         fmpz_clear(den);
         return result;
     }
+    int proved = 1;
+    if (current_kind == KIND_DET_MODULAR || current_kind == KIND_DET_MODULAR_ACCELERATED)
+    {
+        char * comma = strrchr(args, ',');
+        if (comma == NULL)
+        {
+            return unrecognized(line_number);
+        }
+        proved = strcmp(comma, ", true") == 0;
+        if (!proved && strcmp(comma, ", false") != 0)
+        {
+            return unrecognized(line_number);
+        }
+        *comma = '\0';
+    }
     fmpz_mat_t a;
     if (!fmpz_mat_init_set_str_malachite(a, args))
     {
@@ -488,9 +504,25 @@ check_line(char * line, int line_number)
     {
         fmpz_mat_det_bareiss(det, a);
     }
-    else
+    else if (current_kind == KIND_DET_COFACTOR)
     {
         fmpz_mat_det_cofactor(det, a);
+    }
+    else if (current_kind == KIND_DET)
+    {
+        fmpz_mat_det(det, a);
+    }
+    else if (current_kind == KIND_DET_MODULAR)
+    {
+        fmpz_mat_det_modular(det, a, proved);
+    }
+    else if (current_kind == KIND_DET_MODULAR_ACCELERATED)
+    {
+        fmpz_mat_det_modular_accelerated(det, a, proved);
+    }
+    else
+    {
+        fmpz_mat_det_divisor(det, a);
     }
     result = compare_fmpz(det, rest, line_number);
     fmpz_clear(det);
@@ -601,4 +633,29 @@ run_fmpz_mat_rref_upper_certify_lu_mod_p(const char * arg)
 {
     return run(arg, "fmpz_mat_rref_upper_certify_lu_mod_p", "rref_upper_certify_lu_mod_p",
                KIND_RREF_CERTIFY);
+}
+
+int
+run_fmpz_mat_det(const char * arg)
+{
+    return run(arg, "fmpz_mat_det", "determinant", KIND_DET);
+}
+
+int
+run_fmpz_mat_det_modular(const char * arg)
+{
+    return run(arg, "fmpz_mat_det_modular", "determinant_modular", KIND_DET_MODULAR);
+}
+
+int
+run_fmpz_mat_det_modular_accelerated(const char * arg)
+{
+    return run(arg, "fmpz_mat_det_modular_accelerated", "determinant_modular_accelerated",
+               KIND_DET_MODULAR_ACCELERATED);
+}
+
+int
+run_fmpz_mat_det_divisor(const char * arg)
+{
+    return run(arg, "fmpz_mat_det_divisor", "determinant_divisor", KIND_DET_DIVISOR);
 }

@@ -170,6 +170,7 @@ pub mod rational_matrix {
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod content_chained;
+        pub mod determinant;
         pub mod integer_matrix_mul;
         pub mod inverse;
         pub mod is_solution;

@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonical_primitive_part::register(runner);
     content::register(runner);
     content_chained::register(runner);
+    determinant::register(runner);
     integer_matrix_mul::register(runner);
     inverse::register(runner);
     kronecker_product::register(runner);
@@ -36,6 +37,7 @@ mod add;
 mod canonical_primitive_part;
 mod content;
 mod content_chained;
+mod determinant;
 mod integer_matrix_mul;
 mod inverse;
 mod kronecker_product;

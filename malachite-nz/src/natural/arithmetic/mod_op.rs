@@ -1590,7 +1590,7 @@ impl Natural {
         }
     }
 
-    fn rem_limb_ref(&self, other: Limb) -> Limb {
+    pub(crate) fn rem_limb_ref(&self, other: Limb) -> Limb {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
             (Self(Small(small)), other) => small % other,

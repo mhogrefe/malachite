@@ -3966,6 +3966,44 @@ fn test_against_flint() {
             );
         }
     }
+    // Determinants of IntegerMatrixes and RationalMatrixes, against fmpz_mat_det,
+    // fmpz_mat_det_modular (proved or not), fmpz_mat_det_modular_accelerated, fmpz_mat_det_divisor,
+    // and fmpq_mat_det. The `_low_rank` demos make many matrices singular.
+    for (crate_dir, demo, flint_mode) in [
+        ("../malachite-nz", "integer_matrix_determinant", "fmpz_mat_det"),
+        ("../malachite-nz", "integer_matrix_determinant_low_rank", "fmpz_mat_det"),
+        ("../malachite-nz", "integer_matrix_determinant_modular", "fmpz_mat_det_modular"),
+        (
+            "../malachite-nz",
+            "integer_matrix_determinant_modular_low_rank",
+            "fmpz_mat_det_modular",
+        ),
+        (
+            "../malachite-nz",
+            "integer_matrix_determinant_modular_unproved",
+            "fmpz_mat_det_modular",
+        ),
+        (
+            "../malachite-nz",
+            "integer_matrix_determinant_modular_accelerated",
+            "fmpz_mat_det_modular_accelerated",
+        ),
+        (
+            "../malachite-nz",
+            "integer_matrix_determinant_modular_accelerated_low_rank",
+            "fmpz_mat_det_modular_accelerated",
+        ),
+        ("../malachite-nz", "integer_matrix_determinant_divisor", "fmpz_mat_det_divisor"),
+        (
+            "../malachite-nz",
+            "integer_matrix_determinant_divisor_low_rank",
+            "fmpz_mat_det_divisor",
+        ),
+        ("../malachite-q", "rational_matrix_determinant", "fmpq_mat_det"),
+        ("../malachite-q", "rational_matrix_determinant_low_rank", "fmpq_mat_det"),
+    ] {
+        check_demo_against_flint(&oracle, crate_dir, &format!("demo_{demo}"), flint_mode);
+    }
     // Rational reconstruction of RationalMatrixes, against fmpq_mat_set_fmpz_mat_mod_fmpz. The
     // `_round_trip` demo reconstructs the residues of generated rational matrices modulo a modulus
     // large enough to recover them.

@@ -1,0 +1,7 @@
+determinant_divisor([]_{0,0}) = 1
+determinant_divisor([0]) = 0
+determinant_divisor([-7]) = 7
+determinant_divisor([1, 2; 3, 4]) = 1
+determinant_divisor([2, 4; 1, 2]) = 0
+determinant_divisor([2, 0, 0, 0; 0, 3, 0, 0; 0, 0, 5, 0; 0, 0, 0, 7]) = 210
+determinant_divisor([576460752303423619, 0; 0, 1]) = 576460752303423619

@@ -2134,6 +2134,13 @@ pub trait FractionFreeLuDecomposition {
     fn fraction_free_lu_decomposition(self) -> Self::Output;
 }
 
+/// Computes the determinant of a square matrix.
+pub trait Determinant {
+    type Output;
+
+    fn determinant(self) -> Self::Output;
+}
+
 /// Computes the rank of a matrix modulo a prime $m$. The elements of the matrix must already be
 /// reduced modulo $m$.
 pub trait ModRank<M = Self> {

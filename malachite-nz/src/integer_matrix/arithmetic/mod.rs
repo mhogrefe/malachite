@@ -63,14 +63,19 @@ pub mod content_chained;
 /// combine a matrix of residues modulo any number with one modulo a word-sized number into balanced
 /// representatives by the Chinese remainder theorem.
 pub mod crt;
-crate_test_mod! {
-    /// Algorithms for the determinant: cofactor expansion and Bareiss's fraction-free elimination.
-    /// Internal machinery for a future determinant, public only under `test_build`.
-    determinant
-}
+/// Implementations of [`Determinant`](malachite_base::num::arithmetic::traits::Determinant), for
+/// computing the determinants of square integer matrices.
+pub mod determinant;
 /// The method [`determinant_bound`](super::IntegerMatrix::determinant_bound), an upper bound for
 /// the absolute value of the determinant from Hadamard's inequality.
 pub mod determinant_bound;
+crate_test_mod! {
+    /// A divisor of the determinant of a square integer matrix, found by solving a linear system.
+    /// Internal machinery for
+    /// [`Determinant`](malachite_base::num::arithmetic::traits::Determinant), public only under
+    /// `test_build`.
+    determinant_divisor
+}
 /// Exact division of a matrix by a scalar, by implementations of
 /// [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign).

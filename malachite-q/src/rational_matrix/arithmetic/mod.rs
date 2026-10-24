@@ -23,6 +23,9 @@ pub mod content;
 /// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
 /// which computes the GCD of a number and a matrix's elements.
 pub mod content_chained;
+/// Implementations of [`Determinant`](malachite_base::num::arithmetic::traits::Determinant), for
+/// computing the determinants of square rational matrices.
+pub mod determinant;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying an
 /// [`IntegerMatrix`](malachite_nz::integer_matrix::IntegerMatrix) by a
 /// [`RationalMatrix`](super::RationalMatrix).

@@ -14,12 +14,13 @@
 
 use crate::integer_matrix::IntegerMatrix;
 use crate::integer_matrix::arithmetic::fraction_matrix::RightHandSide;
+use crate::natural_matrix::arithmetic::mod_determinant::permutation_is_odd;
 use crate::platform::Limb;
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
-    Mod, ModMul, ModSolveLowerTriangular, ModSolveUpperTriangular,
+    Mod, ModMul, ModMulAssign, ModNegAssign, ModSolveLowerTriangular, ModSolveUpperTriangular,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
@@ -86,6 +87,23 @@ impl WordLu {
             pivots_nonpivots,
             lu,
         }
+    }
+
+    // The determinant modulo p of a square matrix A: the product of the diagonal of U, negated if
+    // the row permutation is odd. When A is singular modulo p, a diagonal element is zero.
+    //
+    // This is equivalent to the determinant in `fmpz_mat_det_modular_given_divisor` from
+    // `fmpz_mat/det_modular_given_divisor.c`, FLINT 3.6.0.
+    pub(crate) fn determinant(&self) -> Limb {
+        let n = self.perm.len();
+        let mut det = 1;
+        for i in 0..n {
+            det.mod_mul_assign(self.lu.elements[i * (n + 1)], self.p);
+        }
+        if permutation_is_odd(&self.perm) {
+            det.mod_neg_assign(self.p);
+        }
+        det
     }
 
     // Solves AX = B modulo p for a square matrix A of full rank, where `pb` holds the elements of

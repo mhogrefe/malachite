@@ -527,6 +527,13 @@ documented by git history.
   depending on the dimensions), and all others as `fmpz_mat_can_solve` does. `inverse` returns an
   integer matrix $B$ and a nonzero denominator $d$ with $AB = dI$, or `None` for a singular matrix,
   like `fmpz_mat_inv`.
+- New `Determinant` trait in malachite-base, implemented in malachite-nz for `IntegerMatrix` and
+  in malachite-q for `RationalMatrix`, with the matrix by value or by reference. The integer
+  determinant is computed as FLINT's `fmpz_mat_det` computes it: by cofactor expansion, Bareiss's
+  fraction-free elimination, or a multimodular algorithm, which above dimension 59 may first find a
+  large divisor of the determinant by solving a linear system; the rational determinant clears the
+  denominators of each row and divides the integer determinant by their product, like
+  `fmpq_mat_det`.
 - In `test_util`, `run_benchmark` now interleaves the timed calls of its series, rotating which
   series goes first in each round, after an untimed call; the first series of a benchmark had been
   timed about 10% slower than an identical later one.

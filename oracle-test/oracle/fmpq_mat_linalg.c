@@ -8,11 +8,12 @@
     version 3 of the License, or (at your option) any later version. See
     <https://www.gnu.org/licenses/>.
 
-    Diffs the lines printed by the RationalMatrix solving demos against FLINT's fmpq_mat
-    functions.
+    Diffs the lines printed by the RationalMatrix solving, inverse, and determinant demos against
+    FLINT's fmpq_mat functions.
 
-    The demos print `op(A, B) = R`, where `R` is `None` or `Some(X)`, and the inverse demos print
-    `inverse(A) = R`. The modes recompute the results with `fmpq_mat_solve_fraction_free`,
+    The demos print `op(A, B) = R`, where `R` is `None` or `Some(X)`, the inverse demos print
+    `inverse(A) = R`, and the determinant demos print `determinant(A) = d`, which the
+    `fmpq_mat_det` mode recomputes. The modes recompute the results with `fmpq_mat_solve_fraction_free`,
     `fmpq_mat_solve_dixon`, `fmpq_mat_solve_multi_mod`, `fmpq_mat_solve`,
     `fmpq_mat_can_solve_fraction_free`, `fmpq_mat_can_solve_multi_mod`, `fmpq_mat_can_solve_dixon`,
     `fmpq_mat_can_solve`, and `fmpq_mat_inv`; the `fmpq_mat_solve_or_can_solve` mode checks
@@ -37,7 +38,7 @@ static int current_kind;
 
 enum { KIND_SOLVE_FRACTION_FREE, KIND_SOLVE_DIXON, KIND_SOLVE_MULTI_MOD, KIND_SOLVE,
        KIND_CAN_SOLVE_FRACTION_FREE, KIND_CAN_SOLVE_MULTI_MOD, KIND_CAN_SOLVE_DIXON, KIND_CAN_SOLVE,
-       KIND_SOLVE_OR_CAN_SOLVE, KIND_INV };
+       KIND_SOLVE_OR_CAN_SOLVE, KIND_INV, KIND_DET };
 
 /* The length of the matrix string at the start of `s`: `[]_{h,w}` or `[...]`. */
 static size_t
@@ -106,6 +107,32 @@ check_line(char * line, int line_number)
     char * args = line + op_len + 1;
     char * rest = eq + 4;
     checked++;
+    if (current_kind == KIND_DET)
+    {
+        fmpq_mat_t a;
+        fmpq_t det, expected;
+        int result = 0;
+        if (!fmpq_mat_init_set_str_malachite(a, args))
+        {
+            fmpq_mat_clear(a);
+            return error("unreadable input", line_number);
+        }
+        fmpq_init(det);
+        fmpq_init(expected);
+        fmpq_mat_det(det, a);
+        if (fmpq_set_str(expected, rest, 10) != 0)
+        {
+            result = error("unreadable result", line_number);
+        }
+        else if (!fmpq_equal(det, expected))
+        {
+            result = error("the results differ", line_number);
+        }
+        fmpq_clear(det);
+        fmpq_clear(expected);
+        fmpq_mat_clear(a);
+        return result;
+    }
     size_t a_len = matrix_length(args);
     int single = current_kind == KIND_INV;
     if (a_len == 0 || (single ? args[a_len] != '\0' : strncmp(args + a_len, ", ", 2) != 0))
@@ -243,4 +270,10 @@ int
 run_fmpq_mat_inv(const char * arg)
 {
     return run(arg, "fmpq_mat_inv", "inverse", KIND_INV);
+}
+
+int
+run_fmpq_mat_det(const char * arg)
+{
+    return run(arg, "fmpq_mat_det", "determinant", KIND_DET);
 }
