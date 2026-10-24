@@ -1,0 +1,13 @@
+is_in_smith_normal_form([]_{0,0}) = true
+is_in_smith_normal_form([]_{0,3}) = true
+is_in_smith_normal_form([0, 0; 0, 0]) = true
+is_in_smith_normal_form([3]) = true
+is_in_smith_normal_form([-3]) = false
+is_in_smith_normal_form([1, 0; 0, 2]) = true
+is_in_smith_normal_form([2, 0; 0, 3]) = false
+is_in_smith_normal_form([1, 0; 0, -2]) = false
+is_in_smith_normal_form([1, 1; 0, 2]) = false
+is_in_smith_normal_form([0, 0; 0, 1]) = false
+is_in_smith_normal_form([1, 0; 0, 0]) = true
+is_in_smith_normal_form([2, 0, 0; 0, 6, 0]) = true
+is_in_smith_normal_form([2, 0; 0, 6; 0, 0]) = true

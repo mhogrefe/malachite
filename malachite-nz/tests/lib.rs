@@ -364,6 +364,7 @@ pub mod integer_matrix {
         pub mod determinant;
         pub mod determinant_bound;
         pub mod div_exact;
+        pub mod elementary_divisors;
         pub mod fraction_free_lu_decomposition;
         pub mod fraction_matrix;
         pub mod hermite_normal_form;
@@ -371,6 +372,7 @@ pub mod integer_matrix {
         pub mod inverse;
         pub mod is_in_hermite_normal_form;
         pub mod is_in_reduced_row_echelon_form_with_rank;
+        pub mod is_in_smith_normal_form;
         pub mod kronecker_product;
         pub mod mod_op;
         pub mod mod_power_of_2;
@@ -383,6 +385,8 @@ pub mod integer_matrix {
         pub mod reduced_row_echelon_form;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod smith_normal_form;
+        pub mod smith_normal_form_and_transforms;
         pub mod solve;
         pub mod solve_bounds;
         pub mod solve_dixon;

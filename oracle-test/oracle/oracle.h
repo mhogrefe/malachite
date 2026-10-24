@@ -376,6 +376,17 @@ int run_fmpz_mat_hnf_minors_transform(const char * arg);
 int run_fmpz_mat_hnf_transform_naive(const char * arg);
 int run_fmpz_mat_is_in_hnf(const char * arg);
 int run_fmpz_xgcd(const char * arg);
+
+/* fmpz_mat_snf.c */
+int run_fmpz_mat_snf(const char * arg);
+int run_fmpz_mat_snf_diagonal(const char * arg);
+int run_fmpz_mat_snf_iterative_hermite(const char * arg);
+int run_fmpz_mat_snf_kannan_bachem(const char * arg);
+int run_fmpz_mat_snf_iliopoulos(const char * arg);
+int run_fmpz_mat_snf_transform(const char * arg);
+int run_fmpz_mat_is_in_snf(const char * arg);
+int run_fmpz_mat_elementary_divisors(const char * arg);
+int run_fmpz_xgcd_canonical_bezout(const char * arg);
 int run_fmpq_mat_rref(const char * arg);
 int run_fmpq_mat_rref_classical(const char * arg);
 int run_fmpq_mat_rref_fraction_free(const char * arg);

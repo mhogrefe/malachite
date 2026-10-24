@@ -553,6 +553,16 @@ documented by git history.
   with cutoffs measured for Malachite and with primes tried in increasing order rather than at
   random. `hermite_normal_form_and_transform` also returns a unimodular $U$ with $UA = H$, as
   `fmpz_mat_hnf_transform` does, with FLINT's choice of $U$ when it is not unique.
+- New `SmithNormalForm`, `SmithNormalFormAssign`, `SmithNormalFormAndTransforms`, and
+  `ElementaryDivisors` traits in malachite-base, implemented in malachite-nz for `IntegerMatrix`,
+  with the matrix by value or by reference, and `IntegerMatrix::is_in_smith_normal_form`. The Smith
+  normal form is found as FLINT's `fmpz_mat_snf` finds it, by alternating row and column Hermite
+  normal forms, except that matrices whose smaller dimension is at most 4 are reduced by the
+  algorithm of Kannan and Bachem. `smith_normal_form_and_transforms` also returns unimodular $U$
+  and $V$ with $UAV = S$, FLINT's choices, as `fmpz_mat_snf_transform` does. `elementary_divisors`
+  returns the nonzero diagonal elements of the Smith normal form, found by Lübeck's algorithm for
+  matrices of rank at least 32 whose Hermite normal form has word-sized pivots, as by
+  `fmpz_mat_elementary_divisors`.
 - In `test_util`, `run_benchmark` now interleaves the timed calls of its series, rotating which
   series goes first in each round, after an untimed call; the first series of a benchmark had been
   timed about 10% slower than an identical later one.

@@ -4034,6 +4034,37 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", &format!("demo_{demo}"), flint_mode);
     }
+    // Smith normal forms of IntegerMatrixes, against fmpz_mat_snf and its diagonal,
+    // Kannan-Bachem, and Iliopoulos forms (the iterative Hermite one, static in FLINT, against
+    // fmpz_mat_snf, since the form is unique), fmpz_mat_snf_transform (U and V are not unique, and
+    // match FLINT's), fmpz_mat_is_in_snf, and fmpz_mat_elementary_divisors. The `_low_rank` demos
+    // make many matrices rank deficient. Also Integer's extended GCD, which the transforms use,
+    // against fmpz_xgcd_canonical_bezout.
+    for (demo, flint_mode) in [
+        ("integer_matrix_smith_normal_form", "fmpz_mat_snf"),
+        ("integer_matrix_smith_normal_form_low_rank", "fmpz_mat_snf"),
+        ("integer_matrix_snf_diagonal", "fmpz_mat_snf_diagonal"),
+        ("integer_matrix_snf_iterative_hermite", "fmpz_mat_snf_iterative_hermite"),
+        (
+            "integer_matrix_snf_iterative_hermite_low_rank",
+            "fmpz_mat_snf_iterative_hermite",
+        ),
+        ("integer_matrix_snf_kannan_bachem", "fmpz_mat_snf_kannan_bachem"),
+        ("integer_matrix_snf_kannan_bachem_low_rank", "fmpz_mat_snf_kannan_bachem"),
+        ("integer_matrix_snf_iliopoulos", "fmpz_mat_snf_iliopoulos"),
+        ("integer_matrix_smith_normal_form_and_transforms", "fmpz_mat_snf_transform"),
+        (
+            "integer_matrix_smith_normal_form_and_transforms_low_rank",
+            "fmpz_mat_snf_transform",
+        ),
+        ("integer_matrix_is_in_smith_normal_form", "fmpz_mat_is_in_snf"),
+        ("integer_matrix_is_in_smith_normal_form_of_form", "fmpz_mat_is_in_snf"),
+        ("integer_matrix_elementary_divisors", "fmpz_mat_elementary_divisors"),
+        ("integer_matrix_elementary_divisors_low_rank", "fmpz_mat_elementary_divisors"),
+        ("integer_extended_gcd", "fmpz_xgcd_canonical_bezout"),
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", &format!("demo_{demo}"), flint_mode);
+    }
     // Rational reconstruction of RationalMatrixes, against fmpq_mat_set_fmpz_mat_mod_fmpz. The
     // `_round_trip` demo reconstructs the residues of generated rational matrices modulo a modulus
     // large enough to recover them.

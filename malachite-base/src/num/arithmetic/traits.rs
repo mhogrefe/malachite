@@ -2193,6 +2193,35 @@ pub trait HermiteNormalFormAndTransform {
     fn hermite_normal_form_and_transform(self) -> Self::Output;
 }
 
+/// Computes the Smith normal form of a matrix: the unique diagonal matrix $S = UAV$, for unimodular
+/// $U$ and $V$, whose diagonal elements are nonnegative and each divide the next.
+pub trait SmithNormalForm {
+    type Output;
+
+    fn smith_normal_form(self) -> Self::Output;
+}
+
+/// Replaces a matrix with its Smith normal form.
+pub trait SmithNormalFormAssign {
+    fn smith_normal_form_assign(&mut self);
+}
+
+/// Computes the Smith normal form $S$ of a matrix $A$, together with unimodular matrices $U$ and
+/// $V$ such that $UAV = S$.
+pub trait SmithNormalFormAndTransforms {
+    type Output;
+
+    fn smith_normal_form_and_transforms(self) -> Self::Output;
+}
+
+/// Computes the elementary divisors of a matrix: the nonzero diagonal elements of its Smith normal
+/// form, one for each unit of rank, in increasing order of divisibility.
+pub trait ElementaryDivisors {
+    type Output;
+
+    fn elementary_divisors(self) -> Self::Output;
+}
+
 /// Computes the rank of a matrix modulo a prime $m$. The elements of the matrix must already be
 /// reduced modulo $m$.
 pub trait ModRank<M = Self> {

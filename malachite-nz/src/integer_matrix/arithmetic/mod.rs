@@ -135,6 +135,10 @@ crate_test_mod! {
 /// assert_eq!(a.to_string(), "[0, 2; 85, 1]");
 /// ```
 pub mod div_exact;
+/// Implementations of
+/// [`ElementaryDivisors`](malachite_base::num::arithmetic::traits::ElementaryDivisors), for
+/// computing the elementary divisors of integer matrices.
+pub mod elementary_divisors;
 /// Implementations of [`FractionFreeLuDecomposition`][fflu], for computing a fraction-free LU
 /// decomposition of a matrix.
 ///
@@ -164,6 +168,9 @@ pub mod inverse;
 /// The method [`is_in_hermite_normal_form`](super::IntegerMatrix::is_in_hermite_normal_form), which
 /// checks whether a matrix is in Hermite normal form.
 pub mod is_in_hermite_normal_form;
+/// The method [`is_in_smith_normal_form`](super::IntegerMatrix::is_in_smith_normal_form), which
+/// checks whether a matrix is in Smith normal form.
+pub mod is_in_smith_normal_form;
 crate_test_mod! {
     /// A check of whether a matrix is in fraction-free reduced row echelon form with a given
     /// denominator and rank. Internal machinery for the rank certificates of
@@ -259,6 +266,14 @@ pub mod scalar_mul;
 /// assert_eq!(a.to_string(), "[4, -8; 12, 16]");
 /// ```
 pub mod shl;
+/// Implementations of [`SmithNormalForm`](malachite_base::num::arithmetic::traits::SmithNormalForm)
+/// and [`SmithNormalFormAssign`](malachite_base::num::arithmetic::traits::SmithNormalFormAssign),
+/// for computing the Smith normal forms of integer matrices.
+pub mod smith_normal_form;
+/// Implementations of [`SmithNormalFormAndTransforms`](
+/// malachite_base::num::arithmetic::traits::SmithNormalFormAndTransforms), for computing the Smith
+/// normal forms of integer matrices together with transformation matrices.
+pub mod smith_normal_form_and_transforms;
 /// Implementations of [`Solve`](malachite_base::num::arithmetic::traits::Solve), for solving linear
 /// systems over the rationals with integer matrices.
 pub mod solve;

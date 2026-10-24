@@ -118,6 +118,21 @@ extended_gcd_reduced_cofactor(f: &Integer, g: &Integer) -> (Integer, Integer, In
     (Integer::from(d), a, b)
 }}
 
+// Mutable references to elements `i` and `j`, which are distinct, of `xs`.
+pub(crate) const fn two_elements(
+    xs: &mut [Integer],
+    i: usize,
+    j: usize,
+) -> (&mut Integer, &mut Integer) {
+    if i < j {
+        let (left, right) = xs.split_at_mut(j);
+        (&mut left[i], &mut right[0])
+    } else {
+        let (left, right) = xs.split_at_mut(i);
+        (&mut right[0], &mut left[j])
+    }
+}
+
 // Mutable references to rows `i` and `j`, which are distinct, of the `width`-wide matrix with
 // elements `xs`.
 pub(crate) fn two_rows(
@@ -160,13 +175,35 @@ impl RowCombination {
         }
     }
 
+    // Applies the combination to one element `x` of the first row and the corresponding element `y`
+    // of the second.
+    pub(crate) fn apply_to_pair(&self, x: &mut Integer, y: &mut Integer) {
+        let b = (&self.u * &*x).add_mul(&self.v, &*y);
+        *y *= &self.x_cofactor;
+        y.sub_mul_assign(&self.y_cofactor, &*x);
+        *x = b;
+    }
+
     // Applies the combination to the rows `xs` and `ys`.
     pub(crate) fn apply(&self, xs: &mut [Integer], ys: &mut [Integer]) {
         for (x, y) in xs.iter_mut().zip(ys.iter_mut()) {
-            let b = (&self.u * &*x).add_mul(&self.v, &*y);
-            *y *= &self.x_cofactor;
-            y.sub_mul_assign(&self.y_cofactor, &*x);
-            *x = b;
+            self.apply_to_pair(x, y);
+        }
+    }
+
+    // Applies the combination to columns `x_col` and `y_col`, which are distinct, of the rows from
+    // `start_row` on of the `width`-wide matrix with elements `xs`.
+    pub(crate) fn apply_to_columns(
+        &self,
+        xs: &mut [Integer],
+        width: usize,
+        start_row: usize,
+        x_col: usize,
+        y_col: usize,
+    ) {
+        for row in xs.chunks_exact_mut(width).skip(start_row) {
+            let (x, y) = two_elements(row, x_col, y_col);
+            self.apply_to_pair(x, y);
         }
     }
 }
