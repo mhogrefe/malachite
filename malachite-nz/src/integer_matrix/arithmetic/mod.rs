@@ -185,10 +185,22 @@ pub mod multi_mod;
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;
 
+/// Implementations of [`Nullspace`](malachite_base::num::arithmetic::traits::Nullspace), for
+/// finding bases of the right nullspaces of integer matrices.
+pub mod nullspace;
 /// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
 /// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square matrix
 /// to a power.
 pub mod pow;
+/// Implementations of [`Rank`](malachite_base::num::arithmetic::traits::Rank), for finding the
+/// ranks of integer matrices.
+pub mod rank;
+/// Implementations of
+/// [`ReducedRowEchelonForm`](malachite_base::num::arithmetic::traits::ReducedRowEchelonForm) and
+/// [`ReducedRowEchelonFormAssign`](
+/// malachite_base::num::arithmetic::traits::ReducedRowEchelonFormAssign), for finding the
+/// fraction-free reduced row echelon forms of integer matrices.
+pub mod reduced_row_echelon_form;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying an [`IntegerMatrix`](super::IntegerMatrix) by a scalar on either side.
 pub mod scalar_mul;

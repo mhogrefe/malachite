@@ -1413,6 +1413,15 @@ pub fn rational_matrix_pair_gen_var_3() -> Generator<(RationalMatrix, RationalMa
     )
 }
 
+// All `RationalMatrix`s, with small elements in the random modes, for linear algebra.
+pub fn rational_matrix_gen_var_3() -> Generator<RationalMatrix> {
+    Generator::new(
+        &exhaustive_rational_matrix_gen_var_3,
+        &random_rational_matrix_gen_var_3,
+        &special_random_rational_matrix_gen_var_3,
+    )
+}
+
 // All square `RationalMatrix`s, with small elements in the random modes, for linear algebra.
 pub fn rational_matrix_gen_var_2() -> Generator<RationalMatrix> {
     Generator::new(

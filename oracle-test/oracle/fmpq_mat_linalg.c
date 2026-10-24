@@ -25,6 +25,7 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <flint/fmpq_mat.h>
@@ -38,7 +39,8 @@ static int current_kind;
 
 enum { KIND_SOLVE_FRACTION_FREE, KIND_SOLVE_DIXON, KIND_SOLVE_MULTI_MOD, KIND_SOLVE,
        KIND_CAN_SOLVE_FRACTION_FREE, KIND_CAN_SOLVE_MULTI_MOD, KIND_CAN_SOLVE_DIXON, KIND_CAN_SOLVE,
-       KIND_SOLVE_OR_CAN_SOLVE, KIND_INV, KIND_DET };
+       KIND_SOLVE_OR_CAN_SOLVE, KIND_INV, KIND_DET, KIND_RREF, KIND_RREF_CLASSICAL,
+       KIND_RREF_FRACTION_FREE, KIND_RANK };
 
 /* The length of the matrix string at the start of `s`: `[]_{h,w}` or `[...]`. */
 static size_t
@@ -130,6 +132,59 @@ check_line(char * line, int line_number)
         }
         fmpq_clear(det);
         fmpq_clear(expected);
+        fmpq_mat_clear(a);
+        return result;
+    }
+    if (current_kind >= KIND_RREF)
+    {
+        fmpq_mat_t a, r, expected;
+        int result = 0;
+        if (!fmpq_mat_init_set_str_malachite(a, args))
+        {
+            fmpq_mat_clear(a);
+            return error("unreadable input", line_number);
+        }
+        fmpq_mat_init(r, fmpq_mat_nrows(a), fmpq_mat_ncols(a));
+        slong rank;
+        if (current_kind == KIND_RREF_CLASSICAL)
+        {
+            rank = fmpq_mat_rref_classical(r, a);
+        }
+        else if (current_kind == KIND_RREF_FRACTION_FREE)
+        {
+            rank = fmpq_mat_rref_fraction_free(r, a);
+        }
+        else
+        {
+            rank = fmpq_mat_rref(r, a);
+        }
+        if (current_kind == KIND_RANK)
+        {
+            char * end;
+            long long expected_rank = strtoll(rest, &end, 10);
+            if (*end != '\0' || end == rest)
+            {
+                result = error("unreadable result", line_number);
+            }
+            else if (expected_rank != rank)
+            {
+                result = error("the ranks differ", line_number);
+            }
+        }
+        else if (!fmpq_mat_init_set_str_malachite(expected, rest))
+        {
+            fmpq_mat_clear(expected);
+            result = error("unreadable result", line_number);
+        }
+        else
+        {
+            if (!fmpq_mat_equal(r, expected))
+            {
+                result = error("the results differ", line_number);
+            }
+            fmpq_mat_clear(expected);
+        }
+        fmpq_mat_clear(r);
         fmpq_mat_clear(a);
         return result;
     }
@@ -276,4 +331,28 @@ int
 run_fmpq_mat_det(const char * arg)
 {
     return run(arg, "fmpq_mat_det", "determinant", KIND_DET);
+}
+
+int
+run_fmpq_mat_rref(const char * arg)
+{
+    return run(arg, "fmpq_mat_rref", "reduced_row_echelon_form", KIND_RREF);
+}
+
+int
+run_fmpq_mat_rref_classical(const char * arg)
+{
+    return run(arg, "fmpq_mat_rref_classical", "rref_classical", KIND_RREF_CLASSICAL);
+}
+
+int
+run_fmpq_mat_rref_fraction_free(const char * arg)
+{
+    return run(arg, "fmpq_mat_rref_fraction_free", "rref_fraction_free", KIND_RREF_FRACTION_FREE);
+}
+
+int
+run_fmpq_mat_rank_via_rref(const char * arg)
+{
+    return run(arg, "fmpq_mat_rank_via_rref", "rank", KIND_RANK);
 }

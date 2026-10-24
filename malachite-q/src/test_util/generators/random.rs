@@ -4060,3 +4060,14 @@ pub fn random_rational_matrix_rational_vector_pair_gen_var_3(
         }),
     )
 }
+
+// Matrices of any shape with small elements, for linear algebra.
+pub fn random_rational_matrix_gen_var_3(config: &GenConfig) -> It<RationalMatrix> {
+    Box::new(random_rational_matrices(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 8),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_dimension_n", 4),
+        config.get_or("mean_dimension_d", 1),
+    ))
+}

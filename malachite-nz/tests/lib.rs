@@ -377,6 +377,7 @@ pub mod integer_matrix {
         pub mod multi_mod;
         pub mod neg;
         pub mod pow;
+        pub mod reduced_row_echelon_form;
         pub mod scalar_mul;
         pub mod shl;
         pub mod solve;

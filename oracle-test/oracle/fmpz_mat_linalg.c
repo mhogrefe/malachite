@@ -51,7 +51,8 @@ enum { KIND_FFLU, KIND_DET_BAREISS, KIND_DET_COFACTOR, KIND_DET, KIND_DET_MODULA
        KIND_DET_MODULAR_ACCELERATED, KIND_DET_DIVISOR, KIND_IS_IN_RREF, KIND_SOLVE_FFLU,
        KIND_SOLVE_CRAMER, KIND_SOLVE_FFLU_PRECOMP, KIND_SOLVE, KIND_SOLVE_DIXON_DEN,
        KIND_SOLVE_MULTI_MOD_DEN, KIND_CAN_SOLVE_FFLU, KIND_CAN_SOLVE_MULTI_MOD_DEN, KIND_CAN_SOLVE,
-       KIND_INV, KIND_RREF_CERTIFY };
+       KIND_INV, KIND_RREF_CERTIFY, KIND_RREF, KIND_RREF_FFLU, KIND_RREF_MUL, KIND_RANK,
+       KIND_RANK_SMALL, KIND_NULLSPACE };
 
 static int
 unrecognized(int line_number)
@@ -400,6 +401,130 @@ check_solve(char * args, char * rest, int line_number)
     return result;
 }
 
+/* Checks `op(A) = R`, where R is `(X, den)` for the rref kinds, a rank, or a nullspace basis. */
+static int
+check_reduction(char * args, char * rest, int line_number)
+{
+    fmpz_mat_t a;
+    if (!fmpz_mat_init_set_str_malachite(a, args))
+    {
+        fmpz_mat_clear(a);
+        flint_printf("error in %s test, line %d: unreadable input\n", current_name, line_number);
+        return 1;
+    }
+    slong m = fmpz_mat_nrows(a), n = fmpz_mat_ncols(a);
+    int result = 0;
+    if (current_kind == KIND_RANK || current_kind == KIND_RANK_SMALL)
+    {
+        fmpz_t rank;
+        fmpz_init(rank);
+        if (current_kind == KIND_RANK)
+        {
+            fmpz_set_si(rank, fmpz_mat_rank(a));
+        }
+        else
+        {
+            fmpz_mat_t b;
+            fmpz_mat_init_set(b, a);
+            fmpz_set_si(rank, fmpz_mat_rank_small_inplace(b));
+            fmpz_mat_clear(b);
+        }
+        result = compare_fmpz(rank, rest, line_number);
+        fmpz_clear(rank);
+    }
+    else if (current_kind == KIND_NULLSPACE)
+    {
+        fmpz_mat_t res, expected;
+        fmpz_mat_init(res, n, n);
+        slong nullity = fmpz_mat_nullspace(res, a);
+        if (!fmpz_mat_init_set_str_malachite(expected, rest))
+        {
+            flint_printf("error in %s test, line %d: unreadable result\n", current_name,
+                         line_number);
+            result = 1;
+        }
+        else
+        {
+            fmpz_mat_t x;
+            fmpz_mat_init(x, n, nullity);
+            for (slong i = 0; i < n; i++)
+            {
+                for (slong j = 0; j < nullity; j++)
+                {
+                    fmpz_set(fmpz_mat_entry(x, i, j), fmpz_mat_entry(res, i, j));
+                }
+                for (slong j = nullity; j < n; j++)
+                {
+                    if (!fmpz_is_zero(fmpz_mat_entry(res, i, j)))
+                    {
+                        result = 1;
+                    }
+                }
+            }
+            if (result)
+            {
+                flint_printf("error in %s test, line %d: FLINT's extra columns are nonzero\n",
+                             current_name, line_number);
+            }
+            else
+            {
+                result = report_mat(x, expected, line_number);
+            }
+            fmpz_mat_clear(x);
+            fmpz_mat_clear(expected);
+        }
+        fmpz_mat_clear(res);
+    }
+    else
+    {
+        fmpz_mat_t r;
+        fmpz_t den;
+        fmpz_mat_init(r, m, n);
+        fmpz_init(den);
+        if (current_kind == KIND_RREF)
+        {
+            fmpz_mat_rref(r, den, a);
+        }
+        else if (current_kind == KIND_RREF_FFLU)
+        {
+            fmpz_mat_rref_fflu(r, den, a);
+        }
+        else
+        {
+            fmpz_mat_rref_mul(r, den, a);
+        }
+        size_t len = strlen(rest);
+        size_t x_len;
+        if (len < 4 || rest[0] != '(' || rest[len - 1] != ')'
+            || (x_len = matrix_length(rest + 1)) == 0 || strncmp(rest + 1 + x_len, ", ", 2) != 0)
+        {
+            result = unrecognized(line_number);
+        }
+        else
+        {
+            rest[len - 1] = '\0';
+            rest[1 + x_len] = '\0';
+            fmpz_mat_t expected;
+            if (!fmpz_mat_init_set_str_malachite(expected, rest + 1))
+            {
+                flint_printf("error in %s test, line %d: unreadable result\n", current_name,
+                             line_number);
+                result = 1;
+            }
+            else
+            {
+                result = report_mat(r, expected, line_number)
+                    || compare_fmpz(den, rest + 1 + x_len + 2, line_number);
+            }
+            fmpz_mat_clear(expected);
+        }
+        fmpz_mat_clear(r);
+        fmpz_clear(den);
+    }
+    fmpz_mat_clear(a);
+    return result;
+}
+
 static int
 check_line(char * line, int line_number)
 {
@@ -433,6 +558,10 @@ check_line(char * line, int line_number)
     char * rest = eq + 4;
     checked++;
     int result = 0;
+    if (current_kind >= KIND_RREF)
+    {
+        return check_reduction(args, rest, line_number);
+    }
     if (current_kind >= KIND_SOLVE_FFLU)
     {
         return check_solve(args, rest, line_number);
@@ -658,4 +787,40 @@ int
 run_fmpz_mat_det_divisor(const char * arg)
 {
     return run(arg, "fmpz_mat_det_divisor", "determinant_divisor", KIND_DET_DIVISOR);
+}
+
+int
+run_fmpz_mat_rref(const char * arg)
+{
+    return run(arg, "fmpz_mat_rref", "reduced_row_echelon_form", KIND_RREF);
+}
+
+int
+run_fmpz_mat_rref_fflu(const char * arg)
+{
+    return run(arg, "fmpz_mat_rref_fflu", "rref_fflu", KIND_RREF_FFLU);
+}
+
+int
+run_fmpz_mat_rref_mul(const char * arg)
+{
+    return run(arg, "fmpz_mat_rref_mul", "rref_mul", KIND_RREF_MUL);
+}
+
+int
+run_fmpz_mat_rank(const char * arg)
+{
+    return run(arg, "fmpz_mat_rank", "rank", KIND_RANK);
+}
+
+int
+run_fmpz_mat_rank_small_inplace(const char * arg)
+{
+    return run(arg, "fmpz_mat_rank_small_inplace", "rank_small", KIND_RANK_SMALL);
+}
+
+int
+run_fmpz_mat_nullspace(const char * arg)
+{
+    return run(arg, "fmpz_mat_nullspace", "nullspace", KIND_NULLSPACE);
 }

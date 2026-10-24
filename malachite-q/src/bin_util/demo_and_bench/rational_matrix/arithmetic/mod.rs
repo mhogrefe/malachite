@@ -23,6 +23,7 @@ pub(crate) fn register(runner: &mut Runner) {
     neg::register(runner);
     pow::register(runner);
     reconstruct::register(runner);
+    reduced_row_echelon_form::register(runner);
     scalar_mul::register(runner);
     shl::register(runner);
     shr::register(runner);
@@ -47,6 +48,7 @@ mod mul_vector;
 mod neg;
 mod pow;
 mod reconstruct;
+mod reduced_row_echelon_form;
 mod scalar_mul;
 mod shl;
 mod shr;

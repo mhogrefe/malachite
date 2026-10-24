@@ -547,8 +547,8 @@ pub(crate) fn lu_in_place<T: PrimitiveUnsigned>(
 /// columns, and those of $U$ are on and above the diagonal of the first $r$ rows. Returns the
 /// permutation, the rank, and the packed matrix. The elements of `a` must be reduced modulo `m`.
 ///
-/// This is for malachite-nz's multimodular linear algebra, which needs the factors without
-/// copying them out.
+/// This is for malachite-nz's multimodular linear algebra, which needs the factors without copying
+/// them out.
 #[doc(hidden)]
 pub fn mod_lu_decomposition_packed<T: PrimitiveUnsigned>(
     mut a: UnsignedMatrix<T>,

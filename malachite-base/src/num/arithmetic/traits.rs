@@ -2141,6 +2141,36 @@ pub trait Determinant {
     fn determinant(self) -> Self::Output;
 }
 
+/// Computes the rank of a matrix: the number of linearly independent rows, or equivalently columns.
+pub trait Rank {
+    fn rank(self) -> u64;
+}
+
+/// Computes the reduced row echelon form of a matrix. For a matrix over a field, the result is the
+/// reduced row echelon form itself; for an integer matrix, it is the form scaled by a denominator,
+/// together with that denominator.
+pub trait ReducedRowEchelonForm {
+    type Output;
+
+    fn reduced_row_echelon_form(self) -> Self::Output;
+}
+
+/// Replaces a matrix with its reduced row echelon form. For an integer matrix, the form is scaled
+/// by a denominator, which is returned.
+pub trait ReducedRowEchelonFormAssign {
+    type Output;
+
+    fn reduced_row_echelon_form_assign(&mut self) -> Self::Output;
+}
+
+/// Computes a basis of the right nullspace of a matrix: the vectors $x$ with $Ax = 0$. The basis
+/// vectors are the columns of the result.
+pub trait Nullspace {
+    type Output;
+
+    fn nullspace(self) -> Self::Output;
+}
+
 /// Computes the rank of a matrix modulo a prime $m$. The elements of the matrix must already be
 /// reduced modulo $m$.
 pub trait ModRank<M = Self> {

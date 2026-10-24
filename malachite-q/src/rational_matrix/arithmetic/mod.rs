@@ -52,15 +52,27 @@ pub mod mul_vector;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;
+/// Implementations of [`Nullspace`](malachite_base::num::arithmetic::traits::Nullspace), for
+/// finding bases of the right nullspaces of rational matrices.
+pub mod nullspace;
 /// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
 /// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square
 /// [`RationalMatrix`](super::RationalMatrix) to a power.
 pub mod pow;
+/// Implementations of [`Rank`](malachite_base::num::arithmetic::traits::Rank), for finding the
+/// ranks of rational matrices.
+pub mod rank;
 /// The methods [`reconstruct`](super::RationalMatrix::reconstruct) and
 /// [`reconstruct_ref`](super::RationalMatrix::reconstruct_ref), for recovering a rational matrix
 /// from its residues by rational reconstruction.
 pub mod reconstruct;
 
+/// Implementations of
+/// [`ReducedRowEchelonForm`](malachite_base::num::arithmetic::traits::ReducedRowEchelonForm) and
+/// [`ReducedRowEchelonFormAssign`](
+/// malachite_base::num::arithmetic::traits::ReducedRowEchelonFormAssign), for finding the reduced
+/// row echelon forms of rational matrices.
+pub mod reduced_row_echelon_form;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a [`RationalMatrix`](super::RationalMatrix) by a scalar on either side.
 pub mod scalar_mul;

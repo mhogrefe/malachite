@@ -534,6 +534,17 @@ documented by git history.
   large divisor of the determinant by solving a linear system; the rational determinant clears the
   denominators of each row and divides the integer determinant by their product, like
   `fmpq_mat_det`.
+- New `Rank`, `ReducedRowEchelonForm`, `ReducedRowEchelonFormAssign`, and `Nullspace` traits in
+  malachite-base, implemented in malachite-nz for `IntegerMatrix` and in malachite-q for
+  `RationalMatrix`, with the matrix by value or by reference. For `IntegerMatrix`, the reduced row
+  echelon form is fraction-free: `reduced_row_echelon_form` returns it with its denominator and
+  `reduced_row_echelon_form_assign` returns the denominator, as FLINT's `fmpz_mat_rref` computes
+  them (by fraction-free LU decomposition or, depending on the shape, from the structure found
+  modulo a prime and certified); `rank` is `fmpz_mat_rank`, and `nullspace` is
+  `fmpz_mat_nullspace`, with exactly as many columns as the nullity. For `RationalMatrix`, the
+  reduced row echelon form is `fmpq_mat_rref`'s, the rank is that of the matrix cleared of row
+  denominators, and the nullspace basis is read off the reduced row echelon form, with 1 in each
+  free variable's position.
 - In `test_util`, `run_benchmark` now interleaves the timed calls of its series, rotating which
   series goes first in each round, after an untimed call; the first series of a benchmark had been
   timed about 10% slower than an identical later one.
