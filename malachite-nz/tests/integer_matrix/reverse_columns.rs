@@ -60,9 +60,9 @@ fn reverse_columns_properties() {
         // Reversing the rows and the columns reverses the elements.
         let mut d = b.clone();
         d.reverse_rows();
-        let mut elements = a.elements.clone();
+        let mut elements = a.to_elements();
         elements.reverse();
-        assert_eq!(d.elements, elements);
+        assert_eq!(d.elements_ref(), elements);
 
         b.reverse_columns();
         assert_eq!(b, a);

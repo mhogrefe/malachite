@@ -24,7 +24,7 @@ fn rows_of(m: &UnsignedMatrix<u64>) -> Vec<UnsignedVector<u64>> {
     (0..m.height())
         .map(|i| {
             UnsignedVector::from_elements(
-                &m.elements
+                &m.elements_ref()
                     [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())],
             )
         })

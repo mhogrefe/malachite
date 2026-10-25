@@ -71,8 +71,8 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// $M(n, m) = O(m \\log m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, $m$ is
-            /// `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`,
+            /// $m$ is `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `m` is 0, or if any element of `self` is greater than or equal to `m`.
@@ -101,8 +101,8 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// $M(n, m) = O(m \\log m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, $m$ is
-            /// `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`,
+            /// $m$ is `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `m` is 0, or if any element of `self` is greater than or equal to `m`.
@@ -131,8 +131,8 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// $M(n, m) = O(nm)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, $m$ is
-            /// `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`,
+            /// $m$ is `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `m` is 0, or if any element of `self` is greater than or equal to `m`.
@@ -160,8 +160,8 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// $M(n, m) = O(nm)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, $m$ is
-            /// `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`,
+            /// $m$ is `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `m` is 0, or if any element of `self` is greater than or equal to `m`.
@@ -186,8 +186,8 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// $M(n, m) = O(m \\log m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, $m$ is
-            /// `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`,
+            /// $m$ is `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `m` is 0, or if any element of `self` is greater than or equal to `m`.
@@ -213,8 +213,8 @@ macro_rules! impl_mod_shl_unsigned {
             ///
             /// $M(n, m) = O(m \\log m)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, $m$ is
-            /// `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`,
+            /// $m$ is `m.significant_bits()`, and $k$ is `bits.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `m` is 0, or if any element of `self` is greater than or equal to `m`.

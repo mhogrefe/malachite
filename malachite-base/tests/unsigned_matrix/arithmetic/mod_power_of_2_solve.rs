@@ -52,11 +52,11 @@ fn mod_power_of_2_solve_properties() {
         assert_eq!(x.height(), w);
         assert_eq!((&a).mod_power_of_2_mul(&x, pow), b);
         let v = UnsignedVector {
-            elements: b.elements.clone(),
+            elements: b.to_elements(),
         };
         assert_eq!(
             (&a).mod_power_of_2_solve(&v, pow).unwrap().elements,
-            x.elements
+            x.elements_ref()
         );
     });
 }

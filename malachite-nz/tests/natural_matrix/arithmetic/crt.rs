@@ -254,7 +254,7 @@ fn crt_properties() {
             };
             assert_eq!((c.height(), c.width()), (a.height(), a.width()));
             let m = &m1 * Natural::from(m2);
-            assert!(c.elements.iter().all(|x| *x < m));
+            assert!(c.elements_ref().iter().all(|x| *x < m));
             // The result is congruent to each matrix modulo its modulus.
             assert_eq!(&c % &m1, a);
             assert_eq!(&c % m2, b);

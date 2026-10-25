@@ -65,7 +65,7 @@ fn mul_scalar_properties() {
 
         // Element by element, this is the scalar product, and the shape is unchanged.
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x * &c);
         }
         // Multiplying by 0 gives the zero matrix, by 1 changes nothing, and products of scalars act

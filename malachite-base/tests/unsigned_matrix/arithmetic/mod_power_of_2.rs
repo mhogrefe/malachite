@@ -73,7 +73,7 @@ fn mod_power_of_2_properties() {
         assert_eq!(m.transpose().mod_power_of_2(pow), n.transpose());
 
         // Element by element, this is the `u64` operation.
-        for (&x, &y) in m.elements.iter().zip(&n.elements) {
+        for (&x, &y) in m.elements_ref().iter().zip(n.elements_ref()) {
             assert_eq!(y, x.mod_power_of_2(pow));
         }
 
@@ -85,11 +85,16 @@ fn mod_power_of_2_properties() {
         // A power at least as wide as a `u64` changes nothing, since no element reaches it.
         assert_eq!((&m).mod_power_of_2(u64::WIDTH), m);
         // Modulo 2^0 every element vanishes, but the shape is unchanged.
-        assert!((&m).mod_power_of_2(0).elements.iter().all(|&x| x == 0));
+        assert!(
+            (&m).mod_power_of_2(0)
+                .elements_ref()
+                .iter()
+                .all(|&x| x == 0)
+        );
         // Reducing to the width of the largest element leaves the matrix alone, and to one bit less
         // does not, unless every element was zero already.
         let bits = m
-            .elements
+            .elements_ref()
             .iter()
             .map(|x| x.significant_bits())
             .max()

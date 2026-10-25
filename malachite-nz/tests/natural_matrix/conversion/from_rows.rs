@@ -24,7 +24,7 @@ fn rows_of(m: &NaturalMatrix) -> Vec<NaturalVector> {
     (0..m.height())
         .map(|i| {
             NaturalVector::from_elements(
-                &m.elements
+                &m.elements_ref()
                     [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())],
             )
         })

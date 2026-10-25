@@ -41,7 +41,7 @@ fn verify(a: &UnsignedMatrix<u64>, pow: u64) {
     let w = usize::try_from(a.width()).unwrap();
     if w != 0 {
         let nonzero = |m: &UnsignedMatrix<u64>| -> Vec<Vec<u64>> {
-            m.elements
+            m.elements_ref()
                 .chunks_exact(w)
                 .filter(|row| row.iter().any(|&x| x != 0))
                 .map(<[u64]>::to_vec)

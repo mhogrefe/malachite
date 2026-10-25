@@ -28,7 +28,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_unsigned_matrix_from_elements_column_major(gm: GenMode, config: &GenConfig, limit: usize) {
     for m in unsigned_matrix_gen().get(gm, config).take(limit) {
-        let xs = m.transpose().elements;
+        let xs = m.transpose().into_elements();
         println!(
             "UnsignedMatrix::from_elements_column_major({}, {}, {:?}) = {}",
             m.height(),
@@ -45,7 +45,7 @@ fn demo_unsigned_matrix_from_owned_elements_column_major(
     limit: usize,
 ) {
     for m in unsigned_matrix_gen().get(gm, config).take(limit) {
-        let xs = m.transpose().elements;
+        let xs = m.transpose().into_elements();
         println!(
             "UnsignedMatrix::from_owned_elements_column_major({}, {}, {:?}) = {}",
             m.height(),
@@ -77,7 +77,7 @@ fn benchmark_unsigned_matrix_from_elements_column_major_evaluation_strategy(
                     no_out!(UnsignedMatrix::from_elements_column_major(
                         m.height(),
                         m.width(),
-                        &m.elements
+                        m.elements_ref()
                     ));
                 },
             ),
@@ -86,7 +86,9 @@ fn benchmark_unsigned_matrix_from_elements_column_major_evaluation_strategy(
                 &mut |m| {
                     let (height, width) = (m.height(), m.width());
                     no_out!(UnsignedMatrix::from_owned_elements_column_major(
-                        height, width, m.elements
+                        height,
+                        width,
+                        m.into_elements()
                     ));
                 },
             ),

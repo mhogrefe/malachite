@@ -32,7 +32,7 @@ fn columns_of(m: &IntegerMatrix) -> Vec<IntegerVector> {
         .map(|j| {
             IntegerVector::from_owned_elements(
                 (0..m.height())
-                    .map(|i| m.elements[usize::exact_from(i * m.width() + j)].clone())
+                    .map(|i| m.elements_ref()[usize::exact_from(i * m.width() + j)].clone())
                     .collect(),
             )
         })
@@ -79,7 +79,7 @@ fn benchmark_integer_matrix_from_columns_evaluation_strategy(
         &Bucketer {
             bucketing_function: &|(_, m)| {
                 usize::exact_from(
-                    m.elements
+                    m.elements_ref()
                         .iter()
                         .map(SignificantBits::significant_bits)
                         .sum::<u64>(),

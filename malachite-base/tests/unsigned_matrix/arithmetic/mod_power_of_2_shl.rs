@@ -76,7 +76,7 @@ where
             // The result is reduced, and element by element this is the scalar operation.
             assert!(b.mod_power_of_2_is_reduced(pow));
             assert_eq!((b.height(), b.width()), (a.height(), a.width()));
-            for (&x, &y) in a.elements.iter().zip(&b.elements) {
+            for (&x, &y) in a.elements_ref().iter().zip(b.elements_ref()) {
                 assert_eq!(y, x.mod_power_of_2_shl(bits, pow));
             }
             // Shifting by 0 changes nothing.

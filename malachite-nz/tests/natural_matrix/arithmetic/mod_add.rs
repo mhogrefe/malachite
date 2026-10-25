@@ -179,7 +179,12 @@ fn mod_add_properties() {
         // The result is reduced, has the same shape, and is the elementwise modular sum.
         assert!(r.mod_is_reduced(&m));
         assert_eq!((r.height(), r.width()), (a.height(), a.width()));
-        for ((x, y), z) in a.elements.iter().zip(&b.elements).zip(&r.elements) {
+        for ((x, y), z) in a
+            .elements_ref()
+            .iter()
+            .zip(b.elements_ref())
+            .zip(r.elements_ref())
+        {
             assert_eq!(*z, x.mod_add(y, &m));
         }
         // It is the ordinary sum, reduced.

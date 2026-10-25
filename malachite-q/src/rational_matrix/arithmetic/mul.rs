@@ -16,6 +16,7 @@ use alloc::vec::Vec;
 use core::iter::repeat_n;
 use core::mem;
 use core::ops::{Mul, MulAssign};
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::natural::Natural;
@@ -30,7 +31,7 @@ fn divide_by_denominators(
     denominators: impl Iterator<Item = Natural>,
 ) -> RationalMatrix {
     let elements: Vec<Rational> = numerators
-        .elements
+        .into_elements()
         .into_iter()
         .zip(denominators)
         .map(|(x, d)| {

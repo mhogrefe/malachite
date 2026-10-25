@@ -47,7 +47,7 @@ fn square_elements(a: &NaturalMatrix, pow: u64) -> Vec<Natural> {
             a.elements.iter().map(Limb::wrapping_from).collect(),
         )
         .mod_power_of_2_square(pow)
-        .elements
+        .into_elements()
         .into_iter()
         .map(Natural::from)
         .collect()

@@ -22,8 +22,8 @@ impl PartialEq<IntegerMatrix> for RationalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`. Matrices of
-    /// different shapes are compared in constant time.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
+    /// Matrices of different shapes are compared in constant time.
     ///
     /// # Examples
     /// See [here](super::partial_eq_integer_matrix#partial_eq).
@@ -33,7 +33,7 @@ impl PartialEq<IntegerMatrix> for RationalMatrix {
             && self
                 .elements
                 .iter()
-                .zip(&other.elements)
+                .zip(other.elements_ref())
                 .all(|(x, y)| x == y)
     }
 }
@@ -49,8 +49,8 @@ impl PartialEq<RationalMatrix> for IntegerMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`. Matrices of
-    /// different shapes are compared in constant time.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
+    /// Matrices of different shapes are compared in constant time.
     ///
     /// # Examples
     /// See [here](super::partial_eq_integer_matrix#partial_eq).

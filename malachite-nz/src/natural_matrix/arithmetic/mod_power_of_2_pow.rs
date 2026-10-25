@@ -58,7 +58,7 @@ fn matrix_mod_power_of_2_pow(xs: &[Natural], n: usize, exp: u64, pow: u64) -> Ve
             xs.iter().map(Limb::wrapping_from).collect(),
         )
         .mod_power_of_2_pow(exp, pow)
-        .elements
+        .into_elements()
         .into_iter()
         .map(Natural::from)
         .collect();

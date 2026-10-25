@@ -41,7 +41,7 @@ impl<T: PrimitiveUnsigned> ModMul<T, T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -76,7 +76,7 @@ impl<T: PrimitiveUnsigned> ModMul<T, T> for &UnsignedMatrix<T> {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -112,7 +112,7 @@ impl<T: PrimitiveUnsigned> ModMulAssign<T, T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.

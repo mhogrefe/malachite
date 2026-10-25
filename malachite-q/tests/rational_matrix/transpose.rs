@@ -50,8 +50,8 @@ fn transpose_properties() {
         for i in 0..m.height() {
             for j in 0..m.width() {
                 assert_eq!(
-                    t.elements[usize::exact_from(j * m.height() + i)],
-                    m.elements[usize::exact_from(i * m.width() + j)]
+                    t.elements_ref()[usize::exact_from(j * m.height() + i)],
+                    m.elements_ref()[usize::exact_from(i * m.width() + j)]
                 );
             }
         }
@@ -64,9 +64,9 @@ fn transpose_properties() {
         m_alt.transpose_assign();
         assert_eq!(m_alt, m);
 
-        let mut sorted_m = m.elements.clone();
+        let mut sorted_m = m.to_elements();
         sorted_m.sort_unstable();
-        let mut sorted_t = t.elements;
+        let mut sorted_t = t.to_elements();
         sorted_t.sort_unstable();
         assert_eq!(sorted_m, sorted_t);
     });

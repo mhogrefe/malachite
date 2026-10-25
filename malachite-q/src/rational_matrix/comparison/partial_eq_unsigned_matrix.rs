@@ -28,8 +28,8 @@ where
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`. Matrices of
-    /// different shapes are compared in constant time.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
+    /// Matrices of different shapes are compared in constant time.
     ///
     /// # Examples
     /// See [here](super::partial_eq_unsigned_matrix#partial_eq).
@@ -39,7 +39,7 @@ where
             && self
                 .elements
                 .iter()
-                .zip(&other.elements)
+                .zip(other.elements_ref())
                 .all(|(x, y)| x == y)
     }
 }
@@ -58,8 +58,8 @@ where
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`. Matrices of
-    /// different shapes are compared in constant time.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
+    /// Matrices of different shapes are compared in constant time.
     ///
     /// # Examples
     /// See [here](super::partial_eq_unsigned_matrix#partial_eq).

@@ -41,7 +41,7 @@ fn balanced_crt_elements(
     let m = m1 * &m2_natural;
     let half = &m >> 1u32;
     Some(
-        xs.zip(&r2.elements)
+        xs.zip(r2.elements_ref())
             .map(|(x, &r)| {
                 // Lift x into [0, m1), as _fmpz_CRT_ui_precomp does for negative residues.
                 let x = if x < 0u32 {

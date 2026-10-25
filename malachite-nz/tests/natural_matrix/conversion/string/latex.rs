@@ -18,7 +18,7 @@ use malachite_nz::test_util::generators::natural_matrix_gen;
 // The rows of a matrix with at least one row and one column, each as the strings `f` makes of its
 // elements, joined by `element_separator`.
 fn rows(m: &NaturalMatrix, element_separator: &str, f: impl Fn(&Natural) -> String) -> Vec<String> {
-    m.elements
+    m.elements_ref()
         .chunks(usize::exact_from(m.width()))
         .map(|row| row.iter().map(&f).join(element_separator))
         .collect()

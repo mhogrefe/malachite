@@ -179,7 +179,7 @@ fn rem_properties() {
 
         // This really is the remainder of a division: with the elementwise quotient, `a` is
         // recovered exactly, element by element.
-        for (&x, &y) in a.elements.iter().zip(&b.elements) {
+        for (&x, &y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(x, m * (x / m) + y);
             assert_eq!(y, x % m);
         }
@@ -187,9 +187,16 @@ fn rem_properties() {
 
     unsigned_matrix_gen().test_properties(|a| {
         // Modulo 1 every element vanishes, but the shape is unchanged.
-        assert!((&a % 1).elements.iter().all(|&x| x == 0));
+        assert!((&a % 1).elements_ref().iter().all(|&x| x == 0));
         // A divisor above the largest element leaves the matrix alone.
-        if let Some(above) = a.elements.iter().max().copied().unwrap_or(0).checked_add(1) {
+        if let Some(above) = a
+            .elements_ref()
+            .iter()
+            .max()
+            .copied()
+            .unwrap_or(0)
+            .checked_add(1)
+        {
             assert_eq!(&a % above, a);
         }
         // For a power-of-2 divisor this is `mod_power_of_2`, which reaches the same answer by

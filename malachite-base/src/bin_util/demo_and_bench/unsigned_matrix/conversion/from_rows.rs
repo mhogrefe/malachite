@@ -30,7 +30,7 @@ fn rows_of(m: &UnsignedMatrix<u64>) -> Vec<UnsignedVector<u64>> {
     (0..m.height())
         .map(|i| {
             UnsignedVector::from_elements(
-                &m.elements
+                &m.elements_ref()
                     [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())],
             )
         })
@@ -75,7 +75,7 @@ fn benchmark_unsigned_matrix_from_rows_evaluation_strategy(
         limit,
         file_name,
         &Bucketer {
-            bucketing_function: &|(_, m)| m.elements.len(),
+            bucketing_function: &|(_, m)| m.elements_ref().len(),
             bucketing_label: "m.elements.len()".to_string(),
         },
         &mut [

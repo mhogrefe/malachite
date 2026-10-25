@@ -31,7 +31,7 @@ fn columns_of(m: &UnsignedMatrix<u64>) -> Vec<UnsignedVector<u64>> {
         .map(|j| {
             UnsignedVector::from_owned_elements(
                 (0..m.height())
-                    .map(|i| m.elements[usize::exact_from(i * m.width() + j)])
+                    .map(|i| m.elements_ref()[usize::exact_from(i * m.width() + j)])
                     .collect(),
             )
         })
@@ -76,7 +76,7 @@ fn benchmark_unsigned_matrix_from_columns_evaluation_strategy(
         limit,
         file_name,
         &Bucketer {
-            bucketing_function: &|(_, m)| m.elements.len(),
+            bucketing_function: &|(_, m)| m.elements_ref().len(),
             bucketing_label: "m.elements.len()".to_string(),
         },
         &mut [

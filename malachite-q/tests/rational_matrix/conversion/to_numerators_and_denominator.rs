@@ -54,15 +54,15 @@ fn to_numerators_and_denominator_properties() {
         assert_ne!(d, 0u32);
         assert_eq!((ns.height(), ns.width()), (a.height(), a.width()));
         // The quotients are the elements.
-        for (n, x) in ns.elements.iter().zip(a.elements.iter()) {
+        for (n, x) in ns.elements_ref().iter().zip(a.elements_ref().iter()) {
             assert_eq!(&Rational::from(n) / Rational::from(&d), *x);
         }
         // Every element's denominator divides the result's, and the result is in lowest terms.
-        for x in &a.elements {
+        for x in a.elements_ref() {
             assert!((&d % x.denominator_ref()) == 0u32);
         }
         let mut g = d.clone();
-        for n in &ns.elements {
+        for n in ns.elements_ref() {
             g = g.gcd(n.unsigned_abs_ref());
         }
         assert_eq!(g, Natural::ONE);

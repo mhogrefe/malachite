@@ -99,12 +99,12 @@ fn multi_mod_properties() {
         assert_eq!(residues.len(), ms.len());
         for (rs, &m) in residues.iter().zip(&ms) {
             assert_eq!((rs.height(), rs.width()), (a.height(), a.width()));
-            assert!(rs.elements.iter().all(|&r| r < m));
+            assert!(rs.elements_ref().iter().all(|&r| r < m));
         }
         // The residues are those of the elements, as a vector, in the same order.
-        let v_residues = NaturalVector::from_elements(&a.elements).multi_mod(&ms);
+        let v_residues = NaturalVector::from_elements(a.elements_ref()).multi_mod(&ms);
         for (rs, vrs) in residues.iter().zip(&v_residues) {
-            assert_eq!(rs.elements, vrs.elements);
+            assert_eq!(rs.elements_ref(), vrs.elements);
         }
         // Reduction commutes with transposition.
         assert_eq!(

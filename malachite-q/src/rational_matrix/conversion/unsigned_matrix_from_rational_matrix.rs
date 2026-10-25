@@ -36,7 +36,7 @@ impl<T: PrimitiveUnsigned + for<'a> TryFrom<&'a Rational>> TryFrom<&RationalMatr
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.height() * m.width()`.
     ///
     /// # Examples
     /// See [here](super::unsigned_matrix_from_rational_matrix#try_from).
@@ -69,7 +69,7 @@ impl<T: PrimitiveUnsigned + for<'a> TryFrom<&'a Rational>> TryFrom<RationalMatri
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.height() * m.width()`.
     ///
     /// # Examples
     /// See [here](super::unsigned_matrix_from_rational_matrix#try_from).
@@ -92,7 +92,7 @@ impl<T: PrimitiveUnsigned + for<'a> ConvertibleFrom<&'a Rational>> ConvertibleFr
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.height() * m.width()`.
     ///
     /// # Examples
     /// See [here](super::unsigned_matrix_from_rational_matrix#convertible_from).

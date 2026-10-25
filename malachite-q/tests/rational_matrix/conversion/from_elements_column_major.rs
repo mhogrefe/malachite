@@ -60,16 +60,20 @@ fn from_elements_column_major_properties() {
     rational_matrix_gen().test_properties(|m| {
         // The column-major elements of a matrix are the row-major elements of its transpose.
         let t = m.transpose();
-        let m_alt = RationalMatrix::from_elements_column_major(m.height(), m.width(), &t.elements);
+        let m_alt =
+            RationalMatrix::from_elements_column_major(m.height(), m.width(), t.elements_ref());
         assert!(m_alt.is_valid());
         assert_eq!(m_alt, m);
-        let m_alt =
-            RationalMatrix::from_owned_elements_column_major(m.height(), m.width(), t.elements);
+        let m_alt = RationalMatrix::from_owned_elements_column_major(
+            m.height(),
+            m.width(),
+            t.into_elements(),
+        );
         assert!(m_alt.is_valid());
         assert_eq!(m_alt, m);
 
         assert_eq!(
-            RationalMatrix::from_elements_column_major(m.width(), m.height(), &m.elements),
+            RationalMatrix::from_elements_column_major(m.width(), m.height(), m.elements_ref()),
             m.transpose()
         );
     });

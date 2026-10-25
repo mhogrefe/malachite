@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
+use malachite_base::matrix::Matrix;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 use malachite_base::unsigned_matrix::random::{
@@ -138,7 +139,7 @@ fn random_unsigned_matrices_from_elementary_operations_mod_fail_2() {
     let _ = random_unsigned_matrices_from_elementary_operations_mod(
         EXAMPLE_SEED,
         random_unsigned_matrices_with_rank_mod(EXAMPLE_SEED, 2, 2, 2, 7u8)
-            .skip_while(|a| a.elements.iter().all(|x| *x < 3)),
+            .skip_while(|a| a.elements_ref().iter().all(|x| *x < 3)),
         1,
         3u8,
     )

@@ -296,7 +296,7 @@ fn balanced_crt_properties() {
             let m = &m1 * Natural::from(m2);
             // Each element x satisfies -m / 2 < x <= m / 2.
             let m_integer = Integer::from(&m);
-            assert!(c.elements.iter().all(|x| {
+            assert!(c.elements_ref().iter().all(|x| {
                 let twice = x << 1u32;
                 twice > -&m_integer && twice <= m_integer
             }));

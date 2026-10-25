@@ -52,7 +52,9 @@ fn mod_power_of_2_is_reduced_properties() {
         // The defining property: every element is reduced.
         assert_eq!(
             reduced,
-            m.elements.iter().all(|x| x.mod_power_of_2_is_reduced(pow))
+            m.elements_ref()
+                .iter()
+                .all(|x| x.mod_power_of_2_is_reduced(pow))
         );
         // A matrix is reduced exactly when reducing it changes nothing.
         assert_eq!(reduced, (&m).mod_power_of_2(pow) == m);
@@ -71,7 +73,7 @@ fn mod_power_of_2_is_reduced_properties() {
         assert!(m.mod_power_of_2_is_reduced(u64::WIDTH));
         // The bit length of the largest element decides it.
         let bits = m
-            .elements
+            .elements_ref()
             .iter()
             .map(|x| x.significant_bits())
             .max()

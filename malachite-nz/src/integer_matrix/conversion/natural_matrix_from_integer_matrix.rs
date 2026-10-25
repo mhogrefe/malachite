@@ -32,7 +32,7 @@ impl TryFrom<IntegerMatrix> for NaturalMatrix {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.height() * m.width()`.
     ///
     /// # Examples
     /// See [here](super::natural_matrix_from_integer_matrix#try_from).
@@ -90,7 +90,7 @@ impl ConvertibleFrom<&IntegerMatrix> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.height() * m.width()`.
     ///
     /// # Examples
     /// See [here](super::natural_matrix_from_integer_matrix#convertible_from).

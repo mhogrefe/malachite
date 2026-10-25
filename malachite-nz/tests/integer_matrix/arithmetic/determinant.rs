@@ -178,10 +178,11 @@ fn test_determinant_large() {
         let det = verify_determinant(&a);
         assert_ne!(det, 0u32);
         // A singular matrix of the same dimension, whose last row is the first.
-        let mut b = a.clone();
-        let n = usize::try_from(n).unwrap();
-        let first: Vec<Integer> = b.elements[..n].to_vec();
-        b.elements[(n - 1) * n..].clone_from_slice(&first);
+        let n_u = usize::try_from(n).unwrap();
+        let mut xs = a.to_elements();
+        let first: Vec<Integer> = xs[..n_u].to_vec();
+        xs[(n_u - 1) * n_u..].clone_from_slice(&first);
+        let b = IntegerMatrix::from_owned_elements(n, n, xs);
         assert_eq!(verify_determinant(&b), 0u32);
         assert_eq!(determinant_divisor(&b), Natural::ZERO);
     }

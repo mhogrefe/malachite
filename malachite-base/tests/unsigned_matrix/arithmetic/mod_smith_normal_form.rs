@@ -60,10 +60,10 @@ fn mod_smith_normal_form_properties() {
         let w = usize::try_from(s.width()).unwrap();
         let diagonal: Vec<u64> = (0..d)
             .map(|i| {
-                if s.elements[i * (w + 1)] == 0 {
+                if s.elements_ref()[i * (w + 1)] == 0 {
                     m
                 } else {
-                    s.elements[i * (w + 1)]
+                    s.elements_ref()[i * (w + 1)]
                 }
             })
             .collect();

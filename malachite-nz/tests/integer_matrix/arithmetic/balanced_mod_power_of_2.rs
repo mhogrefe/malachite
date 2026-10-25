@@ -50,7 +50,7 @@ fn balanced_mod_power_of_2_properties() {
         assert_eq!((&a).balanced_mod(Integer::power_of_2(pow)), r);
         // The shape is unchanged, and element by element this is the scalar operation.
         assert_eq!((r.height(), r.width()), (a.height(), a.width()));
-        for (x, y) in a.elements.iter().zip(&r.elements) {
+        for (x, y) in a.elements_ref().iter().zip(r.elements_ref()) {
             assert_eq!(*y, x.balanced_mod_power_of_2(pow));
         }
         // Reducing again changes nothing.

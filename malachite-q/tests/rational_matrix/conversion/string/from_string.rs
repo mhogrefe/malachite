@@ -147,7 +147,7 @@ fn from_str_properties() {
         if let Ok(m) = RationalMatrix::from_str(&s) {
             assert!(m.is_valid());
             assert_eq!(RationalMatrix::from_str(&m.to_string()).unwrap(), m);
-            if m.elements.is_empty() {
+            if m.elements_ref().is_empty() {
                 assert!(s.starts_with("[]_{"));
             } else {
                 // Whatever parses with elements is a bracketed list of rows of `Rational` strings.
@@ -157,7 +157,7 @@ fn from_str_properties() {
                     .flat_map(|row| row.split(", "))
                     .map(|x| Rational::from_str(x).unwrap())
                     .collect();
-                assert_eq!(xs, m.elements);
+                assert_eq!(xs, m.elements_ref());
             }
         }
     });

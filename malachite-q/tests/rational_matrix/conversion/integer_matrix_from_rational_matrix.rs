@@ -55,7 +55,9 @@ fn integer_matrix_from_rational_matrix_properties() {
         // The conversion succeeds exactly when every element is an integer.
         assert_eq!(
             n.is_ok(),
-            m.elements.iter().all(|x| *x.denominator_ref() == 1u32)
+            m.elements_ref()
+                .iter()
+                .all(|x| *x.denominator_ref() == 1u32)
         );
         if let Ok(n) = n {
             assert!(n.is_valid());

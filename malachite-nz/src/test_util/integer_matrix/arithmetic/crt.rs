@@ -30,7 +30,7 @@ pub fn integer_matrix_balanced_crt_naive(
         a.width(),
         a.elements
             .iter()
-            .zip(&b.elements)
+            .zip(b.elements_ref())
             .map(|(x, &r)| x.balanced_crt(m1, Natural::from(r), &m2))
             .collect::<Option<_>>()?,
     ))

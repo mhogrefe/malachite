@@ -51,7 +51,7 @@ fn natural_matrix_from_integer_matrix_properties() {
         let n = NaturalMatrix::try_from(&m);
         assert_eq!(NaturalMatrix::try_from(m.clone()), n);
         // The conversion succeeds exactly when no element is negative.
-        assert_eq!(n.is_ok(), m.elements.iter().all(|x| *x >= 0u32));
+        assert_eq!(n.is_ok(), m.elements_ref().iter().all(|x| *x >= 0u32));
         if let Ok(n) = n {
             assert!(n.is_valid());
             assert_eq!((n.height(), n.width()), (m.height(), m.width()));

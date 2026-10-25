@@ -104,7 +104,7 @@ fn balanced_mod_properties() {
         // Element by element, this is the `Natural` operation: each result is congruent to its
         // element and lies in (-m/2, m/2].
         let m_i = Integer::from(&m);
-        for (x, r) in a.elements.iter().zip(&b.elements) {
+        for (x, r) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*r, x.balanced_mod(&m));
             assert!((r - Integer::from(x)).divisible_by(&m_i));
             // m >= 2|r|, and at equality the remainder is the positive one.
@@ -126,7 +126,7 @@ fn balanced_mod_properties() {
             IntegerMatrix::from_owned_elements(
                 a.height(),
                 a.width(),
-                vec![Integer::ZERO; a.elements.len()]
+                vec![Integer::ZERO; a.elements_ref().len()]
             )
         );
         // Modulo 2 every odd element becomes 1 and every even one 0, which is `%`.

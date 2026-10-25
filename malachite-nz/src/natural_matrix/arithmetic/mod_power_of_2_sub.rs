@@ -46,7 +46,8 @@ impl ModPowerOf2Sub<Self> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times `pow`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
+    /// `pow`.
     ///
     /// # Panics
     /// Panics if `self` and `other` have different shapes, or if any element of either is greater
@@ -90,7 +91,8 @@ impl ModPowerOf2Sub<&Self> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times `pow`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
+    /// `pow`.
     ///
     /// # Panics
     /// Panics if `self` and `other` have different shapes, or if any element of either is greater
@@ -134,7 +136,8 @@ impl ModPowerOf2Sub<NaturalMatrix> for &NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times `pow`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
+    /// `pow`.
     ///
     /// # Panics
     /// Panics if `self` and `other` have different shapes, or if any element of either is greater
@@ -180,7 +183,8 @@ impl ModPowerOf2Sub<&NaturalMatrix> for &NaturalMatrix {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times `pow`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
+    /// `pow`.
     ///
     /// # Panics
     /// Panics if `self` and `other` have different shapes, or if any element of either is greater
@@ -230,7 +234,8 @@ impl ModPowerOf2SubAssign<Self> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times `pow`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
+    /// `pow`.
     ///
     /// # Panics
     /// Panics if `self` and `other` have different shapes, or if any element of either is greater
@@ -274,7 +279,8 @@ impl ModPowerOf2SubAssign<&Self> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times `pow`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
+    /// `pow`.
     ///
     /// # Panics
     /// Panics if `self` and `other` have different shapes, or if any element of either is greater

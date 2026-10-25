@@ -295,11 +295,11 @@ fn mul_properties() {
         assert_eq!(natural_matrix_mul_naive(&a, &b), c);
         // Multiplying in place reuses the storage when the product is no wider than the first
         // factor, which includes every product by a square matrix.
-        if b.width() <= b.height() && !a.elements.is_empty() && !c.elements.is_empty() {
+        if b.width() <= b.height() && !a.elements_ref().is_empty() && !c.elements_ref().is_empty() {
             let mut d = a.clone();
-            let pointer = d.elements.as_ptr();
+            let pointer = d.elements_ref().as_ptr();
             d *= &b;
-            assert_eq!(d.elements.as_ptr(), pointer);
+            assert_eq!(d.elements_ref().as_ptr(), pointer);
         }
 
         // The transpose of a product is the product of the transposes in the other order.

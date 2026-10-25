@@ -136,7 +136,7 @@ fn balanced_mod_properties() {
         // Element by element, this is the `Integer` operation: each result is congruent to its
         // element and lies in (-|m|/2, |m|/2].
         let abs_m = (&m).unsigned_abs();
-        for (x, r) in a.elements.iter().zip(&b.elements) {
+        for (x, r) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*r, x.balanced_mod(&m));
             assert!((r - x).divisible_by(&m));
             // |m| >= 2|r|, and at equality the remainder is the positive one.
@@ -164,7 +164,7 @@ fn balanced_mod_properties() {
         let zero = IntegerMatrix::from_owned_elements(
             a.height(),
             a.width(),
-            vec![Integer::ZERO; a.elements.len()],
+            vec![Integer::ZERO; a.elements_ref().len()],
         );
         assert_eq!((&a).balanced_mod(Integer::ONE), zero);
         assert_eq!((&a).balanced_mod(Integer::NEGATIVE_ONE), zero);

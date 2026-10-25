@@ -65,14 +65,14 @@ fn content_and_primitive_part_properties() {
         // The content and primitive part are those of the elements as a vector, and the shape is
         // unchanged.
         let v = RationalVector {
-            elements: a.elements.clone(),
+            elements: a.to_elements(),
         };
         assert_eq!((&v).content(), content);
         assert_eq!(
             (primitive_part.height(), primitive_part.width()),
             (a.height(), a.width())
         );
-        assert_eq!(primitive_part.elements, v.primitive_part().elements);
+        assert_eq!(primitive_part.elements_ref(), v.primitive_part().elements);
         // They do not depend on the order of the elements.
         assert_eq!((&a.transpose()).content(), content);
         assert_eq!(a.transpose().primitive_part(), primitive_part.transpose());

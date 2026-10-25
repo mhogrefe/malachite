@@ -80,7 +80,7 @@ fn mod_power_of_2_neg_properties() {
         // The result is reduced, has the same shape, and is the elementwise negation.
         assert!(b.mod_power_of_2_is_reduced(pow));
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x.mod_power_of_2_neg(pow));
             assert_eq!(x.mod_power_of_2_add(y, pow), 0u32);
         }
@@ -90,9 +90,9 @@ fn mod_power_of_2_neg_properties() {
         // It is the negation over the integers, reduced.
         let negated = -IntegerMatrix::from(a.clone());
         assert_eq!(
-            b.elements,
+            b.elements_ref(),
             negated
-                .elements
+                .elements_ref()
                 .iter()
                 .map(|x| x.mod_power_of_2(pow))
                 .collect::<Vec<Natural>>()

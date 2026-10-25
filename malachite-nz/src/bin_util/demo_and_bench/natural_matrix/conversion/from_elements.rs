@@ -25,7 +25,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_natural_matrix_from_elements(gm: GenMode, config: &GenConfig, limit: usize) {
     for m in natural_matrix_gen().get(gm, config).take(limit) {
-        let xs = m.elements.clone();
+        let xs = m.to_elements();
         println!(
             "NaturalMatrix::from_elements({}, {}, {:?}) = {}",
             m.height(),
@@ -38,7 +38,7 @@ fn demo_natural_matrix_from_elements(gm: GenMode, config: &GenConfig, limit: usi
 
 fn demo_natural_matrix_from_owned_elements(gm: GenMode, config: &GenConfig, limit: usize) {
     for m in natural_matrix_gen().get(gm, config).take(limit) {
-        let xs = m.elements.clone();
+        let xs = m.to_elements();
         println!(
             "NaturalMatrix::from_owned_elements({}, {}, {:?}) = {}",
             m.height(),
@@ -70,7 +70,7 @@ fn benchmark_natural_matrix_from_elements_evaluation_strategy(
                     no_out!(NaturalMatrix::from_elements(
                         m.height(),
                         m.width(),
-                        &m.elements
+                        &m.elements_ref()
                     ));
                 },
             ),
@@ -79,7 +79,9 @@ fn benchmark_natural_matrix_from_elements_evaluation_strategy(
                 &mut |m| {
                     let (height, width) = (m.height(), m.width());
                     no_out!(NaturalMatrix::from_owned_elements(
-                        height, width, m.elements
+                        height,
+                        width,
+                        m.into_elements()
                     ));
                 },
             ),

@@ -53,7 +53,11 @@ fn partial_eq_integer_matrix_properties() {
         assert_eq!(&m == &RationalMatrix::from(n.clone()), eq);
         if eq {
             assert_eq!((m.height(), m.width()), (n.height(), n.width()));
-            assert!(m.elements.iter().all(|x| *x.denominator_ref() == 1u32));
+            assert!(
+                m.elements_ref()
+                    .iter()
+                    .all(|x| *x.denominator_ref() == 1u32)
+            );
         }
 
         let n_m = RationalMatrix::from(n.clone());

@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{ModMul, ModMulAssign};
 use malachite_base::test_util::bench::bucketers::triple_1_unsigned_matrix_size_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
@@ -71,7 +72,7 @@ fn benchmark_unsigned_matrix_mod_mul_algorithms(
             }),
             ("element by element, no precomputation", &mut |(a, c, m)| {
                 no_out!(
-                    a.elements
+                    a.into_elements()
                         .into_iter()
                         .map(|x| x.mod_mul(c, m))
                         .collect::<Vec<u64>>()

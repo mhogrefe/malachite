@@ -15,6 +15,7 @@ use crate::integer_matrix::IntegerMatrix;
 use crate::natural::Natural;
 use alloc::vec;
 use alloc::vec::Vec;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
     AddMulAssign, DivExactAssign, ElementaryDivisors, HermiteNormalForm, Mod, ModLeftNullspace,
     ModRank, Pow, SmithNormalForm,
@@ -46,7 +47,7 @@ fn elementary_divisors_p(ed: &mut [Natural], mut r: IntegerMatrix, p: u64) {
         // Row j of n is a vector v with vR ≡ 0 (mod p), with a 1 in a column where the other rows
         // have 0, so that each row of n is assigned a distinct row of R.
         let n = rp.mod_left_nullspace(p);
-        let n = &n.elements;
+        let n = n.elements_ref();
         let mut assigned_rows = Vec::with_capacity(nullity);
         for j in 0..nullity {
             let row = (0..h)

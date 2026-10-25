@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::SmithNormalForm;
 use malachite_base::num::basic::traits::One;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
@@ -43,8 +44,8 @@ fn demo_integer_matrix_is_in_smith_normal_form_of_form(
             "is_in_smith_normal_form({s}) = {}",
             s.is_in_smith_normal_form()
         );
-        if let Some(x) = s.elements.first_mut() {
-            *x += Integer::ONE;
+        if !s.is_empty() {
+            s[(0, 0)] += Integer::ONE;
             println!(
                 "is_in_smith_normal_form({s}) = {}",
                 s.is_in_smith_normal_form()

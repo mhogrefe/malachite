@@ -98,7 +98,7 @@ fn benchmark_natural_matrix_mod_shl_algorithms<T: PrimitiveUnsigned>(
                 no_out!(NaturalMatrix::from_owned_elements(
                     height,
                     width,
-                    a.elements
+                    a.into_elements()
                         .into_iter()
                         .map(|x| x.mod_shl(bits, &m))
                         .collect::<Vec<_>>()

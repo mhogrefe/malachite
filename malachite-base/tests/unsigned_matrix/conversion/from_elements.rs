@@ -58,10 +58,10 @@ fn from_owned_elements_fail() {
 #[test]
 fn from_elements_properties() {
     unsigned_matrix_gen().test_properties(|m| {
-        let m_alt = UnsignedMatrix::from_elements(m.height(), m.width(), &m.elements);
+        let m_alt = UnsignedMatrix::from_elements(m.height(), m.width(), m.elements_ref());
         assert!(m_alt.is_valid());
         assert_eq!(m_alt, m);
-        let m_alt = UnsignedMatrix::from_owned_elements(m.height(), m.width(), m.elements.clone());
+        let m_alt = UnsignedMatrix::from_owned_elements(m.height(), m.width(), m.to_elements());
         assert!(m_alt.is_valid());
         assert_eq!(m_alt, m);
     });

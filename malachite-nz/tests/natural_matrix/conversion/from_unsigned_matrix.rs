@@ -46,8 +46,8 @@ fn from_unsigned_matrix_properties() {
         assert_eq!((n.height(), n.width()), (m.height(), m.width()));
         assert_eq!(n.to_string(), m.to_string());
         assert_eq!(
-            n.elements,
-            m.elements
+            n.elements_ref(),
+            m.elements_ref()
                 .iter()
                 .map(|&x| Natural::from(x))
                 .collect::<Vec<_>>()

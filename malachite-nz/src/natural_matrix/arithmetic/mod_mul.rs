@@ -92,8 +92,8 @@ impl ModMul<Natural, Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -135,8 +135,8 @@ impl ModMul<Natural, &Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -178,8 +178,8 @@ impl ModMul<&Natural, Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -221,8 +221,8 @@ impl ModMul<&Natural, &Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -264,8 +264,8 @@ impl ModMul<Natural, Natural> for &NaturalMatrix {
     ///
     /// $M(n, m) = O(nm)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -305,8 +305,8 @@ impl ModMul<Natural, &Natural> for &NaturalMatrix {
     ///
     /// $M(n, m) = O(nm)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -346,8 +346,8 @@ impl ModMul<&Natural, Natural> for &NaturalMatrix {
     ///
     /// $M(n, m) = O(nm)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -387,8 +387,8 @@ impl ModMul<&Natural, &Natural> for &NaturalMatrix {
     ///
     /// $M(n, m) = O(nm)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -426,8 +426,8 @@ impl ModMulAssign<Natural, Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -462,8 +462,8 @@ impl ModMulAssign<Natural, &Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -498,8 +498,8 @@ impl ModMulAssign<&Natural, Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.
@@ -534,8 +534,8 @@ impl ModMulAssign<&Natural, &Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is
-    /// `m.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `m.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, or if any element of `self`, or `c`, is greater than or equal to `m`.

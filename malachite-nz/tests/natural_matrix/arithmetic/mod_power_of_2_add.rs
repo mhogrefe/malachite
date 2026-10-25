@@ -129,7 +129,12 @@ fn mod_power_of_2_add_properties() {
         // The result is reduced, has the same shape, and is the elementwise modular sum.
         assert!(r.mod_power_of_2_is_reduced(pow));
         assert_eq!((r.height(), r.width()), (a.height(), a.width()));
-        for ((x, y), z) in a.elements.iter().zip(&b.elements).zip(&r.elements) {
+        for ((x, y), z) in a
+            .elements_ref()
+            .iter()
+            .zip(b.elements_ref())
+            .zip(r.elements_ref())
+        {
             assert_eq!(*z, x.mod_power_of_2_add(y, pow));
         }
         // It is the ordinary sum, reduced.

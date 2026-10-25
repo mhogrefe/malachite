@@ -130,7 +130,7 @@ fn column_iter_properties() {
         assert!(
             (0..m.width())
                 .flat_map(|j| m.column_iter(j))
-                .eq(m.transpose().elements.iter())
+                .eq(m.transpose().elements_ref().iter())
         );
     });
 }

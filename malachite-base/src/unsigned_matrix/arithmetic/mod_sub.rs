@@ -62,7 +62,7 @@ impl<T: PrimitiveUnsigned> ModSub<Self, T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, if `self` and `other` have different shapes, or if any element of
@@ -105,7 +105,7 @@ impl<T: PrimitiveUnsigned> ModSub<&Self, T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, if `self` and `other` have different shapes, or if any element of
@@ -148,7 +148,7 @@ impl<T: PrimitiveUnsigned> ModSub<UnsignedMatrix<T>, T> for &UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, if `self` and `other` have different shapes, or if any element of
@@ -191,7 +191,7 @@ impl<T: PrimitiveUnsigned> ModSub<&UnsignedMatrix<T>, T> for &UnsignedMatrix<T> 
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, if `self` and `other` have different shapes, or if any element of
@@ -234,7 +234,7 @@ impl<T: PrimitiveUnsigned> ModSubAssign<Self, T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, if `self` and `other` have different shapes, or if any element of
@@ -276,7 +276,7 @@ impl<T: PrimitiveUnsigned> ModSubAssign<&Self, T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero, if `self` and `other` have different shapes, or if any element of

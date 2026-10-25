@@ -58,7 +58,7 @@ fn matrix_mod_pow(xs: &[Natural], n: usize, exp: u64, m: &Natural) -> Vec<Natura
             xs.iter().map(Limb::wrapping_from).collect(),
         )
         .mod_pow(exp, small_m)
-        .elements
+        .into_elements()
         .into_iter()
         .map(Natural::from)
         .collect();

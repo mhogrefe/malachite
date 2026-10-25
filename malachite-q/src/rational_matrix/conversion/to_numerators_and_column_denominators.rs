@@ -48,7 +48,7 @@ impl RationalMatrix {
     /// $M(n, m) = O(mn)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits of the
-    /// elements' numerators and denominators, and $m$ is `self.elements.len()`.
+    /// elements' numerators and denominators, and $m$ is `self.height() * self.width()`.
     ///
     /// # Examples
     /// ```
@@ -101,7 +101,7 @@ impl RationalMatrix {
     /// $M(n, m) = O(mn)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits of the
-    /// elements' numerators and denominators, and $m$ is `self.elements.len()`.
+    /// elements' numerators and denominators, and $m$ is `self.height() * self.width()`.
     ///
     /// # Examples
     /// ```

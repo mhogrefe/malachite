@@ -19,7 +19,7 @@ use malachite_base::vector::Vector;
 pub(crate) fn residue_vectors(residues: &[UnsignedMatrix<Limb>]) -> Vec<UnsignedVector<Limb>> {
     residues
         .iter()
-        .map(|rs| UnsignedVector::from_elements(&rs.elements))
+        .map(|rs| UnsignedVector::from_elements(rs.elements_ref()))
         .collect()
 }
 

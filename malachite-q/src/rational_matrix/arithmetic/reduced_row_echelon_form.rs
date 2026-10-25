@@ -12,6 +12,7 @@
 
 use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
     ReducedRowEchelonForm, ReducedRowEchelonFormAssign, SubMulAssign,
 };
@@ -104,11 +105,11 @@ rref_fraction_free(a: &mut RationalMatrix) -> usize {
     let numerators = a.to_numerators_and_row_denominators().0;
     let (r, den) = numerators.reduced_row_echelon_form();
     let rank = r
-        .elements
+        .elements_ref()
         .chunks_exact(n)
         .take_while(|row| row.iter().any(|x| *x != 0u32))
         .count();
-    for (x, y) in a.elements.iter_mut().zip(r.elements) {
+    for (x, y) in a.elements.iter_mut().zip(r.elements_ref()) {
         *x = if rank == 0 {
             Rational::ZERO
         } else {

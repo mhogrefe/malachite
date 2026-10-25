@@ -27,7 +27,7 @@ fn nonzero_hnf_rows(m: IntegerMatrix) -> Vec<Vec<Integer>> {
         return Vec::new();
     }
     m.hermite_normal_form()
-        .elements
+        .elements_ref()
         .chunks_exact(w)
         .filter(|row| row.iter().any(|x| *x != 0u32))
         .map(<[Integer]>::to_vec)
@@ -42,7 +42,7 @@ fn solvable(a: &NaturalMatrix, b: &[Natural], pow: u64) -> bool {
     // The rows of the transpose of [A | 2^pow·I], and with b appended.
     let mut rows = Vec::with_capacity((w + h + 1) * h);
     for j in 0..w {
-        rows.extend((0..h).map(|i| Integer::from(&a.elements[i * w + j])));
+        rows.extend((0..h).map(|i| Integer::from(&a.elements_ref()[i * w + j])));
     }
     let m = Integer::from(Natural::power_of_2(pow));
     for j in 0..h {
@@ -62,7 +62,7 @@ fn verify(a: &NaturalMatrix, b: &NaturalVector, pow: u64) {
     let bm = NaturalMatrix::from_owned_elements(a.height(), 1, b.elements.clone());
     let xm = a.mod_power_of_2_solve(&bm, pow);
     assert_eq!(
-        xm.as_ref().map(|x| x.elements.clone()),
+        xm.as_ref().map(|x| x.to_elements()),
         x.as_ref().map(|x| x.elements.clone())
     );
     if let Some(xm) = xm {
@@ -87,7 +87,7 @@ fn mod_power_of_2_solve_properties() {
         verify(
             &a,
             &NaturalVector {
-                elements: b.elements,
+                elements: b.into_elements(),
             },
             pow,
         );

@@ -22,11 +22,10 @@ use malachite_nz::test_util::generators::natural_matrix_unsigned_pair_gen_var_4;
 // diagonal element d becomes gcd(d, 2^pow) modulo 2^pow.
 fn snf_from_integer_snf(a: &NaturalMatrix, pow: u64) -> NaturalMatrix {
     let mut s = NaturalMatrix::try_from(IntegerMatrix::from(a).smith_normal_form()).unwrap();
-    let w = usize::try_from(s.width()).unwrap();
     let d = usize::try_from(s.height().min(s.width())).unwrap();
     let m = Natural::power_of_2(pow);
     for i in 0..d {
-        let x = &mut s.elements[i * (w + 1)];
+        let x = &mut s[(i, i)];
         *x = (&*x).gcd(&m).mod_power_of_2(pow);
     }
     s

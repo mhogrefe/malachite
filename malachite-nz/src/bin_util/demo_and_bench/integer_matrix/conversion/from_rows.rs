@@ -31,7 +31,7 @@ fn rows_of(m: &IntegerMatrix) -> Vec<IntegerVector> {
     (0..m.height())
         .map(|i| {
             IntegerVector::from_elements(
-                &m.elements
+                &m.elements_ref()
                     [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())],
             )
         })
@@ -78,7 +78,7 @@ fn benchmark_integer_matrix_from_rows_evaluation_strategy(
         &Bucketer {
             bucketing_function: &|(_, m)| {
                 usize::exact_from(
-                    m.elements
+                    m.elements_ref()
                         .iter()
                         .map(SignificantBits::significant_bits)
                         .sum::<u64>(),

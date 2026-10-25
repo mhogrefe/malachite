@@ -44,7 +44,8 @@ impl ModPowerOf2Mul<Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is `pow`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `pow`.
     ///
     /// # Panics
     /// Panics if any element of `self`, or `c`, is greater than or equal to $2^k$.
@@ -84,7 +85,8 @@ impl ModPowerOf2Mul<&Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is `pow`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `pow`.
     ///
     /// # Panics
     /// Panics if any element of `self`, or `c`, is greater than or equal to $2^k$.
@@ -124,7 +126,8 @@ impl ModPowerOf2Mul<Natural> for &NaturalMatrix {
     ///
     /// $M(n, m) = O(m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is `pow`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `pow`.
     ///
     /// # Panics
     /// Panics if any element of `self`, or `c`, is greater than or equal to $2^k$.
@@ -163,7 +166,8 @@ impl ModPowerOf2Mul<&Natural> for &NaturalMatrix {
     ///
     /// $M(n, m) = O(nm)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is `pow`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `pow`.
     ///
     /// # Panics
     /// Panics if any element of `self`, or `c`, is greater than or equal to $2^k$.
@@ -212,7 +216,8 @@ impl ModPowerOf2MulAssign<Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is `pow`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `pow`.
     ///
     /// # Panics
     /// Panics if any element of `self`, or `c`, is greater than or equal to $2^k$.
@@ -247,7 +252,8 @@ impl ModPowerOf2MulAssign<&Natural> for NaturalMatrix {
     ///
     /// $M(n, m) = O(m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $m$ is `pow`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`, and $m$
+    /// is `pow`.
     ///
     /// # Panics
     /// Panics if any element of `self`, or `c`, is greater than or equal to $2^k$.

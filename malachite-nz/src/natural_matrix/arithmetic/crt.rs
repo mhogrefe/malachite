@@ -37,7 +37,7 @@ pub(crate) fn check_crt_matrix_args(
         r2.width()
     );
     assert!(*m1 != 0u32 && m2 != 0, "the moduli must be positive");
-    for &r in &r2.elements {
+    for &r in r2.elements_ref() {
         assert!(r < m2, "r2 must be reduced mod m2, but {r} >= {m2}");
     }
 }
@@ -82,7 +82,7 @@ fn crt_elements(
     let inverse = crt_limb_inverse(m1, m2)?;
     let m2_natural = Natural::from(m2);
     Some(
-        xs.zip(&r2.elements)
+        xs.zip(r2.elements_ref())
             .map(|(x, &r)| crt_limb_element(x, m1, r, m2, &m2_natural, inverse))
             .collect(),
     )

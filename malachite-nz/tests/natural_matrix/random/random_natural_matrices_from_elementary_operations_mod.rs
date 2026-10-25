@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use itertools::Itertools;
+use malachite_base::matrix::Matrix;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
@@ -174,7 +175,7 @@ fn random_natural_matrices_from_elementary_operations_mod_fail_2() {
             2,
             Natural::from_str("7").unwrap(),
         )
-        .skip_while(|a| a.elements.iter().all(|x| *x < 3u32)),
+        .skip_while(|a| a.elements_ref().iter().all(|x| *x < 3u32)),
         1,
         Natural::from_str("3").unwrap(),
     )

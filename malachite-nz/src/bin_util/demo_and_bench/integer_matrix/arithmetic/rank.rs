@@ -29,12 +29,12 @@ pub(crate) fn register(runner: &mut Runner) {
 
 // Whether every element of `a` has at most 30 bits, as `rank_small` requires.
 fn small(a: &IntegerMatrix) -> bool {
-    a.elements.iter().all(|x| x.significant_bits() <= 30)
+    a.elements_ref().iter().all(|x| x.significant_bits() <= 30)
 }
 
 fn rank_small_of(a: &IntegerMatrix) -> usize {
     rank_small(
-        a.elements.iter().map(i64::exact_from).collect(),
+        a.elements_ref().iter().map(i64::exact_from).collect(),
         usize::exact_from(a.height()),
         usize::exact_from(a.width()),
     )

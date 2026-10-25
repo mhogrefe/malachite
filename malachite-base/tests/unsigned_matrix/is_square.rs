@@ -35,7 +35,10 @@ fn is_square_properties() {
         assert_eq!(m.transpose().is_square(), square);
         // A square matrix's element count is a perfect square.
         if square {
-            assert_eq!(u64::exact_from(m.elements.len()), m.height() * m.height());
+            assert_eq!(
+                u64::exact_from(m.elements_ref().len()),
+                m.height() * m.height()
+            );
         }
     });
 

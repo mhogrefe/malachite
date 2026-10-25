@@ -133,7 +133,7 @@ fn exhaustive_rational_matrices_properties() {
         .collect_vec();
     assert!(ms.iter().all(|m| {
         m.is_valid()
-            && m.elements
+            && m.elements_ref()
                 .iter()
                 .all(|x| *x == 0u32 || *x == Rational::ONE_HALF)
     }));
@@ -215,7 +215,7 @@ fn exhaustive_rational_square_matrices_properties() {
     assert!(ms.iter().all(|m| {
         m.is_valid()
             && m.is_square()
-            && m.elements
+            && m.elements_ref()
                 .iter()
                 .all(|x| *x == 0u32 || *x == Rational::ONE_HALF)
     }));

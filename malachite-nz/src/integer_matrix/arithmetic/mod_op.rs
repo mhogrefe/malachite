@@ -264,7 +264,7 @@ where
     /// $M(n) = O(m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits in the matrix's
-    /// elements, and $m$ is `self.elements.len()`.
+    /// elements, and $m$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero.
@@ -316,7 +316,7 @@ where
     /// $M(n) = O(m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is the total number of bits in the matrix's
-    /// elements, and $m$ is `self.elements.len()`.
+    /// elements, and $m$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is zero.

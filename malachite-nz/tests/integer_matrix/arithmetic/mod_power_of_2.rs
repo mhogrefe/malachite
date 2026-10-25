@@ -83,7 +83,7 @@ fn mod_power_of_2_properties() {
         assert!(b.mod_power_of_2_is_reduced(pow));
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
         // Element by element, this is the `Integer` operation.
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x.mod_power_of_2(pow));
         }
         // It is `mod_op` with a power-of-2 modulus.
@@ -103,7 +103,7 @@ fn mod_power_of_2_properties() {
             NaturalMatrix::from_owned_elements(
                 a.height(),
                 a.width(),
-                vec![Natural::ZERO; a.elements.len()]
+                vec![Natural::ZERO; a.elements_ref().len()]
             )
         );
         for pow in [64, 100] {
@@ -125,7 +125,7 @@ fn rem_power_of_2_properties() {
         assert_eq!(x, b);
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
         // Element by element, this is the `Integer` operation.
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x.rem_power_of_2(pow));
         }
         // It is `%` with a power-of-2 modulus, and it commutes with negation.

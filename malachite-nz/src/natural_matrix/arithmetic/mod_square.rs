@@ -48,7 +48,7 @@ fn square_elements(a: &NaturalMatrix, m: &Natural) -> Vec<Natural> {
             a.elements.iter().map(Limb::wrapping_from).collect(),
         )
         .mod_square(small_m)
-        .elements
+        .into_elements()
         .into_iter()
         .map(Natural::from)
         .collect()

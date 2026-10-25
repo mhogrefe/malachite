@@ -132,7 +132,12 @@ fn add_properties() {
         // The sum is taken element by element, and addition is commutative.
         assert!(sum.is_valid());
         assert_eq!((sum.height(), sum.width()), (a.height(), a.width()));
-        for ((x, y), z) in a.elements.iter().zip(&b.elements).zip(&sum.elements) {
+        for ((x, y), z) in a
+            .elements_ref()
+            .iter()
+            .zip(b.elements_ref())
+            .zip(sum.elements_ref())
+        {
             assert_eq!(x + y, *z);
         }
         assert_eq!(&b + &a, sum);

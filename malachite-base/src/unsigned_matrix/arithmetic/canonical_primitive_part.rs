@@ -26,7 +26,7 @@ impl<T: PrimitiveUnsigned> CanonicalPrimitivePart for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Examples
     /// ```
@@ -57,7 +57,7 @@ impl<T: PrimitiveUnsigned> CanonicalPrimitivePart for &UnsignedMatrix<T> {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Examples
     /// ```
@@ -85,7 +85,7 @@ impl<T: PrimitiveUnsigned> CanonicalPrimitivePartAssign for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Examples
     /// ```
@@ -118,7 +118,7 @@ impl<T: PrimitiveUnsigned> ContentAndCanonicalPrimitivePart for UnsignedMatrix<T
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Examples
     /// ```
@@ -152,7 +152,7 @@ impl<T: PrimitiveUnsigned> ContentAndCanonicalPrimitivePart for &UnsignedMatrix<
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Examples
     /// ```

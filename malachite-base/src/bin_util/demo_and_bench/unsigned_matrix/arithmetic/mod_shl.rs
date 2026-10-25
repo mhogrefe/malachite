@@ -105,7 +105,7 @@ fn benchmark_unsigned_matrix_mod_shl_algorithms<
                 no_out!(UnsignedMatrix::from_owned_elements(
                     height,
                     width,
-                    a.elements
+                    a.into_elements()
                         .into_iter()
                         .map(|x| x.mod_shl(bits, m))
                         .collect::<Vec<T>>()

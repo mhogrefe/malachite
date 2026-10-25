@@ -55,7 +55,7 @@ fn partial_eq_natural_matrix_properties() {
         if eq {
             assert_eq!((m.height(), m.width()), (n.height(), n.width()));
             assert!(
-                m.elements
+                m.elements_ref()
                     .iter()
                     .all(|x| *x >= 0u32 && *x.denominator_ref() == 1u32)
             );

@@ -74,9 +74,12 @@ fn canonical_primitive_part_properties() {
         // It is the canonical primitive part of the elements as a vector, since a vector's first
         // nonzero element is the matrix's first in row-major order.
         let v = NaturalVector {
-            elements: a.elements.clone(),
+            elements: a.to_elements(),
         };
-        assert_eq!(canonical.elements, v.canonical_primitive_part().elements);
+        assert_eq!(
+            canonical.elements_ref(),
+            v.canonical_primitive_part().elements
+        );
         assert_eq!(
             (canonical.height(), canonical.width()),
             (a.height(), a.width())

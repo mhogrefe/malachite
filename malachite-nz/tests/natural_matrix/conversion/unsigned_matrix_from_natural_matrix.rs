@@ -69,7 +69,10 @@ where
         let n = UnsignedMatrix::<T>::try_from(&m);
         assert_eq!(UnsignedMatrix::<T>::try_from(m.clone()), n);
         // The conversion succeeds exactly when every element fits.
-        assert_eq!(n.is_ok(), m.elements.iter().all(|x| T::convertible_from(x)));
+        assert_eq!(
+            n.is_ok(),
+            m.elements_ref().iter().all(|x| T::convertible_from(x))
+        );
         if let Ok(n) = n {
             assert!(n.is_valid());
             assert_eq!((n.height(), n.width()), (m.height(), m.width()));

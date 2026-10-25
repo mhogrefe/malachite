@@ -30,7 +30,10 @@ fn test_height_and_width() {
 #[test]
 fn dimensions_properties() {
     natural_matrix_gen().test_properties(|m| {
-        assert_eq!(m.height() * m.width(), u64::exact_from(m.elements.len()));
+        assert_eq!(
+            m.height() * m.width(),
+            u64::exact_from(m.elements_ref().len())
+        );
         let t = m.transpose();
         assert_eq!(t.height(), m.width());
         assert_eq!(t.width(), m.height());

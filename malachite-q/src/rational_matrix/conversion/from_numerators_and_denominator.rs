@@ -54,7 +54,7 @@ impl RationalMatrix {
             numerators.height(),
             numerators.width(),
             numerators
-                .elements
+                .elements_ref()
                 .iter()
                 .map(|n| {
                     Rational::from_sign_and_naturals_ref(

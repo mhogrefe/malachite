@@ -82,8 +82,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             ///
             /// $M(n, k) = O(k)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $k$
-            /// is `pow`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`,
+            /// and $k$ is `pow`.
             ///
             /// # Panics
             /// Panics if any element of `self` is greater than or equal to $2^k$.
@@ -111,8 +111,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             ///
             /// $M(n, k) = O(nk)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $k$
-            /// is `pow`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`,
+            /// and $k$ is `pow`.
             ///
             /// # Panics
             /// Panics if any element of `self` is greater than or equal to $2^k$.
@@ -137,8 +137,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             ///
             /// $M(n, k) = O(k)$
             ///
-            /// where $T$ is time, $M$ is additional memory, $n$ is `self.elements.len()`, and $k$
-            /// is `pow`.
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.height() * self.width()`,
+            /// and $k$ is `pow`.
             ///
             /// # Panics
             /// Panics if any element of `self` is greater than or equal to $2^k$.

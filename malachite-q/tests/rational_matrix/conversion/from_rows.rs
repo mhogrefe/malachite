@@ -24,7 +24,7 @@ fn rows_of(m: &RationalMatrix) -> Vec<RationalVector> {
     (0..m.height())
         .map(|i| {
             RationalVector::from_elements(
-                &m.elements
+                &m.elements_ref()
                     [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())],
             )
         })

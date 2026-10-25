@@ -45,7 +45,8 @@ impl ModPowerOf2Neg for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times `pow`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
+    /// `pow`.
     ///
     /// # Panics
     /// Panics if any element of `self` is greater than or equal to $2^k$.
@@ -91,7 +92,8 @@ impl ModPowerOf2Neg for &NaturalMatrix {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times `pow`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
+    /// `pow`.
     ///
     /// # Panics
     /// Panics if any element of `self` is greater than or equal to $2^k$.
@@ -128,7 +130,8 @@ impl ModPowerOf2NegAssign for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times `pow`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
+    /// `pow`.
     ///
     /// # Panics
     /// Panics if any element of `self` is greater than or equal to $2^k$.

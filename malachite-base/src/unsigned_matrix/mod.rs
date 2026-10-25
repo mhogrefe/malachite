@@ -21,13 +21,15 @@ use core::ops::{Deref, Range};
 
 /// A matrix whose elements are primitive unsigned integers.
 ///
-/// The elements are stored in one [`Vec`], `elements`, in row-major order: the element in row $i$
-/// and column $j$, both counted from 0, is at index $iw + j$, where $w$ is the width. This is the
-/// layout of FLINT's matrices, without the stride FLINT uses for windows into other matrices.
+/// The elements are stored in one [`Vec`] in row-major order: the element in row $i$ and column
+/// $j$, both counted from 0, is at index $iw + j$, where $w$ is the width. This is the layout of
+/// FLINT's matrices, without the stride FLINT uses for windows into other matrices.
 ///
-/// `elements` is public, but its length must stay equal to the height times the width; a matrix
-/// whose `elements` has been resized is invalid, and functions on it may panic or return wrong
-/// results. The dimensions are private, so that they can only change together with the elements.
+/// The elements and dimensions are private, so that the number of elements is always the height
+/// times the width. Elements are read and written with [`Index`](core::ops::Index),
+/// [`IndexMut`](core::ops::IndexMut), `get`, and `get_mut`, and a matrix's elements in row-major
+/// order are available with [`Matrix::elements_ref`](crate::matrix::Matrix::elements_ref) and
+/// [`Matrix::into_elements`](crate::matrix::Matrix::into_elements).
 #[derive(Clone, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(
@@ -35,7 +37,7 @@ use core::ops::{Deref, Range};
     serde(try_from = "SerdeUnsignedMatrix<T>", into = "SerdeUnsignedMatrix<T>")
 )]
 pub struct UnsignedMatrix<T: PrimitiveUnsigned> {
-    pub elements: Vec<T>,
+    pub(crate) elements: Vec<T>,
     height: usize,
     width: usize,
 }

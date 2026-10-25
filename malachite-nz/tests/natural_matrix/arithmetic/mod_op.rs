@@ -212,7 +212,7 @@ fn rem_properties() {
 
         // This really is the remainder of a division: with the elementwise quotient, `a` is
         // recovered exactly, element by element.
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*x, &m * (x / &m) + y);
             assert_eq!(*y, x % &m);
         }
@@ -220,9 +220,14 @@ fn rem_properties() {
 
     natural_matrix_gen().test_properties(|a| {
         // Modulo 1 every element vanishes, but the shape is unchanged.
-        assert!((&a % Natural::ONE).elements.iter().all(|x| *x == 0u32));
+        assert!(
+            (&a % Natural::ONE)
+                .elements_ref()
+                .iter()
+                .all(|x| *x == 0u32)
+        );
         // A divisor above the largest element leaves the matrix alone.
-        let above = a.elements.iter().max().cloned().unwrap_or_default() + Natural::ONE;
+        let above = a.elements_ref().iter().max().cloned().unwrap_or_default() + Natural::ONE;
         assert_eq!(&a % &above, a);
         // For a power-of-2 divisor this is `mod_power_of_2`, which reaches the same answer by
         // masking rather than dividing.

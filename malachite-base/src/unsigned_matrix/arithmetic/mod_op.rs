@@ -35,7 +35,7 @@ impl<T: PrimitiveUnsigned> Rem<T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is 0.
@@ -73,7 +73,7 @@ impl<T: PrimitiveUnsigned> Rem<T> for &UnsignedMatrix<T> {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is 0.
@@ -114,7 +114,7 @@ impl<T: PrimitiveUnsigned> RemAssign<T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is 0.
@@ -155,7 +155,7 @@ impl<T: PrimitiveUnsigned> Mod<T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is 0.
@@ -190,7 +190,7 @@ impl<T: PrimitiveUnsigned> Mod<T> for &UnsignedMatrix<T> {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is 0.
@@ -223,7 +223,7 @@ impl<T: PrimitiveUnsigned> ModAssign<T> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `m` is 0.

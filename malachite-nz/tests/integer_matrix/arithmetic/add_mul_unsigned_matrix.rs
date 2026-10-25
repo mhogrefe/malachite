@@ -54,15 +54,20 @@ fn add_mul_unsigned_matrix_assign_properties() {
         let a = UnsignedMatrix::<u64>::from_owned_elements(
             x.height(),
             x.width(),
-            x.elements
+            x.elements_ref()
                 .iter()
                 .map(|y| u64::wrapping_from(y.unsigned_abs_ref()))
                 .collect(),
         );
-        let c = x.elements.first().cloned().unwrap_or_default();
+        let c = x.elements_ref().first().cloned().unwrap_or_default();
         let mut result = b.clone();
         add_mul_unsigned_matrix_assign(&mut result, &a, &c);
-        for ((r, y), z) in result.elements.iter().zip(&b.elements).zip(&a.elements) {
+        for ((r, y), z) in result
+            .elements_ref()
+            .iter()
+            .zip(b.elements_ref())
+            .zip(a.elements_ref())
+        {
             assert_eq!(*r, y + &c * Integer::from(*z));
         }
     });

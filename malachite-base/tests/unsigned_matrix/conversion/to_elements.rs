@@ -32,7 +32,7 @@ fn test_to_elements() {
 fn to_elements_properties() {
     unsigned_matrix_gen().test_properties(|m| {
         let xs = m.to_elements();
-        assert_eq!(xs, m.elements);
+        assert_eq!(xs, m.elements_ref());
         assert_eq!(m.elements_ref(), xs.as_slice());
         assert_eq!(u64::exact_from(xs.len()), m.height() * m.width());
         assert_eq!(m.clone().into_elements(), xs);

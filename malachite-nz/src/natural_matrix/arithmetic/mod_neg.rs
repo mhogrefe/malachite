@@ -52,7 +52,7 @@ impl ModNeg<Natural> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
     /// `m.significant_bits()`.
     ///
     /// # Panics
@@ -95,7 +95,7 @@ impl ModNeg<&Natural> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
     /// `m.significant_bits()`.
     ///
     /// # Panics
@@ -138,7 +138,7 @@ impl ModNeg<Natural> for &NaturalMatrix {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
     /// `m.significant_bits()`.
     ///
     /// # Panics
@@ -183,7 +183,7 @@ impl ModNeg<&Natural> for &NaturalMatrix {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
     /// `m.significant_bits()`.
     ///
     /// # Panics
@@ -221,7 +221,7 @@ impl ModNegAssign<Natural> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
     /// `m.significant_bits()`.
     ///
     /// # Panics
@@ -255,7 +255,7 @@ impl ModNegAssign<&Natural> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()` times
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()` times
     /// `m.significant_bits()`.
     ///
     /// # Panics

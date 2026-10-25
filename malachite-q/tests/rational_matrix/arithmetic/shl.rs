@@ -97,7 +97,7 @@ where
 
         // Element by element, this is the scalar shift, and the shape is unchanged.
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x << bits);
         }
         // It is multiplication by a power of 2, and shifting by the same amount of another type
@@ -148,7 +148,7 @@ where
 
         // Element by element, this is the scalar shift, and the shape is unchanged.
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x << bits);
         }
         // It is multiplication by a power of 2, and shifting by the same amount of another type

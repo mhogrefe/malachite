@@ -48,7 +48,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Add<Self> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `pow` is greater than `T::WIDTH`, if `self` and `other` have different shapes, or
@@ -92,7 +92,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Add<&Self> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `pow` is greater than `T::WIDTH`, if `self` and `other` have different shapes, or
@@ -136,7 +136,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Add<UnsignedMatrix<T>> for &UnsignedMatrix
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `pow` is greater than `T::WIDTH`, if `self` and `other` have different shapes, or
@@ -180,7 +180,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Add<&UnsignedMatrix<T>> for &UnsignedMatri
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `pow` is greater than `T::WIDTH`, if `self` and `other` have different shapes, or
@@ -230,7 +230,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddAssign<Self> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `pow` is greater than `T::WIDTH`, if `self` and `other` have different shapes, or
@@ -274,7 +274,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddAssign<&Self> for UnsignedMatrix<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
     ///
     /// # Panics
     /// Panics if `pow` is greater than `T::WIDTH`, if `self` and `other` have different shapes, or

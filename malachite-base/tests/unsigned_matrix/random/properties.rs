@@ -61,7 +61,12 @@ fn random_unsigned_matrices_with_permuted_diagonal_properties() {
             assert!(m.is_valid());
             assert_eq!((m.height(), m.width()), (height, width));
             assert!(is_permuted_diagonal(&m));
-            let mut values: Vec<_> = m.elements.iter().filter(|&x| *x != 0).copied().collect();
+            let mut values: Vec<_> = m
+                .elements_ref()
+                .iter()
+                .filter(|&x| *x != 0)
+                .copied()
+                .collect();
             values.sort();
             assert_eq!(values, expected);
         }
@@ -81,7 +86,7 @@ fn random_unsigned_matrices_with_rank_mod_properties() {
             assert!(m.mod_is_reduced(&p));
             assert!(is_permuted_diagonal(&m));
             assert_eq!(
-                m.elements.iter().filter(|&x| *x != 0).count(),
+                m.elements_ref().iter().filter(|&x| *x != 0).count(),
                 usize::try_from(rank).unwrap()
             );
             assert_eq!(naive_rank_mod_prime(&m, p), rank);

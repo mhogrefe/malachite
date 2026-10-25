@@ -69,7 +69,7 @@ impl WordLu {
         } else {
             let mut nonpivots = Vec::with_capacity(width - rank);
             let mut j = 0;
-            for row in lu.elements.chunks_exact(width).take(rank) {
+            for row in lu.elements_ref().chunks_exact(width).take(rank) {
                 while row[j] == 0 {
                     nonpivots.push(j);
                     j += 1;
@@ -98,7 +98,7 @@ impl WordLu {
         let n = self.perm.len();
         let mut det = 1;
         for i in 0..n {
-            det.mod_mul_assign(self.lu.elements[i * (n + 1)], self.p);
+            det.mod_mul_assign(self.lu.elements_ref()[i * (n + 1)], self.p);
         }
         if permutation_is_odd(&self.perm) {
             det.mod_neg_assign(self.p);
@@ -121,7 +121,7 @@ impl WordLu {
     // `fmpq_mat/solve_multi_mod.c`, FLINT 3.6.0.
     pub(crate) fn solve_square(&self, b: &UnsignedMatrix<Limb>) -> UnsignedMatrix<Limb> {
         let k = usize::exact_from(b.width());
-        self.solve_square_permuted(permute_rows(&b.elements, k, &self.perm), k)
+        self.solve_square_permuted(permute_rows(b.elements_ref(), k, &self.perm), k)
     }
 
     // The inverse modulo p of a square matrix A of full rank.
@@ -171,7 +171,7 @@ pub(crate) fn can_solve_inner(
     for (pivot, &column) in pivots.iter_mut().zip(&lu.pivots_nonpivots[..rank]) {
         *pivot = isize::exact_from(column);
     }
-    let pb = permute_rows(&b.mod_word(p).elements, k, &lu.perm);
+    let pb = permute_rows(&b.mod_word(p).elements_ref(), k, &lu.perm);
     // The lower triangular solve reads only the part of this block that holds L.
     let l_top = lu
         .lu
@@ -184,19 +184,19 @@ pub(crate) fn can_solve_inner(
             u64::exact_from(rank)..u64::exact_from(h),
             0..u64::exact_from(rank),
         );
-        if (&l_rest).mod_mul(&y, p).elements != pb[rank * k..] {
+        if (&l_rest).mod_mul(&y, p).elements_ref() != &pb[rank * k..] {
             return (rank, None);
         }
     }
     // The rank by rank upper triangular matrix made of the pivot columns of U. The upper triangular
     // solve reads only its elements on and above the diagonal, which are those of U.
     let mut u_pivots = Vec::with_capacity(rank * rank);
-    for row in lu.lu.elements.chunks_exact(w).take(rank) {
+    for row in lu.lu.elements_ref().chunks_exact(w).take(rank) {
         u_pivots.extend(lu.pivots_nonpivots[..rank].iter().map(|&j| row[j]));
     }
     let y = from_elements(rank, rank, u_pivots).mod_solve_upper_triangular(y, p, false);
     let mut x = vec![0; w * k];
-    for (row, &j) in y.elements.chunks_exact(k).zip(&lu.pivots_nonpivots[..rank]) {
+    for (row, &j) in y.elements_ref().chunks_exact(k).zip(&lu.pivots_nonpivots[..rank]) {
         x[j * k..(j + 1) * k].copy_from_slice(row);
     }
     (rank, Some(from_elements(w, k, x)))

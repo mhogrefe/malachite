@@ -22,7 +22,7 @@ impl From<NaturalMatrix> for IntegerMatrix {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.height() * m.width()`.
     ///
     /// # Examples
     /// ```

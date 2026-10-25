@@ -31,7 +31,7 @@ add_mul_unsigned_matrix_assign<T: PrimitiveUnsigned>(
 {
     assert_eq!(b.height(), a.height(), "the matrices must have the same height");
     assert_eq!(b.width(), a.width(), "the matrices must have the same width");
-    for (x, &y) in b.elements.iter_mut().zip(&a.elements) {
+    for (x, &y) in b.elements.iter_mut().zip(a.elements_ref()) {
         x.add_mul_assign(c, Integer::from(y));
     }
 }}

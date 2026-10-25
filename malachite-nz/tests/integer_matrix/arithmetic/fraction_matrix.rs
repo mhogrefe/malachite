@@ -47,7 +47,7 @@ fn test_fractions_to_numerators_and_denominator() {
 fn fractions_to_numerators_and_denominator_properties() {
     integer_matrix_natural_pair_gen().test_properties(|(a, d)| {
         let d = d + Natural::ONE;
-        let fractions: Vec<Fraction> = a.elements.iter().map(|n| fraction(n, &d)).collect();
+        let fractions: Vec<Fraction> = a.elements_ref().iter().map(|n| fraction(n, &d)).collect();
         let height = usize::exact_from(a.height());
         let width = usize::exact_from(a.width());
         let (numerators, den) = fractions_to_numerators_and_denominator(&fractions, height, width);
@@ -60,7 +60,7 @@ fn fractions_to_numerators_and_denominator_properties() {
             .iter()
             .fold(Natural::ONE, |l, f| l.lcm(&f.denominator));
         assert_eq!(den, lcm);
-        for (n, f) in numerators.elements.iter().zip(&fractions) {
+        for (n, f) in numerators.elements_ref().iter().zip(&fractions) {
             let original = Integer::from_sign_and_abs_ref(f.sign, &f.numerator);
             assert_eq!(
                 n * Integer::from(&f.denominator),

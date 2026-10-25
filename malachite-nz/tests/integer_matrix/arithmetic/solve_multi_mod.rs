@@ -50,7 +50,7 @@ fn verify_solution(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatri
         assert!(*den > 0u32);
         assert_eq!(a * x, b * den);
         let g = x
-            .elements
+            .elements_ref()
             .iter()
             .fold(den.unsigned_abs_ref().clone(), |g, y| {
                 g.gcd(y.unsigned_abs_ref())

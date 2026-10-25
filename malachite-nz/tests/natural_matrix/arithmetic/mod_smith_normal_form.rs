@@ -26,10 +26,9 @@ use malachite_nz::test_util::generators::{
 // diagonal element d becomes gcd(d, m) modulo m.
 fn snf_from_integer_snf(a: &NaturalMatrix, m: &Natural) -> NaturalMatrix {
     let mut s = NaturalMatrix::try_from(IntegerMatrix::from(a).smith_normal_form()).unwrap();
-    let w = usize::try_from(s.width()).unwrap();
     let d = usize::try_from(s.height().min(s.width())).unwrap();
     for i in 0..d {
-        let x = &mut s.elements[i * (w + 1)];
+        let x = &mut s[(i, i)];
         *x = (&*x).gcd(m).mod_op(m);
     }
     s

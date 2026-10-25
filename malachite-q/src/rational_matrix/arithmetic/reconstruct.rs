@@ -103,7 +103,8 @@ impl RationalMatrix {
     pub fn reconstruct(a: NaturalMatrix, m: &Natural) -> Option<Self> {
         assert_reconstruct_arguments(&a, m);
         let (height, width) = (a.height(), a.width());
-        reconstruct_fractions(a.elements.into_iter(), m).map(|x| from_fractions(height, width, x))
+        reconstruct_fractions(a.into_elements().into_iter(), m)
+            .map(|x| from_fractions(height, width, x))
     }
 
     /// Recovers a [`RationalMatrix`] from a matrix of residues modulo $m$ by rational
@@ -167,7 +168,7 @@ impl RationalMatrix {
     /// reduced or $m < 3$, where FLINT reduces the residues and reconstructs only zeros.
     pub fn reconstruct_ref(a: &NaturalMatrix, m: &Natural) -> Option<Self> {
         assert_reconstruct_arguments(a, m);
-        reconstruct_fractions(a.elements.iter(), m)
+        reconstruct_fractions(a.elements_ref().iter(), m)
             .map(|x| from_fractions(a.height(), a.width(), x))
     }
 }

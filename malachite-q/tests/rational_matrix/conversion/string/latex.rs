@@ -22,7 +22,7 @@ fn rows(
     element_separator: &str,
     f: impl Fn(&Rational) -> String,
 ) -> Vec<String> {
-    m.elements
+    m.elements_ref()
         .chunks(usize::exact_from(m.width()))
         .map(|row| row.iter().map(&f).join(element_separator))
         .collect()

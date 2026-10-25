@@ -52,7 +52,7 @@ fn neg_properties() {
         assert_eq!(-&b, a);
         assert_eq!(b == a, a.is_zero());
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, -x);
         }
         // Negation commutes with transposition, and preserves the shape predicates.
@@ -72,6 +72,11 @@ fn neg_properties() {
     integer_matrix_gen().test_properties(|a| {
         // Negating a `IntegerMatrix`'s conversion negates every element.
         let b = -RationalMatrix::from(a.clone());
-        assert!(b.elements.iter().zip(&a.elements).all(|(x, y)| -x == *y));
+        assert!(
+            b.elements_ref()
+                .iter()
+                .zip(a.elements_ref())
+                .all(|(x, y)| -x == *y)
+        );
     });
 }

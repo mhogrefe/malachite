@@ -59,7 +59,7 @@ fn limb_matrix(height: usize, width: usize, xs: &[Natural]) -> UnsignedMatrix<Li
 fn limb_product(a: &NaturalMatrix, b: &NaturalMatrix, pow: u64) -> Vec<Natural> {
     limb_matrix(a.height, a.width, &a.elements)
         .mod_power_of_2_mul(limb_matrix(b.height, b.width, &b.elements), pow)
-        .elements
+        .into_elements()
         .into_iter()
         .map(Natural::from)
         .collect()

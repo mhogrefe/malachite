@@ -106,7 +106,7 @@ fn benchmark_unsigned_matrix_div_exact_algorithms(
                 no_out!(UnsignedMatrix::from_owned_elements(
                     a.height(),
                     a.width(),
-                    a.elements.iter().map(|x| x / c).collect()
+                    a.elements_ref().iter().map(|x| x / c).collect()
                 ));
             }),
         ],

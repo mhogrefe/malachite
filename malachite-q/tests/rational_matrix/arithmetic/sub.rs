@@ -128,7 +128,12 @@ fn sub_properties() {
         // The difference is taken element by element.
         assert!(diff.is_valid());
         assert_eq!((diff.height(), diff.width()), (a.height(), a.width()));
-        for ((x, y), z) in a.elements.iter().zip(&b.elements).zip(&diff.elements) {
+        for ((x, y), z) in a
+            .elements_ref()
+            .iter()
+            .zip(b.elements_ref())
+            .zip(diff.elements_ref())
+        {
             assert_eq!(x - y, *z);
         }
         // Subtracting is adding the negation, swapping the operands negates the difference, and

@@ -98,7 +98,11 @@ fn columns_properties() {
                 .all(|(xs, k)| xs.eq(m.column_iter(k)))
         );
         // Flattening the columns gives the elements of the transpose.
-        assert!(m.columns().flatten().eq(m.transpose().elements.iter()));
+        assert!(
+            m.columns()
+                .flatten()
+                .eq(m.transpose().elements_ref().iter())
+        );
 
         // Taking from both ends meets in the middle, with the length always exact.
         let mut it = m.columns();
@@ -136,10 +140,14 @@ fn columns_properties() {
                 *x += Natural::ONE;
             }
         }
-        let mut expected = old.clone();
-        for x in &mut expected.elements {
-            *x += Natural::ONE;
-        }
+        let expected = NaturalMatrix::from_owned_elements(
+            old.height(),
+            old.width(),
+            old.elements_ref()
+                .iter()
+                .map(|x| x + Natural::ONE)
+                .collect(),
+        );
         assert_eq!(m, expected);
         for xs in m.columns_mut().rev() {
             for x in xs.rev() {

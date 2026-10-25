@@ -24,7 +24,7 @@ fn nonzero_rows(r: &IntegerMatrix) -> usize {
     if w == 0 {
         return 0;
     }
-    r.elements
+    r.elements_ref()
         .chunks_exact(w)
         .take_while(|row| row.iter().any(|x| *x != 0u32))
         .count()
@@ -80,9 +80,9 @@ fn verify_rank(a: &IntegerMatrix) -> u64 {
     assert_eq!(a.clone().rank(), rank);
     assert_eq!(a.transpose().rank(), rank);
     assert!(rank <= a.height().min(a.width()));
-    if a.elements.iter().all(|x| x.significant_bits() <= 30) {
+    if a.elements_ref().iter().all(|x| x.significant_bits() <= 30) {
         let small = rank_small(
-            a.elements
+            a.elements_ref()
                 .iter()
                 .map(|x| i64::try_from(x).unwrap())
                 .collect(),

@@ -96,7 +96,7 @@ fn rows_properties() {
                 .all(|(xs, k)| xs.eq(m.row_iter(k)))
         );
         // Flattening the rows gives the elements.
-        assert!(m.rows().flatten().eq(m.elements.iter()));
+        assert!(m.rows().flatten().eq(m.elements_ref().iter()));
 
         // Taking from both ends meets in the middle, with the length always exact.
         let mut it = m.rows();
@@ -134,10 +134,11 @@ fn rows_properties() {
                 *x ^= 1;
             }
         }
-        let mut expected = old.clone();
-        for x in &mut expected.elements {
-            *x ^= 1;
-        }
+        let expected = UnsignedMatrix::from_owned_elements(
+            old.height(),
+            old.width(),
+            old.elements_ref().iter().map(|x| x ^ 1).collect(),
+        );
         assert_eq!(m, expected);
         for xs in m.rows_mut().rev() {
             for x in xs.rev() {

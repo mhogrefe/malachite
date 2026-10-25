@@ -53,7 +53,7 @@ fn from_numerators_and_denominator_properties() {
             let d = Natural::from(d);
             let a = RationalMatrix::from_numerators_and_denominator(&ns, &d);
             assert_eq!((a.height(), a.width()), (ns.height(), ns.width()));
-            for (x, n) in a.elements.iter().zip(ns.elements.iter()) {
+            for (x, n) in a.elements_ref().iter().zip(ns.elements_ref().iter()) {
                 assert_eq!(*x, Rational::from(n) / Rational::from(&d));
             }
         }

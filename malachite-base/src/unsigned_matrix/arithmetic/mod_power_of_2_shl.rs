@@ -96,7 +96,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() *
+            /// self.width()`.
             ///
             /// # Panics
             /// Panics if `pow` is greater than `T::WIDTH`, or if any element of `self` is greater
@@ -125,7 +126,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             ///
             /// $M(n) = O(n)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() *
+            /// self.width()`.
             ///
             /// # Panics
             /// Panics if `pow` is greater than `T::WIDTH`, or if any element of `self` is greater
@@ -151,7 +153,8 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() *
+            /// self.width()`.
             ///
             /// # Panics
             /// Panics if `pow` is greater than `T::WIDTH`, or if any element of `self` is greater

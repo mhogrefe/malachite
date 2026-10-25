@@ -17,15 +17,15 @@ use malachite_nz::test_util::generators::natural_matrix_gen;
 // The matrix with the elements in row `i` and column `j` kept where `i == j`, and the others
 // replaced with zero.
 fn diagonal_part(m: &NaturalMatrix) -> NaturalMatrix {
-    let mut n = m.clone();
+    let mut xs = m.to_elements();
     let width = usize::exact_from(m.width());
-    for (k, x) in n.elements.iter_mut().enumerate() {
+    for (k, x) in xs.iter_mut().enumerate() {
         let (i, j) = (k / width, k % width);
         if !(i == j) {
             *x = Natural::ZERO;
         }
     }
-    n
+    NaturalMatrix::from_owned_elements(m.height(), m.width(), xs)
 }
 
 #[test]

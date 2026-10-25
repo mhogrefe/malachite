@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOf2IsReduced, PowerOf2};
 use malachite_base::test_util::generators::{
     unsigned_matrix_gen, unsigned_matrix_unsigned_pair_gen_var_1,
@@ -66,7 +67,7 @@ fn mod_is_reduced_properties() {
     unsigned_matrix_unsigned_pair_gen_var_1().test_properties(|(a, m)| {
         let reduced = a.mod_is_reduced(&m);
         // The defining property: every element is below the modulus.
-        assert_eq!(reduced, a.elements.iter().all(|&x| x < m));
+        assert_eq!(reduced, a.elements_ref().iter().all(|&x| x < m));
         // A matrix is reduced exactly when reducing it changes nothing.
         assert_eq!(reduced, &a % m == a);
         // Reducing always gives a reduced matrix.
@@ -80,7 +81,7 @@ fn mod_is_reduced_properties() {
     unsigned_matrix_gen().test_properties(|a| {
         // The largest element decides it: a matrix is reduced modulo anything above it, and modulo
         // nothing at or below it.
-        let max = a.elements.iter().max().copied().unwrap_or(0);
+        let max = a.elements_ref().iter().max().copied().unwrap_or(0);
         if let Some(above) = max.checked_add(1) {
             assert!(a.mod_is_reduced(&above));
         }

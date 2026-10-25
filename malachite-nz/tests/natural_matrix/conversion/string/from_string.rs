@@ -141,7 +141,7 @@ fn from_str_properties() {
         if let Ok(m) = NaturalMatrix::from_str(&s) {
             assert!(m.is_valid());
             assert_eq!(NaturalMatrix::from_str(&m.to_string()).unwrap(), m);
-            if m.elements.is_empty() {
+            if m.elements_ref().is_empty() {
                 assert!(s.starts_with("[]_{"));
             } else {
                 // Whatever parses with elements is a bracketed list of rows of `Natural` strings.
@@ -151,7 +151,7 @@ fn from_str_properties() {
                     .flat_map(|row| row.split(", "))
                     .map(|x| Natural::from_str(x).unwrap())
                     .collect();
-                assert_eq!(xs, m.elements);
+                assert_eq!(xs, m.elements_ref());
             }
         }
     });

@@ -128,8 +128,8 @@ fn mod_howell_form_properties() {
             .filter(|&i| s.row_iter(i).any(|x| *x != 0))
             .flat_map(|i| s.row_iter(i).copied().collect::<Vec<_>>())
             .collect();
-        nonzero.resize(b.elements.len(), Default::default());
-        assert_eq!(b.elements, nonzero);
+        nonzero.resize(b.elements_ref().len(), Default::default());
+        assert_eq!(b.elements_ref(), nonzero);
         assert_eq!(w, b.width());
         if a_is_small(&a, m) {
             assert_eq!(unsigned_matrix_mod_howell_form_naive(&a, m), b);

@@ -25,7 +25,7 @@ fn columns_of(m: &RationalMatrix) -> Vec<RationalVector> {
         .map(|j| {
             RationalVector::from_owned_elements(
                 (0..m.height())
-                    .map(|i| m.elements[usize::exact_from(i * m.width() + j)].clone())
+                    .map(|i| m.elements_ref()[usize::exact_from(i * m.width() + j)].clone())
                     .collect(),
             )
         })

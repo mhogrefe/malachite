@@ -96,7 +96,7 @@ fn row_iter_properties() {
                 .eq((0..m.width()).map(|j| m.get(i, j).unwrap()))
         );
         assert!(
-            m.row_iter(i).eq(m.elements
+            m.row_iter(i).eq(m.elements_ref()
                 [usize::exact_from(i * m.width())..usize::exact_from((i + 1) * m.width())]
                 .iter())
         );
@@ -133,7 +133,7 @@ fn row_iter_properties() {
         assert!(
             (0..m.height())
                 .flat_map(|i| m.row_iter(i))
-                .eq(m.elements.iter())
+                .eq(m.elements_ref().iter())
         );
     });
 }

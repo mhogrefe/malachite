@@ -122,7 +122,7 @@ fn mod_mul_properties() {
         assert!(b.mod_is_reduced(&m));
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
         assert_eq!((&a * &c) % &m, b);
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x.mod_mul(&c, &m));
         }
 

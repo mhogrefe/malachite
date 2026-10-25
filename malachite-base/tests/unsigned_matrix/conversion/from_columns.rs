@@ -25,7 +25,7 @@ fn columns_of(m: &UnsignedMatrix<u64>) -> Vec<UnsignedVector<u64>> {
         .map(|j| {
             UnsignedVector::from_owned_elements(
                 (0..m.height())
-                    .map(|i| m.elements[usize::exact_from(i * m.width() + j)])
+                    .map(|i| m.elements_ref()[usize::exact_from(i * m.width() + j)])
                     .collect(),
             )
         })

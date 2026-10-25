@@ -152,7 +152,12 @@ fn mod_sub_properties() {
         // The result is reduced, has the same shape, and is the elementwise modular difference.
         assert!(r.mod_is_reduced(&m));
         assert_eq!((r.height(), r.width()), (a.height(), a.width()));
-        for ((&x, &y), &z) in a.elements.iter().zip(&b.elements).zip(&r.elements) {
+        for ((&x, &y), &z) in a
+            .elements_ref()
+            .iter()
+            .zip(b.elements_ref())
+            .zip(r.elements_ref())
+        {
             assert_eq!(z, x.mod_sub(y, m));
         }
         // Subtracting is adding the negation, swapping the operands negates the difference, and

@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{Content, ContentChained, Gcd};
 use malachite_base::test_util::generators::unsigned_matrix_unsigned_pair_gen_var_6;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
@@ -53,7 +54,7 @@ fn content_chained_properties() {
         // It is the GCD of `x` and the content, as for the elements as a vector.
         assert_eq!(out, (&a).content().gcd(x));
         let v = UnsignedVector::<u64> {
-            elements: a.elements.clone(),
+            elements: a.to_elements(),
         };
         assert_eq!(v.content_chained(x), out);
     });

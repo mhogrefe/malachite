@@ -29,7 +29,7 @@ fn test_is_empty() {
 fn is_empty_properties() {
     natural_matrix_gen().test_properties(|m| {
         let empty = m.is_empty();
-        assert_eq!(empty, m.elements.is_empty());
+        assert_eq!(empty, m.elements_ref().is_empty());
         assert_eq!(empty, m.height() == 0 || m.width() == 0);
         assert_eq!(m.transpose().is_empty(), empty);
         if empty {

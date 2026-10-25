@@ -95,7 +95,7 @@ fn mod_neg_properties() {
         // The result is reduced, has the same shape, and is the elementwise negation.
         assert!(b.mod_is_reduced(&m));
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x.mod_neg(&m));
         }
         // Negating twice gives the matrix back, and negation commutes with transposition.
@@ -106,9 +106,9 @@ fn mod_neg_properties() {
         let negated = -IntegerMatrix::from(a.clone());
         assert!(
             negated
-                .elements
+                .elements_ref()
                 .iter()
-                .zip(&b.elements)
+                .zip(b.elements_ref())
                 .all(|(x, y)| x.mod_op(&m_i) == *y)
         );
     });

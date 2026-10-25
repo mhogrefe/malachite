@@ -51,7 +51,7 @@ fn mod_power_of_2_smith_normal_form_properties() {
         // The diagonal elements are powers of 2 in increasing order, followed by zeros.
         let d = usize::try_from(s.height().min(s.width())).unwrap();
         let w = usize::try_from(s.width()).unwrap();
-        let diagonal: Vec<u64> = (0..d).map(|i| s.elements[i * (w + 1)]).collect();
+        let diagonal: Vec<u64> = (0..d).map(|i| s.elements_ref()[i * (w + 1)]).collect();
         for pair in diagonal.windows(2) {
             assert!(pair[1] == 0 || pair[0] != 0 && pair[1] % pair[0] == 0);
         }

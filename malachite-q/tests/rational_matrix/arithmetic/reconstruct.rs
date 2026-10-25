@@ -28,7 +28,7 @@ fn verify_reconstruct(a: &NaturalMatrix, m: &Natural) -> Option<RationalMatrix> 
         assert_eq!(x.height(), a.height());
         assert_eq!(x.width(), a.width());
         // Every element n/d has the given residue r: n = rd (mod m).
-        for (y, r) in x.elements.iter().zip(&a.elements) {
+        for (y, r) in x.elements_ref().iter().zip(a.elements_ref()) {
             let n = Integer::from_sign_and_abs_ref(*y >= 0u32, y.numerator_ref());
             let rd = Integer::from(r * y.denominator_ref());
             assert!((rd - n).divisible_by(Integer::from(m)));
@@ -92,12 +92,12 @@ fn reconstruct_properties() {
     natural_matrix_natural_pair_gen_var_8().test_properties(|(a, m)| {
         let result = verify_reconstruct(&a, &m);
         // The first element is reconstructed on its own, by `Rational::reconstruct`.
-        if let Some(r) = a.elements.first() {
+        if let Some(r) = a.elements_ref().first() {
             let first = Rational::reconstruct_ref(r, &m);
             match &result {
-                Some(x) => assert_eq!(first.as_ref(), x.elements.first()),
+                Some(x) => assert_eq!(first.as_ref(), x.elements_ref().first()),
                 None => assert!(
-                    first.is_none() || a.elements.len() != 1,
+                    first.is_none() || a.elements_ref().len() != 1,
                     "a single element that reconstructs on its own must reconstruct"
                 ),
             }

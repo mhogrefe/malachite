@@ -117,7 +117,7 @@ fn solve_helper(
     if pow <= Limb::WIDTH {
         to_limb_matrix(&a)
             .mod_power_of_2_solve(limb_matrix(b_height, b_width, &b), pow)
-            .map(|x| x.elements.into_iter().map(Natural::from).collect())
+            .map(|x| x.into_elements().into_iter().map(Natural::from).collect())
     } else {
         let (h, w) = (a.height, a.width);
         solve_mod_power_of_2(a.elements, h, w, b, b_width, pow)

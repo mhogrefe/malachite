@@ -23,7 +23,7 @@ use std::panic::catch_unwind;
 // Whether the rational matrix `x` solves AX = B, by malachite-nz's check on its fractions.
 fn is_solution(x: &RationalMatrix, a: &IntegerMatrix, b: &IntegerMatrix) -> bool {
     let fractions: Vec<Fraction> = x
-        .elements
+        .elements_ref()
         .iter()
         .map(|y| Fraction {
             sign: *y >= 0u32,
@@ -83,15 +83,15 @@ fn is_solution_properties() {
             let x = RationalMatrix::from_owned_elements(
                 x.height(),
                 x.width(),
-                x.elements
+                x.into_elements()
                     .into_iter()
                     .map(|n| Rational::from_integers(n, d.clone()))
                     .collect(),
             );
             assert!(is_solution(&x, &a, &b));
-            if !b.elements.is_empty() && !a.elements.is_empty() {
+            if !b.elements_ref().is_empty() && !a.elements_ref().is_empty() {
                 let mut c = b.clone();
-                c.elements[0] += Integer::ONE;
+                c[(0, 0)] += Integer::ONE;
                 assert!(!is_solution(&x, &a, &c));
             }
         }

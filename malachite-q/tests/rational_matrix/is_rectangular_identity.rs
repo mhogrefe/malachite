@@ -52,7 +52,7 @@ fn is_rectangular_identity_properties() {
             rectangular_identity
         );
         assert_eq!(m.is_identity(), m.is_square() && rectangular_identity);
-        if m.elements.is_empty() {
+        if m.elements_ref().is_empty() {
             assert!(rectangular_identity);
         }
     });

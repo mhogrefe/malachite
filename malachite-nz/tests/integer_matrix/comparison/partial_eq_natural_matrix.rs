@@ -52,7 +52,7 @@ fn partial_eq_natural_matrix_properties() {
         assert_eq!(&m == &IntegerMatrix::from(n.clone()), eq);
         if eq {
             assert_eq!((m.height(), m.width()), (n.height(), n.width()));
-            assert!(m.elements.iter().all(|x| *x >= 0u32));
+            assert!(m.elements_ref().iter().all(|x| *x >= 0u32));
         }
 
         let n_m = IntegerMatrix::from(n.clone());

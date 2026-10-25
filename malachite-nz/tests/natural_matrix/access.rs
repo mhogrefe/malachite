@@ -112,7 +112,7 @@ fn test_get() {
 fn index_properties() {
     natural_matrix_unsigned_unsigned_triple_gen_var_1().test_properties(|(m, i, j)| {
         let x = &m[(i, j)];
-        assert_eq!(x, &m.elements[i * usize::exact_from(m.width()) + j]);
+        assert_eq!(x, &m.elements_ref()[i * usize::exact_from(m.width()) + j]);
         assert_eq!(m.get(u64::exact_from(i), u64::exact_from(j)), Some(x));
         assert_eq!(&m.transpose()[(j, i)], x);
 
@@ -141,7 +141,7 @@ fn index_properties() {
                 xs.push(m[(i, j)].clone());
             }
         }
-        assert_eq!(xs, m.elements);
+        assert_eq!(xs, m.elements_ref());
     });
 }
 

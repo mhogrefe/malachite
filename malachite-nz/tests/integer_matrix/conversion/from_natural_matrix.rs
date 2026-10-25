@@ -38,13 +38,13 @@ fn from_natural_matrix_properties() {
         assert_eq!((n.height(), n.width()), (m.height(), m.width()));
         assert_eq!(n.to_string(), m.to_string());
         assert_eq!(
-            n.elements,
-            m.elements
+            n.elements_ref(),
+            m.elements_ref()
                 .iter()
                 .map(|x| Integer::from(x.clone()))
                 .collect::<Vec<_>>()
         );
-        assert!(n.elements.iter().all(|x| *x >= 0u32));
+        assert!(n.elements_ref().iter().all(|x| *x >= 0u32));
         // Reading the string back as an `IntegerMatrix` gives the same thing.
         assert_eq!(IntegerMatrix::from_str(&m.to_string()).unwrap(), n);
         // Converting commutes with transposing.

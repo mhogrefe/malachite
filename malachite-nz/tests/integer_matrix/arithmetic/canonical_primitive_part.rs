@@ -77,9 +77,12 @@ fn canonical_primitive_part_properties() {
         // It is the canonical primitive part of the elements as a vector, since a vector's first
         // nonzero element is the matrix's first in row-major order.
         let v = IntegerVector {
-            elements: a.elements.clone(),
+            elements: a.to_elements(),
         };
-        assert_eq!(canonical.elements, v.canonical_primitive_part().elements);
+        assert_eq!(
+            canonical.elements_ref(),
+            v.canonical_primitive_part().elements
+        );
         assert_eq!(
             (canonical.height(), canonical.width()),
             (a.height(), a.width())
@@ -87,7 +90,7 @@ fn canonical_primitive_part_properties() {
         // It is the primitive part with its first nonzero element, in row-major order, made
         // positive, so a matrix and its negation share it.
         let primitive_part = (&a).primitive_part();
-        let first = primitive_part.elements.iter().find(|&x| *x != 0u32);
+        let first = primitive_part.elements_ref().iter().find(|&x| *x != 0u32);
         assert_eq!(
             canonical,
             if first.is_some_and(|x| *x < 0u32) {
@@ -98,7 +101,7 @@ fn canonical_primitive_part_properties() {
         );
         assert!(
             canonical
-                .elements
+                .elements_ref()
                 .iter()
                 .find(|&x| *x != 0u32)
                 .is_none_or(|x| *x > 0u32)

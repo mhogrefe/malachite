@@ -55,11 +55,8 @@ fn is_in_reduced_row_echelon_form_with_rank_properties() {
                     is_in_reduced_row_echelon_form_with_rank(&(&a * &c), &(&den * &c), rank),
                     result
                 );
-                let mut b = a.clone();
+                let b = -&a;
                 let mut neg_den = den.clone();
-                for x in &mut b.elements {
-                    x.neg_assign();
-                }
                 neg_den.neg_assign();
                 assert_eq!(
                     is_in_reduced_row_echelon_form_with_rank(&b, &neg_den, rank),

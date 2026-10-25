@@ -31,7 +31,7 @@ fn demo_natural_matrix_mod_power_of_2_solve(gm: GenMode, config: &GenConfig, lim
         let h = usize::try_from(a.height()).unwrap();
         let w = usize::try_from(a.width()).unwrap();
         let first_column = NaturalVector {
-            elements: (0..h).map(|i| a.elements[i * w].clone()).collect(),
+            elements: (0..h).map(|i| a.elements_ref()[i * w].clone()).collect(),
         };
         let mut unit = vec![Natural::ZERO; h];
         unit[0] = Natural::ONE.mod_power_of_2(pow);

@@ -41,7 +41,7 @@ fn demo_integer_matrix_is_in_reduced_row_echelon_form_with_rank(
 ) {
     for a in integer_matrix_gen().get(gm, config).take(limit) {
         let den = a
-            .elements
+            .elements_ref()
             .iter()
             .find(|x| **x != 0u32)
             .cloned()
@@ -51,18 +51,22 @@ fn demo_integer_matrix_is_in_reduced_row_echelon_form_with_rank(
         let mut b = a.clone();
         let w = usize::try_from(a.width()).unwrap();
         let nonzero_rows: Vec<usize> = (0..usize::try_from(a.height()).unwrap())
-            .filter(|&i| b.elements[i * w..(i + 1) * w].iter().any(|x| *x != 0u32))
+            .filter(|&i| {
+                b.elements_ref()[i * w..(i + 1) * w]
+                    .iter()
+                    .any(|x| *x != 0u32)
+            })
             .collect();
         // Move the nonzero rows to the top.
-        let mut elements = Vec::with_capacity(b.elements.len());
+        let mut elements = Vec::with_capacity(b.elements_ref().len());
         for &i in &nonzero_rows {
-            elements.extend_from_slice(&b.elements[i * w..(i + 1) * w]);
+            elements.extend_from_slice(&b.elements_ref()[i * w..(i + 1) * w]);
         }
-        elements.resize(b.elements.len(), Integer::ZERO);
+        elements.resize(b.elements_ref().len(), Integer::ZERO);
         b = IntegerMatrix::from_owned_elements(a.height(), a.width(), elements);
         let leading_columns: Vec<usize> = (0..nonzero_rows.len())
             .map(|i| {
-                b.elements[i * w..(i + 1) * w]
+                b.elements_ref()[i * w..(i + 1) * w]
                     .iter()
                     .position(|x| *x != 0u32)
                     .unwrap()
@@ -70,7 +74,7 @@ fn demo_integer_matrix_is_in_reduced_row_echelon_form_with_rank(
             .collect();
         for (i, &j) in leading_columns.iter().enumerate() {
             for k in 0..nonzero_rows.len() {
-                b.elements[k * w + j] = if k == i { den.clone() } else { Integer::ZERO };
+                b[(k, j)] = if k == i { den.clone() } else { Integer::ZERO };
             }
         }
         print_check(&b, &den, u64::try_from(nonzero_rows.len()).unwrap());

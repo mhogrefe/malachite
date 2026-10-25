@@ -186,7 +186,7 @@ fn mod_mul_matrix_properties() {
         let n = a.height();
         // The modulus must exceed every element and 1, the identity's diagonal element.
         if let Some(m) = a
-            .elements
+            .elements_ref()
             .iter()
             .max()
             .and_then(|&x| x.checked_add(1))

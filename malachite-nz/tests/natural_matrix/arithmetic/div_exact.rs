@@ -91,7 +91,7 @@ fn div_exact_properties() {
         // quotient. The shape is unchanged, and multiplying by the scalar recovers the matrix.
         assert_eq!(b.height(), a.height());
         assert_eq!(b.width(), a.width());
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x.div_exact(&c));
             assert_eq!(*y, x / &c);
         }

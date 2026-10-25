@@ -26,7 +26,7 @@ where
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.elements.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.height() * m.width()`.
     ///
     /// # Examples
     /// ```
@@ -47,7 +47,7 @@ where
         Self::from_owned_elements(
             m.height(),
             m.width(),
-            m.elements.into_iter().map(Natural::from).collect(),
+            m.into_elements().into_iter().map(Natural::from).collect(),
         )
     }
 }

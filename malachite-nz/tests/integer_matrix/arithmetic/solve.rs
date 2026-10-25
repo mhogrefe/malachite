@@ -295,7 +295,7 @@ fn verify_can_solve(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatr
         assert!(*den > 0u32);
         // The denominator is the least common denominator of the solution.
         let g = x
-            .elements
+            .elements_ref()
             .iter()
             .fold(den.unsigned_abs_ref().clone(), |g, y| {
                 g.gcd(y.unsigned_abs_ref())
@@ -487,7 +487,6 @@ fn test_solve_large() {
         let x = verify_public_solve(&a, &b).unwrap();
         assert!(same_rational_solution(&x, &solve_fflu(&a, &b).unwrap()));
         // A singular matrix of the same dimension, whose last row is the sum of the others.
-        let mut a = a;
         let sum = (0..n - 1).fold(
             vec![Integer::ZERO; usize::try_from(n).unwrap()],
             |mut s, i| {
@@ -498,7 +497,9 @@ fn test_solve_large() {
             },
         );
         let last = usize::try_from((n - 1) * n).unwrap();
-        a.elements[last..].clone_from_slice(&sum);
+        let mut xs = a.into_elements();
+        xs[last..].clone_from_slice(&sum);
+        let a = IntegerMatrix::from_owned_elements(n, n, xs);
         verify_public_solve(&a, &b);
         // A consistent system with that matrix.
         let b = &a * pseudorandom_matrix_with_bits(n, k, bits, &mut seed);

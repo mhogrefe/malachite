@@ -22,8 +22,8 @@ impl PartialEq<NaturalMatrix> for IntegerMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`. Matrices of
-    /// different shapes are compared in constant time.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
+    /// Matrices of different shapes are compared in constant time.
     ///
     /// # Examples
     /// See [here](super::partial_eq_natural_matrix#partial_eq).
@@ -49,8 +49,8 @@ impl PartialEq<IntegerMatrix> for NaturalMatrix {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.elements.len()`. Matrices of
-    /// different shapes are compared in constant time.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.height() * self.width()`.
+    /// Matrices of different shapes are compared in constant time.
     ///
     /// # Examples
     /// See [here](super::partial_eq_natural_matrix#partial_eq).

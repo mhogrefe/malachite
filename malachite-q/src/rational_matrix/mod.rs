@@ -23,13 +23,15 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 /// A matrix whose elements are [`Rational`]s.
 ///
-/// The elements are stored in one [`Vec`], `elements`, in row-major order: the element in row $i$
-/// and column $j$, both counted from 0, is at index $iw + j$, where $w$ is the width. This is the
-/// layout of FLINT's `fmpq_mat_t`, without the stride FLINT uses for windows into other matrices.
+/// The elements are stored in one [`Vec`] in row-major order: the element in row $i$ and column
+/// $j$, both counted from 0, is at index $iw + j$, where $w$ is the width. This is the layout of
+/// FLINT's `fmpq_mat_t`, without the stride FLINT uses for windows into other matrices.
 ///
-/// `elements` is public, but its length must stay equal to the height times the width; a matrix
-/// whose `elements` has been resized is invalid, and functions on it may panic or return wrong
-/// results. The dimensions are private, so that they can only change together with the elements.
+/// The elements and dimensions are private, so that the number of elements is always the height
+/// times the width. Elements are read and written with [`Index`](core::ops::Index),
+/// [`IndexMut`](core::ops::IndexMut), `get`, and `get_mut`, and a matrix's elements in row-major
+/// order are available with [`Matrix::elements_ref`](malachite_base::matrix::Matrix::elements_ref)
+/// and [`Matrix::into_elements`](malachite_base::matrix::Matrix::into_elements).
 #[derive(Clone, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(
@@ -37,7 +39,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
     serde(try_from = "SerdeRationalMatrix", into = "SerdeRationalMatrix")
 )]
 pub struct RationalMatrix {
-    pub elements: Vec<Rational>,
+    pub(crate) elements: Vec<Rational>,
     height: usize,
     width: usize,
 }

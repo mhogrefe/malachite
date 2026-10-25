@@ -62,7 +62,7 @@ fn test_shortlex_cmp_vs_lexicographic() {
         let n = NaturalMatrix::from_str(t).unwrap();
         assert_eq!(shortlex(&m, &n), shortlex_out, "shortlex {s} vs {t}");
         assert_eq!(
-            m.elements.cmp(&n.elements),
+            m.elements_ref().cmp(n.elements_ref()),
             lex_out,
             "lexicographic {s} vs {t}"
         );
@@ -100,12 +100,18 @@ fn shortlex_cmp_properties() {
 
         // Shortlex is lexicographic order on (number of elements, height, width, elements).
         assert_eq!(
-            (m.elements.len(), m.height(), m.width(), &m.elements).cmp(&(
-                n.elements.len(),
-                n.height(),
-                n.width(),
-                &n.elements
-            )),
+            (
+                m.elements_ref().len(),
+                m.height(),
+                m.width(),
+                m.elements_ref()
+            )
+                .cmp(&(
+                    n.elements_ref().len(),
+                    n.height(),
+                    n.width(),
+                    &n.elements_ref()
+                )),
             c
         );
 

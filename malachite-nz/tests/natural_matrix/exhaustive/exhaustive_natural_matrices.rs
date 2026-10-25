@@ -129,7 +129,7 @@ fn exhaustive_natural_matrices_properties() {
         .collect_vec();
     assert!(
         ms.iter()
-            .all(|m| m.is_valid() && m.elements.iter().all(|x| *x >= 0u32 && *x < 2u32))
+            .all(|m| m.is_valid() && m.elements_ref().iter().all(|x| *x >= 0u32 && *x < 2u32))
     );
     assert_eq!(ms.iter().collect::<HashSet<_>>().len(), ms.len());
 
@@ -205,7 +205,7 @@ fn exhaustive_natural_square_matrices_properties() {
         .collect_vec();
     assert!(
         ms.iter()
-            .all(|m| m.is_valid() && m.is_square() && m.elements.iter().all(|x| *x < 2u32))
+            .all(|m| m.is_valid() && m.is_square() && m.elements_ref().iter().all(|x| *x < 2u32))
     );
     assert_eq!(ms.iter().collect::<HashSet<_>>().len(), ms.len());
 

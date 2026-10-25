@@ -57,7 +57,7 @@ fn natural_matrix_from_rational_matrix_properties() {
         // The conversion succeeds exactly when every element is a nonnegative integer.
         assert_eq!(
             n.is_ok(),
-            m.elements
+            m.elements_ref()
                 .iter()
                 .all(|x| *x >= 0u32 && *x.denominator_ref() == 1u32)
         );

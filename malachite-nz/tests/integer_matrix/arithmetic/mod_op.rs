@@ -129,14 +129,14 @@ fn mod_op_properties() {
         // Element by element, this is the `Integer` operation, and each result is congruent to the
         // original element.
         let m_i = Integer::from(&m);
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(Integer::from(y), x.mod_op(&m_i));
             assert!((Integer::from(y) - x).divisible_by(&m_i));
         }
 
         // Negating the matrix gives the negated residues.
         let neg_w = (-&a).mod_op(&m);
-        for (x, y) in b.elements.iter().zip(&neg_w.elements) {
+        for (x, y) in b.elements_ref().iter().zip(neg_w.elements_ref()) {
             assert!((Integer::from(x) + Integer::from(y)).divisible_by(&m_i));
         }
 
@@ -153,7 +153,7 @@ fn mod_op_properties() {
             NaturalMatrix::from_owned_elements(
                 a.height(),
                 a.width(),
-                vec![Natural::ZERO; a.elements.len()]
+                vec![Natural::ZERO; a.elements_ref().len()]
             )
         );
         // For a power-of-2 divisor this is `mod_power_of_2`.
@@ -351,7 +351,7 @@ fn rem_properties() {
         assert_eq!((b.height(), b.width()), (a.height(), a.width()));
 
         // Element by element, this is the `Integer` operation.
-        for (x, y) in a.elements.iter().zip(&b.elements) {
+        for (x, y) in a.elements_ref().iter().zip(b.elements_ref()) {
             assert_eq!(*y, x % &m);
         }
 

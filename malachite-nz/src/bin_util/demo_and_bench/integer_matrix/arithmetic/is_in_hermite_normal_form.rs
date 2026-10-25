@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::HermiteNormalForm;
 use malachite_base::num::basic::traits::One;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
@@ -46,8 +47,10 @@ fn demo_integer_matrix_is_in_hermite_normal_form_of_form(
             "is_in_hermite_normal_form({h}) = {}",
             h.is_in_hermite_normal_form()
         );
-        if let Some(x) = h.elements.last_mut() {
-            *x += Integer::ONE;
+        if !h.is_empty() {
+            let i = usize::try_from(h.height() - 1).unwrap();
+            let j = usize::try_from(h.width() - 1).unwrap();
+            h[(i, j)] += Integer::ONE;
             println!(
                 "is_in_hermite_normal_form({h}) = {}",
                 h.is_in_hermite_normal_form()
