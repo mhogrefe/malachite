@@ -6,16 +6,20 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::ops::{Shl, ShlAssign};
+use core::ops::{Shl, ShlAssign, Shr};
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::arithmetic::traits::{EntrywiseShlRound, PowerOf2};
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
-use malachite_nz::test_util::generators::natural_matrix_unsigned_pair_gen_var_5;
+use malachite_nz::test_util::generators::{
+    natural_matrix_signed_pair_gen_var_1, natural_matrix_unsigned_pair_gen_var_5,
+};
 
 fn test_shl_helper<T: PrimitiveUnsigned>()
 where
@@ -45,9 +49,43 @@ where
     );
 }
 
+fn test_shl_signed_helper<T: PrimitiveSigned>()
+where
+    NaturalMatrix: Shl<T, Output = NaturalMatrix> + ShlAssign<T>,
+    for<'a> &'a NaturalMatrix: Shl<T, Output = NaturalMatrix>,
+{
+    let test = |s, bits: i8, out| {
+        let bits = T::from(bits);
+        let v = NaturalMatrix::from_str(s).unwrap();
+        let w = &v << bits;
+        assert_eq!(w.to_string(), out);
+        assert_eq!(v.clone() << bits, w);
+        let mut x = v;
+        x <<= bits;
+        assert_eq!(x, w);
+    };
+    test("[]_{0,0}", 0, "[]_{0,0}");
+    test("[]_{0,0}", -5, "[]_{0,0}");
+    test("[1, 2, 3]", 0, "[1, 2, 3]");
+    test("[1, 2, 3]", 2, "[4, 8, 12]");
+    test("[1, 2; 3, 5]", -1, "[0, 1; 1, 2]");
+    test("[7, 1]", -3, "[0, 0]");
+    test(
+        "[7, 1]",
+        100,
+        "[8873554201597605810476922437632, 1267650600228229401496703205376]",
+    );
+    test(
+        "[8873554201597605810476922437632, 1267650600228229401496703205376]",
+        -100,
+        "[7, 1]",
+    );
+}
+
 #[test]
 fn test_shl() {
     apply_fn_to_unsigneds!(test_shl_helper);
+    apply_fn_to_signeds!(test_shl_signed_helper);
 }
 
 fn shl_properties_helper<T: PrimitiveUnsigned>()
@@ -99,4 +137,51 @@ where
 #[test]
 fn shl_properties() {
     apply_fn_to_unsigneds!(shl_properties_helper);
+}
+
+fn shl_signed_properties_helper<T: PrimitiveSigned>()
+where
+    NaturalMatrix: Shl<T, Output = NaturalMatrix> + ShlAssign<T>,
+    for<'a> &'a NaturalMatrix: Shl<T, Output = NaturalMatrix>
+        + Shr<T, Output = NaturalMatrix>
+        + EntrywiseShlRound<T, Output = NaturalMatrix>,
+    for<'a> &'a Natural: Shl<T, Output = Natural>,
+    i64: ExactFrom<T>,
+{
+    natural_matrix_signed_pair_gen_var_1::<T>().test_properties(|(v, bits)| {
+        let w = &v << bits;
+        // The forms agree.
+        assert_eq!(v.clone() << bits, w);
+        let mut x = v.clone();
+        x <<= bits;
+        assert_eq!(x, w);
+
+        // Element by element, this is the scalar shift, and the shape is unchanged.
+        assert_eq!((w.height(), w.width()), (v.height(), v.width()));
+        for (x, y) in v.elements_ref().iter().zip(w.elements_ref()) {
+            assert_eq!(*y, x << bits);
+        }
+        // Shifting by the same amount of another type gives the same result.
+        assert_eq!(
+            <&NaturalMatrix as Shl<i64>>::shl(&v, i64::exact_from(bits)),
+            w
+        );
+        // A negative shift takes the floor.
+        for rm in [Floor, Down] {
+            assert_eq!((&v).entrywise_shl_round(bits, rm), w);
+        }
+        // A left shift is a right shift by the negated amount.
+        if let Some(neg_bits) = bits.checked_neg() {
+            assert_eq!(&v >> neg_bits, w);
+        }
+        // Shifting left and then back recovers the matrix.
+        if bits >= T::ZERO {
+            assert_eq!(&w >> bits, v);
+        }
+    });
+}
+
+#[test]
+fn shl_signed_properties() {
+    apply_fn_to_signeds!(shl_signed_properties_helper);
 }

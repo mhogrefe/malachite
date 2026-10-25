@@ -75,9 +75,14 @@ documented by git history.
   and with each operand by value or by reference: the matrix-vector product $Av$ and the
   vector-matrix product $vA$ modulo $m$. The elements must be reduced, and the vector's dimension
   must be the width (for $Av$) or the height (for $vA$) of the matrix.
-- `<<` (`Shl` and `ShlAssign`) by any primitive unsigned type for `NaturalMatrix` and
-  `IntegerMatrix`, with the matrix by value or by reference, multiplying every element by a power
-  of 2 and keeping the shape.
+- `<<` and `>>` (`Shl`, `ShlAssign`, `Shr`, and `ShrAssign`) by any primitive unsigned or signed
+  type for `NaturalMatrix` and `IntegerMatrix`, with the matrix by value or by reference,
+  multiplying every element by a power of 2 or dividing it and taking the floor, and keeping the
+  shape; a negative amount shifts the other way. `EntrywiseShrRound` and `EntrywiseShrRoundAssign`
+  (by unsigned or signed amounts) and `EntrywiseShlRound` and `EntrywiseShlRoundAssign` (by signed
+  amounts) round every element with any rounding mode; `entrywise_shr_round(k, Down)` is FLINT's
+  `fmpz_mat_scalar_tdiv_q_2exp`. `UnsignedMatrix<T>` gets `>>` and `EntrywiseShrRound` by any
+  primitive unsigned type, as `UnsignedVector<T>` has.
 - `<<` and `>>` (`Shl`, `ShlAssign`, `Shr`, and `ShrAssign`) by any primitive unsigned or signed
   type for malachite-q's `RationalMatrix`, with the matrix by value or by reference, multiplying or
   dividing every element by a power of 2 exactly; a negative amount shifts the other way.

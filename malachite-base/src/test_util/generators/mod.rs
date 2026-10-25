@@ -5619,6 +5619,29 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_13() -> Generator<(UnsignedMatrix<u
     )
 }
 
+// All `(UnsignedMatrix<T>, U)` where the `U` is no greater than `T::WIDTH + 1`.
+pub fn unsigned_matrix_unsigned_pair_gen_var_14<T: PrimitiveUnsigned, U: PrimitiveUnsigned>()
+-> Generator<(UnsignedMatrix<T>, U)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_14,
+        &random_unsigned_matrix_unsigned_pair_gen_var_14,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_14,
+    )
+}
+
+// All `(UnsignedMatrix<T>, U, RoundingMode)` where the `U` is no greater than `T::WIDTH + 1` and
+// the triple is a valid input to `UnsignedMatrix::entrywise_shr_round`.
+pub fn unsigned_matrix_unsigned_rounding_mode_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(UnsignedMatrix<T>, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_rounding_mode_triple_gen_var_1,
+        &random_unsigned_matrix_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_unsigned_matrix_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, UnsignedVector<u64>, u64)` where the vector's dimension is the height
 // of the matrix, the `u64` is no greater than 64, and every element is less than 2 to its power.
 pub fn unsigned_matrix_unsigned_vector_unsigned_triple_gen_var_2()

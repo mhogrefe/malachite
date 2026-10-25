@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content::register(runner);
     content_chained::register(runner);
     div_exact::register(runner);
+    entrywise_shr_round::register(runner);
     mod_add::register(runner);
     mod_determinant::register(runner);
     mod_howell_form::register(runner);
@@ -58,6 +59,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_strong_echelon_form::register(runner);
     mod_sub::register(runner);
     mod_trace::register(runner);
+    shr::register(runner);
     vector_mod_mul::register(runner);
     vector_mod_power_of_2_mul::register(runner);
 }
@@ -66,6 +68,7 @@ mod canonical_primitive_part;
 mod content;
 mod content_chained;
 mod div_exact;
+mod entrywise_shr_round;
 mod mod_add;
 mod mod_determinant;
 mod mod_howell_form;
@@ -111,5 +114,6 @@ mod mod_square;
 mod mod_strong_echelon_form;
 mod mod_sub;
 mod mod_trace;
+mod shr;
 mod vector_mod_mul;
 mod vector_mod_power_of_2_mul;

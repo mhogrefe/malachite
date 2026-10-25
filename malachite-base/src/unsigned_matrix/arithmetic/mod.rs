@@ -71,6 +71,71 @@ pub mod content_chained;
 /// assert_eq!(a.to_string(), "[0, 2; 85, 1]");
 /// ```
 pub mod div_exact;
+/// Right-shifting a matrix (dividing it by a power of 2) and rounding every element, by
+/// implementations of [`EntrywiseShrRound`](crate::num::arithmetic::traits::EntrywiseShrRound) and
+/// [`EntrywiseShrRoundAssign`](crate::num::arithmetic::traits::EntrywiseShrRoundAssign).
+///
+/// # entrywise_shr_round
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShrRound;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// let v = UnsignedMatrix::<u8>::from_str("[1, 2; 3, 5]").unwrap();
+/// assert_eq!(
+///     (&v).entrywise_shr_round(1u8, Floor).to_string(),
+///     "[0, 1; 1, 2]"
+/// );
+/// assert_eq!(
+///     (&v).entrywise_shr_round(1u16, Ceiling).to_string(),
+///     "[1, 1; 2, 3]"
+/// );
+/// // Ties round to even.
+/// assert_eq!(
+///     (&v).entrywise_shr_round(1u32, Nearest).to_string(),
+///     "[0, 1; 2, 2]"
+/// );
+/// assert_eq!(
+///     UnsignedMatrix::<u8>::from_str("[4, 8, 12]")
+///         .unwrap()
+///         .entrywise_shr_round(2u64, Exact)
+///         .to_string(),
+///     "[1, 2, 3]"
+/// );
+/// // Shifting by at least the width rounds every element to 0 or 1.
+/// assert_eq!(
+///     UnsignedMatrix::<u8>::from_str("[255, 128, 127]")
+///         .unwrap()
+///         .entrywise_shr_round(8u8, Nearest)
+///         .to_string(),
+///     "[1, 0, 0]"
+/// );
+/// assert_eq!(
+///     UnsignedMatrix::<u8>::from_str("[255, 1, 0]")
+///         .unwrap()
+///         .entrywise_shr_round(100u128, Ceiling)
+///         .to_string(),
+///     "[1, 1, 0]"
+/// );
+/// ```
+///
+/// # entrywise_shr_round_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShrRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// let mut a = UnsignedMatrix::<u8>::from_str("[1, 2; 3, 5]").unwrap();
+/// a.entrywise_shr_round_assign(1u8, Nearest);
+/// assert_eq!(a.to_string(), "[0, 1; 2, 2]");
+///
+/// let mut a = UnsignedMatrix::<u8>::from_str("[1, 2; 3, 5]").unwrap();
+/// a.entrywise_shr_round_assign(1u32, Up);
+/// assert_eq!(a.to_string(), "[1, 1; 2, 3]");
+/// ```
+pub mod entrywise_shr_round;
 /// Implementations of [`ModAdd`](crate::num::arithmetic::traits::ModAdd) and
 /// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.
@@ -409,6 +474,56 @@ pub mod mod_sub;
 /// Implementations of [`ModTrace`](crate::num::arithmetic::traits::ModTrace), the sum of the
 /// diagonal elements of a square matrix modulo a number.
 pub mod mod_trace;
+/// Right-shifting a matrix (dividing it by a power of 2 and taking the floor), by implementations
+/// of [`Shr`](core::ops::Shr) and [`ShrAssign`](core::ops::ShrAssign).
+///
+/// # shr
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// assert_eq!(
+///     (UnsignedMatrix::<u8>::from_str("[]_{0,0}").unwrap() >> 10u8).to_string(),
+///     "[]_{0,0}"
+/// );
+/// assert_eq!(
+///     (UnsignedMatrix::<u8>::from_str("[1, 2; 3, 5]").unwrap() >> 0u16).to_string(),
+///     "[1, 2; 3, 5]"
+/// );
+/// assert_eq!(
+///     (UnsignedMatrix::<u8>::from_str("[1, 2; 3, 5]").unwrap() >> 1u32).to_string(),
+///     "[0, 1; 1, 2]"
+/// );
+/// assert_eq!(
+///     (&UnsignedMatrix::<u8>::from_str("[255, 128]").unwrap() >> 7u64).to_string(),
+///     "[1, 1]"
+/// );
+/// // Shifting by at least the width zeroes every element, keeping the shape.
+/// assert_eq!(
+///     (&UnsignedMatrix::<u8>::from_str("[255, 128]").unwrap() >> 8u128).to_string(),
+///     "[0, 0]"
+/// );
+/// assert_eq!(
+///     (UnsignedMatrix::<u64>::from_str("[18446744073709551615, 1]").unwrap() >> 63usize)
+///         .to_string(),
+///     "[1, 0]"
+/// );
+/// ```
+///
+/// # shr_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::unsigned_matrix::UnsignedMatrix;
+///
+/// let mut a = UnsignedMatrix::<u8>::from_str("[1, 2; 3, 5]").unwrap();
+/// a >>= 1u8;
+/// assert_eq!(a.to_string(), "[0, 1; 1, 2]");
+///
+/// let mut a = UnsignedMatrix::<u8>::from_str("[255, 128]").unwrap();
+/// a >>= 200u32;
+/// assert_eq!(a.to_string(), "[0, 0]");
+/// ```
+pub mod shr;
 /// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) for multiplying an
 /// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector) by an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) on the right modulo a number.

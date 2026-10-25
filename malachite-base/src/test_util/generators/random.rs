@@ -9341,6 +9341,62 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_13(
     )
 }
 
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_14<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_unsigned_matrices::<T>(
+                seed,
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, U::ZERO, U::exact_from(T::WIDTH + 1)),
+    ))
+}
+
+// When the rounding mode is `Exact`, the low bits of every element are cleared, so that the shift
+// is exact.
+pub fn random_unsigned_matrix_unsigned_rounding_mode_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, U, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_matrices::<T>(
+                    seed,
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, U::ZERO, U::exact_from(T::WIDTH + 1)),
+            &random_rounding_modes,
+        )
+        .map(|(mut v, bits, rm)| {
+            if rm == Exact {
+                let bits: u64 = bits.exact_into();
+                for x in &mut v.elements {
+                    *x = if bits >= T::WIDTH {
+                        T::ZERO
+                    } else {
+                        *x >> bits << bits
+                    };
+                }
+            }
+            (v, bits, rm)
+        }),
+    )
+}
+
 pub fn random_unsigned_matrix_unsigned_pair_gen_var_6(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64)> {

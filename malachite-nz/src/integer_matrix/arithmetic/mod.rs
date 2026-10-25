@@ -143,6 +143,155 @@ pub mod div_exact;
 /// [`ElementaryDivisors`](malachite_base::num::arithmetic::traits::ElementaryDivisors), for
 /// computing the elementary divisors of integer matrices.
 pub mod elementary_divisors;
+/// Left-shifting a matrix (multiplying it by a power of 2) and rounding every element, by
+/// implementations of
+/// [`EntrywiseShlRound`](malachite_base::num::arithmetic::traits::EntrywiseShlRound) and
+/// [`EntrywiseShlRoundAssign`](malachite_base::num::arithmetic::traits::EntrywiseShlRoundAssign).
+///
+/// # entrywise_shl_round
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShlRound;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[-1, 2; -3, 5]")
+///         .unwrap()
+///         .entrywise_shl_round(-1i8, Floor))
+///     .to_string(),
+///     "[-1, 1; -2, 2]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[-1, 2; -3, 5]")
+///         .unwrap()
+///         .entrywise_shl_round(-1i16, Down))
+///     .to_string(),
+///     "[0, 1; -1, 2]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[-1, 2; -3, 5]")
+///         .unwrap()
+///         .entrywise_shl_round(-1i32, Nearest))
+///         .to_string(),
+///     "[0, 1; -2, 2]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[4, -8, 12]")
+///         .unwrap()
+///         .entrywise_shl_round(-2i64, Exact))
+///     .to_string(),
+///     "[1, -2, 3]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[1, -2, 3]")
+///         .unwrap()
+///         .entrywise_shl_round(2i8, Exact))
+///         .to_string(),
+///     "[4, -8, 12]"
+/// );
+/// ```
+///
+/// # entrywise_shl_round_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShlRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// let mut a = IntegerMatrix::from_str("[-1, 2; -3, 5]").unwrap();
+/// a.entrywise_shl_round_assign(-1i8, Down);
+/// assert_eq!(a.to_string(), "[0, 1; -1, 2]");
+/// let mut a = IntegerMatrix::from_str("[1, -2, 3]").unwrap();
+/// a.entrywise_shl_round_assign(2i32, Exact);
+/// assert_eq!(a.to_string(), "[4, -8, 12]");
+/// ```
+pub mod entrywise_shl_round;
+/// Right-shifting a matrix (dividing it by a power of 2) and rounding every element, by
+/// implementations of
+/// [`EntrywiseShrRound`](malachite_base::num::arithmetic::traits::EntrywiseShrRound) and
+/// [`EntrywiseShrRoundAssign`](malachite_base::num::arithmetic::traits::EntrywiseShrRoundAssign).
+///
+/// # entrywise_shr_round
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShrRound;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[-1, 2; -3, 5]")
+///         .unwrap()
+///         .entrywise_shr_round(1u8, Floor))
+///     .to_string(),
+///     "[-1, 1; -2, 2]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[-1, 2; -3, 5]")
+///         .unwrap()
+///         .entrywise_shr_round(1u16, Down))
+///     .to_string(),
+///     "[0, 1; -1, 2]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[-1, 2; -3, 5]")
+///         .unwrap()
+///         .entrywise_shr_round(1u32, Ceiling))
+///     .to_string(),
+///     "[0, 1; -1, 3]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[-1, 2; -3, 5]")
+///         .unwrap()
+///         .entrywise_shr_round(1u64, Up))
+///         .to_string(),
+///     "[-1, 1; -2, 3]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[-1, 2; -3, 5]")
+///         .unwrap()
+///         .entrywise_shr_round(1u8, Nearest))
+///     .to_string(),
+///     "[0, 1; -2, 2]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[4, -8, 12]")
+///         .unwrap()
+///         .entrywise_shr_round(2u16, Exact))
+///     .to_string(),
+///     "[1, -2, 3]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[-1, 2; -3, 5]")
+///         .unwrap()
+///         .entrywise_shr_round(1i8, Down))
+///     .to_string(),
+///     "[0, 1; -1, 2]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[1, -2, 3]")
+///         .unwrap()
+///         .entrywise_shr_round(-2i16, Exact))
+///         .to_string(),
+///     "[4, -8, 12]"
+/// );
+/// ```
+///
+/// # entrywise_shr_round_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::EntrywiseShrRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// let mut a = IntegerMatrix::from_str("[-1, 2; -3, 5]").unwrap();
+/// a.entrywise_shr_round_assign(1u8, Down);
+/// assert_eq!(a.to_string(), "[0, 1; -1, 2]");
+/// let mut a = IntegerMatrix::from_str("[-1, 2; -3, 5]").unwrap();
+/// a.entrywise_shr_round_assign(1i32, Nearest);
+/// assert_eq!(a.to_string(), "[0, 1; -2, 2]");
+/// ```
+pub mod entrywise_shr_round;
 /// Implementations of [`FractionFreeLuDecomposition`][fflu], for computing a fraction-free LU
 /// decomposition of a matrix.
 ///
@@ -247,16 +396,26 @@ pub mod scalar_mul;
 ///     "[]_{0,0}"
 /// );
 /// assert_eq!(
-///     (IntegerMatrix::from_str("[1, -2; 3, 4]").unwrap() << 0u16).to_string(),
-///     "[1, -2; 3, 4]"
+///     (IntegerMatrix::from_str("[1, -2, 3]").unwrap() << 0u16).to_string(),
+///     "[1, -2, 3]"
 /// );
 /// assert_eq!(
-///     (IntegerMatrix::from_str("[1, -2; 3, 4]").unwrap() << 2u32).to_string(),
-///     "[4, -8; 12, 16]"
+///     (IntegerMatrix::from_str("[1, -2, 3]").unwrap() << 2u32).to_string(),
+///     "[4, -8, 12]"
 /// );
 /// assert_eq!(
-///     (&IntegerMatrix::from_str("[-3; 0]").unwrap() << 100u64).to_string(),
-///     "[-3802951800684688204490109616128; 0]"
+///     (&IntegerMatrix::from_str("[-3, 0]").unwrap() << 100u64).to_string(),
+///     "[-3802951800684688204490109616128, 0]"
+/// );
+///
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[1, -2, 3]").unwrap() << 2i8).to_string(),
+///     "[4, -8, 12]"
+/// );
+///
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[-1, 2; -3, 5]").unwrap() << -1i64).to_string(),
+///     "[-1, 1; -2, 2]"
 /// );
 /// ```
 ///
@@ -265,11 +424,67 @@ pub mod scalar_mul;
 /// use core::str::FromStr;
 /// use malachite_nz::integer_matrix::IntegerMatrix;
 ///
-/// let mut a = IntegerMatrix::from_str("[1, -2; 3, 4]").unwrap();
+/// let mut a = IntegerMatrix::from_str("[1, -2, 3]").unwrap();
 /// a <<= 2u32;
-/// assert_eq!(a.to_string(), "[4, -8; 12, 16]");
+/// assert_eq!(a.to_string(), "[4, -8, 12]");
+///
+/// let mut a = IntegerMatrix::from_str("[-1, 2; -3, 5]").unwrap();
+/// a <<= -1i32;
+/// assert_eq!(a.to_string(), "[-1, 1; -2, 2]");
 /// ```
 pub mod shl;
+/// Right-shifting a matrix (dividing it by a power of 2 and taking the floor), by implementations
+/// of [`Shr`](core::ops::Shr) and [`ShrAssign`](core::ops::ShrAssign).
+///
+/// # shr
+/// ```
+/// use core::str::FromStr;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[]_{0,0}").unwrap() >> 10u8).to_string(),
+///     "[]_{0,0}"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[1, -2, 3]").unwrap() >> 0u16).to_string(),
+///     "[1, -2, 3]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[4, -8, 12]").unwrap() >> 2u32).to_string(),
+///     "[1, -2, 3]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[-1, 2; -3, 5]").unwrap() >> 1u8).to_string(),
+///     "[-1, 1; -2, 2]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[-3802951800684688204490109616128, 0]").unwrap() >> 100u64)
+///         .to_string(),
+///     "[-3, 0]"
+/// );
+/// assert_eq!(
+///     (IntegerMatrix::from_str("[1, -2, 3]").unwrap() >> -2i8).to_string(),
+///     "[4, -8, 12]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[-1, 2; -3, 5]").unwrap() >> 1i64).to_string(),
+///     "[-1, 1; -2, 2]"
+/// );
+/// ```
+///
+/// # shr_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// let mut a = IntegerMatrix::from_str("[-1, 2; -3, 5]").unwrap();
+/// a >>= 1u32;
+/// assert_eq!(a.to_string(), "[-1, 1; -2, 2]");
+/// let mut a = IntegerMatrix::from_str("[1, -2, 3]").unwrap();
+/// a >>= -2i32;
+/// assert_eq!(a.to_string(), "[4, -8, 12]");
+/// ```
+pub mod shr;
 /// Implementations of [`SmithNormalForm`](malachite_base::num::arithmetic::traits::SmithNormalForm)
 /// and [`SmithNormalFormAssign`](malachite_base::num::arithmetic::traits::SmithNormalFormAssign),
 /// for computing the Smith normal forms of integer matrices.

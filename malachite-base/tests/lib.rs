@@ -896,6 +896,7 @@ pub mod unsigned_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod div_exact;
+        pub mod entrywise_shr_round;
         pub mod mod_add;
         pub mod mod_determinant;
         pub mod mod_howell_form;
@@ -940,6 +941,7 @@ pub mod unsigned_matrix {
         pub mod mod_strong_echelon_form;
         pub mod mod_sub;
         pub mod mod_trace;
+        pub mod shr;
         pub mod vector_mod_mul;
         pub mod vector_mod_power_of_2_mul;
     }

@@ -366,6 +366,8 @@ pub mod integer_matrix {
         pub mod determinant_sign;
         pub mod div_exact;
         pub mod elementary_divisors;
+        pub mod entrywise_shl_round;
+        pub mod entrywise_shr_round;
         pub mod fraction_free_lu_decomposition;
         pub mod fraction_matrix;
         pub mod hermite_normal_form;
@@ -386,6 +388,7 @@ pub mod integer_matrix {
         pub mod reduced_row_echelon_form;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod shr;
         pub mod smith_normal_form;
         pub mod smith_normal_form_and_transforms;
         pub mod solve;
@@ -1101,6 +1104,8 @@ pub mod natural_matrix {
         pub mod determinant_sign;
         pub mod div_exact;
         pub mod elementary_divisors;
+        pub mod entrywise_shl_round;
+        pub mod entrywise_shr_round;
         pub mod kronecker_product;
         pub mod mod_add;
         pub mod mod_determinant;
@@ -1154,6 +1159,7 @@ pub mod natural_matrix {
         pub mod rank;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod shr;
         pub mod smith_normal_form;
         pub mod square;
         pub mod trace;

@@ -4504,6 +4504,57 @@ pub fn natural_matrix_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(NaturalMatrix, T)` where `T` is small and signed.
+pub fn natural_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(NaturalMatrix, T)> {
+    Generator::new(
+        &exhaustive_natural_matrix_signed_pair_gen_var_1,
+        &random_natural_matrix_signed_pair_gen_var_1,
+        &special_random_natural_matrix_signed_pair_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, T, RoundingMode)` where `T` is small and unsigned and the triple is a valid
+// input to `NaturalMatrix::entrywise_shr_round`.
+pub fn natural_matrix_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(NaturalMatrix, T, RoundingMode)>
+where
+    NaturalMatrix: Shl<T, Output = NaturalMatrix>,
+{
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_rounding_mode_triple_gen_var_1,
+        &random_natural_matrix_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_natural_matrix_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, T, RoundingMode)` where `T` is small and signed and the triple is a valid
+// input to `NaturalMatrix::entrywise_shl_round`.
+pub fn natural_matrix_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(NaturalMatrix, T, RoundingMode)>
+where
+    NaturalMatrix: Shr<T, Output = NaturalMatrix>,
+{
+    Generator::new(
+        &exhaustive_natural_matrix_signed_rounding_mode_triple_gen_var_1,
+        &random_natural_matrix_signed_rounding_mode_triple_gen_var_1,
+        &special_random_natural_matrix_signed_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, T, RoundingMode)` where `T` is small and signed and the triple is a valid
+// input to `NaturalMatrix::entrywise_shr_round`.
+pub fn natural_matrix_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> Generator<(NaturalMatrix, T, RoundingMode)>
+where
+    NaturalMatrix: Shl<T, Output = NaturalMatrix>,
+{
+    Generator::new(
+        &exhaustive_natural_matrix_signed_rounding_mode_triple_gen_var_2,
+        &random_natural_matrix_signed_rounding_mode_triple_gen_var_2,
+        &special_random_natural_matrix_signed_rounding_mode_triple_gen_var_2,
+    )
+}
+
 pub fn integer_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
 -> Generator<(IntegerMatrix, T)> {
     Generator::new(
@@ -4520,6 +4571,57 @@ pub fn integer_matrix_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
         &exhaustive_integer_matrix_unsigned_pair_gen_var_4,
         &random_integer_matrix_unsigned_pair_gen_var_4,
         &special_random_integer_matrix_unsigned_pair_gen_var_4,
+    )
+}
+
+// All `(IntegerMatrix, T)` where `T` is small and signed.
+pub fn integer_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(IntegerMatrix, T)> {
+    Generator::new(
+        &exhaustive_integer_matrix_signed_pair_gen_var_1,
+        &random_integer_matrix_signed_pair_gen_var_1,
+        &special_random_integer_matrix_signed_pair_gen_var_1,
+    )
+}
+
+// All `(IntegerMatrix, T, RoundingMode)` where `T` is small and unsigned and the triple is a valid
+// input to `IntegerMatrix::entrywise_shr_round`.
+pub fn integer_matrix_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(IntegerMatrix, T, RoundingMode)>
+where
+    IntegerMatrix: Shl<T, Output = IntegerMatrix>,
+{
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_rounding_mode_triple_gen_var_1,
+        &random_integer_matrix_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_integer_matrix_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(IntegerMatrix, T, RoundingMode)` where `T` is small and signed and the triple is a valid
+// input to `IntegerMatrix::entrywise_shl_round`.
+pub fn integer_matrix_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(IntegerMatrix, T, RoundingMode)>
+where
+    IntegerMatrix: Shr<T, Output = IntegerMatrix>,
+{
+    Generator::new(
+        &exhaustive_integer_matrix_signed_rounding_mode_triple_gen_var_1,
+        &random_integer_matrix_signed_rounding_mode_triple_gen_var_1,
+        &special_random_integer_matrix_signed_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(IntegerMatrix, T, RoundingMode)` where `T` is small and signed and the triple is a valid
+// input to `IntegerMatrix::entrywise_shr_round`.
+pub fn integer_matrix_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> Generator<(IntegerMatrix, T, RoundingMode)>
+where
+    IntegerMatrix: Shl<T, Output = IntegerMatrix>,
+{
+    Generator::new(
+        &exhaustive_integer_matrix_signed_rounding_mode_triple_gen_var_2,
+        &random_integer_matrix_signed_rounding_mode_triple_gen_var_2,
+        &special_random_integer_matrix_signed_rounding_mode_triple_gen_var_2,
     )
 }
 

@@ -4158,6 +4158,76 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>()
     ))
 }
 
+pub fn exhaustive_natural_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> It<(NaturalMatrix, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_matrices(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_natural_matrix_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(NaturalMatrix, T, RoundingMode)>
+where
+    NaturalMatrix: Shl<T, Output = NaturalMatrix>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_natural_matrices(), exhaustive_unsigneds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| (if rm == Exact { v << i } else { v }, i, rm)),
+    )
+}
+
+pub fn exhaustive_natural_matrix_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> It<(NaturalMatrix, T, RoundingMode)>
+where
+    NaturalMatrix: Shr<T, Output = NaturalMatrix>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_natural_matrices(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| {
+            (
+                if i < T::ZERO && rm == Exact {
+                    v >> i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn exhaustive_natural_matrix_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> It<(NaturalMatrix, T, RoundingMode)>
+where
+    NaturalMatrix: Shl<T, Output = NaturalMatrix>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_natural_matrices(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| {
+            (
+                if i > T::ZERO && rm == Exact {
+                    v << i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
 pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(IntegerMatrix, T)> {
     Box::new(exhaustive_pairs(
@@ -4172,6 +4242,76 @@ pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>()
         exhaustive_integer_matrices(),
         exhaustive_unsigneds(),
     ))
+}
+
+pub fn exhaustive_integer_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> It<(IntegerMatrix, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integer_matrices(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_integer_matrix_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(IntegerMatrix, T, RoundingMode)>
+where
+    IntegerMatrix: Shl<T, Output = IntegerMatrix>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_integer_matrices(), exhaustive_unsigneds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| (if rm == Exact { v << i } else { v }, i, rm)),
+    )
+}
+
+pub fn exhaustive_integer_matrix_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>()
+-> It<(IntegerMatrix, T, RoundingMode)>
+where
+    IntegerMatrix: Shr<T, Output = IntegerMatrix>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_integer_matrices(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| {
+            (
+                if i < T::ZERO && rm == Exact {
+                    v >> i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn exhaustive_integer_matrix_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>()
+-> It<(IntegerMatrix, T, RoundingMode)>
+where
+    IntegerMatrix: Shl<T, Output = IntegerMatrix>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_integer_matrices(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((v, i), rm)| {
+            (
+                if i > T::ZERO && rm == Exact {
+                    v << i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
 }
 
 pub fn exhaustive_natural_matrix_natural_pair_gen_var_1() -> It<(NaturalMatrix, Natural)> {

@@ -62,8 +62,9 @@ macro_rules! impl_natural_vector_entrywise_shr_round_unsigned {
             /// Panics if `rm` is `Exact` and some element is not divisible by $2^k$.
             ///
             /// # Examples
-            /// See [here](super::entrywise_shr_round#entrywise_shr_round).            /// With `rm`
-            /// equal to `Down`, this is equivalent to `_fmpz_vec_scalar_tdiv_q_2exp` from
+            /// See [here](super::entrywise_shr_round#entrywise_shr_round).
+            ///
+            /// With `rm` equal to `Down`, this is equivalent to `_fmpz_vec_scalar_tdiv_q_2exp` from
             /// `fmpz_vec/scalar.c`, FLINT 3.6.0.
             #[inline]
             fn entrywise_shr_round(mut self, bits: $t, rm: RoundingMode) -> NaturalVector {
@@ -99,8 +100,9 @@ macro_rules! impl_natural_vector_entrywise_shr_round_unsigned {
             /// Panics if `rm` is `Exact` and some element is not divisible by $2^k$.
             ///
             /// # Examples
-            /// See [here](super::entrywise_shr_round#entrywise_shr_round).            /// With `rm`
-            /// equal to `Down`, this is equivalent to `_fmpz_vec_scalar_tdiv_q_2exp` from
+            /// See [here](super::entrywise_shr_round#entrywise_shr_round).
+            ///
+            /// With `rm` equal to `Down`, this is equivalent to `_fmpz_vec_scalar_tdiv_q_2exp` from
             /// `fmpz_vec/scalar.c`, FLINT 3.6.0.
             #[inline]
             fn entrywise_shr_round(self, bits: $t, rm: RoundingMode) -> NaturalVector {

@@ -8905,6 +8905,151 @@ pub fn special_random_natural_matrix_unsigned_pair_gen_var_5<T: PrimitiveUnsigne
     ))
 }
 
+pub fn special_random_natural_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_natural_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_natural_matrix_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, T, RoundingMode)>
+where
+    NaturalMatrix: Shl<T, Output = NaturalMatrix>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(v, i, rm)| (if rm == Exact { v << i } else { v }, i, rm)),
+    )
+}
+
+pub fn special_random_natural_matrix_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, T, RoundingMode)>
+where
+    NaturalMatrix: Shr<T, Output = NaturalMatrix>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(v, i, rm)| {
+            (
+                if i < T::ZERO && rm == Exact {
+                    v >> i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn special_random_natural_matrix_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, T, RoundingMode)>
+where
+    NaturalMatrix: Shl<T, Output = NaturalMatrix>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(v, i, rm)| {
+            (
+                if i > T::ZERO && rm == Exact {
+                    v << i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
 pub fn special_random_integer_matrix_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, T)> {
@@ -8955,6 +9100,151 @@ pub fn special_random_integer_matrix_unsigned_pair_gen_var_4<T: PrimitiveUnsigne
             )
         },
     ))
+}
+
+pub fn special_random_integer_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_matrices(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_dimension_n", 4),
+                config.get_or("mean_dimension_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_matrix_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, T, RoundingMode)>
+where
+    IntegerMatrix: Shl<T, Output = IntegerMatrix>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(v, i, rm)| (if rm == Exact { v << i } else { v }, i, rm)),
+    )
+}
+
+pub fn special_random_integer_matrix_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, T, RoundingMode)>
+where
+    IntegerMatrix: Shr<T, Output = IntegerMatrix>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(v, i, rm)| {
+            (
+                if i < T::ZERO && rm == Exact {
+                    v >> i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn special_random_integer_matrix_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, T, RoundingMode)>
+where
+    IntegerMatrix: Shl<T, Output = IntegerMatrix>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(v, i, rm)| {
+            (
+                if i > T::ZERO && rm == Exact {
+                    v << i
+                } else {
+                    v
+                },
+                i,
+                rm,
+            )
+        }),
+    )
 }
 
 pub fn special_random_natural_matrix_natural_pair_gen_var_1(

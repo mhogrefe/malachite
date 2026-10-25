@@ -51,8 +51,10 @@ macro_rules! impl_integer_vector_shr_unsigned {
             /// elements, and $k$ is `self.dimension()`.
             ///
             /// # Examples
-            /// See [here](super::shr#shr).            /// This is equivalent to
-            /// `_fmpz_vec_scalar_fdiv_q_2exp` from `fmpz_vec/scalar.c`, FLINT 3.6.0.
+            /// See [here](super::shr#shr).
+            ///
+            /// This is equivalent to `_fmpz_vec_scalar_fdiv_q_2exp` from `fmpz_vec/scalar.c`, FLINT
+            /// 3.6.0.
             #[inline]
             fn shr(mut self, bits: $t) -> IntegerVector {
                 self >>= bits;
@@ -79,8 +81,10 @@ macro_rules! impl_integer_vector_shr_unsigned {
             /// elements, and $k$ is `self.dimension()`.
             ///
             /// # Examples
-            /// See [here](super::shr#shr).            /// This is equivalent to
-            /// `_fmpz_vec_scalar_fdiv_q_2exp` from `fmpz_vec/scalar.c`, FLINT 3.6.0.
+            /// See [here](super::shr#shr).
+            ///
+            /// This is equivalent to `_fmpz_vec_scalar_fdiv_q_2exp` from `fmpz_vec/scalar.c`, FLINT
+            /// 3.6.0.
             #[inline]
             fn shr(self, bits: $t) -> IntegerVector {
                 shr_ref(self, bits)
@@ -104,8 +108,10 @@ macro_rules! impl_integer_vector_shr_unsigned {
             /// elements, and $k$ is `self.dimension()`.
             ///
             /// # Examples
-            /// See [here](super::shr#shr_assign).            /// This is equivalent to
-            /// `_fmpz_vec_scalar_fdiv_q_2exp` from `fmpz_vec/scalar.c`, FLINT 3.6.0.
+            /// See [here](super::shr#shr_assign).
+            ///
+            /// This is equivalent to `_fmpz_vec_scalar_fdiv_q_2exp` from `fmpz_vec/scalar.c`, FLINT
+            /// 3.6.0.
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
                 shr_assign(self, bits);

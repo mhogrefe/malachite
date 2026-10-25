@@ -7652,6 +7652,37 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_13() -> It<(UnsignedMatr
     )
 }
 
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_14<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, U)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigned_matrices::<T>(),
+        primitive_int_increasing_inclusive_range(U::ZERO, U::exact_from(T::WIDTH + 1)),
+    ))
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_rounding_mode_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, U, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs(
+                exhaustive_unsigned_matrices::<T>(),
+                primitive_int_increasing_inclusive_range(U::ZERO, U::exact_from(T::WIDTH + 1)),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|((v, bits), rm)| {
+            *rm != Exact
+                || v.elements
+                    .iter()
+                    .all(|x| x.divisible_by_power_of_2((*bits).exact_into()))
+        }),
+    ))
+}
+
 // Square matrices with nonzero diagonal elements, matrices with the same height, all with their
 // elements less than a prime m, and m.
 pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7()
