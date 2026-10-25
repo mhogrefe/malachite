@@ -15,6 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
     from_integer_matrix::register(runner);
     from_natural_matrix::register(runner);
     from_numerators_and_denominator::register(runner);
+    from_row_slices::register(runner);
     from_rows::register(runner);
     from_unsigned_matrix::register(runner);
     integer_matrix_from_rational_matrix::register(runner);
@@ -35,6 +36,7 @@ mod from_elements_column_major;
 mod from_integer_matrix;
 mod from_natural_matrix;
 mod from_numerators_and_denominator;
+mod from_row_slices;
 mod from_rows;
 mod from_unsigned_matrix;
 mod integer_matrix_from_rational_matrix;

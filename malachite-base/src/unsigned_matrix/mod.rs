@@ -431,6 +431,50 @@ impl<T: PrimitiveUnsigned> Matrix for UnsignedMatrix<T> {
         Self::from_owned_elements(width, height, xs).transpose()
     }
 
+    /// Creates an [`UnsignedMatrix`] from a slice of its rows, each a slice of elements. The height
+    /// is the number of rows and the width is their common length; with no rows, the matrix is
+    /// 0-by-0.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements.
+    ///
+    /// # Panics
+    /// Panics if the rows do not all have the same length.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_base::unsigned_matrix::UnsignedMatrix;
+    ///
+    /// let m = UnsignedMatrix::<u64>::from_row_slices(&[&[1, 2, 3], &[4, 5, 6]]);
+    /// assert_eq!(m.to_string(), "[1, 2, 3; 4, 5, 6]");
+    ///
+    /// let m = UnsignedMatrix::<u64>::from_row_slices(&[&[], &[]]);
+    /// assert_eq!(m.to_string(), "[]_{2,0}");
+    ///
+    /// // With no rows, the matrix is 0-by-0.
+    /// assert_eq!(
+    ///     UnsignedMatrix::<u64>::from_row_slices(&[]).to_string(),
+    ///     "[]_{0,0}"
+    /// );
+    /// ```
+    fn from_row_slices(rows: &[&[T]]) -> Self {
+        let width = rows.first().map_or(0, |row| row.len());
+        assert!(
+            rows.iter().all(|row| row.len() == width),
+            "the rows must all have the same length"
+        );
+        Self {
+            elements: rows.concat(),
+            height: rows.len(),
+            width,
+        }
+    }
+
     /// Returns the zero matrix of a given height and width: every element is 0.
     ///
     /// # Worst-case complexity

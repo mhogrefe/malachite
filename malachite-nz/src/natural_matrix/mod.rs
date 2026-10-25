@@ -461,6 +461,48 @@ impl Matrix for NaturalMatrix {
         }
     }
 
+    /// Creates a [`NaturalMatrix`] from a slice of its rows, each a slice of elements. The height
+    /// is the number of rows and the width is their common length; with no rows, the matrix is
+    /// 0-by-0.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of bits of the
+    /// elements.
+    ///
+    /// # Panics
+    /// Panics if the rows do not all have the same length.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    ///
+    /// let first = [1u32, 2, 3].map(Natural::from);
+    /// let second = [4u32, 5, 6].map(Natural::from);
+    /// let m = NaturalMatrix::from_row_slices(&[&first, &second]);
+    /// assert_eq!(m.to_string(), "[1, 2, 3; 4, 5, 6]");
+    ///
+    /// // With no rows, the matrix is 0-by-0.
+    /// assert_eq!(NaturalMatrix::from_row_slices(&[]).to_string(), "[]_{0,0}");
+    /// ```
+    fn from_row_slices(rows: &[&[Natural]]) -> Self {
+        let width = rows.first().map_or(0, |row| row.len());
+        assert!(
+            rows.iter().all(|row| row.len() == width),
+            "the rows must all have the same length"
+        );
+        Self {
+            elements: rows.concat(),
+            height: rows.len(),
+            width,
+        }
+    }
+
     /// Returns the zero matrix of a given height and width: every element is 0.
     ///
     /// # Worst-case complexity

@@ -418,6 +418,7 @@ pub mod integer_matrix {
         pub mod from_elements;
         pub mod from_elements_column_major;
         pub mod from_natural_matrix;
+        pub mod from_row_slices;
         pub mod from_rows;
         pub mod from_unsigned_matrix;
         pub mod natural_matrix_from_integer_matrix;
@@ -1177,6 +1178,7 @@ pub mod natural_matrix {
         pub mod from_columns;
         pub mod from_elements;
         pub mod from_elements_column_major;
+        pub mod from_row_slices;
         pub mod from_rows;
         pub mod from_unsigned_matrix;
         #[cfg(feature = "serde")]

@@ -214,6 +214,7 @@ pub mod rational_matrix {
         pub mod from_integer_matrix;
         pub mod from_natural_matrix;
         pub mod from_numerators_and_denominator;
+        pub mod from_row_slices;
         pub mod from_rows;
         pub mod from_unsigned_matrix;
         pub mod integer_matrix_from_rational_matrix;

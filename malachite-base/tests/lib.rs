@@ -959,6 +959,7 @@ pub mod unsigned_matrix {
         pub mod from_columns;
         pub mod from_elements;
         pub mod from_elements_column_major;
+        pub mod from_row_slices;
         pub mod from_rows;
         #[cfg(feature = "serde")]
         pub mod serde;

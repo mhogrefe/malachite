@@ -12,6 +12,7 @@ documented by git history.
 
 - The `Matrix` trait (`malachite_base::matrix`), for what every matrix type has in common, as
   `Vector` is for vectors: `from_elements`, `from_owned_elements` and their column-major forms,
+  `from_row_slices` (from a `&[&[T]]` of rows),
   `zero`, `identity`, `rectangular_identity` (ones in positions $(i, i)$ of a matrix of any shape,
   as FLINT's `*_mat_one` gives), `standard_basis_matrix` (the matrix units $E_{ij}$), `to_elements`,
   `into_elements`, `elements_ref`, `height`, `width`, `is_square`, `is_empty`, `is_zero`,

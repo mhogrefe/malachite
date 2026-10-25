@@ -41,6 +41,12 @@ pub trait Matrix: Sized {
     /// column-major order, taking ownership of the [`Vec`].
     fn from_owned_elements_column_major(height: u64, width: u64, xs: Vec<Self::Element>) -> Self;
 
+    /// Creates a matrix from a slice of its rows, each a slice of elements. The height is the
+    /// number of rows and the width is their common length; with no rows, the matrix is 0-by-0.
+    fn from_row_slices(rows: &[&[Self::Element]]) -> Self
+    where
+        Self::Element: Clone;
+
     /// Returns the zero matrix of a given height and width: every element is 0.
     fn zero(height: u64, width: u64) -> Self;
 
