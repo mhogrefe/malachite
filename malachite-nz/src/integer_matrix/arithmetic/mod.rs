@@ -14,6 +14,91 @@ crate_test_mod! {
     /// [`Solve`](malachite_base::num::arithmetic::traits::Solve), public only under `test_build`.
     add_mul_unsigned_matrix
 }
+/// Adding a multiple of one matrix to another, by implementations of
+/// [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
+/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign).
+///
+/// # add_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMul;
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// assert_eq!(
+///     IntegerMatrix::from_str("[]_{0,0}")
+///         .unwrap()
+///         .add_mul(
+///             IntegerMatrix::from_str("[]_{0,0}").unwrap(),
+///             Integer::from(5)
+///         )
+///         .to_string(),
+///     "[]_{0,0}"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[1, -2, 3]")
+///         .unwrap()
+///         .add_mul(
+///             IntegerMatrix::from_str("[4, 5, -6]").unwrap(),
+///             Integer::ZERO
+///         )
+///         .to_string(),
+///     "[1, -2, 3]"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[1, -2, 3]")
+///         .unwrap()
+///         .add_mul(IntegerMatrix::from_str("[4, 5, -6]").unwrap(), Integer::ONE)
+///         .to_string(),
+///     "[5, 3, -3]"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[1, -2, 3]")
+///         .unwrap()
+///         .add_mul(
+///             IntegerMatrix::from_str("[4, 5, -6]").unwrap(),
+///             Integer::NEGATIVE_ONE
+///         )
+///         .to_string(),
+///     "[-3, -7, 9]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[1, -2, 3]").unwrap())
+///         .add_mul(
+///             &IntegerMatrix::from_str("[4, 5, -6]").unwrap(),
+///             &Integer::from(10)
+///         )
+///         .to_string(),
+///     "[41, 48, -57]"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[1, 0]")
+///         .unwrap()
+///         .add_mul(
+///             &IntegerMatrix::from_str("[18446744073709551615, -1]").unwrap(),
+///             &Integer::from_str("18446744073709551617").unwrap()
+///         )
+///         .to_string(),
+///     "[340282366920938463463374607431768211456, -18446744073709551617]"
+/// );
+/// ```
+///
+/// # add_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// let mut a = IntegerMatrix::from_str("[1, -2, 3]").unwrap();
+/// a.add_mul_assign(
+///     IntegerMatrix::from_str("[4, 5, -6]").unwrap(),
+///     Integer::from(10),
+/// );
+/// assert_eq!(a.to_string(), "[41, 48, -57]");
+/// ```
+pub mod add_mul;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod) and
 /// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
 /// every element of an [`IntegerMatrix`](super::IntegerMatrix) to the representative closest to
@@ -516,6 +601,91 @@ pub mod square;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;
+/// Subtracting a multiple of one matrix from another, by implementations of
+/// [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
+/// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign).
+///
+/// # sub_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::SubMul;
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// assert_eq!(
+///     IntegerMatrix::from_str("[]_{0,0}")
+///         .unwrap()
+///         .sub_mul(
+///             IntegerMatrix::from_str("[]_{0,0}").unwrap(),
+///             Integer::from(5)
+///         )
+///         .to_string(),
+///     "[]_{0,0}"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[1, -2, 3]")
+///         .unwrap()
+///         .sub_mul(
+///             IntegerMatrix::from_str("[4, 5, -6]").unwrap(),
+///             Integer::ZERO
+///         )
+///         .to_string(),
+///     "[1, -2, 3]"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[1, -2, 3]")
+///         .unwrap()
+///         .sub_mul(IntegerMatrix::from_str("[4, 5, -6]").unwrap(), Integer::ONE)
+///         .to_string(),
+///     "[-3, -7, 9]"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[1, -2, 3]")
+///         .unwrap()
+///         .sub_mul(
+///             IntegerMatrix::from_str("[4, 5, -6]").unwrap(),
+///             Integer::NEGATIVE_ONE
+///         )
+///         .to_string(),
+///     "[5, 3, -3]"
+/// );
+/// assert_eq!(
+///     (&IntegerMatrix::from_str("[1, -2, 3]").unwrap())
+///         .sub_mul(
+///             &IntegerMatrix::from_str("[4, 5, -6]").unwrap(),
+///             &Integer::from(10)
+///         )
+///         .to_string(),
+///     "[-39, -52, 63]"
+/// );
+/// assert_eq!(
+///     IntegerMatrix::from_str("[1, 0]")
+///         .unwrap()
+///         .sub_mul(
+///             &IntegerMatrix::from_str("[18446744073709551615, -1]").unwrap(),
+///             &Integer::from_str("18446744073709551617").unwrap()
+///         )
+///         .to_string(),
+///     "[-340282366920938463463374607431768211454, 18446744073709551617]"
+/// );
+/// ```
+///
+/// # sub_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::SubMulAssign;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer_matrix::IntegerMatrix;
+///
+/// let mut a = IntegerMatrix::from_str("[1, -2, 3]").unwrap();
+/// a.sub_mul_assign(
+///     IntegerMatrix::from_str("[4, 5, -6]").unwrap(),
+///     Integer::from(10),
+/// );
+/// assert_eq!(a.to_string(), "[-39, -52, 63]");
+/// ```
+pub mod sub_mul;
 /// The method [`submatrix_determinant_bound`](super::IntegerMatrix::submatrix_determinant_bound),
 /// an upper bound for the absolute values of the determinants of the square submatrices of a
 /// matrix.

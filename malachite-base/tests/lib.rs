@@ -898,6 +898,7 @@ pub mod unsigned_matrix {
         pub mod div_exact;
         pub mod entrywise_shr_round;
         pub mod mod_add;
+        pub mod mod_add_mul;
         pub mod mod_determinant;
         pub mod mod_howell_form;
         pub mod mod_inverse;
@@ -913,6 +914,7 @@ pub mod unsigned_matrix {
         pub mod mod_pow;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_determinant;
         pub mod mod_power_of_2_howell_form;
         pub mod mod_power_of_2_inverse;
@@ -929,6 +931,7 @@ pub mod unsigned_matrix {
         pub mod mod_power_of_2_square;
         pub mod mod_power_of_2_strong_echelon_form;
         pub mod mod_power_of_2_sub;
+        pub mod mod_power_of_2_sub_mul;
         pub mod mod_power_of_2_trace;
         pub mod mod_rank;
         pub mod mod_reduced_row_echelon_form;
@@ -940,6 +943,7 @@ pub mod unsigned_matrix {
         pub mod mod_square;
         pub mod mod_strong_echelon_form;
         pub mod mod_sub;
+        pub mod mod_sub_mul;
         pub mod mod_trace;
         pub mod shr;
         pub mod vector_mod_mul;

@@ -10,6 +10,7 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
+    add_mul::register(runner);
     balanced_mod::register(runner);
     balanced_mod_power_of_2::register(runner);
     canonical_primitive_part::register(runner);
@@ -24,6 +25,7 @@ pub(crate) fn register(runner: &mut Runner) {
     entrywise_shr_round::register(runner);
     kronecker_product::register(runner);
     mod_add::register(runner);
+    mod_add_mul::register(runner);
     mod_determinant::register(runner);
     mod_howell_form::register(runner);
     mod_inverse::register(runner);
@@ -40,6 +42,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_pow::register(runner);
     mod_power_of_2::register(runner);
     mod_power_of_2_add::register(runner);
+    mod_power_of_2_add_mul::register(runner);
     mod_power_of_2_determinant::register(runner);
     mod_power_of_2_howell_form::register(runner);
     mod_power_of_2_inverse::register(runner);
@@ -56,6 +59,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_square::register(runner);
     mod_power_of_2_strong_echelon_form::register(runner);
     mod_power_of_2_sub::register(runner);
+    mod_power_of_2_sub_mul::register(runner);
     mod_power_of_2_trace::register(runner);
     mod_rank::register(runner);
     mod_reduced_row_echelon_form::register(runner);
@@ -67,6 +71,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_square::register(runner);
     mod_strong_echelon_form::register(runner);
     mod_sub::register(runner);
+    mod_sub_mul::register(runner);
     mod_trace::register(runner);
     mul::register(runner);
     mul_vector::register(runner);
@@ -86,6 +91,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod add;
+mod add_mul;
 mod balanced_mod;
 mod balanced_mod_power_of_2;
 mod canonical_primitive_part;
@@ -100,6 +106,7 @@ mod entrywise_shl_round;
 mod entrywise_shr_round;
 mod kronecker_product;
 mod mod_add;
+mod mod_add_mul;
 mod mod_determinant;
 mod mod_howell_form;
 mod mod_inverse;
@@ -116,6 +123,7 @@ mod mod_op;
 mod mod_pow;
 mod mod_power_of_2;
 mod mod_power_of_2_add;
+mod mod_power_of_2_add_mul;
 mod mod_power_of_2_determinant;
 mod mod_power_of_2_howell_form;
 mod mod_power_of_2_inverse;
@@ -132,6 +140,7 @@ mod mod_power_of_2_solve;
 mod mod_power_of_2_square;
 mod mod_power_of_2_strong_echelon_form;
 mod mod_power_of_2_sub;
+mod mod_power_of_2_sub_mul;
 mod mod_power_of_2_trace;
 mod mod_rank;
 mod mod_reduced_row_echelon_form;
@@ -143,6 +152,7 @@ mod mod_solve_upper_triangular;
 mod mod_square;
 mod mod_strong_echelon_form;
 mod mod_sub;
+mod mod_sub_mul;
 mod mod_trace;
 mod mul;
 mod mul_vector;

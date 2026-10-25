@@ -1395,6 +1395,16 @@ pub fn rational_matrix_pair_gen_var_1() -> Generator<(RationalMatrix, RationalMa
     )
 }
 
+// All `(RationalMatrix, RationalMatrix, Rational)` where the matrices have the same shape.
+pub fn rational_matrix_rational_matrix_rational_triple_gen_var_1()
+-> Generator<(RationalMatrix, RationalMatrix, Rational)> {
+    Generator::new(
+        &exhaustive_rational_matrix_rational_matrix_rational_triple_gen_var_1,
+        &random_rational_matrix_rational_matrix_rational_triple_gen_var_1,
+        &special_random_rational_matrix_rational_matrix_rational_triple_gen_var_1,
+    )
+}
+
 // All pairs of `RationalMatrix`s of the same width.
 pub fn rational_matrix_pair_gen_var_2() -> Generator<(RationalMatrix, RationalMatrix)> {
     Generator::new(

@@ -2477,6 +2477,20 @@ pub fn random_rational_matrix_pair_gen_var_1(
     )
 }
 
+pub fn random_rational_matrix_rational_matrix_rational_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalMatrix, RationalMatrix, Rational)> {
+    Box::new(
+        random_rational_matrix_pair_gen_var_1(config)
+            .zip(random_rationals(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((a, b), c)| (a, b, c)),
+    )
+}
+
 // Pairs of matrices of the same random width, with random heights.
 pub fn random_rational_matrix_pair_gen_var_2(
     config: &GenConfig,

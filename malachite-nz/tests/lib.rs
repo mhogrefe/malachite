@@ -351,6 +351,7 @@ pub mod integer_matrix {
     pub mod access;
     pub mod arithmetic {
         pub mod add;
+        pub mod add_mul;
         pub mod add_mul_unsigned_matrix;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
@@ -397,6 +398,7 @@ pub mod integer_matrix {
         pub mod solve_multi_mod;
         pub mod square;
         pub mod sub;
+        pub mod sub_mul;
         pub mod submatrix_determinant_bound;
         pub mod trace;
         pub mod vector_mul;
@@ -1094,6 +1096,7 @@ pub mod natural_matrix {
     pub mod access;
     pub mod arithmetic {
         pub mod add;
+        pub mod add_mul;
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
@@ -1108,6 +1111,7 @@ pub mod natural_matrix {
         pub mod entrywise_shr_round;
         pub mod kronecker_product;
         pub mod mod_add;
+        pub mod mod_add_mul;
         pub mod mod_determinant;
         pub mod mod_howell_form;
         pub mod mod_inverse;
@@ -1123,6 +1127,7 @@ pub mod natural_matrix {
         pub mod mod_pow;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_add_mul;
         pub mod mod_power_of_2_determinant;
         pub mod mod_power_of_2_howell_form;
         pub mod mod_power_of_2_inverse;
@@ -1139,6 +1144,7 @@ pub mod natural_matrix {
         pub mod mod_power_of_2_square;
         pub mod mod_power_of_2_strong_echelon_form;
         pub mod mod_power_of_2_sub;
+        pub mod mod_power_of_2_sub_mul;
         pub mod mod_power_of_2_trace;
         pub mod mod_rank;
         pub mod mod_reduced_row_echelon_form;
@@ -1150,6 +1156,7 @@ pub mod natural_matrix {
         pub mod mod_square;
         pub mod mod_strong_echelon_form;
         pub mod mod_sub;
+        pub mod mod_sub_mul;
         pub mod mod_trace;
         pub mod mul;
         pub mod mul_vector;

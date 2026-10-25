@@ -3724,6 +3724,17 @@ pub fn exhaustive_integer_matrix_pair_gen_var_1() -> It<(IntegerMatrix, IntegerM
     )
 }
 
+pub fn exhaustive_integer_matrix_integer_matrix_integer_triple_gen_var_1()
+-> It<(IntegerMatrix, IntegerMatrix, Integer)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_integer_matrix_pair_gen_var_1(),
+            exhaustive_integers(),
+        )
+        .map(|((a, b), c)| (a, b, c)),
+    )
+}
+
 // Pairs of matrices of the same width: every triple of two heights and a width, and for each triple
 // every pair of matrices of those shapes.
 pub fn exhaustive_integer_matrix_pair_gen_var_2() -> It<(IntegerMatrix, IntegerMatrix)> {
@@ -4733,6 +4744,62 @@ pub fn exhaustive_natural_matrix_pair_gen_var_1() -> It<(NaturalMatrix, NaturalM
             ys,
         )
         .map(|(_, p)| p),
+    )
+}
+
+pub fn exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_7()
+-> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_matrix_pair_gen_var_1(),
+            exhaustive_naturals(),
+        )
+        .map(|((a, b), c)| (a, b, c)),
+    )
+}
+
+// The modulus is the largest input plus 1 plus a free `Natural`, so that no quadruple is generated
+// twice.
+pub fn exhaustive_natural_matrix_natural_matrix_natural_natural_quadruple_gen_var_1()
+-> It<(NaturalMatrix, NaturalMatrix, Natural, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_7(),
+            exhaustive_naturals(),
+        )
+        .map(|((v, w, c), k)| {
+            let m = v
+                .elements
+                .iter()
+                .chain(&w.elements)
+                .chain(core::iter::once(&c))
+                .max()
+                .unwrap()
+                + k
+                + Natural::ONE;
+            (v, w, c, m)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_matrix_natural_matrix_natural_unsigned_quadruple_gen_var_1()
+-> It<(NaturalMatrix, NaturalMatrix, Natural, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_7(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|((v, w, c), pow)| {
+            let bits = v
+                .elements
+                .iter()
+                .chain(&w.elements)
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0)
+                .max(c.significant_bits());
+            (v, w, c, pow + bits)
+        }),
     )
 }
 

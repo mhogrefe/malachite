@@ -9,6 +9,78 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// matrices of the same shape.
 pub mod add;
+/// Adding a multiple of one matrix to another, by implementations of
+/// [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
+/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign).
+///
+/// # add_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMul;
+/// use malachite_base::num::basic::traits::{One, Zero};
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::NaturalMatrix;
+///
+/// assert_eq!(
+///     NaturalMatrix::from_str("[]_{0,0}")
+///         .unwrap()
+///         .add_mul(
+///             NaturalMatrix::from_str("[]_{0,0}").unwrap(),
+///             Natural::from(5u32)
+///         )
+///         .to_string(),
+///     "[]_{0,0}"
+/// );
+/// assert_eq!(
+///     NaturalMatrix::from_str("[1, 2, 3]")
+///         .unwrap()
+///         .add_mul(NaturalMatrix::from_str("[4, 5, 6]").unwrap(), Natural::ZERO)
+///         .to_string(),
+///     "[1, 2, 3]"
+/// );
+/// assert_eq!(
+///     NaturalMatrix::from_str("[1, 2, 3]")
+///         .unwrap()
+///         .add_mul(NaturalMatrix::from_str("[4, 5, 6]").unwrap(), Natural::ONE)
+///         .to_string(),
+///     "[5, 7, 9]"
+/// );
+/// assert_eq!(
+///     (&NaturalMatrix::from_str("[1, 2, 3]").unwrap())
+///         .add_mul(
+///             &NaturalMatrix::from_str("[4, 5, 6]").unwrap(),
+///             &Natural::from(10u32)
+///         )
+///         .to_string(),
+///     "[41, 52, 63]"
+/// );
+/// assert_eq!(
+///     NaturalMatrix::from_str("[1, 0]")
+///         .unwrap()
+///         .add_mul(
+///             &NaturalMatrix::from_str("[18446744073709551615, 1]").unwrap(),
+///             &Natural::from_str("18446744073709551617").unwrap()
+///         )
+///         .to_string(),
+///     "[340282366920938463463374607431768211456, 18446744073709551617]"
+/// );
+/// ```
+///
+/// # add_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural_matrix::NaturalMatrix;
+///
+/// let mut a = NaturalMatrix::from_str("[1, 2, 3]").unwrap();
+/// a.add_mul_assign(
+///     NaturalMatrix::from_str("[4, 5, 6]").unwrap(),
+///     Natural::from(10u32),
+/// );
+/// assert_eq!(a.to_string(), "[41, 52, 63]");
+/// ```
+pub mod add_mul;
 /// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), which
 /// reduce every element of a [`NaturalMatrix`](super::NaturalMatrix) to the representative closest
 /// to zero modulo a number.
@@ -246,6 +318,10 @@ pub mod kronecker_product;
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
 pub mod mod_add;
+/// Implementations of [`ModAddMul`](malachite_base::num::arithmetic::traits::ModAddMul) and
+/// [`ModAddMulAssign`](malachite_base::num::arithmetic::traits::ModAddMulAssign), for adding a
+/// scalar multiple of one matrix to another modulo a number.
+pub mod mod_add_mul;
 /// Implementations of [`ModDeterminant`](malachite_base::num::arithmetic::traits::ModDeterminant),
 /// for computing the determinant of a square matrix modulo a number.
 pub mod mod_determinant;
@@ -314,6 +390,11 @@ pub mod mod_power_of_2;
 /// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign), for
 /// adding [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a power of 2.
 pub mod mod_power_of_2_add;
+/// Implementations of
+/// [`ModPowerOf2AddMul`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMul) and
+/// [`ModPowerOf2AddMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMulAssign),
+/// for adding a scalar multiple of one matrix to another modulo a power of 2.
+pub mod mod_power_of_2_add_mul;
 /// Implementations of
 /// [`ModPowerOf2Determinant`](malachite_base::num::arithmetic::traits::ModPowerOf2Determinant), for
 /// computing determinants of square matrices of naturals modulo powers of 2.
@@ -434,6 +515,11 @@ pub mod mod_power_of_2_strong_echelon_form;
 /// subtracting [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a power of 2.
 pub mod mod_power_of_2_sub;
 
+/// Implementations of
+/// [`ModPowerOf2SubMul`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMul) and
+/// [`ModPowerOf2SubMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMulAssign),
+/// for subtracting a scalar multiple of one matrix from another modulo a power of 2.
+pub mod mod_power_of_2_sub_mul;
 /// An implementation of
 /// [`ModPowerOf2Trace`](malachite_base::num::arithmetic::traits::ModPowerOf2Trace), the sum of the
 /// diagonal elements of a square matrix modulo a power of 2.
@@ -525,6 +611,10 @@ pub mod mod_strong_echelon_form;
 /// [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a number.
 pub mod mod_sub;
 
+/// Implementations of [`ModSubMul`](malachite_base::num::arithmetic::traits::ModSubMul) and
+/// [`ModSubMulAssign`](malachite_base::num::arithmetic::traits::ModSubMulAssign), for subtracting a
+/// scalar multiple of one matrix from another modulo a number.
+pub mod mod_sub_mul;
 /// Implementations of [`ModTrace`](malachite_base::num::arithmetic::traits::ModTrace), the sum of
 /// the diagonal elements of a square matrix modulo a number.
 pub mod mod_trace;

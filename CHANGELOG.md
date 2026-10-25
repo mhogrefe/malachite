@@ -92,6 +92,11 @@ documented by git history.
 - `ModShl` and `ModShlAssign` by any primitive unsigned type for `UnsignedMatrix<T>` (and, in
   malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference), left-shifting every
   element modulo $m$ and keeping the shape; the elements must already be reduced.
+- `ModAddMul`, `ModSubMul`, `ModPowerOf2AddMul`, and `ModPowerOf2SubMul` (and their `Assign` forms)
+  for `UnsignedMatrix<T>` (and, in malachite-nz, for `NaturalMatrix`, in every combination of value
+  and reference), computing $A \pm cB$ element by element modulo $m$ or $2^k$ for matrices of the
+  same shape and a scalar $c$; the elements and the scalar must already be reduced. `mod_add_mul`
+  on `UnsignedMatrix<T>` is FLINT's `nmod_mat_scalar_addmul_ui`.
 - `RationalMatrix::to_numerators_and_denominator`, `into_numerators_and_denominator`, and
   `from_numerators_and_denominator` in malachite-q, converting between a `RationalMatrix` and an
   `IntegerMatrix` of numerators over a single `Natural` denominator (the least common multiple of
@@ -595,6 +600,12 @@ documented by git history.
 
 ### malachite-nz
 
+- `AddMul`, `AddMulAssign`, `SubMul`, and `SubMulAssign` for `IntegerMatrix` with an `Integer`
+  scalar, and `AddMul` and `AddMulAssign` for `NaturalMatrix` with a `Natural` scalar, in every
+  combination of value and reference: $A + cB$ and $A - cB$ element by element, for matrices of the
+  same shape, special-casing $c = 0$, $1$, and $-1$. These are FLINT's `fmpz_mat_scalar_addmul_*`
+  and `fmpz_mat_scalar_submul_*`. malachite-q's `RationalMatrix` gets `AddMul` and `SubMul` (and
+  their `Assign` forms) with a `Rational` scalar in the same way.
 - `Rank`, `Determinant` (returning an `Integer`), `SmithNormalForm`, `SmithNormalFormAssign`, and
   `ElementaryDivisors` for `NaturalMatrix`, by value or by reference, computed as for the
   `IntegerMatrix` with the same elements; and `From<&NaturalMatrix>` for `IntegerMatrix`.

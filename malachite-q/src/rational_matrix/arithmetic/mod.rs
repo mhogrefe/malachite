@@ -9,6 +9,84 @@
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// matrices of the same shape.
 pub mod add;
+/// Adding a multiple of one matrix to another, by implementations of
+/// [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
+/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign).
+///
+/// # add_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMul;
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_q::Rational;
+/// use malachite_q::rational_matrix::RationalMatrix;
+///
+/// assert_eq!(
+///     RationalMatrix::from_str("[]_{0,0}")
+///         .unwrap()
+///         .add_mul(
+///             RationalMatrix::from_str("[]_{0,0}").unwrap(),
+///             Rational::from(5)
+///         )
+///         .to_string(),
+///     "[]_{0,0}"
+/// );
+/// assert_eq!(
+///     RationalMatrix::from_str("[1/2, -2, 3]")
+///         .unwrap()
+///         .add_mul(
+///             RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///             Rational::ZERO
+///         )
+///         .to_string(),
+///     "[1/2, -2, 3]"
+/// );
+/// assert_eq!(
+///     RationalMatrix::from_str("[1/2, -2, 3]")
+///         .unwrap()
+///         .add_mul(
+///             RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///             Rational::ONE
+///         )
+///         .to_string(),
+///     "[9/2, -5/3, -3]"
+/// );
+/// assert_eq!(
+///     RationalMatrix::from_str("[1/2, -2, 3]")
+///         .unwrap()
+///         .add_mul(
+///             RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///             Rational::NEGATIVE_ONE
+///         )
+///         .to_string(),
+///     "[-7/2, -7/3, 9]"
+/// );
+/// assert_eq!(
+///     (&RationalMatrix::from_str("[1/2, -2, 3]").unwrap())
+///         .add_mul(
+///             &RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///             &Rational::from_signeds(3, 2)
+///         )
+///         .to_string(),
+///     "[13/2, -3/2, -6]"
+/// );
+/// ```
+///
+/// # add_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::AddMulAssign;
+/// use malachite_q::Rational;
+/// use malachite_q::rational_matrix::RationalMatrix;
+///
+/// let mut a = RationalMatrix::from_str("[1/2, -2, 3]").unwrap();
+/// a.add_mul_assign(
+///     RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///     Rational::from_signeds(3, 2),
+/// );
+/// assert_eq!(a.to_string(), "[13/2, -3/2, -6]");
+/// ```
+pub mod add_mul;
 /// Implementations of [`CanonicalPrimitivePart`](
 /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart) and
 /// [`ContentAndCanonicalPrimitivePart`](
@@ -189,6 +267,84 @@ pub mod square;
 /// subtracting matrices of the same shape.
 pub mod sub;
 
+/// Subtracting a multiple of one matrix from another, by implementations of
+/// [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
+/// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign).
+///
+/// # sub_mul
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::SubMul;
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_q::Rational;
+/// use malachite_q::rational_matrix::RationalMatrix;
+///
+/// assert_eq!(
+///     RationalMatrix::from_str("[]_{0,0}")
+///         .unwrap()
+///         .sub_mul(
+///             RationalMatrix::from_str("[]_{0,0}").unwrap(),
+///             Rational::from(5)
+///         )
+///         .to_string(),
+///     "[]_{0,0}"
+/// );
+/// assert_eq!(
+///     RationalMatrix::from_str("[1/2, -2, 3]")
+///         .unwrap()
+///         .sub_mul(
+///             RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///             Rational::ZERO
+///         )
+///         .to_string(),
+///     "[1/2, -2, 3]"
+/// );
+/// assert_eq!(
+///     RationalMatrix::from_str("[1/2, -2, 3]")
+///         .unwrap()
+///         .sub_mul(
+///             RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///             Rational::ONE
+///         )
+///         .to_string(),
+///     "[-7/2, -7/3, 9]"
+/// );
+/// assert_eq!(
+///     RationalMatrix::from_str("[1/2, -2, 3]")
+///         .unwrap()
+///         .sub_mul(
+///             RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///             Rational::NEGATIVE_ONE
+///         )
+///         .to_string(),
+///     "[9/2, -5/3, -3]"
+/// );
+/// assert_eq!(
+///     (&RationalMatrix::from_str("[1/2, -2, 3]").unwrap())
+///         .sub_mul(
+///             &RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///             &Rational::from_signeds(3, 2)
+///         )
+///         .to_string(),
+///     "[-11/2, -5/2, 12]"
+/// );
+/// ```
+///
+/// # sub_mul_assign
+/// ```
+/// use core::str::FromStr;
+/// use malachite_base::num::arithmetic::traits::SubMulAssign;
+/// use malachite_q::Rational;
+/// use malachite_q::rational_matrix::RationalMatrix;
+///
+/// let mut a = RationalMatrix::from_str("[1/2, -2, 3]").unwrap();
+/// a.sub_mul_assign(
+///     RationalMatrix::from_str("[4, 1/3, -6]").unwrap(),
+///     Rational::from_signeds(3, 2),
+/// );
+/// assert_eq!(a.to_string(), "[-11/2, -5/2, 12]");
+/// ```
+pub mod sub_mul;
 /// An implementation of [`Trace`](malachite_base::num::arithmetic::traits::Trace), the sum of the
 /// diagonal elements of a square matrix.
 pub mod trace;

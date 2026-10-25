@@ -10,6 +10,7 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
+    add_mul::register(runner);
     balanced_mod::register(runner);
     balanced_mod_power_of_2::register(runner);
     can_solve_multi_mod::register(runner);
@@ -56,12 +57,14 @@ pub(crate) fn register(runner: &mut Runner) {
     solve_multi_mod::register(runner);
     square::register(runner);
     sub::register(runner);
+    sub_mul::register(runner);
     submatrix_determinant_bound::register(runner);
     trace::register(runner);
     vector_mul::register(runner);
 }
 
 mod add;
+mod add_mul;
 mod balanced_mod;
 mod balanced_mod_power_of_2;
 mod can_solve_multi_mod;
@@ -108,6 +111,7 @@ mod solve_dixon;
 mod solve_multi_mod;
 mod square;
 mod sub;
+mod sub_mul;
 mod submatrix_determinant_bound;
 mod trace;
 mod vector_mul;

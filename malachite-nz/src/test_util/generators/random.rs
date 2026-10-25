@@ -7153,6 +7153,20 @@ pub fn random_integer_matrix_pair_gen_var_1(
     )
 }
 
+pub fn random_integer_matrix_integer_matrix_integer_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, IntegerMatrix, Integer)> {
+    Box::new(
+        random_integer_matrix_pair_gen_var_1(config)
+            .zip(random_integers(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((a, b), c)| (a, b, c)),
+    )
+}
+
 // Pairs of matrices of the same random width, with random heights.
 pub fn random_integer_matrix_pair_gen_var_2(
     config: &GenConfig,
@@ -8904,6 +8918,69 @@ pub fn random_natural_matrix_pair_gen_var_1(
             let b = NaturalMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
             (a, b)
         }),
+    )
+}
+
+pub fn random_natural_matrix_natural_matrix_natural_triple_gen_var_7(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Box::new(
+        random_natural_matrix_pair_gen_var_1(config)
+            .zip(random_naturals(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((a, b), c)| (a, b, c)),
+    )
+}
+
+pub fn random_natural_matrix_natural_matrix_natural_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix, Natural, Natural)> {
+    Box::new(
+        random_natural_matrix_natural_matrix_natural_triple_gen_var_7(config)
+            .zip(random_naturals(
+                EXAMPLE_SEED.fork("k"),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+            .map(|((v, w, c), k)| {
+                let m = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .chain(core::iter::once(&c))
+                    .max()
+                    .unwrap()
+                    + k
+                    + Natural::ONE;
+                (v, w, c, m)
+            }),
+    )
+}
+
+pub fn random_natural_matrix_natural_matrix_natural_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, NaturalMatrix, Natural, u64)> {
+    Box::new(
+        random_natural_matrix_natural_matrix_natural_triple_gen_var_7(config)
+            .zip(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            ))
+            .map(|((v, w, c), pow)| {
+                let bits = v
+                    .elements
+                    .iter()
+                    .chain(&w.elements)
+                    .map(SignificantBits::significant_bits)
+                    .max()
+                    .unwrap_or(0)
+                    .max(c.significant_bits());
+                (v, w, c, pow + bits)
+            }),
     )
 }
 

@@ -7683,6 +7683,168 @@ pub fn exhaustive_unsigned_matrix_unsigned_rounding_mode_triple_gen_var_1<
     ))
 }
 
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_10<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>, u64)> {
+    fn ys<T: PrimitiveUnsigned>(
+        ((height, width), pow): ((u64, u64), u64),
+    ) -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>)> {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                height,
+                width,
+                residues_mod_power_of_2::<T>(pow),
+            ),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )),
+            ys::<T>,
+        )
+        .map(|((_, pow), (v, w))| (v, w, pow)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_11<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>, T)> {
+    fn ys<T: PrimitiveUnsigned>(
+        ((height, width), m): ((u64, u64), T),
+    ) -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>)> {
+        Box::new(exhaustive_pairs_from_single(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                height,
+                width,
+                residues_mod(m),
+            ),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_positive_primitive_ints::<T>(),
+            )),
+            ys::<T>,
+        )
+        .map(|((_, m), (v, w))| (v, w, m)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_10<T: PrimitiveUnsigned>()
+-> It<(UnsignedMatrix<T>, T, u64)> {
+    fn ys<T: PrimitiveUnsigned>(
+        ((height, width), pow): ((u64, u64), u64),
+    ) -> It<(UnsignedMatrix<T>, T)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                height,
+                width,
+                residues_mod_power_of_2::<T>(pow),
+            ),
+            residues_mod_power_of_2::<T>(pow),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )),
+            ys::<T>,
+        )
+        .map(|((_, pow), (v, c))| (v, c, pow)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>()
+-> It<(UnsignedMatrix<T>, T, T)> {
+    fn ys<T: PrimitiveUnsigned>(
+        ((height, width), m): ((u64, u64), T),
+    ) -> It<(UnsignedMatrix<T>, T)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                height,
+                width,
+                residues_mod(m),
+            ),
+            residues_mod(m),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_positive_primitive_ints::<T>(),
+            )),
+            ys::<T>,
+        )
+        .map(|((_, m), (v, c))| (v, c, m)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>, T, u64)> {
+    fn ys<T: PrimitiveUnsigned>(
+        ((height, width), pow): ((u64, u64), u64),
+    ) -> It<((UnsignedMatrix<T>, UnsignedMatrix<T>), T)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_pairs_from_single(
+                exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                    height,
+                    width,
+                    residues_mod_power_of_2::<T>(pow),
+                ),
+            ),
+            residues_mod_power_of_2::<T>(pow),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            )),
+            ys::<T>,
+        )
+        .map(|((_, pow), ((v, w), c))| (v, w, c, pow)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_unsigned_quadruple_gen_var_3<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>, T, T)> {
+    fn ys<T: PrimitiveUnsigned>(
+        ((height, width), m): ((u64, u64), T),
+    ) -> It<((UnsignedMatrix<T>, UnsignedMatrix<T>), T)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_pairs_from_single(
+                exhaustive_unsigned_matrices_with_dimensions_from_iterator(
+                    height,
+                    width,
+                    residues_mod(m),
+                ),
+            ),
+            residues_mod(m),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn(
+            Box::new(exhaustive_pairs(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()),
+                exhaustive_positive_primitive_ints::<T>(),
+            )),
+            ys::<T>,
+        )
+        .map(|((_, m), ((v, w), c))| (v, w, c, m)),
+    )
+}
+
 // Square matrices with nonzero diagonal elements, matrices with the same height, all with their
 // elements less than a prime m, and m.
 pub fn exhaustive_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_7()

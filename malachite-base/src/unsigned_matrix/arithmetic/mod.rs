@@ -140,6 +140,10 @@ pub mod entrywise_shr_round;
 /// [`ModAddAssign`](crate::num::arithmetic::traits::ModAddAssign), for adding
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.
 pub mod mod_add;
+/// Implementations of [`ModAddMul`](crate::num::arithmetic::traits::ModAddMul) and
+/// [`ModAddMulAssign`](crate::num::arithmetic::traits::ModAddMulAssign), for adding a scalar
+/// multiple of one matrix to another modulo a number.
+pub mod mod_add_mul;
 /// Implementations of [`ModDeterminant`](crate::num::arithmetic::traits::ModDeterminant), for
 /// computing the determinant of a square matrix modulo a number.
 pub mod mod_determinant;
@@ -237,6 +241,10 @@ pub mod mod_power_of_2;
 /// [`ModPowerOf2AddAssign`](crate::num::arithmetic::traits::ModPowerOf2AddAssign), for adding
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a power of 2.
 pub mod mod_power_of_2_add;
+/// Implementations of [`ModPowerOf2AddMul`](crate::num::arithmetic::traits::ModPowerOf2AddMul) and
+/// [`ModPowerOf2AddMulAssign`](crate::num::arithmetic::traits::ModPowerOf2AddMulAssign), for adding
+/// a scalar multiple of one matrix to another modulo a power of 2.
+pub mod mod_power_of_2_add_mul;
 /// Implementations of
 /// [`ModPowerOf2Determinant`](crate::num::arithmetic::traits::ModPowerOf2Determinant), for
 /// computing determinants of square matrices modulo powers of 2.
@@ -353,6 +361,10 @@ pub mod mod_power_of_2_strong_echelon_form;
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a power of 2.
 pub mod mod_power_of_2_sub;
 
+/// Implementations of [`ModPowerOf2SubMul`](crate::num::arithmetic::traits::ModPowerOf2SubMul) and
+/// [`ModPowerOf2SubMulAssign`](crate::num::arithmetic::traits::ModPowerOf2SubMulAssign), for
+/// subtracting a scalar multiple of one matrix from another modulo a power of 2.
+pub mod mod_power_of_2_sub_mul;
 /// An implementation of [`ModPowerOf2Trace`](crate::num::arithmetic::traits::ModPowerOf2Trace), the
 /// sum of the diagonal elements of a square matrix modulo a power of 2.
 pub mod mod_power_of_2_trace;
@@ -471,6 +483,10 @@ pub mod mod_strong_echelon_form;
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a number.
 pub mod mod_sub;
 
+/// Implementations of [`ModSubMul`](crate::num::arithmetic::traits::ModSubMul) and
+/// [`ModSubMulAssign`](crate::num::arithmetic::traits::ModSubMulAssign), for subtracting a scalar
+/// multiple of one matrix from another modulo a number.
+pub mod mod_sub_mul;
 /// Implementations of [`ModTrace`](crate::num::arithmetic::traits::ModTrace), the sum of the
 /// diagonal elements of a square matrix modulo a number.
 pub mod mod_trace;

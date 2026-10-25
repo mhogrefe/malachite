@@ -1138,6 +1138,17 @@ pub fn exhaustive_rational_matrix_pair_gen_var_1() -> It<(RationalMatrix, Ration
     )
 }
 
+pub fn exhaustive_rational_matrix_rational_matrix_rational_triple_gen_var_1()
+-> It<(RationalMatrix, RationalMatrix, Rational)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_rational_matrix_pair_gen_var_1(),
+            exhaustive_rationals(),
+        )
+        .map(|((a, b), c)| (a, b, c)),
+    )
+}
+
 // Pairs of matrices of the same width: every triple of two heights and a width, and for each triple
 // every pair of matrices of those shapes.
 pub fn exhaustive_rational_matrix_pair_gen_var_2() -> It<(RationalMatrix, RationalMatrix)> {

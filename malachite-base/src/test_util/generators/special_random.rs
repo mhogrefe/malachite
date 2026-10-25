@@ -11099,6 +11099,122 @@ pub fn special_random_unsigned_matrix_unsigned_rounding_mode_triple_gen_var_1<
     )
 }
 
+// Pairs of `UnsignedMatrix<T>`s of the same random shape.
+fn special_random_unsigned_matrix_pairs_of_same_shape<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>)> {
+    let mut xs = striped_random_unsigneds::<T>(
+        EXAMPLE_SEED.fork("elements"),
+        config.get_or("mean_stripe_n", T::WIDTH >> 1),
+        config.get_or("mean_stripe_d", 1),
+    );
+    Box::new(
+        random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("dimensions"),
+            config.get_or("mean_dimension_n", 4),
+            config.get_or("mean_dimension_d", 1),
+        ))
+        .map(move |(height, width)| {
+            let n = usize::exact_from(height * width);
+            let a = UnsignedMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
+            let b = UnsignedMatrix::from_owned_elements(height, width, (&mut xs).take(n).collect());
+            (a, b)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_10<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>, u64)> {
+    Box::new(
+        special_random_unsigned_matrix_pairs_of_same_shape::<T>(config)
+            .zip(random_unsigned_inclusive_range::<u64>(
+                EXAMPLE_SEED.fork("pow"),
+                0,
+                T::WIDTH,
+            ))
+            .map(|((a, b), pow)| (a.mod_power_of_2(pow), b.mod_power_of_2(pow), pow)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_11<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>, T)> {
+    Box::new(
+        special_random_unsigned_matrix_pairs_of_same_shape::<T>(config)
+            .zip(striped_random_positive_unsigneds::<T>(
+                EXAMPLE_SEED.fork("m"),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ))
+            .map(|((a, b), m)| (a % m, b % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_10<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, T, u64)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_10::<T>(config)
+            .zip(striped_random_unsigneds::<T>(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ))
+            .map(|((a, _, pow), c)| (a, c.mod_power_of_2(pow), pow)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, T, T)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_11::<T>(config)
+            .zip(striped_random_unsigneds::<T>(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ))
+            .map(|((a, _, m), c)| (a, c % m, m)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>, T, u64)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_10::<T>(config)
+            .zip(striped_random_unsigneds::<T>(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ))
+            .map(|((a, b, pow), c)| (a, b, c.mod_power_of_2(pow), pow)),
+    )
+}
+
+pub fn special_random_unsigned_matrix_unsigned_matrix_unsigned_unsigned_quadruple_gen_var_3<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, UnsignedMatrix<T>, T, T)> {
+    Box::new(
+        special_random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_11::<T>(config)
+            .zip(striped_random_unsigneds::<T>(
+                EXAMPLE_SEED.fork("c"),
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ))
+            .map(|((a, b, m), c)| (a, b, c % m, m)),
+    )
+}
+
 pub fn special_random_unsigned_matrix_unsigned_pair_gen_var_6(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64)> {

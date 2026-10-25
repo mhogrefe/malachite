@@ -4045,6 +4045,16 @@ pub fn integer_matrix_pair_gen_var_1() -> Generator<(IntegerMatrix, IntegerMatri
     )
 }
 
+// All `(IntegerMatrix, IntegerMatrix, Integer)` where the matrices have the same shape.
+pub fn integer_matrix_integer_matrix_integer_triple_gen_var_1()
+-> Generator<(IntegerMatrix, IntegerMatrix, Integer)> {
+    Generator::new(
+        &exhaustive_integer_matrix_integer_matrix_integer_triple_gen_var_1,
+        &random_integer_matrix_integer_matrix_integer_triple_gen_var_1,
+        &special_random_integer_matrix_integer_matrix_integer_triple_gen_var_1,
+    )
+}
+
 // All pairs of `IntegerMatrix`s of the same width.
 pub fn integer_matrix_pair_gen_var_2() -> Generator<(IntegerMatrix, IntegerMatrix)> {
     Generator::new(
@@ -4934,6 +4944,38 @@ pub fn natural_matrix_pair_gen_var_1() -> Generator<(NaturalMatrix, NaturalMatri
         &exhaustive_natural_matrix_pair_gen_var_1,
         &random_natural_matrix_pair_gen_var_1,
         &special_random_natural_matrix_pair_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, NaturalMatrix, Natural)` where the matrices have the same shape.
+pub fn natural_matrix_natural_matrix_natural_triple_gen_var_7()
+-> Generator<(NaturalMatrix, NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_triple_gen_var_7,
+        &random_natural_matrix_natural_matrix_natural_triple_gen_var_7,
+        &special_random_natural_matrix_natural_matrix_natural_triple_gen_var_7,
+    )
+}
+
+// All `(NaturalMatrix, NaturalMatrix, Natural, Natural)` where the matrices have the same shape
+// and every element of both, and the first `Natural`, is less than the second `Natural`.
+pub fn natural_matrix_natural_matrix_natural_natural_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, NaturalMatrix, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_natural_quadruple_gen_var_1,
+        &random_natural_matrix_natural_matrix_natural_natural_quadruple_gen_var_1,
+        &special_random_natural_matrix_natural_matrix_natural_natural_quadruple_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, NaturalMatrix, Natural, u64)` where the matrices have the same shape and
+// every element of both, and the `Natural`, is less than 2 to the power of the `u64`.
+pub fn natural_matrix_natural_matrix_natural_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, NaturalMatrix, Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_matrix_natural_unsigned_quadruple_gen_var_1,
+        &random_natural_matrix_natural_matrix_natural_unsigned_quadruple_gen_var_1,
+        &special_random_natural_matrix_natural_matrix_natural_unsigned_quadruple_gen_var_1,
     )
 }
 

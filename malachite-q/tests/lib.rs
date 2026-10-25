@@ -167,6 +167,7 @@ pub mod rational_matrix {
     pub mod access;
     pub mod arithmetic {
         pub mod add;
+        pub mod add_mul;
         pub mod canonical_primitive_part;
         pub mod content;
         pub mod content_chained;
@@ -189,6 +190,7 @@ pub mod rational_matrix {
         pub mod solve;
         pub mod square;
         pub mod sub;
+        pub mod sub_mul;
         pub mod trace;
         pub mod vector_mul;
     }
