@@ -70,7 +70,7 @@ fn benchmark_integer_matrix_from_elements_evaluation_strategy(
                     no_out!(IntegerMatrix::from_elements(
                         m.height(),
                         m.width(),
-                        &m.elements_ref()
+                        m.elements_ref()
                     ));
                 },
             ),

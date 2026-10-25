@@ -171,7 +171,7 @@ pub(crate) fn can_solve_inner(
     for (pivot, &column) in pivots.iter_mut().zip(&lu.pivots_nonpivots[..rank]) {
         *pivot = isize::exact_from(column);
     }
-    let pb = permute_rows(&b.mod_word(p).elements_ref(), k, &lu.perm);
+    let pb = permute_rows(b.mod_word(p).elements_ref(), k, &lu.perm);
     // The lower triangular solve reads only the part of this block that holds L.
     let l_top = lu
         .lu

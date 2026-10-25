@@ -111,7 +111,7 @@ fn shortlex_cmp_properties() {
                     n.elements_ref().len(),
                     n.height(),
                     n.width(),
-                    &n.elements_ref()
+                    n.elements_ref()
                 )),
             c
         );

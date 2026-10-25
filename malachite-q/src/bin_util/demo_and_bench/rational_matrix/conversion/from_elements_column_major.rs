@@ -77,7 +77,7 @@ fn benchmark_rational_matrix_from_elements_column_major_evaluation_strategy(
                     no_out!(RationalMatrix::from_elements_column_major(
                         m.height(),
                         m.width(),
-                        &m.elements_ref()
+                        m.elements_ref()
                     ));
                 },
             ),

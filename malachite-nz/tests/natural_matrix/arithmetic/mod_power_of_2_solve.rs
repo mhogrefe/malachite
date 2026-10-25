@@ -62,7 +62,7 @@ fn verify(a: &NaturalMatrix, b: &NaturalVector, pow: u64) {
     let bm = NaturalMatrix::from_owned_elements(a.height(), 1, b.elements.clone());
     let xm = a.mod_power_of_2_solve(&bm, pow);
     assert_eq!(
-        xm.as_ref().map(|x| x.to_elements()),
+        xm.as_ref().map(Matrix::to_elements),
         x.as_ref().map(|x| x.elements.clone())
     );
     if let Some(xm) = xm {

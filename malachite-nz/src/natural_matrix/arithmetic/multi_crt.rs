@@ -41,7 +41,7 @@ pub(crate) fn matrix_residue_slices<'a>(
     (
         height,
         width,
-        residues.iter().map(|rs| rs.elements_ref()).collect(),
+        residues.iter().map(Matrix::elements_ref).collect(),
     )
 }
 

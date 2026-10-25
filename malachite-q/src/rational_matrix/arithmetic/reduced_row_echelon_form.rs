@@ -113,7 +113,7 @@ rref_fraction_free(a: &mut RationalMatrix) -> usize {
         *x = if rank == 0 {
             Rational::ZERO
         } else {
-            Rational::from_integers_ref(&y, &den)
+            Rational::from_integers_ref(y, &den)
         };
     }
     rank
