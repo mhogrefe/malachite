@@ -363,6 +363,7 @@ pub mod integer_matrix {
         pub mod crt;
         pub mod determinant;
         pub mod determinant_bound;
+        pub mod determinant_sign;
         pub mod div_exact;
         pub mod elementary_divisors;
         pub mod fraction_free_lu_decomposition;
@@ -1096,6 +1097,7 @@ pub mod natural_matrix {
         pub mod content_chained;
         pub mod crt;
         pub mod determinant;
+        pub mod determinant_sign;
         pub mod div_exact;
         pub mod elementary_divisors;
         pub mod kronecker_product;

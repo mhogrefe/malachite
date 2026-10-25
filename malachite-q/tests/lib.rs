@@ -171,6 +171,7 @@ pub mod rational_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod determinant;
+        pub mod determinant_sign;
         pub mod integer_matrix_mul;
         pub mod inverse;
         pub mod is_solution;

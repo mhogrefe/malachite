@@ -69,6 +69,10 @@ pub mod determinant;
 /// The method [`determinant_bound`](super::IntegerMatrix::determinant_bound), an upper bound for
 /// the absolute value of the determinant from Hadamard's inequality.
 pub mod determinant_bound;
+/// Implementations of
+/// [`DeterminantSign`](malachite_base::num::arithmetic::traits::DeterminantSign), for determining
+/// the signs of the determinants of square integer matrices.
+pub mod determinant_sign;
 crate_test_mod! {
     /// A divisor of the determinant of a square integer matrix, found by solving a linear system.
     /// Internal machinery for

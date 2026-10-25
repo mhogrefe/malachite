@@ -26,6 +26,10 @@ pub mod content_chained;
 /// Implementations of [`Determinant`](malachite_base::num::arithmetic::traits::Determinant), for
 /// computing the determinants of square rational matrices.
 pub mod determinant;
+/// Implementations of
+/// [`DeterminantSign`](malachite_base::num::arithmetic::traits::DeterminantSign), for determining
+/// the signs of the determinants of square rational matrices.
+pub mod determinant_sign;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying an
 /// [`IntegerMatrix`](malachite_nz::integer_matrix::IntegerMatrix) by a
 /// [`RationalMatrix`](super::RationalMatrix).

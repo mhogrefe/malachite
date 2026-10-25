@@ -2171,6 +2171,12 @@ pub trait Determinant {
     fn determinant(self) -> Self::Output;
 }
 
+/// Determines the sign of the determinant of a square matrix, as the ordering of the determinant
+/// against 0, without computing the determinant when it can be avoided.
+pub trait DeterminantSign {
+    fn determinant_sign(self) -> Ordering;
+}
+
 /// Computes the rank of a matrix: the number of linearly independent rows, or equivalently columns.
 pub trait Rank {
     fn rank(self) -> u64;

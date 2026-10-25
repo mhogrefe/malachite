@@ -575,6 +575,14 @@ documented by git history.
   `UnsignedMatrix<T>` and, in malachite-nz, `NaturalMatrix`: the Smith normal form over
   $\mathbb{Z}/m$ for any modulus $m$, whose diagonal elements are $\gcd(d_i, m)$ for the integer
   Smith normal form's $d_i$, with 0 standing for $m$.
+- New `DeterminantSign` trait, implemented in malachite-nz for `NaturalMatrix` and `IntegerMatrix`
+  and in malachite-q for `RationalMatrix`, by value or by reference: the sign of the determinant
+  as an `Ordering`. Dimension 2 uses `cmp_products`. For larger matrices whose elements are not
+  small for their dimension, the sign is certified without computing the determinant: a
+  floating-point LU decomposition of the equilibrated matrix yields a preconditioner, the matrix
+  is multiplied by it exactly, and strict diagonal dominance of the product proves the sign. The
+  determinant is computed only for small elements, or when the matrix is singular or too
+  ill-conditioned for the certificate.
 - In `test_util`, `run_benchmark` now interleaves the timed calls of its series, rotating which
   series goes first in each round, after an untimed call; the first series of a benchmark had been
   timed about 10% slower than an identical later one.

@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content_chained::register(runner);
     crt::register(runner);
     determinant::register(runner);
+    determinant_sign::register(runner);
     determinant_bound::register(runner);
     determinant_divisor::register(runner);
     div_exact::register(runner);
@@ -69,6 +70,7 @@ mod crt;
 mod determinant;
 mod determinant_bound;
 mod determinant_divisor;
+mod determinant_sign;
 mod div_exact;
 mod elementary_divisors;
 mod fraction_free_lu_decomposition;

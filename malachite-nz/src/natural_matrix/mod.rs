@@ -29,8 +29,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 /// The elements and dimensions are private, so that the number of elements is always the height
 /// times the width. Elements are read and written with [`Index`](core::ops::Index),
 /// [`IndexMut`](core::ops::IndexMut), `get`, and `get_mut`, and a matrix's elements in row-major
-/// order are available with [`Matrix::elements_ref`](malachite_base::matrix::Matrix::elements_ref)
-/// and [`Matrix::into_elements`](malachite_base::matrix::Matrix::into_elements).
+/// order are available with [`Matrix::elements_ref`] and [`Matrix::into_elements`].
 #[derive(Clone, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(

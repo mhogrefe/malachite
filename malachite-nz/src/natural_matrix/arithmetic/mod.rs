@@ -42,6 +42,10 @@ pub mod crt;
 /// Implementations of [`Determinant`](malachite_base::num::arithmetic::traits::Determinant), for
 /// computing the determinants of square matrices of naturals.
 pub mod determinant;
+/// Implementations of
+/// [`DeterminantSign`](malachite_base::num::arithmetic::traits::DeterminantSign), for determining
+/// the signs of the determinants of square matrices of naturals.
+pub mod determinant_sign;
 /// Exact division of a matrix by a scalar, by implementations of
 /// [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign).

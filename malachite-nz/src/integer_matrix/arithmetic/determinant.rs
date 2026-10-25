@@ -209,7 +209,7 @@ determinant_modular_accelerated(a: &IntegerMatrix, proved: bool) -> Integer {
 // bits of the elements.
 //
 // This is equivalent to `fmpz_mat_det` from `fmpz_mat/det.c`, FLINT 3.6.0.
-fn determinant_helper(a: &IntegerMatrix) -> Integer {
+pub(crate) fn determinant_helper(a: &IntegerMatrix) -> Integer {
     assert_eq!(a.height, a.width, "the matrix must be square");
     let n = a.height;
     if n <= COFACTOR_MAX_DIMENSION {
