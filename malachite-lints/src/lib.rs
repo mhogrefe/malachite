@@ -63,6 +63,7 @@ mod use_const_binding;
 mod use_const_block;
 mod use_const_cast;
 mod use_coprime_with;
+mod use_determinant_sign;
 mod use_div_mod;
 mod use_div_mod_precomputed;
 mod use_divisible_by;
@@ -512,7 +513,10 @@ fn in_cross_check_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span)
     use rustc_lint::LintContext;
     if let rustc_span::FileName::Real(real) = cx.sess().source_map().span_to_filename(span)
         && let Some(path) = real.local_path()
-        && path.to_string_lossy().replace('\\', "/").contains("/test_util/")
+        && path
+            .to_string_lossy()
+            .replace('\\', "/")
+            .contains("/test_util/")
     {
         return false;
     }
@@ -600,6 +604,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_const_block::USE_CONST_BLOCK,
         use_const_cast::USE_CONST_CAST,
         use_coprime_with::USE_COPRIME_WITH,
+        use_determinant_sign::USE_DETERMINANT_SIGN,
         use_div_mod::USE_DIV_MOD,
         use_div_mod_precomputed::USE_DIV_MOD_PRECOMPUTED,
         use_divisible_by::USE_DIVISIBLE_BY,
@@ -686,6 +691,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_const_block::UseConstBlock));
     lint_store.register_late_pass(|_| Box::new(use_const_cast::UseConstCast));
     lint_store.register_late_pass(|_| Box::new(use_coprime_with::UseCoprimeWith));
+    lint_store.register_late_pass(|_| Box::new(use_determinant_sign::UseDeterminantSign));
     lint_store.register_late_pass(|_| Box::new(use_divisible_by::UseDivisibleBy));
     lint_store.register_late_pass(|_| Box::new(use_exact_from::UseExactFrom));
     lint_store.register_late_pass(|_| Box::new(use_fused_mul::UseFusedMul));

@@ -84,7 +84,11 @@ impl<'tcx> LateLintPass<'tcx> for UseSign {
         } else {
             false
         };
-        if !zero || in_exempt_fn(cx, expr) {
+        // A determinant compared with zero is `use_determinant_sign`'s, which avoids computing it.
+        if !zero
+            || in_exempt_fn(cx, expr)
+            || crate::use_determinant_sign::is_determinant_call(cx, receiver)
+        {
             return;
         }
         span_lint_and_help(

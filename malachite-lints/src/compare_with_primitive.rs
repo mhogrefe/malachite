@@ -155,6 +155,10 @@ impl<'tcx> LateLintPass<'tcx> for CompareWithPrimitive {
                     return;
                 }
                 for (c, other) in [(lhs, rhs), (rhs, lhs)] {
+                    // A determinant compared with zero is `use_determinant_sign`'s.
+                    if crate::use_determinant_sign::is_determinant_call(cx, other) {
+                        continue;
+                    }
                     let Some((lit, signed)) = primitive_equivalent(cx, c, false) else {
                         continue;
                     };
@@ -189,6 +193,10 @@ impl<'tcx> LateLintPass<'tcx> for CompareWithPrimitive {
                 // `cmp` against a `ZERO` constant is `use_sign`'s, with the better suggestion
                 // `sign()`.
                 if name == "cmp" && crate::is_zero_assoc_const(cx, arg) {
+                    return;
+                }
+                // A determinant compared with zero is `use_determinant_sign`'s.
+                if crate::use_determinant_sign::is_determinant_call(cx, recv) {
                     return;
                 }
                 // The `from(primitive)` method form is exempt in test code: comparison tests

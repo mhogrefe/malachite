@@ -1,0 +1,83 @@
+error: this computes a determinant only for its sign
+  --> $DIR/use_determinant_sign.rs:13:13
+   |
+LL |     let _ = a.clone().determinant().sign();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.determinant().sign()` is `a.determinant_sign()`, which usually finds the sign without computing the determinant
+   = note: `#[deny(use_determinant_sign)]` on by default
+
+error: this computes a determinant only for its sign
+  --> $DIR/use_determinant_sign.rs:14:13
+   |
+LL |     let _ = (&a).determinant().sign();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.determinant().sign()` is `a.determinant_sign()`, which usually finds the sign without computing the determinant
+
+error: this computes a determinant only for its sign
+  --> $DIR/use_determinant_sign.rs:15:13
+   |
+LL |     let _ = Determinant::determinant(&a).sign();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.determinant().sign()` is `a.determinant_sign()`, which usually finds the sign without computing the determinant
+
+error: this compares a determinant with zero
+  --> $DIR/use_determinant_sign.rs:17:13
+   |
+LL |     let _ = a.clone().determinant() > 0u32;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: compare `a.determinant_sign()` with `Less`, `Equal`, or `Greater` instead; it usually finds the sign without computing the determinant
+
+error: this compares a determinant with zero
+  --> $DIR/use_determinant_sign.rs:18:13
+   |
+LL |     let _ = (&a).determinant() == Integer::ZERO;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: compare `a.determinant_sign()` with `Less`, `Equal`, or `Greater` instead; it usually finds the sign without computing the determinant
+
+error: this compares a determinant with zero
+  --> $DIR/use_determinant_sign.rs:19:13
+   |
+LL |     let _ = 0u32 != (&a).determinant();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: compare `a.determinant_sign()` with `Less`, `Equal`, or `Greater` instead; it usually finds the sign without computing the determinant
+
+error: this compares a determinant with zero
+  --> $DIR/use_determinant_sign.rs:21:13
+   |
+LL |     let _ = (&a).determinant().cmp(&Integer::ZERO);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `a.determinant_sign()`, comparing it with `Less`, `Equal`, or `Greater` if needed; it usually finds the sign without computing the determinant
+
+error: this compares a determinant with zero
+  --> $DIR/use_determinant_sign.rs:22:13
+   |
+LL |     let _ = (&a).determinant().partial_cmp(&0u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `a.determinant_sign()`, comparing it with `Less`, `Equal`, or `Greater` if needed; it usually finds the sign without computing the determinant
+
+error: this computes a determinant only for its sign
+  --> $DIR/use_determinant_sign.rs:25:13
+   |
+LL |     let _ = (&n).determinant().sign();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.determinant().sign()` is `a.determinant_sign()`, which usually finds the sign without computing the determinant
+
+error: this compares a determinant with zero
+  --> $DIR/use_determinant_sign.rs:27:13
+   |
+LL |     let _ = (&q).determinant() < 0u32;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: compare `a.determinant_sign()` with `Less`, `Equal`, or `Greater` instead; it usually finds the sign without computing the determinant
+
+error: aborting due to 10 previous errors
+

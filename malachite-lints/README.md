@@ -430,6 +430,19 @@ flagged: it returns an `Option` whose `None` arm (NaN) callers match on, which `
 model the same way. `compare_with_primitive` cedes `cmp(&T::ZERO)` to this lint, so that only the
 better `sign()` suggestion fires.
 
+### `use_determinant_sign`
+
+Flags computing the determinant of a matrix only to find its sign, where the matrix type implements
+`DeterminantSign` (`NaturalMatrix`, `IntegerMatrix`, `RationalMatrix`): `a.determinant().sign()`,
+and the determinant compared with zero by an operator (`a.determinant() > 0u32`,
+`a.determinant() == Integer::ZERO`, with the zero on either side) or by `cmp`, `partial_cmp`, `eq`,
+`ne`, `lt`, `le`, `gt`, or `ge`. Both the method-call form and the path form
+`Determinant::determinant(&a)` are caught. `determinant_sign` usually certifies the sign without
+computing the determinant, which for an integer matrix can be enormous. A determinant bound to a
+variable and used later is not flagged. Test code is exempt, since tests cross-check
+`determinant_sign` against the sign of the determinant on purpose. `use_sign` and
+`compare_with_primitive` defer to this lint when the value compared with zero is a determinant.
+
 ### `use_divisible_by`
 
 Flags a remainder compared with zero for a primitive integer, `Natural`, or `Integer`: use
