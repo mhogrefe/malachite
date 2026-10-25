@@ -35,9 +35,19 @@ pub(crate) fn howell_form_in_place(
     if height == 0 || width == 0 {
         return 0;
     }
+    strong_echelon_form_in_place(xs, height, width, m);
+    move_zero_rows_last(xs, height, width)
+}
+
+// Moves the zero rows of the `height` by `width` matrix with elements `xs`, which is in strong
+// echelon form, after its nonzero rows, keeping the nonzero rows in order, and returns the number
+// of nonzero rows.
+//
+// This is equivalent to the second half of `fmpz_mat_howell_form_mod` from
+// `fmpz_mat/howell_form_mod.c`, FLINT 3.6.0.
+pub(crate) fn move_zero_rows_last(xs: &mut [Natural], height: usize, width: usize) -> usize {
     let n = height;
     let mut k = n;
-    strong_echelon_form_in_place(xs, height, width, m);
     for i in 0..n {
         if is_zero_row(xs, width, i) {
             k -= 1;

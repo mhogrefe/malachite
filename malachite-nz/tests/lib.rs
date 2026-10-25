@@ -1095,7 +1095,9 @@ pub mod natural_matrix {
         pub mod content;
         pub mod content_chained;
         pub mod crt;
+        pub mod determinant;
         pub mod div_exact;
+        pub mod elementary_divisors;
         pub mod kronecker_product;
         pub mod mod_add;
         pub mod mod_determinant;
@@ -1113,6 +1115,9 @@ pub mod natural_matrix {
         pub mod mod_pow;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_determinant;
+        pub mod mod_power_of_2_howell_form;
+        pub mod mod_power_of_2_inverse;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_kronecker_product;
         pub mod mod_power_of_2_mul;
@@ -1121,12 +1126,16 @@ pub mod natural_matrix {
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_pow;
         pub mod mod_power_of_2_shl;
+        pub mod mod_power_of_2_smith_normal_form;
+        pub mod mod_power_of_2_solve;
         pub mod mod_power_of_2_square;
+        pub mod mod_power_of_2_strong_echelon_form;
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_trace;
         pub mod mod_rank;
         pub mod mod_reduced_row_echelon_form;
         pub mod mod_shl;
+        pub mod mod_smith_normal_form;
         pub mod mod_solve;
         pub mod mod_solve_lower_triangular;
         pub mod mod_solve_upper_triangular;
@@ -1139,8 +1148,10 @@ pub mod natural_matrix {
         pub mod multi_crt;
         pub mod multi_mod;
         pub mod pow;
+        pub mod rank;
         pub mod scalar_mul;
         pub mod shl;
+        pub mod smith_normal_form;
         pub mod square;
         pub mod trace;
         pub mod vector_mod_mul;

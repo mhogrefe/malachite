@@ -39,6 +39,9 @@ pub mod content_chained;
 /// of residues modulo any number with one modulo a word-sized number by the Chinese remainder
 /// theorem.
 pub mod crt;
+/// Implementations of [`Determinant`](malachite_base::num::arithmetic::traits::Determinant), for
+/// computing the determinants of square matrices of naturals.
+pub mod determinant;
 /// Exact division of a matrix by a scalar, by implementations of
 /// [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign).
@@ -91,6 +94,10 @@ pub mod crt;
 /// assert_eq!(a.to_string(), "[0, 2; 85, 1]");
 /// ```
 pub mod div_exact;
+/// Implementations of
+/// [`ElementaryDivisors`](malachite_base::num::arithmetic::traits::ElementaryDivisors), for
+/// computing the elementary divisors of matrices of naturals.
+pub mod elementary_divisors;
 /// Implementations of
 /// [`KroneckerProduct`](malachite_base::num::arithmetic::traits::KroneckerProduct) and
 /// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
@@ -168,6 +175,20 @@ pub mod mod_power_of_2;
 /// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign), for
 /// adding [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a power of 2.
 pub mod mod_power_of_2_add;
+/// Implementations of
+/// [`ModPowerOf2Determinant`](malachite_base::num::arithmetic::traits::ModPowerOf2Determinant), for
+/// computing determinants of square matrices of naturals modulo powers of 2.
+pub mod mod_power_of_2_determinant;
+/// Implementations of
+/// [`ModPowerOf2HowellForm`](malachite_base::num::arithmetic::traits::ModPowerOf2HowellForm) and
+/// [`ModPowerOf2HowellFormAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2HowellFormAssign), for computing Howell
+/// forms of matrices of naturals modulo powers of 2.
+pub mod mod_power_of_2_howell_form;
+/// Implementations of
+/// [`ModPowerOf2Inverse`](malachite_base::num::arithmetic::traits::ModPowerOf2Inverse), for
+/// inverting square matrices of naturals modulo powers of 2.
+pub mod mod_power_of_2_inverse;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), a trait
 /// for checking whether every element of a [`NaturalMatrix`](super::NaturalMatrix) is reduced
@@ -248,11 +269,27 @@ pub mod mod_power_of_2_pow;
 /// assert_eq!(a.to_string(), "[0, 0; 0, 0]");
 /// ```
 pub mod mod_power_of_2_shl;
+/// Implementations of [`ModPowerOf2SmithNormalForm`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2SmithNormalForm) and
+/// [`ModPowerOf2SmithNormalFormAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2SmithNormalFormAssign), for computing Smith
+/// normal forms of matrices of naturals modulo powers of 2.
+pub mod mod_power_of_2_smith_normal_form;
+/// Implementations of
+/// [`ModPowerOf2Solve`](malachite_base::num::arithmetic::traits::ModPowerOf2Solve), for solving
+/// linear systems of naturals modulo powers of 2.
+pub mod mod_power_of_2_solve;
 /// Implementations of
 /// [`ModPowerOf2Square`](malachite_base::num::arithmetic::traits::ModPowerOf2Square) and
 /// [`ModPowerOf2SquareAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign),
 /// for squaring a square matrix modulo a power of 2.
 pub mod mod_power_of_2_square;
+/// Implementations of [`ModPowerOf2StrongEchelonForm`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2StrongEchelonForm) and
+/// [`ModPowerOf2StrongEchelonFormAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2StrongEchelonFormAssign), for computing
+/// strong echelon forms of matrices of naturals modulo powers of 2.
+pub mod mod_power_of_2_strong_echelon_form;
 /// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
 /// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
 /// subtracting [`NaturalMatrix`](super::NaturalMatrix)s of the same shape modulo a power of 2.
@@ -317,6 +354,11 @@ pub mod mod_reduced_row_echelon_form;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of
+/// [`ModSmithNormalForm`](malachite_base::num::arithmetic::traits::ModSmithNormalForm) and
+/// [`ModSmithNormalFormAssign`](malachite_base::num::arithmetic::traits::ModSmithNormalFormAssign),
+/// for computing Smith normal forms of matrices of naturals modulo any modulus.
+pub mod mod_smith_normal_form;
 /// Implementations of [`ModSolve`](malachite_base::num::arithmetic::traits::ModSolve), for solving
 /// a system of linear equations modulo a prime.
 pub mod mod_solve;
@@ -364,6 +406,9 @@ pub mod multi_mod;
 /// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square matrix
 /// to a power.
 pub mod pow;
+/// Implementations of [`Rank`](malachite_base::num::arithmetic::traits::Rank), for finding the
+/// ranks of matrices of naturals.
+pub mod rank;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a [`NaturalMatrix`](super::NaturalMatrix) by a scalar on either side.
 pub mod scalar_mul;
@@ -404,6 +449,10 @@ pub mod scalar_mul;
 /// assert_eq!(a.to_string(), "[4, 8; 12, 16]");
 /// ```
 pub mod shl;
+/// Implementations of [`SmithNormalForm`](malachite_base::num::arithmetic::traits::SmithNormalForm)
+/// and [`SmithNormalFormAssign`](malachite_base::num::arithmetic::traits::SmithNormalFormAssign),
+/// for computing the Smith normal forms of matrices of naturals.
+pub mod smith_normal_form;
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a square
 /// matrix.

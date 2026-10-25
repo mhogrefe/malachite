@@ -912,6 +912,9 @@ pub mod unsigned_matrix {
         pub mod mod_pow;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_determinant;
+        pub mod mod_power_of_2_howell_form;
+        pub mod mod_power_of_2_inverse;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_kronecker_product;
         pub mod mod_power_of_2_mul;
@@ -920,12 +923,16 @@ pub mod unsigned_matrix {
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_pow;
         pub mod mod_power_of_2_shl;
+        pub mod mod_power_of_2_smith_normal_form;
+        pub mod mod_power_of_2_solve;
         pub mod mod_power_of_2_square;
+        pub mod mod_power_of_2_strong_echelon_form;
         pub mod mod_power_of_2_sub;
         pub mod mod_power_of_2_trace;
         pub mod mod_rank;
         pub mod mod_reduced_row_echelon_form;
         pub mod mod_shl;
+        pub mod mod_smith_normal_form;
         pub mod mod_solve;
         pub mod mod_solve_lower_triangular;
         pub mod mod_solve_upper_triangular;

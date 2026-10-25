@@ -172,6 +172,18 @@ pub mod mod_power_of_2;
 /// [`ModPowerOf2AddAssign`](crate::num::arithmetic::traits::ModPowerOf2AddAssign), for adding
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a power of 2.
 pub mod mod_power_of_2_add;
+/// Implementations of
+/// [`ModPowerOf2Determinant`](crate::num::arithmetic::traits::ModPowerOf2Determinant), for
+/// computing determinants of square matrices modulo powers of 2.
+pub mod mod_power_of_2_determinant;
+/// Implementations of
+/// [`ModPowerOf2HowellForm`](crate::num::arithmetic::traits::ModPowerOf2HowellForm) and
+/// [`ModPowerOf2HowellFormAssign`](crate::num::arithmetic::traits::ModPowerOf2HowellFormAssign),
+/// for computing Howell forms of matrices modulo powers of 2.
+pub mod mod_power_of_2_howell_form;
+/// Implementations of [`ModPowerOf2Inverse`](crate::num::arithmetic::traits::ModPowerOf2Inverse),
+/// for inverting square matrices modulo powers of 2.
+pub mod mod_power_of_2_inverse;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), a trait for
 /// checking whether every element of an [`UnsignedMatrix`](super::UnsignedMatrix) is reduced modulo
@@ -252,10 +264,25 @@ pub mod mod_power_of_2_pow;
 /// assert_eq!(a.to_string(), "[0, 0; 0, 0]");
 /// ```
 pub mod mod_power_of_2_shl;
+/// Implementations of
+/// [`ModPowerOf2SmithNormalForm`](crate::num::arithmetic::traits::ModPowerOf2SmithNormalForm) and
+/// [`ModPowerOf2SmithNormalFormAssign`](
+/// crate::num::arithmetic::traits::ModPowerOf2SmithNormalFormAssign), for computing Smith normal
+/// forms of matrices modulo powers of 2.
+pub mod mod_power_of_2_smith_normal_form;
+/// Implementations of [`ModPowerOf2Solve`](crate::num::arithmetic::traits::ModPowerOf2Solve), for
+/// solving linear systems modulo powers of 2.
+pub mod mod_power_of_2_solve;
 /// Implementations of [`ModPowerOf2Square`](crate::num::arithmetic::traits::ModPowerOf2Square) and
 /// [`ModPowerOf2SquareAssign`](crate::num::arithmetic::traits::ModPowerOf2SquareAssign), for
 /// squaring a square matrix modulo a power of 2.
 pub mod mod_power_of_2_square;
+/// Implementations of
+/// [`ModPowerOf2StrongEchelonForm`](crate::num::arithmetic::traits::ModPowerOf2StrongEchelonForm)
+/// and [`ModPowerOf2StrongEchelonFormAssign`](
+/// crate::num::arithmetic::traits::ModPowerOf2StrongEchelonFormAssign), for computing strong
+/// echelon forms of matrices modulo powers of 2.
+pub mod mod_power_of_2_strong_echelon_form;
 /// Implementations of [`ModPowerOf2Sub`](crate::num::arithmetic::traits::ModPowerOf2Sub) and
 /// [`ModPowerOf2SubAssign`](crate::num::arithmetic::traits::ModPowerOf2SubAssign), for subtracting
 /// [`UnsignedMatrix`](super::UnsignedMatrix)s of the same shape modulo a power of 2.
@@ -308,6 +335,10 @@ pub mod mod_reduced_row_echelon_form;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of [`ModSmithNormalForm`](crate::num::arithmetic::traits::ModSmithNormalForm)
+/// and [`ModSmithNormalFormAssign`](crate::num::arithmetic::traits::ModSmithNormalFormAssign), for
+/// computing Smith normal forms of matrices modulo any modulus.
+pub mod mod_smith_normal_form;
 /// Implementations of [`ModSolve`](crate::num::arithmetic::traits::ModSolve), for solving a system
 /// of linear equations modulo a prime.
 pub mod mod_solve;

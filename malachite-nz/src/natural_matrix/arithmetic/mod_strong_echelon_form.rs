@@ -50,7 +50,7 @@ fn pivot(xs: &mut [Natural], height: usize, width: usize, start_row: usize, col:
 }
 
 // Rows `i` and `j`, where `i < j`, of the matrix with elements `xs` and width `width`.
-fn two_rows(
+pub(crate) fn two_rows(
     xs: &mut [Natural],
     width: usize,
     i: usize,
@@ -112,7 +112,7 @@ fn is_divisible(b: &Natural, a: &Natural, m: &Natural) -> Option<Natural> {
 
 // Returns `(g, s, t, u, v)`, where `g = gcd(a, b)`, `sa + tb = g`, `u = -b / g`, and `v = a / g`,
 // all modulo `m`; `g` is 0 if `a` and `b` are both 0.
-fn xgcd_transform(
+pub(crate) fn xgcd_transform(
     a: &Natural,
     b: &Natural,
     m: &Natural,
@@ -133,7 +133,7 @@ fn xgcd_transform(
 }
 
 // Replaces `(x, y)` by `(sx + ty, ux + vy)`, modulo `m`.
-fn transform_pair(
+pub(crate) fn transform_pair(
     x: &Natural,
     y: &Natural,
     (s, t, u, v): (&Natural, &Natural, &Natural, &Natural),

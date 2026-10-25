@@ -563,12 +563,27 @@ documented by git history.
   returns the nonzero diagonal elements of the Smith normal form, found by Lübeck's algorithm for
   matrices of rank at least 32 whose Hermite normal form has word-sized pivots, as by
   `fmpz_mat_elementary_divisors`.
+- New `ModPowerOf2HowellForm`, `ModPowerOf2StrongEchelonForm` (and their `Assign` forms),
+  `ModPowerOf2Determinant`, `ModPowerOf2Solve`, and `ModPowerOf2SmithNormalForm` (and its `Assign`
+  form) traits, implemented for `UnsignedMatrix<T>` and, in malachite-nz, `NaturalMatrix`, and
+  `ModPowerOf2Inverse` implemented for both. They work over the chain ring $\mathbb{Z}/2^k$ by
+  elimination pivoting on the smallest 2-adic valuation, and `UnsignedMatrix<T>` supports
+  exponents up to the width of `T`, including modulo $2^{64}$ for `u64`s. The Howell and strong
+  echelon forms equal the general ones modulo $2^k$, the inverse exists exactly when the
+  determinant is odd, and, unlike modulo a general composite number, every system can be solved.
+- New `ModSmithNormalForm` and `ModSmithNormalFormAssign` traits, implemented for
+  `UnsignedMatrix<T>` and, in malachite-nz, `NaturalMatrix`: the Smith normal form over
+  $\mathbb{Z}/m$ for any modulus $m$, whose diagonal elements are $\gcd(d_i, m)$ for the integer
+  Smith normal form's $d_i$, with 0 standing for $m$.
 - In `test_util`, `run_benchmark` now interleaves the timed calls of its series, rotating which
   series goes first in each round, after an untimed call; the first series of a benchmark had been
   timed about 10% slower than an identical later one.
 
 ### malachite-nz
 
+- `Rank`, `Determinant` (returning an `Integer`), `SmithNormalForm`, `SmithNormalFormAssign`, and
+  `ElementaryDivisors` for `NaturalMatrix`, by value or by reference, computed as for the
+  `IntegerMatrix` with the same elements; and `From<&NaturalMatrix>` for `IntegerMatrix`.
 - `DivExact` and `DivExactAssign` of `NaturalMatrix` by `Natural` and of `IntegerMatrix` by
   `Integer`, in every combination of value and reference, dividing every element by a scalar that
   divides it exactly, like FLINT's `fmpz_mat_scalar_divexact_fmpz`.

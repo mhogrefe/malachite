@@ -47,3 +47,42 @@ impl From<NaturalMatrix> for IntegerMatrix {
         )
     }
 }
+
+impl From<&NaturalMatrix> for IntegerMatrix {
+    /// Converts a [`NaturalMatrix`] to an [`IntegerMatrix`], taking the [`NaturalMatrix`] by
+    /// reference.
+    ///
+    /// Every [`Natural`](crate::natural::Natural) is an [`Integer`], so nothing is lost and nothing
+    /// can fail. The elements are converted one by one, so the height and width are unchanged.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of limbs of the
+    /// elements of `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    ///
+    /// let m = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    /// assert_eq!(IntegerMatrix::from(&m).to_string(), "[1, 2, 3; 4, 5, 6]");
+    ///
+    /// assert_eq!(
+    ///     IntegerMatrix::from(&NaturalMatrix::from_str("[]_{0,2}").unwrap()).to_string(),
+    ///     "[]_{0,2}"
+    /// );
+    /// ```
+    #[inline]
+    fn from(m: &NaturalMatrix) -> Self {
+        Self::from_owned_elements(
+            m.height(),
+            m.width(),
+            m.elements.iter().map(Integer::from).collect(),
+        )
+    }
+}

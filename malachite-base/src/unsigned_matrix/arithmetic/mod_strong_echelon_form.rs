@@ -136,7 +136,7 @@ pub(crate) fn signed_to_residue<U: PrimitiveUnsigned + WrappingFrom<S>, S: Primi
 // and then negates `t`; here the signed cofactors of `extended_gcd` are reduced instead. Any such
 // cofactors give an invertible transformation, and the strong echelon form is unique, so the result
 // does not depend on the choice.
-fn xgcd_transform<
+pub(crate) fn xgcd_transform<
     U: PrimitiveUnsigned + ExtendedGcd<U, Gcd = U, Cofactor = S> + WrappingFrom<S>,
     S: PrimitiveSigned,
 >(
