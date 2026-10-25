@@ -4004,6 +4004,35 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, crate_dir, &format!("demo_{demo}"), flint_mode);
     }
+    // Permanents of IntegerMatrixes, NaturalMatrixes, and RationalMatrixes, against
+    // fmpz_mat_permanent and fmpq_mat_permanent; the demos' matrices have dimension at most 8.
+    // Determinant signs against the signs of fmpz_mat_det and fmpq_mat_det, and determinants modulo
+    // powers of 2 against fmpz_mod_mat_det.
+    for (crate_dir, demo, flint_mode) in [
+        ("../malachite-nz", "integer_matrix_permanent", "fmpz_mat_permanent"),
+        ("../malachite-nz", "integer_matrix_permanent_dense", "fmpz_mat_permanent"),
+        ("../malachite-nz", "integer_matrix_permanent_cofactor", "fmpz_mat_permanent"),
+        ("../malachite-nz", "integer_matrix_permanent_glynn", "fmpz_mat_permanent"),
+        ("../malachite-nz", "natural_matrix_permanent", "fmpz_mat_permanent"),
+        ("../malachite-q", "rational_matrix_permanent", "fmpq_mat_permanent"),
+        ("../malachite-nz", "integer_matrix_determinant_sign", "fmpz_mat_det_sign"),
+        ("../malachite-nz", "integer_matrix_determinant_sign_low_rank", "fmpz_mat_det_sign"),
+        ("../malachite-nz", "natural_matrix_determinant_sign", "fmpz_mat_det_sign"),
+        ("../malachite-q", "rational_matrix_determinant_sign", "fmpq_mat_det_sign"),
+        ("../malachite-q", "rational_matrix_determinant_sign_low_rank", "fmpq_mat_det_sign"),
+        (
+            "../malachite-base",
+            "unsigned_matrix_mod_power_of_2_determinant",
+            "fmpz_mod_mat_det_power_of_2",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_power_of_2_determinant",
+            "fmpz_mod_mat_det_power_of_2",
+        ),
+    ] {
+        check_demo_against_flint(&oracle, crate_dir, &format!("demo_{demo}"), flint_mode);
+    }
     // Hermite normal forms of IntegerMatrixes, against fmpz_mat_hnf and its classical, xgcd,
     // minors, Pernet-Stein, and modular forms, fmpz_mat_hnf_transform and its minors and naive
     // forms (U is not unique for matrices with more rows than columns, and matches FLINT's because

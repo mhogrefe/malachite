@@ -631,6 +631,9 @@ pub mod multi_crt;
 /// [`NaturalMatrix::multi_mod`](super::NaturalMatrix::multi_mod), which reduces a matrix modulo
 /// many word-sized moduli.
 pub mod multi_mod;
+/// Implementations of [`Permanent`](malachite_base::num::arithmetic::traits::Permanent), for
+/// computing the permanents of square matrices of naturals.
+pub mod permanent;
 /// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
 /// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square matrix
 /// to a power.

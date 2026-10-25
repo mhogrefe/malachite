@@ -114,6 +114,11 @@ string in a unit file is printed bare, exactly as the demo would print it.
 | `fmpz_mat_mul` | `fmpz_mat_mul` | `demo_integer_matrix_mul` and its `_val_ref`, `_ref_val`, `_ref_ref`, `_assign`, and `_assign_ref` versions, and the same six `natural_matrix` demos (malachite-nz), plus unit rows; and, in the random modes with fewer lines, `_large_dimensions_small_elements`, `_large_dimensions_double_word_elements`, `_large_elements`, and `_large_dimensions_and_elements`, which enlarge the random sizes to reach the blocked and double-word kernels, Waksman's and Strassen's algorithms, and the multimodular algorithm. Matrices are read by `fmpz_mat_init_set_str_malachite` in `oracle/util.c` |
 | `nmod_mat_mul` | `nmod_mat_mul` | `demo_unsigned_matrix_mod_mul_matrix`, `_assign`, and `_small_moduli` (malachite-base), plus unit rows; and, in the random modes with 5 lines, `_large_dimensions`, which reaches Strassen's algorithm |
 | `sqrtmod_stress` | `fmpz_sqrtmod` | none — a memory-stress diagnostic, run manually |
+| `fmpz_mat_permanent` | `fmpz_mat_permanent` | `demo_integer_matrix_permanent`, `_dense`, `_cofactor`, and `_glynn`, and `demo_natural_matrix_permanent` (malachite-nz); the matrices have dimension at most 8, so FLINT always succeeds |
+| `fmpq_mat_permanent` | `fmpq_mat_permanent` | `demo_rational_matrix_permanent` (malachite-q) |
+| `fmpz_mat_det_sign` | the sign of `fmpz_mat_det` | `demo_integer_matrix_determinant_sign` and `_low_rank` and `demo_natural_matrix_determinant_sign` (malachite-nz) |
+| `fmpq_mat_det_sign` | the sign of `fmpq_mat_det` | `demo_rational_matrix_determinant_sign` and `_low_rank` (malachite-q) |
+| `fmpz_mod_mat_det_power_of_2` | `fmpz_mod_mat_det` modulo $2^k$ | `demo_unsigned_matrix_mod_power_of_2_determinant` (malachite-base) and `demo_natural_matrix_mod_power_of_2_determinant` (malachite-nz); modulo $2^0 = 1$ the determinant must be 0 |
 
 The `sqrtmod` modes skip documented divergence windows, noted in comments in
 `oracle/sqrtmod.c`;

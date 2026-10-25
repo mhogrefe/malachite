@@ -586,6 +586,13 @@ documented by git history.
   `UnsignedMatrix<T>` and, in malachite-nz, `NaturalMatrix`: the Smith normal form over
   $\mathbb{Z}/m$ for any modulus $m$, whose diagonal elements are $\gcd(d_i, m)$ for the integer
   Smith normal form's $d_i$, with 0 standing for $m$.
+- New `Permanent` trait, implemented in malachite-nz for `NaturalMatrix` (returning a `Natural`)
+  and `IntegerMatrix` and in malachite-q for `RationalMatrix`, by value or by reference. Dense
+  matrices use FLINT's algorithms (cofactor expansion, and Glynn's formula, on single words when the
+  elements are small), but unlike FLINT's `fmpz_mat_permanent`, which fails above dimension 62, the
+  permanent is always computed: zero, single-nonzero, and two-nonzero rows and columns and
+  independent blocks are reduced first, so permutation, triangular, block-diagonal, and banded
+  matrices of any size are cheap.
 - New `DeterminantSign` trait, implemented in malachite-nz for `NaturalMatrix` and `IntegerMatrix`
   and in malachite-q for `RationalMatrix`, by value or by reference: the sign of the determinant
   as an `Ordering`. Dimension 2 uses `cmp_products`. For larger matrices whose elements are not

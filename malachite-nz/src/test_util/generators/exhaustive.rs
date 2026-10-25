@@ -3675,6 +3675,10 @@ pub fn exhaustive_integer_matrix_gen_var_1() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_square_matrices())
 }
 
+pub fn exhaustive_integer_matrix_gen_var_4() -> It<IntegerMatrix> {
+    Box::new(exhaustive_integer_matrix_gen_var_1().filter(|a| a.height() <= 8))
+}
+
 pub fn exhaustive_integer_matrix_gen_var_2() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_matrix_gen_var_1().filter(|a| a.height() <= 4))
 }
@@ -4711,6 +4715,10 @@ pub fn exhaustive_integer_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>(
 
 pub fn exhaustive_natural_matrix_gen_var_1() -> It<NaturalMatrix> {
     Box::new(exhaustive_natural_square_matrices())
+}
+
+pub fn exhaustive_natural_matrix_gen_var_2() -> It<NaturalMatrix> {
+    Box::new(exhaustive_natural_matrix_gen_var_1().filter(|a| a.height() <= 8))
 }
 
 pub fn exhaustive_natural_matrix_pair_gen() -> It<(NaturalMatrix, NaturalMatrix)> {

@@ -181,6 +181,7 @@ pub mod rational_matrix {
         pub mod mul_integer_matrix;
         pub mod mul_vector;
         pub mod neg;
+        pub mod permanent;
         pub mod pow;
         pub mod reconstruct;
         pub mod reduced_row_echelon_form;

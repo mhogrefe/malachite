@@ -11,6 +11,7 @@ pub mod kronecker_product;
 pub mod mul;
 pub mod mul_integer_matrix;
 pub mod mul_vector;
+pub mod permanent;
 pub mod pow;
 pub mod reconstruct;
 pub mod solve;

@@ -7087,6 +7087,10 @@ pub fn random_integer_matrix_gen_var_1(config: &GenConfig) -> It<IntegerMatrix> 
     ))
 }
 
+pub fn random_integer_matrix_gen_var_4(config: &GenConfig) -> It<IntegerMatrix> {
+    Box::new(random_integer_matrix_gen_var_1(config).filter(|a| a.height() <= 8))
+}
+
 pub fn random_integer_matrix_gen_var_2(config: &GenConfig) -> It<IntegerMatrix> {
     Box::new(random_integer_matrix_gen_var_1(config).filter(|a| a.height() <= 4))
 }
@@ -8678,6 +8682,10 @@ pub fn random_natural_matrix_gen_var_1(config: &GenConfig) -> It<NaturalMatrix> 
         config.get_or("mean_size_n", 4),
         config.get_or("mean_size_d", 1),
     ))
+}
+
+pub fn random_natural_matrix_gen_var_2(config: &GenConfig) -> It<NaturalMatrix> {
+    Box::new(random_natural_matrix_gen_var_1(config).filter(|a| a.height() <= 8))
 }
 
 pub fn random_natural_matrix_pair_gen(config: &GenConfig) -> It<(NaturalMatrix, NaturalMatrix)> {

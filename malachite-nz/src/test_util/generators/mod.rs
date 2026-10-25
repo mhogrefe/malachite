@@ -3985,6 +3985,16 @@ pub fn integer_matrix_gen_var_1() -> Generator<IntegerMatrix> {
     )
 }
 
+// All square `IntegerMatrix`s of dimension at most 8, small enough for computing permanents by
+// summing over permutations.
+pub fn integer_matrix_gen_var_4() -> Generator<IntegerMatrix> {
+    Generator::new(
+        &exhaustive_integer_matrix_gen_var_4,
+        &random_integer_matrix_gen_var_4,
+        &special_random_integer_matrix_gen_var_4,
+    )
+}
+
 // All square `IntegerMatrix`s of dimension at most 4.
 pub fn integer_matrix_gen_var_2() -> Generator<IntegerMatrix> {
     Generator::new(
@@ -4891,6 +4901,16 @@ pub fn natural_matrix_gen_var_1() -> Generator<NaturalMatrix> {
     )
 }
 
+// All square `NaturalMatrix`s of dimension at most 8, small enough for computing permanents by
+// summing over permutations.
+pub fn natural_matrix_gen_var_2() -> Generator<NaturalMatrix> {
+    Generator::new(
+        &exhaustive_natural_matrix_gen_var_2,
+        &random_natural_matrix_gen_var_2,
+        &special_random_natural_matrix_gen_var_2,
+    )
+}
+
 pub fn natural_matrix_pair_gen() -> Generator<(NaturalMatrix, NaturalMatrix)> {
     Generator::new(
         &exhaustive_natural_matrix_pair_gen,
@@ -4957,8 +4977,8 @@ pub fn natural_matrix_natural_matrix_natural_triple_gen_var_7()
     )
 }
 
-// All `(NaturalMatrix, NaturalMatrix, Natural, Natural)` where the matrices have the same shape
-// and every element of both, and the first `Natural`, is less than the second `Natural`.
+// All `(NaturalMatrix, NaturalMatrix, Natural, Natural)` where the matrices have the same shape and
+// every element of both, and the first `Natural`, is less than the second `Natural`.
 pub fn natural_matrix_natural_matrix_natural_natural_quadruple_gen_var_1()
 -> Generator<(NaturalMatrix, NaturalMatrix, Natural, Natural)> {
     Generator::new(

@@ -43,6 +43,7 @@ pub(crate) fn register(runner: &mut Runner) {
     multi_mod::register(runner);
     neg::register(runner);
     nullspace::register(runner);
+    permanent::register(runner);
     pow::register(runner);
     rank::register(runner);
     reduced_row_echelon_form::register(runner);
@@ -97,6 +98,7 @@ mod multi_crt;
 mod multi_mod;
 mod neg;
 mod nullspace;
+mod permanent;
 mod pow;
 mod rank;
 mod reduced_row_echelon_form;

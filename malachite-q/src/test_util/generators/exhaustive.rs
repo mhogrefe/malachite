@@ -1824,6 +1824,10 @@ pub fn exhaustive_rational_matrix_gen_var_2() -> It<RationalMatrix> {
     exhaustive_rational_matrix_gen_var_1()
 }
 
+pub fn exhaustive_rational_matrix_gen_var_4() -> It<RationalMatrix> {
+    Box::new(exhaustive_rational_matrix_gen_var_2().filter(|a| a.height() <= 8))
+}
+
 pub fn exhaustive_rational_matrix_pair_gen_var_6() -> It<(RationalMatrix, RationalMatrix)> {
     exhaustive_rational_matrix_pair_gen_var_3()
 }

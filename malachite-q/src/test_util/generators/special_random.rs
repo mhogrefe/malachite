@@ -4510,6 +4510,10 @@ pub fn special_random_rational_matrix_gen_var_2(config: &GenConfig) -> It<Ration
     ))
 }
 
+pub fn special_random_rational_matrix_gen_var_4(config: &GenConfig) -> It<RationalMatrix> {
+    Box::new(special_random_rational_matrix_gen_var_2(config).filter(|a| a.height() <= 8))
+}
+
 // Pairs of matrices with the same height and small elements, for linear algebra.
 pub fn special_random_rational_matrix_pair_gen_var_6(
     config: &GenConfig,

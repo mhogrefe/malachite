@@ -385,6 +385,7 @@ pub mod integer_matrix {
         pub mod multi_crt;
         pub mod multi_mod;
         pub mod neg;
+        pub mod permanent;
         pub mod pow;
         pub mod reduced_row_echelon_form;
         pub mod scalar_mul;
@@ -1162,6 +1163,7 @@ pub mod natural_matrix {
         pub mod mul_vector;
         pub mod multi_crt;
         pub mod multi_mod;
+        pub mod permanent;
         pub mod pow;
         pub mod rank;
         pub mod scalar_mul;

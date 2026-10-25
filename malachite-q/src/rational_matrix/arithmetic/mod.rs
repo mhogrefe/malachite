@@ -137,6 +137,9 @@ pub mod neg;
 /// Implementations of [`Nullspace`](malachite_base::num::arithmetic::traits::Nullspace), for
 /// finding bases of the right nullspaces of rational matrices.
 pub mod nullspace;
+/// Implementations of [`Permanent`](malachite_base::num::arithmetic::traits::Permanent), for
+/// computing the permanents of square rational matrices.
+pub mod permanent;
 /// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
 /// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square
 /// [`RationalMatrix`](super::RationalMatrix) to a power.

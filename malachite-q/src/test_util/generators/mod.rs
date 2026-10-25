@@ -1441,6 +1441,16 @@ pub fn rational_matrix_gen_var_2() -> Generator<RationalMatrix> {
     )
 }
 
+// All square `RationalMatrix`s of dimension at most 8, small enough for computing permanents by
+// summing over permutations.
+pub fn rational_matrix_gen_var_4() -> Generator<RationalMatrix> {
+    Generator::new(
+        &exhaustive_rational_matrix_gen_var_4,
+        &random_rational_matrix_gen_var_4,
+        &special_random_rational_matrix_gen_var_4,
+    )
+}
+
 // All pairs of `RationalMatrix`s of the same height, with small elements in the random modes, for
 // linear algebra.
 pub fn rational_matrix_pair_gen_var_6() -> Generator<(RationalMatrix, RationalMatrix)> {

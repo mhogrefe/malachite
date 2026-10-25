@@ -77,6 +77,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mul_vector::register(runner);
     multi_crt::register(runner);
     multi_mod::register(runner);
+    permanent::register(runner);
     pow::register(runner);
     rank::register(runner);
     scalar_mul::register(runner);
@@ -158,6 +159,7 @@ mod mul;
 mod mul_vector;
 mod multi_crt;
 mod multi_mod;
+mod permanent;
 mod pow;
 mod rank;
 mod scalar_mul;
