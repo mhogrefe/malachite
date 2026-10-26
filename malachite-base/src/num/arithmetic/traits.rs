@@ -2171,6 +2171,22 @@ pub trait Determinant {
     fn determinant(self) -> Self::Output;
 }
 
+/// Applies the similarity transform $A \mapsto P^{-1}AP$ of FLINT's `fmpz_mat_similarity` to a
+/// square matrix, where $P$ is the identity matrix with some of the elements of row `r` replaced by
+/// `d`. See the implementations for exactly which.
+pub trait SimilarityTransform<D> {
+    type Output;
+
+    fn similarity_transform(self, r: u64, d: D) -> Self::Output;
+}
+
+/// Applies the similarity transform $A \mapsto P^{-1}AP$ of FLINT's `fmpz_mat_similarity` to a
+/// square matrix in place, where $P$ is the identity matrix with some of the elements of row `r`
+/// replaced by `d`. See the implementations for exactly which.
+pub trait SimilarityTransformAssign<D> {
+    fn similarity_transform_assign(&mut self, r: u64, d: D);
+}
+
 /// Computes the permanent of a square matrix modulo $m$. The elements of the matrix must already be
 /// reduced modulo $m$.
 pub trait ModPermanent<M = Self> {

@@ -391,6 +391,7 @@ pub mod integer_matrix {
         pub mod scalar_mul;
         pub mod shl;
         pub mod shr;
+        pub mod similarity_transform;
         pub mod smith_normal_form;
         pub mod smith_normal_form_and_transforms;
         pub mod solve;

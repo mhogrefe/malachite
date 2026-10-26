@@ -4189,6 +4189,17 @@ pub fn integer_matrix_unsigned_pair_gen_var_2() -> Generator<(IntegerMatrix, u64
     )
 }
 
+// All `(m, r, d)` where `m` is a square `IntegerMatrix`, `r` is one of its row indices, and `d` is
+// an `Integer`.
+pub fn integer_matrix_unsigned_integer_triple_gen_var_1() -> Generator<(IntegerMatrix, u64, Integer)>
+{
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_integer_triple_gen_var_1,
+        &random_integer_matrix_unsigned_integer_triple_gen_var_1,
+        &special_random_integer_matrix_unsigned_integer_triple_gen_var_1,
+    )
+}
+
 // All `(m, i)` with `i` a column index of `m`.
 pub fn integer_matrix_unsigned_pair_gen_var_3() -> Generator<(IntegerMatrix, u64)> {
     Generator::new(

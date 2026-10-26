@@ -18,5 +18,6 @@ pub mod multi_crt;
 pub mod multi_mod;
 pub mod permanent;
 pub mod pow;
+pub mod similarity_transform;
 pub mod solve;
 pub mod square;

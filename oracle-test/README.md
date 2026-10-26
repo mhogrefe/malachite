@@ -121,6 +121,7 @@ string in a unit file is printed bare, exactly as the demo would print it.
 | `fmpz_mod_mat_det_power_of_2` | `fmpz_mod_mat_det` modulo $2^k$ | `demo_unsigned_matrix_mod_power_of_2_determinant` (malachite-base) and `demo_natural_matrix_mod_power_of_2_determinant` (malachite-nz); modulo $2^0 = 1$ the determinant must be 0 |
 | `fmpz_mat_permanent_power_of_2` | `fmpz_mat_permanent`, reduced modulo $2^k$ | `demo_unsigned_matrix_mod_power_of_2_permanent` (malachite-base) and `demo_natural_matrix_mod_power_of_2_permanent` (malachite-nz); the matrices have dimension at most 8; modulo $2^0 = 1$ the permanent must be 0 |
 | `fmpz_mat_permanent_mod` | `fmpz_mat_permanent`, reduced modulo $m$ | `demo_unsigned_matrix_mod_permanent` (malachite-base) and `demo_natural_matrix_mod_permanent` (malachite-nz); the matrices have dimension at most 8 |
+| `fmpz_mat_similarity` | `fmpz_mat_similarity` | `demo_integer_matrix_similarity_transform` (malachite-nz) |
 
 The `sqrtmod` modes skip documented divergence windows, noted in comments in
 `oracle/sqrtmod.c`;

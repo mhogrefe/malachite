@@ -50,6 +50,7 @@ pub(crate) fn register(runner: &mut Runner) {
     scalar_mul::register(runner);
     shl::register(runner);
     shr::register(runner);
+    similarity_transform::register(runner);
     smith_normal_form::register(runner);
     smith_normal_form_and_transforms::register(runner);
     solve::register(runner);
@@ -105,6 +106,7 @@ mod reduced_row_echelon_form;
 mod scalar_mul;
 mod shl;
 mod shr;
+mod similarity_transform;
 mod smith_normal_form;
 mod smith_normal_form_and_transforms;
 mod solve;

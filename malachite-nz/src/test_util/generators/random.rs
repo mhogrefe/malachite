@@ -7435,6 +7435,22 @@ pub fn random_integer_matrix_unsigned_pair_gen_var_2(
     )
 }
 
+pub fn random_integer_matrix_unsigned_integer_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, u64, Integer)> {
+    let ds = random_integers(
+        EXAMPLE_SEED.fork("scalar"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        random_integer_matrix_gen_var_1(config)
+            .flat_map(|m| (0..m.height()).map(move |r| (m.clone(), r)))
+            .zip(ds)
+            .map(|((m, r), d)| (m, r, d)),
+    )
+}
+
 pub fn random_integer_matrix_unsigned_pair_gen_var_3(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, u64)> {

@@ -573,6 +573,12 @@ pub mod shl;
 /// assert_eq!(a.to_string(), "[4, -8, 12]");
 /// ```
 pub mod shr;
+/// Implementations of
+/// [`SimilarityTransform`](malachite_base::num::arithmetic::traits::SimilarityTransform) and
+/// [`SimilarityTransformAssign`](
+/// malachite_base::num::arithmetic::traits::SimilarityTransformAssign),
+/// for applying the similarity transform of FLINT's `fmpz_mat_similarity` to a square matrix.
+pub mod similarity_transform;
 /// Implementations of [`SmithNormalForm`](malachite_base::num::arithmetic::traits::SmithNormalForm)
 /// and [`SmithNormalFormAssign`](malachite_base::num::arithmetic::traits::SmithNormalFormAssign),
 /// for computing the Smith normal forms of integer matrices.

@@ -250,6 +250,7 @@ static const oracle_mode modes[] = {
     {"fmpz_mod_mat_det_power_of_2", run_fmpz_mod_mat_det_power_of_2},
     {"fmpz_mat_permanent_power_of_2", run_fmpz_mat_permanent_power_of_2},
     {"fmpz_mat_permanent_mod", run_fmpz_mat_permanent_mod},
+    {"fmpz_mat_similarity", run_fmpz_mat_similarity},
     {"fmpq_mat_solve_fraction_free", run_fmpq_mat_solve_fraction_free},
     {"fmpq_mat_solve_dixon", run_fmpq_mat_solve_dixon},
     {"fmpq_mat_solve_multi_mod", run_fmpq_mat_solve_multi_mod},

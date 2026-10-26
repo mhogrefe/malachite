@@ -8417,6 +8417,24 @@ pub fn special_random_integer_matrix_unsigned_pair_gen_var_2(
     )
 }
 
+pub fn special_random_integer_matrix_unsigned_integer_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, u64, Integer)> {
+    let ds = striped_random_integers(
+        EXAMPLE_SEED.fork("scalar"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    );
+    Box::new(
+        special_random_integer_matrix_gen_var_1(config)
+            .flat_map(|m| (0..m.height()).map(move |r| (m.clone(), r)))
+            .zip(ds)
+            .map(|((m, r), d)| (m, r, d)),
+    )
+}
+
 pub fn special_random_integer_matrix_unsigned_pair_gen_var_3(
     config: &GenConfig,
 ) -> It<(IntegerMatrix, u64)> {

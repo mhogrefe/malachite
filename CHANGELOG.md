@@ -644,6 +644,12 @@ documented by git history.
   system, identical to FLINT's `fmpz_mat_det_bound`, `fmpz_mat_det_bound_submatrix`, and
   `fmpz_mat_solve_bound` (computed, as in FLINT, with upper-bounding 30-bit floating-point
   magnitudes).
+- New `SimilarityTransform` and `SimilarityTransformAssign` traits in malachite-base, implemented
+  for `IntegerMatrix` with the matrix and the `Integer` scalar each by value or by reference:
+  FLINT's `fmpz_mat_similarity`, which replaces a square matrix $A$ with $P^{-1}AP$, where $P$ is
+  the identity matrix with $d$ in row $r$ in every column except $r - 1$ and $r$. That is what
+  FLINT's code computes; its manual leaves out the exception for column $r - 1$. Unlike FLINT,
+  Malachite panics if the matrix is not square or $r$ is not a row index.
 - By-reference forms of the widening vector and polynomial conversions: `From<&UnsignedVector<T>>`
   for `NaturalVector` and `IntegerVector`, `From<&NaturalVector>` for `IntegerVector`,
   `From<&UnsignedPolynomial<T>>` for `NaturalPolynomial` and `IntegerPolynomial`, and

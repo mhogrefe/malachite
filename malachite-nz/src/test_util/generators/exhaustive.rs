@@ -3937,6 +3937,19 @@ pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_2() -> It<(IntegerMatrix,
     )
 }
 
+// Each square matrix paired with each of its row indices, and then with every `Integer`.
+pub fn exhaustive_integer_matrix_unsigned_integer_triple_gen_var_1()
+-> It<(IntegerMatrix, u64, Integer)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_integer_matrix_gen_var_1()
+                .flat_map(|m| (0..m.height()).map(move |r| (m.clone(), r))),
+            exhaustive_integers(),
+        )
+        .map(|((m, r), d)| (m, r, d)),
+    )
+}
+
 // Each matrix paired with each of its column indices. A matrix has finitely many, so this reaches
 // every pair, and no index is reduced from an arbitrary integer.
 pub fn exhaustive_integer_matrix_unsigned_pair_gen_var_3() -> It<(IntegerMatrix, u64)> {

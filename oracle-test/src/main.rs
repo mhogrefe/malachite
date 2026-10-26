@@ -4043,6 +4043,7 @@ fn test_against_flint() {
         ),
         ("../malachite-base", "unsigned_matrix_mod_permanent", "fmpz_mat_permanent_mod"),
         ("../malachite-nz", "natural_matrix_mod_permanent", "fmpz_mat_permanent_mod"),
+        ("../malachite-nz", "integer_matrix_similarity_transform", "fmpz_mat_similarity"),
     ] {
         check_demo_against_flint(&oracle, crate_dir, &format!("demo_{demo}"), flint_mode);
     }
