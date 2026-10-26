@@ -4007,7 +4007,8 @@ fn test_against_flint() {
     // Permanents of IntegerMatrixes, NaturalMatrixes, and RationalMatrixes, against
     // fmpz_mat_permanent and fmpq_mat_permanent; the demos' matrices have dimension at most 8.
     // Determinant signs against the signs of fmpz_mat_det and fmpq_mat_det, and determinants modulo
-    // powers of 2 against fmpz_mod_mat_det.
+    // powers of 2 against fmpz_mod_mat_det, and permanents modulo powers of 2 and modulo any number
+    // against fmpz_mat_permanent reduced modulo the modulus.
     for (crate_dir, demo, flint_mode) in [
         ("../malachite-nz", "integer_matrix_permanent", "fmpz_mat_permanent"),
         ("../malachite-nz", "integer_matrix_permanent_dense", "fmpz_mat_permanent"),
@@ -4030,6 +4031,18 @@ fn test_against_flint() {
             "natural_matrix_mod_power_of_2_determinant",
             "fmpz_mod_mat_det_power_of_2",
         ),
+        (
+            "../malachite-base",
+            "unsigned_matrix_mod_power_of_2_permanent",
+            "fmpz_mat_permanent_power_of_2",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_power_of_2_permanent",
+            "fmpz_mat_permanent_power_of_2",
+        ),
+        ("../malachite-base", "unsigned_matrix_mod_permanent", "fmpz_mat_permanent_mod"),
+        ("../malachite-nz", "natural_matrix_mod_permanent", "fmpz_mat_permanent_mod"),
     ] {
         check_demo_against_flint(&oracle, crate_dir, &format!("demo_{demo}"), flint_mode);
     }

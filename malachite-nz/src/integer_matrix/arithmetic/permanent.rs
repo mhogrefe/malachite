@@ -27,6 +27,9 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
+use malachite_base::unsigned_matrix::arithmetic::permanent_over_ring::{
+    PermanentRing, permanent_structured as permanent_structured_over_ring,
+};
 
 // The largest dimension for which Glynn's formula can be used: the sign vectors are indexed by a
 // `u64`, and there are $2^{n-1}$ of them.
@@ -255,195 +258,59 @@ permanent_dense(a: &IntegerMatrix) -> Integer {
     permanent_glynn_word(a, s_bits, usize::exact_from(r_bits.div_ceil(Limb::WIDTH)))
 }}
 
-// The submatrix of `a` formed by the rows `rows` and the columns `cols`, in the given orders.
-fn submatrix(a: &IntegerMatrix, rows: &[usize], cols: &[usize]) -> IntegerMatrix {
-    let mut elements = Vec::with_capacity(rows.len() * cols.len());
-    for &i in rows {
-        elements.extend(cols.iter().map(|&j| a.elements[i * a.width + j].clone()));
+// The integers, for `permanent_structured`.
+struct IntegerRing;
+
+impl PermanentRing for IntegerRing {
+    type Element = Integer;
+
+    const DENSE_MAX_DIMENSION: usize = GLYNN_MAX_DIMENSION;
+
+    #[inline]
+    fn zero(&self) -> Integer {
+        Integer::ZERO
     }
-    IntegerMatrix {
-        elements,
-        height: rows.len(),
-        width: cols.len(),
+
+    #[inline]
+    fn one(&self) -> Integer {
+        Integer::ONE
+    }
+
+    #[inline]
+    fn is_zero(&self, x: &Integer) -> bool {
+        *x == 0u32
+    }
+
+    #[inline]
+    fn add_assign(&self, x: &mut Integer, y: &Integer) {
+        *x += y;
+    }
+
+    #[inline]
+    fn mul_assign(&self, x: &mut Integer, y: &Integer) {
+        *x *= y;
+    }
+
+    #[inline]
+    fn mul_add_mul(&self, x: &Integer, y: &Integer, z: &Integer, w: &Integer) -> Integer {
+        x.mul_add_mul(y, z, w)
+    }
+
+    fn permanent_dense(&self, xs: &[Integer], n: usize) -> Integer {
+        let n = u64::exact_from(n);
+        permanent_dense(&IntegerMatrix::from_elements(n, n, xs))
     }
 }
 
-// The matrix `a` without row `i` and column `j`.
-fn minor(a: &IntegerMatrix, i: usize, j: usize) -> IntegerMatrix {
-    let n = a.height;
-    let rows: Vec<usize> = (0..n).filter(|&k| k != i).collect();
-    let cols: Vec<usize> = (0..n).filter(|&k| k != j).collect();
-    submatrix(a, &rows, &cols)
-}
-
-// The matrix whose permanent equals that of `a`, a square matrix whose row `i` has exactly two
-// nonzero elements, $x$ in column `j_1` and $y$ in column `j_2`: row `i` and column `j_2` are
-// removed, and column `j_1` is replaced by $y$ times itself plus $x$ times column `j_2`. Expanding
-// along row `i` gives $x \operatorname{perm}(A_{i, j_1}) + y \operatorname{perm}(A_{i, j_2})$, and
-// the two minors differ only in the column they keep, so by linearity in that column, and since the
-// permanent does not depend on the order of the columns, the sum is the permanent of the result.
-fn contract_row(a: &IntegerMatrix, i: usize, j_1: usize, j_2: usize) -> IntegerMatrix {
-    let n = a.height;
-    let x = &a.elements[i * n + j_1];
-    let y = &a.elements[i * n + j_2];
-    let mut elements = Vec::with_capacity((n - 1) * (n - 1));
-    for k in (0..n).filter(|&k| k != i) {
-        let row = &a.elements[k * n..(k + 1) * n];
-        for (j, z) in row.iter().enumerate() {
-            if j == j_1 {
-                elements.push(y.mul_add_mul(z, x, &row[j_2]));
-            } else if j != j_2 {
-                elements.push(z.clone());
-            }
-        }
-    }
-    IntegerMatrix {
-        elements,
-        height: n - 1,
-        width: n - 1,
-    }
-}
-
-// The connected components of the bipartite graph whose vertices are the rows and columns of the
-// square matrix `a` and whose edges are its nonzero elements, as pairs of row and column lists.
-fn components(a: &IntegerMatrix) -> Vec<(Vec<usize>, Vec<usize>)> {
-    let n = a.height;
-    // Vertices 0..n are rows and n..2n are columns.
-    let mut component = vec![usize::MAX; n << 1];
-    let mut result = Vec::new();
-    for start in 0..n << 1 {
-        if component[start] != usize::MAX {
-            continue;
-        }
-        let c = result.len();
-        let mut rows = Vec::new();
-        let mut cols = Vec::new();
-        let mut stack = vec![start];
-        component[start] = c;
-        while let Some(v) = stack.pop() {
-            if v < n {
-                rows.push(v);
-                for j in 0..n {
-                    if a.elements[v * n + j] != 0u32 && component[n + j] == usize::MAX {
-                        component[n + j] = c;
-                        stack.push(n + j);
-                    }
-                }
-            } else {
-                let j = v - n;
-                cols.push(j);
-                for (i, ci) in component[..n].iter_mut().enumerate() {
-                    if a.elements[i * n + j] != 0u32 && *ci == usize::MAX {
-                        *ci = c;
-                        stack.push(i);
-                    }
-                }
-            }
-        }
-        rows.sort_unstable();
-        cols.sort_unstable();
-        result.push((rows, cols));
-    }
-    result
-}
-
-// The permanent of a square matrix, using its structure before falling back to `permanent_dense`. A
-// zero row or column gives 0. A row or column with a single nonzero element `x` gives `x` times the
-// permanent of the minor. If the nonzero elements split into independent blocks (connected
-// components of the bipartite graph of rows and columns), the permanent is the product of the
-// blocks' permanents, or 0 if some block is not square. A row or column with two nonzero elements
-// is contracted, lowering the dimension by 1 without branching (see `contract_row`). Otherwise, if
-// the dimension is too large for Glynn's formula, the permanent is expanded along the sparsest row
-// or column; if not, `permanent_dense` computes it.
+// The permanent of a square matrix, using its structure before falling back to `permanent_dense`,
+// by the structural reductions of `permanent_structured` from malachite-base, which are shared with
+// the modular permanents: zero rows and columns, rows and columns with one or two nonzero elements,
+// independent blocks, and, above dimension 64, expansion along the sparsest row or column.
 crate_test_fn! {
 permanent_structured(a: IntegerMatrix) -> Integer {
     assert_eq!(a.height, a.width, "the matrix must be square");
-    let mut a = a;
-    let mut factor = Integer::ONE;
-    loop {
-        let n = a.height;
-        if n <= 2 {
-            return factor * permanent_dense(&a);
-        }
-        let row_counts: Vec<usize> = a
-            .elements
-            .chunks_exact(n)
-            .map(|row| row.iter().filter(|x| **x != 0u32).count())
-            .collect();
-        let col_counts: Vec<usize> = (0..n)
-            .map(|j| (0..n).filter(|&i| a.elements[i * n + j] != 0u32).count())
-            .collect();
-        if row_counts.contains(&0) || col_counts.contains(&0) {
-            return Integer::ZERO;
-        }
-        if let Some(i) = row_counts.iter().position(|&c| c == 1) {
-            let j = (0..n).find(|&j| a.elements[i * n + j] != 0u32).unwrap();
-            factor *= &a.elements[i * n + j];
-            a = minor(&a, i, j);
-            continue;
-        }
-        if let Some(j) = col_counts.iter().position(|&c| c == 1) {
-            let i = (0..n).find(|&i| a.elements[i * n + j] != 0u32).unwrap();
-            factor *= &a.elements[i * n + j];
-            a = minor(&a, i, j);
-            continue;
-        }
-        let blocks = components(&a);
-        if blocks.len() > 1 {
-            for (rows, cols) in &blocks {
-                if rows.len() != cols.len() {
-                    return Integer::ZERO;
-                }
-            }
-            for (rows, cols) in &blocks {
-                factor *= permanent_structured(submatrix(&a, rows, cols));
-                if factor == 0u32 {
-                    return factor;
-                }
-            }
-            return factor;
-        }
-        if let Some(i) = row_counts.iter().position(|&c| c == 2) {
-            let mut nonzero = (0..n).filter(|&j| a.elements[i * n + j] != 0u32);
-            let j_1 = nonzero.next().unwrap();
-            let j_2 = nonzero.next().unwrap();
-            a = contract_row(&a, i, j_1, j_2);
-            continue;
-        }
-        if let Some(j) = col_counts.iter().position(|&c| c == 2) {
-            let mut nonzero = (0..n).filter(|&i| a.elements[i * n + j] != 0u32);
-            let i_1 = nonzero.next().unwrap();
-            let i_2 = nonzero.next().unwrap();
-            a = contract_row(&a.transpose(), j, i_1, i_2);
-            continue;
-        }
-        let (min_row, &min_row_count) =
-            row_counts.iter().enumerate().min_by_key(|&(_, c)| *c).unwrap();
-        let (min_col, &min_col_count) =
-            col_counts.iter().enumerate().min_by_key(|&(_, c)| *c).unwrap();
-        if n > GLYNN_MAX_DIMENSION {
-            let mut sum = Integer::ZERO;
-            if min_row_count <= min_col_count {
-                let i = min_row;
-                for j in 0..n {
-                    let x = &a.elements[i * n + j];
-                    if *x != 0u32 {
-                        sum.add_mul_assign(x, permanent_structured(minor(&a, i, j)));
-                    }
-                }
-            } else {
-                let j = min_col;
-                for i in 0..n {
-                    let x = &a.elements[i * n + j];
-                    if *x != 0u32 {
-                        sum.add_mul_assign(x, permanent_structured(minor(&a, i, j)));
-                    }
-                }
-            }
-            return factor * sum;
-        }
-        return factor * permanent_dense(&a);
-    }
+    let n = a.height;
+    permanent_structured_over_ring(&IntegerRing, a.elements, n)
 }}
 
 // Returns the permanent of the square matrix `a`.

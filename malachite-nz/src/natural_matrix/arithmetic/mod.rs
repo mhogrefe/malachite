@@ -378,6 +378,9 @@ pub mod mod_nullspace;
 /// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), for reducing every element of
 /// a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
 pub mod mod_op;
+/// Implementations of [`ModPermanent`](malachite_base::num::arithmetic::traits::ModPermanent), for
+/// computing the permanents of square matrices of naturals modulo a number.
+pub mod mod_permanent;
 /// Implementations of [`ModPow`](malachite_base::num::arithmetic::traits::ModPow) and
 /// [`ModPowAssign`](malachite_base::num::arithmetic::traits::ModPowAssign), for raising a square
 /// [`NaturalMatrix`](super::NaturalMatrix) to a power modulo a number.
@@ -439,6 +442,10 @@ pub mod mod_power_of_2_mul_vector;
 /// negating every element of a [`NaturalMatrix`](super::NaturalMatrix) modulo a power of 2.
 pub mod mod_power_of_2_neg;
 
+/// Implementations of
+/// [`ModPowerOf2Permanent`](malachite_base::num::arithmetic::traits::ModPowerOf2Permanent), for
+/// computing the permanents of square matrices of naturals modulo a power of 2.
+pub mod mod_power_of_2_permanent;
 /// Implementations of [`ModPowerOf2Pow`](malachite_base::num::arithmetic::traits::ModPowerOf2Pow)
 /// and [`ModPowerOf2PowAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign), for
 /// raising a square matrix to a power modulo a power of 2.

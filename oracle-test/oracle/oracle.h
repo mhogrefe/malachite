@@ -401,6 +401,8 @@ int run_fmpq_mat_permanent(const char * arg);
 int run_fmpz_mat_det_sign(const char * arg);
 int run_fmpq_mat_det_sign(const char * arg);
 int run_fmpz_mod_mat_det_power_of_2(const char * arg);
+int run_fmpz_mat_permanent_power_of_2(const char * arg);
+int run_fmpz_mat_permanent_mod(const char * arg);
 int run_fmpq_mat_solve_fraction_free(const char * arg);
 int run_fmpq_mat_solve_dixon(const char * arg);
 int run_fmpq_mat_solve_multi_mod(const char * arg);

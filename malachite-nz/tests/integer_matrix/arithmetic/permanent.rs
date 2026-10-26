@@ -163,7 +163,7 @@ fn test_permanent() {
 }
 
 // The square matrix of dimension `n` whose element in row `i` and column `j` is `f(i, j)`.
-fn matrix_from_fn(n: u64, f: impl Fn(u64, u64) -> Integer) -> IntegerMatrix {
+fn matrix_from_fn(n: u64, mut f: impl FnMut(u64, u64) -> Integer) -> IntegerMatrix {
     let elements = (0..n * n).map(|k| f(k / n, k % n)).collect();
     IntegerMatrix::from_owned_elements(n, n, elements)
 }
@@ -230,6 +230,30 @@ fn test_permanent_structured() {
         }),
         "62113250390420",
     );
+}
+
+// The next output of the SplitMix64 generator with state `seed`.
+const fn splitmix64(seed: &mut u64) -> u64 {
+    *seed = seed.wrapping_add(0x9e3779b97f4a7c15);
+    let mut z = *seed;
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
+    z ^ (z >> 31)
+}
+
+#[test]
+fn test_permanent_structured_sparse() {
+    // Pseudorandom sparse matrices with small elements, half of them 0, whose rows and columns
+    // often have one or two nonzero elements, and whose contractions often cancel to 0.
+    const VALUES: [i32; 6] = [0, 0, 0, 1, -1, 2];
+    let mut seed = 0;
+    for k in 0..2000u64 {
+        let n = 3 + k % 6;
+        let a = matrix_from_fn(n, |_, _| {
+            Integer::from(VALUES[usize::try_from(splitmix64(&mut seed) % 6).unwrap()])
+        });
+        verify_permanent(&a);
+    }
 }
 
 #[test]

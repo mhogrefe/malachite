@@ -19,7 +19,11 @@
     `fmpz_mat_det_sign` and `fmpq_mat_det_sign` modes compare it with the sign of `fmpz_mat_det` and
     `fmpq_mat_det`. The determinant-mod-2^k demos print `A.mod_power_of_2_determinant(k) = d`; the
     `fmpz_mod_mat_det_power_of_2` mode recomputes d with `fmpz_mod_mat_det` modulo 2^k, and for k = 0
-    requires d = 0.
+    requires d = 0. The permanent-mod-2^k demos print `A.mod_power_of_2_permanent(k) = p`; the
+    `fmpz_mat_permanent_power_of_2` mode recomputes the permanent over the integers with
+    `fmpz_mat_permanent` and reduces it modulo 2^k, and for k = 0 requires p = 0. The general-mod
+    permanent demos print `A.mod_permanent(m) = p`; the `fmpz_mat_permanent_mod` mode recomputes the
+    permanent over the integers with `fmpz_mat_permanent` and reduces it modulo m.
 
     Matrices are read by fmpz_mat_init_set_str_malachite and fmpq_mat_init_set_str_malachite in
     util.c. Each mode treats any other nonempty line as an error, and an input with no lines at all.
@@ -48,7 +52,9 @@ enum
     KIND_FMPQ_PERMANENT,
     KIND_FMPZ_DET_SIGN,
     KIND_FMPQ_DET_SIGN,
-    KIND_DET_POWER_OF_2
+    KIND_DET_POWER_OF_2,
+    KIND_PERMANENT_POWER_OF_2,
+    KIND_PERMANENT_MOD
 };
 
 static int
@@ -189,7 +195,9 @@ check_det_power_of_2(char * line, int line_number)
 {
     char * pieces[2];
     char * rest;
-    if (!split_method_call(line, ".mod_power_of_2_determinant(", pieces, 2, &rest)
+    const char * method = current_kind == KIND_DET_POWER_OF_2 ? ".mod_power_of_2_determinant("
+                                                              : ".mod_power_of_2_permanent(";
+    if (!split_method_call(line, method, pieces, 2, &rest)
         || strncmp(rest, " = ", 3) != 0)
     {
         return error("unrecognized line", line_number);
@@ -219,6 +227,24 @@ check_det_power_of_2(char * line, int line_number)
             result = error("the determinant modulo 1 must be 0", line_number);
         }
     }
+    else if (current_kind == KIND_PERMANENT_POWER_OF_2)
+    {
+        fmpz_t actual;
+        fmpz_init(actual);
+        if (!fmpz_mat_permanent(actual, a))
+        {
+            result = error("FLINT cannot compute this permanent", line_number);
+        }
+        else
+        {
+            fmpz_fdiv_r_2exp(actual, actual, pow);
+            if (!fmpz_equal(actual, expected))
+            {
+                result = error("the permanents differ", line_number);
+            }
+        }
+        fmpz_clear(actual);
+    }
     else
     {
         fmpz_t m, actual;
@@ -247,6 +273,61 @@ check_det_power_of_2(char * line, int line_number)
 }
 
 static int
+check_permanent_mod(char * line, int line_number)
+{
+    char * pieces[2];
+    char * rest;
+    if (!split_method_call(line, ".mod_permanent(", pieces, 2, &rest)
+        || strncmp(rest, " = ", 3) != 0)
+    {
+        return error("unrecognized line", line_number);
+    }
+    rest += 3;
+    checked++;
+    fmpz_mat_t a;
+    fmpz_t m, expected, actual;
+    fmpz_init(m);
+    fmpz_init(expected);
+    fmpz_init(actual);
+    if (fmpz_set_str(m, pieces[1], 10) != 0 || fmpz_sgn(m) <= 0)
+    {
+        fmpz_clear(m);
+        fmpz_clear(expected);
+        fmpz_clear(actual);
+        return error("unreadable modulus", line_number);
+    }
+    if (!fmpz_mat_init_set_str_malachite(a, pieces[0]) || fmpz_mat_nrows(a) != fmpz_mat_ncols(a))
+    {
+        fmpz_clear(m);
+        fmpz_clear(expected);
+        fmpz_clear(actual);
+        return error("unreadable input", line_number);
+    }
+    int result = 0;
+    if (fmpz_set_str(expected, rest, 10) != 0)
+    {
+        result = error("unreadable result", line_number);
+    }
+    else if (!fmpz_mat_permanent(actual, a))
+    {
+        result = error("FLINT cannot compute this permanent", line_number);
+    }
+    else
+    {
+        fmpz_fdiv_r(actual, actual, m);
+        if (!fmpz_equal(actual, expected))
+        {
+            result = error("the permanents differ", line_number);
+        }
+    }
+    fmpz_clear(m);
+    fmpz_clear(expected);
+    fmpz_clear(actual);
+    fmpz_mat_clear(a);
+    return result;
+}
+
+static int
 check_line(char * line, int line_number)
 {
     line[strcspn(line, "\r\n")] = '\0';
@@ -254,8 +335,13 @@ check_line(char * line, int line_number)
     {
         return 0;
     }
-    return current_kind == KIND_DET_POWER_OF_2 ? check_det_power_of_2(line, line_number)
-                                               : check_permanent_or_sign(line, line_number);
+    if (current_kind == KIND_PERMANENT_MOD)
+    {
+        return check_permanent_mod(line, line_number);
+    }
+    return current_kind == KIND_DET_POWER_OF_2 || current_kind == KIND_PERMANENT_POWER_OF_2
+               ? check_det_power_of_2(line, line_number)
+               : check_permanent_or_sign(line, line_number);
 }
 
 static int
@@ -290,6 +376,18 @@ int
 run_fmpq_mat_det_sign(const char * arg)
 {
     return run(arg, "fmpq_mat_det_sign", KIND_FMPQ_DET_SIGN);
+}
+
+int
+run_fmpz_mat_permanent_power_of_2(const char * arg)
+{
+    return run(arg, "fmpz_mat_permanent_power_of_2", KIND_PERMANENT_POWER_OF_2);
+}
+
+int
+run_fmpz_mat_permanent_mod(const char * arg)
+{
+    return run(arg, "fmpz_mat_permanent_mod", KIND_PERMANENT_MOD);
 }
 
 int

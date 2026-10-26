@@ -586,13 +586,27 @@ documented by git history.
   `UnsignedMatrix<T>` and, in malachite-nz, `NaturalMatrix`: the Smith normal form over
   $\mathbb{Z}/m$ for any modulus $m$, whose diagonal elements are $\gcd(d_i, m)$ for the integer
   Smith normal form's $d_i$, with 0 standing for $m$.
+- New `ModPowerOf2Permanent` trait, implemented for `UnsignedMatrix<T>` and, in malachite-nz,
+  `NaturalMatrix`, by value or by reference: the permanent modulo $2^k$ of a matrix whose elements
+  are reduced. Modulo 2 it is the determinant, computed in polynomial time; otherwise the same
+  structural reductions as for `Permanent` are followed by cofactor expansion or Glynn's formula,
+  whose sum, $2^{n-1}$ times the permanent, is computed modulo $2^{k+n-1}$ and shifted, falling
+  back to Ryser's formula when $2^{k+n-1}$ does not fit in the element type. `NaturalMatrix` uses
+  single or double limbs when $2^k$ fits in them.
+- New `ModPermanent` trait, implemented for `UnsignedMatrix<T>` and, in malachite-nz,
+  `NaturalMatrix`, by value or by reference: the permanent modulo any $m$ of a matrix whose
+  elements are reduced. Writing $m = 2^k q$ with $q$ odd, the permanent is found modulo $2^k$ as
+  for `ModPowerOf2Permanent` and modulo $q$ with Glynn's formula, which needs half as many terms as
+  Ryser's, and the two are combined by the Chinese remainder theorem. `NaturalMatrix` uses single
+  or double limbs when $m$ fits in them.
 - New `Permanent` trait, implemented in malachite-nz for `NaturalMatrix` (returning a `Natural`)
   and `IntegerMatrix` and in malachite-q for `RationalMatrix`, by value or by reference. Dense
   matrices use FLINT's algorithms (cofactor expansion, and Glynn's formula, on single words when the
   elements are small), but unlike FLINT's `fmpz_mat_permanent`, which fails above dimension 62, the
   permanent is always computed: zero, single-nonzero, and two-nonzero rows and columns and
-  independent blocks are reduced first, so permutation, triangular, block-diagonal, and banded
-  matrices of any size are cheap.
+  independent blocks are reduced first, each reduction in time linear in the dimension, so
+  permutation, triangular, block-diagonal, and banded matrices of any size are cheap. The modular
+  permanents share these reductions.
 - New `DeterminantSign` trait, implemented in malachite-nz for `NaturalMatrix` and `IntegerMatrix`
   and in malachite-q for `RationalMatrix`, by value or by reference: the sign of the determinant
   as an `Ordering`. Dimension 2 uses `cmp_products`. For larger matrices whose elements are not

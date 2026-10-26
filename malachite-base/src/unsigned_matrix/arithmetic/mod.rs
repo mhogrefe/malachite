@@ -229,6 +229,9 @@ pub mod mod_nullspace;
 /// [`ModAssign`](crate::num::arithmetic::traits::ModAssign), for reducing every element of an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) modulo a number.
 pub mod mod_op;
+/// Implementations of [`ModPermanent`](crate::num::arithmetic::traits::ModPermanent), for computing
+/// the permanents of square matrices of unsigned integers modulo a number.
+pub mod mod_permanent;
 /// Implementations of [`ModPow`](crate::num::arithmetic::traits::ModPow) and
 /// [`ModPowAssign`](crate::num::arithmetic::traits::ModPowAssign), for raising a square matrix to a
 /// power modulo a number.
@@ -287,6 +290,10 @@ pub mod mod_power_of_2_mul_vector;
 /// every element of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a power of 2.
 pub mod mod_power_of_2_neg;
 
+/// Implementations of
+/// [`ModPowerOf2Permanent`](crate::num::arithmetic::traits::ModPowerOf2Permanent), for computing
+/// the permanents of square matrices of unsigned integers modulo a power of 2.
+pub mod mod_power_of_2_permanent;
 /// Implementations of [`ModPowerOf2Pow`](crate::num::arithmetic::traits::ModPowerOf2Pow) and
 /// [`ModPowerOf2PowAssign`](crate::num::arithmetic::traits::ModPowerOf2PowAssign), for raising a
 /// square matrix to a power modulo a power of 2.
@@ -490,6 +497,10 @@ pub mod mod_sub_mul;
 /// Implementations of [`ModTrace`](crate::num::arithmetic::traits::ModTrace), the sum of the
 /// diagonal elements of a square matrix modulo a number.
 pub mod mod_trace;
+/// The permanent algorithms shared by the modular permanents of `UnsignedMatrix`s and
+/// malachite-nz's `NaturalMatrix`s, generic over the ring of residues.
+#[doc(hidden)]
+pub mod permanent_over_ring;
 /// Right-shifting a matrix (dividing it by a power of 2 and taking the floor), by implementations
 /// of [`Shr`](core::ops::Shr) and [`ShrAssign`](core::ops::ShrAssign).
 ///

@@ -2171,6 +2171,22 @@ pub trait Determinant {
     fn determinant(self) -> Self::Output;
 }
 
+/// Computes the permanent of a square matrix modulo $m$. The elements of the matrix must already be
+/// reduced modulo $m$.
+pub trait ModPermanent<M = Self> {
+    type Output;
+
+    fn mod_permanent(self, m: M) -> Self::Output;
+}
+
+/// Computes the permanent of a square matrix modulo $2^k$. The elements of the matrix must already
+/// be reduced modulo $2^k$.
+pub trait ModPowerOf2Permanent {
+    type Output;
+
+    fn mod_power_of_2_permanent(self, pow: u64) -> Self::Output;
+}
+
 /// Computes the permanent of a square matrix.
 pub trait Permanent {
     type Output;

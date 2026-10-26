@@ -911,6 +911,7 @@ pub mod unsigned_matrix {
         pub mod mod_neg;
         pub mod mod_nullspace;
         pub mod mod_op;
+        pub mod mod_permanent;
         pub mod mod_pow;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
@@ -924,6 +925,7 @@ pub mod unsigned_matrix {
         pub mod mod_power_of_2_mul_matrix;
         pub mod mod_power_of_2_mul_vector;
         pub mod mod_power_of_2_neg;
+        pub mod mod_power_of_2_permanent;
         pub mod mod_power_of_2_pow;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_smith_normal_form;
