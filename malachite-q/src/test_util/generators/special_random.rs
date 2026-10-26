@@ -2705,6 +2705,16 @@ pub fn special_random_rational_matrix_rational_pair_gen(
     ))
 }
 
+pub fn special_random_rational_matrix_unsigned_rational_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalMatrix, u64, Rational)> {
+    Box::new(
+        special_random_rational_matrix_rational_pair_gen(config)
+            .filter(|(a, _)| a.height() == a.width())
+            .flat_map(|(a, d)| (0..a.height()).map(move |r| (a.clone(), r, d.clone()))),
+    )
+}
+
 pub fn special_random_rational_matrix_triple_gen(
     config: &GenConfig,
 ) -> It<(RationalMatrix, RationalMatrix, RationalMatrix)> {

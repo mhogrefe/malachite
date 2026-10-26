@@ -9451,6 +9451,18 @@ pub fn random_unsigned_matrix_unsigned_unsigned_triple_gen_var_10<T: PrimitiveUn
     )
 }
 
+pub fn random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, u64, T, u64)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_unsigned_triple_gen_var_10::<T>(config)
+            .filter(|(a, _, _)| a.height() == a.width())
+            .flat_map(|(a, d, m)| (0..a.height()).map(move |r| (a.clone(), r, d, m))),
+    )
+}
+
 pub fn random_unsigned_matrix_unsigned_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<T>, T, T)> {
@@ -9458,6 +9470,18 @@ pub fn random_unsigned_matrix_unsigned_unsigned_triple_gen_var_11<T: PrimitiveUn
         random_unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_11::<T>(config)
             .zip(random_primitive_ints::<T>(EXAMPLE_SEED.fork("c")))
             .map(|((a, _, m), c)| (a, c % m, m)),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<T>, u64, T, T)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_unsigned_triple_gen_var_11::<T>(config)
+            .filter(|(a, _, _)| a.height() == a.width())
+            .flat_map(|(a, d, m)| (0..a.height()).map(move |r| (a.clone(), r, d, m))),
     )
 }
 

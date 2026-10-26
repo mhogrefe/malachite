@@ -4398,6 +4398,15 @@ pub fn exhaustive_natural_matrix_natural_unsigned_triple_gen_var_1()
     )
 }
 
+pub fn exhaustive_natural_matrix_unsigned_natural_unsigned_quadruple_gen_var_1()
+-> It<(NaturalMatrix, u64, Natural, u64)> {
+    Box::new(
+        exhaustive_natural_matrix_natural_unsigned_triple_gen_var_1()
+            .filter(|(a, _, _)| a.height() == a.width())
+            .flat_map(|(a, d, m)| (0..a.height()).map(move |r| (a.clone(), r, d.clone(), m))),
+    )
+}
+
 // A matrix, a scalar, and a modulus that every element and the scalar are less than.
 pub fn exhaustive_natural_matrix_natural_natural_triple_gen_var_1()
 -> It<(NaturalMatrix, Natural, Natural)> {
@@ -4411,6 +4420,17 @@ pub fn exhaustive_natural_matrix_natural_natural_triple_gen_var_1()
             let m = max.unwrap_or_default() + k + Natural::ONE;
             (a, c, m)
         }),
+    )
+}
+
+pub fn exhaustive_natural_matrix_unsigned_natural_natural_quadruple_gen_var_1()
+-> It<(NaturalMatrix, u64, Natural, Natural)> {
+    Box::new(
+        exhaustive_natural_matrix_natural_natural_triple_gen_var_1()
+            .filter(|(a, _, _)| a.height() == a.width())
+            .flat_map(|(a, d, m)| {
+                (0..a.height()).map(move |r| (a.clone(), r, d.clone(), m.clone()))
+            }),
     )
 }
 

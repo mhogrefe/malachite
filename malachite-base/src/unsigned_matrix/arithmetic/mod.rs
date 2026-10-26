@@ -344,6 +344,12 @@ pub mod mod_power_of_2_pow;
 /// assert_eq!(a.to_string(), "[0, 0; 0, 0]");
 /// ```
 pub mod mod_power_of_2_shl;
+/// Implementations of [`ModPowerOf2SimilarityTransform`](
+/// crate::num::arithmetic::traits::ModPowerOf2SimilarityTransform) and
+/// [`ModPowerOf2SimilarityTransformAssign`](
+/// crate::num::arithmetic::traits::ModPowerOf2SimilarityTransformAssign), for applying the
+/// similarity transform of FLINT's `fmpz_mat_similarity` to a square matrix modulo a power of 2.
+pub mod mod_power_of_2_similarity_transform;
 /// Implementations of
 /// [`ModPowerOf2SmithNormalForm`](crate::num::arithmetic::traits::ModPowerOf2SmithNormalForm) and
 /// [`ModPowerOf2SmithNormalFormAssign`](
@@ -419,6 +425,12 @@ pub mod mod_reduced_row_echelon_form;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of [`ModSimilarityTransform`](
+/// crate::num::arithmetic::traits::ModSimilarityTransform) and
+/// [`ModSimilarityTransformAssign`](crate::num::arithmetic::traits::ModSimilarityTransformAssign),
+/// for applying the similarity transform of FLINT's `nmod_mat_similarity` to a square matrix modulo
+/// a number.
+pub mod mod_similarity_transform;
 /// Implementations of [`ModSmithNormalForm`](crate::num::arithmetic::traits::ModSmithNormalForm)
 /// and [`ModSmithNormalFormAssign`](crate::num::arithmetic::traits::ModSmithNormalFormAssign), for
 /// computing Smith normal forms of matrices modulo any modulus.
@@ -551,6 +563,10 @@ pub mod permanent_over_ring;
 /// assert_eq!(a.to_string(), "[0, 0]");
 /// ```
 pub mod shr;
+/// The similarity transform shared by the similarity transforms of all the matrix types, generic
+/// over the ring of elements.
+#[doc(hidden)]
+pub mod similarity_over_ring;
 /// Implementations of [`ModMul`](crate::num::arithmetic::traits::ModMul) for multiplying an
 /// [`UnsignedVector`](crate::unsigned_vector::UnsignedVector) by an
 /// [`UnsignedMatrix`](super::UnsignedMatrix) on the right modulo a number.

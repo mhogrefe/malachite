@@ -4191,6 +4191,7 @@ pub fn integer_matrix_unsigned_pair_gen_var_2() -> Generator<(IntegerMatrix, u64
 
 // All `(m, r, d)` where `m` is a square `IntegerMatrix`, `r` is one of its row indices, and `d` is
 // an `Integer`.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub fn integer_matrix_unsigned_integer_triple_gen_var_1() -> Generator<(IntegerMatrix, u64, Integer)>
 {
     Generator::new(
@@ -4950,6 +4951,17 @@ pub fn natural_matrix_natural_unsigned_triple_gen_var_1() -> Generator<(NaturalM
     )
 }
 
+// All `(a, r, d, pow)` where `a` is a square `NaturalMatrix`, `r` is one of its row indices, and
+// every element of `a`, and `d`, is less than `2^pow`.
+pub fn natural_matrix_unsigned_natural_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, u64, Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_natural_unsigned_quadruple_gen_var_1,
+        &random_natural_matrix_unsigned_natural_unsigned_quadruple_gen_var_1,
+        &special_random_natural_matrix_unsigned_natural_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // All `(NaturalMatrix, Natural, Natural)` where every element of the matrix, and the first
 // `Natural`, is less than the second.
 pub fn natural_matrix_natural_natural_triple_gen_var_1()
@@ -4958,6 +4970,17 @@ pub fn natural_matrix_natural_natural_triple_gen_var_1()
         &exhaustive_natural_matrix_natural_natural_triple_gen_var_1,
         &random_natural_matrix_natural_natural_triple_gen_var_1,
         &special_random_natural_matrix_natural_natural_triple_gen_var_1,
+    )
+}
+
+// All `(a, r, d, m)` where `a` is a square `NaturalMatrix`, `r` is one of its row indices, and
+// every element of `a`, and `d`, is less than `m`.
+pub fn natural_matrix_unsigned_natural_natural_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, u64, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_natural_natural_quadruple_gen_var_1,
+        &random_natural_matrix_unsigned_natural_natural_quadruple_gen_var_1,
+        &special_random_natural_matrix_unsigned_natural_natural_quadruple_gen_var_1,
     )
 }
 

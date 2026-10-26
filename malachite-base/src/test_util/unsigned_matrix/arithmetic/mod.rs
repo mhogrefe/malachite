@@ -28,3 +28,4 @@ pub mod mod_solve_lower_triangular;
 pub mod mod_solve_upper_triangular;
 pub mod mod_square;
 pub mod mod_strong_echelon_form;
+pub mod similarity_transform;

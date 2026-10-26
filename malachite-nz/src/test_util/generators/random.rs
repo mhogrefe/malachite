@@ -8895,6 +8895,16 @@ pub fn random_natural_matrix_natural_unsigned_triple_gen_var_1(
     )
 }
 
+pub fn random_natural_matrix_unsigned_natural_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, Natural, u64)> {
+    Box::new(
+        random_natural_matrix_natural_unsigned_triple_gen_var_1(config)
+            .filter(|(a, _, _)| a.height() == a.width())
+            .flat_map(|(a, d, m)| (0..a.height()).map(move |r| (a.clone(), r, d.clone(), m))),
+    )
+}
+
 pub fn random_natural_matrix_natural_natural_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, Natural, Natural)> {
@@ -8909,6 +8919,18 @@ pub fn random_natural_matrix_natural_natural_triple_gen_var_1(
                 let max = a.elements.iter().chain(core::iter::once(&c)).max().cloned();
                 let m = max.unwrap_or_default() + k + Natural::ONE;
                 (a, c, m)
+            }),
+    )
+}
+
+pub fn random_natural_matrix_unsigned_natural_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, Natural, Natural)> {
+    Box::new(
+        random_natural_matrix_natural_natural_triple_gen_var_1(config)
+            .filter(|(a, _, _)| a.height() == a.width())
+            .flat_map(|(a, d, m)| {
+                (0..a.height()).map(move |r| (a.clone(), r, d.clone(), m.clone()))
             }),
     )
 }

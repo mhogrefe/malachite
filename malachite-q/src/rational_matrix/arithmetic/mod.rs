@@ -259,6 +259,12 @@ pub mod shl;
 /// assert_eq!(a.to_string(), "[2, -3, 12]");
 /// ```
 pub mod shr;
+/// Implementations of
+/// [`SimilarityTransform`](malachite_base::num::arithmetic::traits::SimilarityTransform) and
+/// [`SimilarityTransformAssign`](
+/// malachite_base::num::arithmetic::traits::SimilarityTransformAssign), for applying the similarity
+/// transform of FLINT's `fmpq_mat_similarity` to a square matrix.
+pub mod similarity_transform;
 /// Implementations of [`Solve`](malachite_base::num::arithmetic::traits::Solve), for solving linear
 /// systems with rational matrices.
 pub mod solve;

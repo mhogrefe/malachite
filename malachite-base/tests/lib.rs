@@ -928,6 +928,7 @@ pub mod unsigned_matrix {
         pub mod mod_power_of_2_permanent;
         pub mod mod_power_of_2_pow;
         pub mod mod_power_of_2_shl;
+        pub mod mod_power_of_2_similarity_transform;
         pub mod mod_power_of_2_smith_normal_form;
         pub mod mod_power_of_2_solve;
         pub mod mod_power_of_2_square;
@@ -938,6 +939,7 @@ pub mod unsigned_matrix {
         pub mod mod_rank;
         pub mod mod_reduced_row_echelon_form;
         pub mod mod_shl;
+        pub mod mod_similarity_transform;
         pub mod mod_smith_normal_form;
         pub mod mod_solve;
         pub mod mod_solve_lower_triangular;

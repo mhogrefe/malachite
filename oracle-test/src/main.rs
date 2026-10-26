@@ -4044,6 +4044,27 @@ fn test_against_flint() {
         ("../malachite-base", "unsigned_matrix_mod_permanent", "fmpz_mat_permanent_mod"),
         ("../malachite-nz", "natural_matrix_mod_permanent", "fmpz_mat_permanent_mod"),
         ("../malachite-nz", "integer_matrix_similarity_transform", "fmpz_mat_similarity"),
+        ("../malachite-q", "rational_matrix_similarity_transform", "fmpq_mat_similarity"),
+        (
+            "../malachite-base",
+            "unsigned_matrix_mod_similarity_transform_u64",
+            "nmod_mat_similarity",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_similarity_transform",
+            "fmpz_mod_mat_similarity",
+        ),
+        (
+            "../malachite-base",
+            "unsigned_matrix_mod_power_of_2_similarity_transform_u64",
+            "fmpz_mod_mat_similarity_power_of_2",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_power_of_2_similarity_transform",
+            "fmpz_mod_mat_similarity_power_of_2",
+        ),
     ] {
         check_demo_against_flint(&oracle, crate_dir, &format!("demo_{demo}"), flint_mode);
     }

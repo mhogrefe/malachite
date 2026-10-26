@@ -14,5 +14,6 @@ pub mod mul_vector;
 pub mod permanent;
 pub mod pow;
 pub mod reconstruct;
+pub mod similarity_transform;
 pub mod solve;
 pub mod square;

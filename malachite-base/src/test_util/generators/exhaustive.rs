@@ -7761,6 +7761,16 @@ pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_10<T: Primiti
     )
 }
 
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, u64, T, u64)> {
+    Box::new(
+        exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_10::<T>()
+            .filter(|(a, _, _)| a.height() == a.width())
+            .flat_map(|(a, d, m)| (0..a.height()).map(move |r| (a.clone(), r, d, m))),
+    )
+}
+
 pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>()
 -> It<(UnsignedMatrix<T>, T, T)> {
     fn ys<T: PrimitiveUnsigned>(
@@ -7784,6 +7794,16 @@ pub fn exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_11<T: Primiti
             ys::<T>,
         )
         .map(|((_, m), (v, c))| (v, c, m)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedMatrix<T>, u64, T, T)> {
+    Box::new(
+        exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_11::<T>()
+            .filter(|(a, _, _)| a.height() == a.width())
+            .flat_map(|(a, d, m)| (0..a.height()).map(move |r| (a.clone(), r, d, m))),
     )
 }
 

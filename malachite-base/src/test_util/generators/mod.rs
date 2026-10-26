@@ -5676,6 +5676,17 @@ pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_10<T: PrimitiveUnsigned>
     )
 }
 
+// All `(a, r, d, pow)` where `a` is a square `UnsignedMatrix<T>`, `r` is one of its row indices,
+// `pow` is no greater than `T::WIDTH`, and every element of `a`, and `d`, is less than `2^pow`.
+pub fn unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedMatrix<T>, u64, T, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_2,
+        &random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_2,
+        &special_random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_2,
+    )
+}
+
 // All `(UnsignedMatrix<T>, T, T)` where the last `T` is positive, and every element of the matrix,
 // and the first `T`, is less than it.
 pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>()
@@ -5684,6 +5695,17 @@ pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>
         &exhaustive_unsigned_matrix_unsigned_unsigned_triple_gen_var_11,
         &random_unsigned_matrix_unsigned_unsigned_triple_gen_var_11,
         &special_random_unsigned_matrix_unsigned_unsigned_triple_gen_var_11,
+    )
+}
+
+// All `(a, r, d, m)` where `a` is a square `UnsignedMatrix<T>`, `r` is one of its row indices, `m`
+// is positive, and every element of `a`, and `d`, is less than `m`.
+pub fn unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedMatrix<T>, u64, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+        &random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1,
     )
 }
 

@@ -1378,6 +1378,16 @@ pub fn rational_matrix_rational_pair_gen() -> Generator<(RationalMatrix, Rationa
     )
 }
 
+// All `(a, r, d)` where `a` is a square `RationalMatrix` and `r` is one of its row indices.
+pub fn rational_matrix_unsigned_rational_triple_gen_var_1()
+-> Generator<(RationalMatrix, u64, Rational)> {
+    Generator::new(
+        &exhaustive_rational_matrix_unsigned_rational_triple_gen_var_1,
+        &random_rational_matrix_unsigned_rational_triple_gen_var_1,
+        &special_random_rational_matrix_unsigned_rational_triple_gen_var_1,
+    )
+}
+
 pub fn rational_matrix_triple_gen() -> Generator<(RationalMatrix, RationalMatrix, RationalMatrix)> {
     Generator::new(
         &exhaustive_rational_matrix_triple_gen,

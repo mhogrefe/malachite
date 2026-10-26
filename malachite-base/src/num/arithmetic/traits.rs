@@ -2187,6 +2187,42 @@ pub trait SimilarityTransformAssign<D> {
     fn similarity_transform_assign(&mut self, r: u64, d: D);
 }
 
+/// Applies the similarity transform $A \mapsto P^{-1}AP$ of FLINT's `nmod_mat_similarity` and
+/// `fmpz_mod_mat_similarity` to a square matrix modulo $m$, where $P$ is the identity matrix with
+/// some of the elements of row `r` replaced by `d`. See the implementations for exactly which. The
+/// matrix and `d` must already be reduced modulo $m$.
+pub trait ModSimilarityTransform<D, M = D> {
+    type Output;
+
+    fn mod_similarity_transform(self, r: u64, d: D, m: M) -> Self::Output;
+}
+
+/// Applies the similarity transform $A \mapsto P^{-1}AP$ of FLINT's `nmod_mat_similarity` and
+/// `fmpz_mod_mat_similarity` to a square matrix modulo $m$, in place, where $P$ is the identity
+/// matrix with some of the elements of row `r` replaced by `d`. See the implementations for exactly
+/// which. The matrix and `d` must already be reduced modulo $m$.
+pub trait ModSimilarityTransformAssign<D, M = D> {
+    fn mod_similarity_transform_assign(&mut self, r: u64, d: D, m: M);
+}
+
+/// Applies the similarity transform $A \mapsto P^{-1}AP$ of FLINT's `fmpz_mat_similarity` to a
+/// square matrix modulo $2^k$, where $P$ is the identity matrix with some of the elements of row
+/// `r` replaced by `d`. See the implementations for exactly which. The matrix and `d` must already
+/// be reduced modulo $2^k$.
+pub trait ModPowerOf2SimilarityTransform<D> {
+    type Output;
+
+    fn mod_power_of_2_similarity_transform(self, r: u64, d: D, pow: u64) -> Self::Output;
+}
+
+/// Applies the similarity transform $A \mapsto P^{-1}AP$ of FLINT's `fmpz_mat_similarity` to a
+/// square matrix modulo $2^k$, in place, where $P$ is the identity matrix with some of the elements
+/// of row `r` replaced by `d`. See the implementations for exactly which. The matrix and `d` must
+/// already be reduced modulo $2^k$.
+pub trait ModPowerOf2SimilarityTransformAssign<D> {
+    fn mod_power_of_2_similarity_transform_assign(&mut self, r: u64, d: D, pow: u64);
+}
+
 /// Computes the permanent of a square matrix modulo $m$. The elements of the matrix must already be
 /// reduced modulo $m$.
 pub trait ModPermanent<M = Self> {

@@ -188,6 +188,7 @@ pub mod rational_matrix {
         pub mod scalar_mul;
         pub mod shl;
         pub mod shr;
+        pub mod similarity_transform;
         pub mod solve;
         pub mod square;
         pub mod sub;

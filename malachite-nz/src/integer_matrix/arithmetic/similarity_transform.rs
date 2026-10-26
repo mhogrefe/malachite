@@ -12,21 +12,49 @@
 
 use crate::integer::Integer;
 use crate::integer_matrix::IntegerMatrix;
-use malachite_base::num::arithmetic::traits::{
-    SimilarityTransform, SimilarityTransformAssign, SubMulAssign,
-};
+use malachite_base::num::arithmetic::traits::{SimilarityTransform, SimilarityTransformAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::unsigned_matrix::arithmetic::similarity_over_ring::{
+    SimilarityRing, similarity_transform_in_place,
+};
 
-// Replaces the square matrix `a` with $P^{-1}AP$, where $P$ is the identity matrix with the
-// elements of row `r` in the columns other than `r - 1` and `r` replaced by `d`: first `d` times
-// column `r` is added to each of those columns, and then `d` times each of the corresponding rows
-// is subtracted from row `r`.
+// The integers, for `similarity_transform_in_place`.
+struct IntegerRing;
+
+impl SimilarityRing for IntegerRing {
+    type Element = Integer;
+
+    #[inline]
+    fn zero(&self) -> Integer {
+        Integer::ZERO
+    }
+
+    #[inline]
+    fn is_zero(&self, x: &Integer) -> bool {
+        *x == 0u32
+    }
+
+    #[inline]
+    fn add_assign(&self, x: &mut Integer, y: &Integer) {
+        *x += y;
+    }
+
+    #[inline]
+    fn sub_assign(&self, x: &mut Integer, y: &Integer) {
+        *x -= y;
+    }
+
+    #[inline]
+    fn mul(&self, x: &Integer, y: &Integer) -> Integer {
+        x * y
+    }
+}
+
+// Replaces the square matrix `a` with $P^{-1}AP$, as `similarity_transform_in_place` describes.
 //
 // This is equivalent to `fmpz_mat_similarity` from `fmpz_mat/similarity.c`, FLINT 3.6.0, except
-// that it panics if the matrix is not square or `r` is not a row index, which FLINT does not check,
-// and that it multiplies by `d` once per row in the first step and once per column in the second,
-// rather than once per element.
+// that it panics if the matrix is not square or `r` is not a row index, which FLINT does not check.
 fn similarity_transform_helper(a: &mut IntegerMatrix, r: u64, d: &Integer) {
     assert_eq!(a.height, a.width, "the matrix must be square");
     let n = a.height;
@@ -34,32 +62,7 @@ fn similarity_transform_helper(a: &mut IntegerMatrix, r: u64, d: &Integer) {
         r < u64::exact_from(n),
         "r must be less than the dimension of the matrix, {n}, but it is {r}"
     );
-    if *d == 0u32 {
-        return;
-    }
-    let r = usize::exact_from(r);
-    // The columns, and rows, that P mixes with column, and row, r.
-    let mixed = |j: usize| j != r && j + 1 != r;
-    // A := AP
-    for row in a.elements.chunks_exact_mut(n) {
-        if row[r] == 0u32 {
-            continue;
-        }
-        let x = &row[r] * d;
-        for (j, y) in row.iter_mut().enumerate() {
-            if mixed(j) {
-                *y += &x;
-            }
-        }
-    }
-    // A := P^{-1}A, where P^{-1} is P with -d in place of d
-    for j in 0..n {
-        let mut sum = Integer::ZERO;
-        for k in (0..n).filter(|&k| mixed(k)) {
-            sum += &a.elements[k * n + j];
-        }
-        a.elements[r * n + j].sub_mul_assign(sum, d);
-    }
+    similarity_transform_in_place(&IntegerRing, &mut a.elements, n, usize::exact_from(r), d);
 }
 
 impl SimilarityTransformAssign<Integer> for IntegerMatrix {

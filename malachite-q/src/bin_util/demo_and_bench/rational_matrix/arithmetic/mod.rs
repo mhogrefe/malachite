@@ -30,6 +30,7 @@ pub(crate) fn register(runner: &mut Runner) {
     scalar_mul::register(runner);
     shl::register(runner);
     shr::register(runner);
+    similarity_transform::register(runner);
     solve::register(runner);
     square::register(runner);
     sub::register(runner);
@@ -59,6 +60,7 @@ mod reduced_row_echelon_form;
 mod scalar_mul;
 mod shl;
 mod shr;
+mod similarity_transform;
 mod solve;
 mod square;
 mod sub;

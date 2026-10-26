@@ -496,6 +496,13 @@ pub mod mod_power_of_2_pow;
 /// assert_eq!(a.to_string(), "[0, 0; 0, 0]");
 /// ```
 pub mod mod_power_of_2_shl;
+/// Implementations of [`ModPowerOf2SimilarityTransform`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2SimilarityTransform) and
+/// [`ModPowerOf2SimilarityTransformAssign`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2SimilarityTransformAssign), for applying the
+/// similarity transform of FLINT's `fmpz_mat_similarity` to a square matrix of naturals modulo a
+/// power of 2.
+pub mod mod_power_of_2_similarity_transform;
 /// Implementations of [`ModPowerOf2SmithNormalForm`](
 /// malachite_base::num::arithmetic::traits::ModPowerOf2SmithNormalForm) and
 /// [`ModPowerOf2SmithNormalFormAssign`](
@@ -586,6 +593,13 @@ pub mod mod_reduced_row_echelon_form;
 /// assert_eq!(a.to_string(), "[3, 2, 6]");
 /// ```
 pub mod mod_shl;
+/// Implementations of [`ModSimilarityTransform`](
+/// malachite_base::num::arithmetic::traits::ModSimilarityTransform) and
+/// [`ModSimilarityTransformAssign`](
+/// malachite_base::num::arithmetic::traits::ModSimilarityTransformAssign), for applying the
+/// similarity transform of FLINT's `fmpz_mod_mat_similarity` to a square matrix of naturals modulo
+/// a number.
+pub mod mod_similarity_transform;
 /// Implementations of
 /// [`ModSmithNormalForm`](malachite_base::num::arithmetic::traits::ModSmithNormalForm) and
 /// [`ModSmithNormalFormAssign`](malachite_base::num::arithmetic::traits::ModSmithNormalFormAssign),

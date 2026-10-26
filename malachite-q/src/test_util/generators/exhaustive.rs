@@ -1115,6 +1115,15 @@ pub fn exhaustive_rational_matrix_rational_pair_gen() -> It<(RationalMatrix, Rat
     ))
 }
 
+pub fn exhaustive_rational_matrix_unsigned_rational_triple_gen_var_1()
+-> It<(RationalMatrix, u64, Rational)> {
+    Box::new(
+        exhaustive_rational_matrix_rational_pair_gen()
+            .filter(|(a, _)| a.height() == a.width())
+            .flat_map(|(a, d)| (0..a.height()).map(move |r| (a.clone(), r, d.clone()))),
+    )
+}
+
 pub fn exhaustive_rational_matrix_triple_gen()
 -> It<(RationalMatrix, RationalMatrix, RationalMatrix)> {
     Box::new(exhaustive_triples_from_single(
