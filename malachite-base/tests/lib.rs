@@ -899,6 +899,7 @@ pub mod unsigned_matrix {
         pub mod entrywise_shr_round;
         pub mod mod_add;
         pub mod mod_add_mul;
+        pub mod mod_characteristic_polynomial;
         pub mod mod_determinant;
         pub mod mod_howell_form;
         pub mod mod_inverse;

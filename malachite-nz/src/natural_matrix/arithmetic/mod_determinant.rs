@@ -16,8 +16,11 @@ use crate::natural_matrix::NaturalMatrix;
 use crate::natural_matrix::arithmetic::mod_lu_decomposition::{assert_reduced, lu_in_place};
 use crate::natural_matrix::arithmetic::mod_strong_echelon_form::to_limb_matrix;
 use alloc::vec;
+use malachite_base::unsigned_matrix::arithmetic::berkowitz_over_ring::{
+    BerkowitzRing, charpoly_berkowitz_over_ring,
+};
 use malachite_base::num::arithmetic::traits::{
-    AddMulAssign, ModAdd, ModAddAssign, ModAssign, ModDeterminant, ModMul, ModMulAssign, ModNeg,
+    AddMulAssign, ModAdd, ModAddAssign, ModDeterminant, ModMul, ModMulAssign, ModNeg,
     ModNegAssign, ModSub, ModSubAssign, Parity,
 };
 use malachite_base::num::basic::traits::{One, Zero};
@@ -69,68 +72,74 @@ fn det_cofactor(xs: &[Natural], n: usize, m: &Natural) -> Natural {
     }
 }
 
+// The integers modulo a positive `m`, as `Natural`s, for `charpoly_berkowitz_over_ring`. The dot
+// products are computed exactly and reduced once.
+struct NaturalModBerkowitzRing<'a> {
+    m: &'a Natural,
+}
+
+impl BerkowitzRing for NaturalModBerkowitzRing<'_> {
+    type Element = Natural;
+
+    #[inline]
+    fn zero(&self) -> Natural {
+        Natural::ZERO
+    }
+
+    #[inline]
+    fn one(&self) -> Natural {
+        Natural::ONE % self.m
+    }
+
+    #[inline]
+    fn neg(&self, x: &Natural) -> Natural {
+        x.mod_neg(self.m)
+    }
+
+    #[inline]
+    fn add(&self, x: &Natural, y: &Natural) -> Natural {
+        x.mod_add(y, self.m)
+    }
+
+    #[inline]
+    fn sub_assign(&self, x: &mut Natural, y: &Natural) {
+        x.mod_sub_assign(y, self.m);
+    }
+
+    #[inline]
+    fn mul(&self, x: &Natural, y: &Natural) -> Natural {
+        x.mod_mul(y, self.m)
+    }
+
+    fn dot(&self, xs: &[Natural], ys: &[Natural]) -> Natural {
+        let mut s = Natural::ZERO;
+        for (x, y) in xs.iter().zip(ys) {
+            s.add_mul_assign(x, y);
+        }
+        s % self.m
+    }
+
+    fn dot_rev(&self, xs: &[Natural], ys: &[Natural]) -> Natural {
+        let mut s = Natural::ZERO;
+        for (x, y) in xs.iter().zip(ys.iter().rev()) {
+            s.add_mul_assign(x, y);
+        }
+        s % self.m
+    }
+}
+
 // Sets `cp`, of length n + 1, to the coefficients of the characteristic polynomial modulo `m` of
 // the n by n matrix with elements `xs`, from the constant coefficient up, with Berkowitz's
-// division-free algorithm. The dot products are computed exactly and reduced once.
+// division-free algorithm.
 //
 // This is equivalent to `_gr_mat_charpoly_berkowitz` from `gr_mat/charpoly_berkowitz.c`, FLINT
 // 3.6.0.
 pub(crate) fn charpoly_berkowitz(cp: &mut [Natural], xs: &[Natural], n: usize, m: &Natural) {
-    let entry = |i: usize, j: usize| &xs[i * n + j];
-    // The exact dot product of `us` and `vs`, reduced modulo `m`.
-    let dot = |us: &[Natural], vs: &[Natural]| {
-        let mut s = Natural::ZERO;
-        for (u, v) in us.iter().zip(vs) {
-            s.add_mul_assign(u, v);
-        }
-        s % m
-    };
-    if n == 0 {
-        cp[0] = Natural::ONE % m;
-    } else if n == 1 {
-        cp[0] = entry(0, 0).mod_neg(m);
-        cp[1] = Natural::ONE % m;
-    } else if n == 2 {
-        cp[0] = det_cofactor(xs, 2, m);
-        cp[1] = entry(0, 0).mod_add(entry(1, 1), m).mod_neg(m);
-        cp[2] = Natural::ONE % m;
-    } else {
-        // `a` holds n - 1 rows of length n, and `big_a` is FLINT's `A`, the last row of FLINT's
-        // `a`.
-        let mut scratch = vec![Natural::ZERO; n * n];
-        let (a, big_a) = scratch.split_at_mut((n - 1) * n);
-        for c in &mut cp[..=n] {
-            *c = Natural::ZERO;
-        }
-        cp[0] = entry(0, 0).mod_neg(m);
-        for t in 1..n {
-            for (i, x) in a[..=t].iter_mut().enumerate() {
-                *x = entry(i, t).clone();
-            }
-            big_a[0] = entry(t, t).clone();
-            for k in 1..t {
-                let (previous, current) = a.split_at_mut(k * n);
-                let previous = &previous[(k - 1) * n..][..=t];
-                for (i, x) in current[..=t].iter_mut().enumerate() {
-                    *x = dot(&xs[i * n..][..=t], previous);
-                }
-                big_a[k] = current[t].clone();
-            }
-            big_a[t] = dot(&xs[t * n..][..=t], &a[(t - 1) * n..][..=t]);
-            for k in 0..=t {
-                let mut s = Natural::ZERO;
-                for (u, v) in big_a[..k].iter().zip(cp[..k].iter().rev()) {
-                    s.add_mul_assign(u, v);
-                }
-                s.mod_assign(m);
-                cp[k].mod_sub_assign(s, m);
-                cp[k].mod_sub_assign(&big_a[k], m);
-            }
-        }
-        // Shift all coefficients up by one.
-        cp[..=n].rotate_right(1);
-        cp[0] = Natural::ONE % m;
-        cp[..=n].reverse();
+    for (c, x) in cp
+        .iter_mut()
+        .zip(charpoly_berkowitz_over_ring(&NaturalModBerkowitzRing { m }, xs, n))
+    {
+        *c = x;
     }
 }
 

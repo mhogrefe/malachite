@@ -15,6 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
     balanced_mod_power_of_2::register(runner);
     can_solve_multi_mod::register(runner);
     canonical_primitive_part::register(runner);
+    characteristic_polynomial::register(runner);
     certify_lu_mod_p::register(runner);
     content::register(runner);
     content_chained::register(runner);
@@ -71,6 +72,7 @@ mod balanced_mod;
 mod balanced_mod_power_of_2;
 mod can_solve_multi_mod;
 mod canonical_primitive_part;
+mod characteristic_polynomial;
 mod certify_lu_mod_p;
 mod content;
 mod content_chained;

@@ -359,6 +359,7 @@ pub mod integer_matrix {
         pub mod can_solve_multi_mod;
         pub mod canonical_primitive_part;
         pub mod certify_lu_mod_p;
+        pub mod characteristic_polynomial;
         pub mod content;
         pub mod content_chained;
         pub mod crt;

@@ -4044,6 +4044,16 @@ fn test_against_flint() {
         ("../malachite-base", "unsigned_matrix_mod_permanent", "fmpz_mat_permanent_mod"),
         ("../malachite-nz", "natural_matrix_mod_permanent", "fmpz_mat_permanent_mod"),
         ("../malachite-nz", "integer_matrix_similarity_transform", "fmpz_mat_similarity"),
+        (
+            "../malachite-nz",
+            "integer_matrix_characteristic_polynomial",
+            "fmpz_mat_charpoly",
+        ),
+        (
+            "../malachite-nz",
+            "integer_matrix_characteristic_polynomial_bound",
+            "fmpz_mat_charpoly_bound",
+        ),
         ("../malachite-q", "rational_matrix_similarity_transform", "fmpq_mat_similarity"),
         (
             "../malachite-base",

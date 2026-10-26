@@ -2223,6 +2223,13 @@ pub trait ModPowerOf2SimilarityTransformAssign<D> {
     fn mod_power_of_2_similarity_transform_assign(&mut self, r: u64, d: D, pow: u64);
 }
 
+/// Computes the characteristic polynomial of a square matrix.
+pub trait CharacteristicPolynomial {
+    type Output;
+
+    fn characteristic_polynomial(self) -> Self::Output;
+}
+
 /// Computes the permanent of a square matrix modulo $m$. The elements of the matrix must already be
 /// reduced modulo $m$.
 pub trait ModPermanent<M = Self> {

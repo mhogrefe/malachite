@@ -135,6 +135,12 @@ crate_test_mod! {
 /// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which compute the
 /// primitive part of a matrix with its first nonzero element, in row-major order, made positive.
 pub mod canonical_primitive_part;
+/// Implementations of
+/// [`CharacteristicPolynomial`](malachite_base::num::arithmetic::traits::CharacteristicPolynomial),
+/// for computing the characteristic polynomial of a square matrix.
+pub mod characteristic_polynomial;
+/// A bound on the coefficients of the characteristic polynomial of a square matrix.
+pub mod characteristic_polynomial_bound;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart),
 /// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), and
@@ -421,6 +427,8 @@ crate_test_mod! {
 /// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
 /// computing the Kronecker product of two [`IntegerMatrix`](super::IntegerMatrix)s.
 pub mod kronecker_product;
+// Floating-point magnitudes that are always rounded up, for rigorous bounds.
+pub(crate) mod mag;
 /// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
 /// [`Rem`](core::ops::Rem), and [`RemAssign`](core::ops::RemAssign), for reducing every element of
 /// an [`IntegerMatrix`](super::IntegerMatrix) modulo a number.

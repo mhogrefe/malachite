@@ -6,6 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Berkowitz's division-free algorithm for characteristic polynomials, generic over the ring of
+/// elements.
+#[doc(hidden)]
+pub mod berkowitz_over_ring;
 /// Implementations of [`CanonicalPrimitivePart`](
 /// crate::num::arithmetic::traits::CanonicalPrimitivePart), [`CanonicalPrimitivePartAssign`](
 /// crate::num::arithmetic::traits::CanonicalPrimitivePartAssign), and
@@ -144,6 +148,9 @@ pub mod mod_add;
 /// [`ModAddMulAssign`](crate::num::arithmetic::traits::ModAddMulAssign), for adding a scalar
 /// multiple of one matrix to another modulo a number.
 pub mod mod_add_mul;
+/// The characteristic polynomial of a square matrix modulo a number.
+#[doc(hidden)]
+pub mod mod_characteristic_polynomial;
 /// Implementations of [`ModDeterminant`](crate::num::arithmetic::traits::ModDeterminant), for
 /// computing the determinant of a square matrix modulo a number.
 pub mod mod_determinant;

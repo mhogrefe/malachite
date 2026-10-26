@@ -22,11 +22,13 @@ use crate::num::conversion::traits::WrappingFrom;
 use crate::num::factorization::traits::IsPrime;
 use crate::num::logic::traits::NotAssign;
 use crate::unsigned_matrix::UnsignedMatrix;
+use crate::unsigned_matrix::arithmetic::berkowitz_over_ring::{
+    UnsignedModBerkowitzRing, charpoly_berkowitz_over_ring,
+};
 use crate::unsigned_matrix::arithmetic::mod_lu_decomposition::{assert_reduced, lu_in_place};
 use crate::unsigned_matrix::arithmetic::mod_strong_echelon_form::{
     is_divisible, signed_to_residue,
 };
-use crate::unsigned_vector::arithmetic::mod_dot::{ModData, column_sum, dot_sum};
 use alloc::vec;
 
 // This is equivalent to `_nmod_mat_det_2x2` from `nmod_mat/det.c`, FLINT 3.6.0.
@@ -110,54 +112,11 @@ fn det_4x4<T: PrimitiveUnsigned>(xs: &[T], m: T) -> T {
 // algorithm.
 //
 // This is equivalent to `_nmod_mat_charpoly_berkowitz` from `nmod_mat/charpoly.c`, FLINT 3.6.0.
-pub(crate) fn charpoly_berkowitz<T: PrimitiveUnsigned>(cp: &mut [T], xs: &[T], n: usize, m: T) {
-    let entry = |i: usize, j: usize| xs[i * n + j];
-    if m == T::ONE {
-        cp[..=n].fill(T::ZERO);
-    } else if n == 0 {
-        cp[0] = T::ONE;
-    } else if n == 1 {
-        cp[0] = entry(0, 0).mod_neg(m);
-        cp[1] = T::ONE;
-    } else if n == 2 {
-        cp[0] = entry(0, 0)
-            .mod_mul(entry(1, 1), m)
-            .mod_sub(entry(0, 1).mod_mul(entry(1, 0), m), m);
-        cp[1] = entry(0, 0).mod_add(entry(1, 1), m).mod_neg(m);
-        cp[2] = T::ONE;
-    } else {
-        // `a` holds n - 1 rows of length n, and `big_a` is FLINT's `A`, the last row of FLINT's
-        // `a`.
-        let mut scratch = vec![T::ZERO; n * n];
-        let (a, big_a) = scratch.split_at_mut((n - 1) * n);
-        let d = ModData::new(m, n);
-        cp[..=n].fill(T::ZERO);
-        cp[0] = entry(0, 0).mod_neg(m);
-        for t in 1..n {
-            for (i, x) in a[..=t].iter_mut().enumerate() {
-                *x = entry(i, t);
-            }
-            big_a[0] = entry(t, t);
-            for k in 1..t {
-                let (previous, current) = a.split_at_mut(k * n);
-                let previous = &previous[(k - 1) * n..][..=t];
-                for (i, x) in current[..=t].iter_mut().enumerate() {
-                    *x = d.reduce_sum(dot_sum(&xs[i * n..][..=t], previous, &d));
-                }
-                big_a[k] = current[t];
-            }
-            big_a[t] = d.reduce_sum(dot_sum(&xs[t * n..][..=t], &a[(t - 1) * n..][..=t], &d));
-            for k in 0..=t {
-                let s = d.reduce_sum(column_sum(&big_a[..k], &cp[..k], &d));
-                cp[k] = cp[k].mod_sub(s, m).mod_sub(big_a[k], m);
-            }
-        }
-        // Shift all coefficients up by one.
-        cp.copy_within(0..n, 1);
-        cp[0] = T::ONE;
-        cp[..=n].reverse();
-    }
-}
+crate_test_fn! {
+charpoly_berkowitz<T: PrimitiveUnsigned>(cp: &mut [T], xs: &[T], n: usize, m: T) {
+    let ring = UnsignedModBerkowitzRing::new(m, n);
+    cp[..=n].copy_from_slice(&charpoly_berkowitz_over_ring(&ring, xs, n));
+}}
 
 // This is equivalent to `_nmod_mat_det` from `nmod_mat/det.c`, FLINT 3.6.0.
 pub(crate) fn det_lu<T: PrimitiveUnsigned>(mut a: UnsignedMatrix<T>, m: T) -> T {

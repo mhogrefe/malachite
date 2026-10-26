@@ -1,0 +1,6 @@
+[]_{0,0}.characteristic_polynomial_bound() = 1
+[1, 2; 3, 4].characteristic_polynomial_bound() = 12
+[3, -4; 4, 3].characteristic_polynomial_bound() = 26
+[0, 0; 0, 0].characteristic_polynomial_bound() = 1
+[1, 2, 3; 4, 5, 6; 7, 8, 10].characteristic_polynomial_bound() = 480
+[0, -1; 1, 0].characteristic_polynomial_bound() = 3
