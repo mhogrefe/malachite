@@ -435,6 +435,9 @@ documented by git history.
   elements is not much larger than the rows' own denominators, the integer matrix $N = dA$ is
   raised to the power and $N^k/d^k$ is reduced once; otherwise the matrix is raised to the power by
   binary powering in rational arithmetic.
+  `Pow<i64>` and `PowAssign<i64>` also accept negative exponents: the matrix is inverted first and
+  the inverse raised to the power, panicking if the matrix is singular, as `Rational::pow` does
+  for 0. With both impls, an exponent literal needs a suffix, such as `a.pow(3u64)`.
 - New `KroneckerProduct` and `KroneckerProductAssign` traits in malachite-base, implemented for
   `NaturalMatrix` and `IntegerMatrix` in malachite-nz and `RationalMatrix` in malachite-q, with
   each operand by value or by reference: the Kronecker product $A \otimes B$, the block matrix whose

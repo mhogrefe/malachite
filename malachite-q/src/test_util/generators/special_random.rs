@@ -37,7 +37,7 @@ use crate::test_util::extra_variadic::{
 use crate::test_util::generators::{rational_matrix_positions, round_to_multiple_rational_filter};
 use malachite_base::bools::random::random_bools;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
+use malachite_base::num::arithmetic::traits::{DeterminantSign, IsPowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -54,12 +54,12 @@ use malachite_base::num::random::geometric::{
     geometric_random_signeds, geometric_random_unsigned_inclusive_range,
     geometric_random_unsigneds,
 };
-use malachite_base::num::random::random_unsigned_inclusive_range;
 use malachite_base::num::random::striped::{
     striped_random_signeds, striped_random_unsigned_inclusive_range, striped_random_unsigneds,
 };
 use malachite_base::num::random::{
-    random_finite_primitive_floats, random_nonzero_finite_primitive_floats, random_primitive_floats,
+    random_finite_primitive_floats, random_nonzero_finite_primitive_floats,
+    random_primitive_floats, random_signed_inclusive_range, random_unsigned_inclusive_range,
 };
 use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
 use malachite_base::random::EXAMPLE_SEED;
@@ -105,6 +105,7 @@ use malachite_nz::natural_vector::NaturalVector;
 use malachite_nz::natural_vector::random::striped_random_natural_vectors;
 use malachite_nz::test_util::generators::random::random_gmp_format_strings;
 use num::BigRational;
+use std::cmp::Ordering::*;
 use std::ops::Shr;
 
 // -- GaussianRational --
@@ -3076,6 +3077,29 @@ pub fn special_random_rational_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>(
             )
         },
     ))
+}
+
+pub fn special_random_rational_matrix_signed_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalMatrix, i64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rational_square_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 16),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_size_n", 2),
+                    config.get_or("mean_size_d", 1),
+                )
+            },
+            &|seed| random_signed_inclusive_range(seed, -12, 12),
+        )
+        .filter(|(a, exp)| *exp >= 0 || a.determinant_sign() != Equal),
+    )
 }
 
 pub fn special_random_rational_matrix_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(

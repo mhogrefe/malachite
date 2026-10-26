@@ -8,7 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{Pow, PowAssign, Square};
+use malachite_base::num::arithmetic::traits::{Inverse, Pow, PowAssign, Square};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::test_util::generators::integer_matrix_unsigned_pair_gen_var_5;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::rational_matrix::arithmetic::pow::pow_in_rational_arithmetic;
@@ -19,7 +20,7 @@ use malachite_q::test_util::rational_matrix::arithmetic::pow::*;
 
 #[test]
 fn test_pow() {
-    let test = |s, exp, out| {
+    let test = |s, exp: u64, out| {
         let a = RationalMatrix::from_str(s).unwrap();
         let b = (&a).pow(exp);
         assert!(b.is_valid());
@@ -284,27 +285,27 @@ fn test_pow() {
 #[test]
 #[should_panic]
 fn pow_fail() {
-    let _ = RationalMatrix::from_str("[1/2, 2]").unwrap().pow(2);
+    let _ = RationalMatrix::from_str("[1/2, 2]").unwrap().pow(2u64);
 }
 
 #[test]
 #[should_panic]
 fn pow_fail_exp_1() {
     // The matrix is not square, and the exponent is 1.
-    let _ = RationalMatrix::from_str("[1/2, 2]").unwrap().pow(1);
+    let _ = RationalMatrix::from_str("[1/2, 2]").unwrap().pow(1u64);
 }
 
 #[test]
 #[should_panic]
 fn pow_ref_fail() {
-    let _ = (&RationalMatrix::from_str("[1/2; 2]").unwrap()).pow(0);
+    let _ = (&RationalMatrix::from_str("[1/2; 2]").unwrap()).pow(0u64);
 }
 
 #[test]
 #[should_panic]
 fn pow_assign_fail() {
     let mut a = RationalMatrix::from_str("[]_{0,2}").unwrap();
-    a.pow_assign(1);
+    a.pow_assign(1u64);
 }
 
 #[test]
@@ -333,9 +334,9 @@ fn pow_properties() {
     });
 
     rational_matrix_gen_var_1().test_properties(|a| {
-        assert_eq!((&a).pow(0), RationalMatrix::identity(a.height()));
-        assert_eq!((&a).pow(1), a);
-        assert_eq!((&a).pow(2), (&a).square());
+        assert_eq!((&a).pow(0u64), RationalMatrix::identity(a.height()));
+        assert_eq!((&a).pow(1u64), a);
+        assert_eq!((&a).pow(2u64), (&a).square());
     });
 
     integer_matrix_unsigned_pair_gen_var_5().test_properties(|(a, exp)| {
@@ -344,5 +345,98 @@ fn pow_properties() {
             RationalMatrix::from(a.clone()).pow(exp),
             RationalMatrix::from(a.pow(exp))
         );
+    });
+}
+
+#[test]
+fn test_pow_signed() {
+    let test = |s, exp: i64, out| {
+        let a = RationalMatrix::from_str(s).unwrap();
+        let b = (&a).pow(exp);
+        assert!(b.is_valid());
+        assert_eq!(b.to_string(), out);
+        assert_eq!(a.clone().pow(exp), b);
+        let mut c = a.clone();
+        c.pow_assign(exp);
+        assert!(c.is_valid());
+        assert_eq!(c, b);
+    };
+    // - non-negative exponents
+    test("[]_{0,0}", 0, "[]_{0,0}");
+    test("[1/2]", 0, "[1]");
+    test("[1/2, 1; 1, 0]", 5, "[65/32, 29/16; 29/16, 9/8]");
+    // - negative exponents
+    test("[]_{0,0}", -3, "[]_{0,0}");
+    test("[1/2]", -1, "[2]");
+    test("[-2/3]", -4, "[81/16]");
+    test("[1/2, 1; 1, 0]", -1, "[0, 1; 1, -1/2]");
+    test("[1/2, 1; 1, 0]", -5, "[-9/8, 29/16; 29/16, -65/32]");
+    test("[1, 1; 1, 0]", -10, "[34, -55; -55, 89]");
+    test("[1/2, 1/3; -2, 3/4]", -1, "[18/25, -8/25; 48/25, 12/25]");
+    test(
+        "[1/2, 1/3; -2, 3/4]",
+        -3,
+        "[-504/625, -96/625; 576/625, -576/625]",
+    );
+}
+
+#[test]
+#[should_panic]
+fn pow_signed_fail_not_square() {
+    let _ = RationalMatrix::from_str("[1/2, 2]").unwrap().pow(-1i64);
+}
+
+#[test]
+#[should_panic]
+fn pow_signed_fail_singular() {
+    let _ = RationalMatrix::from_str("[2, 4; 1, 2]").unwrap().pow(-1i64);
+}
+
+#[test]
+#[should_panic]
+fn pow_signed_ref_fail_singular() {
+    let _ = (&RationalMatrix::from_str("[0]").unwrap()).pow(-2i64);
+}
+
+#[test]
+#[should_panic]
+fn pow_signed_assign_fail_singular() {
+    let mut a = RationalMatrix::from_str("[1, 1; 1, 1]").unwrap();
+    a.pow_assign(-1i64);
+}
+
+#[test]
+fn pow_signed_properties() {
+    rational_matrix_unsigned_pair_gen_var_4().test_properties(|(a, exp)| {
+        let k = i64::exact_from(exp);
+        // A non-negative signed power is the unsigned power.
+        assert_eq!((&a).pow(k), (&a).pow(exp));
+        let Some(inverse) = (&a).inverse() else {
+            return;
+        };
+        let b = (&a).pow(-k);
+        assert!(b.is_valid());
+        // A^(-k) is (A^-1)^k, and it cancels A^k.
+        assert_eq!((&inverse).pow(exp), b);
+        assert_eq!(&b * (&a).pow(exp), RationalMatrix::identity(a.height()));
+        // The remaining checks invert again, which is costly for larger matrices.
+        if a.height() <= 3 {
+            assert_eq!(a.clone().pow(-k), b);
+            let mut c = a.clone();
+            c.pow_assign(-k);
+            assert!(c.is_valid());
+            assert_eq!(c, b);
+            // A^(-k) is also (A^k)^-1.
+            assert_eq!((&a).pow(exp).inverse().unwrap(), b);
+            // One more negative factor multiplies by the inverse.
+            assert_eq!((&a).pow(-k - 1), &b * &inverse);
+        }
+    });
+
+    rational_matrix_gen_var_1().test_properties(|a| {
+        assert_eq!((&a).pow(0i64), RationalMatrix::identity(a.height()));
+        if let Some(inverse) = (&a).inverse() {
+            assert_eq!((&a).pow(-1i64), inverse);
+        }
     });
 }

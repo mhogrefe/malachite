@@ -1592,6 +1592,16 @@ pub fn rational_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<
     )
 }
 
+// All `(RationalMatrix, i64)` pairs, where the matrix is square, the `i64` is a small power, and
+// the matrix is nonsingular if the power is negative.
+pub fn rational_matrix_signed_pair_gen_var_2() -> Generator<(RationalMatrix, i64)> {
+    Generator::new(
+        &exhaustive_rational_matrix_signed_pair_gen_var_2,
+        &random_rational_matrix_signed_pair_gen_var_2,
+        &special_random_rational_matrix_signed_pair_gen_var_2,
+    )
+}
+
 // All `(RationalMatrix, T)` where `T` is unsigned and small.
 pub fn rational_matrix_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>()
 -> Generator<(RationalMatrix, T)> {

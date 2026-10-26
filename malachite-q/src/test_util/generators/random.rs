@@ -33,7 +33,7 @@ use crate::test_util::extra_variadic::{
 use crate::test_util::generators::{rational_matrix_positions, round_to_multiple_rational_filter};
 use malachite_base::bools::random::random_bools;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
+use malachite_base::num::arithmetic::traits::{DeterminantSign, IsPowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -51,8 +51,9 @@ use malachite_base::num::random::geometric::{
     geometric_random_unsigneds,
 };
 use malachite_base::num::random::{
-    random_primitive_ints, random_unsigned_inclusive_range, special_random_finite_primitive_floats,
-    special_random_nonzero_finite_primitive_floats, special_random_primitive_floats,
+    random_primitive_ints, random_signed_inclusive_range, random_unsigned_inclusive_range,
+    special_random_finite_primitive_floats, special_random_nonzero_finite_primitive_floats,
+    special_random_primitive_floats,
 };
 use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
 use malachite_base::random::EXAMPLE_SEED;
@@ -2789,6 +2790,27 @@ pub fn random_rational_matrix_signed_pair_gen_var_1<T: PrimitiveSigned>(
             )
         },
     ))
+}
+
+pub fn random_rational_matrix_signed_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalMatrix, i64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_rational_square_matrices(
+                    seed,
+                    config.get_or("mean_bits_n", 16),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_size_n", 2),
+                    config.get_or("mean_size_d", 1),
+                )
+            },
+            &|seed| random_signed_inclusive_range(seed, -12, 12),
+        )
+        .filter(|(a, exp)| *exp >= 0 || a.determinant_sign() != Equal),
+    )
 }
 
 pub fn random_rational_matrix_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(

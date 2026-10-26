@@ -14,7 +14,9 @@ use crate::rational_matrix::conversion::to_numerators_and_row_denominators::{
 use alloc::vec;
 use core::iter::repeat_n;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{LcmAssign, Pow, PowAssign, Square, SquareAssign};
+use malachite_base::num::arithmetic::traits::{
+    Inverse, LcmAssign, Pow, PowAssign, Square, SquareAssign,
+};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_nz::integer_matrix::IntegerMatrix;
@@ -148,6 +150,31 @@ fn pow_owned(a: RationalMatrix, exp: u64) -> RationalMatrix {
     }
 }
 
+// The inverse of a matrix being raised to a negative power, which must exist.
+const fn expect_inverse(inverse: Option<RationalMatrix>) -> RationalMatrix {
+    inverse.expect("a singular matrix cannot be raised to a negative power")
+}
+
+// The inverse is taken before the power, since inverting $A^k$ would work on elements that have
+// already grown $k$-fold.
+fn pow_signed_owned(a: RationalMatrix, exp: i64) -> RationalMatrix {
+    let abs_exp = exp.unsigned_abs();
+    if exp >= 0 {
+        pow_owned(a, abs_exp)
+    } else {
+        pow_owned(expect_inverse(a.inverse()), abs_exp)
+    }
+}
+
+fn pow_signed_ref(a: &RationalMatrix, exp: i64) -> RationalMatrix {
+    let abs_exp = exp.unsigned_abs();
+    if exp >= 0 {
+        pow_ref(a, abs_exp)
+    } else {
+        pow_owned(expect_inverse(a.inverse()), abs_exp)
+    }
+}
+
 impl Pow<u64> for RationalMatrix {
     type Output = Self;
 
@@ -188,16 +215,19 @@ impl Pow<u64> for RationalMatrix {
     /// use malachite_q::rational_matrix::RationalMatrix;
     ///
     /// let a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
-    /// assert_eq!(a.pow(5).to_string(), "[65/32, 29/16; 29/16, 9/8]");
+    /// assert_eq!(a.pow(5u64).to_string(), "[65/32, 29/16; 29/16, 9/8]");
     ///
     /// let a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
-    /// assert_eq!(a.pow(3).to_string(), "[-25/24, 25/144; -25/24, -175/192]");
+    /// assert_eq!(
+    ///     a.pow(3u64).to_string(),
+    ///     "[-25/24, 25/144; -25/24, -175/192]"
+    /// );
     ///
     /// let a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
-    /// assert_eq!(a.pow(0).to_string(), "[1, 0; 0, 1]");
+    /// assert_eq!(a.pow(0u64).to_string(), "[1, 0; 0, 1]");
     ///
     /// let a = RationalMatrix::from_str("[-2/3]").unwrap();
-    /// assert_eq!(a.pow(4).to_string(), "[16/81]");
+    /// assert_eq!(a.pow(4u64).to_string(), "[16/81]");
     /// ```
     #[inline]
     fn pow(self, exp: u64) -> Self {
@@ -246,19 +276,19 @@ impl Pow<u64> for &RationalMatrix {
     /// use malachite_q::rational_matrix::RationalMatrix;
     ///
     /// let a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
-    /// assert_eq!((&a).pow(5).to_string(), "[65/32, 29/16; 29/16, 9/8]");
+    /// assert_eq!((&a).pow(5u64).to_string(), "[65/32, 29/16; 29/16, 9/8]");
     ///
     /// let a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
     /// assert_eq!(
-    ///     (&a).pow(3).to_string(),
+    ///     (&a).pow(3u64).to_string(),
     ///     "[-25/24, 25/144; -25/24, -175/192]"
     /// );
     ///
     /// let a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
-    /// assert_eq!((&a).pow(0).to_string(), "[1, 0; 0, 1]");
+    /// assert_eq!((&a).pow(0u64).to_string(), "[1, 0; 0, 1]");
     ///
     /// let a = RationalMatrix::from_str("[-2/3]").unwrap();
-    /// assert_eq!((&a).pow(4).to_string(), "[16/81]");
+    /// assert_eq!((&a).pow(4u64).to_string(), "[16/81]");
     /// ```
     fn pow(self, exp: u64) -> RationalMatrix {
         assert_square(self);
@@ -304,25 +334,197 @@ impl PowAssign<u64> for RationalMatrix {
     /// use malachite_q::rational_matrix::RationalMatrix;
     ///
     /// let mut a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
-    /// a.pow_assign(5);
+    /// a.pow_assign(5u64);
     /// assert_eq!(a.to_string(), "[65/32, 29/16; 29/16, 9/8]");
     ///
     /// let mut a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
-    /// a.pow_assign(3);
+    /// a.pow_assign(3u64);
     /// assert_eq!(a.to_string(), "[-25/24, 25/144; -25/24, -175/192]");
     ///
     /// let mut a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
-    /// a.pow_assign(0);
+    /// a.pow_assign(0u64);
     /// assert_eq!(a.to_string(), "[1, 0; 0, 1]");
     ///
     /// let mut a = RationalMatrix::from_str("[-2/3]").unwrap();
-    /// a.pow_assign(4);
+    /// a.pow_assign(4u64);
     /// assert_eq!(a.to_string(), "[16/81]");
     /// ```
     fn pow_assign(&mut self, exp: u64) {
         assert_square(self);
         if exp != 1 {
             *self = pow_owned(take_matrix(self), exp);
+        }
+    }
+}
+
+impl Pow<i64> for RationalMatrix {
+    type Output = Self;
+
+    /// Raises a square [`RationalMatrix`] to a signed power, taking it by value.
+    ///
+    /// The power $A^k$ of an $n \times n$ matrix $A$ is the product of $k$ copies of $A$ when $k
+    /// \geq 0$, and the product of $-k$ copies of $A^{-1}$ when $k < 0$; $A^0$ is the $n \times n$
+    /// identity matrix.
+    ///
+    /// $$
+    /// f(A, k) = A^k.
+    /// $$
+    ///
+    /// A non-negative power is computed as by the [`Pow<u64>`](Pow) implementation. For a negative
+    /// one, the matrix is inverted first, as by [`Inverse`], and the inverse is raised to $-k$,
+    /// since inverting $A^{-k}$ would work on elements that have already grown $-k$-fold.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b, k) = O(n^6 b^2 + n^4 b|k| \log (nb|k|) \log\log (nb|k|))$
+    ///
+    /// $M(n, b, k) = O(n^4 b + n^3 b|k|)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the matrix, $b$ is the
+    /// maximum number of significant bits of the numerators and denominators of its elements, and
+    /// $k$ is `exp`: the inverse has elements of $O(nb)$ bits.
+    ///
+    /// # Panics
+    /// Panics if the matrix is not square, or if `exp` is negative and the matrix is singular.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
+    /// assert_eq!(a.pow(5i64).to_string(), "[65/32, 29/16; 29/16, 9/8]");
+    ///
+    /// let a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
+    /// assert_eq!(a.pow(-1i64).to_string(), "[0, 1; 1, -1/2]");
+    ///
+    /// let a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
+    /// assert_eq!(a.pow(-5i64).to_string(), "[-9/8, 29/16; 29/16, -65/32]");
+    ///
+    /// let a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
+    /// assert_eq!(
+    ///     a.pow(-3i64).to_string(),
+    ///     "[-504/625, -96/625; 576/625, -576/625]"
+    /// );
+    ///
+    /// let a = RationalMatrix::from_str("[-2/3]").unwrap();
+    /// assert_eq!(a.pow(-4i64).to_string(), "[81/16]");
+    /// ```
+    #[inline]
+    fn pow(self, exp: i64) -> Self {
+        assert_square(&self);
+        pow_signed_owned(self, exp)
+    }
+}
+
+impl Pow<i64> for &RationalMatrix {
+    type Output = RationalMatrix;
+
+    /// Raises a square [`RationalMatrix`] to a signed power, taking it by reference.
+    ///
+    /// The power $A^k$ of an $n \times n$ matrix $A$ is the product of $k$ copies of $A$ when $k
+    /// \geq 0$, and the product of $-k$ copies of $A^{-1}$ when $k < 0$; $A^0$ is the $n \times n$
+    /// identity matrix.
+    ///
+    /// $$
+    /// f(A, k) = A^k.
+    /// $$
+    ///
+    /// A non-negative power is computed as by the [`Pow<u64>`](Pow) implementation. For a negative
+    /// one, the matrix is inverted first, as by [`Inverse`], and the inverse is raised to $-k$,
+    /// since inverting $A^{-k}$ would work on elements that have already grown $-k$-fold.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b, k) = O(n^6 b^2 + n^4 b|k| \log (nb|k|) \log\log (nb|k|))$
+    ///
+    /// $M(n, b, k) = O(n^4 b + n^3 b|k|)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the matrix, $b$ is the
+    /// maximum number of significant bits of the numerators and denominators of its elements, and
+    /// $k$ is `exp`: the inverse has elements of $O(nb)$ bits.
+    ///
+    /// # Panics
+    /// Panics if the matrix is not square, or if `exp` is negative and the matrix is singular.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
+    /// assert_eq!((&a).pow(5i64).to_string(), "[65/32, 29/16; 29/16, 9/8]");
+    ///
+    /// let a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
+    /// assert_eq!((&a).pow(-1i64).to_string(), "[0, 1; 1, -1/2]");
+    ///
+    /// let a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
+    /// assert_eq!((&a).pow(-5i64).to_string(), "[-9/8, 29/16; 29/16, -65/32]");
+    ///
+    /// let a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
+    /// assert_eq!(
+    ///     (&a).pow(-3i64).to_string(),
+    ///     "[-504/625, -96/625; 576/625, -576/625]"
+    /// );
+    ///
+    /// let a = RationalMatrix::from_str("[-2/3]").unwrap();
+    /// assert_eq!((&a).pow(-4i64).to_string(), "[81/16]");
+    /// ```
+    fn pow(self, exp: i64) -> RationalMatrix {
+        assert_square(self);
+        pow_signed_ref(self, exp)
+    }
+}
+
+impl PowAssign<i64> for RationalMatrix {
+    /// Raises a square [`RationalMatrix`] to a signed power in place.
+    ///
+    /// The power $A^k$ of an $n \times n$ matrix $A$ is the product of $k$ copies of $A$ when $k
+    /// \geq 0$, and the product of $-k$ copies of $A^{-1}$ when $k < 0$; $A^0$ is the $n \times n$
+    /// identity matrix.
+    ///
+    /// $$
+    /// f(A, k) = A^k.
+    /// $$
+    ///
+    /// A non-negative power is computed as by the [`Pow<u64>`](Pow) implementation. For a negative
+    /// one, the matrix is inverted first, as by [`Inverse`], and the inverse is raised to $-k$,
+    /// since inverting $A^{-k}$ would work on elements that have already grown $-k$-fold.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, b, k) = O(n^6 b^2 + n^4 b|k| \log (nb|k|) \log\log (nb|k|))$
+    ///
+    /// $M(n, b, k) = O(n^4 b + n^3 b|k|)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the dimension of the matrix, $b$ is the
+    /// maximum number of significant bits of the numerators and denominators of its elements, and
+    /// $k$ is `exp`: the inverse has elements of $O(nb)$ bits.
+    ///
+    /// # Panics
+    /// Panics if the matrix is not square, or if `exp` is negative and the matrix is singular.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::num::arithmetic::traits::PowAssign;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let mut a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
+    /// a.pow_assign(5i64);
+    /// assert_eq!(a.to_string(), "[65/32, 29/16; 29/16, 9/8]");
+    ///
+    /// let mut a = RationalMatrix::from_str("[1/2, 1; 1, 0]").unwrap();
+    /// a.pow_assign(-5i64);
+    /// assert_eq!(a.to_string(), "[-9/8, 29/16; 29/16, -65/32]");
+    ///
+    /// let mut a = RationalMatrix::from_str("[1/2, 1/3; -2, 3/4]").unwrap();
+    /// a.pow_assign(-3i64);
+    /// assert_eq!(a.to_string(), "[-504/625, -96/625; 576/625, -576/625]");
+    /// ```
+    fn pow_assign(&mut self, exp: i64) {
+        assert_square(self);
+        if exp != 1 {
+            *self = pow_signed_owned(take_matrix(self), exp);
         }
     }
 }
