@@ -660,7 +660,9 @@ documented by git history.
   multimodular algorithm (Danilevsky's method modulo word-sized primes, recombined by the Chinese
   remainder theorem), with the cutoff between the last two measured for Malachite rather than taken
   from FLINT. Also `IntegerMatrix::characteristic_polynomial_bound`, a bound on the coefficients
-  identical to FLINT's `fmpz_mat_charpoly_bound`.
+  identical to FLINT's `fmpz_mat_charpoly_bound`. In malachite-q, `RationalMatrix` implements it
+  too, returning a `RationalPolynomial`, like FLINT's `fmpq_mat_charpoly`: the denominators are
+  cleared and the integer characteristic polynomial is rescaled.
 - By-reference forms of the widening vector and polynomial conversions: `From<&UnsignedVector<T>>`
   for `NaturalVector` and `IntegerVector`, `From<&NaturalVector>` for `IntegerVector`,
   `From<&UnsignedPolynomial<T>>` for `NaturalPolynomial` and `IntegerPolynomial`, and

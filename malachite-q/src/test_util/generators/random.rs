@@ -4121,3 +4121,37 @@ pub fn random_rational_matrix_gen_var_3(config: &GenConfig) -> It<RationalMatrix
         config.get_or("mean_dimension_d", 1),
     ))
 }
+
+// Triples `(a, r, d)` where `a` is a nonempty square matrix with small elements, `r` is one of its
+// row indices, chosen at random, and `d` is a small `Rational`, for linear algebra.
+pub fn random_rational_matrix_unsigned_rational_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalMatrix, u64, Rational)> {
+    let mut indices = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("indices"));
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_rational_square_matrices(
+                    seed,
+                    config.get_or("mean_bits_n", 8),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_size_n", 4),
+                    config.get_or("mean_size_d", 1),
+                )
+            },
+            &|seed| {
+                random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 8),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .filter(|(a, _)| a.height() != 0)
+        .map(move |(a, d)| {
+            let r = indices.next().unwrap() % a.height();
+            (a, r, d)
+        }),
+    )
+}

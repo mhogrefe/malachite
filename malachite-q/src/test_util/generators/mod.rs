@@ -1388,6 +1388,17 @@ pub fn rational_matrix_unsigned_rational_triple_gen_var_1()
     )
 }
 
+// All `(a, r, d)` where `a` is a square `RationalMatrix` and `r` is one of its row indices, with
+// small elements in the random modes, for linear algebra.
+pub fn rational_matrix_unsigned_rational_triple_gen_var_2()
+-> Generator<(RationalMatrix, u64, Rational)> {
+    Generator::new(
+        &exhaustive_rational_matrix_unsigned_rational_triple_gen_var_2,
+        &random_rational_matrix_unsigned_rational_triple_gen_var_2,
+        &special_random_rational_matrix_unsigned_rational_triple_gen_var_2,
+    )
+}
+
 pub fn rational_matrix_triple_gen() -> Generator<(RationalMatrix, RationalMatrix, RationalMatrix)> {
     Generator::new(
         &exhaustive_rational_matrix_triple_gen,

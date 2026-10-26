@@ -8,16 +8,17 @@
     version 3 of the License, or (at your option) any later version. See
     <https://www.gnu.org/licenses/>.
 
-    Oracles for Malachite's characteristic polynomials of `IntegerMatrix`es. The demo prints
-    `A.characteristic_polynomial() = p`; the `fmpz_mat_charpoly` mode recomputes p with
-    `fmpz_mat_charpoly`. The bound demo prints `A.characteristic_polynomial_bound() = b`; the
-    `fmpz_mat_charpoly_bound` mode requires b to equal `fmpz_mat_charpoly_bound` exactly, since
-    Malachite rounds its floating-point magnitudes as FLINT does. Malachite panics rather than
-    printing a line for a non-square matrix.
+    Oracles for Malachite's characteristic polynomials of `IntegerMatrix`es and `RationalMatrix`es.
+    The demos print `A.characteristic_polynomial() = p`, or `(&A).characteristic_polynomial() = p`
+    for the `_ref` demos; the `fmpz_mat_charpoly` and `fmpq_mat_charpoly` modes recompute p with
+    `fmpz_mat_charpoly` and `fmpq_mat_charpoly`. The bound demo prints
+    `A.characteristic_polynomial_bound() = b`; the `fmpz_mat_charpoly_bound` mode requires b to
+    equal `fmpz_mat_charpoly_bound` exactly, since Malachite rounds its floating-point magnitudes as
+    FLINT does. Malachite panics rather than printing a line for a non-square matrix.
 
-    Matrices are read by fmpz_mat_init_set_str_malachite and polynomials by
-    fmpz_poly_set_str_malachite in util.c. Any other nonempty line is an error, and so is an input
-    with no lines at all.
+    Matrices are read by fmpz_mat_init_set_str_malachite or fmpq_mat_init_set_str_malachite and
+    polynomials by fmpz_poly_set_str_malachite or fmpq_poly_set_str_malachite in util.c. Any other
+    nonempty line is an error, and so is an input with no lines at all.
 */
 
 #include <stdio.h>
@@ -27,18 +28,55 @@
 #include <flint/fmpz.h>
 #include <flint/fmpz_mat.h>
 #include <flint/fmpz_poly.h>
+#include <flint/fmpq_mat.h>
+#include <flint/fmpq_poly.h>
 
 #include "oracle.h"
 
 static long checked;
 static const char * current_name;
 static int bound_mode;
+static int rational_mode;
 
 static int
 error(const char * message, int line_number)
 {
     flint_printf("error in %s test, line %d: %s\n", current_name, line_number, message);
     return 1;
+}
+
+static int
+check_rational(const char * input, const char * output, int line_number)
+{
+    fmpq_mat_t a;
+    if (!fmpq_mat_init_set_str_malachite(a, input))
+    {
+        return error("unreadable input", line_number);
+    }
+    int result = 0;
+    fmpq_poly_t expected, actual;
+    fmpq_poly_init(expected);
+    fmpq_poly_init(actual);
+    if (fmpq_mat_nrows(a) != fmpq_mat_ncols(a))
+    {
+        result = error("the input is not square", line_number);
+    }
+    else if (!fmpq_poly_set_str_malachite(expected, output))
+    {
+        result = error("unreadable result", line_number);
+    }
+    else
+    {
+        fmpq_mat_charpoly(actual, a);
+        if (!fmpq_poly_equal(actual, expected))
+        {
+            result = error("the characteristic polynomials differ", line_number);
+        }
+    }
+    fmpq_poly_clear(expected);
+    fmpq_poly_clear(actual);
+    fmpq_mat_clear(a);
+    return result;
 }
 
 static int
@@ -59,6 +97,17 @@ check_line(char * line, int line_number)
     *at = '\0';
     char * rest = at + strlen(method);
     checked++;
+    /* The `_ref` demos print `(&A)` in place of `A`. */
+    size_t input_len = strlen(line);
+    if (strncmp(line, "(&", 2) == 0 && input_len > 2 && line[input_len - 1] == ')')
+    {
+        line[input_len - 1] = '\0';
+        line += 2;
+    }
+    if (rational_mode)
+    {
+        return check_rational(line, rest, line_number);
+    }
     fmpz_mat_t a;
     if (!fmpz_mat_init_set_str_malachite(a, line))
     {
@@ -114,11 +163,12 @@ check_line(char * line, int line_number)
 }
 
 static int
-run(const char * arg, const char * name, int bound)
+run(const char * arg, const char * name, int bound, int rational)
 {
     checked = 0;
     current_name = name;
     bound_mode = bound;
+    rational_mode = rational;
     int result = for_each_line(arg, check_line);
     return result != 0 ? result : require_some_lines(name, checked);
 }
@@ -126,11 +176,17 @@ run(const char * arg, const char * name, int bound)
 int
 run_fmpz_mat_charpoly(const char * arg)
 {
-    return run(arg, "fmpz_mat_charpoly", 0);
+    return run(arg, "fmpz_mat_charpoly", 0, 0);
 }
 
 int
 run_fmpz_mat_charpoly_bound(const char * arg)
 {
-    return run(arg, "fmpz_mat_charpoly_bound", 1);
+    return run(arg, "fmpz_mat_charpoly_bound", 1, 0);
+}
+
+int
+run_fmpq_mat_charpoly(const char * arg)
+{
+    return run(arg, "fmpq_mat_charpoly", 0, 1);
 }

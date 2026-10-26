@@ -124,6 +124,7 @@ string in a unit file is printed bare, exactly as the demo would print it.
 | `fmpz_mat_similarity` | `fmpz_mat_similarity` | `demo_integer_matrix_similarity_transform` (malachite-nz) |
 | `fmpz_mat_charpoly` | `fmpz_mat_charpoly` | `demo_integer_matrix_characteristic_polynomial` and `demo_natural_matrix_characteristic_polynomial` (malachite-nz) |
 | `fmpz_mat_charpoly_bound` | `fmpz_mat_charpoly_bound`, compared exactly | `demo_integer_matrix_characteristic_polynomial_bound` (malachite-nz) |
+| `fmpq_mat_charpoly` | `fmpq_mat_charpoly` | `demo_rational_matrix_characteristic_polynomial` and `_ref` (malachite-q), plus unit rows |
 | `fmpq_mat_similarity` | `fmpq_mat_similarity` | `demo_rational_matrix_similarity_transform` (malachite-q) |
 | `nmod_mat_similarity` | `nmod_mat_similarity` | `demo_unsigned_matrix_mod_similarity_transform_u64` (malachite-base); modulo 1 the result must be 0 |
 | `fmpz_mod_mat_similarity` | `fmpz_mod_mat_similarity` | `demo_natural_matrix_mod_similarity_transform` (malachite-nz); modulo 1 the result must be 0 |

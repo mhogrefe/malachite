@@ -4059,6 +4059,16 @@ fn test_against_flint() {
             "integer_matrix_characteristic_polynomial_bound",
             "fmpz_mat_charpoly_bound",
         ),
+        (
+            "../malachite-q",
+            "rational_matrix_characteristic_polynomial",
+            "fmpq_mat_charpoly",
+        ),
+        (
+            "../malachite-q",
+            "rational_matrix_characteristic_polynomial_ref",
+            "fmpq_mat_charpoly",
+        ),
         ("../malachite-q", "rational_matrix_similarity_transform", "fmpq_mat_similarity"),
         (
             "../malachite-base",

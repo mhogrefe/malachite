@@ -93,6 +93,10 @@ pub mod add_mul;
 /// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which compute the
 /// primitive part of a matrix with its first nonzero element, in row-major order, made positive.
 pub mod canonical_primitive_part;
+/// Implementations of
+/// [`CharacteristicPolynomial`](malachite_base::num::arithmetic::traits::CharacteristicPolynomial),
+/// for computing the characteristic polynomial of a square matrix.
+pub mod characteristic_polynomial;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), and
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),

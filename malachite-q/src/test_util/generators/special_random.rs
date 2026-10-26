@@ -59,7 +59,8 @@ use malachite_base::num::random::striped::{
 };
 use malachite_base::num::random::{
     random_finite_primitive_floats, random_nonzero_finite_primitive_floats,
-    random_primitive_floats, random_signed_inclusive_range, random_unsigned_inclusive_range,
+    random_primitive_floats, random_primitive_ints, random_signed_inclusive_range,
+    random_unsigned_inclusive_range,
 };
 use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
 use malachite_base::random::EXAMPLE_SEED;
@@ -4615,4 +4616,42 @@ pub fn special_random_rational_matrix_gen_var_3(config: &GenConfig) -> It<Ration
         config.get_or("mean_dimension_n", 4),
         config.get_or("mean_dimension_d", 1),
     ))
+}
+
+// Triples `(a, r, d)` where `a` is a nonempty square matrix with small elements, `r` is one of its
+// row indices, chosen at random, and `d` is a small `Rational`, for linear algebra.
+pub fn special_random_rational_matrix_unsigned_rational_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(RationalMatrix, u64, Rational)> {
+    let mut indices = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("indices"));
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rational_square_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 8),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_size_n", 4),
+                    config.get_or("mean_size_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 8),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .filter(|(a, _)| a.height() != 0)
+        .map(move |(a, d)| {
+            let r = indices.next().unwrap() % a.height();
+            (a, r, d)
+        }),
+    )
 }

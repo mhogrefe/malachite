@@ -169,6 +169,7 @@ pub mod rational_matrix {
         pub mod add;
         pub mod add_mul;
         pub mod canonical_primitive_part;
+        pub mod characteristic_polynomial;
         pub mod content;
         pub mod content_chained;
         pub mod determinant;

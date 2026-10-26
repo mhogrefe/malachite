@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     add_mul::register(runner);
     canonical_primitive_part::register(runner);
+    characteristic_polynomial::register(runner);
     content::register(runner);
     content_chained::register(runner);
     determinant::register(runner);
@@ -42,6 +43,7 @@ pub(crate) fn register(runner: &mut Runner) {
 mod add;
 mod add_mul;
 mod canonical_primitive_part;
+mod characteristic_polynomial;
 mod content;
 mod content_chained;
 mod determinant;

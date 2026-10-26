@@ -1861,3 +1861,8 @@ pub fn exhaustive_rational_matrix_rational_vector_pair_gen_var_3()
 pub fn exhaustive_rational_matrix_gen_var_3() -> It<RationalMatrix> {
     exhaustive_rational_matrix_gen()
 }
+
+pub fn exhaustive_rational_matrix_unsigned_rational_triple_gen_var_2()
+-> It<(RationalMatrix, u64, Rational)> {
+    exhaustive_rational_matrix_unsigned_rational_triple_gen_var_1()
+}
