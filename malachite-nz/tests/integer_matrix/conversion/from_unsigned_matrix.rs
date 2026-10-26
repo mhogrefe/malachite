@@ -20,7 +20,11 @@ fn test_from_unsigned_matrix() {
     where
         Integer: From<T>,
     {
-        let m = IntegerMatrix::from(UnsignedMatrix::<T>::from_str(s).unwrap());
+        let u = UnsignedMatrix::<T>::from_str(s).unwrap();
+        let m = IntegerMatrix::from(&u);
+        assert!(m.is_valid());
+        assert_eq!(m.to_string(), s);
+        let m = IntegerMatrix::from(u);
         assert!(m.is_valid());
         assert_eq!(m.to_string(), s);
     }
@@ -42,6 +46,9 @@ fn from_unsigned_matrix_properties() {
     unsigned_matrix_gen().test_properties(|m| {
         let n = IntegerMatrix::from(m.clone());
         assert!(n.is_valid());
+        let n_alt = IntegerMatrix::from(&m);
+        assert!(n_alt.is_valid());
+        assert_eq!(n_alt, n);
         // Nothing is lost: the shape, every element, and the written form all survive.
         assert_eq!((n.height(), n.width()), (m.height(), m.width()));
         assert_eq!(n.to_string(), m.to_string());

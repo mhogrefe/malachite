@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
+use malachite_base::num::arithmetic::traits::AddMulAssign;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
@@ -70,5 +71,9 @@ fn add_mul_unsigned_matrix_assign_properties() {
         {
             assert_eq!(*r, y + &c * Integer::from(*z));
         }
+        // The public form of fmpz_mat_scalar_addmul_nmod_mat_ui: convert, then add_mul_assign.
+        let mut composed = b.clone();
+        composed.add_mul_assign(IntegerMatrix::from(&a), &c);
+        assert_eq!(composed, result);
     });
 }

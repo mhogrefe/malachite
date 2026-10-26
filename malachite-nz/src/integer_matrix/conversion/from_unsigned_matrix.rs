@@ -16,7 +16,8 @@ impl<T: PrimitiveUnsigned> From<UnsignedMatrix<T>> for IntegerMatrix
 where
     Integer: From<T>,
 {
-    /// Converts an [`UnsignedMatrix`] to an [`IntegerMatrix`].
+    /// Converts an [`UnsignedMatrix`] to an [`IntegerMatrix`], taking the [`UnsignedMatrix`] by
+    /// value.
     ///
     /// Every unsigned primitive is an [`Integer`], so nothing is lost and nothing can fail. The
     /// elements are converted one by one, so the height and width are unchanged.
@@ -48,6 +49,47 @@ where
             m.height(),
             m.width(),
             m.into_elements().into_iter().map(Integer::from).collect(),
+        )
+    }
+}
+
+impl<T: PrimitiveUnsigned> From<&UnsignedMatrix<T>> for IntegerMatrix
+where
+    Integer: From<T>,
+{
+    /// Converts an [`UnsignedMatrix`] to an [`IntegerMatrix`], taking the [`UnsignedMatrix`] by
+    /// reference.
+    ///
+    /// Every unsigned primitive is an [`Integer`], so nothing is lost and nothing can fail. The
+    /// elements are converted one by one, so the height and width are unchanged.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.height() * m.width()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_matrix::UnsignedMatrix;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    ///
+    /// let m = UnsignedMatrix::<u64>::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    /// assert_eq!(IntegerMatrix::from(&m).to_string(), "[1, 2, 3; 4, 5, 6]");
+    ///
+    /// assert_eq!(
+    ///     IntegerMatrix::from(&UnsignedMatrix::<u8>::from_str("[]_{3,0}").unwrap()).to_string(),
+    ///     "[]_{3,0}"
+    /// );
+    /// ```
+    #[inline]
+    fn from(m: &UnsignedMatrix<T>) -> Self {
+        Self::from_owned_elements(
+            m.height(),
+            m.width(),
+            m.elements_ref().iter().map(|&x| Integer::from(x)).collect(),
         )
     }
 }

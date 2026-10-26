@@ -15,7 +15,11 @@ use malachite_nz::integer_matrix::IntegerMatrix;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_matrix_from_unsigned_matrix);
-    register_bench!(runner, benchmark_integer_matrix_from_unsigned_matrix);
+    register_demo!(runner, demo_integer_matrix_from_unsigned_matrix_ref);
+    register_bench!(
+        runner,
+        benchmark_integer_matrix_from_unsigned_matrix_evaluation_strategy
+    );
 }
 
 fn demo_integer_matrix_from_unsigned_matrix(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -28,7 +32,13 @@ fn demo_integer_matrix_from_unsigned_matrix(gm: GenMode, config: &GenConfig, lim
     }
 }
 
-fn benchmark_integer_matrix_from_unsigned_matrix(
+fn demo_integer_matrix_from_unsigned_matrix_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for m in unsigned_matrix_gen().get(gm, config).take(limit) {
+        println!("IntegerMatrix::from(&{}) = {}", m, IntegerMatrix::from(&m));
+    }
+}
+
+fn benchmark_integer_matrix_from_unsigned_matrix_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -36,14 +46,19 @@ fn benchmark_integer_matrix_from_unsigned_matrix(
 ) {
     run_benchmark(
         "IntegerMatrix::from(UnsignedMatrix<u64>)",
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         unsigned_matrix_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &unsigned_matrix_size_bucketer("m"),
-        &mut [("Malachite", &mut |m| {
-            let _ = IntegerMatrix::from(m);
-        })],
+        &mut [
+            ("IntegerMatrix::from(UnsignedMatrix<u64>)", &mut |m| {
+                let _ = IntegerMatrix::from(m);
+            }),
+            ("IntegerMatrix::from(&UnsignedMatrix<u64>)", &mut |m| {
+                let _ = IntegerMatrix::from(&m);
+            }),
+        ],
     );
 }

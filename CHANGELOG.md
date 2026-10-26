@@ -279,7 +279,8 @@ documented by git history.
   the element and row/column constructors, `height`, `width`, `transpose`, `transpose_assign`,
   `Index`/`IndexMut` by `(row, column)`, `get`, `get_mut`, `Display`/`Debug`, `FromStr` (which
   rejects negative elements, including `-0`), `ToLatex`, `ToTypst`, and serde support.
-- `From<UnsignedMatrix<T>>` for `NaturalMatrix`, for every primitive unsigned `T`.
+- `From<UnsignedMatrix<T>>` and `From<&UnsignedMatrix<T>>` for `NaturalMatrix`, for every primitive
+  unsigned `T`.
 - `PartialEq<UnsignedMatrix<T>>` for `NaturalMatrix` and `PartialEq<NaturalMatrix>` for
   `UnsignedMatrix<T>`: equal when the shapes match and every element is equal.
 - `PartialEq` in both directions between `IntegerMatrix` and `UnsignedMatrix<T>`, and between
@@ -287,8 +288,9 @@ documented by git history.
 - `TryFrom<NaturalMatrix>` and `TryFrom<&NaturalMatrix>` for `UnsignedMatrix<T>`, failing with
   `UnsignedMatrixFromNaturalMatrixError` when an element is too large for `T`, and the matching
   `ConvertibleFrom<&NaturalMatrix>`.
-- `From<UnsignedMatrix<T>>` for `IntegerMatrix`, for every primitive unsigned `T`, and
-  `From<NaturalMatrix>` for `IntegerMatrix`.
+- `From<UnsignedMatrix<T>>` and `From<&UnsignedMatrix<T>>` for `IntegerMatrix`, for every primitive
+  unsigned `T`, and `From<NaturalMatrix>` for `IntegerMatrix`. With `AddMulAssign`, the by-reference
+  conversion covers FLINT's `fmpz_mat_scalar_addmul_nmod_mat_ui`.
 - `TryFrom<IntegerMatrix>` and `TryFrom<&IntegerMatrix>` for `UnsignedMatrix<T>` (failing with
   `UnsignedMatrixFromIntegerMatrixError` when an element is negative or too large for `T`) and for
   `NaturalMatrix` (failing with `NaturalMatrixFromIntegerMatrixError` when an element is
