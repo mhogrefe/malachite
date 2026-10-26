@@ -98,6 +98,10 @@ pub mod balanced_mod_power_of_2;
 /// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which, for a matrix
 /// with non-negative elements, are the same as the primitive part.
 pub mod canonical_primitive_part;
+/// Implementations of
+/// [`CharacteristicPolynomial`](malachite_base::num::arithmetic::traits::CharacteristicPolynomial),
+/// for computing the characteristic polynomial of a square matrix of naturals.
+pub mod characteristic_polynomial;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart),
 /// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), and

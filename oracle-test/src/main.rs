@@ -4051,6 +4051,11 @@ fn test_against_flint() {
         ),
         (
             "../malachite-nz",
+            "natural_matrix_characteristic_polynomial",
+            "fmpz_mat_charpoly",
+        ),
+        (
+            "../malachite-nz",
             "integer_matrix_characteristic_polynomial_bound",
             "fmpz_mat_charpoly_bound",
         ),

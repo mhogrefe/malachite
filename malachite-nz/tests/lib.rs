@@ -1103,6 +1103,7 @@ pub mod natural_matrix {
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
         pub mod canonical_primitive_part;
+        pub mod characteristic_polynomial;
         pub mod content;
         pub mod content_chained;
         pub mod crt;

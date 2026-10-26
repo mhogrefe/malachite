@@ -654,13 +654,13 @@ documented by git history.
   row $r$ in every column except $r - 1$ and $r$. That is what FLINT's code computes; its manual
   leaves out the exception for column $r - 1$. Unlike FLINT, Malachite panics if the matrix is not
   square, $r$ is not a row index, or (for the modular forms) an input is not reduced.
-- New `CharacteristicPolynomial` trait in malachite-base, implemented for `IntegerMatrix`, by value
-  or by reference, returning an `IntegerPolynomial`, like FLINT's `fmpz_mat_charpoly`: closed
-  formulas up to dimension 3, Berkowitz's division-free algorithm, or a multimodular algorithm
-  (Danilevsky's method modulo word-sized primes, recombined by the Chinese remainder theorem), with
-  the cutoff between the last two measured for Malachite rather than taken from FLINT. Also
-  `IntegerMatrix::characteristic_polynomial_bound`, a bound on the coefficients identical to
-  FLINT's `fmpz_mat_charpoly_bound`.
+- New `CharacteristicPolynomial` trait in malachite-base, implemented for `IntegerMatrix` and
+  `NaturalMatrix`, by value or by reference, returning an `IntegerPolynomial`, like FLINT's
+  `fmpz_mat_charpoly`: closed formulas up to dimension 3, Berkowitz's division-free algorithm, or a
+  multimodular algorithm (Danilevsky's method modulo word-sized primes, recombined by the Chinese
+  remainder theorem), with the cutoff between the last two measured for Malachite rather than taken
+  from FLINT. Also `IntegerMatrix::characteristic_polynomial_bound`, a bound on the coefficients
+  identical to FLINT's `fmpz_mat_charpoly_bound`.
 - By-reference forms of the widening vector and polynomial conversions: `From<&UnsignedVector<T>>`
   for `NaturalVector` and `IntegerVector`, `From<&NaturalVector>` for `IntegerVector`,
   `From<&UnsignedPolynomial<T>>` for `NaturalPolynomial` and `IntegerPolynomial`, and
