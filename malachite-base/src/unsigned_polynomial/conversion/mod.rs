@@ -12,6 +12,6 @@ pub mod from_unsigned;
 /// Implementations of traits for serialization and deserialization using
 /// [serde](https://serde.rs/).
 pub mod serde;
-/// Functions for converting a [`UnsignedPolynomial`](super::UnsignedPolynomial) to and from a
+/// Functions for converting an [`UnsignedPolynomial`](super::UnsignedPolynomial) to and from a
 /// [`String`].
 pub mod string;

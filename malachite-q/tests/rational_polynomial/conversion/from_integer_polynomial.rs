@@ -37,6 +37,8 @@ fn test_from_integer_polynomial() {
 fn from_integer_polynomial_properties() {
     integer_polynomial_gen().test_properties(|p| {
         let q = RationalPolynomial::from(p.clone());
+        // Converting by reference gives the same thing.
+        assert_eq!(RationalPolynomial::from(&p), q);
         assert!(q.is_valid());
         // Nothing is lost: the degree, every coefficient, and the written form all survive.
         assert_eq!(q.degree(), p.degree());

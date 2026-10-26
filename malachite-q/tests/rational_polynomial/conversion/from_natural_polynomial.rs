@@ -37,6 +37,8 @@ fn test_from_natural_polynomial() {
 fn from_natural_polynomial_properties() {
     natural_polynomial_gen().test_properties(|p| {
         let q = RationalPolynomial::from(p.clone());
+        // Converting by reference gives the same thing.
+        assert_eq!(RationalPolynomial::from(&p), q);
         assert!(q.is_valid());
         // Nothing is lost: the degree, every coefficient, and the written form all survive.
         assert_eq!(q.degree(), p.degree());

@@ -14,7 +14,11 @@ use malachite_nz::test_util::generators::natural_vector_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_vector_from_natural_vector);
-    register_bench!(runner, benchmark_integer_vector_from_natural_vector);
+    register_demo!(runner, demo_integer_vector_from_natural_vector_ref);
+    register_bench!(
+        runner,
+        benchmark_integer_vector_from_natural_vector_evaluation_strategy
+    );
 }
 
 fn demo_integer_vector_from_natural_vector(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -27,7 +31,13 @@ fn demo_integer_vector_from_natural_vector(gm: GenMode, config: &GenConfig, limi
     }
 }
 
-fn benchmark_integer_vector_from_natural_vector(
+fn demo_integer_vector_from_natural_vector_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for v in natural_vector_gen().get(gm, config).take(limit) {
+        println!("IntegerVector::from(&{}) = {}", v, IntegerVector::from(&v));
+    }
+}
+
+fn benchmark_integer_vector_from_natural_vector_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -35,14 +45,19 @@ fn benchmark_integer_vector_from_natural_vector(
 ) {
     run_benchmark(
         "IntegerVector::from(NaturalVector)",
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         natural_vector_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &natural_vector_bit_bucketer("v"),
-        &mut [("Malachite", &mut |v| {
-            let _ = IntegerVector::from(v);
-        })],
+        &mut [
+            ("IntegerVector::from(NaturalVector)", &mut |v| {
+                let _ = IntegerVector::from(v);
+            }),
+            ("IntegerVector::from(&NaturalVector)", &mut |v| {
+                let _ = IntegerVector::from(&v);
+            }),
+        ],
     );
 }

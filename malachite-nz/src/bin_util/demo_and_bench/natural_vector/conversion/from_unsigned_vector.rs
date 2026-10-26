@@ -14,7 +14,11 @@ use malachite_nz::natural_vector::NaturalVector;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_vector_from_unsigned_vector);
-    register_bench!(runner, benchmark_natural_vector_from_unsigned_vector);
+    register_demo!(runner, demo_natural_vector_from_unsigned_vector_ref);
+    register_bench!(
+        runner,
+        benchmark_natural_vector_from_unsigned_vector_evaluation_strategy
+    );
 }
 
 fn demo_natural_vector_from_unsigned_vector(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -27,7 +31,13 @@ fn demo_natural_vector_from_unsigned_vector(gm: GenMode, config: &GenConfig, lim
     }
 }
 
-fn benchmark_natural_vector_from_unsigned_vector(
+fn demo_natural_vector_from_unsigned_vector_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for v in unsigned_vector_gen().get(gm, config).take(limit) {
+        println!("NaturalVector::from(&{}) = {}", v, NaturalVector::from(&v));
+    }
+}
+
+fn benchmark_natural_vector_from_unsigned_vector_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -35,14 +45,19 @@ fn benchmark_natural_vector_from_unsigned_vector(
 ) {
     run_benchmark(
         "NaturalVector::from(UnsignedVector<u64>)",
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         unsigned_vector_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &unsigned_vector_dimension_bucketer("v"),
-        &mut [("Malachite", &mut |v| {
-            let _ = NaturalVector::from(v);
-        })],
+        &mut [
+            ("NaturalVector::from(UnsignedVector<u64>)", &mut |v| {
+                let _ = NaturalVector::from(v);
+            }),
+            ("NaturalVector::from(&UnsignedVector<u64>)", &mut |v| {
+                let _ = NaturalVector::from(&v);
+            }),
+        ],
     );
 }

@@ -36,6 +36,8 @@ fn test_from_unsigned_polynomial() {
 fn from_unsigned_polynomial_properties() {
     unsigned_polynomial_gen().test_properties(|p| {
         let q = NaturalPolynomial::from(p.clone());
+        // Converting by reference gives the same thing.
+        assert_eq!(NaturalPolynomial::from(&p), q);
         assert!(q.is_valid());
         // Nothing is lost: the degree, every coefficient, and the written form all survive.
         assert_eq!(q.degree(), p.degree());

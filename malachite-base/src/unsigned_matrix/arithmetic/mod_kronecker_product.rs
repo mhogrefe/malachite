@@ -268,7 +268,7 @@ impl<T: PrimitiveUnsigned> ModKroneckerProduct<&UnsignedMatrix<T>, T> for &Unsig
 }
 
 impl<T: PrimitiveUnsigned> ModKroneckerProductAssign<Self, T> for UnsignedMatrix<T> {
-    /// Replaces a [`UnsignedMatrix`] with its Kronecker product with another [`UnsignedMatrix`]
+    /// Replaces an [`UnsignedMatrix`] with its Kronecker product with another [`UnsignedMatrix`]
     /// modulo $m$, taking the second by value.
     ///
     /// See the documentation for the [`ModKroneckerProduct`] implementation that takes all
@@ -311,7 +311,7 @@ impl<T: PrimitiveUnsigned> ModKroneckerProductAssign<Self, T> for UnsignedMatrix
 }
 
 impl<T: PrimitiveUnsigned> ModKroneckerProductAssign<&Self, T> for UnsignedMatrix<T> {
-    /// Replaces a [`UnsignedMatrix`] with its Kronecker product with another [`UnsignedMatrix`]
+    /// Replaces an [`UnsignedMatrix`] with its Kronecker product with another [`UnsignedMatrix`]
     /// modulo $m$, taking the second by reference.
     ///
     /// See the documentation for the [`ModKroneckerProduct`] implementation that takes all

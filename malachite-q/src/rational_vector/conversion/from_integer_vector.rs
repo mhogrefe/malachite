@@ -11,7 +11,8 @@ use crate::rational_vector::RationalVector;
 use malachite_nz::integer_vector::IntegerVector;
 
 impl From<IntegerVector> for RationalVector {
-    /// Converts an [`IntegerVector`] to a [`RationalVector`].
+    /// Converts an [`IntegerVector`] to a [`RationalVector`], taking the [`IntegerVector`] by
+    /// value.
     ///
     /// Every [`Integer`](malachite_nz::integer::Integer) is a [`Rational`], so nothing is lost and
     /// nothing can fail. The elements are converted one by one, each with denominator 1, so the
@@ -42,6 +43,44 @@ impl From<IntegerVector> for RationalVector {
     fn from(v: IntegerVector) -> Self {
         Self {
             elements: v.elements.into_iter().map(Rational::from).collect(),
+        }
+    }
+}
+
+impl From<&IntegerVector> for RationalVector {
+    /// Converts an [`IntegerVector`] to a [`RationalVector`], taking the [`IntegerVector`] by
+    /// reference.
+    ///
+    /// Every [`Integer`](malachite_nz::integer::Integer) is a [`Rational`], so nothing is lost and
+    /// nothing can fail. The elements are converted one by one, each with denominator 1, so the
+    /// dimension is unchanged.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of limbs of the
+    /// elements of `v`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    /// use malachite_q::rational_vector::RationalVector;
+    ///
+    /// let v = IntegerVector::from_str("(1, -2, 3)").unwrap();
+    /// assert_eq!(RationalVector::from(&v).to_string(), "(1, -2, 3)");
+    ///
+    /// assert_eq!(
+    ///     RationalVector::from(&IntegerVector::from_str("()").unwrap()).to_string(),
+    ///     "()"
+    /// );
+    /// ```
+    #[inline]
+    fn from(v: &IntegerVector) -> Self {
+        Self {
+            elements: v.elements.iter().map(Rational::from).collect(),
         }
     }
 }

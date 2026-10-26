@@ -15,7 +15,11 @@ use malachite_q::rational_matrix::RationalMatrix;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_matrix_from_integer_matrix);
-    register_bench!(runner, benchmark_rational_matrix_from_integer_matrix);
+    register_demo!(runner, demo_rational_matrix_from_integer_matrix_ref);
+    register_bench!(
+        runner,
+        benchmark_rational_matrix_from_integer_matrix_evaluation_strategy
+    );
 }
 
 fn demo_rational_matrix_from_integer_matrix(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -28,7 +32,17 @@ fn demo_rational_matrix_from_integer_matrix(gm: GenMode, config: &GenConfig, lim
     }
 }
 
-fn benchmark_rational_matrix_from_integer_matrix(
+fn demo_rational_matrix_from_integer_matrix_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for m in integer_matrix_gen().get(gm, config).take(limit) {
+        println!(
+            "RationalMatrix::from(&{}) = {}",
+            m,
+            RationalMatrix::from(&m)
+        );
+    }
+}
+
+fn benchmark_rational_matrix_from_integer_matrix_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -36,14 +50,19 @@ fn benchmark_rational_matrix_from_integer_matrix(
 ) {
     run_benchmark(
         "RationalMatrix::from(IntegerMatrix)",
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         integer_matrix_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &integer_matrix_bit_bucketer("m"),
-        &mut [("Malachite", &mut |m| {
-            let _ = RationalMatrix::from(m);
-        })],
+        &mut [
+            ("RationalMatrix::from(IntegerMatrix)", &mut |m| {
+                let _ = RationalMatrix::from(m);
+            }),
+            ("RationalMatrix::from(&IntegerMatrix)", &mut |m| {
+                let _ = RationalMatrix::from(&m);
+            }),
+        ],
     );
 }

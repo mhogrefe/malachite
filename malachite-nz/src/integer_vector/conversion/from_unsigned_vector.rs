@@ -14,7 +14,8 @@ impl<T: PrimitiveUnsigned> From<UnsignedVector<T>> for IntegerVector
 where
     Integer: From<T>,
 {
-    /// Converts an [`UnsignedVector`] to an [`IntegerVector`].
+    /// Converts an [`UnsignedVector`] to an [`IntegerVector`], taking the [`UnsignedVector`] by
+    /// value.
     ///
     /// Every unsigned primitive is an [`Integer`], so nothing is lost and nothing can fail. The
     /// elements are converted one by one, so the dimension is unchanged.
@@ -44,6 +45,45 @@ where
     fn from(v: UnsignedVector<T>) -> Self {
         Self {
             elements: v.elements.into_iter().map(Integer::from).collect(),
+        }
+    }
+}
+
+impl<T: PrimitiveUnsigned> From<&UnsignedVector<T>> for IntegerVector
+where
+    Integer: From<T>,
+{
+    /// Converts an [`UnsignedVector`] to an [`IntegerVector`], taking the [`UnsignedVector`] by
+    /// reference.
+    ///
+    /// Every unsigned primitive is an [`Integer`], so nothing is lost and nothing can fail. The
+    /// elements are converted one by one, so the dimension is unchanged.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `v.dimension()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_vector::UnsignedVector;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    ///
+    /// let v = UnsignedVector::<u64>::from_str("(1, 2, 3)").unwrap();
+    /// assert_eq!(IntegerVector::from(&v).to_string(), "(1, 2, 3)");
+    ///
+    /// assert_eq!(
+    ///     IntegerVector::from(&UnsignedVector::<u8>::from_str("()").unwrap()).to_string(),
+    ///     "()"
+    /// );
+    /// ```
+    #[inline]
+    fn from(v: &UnsignedVector<T>) -> Self {
+        Self {
+            elements: v.elements.iter().map(|&x| Integer::from(x)).collect(),
         }
     }
 }

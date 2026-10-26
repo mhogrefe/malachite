@@ -10,7 +10,7 @@ use crate::integer_vector::IntegerVector;
 use crate::natural_vector::NaturalVector;
 
 impl From<NaturalVector> for IntegerVector {
-    /// Converts a [`NaturalVector`] to an [`IntegerVector`].
+    /// Converts a [`NaturalVector`] to an [`IntegerVector`], taking the [`NaturalVector`] by value.
     ///
     /// Every [`Natural`](crate::natural::Natural) is an [`Integer`], so nothing is lost and nothing
     /// can fail. The elements are converted one by one, without copying their limbs, so the
@@ -41,6 +41,44 @@ impl From<NaturalVector> for IntegerVector {
     fn from(v: NaturalVector) -> Self {
         Self {
             elements: v.elements.into_iter().map(Integer::from).collect(),
+        }
+    }
+}
+
+impl From<&NaturalVector> for IntegerVector {
+    /// Converts a [`NaturalVector`] to an [`IntegerVector`], taking the [`NaturalVector`] by
+    /// reference.
+    ///
+    /// Every [`Natural`](crate::natural::Natural) is an [`Integer`], so nothing is lost and nothing
+    /// can fail. The elements are converted one by one, without copying their limbs, so the
+    /// dimension is unchanged.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of limbs of the
+    /// elements of `v`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_vector::IntegerVector;
+    /// use malachite_nz::natural_vector::NaturalVector;
+    ///
+    /// let v = NaturalVector::from_str("(1, 2, 3)").unwrap();
+    /// assert_eq!(IntegerVector::from(&v).to_string(), "(1, 2, 3)");
+    ///
+    /// assert_eq!(
+    ///     IntegerVector::from(&NaturalVector::from_str("()").unwrap()).to_string(),
+    ///     "()"
+    /// );
+    /// ```
+    #[inline]
+    fn from(v: &NaturalVector) -> Self {
+        Self {
+            elements: v.elements.iter().map(Integer::from).collect(),
         }
     }
 }

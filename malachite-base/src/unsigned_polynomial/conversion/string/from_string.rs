@@ -94,7 +94,7 @@ pub(crate) fn from_string_with<T: PrimitiveUnsigned, S: VarScheme + ?Sized>(
 impl<T: PrimitiveUnsigned> FromStr for UnsignedPolynomial<T> {
     type Err = ();
 
-    /// Converts a string to a [`UnsignedPolynomial`].
+    /// Converts a string to an [`UnsignedPolynomial`].
     ///
     /// The variable is called `x`. [`from_string_with`](UnsignedPolynomial::from_string_with) is
     /// the way to call it something else.
@@ -105,7 +105,7 @@ impl<T: PrimitiveUnsigned> FromStr for UnsignedPolynomial<T> {
     /// same degree, a variable other than the one asked for, or anything with a space in it. The
     /// zero polynomial is `0`, and is the only string in which a zero coefficient may be written.
     ///
-    /// If the string does not represent a [`UnsignedPolynomial`], an `Err` is returned.
+    /// If the string does not represent an [`UnsignedPolynomial`], an `Err` is returned.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

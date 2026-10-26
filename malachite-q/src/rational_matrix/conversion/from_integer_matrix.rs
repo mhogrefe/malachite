@@ -12,7 +12,8 @@ use malachite_base::matrix::Matrix;
 use malachite_nz::integer_matrix::IntegerMatrix;
 
 impl From<IntegerMatrix> for RationalMatrix {
-    /// Converts an [`IntegerMatrix`] to a [`RationalMatrix`].
+    /// Converts an [`IntegerMatrix`] to a [`RationalMatrix`], taking the [`IntegerMatrix`] by
+    /// value.
     ///
     /// Every [`Integer`](malachite_nz::integer::Integer) is a [`Rational`], so nothing is lost and
     /// nothing can fail. The elements are converted one by one, so the height and width are
@@ -45,6 +46,49 @@ impl From<IntegerMatrix> for RationalMatrix {
             m.height(),
             m.width(),
             m.into_elements().into_iter().map(Rational::from).collect(),
+        )
+    }
+}
+
+impl From<&IntegerMatrix> for RationalMatrix {
+    /// Converts an [`IntegerMatrix`] to a [`RationalMatrix`], taking the [`IntegerMatrix`] by
+    /// reference.
+    ///
+    /// Every [`Integer`](malachite_nz::integer::Integer) is a [`Rational`], so nothing is lost and
+    /// nothing can fail. The elements are converted one by one, so the height and width are
+    /// unchanged.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of limbs of the
+    /// elements of `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_matrix::IntegerMatrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let m = IntegerMatrix::from_str("[1, -2, 3; -4, 5, -6]").unwrap();
+    /// assert_eq!(
+    ///     RationalMatrix::from(&m).to_string(),
+    ///     "[1, -2, 3; -4, 5, -6]"
+    /// );
+    ///
+    /// assert_eq!(
+    ///     RationalMatrix::from(&IntegerMatrix::from_str("[]_{0,2}").unwrap()).to_string(),
+    ///     "[]_{0,2}"
+    /// );
+    /// ```
+    #[inline]
+    fn from(m: &IntegerMatrix) -> Self {
+        Self::from_owned_elements(
+            m.height(),
+            m.width(),
+            m.elements_ref().iter().map(Rational::from).collect(),
         )
     }
 }

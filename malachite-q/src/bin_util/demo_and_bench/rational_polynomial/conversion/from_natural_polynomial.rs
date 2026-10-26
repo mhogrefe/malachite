@@ -15,9 +15,10 @@ use malachite_q::rational_polynomial::RationalPolynomial;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_polynomial_from_natural_polynomial);
+    register_demo!(runner, demo_rational_polynomial_from_natural_polynomial_ref);
     register_bench!(
         runner,
-        benchmark_rational_polynomial_from_natural_polynomial
+        benchmark_rational_polynomial_from_natural_polynomial_evaluation_strategy
     );
 }
 
@@ -31,7 +32,21 @@ fn demo_rational_polynomial_from_natural_polynomial(gm: GenMode, config: &GenCon
     }
 }
 
-fn benchmark_rational_polynomial_from_natural_polynomial(
+fn demo_rational_polynomial_from_natural_polynomial_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for p in natural_polynomial_gen().get(gm, config).take(limit) {
+        println!(
+            "RationalPolynomial::from(&{}) = {}",
+            p,
+            RationalPolynomial::from(&p)
+        );
+    }
+}
+
+fn benchmark_rational_polynomial_from_natural_polynomial_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -39,14 +54,19 @@ fn benchmark_rational_polynomial_from_natural_polynomial(
 ) {
     run_benchmark(
         "RationalPolynomial::from(NaturalPolynomial)",
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         natural_polynomial_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &natural_polynomial_bit_bucketer("p"),
-        &mut [("Malachite", &mut |p| {
-            let _ = RationalPolynomial::from(p);
-        })],
+        &mut [
+            ("RationalPolynomial::from(NaturalPolynomial)", &mut |p| {
+                let _ = RationalPolynomial::from(p);
+            }),
+            ("RationalPolynomial::from(&NaturalPolynomial)", &mut |p| {
+                let _ = RationalPolynomial::from(&p);
+            }),
+        ],
     );
 }

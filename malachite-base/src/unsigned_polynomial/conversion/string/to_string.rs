@@ -28,7 +28,8 @@ pub(crate) enum Language {
 }
 
 impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
-    // Writes a `UnsignedPolynomial<T>` whose variable is named by `var`, in one of three languages.
+    // Writes an `UnsignedPolynomial<T>` whose variable is named by `var`, in one of three
+    // languages.
     //
     // The destination is anything that can be written to rather than a `Formatter`, since a
     // `Formatter` cannot be made outside a `fmt` method, and the `to_*_string_with` functions need
@@ -89,7 +90,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
 }
 
 impl<T: PrimitiveUnsigned> Display for UnsignedPolynomial<T> {
-    /// Converts a [`UnsignedPolynomial`] to a [`String`].
+    /// Converts an [`UnsignedPolynomial`] to a [`String`].
     ///
     /// The variable is called `x`.
     /// [`to_string_with`](crate::polynomial::Polynomial::to_string_with) is the way to call it

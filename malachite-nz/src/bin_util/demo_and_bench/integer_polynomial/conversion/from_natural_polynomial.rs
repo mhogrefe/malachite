@@ -15,7 +15,11 @@ use malachite_nz::test_util::generators::natural_polynomial_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_polynomial_from_natural_polynomial);
-    register_bench!(runner, benchmark_integer_polynomial_from_natural_polynomial);
+    register_demo!(runner, demo_integer_polynomial_from_natural_polynomial_ref);
+    register_bench!(
+        runner,
+        benchmark_integer_polynomial_from_natural_polynomial_evaluation_strategy
+    );
 }
 
 fn demo_integer_polynomial_from_natural_polynomial(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -28,7 +32,21 @@ fn demo_integer_polynomial_from_natural_polynomial(gm: GenMode, config: &GenConf
     }
 }
 
-fn benchmark_integer_polynomial_from_natural_polynomial(
+fn demo_integer_polynomial_from_natural_polynomial_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for p in natural_polynomial_gen().get(gm, config).take(limit) {
+        println!(
+            "IntegerPolynomial::from(&{}) = {}",
+            p,
+            IntegerPolynomial::from(&p)
+        );
+    }
+}
+
+fn benchmark_integer_polynomial_from_natural_polynomial_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -36,14 +54,19 @@ fn benchmark_integer_polynomial_from_natural_polynomial(
 ) {
     run_benchmark(
         "IntegerPolynomial::from(NaturalPolynomial)",
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         natural_polynomial_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &natural_polynomial_bit_bucketer("p"),
-        &mut [("Malachite", &mut |p| {
-            let _ = IntegerPolynomial::from(p);
-        })],
+        &mut [
+            ("IntegerPolynomial::from(NaturalPolynomial)", &mut |p| {
+                let _ = IntegerPolynomial::from(p);
+            }),
+            ("IntegerPolynomial::from(&NaturalPolynomial)", &mut |p| {
+                let _ = IntegerPolynomial::from(&p);
+            }),
+        ],
     );
 }

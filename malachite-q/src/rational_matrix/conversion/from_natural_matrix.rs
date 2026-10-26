@@ -12,7 +12,7 @@ use malachite_base::matrix::Matrix;
 use malachite_nz::natural_matrix::NaturalMatrix;
 
 impl From<NaturalMatrix> for RationalMatrix {
-    /// Converts a [`NaturalMatrix`] to a [`RationalMatrix`].
+    /// Converts a [`NaturalMatrix`] to a [`RationalMatrix`], taking the [`NaturalMatrix`] by value.
     ///
     /// Every [`Natural`](malachite_nz::natural::Natural) is a [`Rational`], so nothing is lost and
     /// nothing can fail. The elements are converted one by one, so the height and width are
@@ -45,6 +45,46 @@ impl From<NaturalMatrix> for RationalMatrix {
             m.height(),
             m.width(),
             m.into_elements().into_iter().map(Rational::from).collect(),
+        )
+    }
+}
+
+impl From<&NaturalMatrix> for RationalMatrix {
+    /// Converts a [`NaturalMatrix`] to a [`RationalMatrix`], taking the [`NaturalMatrix`] by
+    /// reference.
+    ///
+    /// Every [`Natural`](malachite_nz::natural::Natural) is a [`Rational`], so nothing is lost and
+    /// nothing can fail. The elements are converted one by one, so the height and width are
+    /// unchanged.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of limbs of the
+    /// elements of `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::natural_matrix::NaturalMatrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let m = NaturalMatrix::from_str("[1, 2, 3; 4, 5, 6]").unwrap();
+    /// assert_eq!(RationalMatrix::from(&m).to_string(), "[1, 2, 3; 4, 5, 6]");
+    ///
+    /// assert_eq!(
+    ///     RationalMatrix::from(&NaturalMatrix::from_str("[]_{0,2}").unwrap()).to_string(),
+    ///     "[]_{0,2}"
+    /// );
+    /// ```
+    #[inline]
+    fn from(m: &NaturalMatrix) -> Self {
+        Self::from_owned_elements(
+            m.height(),
+            m.width(),
+            m.elements_ref().iter().map(Rational::from).collect(),
         )
     }
 }

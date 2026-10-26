@@ -641,6 +641,11 @@ documented by git history.
   system, identical to FLINT's `fmpz_mat_det_bound`, `fmpz_mat_det_bound_submatrix`, and
   `fmpz_mat_solve_bound` (computed, as in FLINT, with upper-bounding 30-bit floating-point
   magnitudes).
+- By-reference forms of the widening vector and polynomial conversions: `From<&UnsignedVector<T>>`
+  for `NaturalVector` and `IntegerVector`, `From<&NaturalVector>` for `IntegerVector`,
+  `From<&UnsignedPolynomial<T>>` for `NaturalPolynomial` and `IntegerPolynomial`, and
+  `From<&NaturalPolynomial>` for `IntegerPolynomial`, matching the narrowing conversions, which
+  already took either.
 
 ### malachite-q
 
@@ -651,7 +656,7 @@ documented by git history.
   lowest terms), `ToLatex` (elements as `\frac`s), `ToTypst` (elements as `frac`s), and serde
   support.
 - `From<UnsignedMatrix<T>>` (for every primitive unsigned `T`), `From<NaturalMatrix>`, and
-  `From<IntegerMatrix>` for `RationalMatrix`.
+  `From<IntegerMatrix>` for `RationalMatrix`, each by value or by reference.
 - `PartialEq` in both directions between `RationalMatrix` and each of `UnsignedMatrix<T>`,
   `NaturalMatrix`, and `IntegerMatrix`.
 - `TryFrom<RationalMatrix>` and `TryFrom<&RationalMatrix>` for `UnsignedMatrix<T>`, `NaturalMatrix`,
@@ -690,6 +695,10 @@ documented by git history.
   `IntegerMatrix`, giving the unique solution when $A$ is square and nonsingular, as FLINT's
   `fmpq_mat_solve` does, and `fmpq_mat_can_solve`'s otherwise. `inverse` returns the inverse, or
   `None` for a singular matrix, like `fmpq_mat_inv`.
+- By-reference forms of the widening vector and polynomial conversions: `From<&UnsignedVector<T>>`,
+  `From<&NaturalVector>`, and `From<&IntegerVector>` for `RationalVector`, and
+  `From<&UnsignedPolynomial<T>>`, `From<&NaturalPolynomial>`, and `From<&IntegerPolynomial>` for
+  `RationalPolynomial`.
 
 ### malachite-float
 

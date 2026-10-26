@@ -16,7 +16,8 @@ impl<T: PrimitiveUnsigned> From<UnsignedPolynomial<T>> for IntegerPolynomial
 where
     Integer: From<T>,
 {
-    /// Converts a [`UnsignedPolynomial`] to an [`IntegerPolynomial`].
+    /// Converts an [`UnsignedPolynomial`] to an [`IntegerPolynomial`], taking the
+    /// [`UnsignedPolynomial`] by value.
     ///
     /// Every unsigned primitive is an [`Integer`], so nothing is lost and nothing can fail. The
     /// coefficients are converted one by one, and the leading one stays nonzero, so the degree is
@@ -53,6 +54,51 @@ where
             p.into_coefficients_asc()
                 .into_iter()
                 .map(Integer::from)
+                .collect(),
+        )
+    }
+}
+
+impl<T: PrimitiveUnsigned> From<&UnsignedPolynomial<T>> for IntegerPolynomial
+where
+    Integer: From<T>,
+{
+    /// Converts an [`UnsignedPolynomial`] to an [`IntegerPolynomial`], taking the
+    /// [`UnsignedPolynomial`] by reference.
+    ///
+    /// Every unsigned primitive is an [`Integer`], so nothing is lost and nothing can fail. The
+    /// coefficients are converted one by one, and the leading one stays nonzero, so the degree is
+    /// unchanged.
+    ///
+    /// $f(p) = p$, read on the left over the coefficients and on the right over $\Z$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of coefficients.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// let p = UnsignedPolynomial::<u64>::from_str("x^2+3*x+2").unwrap();
+    /// assert_eq!(IntegerPolynomial::from(&p).to_string(), "x^2+3*x+2");
+    ///
+    /// assert_eq!(
+    ///     IntegerPolynomial::from(&UnsignedPolynomial::<u64>::default()).to_string(),
+    ///     "0"
+    /// );
+    /// ```
+    #[inline]
+    fn from(p: &UnsignedPolynomial<T>) -> Self {
+        Self::from_coefficients_asc(
+            p.coefficients_asc()
+                .iter()
+                .map(|&x| Integer::from(x))
                 .collect(),
         )
     }

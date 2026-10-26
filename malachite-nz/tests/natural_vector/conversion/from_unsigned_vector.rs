@@ -36,6 +36,8 @@ fn test_from_unsigned_vector() {
 fn from_unsigned_vector_properties() {
     unsigned_vector_gen().test_properties(|v| {
         let w = NaturalVector::from(v.clone());
+        // Converting by reference gives the same thing.
+        assert_eq!(NaturalVector::from(&v), w);
         // Nothing is lost: the dimension, every element, and the written form all survive.
         assert_eq!(w.dimension(), v.dimension());
         assert_eq!(w.to_string(), v.to_string());

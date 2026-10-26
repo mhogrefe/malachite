@@ -12,7 +12,8 @@ use crate::natural_polynomial::NaturalPolynomial;
 use malachite_base::polynomial::Polynomial;
 
 impl From<NaturalPolynomial> for IntegerPolynomial {
-    /// Converts a [`NaturalPolynomial`] to an [`IntegerPolynomial`].
+    /// Converts a [`NaturalPolynomial`] to an [`IntegerPolynomial`], taking the
+    /// [`NaturalPolynomial`] by value.
     ///
     /// Every polynomial with [`Natural`](crate::natural::Natural) coefficients is one with
     /// [`Integer`] coefficients, so nothing is lost and nothing can fail. The coefficients are
@@ -52,5 +53,43 @@ impl From<NaturalPolynomial> for IntegerPolynomial {
                 .map(Integer::from)
                 .collect(),
         )
+    }
+}
+
+impl From<&NaturalPolynomial> for IntegerPolynomial {
+    /// Converts a [`NaturalPolynomial`] to an [`IntegerPolynomial`], taking the
+    /// [`NaturalPolynomial`] by reference.
+    ///
+    /// Every polynomial with [`Natural`](crate::natural::Natural) coefficients is one with
+    /// [`Integer`] coefficients, so nothing is lost and nothing can fail. The coefficients are
+    /// converted one by one, and the leading one stays nonzero, so the degree is unchanged.
+    ///
+    /// $f(p) = p$, read on the left over $\N$ and on the right over $\Z$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of limbs of the
+    /// coefficients of `p`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    /// use malachite_nz::natural_polynomial::NaturalPolynomial;
+    ///
+    /// let p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();
+    /// assert_eq!(IntegerPolynomial::from(&p).to_string(), "x^2+3*x+2");
+    ///
+    /// assert_eq!(
+    ///     IntegerPolynomial::from(&NaturalPolynomial::default()).to_string(),
+    ///     "0"
+    /// );
+    /// ```
+    #[inline]
+    fn from(p: &NaturalPolynomial) -> Self {
+        Self::from_coefficients_asc(p.coefficients_asc().iter().map(Integer::from).collect())
     }
 }

@@ -11,7 +11,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 
 impl<T: PrimitiveUnsigned> ModPowerOf2IsReduced for UnsignedPolynomial<T> {
-    /// Returns whether a [`UnsignedPolynomial`] is reduced modulo $2^k$; in other words, whether
+    /// Returns whether an [`UnsignedPolynomial`] is reduced modulo $2^k$; in other words, whether
     /// every one of its coefficients has no more than $k$ significant bits.
     ///
     /// Asking that of every coefficient is asking it of the largest, so this is the number of

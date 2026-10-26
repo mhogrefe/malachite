@@ -15,9 +15,13 @@ use malachite_q::rational_polynomial::RationalPolynomial;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_polynomial_from_unsigned_polynomial);
+    register_demo!(
+        runner,
+        demo_rational_polynomial_from_unsigned_polynomial_ref
+    );
     register_bench!(
         runner,
-        benchmark_rational_polynomial_from_unsigned_polynomial
+        benchmark_rational_polynomial_from_unsigned_polynomial_evaluation_strategy
     );
 }
 
@@ -35,7 +39,21 @@ fn demo_rational_polynomial_from_unsigned_polynomial(
     }
 }
 
-fn benchmark_rational_polynomial_from_unsigned_polynomial(
+fn demo_rational_polynomial_from_unsigned_polynomial_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for p in unsigned_polynomial_gen().get(gm, config).take(limit) {
+        println!(
+            "RationalPolynomial::from(&{}) = {}",
+            p,
+            RationalPolynomial::from(&p)
+        );
+    }
+}
+
+fn benchmark_rational_polynomial_from_unsigned_polynomial_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -43,14 +61,25 @@ fn benchmark_rational_polynomial_from_unsigned_polynomial(
 ) {
     run_benchmark(
         "RationalPolynomial::from(UnsignedPolynomial<u64>)",
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         unsigned_polynomial_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &unsigned_polynomial_bit_bucketer("p"),
-        &mut [("Malachite", &mut |p| {
-            let _ = RationalPolynomial::from(p);
-        })],
+        &mut [
+            (
+                "RationalPolynomial::from(UnsignedPolynomial<u64>)",
+                &mut |p| {
+                    let _ = RationalPolynomial::from(p);
+                },
+            ),
+            (
+                "RationalPolynomial::from(&UnsignedPolynomial<u64>)",
+                &mut |p| {
+                    let _ = RationalPolynomial::from(&p);
+                },
+            ),
+        ],
     );
 }

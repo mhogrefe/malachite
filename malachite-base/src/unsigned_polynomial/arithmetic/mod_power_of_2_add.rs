@@ -306,8 +306,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Add<&UnsignedPolynomial<T>> for &UnsignedP
 }
 
 impl<T: PrimitiveUnsigned> ModPowerOf2AddAssign<Self> for UnsignedPolynomial<T> {
-    /// Adds a [`UnsignedPolynomial`] to a [`UnsignedPolynomial`] modulo $2^k$, in place, taking the
-    /// second by value. The coefficients of both must already be reduced modulo $2^k$.
+    /// Adds an [`UnsignedPolynomial`] to an [`UnsignedPolynomial`] modulo $2^k$, in place, taking
+    /// the second by value. The coefficients of both must already be reduced modulo $2^k$.
     ///
     /// $$
     /// p \gets p + q \bmod 2^k.
@@ -359,8 +359,8 @@ impl<T: PrimitiveUnsigned> ModPowerOf2AddAssign<Self> for UnsignedPolynomial<T> 
 }
 
 impl<T: PrimitiveUnsigned> ModPowerOf2AddAssign<&Self> for UnsignedPolynomial<T> {
-    /// Adds a [`UnsignedPolynomial`] to a [`UnsignedPolynomial`] modulo $2^k$, in place, taking the
-    /// second by reference. The coefficients of both must already be reduced modulo $2^k$.
+    /// Adds an [`UnsignedPolynomial`] to an [`UnsignedPolynomial`] modulo $2^k$, in place, taking
+    /// the second by reference. The coefficients of both must already be reduced modulo $2^k$.
     ///
     /// $$
     /// p \gets p + q \bmod 2^k.

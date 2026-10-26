@@ -11,7 +11,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 
 impl<T: PrimitiveUnsigned> ModIsReduced<T> for UnsignedPolynomial<T> {
-    /// Returns whether a [`UnsignedPolynomial`] is reduced modulo a [`u64`] $m$; in other words,
+    /// Returns whether an [`UnsignedPolynomial`] is reduced modulo a [`u64`] $m$; in other words,
     /// whether every one of its coefficients is less than $m$.
     ///
     /// Asking that of every coefficient is asking it of the largest, so this is a comparison

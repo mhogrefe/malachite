@@ -33,6 +33,8 @@ fn test_from_natural_matrix() {
 fn from_natural_matrix_properties() {
     natural_matrix_gen().test_properties(|m| {
         let n = RationalMatrix::from(m.clone());
+        // Converting by reference gives the same thing.
+        assert_eq!(RationalMatrix::from(&m), n);
         assert!(n.is_valid());
         // Nothing is lost: the shape, every element, and the written form all survive.
         assert_eq!((n.height(), n.width()), (m.height(), m.width()));

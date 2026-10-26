@@ -15,7 +15,7 @@ use alloc::vec::Vec;
 impl<T: PrimitiveUnsigned> ModPowerOf2 for UnsignedPolynomial<T> {
     type Output = Self;
 
-    /// Divides every coefficient of a [`UnsignedPolynomial`] by $2^k$, keeping the remainders,
+    /// Divides every coefficient of an [`UnsignedPolynomial`] by $2^k$, keeping the remainders,
     /// taking the polynomial by value.
     ///
     /// The result is reduced modulo $2^k$, which is to say that [`mod_power_of_2_is_reduced`](
@@ -82,7 +82,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2 for UnsignedPolynomial<T> {
 impl<T: PrimitiveUnsigned> ModPowerOf2 for &UnsignedPolynomial<T> {
     type Output = UnsignedPolynomial<T>;
 
-    /// Divides every coefficient of a [`UnsignedPolynomial`] by $2^k$, keeping the remainders,
+    /// Divides every coefficient of an [`UnsignedPolynomial`] by $2^k$, keeping the remainders,
     /// taking the polynomial by reference.
     ///
     /// See the documentation for the [`ModPowerOf2`] implementation on [`UnsignedPolynomial`] for
@@ -120,7 +120,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2 for &UnsignedPolynomial<T> {
 }
 
 impl<T: PrimitiveUnsigned> ModPowerOf2Assign for UnsignedPolynomial<T> {
-    /// Divides every coefficient of a [`UnsignedPolynomial`] by $2^k$, replacing the polynomial by
+    /// Divides every coefficient of an [`UnsignedPolynomial`] by $2^k$, replacing the polynomial by
     /// the one whose coefficients are the remainders.
     ///
     /// See the documentation for the [`ModPowerOf2`] implementation on [`UnsignedPolynomial`] for

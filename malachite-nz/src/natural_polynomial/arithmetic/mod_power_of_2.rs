@@ -26,7 +26,7 @@ impl ModPowerOf2 for NaturalPolynomial {
     /// coefficients. So $4x^2 + 3$ modulo $4$ is the constant $3$, not a quadratic with a zero
     /// leading coefficient.
     ///
-    /// Unlike a [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial),
+    /// Unlike an [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial),
     /// there is no power wide enough to leave every polynomial alone: a
     /// [`Natural`](crate::natural::Natural) coefficient can be larger than any $2^k$, so a large
     /// $k$ is as meaningful as a small one.

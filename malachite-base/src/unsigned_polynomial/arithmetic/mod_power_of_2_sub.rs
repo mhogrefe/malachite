@@ -325,7 +325,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Sub<&UnsignedPolynomial<T>> for &UnsignedP
 }
 
 impl<T: PrimitiveUnsigned> ModPowerOf2SubAssign<Self> for UnsignedPolynomial<T> {
-    /// Subtracts a [`UnsignedPolynomial`] from a [`UnsignedPolynomial`] modulo $2^k$, in place,
+    /// Subtracts an [`UnsignedPolynomial`] from an [`UnsignedPolynomial`] modulo $2^k$, in place,
     /// taking the second by value. The coefficients of both must already be reduced modulo $2^k$.
     ///
     /// $$
@@ -378,7 +378,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SubAssign<Self> for UnsignedPolynomial<T> 
 }
 
 impl<T: PrimitiveUnsigned> ModPowerOf2SubAssign<&Self> for UnsignedPolynomial<T> {
-    /// Subtracts a [`UnsignedPolynomial`] from a [`UnsignedPolynomial`] modulo $2^k$, in place,
+    /// Subtracts an [`UnsignedPolynomial`] from an [`UnsignedPolynomial`] modulo $2^k$, in place,
     /// taking the second by reference. The coefficients of both must already be reduced modulo
     /// $2^k$.
     ///

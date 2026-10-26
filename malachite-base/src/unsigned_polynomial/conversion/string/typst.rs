@@ -15,7 +15,7 @@ use crate::vars::xyz::XyzVars;
 use core::fmt::{Formatter, Result};
 
 impl<T: PrimitiveUnsigned> ToTypst for UnsignedPolynomial<T> {
-    /// Writes a [`UnsignedPolynomial`] as a Typst math-mode fragment.
+    /// Writes an [`UnsignedPolynomial`] as a Typst math-mode fragment.
     ///
     /// The variable is called `x`.
     /// [`to_typst_string_with`](crate::polynomial::Polynomial::to_typst_string_with) is the way to

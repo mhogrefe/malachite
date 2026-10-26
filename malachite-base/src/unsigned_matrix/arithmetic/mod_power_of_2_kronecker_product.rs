@@ -320,7 +320,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2KroneckerProduct<&UnsignedMatrix<T>> for &
 }
 
 impl<T: PrimitiveUnsigned> ModPowerOf2KroneckerProductAssign<Self> for UnsignedMatrix<T> {
-    /// Replaces a [`UnsignedMatrix`] with its Kronecker product with another [`UnsignedMatrix`]
+    /// Replaces an [`UnsignedMatrix`] with its Kronecker product with another [`UnsignedMatrix`]
     /// modulo $2^k$, taking the second by value.
     ///
     /// The elements of both matrices must already be reduced modulo $2^k$. The Kronecker product $A
@@ -373,7 +373,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2KroneckerProductAssign<Self> for UnsignedM
 }
 
 impl<T: PrimitiveUnsigned> ModPowerOf2KroneckerProductAssign<&Self> for UnsignedMatrix<T> {
-    /// Replaces a [`UnsignedMatrix`] with its Kronecker product with another [`UnsignedMatrix`]
+    /// Replaces an [`UnsignedMatrix`] with its Kronecker product with another [`UnsignedMatrix`]
     /// modulo $2^k$, taking the second by reference.
     ///
     /// The elements of both matrices must already be reduced modulo $2^k$. The Kronecker product $A

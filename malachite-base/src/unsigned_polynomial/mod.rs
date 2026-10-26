@@ -23,7 +23,7 @@ pub mod arithmetic;
 /// Implementations of [`Ord`] and [`PartialOrd`] for [`UnsignedPolynomial`], comparing two
 /// polynomials by their behavior for large arguments.
 pub mod comparison;
-/// Functions for converting a [`UnsignedPolynomial`] to and from other types.
+/// Functions for converting an [`UnsignedPolynomial`] to and from other types.
 pub mod conversion;
 /// Iterators that generate [`UnsignedPolynomial`]s without repetition.
 pub mod exhaustive;
@@ -56,12 +56,12 @@ pub struct UnsignedPolynomial<T: PrimitiveUnsigned> {
     coefficients: Vec<T>,
 }
 
-// A `UnsignedPolynomial` is its coefficients, so this is what is serialized: the list of them, in
+// An `UnsignedPolynomial` is its coefficients, so this is what is serialized: the list of them, in
 // the order they are held in. The wrapper is transparent, so the encoding is the list itself and
 // nothing around it.
 //
 // Deserializing goes through `TryFrom`, which rejects a list whose last coefficient is zero: such a
-// list is not a `UnsignedPolynomial`'s coefficients, and accepting it would build one that two
+// list is not an `UnsignedPolynomial`'s coefficients, and accepting it would build one that two
 // equal polynomials could disagree with.
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
@@ -92,7 +92,7 @@ impl<T: PrimitiveUnsigned> UnsignedPolynomial<T> {
         }
     }
 
-    /// Returns a reference to a [`UnsignedPolynomial`]'s coefficients, in ascending order.
+    /// Returns a reference to an [`UnsignedPolynomial`]'s coefficients, in ascending order.
     ///
     /// The first is the constant term and the last is the leading coefficient, so the slice is what
     /// [`from_coefficients_asc`](Self::from_coefficients_asc) would take back. It holds no trailing
@@ -208,7 +208,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         }
     }
 
-    /// Converts a [`Vec`] of [`u64`]s to a [`UnsignedPolynomial`].
+    /// Converts a [`Vec`] of [`u64`]s to an [`UnsignedPolynomial`].
     ///
     /// The coefficients are in ascending order, so that the first is the constant term. Trailing
     /// zeros are dropped, since a polynomial does not hold them; the [`Vec`] may therefore end with
@@ -245,7 +245,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         p
     }
 
-    /// Converts a [`UnsignedPolynomial`] to a [`Vec`] of [`u64`]s, in ascending order.
+    /// Converts an [`UnsignedPolynomial`] to a [`Vec`] of [`u64`]s, in ascending order.
     ///
     /// The first is the constant term and the last is the leading coefficient, so the [`Vec`] is
     /// what [`from_coefficients_asc`](Self::from_coefficients_asc) would take back. It holds no
@@ -276,7 +276,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         self.coefficients
     }
 
-    /// Returns the degree of a [`UnsignedPolynomial`].
+    /// Returns the degree of an [`UnsignedPolynomial`].
     ///
     /// The zero polynomial has no degree, and gives `None`. Every other polynomial's degree is the
     /// index of its leading coefficient, so that a nonzero constant has degree 0.
@@ -312,7 +312,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         self.coefficients.len().checked_sub(1).map(u64::exact_from)
     }
 
-    /// Returns the length of a [`UnsignedPolynomial`]: the number of coefficients it holds.
+    /// Returns the length of an [`UnsignedPolynomial`]: the number of coefficients it holds.
     ///
     /// A polynomial holds no trailing zeros, so its length is one more than its
     /// [`degree`](Self::degree), and the zero polynomial, which has no degree, has length 0.
@@ -344,7 +344,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         u64::exact_from(self.coefficients.len())
     }
 
-    /// Returns one of a [`UnsignedPolynomial`]'s coefficients.
+    /// Returns one of an [`UnsignedPolynomial`]'s coefficients.
     ///
     /// The index is the power of the variable the coefficient belongs to, so that index 0 gives the
     /// constant term. An index past the degree gives zero, which is the coefficient a polynomial
@@ -374,7 +374,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
             .unwrap_or(T::ZERO)
     }
 
-    /// Returns a [`UnsignedPolynomial`]'s leading coefficient.
+    /// Returns an [`UnsignedPolynomial`]'s leading coefficient.
     ///
     /// This is the coefficient of the highest power of the variable that the polynomial has one
     /// for. The zero polynomial has no such power, and gives zero, which is what every one of its
@@ -430,7 +430,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         self.coefficients.last() == Some(&T::ONE)
     }
 
-    /// Mutates one of a [`UnsignedPolynomial`]'s coefficients using a provided closure, and then
+    /// Mutates one of an [`UnsignedPolynomial`]'s coefficients using a provided closure, and then
     /// returns whatever the closure returns.
     ///
     /// The index is the power of the variable the coefficient belongs to. An index past the degree
@@ -487,7 +487,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         out
     }
 
-    /// Sets the coefficients of a [`UnsignedPolynomial`] of $x^i$ for $i$ in `start..end` to zero.
+    /// Sets the coefficients of an [`UnsignedPolynomial`] of $x^i$ for $i$ in `start..end` to zero.
     ///
     /// Indices past the degree are allowed; the coefficients there are zero already. Zeroing the
     /// leading coefficient lowers the degree, to that of the highest nonzero coefficient that
@@ -542,8 +542,8 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         }
     }
 
-    /// Truncates a [`UnsignedPolynomial`] to its first `len` coefficients, taking the polynomial by
-    /// reference and returning the result.
+    /// Truncates an [`UnsignedPolynomial`] to its first `len` coefficients, taking the polynomial
+    /// by reference and returning the result.
     ///
     /// The result is the polynomial reduced modulo $x^{\mathrm{len}}$: every term of degree `len`
     /// or more is dropped, and then any zeros left at the top go too, so the result may have fewer
@@ -613,7 +613,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         }
     }
 
-    /// Truncates a [`UnsignedPolynomial`] to its first `len` coefficients, in place.
+    /// Truncates an [`UnsignedPolynomial`] to its first `len` coefficients, in place.
     ///
     /// See [`truncate`](Self::truncate) for what the result is.
     ///
@@ -657,7 +657,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         }
     }
 
-    /// Reverses the coefficients of a [`UnsignedPolynomial`], considered as having length `len`,
+    /// Reverses the coefficients of an [`UnsignedPolynomial`], considered as having length `len`,
     /// taking the polynomial by reference.
     ///
     /// The polynomial is first truncated, or padded with zeros, to exactly `len` coefficients, and
@@ -735,8 +735,8 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         Self::from_coefficients_asc(coefficients)
     }
 
-    /// Reverses the coefficients of a [`UnsignedPolynomial`], considered as having length `len`, in
-    /// place.
+    /// Reverses the coefficients of an [`UnsignedPolynomial`], considered as having length `len`,
+    /// in place.
     ///
     /// See [`reverse`](Self::reverse) for what the result is.
     ///
@@ -795,7 +795,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         self.trim();
     }
 
-    /// Converts a [`UnsignedPolynomial`] to a [`String`], naming its variable with any
+    /// Converts an [`UnsignedPolynomial`] to a [`String`], naming its variable with any
     /// [`VarScheme`].
     ///
     /// The syntax is the one [`Display`](core::fmt::Display) writes, which that implementation
@@ -837,7 +837,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         s
     }
 
-    /// Converts a [`UnsignedPolynomial`] to a LaTeX math-mode fragment, naming its variable with
+    /// Converts an [`UnsignedPolynomial`] to a LaTeX math-mode fragment, naming its variable with
     /// any [`VarScheme`].
     ///
     /// The fragment is the one [`ToLatex`](crate::strings::latex::ToLatex) writes, which that
@@ -885,7 +885,7 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         s
     }
 
-    /// Converts a [`UnsignedPolynomial`] to a Typst math-mode fragment, naming its variable with
+    /// Converts an [`UnsignedPolynomial`] to a Typst math-mode fragment, naming its variable with
     /// any [`VarScheme`].
     ///
     /// The fragment is the one [`ToTypst`](crate::strings::typst::ToTypst) writes, which that
@@ -930,7 +930,8 @@ impl<T: PrimitiveUnsigned> Polynomial for UnsignedPolynomial<T> {
         s
     }
 
-    /// Converts a string to a [`UnsignedPolynomial`], with its variable named by any [`VarScheme`].
+    /// Converts a string to an [`UnsignedPolynomial`], with its variable named by any
+    /// [`VarScheme`].
     ///
     /// The syntax is the one [`FromStr`](core::str::FromStr) reads, which that implementation
     /// describes; the only difference is that the variable is whichever one is handed in rather

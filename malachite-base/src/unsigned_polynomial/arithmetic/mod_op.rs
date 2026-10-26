@@ -16,7 +16,7 @@ use core::ops::{Rem, RemAssign};
 impl<T: PrimitiveUnsigned> Rem<T> for UnsignedPolynomial<T> {
     type Output = Self;
 
-    /// Divides every coefficient of a [`UnsignedPolynomial`] by a [`u64`], keeping the remainders,
+    /// Divides every coefficient of an [`UnsignedPolynomial`] by a [`u64`], keeping the remainders,
     /// taking the polynomial by value.
     ///
     /// $p \\% m$ is the polynomial whose $i$th coefficient is $p_i \\% m$, and this is the
@@ -90,7 +90,7 @@ impl<T: PrimitiveUnsigned> Rem<T> for UnsignedPolynomial<T> {
 impl<T: PrimitiveUnsigned> Rem<T> for &UnsignedPolynomial<T> {
     type Output = UnsignedPolynomial<T>;
 
-    /// Divides every coefficient of a [`UnsignedPolynomial`] by a [`u64`], keeping the remainders,
+    /// Divides every coefficient of an [`UnsignedPolynomial`] by a [`u64`], keeping the remainders,
     /// taking the polynomial by reference.
     ///
     /// See the documentation for the [`Rem`] implementation on [`UnsignedPolynomial`] for details,
@@ -131,8 +131,8 @@ impl<T: PrimitiveUnsigned> Rem<T> for &UnsignedPolynomial<T> {
 }
 
 impl<T: PrimitiveUnsigned> RemAssign<T> for UnsignedPolynomial<T> {
-    /// Divides every coefficient of a [`UnsignedPolynomial`] by a [`u64`], replacing the polynomial
-    /// by the one whose coefficients are the remainders.
+    /// Divides every coefficient of an [`UnsignedPolynomial`] by a [`u64`], replacing the
+    /// polynomial by the one whose coefficients are the remainders.
     ///
     /// See the documentation for the [`Rem`] implementation on [`UnsignedPolynomial`] for details,
     /// including how reducing can lower the degree.
@@ -172,10 +172,10 @@ impl<T: PrimitiveUnsigned> RemAssign<T> for UnsignedPolynomial<T> {
 impl<T: PrimitiveUnsigned> Mod<T> for UnsignedPolynomial<T> {
     type Output = Self;
 
-    /// Divides every coefficient of a [`UnsignedPolynomial`] by a [`u64`], keeping the remainders,
+    /// Divides every coefficient of an [`UnsignedPolynomial`] by a [`u64`], keeping the remainders,
     /// taking the polynomial by value.
     ///
-    /// A [`UnsignedPolynomial`]'s coefficients are never negative, so there is nothing for this to
+    /// An [`UnsignedPolynomial`]'s coefficients are never negative, so there is nothing for this to
     /// do that `%` does not: the two agree everywhere, and this is the same operation under the
     /// name the mod-family traits use. See the documentation for the [`Rem`] implementation for
     /// details, including how reducing can lower the degree.
@@ -222,10 +222,10 @@ impl<T: PrimitiveUnsigned> Mod<T> for UnsignedPolynomial<T> {
 impl<T: PrimitiveUnsigned> Mod<T> for &UnsignedPolynomial<T> {
     type Output = UnsignedPolynomial<T>;
 
-    /// Divides every coefficient of a [`UnsignedPolynomial`] by a [`u64`], keeping the remainders,
+    /// Divides every coefficient of an [`UnsignedPolynomial`] by a [`u64`], keeping the remainders,
     /// taking the polynomial by reference.
     ///
-    /// This agrees with `%` everywhere, a [`UnsignedPolynomial`]'s coefficients never being
+    /// This agrees with `%` everywhere, an [`UnsignedPolynomial`]'s coefficients never being
     /// negative. See the documentation for the [`Rem`] implementation on [`UnsignedPolynomial`] for
     /// details.
     ///
@@ -257,10 +257,10 @@ impl<T: PrimitiveUnsigned> Mod<T> for &UnsignedPolynomial<T> {
 }
 
 impl<T: PrimitiveUnsigned> ModAssign<T> for UnsignedPolynomial<T> {
-    /// Divides every coefficient of a [`UnsignedPolynomial`] by a [`u64`], replacing the polynomial
-    /// by the one whose coefficients are the remainders.
+    /// Divides every coefficient of an [`UnsignedPolynomial`] by a [`u64`], replacing the
+    /// polynomial by the one whose coefficients are the remainders.
     ///
-    /// This agrees with `%=` everywhere, a [`UnsignedPolynomial`]'s coefficients never being
+    /// This agrees with `%=` everywhere, an [`UnsignedPolynomial`]'s coefficients never being
     /// negative. See the documentation for the [`Rem`] implementation on [`UnsignedPolynomial`] for
     /// details.
     ///

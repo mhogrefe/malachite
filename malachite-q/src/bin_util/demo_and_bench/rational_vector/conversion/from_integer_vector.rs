@@ -15,7 +15,11 @@ use malachite_q::rational_vector::RationalVector;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_vector_from_integer_vector);
-    register_bench!(runner, benchmark_rational_vector_from_integer_vector);
+    register_demo!(runner, demo_rational_vector_from_integer_vector_ref);
+    register_bench!(
+        runner,
+        benchmark_rational_vector_from_integer_vector_evaluation_strategy
+    );
 }
 
 fn demo_rational_vector_from_integer_vector(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -28,7 +32,17 @@ fn demo_rational_vector_from_integer_vector(gm: GenMode, config: &GenConfig, lim
     }
 }
 
-fn benchmark_rational_vector_from_integer_vector(
+fn demo_rational_vector_from_integer_vector_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for v in integer_vector_gen().get(gm, config).take(limit) {
+        println!(
+            "RationalVector::from(&{}) = {}",
+            v,
+            RationalVector::from(&v)
+        );
+    }
+}
+
+fn benchmark_rational_vector_from_integer_vector_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -36,14 +50,19 @@ fn benchmark_rational_vector_from_integer_vector(
 ) {
     run_benchmark(
         "RationalVector::from(IntegerVector)",
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         integer_vector_gen().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &integer_vector_bit_bucketer("v"),
-        &mut [("Malachite", &mut |v| {
-            let _ = RationalVector::from(v);
-        })],
+        &mut [
+            ("RationalVector::from(IntegerVector)", &mut |v| {
+                let _ = RationalVector::from(v);
+            }),
+            ("RationalVector::from(&IntegerVector)", &mut |v| {
+                let _ = RationalVector::from(&v);
+            }),
+        ],
     );
 }

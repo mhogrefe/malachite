@@ -13,7 +13,7 @@ use crate::unsigned_polynomial::UnsignedPolynomial;
 impl<T: PrimitiveUnsigned> Height for UnsignedPolynomial<T> {
     type Output = T;
 
-    /// Returns the height of a [`UnsignedPolynomial`]: the largest of its coefficients.
+    /// Returns the height of an [`UnsignedPolynomial`]: the largest of its coefficients.
     ///
     /// The zero polynomial has no coefficients, and its height is 0.
     ///
@@ -65,7 +65,7 @@ impl<T: PrimitiveUnsigned> Height for UnsignedPolynomial<T> {
             .unwrap_or(T::ZERO)
     }
 
-    /// Returns the height of a [`UnsignedPolynomial`], taking it by value.
+    /// Returns the height of an [`UnsignedPolynomial`], taking it by value.
     ///
     /// A [`u64`] is [`Copy`], so this is the same work as [`to_height`](Height::to_height); it is
     /// here so that the two spellings agree across the types that implement [`Height`].
@@ -101,7 +101,7 @@ impl<T: PrimitiveUnsigned> Height for UnsignedPolynomial<T> {
         self.to_height()
     }
 
-    /// Returns the number of significant bits of the height of a [`UnsignedPolynomial`].
+    /// Returns the number of significant bits of the height of an [`UnsignedPolynomial`].
     ///
     /// Since bit length is monotone, this is the largest of the coefficients' bit lengths, which is
     /// the bit length of the largest coefficient.
