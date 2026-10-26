@@ -131,8 +131,8 @@ pub fn charpoly_berkowitz_over_ring<R: BerkowitzRing>(
             cp[2] = ring.one();
         }
         _ => {
-            // `a` holds n - 1 rows of length n, and `big_a` is FLINT's `A`, the last row of
-            // FLINT's `a`.
+            // `a` holds n - 1 rows of length n, and `big_a` is FLINT's `A`, the last row of FLINT's
+            // `a`.
             let mut scratch = vec![ring.zero(); n * n];
             let (a, big_a) = scratch.split_at_mut((n - 1) * n);
             cp[0] = ring.neg(entry(0, 0));

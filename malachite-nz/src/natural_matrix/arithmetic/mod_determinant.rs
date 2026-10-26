@@ -16,15 +16,15 @@ use crate::natural_matrix::NaturalMatrix;
 use crate::natural_matrix::arithmetic::mod_lu_decomposition::{assert_reduced, lu_in_place};
 use crate::natural_matrix::arithmetic::mod_strong_echelon_form::to_limb_matrix;
 use alloc::vec;
-use malachite_base::unsigned_matrix::arithmetic::berkowitz_over_ring::{
-    BerkowitzRing, charpoly_berkowitz_over_ring,
-};
 use malachite_base::num::arithmetic::traits::{
-    AddMulAssign, ModAdd, ModAddAssign, ModDeterminant, ModMul, ModMulAssign, ModNeg,
-    ModNegAssign, ModSub, ModSubAssign, Parity,
+    AddMulAssign, ModAdd, ModAddAssign, ModDeterminant, ModMul, ModMulAssign, ModNeg, ModNegAssign,
+    ModSub, ModSubAssign, Parity,
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::NotAssign;
+use malachite_base::unsigned_matrix::arithmetic::berkowitz_over_ring::{
+    BerkowitzRing, charpoly_berkowitz_over_ring,
+};
 
 // The value ab - cd modulo m.
 //
@@ -135,10 +135,11 @@ impl BerkowitzRing for NaturalModBerkowitzRing<'_> {
 // This is equivalent to `_gr_mat_charpoly_berkowitz` from `gr_mat/charpoly_berkowitz.c`, FLINT
 // 3.6.0.
 pub(crate) fn charpoly_berkowitz(cp: &mut [Natural], xs: &[Natural], n: usize, m: &Natural) {
-    for (c, x) in cp
-        .iter_mut()
-        .zip(charpoly_berkowitz_over_ring(&NaturalModBerkowitzRing { m }, xs, n))
-    {
+    for (c, x) in cp.iter_mut().zip(charpoly_berkowitz_over_ring(
+        &NaturalModBerkowitzRing { m },
+        xs,
+        n,
+    )) {
         *c = x;
     }
 }

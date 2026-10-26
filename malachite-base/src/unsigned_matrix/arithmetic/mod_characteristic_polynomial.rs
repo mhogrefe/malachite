@@ -37,10 +37,10 @@ fn mul_monic_assign<T: PrimitiveUnsigned>(p: &mut Vec<T>, b: &[T], m: T) {
     }
 }
 
-// The coefficients of the characteristic polynomial of the n by n matrix with elements `xs`, reduced
-// modulo `m`, from the constant coefficient up, by Danilevsky's method, which reduces the matrix to
-// Frobenius normal form with similarity transforms; or `None` if a pivot is not invertible modulo
-// `m`, which cannot happen if `m` is prime.
+// The coefficients of the characteristic polynomial of the n by n matrix with elements `xs`,
+// reduced modulo `m`, from the constant coefficient up, by Danilevsky's method, which reduces the
+// matrix to Frobenius normal form with similarity transforms; or `None` if a pivot is not
+// invertible modulo `m`, which cannot happen if `m` is prime.
 //
 // This is equivalent to `_nmod_mat_charpoly_danilevsky` from `nmod_mat/charpoly.c`, FLINT 3.6.0.
 crate_test_fn! {
@@ -56,8 +56,9 @@ charpoly_danilevsky<T: PrimitiveUnsigned>(xs: &[T], n: usize, m: T) -> Option<Ve
     let mut a = xs.to_vec();
     let d = ModData::new(m, n);
     let mut p = vec![T::ONE];
-    let mut w = vec![T::ZERO; n];
-    let mut v = vec![T::ZERO; n];
+    // `w` is FLINT's `W`, a copy of a row, and `v` is FLINT's `V`, that row times a scalar.
+    let mut scratch = vec![T::ZERO; n << 1];
+    let (w, v) = scratch.split_at_mut(n);
     let mut i = 1;
     while i < n {
         let mut h = a[(n - i) * stride + n - i - 1];
@@ -132,9 +133,9 @@ charpoly_danilevsky<T: PrimitiveUnsigned>(xs: &[T], n: usize, m: T) -> Option<Ve
     Some(p)
 }}
 
-// The coefficients of the characteristic polynomial of the n by n matrix with elements `xs`, reduced
-// modulo `m`, from the constant coefficient up: by Danilevsky's method above dimension 8, if it
-// succeeds, and otherwise by Berkowitz's division-free algorithm.
+// The coefficients of the characteristic polynomial of the n by n matrix with elements `xs`,
+// reduced modulo `m`, from the constant coefficient up: by Danilevsky's method above dimension 8,
+// if it succeeds, and otherwise by Berkowitz's division-free algorithm.
 //
 // This is equivalent to `nmod_mat_charpoly` from `nmod_mat/charpoly.c`, FLINT 3.6.0, without the
 // path for prime moduli below 256 at dimension 32 and up, which computes the same polynomial.

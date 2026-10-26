@@ -62,9 +62,15 @@ fn test_characteristic_polynomial() {
     // - dimension 3
     test("[1, 2, 3; 4, 5, 6; 7, 8, 10]", "x^3-16*x^2-12*x+3");
     // - dimension 4: Berkowitz's algorithm
-    test("[2, -1, 0, 3; 1, 0, 4, -2; 0, 3, 1, 1; -1, 2, 0, 5]", "x^4-8*x^3+13*x^2+41*x-127");
+    test(
+        "[2, -1, 0, 3; 1, 0, 4, -2; 0, 3, 1, 1; -1, 2, 0, 5]",
+        "x^4-8*x^3+13*x^2+41*x-127",
+    );
     // - the zero matrix
-    test("[0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0]", "x^5");
+    test(
+        "[0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0]",
+        "x^5",
+    );
     // - the identity matrix: the multimodular algorithm
     test(
         "[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0; 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0; 0, 0, 1, 0, 0, 0\
@@ -189,7 +195,11 @@ fn characteristic_polynomial_properties() {
         assert_eq!(a.transpose().characteristic_polynomial(), p);
         // The bound holds.
         let bound = a.characteristic_polynomial_bound();
-        assert!(p.coefficients_asc().iter().all(|c| *c.unsigned_abs_ref() <= bound));
+        assert!(
+            p.coefficients_asc()
+                .iter()
+                .all(|c| *c.unsigned_abs_ref() <= bound)
+        );
     });
 
     integer_matrix_unsigned_integer_triple_gen_var_1().test_properties(|(a, r, d)| {

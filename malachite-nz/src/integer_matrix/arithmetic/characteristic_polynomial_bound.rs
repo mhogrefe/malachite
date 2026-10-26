@@ -11,16 +11,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_matrix::IntegerMatrix;
-use crate::natural::Natural;
 use crate::integer_matrix::arithmetic::mag::Mag;
+use crate::natural::Natural;
 use alloc::vec;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 // An upper bound for the absolute values of the coefficients of the characteristic polynomial of
-// the square matrix `a`: the coefficient of $x^{n-k}$ is a sum of $\binom{n}{k}$ principal minors of
-// size $k$, each bounded by Hadamard's inequality with the $k$ largest row norms, or the $k$ largest
-// column norms.
+// the square matrix `a`: the coefficient of $x^{n-k}$ is a sum of $\binom{n}{k}$ principal minors
+// of size $k$, each bounded by Hadamard's inequality with the $k$ largest row norms, or the $k$
+// largest column norms.
 //
 // This is equivalent to `fmpz_mat_charpoly_bound` from `fmpz_mat/charpoly_bound.c`, FLINT 3.6.0.
 pub(crate) fn characteristic_polynomial_bound_helper(a: &IntegerMatrix) -> Natural {

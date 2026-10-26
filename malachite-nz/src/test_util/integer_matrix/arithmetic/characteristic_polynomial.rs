@@ -12,21 +12,21 @@ use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{Determinant, Parity};
+use malachite_base::num::arithmetic::traits::{Determinant, Parity, PowerOf2};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::polynomial::Polynomial;
 
 // The characteristic polynomial of a square matrix from its principal minors: the coefficient of
-// $x^{n-k}$ is $(-1)^k$ times the sum of the determinants of the $k \times k$ principal submatrices,
-// so this takes time exponential in the dimension.
+// $x^{n-k}$ is $(-1)^k$ times the sum of the determinants of the $k \times k$ principal
+// submatrices, so this takes time exponential in the dimension.
 pub fn integer_matrix_characteristic_polynomial_naive(a: &IntegerMatrix) -> IntegerPolynomial {
     assert!(a.is_square(), "the matrix must be square");
     let n = usize::exact_from(a.height());
     let mut cp = vec![Integer::ZERO; n + 1];
-    for subset in 0..1u64 << n {
+    for subset in 0..u64::power_of_2(u64::exact_from(n)) {
         let indices: Vec<u64> = (0..u64::exact_from(n))
-            .filter(|&i| subset >> i & 1 != 0)
+            .filter(|&i| (subset >> i).odd())
             .collect();
         let k = indices.len();
         let elements = indices
@@ -45,7 +45,10 @@ pub fn integer_matrix_characteristic_polynomial_naive(a: &IntegerMatrix) -> Inte
 }
 
 // The polynomial `p` evaluated at the square matrix `a`, by Horner's rule.
-pub fn integer_polynomial_evaluate_at_matrix(p: &IntegerPolynomial, a: &IntegerMatrix) -> IntegerMatrix {
+pub fn integer_polynomial_evaluate_at_matrix(
+    p: &IntegerPolynomial,
+    a: &IntegerMatrix,
+) -> IntegerMatrix {
     let n = a.height();
     let mut result = IntegerMatrix::zero(n, n);
     for c in p.coefficients_asc().iter().rev() {

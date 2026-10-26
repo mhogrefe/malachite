@@ -33,7 +33,10 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_integer_matrix_characteristic_polynomial_naive_algorithms
     );
-    register_bench!(runner, benchmark_integer_matrix_characteristic_polynomial_bound);
+    register_bench!(
+        runner,
+        benchmark_integer_matrix_characteristic_polynomial_bound
+    );
 }
 
 fn demo_integer_matrix_characteristic_polynomial(gm: GenMode, config: &GenConfig, limit: usize) {

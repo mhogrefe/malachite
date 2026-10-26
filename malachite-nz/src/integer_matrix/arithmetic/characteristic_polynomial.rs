@@ -14,7 +14,7 @@
 
 use crate::integer::Integer;
 use crate::integer_matrix::IntegerMatrix;
-use crate::integer_matrix::arithmetic::characteristic_polynomial_bound::characteristic_polynomial_bound_helper;
+use crate::integer_matrix::arithmetic::characteristic_polynomial_bound::*;
 use crate::integer_matrix::arithmetic::mul::multi_mod::next_prime;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_vector::IntegerVector;
@@ -24,7 +24,9 @@ use crate::platform::Limb;
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{AddMulAssign, CharacteristicPolynomial, SubMulAssign};
+use malachite_base::num::arithmetic::traits::{
+    AddMulAssign, CharacteristicPolynomial, SubMulAssign,
+};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::polynomial::Polynomial;
@@ -170,10 +172,10 @@ charpoly_modular(a: &IntegerMatrix) -> Vec<Integer> {
 const fn berkowitz_max_dimension(bits: u64) -> usize {
     match bits {
         0..=16 => 8,
-        17..=32 => 10,
         33..=128 => 22,
         129..=256 => 20,
         257..=512 => 16,
+        // 17 to 32 bits, and more than 512
         _ => 10,
     }
 }
@@ -223,19 +225,19 @@ impl CharacteristicPolynomial for IntegerMatrix {
     /// Computes the characteristic polynomial of a square [`IntegerMatrix`], taking it by value.
     ///
     /// The characteristic polynomial of an $n \times n$ matrix $A$ is $\det(xI - A)$, a monic
-    /// polynomial of degree $n$ with integer coefficients; that of the $0 \times 0$ matrix is 1. Its
-    /// constant coefficient is $(-1)^n \det A$, and its coefficient of $x^{n-1}$ is $-\operatorname{tr}
-    /// A$.
+    /// polynomial of degree $n$ with integer coefficients; that of the $0 \times 0$ matrix is 1.
+    /// Its constant coefficient is $(-1)^n \det A$, and its coefficient of $x^{n-1}$ is
+    /// $-\operatorname{tr} A$.
     ///
     /// $$
     /// f(A) = \det(xI - A).
     /// $$
     ///
-    /// Matrices up to $3 \times 3$ use explicit formulas, and the zero matrix gives $x^n$. Otherwise,
-    /// if the dimension is small for the size of the elements (at most 8 to 22, depending on the
-    /// number of bits of the largest element), Berkowitz's division-free algorithm is used. For
-    /// larger dimensions, the polynomial is computed modulo enough word-sized primes for their
-    /// product to exceed twice
+    /// Matrices up to $3 \times 3$ use explicit formulas, and the zero matrix gives $x^n$.
+    /// Otherwise, if the dimension is small for the size of the elements (at most 8 to 22,
+    /// depending on the number of bits of the largest element), Berkowitz's division-free algorithm
+    /// is used. For larger dimensions, the polynomial is computed modulo enough word-sized primes
+    /// for their product to exceed twice
     /// [`characteristic_polynomial_bound`](IntegerMatrix::characteristic_polynomial_bound), by
     /// Danilevsky's method above dimension 8 (or Berkowitz's algorithm, if Danilevsky's method
     /// meets a pivot that is not invertible) and by Berkowitz's algorithm below, and the
@@ -262,14 +264,20 @@ impl CharacteristicPolynomial for IntegerMatrix {
     /// assert_eq!(a.clone().characteristic_polynomial().to_string(), "1");
     ///
     /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
-    /// assert_eq!(a.clone().characteristic_polynomial().to_string(), "x^2-5*x-2");
+    /// assert_eq!(
+    ///     a.clone().characteristic_polynomial().to_string(),
+    ///     "x^2-5*x-2"
+    /// );
     ///
     /// // A rotation by a right angle
     /// let a = IntegerMatrix::from_str("[0, -1; 1, 0]").unwrap();
     /// assert_eq!(a.clone().characteristic_polynomial().to_string(), "x^2+1");
     ///
     /// let a = IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6; 7, 8, 10]").unwrap();
-    /// assert_eq!(a.clone().characteristic_polynomial().to_string(), "x^3-16*x^2-12*x+3");
+    /// assert_eq!(
+    ///     a.clone().characteristic_polynomial().to_string(),
+    ///     "x^3-16*x^2-12*x+3"
+    /// );
     ///
     /// let a = IntegerMatrix::from_str("[0, 0; 0, 0]").unwrap();
     /// assert_eq!(a.clone().characteristic_polynomial().to_string(), "x^2");
@@ -287,22 +295,23 @@ impl CharacteristicPolynomial for IntegerMatrix {
 impl CharacteristicPolynomial for &IntegerMatrix {
     type Output = IntegerPolynomial;
 
-    /// Computes the characteristic polynomial of a square [`IntegerMatrix`], taking it by reference.
+    /// Computes the characteristic polynomial of a square [`IntegerMatrix`], taking it by
+    /// reference.
     ///
     /// The characteristic polynomial of an $n \times n$ matrix $A$ is $\det(xI - A)$, a monic
-    /// polynomial of degree $n$ with integer coefficients; that of the $0 \times 0$ matrix is 1. Its
-    /// constant coefficient is $(-1)^n \det A$, and its coefficient of $x^{n-1}$ is $-\operatorname{tr}
-    /// A$.
+    /// polynomial of degree $n$ with integer coefficients; that of the $0 \times 0$ matrix is 1.
+    /// Its constant coefficient is $(-1)^n \det A$, and its coefficient of $x^{n-1}$ is
+    /// $-\operatorname{tr} A$.
     ///
     /// $$
     /// f(A) = \det(xI - A).
     /// $$
     ///
-    /// Matrices up to $3 \times 3$ use explicit formulas, and the zero matrix gives $x^n$. Otherwise,
-    /// if the dimension is small for the size of the elements (at most 8 to 22, depending on the
-    /// number of bits of the largest element), Berkowitz's division-free algorithm is used. For
-    /// larger dimensions, the polynomial is computed modulo enough word-sized primes for their
-    /// product to exceed twice
+    /// Matrices up to $3 \times 3$ use explicit formulas, and the zero matrix gives $x^n$.
+    /// Otherwise, if the dimension is small for the size of the elements (at most 8 to 22,
+    /// depending on the number of bits of the largest element), Berkowitz's division-free algorithm
+    /// is used. For larger dimensions, the polynomial is computed modulo enough word-sized primes
+    /// for their product to exceed twice
     /// [`characteristic_polynomial_bound`](IntegerMatrix::characteristic_polynomial_bound), by
     /// Danilevsky's method above dimension 8 (or Berkowitz's algorithm, if Danilevsky's method
     /// meets a pivot that is not invertible) and by Berkowitz's algorithm below, and the
@@ -336,7 +345,10 @@ impl CharacteristicPolynomial for &IntegerMatrix {
     /// assert_eq!((&a).characteristic_polynomial().to_string(), "x^2+1");
     ///
     /// let a = IntegerMatrix::from_str("[1, 2, 3; 4, 5, 6; 7, 8, 10]").unwrap();
-    /// assert_eq!((&a).characteristic_polynomial().to_string(), "x^3-16*x^2-12*x+3");
+    /// assert_eq!(
+    ///     (&a).characteristic_polynomial().to_string(),
+    ///     "x^3-16*x^2-12*x+3"
+    /// );
     ///
     /// let a = IntegerMatrix::from_str("[0, 0; 0, 0]").unwrap();
     /// assert_eq!((&a).characteristic_polynomial().to_string(), "x^2");
