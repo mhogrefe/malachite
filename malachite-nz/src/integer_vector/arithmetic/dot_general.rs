@@ -111,11 +111,22 @@ pub(crate) fn coefficient_from_signed_triple<C: PolynomialCoefficient>(
     }
 }
 
-// The `Integer` with absolute value `(xs, xn)`, negated if `negative`.
+// Sets `out` to the coefficient whose two's complement representation is the three limbs `(x2, x1,
+// x0)`, reusing its limb vector when it has one.
 //
-// This is equivalent to `_fmpz_set_mpn` from `fmpz_vec/dot.c`, FLINT 3.6.0.
-fn coefficient_from_limbs<C: PolynomialCoefficient>(xs: &[Limb], xn: usize, negative: bool) -> C {
-    C::from_sign_and_abs(!negative, Natural::from_limbs_asc(&xs[..xn]))
+// This is equivalent to `fmpz_set_signed_uiuiui` from `fmpz.h`, FLINT 3.6.0.
+fn assign_coefficient_from_signed_triple<C: PolynomialCoefficient>(
+    out: &mut C,
+    x2: Limb,
+    x1: Limb,
+    x0: Limb,
+) {
+    if x2.get_highest_bit() {
+        let (y2, y1, y0) = Limb::xxx_sub_yyy_to_zzz(0, 0, 0, x2, x1, x0);
+        out.assign_sign_and_limbs(false, &[y0, y1, y2]);
+    } else {
+        out.assign_sign_and_limbs(true, &[x0, x1, x2]);
+    }
 }
 
 // Returns `initial` plus, or if `subtract` minus, the dot product of `xs` and `ys`, which must have
@@ -191,10 +202,29 @@ pub(crate) fn vec_dot_general_strided_with_scratch<C: PolynomialCoefficient>(
     reverse: bool,
     buffers: &mut DotScratch,
 ) -> C {
+    let mut out = C::ZERO;
+    vec_dot_general_strided_to_out(
+        &mut out, initial, subtract, xs, ys, stride, reverse, buffers,
+    );
+    out
+}
+
+// Like `vec_dot_general_strided_with_scratch`, but setting `out` to the result, and reusing its
+// limb vector when it has one, as FLINT does.
+pub(crate) fn vec_dot_general_strided_to_out<C: PolynomialCoefficient>(
+    out: &mut C,
+    initial: Option<&C>,
+    subtract: bool,
+    xs: &[C],
+    ys: &[C],
+    stride: usize,
+    reverse: bool,
+    buffers: &mut DotScratch,
+) {
     let len = xs.len();
     assert!(len == 0 || ys.len() > (len - 1) * stride);
     if len <= 1 {
-        return if let Some(initial) = initial {
+        *out = if let Some(initial) = initial {
             let mut result = initial.clone();
             if len == 1 {
                 if subtract {
@@ -210,6 +240,7 @@ pub(crate) fn vec_dot_general_strided_with_scratch<C: PolynomialCoefficient>(
         } else {
             C::ZERO
         };
+        return;
     }
     let mut s0: Limb = 0;
     let mut s1: Limb = 0;
@@ -313,7 +344,8 @@ pub(crate) fn vec_dot_general_strided_with_scratch<C: PolynomialCoefficient>(
         if subtract {
             (s2, s1, s0) = Limb::xxx_sub_yyy_to_zzz(0, 0, 0, s2, s1, s0);
         }
-        return coefficient_from_signed_triple(s2, s1, s0);
+        assign_coefficient_from_signed_triple(out, s2, s1, s0);
+        return;
     }
     // Add the small terms to the large ones, through `t`, which is free here. FLINT adds them even
     // when they are zero.
@@ -332,10 +364,11 @@ pub(crate) fn vec_dot_general_strided_with_scratch<C: PolynomialCoefficient>(
 
     mpn_norm(pos, &mut posn);
     mpn_norm(neg, &mut negn);
+    // This is equivalent to `_fmpz_set_mpn` from `fmpz_vec/dot.c`, FLINT 3.6.0.
     if negn == 0 {
-        coefficient_from_limbs(pos, posn, subtract)
+        out.assign_sign_and_limbs(!subtract, &pos[..posn]);
     } else if posn == 0 {
-        coefficient_from_limbs(neg, negn, !subtract)
+        out.assign_sign_and_limbs(subtract, &neg[..negn]);
     } else {
         // Do the subtraction.
         let mut tneg = false;
@@ -357,6 +390,6 @@ pub(crate) fn vec_dot_general_strided_with_scratch<C: PolynomialCoefficient>(
             limbs_sub_greater_to_out(&mut t[..tn], &pos[..posn], &neg[..negn]);
         }
         mpn_norm(t, &mut tn);
-        coefficient_from_limbs(t, tn, tneg ^ subtract)
+        out.assign_sign_and_limbs(!(tneg ^ subtract), &t[..tn]);
     }
 }

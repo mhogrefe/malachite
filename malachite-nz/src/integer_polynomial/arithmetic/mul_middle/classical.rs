@@ -13,8 +13,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::mul_truncated::classical::product_coefficient;
-use crate::integer_polynomial::arithmetic::square_truncated::classical::square_coefficient;
+use crate::integer_polynomial::arithmetic::mul_truncated::classical::product_coefficient_to_out;
+use crate::integer_polynomial::arithmetic::square_truncated::classical::square_coefficient_to_out;
 use crate::integer_vector::arithmetic::dot_general::DotScratch;
 use core::ptr;
 
@@ -50,12 +50,12 @@ crate_test_fn! {mul_middle_to_out_classical<C: PolynomialCoefficient>(
     } else if ptr::eq(xs, ys) {
         let mut buffers = DotScratch::default();
         for (o, i) in out.iter_mut().zip(nlo..nhi) {
-            *o = square_coefficient(xs, i, &mut buffers);
+            square_coefficient_to_out(o, xs, i, &mut buffers);
         }
     } else {
         let mut buffers = DotScratch::default();
         for (o, i) in out.iter_mut().zip(nlo..nhi) {
-            *o = product_coefficient(xs, ys, i, &mut buffers);
+            product_coefficient_to_out(o, xs, ys, i, &mut buffers);
         }
     }
 }}

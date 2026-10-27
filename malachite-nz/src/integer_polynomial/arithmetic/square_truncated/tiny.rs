@@ -14,10 +14,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::coefficient::{PolynomialCoefficient, small_values};
+use crate::integer_polynomial::arithmetic::coefficient::{PolynomialCoefficient, small_value};
+use crate::integer_polynomial::arithmetic::mul_truncated::tiny::TINY_STACK_LEN;
 use crate::platform::{SignedDoubleLimb, SignedLimb};
 use alloc::vec;
-use alloc::vec::Vec;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -44,8 +44,35 @@ pub(crate) fn square_truncated_to_out_tiny<
     xs: &[C],
 ) {
     let n = out.len();
-    let xs: Vec<T> = small_values(&xs[..xs.len().min(n)]);
-    let mut res = vec![T::ZERO; n];
+    let xs = &xs[..xs.len().min(n)];
+    // Short squares, the common case, sum on the stack, as FLINT's do.
+    if n <= TINY_STACK_LEN {
+        let mut xs_values = [T::ZERO; TINY_STACK_LEN];
+        let mut res = [T::ZERO; TINY_STACK_LEN];
+        square_truncated_to_out_tiny_with(out, xs, &mut xs_values[..xs.len()], &mut res[..n]);
+    } else {
+        let mut buffer = vec![T::ZERO; xs.len() + n];
+        let (xs_values, res) = buffer.split_at_mut(xs.len());
+        square_truncated_to_out_tiny_with(out, xs, xs_values, res);
+    }
+}
+
+// `square_truncated_to_out_tiny`, with `xs_values` to hold the values of `xs`, which it must have
+// the length of, and `res` to sum in, which must be zero and have the length of `out`.
+fn square_truncated_to_out_tiny_with<
+    T: PrimitiveSigned + From<SignedLimb>,
+    C: PolynomialCoefficient + ExactFrom<T>,
+>(
+    out: &mut [C],
+    xs: &[C],
+    xs_values: &mut [T],
+    res: &mut [T],
+) {
+    let n = out.len();
+    for (v, x) in xs_values.iter_mut().zip(xs) {
+        *v = T::from(small_value(x).unwrap());
+    }
+    let xs = &*xs_values;
     for (i, &x) in xs.iter().enumerate() {
         if x != T::ZERO {
             if i << 1 < n {
@@ -60,7 +87,7 @@ pub(crate) fn square_truncated_to_out_tiny<
             }
         }
     }
-    for (o, r) in out.iter_mut().zip(res) {
+    for (o, &r) in out.iter_mut().zip(&*res) {
         *o = C::exact_from(r);
     }
 }

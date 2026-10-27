@@ -669,7 +669,8 @@ documented by git history.
   reduction to Hessenberg form with pivots of smallest 2-adic valuation, in $O(n^3)$ ring
   operations, agreeing with FLINT's `fmpz_mod_mat_charpoly` modulo $2^k$.
 - New `ComposeTruncated` and `ComposeTruncatedAssign` traits in malachite-base, implemented for
-  `IntegerPolynomial` and `NaturalPolynomial` with either polynomial by value or by reference: composition of power series,
+  `IntegerPolynomial`, `NaturalPolynomial`, and `RationalPolynomial` (in malachite-q) with either
+  polynomial by value or by reference: composition of power series,
   $p(q(x)) \bmod x^n$, like FLINT's `fmpz_poly_compose_series`, with Horner's rule, the Brent–Kung
   algorithm (built on `IntegerMatrix` multiplication), and the near-linear algorithm of Kinoshita
   and Li, chosen by measured cutoffs; outer coefficients that cannot contribute are skipped, and

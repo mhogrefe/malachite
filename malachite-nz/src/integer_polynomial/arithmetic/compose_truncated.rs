@@ -326,12 +326,17 @@ fn compose_truncated_monomial(xs: &[Integer], c: &Integer, v: usize, n: usize) -
 // most `bits` bits. Each of Horner's `len1` steps multiplies by the inner polynomial, while the
 // Brent–Kung algorithm costs about $\sqrt n$ full products. Measured on this machine, Horner's
 // rule is about as fast or faster up to $2.5\sqrt n$ outer coefficients, and for any number when
-// the inner polynomial has at most 5 coefficients and they are not small, so that the full products
-// the other algorithms rely on are expensive. FLINT uses Horner's rule up to 10 outer coefficients,
-// whatever the other lengths.
+// the inner polynomial has at most 5 coefficients, unless the result is of medium length and the
+// coefficients are small: the Brent–Kung algorithm is faster when $nb^2 < 6144$ and $nb > 64$,
+// where $b$ is `bits`. FLINT uses Horner's rule up to 10 outer coefficients, whatever the other
+// lengths.
 fn horner_preferred(len1: usize, len2: usize, n: usize, bits: u64) -> bool {
-    let (len1, n) = (u128::exact_from(len1), u128::exact_from(n));
-    (len1 * len1) << 2 <= 25 * n || (len2 <= 5 && bits >= 8)
+    let (len1, n, bits) = (
+        u128::exact_from(len1),
+        u128::exact_from(n),
+        u128::from(bits),
+    );
+    (len1 * len1) << 2 <= 25 * n || (len2 <= 5 && (n * bits * bits >= 6144 || n * bits <= 64))
 }
 
 // Whether the Kinoshita–Li algorithm is used rather than the Brent–Kung algorithm, for an outer

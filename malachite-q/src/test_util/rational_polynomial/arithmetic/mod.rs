@@ -10,6 +10,7 @@ pub mod add;
 pub mod add_truncated;
 pub mod compose;
 pub mod compose_power_of_x;
+pub mod compose_truncated;
 pub mod deflate_power_of_x;
 pub mod derivative;
 pub mod div_power_of_x;

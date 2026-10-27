@@ -13,16 +13,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_vector::arithmetic::dot_general::{
-    DotScratch, vec_dot_general_strided_with_scratch,
-};
+use crate::integer_vector::arithmetic::dot_general::{DotScratch, vec_dot_general_strided_to_out};
 use core::cmp::min;
 use malachite_base::num::arithmetic::traits::Parity;
 
-// The coefficient of $x^i$ in the square of the polynomial with coefficients `xs`, which is
-// nonempty, where `i < 2 * xs.len() - 1`: twice the dot product of the coefficients of $x^j$ and
-// $x^{i-j}$ over the $j < i / 2$ for which both exist, plus the square of the coefficient of
-// $x^{i/2}$ if `i` is even. The dot product sums in `buffers`.
+// Sets `out` to the coefficient of $x^i$ in the square of the polynomial with coefficients `xs`,
+// which is nonempty, where `i < 2 * xs.len() - 1`: twice the dot product of the coefficients of
+// $x^j$ and $x^{i-j}$ over the $j < i / 2$ for which both exist, plus the square of the coefficient
+// of $x^{i/2}$ if `i` is even, reusing the limb vector of `out` when it has one. The dot product
+// sums in `buffers`.
 //
 // # Worst-case complexity
 // $T(n, m) = O(nm \log m \log\log m)$
@@ -31,14 +30,16 @@ use malachite_base::num::arithmetic::traits::Parity;
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is the largest number of
 // significant bits of any element of `xs`.
-pub(crate) fn square_coefficient<C: PolynomialCoefficient>(
+pub(crate) fn square_coefficient_to_out<C: PolynomialCoefficient>(
+    out: &mut C,
     xs: &[C],
     i: usize,
     buffers: &mut DotScratch,
-) -> C {
+) {
     let start = (i + 1).saturating_sub(xs.len());
     let stop = min(xs.len(), (i + 1) >> 1);
-    let mut c = vec_dot_general_strided_with_scratch(
+    vec_dot_general_strided_to_out(
+        out,
         None,
         false,
         &xs[start..stop],
@@ -47,11 +48,10 @@ pub(crate) fn square_coefficient<C: PolynomialCoefficient>(
         true,
         buffers,
     );
-    c.double_assign();
+    out.double_assign();
     if i.even() {
-        c.add_mul_assign(&xs[i >> 1], &xs[i >> 1]);
+        out.add_mul_assign(&xs[i >> 1], &xs[i >> 1]);
     }
-    c
 }
 
 // Sets `out` to the first `out.len()` coefficients of the square of the polynomial with
@@ -75,6 +75,6 @@ crate_test_fn! {square_truncated_to_out_classical<C: PolynomialCoefficient>(
     let xs = &xs[..min(xs.len(), out.len())];
     let mut buffers = DotScratch::default();
     for (i, o) in out.iter_mut().enumerate() {
-        *o = square_coefficient(xs, i, &mut buffers);
+        square_coefficient_to_out(o, xs, i, &mut buffers);
     }
 }}

@@ -2240,6 +2240,24 @@ fn test_against_flint() {
             "fmpz_poly_compose_series",
         );
     }
+    // The generated cases from compose_truncated_properties in malachite-q's RationalPolynomial
+    // tests: all six forms, and long lengths.
+    for demo_name in [
+        "demo_rational_polynomial_compose_truncated",
+        "demo_rational_polynomial_compose_truncated_val_ref",
+        "demo_rational_polynomial_compose_truncated_ref_val",
+        "demo_rational_polynomial_compose_truncated_ref_ref",
+        "demo_rational_polynomial_compose_truncated_assign",
+        "demo_rational_polynomial_compose_truncated_assign_ref",
+        "demo_rational_polynomial_compose_truncated_long",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-q",
+            demo_name,
+            "fmpq_poly_compose_series",
+        );
+    }
     // The generated cases from compose_properties in malachite-nz's NaturalPolynomial tests: all six
     // forms, long polynomials, and linear inner polynomials.
     for demo_name in [

@@ -13,15 +13,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_vector::arithmetic::dot_general::{
-    DotScratch, vec_dot_general_strided_with_scratch,
-};
+use crate::integer_vector::arithmetic::dot_general::{DotScratch, vec_dot_general_strided_to_out};
 use core::cmp::min;
 
-// The coefficient of $x^i$ in the product of the polynomials with coefficients `xs` and `ys`, both
-// nonempty, where `i < xs.len() + ys.len() - 1`: the dot product of the coefficients of $x^j$ in
-// the first and of $x^{i-j}$ in the second, over the $j$ for which both exist. The dot product sums
-// in `buffers`.
+// Sets `out` to the coefficient of $x^i$ in the product of the polynomials with coefficients `xs`
+// and `ys`, both nonempty, where `i < xs.len() + ys.len() - 1`: the dot product of the coefficients
+// of $x^j$ in the first and of $x^{i-j}$ in the second, over the $j$ for which both exist, reusing
+// the limb vector of `out` when it has one. The dot product sums in `buffers`.
 //
 // # Worst-case complexity
 // $T(n, m) = O(nm \log m \log\log m)$
@@ -30,16 +28,18 @@ use core::cmp::min;
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `min(xs.len(), ys.len())`, and $m$ is the
 // largest number of significant bits of any element of `xs` or `ys`.
-pub(crate) fn product_coefficient<C: PolynomialCoefficient>(
+pub(crate) fn product_coefficient_to_out<C: PolynomialCoefficient>(
+    out: &mut C,
     xs: &[C],
     ys: &[C],
     i: usize,
     buffers: &mut DotScratch,
-) -> C {
+) {
     let top1 = min(xs.len() - 1, i);
     let top2 = min(ys.len() - 1, i);
     let n = top1 + top2 + 1 - i;
-    vec_dot_general_strided_with_scratch(
+    vec_dot_general_strided_to_out(
+        out,
         None,
         false,
         &xs[i - top2..i - top2 + n],
@@ -47,7 +47,7 @@ pub(crate) fn product_coefficient<C: PolynomialCoefficient>(
         1,
         true,
         buffers,
-    )
+    );
 }
 
 // Sets `out` to the first `out.len()` coefficients of the product of the polynomials with
@@ -79,7 +79,7 @@ crate_test_fn! {mul_truncated_to_out_classical<C: PolynomialCoefficient>(
     } else {
         let mut buffers = DotScratch::default();
         for (i, o) in out.iter_mut().enumerate() {
-            *o = product_coefficient(xs, ys, i, &mut buffers);
+            product_coefficient_to_out(o, xs, ys, i, &mut buffers);
         }
     }
 }}

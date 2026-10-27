@@ -12,10 +12,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::coefficient::{PolynomialCoefficient, small_values};
+use crate::integer_polynomial::arithmetic::coefficient::{PolynomialCoefficient, small_value};
 use crate::platform::{SignedDoubleLimb, SignedLimb};
 use alloc::vec;
-use alloc::vec::Vec;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -44,21 +43,49 @@ pub(crate) fn mul_truncated_to_out_tiny<
     ys: &[C],
 ) {
     let n = out.len();
-    let ys: Vec<T> = small_values(&ys[..ys.len().min(n)]);
-    let mut res = vec![T::ZERO; n];
-    for (i, x) in small_values::<T, _>(&xs[..xs.len().min(n)])
-        .into_iter()
-        .enumerate()
-    {
+    let ys = &ys[..ys.len().min(n)];
+    // Short products, the common case, sum on the stack, as FLINT's do.
+    if n <= TINY_STACK_LEN {
+        let mut ys_values = [T::ZERO; TINY_STACK_LEN];
+        let mut res = [T::ZERO; TINY_STACK_LEN];
+        mul_truncated_to_out_tiny_with(out, xs, ys, &mut ys_values[..ys.len()], &mut res[..n]);
+    } else {
+        let mut buffer = vec![T::ZERO; ys.len() + n];
+        let (ys_values, res) = buffer.split_at_mut(ys.len());
+        mul_truncated_to_out_tiny_with(out, xs, ys, ys_values, res);
+    }
+}
+
+// The length up to which the tiny kernels keep their values and sums on the stack.
+pub(crate) const TINY_STACK_LEN: usize = 64;
+
+// `mul_truncated_to_out_tiny`, with `ys_values` to hold the values of `ys`, which it must have the
+// length of, and `res` to sum in, which must be zero and have the length of `out`.
+fn mul_truncated_to_out_tiny_with<
+    T: PrimitiveSigned + From<SignedLimb>,
+    C: PolynomialCoefficient + ExactFrom<T>,
+>(
+    out: &mut [C],
+    xs: &[C],
+    ys: &[C],
+    ys_values: &mut [T],
+    res: &mut [T],
+) {
+    let n = out.len();
+    for (v, y) in ys_values.iter_mut().zip(ys) {
+        *v = T::from(small_value(y).unwrap());
+    }
+    for (i, x) in xs[..xs.len().min(n)].iter().enumerate() {
+        let x = T::from(small_value(x).unwrap());
         if x != T::ZERO {
-            for (r, &y) in res[i..].iter_mut().zip(&ys) {
+            for (r, &y) in res[i..].iter_mut().zip(&*ys_values) {
                 if y != T::ZERO {
                     *r += x * y;
                 }
             }
         }
     }
-    for (o, r) in out.iter_mut().zip(res) {
+    for (o, &r) in out.iter_mut().zip(&*res) {
         *o = C::exact_from(r);
     }
 }
