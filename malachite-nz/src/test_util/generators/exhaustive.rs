@@ -8823,3 +8823,27 @@ pub fn exhaustive_integer_vector_unsigned_vec_pair_gen_var_1() -> It<(IntegerVec
         ))
     })
 }
+
+// Triples `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 19.
+pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_3()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_natural_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+        )
+        .map(|(p, q, len)| (p, q.mul_power_of_x(1), len)),
+    )
+}
+
+// Triples `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 1000.
+pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_4()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_natural_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 1000),
+        )
+        .map(|(p, q, len)| (p, q.mul_power_of_x(1), len)),
+    )
+}

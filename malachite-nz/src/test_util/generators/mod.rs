@@ -437,6 +437,26 @@ pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_2()
     )
 }
 
+// All `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 19.
+pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_3()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_3,
+        &random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_3,
+        &special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 1000.
+pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_4()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_4,
+        &random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_4,
+        &special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_4,
+    )
+}
+
 // All `(NaturalPolynomial, NaturalPolynomial, u64, u64)` where the first `u64` is a small length
 // and the coefficients of both polynomials are less than 2 to the power of the second `u64`. The
 // random polynomials are reduced from arbitrary ones, so sums often wrap around.

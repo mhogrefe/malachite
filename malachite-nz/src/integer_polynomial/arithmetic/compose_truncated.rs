@@ -129,8 +129,8 @@ fn zero_gaps(xs: &mut [Integer], stride: usize, filled: usize) {
     }
 }
 
-// The parameters of one level of the Kinoshita–Li algorithm: the x-degree bound `xn` of $Q_k$, the
-// lower y-index `ylo` of the wanted slice, the y-degree bound `ydeg` of $Q_k$, and the offset
+// The parameters of one level of the Kinoshita–Li algorithm: the x-degree bound `xn` of $Q_k$,
+// the lower y-index `ylo` of the wanted slice, the y-degree bound `ydeg` of $Q_k$, and the offset
 // `qoff` of $Q_k$ in the chain of $Q$s.
 #[derive(Clone, Copy, Default)]
 struct Level {
@@ -402,8 +402,8 @@ crate_test_fn! {compose_truncated_with(
     if xs.is_empty() || n == 0 {
         return IntegerPolynomial::ZERO;
     }
-    if !ys.is_empty() {
-        let v = ys.iter().position(|y| *y != 0u32).unwrap();
+    // The inner polynomial may have zeros at the end, or be all zeros, if it was truncated.
+    if let Some(v) = ys.iter().position(|y| *y != 0u32) {
         let xs = &xs[..min(xs.len(), (n - 1) / v + 1)];
         if xs.len() > 1 {
             let lenr = min((xs.len() - 1).saturating_mul(ys.len() - 1) + 1, n);
@@ -418,7 +418,7 @@ crate_test_fn! {compose_truncated_with(
 }}
 
 #[inline]
-fn compose_truncated_ref(xs: &[Integer], ys: &[Integer], len: u64) -> IntegerPolynomial {
+pub(crate) fn compose_truncated_ref(xs: &[Integer], ys: &[Integer], len: u64) -> IntegerPolynomial {
     compose_truncated_with(xs, ys, len, compose_truncated_dispatch)
 }
 

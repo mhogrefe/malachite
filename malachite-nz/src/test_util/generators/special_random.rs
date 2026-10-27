@@ -16280,3 +16280,51 @@ pub fn special_random_large_type_gen_var_58(
 pub fn special_random_large_type_gen_var_59(config: &GenConfig) -> It<usize> {
     random_adjust_limbs(config)
 }
+
+// Triples `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 19.
+pub fn special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+        )
+        .map(|(p, q, len)| (p, q.mul_power_of_x(1), len)),
+    )
+}
+
+// Triples `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 1000.
+pub fn special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 1000),
+        )
+        .map(|(p, q, len)| (p, q.mul_power_of_x(1), len)),
+    )
+}

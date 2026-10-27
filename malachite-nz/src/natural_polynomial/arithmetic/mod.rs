@@ -48,6 +48,10 @@ pub mod compose;
 /// [`ComposePowerOfXAssign`](malachite_base::polynomial::ComposePowerOfXAssign), for substituting a
 /// power of the variable into a polynomial.
 pub mod compose_power_of_x;
+/// Implementations of [`ComposeTruncated`](malachite_base::polynomial::ComposeTruncated) and
+/// [`ComposeTruncatedAssign`](malachite_base::polynomial::ComposeTruncatedAssign), for composing
+/// two polynomials as power series.
+pub mod compose_truncated;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart),
 /// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), and
