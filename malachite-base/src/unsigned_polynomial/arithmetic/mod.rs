@@ -122,6 +122,12 @@ pub mod mod_power_of_2_add_truncated;
 /// [`ModPowerOf2ComposeAssign`](crate::polynomial::ModPowerOf2ComposeAssign), for composing two
 /// polynomials modulo $2^k$.
 pub mod mod_power_of_2_compose;
+/// Implementations of
+/// [`ModPowerOf2ComposeTruncated`](crate::polynomial::ModPowerOf2ComposeTruncated) and
+/// [`ModPowerOf2ComposeTruncatedAssign`](crate::polynomial::ModPowerOf2ComposeTruncatedAssign), for
+/// composing two polynomials modulo $2^k$ as power series, keeping only the low coefficients of the
+/// result.
+pub mod mod_power_of_2_compose_truncated;
 /// Implementations of [`ModPowerOf2Derivative`](crate::polynomial::ModPowerOf2Derivative) and
 /// [`ModPowerOf2DerivativeAssign`](crate::polynomial::ModPowerOf2DerivativeAssign), for
 /// differentiating a polynomial modulo a power of 2.

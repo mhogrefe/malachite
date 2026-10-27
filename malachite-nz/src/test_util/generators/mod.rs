@@ -469,6 +469,29 @@ pub fn natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1()
     )
 }
 
+// All `(NaturalPolynomial, NaturalPolynomial, u64, u64)` where the first `u64` is a small length,
+// the coefficients of both polynomials are less than 2 to the power of the second `u64`, and the
+// second polynomial has constant coefficient 0.
+pub fn natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2,
+        &random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2,
+        &special_random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2,
+    )
+}
+
+// Like `natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2`, but with lengths up to
+// 1000.
+pub fn natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_3()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_3,
+        &random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_3,
+        &special_random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_3,
+    )
+}
+
 // All `(NaturalPolynomial, NaturalPolynomial, u64, Natural)` where the `u64` is a small length, the
 // `Natural` is positive, and the coefficients of both polynomials are less than it. The random
 // polynomials are reduced from arbitrary ones, so sums often wrap around.

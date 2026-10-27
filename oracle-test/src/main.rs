@@ -2300,6 +2300,36 @@ fn test_against_flint() {
             "mod_power_of_2_compose",
         );
     }
+    // The power series composition demos of malachite-base's UnsignedPolynomial and malachite-nz's
+    // NaturalPolynomial, modulo powers of 2: by value, by reference, in place, and with lengths up
+    // to 1000.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_compose_truncated_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_compose_truncated_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_compose_truncated_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_compose_truncated_assign_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_compose_truncated_long_u64",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "mod_power_of_2_compose_series",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_compose_truncated",
+        "demo_natural_polynomial_mod_power_of_2_compose_truncated_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_compose_truncated_assign",
+        "demo_natural_polynomial_mod_power_of_2_compose_truncated_long",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "mod_power_of_2_compose_series",
+        );
+    }
     // The generated cases from mod_compose_properties in malachite-base's UnsignedPolynomial tests
     // and malachite-nz's NaturalPolynomial tests: by value, by reference, and in place.
     for demo_name in [

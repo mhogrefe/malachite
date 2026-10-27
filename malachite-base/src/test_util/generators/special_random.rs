@@ -64,7 +64,7 @@ use crate::num::random::{
     random_positive_unsigneds, random_primitive_float_inclusive_range,
     random_primitive_float_range, random_primitive_floats, random_unsigneds_less_than,
 };
-use crate::polynomial::ComposePowerOfX;
+use crate::polynomial::{ComposePowerOfX, MulPowerOfX};
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
@@ -10550,6 +10550,68 @@ pub fn special_random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_v
             &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
         )
         .map(|(p, q, len, pow)| (p.mod_power_of_2(pow), q.mod_power_of_2(pow), len, pow)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_3<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, q, len, pow)| {
+            (
+                p.mod_power_of_2(pow),
+                q.mod_power_of_2(pow).mul_power_of_x(1),
+                len,
+                pow,
+            )
+        }),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_4<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 1000),
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, q, len, pow)| {
+            (
+                p.mod_power_of_2(pow),
+                q.mod_power_of_2(pow).mul_power_of_x(1),
+                len,
+                pow,
+            )
+        }),
     )
 }
 

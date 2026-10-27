@@ -795,6 +795,36 @@ pub fn exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1(
     )
 }
 
+pub fn exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_natural_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, q, len, mut pow)| {
+            pow += max(p.height_significant_bits(), q.height_significant_bits());
+            (p, q.mul_power_of_x(1), len, pow)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_3()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_natural_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 1000),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, q, len, mut pow)| {
+            pow += max(p.height_significant_bits(), q.height_significant_bits());
+            (p, q.mul_power_of_x(1), len, pow)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_1()
 -> It<(NaturalPolynomial, NaturalPolynomial, u64, Natural)> {
     Box::new(

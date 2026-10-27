@@ -166,6 +166,12 @@ pub mod mod_power_of_2_add_truncated;
 /// [`ModPowerOf2ComposeAssign`](malachite_base::polynomial::ModPowerOf2ComposeAssign), for
 /// composing two polynomials modulo $2^k$.
 pub mod mod_power_of_2_compose;
+/// Implementations of
+/// [`ModPowerOf2ComposeTruncated`](malachite_base::polynomial::ModPowerOf2ComposeTruncated) and
+/// [`ModPowerOf2ComposeTruncatedAssign`](
+/// malachite_base::polynomial::ModPowerOf2ComposeTruncatedAssign), for composing two polynomials
+/// modulo $2^k$ as power series, keeping only the low coefficients of the result.
+pub mod mod_power_of_2_compose_truncated;
 /// Implementations of [`ModPowerOf2Derivative`](malachite_base::polynomial::ModPowerOf2Derivative)
 /// and [`ModPowerOf2DerivativeAssign`](malachite_base::polynomial::ModPowerOf2DerivativeAssign),
 /// for differentiating a polynomial modulo a power of 2.

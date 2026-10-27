@@ -46,7 +46,7 @@ use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use crate::options::exhaustive::exhaustive_options;
 use crate::orderings::exhaustive::exhaustive_orderings;
-use crate::polynomial::ComposePowerOfX;
+use crate::polynomial::{ComposePowerOfX, MulPowerOfX};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::sets::exhaustive::{exhaustive_b_tree_sets, exhaustive_hash_sets};
@@ -6712,6 +6712,38 @@ pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1
             primitive_int_increasing_inclusive_range(0, 19),
             primitive_int_increasing_inclusive_range(0, T::WIDTH),
         )
+        .filter(|(p, q, _, pow)| {
+            p.mod_power_of_2_is_reduced(*pow) && q.mod_power_of_2_is_reduced(*pow)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_3<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 19),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .map(|(p, q, len, pow)| (p, q.mul_power_of_x(1), len, pow))
+        .filter(|(p, q, _, pow)| {
+            p.mod_power_of_2_is_reduced(*pow) && q.mod_power_of_2_is_reduced(*pow)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_4<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 1000),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .map(|(p, q, len, pow)| (p, q.mul_power_of_x(1), len, pow))
         .filter(|(p, q, _, pow)| {
             p.mod_power_of_2_is_reduced(*pow) && q.mod_power_of_2_is_reduced(*pow)
         }),

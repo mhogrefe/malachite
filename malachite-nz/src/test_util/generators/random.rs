@@ -1142,6 +1142,76 @@ pub fn random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1(
     )
 }
 
+pub fn random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, q, len, pow)| {
+            (
+                p.mod_power_of_2(pow),
+                q.mod_power_of_2(pow).mul_power_of_x(1),
+                len,
+                pow,
+            )
+        }),
+    )
+}
+
+pub fn random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 1000),
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, q, len, pow)| {
+            (
+                p.mod_power_of_2(pow),
+                q.mod_power_of_2(pow).mul_power_of_x(1),
+                len,
+                pow,
+            )
+        }),
+    )
+}
+
 pub fn random_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, NaturalPolynomial, u64, Natural)> {

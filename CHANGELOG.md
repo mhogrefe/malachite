@@ -675,6 +675,14 @@ documented by git history.
   algorithm (built on `IntegerMatrix` multiplication), and the near-linear algorithm of Kinoshita
   and Li, chosen by measured cutoffs; outer coefficients that cannot contribute are skipped, and
   monomial inner polynomials are handled directly.
+- New `ModPowerOf2ComposeTruncated` and `ModPowerOf2ComposeTruncatedAssign` traits in
+  malachite-base, implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` with either
+  polynomial by value or by reference: composition of power series modulo $2^k$,
+  $(p(q(x)) \bmod x^n) \bmod 2^k$, like FLINT's `nmod_poly_compose_series` with a power-of-2
+  modulus, with Horner's rule, divide and conquer, and the Brent–Kung algorithm, chosen by
+  measured cutoffs; `UnsignedPolynomial`s, and `NaturalPolynomial`s when $2^k$ fits in two limbs,
+  are composed in wrapping word arithmetic, and otherwise the coefficients are kept reduced
+  throughout.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's
