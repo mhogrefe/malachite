@@ -663,6 +663,20 @@ documented by git history.
   identical to FLINT's `fmpz_mat_charpoly_bound`. In malachite-q, `RationalMatrix` implements it
   too, returning a `RationalPolynomial`, like FLINT's `fmpq_mat_charpoly`: the denominators are
   cleared and the integer characteristic polynomial is rescaled.
+- New `ModPowerOf2CharacteristicPolynomial` trait in malachite-base, implemented for
+  `UnsignedMatrix<T>` (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a
+  `NaturalPolynomial`), by value or by reference: the characteristic polynomial modulo $2^k$, by
+  reduction to Hessenberg form with pivots of smallest 2-adic valuation, in $O(n^3)$ ring
+  operations, agreeing with FLINT's `fmpz_mod_mat_charpoly` modulo $2^k$.
+- New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
+  (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
+  value or by reference: the characteristic polynomial modulo any $m$, like FLINT's
+  `nmod_mat_charpoly` and `fmpz_mod_mat_charpoly`. Small matrices use Berkowitz's algorithm and
+  larger ones Danilevsky's method, with cutoffs measured for Malachite; power-of-2 moduli use the
+  2-adic Hessenberg reduction; and where Danilevsky's method meets a pivot that is not invertible,
+  large matrices are reduced to Hessenberg form with extended-GCD row operations, in $O(n^3)$
+  operations, rather than falling back on Berkowitz's $O(n^4)$ algorithm. `NaturalMatrix` moduli of
+  up to two limbs use the word-sized algorithm.
 - By-reference forms of the widening vector and polynomial conversions: `From<&UnsignedVector<T>>`
   for `NaturalVector` and `IntegerVector`, `From<&NaturalVector>` for `IntegerVector`,
   `From<&UnsignedPolynomial<T>>` for `NaturalPolynomial` and `IntegerPolynomial`, and

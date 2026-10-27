@@ -326,6 +326,10 @@ pub mod mod_add;
 /// [`ModAddMulAssign`](malachite_base::num::arithmetic::traits::ModAddMulAssign), for adding a
 /// scalar multiple of one matrix to another modulo a number.
 pub mod mod_add_mul;
+/// Implementations of [`ModCharacteristicPolynomial`](
+/// malachite_base::num::arithmetic::traits::ModCharacteristicPolynomial), for computing
+/// characteristic polynomials of square matrices modulo a number.
+pub mod mod_characteristic_polynomial;
 /// Implementations of [`ModDeterminant`](malachite_base::num::arithmetic::traits::ModDeterminant),
 /// for computing the determinant of a square matrix modulo a number.
 pub mod mod_determinant;
@@ -402,6 +406,10 @@ pub mod mod_power_of_2_add;
 /// [`ModPowerOf2AddMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMulAssign),
 /// for adding a scalar multiple of one matrix to another modulo a power of 2.
 pub mod mod_power_of_2_add_mul;
+/// Implementations of [`ModPowerOf2CharacteristicPolynomial`](
+/// malachite_base::num::arithmetic::traits::ModPowerOf2CharacteristicPolynomial), for computing
+/// characteristic polynomials of square matrices modulo powers of 2.
+pub mod mod_power_of_2_characteristic_polynomial;
 /// Implementations of
 /// [`ModPowerOf2Determinant`](malachite_base::num::arithmetic::traits::ModPowerOf2Determinant), for
 /// computing determinants of square matrices of naturals modulo powers of 2.

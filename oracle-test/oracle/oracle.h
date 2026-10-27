@@ -407,6 +407,8 @@ int run_fmpz_mat_similarity(const char * arg);
 int run_fmpz_mat_charpoly(const char * arg);
 int run_fmpz_mat_charpoly_bound(const char * arg);
 int run_fmpq_mat_charpoly(const char * arg);
+int run_fmpz_mod_mat_charpoly_power_of_2(const char * arg);
+int run_fmpz_mod_mat_charpoly(const char * arg);
 int run_fmpq_mat_similarity(const char * arg);
 int run_nmod_mat_similarity(const char * arg);
 int run_fmpz_mod_mat_similarity(const char * arg);

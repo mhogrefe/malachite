@@ -8,6 +8,7 @@
 
 pub mod crt;
 pub mod kronecker_product;
+pub mod mod_characteristic_polynomial;
 pub mod mod_determinant;
 pub mod mod_howell_form;
 pub mod mod_kronecker_product;

@@ -46,8 +46,8 @@ pub trait BerkowitzRing {
 /// number of terms.
 #[doc(hidden)]
 pub struct UnsignedModBerkowitzRing<T: PrimitiveUnsigned> {
-    m: T,
-    data: ModData<T>,
+    pub(crate) m: T,
+    pub(crate) data: ModData<T>,
 }
 
 impl<T: PrimitiveUnsigned> UnsignedModBerkowitzRing<T> {

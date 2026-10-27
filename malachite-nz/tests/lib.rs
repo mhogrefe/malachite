@@ -1116,6 +1116,7 @@ pub mod natural_matrix {
         pub mod kronecker_product;
         pub mod mod_add;
         pub mod mod_add_mul;
+        pub mod mod_characteristic_polynomial;
         pub mod mod_determinant;
         pub mod mod_howell_form;
         pub mod mod_inverse;
@@ -1133,6 +1134,7 @@ pub mod natural_matrix {
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_add_mul;
+        pub mod mod_power_of_2_characteristic_polynomial;
         pub mod mod_power_of_2_determinant;
         pub mod mod_power_of_2_howell_form;
         pub mod mod_power_of_2_inverse;

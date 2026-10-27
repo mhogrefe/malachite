@@ -17,6 +17,10 @@ pub mod berkowitz_over_ring;
 /// crate::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which, for a matrix with
 /// non-negative elements, are the same as the primitive part.
 pub mod canonical_primitive_part;
+/// Danilevsky's method and the reduction to Hessenberg form for characteristic polynomials, generic
+/// over the ring of elements.
+#[doc(hidden)]
+pub mod charpoly_over_ring;
 /// Implementations of [`Content`](crate::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](crate::num::arithmetic::traits::PrimitivePart),
 /// [`PrimitivePartAssign`](crate::num::arithmetic::traits::PrimitivePartAssign), and
@@ -148,8 +152,9 @@ pub mod mod_add;
 /// [`ModAddMulAssign`](crate::num::arithmetic::traits::ModAddMulAssign), for adding a scalar
 /// multiple of one matrix to another modulo a number.
 pub mod mod_add_mul;
-/// The characteristic polynomial of a square matrix modulo a number.
-#[doc(hidden)]
+/// Implementations of [`ModCharacteristicPolynomial`](
+/// crate::num::arithmetic::traits::ModCharacteristicPolynomial), for computing characteristic
+/// polynomials of square matrices modulo a number.
 pub mod mod_characteristic_polynomial;
 /// Implementations of [`ModDeterminant`](crate::num::arithmetic::traits::ModDeterminant), for
 /// computing the determinant of a square matrix modulo a number.
@@ -255,6 +260,10 @@ pub mod mod_power_of_2_add;
 /// [`ModPowerOf2AddMulAssign`](crate::num::arithmetic::traits::ModPowerOf2AddMulAssign), for adding
 /// a scalar multiple of one matrix to another modulo a power of 2.
 pub mod mod_power_of_2_add_mul;
+/// Implementations of [`ModPowerOf2CharacteristicPolynomial`](
+/// crate::num::arithmetic::traits::ModPowerOf2CharacteristicPolynomial), for computing
+/// characteristic polynomials of square matrices modulo powers of 2.
+pub mod mod_power_of_2_characteristic_polynomial;
 /// Implementations of
 /// [`ModPowerOf2Determinant`](crate::num::arithmetic::traits::ModPowerOf2Determinant), for
 /// computing determinants of square matrices modulo powers of 2.

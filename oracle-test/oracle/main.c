@@ -254,6 +254,8 @@ static const oracle_mode modes[] = {
     {"fmpz_mat_charpoly", run_fmpz_mat_charpoly},
     {"fmpz_mat_charpoly_bound", run_fmpz_mat_charpoly_bound},
     {"fmpq_mat_charpoly", run_fmpq_mat_charpoly},
+    {"fmpz_mod_mat_charpoly_power_of_2", run_fmpz_mod_mat_charpoly_power_of_2},
+    {"fmpz_mod_mat_charpoly", run_fmpz_mod_mat_charpoly},
     {"fmpq_mat_similarity", run_fmpq_mat_similarity},
     {"nmod_mat_similarity", run_nmod_mat_similarity},
     {"fmpz_mod_mat_similarity", run_fmpz_mod_mat_similarity},

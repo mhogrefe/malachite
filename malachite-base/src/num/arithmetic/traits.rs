@@ -2230,6 +2230,22 @@ pub trait CharacteristicPolynomial {
     fn characteristic_polynomial(self) -> Self::Output;
 }
 
+/// Computes the characteristic polynomial of a square matrix modulo $m$. The elements of the matrix
+/// must already be reduced modulo $m$.
+pub trait ModCharacteristicPolynomial<M = Self> {
+    type Output;
+
+    fn mod_characteristic_polynomial(self, m: M) -> Self::Output;
+}
+
+/// Computes the characteristic polynomial of a square matrix modulo $2^k$. The elements of the
+/// matrix must already be reduced modulo $2^k$.
+pub trait ModPowerOf2CharacteristicPolynomial {
+    type Output;
+
+    fn mod_power_of_2_characteristic_polynomial(self, pow: u64) -> Self::Output;
+}
+
 /// Computes the permanent of a square matrix modulo $m$. The elements of the matrix must already be
 /// reduced modulo $m$.
 pub trait ModPermanent<M = Self> {

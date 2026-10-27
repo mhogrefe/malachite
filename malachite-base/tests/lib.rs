@@ -917,6 +917,7 @@ pub mod unsigned_matrix {
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_add_mul;
+        pub mod mod_power_of_2_characteristic_polynomial;
         pub mod mod_power_of_2_determinant;
         pub mod mod_power_of_2_howell_form;
         pub mod mod_power_of_2_inverse;

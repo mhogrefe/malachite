@@ -74,8 +74,8 @@ fn det_cofactor(xs: &[Natural], n: usize, m: &Natural) -> Natural {
 
 // The integers modulo a positive `m`, as `Natural`s, for `charpoly_berkowitz_over_ring`. The dot
 // products are computed exactly and reduced once.
-struct NaturalModBerkowitzRing<'a> {
-    m: &'a Natural,
+pub(crate) struct NaturalModBerkowitzRing<'a> {
+    pub(crate) m: &'a Natural,
 }
 
 impl BerkowitzRing for NaturalModBerkowitzRing<'_> {

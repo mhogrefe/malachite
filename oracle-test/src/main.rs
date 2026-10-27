@@ -4069,6 +4069,61 @@ fn test_against_flint() {
             "rational_matrix_characteristic_polynomial_ref",
             "fmpq_mat_charpoly",
         ),
+        (
+            "../malachite-base",
+            "unsigned_matrix_mod_power_of_2_characteristic_polynomial",
+            "fmpz_mod_mat_charpoly_power_of_2",
+        ),
+        (
+            "../malachite-base",
+            "unsigned_matrix_mod_power_of_2_characteristic_polynomial_ref",
+            "fmpz_mod_mat_charpoly_power_of_2",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_power_of_2_characteristic_polynomial",
+            "fmpz_mod_mat_charpoly_power_of_2",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_power_of_2_characteristic_polynomial_ref",
+            "fmpz_mod_mat_charpoly_power_of_2",
+        ),
+        (
+            "../malachite-base",
+            "unsigned_matrix_mod_characteristic_polynomial",
+            "fmpz_mod_mat_charpoly",
+        ),
+        (
+            "../malachite-base",
+            "unsigned_matrix_mod_characteristic_polynomial_ref",
+            "fmpz_mod_mat_charpoly",
+        ),
+        (
+            "../malachite-base",
+            "unsigned_matrix_mod_characteristic_polynomial_large_dimensions",
+            "fmpz_mod_mat_charpoly",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_characteristic_polynomial",
+            "fmpz_mod_mat_charpoly",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_characteristic_polynomial_ref",
+            "fmpz_mod_mat_charpoly",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_characteristic_polynomial_large_moduli",
+            "fmpz_mod_mat_charpoly",
+        ),
+        (
+            "../malachite-nz",
+            "natural_matrix_mod_characteristic_polynomial_large_dimensions",
+            "fmpz_mod_mat_charpoly",
+        ),
         ("../malachite-q", "rational_matrix_similarity_transform", "fmpq_mat_similarity"),
         (
             "../malachite-base",
