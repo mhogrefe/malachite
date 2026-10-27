@@ -654,6 +654,26 @@ pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1()
     )
 }
 
+// All `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 19.
+pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_2()
+-> Generator<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_2,
+        &random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_2,
+        &special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 1000.
+pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3()
+-> Generator<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3,
+        &random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3,
+        &special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3,
+    )
+}
+
 pub fn integer_polynomial_triple_gen()
 -> Generator<(IntegerPolynomial, IntegerPolynomial, IntegerPolynomial)> {
     Generator::new(

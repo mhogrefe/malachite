@@ -884,6 +884,7 @@ pub mod integer_polynomial {
         pub mod canonicalize_unit;
         pub mod compose;
         pub mod compose_power_of_x;
+        pub mod compose_truncated;
         pub mod content;
         pub mod deflate_power_of_x;
         pub mod derivative;

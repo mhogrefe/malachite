@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonicalize_unit::register(runner);
     compose::register(runner);
     compose_power_of_x::register(runner);
+    compose_truncated::register(runner);
     content::register(runner);
     derivative::register(runner);
     div_exact::register(runner);
@@ -60,6 +61,7 @@ mod canonical_primitive_part;
 mod canonicalize_unit;
 mod compose;
 mod compose_power_of_x;
+mod compose_truncated;
 mod content;
 mod deflate_power_of_x;
 mod derivative;

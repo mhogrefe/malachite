@@ -160,7 +160,7 @@ use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
 use malachite_base::options::exhaustive::exhaustive_options;
-use malachite_base::polynomial::{ComposePowerOfX, Polynomial};
+use malachite_base::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::slices::slice_trailing_zeros;
@@ -307,6 +307,30 @@ pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_
         exhaustive_integer_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+// Triples `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 19.
+pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_2()
+-> It<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_integer_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+        )
+        .map(|(p, q, len)| (p, q.mul_power_of_x(1), len)),
+    )
+}
+
+// Triples `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 1000.
+pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3()
+-> It<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_integer_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 1000),
+        )
+        .map(|(p, q, len)| (p, q.mul_power_of_x(1), len)),
+    )
 }
 
 pub fn exhaustive_integer_polynomial_triple_gen()

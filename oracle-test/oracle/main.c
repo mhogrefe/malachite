@@ -163,6 +163,7 @@ static const oracle_mode modes[] = {
     {"_fmpz_vec_set_fft", run__fmpz_vec_set_fft},
     {"_fmpz_mod_vec_scalar_div_fmpz_mod", run__fmpz_mod_vec_scalar_div_fmpz_mod},
     {"fmpz_poly_compose", run_fmpz_poly_compose},
+    {"fmpz_poly_compose_series", run_fmpz_poly_compose_series},
     {"mod_power_of_2_compose", run_mod_power_of_2_compose},
     {"mod_compose", run_mod_compose},
     {"fmpq_poly_compose", run_fmpq_poly_compose},

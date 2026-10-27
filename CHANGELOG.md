@@ -668,6 +668,12 @@ documented by git history.
   `NaturalPolynomial`), by value or by reference: the characteristic polynomial modulo $2^k$, by
   reduction to Hessenberg form with pivots of smallest 2-adic valuation, in $O(n^3)$ ring
   operations, agreeing with FLINT's `fmpz_mod_mat_charpoly` modulo $2^k$.
+- New `ComposeTruncated` and `ComposeTruncatedAssign` traits in malachite-base, implemented for
+  `IntegerPolynomial` with either polynomial by value or by reference: composition of power series,
+  $p(q(x)) \bmod x^n$, like FLINT's `fmpz_poly_compose_series`, with Horner's rule, the Brent–Kung
+  algorithm (built on `IntegerMatrix` multiplication), and the near-linear algorithm of Kinoshita
+  and Li, chosen by measured cutoffs; outer coefficients that cannot contribute are skipped, and
+  monomial inner polynomials are handled directly.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

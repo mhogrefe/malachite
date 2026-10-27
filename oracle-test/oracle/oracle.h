@@ -302,6 +302,9 @@ int run_mod_power_of_2_compose(const char * arg);
 /* fmpz_poly_compose.c */
 int run_fmpz_poly_compose(const char * arg);
 
+/* fmpz_poly_compose_series.c */
+int run_fmpz_poly_compose_series(const char * arg);
+
 /* fmpz_poly_taylor_shift.c */
 int run_fmpz_poly_taylor_shift(const char * arg);
 

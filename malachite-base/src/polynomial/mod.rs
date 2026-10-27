@@ -796,6 +796,34 @@ pub trait ComposeAssign<Rhs = Self> {
     fn compose_assign(&mut self, other: Rhs);
 }
 
+/// Composes two polynomials, keeping only the coefficients of $x^i$ for $i$ less than a given
+/// length: composition of power series. The inner polynomial must have constant coefficient 0.
+///
+/// With $n$ equal to `len`, this is $p(q(x)) \bmod x^n$. Since $q(0) = 0$, the coefficients of
+/// $x^i$ for $i \geq n$ of $p$ and $q$ do not affect the result.
+pub trait ComposeTruncated<Rhs = Self> {
+    type Output;
+
+    /// Composes two polynomials and truncates the result to its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, q, n) = p(q(x)) \bmod x^n.
+    /// $$
+    fn compose_truncated(self, other: Rhs, len: u64) -> Self::Output;
+}
+
+/// Composes two polynomials in place, keeping only the coefficients of $x^i$ for $i$ less than a
+/// given length: composition of power series. The inner polynomial must have constant coefficient
+/// 0.
+pub trait ComposeTruncatedAssign<Rhs = Self> {
+    /// Composes `self` with a polynomial and truncates the result to its first `len` coefficients.
+    ///
+    /// $$
+    /// p \gets p(q(x)) \bmod x^n.
+    /// $$
+    fn compose_truncated_assign(&mut self, other: Rhs, len: u64);
+}
+
 /// Composes two polynomials modulo $m$, giving $p(q(x)) \bmod m$. The coefficients of both must
 /// already be reduced modulo $m$.
 pub trait ModCompose<Rhs = Self, M = Self> {

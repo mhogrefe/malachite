@@ -2215,6 +2215,24 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_compose");
     }
+    // The generated cases from compose_truncated_properties in malachite-nz's IntegerPolynomial
+    // tests: all six forms, and long lengths reaching all three algorithms.
+    for demo_name in [
+        "demo_integer_polynomial_compose_truncated",
+        "demo_integer_polynomial_compose_truncated_val_ref",
+        "demo_integer_polynomial_compose_truncated_ref_val",
+        "demo_integer_polynomial_compose_truncated_ref_ref",
+        "demo_integer_polynomial_compose_truncated_assign",
+        "demo_integer_polynomial_compose_truncated_assign_ref",
+        "demo_integer_polynomial_compose_truncated_long",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "fmpz_poly_compose_series",
+        );
+    }
     // The generated cases from compose_properties in malachite-nz's NaturalPolynomial tests: all six
     // forms, long polynomials, and linear inner polynomials.
     for demo_name in [
