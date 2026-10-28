@@ -168,6 +168,7 @@ static const oracle_mode modes[] = {
     {"mod_power_of_2_compose", run_mod_power_of_2_compose},
     {"mod_power_of_2_compose_series", run_mod_power_of_2_compose_series},
     {"mod_compose", run_mod_compose},
+    {"mod_compose_series", run_mod_compose_series},
     {"fmpq_poly_compose", run_fmpq_poly_compose},
     {"fmpz_poly_taylor_shift", run_fmpz_poly_taylor_shift},
     {"mod_power_of_2_taylor_shift", run_mod_power_of_2_taylor_shift},

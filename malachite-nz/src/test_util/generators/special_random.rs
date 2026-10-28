@@ -1376,6 +1376,70 @@ pub fn special_random_natural_polynomial_pair_unsigned_natural_quadruple_gen_var
     )
 }
 
+pub fn special_random_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64, Natural)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+            &|seed| {
+                striped_random_positive_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, q, len, m)| (p.mod_op(&m), q.mod_op(&m).mul_power_of_x(1), len, m)),
+    )
+}
+
+pub fn special_random_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64, Natural)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 1000),
+            &|seed| {
+                striped_random_positive_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, q, len, m)| (p.mod_op(&m), q.mod_op(&m).mul_power_of_x(1), len, m)),
+    )
+}
+
 pub fn special_random_natural_polynomial_natural_polynomial_natural_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, NaturalPolynomial, Natural)> {

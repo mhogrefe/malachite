@@ -22,6 +22,7 @@ pub mod l2_norm_squared;
 pub mod mod_add;
 pub mod mod_add_truncated;
 pub mod mod_compose;
+pub mod mod_compose_truncated;
 pub mod mod_derivative;
 pub mod mod_integral;
 pub mod mod_mul;

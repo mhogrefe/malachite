@@ -684,6 +684,12 @@ documented by git history.
   faster at 16384. Truncated compositions reuse the transforms of a factor they multiply by
   repeatedly (the inner polynomial, and in the Brent–Kung algorithm its power $q^m$), so that each
   such product costs two transforms rather than three.
+- `UnsignedPolynomial<T>` multiplication and squaring modulo any $m$ (`ModMul`, `ModMulTruncated`,
+  `ModSquare`, `ModSquareTruncated`, and the operations built on them, including those of
+  `NaturalPolynomial`s modulo an $m$ that fits in a limb) use the same transforms for long
+  polynomials, with each coefficient reconstructed modulo $m$, in $O(n \log n)$ time. Since
+  Karatsuba multiplication modulo $m$ reduces every product, the transforms overtake it sooner, from
+  about 230 to 900 coefficients, and are 2 to 5 times faster at 2048 and 3 to 12 times at 10000.
 - New `ModPowerOf2ComposeTruncated` and `ModPowerOf2ComposeTruncatedAssign` traits in
   malachite-base, implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` with either
   polynomial by value or by reference: composition of power series modulo $2^k$,
@@ -692,6 +698,13 @@ documented by git history.
   measured cutoffs; `UnsignedPolynomial`s, and `NaturalPolynomial`s when $2^k$ fits in two limbs,
   are composed in wrapping word arithmetic, and otherwise the coefficients are kept reduced
   throughout.
+- New `ModComposeTruncated` and `ModComposeTruncatedAssign` traits in malachite-base,
+  implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial`, with either polynomial and,
+  for `NaturalPolynomial`, the modulus by value or by reference: composition of power series
+  modulo any positive $m$, $(p(q(x)) \bmod x^n) \bmod m$, like FLINT's
+  `nmod_poly_compose_series`, with Horner's rule, divide and conquer, and the Brent–Kung
+  algorithm, chosen by measured cutoffs. `NaturalPolynomial`s with a modulus that fits in a limb
+  are composed as `UnsignedPolynomial`s of limbs.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

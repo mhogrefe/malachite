@@ -104,6 +104,11 @@ pub mod mod_add_truncated;
 /// [`ModComposeAssign`](malachite_base::polynomial::ModComposeAssign), for composing two
 /// polynomials modulo a [`Natural`](crate::natural::Natural).
 pub mod mod_compose;
+/// Implementations of [`ModComposeTruncated`](malachite_base::polynomial::ModComposeTruncated) and
+/// [`ModComposeTruncatedAssign`](malachite_base::polynomial::ModComposeTruncatedAssign), for
+/// composing two polynomials modulo $m$ as power series, keeping only the low coefficients of the
+/// result.
+pub mod mod_compose_truncated;
 /// Implementations of [`ModDerivative`](malachite_base::polynomial::ModDerivative) and
 /// [`ModDerivativeAssign`](malachite_base::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.

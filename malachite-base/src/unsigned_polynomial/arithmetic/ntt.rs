@@ -14,6 +14,10 @@
 // modulo $2^W$ by Garner's algorithm, whose mixed-radix digits are combined in wrapping arithmetic.
 // For small $k$ a single prime suffices, so the cost falls with $k$.
 //
+// The same transforms multiply polynomials whose coefficients are reduced modulo a word $m$: each
+// coefficient of the product over the integers is then less than $l m^2$, and it is reconstructed
+// modulo $m$ instead, so the result is reduced. `NttModulus` says which of the two is wanted.
+//
 // Each prime is $p = c 2^{40} + 1$, with $2^{61} < p < 2^{62}$, so transforms of up to $2^{40}$
 // points exist modulo every prime, and Montgomery multiplication with $R = 2^{64}$ never overflows.
 // The forward transform is decimation in frequency, taking its input in natural order and leaving
@@ -27,7 +31,10 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::logic::traits::BitIterable;
+use crate::unsigned_polynomial::arithmetic::mod_mul::mod_mul_to_out;
+use crate::unsigned_polynomial::arithmetic::mod_mul_truncated::mod_mul_truncated_to_out;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::mul_wrapping;
+use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::mul_truncated_wrapping;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::min;
@@ -49,6 +56,71 @@ const MAX_LOG_LEN: u64 = 40;
 
 // A lower bound on the number of bits of every prime in `PRIMES`: each exceeds $2^{61}$.
 const PRIME_BITS: u64 = 61;
+
+// What a product by transforms is computed modulo: $2^k$, where $k$ is the `u64`, which must be no
+// greater than `T::WIDTH`, with the inputs reduced modulo $2^k$ first and the result correct modulo
+// $2^k$ but not reduced; or $m$, with the inputs already reduced modulo $m$ and the result reduced
+// modulo $m$.
+#[derive(Clone, Copy)]
+pub(crate) enum NttModulus<T> {
+    PowerOf2(u64),
+    Mod(T),
+}
+
+impl<T: PrimitiveUnsigned> NttModulus<T> {
+    // The number of bits of the inputs, once reduced, at most.
+    fn bits(self) -> u64 {
+        match self {
+            Self::PowerOf2(pow) => pow,
+            Self::Mod(m) => m.significant_bits(),
+        }
+    }
+
+    // `x`, reduced as the inputs must be.
+    fn input(self, x: T) -> T {
+        match self {
+            Self::PowerOf2(pow) => x.mod_power_of_2(pow),
+            Self::Mod(_) => x,
+        }
+    }
+
+    // Sets `out` to the product of the polynomials with coefficients `xs` and `ys`, both nonempty,
+    // as the result of a product by transforms is: `out` must have length `xs.len() + ys.len() -
+    // 1`. This is for short products, without the transforms.
+    fn mul_to_out(self, out: &mut [T], xs: &[T], ys: &[T]) {
+        match self {
+            Self::PowerOf2(pow) => mul_wrapping(out, xs, ys, pow),
+            Self::Mod(m) => mod_mul_to_out(out, xs, ys, m),
+        }
+    }
+
+    // Whether products by a fixed factor, the shorter of whose factors has `len` coefficients after
+    // truncation, use its transforms (see `fixed_ntt_preferred` and `mod_fixed_ntt_preferred`).
+    fn fixed_ntt_preferred(self, len: usize) -> bool {
+        match self {
+            Self::PowerOf2(pow) => fixed_ntt_preferred::<T>(len, pow),
+            Self::Mod(m) => mod_fixed_ntt_preferred(len, m.significant_bits()),
+        }
+    }
+
+    // Subtracts `y` from `x`, as the result of a product by transforms is.
+    fn sub_assign(self, x: &mut T, y: T) {
+        match self {
+            Self::PowerOf2(_) => x.wrapping_sub_assign(y),
+            Self::Mod(m) => x.mod_sub_assign(y, m),
+        }
+    }
+}
+
+// $x \bmod m$, for $m$ positive. If $m \leq x$, then $m$ fits in a `u64`.
+fn reduce_u64<T: PrimitiveUnsigned>(x: u64, m: T) -> T {
+    let m: u128 = m.wrapping_into();
+    if m > u128::from(x) {
+        T::wrapping_from(x)
+    } else {
+        T::wrapping_from(x % u64::wrapping_from(m))
+    }
+}
 
 // Arithmetic modulo one of the primes, with Montgomery multiplication for $R = 2^{64}$.
 #[derive(Clone, Copy)]
@@ -281,13 +353,18 @@ fn inverse(prime: Prime, xs: &mut [u64], inverse_table: &[u64]) {
 }
 
 // The residues modulo the prime of the coefficients of the polynomial with coefficients `xs`, each
-// reduced modulo $2^k$ first, where $k$ is `pow`, reduced modulo $x^n - 1$: the element at index
-// $j$ is added at index $j \bmod n$, and the result is padded with zeros to length `n`.
-fn residues<T: PrimitiveUnsigned>(prime: Prime, xs: &[T], pow: u64, n: usize) -> Vec<u64> {
+// reduced as `modulus` says first, reduced modulo $x^n - 1$: the element at index $j$ is added at
+// index $j \bmod n$, and the result is padded with zeros to length `n`.
+fn residues<T: PrimitiveUnsigned>(
+    prime: Prime,
+    xs: &[T],
+    modulus: NttModulus<T>,
+    n: usize,
+) -> Vec<u64> {
     let mut out = vec![0; n];
     for chunk in xs.chunks(n) {
         for (o, &x) in out.iter_mut().zip(chunk) {
-            let x: u128 = x.mod_power_of_2(pow).wrapping_into();
+            let x: u128 = modulus.input(x).wrapping_into();
             let r = if T::WIDTH <= 64 {
                 prime.reduce(x as u64)
             } else {
@@ -310,12 +387,12 @@ fn prime_count(pow: u64, len: usize) -> usize {
     count
 }
 
-// Sets each element of `out` to the coefficient, modulo $2^W$, with residues `residues[i][j]`
-// modulo the first primes, where `j` is its index, by Garner's algorithm: the mixed-radix digits
-// $v_i$ are computed modulo the primes, and $\sum_i v_i \prod_{j < i} p_j$ is evaluated in wrapping
-// arithmetic.
-fn reconstruct<T: PrimitiveUnsigned>(out: &mut [T], residues: &[Vec<u64>]) {
-    reconstruct_with(out, residues, &garner_inverses(residues.len()));
+// Sets each element of `out` to the coefficient with residues `residues[i][j]` modulo the first
+// primes, where `j` is its index, by Garner's algorithm: the mixed-radix digits $v_i$ are computed
+// modulo the primes, and $\sum_i v_i \prod_{j < i} p_j$ is evaluated in wrapping arithmetic, or
+// modulo $m$, as `modulus` says.
+fn reconstruct<T: PrimitiveUnsigned>(out: &mut [T], residues: &[Vec<u64>], modulus: NttModulus<T>) {
+    reconstruct_with(out, residues, &garner_inverses(residues.len()), modulus);
 }
 
 // The inverses that Garner's algorithm needs for the first `count` primes: element `[i][j]` is
@@ -342,21 +419,15 @@ fn reconstruct_with<T: PrimitiveUnsigned>(
     out: &mut [T],
     residues: &[Vec<u64>],
     inverses: &[Vec<u64>],
+    modulus: NttModulus<T>,
 ) {
     let count = residues.len();
     let primes: Vec<Prime> = PRIMES[..count]
         .iter()
         .map(|&(p, _)| Prime::new(p))
         .collect();
-    // radices[i] is the product of the first i primes, modulo 2^W.
-    let mut radices = Vec::with_capacity(count);
-    let mut radix = T::ONE;
-    for prime in &primes {
-        radices.push(radix);
-        radix.wrapping_mul_assign(T::wrapping_from(prime.p));
-    }
-    let mut digits = vec![0u64; count];
-    for (k, o) in out.iter_mut().enumerate() {
+    // The mixed-radix digits of the coefficient with index `k`.
+    let digits = |k: usize, digits: &mut [u64]| {
         for i in 0..count {
             let pi = primes[i];
             let mut t = residues[i][k];
@@ -365,24 +436,56 @@ fn reconstruct_with<T: PrimitiveUnsigned>(
             }
             digits[i] = t;
         }
-        let mut sum = T::ZERO;
-        for (&d, &r) in digits.iter().zip(&radices) {
-            sum.wrapping_add_assign(T::wrapping_from(d).wrapping_mul(r));
+    };
+    let mut ds = vec![0u64; count];
+    match modulus {
+        NttModulus::PowerOf2(_) => {
+            // radices[i] is the product of the first i primes, modulo 2^W.
+            let mut radices = Vec::with_capacity(count);
+            let mut radix = T::ONE;
+            for prime in &primes {
+                radices.push(radix);
+                radix.wrapping_mul_assign(T::wrapping_from(prime.p));
+            }
+            for (k, o) in out.iter_mut().enumerate() {
+                digits(k, &mut ds);
+                let mut sum = T::ZERO;
+                for (&d, &r) in ds.iter().zip(&radices) {
+                    sum.wrapping_add_assign(T::wrapping_from(d).wrapping_mul(r));
+                }
+                *o = sum;
+            }
         }
-        *o = sum;
+        NttModulus::Mod(m) => {
+            let data = T::precompute_mod_mul_data(&m);
+            // radices[i] is the product of the first i primes, modulo m.
+            let mut radices = Vec::with_capacity(count);
+            let mut radix = reduce_u64(1, m);
+            for prime in &primes {
+                radices.push(radix);
+                radix.mod_mul_precomputed_assign(reduce_u64(prime.p, m), m, &data);
+            }
+            for (k, o) in out.iter_mut().enumerate() {
+                digits(k, &mut ds);
+                let mut sum = T::ZERO;
+                for (&d, &r) in ds.iter().zip(&radices) {
+                    sum.mod_add_assign(reduce_u64(d, m).mod_mul_precomputed(r, m, &data), m);
+                }
+                *o = sum;
+            }
+        }
     }
 }
 
 // Sets `out`, whose length is at most $N = 2^{\text{log\_len}}$, to the first `out.len()`
-// coefficients of the cyclic convolution of length $N$ of `xs` and `ys`, modulo $2^W$, computed
-// exactly modulo the first `count` primes, whose product must exceed every coefficient of the
-// convolution of `xs` and `ys` reduced modulo $2^k$, where $k$ is `pow`. If `ys` is `None`, `xs` is
-// squared.
+// coefficients of the cyclic convolution of length $N$ of `xs` and `ys`, modulo $2^W$ or $m$ as
+// `modulus` says, computed exactly modulo the first `count` primes, whose product must exceed every
+// coefficient of the convolution of `xs` and `ys` once reduced. If `ys` is `None`, `xs` is squared.
 fn cyclic_ntt<T: PrimitiveUnsigned>(
     out: &mut [T],
     xs: &[T],
     ys: Option<&[T]>,
-    pow: u64,
+    modulus: NttModulus<T>,
     log_len: u64,
     count: usize,
 ) {
@@ -394,10 +497,10 @@ fn cyclic_ntt<T: PrimitiveUnsigned>(
         let prime = Prime::new(p);
         let tables = twiddles(prime, root, log_len);
         let (table, inverse_table) = tables.split_at(n - 1);
-        let mut a = residues(prime, xs, pow, n);
+        let mut a = residues(prime, xs, modulus, n);
         forward(prime, &mut a, table);
         if let Some(ys) = ys {
-            let mut b = residues(prime, ys, pow, n);
+            let mut b = residues(prime, ys, modulus, n);
             forward(prime, &mut b, table);
             for (x, y) in a.iter_mut().zip(&b) {
                 *x = prime.mul_lazy(*x, *y);
@@ -410,7 +513,7 @@ fn cyclic_ntt<T: PrimitiveUnsigned>(
         inverse(prime, &mut a, inverse_table);
         all_residues.push(scaled_product(prime, &a[..len], transform_scale(prime, n)));
     }
-    reconstruct(out, &all_residues);
+    reconstruct(out, &all_residues, modulus);
 }
 
 // The constant that undoes the factors left by a product of transforms of length `n`: the pointwise
@@ -456,7 +559,7 @@ struct FixedFactorPrime {
 pub(crate) struct NttFixedFactor<T: PrimitiveUnsigned> {
     n: usize,
     log_len: u64,
-    pow: u64,
+    modulus: NttModulus<T>,
     // The length of the fixed factor, after truncation to `n` coefficients.
     len: usize,
     // The top coefficients of the fixed factor, for correcting wrapped coefficients; empty if
@@ -468,8 +571,9 @@ pub(crate) struct NttFixedFactor<T: PrimitiveUnsigned> {
 
 impl<T: PrimitiveUnsigned> NttFixedFactor<T> {
     // Prepares the polynomial with coefficients `ys`, which is nonempty, for products truncated to
-    // `n` coefficients, correct modulo $2^k$, where $k$ is `pow`.
-    pub(crate) fn new(ys: &[T], n: usize, pow: u64) -> Self {
+    // `n` coefficients, modulo $2^k$ or $m$ as `modulus` says.
+    pub(crate) fn new(ys: &[T], n: usize, modulus: NttModulus<T>) -> Self {
+        let pow = modulus.bits();
         let ys = &ys[..min(ys.len(), n)];
         let max_len = n + ys.len() - 1;
         let mut size = max_len.next_power_of_two().max(2);
@@ -495,7 +599,7 @@ impl<T: PrimitiveUnsigned> NttFixedFactor<T> {
             .map(|&(p, root)| {
                 let prime = Prime::new(p);
                 let tables = twiddles(prime, root, log_len);
-                let mut transform = residues(prime, ys, pow, size);
+                let mut transform = residues(prime, ys, modulus, size);
                 forward(prime, &mut transform, &tables[..size - 1]);
                 FixedFactorPrime {
                     prime,
@@ -508,7 +612,7 @@ impl<T: PrimitiveUnsigned> NttFixedFactor<T> {
         Self {
             n,
             log_len,
-            pow,
+            modulus,
             len: ys.len(),
             top,
             primes,
@@ -518,7 +622,7 @@ impl<T: PrimitiveUnsigned> NttFixedFactor<T> {
 
     // Sets `out`, which is nonempty and at most `n` long, to the first `out.len()` coefficients of
     // the product of the polynomial with coefficients `xs`, which is nonempty, and the fixed
-    // factor, correct modulo $2^k$ but not reduced. The elements of `xs` need not be reduced.
+    // factor, as `modulus` says (see `NttModulus`).
     pub(crate) fn mul_truncated(&self, out: &mut [T], xs: &[T]) {
         let len = out.len();
         assert!(len <= self.n);
@@ -530,7 +634,7 @@ impl<T: PrimitiveUnsigned> NttFixedFactor<T> {
         for data in &self.primes {
             let prime = data.prime;
             let (table, inverse_table) = data.tables.split_at(size - 1);
-            let mut a = residues(prime, xs, self.pow, size);
+            let mut a = residues(prime, xs, self.modulus, size);
             forward(prime, &mut a, table);
             for (x, &y) in a.iter_mut().zip(&data.transform) {
                 *x = prime.mul_lazy(*x, y);
@@ -538,7 +642,12 @@ impl<T: PrimitiveUnsigned> NttFixedFactor<T> {
             inverse(prime, &mut a, inverse_table);
             all_residues.push(scaled_product(prime, &a[..low_len], data.scale));
         }
-        reconstruct_with(&mut out[..low_len], &all_residues, &self.inverses);
+        reconstruct_with(
+            &mut out[..low_len],
+            &all_residues,
+            &self.inverses,
+            self.modulus,
+        );
         if full_len > size {
             // The coefficients c_i for i >= size wrapped around onto c_{i - size}; they involve
             // only the top `excess` coefficients of each factor.
@@ -548,14 +657,62 @@ impl<T: PrimitiveUnsigned> NttFixedFactor<T> {
             let top_ys = &self.top[self.top.len() - (self.len - start2)..];
             let top_xs = &xs[start1..];
             let mut top = vec![T::ZERO; top_xs.len() + top_ys.len() - 1];
-            mul_wrapping(&mut top, top_xs, top_ys, self.pow);
+            self.modulus.mul_to_out(&mut top, top_xs, top_ys);
             let high = &top[size - start1 - start2..];
             for (o, &h) in out.iter_mut().zip(high) {
-                o.wrapping_sub_assign(h);
+                self.modulus.sub_assign(o, h);
             }
             if len > size {
                 out[size..].copy_from_slice(&high[..len - size]);
             }
+        }
+    }
+}
+
+// The fewest products by a fixed factor for which its transforms are computed once. With fewer, the
+// saving does not make up for the transforms being chosen at lengths where they lose to Karatsuba
+// multiplication, since `fixed_ntt_preferred` was measured for 8 products.
+const FIXED_FACTOR_MIN_USES: usize = 4;
+
+// A polynomial that many others are multiplied by, keeping only the first `n` coefficients of each
+// product, modulo $2^k$ or $m$ as `modulus` says (see `NttModulus`): when there are enough products
+// and they are long enough, its transforms are computed once (see `NttFixedFactor`); otherwise each
+// product is a call to `mul_truncated_wrapping` or `mod_mul_truncated_to_out`.
+pub(crate) struct FixedFactor<'a, T: PrimitiveUnsigned> {
+    ys: &'a [T],
+    modulus: NttModulus<T>,
+    ntt: Option<NttFixedFactor<T>>,
+}
+
+impl<'a, T: PrimitiveUnsigned> FixedFactor<'a, T> {
+    // Prepares the polynomial with coefficients `ys`, which is nonempty, for `uses` products
+    // truncated to `n` coefficients.
+    pub(crate) fn new(ys: &'a [T], n: usize, modulus: NttModulus<T>, uses: usize) -> Self {
+        let ntt = if uses >= FIXED_FACTOR_MIN_USES && modulus.fixed_ntt_preferred(min(ys.len(), n))
+        {
+            Some(NttFixedFactor::new(ys, n, modulus))
+        } else {
+            None
+        };
+        Self { ys, modulus, ntt }
+    }
+
+    // Sets `out`, which is nonempty and no longer than the `n` the factor was prepared for, to the
+    // first `out.len()` coefficients of the product of the polynomial with coefficients `xs`, which
+    // is nonempty, and the fixed factor. A short `xs` is multiplied without the transforms.
+    pub(crate) fn mul_truncated(&self, out: &mut [T], xs: &[T]) {
+        match &self.ntt {
+            Some(ntt)
+                if self
+                    .modulus
+                    .fixed_ntt_preferred(min(min(xs.len(), self.ys.len()), out.len())) =>
+            {
+                ntt.mul_truncated(out, xs);
+            }
+            _ => match self.modulus {
+                NttModulus::PowerOf2(pow) => mul_truncated_wrapping(out, xs, self.ys, pow),
+                NttModulus::Mod(m) => mod_mul_truncated_to_out(out, xs, self.ys, m),
+            },
         }
     }
 }
@@ -565,10 +722,9 @@ impl<T: PrimitiveUnsigned> NttFixedFactor<T> {
 const WRAP_DIVISOR: usize = 4;
 
 // Sets `out` to the first `out.len()` coefficients of the product of the polynomials with
-// coefficients `xs` and `ys`, all three nonempty, modulo $2^k$, where $k$ is `pow`, which must be
-// no greater than `T::WIDTH`; `out.len()` must be at most `xs.len() + ys.len() - 1`. The elements
-// of `xs` and `ys` need not be reduced, and those of `out` are correct modulo $2^k$ but not
-// reduced. If `ys` is `None`, `xs` is squared, with one transform fewer.
+// coefficients `xs` and `ys`, all three nonempty, modulo $2^k$ or $m$ as `modulus` says (see
+// `NttModulus`); `out.len()` must be at most `xs.len() + ys.len() - 1`. If `ys` is `None`, `xs` is
+// squared, with one transform fewer.
 //
 // A product of $L$ coefficients needs a transform of length $N \geq L$, a power of 2. When $L$
 // exceeds $N/2$ by only $t \leq N / 8$, the cyclic convolution of length $N/2$ is computed instead:
@@ -578,8 +734,9 @@ fn mul_truncated_ntt_helper<T: PrimitiveUnsigned>(
     out: &mut [T],
     xs: &[T],
     ys: Option<&[T]>,
-    pow: u64,
+    modulus: NttModulus<T>,
 ) {
+    let pow = modulus.bits();
     let len = out.len();
     let xs = &xs[..min(xs.len(), len)];
     let ys = ys.map(|ys| &ys[..min(ys.len(), len)]);
@@ -590,7 +747,14 @@ fn mul_truncated_ntt_helper<T: PrimitiveUnsigned>(
     let excess = full_len.saturating_sub(half);
     if half < 4 || excess == 0 || excess > half / WRAP_DIVISOR {
         let log_len = u64::wrapping_from(n).ceiling_log_base_2();
-        cyclic_ntt(out, xs, ys, pow, log_len, prime_count(pow, min(len1, len2)));
+        cyclic_ntt(
+            out,
+            xs,
+            ys,
+            modulus,
+            log_len,
+            prime_count(pow, min(len1, len2)),
+        );
         return;
     }
     // The top coefficients: c_i for i >= half involves only the elements of `xs` from index len1 -
@@ -599,7 +763,7 @@ fn mul_truncated_ntt_helper<T: PrimitiveUnsigned>(
     let top_xs = &xs[start1..];
     let top_ys = ys.map_or(top_xs, |ys| &ys[start2..]);
     let mut top = vec![T::ZERO; top_xs.len() + top_ys.len() - 1];
-    mul_wrapping(&mut top, top_xs, top_ys, pow);
+    modulus.mul_to_out(&mut top, top_xs, top_ys);
     let high = &top[half - start1 - start2..];
     // Each coefficient of the cyclic convolution is a sum of at most twice as many products, so one
     // more bit is needed.
@@ -609,12 +773,12 @@ fn mul_truncated_ntt_helper<T: PrimitiveUnsigned>(
         &mut out[..low_len],
         xs,
         ys,
-        pow,
+        modulus,
         log_len,
         prime_count(pow + 1, min(len1, len2)),
     );
     for (o, &h) in out.iter_mut().zip(high) {
-        o.wrapping_sub_assign(h);
+        modulus.sub_assign(o, h);
     }
     if len > half {
         out[half..].copy_from_slice(&high[..len - half]);
@@ -631,7 +795,7 @@ crate_test_fn! {mul_truncated_ntt<T: PrimitiveUnsigned>(
     ys: &[T],
     pow: u64,
 ) {
-    mul_truncated_ntt_helper(out, xs, Some(ys), pow);
+    mul_truncated_ntt_helper(out, xs, Some(ys), NttModulus::PowerOf2(pow));
 }}
 
 // Sets `out` to the first `out.len()` coefficients of the square of the polynomial with
@@ -639,15 +803,37 @@ crate_test_fn! {mul_truncated_ntt<T: PrimitiveUnsigned>(
 // transforms; `out.len()` must be at most `2 * xs.len() - 1`. The input need not be reduced, and
 // the output is correct modulo $2^k$ but not reduced.
 crate_test_fn! {square_truncated_ntt<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], pow: u64) {
-    mul_truncated_ntt_helper(out, xs, None, pow);
+    mul_truncated_ntt_helper(out, xs, None, NttModulus::PowerOf2(pow));
+}}
+
+// Sets `out` to the first `out.len()` coefficients of the product of the polynomials with
+// coefficients `xs` and `ys`, all three nonempty and the inputs reduced modulo `m`, modulo `m`, by
+// number-theoretic transforms; `out.len()` must be at most `xs.len() + ys.len() - 1`.
+crate_test_fn! {mod_mul_truncated_ntt<T: PrimitiveUnsigned>(
+    out: &mut [T],
+    xs: &[T],
+    ys: &[T],
+    m: T,
+) {
+    mul_truncated_ntt_helper(out, xs, Some(ys), NttModulus::Mod(m));
+}}
+
+// Sets `out` to the first `out.len()` coefficients of the square of the polynomial with
+// coefficients `xs`, both nonempty and the input reduced modulo `m`, modulo `m`, by
+// number-theoretic transforms; `out.len()` must be at most `2 * xs.len() - 1`.
+crate_test_fn! {mod_square_truncated_ntt<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], m: T) {
+    mul_truncated_ntt_helper(out, xs, None, NttModulus::Mod(m));
 }}
 
 // The operations whose choice between Karatsuba multiplication and number-theoretic transforms is
 // measured separately.
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub(crate) enum NttOp {
-    // A product, whole or truncated.
+    // A whole product, and, modulo $2^k$, a truncated one.
     Mul,
+    // A truncated product modulo $m$, which Karatsuba multiplication computes at a lower cost than
+    // a whole one.
+    MulTruncated,
     // A whole square.
     Square,
     // A truncated square, which Karatsuba multiplication computes at about half the cost of a whole
@@ -688,13 +874,49 @@ pub(crate) fn ntt_preferred<T: PrimitiveUnsigned>(op: NttOp, len: usize, pow: u6
         [896, 2560, 4096, 6144, 7168, 9216],
     ];
     let row = match op {
-        NttOp::Mul => 0,
+        NttOp::Mul | NttOp::MulTruncated => 0,
         NttOp::Square => 1,
         NttOp::SquareTruncated => 2,
     };
     // The cheapest case, a single prime, has the lowest threshold; check it before counting.
     let table = if T::WIDTH > 64 { &WIDE } else { &NARROW };
     len >= table[row][0] && len >= table[row][prime_count(pow, len) - 1]
+}
+
+// Whether a product of polynomials with coefficients of type `T` modulo $m$, where $m$ has `bits`
+// bits, the shorter of whose factors (after any truncation) has `len` coefficients, is computed by
+// number-theoretic transforms rather than by Karatsuba multiplication. Karatsuba multiplication
+// modulo $m$ reduces every product, so it costs more than in wrapping arithmetic, and the
+// thresholds are lower than `ntt_preferred`'s. Measured on an Apple M-series machine, 2026-10, on
+// balanced factors, for moduli of 8 to 64 bits (one to three primes) and `u128` moduli of 100 and
+// 128 bits (four and five primes); the entries for `u128` with fewer primes are the narrow ones,
+// and the sixth entries are the fifth.
+pub(crate) fn mod_ntt_preferred(op: NttOp, len: usize, bits: u64) -> bool {
+    // The thresholds for 1 to 6 primes.
+    const THRESHOLDS: [[usize; 6]; 4] = [
+        [229, 387, 460, 273, 229, 229],
+        [387, 460, 548, 273, 229, 229],
+        [387, 460, 460, 460, 387, 387],
+        [460, 776, 776, 460, 387, 387],
+    ];
+    let row = match op {
+        NttOp::Mul => 0,
+        NttOp::MulTruncated => 1,
+        NttOp::Square => 2,
+        NttOp::SquareTruncated => 3,
+    };
+    // Every threshold is at least the lowest; check it before counting.
+    len >= 229 && len >= THRESHOLDS[row][prime_count(bits, len) - 1]
+}
+
+// Whether multiplications modulo $m$ by a fixed factor, truncated to `n` coefficients, use an
+// `NttFixedFactor` rather than Karatsuba multiplication, where `len` is the length of the shorter
+// factor after truncation and $m$ has `bits` bits. Measured as for `mod_ntt_preferred`, for 8
+// products by one fixed factor, all of the same length.
+pub(crate) fn mod_fixed_ntt_preferred(len: usize, bits: u64) -> bool {
+    // The thresholds for 1 to 6 primes.
+    const THRESHOLDS: [usize; 6] = [193, 229, 273, 193, 162, 162];
+    len >= 162 && len >= THRESHOLDS[prime_count(bits, len) - 1]
 }
 
 // Sets each element of `outs`, all with the same nonzero length $n$, to the first $n$ coefficients
@@ -709,7 +931,25 @@ mul_truncated_many_by_fixed_ntt<T: PrimitiveUnsigned>(
     ys: &[T],
     pow: u64,
 ) {
-    let factor = NttFixedFactor::<T>::new(ys, outs[0].len(), pow);
+    let factor = NttFixedFactor::<T>::new(ys, outs[0].len(), NttModulus::PowerOf2(pow));
+    for (out, xs) in outs.iter_mut().zip(xss) {
+        factor.mul_truncated(out, xs);
+    }
+}}
+
+// Sets each element of `outs`, all with the same nonzero length $n$, to the first $n$ coefficients
+// of the product of the corresponding element of `xss` and `ys`, all reduced modulo `m`, modulo
+// `m`, by number-theoretic transforms with the transforms of `ys` computed once. For measuring
+// `mod_fixed_ntt_preferred`.
+crate_test_fn! {
+#[allow(dead_code)]
+mod_mul_truncated_many_by_fixed_ntt<T: PrimitiveUnsigned>(
+    outs: &mut [Vec<T>],
+    xss: &[Vec<T>],
+    ys: &[T],
+    m: T,
+) {
+    let factor = NttFixedFactor::<T>::new(ys, outs[0].len(), NttModulus::Mod(m));
     for (out, xs) in outs.iter_mut().zip(xss) {
         factor.mul_truncated(out, xs);
     }

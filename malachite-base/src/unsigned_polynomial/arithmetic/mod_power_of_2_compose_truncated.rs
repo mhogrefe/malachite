@@ -24,6 +24,7 @@ use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
 };
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::*;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_square_truncated::*;
+use crate::unsigned_polynomial::arithmetic::ntt::{FixedFactor, NttModulus};
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::min;
@@ -48,7 +49,7 @@ crate_test_fn! {mod_power_of_2_compose_truncated_horner<T: PrimitiveUnsigned>(
     acc.extend(ys.iter().map(|&y| y.wrapping_mul(leading)));
     acc[0].wrapping_add_assign(xs[i]);
     let mut scratch = Vec::with_capacity(n);
-    let factor = FixedFactor::new(ys, n, pow, i);
+    let factor = FixedFactor::new(ys, n, NttModulus::PowerOf2(pow), i);
     while i > 0 {
         i -= 1;
         // The product overwrites every element, so stale ones may stay.
@@ -160,7 +161,7 @@ crate_test_fn! {mod_power_of_2_compose_truncated_brent_kung<T: PrimitiveUnsigned
     a[0] = T::ONE;
     a[n..n + ys.len()].copy_from_slice(ys);
     // The powers of `ys` and then `ys^m` itself: m - 1 products.
-    let factor = FixedFactor::new(ys, n, pow, m - 1);
+    let factor = FixedFactor::new(ys, n, NttModulus::PowerOf2(pow), m - 1);
     for i in 2..m {
         let (previous, current) = a.split_at_mut(i * n);
         factor.mul_truncated(&mut current[..n], &previous[(i - 1) * n..]);
@@ -169,7 +170,7 @@ crate_test_fn! {mod_power_of_2_compose_truncated_brent_kung<T: PrimitiveUnsigned
     // Combine the rows by Horner's rule in h = ys^m.
     let mut h = vec![T::ZERO; n];
     factor.mul_truncated(&mut h, &a[(m - 1) * n..]);
-    let h_factor = FixedFactor::new(&h, n, pow, m - 1);
+    let h_factor = FixedFactor::new(&h, n, NttModulus::PowerOf2(pow), m - 1);
     let mut acc = c[(m - 1) * n..].to_vec();
     let mut scratch = vec![T::ZERO; n];
     for row in c.chunks_exact(n).take(m - 1).rev() {

@@ -15,6 +15,9 @@ use crate::unsigned_polynomial::arithmetic::mod_mul::{
 };
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::from_coefficients_trimmed;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::truncated_len;
+use crate::unsigned_polynomial::arithmetic::ntt::{
+    NttOp, mod_mul_truncated_ntt, mod_ntt_preferred,
+};
 use crate::unsigned_vector::arithmetic::mod_add::mod_add_assign_slice;
 use crate::unsigned_vector::arithmetic::mod_dot::{ModData, column_sum};
 use alloc::vec;
@@ -137,12 +140,12 @@ mod_mul_truncated_to_out_karatsuba<T: PrimitiveUnsigned>(
 #[doc(hidden)]
 pub fn mod_mul_truncated_to_out<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T], m: T) {
     assert_lengths(out, xs, ys);
-    mod_mul_truncated_karatsuba(
-        out,
-        xs,
-        ys,
-        &ModData::new(m, xs.len().min(ys.len()).min(out.len())),
-    );
+    let len = min(min(xs.len(), ys.len()), out.len());
+    if mod_ntt_preferred(NttOp::MulTruncated, len, m.significant_bits()) {
+        mod_mul_truncated_ntt(out, xs, ys, m);
+    } else {
+        mod_mul_truncated_karatsuba(out, xs, ys, &ModData::new(m, len));
+    }
 }
 
 // The product of the polynomials with coefficients `xs` and `ys`, both reduced modulo `m`,
@@ -176,7 +179,7 @@ impl<T: PrimitiveUnsigned> ModMulTruncated<Self, T> for UnsignedPolynomial<T> {
     /// $x^n$, so only their first `len` coefficients are read.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -232,7 +235,7 @@ impl<T: PrimitiveUnsigned> ModMulTruncated<&Self, T> for UnsignedPolynomial<T> {
     /// $x^n$, so only their first `len` coefficients are read.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -288,7 +291,7 @@ impl<T: PrimitiveUnsigned> ModMulTruncated<UnsignedPolynomial<T>, T> for &Unsign
     /// $x^n$, so only their first `len` coefficients are read.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -347,7 +350,7 @@ impl<T: PrimitiveUnsigned> ModMulTruncated<&UnsignedPolynomial<T>, T> for &Unsig
     /// $x^n$, so only their first `len` coefficients are read.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -401,7 +404,7 @@ impl<T: PrimitiveUnsigned> ModMulTruncatedAssign<Self, T> for UnsignedPolynomial
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -439,7 +442,7 @@ impl<T: PrimitiveUnsigned> ModMulTruncatedAssign<&Self, T> for UnsignedPolynomia
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///

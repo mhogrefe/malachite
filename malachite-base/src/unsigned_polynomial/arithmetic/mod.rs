@@ -60,6 +60,10 @@ pub mod mod_add_truncated;
 /// [`ModComposeAssign`](crate::polynomial::ModComposeAssign), for composing two polynomials modulo
 /// a number.
 pub mod mod_compose;
+/// Implementations of [`ModComposeTruncated`](crate::polynomial::ModComposeTruncated) and
+/// [`ModComposeTruncatedAssign`](crate::polynomial::ModComposeTruncatedAssign), for composing two
+/// polynomials modulo $m$ as power series, keeping only the low coefficients of the result.
+pub mod mod_compose_truncated;
 /// Implementations of [`ModDerivative`](crate::polynomial::ModDerivative) and
 /// [`ModDerivativeAssign`](crate::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.

@@ -17,6 +17,9 @@ use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::trunca
 use crate::unsigned_polynomial::arithmetic::mod_square::{
     mod_square_classical_prefix, mod_square_karatsuba,
 };
+use crate::unsigned_polynomial::arithmetic::ntt::{
+    NttOp, mod_ntt_preferred, mod_square_truncated_ntt,
+};
 use crate::unsigned_vector::arithmetic::mod_add::mod_add_assign_slice;
 use crate::unsigned_vector::arithmetic::mod_dot::ModData;
 use alloc::vec;
@@ -91,7 +94,12 @@ mod_square_truncated_to_out_karatsuba<T: PrimitiveUnsigned>(out: &mut [T], xs: &
 #[doc(hidden)]
 pub fn mod_square_truncated_to_out<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], m: T) {
     assert_lengths(out, xs);
-    mod_square_truncated_karatsuba(out, xs, &ModData::new(m, xs.len().min(out.len())));
+    let len = min(xs.len(), out.len());
+    if mod_ntt_preferred(NttOp::SquareTruncated, len, m.significant_bits()) {
+        mod_square_truncated_ntt(out, xs, m);
+    } else {
+        mod_square_truncated_karatsuba(out, xs, &ModData::new(m, len));
+    }
 }
 
 fn assert_reduced<T: PrimitiveUnsigned>(p: &UnsignedPolynomial<T>, m: T) {
@@ -130,7 +138,7 @@ impl<T: PrimitiveUnsigned> ModSquareTruncated<T> for UnsignedPolynomial<T> {
     /// so only its first `len` coefficients are read.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -186,7 +194,7 @@ impl<T: PrimitiveUnsigned> ModSquareTruncated<T> for &UnsignedPolynomial<T> {
     /// so only its first `len` coefficients are read.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -234,7 +242,7 @@ impl<T: PrimitiveUnsigned> ModSquareTruncatedAssign<T> for UnsignedPolynomial<T>
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///

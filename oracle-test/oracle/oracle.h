@@ -299,6 +299,9 @@ int run_mod_compose(const char * arg);
 /* mod_power_of_2_compose.c */
 int run_mod_power_of_2_compose(const char * arg);
 
+/* mod_compose_series.c */
+int run_mod_compose_series(const char * arg);
+
 /* mod_power_of_2_compose_series.c */
 int run_mod_power_of_2_compose_series(const char * arg);
 

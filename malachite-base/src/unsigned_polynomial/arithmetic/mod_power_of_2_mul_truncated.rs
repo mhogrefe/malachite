@@ -14,9 +14,7 @@ use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
     MOD_POWER_OF_2_MUL_KARATSUBA_THRESHOLD, add_wrapping_assign, from_coefficients_trimmed,
     mask_coefficients, mul_karatsuba_wrapping,
 };
-use crate::unsigned_polynomial::arithmetic::ntt::{
-    NttFixedFactor, NttOp, fixed_ntt_preferred, mul_truncated_ntt, ntt_preferred,
-};
+use crate::unsigned_polynomial::arithmetic::ntt::{NttOp, mul_truncated_ntt, ntt_preferred};
 use alloc::vec;
 use core::cmp::min;
 
@@ -100,52 +98,6 @@ pub(crate) fn mul_truncated_wrapping<T: PrimitiveUnsigned>(
         mul_truncated_ntt(out, xs, ys, pow);
     } else {
         mul_truncated_karatsuba_wrapping(out, xs, ys);
-    }
-}
-
-// The fewest products by a fixed factor for which its transforms are computed once. With fewer, the
-// saving does not make up for the transforms being chosen at lengths where they lose to Karatsuba
-// multiplication, since `fixed_ntt_preferred` was measured for 8 products.
-const FIXED_FACTOR_MIN_USES: usize = 4;
-
-// A polynomial that many others are multiplied by, keeping only the first `n` coefficients of each
-// product: when there are enough products and they are long enough, its transforms are computed
-// once (see `NttFixedFactor`); otherwise each product is a call to `mul_truncated_wrapping`.
-pub(crate) struct FixedFactor<'a, T: PrimitiveUnsigned> {
-    ys: &'a [T],
-    pow: u64,
-    ntt: Option<NttFixedFactor<T>>,
-}
-
-impl<'a, T: PrimitiveUnsigned> FixedFactor<'a, T> {
-    // Prepares the polynomial with coefficients `ys`, which is nonempty, for `uses` products
-    // truncated to `n` coefficients, correct modulo $2^k$, where $k$ is `pow`.
-    pub(crate) fn new(ys: &'a [T], n: usize, pow: u64, uses: usize) -> Self {
-        let ntt =
-            if uses >= FIXED_FACTOR_MIN_USES && fixed_ntt_preferred::<T>(min(ys.len(), n), pow) {
-                Some(NttFixedFactor::new(ys, n, pow))
-            } else {
-                None
-            };
-        Self { ys, pow, ntt }
-    }
-
-    // Sets `out`, which is nonempty and no longer than the `n` the factor was prepared for, to the
-    // first `out.len()` coefficients of the product of the polynomial with coefficients `xs`, which
-    // is nonempty, and the fixed factor, correct modulo $2^k$ but not reduced. A short `xs` is
-    // multiplied without the transforms.
-    pub(crate) fn mul_truncated(&self, out: &mut [T], xs: &[T]) {
-        match &self.ntt {
-            Some(ntt)
-                if fixed_ntt_preferred::<T>(
-                    min(min(xs.len(), self.ys.len()), out.len()),
-                    self.pow,
-                ) =>
-            {
-                ntt.mul_truncated(out, xs);
-            }
-            _ => mul_truncated_wrapping(out, xs, self.ys, self.pow),
-        }
     }
 }
 

@@ -6763,6 +6763,34 @@ pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2
     )
 }
 
+pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_5<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 19),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .map(|(p, q, len, m)| (p, q.mul_power_of_x(1), len, m))
+        .filter(|(p, q, _, m)| p.mod_is_reduced(m) && q.mod_is_reduced(m)),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_6<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 1000),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .map(|(p, q, len, m)| (p, q.mul_power_of_x(1), len, m))
+        .filter(|(p, q, _, m)| p.mod_is_reduced(m) && q.mod_is_reduced(m)),
+    )
+}
+
 pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
 -> It<(UnsignedPolynomial<T>, T, T)> {
     Box::new(

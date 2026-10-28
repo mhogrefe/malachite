@@ -11,10 +11,14 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_add::assert_reduced;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::from_coefficients_trimmed;
+use crate::unsigned_polynomial::arithmetic::ntt::{
+    NttOp, mod_mul_truncated_ntt, mod_ntt_preferred,
+};
 use crate::unsigned_vector::arithmetic::mod_add::mod_add_assign_slice;
 use crate::unsigned_vector::arithmetic::mod_dot::{ModData, column_sum};
 use crate::unsigned_vector::arithmetic::mod_sub::mod_sub_assign_slice;
 use alloc::vec;
+use core::cmp::min;
 
 // Multiplication of polynomials whose coefficients are words reduced modulo a word $m$. As in
 // FLINT's `_nmod_poly_mul_classical`, each coefficient of a product is accumulated exactly, in one,
@@ -173,7 +177,12 @@ mod_mul_to_out_karatsuba<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T]
 #[doc(hidden)]
 pub fn mod_mul_to_out<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T], m: T) {
     assert_lengths(out, xs, ys);
-    mod_mul_karatsuba(out, xs, ys, &ModData::new(m, xs.len().min(ys.len())));
+    let len = min(xs.len(), ys.len());
+    if mod_ntt_preferred(NttOp::Mul, len, m.significant_bits()) {
+        mod_mul_truncated_ntt(out, xs, ys, m);
+    } else {
+        mod_mul_karatsuba(out, xs, ys, &ModData::new(m, len));
+    }
 }
 
 // The product of the polynomials with coefficients `xs` and `ys`, both reduced modulo `m`, modulo
@@ -205,7 +214,7 @@ impl<T: PrimitiveUnsigned> ModMul<Self, T> for UnsignedPolynomial<T> {
     /// then the degree of the product is lower than the sum of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -260,7 +269,7 @@ impl<T: PrimitiveUnsigned> ModMul<&Self, T> for UnsignedPolynomial<T> {
     /// then the degree of the product is lower than the sum of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -315,7 +324,7 @@ impl<T: PrimitiveUnsigned> ModMul<UnsignedPolynomial<T>, T> for &UnsignedPolynom
     /// then the degree of the product is lower than the sum of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -368,7 +377,7 @@ impl<T: PrimitiveUnsigned> ModMul<&UnsignedPolynomial<T>, T> for &UnsignedPolyno
     /// then the degree of the product is lower than the sum of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -417,7 +426,7 @@ impl<T: PrimitiveUnsigned> ModMulAssign<Self, T> for UnsignedPolynomial<T> {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -455,7 +464,7 @@ impl<T: PrimitiveUnsigned> ModMulAssign<&Self, T> for UnsignedPolynomial<T> {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///

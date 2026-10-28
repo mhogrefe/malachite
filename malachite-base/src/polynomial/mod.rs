@@ -872,6 +872,39 @@ pub trait ModPowerOf2ComposeAssign<Rhs = Self> {
     fn mod_power_of_2_compose_assign(&mut self, other: Rhs, pow: u64);
 }
 
+/// Composes two polynomials modulo $m$, keeping only the coefficients of $x^i$ for $i$ less than a
+/// given length: composition of power series with coefficients modulo $m$. The inner polynomial
+/// must have constant coefficient 0, and the coefficients of both must already be reduced modulo
+/// $m$.
+///
+/// With $n$ equal to `len`, this is $p(q(x)) \bmod x^n$ with coefficients modulo $m$. Since $q(0) =
+/// 0$, the coefficients of $x^i$ for $i \geq n$ of $p$ and $q$ do not affect the result.
+pub trait ModComposeTruncated<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Composes two polynomials modulo $m$ and truncates the result to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p, q, n, m) = (p(q(x)) \bmod x^n) \bmod m.
+    /// $$
+    fn mod_compose_truncated(self, other: Rhs, len: u64, m: M) -> Self::Output;
+}
+
+/// Composes two polynomials modulo $m$ in place, keeping only the coefficients of $x^i$ for $i$
+/// less than a given length: composition of power series with coefficients modulo $m$. The inner
+/// polynomial must have constant coefficient 0, and the coefficients of both must already be
+/// reduced modulo $m$.
+pub trait ModComposeTruncatedAssign<Rhs = Self, M = Self> {
+    /// Composes `self` with a polynomial modulo $m$ and truncates the result to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// p \gets (p(q(x)) \bmod x^n) \bmod m.
+    /// $$
+    fn mod_compose_truncated_assign(&mut self, other: Rhs, len: u64, m: M);
+}
+
 /// Composes two polynomials modulo $2^k$, keeping only the coefficients of $x^i$ for $i$ less than
 /// a given length: composition of power series with coefficients modulo $2^k$. The inner polynomial
 /// must have constant coefficient 0, and the coefficients of both must already be reduced modulo
