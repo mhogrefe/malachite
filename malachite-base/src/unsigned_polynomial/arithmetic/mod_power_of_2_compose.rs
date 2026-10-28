@@ -11,9 +11,9 @@ use crate::polynomial::{ModPowerOf2Compose, ModPowerOf2ComposeAssign, ModPowerOf
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_add::assert_reduced;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
-    add_wrapping_assign, from_coefficients_trimmed, mask_coefficients, mul_karatsuba_wrapping,
+    add_wrapping_assign, from_coefficients_trimmed, mask_coefficients, mul_wrapping,
 };
-use crate::unsigned_polynomial::arithmetic::mod_power_of_2_square::square_karatsuba_wrapping;
+use crate::unsigned_polynomial::arithmetic::mod_power_of_2_square::square_wrapping;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_taylor_shift::*;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -36,9 +36,13 @@ const fn compose_horner_preferred<T: PrimitiveUnsigned>(xs_len: usize, ys_len: u
 }
 
 // The coefficients of the composition of the polynomials with coefficients `xs` and `ys`, both
-// nonempty, modulo $2^W$, by Horner's rule over whole polynomials: $((x_{n-1} y + x_{n-2}) y +
-// \cdots) y + x_0$. The result is neither reduced modulo a smaller power of 2 nor trimmed.
-crate_test_fn! {mod_power_of_2_compose_horner<T: PrimitiveUnsigned>(xs: &[T], ys: &[T]) -> Vec<T> {
+// nonempty, correct modulo $2^k$, where $k$ is `pow`, by Horner's rule over whole polynomials:
+// $((x_{n-1} y + x_{n-2}) y + \cdots) y + x_0$. The result is neither reduced nor trimmed.
+crate_test_fn! {mod_power_of_2_compose_horner<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    pow: u64,
+) -> Vec<T> {
     let (&leading, rest) = xs.split_last().unwrap();
     let Some((&second, rest)) = rest.split_last() else {
         return vec![leading];
@@ -50,7 +54,7 @@ crate_test_fn! {mod_power_of_2_compose_horner<T: PrimitiveUnsigned>(xs: &[T], ys
     for &x in rest.iter().rev() {
         // The product overwrites every element, so stale ones may stay.
         scratch.resize(acc.len() + step, T::ZERO);
-        mul_karatsuba_wrapping(&mut scratch, &acc, ys);
+        mul_wrapping(&mut scratch, &acc, ys, pow);
         scratch[0].wrapping_add_assign(x);
         swap(&mut acc, &mut scratch);
     }
@@ -66,13 +70,14 @@ fn add_wrapping_assign_val<T: PrimitiveUnsigned>(xs: &mut Vec<T>, mut ys: Vec<T>
 }
 
 // The coefficients of the composition of the polynomials with coefficients `xs` and `ys`, both
-// nonempty, modulo $2^W$, by divide and conquer: each coefficient of `xs` starts as a constant
-// group; at every level, neighboring groups $g_{2i}$ and $g_{2i+1}$ merge into $g_{2i} + y^{2^j}
-// g_{2i+1}$, and the power of `ys` is squared, until one group is left. Zero groups are kept empty.
-// The result is neither reduced modulo a smaller power of 2 nor trimmed.
+// nonempty, correct modulo $2^k$, where $k$ is `pow`, by divide and conquer: each coefficient of
+// `xs` starts as a constant group; at every level, neighboring groups $g_{2i}$ and $g_{2i+1}$ merge
+// into $g_{2i} + y^{2^j} g_{2i+1}$, and the power of `ys` is squared, until one group is left. Zero
+// groups are kept empty. The result is neither reduced nor trimmed.
 crate_test_fn! {mod_power_of_2_compose_divide_and_conquer<T: PrimitiveUnsigned>(
     xs: &[T],
     ys: &[T],
+    pow: u64,
 ) -> Vec<T> {
     let mut groups: Vec<Vec<T>> = xs
         .iter()
@@ -87,7 +92,7 @@ crate_test_fn! {mod_power_of_2_compose_divide_and_conquer<T: PrimitiveUnsigned>(
                 && !hi.is_empty()
             {
                 let mut product = vec![T::ZERO; power.len() + hi.len() - 1];
-                mul_karatsuba_wrapping(&mut product, &power, &hi);
+                mul_wrapping(&mut product, &power, &hi, pow);
                 add_wrapping_assign_val(&mut lo, product);
             }
             merged.push(lo);
@@ -97,7 +102,7 @@ crate_test_fn! {mod_power_of_2_compose_divide_and_conquer<T: PrimitiveUnsigned>(
             break;
         }
         let mut square = vec![T::ZERO; (power.len() << 1) - 1];
-        square_karatsuba_wrapping(&mut square, &power);
+        square_wrapping(&mut square, &power, pow);
         power = square;
     }
     groups.pop().unwrap()
@@ -143,9 +148,9 @@ pub fn mod_power_of_2_compose_vec<T: PrimitiveUnsigned>(
         }
         _ => {
             let mut out = if compose_horner_preferred::<T>(xs.len(), ys.len()) {
-                mod_power_of_2_compose_horner(&xs, ys)
+                mod_power_of_2_compose_horner(&xs, ys, pow)
             } else {
-                mod_power_of_2_compose_divide_and_conquer(&xs, ys)
+                mod_power_of_2_compose_divide_and_conquer(&xs, ys, pow)
             };
             mask_coefficients(&mut out, pow);
             out
@@ -174,7 +179,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Compose<Self> for UnsignedPolynomial<T> {
     /// product of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O((nm)^{\log_2 3})$
+    /// $T(n, m) = O(nm \log^2 (nm))$
     ///
     /// $M(n, m) = O(nm)$
     ///
@@ -243,7 +248,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Compose<&Self> for UnsignedPolynomial<T> {
     /// product of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O((nm)^{\log_2 3})$
+    /// $T(n, m) = O(nm \log^2 (nm))$
     ///
     /// $M(n, m) = O(nm)$
     ///
@@ -312,7 +317,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Compose<UnsignedPolynomial<T>> for &Unsign
     /// product of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O((nm)^{\log_2 3})$
+    /// $T(n, m) = O(nm \log^2 (nm))$
     ///
     /// $M(n, m) = O(nm)$
     ///
@@ -385,7 +390,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Compose<&UnsignedPolynomial<T>> for &Unsig
     /// product of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O((nm)^{\log_2 3})$
+    /// $T(n, m) = O(nm \log^2 (nm))$
     ///
     /// $M(n, m) = O(nm)$
     ///
@@ -457,7 +462,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2ComposeAssign<Self> for UnsignedPolynomial
     /// product of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O((nm)^{\log_2 3})$
+    /// $T(n, m) = O(nm \log^2 (nm))$
     ///
     /// $M(n, m) = O(nm)$
     ///
@@ -513,7 +518,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2ComposeAssign<&Self> for UnsignedPolynomia
     /// product of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O((nm)^{\log_2 3})$
+    /// $T(n, m) = O(nm \log^2 (nm))$
     ///
     /// $M(n, m) = O(nm)$
     ///

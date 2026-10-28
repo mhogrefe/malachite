@@ -675,6 +675,15 @@ documented by git history.
   algorithm (built on `IntegerMatrix` multiplication), and the near-linear algorithm of Kinoshita
   and Li, chosen by measured cutoffs; outer coefficients that cannot contribute are skipped, and
   monomial inner polynomials are handled directly.
+- `UnsignedPolynomial<T>` multiplication and squaring modulo $2^k$ (`ModPowerOf2Mul`,
+  `ModPowerOf2MulTruncated`, `ModPowerOf2Square`, `ModPowerOf2SquareTruncated`, and the
+  compositions and Taylor shifts built on them) use number-theoretic transforms for long
+  polynomials: exact products modulo one to six word primes, as few as $k$ and the length need,
+  reconstructed by Garner's algorithm, in $O(n \log n)$ time. They overtake Karatsuba
+  multiplication from about 512 coefficients for $k$ up to about 24 bits and are 2 to 6 times
+  faster at 16384. Truncated compositions reuse the transforms of a factor they multiply by
+  repeatedly (the inner polynomial, and in the Brent–Kung algorithm its power $q^m$), so that each
+  such product costs two transforms rather than three.
 - New `ModPowerOf2ComposeTruncated` and `ModPowerOf2ComposeTruncatedAssign` traits in
   malachite-base, implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` with either
   polynomial by value or by reference: composition of power series modulo $2^k$,

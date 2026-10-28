@@ -172,7 +172,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2TaylorShift<T> for UnsignedPolynomial<T> {
     /// does the degree.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log^2 n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -226,7 +226,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2TaylorShift<T> for &UnsignedPolynomial<T> 
     /// does the degree.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log^2 n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -276,7 +276,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2TaylorShiftAssign<T> for UnsignedPolynomia
     /// does the degree.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log^2 n)$
     ///
     /// $M(n) = O(n)$
     ///

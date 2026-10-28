@@ -364,3 +364,5 @@ pub mod mod_taylor_shift;
 /// [`MulPowerOfXAssign`](crate::polynomial::MulPowerOfXAssign), for multiplying a polynomial by a
 /// power of its variable.
 pub mod mul_power_of_x;
+#[doc(hidden)]
+pub mod ntt;

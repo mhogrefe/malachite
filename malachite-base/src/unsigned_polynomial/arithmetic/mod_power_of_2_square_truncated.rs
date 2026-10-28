@@ -16,6 +16,7 @@ use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
 };
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::*;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_square::square_karatsuba_wrapping;
+use crate::unsigned_polynomial::arithmetic::ntt::{NttOp, ntt_preferred, square_truncated_ntt};
 use alloc::vec;
 use core::cmp::min;
 
@@ -74,6 +75,18 @@ pub(crate) fn square_truncated_karatsuba_wrapping<T: PrimitiveUnsigned>(out: &mu
     }
 }
 
+// Sets `out` to the first `out.len()` coefficients of the square of the polynomial with
+// coefficients `xs`, both nonempty, correct modulo $2^k$, where $k$ is `pow`, but not reduced: by
+// Karatsuba squaring, or, for long inputs, by number-theoretic transforms (see `ntt_preferred`).
+// `out.len()` must be at most `2 * xs.len() - 1`. The input need not be reduced.
+pub(crate) fn square_truncated_wrapping<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], pow: u64) {
+    if ntt_preferred::<T>(NttOp::SquareTruncated, min(xs.len(), out.len()), pow) {
+        square_truncated_ntt(out, xs, pow);
+    } else {
+        square_truncated_karatsuba_wrapping(out, xs);
+    }
+}
+
 fn assert_lengths<T>(out: &[T], xs: &[T]) {
     assert!(!out.is_empty());
     assert!(!xs.is_empty());
@@ -125,7 +138,7 @@ pub fn mod_power_of_2_square_truncated_to_out<T: PrimitiveUnsigned>(
 ) {
     assert_lengths(out, xs);
     assert!(pow <= T::WIDTH);
-    square_truncated_karatsuba_wrapping(out, xs);
+    square_truncated_wrapping(out, xs, pow);
     mask_coefficients(out, pow);
 }
 
@@ -167,7 +180,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SquareTruncated for UnsignedPolynomial<T> 
     /// so only its first `len` coefficients are read.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -224,7 +237,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SquareTruncated for &UnsignedPolynomial<T>
     /// so only its first `len` coefficients are read.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -273,7 +286,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SquareTruncatedAssign for UnsignedPolynomi
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///

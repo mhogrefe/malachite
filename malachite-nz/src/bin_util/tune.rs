@@ -1673,10 +1673,10 @@ fn tune_poly_unsigned_mod_power_of_2_compose_grid() {
                     .map(|x| x | T::ONE)
                     .collect();
                 let t_horner = time_shift(&xs, &|xs| {
-                    black_box(mod_power_of_2_compose_horner(xs, &ys));
+                    black_box(mod_power_of_2_compose_horner(xs, &ys, T::WIDTH));
                 });
                 let t_dc = time_shift(&xs, &|xs| {
-                    black_box(mod_power_of_2_compose_divide_and_conquer(xs, &ys));
+                    black_box(mod_power_of_2_compose_divide_and_conquer(xs, &ys, T::WIDTH));
                 });
                 print_compose_row(T::NAME, T::WIDTH, len2, len1, t_horner, t_dc);
             }

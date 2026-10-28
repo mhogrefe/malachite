@@ -15,6 +15,7 @@ use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
     MOD_POWER_OF_2_SQUARE_KARATSUBA_THRESHOLD, add_wrapping_assign, from_coefficients_trimmed,
     karatsuba_wrapping_scratch_len, mask_coefficients, sub_wrapping_assign,
 };
+use crate::unsigned_polynomial::arithmetic::ntt::{NttOp, ntt_preferred, square_truncated_ntt};
 use alloc::vec;
 
 // Sets `out` to the square of the polynomial with coefficients `xs`, modulo $2^\text{W}$, by
@@ -83,6 +84,18 @@ pub(crate) fn square_karatsuba_wrapping<T: PrimitiveUnsigned>(out: &mut [T], xs:
     square_karatsuba_scratch_wrapping(out, xs, &mut scratch);
 }
 
+// Sets `out` to the square of the polynomial with coefficients `xs`, which is nonempty, correct
+// modulo $2^k$, where $k$ is `pow`, but not reduced: by Karatsuba squaring, or, for long inputs, by
+// number-theoretic transforms (see `ntt_preferred`). `out` must have length `2 * xs.len() - 1`. The
+// input need not be reduced.
+pub(crate) fn square_wrapping<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], pow: u64) {
+    if ntt_preferred::<T>(NttOp::Square, xs.len(), pow) {
+        square_truncated_ntt(out, xs, pow);
+    } else {
+        square_karatsuba_wrapping(out, xs);
+    }
+}
+
 fn assert_lengths<T>(out: &[T], xs: &[T]) {
     assert!(!xs.is_empty());
     assert_eq!(out.len(), (xs.len() << 1) - 1);
@@ -130,7 +143,7 @@ mod_power_of_2_square_to_out_karatsuba<T: PrimitiveUnsigned>(
 pub fn mod_power_of_2_square_to_out<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], pow: u64) {
     assert_lengths(out, xs);
     assert!(pow <= T::WIDTH);
-    square_karatsuba_wrapping(out, xs);
+    square_wrapping(out, xs, pow);
     mask_coefficients(out, pow);
 }
 
@@ -170,7 +183,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Square for UnsignedPolynomial<T> {
     /// square is lower than twice the degree.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -226,7 +239,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Square for &UnsignedPolynomial<T> {
     /// square is lower than twice the degree.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -275,7 +288,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2SquareAssign for UnsignedPolynomial<T> {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///

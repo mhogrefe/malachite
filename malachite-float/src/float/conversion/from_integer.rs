@@ -207,7 +207,7 @@ impl Float {
     /// - If the [`Integer`] rounds to a value greater than or equal to $2^{2^{30}-1}$), this
     ///   function overflows to $\infty$.
     /// - If the [`Integer`] rounds to a value less than or equal to -$2^{2^{30}-1}$), this function
-    ///   overflows to $\infty$.
+    ///   overflows to $-\infty$.
     ///
     /// # Worst-case complexity
     /// $T(m,n) = O(\max(m,n))$
@@ -270,7 +270,7 @@ impl Float {
     /// - If the [`Integer`] rounds to a value greater than or equal to $2^{2^{30}-1}$), this
     ///   function overflows to $\infty$.
     /// - If the [`Integer`] rounds to a value less than or equal to -$2^{2^{30}-1}$), this function
-    ///   overflows to $\infty$.
+    ///   overflows to $-\infty$.
     ///
     /// # Worst-case complexity
     /// $T(m,n) = O(\max(m,n))$

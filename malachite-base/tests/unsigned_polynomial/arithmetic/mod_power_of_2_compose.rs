@@ -40,7 +40,7 @@ fn check<T: PrimitiveUnsigned>(
     if *p != UnsignedPolynomial::ZERO && *q != UnsignedPolynomial::ZERO {
         // Both kernels, whatever the lengths, reduced afterwards.
         for kernel in [mod_power_of_2_compose_horner, mod_power_of_2_compose_divide_and_conquer] {
-            let xs = kernel(p.coefficients_asc(), q.coefficients_asc());
+            let xs = kernel(p.coefficients_asc(), q.coefficients_asc(), pow);
             assert_eq!(
                 UnsignedPolynomial::from_coefficients_asc(
                     xs.into_iter().map(|x| x.mod_power_of_2(pow)).collect(),

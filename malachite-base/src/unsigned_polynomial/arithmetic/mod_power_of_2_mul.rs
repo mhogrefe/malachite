@@ -10,8 +10,10 @@ use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_add::assert_reduced;
+use crate::unsigned_polynomial::arithmetic::ntt::{NttOp, mul_truncated_ntt, ntt_preferred};
 use alloc::vec;
 use alloc::vec::Vec;
+use core::cmp::min;
 
 // Multiplication of polynomials whose coefficients are words reduced modulo $2^k$, for $k$ no
 // greater than the word width W. Arithmetic modulo $2^\text{W}$ is wrapping arithmetic, and $2^k$
@@ -149,6 +151,18 @@ pub(crate) fn mul_karatsuba_wrapping<T: PrimitiveUnsigned>(out: &mut [T], xs: &[
     }
 }
 
+// Sets `out` to the product of the polynomials with coefficients `xs` and `ys`, both nonempty,
+// correct modulo $2^k$, where $k$ is `pow`, but not reduced: by Karatsuba multiplication, or, for
+// long factors, by number-theoretic transforms (see `ntt_preferred`). `out` must have length
+// `xs.len() + ys.len() - 1`. The inputs need not be reduced.
+pub(crate) fn mul_wrapping<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T], pow: u64) {
+    if ntt_preferred::<T>(NttOp::Mul, min(xs.len(), ys.len()), pow) {
+        mul_truncated_ntt(out, xs, ys, pow);
+    } else {
+        mul_karatsuba_wrapping(out, xs, ys);
+    }
+}
+
 fn assert_lengths<T>(out: &[T], xs: &[T], ys: &[T]) {
     assert!(!xs.is_empty());
     assert!(!ys.is_empty());
@@ -204,7 +218,7 @@ pub fn mod_power_of_2_mul_to_out<T: PrimitiveUnsigned>(
 ) {
     assert_lengths(out, xs, ys);
     assert!(pow <= T::WIDTH);
-    mul_karatsuba_wrapping(out, xs, ys);
+    mul_wrapping(out, xs, ys, pow);
     mask_coefficients(out, pow);
 }
 
@@ -244,7 +258,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Mul<Self> for UnsignedPolynomial<T> {
     /// product is lower than the sum of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -300,7 +314,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Mul<&Self> for UnsignedPolynomial<T> {
     /// product is lower than the sum of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -356,7 +370,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Mul<UnsignedPolynomial<T>> for &UnsignedPo
     /// product is lower than the sum of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -410,7 +424,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Mul<&UnsignedPolynomial<T>> for &UnsignedP
     /// product is lower than the sum of the degrees.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -460,7 +474,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2MulAssign<Self> for UnsignedPolynomial<T> 
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///
@@ -499,7 +513,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2MulAssign<&Self> for UnsignedPolynomial<T>
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{\log_2 3})$
+    /// $T(n) = O(n \log n)$
     ///
     /// $M(n) = O(n)$
     ///

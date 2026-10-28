@@ -23,21 +23,16 @@ use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
     add_wrapping_assign, from_coefficients_trimmed, mask_coefficients,
 };
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::*;
+use crate::unsigned_polynomial::arithmetic::mod_power_of_2_square_truncated::*;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::min;
 use core::mem::{swap, take};
 
-// Sets `out` to the first `out.len()` coefficients of the product of the polynomials with
-// coefficients `xs` and `ys`, both nonempty, modulo $2^W$.
-fn mul_truncated_wrapping<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T]) {
-    mul_truncated_karatsuba_wrapping(out, xs, ys);
-}
-
 // The first `n` coefficients of the composition of the polynomials with coefficients `xs` and `ys`,
-// modulo $2^W$, where `xs.len() >= 2` and `ys[0]` is 0, by Horner's rule. The running polynomial
-// and the scratch product trade places at every step. The result is not reduced modulo a smaller
-// power of 2.
+// correct modulo $2^k$, where $k$ is `pow`, `xs.len() >= 2`, and `ys[0]` is 0, by Horner's rule.
+// The running polynomial and the scratch product trade places at every step. The result is not
+// reduced.
 //
 // This is equivalent to `_gr_poly_compose_series_horner` from `gr_poly/compose_series_horner.c`,
 // FLINT 3.6.0, in wrapping word arithmetic, except that the product is not copied back.
@@ -45,6 +40,7 @@ crate_test_fn! {mod_power_of_2_compose_truncated_horner<T: PrimitiveUnsigned>(
     xs: &[T],
     ys: &[T],
     n: usize,
+    pow: u64,
 ) -> Vec<T> {
     let (&leading, rest) = xs.split_last().unwrap();
     let mut i = rest.len() - 1;
@@ -52,11 +48,12 @@ crate_test_fn! {mod_power_of_2_compose_truncated_horner<T: PrimitiveUnsigned>(
     acc.extend(ys.iter().map(|&y| y.wrapping_mul(leading)));
     acc[0].wrapping_add_assign(xs[i]);
     let mut scratch = Vec::with_capacity(n);
+    let factor = FixedFactor::new(ys, n, pow, i);
     while i > 0 {
         i -= 1;
         // The product overwrites every element, so stale ones may stay.
         scratch.resize(min(acc.len() + ys.len() - 1, n), T::ZERO);
-        mul_truncated_wrapping(&mut scratch, &acc, ys);
+        factor.mul_truncated(&mut scratch, &acc);
         swap(&mut acc, &mut scratch);
         acc[0].wrapping_add_assign(xs[i]);
     }
@@ -64,15 +61,17 @@ crate_test_fn! {mod_power_of_2_compose_truncated_horner<T: PrimitiveUnsigned>(
     acc
 }}
 
-// The first `n` coefficients of `xs + ys * zs`, modulo $2^W$, where `ys` and `zs` are nonempty.
+// The first `n` coefficients of `xs + ys * zs`, correct modulo $2^k$, where $k$ is `pow`, and `ys`
+// and `zs` are nonempty.
 fn add_mul_truncated_wrapping<T: PrimitiveUnsigned>(
     mut xs: Vec<T>,
     ys: &[T],
     zs: &[T],
     n: usize,
+    pow: u64,
 ) -> Vec<T> {
     let mut product = vec![T::ZERO; min(ys.len() + zs.len() - 1, n)];
-    mul_truncated_wrapping(&mut product, ys, zs);
+    mul_truncated_wrapping(&mut product, ys, zs, pow);
     if product.len() > xs.len() {
         swap(&mut xs, &mut product);
     }
@@ -81,11 +80,11 @@ fn add_mul_truncated_wrapping<T: PrimitiveUnsigned>(
 }
 
 // The first `n` coefficients of the composition of the polynomials with coefficients `xs` and `ys`,
-// modulo $2^W$, where `xs.len() >= 3` and `ys[0]` is 0, by divide and conquer: neighboring pairs of
-// coefficients $x_{2i} + x_{2i+1}y$ start as groups; at every level, neighboring groups $g_{2i}$
-// and $g_{2i+1}$ merge into $g_{2i} + y^{2^j} g_{2i+1}$, and the power of `ys` is squared, until
-// one group is left, everything truncated to `n` coefficients. The result is not reduced modulo a
-// smaller power of 2.
+// correct modulo $2^k$, where $k$ is `pow`, `xs.len() >= 3`, and `ys[0]` is 0, by divide and
+// conquer: neighboring pairs of coefficients $x_{2i} + x_{2i+1}y$ start as groups; at every level,
+// neighboring groups $g_{2i}$ and $g_{2i+1}$ merge into $g_{2i} + y^{2^j} g_{2i+1}$, and the power
+// of `ys` is squared, until one group is left, everything truncated to `n` coefficients. The result
+// is not reduced.
 //
 // This is equivalent to `_gr_poly_compose_series_divconquer` from
 // `gr_poly/compose_series_divconquer.c`, FLINT 3.6.0, in wrapping word arithmetic, except that each
@@ -94,6 +93,7 @@ crate_test_fn! {mod_power_of_2_compose_truncated_divide_and_conquer<T: Primitive
     xs: &[T],
     ys: &[T],
     n: usize,
+    pow: u64,
 ) -> Vec<T> {
     let mut groups: Vec<Vec<T>> = xs
         .chunks(2)
@@ -108,13 +108,13 @@ crate_test_fn! {mod_power_of_2_compose_truncated_divide_and_conquer<T: Primitive
         })
         .collect();
     let mut power = vec![T::ZERO; min((ys.len() << 1) - 1, n)];
-    mul_truncated_wrapping(&mut power, ys, ys);
+    square_truncated_wrapping(&mut power, ys, pow);
     loop {
         let mut merged = Vec::with_capacity(groups.len().div_ceil(2));
         let mut groups_iter = groups.into_iter();
         while let Some(lo) = groups_iter.next() {
             merged.push(if let Some(hi) = groups_iter.next() {
-                add_mul_truncated_wrapping(lo, &power, &hi, n)
+                add_mul_truncated_wrapping(lo, &power, &hi, n, pow)
             } else {
                 lo
             });
@@ -124,7 +124,7 @@ crate_test_fn! {mod_power_of_2_compose_truncated_divide_and_conquer<T: Primitive
             break;
         }
         let mut square = vec![T::ZERO; min((power.len() << 1) - 1, n)];
-        mul_truncated_wrapping(&mut square, &power, &power);
+        square_truncated_wrapping(&mut square, &power, pow);
         power = square;
     }
     let mut out = groups.pop().unwrap();
@@ -133,10 +133,11 @@ crate_test_fn! {mod_power_of_2_compose_truncated_divide_and_conquer<T: Primitive
 }}
 
 // The first `n` coefficients of the composition of the polynomials with coefficients `xs` and `ys`,
-// modulo $2^W$, where `ys[0]` is 0 and `2 <= xs.len() <= n`, by the Brent–Kung algorithm: with $m
-// = \lfloor \sqrt n \rfloor + 1$, the products of the $m$ blocks of $m$ coefficients of `xs` with
-// the first $m$ powers of `ys` are the rows of a matrix product, and they are combined by Horner's
-// rule in $y^m$. The result is not reduced modulo a smaller power of 2.
+// correct modulo $2^k$, where $k$ is `pow`, `ys[0]` is 0, and `2 <= xs.len() <= n`, by the
+// Brent–Kung algorithm: with $m = \lfloor \sqrt n \rfloor + 1$, the products of the $m$ blocks of
+// $m$ coefficients of `xs` with the first $m$ powers of `ys` are the rows of a matrix product,
+// computed modulo $2^W$, and they are combined by Horner's rule in $y^m$. The result is not
+// reduced.
 //
 // This is equivalent to `_gr_poly_compose_series_brent_kung` from
 // `gr_poly/compose_series_brent_kung.c`, FLINT 3.6.0, in wrapping word arithmetic, except that the
@@ -146,6 +147,7 @@ crate_test_fn! {mod_power_of_2_compose_truncated_brent_kung<T: PrimitiveUnsigned
     xs: &[T],
     ys: &[T],
     n: usize,
+    pow: u64,
 ) -> Vec<T> {
     let m = n.floor_sqrt() + 1;
     // The rows of B are the blocks of xs.
@@ -157,18 +159,21 @@ crate_test_fn! {mod_power_of_2_compose_truncated_brent_kung<T: PrimitiveUnsigned
     let mut a = vec![T::ZERO; m * n];
     a[0] = T::ONE;
     a[n..n + ys.len()].copy_from_slice(ys);
+    // The powers of `ys` and then `ys^m` itself: m - 1 products.
+    let factor = FixedFactor::new(ys, n, pow, m - 1);
     for i in 2..m {
         let (previous, current) = a.split_at_mut(i * n);
-        mul_truncated_wrapping(&mut current[..n], &previous[(i - 1) * n..], ys);
+        factor.mul_truncated(&mut current[..n], &previous[(i - 1) * n..]);
     }
     let c = matrix_wrapping_mul(&b, &a, ProductShape { ar: m, br: m, bc: n });
     // Combine the rows by Horner's rule in h = ys^m.
     let mut h = vec![T::ZERO; n];
-    mul_truncated_wrapping(&mut h, &a[(m - 1) * n..], ys);
+    factor.mul_truncated(&mut h, &a[(m - 1) * n..]);
+    let h_factor = FixedFactor::new(&h, n, pow, m - 1);
     let mut acc = c[(m - 1) * n..].to_vec();
     let mut scratch = vec![T::ZERO; n];
     for row in c.chunks_exact(n).take(m - 1).rev() {
-        mul_truncated_wrapping(&mut scratch, &acc, &h);
+        h_factor.mul_truncated(&mut scratch, &acc);
         add_wrapping_assign(&mut scratch, row);
         swap(&mut acc, &mut scratch);
     }
@@ -212,8 +217,9 @@ const fn divide_and_conquer_preferred(len1: usize, len2: usize, n: usize) -> boo
 }
 
 // The first `n` coefficients of the composition of the polynomials with coefficients `xs` and `ys`,
-// modulo $2^W$, where `xs.len() >= 2` and `ys[0]` is 0: directly if `ys` has a single nonzero
-// coefficient, and otherwise by Horner's rule, divide and conquer, or the Brent–Kung algorithm.
+// correct modulo $2^k$, where $k$ is `pow`, `xs.len() >= 2`, and `ys[0]` is 0: directly if `ys` has
+// a single nonzero coefficient, and otherwise by Horner's rule, divide and conquer, or the
+// Brent–Kung algorithm.
 //
 // This is equivalent to `_gr_poly_compose_series` from `gr_poly/compose_series.c`, FLINT 3.6.0, in
 // wrapping word arithmetic, except that the monomial case allows a monomial of any degree, that the
@@ -223,24 +229,25 @@ fn mod_power_of_2_compose_truncated_dispatch<T: PrimitiveUnsigned>(
     xs: &[T],
     ys: &[T],
     n: usize,
+    pow: u64,
 ) -> Vec<T> {
     let v = ys.iter().position(|&y| y != T::ZERO).unwrap();
     if ys[v + 1..].iter().all(|&y| y == T::ZERO) {
         mod_power_of_2_compose_truncated_monomial(xs, ys[v], v, n)
     } else if horner_preferred(xs.len(), n) {
-        mod_power_of_2_compose_truncated_horner(xs, ys, n)
+        mod_power_of_2_compose_truncated_horner(xs, ys, n, pow)
     } else if divide_and_conquer_preferred(xs.len(), ys.len(), n) {
-        mod_power_of_2_compose_truncated_divide_and_conquer(xs, ys, n)
+        mod_power_of_2_compose_truncated_divide_and_conquer(xs, ys, n, pow)
     } else {
-        mod_power_of_2_compose_truncated_brent_kung(xs, ys, n)
+        mod_power_of_2_compose_truncated_brent_kung(xs, ys, n, pow)
     }
 }
 
 // The coefficients of the composition, modulo $2^k$, of the polynomials with coefficients `xs` and
 // `ys`, keeping only the coefficients of $x^i$ for $i$ less than `len`, with `kernel` doing the
-// work in wrapping word arithmetic in the general case. The result is reduced and trimmed. If $v$
-// is the index of the first nonzero coefficient of `ys`, the term $p_i q^i$ is divisible by
-// $x^{iv}$, so only the first $\lceil n/v \rceil$ coefficients of `xs` are read.
+// work in the general case. The result is reduced and trimmed. If $v$ is the index of the first
+// nonzero coefficient of `ys`, the term $p_i q^i$ is divisible by $x^{iv}$, so only the first
+// $\lceil n/v \rceil$ coefficients of `xs` are read.
 //
 // This is equivalent to `nmod_poly_compose_series` from `nmod_poly/compose_series.c`, FLINT 3.6.0,
 // with modulus $2^k$, except that `xs` is truncated using $v$.
@@ -249,7 +256,7 @@ crate_test_fn! {mod_power_of_2_compose_truncated_with<T: PrimitiveUnsigned>(
     ys: &[T],
     len: u64,
     pow: u64,
-    kernel: fn(&[T], &[T], usize) -> Vec<T>,
+    kernel: fn(&[T], &[T], usize, u64) -> Vec<T>,
 ) -> Vec<T> {
     if let Some(&y) = ys.first() {
         assert_eq!(y, T::ZERO, "the inner polynomial must have constant coefficient 0");
@@ -265,7 +272,7 @@ crate_test_fn! {mod_power_of_2_compose_truncated_with<T: PrimitiveUnsigned>(
             let lenr = min((xs.len() - 1).saturating_mul(ys.len() - 1) + 1, n);
             let xs = &xs[..min(xs.len(), lenr)];
             let ys = &ys[..min(ys.len(), lenr)];
-            let mut out = kernel(xs, ys, lenr);
+            let mut out = kernel(xs, ys, lenr, pow);
             mask_coefficients(&mut out, pow);
             return from_coefficients_trimmed(out).coefficients;
         }
@@ -318,7 +325,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2ComposeTruncated<Self> for UnsignedPolynom
     /// trimmed.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{1/2 + \\log_2 3})$
+    /// $T(n) = O(n^2)$
     ///
     /// $M(n) = O(n^{3/2})$
     ///
@@ -387,7 +394,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2ComposeTruncated<&Self> for UnsignedPolyno
     /// trimmed.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{1/2 + \\log_2 3})$
+    /// $T(n) = O(n^2)$
     ///
     /// $M(n) = O(n^{3/2})$
     ///
@@ -458,7 +465,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2ComposeTruncated<UnsignedPolynomial<T>>
     /// trimmed.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{1/2 + \\log_2 3})$
+    /// $T(n) = O(n^2)$
     ///
     /// $M(n) = O(n^{3/2})$
     ///
@@ -531,7 +538,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2ComposeTruncated<&UnsignedPolynomial<T>>
     /// trimmed.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{1/2 + \\log_2 3})$
+    /// $T(n) = O(n^2)$
     ///
     /// $M(n) = O(n^{3/2})$
     ///
@@ -608,7 +615,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2ComposeTruncatedAssign<Self> for UnsignedP
     /// trimmed.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{1/2 + \\log_2 3})$
+    /// $T(n) = O(n^2)$
     ///
     /// $M(n) = O(n^{3/2})$
     ///
@@ -668,7 +675,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2ComposeTruncatedAssign<&Self> for Unsigned
     /// trimmed.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{1/2 + \\log_2 3})$
+    /// $T(n) = O(n^2)$
     ///
     /// $M(n) = O(n^{3/2})$
     ///
