@@ -123,7 +123,7 @@ const fn newton_cutoff<T: PrimitiveUnsigned>() -> usize {
 //
 // This is equivalent to `_nmod_poly_inv_series` from `nmod_poly/inv_series.c`, FLINT 3.6.0, with
 // `_gr_nmod_poly_inv_series` from `gr/nmod.c` inlined, in wrapping arithmetic.
-fn mod_power_of_2_inverse_truncated_dispatch<T: PrimitiveUnsigned>(
+pub(crate) fn mod_power_of_2_inverse_truncated_dispatch<T: PrimitiveUnsigned>(
     xs: &[T],
     n: usize,
     pow: u64,
@@ -174,6 +174,24 @@ crate_test_fn! {mod_power_of_2_inverse_truncated_with<T: PrimitiveUnsigned>(
     }
     Some(from_coefficients_trimmed(out))
 }}
+
+/// The coefficients of the inverse as a power series, modulo $2^k$, of the polynomial with
+/// coefficients `xs`, keeping only the coefficients of $x^i$ for $i$ less than `len`, trimmed, or
+/// `None` if the constant coefficient is not invertible. The coefficients must be reduced modulo
+/// $2^k$, where $k$ is `pow`, which must be no greater than `T::WIDTH`.
+///
+/// This is not part of the public API; it is public so that `malachite-nz` can invert
+/// `NaturalPolynomial`s modulo a word.
+#[doc(hidden)]
+#[inline]
+pub fn mod_power_of_2_inverse_truncated_vec<T: PrimitiveUnsigned>(
+    xs: &[T],
+    len: u64,
+    pow: u64,
+) -> Option<Vec<T>> {
+    mod_power_of_2_inverse_truncated_with(xs, len, pow, mod_power_of_2_inverse_truncated_dispatch)
+        .map(|p| p.coefficients)
+}
 
 impl<T: PrimitiveUnsigned> ModPowerOf2InverseTruncated for UnsignedPolynomial<T> {
     type Output = Self;

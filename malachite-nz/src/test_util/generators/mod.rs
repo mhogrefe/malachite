@@ -526,6 +526,49 @@ pub fn natural_polynomial_pair_unsigned_natural_quadruple_gen_var_3()
     )
 }
 
+// Like `natural_polynomial_pair_unsigned_natural_quadruple_gen_var_1`, but where the constant
+// coefficient of the second polynomial is coprime to the `Natural`.
+pub fn natural_polynomial_pair_unsigned_natural_quadruple_gen_var_4()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_4,
+        &random_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_4,
+        &special_random_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_4,
+    )
+}
+
+// Like `natural_polynomial_pair_unsigned_natural_quadruple_gen_var_4`, but with lengths up to 1000.
+pub fn natural_polynomial_pair_unsigned_natural_quadruple_gen_var_5()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_5,
+        &random_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_5,
+        &special_random_natural_polynomial_pair_unsigned_natural_quadruple_gen_var_5,
+    )
+}
+
+// Like `natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1`, but where the constant
+// coefficient of the second polynomial is odd, unless the second `u64` is 0.
+pub fn natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_4()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_4,
+        &random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_4,
+        &special_random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_4,
+    )
+}
+
+// Like `natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_4`, but with lengths up to
+// 1000.
+pub fn natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_5()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_5,
+        &random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_5,
+        &special_random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_5,
+    )
+}
+
 // All `(NaturalPolynomial, NaturalPolynomial, Natural)` where the `Natural` is positive and the
 // coefficients of both polynomials are less than it. The random polynomials are reduced from
 // arbitrary ones, so sums often wrap around and leading coefficients often cancel.
@@ -601,6 +644,27 @@ pub fn natural_polynomial_unsigned_natural_triple_gen_var_3()
         &exhaustive_natural_polynomial_unsigned_natural_triple_gen_var_3,
         &random_natural_polynomial_unsigned_natural_triple_gen_var_3,
         &special_random_natural_polynomial_unsigned_natural_triple_gen_var_3,
+    )
+}
+
+// Like `natural_polynomial_unsigned_natural_triple_gen_var_3`, but with the `u64` at most 1000.
+pub fn natural_polynomial_unsigned_natural_triple_gen_var_4()
+-> Generator<(NaturalPolynomial, u64, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_natural_triple_gen_var_4,
+        &random_natural_polynomial_unsigned_natural_triple_gen_var_4,
+        &special_random_natural_polynomial_unsigned_natural_triple_gen_var_4,
+    )
+}
+
+// Like `natural_polynomial_unsigned_unsigned_triple_gen_var_4`, but with the first `u64` at most
+// 1000.
+pub fn natural_polynomial_unsigned_unsigned_triple_gen_var_6()
+-> Generator<(NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_6,
+        &random_natural_polynomial_unsigned_unsigned_triple_gen_var_6,
+        &special_random_natural_polynomial_unsigned_unsigned_triple_gen_var_6,
     )
 }
 

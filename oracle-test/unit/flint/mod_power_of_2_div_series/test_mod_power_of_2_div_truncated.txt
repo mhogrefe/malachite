@@ -1,0 +1,13 @@
+(3*x+5).mod_power_of_2_div_truncated(x+1, 0, 3) = 0
+(0).mod_power_of_2_div_truncated(0, 5, 0) = 0
+(3*x+5).checked_mod_power_of_2_div_truncated(0, 3, 3) = None
+(3*x+5).checked_mod_power_of_2_div_truncated(x+2, 3, 3) = None
+(3*x+5).checked_mod_power_of_2_div_truncated(3*x, 3, 3) = None
+(0).mod_power_of_2_div_truncated(x+1, 4, 3) = 0
+(x^2+3*x+2).mod_power_of_2_div_truncated(3, 4, 3) = 3*x^2+x+6
+(5).mod_power_of_2_div_truncated(x+1, 4, 3) = 3*x^3+5*x^2+3*x+5
+(x^2+3*x+2).mod_power_of_2_div_truncated(x+1, 4, 3) = x+2
+(x^2+3*x+2).mod_power_of_2_div_truncated(x^2+2*x+3, 5, 3) = 5*x^4+7*x^3+3*x^2+5*x+6
+(5*x^4+x+3).mod_power_of_2_div_truncated(2*x^3+x+1, 2, 3) = 6*x+3
+(x^2+2*x+1).mod_power_of_2_div_truncated(x+1, 4, 3) = x+1
+(255*x^3+254*x^2+253*x).mod_power_of_2_div_truncated(253*x^2+254*x+255, 5, 8) = 12*x^4+252*x^2+3*x

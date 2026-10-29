@@ -59,7 +59,7 @@ use crate::num::random::{
 };
 use crate::options::random::random_options;
 use crate::orderings::random::random_orderings;
-use crate::polynomial::{ComposePowerOfX, MulPowerOfX};
+use crate::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
@@ -9137,6 +9137,98 @@ pub fn random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_6<
             &random_positive_unsigneds::<T>,
         )
         .map(|(p, q, len, m)| (p % m, (q % m).mul_power_of_x(1), len, m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_7<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(p, q, len, m)| (p % m, q % m, len, m))
+        .filter(|(_, q, _, m)| q.coefficient(0).coprime_with(*m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_8<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, q, len, pow)| (p.mod_power_of_2(pow), q.mod_power_of_2(pow), len, pow))
+        .filter(|(_, q, _, pow)| *pow == 0 || q.coefficient(0).odd()),
+    )
+}
+
+pub fn random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_9<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 1000),
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(p, q, len, m)| (p % m, q % m, len, m))
+        .filter(|(_, q, _, m)| q.coefficient(0).coprime_with(*m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_10<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 1000),
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, q, len, pow)| (p.mod_power_of_2(pow), q.mod_power_of_2(pow), len, pow))
+        .filter(|(_, q, _, pow)| *pow == 0 || q.coefficient(0).odd()),
     )
 }
 

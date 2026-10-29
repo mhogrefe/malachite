@@ -46,7 +46,7 @@ use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use crate::options::exhaustive::exhaustive_options;
 use crate::orderings::exhaustive::exhaustive_orderings;
-use crate::polynomial::{ComposePowerOfX, MulPowerOfX};
+use crate::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::sets::exhaustive::{exhaustive_b_tree_sets, exhaustive_hash_sets};
@@ -6812,6 +6812,70 @@ pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_6
         )
         .map(|(p, q, len, m)| (p, q.mul_power_of_x(1), len, m))
         .filter(|(p, q, _, m)| p.mod_is_reduced(m) && q.mod_is_reduced(m)),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_7<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 19),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(p, q, _, m)| {
+            p.mod_is_reduced(m) && q.mod_is_reduced(m) && q.coefficient(0).coprime_with(*m)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_8<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 19),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(p, q, _, pow)| {
+            p.mod_power_of_2_is_reduced(*pow)
+                && q.mod_power_of_2_is_reduced(*pow)
+                && (*pow == 0 || q.coefficient(0).odd())
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_9<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 1000),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(p, q, _, m)| {
+            p.mod_is_reduced(m) && q.mod_is_reduced(m) && q.coefficient(0).coprime_with(*m)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_10<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, 1000),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(p, q, _, pow)| {
+            p.mod_power_of_2_is_reduced(*pow)
+                && q.mod_power_of_2_is_reduced(*pow)
+                && (*pow == 0 || q.coefficient(0).odd())
+        }),
     )
 }
 

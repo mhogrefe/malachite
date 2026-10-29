@@ -706,11 +706,22 @@ documented by git history.
   algorithm, chosen by measured cutoffs. `NaturalPolynomial`s with a modulus that fits in a limb
   are composed as `UnsignedPolynomial`s of limbs.
 - New `ModInverseTruncated` and `ModPowerOf2InverseTruncated` traits in malachite-base,
-  implemented for `UnsignedPolynomial<T>` by value or by reference: inversion of a power series
-  modulo $m$ or $2^k$, keeping the first $n$ coefficients, like FLINT's `nmod_poly_inv_series`.
-  They return `None` when the constant coefficient is not invertible, as `ModInverse` does. Short
-  series are inverted coefficient by coefficient and longer ones by Newton's iteration with middle
-  products, which use number-theoretic transforms when long.
+  implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial`, by value or by reference (and,
+  for `NaturalPolynomial`, with the modulus by value or by reference): inversion of a power series
+  modulo $m$ or $2^k$, keeping the first $n$ coefficients, like FLINT's `nmod_poly_inv_series` and
+  `fmpz_mod_poly_inv_series`. They return `None` when the constant coefficient is not invertible,
+  as `ModInverse` does. Short series are inverted coefficient by coefficient and longer ones by
+  Newton's iteration, with middle products for words, which use number-theoretic transforms when
+  long. `NaturalPolynomial`s with a modulus of one or two limbs are inverted in word arithmetic.
+- New `ModDivTruncated`, `ModDivTruncatedAssign`, `CheckedModDivTruncated`,
+  `ModPowerOf2DivTruncated`, `ModPowerOf2DivTruncatedAssign`, and `CheckedModPowerOf2DivTruncated`
+  traits in malachite-base, implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` with
+  every combination of arguments by value or by reference: division of power series modulo $m$ or
+  $2^k$, keeping the first $n$ coefficients, like FLINT's `nmod_poly_div_series` and
+  `fmpz_mod_poly_div_series`. The plain forms panic when the divisor's constant coefficient is not
+  invertible, and the checked forms return `None`. Short divisors are handled coefficient by
+  coefficient and longer ones by the method of Karp and Markstein, with cutoffs measured for
+  Malachite.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

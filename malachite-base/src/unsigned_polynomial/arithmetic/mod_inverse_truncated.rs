@@ -216,7 +216,7 @@ crate_test_fn! {mod_inverse_truncated_newton<T: PrimitiveUnsigned>(
 //
 // This is equivalent to `_nmod_poly_inv_series` from `nmod_poly/inv_series.c`, FLINT 3.6.0, with
 // `_gr_nmod_poly_inv_series` from `gr/nmod.c` inlined.
-fn mod_inverse_truncated_dispatch<T: PrimitiveUnsigned>(
+pub(crate) fn mod_inverse_truncated_dispatch<T: PrimitiveUnsigned>(
     xs: &[T],
     n: usize,
     m: T,
@@ -262,6 +262,19 @@ crate_test_fn! {mod_inverse_truncated_with<T: PrimitiveUnsigned>(
     let n = usize::saturating_from(len);
     Some(from_coefficients_trimmed(kernel(xs, n, m, inverse)))
 }}
+
+/// The coefficients of the inverse as a power series, modulo `m`, of the polynomial with
+/// coefficients `xs`, keeping only the coefficients of $x^i$ for $i$ less than `len`, trimmed, or
+/// `None` if the constant coefficient is not invertible. The coefficients must be reduced modulo
+/// `m`, and `m` must be positive.
+///
+/// This is not part of the public API; it is public so that `malachite-nz` can invert
+/// `NaturalPolynomial`s modulo a word.
+#[doc(hidden)]
+#[inline]
+pub fn mod_inverse_truncated_vec<T: PrimitiveUnsigned>(xs: &[T], len: u64, m: T) -> Option<Vec<T>> {
+    mod_inverse_truncated_with(xs, len, m, mod_inverse_truncated_dispatch).map(|p| p.coefficients)
+}
 
 impl<T: PrimitiveUnsigned> ModInverseTruncated<T> for UnsignedPolynomial<T> {
     type Output = Self;

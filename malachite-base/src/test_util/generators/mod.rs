@@ -5237,6 +5237,50 @@ pub fn unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_6<T: Primiti
     )
 }
 
+// Like `unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_2`, but where the constant
+// coefficient of the second polynomial is coprime to the `T`.
+pub fn unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_7<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_7,
+        &random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_7,
+        &special_random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_7,
+    )
+}
+
+// Like `unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1`, but where the constant
+// coefficient of the second polynomial is odd, unless the second `u64` is 0.
+pub fn unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_8<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_8,
+        &random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_8,
+        &special_random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_8,
+    )
+}
+
+// Like `unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_7`, but with lengths up to
+// 1000.
+pub fn unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_9<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_9,
+        &random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_9,
+        &special_random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_9,
+    )
+}
+
+// Like `unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_8`, but with lengths up to
+// 1000.
+pub fn unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_10<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_10,
+        &random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_10,
+        &special_random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_10,
+    )
+}
+
 // All `(UnsignedPolynomial<T>, T, T)` where the last `T` is positive, and the polynomial's
 // coefficients and the first `T` are less than it.
 pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()

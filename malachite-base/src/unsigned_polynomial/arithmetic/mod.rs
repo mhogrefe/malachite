@@ -68,6 +68,11 @@ pub mod mod_compose_truncated;
 /// [`ModDerivativeAssign`](crate::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.
 pub mod mod_derivative;
+/// Implementations of [`ModDivTruncated`](crate::polynomial::ModDivTruncated),
+/// [`ModDivTruncatedAssign`](crate::polynomial::ModDivTruncatedAssign), and
+/// [`CheckedModDivTruncated`](crate::polynomial::CheckedModDivTruncated), for dividing polynomials
+/// as power series modulo a number, keeping only the low coefficients.
+pub mod mod_div_truncated;
 /// Implementations of [`ModIntegral`](crate::polynomial::ModIntegral) and
 /// [`ModIntegralAssign`](crate::polynomial::ModIntegralAssign), for integrating a polynomial modulo
 /// a value.
@@ -139,6 +144,11 @@ pub mod mod_power_of_2_compose_truncated;
 /// [`ModPowerOf2DerivativeAssign`](crate::polynomial::ModPowerOf2DerivativeAssign), for
 /// differentiating a polynomial modulo a power of 2.
 pub mod mod_power_of_2_derivative;
+/// Implementations of [`ModPowerOf2DivTruncated`](crate::polynomial::ModPowerOf2DivTruncated),
+/// [`ModPowerOf2DivTruncatedAssign`](crate::polynomial::ModPowerOf2DivTruncatedAssign), and
+/// [`CheckedModPowerOf2DivTruncated`](crate::polynomial::CheckedModPowerOf2DivTruncated), for
+/// dividing polynomials as power series modulo a power of 2, keeping only the low coefficients.
+pub mod mod_power_of_2_div_truncated;
 /// Implementations of [`ModPowerOf2Integral`](crate::polynomial::ModPowerOf2Integral) and
 /// [`ModPowerOf2IntegralAssign`](crate::polynomial::ModPowerOf2IntegralAssign), for integrating a
 /// polynomial modulo $2^k$.

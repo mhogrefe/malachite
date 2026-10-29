@@ -2330,8 +2330,63 @@ fn test_against_flint() {
             "mod_power_of_2_compose_series",
         );
     }
-    // The power series inversion demos of malachite-base's UnsignedPolynomial, modulo m and modulo
-    // powers of 2: by value, by reference, and with lengths up to 1000.
+    // The power series division demos of malachite-base's UnsignedPolynomial and malachite-nz's
+    // NaturalPolynomial, modulo m and modulo powers of 2: by value, by reference, in place, checked, and with lengths up to 1000.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_div_truncated_u8",
+        "demo_unsigned_polynomial_mod_div_truncated_u64",
+        "demo_unsigned_polynomial_mod_div_truncated_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_div_truncated_assign_u64",
+        "demo_unsigned_polynomial_checked_mod_div_truncated_u8",
+        "demo_unsigned_polynomial_checked_mod_div_truncated_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_div_truncated_long_u64",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_div_series");
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_div_truncated_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_div_truncated_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_div_truncated_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_power_of_2_div_truncated_assign_u64",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_div_truncated_u8",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_div_truncated_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_div_truncated_long_u64",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "mod_power_of_2_div_series",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_div_truncated",
+        "demo_natural_polynomial_mod_div_truncated_ref_ref",
+        "demo_natural_polynomial_mod_div_truncated_assign",
+        "demo_natural_polynomial_checked_mod_div_truncated",
+        "demo_natural_polynomial_checked_mod_div_truncated_ref_ref",
+        "demo_natural_polynomial_mod_div_truncated_long",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_div_series");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_div_truncated",
+        "demo_natural_polynomial_mod_power_of_2_div_truncated_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_div_truncated_assign",
+        "demo_natural_polynomial_checked_mod_power_of_2_div_truncated",
+        "demo_natural_polynomial_checked_mod_power_of_2_div_truncated_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_div_truncated_long",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "mod_power_of_2_div_series",
+        );
+    }
+    // The power series inversion demos of malachite-base's UnsignedPolynomial and malachite-nz's
+    // NaturalPolynomial, modulo m and modulo powers of 2: by value, by reference, and with lengths up
+    // to 1000.
     for demo_name in [
         "demo_unsigned_polynomial_mod_inverse_truncated_u8",
         "demo_unsigned_polynomial_mod_inverse_truncated_u64",
@@ -2349,6 +2404,26 @@ fn test_against_flint() {
         check_demo_against_flint(
             &oracle,
             "../malachite-base",
+            demo_name,
+            "mod_power_of_2_inverse_series",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_inverse_truncated",
+        "demo_natural_polynomial_mod_inverse_truncated_val_ref",
+        "demo_natural_polynomial_mod_inverse_truncated_ref_ref",
+        "demo_natural_polynomial_mod_inverse_truncated_long",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_inverse_series");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_inverse_truncated",
+        "demo_natural_polynomial_mod_power_of_2_inverse_truncated_ref",
+        "demo_natural_polynomial_mod_power_of_2_inverse_truncated_long",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
             demo_name,
             "mod_power_of_2_inverse_series",
         );

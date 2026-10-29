@@ -541,6 +541,62 @@ pub trait ModPowerOf2InverseTruncated {
     fn mod_power_of_2_inverse_truncated(self, len: u64, pow: u64) -> Option<Self::Output>;
 }
 
+/// Divides one polynomial by another as power series modulo $2^k$, keeping only the coefficients of
+/// $x^i$ for $i$ less than a given length. The coefficients must already be reduced modulo $2^k$,
+/// and the constant coefficient of the divisor must be odd.
+///
+/// With $n$ equal to `len`, this is division in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$, where a series is invertible exactly when its constant coefficient is
+/// odd.
+pub trait ModPowerOf2DivTruncated<Rhs = Self> {
+    type Output;
+
+    /// Divides a polynomial by another as power series modulo $2^k$, truncating the quotient to its
+    /// first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, q, n, k) = r, \quad \deg r < n, \quad qr \equiv p \pmod{x^n, 2^k}.
+    /// $$
+    fn mod_power_of_2_div_truncated(self, other: Rhs, len: u64, pow: u64) -> Self::Output;
+}
+
+/// Divides one polynomial by another as power series modulo $2^k$ in place, keeping only the
+/// coefficients of $x^i$ for $i$ less than a given length. The coefficients must already be reduced
+/// modulo $2^k$, and the constant coefficient of the divisor must be odd.
+pub trait ModPowerOf2DivTruncatedAssign<Rhs = Self> {
+    /// Divides `self` by another polynomial as power series modulo $2^k$, truncating the quotient
+    /// to its first `len` coefficients.
+    ///
+    /// $$
+    /// p \gets r, \quad \deg r < n, \quad qr \equiv p \pmod{x^n, 2^k}.
+    /// $$
+    fn mod_power_of_2_div_truncated_assign(&mut self, other: Rhs, len: u64, pow: u64);
+}
+
+/// Divides one polynomial by another as power series modulo $2^k$, keeping only the coefficients of
+/// $x^i$ for $i$ less than a given length, returning `None` if the constant coefficient of the
+/// divisor is even. The coefficients must already be reduced modulo $2^k$.
+pub trait CheckedModPowerOf2DivTruncated<Rhs = Self> {
+    type Output;
+
+    /// Divides a polynomial by another as power series modulo $2^k$, truncating the quotient to its
+    /// first `len` coefficients, or returns `None` if the divisor is not invertible.
+    ///
+    /// $$
+    /// f(p, q, n, k) = \\begin{cases}
+    ///     \operatorname{Some}(r) & \text{if } q_0 \text{ is odd}, \\\\
+    ///     \operatorname{None} & \text{otherwise},
+    /// \\end{cases}
+    /// $$
+    /// where $\deg r < n$ and $qr \equiv p \pmod{x^n, 2^k}$.
+    fn checked_mod_power_of_2_div_truncated(
+        self,
+        other: Rhs,
+        len: u64,
+        pow: u64,
+    ) -> Option<Self::Output>;
+}
+
 /// Adds two polynomials modulo $m$, keeping only the coefficients of $x^i$ for $i$ less than a
 /// given length. The coefficients of both must already be reduced modulo $m$.
 ///
@@ -734,6 +790,56 @@ pub trait ModInverseTruncated<M = Self> {
     /// f(p, n, m) = q \bmod x^n, \quad pq \equiv 1 \pmod{x^n, m}.
     /// $$
     fn mod_inverse_truncated(self, len: u64, m: M) -> Option<Self::Output>;
+}
+
+/// Divides one polynomial by another as power series modulo $m$, keeping only the coefficients of
+/// $x^i$ for $i$ less than a given length. The coefficients must already be reduced modulo $m$, and
+/// the constant coefficient of the divisor must be invertible modulo $m$.
+///
+/// With $n$ equal to `len`, this is division in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$, where a series is invertible exactly when its constant coefficient is.
+pub trait ModDivTruncated<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Divides a polynomial by another as power series modulo $m$, truncating the quotient to its
+    /// first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, q, n, m) = r, \quad \deg r < n, \quad qr \equiv p \pmod{x^n, m}.
+    /// $$
+    fn mod_div_truncated(self, other: Rhs, len: u64, m: M) -> Self::Output;
+}
+
+/// Divides one polynomial by another as power series modulo $m$ in place, keeping only the
+/// coefficients of $x^i$ for $i$ less than a given length. The coefficients must already be reduced
+/// modulo $m$, and the constant coefficient of the divisor must be invertible modulo $m$.
+pub trait ModDivTruncatedAssign<Rhs = Self, M = Self> {
+    /// Divides `self` by another polynomial as power series modulo $m$, truncating the quotient to
+    /// its first `len` coefficients.
+    ///
+    /// $$
+    /// p \gets r, \quad \deg r < n, \quad qr \equiv p \pmod{x^n, m}.
+    /// $$
+    fn mod_div_truncated_assign(&mut self, other: Rhs, len: u64, m: M);
+}
+
+/// Divides one polynomial by another as power series modulo $m$, keeping only the coefficients of
+/// $x^i$ for $i$ less than a given length, returning `None` if the constant coefficient of the
+/// divisor is not invertible modulo $m$. The coefficients must already be reduced modulo $m$.
+pub trait CheckedModDivTruncated<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Divides a polynomial by another as power series modulo $m$, truncating the quotient to its
+    /// first `len` coefficients, or returns `None` if the divisor is not invertible.
+    ///
+    /// $$
+    /// f(p, q, n, m) = \\begin{cases}
+    ///     \operatorname{Some}(r) & \text{if } q_0 \text{ is invertible modulo } m, \\\\
+    ///     \operatorname{None} & \text{otherwise},
+    /// \\end{cases}
+    /// $$
+    /// where $\deg r < n$ and $qr \equiv p \pmod{x^n, m}$.
+    fn checked_mod_div_truncated(self, other: Rhs, len: u64, m: M) -> Option<Self::Output>;
 }
 
 /// Computes the square of a polynomial's $L^2$ norm: the sum of the squares of its coefficients.

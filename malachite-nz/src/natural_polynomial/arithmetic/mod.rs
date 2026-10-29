@@ -113,10 +113,18 @@ pub mod mod_compose_truncated;
 /// [`ModDerivativeAssign`](malachite_base::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.
 pub mod mod_derivative;
+/// Implementations of [`ModDivTruncated`](malachite_base::polynomial::ModDivTruncated),
+/// [`ModDivTruncatedAssign`](malachite_base::polynomial::ModDivTruncatedAssign), and
+/// [`CheckedModDivTruncated`](malachite_base::polynomial::CheckedModDivTruncated), for dividing
+/// polynomials as power series modulo a number, keeping only the low coefficients.
+pub mod mod_div_truncated;
 /// Implementations of [`ModIntegral`](malachite_base::polynomial::ModIntegral) and
 /// [`ModIntegralAssign`](malachite_base::polynomial::ModIntegralAssign), for integrating a
 /// polynomial modulo a value.
 pub mod mod_integral;
+/// Implementations of [`ModInverseTruncated`](malachite_base::polynomial::ModInverseTruncated), for
+/// inverting a polynomial as a power series modulo a number, keeping only the low coefficients.
+pub mod mod_inverse_truncated;
 /// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
 /// which checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
@@ -181,10 +189,21 @@ pub mod mod_power_of_2_compose_truncated;
 /// and [`ModPowerOf2DerivativeAssign`](malachite_base::polynomial::ModPowerOf2DerivativeAssign),
 /// for differentiating a polynomial modulo a power of 2.
 pub mod mod_power_of_2_derivative;
+/// Implementations of
+/// [`ModPowerOf2DivTruncated`](malachite_base::polynomial::ModPowerOf2DivTruncated),
+/// [`ModPowerOf2DivTruncatedAssign`](malachite_base::polynomial::ModPowerOf2DivTruncatedAssign),
+/// and
+/// [`CheckedModPowerOf2DivTruncated`](malachite_base::polynomial::CheckedModPowerOf2DivTruncated),
+/// for dividing polynomials as power series modulo a power of 2, keeping only the low coefficients.
+pub mod mod_power_of_2_div_truncated;
 /// Implementations of [`ModPowerOf2Integral`](malachite_base::polynomial::ModPowerOf2Integral) and
 /// [`ModPowerOf2IntegralAssign`](malachite_base::polynomial::ModPowerOf2IntegralAssign), for
 /// integrating a polynomial modulo $2^k$.
 pub mod mod_power_of_2_integral;
+/// Implementations of
+/// [`ModPowerOf2InverseTruncated`](malachite_base::polynomial::ModPowerOf2InverseTruncated), for
+/// inverting a polynomial as a power series modulo a power of 2, keeping only the low coefficients.
+pub mod mod_power_of_2_inverse_truncated;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given power of 2.

@@ -8,12 +8,13 @@
     version 3 of the License, or (at your option) any later version. See
     <https://www.gnu.org/licenses/>.
 
-    Diffs the lines printed by the UnsignedPolynomial modular power series inversion demos against
+    Diffs the lines printed by the UnsignedPolynomial and NaturalPolynomial modular power series
+    inversion demos against
     fmpz_mod_poly_inv_series and, when the modulus is at least 2 and fits in a word, against
     nmod_poly_inv_series as well. Mode mod_inverse_series reads
     `(P).mod_inverse_truncated(n, m) = R`, and mode mod_power_of_2_inverse_series reads
     `(P).mod_power_of_2_inverse_truncated(n, k) = R`, with the modulus 2^k; in both, `(P)` may be
-    written `(&(P))`. R is a polynomial or `None`. FLINT aborts when the constant coefficient is not
+    written `(&(P))` and the modulus `&(M)`. R is a polynomial or `None`. FLINT aborts when the constant coefficient is not
     invertible, so a `None` is checked against fmpz_gcd instead, and the inverse modulo x^0 or
     modulo 1 must be 0. Any other nonempty line is an error, as is an input with no lines at all.
 */
@@ -46,6 +47,19 @@ cut(char * line, const char * needle)
     return at + strlen(needle);
 }
 
+/* Strips `&(` and the matching `)` from an argument written `&(M)`, in place. */
+static char *
+strip_ref(char * argument)
+{
+    size_t len = strlen(argument);
+    if (len >= 3 && argument[0] == '&' && argument[1] == '(' && argument[len - 1] == ')')
+    {
+        argument[len - 1] = '\0';
+        return argument + 2;
+    }
+    return argument;
+}
+
 /* Splits a line into the polynomial, the length, the modulus or exponent, and the result, in
    place. */
 static int
@@ -76,7 +90,12 @@ split_line(char * line, char ** p, char ** n, char ** m, char ** r)
     }
     *n = args;
     *m = cut(args, ", ");
-    return *m != NULL;
+    if (*m == NULL)
+    {
+        return 0;
+    }
+    *m = strip_ref(*m);
+    return 1;
 }
 
 static int
