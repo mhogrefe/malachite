@@ -141,7 +141,7 @@ crate_test_fn! {mod_power_of_2_div_truncated_newton(
 //
 // This is equivalent to `_gr_fmpz_mod_poly_div_series` from `gr/fmpz_mod.c`, FLINT 3.6.0, with the
 // modulus $2^k$, except that the cutoff was measured (see `NEWTON_POWER_OF_2_CUTOFFS`).
-fn mod_power_of_2_div_truncated_dispatch(
+pub(crate) fn mod_power_of_2_div_truncated_dispatch(
     xs: &[Natural],
     ys: &[Natural],
     n: usize,

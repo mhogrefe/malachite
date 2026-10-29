@@ -113,6 +113,11 @@ pub mod mod_compose_truncated;
 /// [`ModDerivativeAssign`](malachite_base::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.
 pub mod mod_derivative;
+/// Implementations of [`ModDivRem`](malachite_base::polynomial::ModDivRem),
+/// [`ModDivAssignRem`](malachite_base::polynomial::ModDivAssignRem), and
+/// [`CheckedModDivRem`](malachite_base::polynomial::CheckedModDivRem), for dividing polynomials
+/// modulo a number, returning the quotient and remainder.
+pub mod mod_div_rem;
 /// Implementations of [`ModDivTruncated`](malachite_base::polynomial::ModDivTruncated),
 /// [`ModDivTruncatedAssign`](malachite_base::polynomial::ModDivTruncatedAssign), and
 /// [`CheckedModDivTruncated`](malachite_base::polynomial::CheckedModDivTruncated), for dividing
@@ -189,6 +194,11 @@ pub mod mod_power_of_2_compose_truncated;
 /// and [`ModPowerOf2DerivativeAssign`](malachite_base::polynomial::ModPowerOf2DerivativeAssign),
 /// for differentiating a polynomial modulo a power of 2.
 pub mod mod_power_of_2_derivative;
+/// Implementations of [`ModPowerOf2DivRem`](malachite_base::polynomial::ModPowerOf2DivRem),
+/// [`ModPowerOf2DivAssignRem`](malachite_base::polynomial::ModPowerOf2DivAssignRem), and
+/// [`CheckedModPowerOf2DivRem`](malachite_base::polynomial::CheckedModPowerOf2DivRem), for dividing
+/// polynomials modulo a power of 2, returning the quotient and remainder.
+pub mod mod_power_of_2_div_rem;
 /// Implementations of
 /// [`ModPowerOf2DivTruncated`](malachite_base::polynomial::ModPowerOf2DivTruncated),
 /// [`ModPowerOf2DivTruncatedAssign`](malachite_base::polynomial::ModPowerOf2DivTruncatedAssign),
@@ -240,6 +250,16 @@ pub mod mod_power_of_2_pow_truncated;
 /// [`ModPowerOf2Product`](malachite_base::num::arithmetic::traits::ModPowerOf2Product), for
 /// multiplying polynomials together modulo a power of 2.
 pub mod mod_power_of_2_product;
+/// Implementations of [`ModPowerOf2Quotient`](malachite_base::polynomial::ModPowerOf2Quotient),
+/// [`ModPowerOf2QuotientAssign`](malachite_base::polynomial::ModPowerOf2QuotientAssign), and
+/// [`CheckedModPowerOf2Quotient`](malachite_base::polynomial::CheckedModPowerOf2Quotient), for
+/// finding the quotient of polynomials modulo a power of 2.
+pub mod mod_power_of_2_quotient;
+/// Implementations of [`ModPowerOf2Rem`](malachite_base::polynomial::ModPowerOf2Rem),
+/// [`ModPowerOf2RemAssign`](malachite_base::polynomial::ModPowerOf2RemAssign), and
+/// [`CheckedModPowerOf2Rem`](malachite_base::polynomial::CheckedModPowerOf2Rem), for finding the
+/// remainder of polynomials modulo a power of 2.
+pub mod mod_power_of_2_rem;
 /// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
 /// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a polynomial modulo a power of 2.
@@ -351,6 +371,16 @@ pub mod mod_power_of_2_taylor_shift;
 /// Implementations of [`ModProduct`](malachite_base::num::arithmetic::traits::ModProduct), for
 /// multiplying polynomials together modulo a number.
 pub mod mod_product;
+/// Implementations of [`ModQuotient`](malachite_base::polynomial::ModQuotient),
+/// [`ModQuotientAssign`](malachite_base::polynomial::ModQuotientAssign), and
+/// [`CheckedModQuotient`](malachite_base::polynomial::CheckedModQuotient), for finding the quotient
+/// of polynomials modulo a number.
+pub mod mod_quotient;
+/// Implementations of [`ModRem`](malachite_base::polynomial::ModRem),
+/// [`ModRemAssign`](malachite_base::polynomial::ModRemAssign), and
+/// [`CheckedModRem`](malachite_base::polynomial::CheckedModRem), for finding the remainder of
+/// polynomials modulo a number.
+pub mod mod_rem;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
 /// polynomial modulo a number.

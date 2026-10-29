@@ -303,6 +303,10 @@ int run_mod_power_of_2_compose(const char * arg);
 int run_mod_div_series(const char * arg);
 int run_mod_power_of_2_div_series(const char * arg);
 
+/* mod_div_rem.c */
+int run_mod_div_rem(const char * arg);
+int run_mod_power_of_2_div_rem(const char * arg);
+
 /* mod_inverse_series.c */
 int run_mod_inverse_series(const char * arg);
 int run_mod_power_of_2_inverse_series(const char * arg);

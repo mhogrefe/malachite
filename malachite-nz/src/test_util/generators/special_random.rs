@@ -1599,6 +1599,19 @@ pub fn special_random_natural_polynomial_natural_polynomial_natural_triple_gen_v
     )
 }
 
+pub fn special_random_natural_polynomial_natural_polynomial_natural_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, Natural)> {
+    Box::new(
+        special_random_natural_polynomial_natural_polynomial_natural_triple_gen_var_1(config)
+            .filter(|(_, q, m)| {
+                q.coefficients_asc()
+                    .last()
+                    .is_some_and(|y| y.coprime_with(m))
+            }),
+    )
+}
+
 pub fn special_random_natural_polynomial_natural_natural_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, Natural, Natural)> {
@@ -16660,5 +16673,14 @@ pub fn special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_
             &|seed| random_unsigned_inclusive_range(seed, 0, 1000),
         )
         .map(|(p, q, len)| (p, q.mul_power_of_x(1), len)),
+    )
+}
+
+pub fn special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1(config)
+            .filter(|(_, q, _)| q.coefficients_asc().last().is_some_and(Parity::odd)),
     )
 }

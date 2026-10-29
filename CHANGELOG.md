@@ -722,6 +722,17 @@ documented by git history.
   invertible, and the checked forms return `None`. Short divisors are handled coefficient by
   coefficient and longer ones by the method of Karp and Markstein, with cutoffs measured for
   Malachite.
+- New `ModDivRem`, `ModDivAssignRem`, `CheckedModDivRem`, `ModQuotient`, `ModQuotientAssign`,
+  `CheckedModQuotient`, `ModRem`, `ModRemAssign`, and `CheckedModRem` traits in malachite-base, and
+  their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial`
+  with every combination of arguments by value or by reference: Euclidean division of polynomials
+  modulo $m$ or $2^k$, like FLINT's `nmod_poly_divrem`, `nmod_poly_div`, and `nmod_poly_rem` and
+  their `fmpz_mod_poly` counterparts. `NaturalPolynomial`s with a modulus that fits in one or two
+  limbs are divided in word arithmetic. (`ModDiv` already names
+  scalar modular division, so the quotient alone is `ModQuotient`.) The plain forms panic when the
+  divisor is 0 or its leading coefficient is not invertible, and the checked forms return `None`.
+  The quotient is found by dividing the reversed polynomials as power series, and the remainder
+  with one truncated product.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

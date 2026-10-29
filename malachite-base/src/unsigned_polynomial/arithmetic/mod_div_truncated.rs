@@ -296,7 +296,7 @@ impl<T: PrimitiveUnsigned> ModDivTruncated<Self, T> for UnsignedPolynomial<T> {
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]
@@ -353,7 +353,7 @@ impl<T: PrimitiveUnsigned> ModDivTruncated<&Self, T> for UnsignedPolynomial<T> {
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]
@@ -410,7 +410,7 @@ impl<T: PrimitiveUnsigned> ModDivTruncated<UnsignedPolynomial<T>, T> for &Unsign
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]
@@ -472,7 +472,7 @@ impl<T: PrimitiveUnsigned> ModDivTruncated<&UnsignedPolynomial<T>, T> for &Unsig
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]
@@ -529,7 +529,7 @@ impl<T: PrimitiveUnsigned> ModDivTruncatedAssign<Self, T> for UnsignedPolynomial
     /// assert_eq!(p.to_string(), "6*x^4+5*x^3+6*x+3");
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]
@@ -581,7 +581,7 @@ impl<T: PrimitiveUnsigned> ModDivTruncatedAssign<&Self, T> for UnsignedPolynomia
     /// assert_eq!(p.to_string(), "6*x^4+5*x^3+6*x+3");
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]
@@ -646,7 +646,7 @@ impl<T: PrimitiveUnsigned> CheckedModDivTruncated<Self, T> for UnsignedPolynomia
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]
@@ -715,7 +715,7 @@ impl<T: PrimitiveUnsigned> CheckedModDivTruncated<&Self, T> for UnsignedPolynomi
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]
@@ -782,7 +782,7 @@ impl<T: PrimitiveUnsigned> CheckedModDivTruncated<UnsignedPolynomial<T>, T>
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]
@@ -858,7 +858,7 @@ impl<T: PrimitiveUnsigned> CheckedModDivTruncated<&UnsignedPolynomial<T>, T>
     /// );
     /// ```
     ///
-    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0
+    /// This is equivalent to `nmod_poly_div_series` from `nmod_poly/div_series.c`, FLINT 3.6.0,
     /// except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$ or
     /// modulo 1 is 0.
     #[inline]

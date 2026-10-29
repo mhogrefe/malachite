@@ -196,7 +196,7 @@ const NEWTON_CUTOFFS: [(u64, usize); 17] = [
 //
 // This is equivalent to `_gr_fmpz_mod_poly_div_series` from `gr/fmpz_mod.c`, FLINT 3.6.0, except
 // that the cutoff was measured (see `NEWTON_CUTOFFS`).
-fn mod_div_truncated_dispatch(
+pub(crate) fn mod_div_truncated_dispatch(
     xs: &[Natural],
     ys: &[Natural],
     n: usize,
@@ -349,8 +349,8 @@ impl ModDivTruncated<Self, Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated(self, other: Self, len: u64, m: Natural) -> Self {
         helper(&self, &other, len, &m)
@@ -410,8 +410,8 @@ impl ModDivTruncated<Self, &Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated(self, other: Self, len: u64, m: &Natural) -> Self {
         helper(&self, &other, len, m)
@@ -471,8 +471,8 @@ impl ModDivTruncated<&Self, Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated(self, other: &Self, len: u64, m: Natural) -> Self {
         helper(&self, other, len, &m)
@@ -532,8 +532,8 @@ impl ModDivTruncated<&Self, &Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated(self, other: &Self, len: u64, m: &Natural) -> Self {
         helper(&self, other, len, m)
@@ -593,8 +593,8 @@ impl ModDivTruncated<NaturalPolynomial, Natural> for &NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated(
         self,
@@ -659,8 +659,8 @@ impl ModDivTruncated<NaturalPolynomial, &Natural> for &NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated(
         self,
@@ -725,8 +725,8 @@ impl ModDivTruncated<&NaturalPolynomial, Natural> for &NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated(
         self,
@@ -791,8 +791,8 @@ impl ModDivTruncated<&NaturalPolynomial, &Natural> for &NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated(
         self,
@@ -852,8 +852,8 @@ impl ModDivTruncatedAssign<Self, Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated_assign(&mut self, other: Self, len: u64, m: Natural) {
         *self = helper(self, &other, len, &m);
@@ -908,8 +908,8 @@ impl ModDivTruncatedAssign<Self, &Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated_assign(&mut self, other: Self, len: u64, m: &Natural) {
         *self = helper(self, &other, len, m);
@@ -964,8 +964,8 @@ impl ModDivTruncatedAssign<&Self, Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated_assign(&mut self, other: &Self, len: u64, m: Natural) {
         *self = helper(self, other, len, &m);
@@ -1020,8 +1020,8 @@ impl ModDivTruncatedAssign<&Self, &Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$ or
-    /// modulo 1 is 0.
+    /// 3.6.0, except that Malachite panics where FLINT aborts, and that the quotient modulo $x^0$
+    /// or modulo 1 is 0.
     #[inline]
     fn mod_div_truncated_assign(&mut self, other: &Self, len: u64, m: &Natural) {
         *self = helper(self, other, len, m);
@@ -1093,7 +1093,7 @@ impl CheckedModDivTruncated<Self, Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
+    /// 3.6.0, except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
     /// or modulo 1 is 0.
     #[inline]
     fn checked_mod_div_truncated(self, other: Self, len: u64, m: Natural) -> Option<Self> {
@@ -1166,7 +1166,7 @@ impl CheckedModDivTruncated<Self, &Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
+    /// 3.6.0, except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
     /// or modulo 1 is 0.
     #[inline]
     fn checked_mod_div_truncated(self, other: Self, len: u64, m: &Natural) -> Option<Self> {
@@ -1239,7 +1239,7 @@ impl CheckedModDivTruncated<&Self, Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
+    /// 3.6.0, except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
     /// or modulo 1 is 0.
     #[inline]
     fn checked_mod_div_truncated(self, other: &Self, len: u64, m: Natural) -> Option<Self> {
@@ -1312,7 +1312,7 @@ impl CheckedModDivTruncated<&Self, &Natural> for NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
+    /// 3.6.0, except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
     /// or modulo 1 is 0.
     #[inline]
     fn checked_mod_div_truncated(self, other: &Self, len: u64, m: &Natural) -> Option<Self> {
@@ -1385,7 +1385,7 @@ impl CheckedModDivTruncated<NaturalPolynomial, Natural> for &NaturalPolynomial {
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
+    /// 3.6.0, except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
     /// or modulo 1 is 0.
     #[inline]
     fn checked_mod_div_truncated(
@@ -1463,7 +1463,7 @@ impl CheckedModDivTruncated<NaturalPolynomial, &Natural> for &NaturalPolynomial 
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
+    /// 3.6.0, except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
     /// or modulo 1 is 0.
     #[inline]
     fn checked_mod_div_truncated(
@@ -1542,7 +1542,7 @@ impl CheckedModDivTruncated<&NaturalPolynomial, Natural> for &NaturalPolynomial 
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
+    /// 3.6.0, except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
     /// or modulo 1 is 0.
     #[inline]
     fn checked_mod_div_truncated(
@@ -1621,7 +1621,7 @@ impl CheckedModDivTruncated<&NaturalPolynomial, &Natural> for &NaturalPolynomial
     /// ```
     ///
     /// This is equivalent to `fmpz_mod_poly_div_series` from `fmpz_mod_poly/div_series.c`, FLINT
-    /// 3.6.0 except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
+    /// 3.6.0, except that `None` is returned where FLINT aborts, and that the quotient modulo $x^0$
     /// or modulo 1 is 0.
     #[inline]
     fn checked_mod_div_truncated(

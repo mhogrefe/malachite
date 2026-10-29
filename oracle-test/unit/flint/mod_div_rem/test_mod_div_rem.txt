@@ -1,0 +1,46 @@
+(0).mod_div_rem(0, 1) = (0, 0)
+(0).mod_quotient(0, 1) = 0
+(0).mod_rem(0, 1) = 0
+p := 0; p.mod_div_assign_rem(0, 1) = 0; p = 0
+(3*x+5).checked_mod_div_rem(0, 7) = None
+(3*x+5).checked_mod_quotient(0, 7) = None
+(3*x+5).checked_mod_rem(0, 7) = None
+(x^3+x+1).checked_mod_div_rem(2*x+1, 4) = None
+(x^3+x+1).checked_mod_quotient(2*x+1, 4) = None
+(x^3+x+1).checked_mod_rem(2*x+1, 4) = None
+(5).mod_div_rem(3*x+2, 7) = (0, 5)
+(5).mod_quotient(3*x+2, 7) = 0
+(5).mod_rem(3*x+2, 7) = 5
+p := 5; p.mod_div_assign_rem(3*x+2, 7) = 5; p = 0
+(0).mod_div_rem(x+1, 7) = (0, 0)
+(0).mod_quotient(x+1, 7) = 0
+(0).mod_rem(x+1, 7) = 0
+p := 0; p.mod_div_assign_rem(x+1, 7) = 0; p = 0
+(6*x^2+5).mod_div_rem(3, 7) = (2*x^2+4, 0)
+(6*x^2+5).mod_quotient(3, 7) = 2*x^2+4
+(6*x^2+5).mod_rem(3, 7) = 0
+p := 6*x^2+5; p.mod_div_assign_rem(3, 7) = 0; p = 2*x^2+4
+(x^2+3*x+2).mod_div_rem(x+1, 7) = (x+2, 0)
+(x^2+3*x+2).mod_quotient(x+1, 7) = x+2
+(x^2+3*x+2).mod_rem(x+1, 7) = 0
+p := x^2+3*x+2; p.mod_div_assign_rem(x+1, 7) = 0; p = x+2
+(3*x+5).mod_div_rem(x+1, 7) = (3, 2)
+(3*x+5).mod_quotient(x+1, 7) = 3
+(3*x+5).mod_rem(x+1, 7) = 2
+p := 3*x+5; p.mod_div_assign_rem(x+1, 7) = 2; p = 3
+(x^3+2*x+1).mod_div_rem(x^2+3, 7) = (x, 6*x+1)
+(x^3+2*x+1).mod_quotient(x^2+3, 7) = x
+(x^3+2*x+1).mod_rem(x^2+3, 7) = 6*x+1
+p := x^3+2*x+1; p.mod_div_assign_rem(x^2+3, 7) = 6*x+1; p = x
+(x^5+3*x^4+2*x+1).mod_div_rem(3*x^2+x+1, 7) = (5*x^3+4*x^2+4*x+2, 3*x+6)
+(x^5+3*x^4+2*x+1).mod_quotient(3*x^2+x+1, 7) = 5*x^3+4*x^2+4*x+2
+(x^5+3*x^4+2*x+1).mod_rem(3*x^2+x+1, 7) = 3*x+6
+p := x^5+3*x^4+2*x+1; p.mod_div_assign_rem(3*x^2+x+1, 7) = 3*x+6; p = 5*x^3+4*x^2+4*x+2
+(4*x^3+2*x+1).mod_div_rem(5*x+3, 6) = (2*x^2+4, 1)
+(4*x^3+2*x+1).mod_quotient(5*x+3, 6) = 2*x^2+4
+(4*x^3+2*x+1).mod_rem(5*x+3, 6) = 1
+p := 4*x^3+2*x+1; p.mod_div_assign_rem(5*x+3, 6) = 1; p = 2*x^2+4
+(250*x^4+3*x+1).mod_div_rem(249*x^2+7, 251) = (126*x^2+190, 3*x+177)
+(250*x^4+3*x+1).mod_quotient(249*x^2+7, 251) = 126*x^2+190
+(250*x^4+3*x+1).mod_rem(249*x^2+7, 251) = 3*x+177
+p := 250*x^4+3*x+1; p.mod_div_assign_rem(249*x^2+7, 251) = 3*x+177; p = 126*x^2+190

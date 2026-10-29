@@ -171,6 +171,8 @@ static const oracle_mode modes[] = {
     {"mod_compose_series", run_mod_compose_series},
     {"mod_inverse_series", run_mod_inverse_series},
     {"mod_div_series", run_mod_div_series},
+    {"mod_div_rem", run_mod_div_rem},
+    {"mod_power_of_2_div_rem", run_mod_power_of_2_div_rem},
     {"mod_power_of_2_div_series", run_mod_power_of_2_div_series},
     {"mod_power_of_2_inverse_series", run_mod_power_of_2_inverse_series},
     {"fmpq_poly_compose", run_fmpq_poly_compose},

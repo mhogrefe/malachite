@@ -1,0 +1,77 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::num::basic::traits::Zero;
+use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::polynomial::Polynomial;
+use crate::unsigned_polynomial::UnsignedPolynomial;
+use crate::unsigned_polynomial::arithmetic::mod_power_of_2_div_rem::*;
+use crate::unsigned_polynomial::arithmetic::mod_power_of_2_div_truncated::*;
+
+// Divides one polynomial by another modulo 2^k by schoolbook long division, using only the scalar
+// modular arithmetic: while the remainder is at least as long as the divisor, its leading term is
+// cancelled by a multiple of the divisor. Returns `None` if the divisor is zero or its leading
+// coefficient is even.
+pub fn mod_power_of_2_div_rem_naive<T: PrimitiveUnsigned>(
+    p: &UnsignedPolynomial<T>,
+    q: &UnsignedPolynomial<T>,
+    pow: u64,
+) -> Option<(UnsignedPolynomial<T>, UnsignedPolynomial<T>)> {
+    if pow == 0 {
+        return Some((UnsignedPolynomial::ZERO, UnsignedPolynomial::ZERO));
+    }
+    let ys = q.coefficients_asc();
+    let inverse = ys.last()?.mod_power_of_2_inverse(pow)?;
+    let mut rs = p.coefficients_asc().to_vec();
+    if rs.len() < ys.len() {
+        return Some((UnsignedPolynomial::ZERO, p.clone()));
+    }
+    let mut qs = vec![T::ZERO; rs.len() - ys.len() + 1];
+    for i in (0..qs.len()).rev() {
+        let c = rs[i + ys.len() - 1].mod_power_of_2_mul(inverse, pow);
+        qs[i] = c;
+        for (j, &y) in ys.iter().enumerate() {
+            rs[i + j].mod_power_of_2_sub_assign(c.mod_power_of_2_mul(y, pow), pow);
+        }
+    }
+    rs.truncate(ys.len() - 1);
+    Some((
+        UnsignedPolynomial::from_coefficients_asc(qs),
+        UnsignedPolynomial::from_coefficients_asc(rs),
+    ))
+}
+
+// The quotient and remainder of two polynomials modulo 2^k, with the reversals divided as power
+// series coefficient by coefficient.
+pub fn mod_power_of_2_div_rem_basecase_wrapper<T: PrimitiveUnsigned>(
+    p: &UnsignedPolynomial<T>,
+    q: &UnsignedPolynomial<T>,
+    pow: u64,
+) -> Option<(UnsignedPolynomial<T>, UnsignedPolynomial<T>)> {
+    mod_power_of_2_div_rem_with(p.coefficients_asc(), q.coefficients_asc(), pow, basecase)
+}
+
+// `mod_power_of_2_div_truncated_basecase`, with the signature of the other kernels.
+fn basecase<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], n: usize, _pow: u64, inverse: T) -> Vec<T> {
+    mod_power_of_2_div_truncated_basecase(xs, ys, n, inverse)
+}
+
+// The quotient and remainder of two polynomials modulo 2^k, with the reversals divided as power
+// series by the method of Karp and Markstein.
+pub fn mod_power_of_2_div_rem_newton_wrapper<T: PrimitiveUnsigned>(
+    p: &UnsignedPolynomial<T>,
+    q: &UnsignedPolynomial<T>,
+    pow: u64,
+) -> Option<(UnsignedPolynomial<T>, UnsignedPolynomial<T>)> {
+    mod_power_of_2_div_rem_with(
+        p.coefficients_asc(),
+        q.coefficients_asc(),
+        pow,
+        mod_power_of_2_div_truncated_newton,
+    )
+}

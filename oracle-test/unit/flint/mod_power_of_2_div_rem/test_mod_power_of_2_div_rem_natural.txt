@@ -1,0 +1,44 @@
+(0).mod_power_of_2_div_rem(0, 0) = (0, 0)
+(0).mod_power_of_2_quotient(0, 0) = 0
+(0).mod_power_of_2_rem(0, 0) = 0
+p := 0; p.mod_power_of_2_div_assign_rem(0, 0) = 0; p = 0
+(3*x+1).checked_mod_power_of_2_div_rem(0, 3) = None
+(3*x+1).checked_mod_power_of_2_quotient(0, 3) = None
+(3*x+1).checked_mod_power_of_2_rem(0, 3) = None
+(x^3+2*x^2+3).checked_mod_power_of_2_div_rem(2*x+1, 2) = None
+(x^3+2*x^2+3).checked_mod_power_of_2_quotient(2*x+1, 2) = None
+(x^3+2*x^2+3).checked_mod_power_of_2_rem(2*x+1, 2) = None
+(5).mod_power_of_2_div_rem(3*x+2, 3) = (0, 5)
+(5).mod_power_of_2_quotient(3*x+2, 3) = 0
+(5).mod_power_of_2_rem(3*x+2, 3) = 5
+p := 5; p.mod_power_of_2_div_assign_rem(3*x+2, 3) = 5; p = 0
+(x^4+7*x+5).mod_power_of_2_div_rem(5*x^2+2, 3) = (5*x^2+6, 7*x+1)
+(x^4+7*x+5).mod_power_of_2_quotient(5*x^2+2, 3) = 5*x^2+6
+(x^4+7*x+5).mod_power_of_2_rem(5*x^2+2, 3) = 7*x+1
+p := x^4+7*x+5; p.mod_power_of_2_div_assign_rem(5*x^2+2, 3) = 7*x+1; p = 5*x^2+6
+(x^4+7*x+5).mod_power_of_2_div_rem(5*x^2+3, 100) = (1014120480182583521197362564301*x^2+152118072027387528179604384645, 7*x+811296384146066816957890051446)
+(x^4+7*x+5).mod_power_of_2_quotient(5*x^2+3, 100) = 1014120480182583521197362564301*x^2+152118072027387528179604384645
+(x^4+7*x+5).mod_power_of_2_rem(5*x^2+3, 100) = 7*x+811296384146066816957890051446
+p := x^4+7*x+5; p.mod_power_of_2_div_assign_rem(5*x^2+3, 100) = 7*x+811296384146066816957890051446; p = 1014120480182583521197362564301*x^2+152118072027387528179604384645
+(3*x+1).checked_mod_power_of_2_div_rem(0, 200) = None
+(3*x+1).checked_mod_power_of_2_quotient(0, 200) = None
+(3*x+1).checked_mod_power_of_2_rem(0, 200) = None
+(5).mod_power_of_2_div_rem(3*x+2, 200) = (0, 5)
+(5).mod_power_of_2_quotient(3*x+2, 200) = 0
+(5).mod_power_of_2_rem(3*x+2, 200) = 5
+p := 5; p.mod_power_of_2_div_assign_rem(3*x+2, 200) = 5; p = 0
+(6*x^2+5).mod_power_of_2_div_rem(3, 200) = (2*x^2+535646014752996758513987364113720867507400997927597611767127, 0)
+(6*x^2+5).mod_power_of_2_quotient(3, 200) = 2*x^2+535646014752996758513987364113720867507400997927597611767127
+(6*x^2+5).mod_power_of_2_rem(3, 200) = 0
+p := 6*x^2+5; p.mod_power_of_2_div_assign_rem(3, 200) = 0; p = 2*x^2+535646014752996758513987364113720867507400997927597611767127
+(x^4+7*x+5).mod_power_of_2_div_rem(5*x^2+3, 200) = (1285550435407192220433569673872930082017762395026234268241101*x^2+192832565311078833065035451080939512302664359253935140236165, 7*x+1028440348325753776346855739098344065614209916020987414592886)
+(x^4+7*x+5).mod_power_of_2_quotient(5*x^2+3, 200) = 1285550435407192220433569673872930082017762395026234268241101*x^2+192832565311078833065035451080939512302664359253935140236165
+(x^4+7*x+5).mod_power_of_2_rem(5*x^2+3, 200) = 7*x+1028440348325753776346855739098344065614209916020987414592886
+p := x^4+7*x+5; p.mod_power_of_2_div_assign_rem(5*x^2+3, 200) = 7*x+1028440348325753776346855739098344065614209916020987414592886; p = 1285550435407192220433569673872930082017762395026234268241101*x^2+192832565311078833065035451080939512302664359253935140236165
+(x^3+2*x+1).mod_power_of_2_div_rem(x^2, 200) = (x, 2*x+1)
+(x^3+2*x+1).mod_power_of_2_quotient(x^2, 200) = x
+(x^3+2*x+1).mod_power_of_2_rem(x^2, 200) = 2*x+1
+p := x^3+2*x+1; p.mod_power_of_2_div_assign_rem(x^2, 200) = 2*x+1; p = x
+(x^4+7*x+5).checked_mod_power_of_2_div_rem(6*x^2+3, 200) = None
+(x^4+7*x+5).checked_mod_power_of_2_quotient(6*x^2+3, 200) = None
+(x^4+7*x+5).checked_mod_power_of_2_rem(6*x^2+3, 200) = None

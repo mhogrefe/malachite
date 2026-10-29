@@ -68,6 +68,11 @@ pub mod mod_compose_truncated;
 /// [`ModDerivativeAssign`](crate::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.
 pub mod mod_derivative;
+/// Implementations of [`ModDivRem`](crate::polynomial::ModDivRem),
+/// [`ModDivAssignRem`](crate::polynomial::ModDivAssignRem), and
+/// [`CheckedModDivRem`](crate::polynomial::CheckedModDivRem), for dividing polynomials modulo a
+/// number, returning the quotient and remainder.
+pub mod mod_div_rem;
 /// Implementations of [`ModDivTruncated`](crate::polynomial::ModDivTruncated),
 /// [`ModDivTruncatedAssign`](crate::polynomial::ModDivTruncatedAssign), and
 /// [`CheckedModDivTruncated`](crate::polynomial::CheckedModDivTruncated), for dividing polynomials
@@ -144,6 +149,11 @@ pub mod mod_power_of_2_compose_truncated;
 /// [`ModPowerOf2DerivativeAssign`](crate::polynomial::ModPowerOf2DerivativeAssign), for
 /// differentiating a polynomial modulo a power of 2.
 pub mod mod_power_of_2_derivative;
+/// Implementations of [`ModPowerOf2DivRem`](crate::polynomial::ModPowerOf2DivRem),
+/// [`ModPowerOf2DivAssignRem`](crate::polynomial::ModPowerOf2DivAssignRem), and
+/// [`CheckedModPowerOf2DivRem`](crate::polynomial::CheckedModPowerOf2DivRem), for dividing
+/// polynomials modulo a power of 2, returning the quotient and remainder.
+pub mod mod_power_of_2_div_rem;
 /// Implementations of [`ModPowerOf2DivTruncated`](crate::polynomial::ModPowerOf2DivTruncated),
 /// [`ModPowerOf2DivTruncatedAssign`](crate::polynomial::ModPowerOf2DivTruncatedAssign), and
 /// [`CheckedModPowerOf2DivTruncated`](crate::polynomial::CheckedModPowerOf2DivTruncated), for
@@ -192,6 +202,16 @@ pub mod mod_power_of_2_pow_truncated;
 /// Implementations of [`ModPowerOf2Product`](crate::num::arithmetic::traits::ModPowerOf2Product),
 /// for multiplying polynomials together modulo a power of 2.
 pub mod mod_power_of_2_product;
+/// Implementations of [`ModPowerOf2Quotient`](crate::polynomial::ModPowerOf2Quotient),
+/// [`ModPowerOf2QuotientAssign`](crate::polynomial::ModPowerOf2QuotientAssign), and
+/// [`CheckedModPowerOf2Quotient`](crate::polynomial::CheckedModPowerOf2Quotient), for finding the
+/// quotient of polynomials modulo a power of 2.
+pub mod mod_power_of_2_quotient;
+/// Implementations of [`ModPowerOf2Rem`](crate::polynomial::ModPowerOf2Rem),
+/// [`ModPowerOf2RemAssign`](crate::polynomial::ModPowerOf2RemAssign), and
+/// [`CheckedModPowerOf2Rem`](crate::polynomial::CheckedModPowerOf2Rem), for finding the remainder
+/// of polynomials modulo a power of 2.
+pub mod mod_power_of_2_rem;
 /// Implementations of [`ModPowerOf2Shl`](crate::num::arithmetic::traits::ModPowerOf2Shl) and
 /// [`ModPowerOf2ShlAssign`](crate::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a polynomial modulo a power of 2.
@@ -294,6 +314,16 @@ pub mod mod_power_of_2_taylor_shift;
 /// Implementations of [`ModProduct`](crate::num::arithmetic::traits::ModProduct), for multiplying
 /// polynomials together modulo a number.
 pub mod mod_product;
+/// Implementations of [`ModQuotient`](crate::polynomial::ModQuotient),
+/// [`ModQuotientAssign`](crate::polynomial::ModQuotientAssign), and
+/// [`CheckedModQuotient`](crate::polynomial::CheckedModQuotient), for finding the quotient of
+/// polynomials modulo a number.
+pub mod mod_quotient;
+/// Implementations of [`ModRem`](crate::polynomial::ModRem),
+/// [`ModRemAssign`](crate::polynomial::ModRemAssign), and
+/// [`CheckedModRem`](crate::polynomial::CheckedModRem), for finding the remainder of polynomials
+/// modulo a number.
+pub mod mod_rem;
 /// Implementations of [`ModShl`](crate::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](crate::num::arithmetic::traits::ModShlAssign), for left-shifting a polynomial
 /// modulo a number.

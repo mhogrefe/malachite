@@ -2330,6 +2330,81 @@ fn test_against_flint() {
             "mod_power_of_2_compose_series",
         );
     }
+    // The Euclidean division demos of malachite-base's UnsignedPolynomial and malachite-nz's
+    // NaturalPolynomial, modulo m and modulo powers of 2: quotient and remainder, quotient, and remainder, by value, by reference, in
+    // place, and checked.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_div_rem_u8",
+        "demo_unsigned_polynomial_mod_div_rem_u64",
+        "demo_unsigned_polynomial_mod_div_rem_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_div_assign_rem_u64",
+        "demo_unsigned_polynomial_checked_mod_div_rem_u8",
+        "demo_unsigned_polynomial_checked_mod_div_rem_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_quotient_u32",
+        "demo_unsigned_polynomial_mod_quotient_assign_u64",
+        "demo_unsigned_polynomial_checked_mod_quotient_u8",
+        "demo_unsigned_polynomial_mod_rem_u16",
+        "demo_unsigned_polynomial_mod_rem_assign_u64",
+        "demo_unsigned_polynomial_checked_mod_rem_ref_ref_u8",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_div_rem");
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_div_rem_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_div_rem_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_div_rem_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_power_of_2_div_assign_rem_u64",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_div_rem_u8",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_div_rem_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_quotient_u32",
+        "demo_unsigned_polynomial_mod_power_of_2_quotient_assign_u64",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_quotient_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_rem_u16",
+        "demo_unsigned_polynomial_mod_power_of_2_rem_assign_u64",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_rem_ref_ref_u8",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "mod_power_of_2_div_rem",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_div_rem",
+        "demo_natural_polynomial_mod_div_rem_ref_ref",
+        "demo_natural_polynomial_mod_div_assign_rem",
+        "demo_natural_polynomial_checked_mod_div_rem",
+        "demo_natural_polynomial_checked_mod_div_rem_ref_ref",
+        "demo_natural_polynomial_mod_quotient",
+        "demo_natural_polynomial_mod_quotient_assign",
+        "demo_natural_polynomial_checked_mod_quotient_ref_ref",
+        "demo_natural_polynomial_mod_rem_ref_ref",
+        "demo_natural_polynomial_mod_rem_assign",
+        "demo_natural_polynomial_checked_mod_rem",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_div_rem");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_div_rem",
+        "demo_natural_polynomial_mod_power_of_2_div_rem_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_div_assign_rem",
+        "demo_natural_polynomial_checked_mod_power_of_2_div_rem",
+        "demo_natural_polynomial_checked_mod_power_of_2_div_rem_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_quotient",
+        "demo_natural_polynomial_mod_power_of_2_quotient_assign",
+        "demo_natural_polynomial_checked_mod_power_of_2_quotient_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_rem_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_rem_assign",
+        "demo_natural_polynomial_checked_mod_power_of_2_rem",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "mod_power_of_2_div_rem",
+        );
+    }
     // The power series division demos of malachite-base's UnsignedPolynomial and malachite-nz's
     // NaturalPolynomial, modulo m and modulo powers of 2: by value, by reference, in place, checked, and with lengths up to 1000.
     for demo_name in [

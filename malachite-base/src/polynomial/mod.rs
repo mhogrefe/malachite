@@ -597,6 +597,150 @@ pub trait CheckedModPowerOf2DivTruncated<Rhs = Self> {
     ) -> Option<Self::Output>;
 }
 
+/// Divides one polynomial by another modulo $2^k$, returning the quotient and remainder. The
+/// coefficients must already be reduced modulo $2^k$, and the leading coefficient of the divisor
+/// must be odd.
+///
+/// The quotient and remainder are the unique polynomials $q$ and $r$ with coefficients modulo $2^k$
+/// such that $a = bq + r$ and $\deg r < \deg b$.
+pub trait ModPowerOf2DivRem<Rhs = Self> {
+    type DivOutput;
+    type RemOutput;
+
+    /// Divides a polynomial by another modulo $2^k$, returning the quotient and remainder.
+    ///
+    /// $$
+    /// f(a, b, k) = (q, r), \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_div_rem(self, other: Rhs, pow: u64) -> (Self::DivOutput, Self::RemOutput);
+}
+
+/// Divides one polynomial by another modulo $2^k$ in place, replacing the first with the quotient
+/// and returning the remainder. The coefficients must already be reduced modulo $2^k$, and the
+/// leading coefficient of the divisor must be odd.
+pub trait ModPowerOf2DivAssignRem<Rhs = Self> {
+    type RemOutput;
+
+    /// Replaces `self` with its quotient by another polynomial modulo $2^k$, returning the
+    /// remainder.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b,
+    /// $$
+    /// returning $r$.
+    fn mod_power_of_2_div_assign_rem(&mut self, other: Rhs, pow: u64) -> Self::RemOutput;
+}
+
+/// Divides one polynomial by another modulo $2^k$, returning the quotient and remainder, or `None`
+/// if the leading coefficient of the divisor is not odd. The coefficients must already be reduced
+/// modulo $2^k$.
+pub trait CheckedModPowerOf2DivRem<Rhs = Self> {
+    type DivOutput;
+    type RemOutput;
+
+    /// Divides a polynomial by another modulo $2^k$, returning the quotient and remainder, or
+    /// `None` if the divisor's leading coefficient is not odd.
+    ///
+    /// $$
+    /// f(a, b, k) = \\begin{cases}
+    ///     \operatorname{Some}((q, r)) & \text{if } \operatorname{lc}(b) \text{ is odd}, \\\\
+    ///     \operatorname{None} & \text{otherwise},
+    /// \\end{cases}
+    /// $$
+    /// where $a \equiv bq + r \pmod{2^k}$ and $\deg r < \deg b$.
+    fn checked_mod_power_of_2_div_rem(
+        self,
+        other: Rhs,
+        pow: u64,
+    ) -> Option<(Self::DivOutput, Self::RemOutput)>;
+}
+
+/// Finds the quotient of one polynomial divided by another modulo $2^k$. The coefficients must
+/// already be reduced modulo $2^k$, and the leading coefficient of the divisor must be odd.
+///
+/// This is the quotient of [`ModPowerOf2DivRem`]; computing it alone can be faster.
+pub trait ModPowerOf2Quotient<Rhs = Self> {
+    type Output;
+
+    /// Finds the quotient of a polynomial divided by another modulo $2^k$.
+    ///
+    /// $$
+    /// f(a, b, k) = q, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_quotient(self, other: Rhs, pow: u64) -> Self::Output;
+}
+
+/// Replaces one polynomial with its quotient by another modulo $2^k$. The coefficients must already
+/// be reduced modulo $2^k$, and the leading coefficient of the divisor must be odd.
+pub trait ModPowerOf2QuotientAssign<Rhs = Self> {
+    /// Replaces `self` with its quotient by another polynomial modulo $2^k$.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_quotient_assign(&mut self, other: Rhs, pow: u64);
+}
+
+/// Finds the quotient of one polynomial divided by another modulo $2^k$, or `None` if the leading
+/// coefficient of the divisor is not odd. The coefficients must already be reduced modulo $2^k$.
+pub trait CheckedModPowerOf2Quotient<Rhs = Self> {
+    type Output;
+
+    /// Finds the quotient of a polynomial divided by another modulo $2^k$, or `None` if the
+    /// divisor's leading coefficient is not odd.
+    ///
+    /// $$
+    /// f(a, b, k) = \\begin{cases}
+    ///     \operatorname{Some}(q) & \text{if } \operatorname{lc}(b) \text{ is odd}, \\\\
+    ///     \operatorname{None} & \text{otherwise},
+    /// \\end{cases}
+    /// $$
+    /// where $a \equiv bq + r \pmod{2^k}$ and $\deg r < \deg b$.
+    fn checked_mod_power_of_2_quotient(self, other: Rhs, pow: u64) -> Option<Self::Output>;
+}
+
+/// Finds the remainder of one polynomial divided by another modulo $2^k$. The coefficients must
+/// already be reduced modulo $2^k$, and the leading coefficient of the divisor must be odd.
+pub trait ModPowerOf2Rem<Rhs = Self> {
+    type Output;
+
+    /// Finds the remainder of a polynomial divided by another modulo $2^k$.
+    ///
+    /// $$
+    /// f(a, b, k) = r, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_rem(self, other: Rhs, pow: u64) -> Self::Output;
+}
+
+/// Replaces one polynomial with its remainder by another modulo $2^k$. The coefficients must
+/// already be reduced modulo $2^k$, and the leading coefficient of the divisor must be odd.
+pub trait ModPowerOf2RemAssign<Rhs = Self> {
+    /// Replaces `self` with its remainder by another polynomial modulo $2^k$.
+    ///
+    /// $$
+    /// a \gets r, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_rem_assign(&mut self, other: Rhs, pow: u64);
+}
+
+/// Finds the remainder of one polynomial divided by another modulo $2^k$, or `None` if the leading
+/// coefficient of the divisor is not odd. The coefficients must already be reduced modulo $2^k$.
+pub trait CheckedModPowerOf2Rem<Rhs = Self> {
+    type Output;
+
+    /// Finds the remainder of a polynomial divided by another modulo $2^k$, or `None` if the
+    /// divisor's leading coefficient is not odd.
+    ///
+    /// $$
+    /// f(a, b, k) = \\begin{cases}
+    ///     \operatorname{Some}(r) & \text{if } \operatorname{lc}(b) \text{ is odd}, \\\\
+    ///     \operatorname{None} & \text{otherwise},
+    /// \\end{cases}
+    /// $$
+    /// where $a \equiv bq + r \pmod{2^k}$ and $\deg r < \deg b$.
+    fn checked_mod_power_of_2_rem(self, other: Rhs, pow: u64) -> Option<Self::Output>;
+}
+
 /// Adds two polynomials modulo $m$, keeping only the coefficients of $x^i$ for $i$ less than a
 /// given length. The coefficients of both must already be reduced modulo $m$.
 ///
@@ -840,6 +984,149 @@ pub trait CheckedModDivTruncated<Rhs = Self, M = Self> {
     /// $$
     /// where $\deg r < n$ and $qr \equiv p \pmod{x^n, m}$.
     fn checked_mod_div_truncated(self, other: Rhs, len: u64, m: M) -> Option<Self::Output>;
+}
+
+/// Divides one polynomial by another modulo $m$, returning the quotient and remainder. The
+/// coefficients must already be reduced modulo $m$, and the leading coefficient of the divisor must
+/// be invertible modulo $m$.
+///
+/// The quotient and remainder are the unique polynomials $q$ and $r$ with coefficients modulo $m$
+/// such that $a = bq + r$ and $\deg r < \deg b$.
+pub trait ModDivRem<Rhs = Self, M = Self> {
+    type DivOutput;
+    type RemOutput;
+
+    /// Divides a polynomial by another modulo $m$, returning the quotient and remainder.
+    ///
+    /// $$
+    /// f(a, b, m) = (q, r), \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_div_rem(self, other: Rhs, m: M) -> (Self::DivOutput, Self::RemOutput);
+}
+
+/// Divides one polynomial by another modulo $m$ in place, replacing the first with the quotient and
+/// returning the remainder. The coefficients must already be reduced modulo $m$, and the leading
+/// coefficient of the divisor must be invertible modulo $m$.
+pub trait ModDivAssignRem<Rhs = Self, M = Self> {
+    type RemOutput;
+
+    /// Replaces `self` with its quotient by another polynomial modulo $m$, returning the remainder.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b,
+    /// $$
+    /// returning $r$.
+    fn mod_div_assign_rem(&mut self, other: Rhs, m: M) -> Self::RemOutput;
+}
+
+/// Divides one polynomial by another modulo $m$, returning the quotient and remainder, or `None` if
+/// the leading coefficient of the divisor is not invertible modulo $m$. The coefficients must
+/// already be reduced modulo $m$.
+pub trait CheckedModDivRem<Rhs = Self, M = Self> {
+    type DivOutput;
+    type RemOutput;
+
+    /// Divides a polynomial by another modulo $m$, returning the quotient and remainder, or `None`
+    /// if the divisor's leading coefficient is not invertible modulo $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = \\begin{cases}
+    ///     \operatorname{Some}((q, r)) & \text{if } \gcd(\operatorname{lc}(b), m) = 1, \\\\
+    ///     \operatorname{None} & \text{otherwise},
+    /// \\end{cases}
+    /// $$
+    /// where $a \equiv bq + r \pmod{m}$ and $\deg r < \deg b$.
+    fn checked_mod_div_rem(self, other: Rhs, m: M) -> Option<(Self::DivOutput, Self::RemOutput)>;
+}
+
+/// Finds the quotient of one polynomial divided by another modulo $m$. The coefficients must
+/// already be reduced modulo $m$, and the leading coefficient of the divisor must be invertible
+/// modulo $m$.
+///
+/// This is the quotient of [`ModDivRem`]; computing it alone can be faster.
+pub trait ModQuotient<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Finds the quotient of a polynomial divided by another modulo $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = q, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_quotient(self, other: Rhs, m: M) -> Self::Output;
+}
+
+/// Replaces one polynomial with its quotient by another modulo $m$. The coefficients must already
+/// be reduced modulo $m$, and the leading coefficient of the divisor must be invertible modulo $m$.
+pub trait ModQuotientAssign<Rhs = Self, M = Self> {
+    /// Replaces `self` with its quotient by another polynomial modulo $m$.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_quotient_assign(&mut self, other: Rhs, m: M);
+}
+
+/// Finds the quotient of one polynomial divided by another modulo $m$, or `None` if the leading
+/// coefficient of the divisor is not invertible modulo $m$. The coefficients must already be
+/// reduced modulo $m$.
+pub trait CheckedModQuotient<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Finds the quotient of a polynomial divided by another modulo $m$, or `None` if the divisor's
+    /// leading coefficient is not invertible modulo $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = \\begin{cases}
+    ///     \operatorname{Some}(q) & \text{if } \gcd(\operatorname{lc}(b), m) = 1, \\\\
+    ///     \operatorname{None} & \text{otherwise},
+    /// \\end{cases}
+    /// $$
+    /// where $a \equiv bq + r \pmod{m}$ and $\deg r < \deg b$.
+    fn checked_mod_quotient(self, other: Rhs, m: M) -> Option<Self::Output>;
+}
+
+/// Finds the remainder of one polynomial divided by another modulo $m$. The coefficients must
+/// already be reduced modulo $m$, and the leading coefficient of the divisor must be invertible
+/// modulo $m$.
+pub trait ModRem<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Finds the remainder of a polynomial divided by another modulo $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = r, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_rem(self, other: Rhs, m: M) -> Self::Output;
+}
+
+/// Replaces one polynomial with its remainder by another modulo $m$. The coefficients must already
+/// be reduced modulo $m$, and the leading coefficient of the divisor must be invertible modulo $m$.
+pub trait ModRemAssign<Rhs = Self, M = Self> {
+    /// Replaces `self` with its remainder by another polynomial modulo $m$.
+    ///
+    /// $$
+    /// a \gets r, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_rem_assign(&mut self, other: Rhs, m: M);
+}
+
+/// Finds the remainder of one polynomial divided by another modulo $m$, or `None` if the leading
+/// coefficient of the divisor is not invertible modulo $m$. The coefficients must already be
+/// reduced modulo $m$.
+pub trait CheckedModRem<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Finds the remainder of a polynomial divided by another modulo $m$, or `None` if the
+    /// divisor's leading coefficient is not invertible modulo $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = \\begin{cases}
+    ///     \operatorname{Some}(r) & \text{if } \gcd(\operatorname{lc}(b), m) = 1, \\\\
+    ///     \operatorname{None} & \text{otherwise},
+    /// \\end{cases}
+    /// $$
+    /// where $a \equiv bq + r \pmod{m}$ and $\deg r < \deg b$.
+    fn checked_mod_rem(self, other: Rhs, m: M) -> Option<Self::Output>;
 }
 
 /// Computes the square of a polynomial's $L^2$ norm: the sum of the squares of its coefficients.

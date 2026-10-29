@@ -457,6 +457,18 @@ pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_4()
     )
 }
 
+// All `(NaturalPolynomial, NaturalPolynomial, u64)` where the coefficients of both polynomials are
+// less than 2 to the power of the `u64`, and the second polynomial is nonzero with an odd leading
+// coefficient.
+pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_5()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_5,
+        &random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_5,
+        &special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_5,
+    )
+}
+
 // All `(NaturalPolynomial, NaturalPolynomial, u64, u64)` where the first `u64` is a small length
 // and the coefficients of both polynomials are less than 2 to the power of the second `u64`. The
 // random polynomials are reduced from arbitrary ones, so sums often wrap around.
@@ -578,6 +590,18 @@ pub fn natural_polynomial_natural_polynomial_natural_triple_gen_var_1()
         &exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_1,
         &random_natural_polynomial_natural_polynomial_natural_triple_gen_var_1,
         &special_random_natural_polynomial_natural_polynomial_natural_triple_gen_var_1,
+    )
+}
+
+// All `(NaturalPolynomial, NaturalPolynomial, Natural)` where the `Natural` is positive, the
+// coefficients of both polynomials are less than it, and the second polynomial is nonzero with a
+// leading coefficient coprime to the `Natural`.
+pub fn natural_polynomial_natural_polynomial_natural_triple_gen_var_2()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_2,
+        &random_natural_polynomial_natural_polynomial_natural_triple_gen_var_2,
+        &special_random_natural_polynomial_natural_polynomial_natural_triple_gen_var_2,
     )
 }
 

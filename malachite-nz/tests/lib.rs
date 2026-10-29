@@ -996,6 +996,7 @@ pub mod natural_polynomial {
         pub mod mod_compose;
         pub mod mod_compose_truncated;
         pub mod mod_derivative;
+        pub mod mod_div_rem;
         pub mod mod_div_truncated;
         pub mod mod_integral;
         pub mod mod_inverse_truncated;
@@ -1014,6 +1015,7 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_compose;
         pub mod mod_power_of_2_compose_truncated;
         pub mod mod_power_of_2_derivative;
+        pub mod mod_power_of_2_div_rem;
         pub mod mod_power_of_2_div_truncated;
         pub mod mod_power_of_2_integral;
         pub mod mod_power_of_2_inverse_truncated;
@@ -1024,6 +1026,8 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_pow;
         pub mod mod_power_of_2_pow_truncated;
         pub mod mod_power_of_2_product;
+        pub mod mod_power_of_2_quotient;
+        pub mod mod_power_of_2_rem;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_square;
         pub mod mod_power_of_2_square_truncated;
@@ -1032,6 +1036,8 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_sum;
         pub mod mod_power_of_2_taylor_shift;
         pub mod mod_product;
+        pub mod mod_quotient;
+        pub mod mod_rem;
         pub mod mod_shl;
         pub mod mod_square;
         pub mod mod_square_truncated;
