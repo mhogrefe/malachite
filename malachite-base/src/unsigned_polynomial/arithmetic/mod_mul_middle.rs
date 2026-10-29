@@ -8,11 +8,12 @@
 
 use crate::num::arithmetic::traits::Parity;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+use crate::unsigned_polynomial::arithmetic::ntt::{NttOp, mod_mul_middle_ntt, mod_ntt_preferred};
 use crate::unsigned_vector::arithmetic::mod_add::mod_add_assign_slice;
 use crate::unsigned_vector::arithmetic::mod_dot::{ModData, column_sum};
 use crate::unsigned_vector::arithmetic::mod_sub::mod_sub_assign_slice;
 use alloc::vec;
-use core::cmp::Ordering;
+use core::cmp::{Ordering, min};
 
 // Middle products of polynomials whose coefficients are words reduced modulo a word $m$. With `xs`
 // of length $n$ and `ys` of length $n + k - 1$, the middle product is the $k$ coefficients of the
@@ -175,4 +176,18 @@ crate_test_fn! {
 mod_mul_middle_to_out_karatsuba<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T], m: T) {
     assert_lengths(out, xs, ys);
     mod_mul_middle_karatsuba(out, xs, ys, &ModData::new(m, xs.len()));
+}}
+
+// Sets `out` to the middle product of `xs` and `ys` modulo `m`, under the same conditions as
+// `mod_mul_middle_to_out_classical`: by Karatsuba's method for middle products, which falls back to
+// the classical method for short inputs, or, for long ones, by number-theoretic transforms (see
+// `mod_ntt_preferred`).
+crate_test_fn! {
+mod_mul_middle_to_out<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T], m: T) {
+    assert_lengths(out, xs, ys);
+    if mod_ntt_preferred(NttOp::MulMiddle, min(xs.len(), out.len()), m.significant_bits()) {
+        mod_mul_middle_ntt(out, xs, ys, m);
+    } else {
+        mod_mul_middle_karatsuba(out, xs, ys, &ModData::new(m, xs.len()));
+    }
 }}

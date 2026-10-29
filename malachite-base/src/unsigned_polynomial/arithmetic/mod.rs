@@ -72,6 +72,9 @@ pub mod mod_derivative;
 /// [`ModIntegralAssign`](crate::polynomial::ModIntegralAssign), for integrating a polynomial modulo
 /// a value.
 pub mod mod_integral;
+/// Implementations of [`ModInverseTruncated`](crate::polynomial::ModInverseTruncated), for
+/// inverting a polynomial as a power series modulo a number, keeping only the low coefficients.
+pub mod mod_inverse_truncated;
 /// An implementation of [`ModIsReduced`](crate::num::arithmetic::traits::ModIsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
@@ -140,6 +143,10 @@ pub mod mod_power_of_2_derivative;
 /// [`ModPowerOf2IntegralAssign`](crate::polynomial::ModPowerOf2IntegralAssign), for integrating a
 /// polynomial modulo $2^k$.
 pub mod mod_power_of_2_integral;
+/// Implementations of
+/// [`ModPowerOf2InverseTruncated`](crate::polynomial::ModPowerOf2InverseTruncated), for inverting a
+/// polynomial as a power series modulo a power of 2, keeping only the low coefficients.
+pub mod mod_power_of_2_inverse_truncated;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::arithmetic::traits::ModPowerOf2IsReduced), which checks
 /// whether every coefficient of a polynomial is less than a given power of 2.
@@ -148,6 +155,10 @@ pub mod mod_power_of_2_is_reduced;
 /// [`ModPowerOf2MulAssign`](crate::num::arithmetic::traits::ModPowerOf2MulAssign), for multiplying
 /// two polynomials modulo $2^k$.
 pub mod mod_power_of_2_mul;
+/// Middle products of polynomials modulo a power of 2, in wrapping arithmetic. This is not part of
+/// the public API.
+#[doc(hidden)]
+pub mod mod_power_of_2_mul_middle;
 /// Implementations of [`ModPowerOf2MulTruncated`](crate::polynomial::ModPowerOf2MulTruncated) and
 /// [`ModPowerOf2MulTruncatedAssign`](crate::polynomial::ModPowerOf2MulTruncatedAssign), for
 /// multiplying two polynomials modulo $2^k$ and keeping the low coefficients of the product.

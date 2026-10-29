@@ -5093,6 +5093,27 @@ pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_8<T: PrimitiveUnsign
     )
 }
 
+// Like `unsigned_polynomial_unsigned_unsigned_triple_gen_var_8`, but with the `u64` at most 1000.
+pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_14<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, u64, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_14,
+        &random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_14,
+        &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_14,
+    )
+}
+
+// Like `unsigned_polynomial_unsigned_unsigned_triple_gen_var_7`, but with the first `u64` at most
+// 1000.
+pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_15<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_15,
+        &random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_15,
+        &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_15,
+    )
+}
+
 // All `(UnsignedPolynomial<T>, u64, u64, T)` where the `T` is positive, the polynomial's
 // coefficients are less than it, and the `u64`s are small.
 pub fn unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>()

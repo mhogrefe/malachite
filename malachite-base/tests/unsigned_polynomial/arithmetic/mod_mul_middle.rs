@@ -30,7 +30,8 @@ fn test_mod_mul_middle_to_out() {
     test::<u64>(&[1, 2, 3], &[4, 5, 6], 1000, &[28]);
 }
 
-// Classical and Karatsuba middle products against the schoolbook product, on both sides of the
+// Classical and Karatsuba middle products, and the dispatcher, which uses number-theoretic
+// transforms for the longest inputs, against the schoolbook product, on both sides of the
 // threshold, with lengths odd and even, and with more outputs than coefficients and fewer.
 fn mod_mul_middle_algorithms_helper<T: PrimitiveUnsigned>() {
     for &(n, k) in &[
@@ -48,6 +49,9 @@ fn mod_mul_middle_algorithms_helper<T: PrimitiveUnsigned>() {
         (129, 300),
         (300, 129),
         (600, 600),
+        (300, 1000),
+        (1000, 300),
+        (1100, 1100),
     ] {
         for m in test_moduli::<T>() {
             let xs = mod_generated_coefficients::<T>(n, m, 11);
@@ -57,6 +61,8 @@ fn mod_mul_middle_algorithms_helper<T: PrimitiveUnsigned>() {
             mod_mul_middle_to_out_classical(&mut out, &xs, &ys, m);
             assert_eq!(out, expected);
             mod_mul_middle_to_out_karatsuba(&mut out, &xs, &ys, m);
+            assert_eq!(out, expected);
+            mod_mul_middle_to_out(&mut out, &xs, &ys, m);
             assert_eq!(out, expected);
         }
     }

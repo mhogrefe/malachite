@@ -825,6 +825,60 @@ crate_test_fn! {mod_square_truncated_ntt<T: PrimitiveUnsigned>(out: &mut [T], xs
     mul_truncated_ntt_helper(out, xs, None, NttModulus::Mod(m));
 }}
 
+// Sets `out` to the middle product of `xs` and `ys`, both nonempty, modulo $2^k$ or $m$ as
+// `modulus` says (see `NttModulus`): the `out.len()` coefficients of their product from coefficient
+// `xs.len() - 1` on, where `ys` has length `xs.len() + out.len() - 1` and `out` is nonempty. A
+// cyclic convolution of length $N \geq$ `ys.len()` holds them exactly, since the coefficients of
+// the product from $N$ on wrap around onto coefficients below `xs.len() - 1`; and each is a sum of
+// `xs.len()` products, which fixes the number of primes.
+fn mul_middle_ntt_helper<T: PrimitiveUnsigned>(
+    out: &mut [T],
+    xs: &[T],
+    ys: &[T],
+    modulus: NttModulus<T>,
+) {
+    let n = xs.len();
+    let k = out.len();
+    assert_eq!(ys.len(), n + k - 1);
+    let size = ys.len().next_power_of_two().max(2);
+    let log_len = u64::wrapping_from(size).ceiling_log_base_2();
+    assert!(log_len <= MAX_LOG_LEN);
+    let count = prime_count(modulus.bits(), n);
+    let mut all_residues = Vec::with_capacity(count);
+    for &(p, root) in &PRIMES[..count] {
+        let prime = Prime::new(p);
+        let tables = twiddles(prime, root, log_len);
+        let (table, inverse_table) = tables.split_at(size - 1);
+        let mut a = residues(prime, xs, modulus, size);
+        forward(prime, &mut a, table);
+        let mut b = residues(prime, ys, modulus, size);
+        forward(prime, &mut b, table);
+        for (x, y) in a.iter_mut().zip(&b) {
+            *x = prime.mul_lazy(*x, *y);
+        }
+        inverse(prime, &mut a, inverse_table);
+        all_residues.push(scaled_product(
+            prime,
+            &a[n - 1..n - 1 + k],
+            transform_scale(prime, size),
+        ));
+    }
+    reconstruct(out, &all_residues, modulus);
+}
+
+// Sets `out` to the middle product of `xs` and `ys` modulo $2^k$, where $k$ is `pow`, by
+// number-theoretic transforms (see `mul_middle_ntt_helper`). The inputs need not be reduced, and
+// the output is correct modulo $2^k$ but not reduced.
+crate_test_fn! {mul_middle_ntt<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T], pow: u64) {
+    mul_middle_ntt_helper(out, xs, ys, NttModulus::PowerOf2(pow));
+}}
+
+// Sets `out` to the middle product of `xs` and `ys`, both reduced modulo `m`, modulo `m`, by
+// number-theoretic transforms (see `mul_middle_ntt_helper`).
+crate_test_fn! {mod_mul_middle_ntt<T: PrimitiveUnsigned>(out: &mut [T], xs: &[T], ys: &[T], m: T) {
+    mul_middle_ntt_helper(out, xs, ys, NttModulus::Mod(m));
+}}
+
 // The operations whose choice between Karatsuba multiplication and number-theoretic transforms is
 // measured separately.
 #[derive(Clone, Copy, Eq, PartialEq)]
@@ -834,6 +888,9 @@ pub(crate) enum NttOp {
     // A truncated product modulo $m$, which Karatsuba multiplication computes at a lower cost than
     // a whole one.
     MulTruncated,
+    // A middle product: its transforms are as long as a whole product's, but Karatsuba's method for
+    // middle products saves more than it does for products, so the transforms take over later.
+    MulMiddle,
     // A whole square.
     Square,
     // A truncated square, which Karatsuba multiplication computes at about half the cost of a whole
@@ -860,23 +917,29 @@ pub(crate) fn fixed_ntt_preferred<T: PrimitiveUnsigned>(len: usize, pow: u64) ->
 // number-theoretic transforms rather than by Karatsuba multiplication. The transforms cost about
 // the same per prime whatever `T` is, and Karatsuba multiplication about twice as much for `u128`
 // as for narrower types, so the thresholds depend on the number of primes and on whether `T` is
-// `u128`. They were measured on an Apple M-series machine, 2026-10, on balanced factors.
+// `u128`. They were measured on an Apple M-series machine, 2026-10, on balanced factors. For middle
+// products, with `xs` and the output of the same length, the transforms overtake Karatsuba's method
+// at 754 coefficients with one prime and 2938 with two; with three primes, and for `u128` with four
+// or five, Karatsuba's method still wins at 3000, and the entries from 4500 on are extrapolated.
 pub(crate) fn ntt_preferred<T: PrimitiveUnsigned>(op: NttOp, len: usize, pow: u64) -> bool {
     // The thresholds for 1 to 6 primes.
-    const NARROW: [[usize; 6]; 3] = [
+    const NARROW: [[usize; 6]; 4] = [
         [512, 2048, 6144, 12288, 16384, 20480],
         [512, 2048, 6144, 12288, 16384, 20480],
         [896, 3584, 12288, 16384, 20480, 24576],
+        [754, 2938, 4500, 9000, 12000, 15000],
     ];
-    const WIDE: [[usize; 6]; 3] = [
+    const WIDE: [[usize; 6]; 4] = [
         [512, 1536, 2560, 3584, 6144, 8192],
         [512, 1536, 2560, 3584, 6144, 8192],
         [896, 2560, 4096, 6144, 7168, 9216],
+        [754, 2938, 4500, 4500, 4500, 6000],
     ];
     let row = match op {
         NttOp::Mul | NttOp::MulTruncated => 0,
         NttOp::Square => 1,
         NttOp::SquareTruncated => 2,
+        NttOp::MulMiddle => 3,
     };
     // The cheapest case, a single prime, has the lowest threshold; check it before counting.
     let table = if T::WIDTH > 64 { &WIDE } else { &NARROW };
@@ -890,20 +953,25 @@ pub(crate) fn ntt_preferred<T: PrimitiveUnsigned>(op: NttOp, len: usize, pow: u6
 // thresholds are lower than `ntt_preferred`'s. Measured on an Apple M-series machine, 2026-10, on
 // balanced factors, for moduli of 8 to 64 bits (one to three primes) and `u128` moduli of 100 and
 // 128 bits (four and five primes); the entries for `u128` with fewer primes are the narrow ones,
-// and the sixth entries are the fifth.
+// and the sixth entries are the fifth. Middle products, measured likewise with `xs` and the output
+// of the same length, switch at 341 coefficients with one prime, 673 with two, and 754 with three
+// (673 for 62-bit moduli and 754 for 64-bit ones), and at 341 for `u128` moduli of 100 and 128
+// bits.
 pub(crate) fn mod_ntt_preferred(op: NttOp, len: usize, bits: u64) -> bool {
     // The thresholds for 1 to 6 primes.
-    const THRESHOLDS: [[usize; 6]; 4] = [
+    const THRESHOLDS: [[usize; 6]; 5] = [
         [229, 387, 460, 273, 229, 229],
         [387, 460, 548, 273, 229, 229],
         [387, 460, 460, 460, 387, 387],
         [460, 776, 776, 460, 387, 387],
+        [341, 673, 754, 341, 341, 341],
     ];
     let row = match op {
         NttOp::Mul => 0,
         NttOp::MulTruncated => 1,
         NttOp::Square => 2,
         NttOp::SquareTruncated => 3,
+        NttOp::MulMiddle => 4,
     };
     // Every threshold is at least the lowest; check it before counting.
     len >= 229 && len >= THRESHOLDS[row][prime_count(bits, len) - 1]

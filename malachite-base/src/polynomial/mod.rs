@@ -523,6 +523,24 @@ pub trait ModPowerOf2PowTruncatedAssign {
     fn mod_power_of_2_pow_truncated_assign(&mut self, exp: u64, len: u64, pow: u64);
 }
 
+/// Inverts a polynomial as a power series modulo $2^k$, keeping only the coefficients of $x^i$ for
+/// $i$ less than a given length. The coefficients must already be reduced modulo $2^k$.
+///
+/// With $n$ equal to `len`, this is inversion in the ring of polynomials with coefficients modulo
+/// $2^k$, taken modulo $x^n$. The inverse exists exactly when the constant coefficient is odd;
+/// otherwise `None` is returned.
+pub trait ModPowerOf2InverseTruncated {
+    type Output;
+
+    /// Inverts a polynomial as a power series modulo $2^k$, truncated to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p, n, k) = q \bmod x^n, \quad pq \equiv 1 \pmod{x^n, 2^k}.
+    /// $$
+    fn mod_power_of_2_inverse_truncated(self, len: u64, pow: u64) -> Option<Self::Output>;
+}
+
 /// Adds two polynomials modulo $m$, keeping only the coefficients of $x^i$ for $i$ less than a
 /// given length. The coefficients of both must already be reduced modulo $m$.
 ///
@@ -698,6 +716,24 @@ pub trait ModPowTruncatedAssign<M = Self> {
     /// p \gets (p^e \bmod x^n) \bmod m.
     /// $$
     fn mod_pow_truncated_assign(&mut self, exp: u64, len: u64, m: M);
+}
+
+/// Inverts a polynomial as a power series modulo $m$, keeping only the coefficients of $x^i$ for
+/// $i$ less than a given length. The coefficients must already be reduced modulo $m$.
+///
+/// With $n$ equal to `len`, this is inversion in the ring of polynomials with coefficients modulo
+/// $m$, taken modulo $x^n$. The inverse exists exactly when the constant coefficient is invertible
+/// modulo $m$; otherwise `None` is returned.
+pub trait ModInverseTruncated<M = Self> {
+    type Output;
+
+    /// Inverts a polynomial as a power series modulo $m$, truncated to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p, n, m) = q \bmod x^n, \quad pq \equiv 1 \pmod{x^n, m}.
+    /// $$
+    fn mod_inverse_truncated(self, len: u64, m: M) -> Option<Self::Output>;
 }
 
 /// Computes the square of a polynomial's $L^2$ norm: the sum of the squares of its coefficients.

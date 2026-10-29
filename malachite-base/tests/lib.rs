@@ -1054,6 +1054,7 @@ pub mod unsigned_polynomial {
         pub mod mod_compose_truncated;
         pub mod mod_derivative;
         pub mod mod_integral;
+        pub mod mod_inverse_truncated;
         pub mod mod_is_reduced;
         pub mod mod_make_monic;
         pub mod mod_mul;
@@ -1071,7 +1072,9 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_compose_truncated;
         pub mod mod_power_of_2_derivative;
         pub mod mod_power_of_2_integral;
+        pub mod mod_power_of_2_inverse_truncated;
         pub mod mod_power_of_2_mul;
+        pub mod mod_power_of_2_mul_middle;
         pub mod mod_power_of_2_mul_truncated;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_nth_derivative;
