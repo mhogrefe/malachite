@@ -140,10 +140,10 @@ crate_test_fn! {mod_power_of_2_div_rem_with<T: PrimitiveUnsigned>(
     Some((reduced(qs, pow), reduced(rs, pow)))
 }}
 
-/// The coefficients of the quotient and remainder modulo $2^k$ of the polynomials with
-/// coefficients `xs` and `ys`, without zeros at the end, or `None` if `ys` is empty or its last
-/// coefficient is even. The coefficients must be reduced modulo $2^k$, where $k$ is `pow`, which
-/// must be no greater than `T::WIDTH`, and neither `xs` nor `ys` may end with a zero.
+/// The coefficients of the quotient and remainder modulo $2^k$ of the polynomials with coefficients
+/// `xs` and `ys`, without zeros at the end, or `None` if `ys` is empty or its last coefficient is
+/// even. The coefficients must be reduced modulo $2^k$, where $k$ is `pow`, which must be no
+/// greater than `T::WIDTH`, and neither `xs` nor `ys` may end with a zero.
 ///
 /// This is not part of the public API; it is public so that `malachite-nz` can divide
 /// `NaturalPolynomial`s modulo a power of 2.

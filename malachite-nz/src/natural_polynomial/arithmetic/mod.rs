@@ -113,6 +113,11 @@ pub mod mod_compose_truncated;
 /// [`ModDerivativeAssign`](malachite_base::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.
 pub mod mod_derivative;
+/// Implementations of [`ModDivExact`](malachite_base::polynomial::ModDivExact),
+/// [`ModDivExactAssign`](malachite_base::polynomial::ModDivExactAssign), and
+/// [`CheckedModDivExact`](malachite_base::polynomial::CheckedModDivExact), for dividing polynomials
+/// modulo a number when the division is exact.
+pub mod mod_div_exact;
 /// Implementations of [`ModDivRem`](malachite_base::polynomial::ModDivRem),
 /// [`ModDivAssignRem`](malachite_base::polynomial::ModDivAssignRem), and
 /// [`CheckedModDivRem`](malachite_base::polynomial::CheckedModDivRem), for dividing polynomials
@@ -123,6 +128,9 @@ pub mod mod_div_rem;
 /// [`CheckedModDivTruncated`](malachite_base::polynomial::CheckedModDivTruncated), for dividing
 /// polynomials as power series modulo a number, keeping only the low coefficients.
 pub mod mod_div_truncated;
+/// Implementations of [`ModDivisibleBy`](malachite_base::polynomial::ModDivisibleBy), which
+/// determines whether one polynomial is divisible by another modulo a number.
+pub mod mod_divisible_by;
 /// Implementations of [`ModIntegral`](malachite_base::polynomial::ModIntegral) and
 /// [`ModIntegralAssign`](malachite_base::polynomial::ModIntegralAssign), for integrating a
 /// polynomial modulo a value.
@@ -194,6 +202,11 @@ pub mod mod_power_of_2_compose_truncated;
 /// and [`ModPowerOf2DerivativeAssign`](malachite_base::polynomial::ModPowerOf2DerivativeAssign),
 /// for differentiating a polynomial modulo a power of 2.
 pub mod mod_power_of_2_derivative;
+/// Implementations of [`ModPowerOf2DivExact`](malachite_base::polynomial::ModPowerOf2DivExact),
+/// [`ModPowerOf2DivExactAssign`](malachite_base::polynomial::ModPowerOf2DivExactAssign), and
+/// [`CheckedModPowerOf2DivExact`](malachite_base::polynomial::CheckedModPowerOf2DivExact), for
+/// dividing polynomials modulo a power of 2 when the division is exact.
+pub mod mod_power_of_2_div_exact;
 /// Implementations of [`ModPowerOf2DivRem`](malachite_base::polynomial::ModPowerOf2DivRem),
 /// [`ModPowerOf2DivAssignRem`](malachite_base::polynomial::ModPowerOf2DivAssignRem), and
 /// [`CheckedModPowerOf2DivRem`](malachite_base::polynomial::CheckedModPowerOf2DivRem), for dividing
@@ -206,6 +219,10 @@ pub mod mod_power_of_2_div_rem;
 /// [`CheckedModPowerOf2DivTruncated`](malachite_base::polynomial::CheckedModPowerOf2DivTruncated),
 /// for dividing polynomials as power series modulo a power of 2, keeping only the low coefficients.
 pub mod mod_power_of_2_div_truncated;
+/// Implementations of
+/// [`ModPowerOf2DivisibleBy`](malachite_base::polynomial::ModPowerOf2DivisibleBy), which determines
+/// whether one polynomial is divisible by another modulo a power of 2.
+pub mod mod_power_of_2_divisible_by;
 /// Implementations of [`ModPowerOf2Integral`](malachite_base::polynomial::ModPowerOf2Integral) and
 /// [`ModPowerOf2IntegralAssign`](malachite_base::polynomial::ModPowerOf2IntegralAssign), for
 /// integrating a polynomial modulo $2^k$.

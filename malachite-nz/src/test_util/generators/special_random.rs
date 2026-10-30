@@ -127,8 +127,8 @@ use malachite_base::iterators::with_special_value;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
     AddMul, ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy,
-    DivisibleByPowerOf2, EqMod, EqModPowerOf2, Height, HeightRef, Mod, ModMul, ModPowerOf2, Parity,
-    Pow, PowerOf2, RoundToMultipleOfPowerOf2Assign, Square,
+    DivisibleByPowerOf2, EqMod, EqModPowerOf2, Height, HeightRef, Mod, ModMul, ModPowerOf2,
+    ModPowerOf2Mul, Parity, Pow, PowerOf2, RoundToMultipleOfPowerOf2Assign, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -1609,6 +1609,15 @@ pub fn special_random_natural_polynomial_natural_polynomial_natural_triple_gen_v
                     .last()
                     .is_some_and(|y| y.coprime_with(m))
             }),
+    )
+}
+
+pub fn special_random_natural_polynomial_natural_polynomial_natural_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, Natural)> {
+    Box::new(
+        special_random_natural_polynomial_natural_polynomial_natural_triple_gen_var_2(config)
+            .map(|(p, q, m)| ((&q).mod_mul(&p, &m), q, m)),
     )
 }
 
@@ -16682,5 +16691,14 @@ pub fn special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_
     Box::new(
         special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1(config)
             .filter(|(_, q, _)| q.coefficients_asc().last().is_some_and(Parity::odd)),
+    )
+}
+
+pub fn special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_6(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        special_random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_5(config)
+            .map(|(p, q, pow)| ((&q).mod_power_of_2_mul(&p, pow), q, pow)),
     )
 }

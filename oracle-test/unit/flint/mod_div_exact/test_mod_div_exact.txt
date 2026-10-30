@@ -1,0 +1,40 @@
+(0).mod_div_exact(0, 1) = 0
+p := 0; p.mod_div_exact_assign(0, 1); p = 0
+(0).checked_mod_div_exact(0, 1) = 0
+(0).mod_divisible_by(0, 1) = true
+(0).mod_div_exact(x+1, 7) = 0
+p := 0; p.mod_div_exact_assign(x+1, 7); p = 0
+(0).checked_mod_div_exact(x+1, 7) = 0
+(0).mod_divisible_by(x+1, 7) = true
+(3*x^2+2*x+6).mod_div_exact(3, 7) = x^2+3*x+2
+p := 3*x^2+2*x+6; p.mod_div_exact_assign(3, 7); p = x^2+3*x+2
+(3*x^2+2*x+6).checked_mod_div_exact(3, 7) = x^2+3*x+2
+(3*x^2+2*x+6).mod_divisible_by(3, 7) = true
+(x^3+4*x^2+5*x+2).mod_div_exact(x+1, 7) = x^2+3*x+2
+p := x^3+4*x^2+5*x+2; p.mod_div_exact_assign(x+1, 7); p = x^2+3*x+2
+(x^3+4*x^2+5*x+2).checked_mod_div_exact(x+1, 7) = x^2+3*x+2
+(x^3+4*x^2+5*x+2).mod_divisible_by(x+1, 7) = true
+(x^5+3*x^4+6*x+2).mod_div_exact(3*x^2+x+1, 7) = 5*x^3+4*x^2+4*x+2
+p := x^5+3*x^4+6*x+2; p.mod_div_exact_assign(3*x^2+x+1, 7); p = 5*x^3+4*x^2+4*x+2
+(x^5+3*x^4+6*x+2).checked_mod_div_exact(3*x^2+x+1, 7) = 5*x^3+4*x^2+4*x+2
+(x^5+3*x^4+6*x+2).mod_divisible_by(3*x^2+x+1, 7) = true
+(6*x^4+2*x^3).mod_div_exact(2*x^3, 7) = 3*x+1
+p := 6*x^4+2*x^3; p.mod_div_exact_assign(2*x^3, 7); p = 3*x+1
+(6*x^4+2*x^3).checked_mod_div_exact(2*x^3, 7) = 3*x+1
+(6*x^4+2*x^3).mod_divisible_by(2*x^3, 7) = true
+(x^4+5*x^3+3*x^2+4*x+2).mod_div_exact(x^2+2, 6) = x^2+5*x+1
+p := x^4+5*x^3+3*x^2+4*x+2; p.mod_div_exact_assign(x^2+2, 6); p = x^2+5*x+1
+(x^4+5*x^3+3*x^2+4*x+2).checked_mod_div_exact(x^2+2, 6) = x^2+5*x+1
+(x^4+5*x^3+3*x^2+4*x+2).mod_divisible_by(x^2+2, 6) = true
+(2*x^5+238*x^3+250*x^2+21*x+3).mod_div_exact(249*x^3+7*x+1, 251) = 250*x^2+3
+p := 2*x^5+238*x^3+250*x^2+21*x+3; p.mod_div_exact_assign(249*x^3+7*x+1, 251); p = 250*x^2+3
+(2*x^5+238*x^3+250*x^2+21*x+3).checked_mod_div_exact(249*x^3+7*x+1, 251) = 250*x^2+3
+(2*x^5+238*x^3+250*x^2+21*x+3).mod_divisible_by(249*x^3+7*x+1, 251) = true
+(x^3+2*x+1).checked_mod_div_exact(x^2+3, 7) = None
+(x^3+2*x+1).mod_divisible_by(x^2+3, 7) = false
+(5).checked_mod_div_exact(3*x+2, 7) = None
+(5).mod_divisible_by(3*x+2, 7) = false
+(x^2+3*x+2).checked_mod_div_exact(x+1, 7) = x+2
+(x^2+3*x+2).mod_divisible_by(x+1, 7) = true
+(0).mod_divisible_by(0, 7) = true
+(x+1).mod_divisible_by(0, 7) = false

@@ -2330,6 +2330,64 @@ fn test_against_flint() {
             "mod_power_of_2_compose_series",
         );
     }
+    // The exact division and divisibility demos of malachite-base's UnsignedPolynomial and
+    // malachite-nz's NaturalPolynomial, modulo m and modulo powers of 2.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_div_exact_u8",
+        "demo_unsigned_polynomial_mod_div_exact_u64",
+        "demo_unsigned_polynomial_mod_div_exact_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_div_exact_assign_u32",
+        "demo_unsigned_polynomial_checked_mod_div_exact_u8",
+        "demo_unsigned_polynomial_checked_mod_div_exact_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_divisible_by_u16",
+        "demo_unsigned_polynomial_mod_divisible_by_ref_ref_u64",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_div_exact");
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_div_exact_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_div_exact_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_div_exact_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_power_of_2_div_exact_assign_u32",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_div_exact_u8",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_div_exact_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_divisible_by_u16",
+        "demo_unsigned_polynomial_mod_power_of_2_divisible_by_ref_ref_u64",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "mod_power_of_2_div_exact",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_div_exact",
+        "demo_natural_polynomial_mod_div_exact_ref_ref",
+        "demo_natural_polynomial_mod_div_exact_assign",
+        "demo_natural_polynomial_checked_mod_div_exact",
+        "demo_natural_polynomial_checked_mod_div_exact_ref_ref",
+        "demo_natural_polynomial_mod_divisible_by",
+        "demo_natural_polynomial_mod_divisible_by_ref_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_div_exact");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_div_exact",
+        "demo_natural_polynomial_mod_power_of_2_div_exact_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_div_exact_assign",
+        "demo_natural_polynomial_checked_mod_power_of_2_div_exact",
+        "demo_natural_polynomial_checked_mod_power_of_2_div_exact_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_divisible_by",
+        "demo_natural_polynomial_mod_power_of_2_divisible_by_ref_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "mod_power_of_2_div_exact",
+        );
+    }
     // The Euclidean division demos of malachite-base's UnsignedPolynomial and malachite-nz's
     // NaturalPolynomial, modulo m and modulo powers of 2: quotient and remainder, quotient, and remainder, by value, by reference, in
     // place, and checked.

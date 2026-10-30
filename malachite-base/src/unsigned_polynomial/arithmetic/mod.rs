@@ -68,6 +68,11 @@ pub mod mod_compose_truncated;
 /// [`ModDerivativeAssign`](crate::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.
 pub mod mod_derivative;
+/// Implementations of [`ModDivExact`](crate::polynomial::ModDivExact),
+/// [`ModDivExactAssign`](crate::polynomial::ModDivExactAssign), and
+/// [`CheckedModDivExact`](crate::polynomial::CheckedModDivExact), for dividing polynomials modulo a
+/// number when the division is exact.
+pub mod mod_div_exact;
 /// Implementations of [`ModDivRem`](crate::polynomial::ModDivRem),
 /// [`ModDivAssignRem`](crate::polynomial::ModDivAssignRem), and
 /// [`CheckedModDivRem`](crate::polynomial::CheckedModDivRem), for dividing polynomials modulo a
@@ -78,6 +83,9 @@ pub mod mod_div_rem;
 /// [`CheckedModDivTruncated`](crate::polynomial::CheckedModDivTruncated), for dividing polynomials
 /// as power series modulo a number, keeping only the low coefficients.
 pub mod mod_div_truncated;
+/// An implementation of [`ModDivisibleBy`](crate::polynomial::ModDivisibleBy), which determines
+/// whether one polynomial is divisible by another modulo a number.
+pub mod mod_divisible_by;
 /// Implementations of [`ModIntegral`](crate::polynomial::ModIntegral) and
 /// [`ModIntegralAssign`](crate::polynomial::ModIntegralAssign), for integrating a polynomial modulo
 /// a value.
@@ -149,6 +157,11 @@ pub mod mod_power_of_2_compose_truncated;
 /// [`ModPowerOf2DerivativeAssign`](crate::polynomial::ModPowerOf2DerivativeAssign), for
 /// differentiating a polynomial modulo a power of 2.
 pub mod mod_power_of_2_derivative;
+/// Implementations of [`ModPowerOf2DivExact`](crate::polynomial::ModPowerOf2DivExact),
+/// [`ModPowerOf2DivExactAssign`](crate::polynomial::ModPowerOf2DivExactAssign), and
+/// [`CheckedModPowerOf2DivExact`](crate::polynomial::CheckedModPowerOf2DivExact), for dividing
+/// polynomials modulo a power of 2 when the division is exact.
+pub mod mod_power_of_2_div_exact;
 /// Implementations of [`ModPowerOf2DivRem`](crate::polynomial::ModPowerOf2DivRem),
 /// [`ModPowerOf2DivAssignRem`](crate::polynomial::ModPowerOf2DivAssignRem), and
 /// [`CheckedModPowerOf2DivRem`](crate::polynomial::CheckedModPowerOf2DivRem), for dividing
@@ -159,6 +172,9 @@ pub mod mod_power_of_2_div_rem;
 /// [`CheckedModPowerOf2DivTruncated`](crate::polynomial::CheckedModPowerOf2DivTruncated), for
 /// dividing polynomials as power series modulo a power of 2, keeping only the low coefficients.
 pub mod mod_power_of_2_div_truncated;
+/// An implementation of [`ModPowerOf2DivisibleBy`](crate::polynomial::ModPowerOf2DivisibleBy),
+/// which determines whether one polynomial is divisible by another modulo a power of 2.
+pub mod mod_power_of_2_divisible_by;
 /// Implementations of [`ModPowerOf2Integral`](crate::polynomial::ModPowerOf2Integral) and
 /// [`ModPowerOf2IntegralAssign`](crate::polynomial::ModPowerOf2IntegralAssign), for integrating a
 /// polynomial modulo $2^k$.

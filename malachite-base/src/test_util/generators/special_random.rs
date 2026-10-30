@@ -18,8 +18,8 @@ use crate::iterators::{NonzeroValues, with_special_value};
 use crate::maps::random::{random_b_tree_maps, random_hash_maps};
 use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, Mod, ModMul, ModPowerOf2, Parity, PowerOf2, RoundToMultiple,
-    ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, DivRound, Mod, ModMul, ModPowerOf2, ModPowerOf2Mul, Parity, PowerOf2,
+    RoundToMultiple, ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -10610,6 +10610,32 @@ pub fn special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_ge
             config,
         )
         .filter(|(_, q, _)| q.coefficients_asc().last().is_some_and(|y| y.odd())),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_6<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    Box::new(
+        special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_4::<T>(
+            config,
+        )
+        .map(|(p, q, m)| ((&q).mod_mul(&p, m), q, m)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_7<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)> {
+    Box::new(
+        special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_5::<T>(
+            config,
+        )
+        .map(|(p, q, pow)| ((&q).mod_power_of_2_mul(&p, pow), q, pow)),
     )
 }
 

@@ -17,8 +17,8 @@ use crate::maps::exhaustive::{exhaustive_b_tree_maps, exhaustive_hash_maps};
 use crate::matrix::Matrix;
 use crate::max;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CheckedNeg, CoprimeWith, DivRound, ModIsReduced, ModPowerOf2IsReduced,
-    Parity, PowerOf2, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, CheckedNeg, CoprimeWith, DivRound, ModIsReduced, ModMul,
+    ModPowerOf2IsReduced, ModPowerOf2Mul, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -6747,6 +6747,24 @@ pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_va
     Box::new(
         exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_1::<T>()
             .filter(|(_, q, _)| q.coefficients_asc().last().is_some_and(|y| y.odd())),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_6<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    Box::new(
+        exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_4::<T>()
+            .map(|(p, q, m)| ((&q).mod_mul(&p, m), q, m)),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_7<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)> {
+    Box::new(
+        exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_5::<T>()
+            .map(|(p, q, pow)| ((&q).mod_power_of_2_mul(&p, pow), q, pow)),
     )
 }
 

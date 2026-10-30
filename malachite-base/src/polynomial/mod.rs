@@ -597,6 +597,64 @@ pub trait CheckedModPowerOf2DivTruncated<Rhs = Self> {
     ) -> Option<Self::Output>;
 }
 
+/// Divides one polynomial by another modulo $2^k$, assuming that the second divides the first. The
+/// coefficients must already be reduced modulo $2^k$, and the leading coefficient of the divisor
+/// must be odd.
+///
+/// If the divisor does not divide the dividend, the result is meaningless.
+pub trait ModPowerOf2DivExact<Rhs = Self> {
+    type Output;
+
+    /// Divides a polynomial by another modulo $2^k$, assuming that the second divides the first.
+    ///
+    /// $$
+    /// f(a, b, k) = q, \quad a \equiv bq \pmod{2^k}.
+    /// $$
+    fn mod_power_of_2_div_exact(self, other: Rhs, pow: u64) -> Self::Output;
+}
+
+/// Divides one polynomial by another modulo $2^k$ in place, assuming that the second divides the
+/// first. The coefficients must already be reduced modulo $2^k$, and the leading coefficient of the
+/// divisor must be odd.
+///
+/// If the divisor does not divide the dividend, the result is meaningless.
+pub trait ModPowerOf2DivExactAssign<Rhs = Self> {
+    /// Replaces `self` with its quotient by another polynomial modulo $2^k$, assuming that the
+    /// second divides the first.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq \pmod{2^k}.
+    /// $$
+    fn mod_power_of_2_div_exact_assign(&mut self, other: Rhs, pow: u64);
+}
+
+/// Divides one polynomial by another modulo $2^k$ if the second divides the first, returning `None`
+/// otherwise. The coefficients must already be reduced modulo $2^k$, and the leading coefficient of
+/// the divisor must be odd.
+pub trait CheckedModPowerOf2DivExact<Rhs = Self> {
+    type Output;
+
+    /// Divides a polynomial by another modulo $2^k$ if the second divides the first, or returns
+    /// `None`.
+    ///
+    /// $$
+    /// f(a, b, k) = \\begin{cases}
+    ///     \operatorname{Some}(q) & \text{if } a \equiv bq \pmod{2^k}, \\\\
+    ///     \operatorname{None} & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
+    fn checked_mod_power_of_2_div_exact(self, other: Rhs, pow: u64) -> Option<Self::Output>;
+}
+
+/// Determines whether one polynomial is divisible by another modulo $2^k$. The coefficients must
+/// already be reduced modulo $2^k$, and the leading coefficient of the divisor, unless it is 0,
+/// must be odd.
+pub trait ModPowerOf2DivisibleBy<Rhs = Self> {
+    /// Determines whether a polynomial is divisible by another modulo $2^k$: whether there is a
+    /// polynomial $q$ with $a \equiv bq \pmod{2^k}$.
+    fn mod_power_of_2_divisible_by(self, other: Rhs, pow: u64) -> bool;
+}
+
 /// Divides one polynomial by another modulo $2^k$, returning the quotient and remainder. The
 /// coefficients must already be reduced modulo $2^k$, and the leading coefficient of the divisor
 /// must be odd.
@@ -984,6 +1042,64 @@ pub trait CheckedModDivTruncated<Rhs = Self, M = Self> {
     /// $$
     /// where $\deg r < n$ and $qr \equiv p \pmod{x^n, m}$.
     fn checked_mod_div_truncated(self, other: Rhs, len: u64, m: M) -> Option<Self::Output>;
+}
+
+/// Divides one polynomial by another modulo $m$, assuming that the second divides the first. The
+/// coefficients must already be reduced modulo $m$, and the leading coefficient of the divisor must
+/// be invertible modulo $m$.
+///
+/// If the divisor does not divide the dividend, the result is meaningless.
+pub trait ModDivExact<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Divides a polynomial by another modulo $m$, assuming that the second divides the first.
+    ///
+    /// $$
+    /// f(a, b, m) = q, \quad a \equiv bq \pmod{m}.
+    /// $$
+    fn mod_div_exact(self, other: Rhs, m: M) -> Self::Output;
+}
+
+/// Divides one polynomial by another modulo $m$ in place, assuming that the second divides the
+/// first. The coefficients must already be reduced modulo $m$, and the leading coefficient of the
+/// divisor must be invertible modulo $m$.
+///
+/// If the divisor does not divide the dividend, the result is meaningless.
+pub trait ModDivExactAssign<Rhs = Self, M = Self> {
+    /// Replaces `self` with its quotient by another polynomial modulo $m$, assuming that the second
+    /// divides the first.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq \pmod{m}.
+    /// $$
+    fn mod_div_exact_assign(&mut self, other: Rhs, m: M);
+}
+
+/// Divides one polynomial by another modulo $m$ if the second divides the first, returning `None`
+/// otherwise. The coefficients must already be reduced modulo $m$, and the leading coefficient of
+/// the divisor must be invertible modulo $m$.
+pub trait CheckedModDivExact<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Divides a polynomial by another modulo $m$ if the second divides the first, or returns
+    /// `None`.
+    ///
+    /// $$
+    /// f(a, b, m) = \\begin{cases}
+    ///     \operatorname{Some}(q) & \text{if } a \equiv bq \pmod{m}, \\\\
+    ///     \operatorname{None} & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
+    fn checked_mod_div_exact(self, other: Rhs, m: M) -> Option<Self::Output>;
+}
+
+/// Determines whether one polynomial is divisible by another modulo $m$. The coefficients must
+/// already be reduced modulo $m$, and the leading coefficient of the divisor, unless it is 0, must
+/// be invertible modulo $m$.
+pub trait ModDivisibleBy<Rhs = Self, M = Self> {
+    /// Determines whether a polynomial is divisible by another modulo $m$: whether there is a
+    /// polynomial $q$ with $a \equiv bq \pmod{m}$.
+    fn mod_divisible_by(self, other: Rhs, m: M) -> bool;
 }
 
 /// Divides one polynomial by another modulo $m$, returning the quotient and remainder. The

@@ -733,6 +733,13 @@ documented by git history.
   divisor is 0 or its leading coefficient is not invertible, and the checked forms return `None`.
   The quotient is found by dividing the reversed polynomials as power series, and the remainder
   with one truncated product.
+- New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
+  malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
+  `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's
+  `nmod_poly_divexact`, and divisibility testing, like `nmod_poly_divides` and
+  `fmpz_mod_poly_divides`. `CheckedModDivExact` returns the quotient when the divisor divides the
+  dividend and `None` otherwise, and `ModDivisibleBy` returns whether it does. Long exact quotients
+  are found half from the bottom, as a power series, and half from the top.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

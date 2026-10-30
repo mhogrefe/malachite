@@ -135,7 +135,7 @@ use malachite_base::iterators::iter_windows;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
     AddMul, ArithmeticCheckedShl, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
-    EqModPowerOf2, Height, HeightRef, Parity, PowerOf2, Square,
+    EqModPowerOf2, Height, HeightRef, ModMul, ModPowerOf2Mul, Parity, PowerOf2, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -956,6 +956,14 @@ pub fn exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_2
                     .is_some_and(|y| y.coprime_with(m))
             },
         ),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_3()
+-> It<(NaturalPolynomial, NaturalPolynomial, Natural)> {
+    Box::new(
+        exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_2()
+            .map(|(p, q, m)| ((&q).mod_mul(&p, &m), q, m)),
     )
 }
 
@@ -9020,5 +9028,13 @@ pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_
     Box::new(
         exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_1()
             .filter(|(_, q, _)| q.coefficients_asc().last().is_some_and(Parity::odd)),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_6()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_5()
+            .map(|(p, q, pow)| ((&q).mod_power_of_2_mul(&p, pow), q, pow)),
     )
 }
