@@ -315,6 +315,72 @@ pub trait MulMiddleAssign<Rhs = Self> {
     fn mul_middle_assign(&mut self, other: Rhs, low: u64, high: u64);
 }
 
+/// Inverts a polynomial as a power series, keeping only the coefficients of $x^i$ for $i$ less than
+/// a given length.
+///
+/// With $n$ equal to `len`, this is inversion in the ring of polynomials modulo $x^n$. Over the
+/// integers, the inverse exists exactly when the constant coefficient is $\pm 1$; otherwise `None`
+/// is returned.
+pub trait InverseTruncated {
+    type Output;
+
+    /// Inverts a polynomial as a power series, truncated to its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, n) = q \bmod x^n, \quad pq \equiv 1 \pmod{x^n}.
+    /// $$
+    fn inverse_truncated(self, len: u64) -> Option<Self::Output>;
+}
+
+/// Divides one polynomial by another as power series, keeping only the coefficients of $x^i$ for
+/// $i$ less than a given length. The constant coefficient of the divisor must be nonzero, and the
+/// quotient must have coefficients in the polynomials' coefficient ring.
+///
+/// With $n$ equal to `len`, this is division in the ring of polynomials modulo $x^n$.
+pub trait DivTruncated<Rhs = Self> {
+    type Output;
+
+    /// Divides a polynomial by another as power series, truncating the quotient to its first `len`
+    /// coefficients.
+    ///
+    /// $$
+    /// f(p, q, n) = r, \quad \deg r < n, \quad qr \equiv p \pmod{x^n}.
+    /// $$
+    fn div_truncated(self, other: Rhs, len: u64) -> Self::Output;
+}
+
+/// Divides one polynomial by another as power series in place, keeping only the coefficients of
+/// $x^i$ for $i$ less than a given length. The constant coefficient of the divisor must be nonzero,
+/// and the quotient must have coefficients in the polynomials' coefficient ring.
+pub trait DivTruncatedAssign<Rhs = Self> {
+    /// Divides `self` by another polynomial as power series, truncating the quotient to its first
+    /// `len` coefficients.
+    ///
+    /// $$
+    /// p \gets r, \quad \deg r < n, \quad qr \equiv p \pmod{x^n}.
+    /// $$
+    fn div_truncated_assign(&mut self, other: Rhs, len: u64);
+}
+
+/// Divides one polynomial by another as power series, keeping only the coefficients of $x^i$ for
+/// $i$ less than a given length, returning `None` if the constant coefficient of the divisor is
+/// zero or the quotient does not have coefficients in the polynomials' coefficient ring.
+pub trait CheckedDivTruncated<Rhs = Self> {
+    type Output;
+
+    /// Divides a polynomial by another as power series, truncating the quotient to its first `len`
+    /// coefficients, or returns `None` if there is no such quotient.
+    ///
+    /// $$
+    /// f(p, q, n) = \\begin{cases}
+    ///     \operatorname{Some}(r) & \text{if } q_0 \neq 0 \text{ and } r \text{ exists}, \\\\
+    ///     \operatorname{None} & \text{otherwise},
+    /// \\end{cases}
+    /// $$
+    /// where $\deg r < n$ and $qr \equiv p \pmod{x^n}$.
+    fn checked_div_truncated(self, other: Rhs, len: u64) -> Option<Self::Output>;
+}
+
 /// Squares a polynomial, keeping only the coefficients of $x^i$ for $i$ less than a given length.
 ///
 /// With $n$ equal to `len`, this is squaring in the ring of polynomials modulo $x^n$, applied to

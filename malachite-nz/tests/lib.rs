@@ -894,11 +894,13 @@ pub mod integer_polynomial {
         pub mod div_power_of_x;
         pub mod div_rem;
         pub mod div_root;
+        pub mod div_truncated;
         pub mod divisible_by;
         pub mod evaluate;
         pub mod exponent_gcd;
         pub mod floor_l2_norm;
         pub mod height;
+        pub mod inverse_truncated;
         pub mod is_unit;
         pub mod l2_norm_squared;
         pub mod mod_op;

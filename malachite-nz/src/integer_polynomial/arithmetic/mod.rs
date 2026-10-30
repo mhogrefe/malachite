@@ -89,6 +89,11 @@ pub mod div_rem;
 /// [`DivRootAssign`](malachite_base::polynomial::DivRootAssign), for dividing a polynomial by $x -
 /// c$.
 pub mod div_root;
+/// Implementations of [`DivTruncated`](malachite_base::polynomial::DivTruncated),
+/// [`DivTruncatedAssign`](malachite_base::polynomial::DivTruncatedAssign), and
+/// [`CheckedDivTruncated`](malachite_base::polynomial::CheckedDivTruncated), for dividing two
+/// polynomials as power series.
+pub mod div_truncated;
 /// Implementations of [`DivisibleBy`](malachite_base::num::arithmetic::traits::DivisibleBy), for
 /// determining whether one polynomial is divisible by another.
 pub mod divisible_by;
@@ -105,6 +110,9 @@ pub mod floor_l2_norm;
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
 /// of a polynomial's coefficients.
 pub mod height;
+/// Implementations of [`InverseTruncated`](malachite_base::polynomial::InverseTruncated), for
+/// inverting a polynomial as a power series.
+pub mod inverse_truncated;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;

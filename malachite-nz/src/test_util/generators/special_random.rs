@@ -521,6 +521,37 @@ pub fn special_random_integer_polynomial_unsigned_pair_gen_var_6(
     )
 }
 
+// The polynomial `1 + x * q` or `-1 + x * q`.
+fn unit_constant_polynomial(q: IntegerPolynomial, positive: bool) -> IntegerPolynomial {
+    let one = IntegerPolynomial::one();
+    q.mul_power_of_x(1) + if positive { one } else { -one }
+}
+
+// Pairs `(p, len)` where the constant coefficient of `p` is 1 or -1 and `len` is at most 19.
+pub fn special_random_integer_polynomial_unsigned_pair_gen_var_7(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_bools,
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+        )
+        .map(|(q, positive, len)| (unit_constant_polynomial(q, positive), len)),
+    )
+}
+
 pub fn special_random_integer_polynomial_unsigned_unsigned_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, u64, u64)> {
@@ -2399,6 +2430,57 @@ pub fn special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_
             &|seed| random_unsigned_inclusive_range(seed, 0, 1000),
         )
         .map(|(p, q, len)| (p, q.mul_power_of_x(1), len)),
+    )
+}
+
+// Triples `(r * q, q, len)` where the constant coefficient of `q` is nonzero and `len` is at most
+// 19.
+pub fn special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+        )
+        .filter(|(_, q, _)| q.coefficients_asc().first().is_some_and(|c| *c != 0u32))
+        .map(|(r, q, len)| (r * &q, q, len)),
+    )
+}
+
+// Triples `(p, q, len)` where the constant coefficient of `q` is 1 or -1 and `len` is at most 19.
+pub fn special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integer_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_bools,
+            &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+        )
+        .map(|(p, q, positive, len)| (p, unit_constant_polynomial(q, positive), len)),
     )
 }
 

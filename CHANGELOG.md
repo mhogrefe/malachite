@@ -765,6 +765,18 @@ documented by git history.
   coefficients of $x^i$ for $\ell \leq i < h$ of a product, shifted down by $\ell$, like FLINT's
   `fmpz_poly_mulmid`, using the classical, Kronecker-substitution, Schönhage–Strassen, and FFT
   middle-product algorithms.
+- New `InverseTruncated`, `DivTruncated`, `DivTruncatedAssign`, and `CheckedDivTruncated` traits
+  in malachite-base, implemented for `IntegerPolynomial` with every combination of arguments by
+  value or by reference: power series inversion, which returns `None` unless the constant
+  coefficient is 1 or -1, and power series division, which panics, or returns `None`, unless the
+  divisor's constant coefficient is nonzero and the quotient has integer coefficients; like
+  FLINT's `fmpz_poly_inv_series` and `fmpz_poly_div_series`, with their basecase, Newton, and
+  divide-and-conquer algorithms. The cutoffs between algorithms depend on the sizes of the
+  coefficients, as measured, and division uses reversed polynomial division rather than inverting
+  the divisor, since an inverse's coefficients grow even when the quotient's do not.
+- `IntegerPolynomial` division by an `IntegerPolynomial` (`/`, `/=`, and `checked_div`) now
+  computes only the quotient, by FLINT's quotient-only basecase and divide-and-conquer algorithms,
+  rather than also computing the remainder.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

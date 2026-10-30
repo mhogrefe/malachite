@@ -199,6 +199,16 @@ pub fn integer_polynomial_unsigned_pair_gen_var_6() -> Generator<(IntegerPolynom
     )
 }
 
+// All `(IntegerPolynomial, u64)` where the constant coefficient of the polynomial is 1 or -1 and
+// the `u64` is at most 19.
+pub fn integer_polynomial_unsigned_pair_gen_var_7() -> Generator<(IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_unsigned_pair_gen_var_7,
+        &random_integer_polynomial_unsigned_pair_gen_var_7,
+        &special_random_integer_polynomial_unsigned_pair_gen_var_7,
+    )
+}
+
 // All `(IntegerPolynomial, u64, u64)` where the last `u64` is positive and the first is less than
 // it. The coefficients are arbitrary.
 pub fn integer_polynomial_unsigned_unsigned_triple_gen_var_1()
@@ -911,6 +921,28 @@ pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3()
         &exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3,
         &random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3,
         &special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(r * q, q, len)` where `r` and `q` are `IntegerPolynomial`s, the constant coefficient of `q`
+// is nonzero, and `len` is at most 19.
+pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_4()
+-> Generator<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_4,
+        &random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_4,
+        &special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_4,
+    )
+}
+
+// All `(IntegerPolynomial, IntegerPolynomial, u64)` where the constant coefficient of the second
+// polynomial is 1 or -1 and the `u64` is at most 19.
+pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_5()
+-> Generator<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_5,
+        &random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_5,
+        &special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_5,
     )
 }
 

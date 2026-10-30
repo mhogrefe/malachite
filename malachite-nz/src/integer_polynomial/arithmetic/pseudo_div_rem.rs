@@ -32,7 +32,7 @@ use malachite_base::polynomial::{PseudoDivAssignRem, PseudoDivRem};
 // This is equivalent to `_fmpz_poly_pseudo_divrem_basecase` from
 // `fmpz_poly/pseudo_divrem_basecase.c`, FLINT 3.6.0, and, with `exact` set, to
 // `_fmpz_poly_divrem_basecase` from `fmpz_poly/divrem_basecase.c` with `exact` set.
-fn basecase(
+pub(crate) fn basecase(
     xs: &[Integer],
     ys: &[Integer],
     exact: bool,

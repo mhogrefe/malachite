@@ -2334,6 +2334,287 @@ fn tune_poly_mod_power_of_2_mul_grid() {
     }
 }
 
+// Finds, for each coefficient size `nb`, the shortest length at which the alternatives to
+// `div_truncated_basecase` win: dividing by a divisor with constant coefficient 1 by inverting it
+// and multiplying, and dividing by one with constant coefficient 3 by reversed polynomial division.
+// Divisors are dense, with other coefficients of exactly `nb` bits; the dividends are either the
+// divisor times a dense quotient of `nb`-bit coefficients (`exact`), or, for the unit divisor, a
+// dense random series, whose quotient's coefficients grow (`random`). Prints `kind nb n basecase
+// alternative` in nanoseconds, and `kind nb crossover n` when the alternative has won at two
+// consecutive lengths. DIV_CUTOFF_BITS (comma-separated) replaces the default sizes.
+fn tune_div_truncated_cutoff() {
+    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::basic::traits::Zero;
+    use malachite_base::num::logic::traits::BitAccess;
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::div_truncated::*;
+    use malachite_nz::integer_polynomial::arithmetic::inverse_truncated::inverse_truncated_dispatch;
+    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::mul_truncated_to_out;
+    use malachite_nz::natural::Natural;
+    use std::time::Instant;
+    fn time_ns(f: &mut dyn FnMut()) -> f64 {
+        let t0 = Instant::now();
+        f();
+        let one = t0.elapsed().as_secs_f64();
+        if one > 1.0 {
+            return one * 1e9;
+        }
+        let iters = if one > 0.02 {
+            1
+        } else {
+            (0.02 / (one + 1e-9)) as u64 + 1
+        };
+        let mut best = f64::INFINITY;
+        for _ in 0..3 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best * 1e9
+    }
+    let bits_list: Vec<u64> = std::env::var("DIV_CUTOFF_BITS").map_or_else(
+        |_| vec![1, 4, 16, 64, 256, 1024],
+        |s| s.split(',').map(|x| x.parse().unwrap()).collect(),
+    );
+    let lengths = [64, 72, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096];
+    let max_n = *lengths.last().unwrap();
+    for &nb in &bits_list {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(&format!("div{nb}")));
+        let mut signs = random_primitive_ints::<u8>(EXAMPLE_SEED.fork(&format!("div{nb}s")));
+        let limb_count = usize::try_from(nb.div_ceil(Limb::WIDTH)).unwrap();
+        let mut dense = |len: usize| -> Vec<Integer> {
+            (0..len)
+                .map(|_| {
+                    let ls: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+                    let mut x = Natural::from_owned_limbs_asc(ls).mod_power_of_2(nb);
+                    x.set_bit(nb - 1);
+                    if signs.next().unwrap().odd() {
+                        -Integer::from(x)
+                    } else {
+                        Integer::from(x)
+                    }
+                })
+                .collect()
+        };
+        let tail = dense(max_n - 1);
+        let quotient = dense(max_n);
+        let random_dividend = dense(max_n);
+        let kinds: Vec<String> = std::env::var("DIV_CUTOFF_KINDS").map_or_else(
+            |_| {
+                vec![
+                    "exact-unit".to_string(),
+                    "random-unit".to_string(),
+                    "exact-nonunit".to_string(),
+                ]
+            },
+            |s| s.split(',').map(ToString::to_string).collect(),
+        );
+        for (kind, y0) in [("exact-unit", 1u32), ("random-unit", 1), ("exact-nonunit", 3)] {
+            if !kinds.iter().any(|k| k == kind) {
+                continue;
+            }
+            let mut ys = vec![Integer::from(y0)];
+            ys.extend(tail.iter().cloned());
+            let mut wins = 0;
+            for &n in &lengths {
+                let ys = &ys[..n];
+                let xs = if kind == "random-unit" {
+                    random_dividend[..n].to_vec()
+                } else {
+                    let mut xs = vec![Integer::ZERO; n];
+                    mul_truncated_to_out(&mut xs, &quotient[..n], ys);
+                    xs
+                };
+                let t_basecase = time_ns(&mut || {
+                    std::hint::black_box(div_truncated_basecase(&xs, ys, n));
+                });
+                if y0 == 1 && std::env::var("DIV_CUTOFF_DC").is_ok() {
+                    let t_dc = time_ns(&mut || {
+                        std::hint::black_box(div_truncated_divide_and_conquer(&xs, ys, n));
+                    });
+                    println!("{kind} {nb} {n} dc {t_dc:.0}");
+                }
+                let t_alternative = if y0 == 1 {
+                    time_ns(&mut || {
+                        let inverse = inverse_truncated_dispatch(ys, n);
+                        let mut out = vec![Integer::ZERO; n];
+                        mul_truncated_to_out(&mut out, &inverse, &xs);
+                        std::hint::black_box(out);
+                    })
+                } else {
+                    time_ns(&mut || {
+                        std::hint::black_box(div_truncated_divide_and_conquer(&xs, ys, n));
+                    })
+                };
+                println!("{kind} {nb} {n} {t_basecase:.0} {t_alternative:.0}");
+                if t_alternative < t_basecase {
+                    wins += 1;
+                    if wins == 2 {
+                        println!("{kind} {nb} crossover {n}");
+                        break;
+                    }
+                } else {
+                    wins = 0;
+                }
+                if t_basecase > 20e9 || t_alternative > 20e9 {
+                    println!("{kind} {nb} no crossover by {n}");
+                    break;
+                }
+            }
+        }
+    }
+}
+
+// Finds, for each coefficient size `nb`, the shortest length at which one Newton step, from an
+// inverse to half the precision found by the basecase, beats the basecase: the crossover of
+// `inverse_truncated_basecase` and `inverse_truncated_newton_with_cutoff`. Inputs are dense series
+// with constant coefficient 1 and other coefficients of exactly `nb` bits and random signs. Prints
+// `nb n basecase newton` for each length tried, in nanoseconds, and `nb crossover n` when Newton
+// has won at two consecutive lengths. INVERSE_CUTOFF_BITS (comma-separated) replaces the default
+// sizes.
+fn tune_inverse_truncated_cutoff() {
+    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::basic::traits::One;
+    use malachite_base::num::logic::traits::BitAccess;
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::inverse_truncated::*;
+    use malachite_nz::natural::Natural;
+    use std::time::Instant;
+    fn time_ns(f: &mut dyn FnMut()) -> f64 {
+        let t0 = Instant::now();
+        f();
+        let one = t0.elapsed().as_secs_f64();
+        if one > 1.0 {
+            return one * 1e9;
+        }
+        let iters = if one > 0.02 {
+            1
+        } else {
+            (0.02 / (one + 1e-9)) as u64 + 1
+        };
+        let mut best = f64::INFINITY;
+        for _ in 0..3 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best * 1e9
+    }
+    let bits_list: Vec<u64> = std::env::var("INVERSE_CUTOFF_BITS").map_or_else(
+        |_| vec![1, 2, 4, 8, 16, 32, 64, 128, 256],
+        |s| s.split(',').map(|x| x.parse().unwrap()).collect(),
+    );
+    let lengths = [
+        32, 48, 64, 80, 96, 128, 160, 192, 256, 320, 384, 512, 640, 768, 1024, 1280, 1536, 2048,
+        2560, 3072, 4096,
+    ];
+    for &nb in &bits_list {
+        let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(&format!("inv{nb}")));
+        let mut signs = random_primitive_ints::<u8>(EXAMPLE_SEED.fork(&format!("inv{nb}s")));
+        let limb_count = usize::try_from(nb.div_ceil(Limb::WIDTH)).unwrap();
+        let max_n = *lengths.last().unwrap();
+        let mut xs = vec![Integer::ONE];
+        for _ in 1..max_n {
+            let ls: Vec<Limb> = (&mut limbs).take(limb_count).collect();
+            let mut x = Natural::from_owned_limbs_asc(ls).mod_power_of_2(nb);
+            x.set_bit(nb - 1);
+            xs.push(if signs.next().unwrap().odd() {
+                -Integer::from(x)
+            } else {
+                Integer::from(x)
+            });
+        }
+        let mut wins = 0;
+        for &n in &lengths {
+            let ys = &xs[..n];
+            let t_basecase = time_ns(&mut || {
+                std::hint::black_box(inverse_truncated_basecase(ys, n));
+            });
+            let t_newton = time_ns(&mut || {
+                std::hint::black_box(inverse_truncated_newton_with_cutoff(ys, n, n));
+            });
+            println!("{nb} {n} {t_basecase:.0} {t_newton:.0}");
+            if t_newton < t_basecase {
+                wins += 1;
+                if wins == 2 {
+                    println!("{nb} crossover {n}");
+                    break;
+                }
+            } else {
+                wins = 0;
+            }
+            if t_basecase > 20e9 {
+                println!("{nb} no crossover by {n}");
+                break;
+            }
+        }
+    }
+}
+
+// The Malachite side of the power series inversion comparison; the C side is
+// perf/scratch/inverse_truncated_flint.c (make inverse-truncated-flint). Both read the same input
+// file, perf/scratch/inverse_truncated.in (see gen_inverse_truncated.py), or the file named by
+// INVERSE_TRUNCATED_INPUT, and time each line the same way (a batch calibrated to at least 20 ms,
+// best of 5). Prints `id n nb default basecase newton` in nanoseconds.
+fn tune_inverse_truncated_grid() {
+    use malachite_nz::integer::Integer;
+    use malachite_nz::integer_polynomial::arithmetic::inverse_truncated::*;
+    use std::str::FromStr;
+    use std::time::Instant;
+    fn time_ns(f: &mut dyn FnMut()) -> f64 {
+        let t0 = Instant::now();
+        f();
+        let one = t0.elapsed().as_secs_f64();
+        let iters = if one > 0.02 {
+            1
+        } else {
+            (0.02 / (one + 1e-9)) as u64 + 1
+        };
+        let mut best = f64::INFINITY;
+        for _ in 0..5 {
+            let t0 = Instant::now();
+            for _ in 0..iters {
+                f();
+            }
+            best = best.min(t0.elapsed().as_secs_f64() / iters as f64);
+        }
+        best * 1e9
+    }
+    let path = std::env::var("INVERSE_TRUNCATED_INPUT")
+        .unwrap_or_else(|_| "../perf/scratch/inverse_truncated.in".to_string());
+    let input = std::fs::read_to_string(&path).unwrap();
+    for line in input.lines() {
+        let mut parts = line.split(" | ");
+        let header: Vec<usize> = parts
+            .next()
+            .unwrap()
+            .split(' ')
+            .map(|x| x.parse().unwrap())
+            .collect();
+        let (id, n, nb) = (header[0], header[1], header[2]);
+        let xs: Vec<Integer> = parts
+            .next()
+            .unwrap()
+            .split(' ')
+            .map(|x| Integer::from_str(x).unwrap())
+            .collect();
+        let t_default = time_ns(&mut || {
+            std::hint::black_box(inverse_truncated_dispatch(&xs, n));
+        });
+        let t_basecase = time_ns(&mut || {
+            std::hint::black_box(inverse_truncated_basecase(&xs, n));
+        });
+        let t_newton = time_ns(&mut || {
+            std::hint::black_box(inverse_truncated_newton(&xs, n));
+        });
+        println!("{id} {n} {nb} {t_default:.0} {t_basecase:.0} {t_newton:.0}");
+    }
+}
+
 // The Malachite side of the polynomial-multiplication shootout; the C side is
 // perf/scratch/poly_mul_flint.c (make poly-mul-flint). The grid of lengths and coefficient sizes,
 // the dense inputs (every coefficient has exactly `bits` bits and a random sign), and the timing (a
@@ -4398,6 +4679,9 @@ fn tune_evaluate() {
 pub fn tune(key: &str) {
     match key {
         "add" => tune_add(),
+        "inverse_truncated_grid" => tune_inverse_truncated_grid(),
+        "inverse_truncated_cutoff" => tune_inverse_truncated_cutoff(),
+        "div_truncated_cutoff" => tune_div_truncated_cutoff(),
         "evaluate" => tune_evaluate(),
         "shl" => tune_shl(),
         "shl_alloc" => tune_shl_alloc(),

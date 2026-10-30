@@ -194,6 +194,10 @@ int run_fmpz_poly_bit_unpack_unsigned(const char * arg);
 int run_fmpz_poly_mul(const char * arg);
 int run_fmpz_poly_mullow(const char * arg);
 int run_fmpz_poly_mulmid(const char * arg);
+
+/* fmpz_poly_series.c */
+int run_fmpz_poly_inv_series(const char * arg);
+int run_fmpz_poly_div_series(const char * arg);
 int run_fmpz_poly_sqr(const char * arg);
 int run_fmpz_poly_sqrlow(const char * arg);
 

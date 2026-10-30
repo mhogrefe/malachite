@@ -3482,6 +3482,49 @@ fn test_against_flint() {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_mulmid");
     }
 
+    // Every case from test_inverse_truncated in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against fmpz_poly_inv_series and its algorithms.
+    for demo_name in [
+        "demo_integer_polynomial_inverse_truncated",
+        "demo_integer_polynomial_inverse_truncated_ref",
+        "demo_integer_polynomial_inverse_truncated_unit",
+        "demo_integer_polynomial_inverse_truncated_unit_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_inv_series");
+    }
+
+    // Every case from test_div_truncated in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against fmpz_poly_div_series and its algorithms.
+    for demo_name in [
+        "demo_integer_polynomial_div_truncated",
+        "demo_integer_polynomial_div_truncated_val_ref",
+        "demo_integer_polynomial_div_truncated_ref_val",
+        "demo_integer_polynomial_div_truncated_ref_ref",
+        "demo_integer_polynomial_div_truncated_assign",
+        "demo_integer_polynomial_div_truncated_assign_ref",
+        "demo_integer_polynomial_checked_div_truncated",
+        "demo_integer_polynomial_checked_div_truncated_ref_ref",
+        "demo_integer_polynomial_checked_div_truncated_exact",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_div_series");
+    }
+
+    // Long series and polynomials, which reach the Newton and divide-and-conquer algorithms. Their
+    // lines are long, so fewer are checked.
+    for (demo_name, flint_mode) in [
+        ("demo_integer_polynomial_inverse_truncated_long", "fmpz_poly_inv_series"),
+        ("demo_integer_polynomial_div_truncated_long", "fmpz_poly_div_series"),
+        ("demo_integer_polynomial_div_long", "fmpz_poly_divrem"),
+    ] {
+        check_demo_against_flint_random_modes_with_limit(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            flint_mode,
+            100,
+        );
+    }
+
     // Every case from test_mul_high_to_out_classical in malachite-nz's IntegerPolynomial tests, and the generated cases
     // from its demos, against _fmpz_poly_mulhigh_classical.
     check_demo_against_flint(

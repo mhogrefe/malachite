@@ -354,6 +354,33 @@ pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_
     )
 }
 
+// Triples `(r * q, q, len)` where the constant coefficient of `q` is nonzero and `len` is at most
+// 19.
+pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_4()
+-> It<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_integer_polynomials(),
+            primitive_int_increasing_inclusive_range(0, 19),
+        )
+        .filter(|(_, q, _)| q.coefficients_asc().first().is_some_and(|c| *c != 0u32))
+        .map(|(r, q, len)| (r * &q, q, len)),
+    )
+}
+
+// Triples `(p, q, len)` where the constant coefficient of `q` is 1 or -1 and `len` is at most 19.
+pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_5()
+-> It<(IntegerPolynomial, IntegerPolynomial, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxyz(
+            exhaustive_integer_polynomials(),
+            exhaustive_bools(),
+            primitive_int_increasing_inclusive_range(0, 19),
+        )
+        .map(|(p, q, positive, len)| (p, unit_constant_polynomial(q, positive), len)),
+    )
+}
+
 // Quadruples `(p, q, low, high)` where `low <= high <= 19`.
 pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
 -> It<(IntegerPolynomial, IntegerPolynomial, u64, u64)> {
@@ -561,6 +588,24 @@ pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_5() -> It<(IntegerPol
 
 pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_6() -> It<(IntegerPolynomial, u64)> {
     Box::new(exhaustive_integer_polynomial_unsigned_pair_gen_var_5().filter(|(p, _)| p.len() == 2))
+}
+
+// The polynomial `1 + x * q` or `-1 + x * q`.
+fn unit_constant_polynomial(q: IntegerPolynomial, positive: bool) -> IntegerPolynomial {
+    let one = IntegerPolynomial::one();
+    q.mul_power_of_x(1) + if positive { one } else { -one }
+}
+
+// Pairs `(p, len)` where the constant coefficient of `p` is 1 or -1 and `len` is at most 19.
+pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_7() -> It<(IntegerPolynomial, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_integer_polynomials(),
+            exhaustive_bools(),
+            primitive_int_increasing_inclusive_range(0, 19),
+        )
+        .map(|(q, positive, len)| (unit_constant_polynomial(q, positive), len)),
+    )
 }
 
 pub fn exhaustive_integer_polynomial_unsigned_unsigned_triple_gen_var_1()
