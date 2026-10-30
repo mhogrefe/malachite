@@ -281,6 +281,40 @@ pub trait MulTruncatedAssign<Rhs = Self> {
     fn mul_truncated_assign(&mut self, other: Rhs, len: u64);
 }
 
+/// Multiplies two polynomials, keeping only the coefficients of $x^i$ for $i$ in a given range, and
+/// shifting them down to start at $x^0$.
+///
+/// This is the middle product: with $\ell$ equal to `low` and $h$ equal to `high`, it is $\lfloor
+/// (pq \bmod x^h) / x^\ell \rfloor$. The polynomials need not be of any particular lengths, and a
+/// range that extends past the end of the product is cut off there.
+pub trait MulMiddle<Rhs = Self> {
+    type Output;
+
+    /// Multiplies two polynomials and returns the coefficients of $x^i$ for `low` $\leq i <$ `high`
+    /// of the product, shifted down by `low`.
+    ///
+    /// $$
+    /// f(p, q, \ell, h) = \left \lfloor \frac{pq \bmod x^h}{x^\ell} \right \rfloor.
+    /// $$
+    fn mul_middle(self, other: Rhs, low: u64, high: u64) -> Self::Output;
+}
+
+/// Multiplies a polynomial by another in place, keeping only the coefficients of $x^i$ for $i$ in a
+/// given range, and shifting them down to start at $x^0$.
+///
+/// This is the middle product: with $\ell$ equal to `low` and $h$ equal to `high`, it is $\lfloor
+/// (pq \bmod x^h) / x^\ell \rfloor$. The polynomials need not be of any particular lengths, and a
+/// range that extends past the end of the product is cut off there.
+pub trait MulMiddleAssign<Rhs = Self> {
+    /// Multiplies `self` by a polynomial and replaces it with the coefficients of $x^i$ for `low`
+    /// $\leq i <$ `high` of the product, shifted down by `low`.
+    ///
+    /// $$
+    /// p \gets \left \lfloor \frac{pq \bmod x^h}{x^\ell} \right \rfloor.
+    /// $$
+    fn mul_middle_assign(&mut self, other: Rhs, low: u64, high: u64);
+}
+
 /// Squares a polynomial, keeping only the coefficients of $x^i$ for $i$ less than a given length.
 ///
 /// With $n$ equal to `len`, this is squaring in the ring of polynomials modulo $x^n$, applied to

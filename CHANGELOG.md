@@ -759,6 +759,12 @@ documented by git history.
   `DivExactAssign`, `CheckedDivExact`, and `DivisibleBy` for exact division and divisibility, like
   `fmpz_poly_divexact` and `fmpz_poly_divides`; `RemovePower` and `RemovePowerAssign`, like
   `fmpz_poly_remove`; and `DivRoot` and `DivRootAssign`, dividing by $x - c$.
+- New `MulMiddle` and `MulMiddleAssign` traits in malachite-base, implemented for
+  `IntegerPolynomial` and `NaturalPolynomial` with every combination of arguments by value or by
+  reference: the
+  coefficients of $x^i$ for $\ell \leq i < h$ of a product, shifted down by $\ell$, like FLINT's
+  `fmpz_poly_mulmid`, using the classical, Kronecker-substitution, Schönhage–Strassen, and FFT
+  middle-product algorithms.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

@@ -354,6 +354,19 @@ pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_
     )
 }
 
+// Quadruples `(p, q, low, high)` where `low <= high <= 19`.
+pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+-> It<(IntegerPolynomial, IntegerPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_integer_polynomials(),
+            exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(0, 19))
+                .filter(|&(low, high)| low <= high),
+        )
+        .map(|(p, q, (low, high))| (p, q, low, high)),
+    )
+}
+
 pub fn exhaustive_integer_polynomial_triple_gen()
 -> It<(IntegerPolynomial, IntegerPolynomial, IntegerPolynomial)> {
     Box::new(exhaustive_triples_from_single(
@@ -799,6 +812,19 @@ pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_
         exhaustive_natural_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+// Quadruples `(p, q, low, high)` where `low <= high <= 19`.
+pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_natural_polynomials(),
+            exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(0, 19))
+                .filter(|&(low, high)| low <= high),
+        )
+        .map(|(p, q, (low, high))| (p, q, low, high)),
+    )
 }
 
 pub fn exhaustive_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1()

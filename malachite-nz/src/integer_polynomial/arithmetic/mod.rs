@@ -134,7 +134,9 @@ pub mod mul;
 pub mod mul_dispatch;
 #[doc(hidden)]
 pub mod mul_high;
-#[doc(hidden)]
+/// Implementations of [`MulMiddle`](malachite_base::polynomial::MulMiddle) and
+/// [`MulMiddleAssign`](malachite_base::polynomial::MulMiddleAssign), for multiplying two
+/// polynomials and keeping only a middle range of coefficients of the product.
 pub mod mul_middle;
 /// Implementations of [`MulPowerOfX`](malachite_base::polynomial::MulPowerOfX) and
 /// [`MulPowerOfXAssign`](malachite_base::polynomial::MulPowerOfXAssign), for multiplying a

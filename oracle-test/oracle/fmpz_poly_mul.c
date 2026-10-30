@@ -9,13 +9,15 @@
     <https://www.gnu.org/licenses/>.
 
     Diffs the lines printed by the IntegerPolynomial multiplication and squaring demos against
-    fmpz_poly_mul, fmpz_poly_mullow, fmpz_poly_sqr, and fmpz_poly_sqrlow.
+    fmpz_poly_mul, fmpz_poly_mullow, fmpz_poly_mulmid, fmpz_poly_sqr, and fmpz_poly_sqrlow.
 
     fmpz_poly_mul: `(P) * (Q) = R`, `(P) * &(Q) = R`, `&(P) * (Q) = R`, `&(P) * &(Q) = R`,
     `p := P; p *= Q; p = R`, and `p := P; p *= &Q; p = R`. When the two operands are written
     identically, FLINT is given the same polynomial for both, so that its squaring path runs too.
 
     fmpz_poly_mullow: `(P).mul_truncated(Q, n) = R` and the other shapes of the add_series mode.
+
+    fmpz_poly_mulmid: `(P).mul_middle(Q, lo, hi) = R` and the same shapes as fmpz_poly_mullow.
 
     fmpz_poly_sqr: `(P).square() = R`, `(&(P)).square() = R`, and
     `p := P; p.square_assign(); p = R`.
@@ -267,6 +269,100 @@ run_fmpz_poly_mullow(const char * arg)
     checked = 0;
     int result = for_each_line(arg, check_mullow_line);
     return result != 0 ? result : require_some_lines("fmpz_poly_mullow", checked);
+}
+
+static int
+check_mulmid_line(char * line, int line_number)
+{
+    char * p_str;
+    char * arg;
+    char * r_str;
+    if (!split_polynomial_scalar_line(line, "mul_middle", "mul_middle_assign", NULL, &p_str, &arg,
+                                      &r_str))
+    {
+        return report_unrecognized(line, "fmpz_poly_mulmid", line_number);
+    }
+    /* The argument is `Q, lo, hi` or `&(Q), lo, hi`. Polynomials are displayed without spaces, so
+       the last two ", " separate the bounds. */
+    char * comma_hi = strrchr(arg, ',');
+    if (comma_hi == NULL || comma_hi[1] != ' ')
+    {
+        flint_printf("error in fmpz_poly_mulmid test, line %d: unrecognized argument\n",
+                     line_number);
+        return 1;
+    }
+    *comma_hi = '\0';
+    char * comma_lo = strrchr(arg, ',');
+    if (comma_lo == NULL || comma_lo[1] != ' ')
+    {
+        flint_printf("error in fmpz_poly_mulmid test, line %d: unrecognized argument\n",
+                     line_number);
+        return 1;
+    }
+    *comma_lo = '\0';
+    char * lo_str = comma_lo + 2;
+    char * hi_str = comma_hi + 2;
+    char * q_str = arg;
+    if (strncmp(q_str, "&(", 2) == 0)
+    {
+        q_str = unwrap(q_str);
+        if (q_str == NULL)
+        {
+            flint_printf("error in fmpz_poly_mulmid test, line %d: unrecognized argument\n",
+                         line_number);
+            return 1;
+        }
+    }
+    char * lo_end;
+    char * hi_end;
+    unsigned long long lo = strtoull(lo_str, &lo_end, 10);
+    unsigned long long hi = strtoull(hi_str, &hi_end, 10);
+    checked++;
+    int result = 0;
+    int same = strcmp(p_str, q_str) == 0;
+    fmpz_poly_t p, q, expected, r;
+    fmpz_poly_init(p);
+    fmpz_poly_init(q);
+    fmpz_poly_init(expected);
+    fmpz_poly_init(r);
+    if (*lo_end != '\0' || *hi_end != '\0' || lo > hi || !fmpz_poly_set_str_malachite(p, p_str)
+        || !fmpz_poly_set_str_malachite(q, q_str)
+        || !fmpz_poly_set_str_malachite(expected, r_str))
+    {
+        flint_printf("error in fmpz_poly_mulmid test, line %d: unreadable input\n", line_number);
+        result = 1;
+    }
+    else
+    {
+        /* FLINT takes `slong` bounds; a bound past the end of the product means the same as one at
+           the end. */
+        slong len = fmpz_poly_length(p) + fmpz_poly_length(q);
+        slong nlo = lo > (unsigned long long) len ? len : (slong) lo;
+        slong nhi = hi > (unsigned long long) len ? len : (slong) hi;
+        fmpz_poly_mulmid(r, p, same ? p : q, nlo, nhi);
+        fmpz_poly_t reference;
+        fmpz_poly_init(reference);
+        fmpz_poly_mulmid_classical(reference, p, same ? p : q, nlo, nhi);
+        use_reference_if_different(r, reference);
+        fmpz_poly_clear(reference);
+        if (!fmpz_poly_equal(r, expected))
+        {
+            result = report_mismatch("fmpz_poly_mulmid", line_number, r);
+        }
+    }
+    fmpz_poly_clear(p);
+    fmpz_poly_clear(q);
+    fmpz_poly_clear(expected);
+    fmpz_poly_clear(r);
+    return result;
+}
+
+int
+run_fmpz_poly_mulmid(const char * arg)
+{
+    checked = 0;
+    int result = for_each_line(arg, check_mulmid_line);
+    return result != 0 ? result : require_some_lines("fmpz_poly_mulmid", checked);
 }
 
 /* Checks a squaring line; `truncated` selects fmpz_poly_sqrlow, whose argument is the length. */

@@ -93,6 +93,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_sum::register(runner);
     mod_taylor_shift::register(runner);
     mul::register(runner);
+    mul_middle::register(runner);
     mul_power_of_x::register(runner);
     mul_truncated::register(runner);
     nth_derivative::register(runner);
@@ -188,6 +189,7 @@ mod mod_sub_truncated;
 mod mod_sum;
 mod mod_taylor_shift;
 mod mul;
+mod mul_middle;
 mod mul_power_of_x;
 mod mul_truncated;
 mod nth_derivative;

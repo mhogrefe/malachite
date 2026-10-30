@@ -574,6 +574,10 @@ pub mod mod_taylor_shift;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying two polynomials.
 pub mod mul;
+/// Implementations of [`MulMiddle`](malachite_base::polynomial::MulMiddle) and
+/// [`MulMiddleAssign`](malachite_base::polynomial::MulMiddleAssign), for multiplying two
+/// polynomials and keeping only a middle range of coefficients of the product.
+pub mod mul_middle;
 /// Implementations of [`MulPowerOfX`](malachite_base::polynomial::MulPowerOfX) and
 /// [`MulPowerOfXAssign`](malachite_base::polynomial::MulPowerOfXAssign), for multiplying a
 /// polynomial by a power of its variable.

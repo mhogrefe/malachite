@@ -8,6 +8,7 @@
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::polynomial::{MulMiddle, MulMiddleAssign};
 use malachite_base::test_util::bench::bucketers::quadruple_1_2_vec_max_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -24,7 +25,9 @@ use malachite_nz::integer_polynomial::arithmetic::mul_middle::schonhage_strassen
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
+use malachite_nz::test_util::bench::bucketers::quadruple_1_2_integer_polynomial_max_bit_bucketer;
 use malachite_nz::test_util::generators::{
+    integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1,
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1,
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2,
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3,
@@ -32,6 +35,7 @@ use malachite_nz::test_util::generators::{
     integer_vec_unsigned_unsigned_triple_gen_var_3, large_type_gen_var_57, large_type_gen_var_58,
 };
 use malachite_nz::test_util::integer_polynomial::arithmetic::mul::*;
+use malachite_nz::test_util::integer_polynomial::arithmetic::mul_middle::mul_middle_naive;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_mul_middle_to_out_classical);
@@ -56,10 +60,25 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_mul_middle_to_out_fft_square);
     register_demo!(runner, demo_mul_middle_to_out_fft_long);
     register_demo!(runner, demo_mul_middle_to_out_fft_long_square);
+    register_demo!(runner, demo_integer_polynomial_mul_middle);
+    register_demo!(runner, demo_integer_polynomial_mul_middle_val_ref);
+    register_demo!(runner, demo_integer_polynomial_mul_middle_ref_val);
+    register_demo!(runner, demo_integer_polynomial_mul_middle_ref_ref);
+    register_demo!(runner, demo_integer_polynomial_mul_middle_assign);
+    register_demo!(runner, demo_integer_polynomial_mul_middle_assign_ref);
 
     register_bench!(runner, benchmark_mul_middle_to_out_algorithms);
     register_bench!(runner, benchmark_mul_middle_to_out_tiny_1_algorithms);
     register_bench!(runner, benchmark_mul_middle_to_out_tiny_2_algorithms);
+    register_bench!(
+        runner,
+        benchmark_integer_polynomial_mul_middle_evaluation_strategy
+    );
+    register_bench!(runner, benchmark_integer_polynomial_mul_middle_algorithms);
+    register_bench!(
+        runner,
+        benchmark_integer_polynomial_mul_middle_assign_evaluation_strategy
+    );
 }
 
 fn demo_mul_middle_to_out_classical(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -519,4 +538,188 @@ fn demo_integers_from_fermat_residues(gm: GenMode, config: &GenConfig, limit: us
         integers_from_fermat_residues(&mut out, &coeffs_f, limbs, sign);
         println!("integers_from_fermat_residues(_, {coeffs_f:?}, {limbs}, {sign}) = {out:?}");
     }
+}
+
+fn demo_integer_polynomial_mul_middle(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, q, low, high) in
+        integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let p_old = p.clone();
+        let q_old = q.clone();
+        println!(
+            "({p_old}).mul_middle({q_old}, {low}, {high}) = {}",
+            p.mul_middle(q, low, high)
+        );
+    }
+}
+
+fn demo_integer_polynomial_mul_middle_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, q, low, high) in
+        integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let p_old = p.clone();
+        let q_old = q.clone();
+        println!(
+            "({p_old}).mul_middle(&({q_old}), {low}, {high}) = {}",
+            p.mul_middle(&q, low, high)
+        );
+    }
+}
+
+fn demo_integer_polynomial_mul_middle_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, q, low, high) in
+        integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let p_old = p.clone();
+        let q_old = q.clone();
+        println!(
+            "(&({p_old})).mul_middle({q_old}, {low}, {high}) = {}",
+            (&p).mul_middle(q, low, high)
+        );
+    }
+}
+
+fn demo_integer_polynomial_mul_middle_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, q, low, high) in
+        integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let p_old = p.clone();
+        let q_old = q.clone();
+        println!(
+            "(&({p_old})).mul_middle(&({q_old}), {low}, {high}) = {}",
+            (&p).mul_middle(&q, low, high)
+        );
+    }
+}
+
+fn demo_integer_polynomial_mul_middle_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut p, q, low, high) in
+        integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let p_old = p.clone();
+        let q_old = q.clone();
+        p.mul_middle_assign(q, low, high);
+        println!("p := {p_old}; p.mul_middle_assign({q_old}, {low}, {high}); p = {p}");
+    }
+}
+
+fn demo_integer_polynomial_mul_middle_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut p, q, low, high) in
+        integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let p_old = p.clone();
+        let q_old = q.clone();
+        p.mul_middle_assign(&q, low, high);
+        println!("p := {p_old}; p.mul_middle_assign(&({q_old}), {low}, {high}); p = {p}");
+    }
+}
+
+fn benchmark_integer_polynomial_mul_middle_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "IntegerPolynomial.mul_middle(IntegerPolynomial, u64, u64)",
+        BenchmarkType::EvaluationStrategy,
+        integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+            .get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_integer_polynomial_max_bit_bucketer("p", "q"),
+        &mut [
+            (
+                "IntegerPolynomial.mul_middle(IntegerPolynomial, u64, u64)",
+                &mut |(p, q, low, high)| {
+                    no_out!(p.mul_middle(q, low, high));
+                },
+            ),
+            (
+                "IntegerPolynomial.mul_middle(&IntegerPolynomial, u64, u64)",
+                &mut |(p, q, low, high)| {
+                    no_out!(p.mul_middle(&q, low, high));
+                },
+            ),
+            (
+                "(&IntegerPolynomial).mul_middle(IntegerPolynomial, u64, u64)",
+                &mut |(p, q, low, high)| {
+                    no_out!((&p).mul_middle(q, low, high));
+                },
+            ),
+            (
+                "(&IntegerPolynomial).mul_middle(&IntegerPolynomial, u64, u64)",
+                &mut |(p, q, low, high)| {
+                    no_out!((&p).mul_middle(&q, low, high));
+                },
+            ),
+        ],
+    );
+}
+
+fn benchmark_integer_polynomial_mul_middle_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "IntegerPolynomial.mul_middle(IntegerPolynomial, u64, u64)",
+        BenchmarkType::Algorithms,
+        integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+            .get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_integer_polynomial_max_bit_bucketer("p", "q"),
+        &mut [
+            ("default", &mut |(p, q, low, high)| {
+                no_out!(p.mul_middle(q, low, high));
+            }),
+            ("naive", &mut |(p, q, low, high)| {
+                no_out!(mul_middle_naive(&p, &q, low, high));
+            }),
+        ],
+    );
+}
+
+fn benchmark_integer_polynomial_mul_middle_assign_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "IntegerPolynomial.mul_middle_assign(IntegerPolynomial, u64, u64)",
+        BenchmarkType::EvaluationStrategy,
+        integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+            .get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_integer_polynomial_max_bit_bucketer("p", "q"),
+        &mut [
+            (
+                "IntegerPolynomial.mul_middle_assign(IntegerPolynomial, u64, u64)",
+                &mut |(mut p, q, low, high)| p.mul_middle_assign(q, low, high),
+            ),
+            (
+                "IntegerPolynomial.mul_middle_assign(&IntegerPolynomial, u64, u64)",
+                &mut |(mut p, q, low, high)| p.mul_middle_assign(&q, low, high),
+            ),
+        ],
+    );
 }

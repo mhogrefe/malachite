@@ -1114,6 +1114,31 @@ pub fn random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_2(
     ))
 }
 
+// Quadruples `(p, q, low, high)` where `low <= high <= 19`.
+pub fn random_natural_polynomial_natural_polynomial_unsigned_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_pairs_from_single(random_unsigned_inclusive_range(seed, 0, 19))
+                    .filter(|&(low, high)| low <= high)
+            },
+        )
+        .map(|(p, q, (low, high))| (p, q, low, high)),
+    )
+}
+
 pub fn random_natural_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
@@ -2130,6 +2155,31 @@ pub fn random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3(
             &|seed| random_unsigned_inclusive_range(seed, 0, 1000),
         )
         .map(|(p, q, len)| (p, q.mul_power_of_x(1), len)),
+    )
+}
+
+// Quadruples `(p, q, low, high)` where `low <= high <= 19`.
+pub fn random_integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial, u64, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_integer_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_pairs_from_single(random_unsigned_inclusive_range(seed, 0, 19))
+                    .filter(|&(low, high)| low <= high)
+            },
+        )
+        .map(|(p, q, (low, high))| (p, q, low, high)),
     )
 }
 

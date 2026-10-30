@@ -437,6 +437,17 @@ pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_2()
     )
 }
 
+// All `(NaturalPolynomial, NaturalPolynomial, u64, u64)` where the `u64`s satisfy `low <= high <=
+// 19`.
+pub fn natural_polynomial_natural_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_polynomial_unsigned_unsigned_quadruple_gen_var_1,
+        &random_natural_polynomial_natural_polynomial_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_natural_polynomial_natural_polynomial_unsigned_unsigned_quadruple_gen_var_1,
+    )
+}
+
 // All `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 19.
 pub fn natural_polynomial_natural_polynomial_unsigned_triple_gen_var_3()
 -> Generator<(NaturalPolynomial, NaturalPolynomial, u64)> {
@@ -900,6 +911,17 @@ pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3()
         &exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3,
         &random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3,
         &special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_3,
+    )
+}
+
+// All `(IntegerPolynomial, IntegerPolynomial, u64, u64)` where the `u64`s satisfy `low <= high <=
+// 19`.
+pub fn integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1()
+-> Generator<(IntegerPolynomial, IntegerPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1,
+        &random_integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1,
     )
 }
 

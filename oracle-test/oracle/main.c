@@ -82,6 +82,7 @@ static const oracle_mode modes[] = {
     {"fmpz_poly_bit_unpack_unsigned", run_fmpz_poly_bit_unpack_unsigned},
     {"fmpz_poly_mul", run_fmpz_poly_mul},
     {"fmpz_poly_mullow", run_fmpz_poly_mullow},
+    {"fmpz_poly_mulmid", run_fmpz_poly_mulmid},
     {"fmpz_poly_sqr", run_fmpz_poly_sqr},
     {"fmpz_poly_sqrlow", run_fmpz_poly_sqrlow},
     {"_fmpz_poly_mul_classical", run__fmpz_poly_mul_classical},

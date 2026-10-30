@@ -3463,6 +3463,25 @@ fn test_against_flint() {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_mullow");
     }
 
+    // Every case from test_mul_middle in malachite-nz's IntegerPolynomial and NaturalPolynomial tests, and
+    // the generated cases from their demos, against fmpz_poly_mulmid.
+    for demo_name in [
+        "demo_integer_polynomial_mul_middle",
+        "demo_integer_polynomial_mul_middle_val_ref",
+        "demo_integer_polynomial_mul_middle_ref_val",
+        "demo_integer_polynomial_mul_middle_ref_ref",
+        "demo_integer_polynomial_mul_middle_assign",
+        "demo_integer_polynomial_mul_middle_assign_ref",
+        "demo_natural_polynomial_mul_middle",
+        "demo_natural_polynomial_mul_middle_val_ref",
+        "demo_natural_polynomial_mul_middle_ref_val",
+        "demo_natural_polynomial_mul_middle_ref_ref",
+        "demo_natural_polynomial_mul_middle_assign",
+        "demo_natural_polynomial_mul_middle_assign_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_mulmid");
+    }
+
     // Every case from test_mul_high_to_out_classical in malachite-nz's IntegerPolynomial tests, and the generated cases
     // from its demos, against _fmpz_poly_mulhigh_classical.
     check_demo_against_flint(

@@ -14,7 +14,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
+use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::arithmetic::coefficient::{
+    PolynomialCoefficient, trim_coefficients, truncate_coefficients,
+};
 use crate::integer_polynomial::arithmetic::mul_dispatch::{
     TinyKernel, classical_preferred, fft_preferred, karatsuba_preferred,
     schonhage_strassen_preferred, tiny_kernel,
@@ -28,10 +31,13 @@ use crate::integer_polynomial::arithmetic::mul_middle::tiny::{
 };
 use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
 use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
+use alloc::vec;
+use alloc::vec::Vec;
 use core::cmp::min;
-use core::mem::swap;
+use core::mem::{swap, take};
 use core::ptr;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::polynomial::{MulMiddle, MulMiddleAssign};
 
 pub mod classical;
 pub mod fft;
@@ -131,3 +137,375 @@ crate_test_fn! {mul_middle_to_out<C: PolynomialCoefficient>(
         None => mul_middle_to_out_kronecker(out, xs, ys, nlo, nhi),
     }
 }}
+
+// The coefficients of $x^i$ for `low` $\leq i <$ `high` of the product of the polynomials with
+// coefficients `xs` and `ys`, shifted down by `low`, without zeros at the end. A range that extends
+// past the end of the product is cut off there.
+//
+// This is equivalent to `fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0, except that it
+// panics if `low > high`, where FLINT returns zero.
+pub(crate) fn mul_middle_ref_ref<C: PolynomialCoefficient>(
+    xs: &[C],
+    ys: &[C],
+    low: u64,
+    high: u64,
+) -> Vec<C> {
+    assert!(low <= high, "low must be at most high");
+    if xs.is_empty() || ys.is_empty() {
+        return Vec::new();
+    }
+    let high = usize::try_from(high)
+        .unwrap_or(usize::MAX)
+        .min(xs.len() + ys.len() - 1);
+    let low = usize::try_from(low).unwrap_or(usize::MAX);
+    if low >= high {
+        return Vec::new();
+    }
+    let mut out = vec![C::ZERO; high - low];
+    mul_middle_to_out(&mut out, xs, ys, low, high);
+    trim_coefficients(&mut out);
+    out
+}
+
+// Multiplies the polynomial with coefficients `xs` by the one with coefficients `ys`, keeping only
+// the coefficients of $x^i$ for `low` $\leq i <$ `high`, shifted down by `low`. When `ys` is a
+// constant, the result is a scalar multiple of a window of `xs`, computed in place in its `Vec`.
+pub(crate) fn mul_middle_val_ref<C: PolynomialCoefficient>(
+    mut xs: Vec<C>,
+    ys: &[C],
+    low: u64,
+    high: u64,
+) -> Vec<C> {
+    if let [c] = ys {
+        assert!(low <= high, "low must be at most high");
+        truncate_coefficients(&mut xs, high);
+        let low = usize::try_from(low).unwrap_or(usize::MAX).min(xs.len());
+        xs.drain(..low);
+        C::vec_mul_scalar_assign(&mut xs, c);
+        xs
+    } else {
+        mul_middle_ref_ref(&xs, ys, low, high)
+    }
+}
+
+// Multiplies the polynomial with coefficients `xs` by the one with coefficients `ys`, keeping only
+// the coefficients of $x^i$ for `low` $\leq i <$ `high`, shifted down by `low`. When either is a
+// constant, the result is computed in place in the other's `Vec`.
+pub(crate) fn mul_middle_val_val<C: PolynomialCoefficient>(
+    xs: Vec<C>,
+    ys: Vec<C>,
+    low: u64,
+    high: u64,
+) -> Vec<C> {
+    if xs.len() == 1 {
+        mul_middle_val_ref(ys, &xs, low, high)
+    } else {
+        mul_middle_val_ref(xs, &ys, low, high)
+    }
+}
+
+impl MulMiddle<Self> for IntegerPolynomial {
+    type Output = Self;
+
+    /// Multiplies two [`IntegerPolynomial`]s, keeping only the coefficients of $x^i$ for `low`
+    /// $\leq i <$ `high` and shifting them down by `low`, taking both by value.
+    ///
+    /// $$
+    /// f(p, q, \ell, h) = \left \lfloor \frac{pq \bmod x^h}{x^\ell} \right \rfloor.
+    /// $$
+    ///
+    /// The range may extend past the end of the product, which cuts it off. The result is trimmed,
+    /// so when the coefficient of $x^{h-1}$ is zero, the degree is lower than $h - \ell - 1$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
+    /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
+    ///
+    /// # Panics
+    /// Panics if `low > high`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// // (x^2-3*x+2)*(2*x+5) = 2*x^3-x^2-11*x+10.
+    /// assert_eq!(
+    ///     (IntegerPolynomial::from_str("x^2-3*x+2").unwrap())
+    ///         .mul_middle(IntegerPolynomial::from_str("2*x+5").unwrap(), 1, 3)
+    ///         .to_string(),
+    ///     "-x-11"
+    /// );
+    /// // The range extends past the end of the product, x^2-1.
+    /// assert_eq!(
+    ///     (IntegerPolynomial::from_str("x+1").unwrap())
+    ///         .mul_middle(IntegerPolynomial::from_str("x-1").unwrap(), 1, 100)
+    ///         .to_string(),
+    ///     "x"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0, except that
+    /// it panics if `low > high`, where FLINT returns zero.
+    #[inline]
+    fn mul_middle(self, other: Self, low: u64, high: u64) -> Self {
+        Self {
+            coefficients: mul_middle_val_val(self.coefficients, other.coefficients, low, high),
+        }
+    }
+}
+
+impl MulMiddle<&Self> for IntegerPolynomial {
+    type Output = Self;
+
+    /// Multiplies two [`IntegerPolynomial`]s, keeping only the coefficients of $x^i$ for `low`
+    /// $\leq i <$ `high` and shifting them down by `low`, taking the first by value and the second
+    /// by reference.
+    ///
+    /// $$
+    /// f(p, q, \ell, h) = \left \lfloor \frac{pq \bmod x^h}{x^\ell} \right \rfloor.
+    /// $$
+    ///
+    /// The range may extend past the end of the product, which cuts it off. The result is trimmed,
+    /// so when the coefficient of $x^{h-1}$ is zero, the degree is lower than $h - \ell - 1$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
+    /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
+    ///
+    /// # Panics
+    /// Panics if `low > high`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// // (x^2-3*x+2)*(2*x+5) = 2*x^3-x^2-11*x+10.
+    /// assert_eq!(
+    ///     (IntegerPolynomial::from_str("x^2-3*x+2").unwrap())
+    ///         .mul_middle(&IntegerPolynomial::from_str("2*x+5").unwrap(), 1, 3)
+    ///         .to_string(),
+    ///     "-x-11"
+    /// );
+    /// // The range extends past the end of the product, x^2-1.
+    /// assert_eq!(
+    ///     (IntegerPolynomial::from_str("x+1").unwrap())
+    ///         .mul_middle(&IntegerPolynomial::from_str("x-1").unwrap(), 1, 100)
+    ///         .to_string(),
+    ///     "x"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0, except that
+    /// it panics if `low > high`, where FLINT returns zero.
+    #[inline]
+    fn mul_middle(self, other: &Self, low: u64, high: u64) -> Self {
+        Self {
+            coefficients: mul_middle_val_ref(self.coefficients, &other.coefficients, low, high),
+        }
+    }
+}
+
+impl MulMiddle<IntegerPolynomial> for &IntegerPolynomial {
+    type Output = IntegerPolynomial;
+
+    /// Multiplies two [`IntegerPolynomial`]s, keeping only the coefficients of $x^i$ for `low`
+    /// $\leq i <$ `high` and shifting them down by `low`, taking the first by reference and the
+    /// second by value.
+    ///
+    /// $$
+    /// f(p, q, \ell, h) = \left \lfloor \frac{pq \bmod x^h}{x^\ell} \right \rfloor.
+    /// $$
+    ///
+    /// The range may extend past the end of the product, which cuts it off. The result is trimmed,
+    /// so when the coefficient of $x^{h-1}$ is zero, the degree is lower than $h - \ell - 1$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
+    /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
+    ///
+    /// # Panics
+    /// Panics if `low > high`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// // (x^2-3*x+2)*(2*x+5) = 2*x^3-x^2-11*x+10.
+    /// assert_eq!(
+    ///     (&IntegerPolynomial::from_str("x^2-3*x+2").unwrap())
+    ///         .mul_middle(IntegerPolynomial::from_str("2*x+5").unwrap(), 1, 3)
+    ///         .to_string(),
+    ///     "-x-11"
+    /// );
+    /// // The range extends past the end of the product, x^2-1.
+    /// assert_eq!(
+    ///     (&IntegerPolynomial::from_str("x+1").unwrap())
+    ///         .mul_middle(IntegerPolynomial::from_str("x-1").unwrap(), 1, 100)
+    ///         .to_string(),
+    ///     "x"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0, except that
+    /// it panics if `low > high`, where FLINT returns zero.
+    #[inline]
+    fn mul_middle(self, other: IntegerPolynomial, low: u64, high: u64) -> IntegerPolynomial {
+        IntegerPolynomial {
+            coefficients: mul_middle_val_ref(other.coefficients, &self.coefficients, low, high),
+        }
+    }
+}
+
+impl MulMiddle<&IntegerPolynomial> for &IntegerPolynomial {
+    type Output = IntegerPolynomial;
+
+    /// Multiplies two [`IntegerPolynomial`]s, keeping only the coefficients of $x^i$ for `low`
+    /// $\leq i <$ `high` and shifting them down by `low`, taking both by reference.
+    ///
+    /// $$
+    /// f(p, q, \ell, h) = \left \lfloor \frac{pq \bmod x^h}{x^\ell} \right \rfloor.
+    /// $$
+    ///
+    /// The range may extend past the end of the product, which cuts it off. The result is trimmed,
+    /// so when the coefficient of $x^{h-1}$ is zero, the degree is lower than $h - \ell - 1$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
+    /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
+    ///
+    /// # Panics
+    /// Panics if `low > high`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// // (x^2-3*x+2)*(2*x+5) = 2*x^3-x^2-11*x+10.
+    /// assert_eq!(
+    ///     (&IntegerPolynomial::from_str("x^2-3*x+2").unwrap())
+    ///         .mul_middle(&IntegerPolynomial::from_str("2*x+5").unwrap(), 1, 3)
+    ///         .to_string(),
+    ///     "-x-11"
+    /// );
+    /// // The range extends past the end of the product, x^2-1.
+    /// assert_eq!(
+    ///     (&IntegerPolynomial::from_str("x+1").unwrap())
+    ///         .mul_middle(&IntegerPolynomial::from_str("x-1").unwrap(), 1, 100)
+    ///         .to_string(),
+    ///     "x"
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0, except that
+    /// it panics if `low > high`, where FLINT returns zero.
+    #[inline]
+    fn mul_middle(self, other: &IntegerPolynomial, low: u64, high: u64) -> IntegerPolynomial {
+        IntegerPolynomial {
+            coefficients: mul_middle_ref_ref(&self.coefficients, &other.coefficients, low, high),
+        }
+    }
+}
+
+impl MulMiddleAssign<Self> for IntegerPolynomial {
+    /// Multiplies an [`IntegerPolynomial`] by another [`IntegerPolynomial`] in place, keeping only
+    /// the coefficients of $x^i$ for `low` $\leq i <$ `high` and shifting them down by `low`,
+    /// taking the right-hand side by value.
+    ///
+    /// $$
+    /// p \gets \left \lfloor \frac{pq \bmod x^h}{x^\ell} \right \rfloor.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
+    /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
+    ///
+    /// # Panics
+    /// Panics if `low > high`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::MulMiddleAssign;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// let mut p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();
+    /// p.mul_middle_assign(IntegerPolynomial::from_str("2*x+5").unwrap(), 1, 3);
+    /// assert_eq!(p.to_string(), "-x-11");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0, except that
+    /// it panics if `low > high`, where FLINT returns zero.
+    #[inline]
+    fn mul_middle_assign(&mut self, other: Self, low: u64, high: u64) {
+        self.coefficients =
+            mul_middle_val_val(take(&mut self.coefficients), other.coefficients, low, high);
+    }
+}
+
+impl MulMiddleAssign<&Self> for IntegerPolynomial {
+    /// Multiplies an [`IntegerPolynomial`] by another [`IntegerPolynomial`] in place, keeping only
+    /// the coefficients of $x^i$ for `low` $\leq i <$ `high` and shifting them down by `low`,
+    /// taking the right-hand side by reference.
+    ///
+    /// $$
+    /// p \gets \left \lfloor \frac{pq \bmod x^h}{x^\ell} \right \rfloor.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{\log_2 3} m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n(m + \log n) \log (nm))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the length of the longer polynomial, and
+    /// $m$ is the largest number of significant bits of any coefficient of either polynomial.
+    ///
+    /// # Panics
+    /// Panics if `low > high`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::polynomial::MulMiddleAssign;
+    /// use malachite_nz::integer_polynomial::IntegerPolynomial;
+    ///
+    /// let mut p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();
+    /// p.mul_middle_assign(&IntegerPolynomial::from_str("2*x+5").unwrap(), 1, 3);
+    /// assert_eq!(p.to_string(), "-x-11");
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_poly_mulmid` from `fmpz_poly/mulmid.c`, FLINT 3.6.0, except that
+    /// it panics if `low > high`, where FLINT returns zero.
+    #[inline]
+    fn mul_middle_assign(&mut self, other: &Self, low: u64, high: u64) {
+        self.coefficients =
+            mul_middle_val_ref(take(&mut self.coefficients), &other.coefficients, low, high);
+    }
+}

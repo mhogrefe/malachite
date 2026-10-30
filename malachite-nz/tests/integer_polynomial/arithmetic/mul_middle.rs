@@ -11,7 +11,9 @@ use malachite_base::num::arithmetic::traits::{Mod, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::{
+    DivPowerOfX, MulMiddle, MulMiddleAssign, MulPowerOfX, MulTruncated, Polynomial,
+};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
@@ -31,6 +33,8 @@ use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::normmod_2expp1::*;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{
+    integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1,
+    integer_polynomial_unsigned_unsigned_triple_gen_var_3,
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_1,
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_2,
     integer_vec_integer_vec_unsigned_unsigned_quadruple_gen_var_3,
@@ -40,6 +44,7 @@ use malachite_nz::test_util::generators::{
 use malachite_nz::test_util::integer_polynomial::arithmetic::mul::{
     generated_coefficients, integers_mul_naive,
 };
+use malachite_nz::test_util::integer_polynomial::arithmetic::mul_middle::mul_middle_naive;
 use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
 
 fn coefficients(p: &str) -> Vec<Integer> {
@@ -1149,5 +1154,163 @@ fn integers_from_fermat_residues_properties() {
         let mut xs_alt = vec![Integer::ZERO; xs.len()];
         integers_from_fermat_residues(&mut xs_alt, &coeffs_f, limbs, true);
         assert_eq!(xs_alt, xs);
+    });
+}
+
+#[test]
+fn test_mul_middle() {
+    let test = |s, t, low, high, out| {
+        let p = IntegerPolynomial::from_str(s).unwrap();
+        let q = IntegerPolynomial::from_str(t).unwrap();
+        let r = (&p).mul_middle(&q, low, high);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!((&p).mul_middle(q.clone(), low, high), r);
+        assert_eq!(p.clone().mul_middle(&q, low, high), r);
+        assert_eq!(p.clone().mul_middle(q.clone(), low, high), r);
+        let mut s = p.clone();
+        s.mul_middle_assign(&q, low, high);
+        assert!(s.is_valid());
+        assert_eq!(s, r);
+        let mut s = p.clone();
+        s.mul_middle_assign(q.clone(), low, high);
+        assert!(s.is_valid());
+        assert_eq!(s, r);
+        assert_eq!(mul_middle_naive(&p, &q, low, high), r);
+    };
+    test("0", "x+1", 0, 3, "0");
+    test("x+1", "0", 1, 2, "0");
+    test("x+1", "x-1", 0, 0, "0");
+    test("x+1", "x-1", 1, 1, "0");
+    test("x+1", "x-1", 0, 3, "x^2-1");
+    test("x+1", "x-1", 1, 3, "x");
+    test("x^2-3*x+2", "2*x+5", 1, 3, "-x-11");
+    test("3*x^2+2*x+1", "6*x^2+5*x+4", 1, 4, "27*x^2+28*x+13");
+    test("3*x^2+2*x+1", "6*x^2+5*x+4", 2, 3, "28");
+    // The range extends past the end of the product.
+    test("x+1", "x-1", 2, 100, "1");
+    test("x+1", "x-1", 0, u64::MAX, "x^2-1");
+    // The range starts past the end of the product.
+    test("x+1", "x-1", 3, 100, "0");
+    test("x+1", "x-1", u64::MAX, u64::MAX, "0");
+    // Constants on either side, which the forms taking the other by value multiply in place.
+    test("3", "x^3+x^2+x-1", 1, 3, "3*x+3");
+    test("x^3+x^2+x-1", "-2", 2, 4, "-2*x-2");
+    test("x^3+x^2+x-1", "-2", 5, 7, "0");
+    test("2*x^2+3", "-x+4", 1, 2, "-3");
+    // The coefficients in the range cancel.
+    test("x^3+x^2+x+1", "x-1", 1, 4, "0");
+    test("x^3+x^2+x+1", "x-1", 0, 5, "x^4-1");
+    test(
+        "18446744073709551616*x+1",
+        "18446744073709551616*x-1",
+        1,
+        3,
+        "340282366920938463463374607431768211456*x",
+    );
+}
+
+#[test]
+#[should_panic]
+fn mul_middle_fail() {
+    let _ = IntegerPolynomial::from_str("x+1").unwrap().mul_middle(
+        IntegerPolynomial::from_str("x-1").unwrap(),
+        2,
+        1,
+    );
+}
+
+#[test]
+#[should_panic]
+fn mul_middle_ref_ref_fail() {
+    let _ = (&IntegerPolynomial::from_str("x+1").unwrap()).mul_middle(
+        &IntegerPolynomial::from_str("x-1").unwrap(),
+        2,
+        1,
+    );
+}
+
+// A constant factor takes the in-place path.
+#[test]
+#[should_panic]
+fn mul_middle_constant_fail() {
+    let _ = IntegerPolynomial::from_str("x+1").unwrap().mul_middle(
+        IntegerPolynomial::from_str("3").unwrap(),
+        2,
+        1,
+    );
+}
+
+// The zero polynomial has no coefficients, so only the explicit check makes this panic rather than
+// quietly returning zero.
+#[test]
+#[should_panic]
+fn mul_middle_zero_polynomial_fail() {
+    let _ = IntegerPolynomial::ZERO.mul_middle(IntegerPolynomial::ZERO, 2, 1);
+}
+
+#[test]
+#[should_panic]
+fn mul_middle_assign_fail() {
+    let mut p = IntegerPolynomial::from_str("x+1").unwrap();
+    p.mul_middle_assign(IntegerPolynomial::from_str("x-1").unwrap(), 2, 1);
+}
+
+#[test]
+fn mul_middle_properties() {
+    integer_polynomial_integer_polynomial_unsigned_unsigned_quadruple_gen_var_1().test_properties(
+        |(p, q, low, high)| {
+            let r = (&p).mul_middle(&q, low, high);
+            assert!(r.is_valid());
+            // The forms agree.
+            assert_eq!((&p).mul_middle(q.clone(), low, high), r);
+            assert_eq!(p.clone().mul_middle(&q, low, high), r);
+            assert_eq!(p.clone().mul_middle(q.clone(), low, high), r);
+            let mut s = p.clone();
+            s.mul_middle_assign(&q, low, high);
+            assert!(s.is_valid());
+            assert_eq!(s, r);
+            let mut s = p.clone();
+            s.mul_middle_assign(q.clone(), low, high);
+            assert!(s.is_valid());
+            assert_eq!(s, r);
+
+            // This is a window of the whole product.
+            assert_eq!(mul_middle_naive(&p, &q, low, high), r);
+            assert_eq!((&p * &q).truncate(high).div_power_of_x(low), r);
+            assert!(r.len() <= high - low);
+            // A window from the bottom is a truncated product.
+            assert_eq!((&p).mul_middle(&q, 0, high), (&p).mul_truncated(&q, high));
+            // A window splits into two adjacent windows.
+            let mid = low + ((high - low) >> 1);
+            assert_eq!(
+                (&p).mul_middle(&q, low, mid)
+                    + (&p).mul_middle(&q, mid, high).mul_power_of_x(mid - low),
+                r
+            );
+            // Multiplication is commutative.
+            assert_eq!((&q).mul_middle(&p, low, high), r);
+            // Negating a factor negates the result.
+            assert_eq!((-&p).mul_middle(&q, low, high), -&r);
+        },
+    );
+
+    integer_polynomial_unsigned_unsigned_triple_gen_var_3().test_properties(|(p, low, high)| {
+        let window = p.clone().truncate(high).div_power_of_x(low);
+        assert_eq!((&p).mul_middle(IntegerPolynomial::one(), low, high), window);
+        assert_eq!(IntegerPolynomial::one().mul_middle(&p, low, high), window);
+        assert_eq!(
+            (&p).mul_middle(IntegerPolynomial::ZERO, low, high),
+            IntegerPolynomial::ZERO
+        );
+        assert_eq!(
+            IntegerPolynomial::ZERO.mul_middle(&p, low, high),
+            IntegerPolynomial::ZERO
+        );
+        // The square path.
+        assert_eq!(
+            (&p).mul_middle(&p, low, high),
+            (&p * &p).truncate(high).div_power_of_x(low)
+        );
     });
 }
