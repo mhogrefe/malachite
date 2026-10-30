@@ -740,6 +740,12 @@ documented by git history.
   `fmpz_mod_poly_divides`. `CheckedModDivExact` returns the quotient when the divisor divides the
   dividend and `None` otherwise, and `ModDivisibleBy` returns whether it does. Long exact quotients
   are found half from the bottom, as a power series, and half from the top.
+- New `ModRemovePower`, `ModRemovePowerAssign`, `ModDivRoot`, and `ModDivRootAssign` traits in
+  malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
+  `NaturalPolynomial`: removing the largest power of a polynomial factor modulo $m$ or $2^k$, like
+  FLINT's `nmod_poly_remove` and `fmpz_mod_poly_remove`, and dividing by $x - c$, like
+  `nmod_poly_div_root`, which also returns the value at $c$. Unlike FLINT's `remove`, which never
+  returns for a constant factor, `ModRemovePower` panics for one.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

@@ -2330,6 +2330,83 @@ fn test_against_flint() {
             "mod_power_of_2_compose_series",
         );
     }
+    // The power removal and root division demos of malachite-base's UnsignedPolynomial and
+    // malachite-nz's NaturalPolynomial, modulo m and modulo powers of 2.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_remove_power_u8",
+        "demo_unsigned_polynomial_mod_remove_power_u64",
+        "demo_unsigned_polynomial_mod_remove_power_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_remove_power_assign_u32",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_remove_power");
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_div_root_u8",
+        "demo_unsigned_polynomial_mod_div_root_u64",
+        "demo_unsigned_polynomial_mod_div_root_ref_u128",
+        "demo_unsigned_polynomial_mod_div_root_assign_u32",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_div_root");
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_remove_power_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_remove_power_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_remove_power_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_power_of_2_remove_power_assign_u32",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "mod_power_of_2_remove_power",
+        );
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_div_root_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_div_root_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_div_root_ref_u128",
+        "demo_unsigned_polynomial_mod_power_of_2_div_root_assign_u32",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "mod_power_of_2_div_root",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_remove_power",
+        "demo_natural_polynomial_mod_remove_power_ref_ref",
+        "demo_natural_polynomial_mod_remove_power_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_remove_power");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_div_root",
+        "demo_natural_polynomial_mod_div_root_ref_ref",
+        "demo_natural_polynomial_mod_div_root_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_div_root");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_remove_power",
+        "demo_natural_polynomial_mod_power_of_2_remove_power_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_remove_power_assign",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "mod_power_of_2_remove_power",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_div_root",
+        "demo_natural_polynomial_mod_power_of_2_div_root_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_div_root_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_power_of_2_div_root");
+    }
     // The exact division and divisibility demos of malachite-base's UnsignedPolynomial and
     // malachite-nz's NaturalPolynomial, modulo m and modulo powers of 2.
     for demo_name in [

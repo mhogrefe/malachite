@@ -6768,6 +6768,24 @@ pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_va
     )
 }
 
+pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_8<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    Box::new(
+        exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_6::<T>()
+            .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)> {
+    Box::new(
+        exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_7::<T>()
+            .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
+    )
+}
+
 pub fn exhaustive_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)> {

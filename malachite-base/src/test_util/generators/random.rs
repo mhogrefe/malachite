@@ -9042,6 +9042,28 @@ pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_7<
     )
 }
 
+pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_8<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    Box::new(
+        random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_6::<T>(config)
+            .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
+    )
+}
+
+pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)> {
+    Box::new(
+        random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_7::<T>(config)
+            .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
+    )
+}
+
 pub fn random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1<
     T: PrimitiveUnsigned,
 >(

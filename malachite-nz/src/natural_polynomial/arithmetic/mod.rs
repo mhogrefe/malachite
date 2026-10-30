@@ -123,6 +123,10 @@ pub mod mod_div_exact;
 /// [`CheckedModDivRem`](malachite_base::polynomial::CheckedModDivRem), for dividing polynomials
 /// modulo a number, returning the quotient and remainder.
 pub mod mod_div_rem;
+/// Implementations of [`ModDivRoot`](malachite_base::polynomial::ModDivRoot) and
+/// [`ModDivRootAssign`](malachite_base::polynomial::ModDivRootAssign), for dividing a polynomial by
+/// $x - c$ modulo a number.
+pub mod mod_div_root;
 /// Implementations of [`ModDivTruncated`](malachite_base::polynomial::ModDivTruncated),
 /// [`ModDivTruncatedAssign`](malachite_base::polynomial::ModDivTruncatedAssign), and
 /// [`CheckedModDivTruncated`](malachite_base::polynomial::CheckedModDivTruncated), for dividing
@@ -212,6 +216,10 @@ pub mod mod_power_of_2_div_exact;
 /// [`CheckedModPowerOf2DivRem`](malachite_base::polynomial::CheckedModPowerOf2DivRem), for dividing
 /// polynomials modulo a power of 2, returning the quotient and remainder.
 pub mod mod_power_of_2_div_rem;
+/// Implementations of [`ModPowerOf2DivRoot`](malachite_base::polynomial::ModPowerOf2DivRoot) and
+/// [`ModPowerOf2DivRootAssign`](malachite_base::polynomial::ModPowerOf2DivRootAssign), for dividing
+/// a polynomial by $x - c$ modulo a power of 2.
+pub mod mod_power_of_2_div_root;
 /// Implementations of
 /// [`ModPowerOf2DivTruncated`](malachite_base::polynomial::ModPowerOf2DivTruncated),
 /// [`ModPowerOf2DivTruncatedAssign`](malachite_base::polynomial::ModPowerOf2DivTruncatedAssign),
@@ -277,6 +285,11 @@ pub mod mod_power_of_2_quotient;
 /// [`CheckedModPowerOf2Rem`](malachite_base::polynomial::CheckedModPowerOf2Rem), for finding the
 /// remainder of polynomials modulo a power of 2.
 pub mod mod_power_of_2_rem;
+/// Implementations of
+/// [`ModPowerOf2RemovePower`](malachite_base::polynomial::ModPowerOf2RemovePower) and
+/// [`ModPowerOf2RemovePowerAssign`](malachite_base::polynomial::ModPowerOf2RemovePowerAssign), for
+/// removing the largest power of a polynomial that divides another modulo a power of 2.
+pub mod mod_power_of_2_remove_power;
 /// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
 /// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign), for
 /// left-shifting a polynomial modulo a power of 2.
@@ -398,6 +411,10 @@ pub mod mod_quotient;
 /// [`CheckedModRem`](malachite_base::polynomial::CheckedModRem), for finding the remainder of
 /// polynomials modulo a number.
 pub mod mod_rem;
+/// Implementations of [`ModRemovePower`](malachite_base::polynomial::ModRemovePower) and
+/// [`ModRemovePowerAssign`](malachite_base::polynomial::ModRemovePowerAssign), for removing the
+/// largest power of a polynomial that divides another modulo a number.
+pub mod mod_remove_power;
 /// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
 /// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
 /// polynomial modulo a number.

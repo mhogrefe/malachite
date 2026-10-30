@@ -967,6 +967,14 @@ pub fn exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_3
     )
 }
 
+pub fn exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_4()
+-> It<(NaturalPolynomial, NaturalPolynomial, Natural)> {
+    Box::new(
+        exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_3()
+            .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_natural_natural_triple_gen_var_1()
 -> It<(NaturalPolynomial, Natural, Natural)> {
     Box::new(
@@ -9036,5 +9044,13 @@ pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_
     Box::new(
         exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_5()
             .map(|(p, q, pow)| ((&q).mod_power_of_2_mul(&p, pow), q, pow)),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_7()
+-> It<(NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        exhaustive_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_6()
+            .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
     )
 }

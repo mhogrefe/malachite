@@ -597,6 +597,65 @@ pub trait CheckedModPowerOf2DivTruncated<Rhs = Self> {
     ) -> Option<Self::Output>;
 }
 
+/// Removes the largest power of a polynomial that divides another modulo $2^k$, returning the
+/// reduced polynomial and how many times the factor was removed. The coefficients must already be
+/// reduced modulo $2^k$, the factor must have degree at least 1, and its leading coefficient must
+/// be odd.
+pub trait ModPowerOf2RemovePower<Rhs = Self> {
+    type Output;
+
+    /// Removes the largest power of a polynomial that divides another modulo $2^k$.
+    ///
+    /// $$
+    /// f(a, b, k) = (q, e), \quad a \equiv b^e q \pmod{2^k}, \quad b \nmid q.
+    /// $$
+    fn mod_power_of_2_remove_power(self, other: Rhs, pow: u64) -> (Self::Output, u64);
+}
+
+/// Replaces a polynomial with itself divided by the largest power of another that divides it modulo
+/// $2^k$, returning how many times the factor was removed. The coefficients must already be reduced
+/// modulo $2^k$, the factor must have degree at least 1, and its leading coefficient must be odd.
+pub trait ModPowerOf2RemovePowerAssign<Rhs = Self> {
+    /// Replaces `self` with itself divided by the largest power of `other` that divides it modulo
+    /// $2^k$, returning the exponent of that power.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv b^e q \pmod{2^k}, \quad b \nmid q,
+    /// $$
+    /// returning $e$.
+    fn mod_power_of_2_remove_power_assign(&mut self, other: Rhs, pow: u64) -> u64;
+}
+
+/// Divides a polynomial by $x - c$ modulo $2^k$, returning the quotient and the remainder, which is
+/// the value of the polynomial at $c$. The coefficients and $c$ must already be reduced modulo
+/// $2^k$.
+pub trait ModPowerOf2DivRoot<C> {
+    type Output;
+    type RemOutput;
+
+    /// Divides a polynomial by $x - c$ modulo $2^k$, returning the quotient and the remainder.
+    ///
+    /// $$
+    /// f(a, c, k) = (q, r), \quad a \equiv (x - c)q + r \pmod{2^k}, \quad r = a(c).
+    /// $$
+    fn mod_power_of_2_div_root(self, c: C, pow: u64) -> (Self::Output, Self::RemOutput);
+}
+
+/// Divides a polynomial by $x - c$ modulo $2^k$ in place, replacing it with the quotient and
+/// returning the remainder, which is the value of the polynomial at $c$. The coefficients and $c$
+/// must already be reduced modulo $2^k$.
+pub trait ModPowerOf2DivRootAssign<C> {
+    type RemOutput;
+
+    /// Replaces a polynomial with its quotient by $x - c$ modulo $2^k$, returning the remainder.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv (x - c)q + r \pmod{2^k},
+    /// $$
+    /// returning $r = a(c)$.
+    fn mod_power_of_2_div_root_assign(&mut self, c: C, pow: u64) -> Self::RemOutput;
+}
+
 /// Divides one polynomial by another modulo $2^k$, assuming that the second divides the first. The
 /// coefficients must already be reduced modulo $2^k$, and the leading coefficient of the divisor
 /// must be odd.
@@ -1042,6 +1101,65 @@ pub trait CheckedModDivTruncated<Rhs = Self, M = Self> {
     /// $$
     /// where $\deg r < n$ and $qr \equiv p \pmod{x^n, m}$.
     fn checked_mod_div_truncated(self, other: Rhs, len: u64, m: M) -> Option<Self::Output>;
+}
+
+/// Removes the largest power of a polynomial that divides another modulo $m$, returning the reduced
+/// polynomial and how many times the factor was removed. The coefficients must already be reduced
+/// modulo $m$, the factor must have degree at least 1, and its leading coefficient must be
+/// invertible modulo $m$.
+pub trait ModRemovePower<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Removes the largest power of a polynomial that divides another modulo $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = (q, e), \quad a \equiv b^e q \pmod{m}, \quad b \nmid q.
+    /// $$
+    fn mod_remove_power(self, other: Rhs, m: M) -> (Self::Output, u64);
+}
+
+/// Replaces a polynomial with itself divided by the largest power of another that divides it modulo
+/// $m$, returning how many times the factor was removed. The coefficients must already be reduced
+/// modulo $m$, the factor must have degree at least 1, and its leading coefficient must be
+/// invertible modulo $m$.
+pub trait ModRemovePowerAssign<Rhs = Self, M = Self> {
+    /// Replaces `self` with itself divided by the largest power of `other` that divides it modulo
+    /// $m$, returning the exponent of that power.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv b^e q \pmod{m}, \quad b \nmid q,
+    /// $$
+    /// returning $e$.
+    fn mod_remove_power_assign(&mut self, other: Rhs, m: M) -> u64;
+}
+
+/// Divides a polynomial by $x - c$ modulo $m$, returning the quotient and the remainder, which is
+/// the value of the polynomial at $c$. The coefficients and $c$ must already be reduced modulo $m$.
+pub trait ModDivRoot<C, M = C> {
+    type Output;
+    type RemOutput;
+
+    /// Divides a polynomial by $x - c$ modulo $m$, returning the quotient and the remainder.
+    ///
+    /// $$
+    /// f(a, c, m) = (q, r), \quad a \equiv (x - c)q + r \pmod{m}, \quad r = a(c).
+    /// $$
+    fn mod_div_root(self, c: C, m: M) -> (Self::Output, Self::RemOutput);
+}
+
+/// Divides a polynomial by $x - c$ modulo $m$ in place, replacing it with the quotient and
+/// returning the remainder, which is the value of the polynomial at $c$. The coefficients and $c$
+/// must already be reduced modulo $m$.
+pub trait ModDivRootAssign<C, M = C> {
+    type RemOutput;
+
+    /// Replaces a polynomial with its quotient by $x - c$ modulo $m$, returning the remainder.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv (x - c)q + r \pmod{m},
+    /// $$
+    /// returning $r = a(c)$.
+    fn mod_div_root_assign(&mut self, c: C, m: M) -> Self::RemOutput;
 }
 
 /// Divides one polynomial by another modulo $m$, assuming that the second divides the first. The

@@ -5216,6 +5216,30 @@ pub fn unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_7<T: Prim
     )
 }
 
+// All `(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)` where the `T` is positive, the
+// coefficients of both polynomials are less than it, and the second polynomial is non-constant with
+// a leading coefficient coprime to the `T` and divides the first.
+pub fn unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_8<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_8,
+        &random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_8,
+        &special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_8,
+    )
+}
+
+// All `(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)` where the `u64` is no greater than
+// `T::WIDTH`, the coefficients of both polynomials are less than 2 to the power of the `u64`, and
+// the second polynomial is non-constant with an odd leading coefficient and divides the first.
+pub fn unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9,
+        &random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9,
+        &special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9,
+    )
+}
+
 // All `(UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64, u64)` where the first `u64` is a small
 // length, the second is no greater than `T::WIDTH`, and the coefficients of both polynomials are
 // less than 2 to the power of the second.

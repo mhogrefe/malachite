@@ -1,0 +1,31 @@
+(0).mod_remove_power(0, 1) = (0, 0)
+(x^2+2).mod_remove_power(x+1, 7) = (x^2+2, 0)
+p := x^2+2; p.mod_remove_power_assign(x+1, 7) = 0; p = x^2+2
+(x^3+4*x^2+5*x+2).mod_remove_power(x+1, 7) = (x+2, 2)
+p := x^3+4*x^2+5*x+2; p.mod_remove_power_assign(x+1, 7) = 2; p = x+2
+(3*x^2+2*x+5).mod_remove_power(3*x+1, 7) = (5, 2)
+p := 3*x^2+2*x+5; p.mod_remove_power_assign(3*x+1, 7) = 2; p = 5
+(0).mod_remove_power(x+1, 7) = (0, 0)
+p := 0; p.mod_remove_power_assign(x+1, 7) = 0; p = 0
+(x^2+2).mod_remove_power(x+1, 6) = (x^2+2, 0)
+p := x^2+2; p.mod_remove_power_assign(x+1, 6) = 0; p = x^2+2
+(x^3+4*x^2+5*x+2).mod_remove_power(x+1, 6) = (x+2, 2)
+p := x^3+4*x^2+5*x+2; p.mod_remove_power_assign(x+1, 6) = 2; p = x+2
+(0).mod_remove_power(x+1, 6) = (0, 0)
+p := 0; p.mod_remove_power_assign(x+1, 6) = 0; p = 0
+(x^2+2).mod_remove_power(x+1, 251) = (x^2+2, 0)
+p := x^2+2; p.mod_remove_power_assign(x+1, 251) = 0; p = x^2+2
+(x^3+4*x^2+5*x+2).mod_remove_power(x+1, 251) = (x+2, 2)
+p := x^3+4*x^2+5*x+2; p.mod_remove_power_assign(x+1, 251) = 2; p = x+2
+(45*x^2+30*x+5).mod_remove_power(3*x+1, 251) = (5, 2)
+p := 45*x^2+30*x+5; p.mod_remove_power_assign(3*x+1, 251) = 2; p = 5
+(0).mod_remove_power(x+1, 251) = (0, 0)
+p := 0; p.mod_remove_power_assign(x+1, 251) = 0; p = 0
+(x^2+2).mod_remove_power(x+1, 1361129467683753853853498429727072845827) = (x^2+2, 0)
+p := x^2+2; p.mod_remove_power_assign(x+1, 1361129467683753853853498429727072845827) = 0; p = x^2+2
+(x^3+4*x^2+5*x+2).mod_remove_power(x+1, 1361129467683753853853498429727072845827) = (x+2, 2)
+p := x^3+4*x^2+5*x+2; p.mod_remove_power_assign(x+1, 1361129467683753853853498429727072845827) = 2; p = x+2
+(45*x^2+30*x+5).mod_remove_power(3*x+1, 1361129467683753853853498429727072845827) = (5, 2)
+p := 45*x^2+30*x+5; p.mod_remove_power_assign(3*x+1, 1361129467683753853853498429727072845827) = 2; p = 5
+(0).mod_remove_power(x+1, 1361129467683753853853498429727072845827) = (0, 0)
+p := 0; p.mod_remove_power_assign(x+1, 1361129467683753853853498429727072845827) = 0; p = 0

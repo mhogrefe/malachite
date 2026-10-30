@@ -307,6 +307,12 @@ int run_mod_power_of_2_div_series(const char * arg);
 int run_mod_div_exact(const char * arg);
 int run_mod_power_of_2_div_exact(const char * arg);
 
+/* mod_remove_power.c */
+int run_mod_remove_power(const char * arg);
+int run_mod_power_of_2_remove_power(const char * arg);
+int run_mod_div_root(const char * arg);
+int run_mod_power_of_2_div_root(const char * arg);
+
 /* mod_div_rem.c */
 int run_mod_div_rem(const char * arg);
 int run_mod_power_of_2_div_rem(const char * arg);

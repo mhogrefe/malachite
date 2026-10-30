@@ -1,0 +1,41 @@
+(0).mod_div_root(0, 1) = (0, 0)
+(0).mod_div_root(3, 7) = (0, 0)
+p := 0; p.mod_div_root_assign(3, 7) = 0; p = 0
+(5).mod_div_root(3, 7) = (0, 5)
+p := 5; p.mod_div_root_assign(3, 7) = 5; p = 0
+(x^2+3*x+2).mod_div_root(0, 7) = (x+3, 2)
+p := x^2+3*x+2; p.mod_div_root_assign(0, 7) = 2; p = x+3
+(x^2+3*x+2).mod_div_root(6, 7) = (x+2, 0)
+p := x^2+3*x+2; p.mod_div_root_assign(6, 7) = 0; p = x+2
+(x^3+2*x+1).mod_div_root(3, 7) = (x^2+3*x+4, 6)
+p := x^3+2*x+1; p.mod_div_root_assign(3, 7) = 6; p = x^2+3*x+4
+(0).mod_div_root(3, 6) = (0, 0)
+p := 0; p.mod_div_root_assign(3, 6) = 0; p = 0
+(5).mod_div_root(3, 6) = (0, 5)
+p := 5; p.mod_div_root_assign(3, 6) = 5; p = 0
+(x^2+3*x+2).mod_div_root(0, 6) = (x+3, 2)
+p := x^2+3*x+2; p.mod_div_root_assign(0, 6) = 2; p = x+3
+(x^2+3*x+2).mod_div_root(5, 6) = (x+2, 0)
+p := x^2+3*x+2; p.mod_div_root_assign(5, 6) = 0; p = x+2
+(x^3+2*x+1).mod_div_root(3, 6) = (x^2+3*x+5, 4)
+p := x^3+2*x+1; p.mod_div_root_assign(3, 6) = 4; p = x^2+3*x+5
+(0).mod_div_root(3, 251) = (0, 0)
+p := 0; p.mod_div_root_assign(3, 251) = 0; p = 0
+(5).mod_div_root(3, 251) = (0, 5)
+p := 5; p.mod_div_root_assign(3, 251) = 5; p = 0
+(x^2+3*x+2).mod_div_root(0, 251) = (x+3, 2)
+p := x^2+3*x+2; p.mod_div_root_assign(0, 251) = 2; p = x+3
+(x^2+3*x+2).mod_div_root(250, 251) = (x+2, 0)
+p := x^2+3*x+2; p.mod_div_root_assign(250, 251) = 0; p = x+2
+(x^3+2*x+1).mod_div_root(3, 251) = (x^2+3*x+11, 34)
+p := x^3+2*x+1; p.mod_div_root_assign(3, 251) = 34; p = x^2+3*x+11
+(0).mod_div_root(3, 1361129467683753853853498429727072845827) = (0, 0)
+p := 0; p.mod_div_root_assign(3, 1361129467683753853853498429727072845827) = 0; p = 0
+(5).mod_div_root(3, 1361129467683753853853498429727072845827) = (0, 5)
+p := 5; p.mod_div_root_assign(3, 1361129467683753853853498429727072845827) = 5; p = 0
+(x^2+3*x+2).mod_div_root(0, 1361129467683753853853498429727072845827) = (x+3, 2)
+p := x^2+3*x+2; p.mod_div_root_assign(0, 1361129467683753853853498429727072845827) = 2; p = x+3
+(x^2+3*x+2).mod_div_root(1361129467683753853853498429727072845826, 1361129467683753853853498429727072845827) = (x+2, 0)
+p := x^2+3*x+2; p.mod_div_root_assign(1361129467683753853853498429727072845826, 1361129467683753853853498429727072845827) = 0; p = x+2
+(x^3+2*x+1).mod_div_root(3, 1361129467683753853853498429727072845827) = (x^2+3*x+11, 34)
+p := x^3+2*x+1; p.mod_div_root_assign(3, 1361129467683753853853498429727072845827) = 34; p = x^2+3*x+11
