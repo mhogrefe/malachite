@@ -1363,6 +1363,85 @@ pub trait CheckedModRem<Rhs = Self, M = Self> {
     fn checked_mod_rem(self, other: Rhs, m: M) -> Option<Self::Output>;
 }
 
+/// Divides one polynomial by another if the second divides the first, returning `None` otherwise.
+pub trait CheckedDivExact<Rhs = Self> {
+    type Output;
+
+    /// Divides a polynomial by another if the second divides the first, or returns `None`.
+    ///
+    /// $$
+    /// f(a, b) = \\begin{cases}
+    ///     \operatorname{Some}(q) & \text{if } a = bq, \\\\
+    ///     \operatorname{None} & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
+    fn checked_div_exact(self, other: Rhs) -> Option<Self::Output>;
+}
+
+/// Divides a polynomial by $x - c$, returning the quotient and the remainder, which is the value of
+/// the polynomial at $c$.
+pub trait DivRoot<C> {
+    type Output;
+    type RemOutput;
+
+    /// Divides a polynomial by $x - c$, returning the quotient and the remainder.
+    ///
+    /// $$
+    /// f(a, c) = (q, r), \quad a = (x - c)q + r, \quad r = a(c).
+    /// $$
+    fn div_root(self, c: C) -> (Self::Output, Self::RemOutput);
+}
+
+/// Divides a polynomial by $x - c$ in place, replacing it with the quotient and returning the
+/// remainder, which is the value of the polynomial at $c$.
+pub trait DivRootAssign<C> {
+    type RemOutput;
+
+    /// Replaces a polynomial with its quotient by $x - c$, returning the remainder.
+    ///
+    /// $$
+    /// a \gets q, \quad a = (x - c)q + r,
+    /// $$
+    /// returning $r = a(c)$.
+    fn div_root_assign(&mut self, c: C) -> Self::RemOutput;
+}
+
+/// Divides one polynomial by another, returning the quotient and remainder, or `None` if the
+/// division is impossible: if the divisor is 0, or if the quotient over the field of fractions does
+/// not have coefficients in the coefficient ring.
+pub trait CheckedDivRem<Rhs = Self> {
+    type DivOutput;
+    type RemOutput;
+
+    /// Divides a polynomial by another, returning the quotient and remainder, or `None` if they do
+    /// not have coefficients in the coefficient ring.
+    ///
+    /// $$
+    /// f(a, b) = \\begin{cases}
+    ///     \operatorname{Some}((q, r)) & \text{if } a = bq + r \text{ with } \deg r < \deg b, \\\\
+    ///     \operatorname{None} & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
+    fn checked_div_rem(self, other: Rhs) -> Option<(Self::DivOutput, Self::RemOutput)>;
+}
+
+/// Finds the remainder of one polynomial divided by another, or `None` if the division is
+/// impossible, as for [`CheckedDivRem`].
+pub trait CheckedRem<Rhs = Self> {
+    type Output;
+
+    /// Finds the remainder of a polynomial divided by another, or `None` if the division is
+    /// impossible.
+    ///
+    /// $$
+    /// f(a, b) = \\begin{cases}
+    ///     \operatorname{Some}(r) & \text{if } a = bq + r \text{ with } \deg r < \deg b, \\\\
+    ///     \operatorname{None} & \text{otherwise}.
+    /// \\end{cases}
+    /// $$
+    fn checked_rem(self, other: Rhs) -> Option<Self::Output>;
+}
+
 /// Pseudo-divides one polynomial by another, returning the quotient, the remainder, and the
 /// exponent $d$: with $\ell$ the leading coefficient of the divisor, the dividend times $\ell^d$ is
 /// the divisor times the quotient plus the remainder, and the remainder's degree is less than the

@@ -16,7 +16,7 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::pseudo_div_rem::*;
 use malachite_base::num::arithmetic::traits::{DivExact, DivisibleBy, Pow, SubMulAssign};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::polynomial::Polynomial;
 
 // The pseudo-quotient and pseudo-remainder of `p` by `q` with the exponent `deg p - deg q + 1`: the
@@ -129,4 +129,59 @@ pub fn pseudo_div_rem_divide_and_conquer_wrapper(
 // qs + r$.
 pub fn pseudo_div_rem_scale(q: &IntegerPolynomial, d: u64) -> Integer {
     q.coefficients_asc().last().unwrap().pow(d)
+}
+
+// The quotient and remainder of `p` by `q`, or `None` if `q` is 0 or the quotient over the
+// rationals is not integral: the naive pseudo-division, when its least exponent is 0.
+pub fn div_rem_naive(
+    p: &IntegerPolynomial,
+    q: &IntegerPolynomial,
+) -> Option<(IntegerPolynomial, IntegerPolynomial)> {
+    if *q == IntegerPolynomial::ZERO {
+        return None;
+    }
+    let (s, r, d) = pseudo_div_rem_naive(p, q);
+    if d == 0 { Some((s, r)) } else { None }
+}
+
+// The quotient and remainder of `p` by `q`, or `None`, by the basecase algorithm.
+pub fn div_rem_basecase_wrapper(
+    p: &IntegerPolynomial,
+    q: &IntegerPolynomial,
+) -> Option<(IntegerPolynomial, IntegerPolynomial)> {
+    if p.len() < q.len() {
+        return Some((IntegerPolynomial::ZERO, p.clone()));
+    }
+    let (s, r) = div_rem_basecase(p.coefficients_asc(), q.coefficients_asc())?;
+    Some((
+        IntegerPolynomial::from_coefficients_asc(s),
+        IntegerPolynomial::from_coefficients_asc(r),
+    ))
+}
+
+// The largest power of `q` that divides `p`, divided out, and its exponent, by dividing by `q`
+// while the remainder is 0.
+pub fn remove_power_naive(
+    p: &IntegerPolynomial,
+    q: &IntegerPolynomial,
+) -> (IntegerPolynomial, u64) {
+    let mut p = p.clone();
+    let mut e = 0;
+    while p != IntegerPolynomial::ZERO {
+        match div_rem_naive(&p, q) {
+            Some((s, r)) if r == IntegerPolynomial::ZERO => {
+                p = s;
+                e += 1;
+            }
+            _ => break,
+        }
+    }
+    (p, e)
+}
+
+// The quotient and remainder of `p` by $x - c$, by naive long division.
+pub fn div_root_naive(p: &IntegerPolynomial, c: &Integer) -> (IntegerPolynomial, Integer) {
+    let divisor = IntegerPolynomial::from_coefficients_asc(vec![-c, Integer::ONE]);
+    let (s, r) = div_rem_naive(p, &divisor).unwrap();
+    (s, r.coefficient(0).clone())
 }

@@ -2291,6 +2291,22 @@ pub fn special_random_integer_polynomial_pair_gen_var_3(
     )
 }
 
+pub fn special_random_integer_polynomial_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(special_random_integer_polynomial_pair_gen_var_3(config).map(|(p, q)| (&p * &q, q)))
+}
+
+pub fn special_random_integer_polynomial_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(
+        special_random_integer_polynomial_pair_gen_var_4(config).filter(|(_, q)| {
+            q.coefficients_asc().len() > 1 || q.coefficients_asc()[0].unsigned_abs_ref() != &1u32
+        }),
+    )
+}
+
 pub fn special_random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, IntegerPolynomial, u64)> {

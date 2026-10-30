@@ -25,14 +25,18 @@ use malachite_base::polynomial::{PseudoDivAssignRem, PseudoDivRem};
 // `ys`, where `ys` is nonempty, its last coefficient $\ell$ is nonzero, and `xs` is at least as
 // long. The leading coefficient of the remainder is cancelled one term at a time; when it is not
 // divisible by $\ell$, everything so far is first multiplied by $\ell$, so $d$ is the least
-// exponent for which the quotient is integral.
+// exponent for which the quotient is integral. If `exact` is set, the division stops, returning
+// `None`, instead of multiplying, so that it succeeds exactly when the quotient of the polynomials
+// over the rationals is integral.
 //
 // This is equivalent to `_fmpz_poly_pseudo_divrem_basecase` from
-// `fmpz_poly/pseudo_divrem_basecase.c`, FLINT 3.6.0.
-crate_test_fn! {pseudo_div_rem_basecase(
+// `fmpz_poly/pseudo_divrem_basecase.c`, FLINT 3.6.0, and, with `exact` set, to
+// `_fmpz_poly_divrem_basecase` from `fmpz_poly/divrem_basecase.c` with `exact` set.
+fn basecase(
     xs: &[Integer],
     ys: &[Integer],
-) -> (Vec<Integer>, Vec<Integer>, u64) {
+    exact: bool,
+) -> Option<(Vec<Integer>, Vec<Integer>, u64)> {
     let lead = ys.last().unwrap();
     let ys_low = &ys[..ys.len() - 1];
     let mut qs = vec![Integer::ZERO; xs.len() - ys.len() + 1];
@@ -42,6 +46,8 @@ crate_test_fn! {pseudo_div_rem_basecase(
         let top = i + ys_low.len();
         if (&rs[top]).divisible_by(lead) {
             qs[i] = (&rs[top]).div_exact(lead);
+        } else if exact {
+            return None;
         } else {
             for q in &mut qs[i + 1..] {
                 *q *= lead;
@@ -57,8 +63,8 @@ crate_test_fn! {pseudo_div_rem_basecase(
         }
     }
     rs.truncate(ys_low.len());
-    (qs, rs, d)
-}}
+    Some((qs, rs, d))
+}
 
 // `xs`, with its first `n` coefficients replaced by zeros.
 fn zero_bottom(xs: &[Integer], n: usize) -> Vec<Integer> {
@@ -79,29 +85,33 @@ fn scale(xs: &mut [Integer], c: &Integer) {
 }
 
 // The pseudo-quotient, pseudo-remainder, and exponent of the polynomials with coefficients `xs` and
-// `ys`, as for `pseudo_div_rem_basecase`, but with an exponent that need not be the least: the
-// divisor is split in two, and the high part of the dividend is divided by the divisor's high part
-// recursively.
+// `ys`, as for `basecase`, including `exact`: the divisor is split in two, and the high part of the
+// dividend is divided by the divisor's high part recursively. The exponent is still the least. When
+// the quotient has at most as many coefficients as the divisor's high part, they depend only on the
+// coefficients that the high part reaches, so the recursive division scales whenever the basecase
+// would; otherwise the remainder after the first recursive division, scaled, is the basecase's
+// state at that point, and the second division continues from it.
 //
 // This is equivalent to `__fmpz_poly_pseudo_divrem_divconquer` from
 // `fmpz_poly/pseudo_divrem_divconquer.c`, FLINT 3.6.0.
-crate_test_fn! {pseudo_div_rem_divide_and_conquer(
+fn divide_and_conquer(
     xs: &[Integer],
     ys: &[Integer],
-) -> (Vec<Integer>, Vec<Integer>, u64) {
+    exact: bool,
+) -> Option<(Vec<Integer>, Vec<Integer>, u64)> {
     let x_len = xs.len();
     let y_len = ys.len();
     if y_len <= 16 || (x_len > (y_len << 1) - 1 && x_len < 128) {
-        return pseudo_div_rem_basecase(xs, ys);
+        return basecase(xs, ys, exact);
     }
     let lead = ys.last().unwrap();
     let n2 = y_len >> 1;
     let n1 = y_len - n2;
-    if x_len < y_len + n2 {
+    Some(if x_len < y_len + n2 {
         // The quotient has at most `n2` coefficients: divide the high part of the dividend by the
         // high `n2` coefficients of the divisor, then account for the low `n1`.
         let p1 = zero_bottom(&xs[n1..], n2 - 1);
-        let (qs, r1, d) = pseudo_div_rem_divide_and_conquer(&p1, &ys[n1..]);
+        let (qs, r1, d) = divide_and_conquer(&p1, &ys[n1..], exact)?;
         let f = lead.pow(d);
         let mut rs = xs[..y_len - 1].to_vec();
         scale(&mut rs, &f);
@@ -116,13 +126,13 @@ crate_test_fn! {pseudo_div_rem_divide_and_conquer(
         // Divide the top `2 * y_len - 1` coefficients of the dividend, then the rest.
         let shift = x_len - (y_len << 1) + 1;
         let p1 = zero_bottom(&xs[shift..], y_len - 1);
-        let (mut q1, r1, s1) = pseudo_div_rem_divide_and_conquer(&p1, ys);
+        let (mut q1, r1, s1) = divide_and_conquer(&p1, ys, exact)?;
         let mut t = xs[..x_len - y_len].to_vec();
         scale(&mut t, &lead.pow(s1));
         for (t, r) in t[shift..].iter_mut().zip(r1) {
             *t += r;
         }
-        let (mut qs, rs, s2) = pseudo_div_rem_divide_and_conquer(&t, ys);
+        let (mut qs, rs, s2) = divide_and_conquer(&t, ys, exact)?;
         scale(&mut q1, &lead.pow(s2));
         qs.extend(q1);
         (qs, rs, s1 + s2)
@@ -130,7 +140,7 @@ crate_test_fn! {pseudo_div_rem_divide_and_conquer(
         // Divide the top coefficients of the dividend by the high `n1` coefficients of the divisor,
         // then the rest by the whole divisor.
         let p1 = zero_bottom(&xs[n2 << 1..], n1 - 1);
-        let (mut q1, r1, s1) = pseudo_div_rem_divide_and_conquer(&p1, &ys[n2..]);
+        let (mut q1, r1, s1) = divide_and_conquer(&p1, &ys[n2..], exact)?;
         let d2q1 = mul_ref_ref(&ys[..n2], &q1);
         let mut t = xs[..y_len + n2 - 1].to_vec();
         scale(&mut t, &lead.pow(s1));
@@ -140,11 +150,49 @@ crate_test_fn! {pseudo_div_rem_divide_and_conquer(
         for (t, x) in t[n2..].iter_mut().zip(d2q1) {
             *t -= x;
         }
-        let (mut qs, rs, s2) = pseudo_div_rem_divide_and_conquer(&t, ys);
+        let (mut qs, rs, s2) = divide_and_conquer(&t, ys, exact)?;
         scale(&mut q1, &lead.pow(s2));
         qs.extend(q1);
         (qs, rs, s1 + s2)
-    }
+    })
+}
+
+// The pseudo-quotient, pseudo-remainder, and least exponent of the polynomials with coefficients
+// `xs` and `ys`, where `ys` is nonempty, its last coefficient is nonzero, and `xs` is at least as
+// long, by `basecase`.
+crate_test_fn! {pseudo_div_rem_basecase(
+    xs: &[Integer],
+    ys: &[Integer],
+) -> (Vec<Integer>, Vec<Integer>, u64) {
+    basecase(xs, ys, false).unwrap()
+}}
+
+// The pseudo-quotient, pseudo-remainder, and least exponent of the polynomials with coefficients
+// `xs` and `ys`, as for `pseudo_div_rem_basecase`, by `divide_and_conquer`.
+crate_test_fn! {pseudo_div_rem_divide_and_conquer(
+    xs: &[Integer],
+    ys: &[Integer],
+) -> (Vec<Integer>, Vec<Integer>, u64) {
+    divide_and_conquer(xs, ys, false).unwrap()
+}}
+
+// The quotient and remainder of the polynomials with coefficients `xs` and `ys`, as for
+// `pseudo_div_rem_basecase`, or `None` if the quotient over the rationals is not integral, by
+// `basecase`.
+crate_test_fn! {div_rem_basecase(
+    xs: &[Integer],
+    ys: &[Integer],
+) -> Option<(Vec<Integer>, Vec<Integer>)> {
+    basecase(xs, ys, true).map(|(qs, rs, _)| (qs, rs))
+}}
+
+// The quotient and remainder of the polynomials with coefficients `xs` and `ys`, or `None` if the
+// quotient over the rationals is not integral, by `divide_and_conquer`.
+crate_test_fn! {div_rem_divide_and_conquer(
+    xs: &[Integer],
+    ys: &[Integer],
+) -> Option<(Vec<Integer>, Vec<Integer>)> {
+    divide_and_conquer(xs, ys, true).map(|(qs, rs, _)| (qs, rs))
 }}
 
 // The polynomial with coefficients `xs`, trimmed.

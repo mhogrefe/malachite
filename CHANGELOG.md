@@ -751,6 +751,14 @@ documented by git history.
   like FLINT's `fmpz_poly_pseudo_divrem`, `fmpz_poly_pseudo_div`, and `fmpz_poly_pseudo_rem`. They
   return the least exponent $d$ with $\ell^d A = BQ + R$, by FLINT's basecase and divide-and-conquer
   algorithms, both of which find it.
+- New `CheckedDivRem`, `CheckedRem`, `CheckedDivExact`, `DivRoot`, and `DivRootAssign` traits in
+  malachite-base. `IntegerPolynomial` now implements `DivRem`, `DivAssignRem`, `CheckedDivRem`,
+  `Div`, `DivAssign`, `CheckedDiv`, `Rem`, `RemAssign`, and `CheckedRem` with an `IntegerPolynomial`
+  divisor, dividing when the quotient over the rationals has integer coefficients (like FLINT's
+  `fmpz_poly_divrem` with `exact` set) and panicking, or returning `None`, otherwise; `DivExact`,
+  `DivExactAssign`, `CheckedDivExact`, and `DivisibleBy` for exact division and divisibility, like
+  `fmpz_poly_divexact` and `fmpz_poly_divides`; `RemovePower` and `RemovePowerAssign`, like
+  `fmpz_poly_remove`; and `DivRoot` and `DivRootAssign`, dividing by $x - c$.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

@@ -1,0 +1,26 @@
+(0).div_exact(x+1) = 0
+(0).checked_div_exact(x+1) = 0
+(0).divisible_by(x+1) = true
+p := 0; p.div_exact_assign(x+1); p = 0
+(6*x^2+3).div_exact(3) = 2*x^2+1
+(6*x^2+3).checked_div_exact(3) = 2*x^2+1
+(6*x^2+3).divisible_by(3) = true
+p := 6*x^2+3; p.div_exact_assign(3); p = 2*x^2+1
+(x^3+3*x^2+3*x+1).div_exact(x+1) = x^2+2*x+1
+(x^3+3*x^2+3*x+1).checked_div_exact(x+1) = x^2+2*x+1
+(x^3+3*x^2+3*x+1).divisible_by(x+1) = true
+p := x^3+3*x^2+3*x+1; p.div_exact_assign(x+1); p = x^2+2*x+1
+(6*x^3+13*x^2+8*x+5).div_exact(3*x+5) = 2*x^2+x+1
+(6*x^3+13*x^2+8*x+5).checked_div_exact(3*x+5) = 2*x^2+x+1
+(6*x^3+13*x^2+8*x+5).divisible_by(3*x+5) = true
+p := 6*x^3+13*x^2+8*x+5; p.div_exact_assign(3*x+5); p = 2*x^2+x+1
+(x^2+1).checked_div_exact(x+1) = None
+(x^2+1).divisible_by(x+1) = false
+(x^2+3).checked_div_exact(2*x+2) = None
+(x^2+3).divisible_by(2*x+2) = false
+(x^2+x+2).checked_div_exact(x^2+1) = None
+(x^2+x+2).divisible_by(x^2+1) = false
+(x+1).checked_div_exact(x^2+1) = None
+(x+1).divisible_by(x^2+1) = false
+(x+1).checked_div_exact(0) = None
+(x+1).divisible_by(0) = false

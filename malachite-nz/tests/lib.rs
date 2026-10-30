@@ -888,8 +888,13 @@ pub mod integer_polynomial {
         pub mod content;
         pub mod deflate_power_of_x;
         pub mod derivative;
+        pub mod div;
         pub mod div_exact;
+        pub mod div_exact_by_polynomial;
         pub mod div_power_of_x;
+        pub mod div_rem;
+        pub mod div_root;
+        pub mod divisible_by;
         pub mod evaluate;
         pub mod exponent_gcd;
         pub mod floor_l2_norm;
@@ -910,6 +915,8 @@ pub mod integer_polynomial {
         pub mod pseudo_div;
         pub mod pseudo_div_rem;
         pub mod pseudo_rem;
+        pub mod rem;
+        pub mod remove_power;
         pub mod scalar_add_mul;
         pub mod shl;
         pub mod square;

@@ -2330,6 +2330,50 @@ fn test_against_flint() {
             "mod_power_of_2_compose_series",
         );
     }
+    // The Euclidean division, exact division, power removal, and root division demos of
+    // malachite-nz's IntegerPolynomial.
+    for demo_name in [
+        "demo_integer_polynomial_div_rem",
+        "demo_integer_polynomial_div_rem_ref_ref",
+        "demo_integer_polynomial_div_assign_rem",
+        "demo_integer_polynomial_checked_div_rem",
+        "demo_integer_polynomial_checked_div_rem_ref_ref",
+        "demo_integer_polynomial_div",
+        "demo_integer_polynomial_div_ref_ref",
+        "demo_integer_polynomial_div_assign",
+        "demo_integer_polynomial_checked_div",
+        "demo_integer_polynomial_rem_by_polynomial",
+        "demo_integer_polynomial_rem_by_polynomial_ref_ref",
+        "demo_integer_polynomial_rem_by_polynomial_assign",
+        "demo_integer_polynomial_checked_rem",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_divrem");
+    }
+    for demo_name in [
+        "demo_integer_polynomial_div_exact_by_polynomial",
+        "demo_integer_polynomial_div_exact_by_polynomial_ref_ref",
+        "demo_integer_polynomial_div_exact_by_polynomial_assign",
+        "demo_integer_polynomial_checked_div_exact",
+        "demo_integer_polynomial_checked_div_exact_divisible",
+        "demo_integer_polynomial_divisible_by",
+        "demo_integer_polynomial_divisible_by_ref_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_divexact");
+    }
+    for demo_name in [
+        "demo_integer_polynomial_remove_power",
+        "demo_integer_polynomial_remove_power_ref_ref",
+        "demo_integer_polynomial_remove_power_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_remove");
+    }
+    for demo_name in [
+        "demo_integer_polynomial_div_root",
+        "demo_integer_polynomial_div_root_ref_ref",
+        "demo_integer_polynomial_div_root_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_div_root");
+    }
     // The pseudo-division demos of malachite-nz's IntegerPolynomial.
     for demo_name in [
         "demo_integer_polynomial_pseudo_div_rem",

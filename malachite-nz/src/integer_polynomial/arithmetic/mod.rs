@@ -69,6 +69,10 @@ pub mod deflate_power_of_x;
 /// [`DerivativeAssign`](malachite_base::polynomial::DerivativeAssign), for differentiating a
 /// polynomial.
 pub mod derivative;
+/// Implementations of [`Div`](core::ops::Div), [`DivAssign`](core::ops::DivAssign), and
+/// [`CheckedDiv`](malachite_base::num::arithmetic::traits::CheckedDiv), for finding the quotient of
+/// two polynomials.
+pub mod div;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), for dividing a
 /// polynomial by an [`Integer`](crate::integer::Integer) that divides every coefficient.
@@ -77,6 +81,17 @@ pub mod div_exact;
 /// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
 /// by a power of its variable and discarding the remainder.
 pub mod div_power_of_x;
+/// Implementations of [`DivRem`](malachite_base::num::arithmetic::traits::DivRem),
+/// [`DivAssignRem`](malachite_base::num::arithmetic::traits::DivAssignRem), and
+/// [`CheckedDivRem`](malachite_base::polynomial::CheckedDivRem), for dividing polynomials.
+pub mod div_rem;
+/// Implementations of [`DivRoot`](malachite_base::polynomial::DivRoot) and
+/// [`DivRootAssign`](malachite_base::polynomial::DivRootAssign), for dividing a polynomial by $x -
+/// c$.
+pub mod div_root;
+/// Implementations of [`DivisibleBy`](malachite_base::num::arithmetic::traits::DivisibleBy), for
+/// determining whether one polynomial is divisible by another.
+pub mod divisible_by;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
 /// polynomial at a value.
 pub mod evaluate;
@@ -157,6 +172,14 @@ pub mod pseudo_div_rem;
 /// [`PseudoRemAssign`](malachite_base::polynomial::PseudoRemAssign), for finding the
 /// pseudo-remainder of two polynomials.
 pub mod pseudo_rem;
+/// Implementations of [`Rem`](core::ops::Rem), [`RemAssign`](core::ops::RemAssign), and
+/// [`CheckedRem`](malachite_base::polynomial::CheckedRem), for finding the remainder of two
+/// polynomials.
+pub mod rem;
+/// Implementations of [`RemovePower`](malachite_base::num::factorization::traits::RemovePower) and
+/// [`RemovePowerAssign`](malachite_base::num::factorization::traits::RemovePowerAssign), for
+/// removing the largest power of a polynomial that divides another.
+pub mod remove_power;
 pub mod scalar_add_mul;
 /// Left-shifting an [`IntegerPolynomial`](super::IntegerPolynomial) (multiplying it by a power of
 /// 2), by shifting every coefficient.

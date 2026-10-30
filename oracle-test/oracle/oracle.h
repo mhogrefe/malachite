@@ -303,6 +303,12 @@ int run_mod_power_of_2_compose(const char * arg);
 int run_mod_div_series(const char * arg);
 int run_mod_power_of_2_div_series(const char * arg);
 
+/* fmpz_poly_divrem.c */
+int run_fmpz_poly_divrem(const char * arg);
+int run_fmpz_poly_divexact(const char * arg);
+int run_fmpz_poly_remove(const char * arg);
+int run_fmpz_poly_div_root(const char * arg);
+
 /* pseudo_div_rem.c */
 int run_fmpz_poly_pseudo_divrem(const char * arg);
 
