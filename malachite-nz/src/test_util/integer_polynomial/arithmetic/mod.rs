@@ -25,6 +25,7 @@ pub mod mul_truncated;
 pub mod nth_derivative;
 pub mod pow;
 pub mod pow_truncated;
+pub mod pseudo_div_rem;
 pub mod scalar_add_mul;
 pub mod shl;
 pub mod square;

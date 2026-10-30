@@ -1363,6 +1363,93 @@ pub trait CheckedModRem<Rhs = Self, M = Self> {
     fn checked_mod_rem(self, other: Rhs, m: M) -> Option<Self::Output>;
 }
 
+/// Pseudo-divides one polynomial by another, returning the quotient, the remainder, and the
+/// exponent $d$: with $\ell$ the leading coefficient of the divisor, the dividend times $\ell^d$ is
+/// the divisor times the quotient plus the remainder, and the remainder's degree is less than the
+/// divisor's. $d$ is the least exponent for which the quotient has integral coefficients.
+pub trait PseudoDivRem<Rhs = Self> {
+    type DivOutput;
+    type RemOutput;
+
+    /// Pseudo-divides a polynomial by another.
+    ///
+    /// $$
+    /// f(a, b) = (q, r, d), \quad \ell^d a = bq + r, \quad \deg r < \deg b,
+    /// $$
+    /// where $\ell$ is the leading coefficient of $b$ and $d$ is as small as possible.
+    fn pseudo_div_rem(self, other: Rhs) -> (Self::DivOutput, Self::RemOutput, u64);
+}
+
+/// Pseudo-divides one polynomial by another in place, replacing the first with the quotient and
+/// returning the remainder and the exponent $d$, as for [`PseudoDivRem`].
+pub trait PseudoDivAssignRem<Rhs = Self> {
+    type RemOutput;
+
+    /// Replaces `self` with its pseudo-quotient by another polynomial, returning the remainder and
+    /// the exponent.
+    ///
+    /// $$
+    /// a \gets q, \quad \ell^d a = bq + r, \quad \deg r < \deg b,
+    /// $$
+    /// returning $(r, d)$, where $\ell$ is the leading coefficient of $b$ and $d$ is as small as
+    /// possible.
+    fn pseudo_div_assign_rem(&mut self, other: Rhs) -> (Self::RemOutput, u64);
+}
+
+/// Pseudo-divides one polynomial by another, returning the quotient and the exponent $d$, as for
+/// [`PseudoDivRem`].
+pub trait PseudoDiv<Rhs = Self> {
+    type Output;
+
+    /// Pseudo-divides a polynomial by another, returning the quotient and the exponent.
+    ///
+    /// $$
+    /// f(a, b) = (q, d), \quad \ell^d a = bq + r, \quad \deg r < \deg b,
+    /// $$
+    /// where $\ell$ is the leading coefficient of $b$ and $d$ is as small as possible.
+    fn pseudo_div(self, other: Rhs) -> (Self::Output, u64);
+}
+
+/// Replaces one polynomial with its pseudo-quotient by another, returning the exponent $d$, as for
+/// [`PseudoDivRem`].
+pub trait PseudoDivAssign<Rhs = Self> {
+    /// Replaces `self` with its pseudo-quotient by another polynomial, returning the exponent.
+    ///
+    /// $$
+    /// a \gets q, \quad \ell^d a = bq + r, \quad \deg r < \deg b,
+    /// $$
+    /// returning $d$, where $\ell$ is the leading coefficient of $b$ and $d$ is as small as
+    /// possible.
+    fn pseudo_div_assign(&mut self, other: Rhs) -> u64;
+}
+
+/// Finds the pseudo-remainder of one polynomial divided by another, and the exponent $d$, as for
+/// [`PseudoDivRem`].
+pub trait PseudoRem<Rhs = Self> {
+    type Output;
+
+    /// Finds the pseudo-remainder of a polynomial divided by another, and the exponent.
+    ///
+    /// $$
+    /// f(a, b) = (r, d), \quad \ell^d a = bq + r, \quad \deg r < \deg b,
+    /// $$
+    /// where $\ell$ is the leading coefficient of $b$ and $d$ is as small as possible.
+    fn pseudo_rem(self, other: Rhs) -> (Self::Output, u64);
+}
+
+/// Replaces one polynomial with its pseudo-remainder by another, returning the exponent $d$, as for
+/// [`PseudoDivRem`].
+pub trait PseudoRemAssign<Rhs = Self> {
+    /// Replaces `self` with its pseudo-remainder by another polynomial, returning the exponent.
+    ///
+    /// $$
+    /// a \gets r, \quad \ell^d a = bq + r, \quad \deg r < \deg b,
+    /// $$
+    /// returning $d$, where $\ell$ is the leading coefficient of $b$ and $d$ is as small as
+    /// possible.
+    fn pseudo_rem_assign(&mut self, other: Rhs) -> u64;
+}
+
 /// Computes the square of a polynomial's $L^2$ norm: the sum of the squares of its coefficients.
 ///
 /// This is exact, unlike the norm itself, which is usually irrational.

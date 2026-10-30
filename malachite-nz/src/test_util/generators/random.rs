@@ -2047,6 +2047,14 @@ pub fn random_integer_polynomial_pair_gen_var_2(
     )
 }
 
+pub fn random_integer_polynomial_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(
+        random_integer_polynomial_pair_gen(config).filter(|(_, q)| *q != IntegerPolynomial::ZERO),
+    )
+}
+
 pub fn random_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(IntegerPolynomial, IntegerPolynomial, u64)> {

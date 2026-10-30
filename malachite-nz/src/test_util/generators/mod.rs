@@ -845,6 +845,15 @@ pub fn integer_polynomial_pair_gen_var_2() -> Generator<(IntegerPolynomial, Inte
     )
 }
 
+// All pairs of `IntegerPolynomial`s where the second is nonzero.
+pub fn integer_polynomial_pair_gen_var_3() -> Generator<(IntegerPolynomial, IntegerPolynomial)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_pair_gen_var_3,
+        &random_integer_polynomial_pair_gen_var_3,
+        &special_random_integer_polynomial_pair_gen_var_3,
+    )
+}
+
 // All `(IntegerPolynomial, IntegerPolynomial, u64)` where the `u64` is a small length.
 pub fn integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1()
 -> Generator<(IntegerPolynomial, IntegerPolynomial, u64)> {

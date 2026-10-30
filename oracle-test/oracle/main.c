@@ -183,6 +183,7 @@ static const oracle_mode modes[] = {
     {"mod_power_of_2_inverse_series", run_mod_power_of_2_inverse_series},
     {"fmpq_poly_compose", run_fmpq_poly_compose},
     {"fmpz_poly_taylor_shift", run_fmpz_poly_taylor_shift},
+    {"fmpz_poly_pseudo_divrem", run_fmpz_poly_pseudo_divrem},
     {"mod_power_of_2_taylor_shift", run_mod_power_of_2_taylor_shift},
     {"mod_taylor_shift", run_mod_taylor_shift},
     {"fmpq_poly_taylor_shift", run_fmpq_poly_taylor_shift},

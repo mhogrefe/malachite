@@ -746,6 +746,11 @@ documented by git history.
   FLINT's `nmod_poly_remove` and `fmpz_mod_poly_remove`, and dividing by $x - c$, like
   `nmod_poly_div_root`, which also returns the value at $c$. Unlike FLINT's `remove`, which never
   returns for a constant factor, `ModRemovePower` panics for one.
+- New `PseudoDivRem`, `PseudoDivAssignRem`, `PseudoDiv`, `PseudoDivAssign`, `PseudoRem`, and
+  `PseudoRemAssign` traits in malachite-base, implemented for `IntegerPolynomial`: pseudo-division,
+  like FLINT's `fmpz_poly_pseudo_divrem`, `fmpz_poly_pseudo_div`, and `fmpz_poly_pseudo_rem`. They
+  return the least exponent $d$ with $\ell^d A = BQ + R$, by FLINT's basecase and divide-and-conquer
+  algorithms, both of which find it.
 - New `ModCharacteristicPolynomial` trait in malachite-base, implemented for `UnsignedMatrix<T>`
   (returning an `UnsignedPolynomial<T>`) and `NaturalMatrix` (returning a `NaturalPolynomial`), by
   value or by reference: the characteristic polynomial modulo any $m$, like FLINT's

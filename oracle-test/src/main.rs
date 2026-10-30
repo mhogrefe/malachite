@@ -2330,6 +2330,18 @@ fn test_against_flint() {
             "mod_power_of_2_compose_series",
         );
     }
+    // The pseudo-division demos of malachite-nz's IntegerPolynomial.
+    for demo_name in [
+        "demo_integer_polynomial_pseudo_div_rem",
+        "demo_integer_polynomial_pseudo_div_rem_ref_ref",
+        "demo_integer_polynomial_pseudo_div_assign_rem",
+        "demo_integer_polynomial_pseudo_div",
+        "demo_integer_polynomial_pseudo_div_assign",
+        "demo_integer_polynomial_pseudo_rem_ref_ref",
+        "demo_integer_polynomial_pseudo_rem_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_pseudo_divrem");
+    }
     // The power removal and root division demos of malachite-base's UnsignedPolynomial and
     // malachite-nz's NaturalPolynomial, modulo m and modulo powers of 2.
     for demo_name in [

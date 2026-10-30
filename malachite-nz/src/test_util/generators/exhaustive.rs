@@ -301,6 +301,13 @@ pub fn exhaustive_integer_polynomial_pair_gen_var_2() -> It<(IntegerPolynomial, 
     )
 }
 
+pub fn exhaustive_integer_polynomial_pair_gen_var_3() -> It<(IntegerPolynomial, IntegerPolynomial)>
+{
+    Box::new(
+        exhaustive_integer_polynomial_pair_gen().filter(|(_, q)| *q != IntegerPolynomial::ZERO),
+    )
+}
+
 pub fn exhaustive_integer_polynomial_integer_polynomial_unsigned_triple_gen_var_1()
 -> It<(IntegerPolynomial, IntegerPolynomial, u64)> {
     Box::new(exhaustive_triples_xxy(

@@ -145,6 +145,18 @@ pub mod pow;
 /// [`PowTruncatedAssign`](malachite_base::polynomial::PowTruncatedAssign), for raising a polynomial
 /// to a power and keeping only the low coefficients of the power.
 pub mod pow_truncated;
+/// Implementations of [`PseudoDiv`](malachite_base::polynomial::PseudoDiv) and
+/// [`PseudoDivAssign`](malachite_base::polynomial::PseudoDivAssign), for finding the
+/// pseudo-quotient of two polynomials.
+pub mod pseudo_div;
+/// Implementations of [`PseudoDivRem`](malachite_base::polynomial::PseudoDivRem) and
+/// [`PseudoDivAssignRem`](malachite_base::polynomial::PseudoDivAssignRem), for pseudo-dividing
+/// polynomials.
+pub mod pseudo_div_rem;
+/// Implementations of [`PseudoRem`](malachite_base::polynomial::PseudoRem) and
+/// [`PseudoRemAssign`](malachite_base::polynomial::PseudoRemAssign), for finding the
+/// pseudo-remainder of two polynomials.
+pub mod pseudo_rem;
 pub mod scalar_add_mul;
 /// Left-shifting an [`IntegerPolynomial`](super::IntegerPolynomial) (multiplying it by a power of
 /// 2), by shifting every coefficient.
