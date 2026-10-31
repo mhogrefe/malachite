@@ -3509,6 +3509,70 @@ fn test_against_flint() {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_div_series");
     }
 
+    // Every case from the RationalPolynomial division tests in malachite-q, and the generated cases
+    // from their demos, against fmpq_poly_divrem, fmpq_poly_divides, fmpq_poly_remove,
+    // fmpq_poly_inv_series, and fmpq_poly_div_series.
+    for (demo_names, flint_mode) in [
+        (
+            &[
+                "demo_rational_polynomial_div_rem",
+                "demo_rational_polynomial_div_rem_ref_ref",
+                "demo_rational_polynomial_div_assign_rem",
+                "demo_rational_polynomial_checked_div_rem",
+                "demo_rational_polynomial_div",
+                "demo_rational_polynomial_div_ref_ref",
+                "demo_rational_polynomial_div_assign",
+                "demo_rational_polynomial_checked_div",
+                "demo_rational_polynomial_rem_by_polynomial",
+                "demo_rational_polynomial_rem_by_polynomial_ref_ref",
+                "demo_rational_polynomial_rem_by_polynomial_assign",
+                "demo_rational_polynomial_checked_rem",
+            ][..],
+            "fmpq_poly_divrem",
+        ),
+        (
+            &[
+                "demo_rational_polynomial_div_exact_by_polynomial",
+                "demo_rational_polynomial_div_exact_by_polynomial_ref_ref",
+                "demo_rational_polynomial_div_exact_by_polynomial_assign",
+                "demo_rational_polynomial_checked_div_exact",
+                "demo_rational_polynomial_checked_div_exact_divisible",
+                "demo_rational_polynomial_divisible_by",
+                "demo_rational_polynomial_divisible_by_divisible",
+            ][..],
+            "fmpq_poly_divides",
+        ),
+        (
+            &[
+                "demo_rational_polynomial_remove_power",
+                "demo_rational_polynomial_remove_power_ref_ref",
+                "demo_rational_polynomial_remove_power_assign",
+            ][..],
+            "fmpq_poly_remove",
+        ),
+        (
+            &[
+                "demo_rational_polynomial_inverse_truncated",
+                "demo_rational_polynomial_inverse_truncated_ref",
+                "demo_rational_polynomial_inverse_truncated_invertible",
+            ][..],
+            "fmpq_poly_inv_series",
+        ),
+        (
+            &[
+                "demo_rational_polynomial_div_truncated",
+                "demo_rational_polynomial_div_truncated_ref_ref",
+                "demo_rational_polynomial_div_truncated_assign",
+                "demo_rational_polynomial_checked_div_truncated",
+            ][..],
+            "fmpq_poly_div_series",
+        ),
+    ] {
+        for demo_name in demo_names {
+            check_demo_against_flint(&oracle, "../malachite-q", demo_name, flint_mode);
+        }
+    }
+
     // Long series and polynomials, which reach the Newton and divide-and-conquer algorithms. Their
     // lines are long, so fewer are checked.
     for (demo_name, flint_mode) in [

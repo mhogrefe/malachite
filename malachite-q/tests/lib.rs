@@ -298,11 +298,17 @@ pub mod rational_polynomial {
         pub mod content;
         pub mod deflate_power_of_x;
         pub mod derivative;
+        pub mod div;
+        pub mod div_exact_by_polynomial;
         pub mod div_power_of_x;
+        pub mod div_rem;
+        pub mod div_truncated;
+        pub mod divisible_by;
         pub mod evaluate;
         pub mod exponent_gcd;
         pub mod height;
         pub mod integral;
+        pub mod inverse_truncated;
         pub mod is_unit;
         pub mod l2_norm_squared;
         pub mod make_monic;
@@ -313,6 +319,8 @@ pub mod rational_polynomial {
         pub mod nth_derivative;
         pub mod pow;
         pub mod pow_truncated;
+        pub mod rem;
+        pub mod remove_power;
         pub mod shl;
         pub mod shr;
         pub mod square;

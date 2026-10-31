@@ -1,0 +1,13 @@
+(&(0)).checked_div_exact(&(x)) = Some(0)
+(&(x)).checked_div_exact(&(0)) = None
+(&(x)).checked_div_exact(&(3/5)) = Some(5/3*x)
+(&(x^2-1/4)).checked_div_exact(&(x-1/2)) = Some(x+1/2)
+(&(2/3*x^2+2/3*x)).checked_div_exact(&(4*x)) = Some(1/6*x+1/6)
+(&(x^3-1)).checked_div_exact(&(x-1)) = Some(x^2+x+1)
+(&(x^2+1)).checked_div_exact(&(x+1)) = None
+(&(0)).divisible_by(&(0)) = true
+(&(x)).divisible_by(&(0)) = false
+(&(0)).divisible_by(&(x)) = true
+(&(x)).divisible_by(&(3/5)) = true
+(&(x^2-1/4)).divisible_by(&(x-1/2)) = true
+(&(x^2+1)).divisible_by(&(x+1)) = false

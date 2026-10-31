@@ -1866,6 +1866,33 @@ pub fn rational_polynomial_pair_gen() -> Generator<(RationalPolynomial, Rational
     )
 }
 
+// All pairs `(p * q, q)` of `RationalPolynomial`s where `q` is not constant.
+pub fn rational_polynomial_pair_gen_var_5() -> Generator<(RationalPolynomial, RationalPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_pair_gen_var_5,
+        &random_rational_polynomial_pair_gen_var_5,
+        &special_random_rational_polynomial_pair_gen_var_5,
+    )
+}
+
+// All pairs `(p * q, q)` of `RationalPolynomial`s where `q` is nonzero.
+pub fn rational_polynomial_pair_gen_var_4() -> Generator<(RationalPolynomial, RationalPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_pair_gen_var_4,
+        &random_rational_polynomial_pair_gen_var_4,
+        &special_random_rational_polynomial_pair_gen_var_4,
+    )
+}
+
+// All pairs of `RationalPolynomial`s where the second is nonzero.
+pub fn rational_polynomial_pair_gen_var_3() -> Generator<(RationalPolynomial, RationalPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_pair_gen_var_3,
+        &random_rational_polynomial_pair_gen_var_3,
+        &special_random_rational_polynomial_pair_gen_var_3,
+    )
+}
+
 // All pairs of `RationalPolynomial`s where the first has degree at least 4 and the second has
 // degree at least 2.
 pub fn rational_polynomial_pair_gen_var_1() -> Generator<(RationalPolynomial, RationalPolynomial)> {
@@ -1893,6 +1920,17 @@ pub fn rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1()
         &exhaustive_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1,
         &random_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1,
         &special_random_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1,
+    )
+}
+
+// All triples `(p, q, len)` where the constant coefficient of `q` is nonzero and `len` is at most
+// 19.
+pub fn rational_polynomial_rational_polynomial_unsigned_triple_gen_var_4()
+-> Generator<(RationalPolynomial, RationalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_4,
+        &random_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_4,
+        &special_random_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_4,
     )
 }
 
@@ -2146,6 +2184,15 @@ pub fn rational_polynomial_unsigned_pair_gen_var_1() -> Generator<(RationalPolyn
         &exhaustive_rational_polynomial_unsigned_pair_gen_var_1,
         &random_rational_polynomial_unsigned_pair_gen_var_1,
         &special_random_rational_polynomial_unsigned_pair_gen_var_1,
+    )
+}
+
+// All pairs `(p, len)` where the constant coefficient of `p` is nonzero and `len` is at most 19.
+pub fn rational_polynomial_unsigned_pair_gen_var_4() -> Generator<(RationalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_unsigned_pair_gen_var_4,
+        &random_rational_polynomial_unsigned_pair_gen_var_4,
+        &special_random_rational_polynomial_unsigned_pair_gen_var_4,
     )
 }
 

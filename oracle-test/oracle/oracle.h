@@ -198,6 +198,13 @@ int run_fmpz_poly_mulmid(const char * arg);
 /* fmpz_poly_series.c */
 int run_fmpz_poly_inv_series(const char * arg);
 int run_fmpz_poly_div_series(const char * arg);
+
+/* fmpq_poly_divrem.c */
+int run_fmpq_poly_divrem(const char * arg);
+int run_fmpq_poly_divides(const char * arg);
+int run_fmpq_poly_remove(const char * arg);
+int run_fmpq_poly_inv_series(const char * arg);
+int run_fmpq_poly_div_series(const char * arg);
 int run_fmpz_poly_sqr(const char * arg);
 int run_fmpz_poly_sqrlow(const char * arg);
 

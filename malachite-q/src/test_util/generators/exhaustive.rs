@@ -1556,6 +1556,32 @@ pub fn exhaustive_rational_polynomial_pair_gen() -> It<(RationalPolynomial, Rati
     ))
 }
 
+// Pairs `(p * q, q)` of `RationalPolynomial`s where `q` is not constant.
+pub fn exhaustive_rational_polynomial_pair_gen_var_5()
+-> It<(RationalPolynomial, RationalPolynomial)> {
+    Box::new(
+        exhaustive_rational_polynomial_pair_gen()
+            .filter(|(_, q)| q.len() > 1)
+            .map(|(p, q)| (p * &q, q)),
+    )
+}
+
+// Pairs `(p * q, q)` of `RationalPolynomial`s where `q` is nonzero.
+pub fn exhaustive_rational_polynomial_pair_gen_var_4()
+-> It<(RationalPolynomial, RationalPolynomial)> {
+    Box::new(
+        exhaustive_rational_polynomial_pair_gen()
+            .filter(|(_, q)| q.len() != 0)
+            .map(|(p, q)| (p * &q, q)),
+    )
+}
+
+// Pairs of `RationalPolynomial`s where the second is nonzero.
+pub fn exhaustive_rational_polynomial_pair_gen_var_3()
+-> It<(RationalPolynomial, RationalPolynomial)> {
+    Box::new(exhaustive_rational_polynomial_pair_gen().filter(|(_, q)| q.len() != 0))
+}
+
 pub fn exhaustive_rational_polynomial_pair_gen_var_1()
 -> It<(RationalPolynomial, RationalPolynomial)> {
     Box::new(exhaustive_pairs(
@@ -1582,6 +1608,15 @@ pub fn exhaustive_rational_polynomial_rational_polynomial_unsigned_triple_gen_va
         exhaustive_rational_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+// Triples `(p, q, len)` where the constant coefficient of `q` is nonzero and `len` is at most 19.
+pub fn exhaustive_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_4()
+-> It<(RationalPolynomial, RationalPolynomial, u64)> {
+    Box::new(
+        exhaustive_rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1()
+            .filter(|(_, q, _)| q.coefficient(0) != 0u32),
+    )
 }
 
 // Triples `(p, q, len)` where `q` has constant coefficient 0 and `len` is at most 19.
@@ -1817,6 +1852,14 @@ pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_1() -> It<(RationalP
         exhaustive_rational_polynomials(),
         primitive_int_increasing_inclusive_range(0, 19),
     ))
+}
+
+// Pairs `(p, len)` where the constant coefficient of `p` is nonzero and `len` is at most 19.
+pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_4() -> It<(RationalPolynomial, u64)> {
+    Box::new(
+        exhaustive_rational_polynomial_unsigned_pair_gen_var_1()
+            .filter(|(p, _)| p.coefficient(0) != 0u32),
+    )
 }
 
 pub fn exhaustive_rational_polynomial_unsigned_unsigned_triple_gen_var_2()

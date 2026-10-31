@@ -1,0 +1,9 @@
+(&(x+1)).inverse_truncated(0) = Some(0)
+(&(0)).inverse_truncated(3) = None
+(&(x)).inverse_truncated(3) = None
+(&(1/3)).inverse_truncated(3) = Some(3)
+(&(2*x+1)).inverse_truncated(4) = Some(-8*x^3+4*x^2-2*x+1)
+(&(x^2+x+1)).inverse_truncated(6) = Some(-x^4+x^3-x+1)
+(&(x+2)).inverse_truncated(3) = Some(1/8*x^2-1/4*x+1/2)
+(&(1/2*x+1/3)).inverse_truncated(4) = Some(-81/8*x^3+27/4*x^2-9/2*x+3)
+(&(-3/2*x^2+5)).inverse_truncated(5) = Some(9/500*x^4+3/50*x^2+1/5)

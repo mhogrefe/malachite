@@ -774,6 +774,13 @@ documented by git history.
   divide-and-conquer algorithms. The cutoffs between algorithms depend on the sizes of the
   coefficients, as measured, and division uses reversed polynomial division rather than inverting
   the divisor, since an inverse's coefficients grow even when the quotient's do not.
+- `RationalPolynomial` now implements `DivRem`, `DivAssignRem`, `CheckedDivRem`, `Div`,
+  `DivAssign`, `CheckedDiv`, `Rem`, `RemAssign`, and `CheckedRem` with a `RationalPolynomial`
+  divisor, like FLINT's `fmpq_poly_divrem`, `fmpq_poly_div`, and `fmpq_poly_rem`; `DivExact`,
+  `DivExactAssign`, `CheckedDivExact`, and `DivisibleBy`, like `fmpq_poly_divides`; `RemovePower`
+  and `RemovePowerAssign`, like `fmpq_poly_remove`; and `InverseTruncated`, `DivTruncated`,
+  `DivTruncatedAssign`, and `CheckedDivTruncated`, power series inversion and division, like
+  `fmpq_poly_inv_series` and `fmpq_poly_div_series`, with cutoffs between algorithms as measured.
 - `IntegerPolynomial` division by an `IntegerPolynomial` (`/`, `/=`, and `checked_div`) now
   computes only the quotient, by FLINT's quotient-only basecase and divide-and-conquer algorithms,
   rather than also computing the remainder.

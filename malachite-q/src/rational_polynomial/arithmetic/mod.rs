@@ -49,10 +49,31 @@ pub mod deflate_power_of_x;
 /// [`DerivativeAssign`](malachite_base::polynomial::DerivativeAssign), for differentiating a
 /// polynomial.
 pub mod derivative;
+/// Implementations of [`Div`](core::ops::Div), [`DivAssign`](core::ops::DivAssign), and
+/// [`CheckedDiv`](malachite_base::num::arithmetic::traits::CheckedDiv), for finding the quotient of
+/// two polynomials.
+pub mod div;
+/// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact),
+/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), and
+/// [`CheckedDivExact`](malachite_base::polynomial::CheckedDivExact), for dividing a polynomial by
+/// one that divides it.
+pub mod div_exact;
 /// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
 /// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
 /// by a power of its variable and discarding the remainder.
 pub mod div_power_of_x;
+/// Implementations of [`DivRem`](malachite_base::num::arithmetic::traits::DivRem),
+/// [`DivAssignRem`](malachite_base::num::arithmetic::traits::DivAssignRem), and
+/// [`CheckedDivRem`](malachite_base::polynomial::CheckedDivRem), for dividing polynomials.
+pub mod div_rem;
+/// Implementations of [`DivTruncated`](malachite_base::polynomial::DivTruncated),
+/// [`DivTruncatedAssign`](malachite_base::polynomial::DivTruncatedAssign), and
+/// [`CheckedDivTruncated`](malachite_base::polynomial::CheckedDivTruncated), for dividing two
+/// polynomials as power series.
+pub mod div_truncated;
+/// Implementations of [`DivisibleBy`](malachite_base::num::arithmetic::traits::DivisibleBy), for
+/// determining whether one polynomial is divisible by another.
+pub mod divisible_by;
 /// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate) for
 /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s and
 /// [`RationalPolynomial`](super::RationalPolynomial)s at [`Rational`](crate::Rational)s, and for
@@ -68,6 +89,9 @@ pub mod height;
 /// Implementations of [`Integral`](malachite_base::polynomial::Integral) and
 /// [`IntegralAssign`](malachite_base::polynomial::IntegralAssign), for integrating a polynomial.
 pub mod integral;
+/// Implementations of [`InverseTruncated`](malachite_base::polynomial::InverseTruncated), for
+/// inverting a polynomial as a power series.
+pub mod inverse_truncated;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
@@ -104,6 +128,14 @@ pub mod pow;
 /// [`PowTruncatedAssign`](malachite_base::polynomial::PowTruncatedAssign), for raising a polynomial
 /// to a power and keeping only the low coefficients of the power.
 pub mod pow_truncated;
+/// Implementations of [`Rem`](core::ops::Rem), [`RemAssign`](core::ops::RemAssign), and
+/// [`CheckedRem`](malachite_base::polynomial::CheckedRem), for finding the remainder of two
+/// polynomials.
+pub mod rem;
+/// Implementations of [`RemovePower`](malachite_base::num::factorization::traits::RemovePower) and
+/// [`RemovePowerAssign`](malachite_base::num::factorization::traits::RemovePowerAssign), for
+/// removing the largest power of a polynomial that divides another.
+pub mod remove_power;
 /// Left-shifting a [`RationalPolynomial`](super::RationalPolynomial) (multiplying it or dividing it
 /// by a power of 2), keeping it in lowest terms.
 ///
