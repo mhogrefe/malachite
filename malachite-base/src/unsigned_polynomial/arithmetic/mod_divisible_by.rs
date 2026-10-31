@@ -19,8 +19,9 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::polynomial::ModDivisibleBy;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_div_exact::assert_invertible;
-use crate::unsigned_polynomial::arithmetic::mod_div_rem::{assert_reduced, mod_div_rem_with};
-use crate::unsigned_polynomial::arithmetic::mod_div_truncated::mod_div_truncated_dispatch;
+use crate::unsigned_polynomial::arithmetic::mod_div_rem::{
+    assert_reduced, mod_div_rem_dispatch, mod_div_rem_with,
+};
 
 // Whether `q` divides `p` modulo `m`.
 //
@@ -39,14 +40,10 @@ fn helper<T: PrimitiveUnsigned>(
         return false;
     }
     assert_invertible(q, m);
-    mod_div_rem_with(
-        &p.coefficients,
-        &q.coefficients,
-        m,
-        mod_div_truncated_dispatch,
-    )
-    .unwrap()
-    .1 == UnsignedPolynomial::ZERO
+    mod_div_rem_with(&p.coefficients, &q.coefficients, m, mod_div_rem_dispatch)
+        .unwrap()
+        .1
+        == UnsignedPolynomial::ZERO
 }
 
 impl<T: PrimitiveUnsigned> ModDivisibleBy<Self, T> for UnsignedPolynomial<T> {

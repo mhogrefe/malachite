@@ -53,7 +53,12 @@ pub fn mod_power_of_2_div_rem_basecase_wrapper<T: PrimitiveUnsigned>(
     q: &UnsignedPolynomial<T>,
     pow: u64,
 ) -> Option<(UnsignedPolynomial<T>, UnsignedPolynomial<T>)> {
-    mod_power_of_2_div_rem_with(p.coefficients_asc(), q.coefficients_asc(), pow, basecase)
+    mod_power_of_2_div_rem_with(
+        p.coefficients_asc(),
+        q.coefficients_asc(),
+        pow,
+        |xs, ys, pow, inverse| mod_power_of_2_div_rem_with_series(xs, ys, pow, inverse, basecase),
+    )
 }
 
 // `mod_power_of_2_div_truncated_basecase`, with the signature of the other kernels.
@@ -72,6 +77,14 @@ pub fn mod_power_of_2_div_rem_newton_wrapper<T: PrimitiveUnsigned>(
         p.coefficients_asc(),
         q.coefficients_asc(),
         pow,
-        mod_power_of_2_div_truncated_newton,
+        |xs, ys, pow, inverse| {
+            mod_power_of_2_div_rem_with_series(
+                xs,
+                ys,
+                pow,
+                inverse,
+                mod_power_of_2_div_truncated_newton,
+            )
+        },
     )
 }

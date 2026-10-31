@@ -102,8 +102,22 @@ fn test_mod_power_of_2_div_rem_helper<T: PrimitiveUnsigned>() {
     test("0", "x+1", 3, Some(("0", "0")));
     // - a constant divisor
     test("6*x^2+5", "3", 3, Some(("2*x^2+7", "0")));
-    // - a quotient of two coefficients
+    // - a quotient of two coefficients, found one term at a time
     test("3*x^2+x+1", "3*x+1", 3, Some(("x", "1")));
+    // - a long divisor with few nonzero coefficients, divided by term by term
+    test(
+        "x^30+x^7+1",
+        "x^21+2*x^3+1",
+        3,
+        Some(("x^9", "6*x^12+7*x^9+x^7+1")),
+    );
+    // - a long divisor with too many nonzero coefficients to divide by term by term
+    test(
+        "x^30+x^7+1",
+        "x^21+x^5+x^4+x^3+x^2+x+1",
+        3,
+        Some(("x^9", "7*x^14+7*x^13+7*x^12+7*x^11+7*x^10+7*x^9+x^7+1")),
+    );
     // - a non-monic divisor
     test("x^4+7*x+5", "5*x^2+2", 3, Some(("5*x^2+6", "7*x+1")));
     // - the full width

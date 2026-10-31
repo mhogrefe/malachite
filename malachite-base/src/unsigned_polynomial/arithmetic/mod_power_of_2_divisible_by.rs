@@ -20,9 +20,8 @@ use crate::polynomial::ModPowerOf2DivisibleBy;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_div_exact::assert_invertible;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_div_rem::{
-    assert_reduced, mod_power_of_2_div_rem_with,
+    assert_reduced, mod_power_of_2_div_rem_dispatch, mod_power_of_2_div_rem_with,
 };
-use crate::unsigned_polynomial::arithmetic::mod_power_of_2_div_truncated::*;
 
 // Whether `q` divides `p` modulo $2^k$, where $k$ is `pow`.
 //
@@ -46,7 +45,7 @@ fn helper<T: PrimitiveUnsigned>(
         &p.coefficients,
         &q.coefficients,
         pow,
-        mod_power_of_2_div_truncated_dispatch,
+        mod_power_of_2_div_rem_dispatch,
     )
     .unwrap()
     .1 == UnsignedPolynomial::ZERO

@@ -57,7 +57,9 @@ pub fn mod_div_rem_basecase_wrapper<T: PrimitiveUnsigned>(
         p.coefficients_asc(),
         q.coefficients_asc(),
         m,
-        mod_div_truncated_basecase,
+        |xs, ys, m, inverse| {
+            mod_div_rem_with_series(xs, ys, m, inverse, mod_div_truncated_basecase)
+        },
     )
 }
 
@@ -72,6 +74,6 @@ pub fn mod_div_rem_newton_wrapper<T: PrimitiveUnsigned>(
         p.coefficients_asc(),
         q.coefficients_asc(),
         m,
-        mod_div_truncated_newton,
+        |xs, ys, m, inverse| mod_div_rem_with_series(xs, ys, m, inverse, mod_div_truncated_newton),
     )
 }

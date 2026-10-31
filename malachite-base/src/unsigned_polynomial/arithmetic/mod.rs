@@ -176,6 +176,12 @@ pub mod mod_power_of_2_div_exact;
 /// [`CheckedModPowerOf2DivRem`](crate::polynomial::CheckedModPowerOf2DivRem), for dividing
 /// polynomials modulo a power of 2, returning the quotient and remainder.
 pub mod mod_power_of_2_div_rem;
+/// Implementations of
+/// [`ModPowerOf2DivRemPrecomputed`](crate::polynomial::ModPowerOf2DivRemPrecomputed) and
+/// [`ModPowerOf2DivAssignRemPrecomputed`](crate::polynomial::ModPowerOf2DivAssignRemPrecomputed),
+/// for dividing polynomials modulo a power of 2 with data precomputed from the divisor, returning
+/// the quotient and remainder.
+pub mod mod_power_of_2_div_rem_precomputed;
 /// Implementations of [`ModPowerOf2DivRoot`](crate::polynomial::ModPowerOf2DivRoot) and
 /// [`ModPowerOf2DivRootAssign`](crate::polynomial::ModPowerOf2DivRootAssign), for dividing a
 /// polynomial by $x - c$ modulo a power of 2.
@@ -236,11 +242,21 @@ pub mod mod_power_of_2_product;
 /// [`CheckedModPowerOf2Quotient`](crate::polynomial::CheckedModPowerOf2Quotient), for finding the
 /// quotient of polynomials modulo a power of 2.
 pub mod mod_power_of_2_quotient;
+/// Implementations of
+/// [`ModPowerOf2QuotientPrecomputed`](crate::polynomial::ModPowerOf2QuotientPrecomputed) and
+/// [`ModPowerOf2QuotientPrecomputedAssign`](
+/// crate::polynomial::ModPowerOf2QuotientPrecomputedAssign), for finding the quotient of
+/// polynomials modulo a power of 2 with data precomputed from the divisor.
+pub mod mod_power_of_2_quotient_precomputed;
 /// Implementations of [`ModPowerOf2Rem`](crate::polynomial::ModPowerOf2Rem),
 /// [`ModPowerOf2RemAssign`](crate::polynomial::ModPowerOf2RemAssign), and
 /// [`CheckedModPowerOf2Rem`](crate::polynomial::CheckedModPowerOf2Rem), for finding the remainder
 /// of polynomials modulo a power of 2.
 pub mod mod_power_of_2_rem;
+/// Implementations of [`ModPowerOf2RemPrecomputed`](crate::polynomial::ModPowerOf2RemPrecomputed)
+/// and [`ModPowerOf2RemPrecomputedAssign`](crate::polynomial::ModPowerOf2RemPrecomputedAssign), for
+/// finding the remainder of polynomials modulo a power of 2 with data precomputed from the divisor.
+pub mod mod_power_of_2_rem_precomputed;
 /// Implementations of [`ModPowerOf2RemovePower`](crate::polynomial::ModPowerOf2RemovePower) and
 /// [`ModPowerOf2RemovePowerAssign`](crate::polynomial::ModPowerOf2RemovePowerAssign), for removing
 /// the largest power of a polynomial that divides another modulo a power of 2.

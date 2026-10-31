@@ -19,7 +19,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::polynomial::{CheckedModDivExact, ModDivExact, ModDivExactAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_div_rem::{
-    assert_reduced, leading_inverse, mod_div_rem_with, mod_quotient_with,
+    assert_reduced, leading_inverse, mod_div_rem_dispatch, mod_div_rem_with, mod_quotient_with,
 };
 use crate::unsigned_polynomial::arithmetic::mod_div_truncated::mod_div_truncated_dispatch;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::from_coefficients_trimmed;
@@ -149,13 +149,8 @@ fn checked_helper<T: PrimitiveUnsigned>(
 ) -> Option<UnsignedPolynomial<T>> {
     assert_reduced(p, q, m);
     assert_invertible(q, m);
-    let (q, r) = mod_div_rem_with(
-        &p.coefficients,
-        &q.coefficients,
-        m,
-        mod_div_truncated_dispatch,
-    )
-    .unwrap();
+    let (q, r) =
+        mod_div_rem_with(&p.coefficients, &q.coefficients, m, mod_div_rem_dispatch).unwrap();
     if r == UnsignedPolynomial::ZERO {
         Some(q)
     } else {

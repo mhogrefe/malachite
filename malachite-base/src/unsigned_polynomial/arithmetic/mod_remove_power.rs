@@ -19,8 +19,9 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::polynomial::{ModRemovePower, ModRemovePowerAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_div_exact::assert_invertible;
-use crate::unsigned_polynomial::arithmetic::mod_div_rem::{assert_reduced, mod_div_rem_with};
-use crate::unsigned_polynomial::arithmetic::mod_div_truncated::mod_div_truncated_dispatch;
+use crate::unsigned_polynomial::arithmetic::mod_div_rem::{
+    assert_reduced, mod_div_rem_dispatch, mod_div_rem_with,
+};
 
 // The largest power of `q` that divides `p` modulo `m`, divided out of `p`, and its exponent: `p`
 // is divided by `q` while the remainder is 0.
@@ -44,13 +45,8 @@ fn helper<T: PrimitiveUnsigned>(
     let mut p = p.clone();
     let mut e = 0;
     while p.coefficients.len() >= q.coefficients.len() {
-        let (s, r) = mod_div_rem_with(
-            &p.coefficients,
-            &q.coefficients,
-            m,
-            mod_div_truncated_dispatch,
-        )
-        .unwrap();
+        let (s, r) =
+            mod_div_rem_with(&p.coefficients, &q.coefficients, m, mod_div_rem_dispatch).unwrap();
         if r != UnsignedPolynomial::ZERO {
             break;
         }

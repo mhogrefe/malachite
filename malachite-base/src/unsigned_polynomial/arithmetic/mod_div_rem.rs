@@ -19,6 +19,9 @@ use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::polynomial::{CheckedModDivRem, ModDivAssignRem, ModDivRem};
 use crate::unsigned_polynomial::UnsignedPolynomial;
+use crate::unsigned_polynomial::arithmetic::mod_div_rem_precomputed::{
+    SPARSE_MIN_LENGTH, mod_div_rem_basecase, mod_div_rem_sparse,
+};
 use crate::unsigned_polynomial::arithmetic::mod_div_truncated::mod_div_truncated_dispatch;
 use crate::unsigned_polynomial::arithmetic::mod_mul_truncated::mod_mul_truncated_to_out;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::from_coefficients_trimmed;
@@ -104,10 +107,51 @@ pub(crate) fn leading_inverse<T: PrimitiveUnsigned>(ys: &[T], m: T) -> Option<T>
     ys.last()?.mod_inverse(m)
 }
 
+// The quotient and remainder modulo `m` of the polynomials with coefficients `xs` and `ys`, where
+// `ys` is nonempty and no longer than `xs`, and `inverse` is the inverse of the last coefficient of
+// `ys` modulo `m`. A quotient of 2 coefficients is found one term at a time, and a long divisor
+// with few nonzero coefficients is divided by directly, term by term; otherwise the reversals are
+// divided as power series. These two cases need only `inverse`, so they are taken from the
+// precomputed-inverse division, where they were measured to be faster than series division.
+pub(crate) fn mod_div_rem_dispatch<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    m: T,
+    inverse: T,
+) -> (Vec<T>, Vec<T>) {
+    if ys.len() > 1 && xs.len() == ys.len() + 1 {
+        return mod_div_rem_basecase(xs, ys, inverse, m);
+    }
+    if ys.len() > SPARSE_MIN_LENGTH
+        && let Some(result) = mod_div_rem_sparse(xs, ys, inverse, m)
+    {
+        return result;
+    }
+    mod_div_rem_with_series(xs, ys, m, inverse, mod_div_truncated_dispatch)
+}
+
+// The quotient modulo `m` of the polynomials with coefficients `xs` and `ys`, as for
+// `mod_div_rem_dispatch`.
+pub(crate) fn mod_quotient_dispatch<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    m: T,
+    inverse: T,
+) -> Vec<T> {
+    if ys.len() > 1 && xs.len() == ys.len() + 1 {
+        return mod_div_rem_basecase(xs, ys, inverse, m).0;
+    }
+    if ys.len() > SPARSE_MIN_LENGTH
+        && let Some((qs, _)) = mod_div_rem_sparse(xs, ys, inverse, m)
+    {
+        return qs;
+    }
+    mod_quotient_with(xs, ys, m, inverse, mod_div_truncated_dispatch)
+}
+
 // The quotient and remainder modulo `m` of the polynomials with coefficients `xs` and `ys`,
-// reduced, with `series` dividing the reversals as power series in the general case, or `None` if
-// `ys` is zero or its leading coefficient is not invertible. Modulo 1, every polynomial is 0, and
-// so is the result.
+// reduced, with `divide` dividing them in the general case, or `None` if `ys` is zero or its
+// leading coefficient is not invertible. Modulo 1, every polynomial is 0, and so is the result.
 //
 // This is equivalent to `nmod_poly_divrem` from `nmod_poly/divrem.c`, FLINT 3.6.0, except that
 // `None` is returned where FLINT aborts or assumes the leading coefficient invertible.
@@ -115,7 +159,7 @@ crate_test_fn! {mod_div_rem_with<T: PrimitiveUnsigned>(
     xs: &[T],
     ys: &[T],
     m: T,
-    series: fn(&[T], &[T], usize, T, T) -> Vec<T>,
+    divide: fn(&[T], &[T], T, T) -> (Vec<T>, Vec<T>),
 ) -> Option<(UnsignedPolynomial<T>, UnsignedPolynomial<T>)> {
     if m == T::ONE {
         return Some((UnsignedPolynomial::ZERO, UnsignedPolynomial::ZERO));
@@ -124,7 +168,7 @@ crate_test_fn! {mod_div_rem_with<T: PrimitiveUnsigned>(
     if xs.len() < ys.len() {
         return Some((UnsignedPolynomial::ZERO, from_coefficients_trimmed(xs.to_vec())));
     }
-    let (qs, rs) = mod_div_rem_with_series(xs, ys, m, inverse, series);
+    let (qs, rs) = divide(xs, ys, m, inverse);
     Some((from_coefficients_trimmed(qs), from_coefficients_trimmed(rs)))
 }}
 
@@ -138,8 +182,7 @@ crate_test_fn! {mod_div_rem_with<T: PrimitiveUnsigned>(
 #[doc(hidden)]
 #[inline]
 pub fn mod_div_rem_vec<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], m: T) -> Option<(Vec<T>, Vec<T>)> {
-    mod_div_rem_with(xs, ys, m, mod_div_truncated_dispatch)
-        .map(|(q, r)| (q.coefficients, r.coefficients))
+    mod_div_rem_with(xs, ys, m, mod_div_rem_dispatch).map(|(q, r)| (q.coefficients, r.coefficients))
 }
 
 fn checked_helper<T: PrimitiveUnsigned>(
@@ -148,12 +191,7 @@ fn checked_helper<T: PrimitiveUnsigned>(
     m: T,
 ) -> Option<(UnsignedPolynomial<T>, UnsignedPolynomial<T>)> {
     assert_reduced(p, q, m);
-    mod_div_rem_with(
-        &p.coefficients,
-        &q.coefficients,
-        m,
-        mod_div_truncated_dispatch,
-    )
+    mod_div_rem_with(&p.coefficients, &q.coefficients, m, mod_div_rem_dispatch)
 }
 
 fn helper<T: PrimitiveUnsigned>(
@@ -184,7 +222,9 @@ impl<T: PrimitiveUnsigned> ModDivRem<Self, T> for UnsignedPolynomial<T> {
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///
@@ -236,7 +276,9 @@ impl<T: PrimitiveUnsigned> ModDivRem<&Self, T> for UnsignedPolynomial<T> {
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///
@@ -288,7 +330,9 @@ impl<T: PrimitiveUnsigned> ModDivRem<UnsignedPolynomial<T>, T> for &UnsignedPoly
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///
@@ -344,7 +388,9 @@ impl<T: PrimitiveUnsigned> ModDivRem<&UnsignedPolynomial<T>, T> for &UnsignedPol
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///
@@ -400,7 +446,9 @@ impl<T: PrimitiveUnsigned> ModDivAssignRem<Self, T> for UnsignedPolynomial<T> {
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///
@@ -454,7 +502,9 @@ impl<T: PrimitiveUnsigned> ModDivAssignRem<&Self, T> for UnsignedPolynomial<T> {
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///
@@ -510,7 +560,9 @@ impl<T: PrimitiveUnsigned> CheckedModDivRem<Self, T> for UnsignedPolynomial<T> {
     /// otherwise the quotient and remainder are unique. When $m$ is 1, every polynomial is 0, and
     /// so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///
@@ -568,7 +620,9 @@ impl<T: PrimitiveUnsigned> CheckedModDivRem<&Self, T> for UnsignedPolynomial<T> 
     /// otherwise the quotient and remainder are unique. When $m$ is 1, every polynomial is 0, and
     /// so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///
@@ -626,7 +680,9 @@ impl<T: PrimitiveUnsigned> CheckedModDivRem<UnsignedPolynomial<T>, T> for &Unsig
     /// otherwise the quotient and remainder are unique. When $m$ is 1, every polynomial is 0, and
     /// so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///
@@ -688,7 +744,9 @@ impl<T: PrimitiveUnsigned> CheckedModDivRem<&UnsignedPolynomial<T>, T> for &Unsi
     /// otherwise the quotient and remainder are unique. When $m$ is 1, every polynomial is 0, and
     /// so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein, and the
     /// remainder from it with one truncated product.
     ///

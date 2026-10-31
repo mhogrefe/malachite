@@ -19,9 +19,8 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::polynomial::{CheckedModQuotient, ModQuotient, ModQuotientAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_div_rem::{
-    assert_reduced, leading_inverse, mod_quotient_with,
+    assert_reduced, leading_inverse, mod_quotient_dispatch,
 };
-use crate::unsigned_polynomial::arithmetic::mod_div_truncated::mod_div_truncated_dispatch;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::from_coefficients_trimmed;
 
 fn checked_helper<T: PrimitiveUnsigned>(
@@ -51,12 +50,8 @@ fn mod_quotient_with_dispatch<T: PrimitiveUnsigned>(
     if xs.len() < ys.len() {
         return Some(UnsignedPolynomial::ZERO);
     }
-    Some(from_coefficients_trimmed(mod_quotient_with(
-        xs,
-        ys,
-        m,
-        inverse,
-        mod_div_truncated_dispatch,
+    Some(from_coefficients_trimmed(mod_quotient_dispatch(
+        xs, ys, m, inverse,
     )))
 }
 
@@ -99,7 +94,9 @@ impl<T: PrimitiveUnsigned> ModQuotient<Self, T> for UnsignedPolynomial<T> {
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity
@@ -146,7 +143,9 @@ impl<T: PrimitiveUnsigned> ModQuotient<&Self, T> for UnsignedPolynomial<T> {
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity
@@ -193,7 +192,9 @@ impl<T: PrimitiveUnsigned> ModQuotient<UnsignedPolynomial<T>, T> for &UnsignedPo
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity
@@ -240,7 +241,9 @@ impl<T: PrimitiveUnsigned> ModQuotient<&UnsignedPolynomial<T>, T> for &UnsignedP
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity
@@ -285,7 +288,9 @@ impl<T: PrimitiveUnsigned> ModQuotientAssign<Self, T> for UnsignedPolynomial<T> 
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity
@@ -331,7 +336,9 @@ impl<T: PrimitiveUnsigned> ModQuotientAssign<&Self, T> for UnsignedPolynomial<T>
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity
@@ -381,7 +388,9 @@ impl<T: PrimitiveUnsigned> CheckedModQuotient<Self, T> for UnsignedPolynomial<T>
     /// otherwise the quotient is unique. When $m$ is 1, every polynomial is 0, and so is the
     /// result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity
@@ -437,7 +446,9 @@ impl<T: PrimitiveUnsigned> CheckedModQuotient<&Self, T> for UnsignedPolynomial<T
     /// otherwise the quotient is unique. When $m$ is 1, every polynomial is 0, and so is the
     /// result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity
@@ -493,7 +504,9 @@ impl<T: PrimitiveUnsigned> CheckedModQuotient<UnsignedPolynomial<T>, T> for &Uns
     /// otherwise the quotient is unique. When $m$ is 1, every polynomial is 0, and so is the
     /// result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity
@@ -555,7 +568,9 @@ impl<T: PrimitiveUnsigned> CheckedModQuotient<&UnsignedPolynomial<T>, T>
     /// otherwise the quotient is unique. When $m$ is 1, every polynomial is 0, and so is the
     /// result.
     ///
-    /// The quotient is found by dividing the reversed polynomials as power series, coefficient by
+    /// A quotient of two coefficients is found one term at a time, and a divisor of more than 20
+    /// coefficients with at most six nonzero ones is divided by term by term. Otherwise, the
+    /// quotient is found by dividing the reversed polynomials as power series, coefficient by
     /// coefficient for short divisors and otherwise by the method of Karp and Markstein.
     ///
     /// # Worst-case complexity

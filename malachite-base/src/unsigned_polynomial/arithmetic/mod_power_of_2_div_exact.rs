@@ -21,8 +21,8 @@ use crate::polynomial::{
 };
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_div_rem::{
-    assert_reduced, leading_inverse, mod_power_of_2_div_rem_with, mod_power_of_2_quotient_with,
-    reduced,
+    assert_reduced, leading_inverse, mod_power_of_2_div_rem_dispatch, mod_power_of_2_div_rem_with,
+    mod_power_of_2_quotient_with, reduced,
 };
 use crate::unsigned_polynomial::arithmetic::mod_power_of_2_div_truncated::*;
 use alloc::vec::Vec;
@@ -182,7 +182,7 @@ fn checked_helper<T: PrimitiveUnsigned>(
         &p.coefficients,
         &q.coefficients,
         pow,
-        mod_power_of_2_div_truncated_dispatch,
+        mod_power_of_2_div_rem_dispatch,
     )
     .unwrap();
     if r == UnsignedPolynomial::ZERO {

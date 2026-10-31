@@ -1079,6 +1079,7 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_derivative;
         pub mod mod_power_of_2_div_exact;
         pub mod mod_power_of_2_div_rem;
+        pub mod mod_power_of_2_div_rem_precomputed;
         pub mod mod_power_of_2_div_root;
         pub mod mod_power_of_2_div_truncated;
         pub mod mod_power_of_2_divisible_by;
@@ -1093,7 +1094,9 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_pow_truncated;
         pub mod mod_power_of_2_product;
         pub mod mod_power_of_2_quotient;
+        pub mod mod_power_of_2_quotient_precomputed;
         pub mod mod_power_of_2_rem;
+        pub mod mod_power_of_2_rem_precomputed;
         pub mod mod_power_of_2_remove_power;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_square;

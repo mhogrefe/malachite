@@ -2561,6 +2561,14 @@ fn test_against_flint() {
         "demo_unsigned_polynomial_mod_power_of_2_rem_u16",
         "demo_unsigned_polynomial_mod_power_of_2_rem_assign_u64",
         "demo_unsigned_polynomial_checked_mod_power_of_2_rem_ref_ref_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_div_rem_precomputed_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_div_rem_precomputed_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_div_rem_precomputed_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_power_of_2_div_assign_rem_precomputed_u32",
+        "demo_unsigned_polynomial_mod_power_of_2_quotient_precomputed_u16",
+        "demo_unsigned_polynomial_mod_power_of_2_quotient_precomputed_assign_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_rem_precomputed_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_rem_precomputed_assign_u8",
     ] {
         check_demo_against_flint(
             &oracle,

@@ -1463,10 +1463,10 @@ pub trait CheckedModRem<Rhs = Self, M = Self> {
     fn checked_mod_rem(self, other: Rhs, m: M) -> Option<Self::Output>;
 }
 
-/// Data precomputed for dividing polynomials modulo $m$ by a fixed divisor: the inverse, modulo
-/// $m$, of the divisor's reversal as a power series, truncated to the divisor's length. With it,
-/// the quotient of a dividend no more than twice as long as the divisor takes one truncated
-/// multiplication rather than a series inversion.
+/// Data precomputed for dividing polynomials modulo $m$ or $2^k$ by a fixed divisor: the inverse,
+/// modulo $m$ or $2^k$, of the divisor's reversal as a power series, truncated to the divisor's
+/// length. With it, the quotient of a dividend no more than twice as long as the divisor takes one
+/// truncated multiplication rather than a series inversion.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[doc(hidden)]
 pub struct ModPolynomialData<C> {
@@ -1602,6 +1602,154 @@ pub trait ModRemPrecomputedAssign<Rhs = Self, M = Self>: ModRemPrecomputed<Rhs, 
     /// a \gets r, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
     /// $$
     fn mod_rem_precomputed_assign(&mut self, other: Rhs, m: M, data: &Self::Data);
+}
+
+/// Divides one polynomial by another modulo $2^k$, returning the quotient and remainder, using data
+/// precomputed from the divisor and $k$. The coefficients must already be reduced modulo $2^k$, and
+/// the leading coefficient of the divisor must be odd.
+///
+/// If many polynomials are divided by the same divisor, it is quicker to precompute the data once,
+/// with [`precompute_mod_power_of_2_div_rem_data`](
+/// ModPowerOf2DivRemPrecomputed::precompute_mod_power_of_2_div_rem_data), and reuse it.
+pub trait ModPowerOf2DivRemPrecomputed<Rhs = Self> {
+    type DivOutput;
+    type RemOutput;
+    type Data;
+
+    /// Precomputes the data for dividing by `other` modulo $2^k$.
+    fn precompute_mod_power_of_2_div_rem_data(other: &Rhs, pow: u64) -> Self::Data;
+
+    /// Divides a polynomial by another modulo $2^k$, returning the quotient and remainder, using
+    /// data precomputed from the divisor and $k$.
+    ///
+    /// $$
+    /// f(a, b, k) = (q, r), \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_div_rem_precomputed(
+        self,
+        other: Rhs,
+        pow: u64,
+        data: &Self::Data,
+    ) -> (Self::DivOutput, Self::RemOutput);
+}
+
+/// Divides one polynomial by another modulo $2^k$ in place, replacing the first with the quotient
+/// and returning the remainder, using data precomputed from the divisor and $k$. The coefficients
+/// must already be reduced modulo $2^k$, and the leading coefficient of the divisor must be odd.
+///
+/// For precomputing the data, use [`precompute_mod_power_of_2_div_rem_data`](
+/// ModPowerOf2DivRemPrecomputed::precompute_mod_power_of_2_div_rem_data).
+pub trait ModPowerOf2DivAssignRemPrecomputed<Rhs = Self>:
+    ModPowerOf2DivRemPrecomputed<Rhs>
+{
+    /// Replaces `self` with its quotient by another polynomial modulo $2^k$, returning the
+    /// remainder, using data precomputed from the divisor and $k$.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b,
+    /// $$
+    /// returning $r$.
+    fn mod_power_of_2_div_assign_rem_precomputed(
+        &mut self,
+        other: Rhs,
+        pow: u64,
+        data: &Self::Data,
+    ) -> Self::RemOutput;
+}
+
+/// Finds the quotient of one polynomial divided by another modulo $2^k$, using data precomputed
+/// from the divisor and $k$. The coefficients must already be reduced modulo $2^k$, and the leading
+/// coefficient of the divisor must be odd.
+///
+/// If many polynomials are divided by the same divisor, it is quicker to precompute the data once,
+/// with [`precompute_mod_power_of_2_quotient_data`](
+/// ModPowerOf2QuotientPrecomputed::precompute_mod_power_of_2_quotient_data), and reuse it.
+pub trait ModPowerOf2QuotientPrecomputed<Rhs = Self> {
+    type Output;
+    type Data;
+
+    /// Precomputes the data for dividing by `other` modulo $2^k$.
+    fn precompute_mod_power_of_2_quotient_data(other: &Rhs, pow: u64) -> Self::Data;
+
+    /// Finds the quotient of a polynomial divided by another modulo $2^k$, using data precomputed
+    /// from the divisor and $k$.
+    ///
+    /// $$
+    /// f(a, b, k) = q, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_quotient_precomputed(
+        self,
+        other: Rhs,
+        pow: u64,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Replaces one polynomial with its quotient by another modulo $2^k$, using data precomputed from
+/// the divisor and $k$. The coefficients must already be reduced modulo $2^k$, and the leading
+/// coefficient of the divisor must be odd.
+///
+/// For precomputing the data, use [`precompute_mod_power_of_2_quotient_data`](
+/// ModPowerOf2QuotientPrecomputed::precompute_mod_power_of_2_quotient_data).
+pub trait ModPowerOf2QuotientPrecomputedAssign<Rhs = Self>:
+    ModPowerOf2QuotientPrecomputed<Rhs>
+{
+    /// Replaces `self` with its quotient by another polynomial modulo $2^k$, using data precomputed
+    /// from the divisor and $k$.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_quotient_precomputed_assign(
+        &mut self,
+        other: Rhs,
+        pow: u64,
+        data: &Self::Data,
+    );
+}
+
+/// Finds the remainder of one polynomial divided by another modulo $2^k$, using data precomputed
+/// from the divisor and $k$. The coefficients must already be reduced modulo $2^k$, and the leading
+/// coefficient of the divisor must be odd.
+///
+/// If many polynomials are reduced by the same divisor, it is quicker to precompute the data once,
+/// with [`precompute_mod_power_of_2_rem_data`](
+/// ModPowerOf2RemPrecomputed::precompute_mod_power_of_2_rem_data), and reuse it.
+pub trait ModPowerOf2RemPrecomputed<Rhs = Self> {
+    type Output;
+    type Data;
+
+    /// Precomputes the data for dividing by `other` modulo $2^k$.
+    fn precompute_mod_power_of_2_rem_data(other: &Rhs, pow: u64) -> Self::Data;
+
+    /// Finds the remainder of a polynomial divided by another modulo $2^k$, using data precomputed
+    /// from the divisor and $k$.
+    ///
+    /// $$
+    /// f(a, b, k) = r, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_rem_precomputed(
+        self,
+        other: Rhs,
+        pow: u64,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Replaces one polynomial with its remainder by another modulo $2^k$, using data precomputed from
+/// the divisor and $k$. The coefficients must already be reduced modulo $2^k$, and the leading
+/// coefficient of the divisor must be odd.
+///
+/// For precomputing the data, use [`precompute_mod_power_of_2_rem_data`](
+/// ModPowerOf2RemPrecomputed::precompute_mod_power_of_2_rem_data).
+pub trait ModPowerOf2RemPrecomputedAssign<Rhs = Self>: ModPowerOf2RemPrecomputed<Rhs> {
+    /// Replaces `self` with its remainder by another polynomial modulo $2^k$, using data
+    /// precomputed from the divisor and $k$.
+    ///
+    /// $$
+    /// a \gets r, \quad a \equiv bq + r \pmod{2^k}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_power_of_2_rem_precomputed_assign(&mut self, other: Rhs, pow: u64, data: &Self::Data);
 }
 
 /// Divides one polynomial by another if the second divides the first, returning `None` otherwise.

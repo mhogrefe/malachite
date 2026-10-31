@@ -95,8 +95,22 @@ fn test_mod_div_rem_helper<T: PrimitiveUnsigned>() {
     test("x^2+3*x+2", "x+1", 7, Some(("x+2", "0")));
     // - a quotient of one coefficient
     test("3*x+5", "x+1", 7, Some(("3", "2")));
-    // - a quotient of two coefficients
+    // - a quotient of two coefficients, found one term at a time
     test("x^3+2*x+1", "x^2+3", 7, Some(("x", "6*x+1")));
+    // - a long divisor with few nonzero coefficients, divided by term by term
+    test(
+        "x^30+x^7+1",
+        "x^21+2*x^3+1",
+        7,
+        Some(("x^9", "5*x^12+6*x^9+x^7+1")),
+    );
+    // - a long divisor with too many nonzero coefficients to divide by term by term
+    test(
+        "x^30+x^7+1",
+        "x^21+x^5+x^4+x^3+x^2+x+1",
+        7,
+        Some(("x^9", "6*x^14+6*x^13+6*x^12+6*x^11+6*x^10+6*x^9+x^7+1")),
+    );
     // - a non-monic divisor
     test(
         "x^5+3*x^4+2*x+1",

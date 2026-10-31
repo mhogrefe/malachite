@@ -44,7 +44,7 @@ const SPARSE_MAX_NONZERO: usize = 6;
 //
 // This is the cutoff in `_nmod_poly_divrem_newton_n_preinv` from
 // `nmod_poly/divrem_newton_n_preinv.c`, FLINT 3.6.0.
-const SPARSE_MIN_LENGTH: usize = 20;
+pub(crate) const SPARSE_MIN_LENGTH: usize = 20;
 
 // The inverse modulo `m` of the reversal of the polynomial with coefficients `ys`, as a power
 // series truncated to `ys.len()` coefficients, where `ys` is nonempty and its last coefficient is
@@ -238,26 +238,24 @@ crate_test_fn! {mod_div_rem_preinv<T: PrimitiveUnsigned>(
     (qs, rs)
 }}
 
-// Divides the polynomial with coefficients `rs` by the one with coefficients `ys` modulo `m` until
-// it has at most `2 * ys.len() - 2` coefficients, the most that `inverse` can divide at once,
-// returning the number left; `ys` has at least 2 coefficients and is no longer than `rs`, and
-// `inverse` is the inverse of the reversal of `ys` truncated to `ys.len()` coefficients. The
-// dividend is divided that many coefficients at a time, from the top, each remainder taking the
-// place of the coefficients it came from and each quotient written to the matching part of `qs`. At
-// least `ys.len()` coefficients are left.
-fn reduce_to_window<T: PrimitiveUnsigned>(
+// Divides the polynomial with coefficients `rs` by one with `y_len` coefficients, at least 2 and no
+// more than `rs.len()`, until it has at most `2 * y_len - 2` coefficients, the most that the
+// divisor's precomputed inverse can divide at once, returning the number left. The dividend is
+// divided that many coefficients at a time, from the top, by `divide`, which returns the quotient
+// and remainder of such a block; each remainder takes the place of the coefficients it came from,
+// and each quotient is written to the matching part of `qs`. At least `y_len` coefficients are
+// left.
+pub(crate) fn reduce_to_window<T: PrimitiveUnsigned>(
     rs: &mut [T],
     qs: &mut [T],
-    ys: &[T],
-    inverse: &[T],
-    m: T,
+    y_len: usize,
+    divide: impl Fn(&[T]) -> (Vec<T>, Vec<T>),
 ) -> usize {
-    let y_len = ys.len();
     let window = (y_len << 1) - 2;
     let mut len = rs.len();
     while len > window {
         let start = len - window;
-        let (q, r) = mod_div_rem_preinv(&rs[start..len], ys, inverse, m);
+        let (q, r) = divide(&rs[start..len]);
         qs[start..start + q.len()].copy_from_slice(&q);
         rs[start..start + r.len()].copy_from_slice(&r);
         len = start + y_len - 1;
@@ -275,9 +273,14 @@ pub(crate) fn mod_div_rem_blocks<T: PrimitiveUnsigned>(
     inverse: &[T],
     m: T,
 ) -> (Vec<T>, Vec<T>) {
+    if xs.len() <= (ys.len() << 1) - 2 {
+        return mod_div_rem_preinv(xs, ys, inverse, m);
+    }
     let mut qs = vec![T::ZERO; xs.len() - ys.len() + 1];
     let mut rs = xs.to_vec();
-    let len = reduce_to_window(&mut rs, &mut qs, ys, inverse, m);
+    let len = reduce_to_window(&mut rs, &mut qs, ys.len(), |xs| {
+        mod_div_rem_preinv(xs, ys, inverse, m)
+    });
     let (q, r) = mod_div_rem_preinv(&rs[..len], ys, inverse, m);
     qs[..q.len()].copy_from_slice(&q);
     (qs, r)
@@ -296,7 +299,9 @@ pub(crate) fn mod_quotient_blocks<T: PrimitiveUnsigned>(
     }
     let mut qs = vec![T::ZERO; xs.len() - ys.len() + 1];
     let mut rs = xs.to_vec();
-    let len = reduce_to_window(&mut rs, &mut qs, ys, inverse, m);
+    let len = reduce_to_window(&mut rs, &mut qs, ys.len(), |xs| {
+        mod_div_rem_preinv(xs, ys, inverse, m)
+    });
     let q = mod_quotient_preinv(&rs[..len], ys, inverse, m);
     qs[..q.len()].copy_from_slice(&q);
     qs
