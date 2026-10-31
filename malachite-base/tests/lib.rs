@@ -1055,6 +1055,7 @@ pub mod unsigned_polynomial {
         pub mod mod_derivative;
         pub mod mod_div_exact;
         pub mod mod_div_rem;
+        pub mod mod_div_rem_precomputed;
         pub mod mod_div_root;
         pub mod mod_div_truncated;
         pub mod mod_divisible_by;
@@ -1103,7 +1104,9 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_taylor_shift;
         pub mod mod_product;
         pub mod mod_quotient;
+        pub mod mod_quotient_precomputed;
         pub mod mod_rem;
+        pub mod mod_rem_precomputed;
         pub mod mod_remove_power;
         pub mod mod_shl;
         pub mod mod_square;

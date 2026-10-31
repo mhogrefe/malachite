@@ -13,7 +13,8 @@
     the modulus is at least 2 and fits in a word, against nmod_poly_divrem, nmod_poly_div, and
     nmod_poly_rem as well. Mode mod_div_rem reads the methods `mod_div_rem`, `mod_quotient`, and
     `mod_rem`, their `checked_` forms, and `mod_div_assign_rem`, `mod_quotient_assign`, and
-    `mod_rem_assign`, with the modulus m; mode mod_power_of_2_div_rem reads the `mod_power_of_2_`
+    `mod_rem_assign`, with the modulus m, and the `_precomputed` versions of the unchecked methods,
+    whose last argument is `&data`; mode mod_power_of_2_div_rem reads the `mod_power_of_2_`
     versions, with the modulus 2^k. The shapes recognized are `(A).METHOD(B, m) = R`, `p := A;
     p.METHOD(B, m); p = R`, and, for the `div_assign_rem` methods, `p := A; p.METHOD(B, m) = R; p =
     Q`, where `A`, `B`, and `m` may be written `&(...)`, and the result of a `div_rem` method is
@@ -35,7 +36,10 @@
 static long checked;
 static long nmod_lines;
 static long none_lines;
+static long preinv_lines;
 static int power_of_2;
+/* Whether the line being checked is of a `_precomputed` method. */
+static int precomputed;
 static const char * mode_name;
 
 /* What a method returns: the quotient and remainder, the quotient, or the remainder. */
@@ -110,6 +114,18 @@ method_op(const char * name, int * assign_rem)
     return -1;
 }
 
+/* Removes `_precomputed` from a method name, in place, setting `precomputed` if it was there. */
+static void
+remove_precomputed(char * name)
+{
+    char * at = strstr(name, "_precomputed");
+    precomputed = at != NULL;
+    if (precomputed)
+    {
+        memmove(at, at + 12, strlen(at + 12) + 1);
+    }
+}
+
 /* Splits a line into the dividend, the divisor, the modulus or exponent, and the expected
    quotient and remainder (either of which may be NULL when the method does not return it), in
    place. Polynomials are displayed without spaces, commas, or parentheses, so the separators are
@@ -135,6 +151,7 @@ split_line(char * line, char ** a, char ** b, char ** m, char ** q, char ** r, i
         args = cut(method, "(");
         if (args == NULL)
             return -1;
+        remove_precomputed(method);
         op = method_op(method, &assign_rem);
         if (op < 0)
             return -1;
@@ -170,6 +187,7 @@ split_line(char * line, char ** a, char ** b, char ** m, char ** q, char ** r, i
         args = cut(method, "(");
         if (args == NULL)
             return -1;
+        remove_precomputed(method);
         op = method_op(method, &assign_rem);
         if (op < 0)
             return -1;
@@ -204,6 +222,12 @@ split_line(char * line, char ** a, char ** b, char ** m, char ** q, char ** r, i
     *m = cut(*b, ", ");
     if (*m == NULL)
         return -1;
+    if (precomputed)
+    {
+        char * data = cut(*m, ", ");
+        if (data == NULL || strcmp(data, "&data") != 0)
+            return -1;
+    }
     *b = strip_ref(*b);
     *m = strip_ref(*m);
     return op;
@@ -363,7 +387,37 @@ check_line(char * line, int line_number)
         nmod_poly_init(zr, n);
         fmpz_poly_get_nmod_poly(x, a);
         fmpz_poly_get_nmod_poly(y, b);
-        if (op == OP_DIV_REM)
+        slong len_a = nmod_poly_length(x);
+        slong len_b = nmod_poly_length(y);
+        if (precomputed && len_a >= len_b && len_a <= 2 * len_b - 2)
+        {
+            /* A precomputed division is also checked against FLINT's division by a precomputed
+               inverse, where FLINT allows it: the inverse of the reversed divisor, to as many
+               terms as the quotient has. */
+            nmod_poly_t y_inverse;
+            nmod_poly_init(y_inverse, n);
+            nmod_poly_reverse(y_inverse, y, len_b);
+            nmod_poly_inv_series(y_inverse, y_inverse, len_a - len_b + 1);
+            if (op == OP_QUOTIENT)
+            {
+                nmod_poly_div_newton_n_preinv(zq, x, y, y_inverse);
+                fmpz_poly_set_nmod_poly_unsigned(q, zq);
+                result |= compare(q, q_expected, 1, "nmod_poly_div_newton_n_preinv", line_number);
+            }
+            else
+            {
+                nmod_poly_divrem_newton_n_preinv(zq, zr, x, y, y_inverse);
+                fmpz_poly_set_nmod_poly_unsigned(q, zq);
+                fmpz_poly_set_nmod_poly_unsigned(r, zr);
+                result |= compare(q, q_expected, op == OP_DIV_REM,
+                                  "nmod_poly_divrem_newton_n_preinv", line_number);
+                result |= compare(r, r_expected, 1, "nmod_poly_divrem_newton_n_preinv",
+                                  line_number);
+            }
+            preinv_lines++;
+            nmod_poly_clear(y_inverse);
+        }
+        else if (op == OP_DIV_REM)
         {
             nmod_poly_divrem(zq, zr, x, y);
             fmpz_poly_set_nmod_poly_unsigned(q, zq);
@@ -406,14 +460,15 @@ run(const char * arg, int pow2, const char * name)
     checked = 0;
     nmod_lines = 0;
     none_lines = 0;
+    preinv_lines = 0;
     power_of_2 = pow2;
     mode_name = name;
     int result = for_each_line(arg, check_line);
     if (result == 0)
     {
         flint_printf("%s: %ld lines, %ld of them None; the rest by fmpz_mod_poly, %ld of them also "
-                     "by nmod_poly\n",
-                     name, checked, none_lines, nmod_lines);
+                     "by nmod_poly, %ld of those by a precomputed inverse\n",
+                     name, checked, none_lines, nmod_lines, preinv_lines);
     }
     return result != 0 ? result : require_some_lines(name, checked);
 }

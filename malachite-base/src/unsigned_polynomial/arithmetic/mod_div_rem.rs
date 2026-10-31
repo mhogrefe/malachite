@@ -67,7 +67,7 @@ crate_test_fn! {mod_quotient_with<T: PrimitiveUnsigned>(
 //
 // This is equivalent to the remainder step of `_gr_poly_divrem_newton` from
 // `gr_poly/divrem_newton.c`, FLINT 3.6.0.
-fn remainder<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], qs: &[T], m: T) -> Vec<T> {
+pub(crate) fn remainder<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], qs: &[T], m: T) -> Vec<T> {
     let r_len = ys.len() - 1;
     if r_len == 0 {
         return Vec::new();

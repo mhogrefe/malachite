@@ -108,6 +108,16 @@ impl<T: PrimitiveUnsigned> ModData<T> {
         }
     }
 
+    // The value $x + ab + cd$ modulo $m$, where the sum fits in two words.
+    #[inline]
+    pub(crate) fn reduce_2_sum(&self, x: T, a: T, b: T, c: T, d: T) -> T {
+        let (hi, lo) = T::x_mul_y_to_zz(a, b);
+        let (hi, lo) = T::xx_add_yy_to_zz(hi, lo, T::ZERO, x);
+        let (p_hi, p_lo) = T::x_mul_y_to_zz(c, d);
+        let (hi, lo) = T::xx_add_yy_to_zz(hi, lo, p_hi, p_lo);
+        self.reduce_2(hi, lo)
+    }
+
     // The value $x_2 2^{2\text{W}} + x_1 2^\text{W} + x_0$ modulo $m$, by Horner's rule, as by
     // FLINT's `NMOD_RED3`.
     #[inline]

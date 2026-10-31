@@ -1463,6 +1463,147 @@ pub trait CheckedModRem<Rhs = Self, M = Self> {
     fn checked_mod_rem(self, other: Rhs, m: M) -> Option<Self::Output>;
 }
 
+/// Data precomputed for dividing polynomials modulo $m$ by a fixed divisor: the inverse, modulo
+/// $m$, of the divisor's reversal as a power series, truncated to the divisor's length. With it,
+/// the quotient of a dividend no more than twice as long as the divisor takes one truncated
+/// multiplication rather than a series inversion.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[doc(hidden)]
+pub struct ModPolynomialData<C> {
+    pub inverse: alloc::vec::Vec<C>,
+}
+
+/// Divides one polynomial by another modulo $m$, returning the quotient and remainder, using data
+/// precomputed from the divisor and $m$. The coefficients must already be reduced modulo $m$, and
+/// the leading coefficient of the divisor must be invertible modulo $m$.
+///
+/// If many polynomials are divided by the same divisor, it is quicker to precompute the data once,
+/// with [`precompute_mod_div_rem_data`](ModDivRemPrecomputed::precompute_mod_div_rem_data), and
+/// reuse it.
+pub trait ModDivRemPrecomputed<Rhs = Self, M = Self> {
+    type DivOutput;
+    type RemOutput;
+    type Data;
+
+    /// Precomputes the data for dividing by `other` modulo `m`.
+    fn precompute_mod_div_rem_data(other: &Rhs, m: &M) -> Self::Data;
+
+    /// Divides a polynomial by another modulo $m$, returning the quotient and remainder, using data
+    /// precomputed from the divisor and $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = (q, r), \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_div_rem_precomputed(
+        self,
+        other: Rhs,
+        m: M,
+        data: &Self::Data,
+    ) -> (Self::DivOutput, Self::RemOutput);
+}
+
+/// Divides one polynomial by another modulo $m$ in place, replacing the first with the quotient and
+/// returning the remainder, using data precomputed from the divisor and $m$. The coefficients must
+/// already be reduced modulo $m$, and the leading coefficient of the divisor must be invertible
+/// modulo $m$.
+///
+/// For precomputing the data, use
+/// [`precompute_mod_div_rem_data`](ModDivRemPrecomputed::precompute_mod_div_rem_data).
+pub trait ModDivAssignRemPrecomputed<Rhs = Self, M = Self>: ModDivRemPrecomputed<Rhs, M> {
+    /// Replaces `self` with its quotient by another polynomial modulo $m$, returning the remainder,
+    /// using data precomputed from the divisor and $m$.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b,
+    /// $$
+    /// returning $r$.
+    fn mod_div_assign_rem_precomputed(
+        &mut self,
+        other: Rhs,
+        m: M,
+        data: &Self::Data,
+    ) -> Self::RemOutput;
+}
+
+/// Finds the quotient of one polynomial divided by another modulo $m$, using data precomputed from
+/// the divisor and $m$. The coefficients must already be reduced modulo $m$, and the leading
+/// coefficient of the divisor must be invertible modulo $m$.
+///
+/// If many polynomials are divided by the same divisor, it is quicker to precompute the data once,
+/// with [`precompute_mod_quotient_data`](ModQuotientPrecomputed::precompute_mod_quotient_data), and
+/// reuse it.
+pub trait ModQuotientPrecomputed<Rhs = Self, M = Self> {
+    type Output;
+    type Data;
+
+    /// Precomputes the data for dividing by `other` modulo `m`.
+    fn precompute_mod_quotient_data(other: &Rhs, m: &M) -> Self::Data;
+
+    /// Finds the quotient of a polynomial divided by another modulo $m$, using data precomputed
+    /// from the divisor and $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = q, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_quotient_precomputed(self, other: Rhs, m: M, data: &Self::Data) -> Self::Output;
+}
+
+/// Replaces one polynomial with its quotient by another modulo $m$, using data precomputed from the
+/// divisor and $m$. The coefficients must already be reduced modulo $m$, and the leading
+/// coefficient of the divisor must be invertible modulo $m$.
+///
+/// For precomputing the data, use
+/// [`precompute_mod_quotient_data`](ModQuotientPrecomputed::precompute_mod_quotient_data).
+pub trait ModQuotientPrecomputedAssign<Rhs = Self, M = Self>:
+    ModQuotientPrecomputed<Rhs, M>
+{
+    /// Replaces `self` with its quotient by another polynomial modulo $m$, using data precomputed
+    /// from the divisor and $m$.
+    ///
+    /// $$
+    /// a \gets q, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_quotient_precomputed_assign(&mut self, other: Rhs, m: M, data: &Self::Data);
+}
+
+/// Finds the remainder of one polynomial divided by another modulo $m$, using data precomputed from
+/// the divisor and $m$. The coefficients must already be reduced modulo $m$, and the leading
+/// coefficient of the divisor must be invertible modulo $m$.
+///
+/// If many polynomials are reduced by the same divisor, it is quicker to precompute the data once,
+/// with [`precompute_mod_rem_data`](ModRemPrecomputed::precompute_mod_rem_data), and reuse it.
+pub trait ModRemPrecomputed<Rhs = Self, M = Self> {
+    type Output;
+    type Data;
+
+    /// Precomputes the data for dividing by `other` modulo `m`.
+    fn precompute_mod_rem_data(other: &Rhs, m: &M) -> Self::Data;
+
+    /// Finds the remainder of a polynomial divided by another modulo $m$, using data precomputed
+    /// from the divisor and $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = r, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_rem_precomputed(self, other: Rhs, m: M, data: &Self::Data) -> Self::Output;
+}
+
+/// Replaces one polynomial with its remainder by another modulo $m$, using data precomputed from
+/// the divisor and $m$. The coefficients must already be reduced modulo $m$, and the leading
+/// coefficient of the divisor must be invertible modulo $m$.
+///
+/// For precomputing the data, use
+/// [`precompute_mod_rem_data`](ModRemPrecomputed::precompute_mod_rem_data).
+pub trait ModRemPrecomputedAssign<Rhs = Self, M = Self>: ModRemPrecomputed<Rhs, M> {
+    /// Replaces `self` with its remainder by another polynomial modulo $m$, using data precomputed
+    /// from the divisor and $m$.
+    ///
+    /// $$
+    /// a \gets r, \quad a \equiv bq + r \pmod{m}, \quad \deg r < \deg b.
+    /// $$
+    fn mod_rem_precomputed_assign(&mut self, other: Rhs, m: M, data: &Self::Data);
+}
+
 /// Divides one polynomial by another if the second divides the first, returning `None` otherwise.
 pub trait CheckedDivExact<Rhs = Self> {
     type Output;

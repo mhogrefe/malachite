@@ -2537,6 +2537,14 @@ fn test_against_flint() {
         "demo_unsigned_polynomial_mod_rem_u16",
         "demo_unsigned_polynomial_mod_rem_assign_u64",
         "demo_unsigned_polynomial_checked_mod_rem_ref_ref_u8",
+        "demo_unsigned_polynomial_mod_div_rem_precomputed_u8",
+        "demo_unsigned_polynomial_mod_div_rem_precomputed_u64",
+        "demo_unsigned_polynomial_mod_div_rem_precomputed_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_div_assign_rem_precomputed_u32",
+        "demo_unsigned_polynomial_mod_quotient_precomputed_u16",
+        "demo_unsigned_polynomial_mod_quotient_precomputed_assign_u64",
+        "demo_unsigned_polynomial_mod_rem_precomputed_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_rem_precomputed_assign_u8",
     ] {
         check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_div_rem");
     }

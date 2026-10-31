@@ -78,6 +78,11 @@ pub mod mod_div_exact;
 /// [`CheckedModDivRem`](crate::polynomial::CheckedModDivRem), for dividing polynomials modulo a
 /// number, returning the quotient and remainder.
 pub mod mod_div_rem;
+/// Implementations of [`ModDivRemPrecomputed`](crate::polynomial::ModDivRemPrecomputed) and
+/// [`ModDivAssignRemPrecomputed`](crate::polynomial::ModDivAssignRemPrecomputed), for dividing
+/// polynomials modulo a number with data precomputed from the divisor, returning the quotient and
+/// remainder.
+pub mod mod_div_rem_precomputed;
 /// Implementations of [`ModDivRoot`](crate::polynomial::ModDivRoot) and
 /// [`ModDivRootAssign`](crate::polynomial::ModDivRootAssign), for dividing a polynomial by $x - c$
 /// modulo a number.
@@ -347,11 +352,19 @@ pub mod mod_product;
 /// [`CheckedModQuotient`](crate::polynomial::CheckedModQuotient), for finding the quotient of
 /// polynomials modulo a number.
 pub mod mod_quotient;
+/// Implementations of [`ModQuotientPrecomputed`](crate::polynomial::ModQuotientPrecomputed) and
+/// [`ModQuotientPrecomputedAssign`](crate::polynomial::ModQuotientPrecomputedAssign), for finding
+/// the quotient of polynomials modulo a number with data precomputed from the divisor.
+pub mod mod_quotient_precomputed;
 /// Implementations of [`ModRem`](crate::polynomial::ModRem),
 /// [`ModRemAssign`](crate::polynomial::ModRemAssign), and
 /// [`CheckedModRem`](crate::polynomial::CheckedModRem), for finding the remainder of polynomials
 /// modulo a number.
 pub mod mod_rem;
+/// Implementations of [`ModRemPrecomputed`](crate::polynomial::ModRemPrecomputed) and
+/// [`ModRemPrecomputedAssign`](crate::polynomial::ModRemPrecomputedAssign), for finding the
+/// remainder of polynomials modulo a number with data precomputed from the divisor.
+pub mod mod_rem_precomputed;
 /// Implementations of [`ModRemovePower`](crate::polynomial::ModRemovePower) and
 /// [`ModRemovePowerAssign`](crate::polynomial::ModRemovePowerAssign), for removing the largest
 /// power of a polynomial that divides another modulo a number.
