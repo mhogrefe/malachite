@@ -37,6 +37,7 @@ static long checked;
 static long nmod_lines;
 static long none_lines;
 static long preinv_lines;
+static long fmpz_mod_preinv_lines;
 static int power_of_2;
 /* Whether the line being checked is of a `_precomputed` method. */
 static int precomputed;
@@ -370,6 +371,36 @@ check_line(char * line, int line_number)
             fmpz_mod_poly_get_fmpz_poly(r, zr, ctx);
             result |= compare(r, r_expected, 1, "fmpz_mod_poly_rem", line_number);
         }
+        slong len_x = fmpz_mod_poly_length(x, ctx);
+        slong len_y = fmpz_mod_poly_length(y, ctx);
+        if (result == 0 && precomputed && len_x >= len_y && len_x <= 2 * len_y - 2)
+        {
+            /* A precomputed division is also checked against FLINT's fmpz_mod_poly division by a
+               precomputed inverse, where FLINT allows it. */
+            fmpz_mod_poly_t y_inverse;
+            fmpz_mod_poly_init(y_inverse, ctx);
+            fmpz_mod_poly_reverse(y_inverse, y, len_y, ctx);
+            fmpz_mod_poly_inv_series(y_inverse, y_inverse, len_x - len_y + 1, ctx);
+            if (op == OP_QUOTIENT)
+            {
+                fmpz_mod_poly_div_newton_n_preinv(zq, x, y, y_inverse, ctx);
+                fmpz_mod_poly_get_fmpz_poly(q, zq, ctx);
+                result |= compare(q, q_expected, 1, "fmpz_mod_poly_div_newton_n_preinv",
+                                  line_number);
+            }
+            else
+            {
+                fmpz_mod_poly_divrem_newton_n_preinv(zq, zr, x, y, y_inverse, ctx);
+                fmpz_mod_poly_get_fmpz_poly(q, zq, ctx);
+                fmpz_mod_poly_get_fmpz_poly(r, zr, ctx);
+                result |= compare(q, q_expected, op == OP_DIV_REM,
+                                  "fmpz_mod_poly_divrem_newton_n_preinv", line_number);
+                result |= compare(r, r_expected, 1, "fmpz_mod_poly_divrem_newton_n_preinv",
+                                  line_number);
+            }
+            fmpz_mod_preinv_lines++;
+            fmpz_mod_poly_clear(y_inverse, ctx);
+        }
         fmpz_mod_poly_clear(x, ctx);
         fmpz_mod_poly_clear(y, ctx);
         fmpz_mod_poly_clear(zq, ctx);
@@ -461,14 +492,16 @@ run(const char * arg, int pow2, const char * name)
     nmod_lines = 0;
     none_lines = 0;
     preinv_lines = 0;
+    fmpz_mod_preinv_lines = 0;
     power_of_2 = pow2;
     mode_name = name;
     int result = for_each_line(arg, check_line);
     if (result == 0)
     {
-        flint_printf("%s: %ld lines, %ld of them None; the rest by fmpz_mod_poly, %ld of them also "
-                     "by nmod_poly, %ld of those by a precomputed inverse\n",
-                     name, checked, none_lines, nmod_lines, preinv_lines);
+        flint_printf("%s: %ld lines, %ld of them None; the rest by fmpz_mod_poly, %ld of those also "
+                     "by a precomputed inverse, and %ld also by nmod_poly, %ld of those by a "
+                     "precomputed inverse\n",
+                     name, checked, none_lines, fmpz_mod_preinv_lines, nmod_lines, preinv_lines);
     }
     return result != 0 ? result : require_some_lines(name, checked);
 }

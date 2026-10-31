@@ -736,16 +736,19 @@ documented by git history.
   the reversed polynomials as power series, and the remainder with one truncated product.
 - New `ModDivRemPrecomputed`, `ModDivAssignRemPrecomputed`, `ModQuotientPrecomputed`,
   `ModQuotientPrecomputedAssign`, `ModRemPrecomputed`, and `ModRemPrecomputedAssign` traits in
-  malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` with
-  every combination of arguments by value or by reference: Euclidean division of polynomials modulo
-  $m$ or $2^k$ with data precomputed from the divisor, like FLINT's
-  `nmod_poly_divrem_newton_n_preinv` and `nmod_poly_div_newton_n_preinv`, for dividing many
+  malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
+  `NaturalPolynomial` with every combination of arguments by value or by reference: Euclidean
+  division of polynomials modulo $m$ or $2^k$ with data precomputed from the divisor, like FLINT's
+  `nmod_poly_divrem_newton_n_preinv`, `nmod_poly_div_newton_n_preinv`,
+  `fmpz_mod_poly_divrem_newton_n_preinv`, and `fmpz_mod_poly_div_newton_n_preinv`, for dividing many
   polynomials by the same one. The data, the inverse of the reversed divisor as a power series, is
   shared by all six traits. A dividend no more than twice as long as the divisor takes one truncated
   product for the quotient and one for the remainder, and, unlike in FLINT, a longer dividend may be
-  divided, a block at a time from the top. Long divisors with at most six nonzero coefficients are
-  divided by term by term, and two-coefficient quotients sum each remainder coefficient exactly and
-  reduce it once; modulo $2^k$ the arithmetic wraps and is reduced at the end.
+  divided, a block at a time from the top. For `UnsignedPolynomial`s, long divisors with at most six
+  nonzero coefficients are divided by term by term, and two-coefficient quotients sum each remainder
+  coefficient exactly and reduce it once; modulo $2^k$ the arithmetic wraps and is reduced at the
+  end. `NaturalPolynomial`s with a modulus of one or two limbs are divided in word arithmetic, as
+  `UnsignedPolynomial`s.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

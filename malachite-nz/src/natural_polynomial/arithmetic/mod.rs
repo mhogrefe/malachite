@@ -123,6 +123,11 @@ pub mod mod_div_exact;
 /// [`CheckedModDivRem`](malachite_base::polynomial::CheckedModDivRem), for dividing polynomials
 /// modulo a number, returning the quotient and remainder.
 pub mod mod_div_rem;
+/// Implementations of [`ModDivRemPrecomputed`](malachite_base::polynomial::ModDivRemPrecomputed)
+/// and [`ModDivAssignRemPrecomputed`](malachite_base::polynomial::ModDivAssignRemPrecomputed), for
+/// dividing polynomials modulo a number with data precomputed from the divisor, returning the
+/// quotient and remainder.
+pub mod mod_div_rem_precomputed;
 /// Implementations of [`ModDivRoot`](malachite_base::polynomial::ModDivRoot) and
 /// [`ModDivRootAssign`](malachite_base::polynomial::ModDivRootAssign), for dividing a polynomial by
 /// $x - c$ modulo a number.
@@ -216,6 +221,12 @@ pub mod mod_power_of_2_div_exact;
 /// [`CheckedModPowerOf2DivRem`](malachite_base::polynomial::CheckedModPowerOf2DivRem), for dividing
 /// polynomials modulo a power of 2, returning the quotient and remainder.
 pub mod mod_power_of_2_div_rem;
+/// Implementations of
+/// [`ModPowerOf2DivRemPrecomputed`](malachite_base::polynomial::ModPowerOf2DivRemPrecomputed) and
+/// [`ModPowerOf2DivAssignRemPrecomputed`](
+/// malachite_base::polynomial::ModPowerOf2DivAssignRemPrecomputed), for dividing polynomials modulo
+/// a power of 2 with data precomputed from the divisor, returning the quotient and remainder.
+pub mod mod_power_of_2_div_rem_precomputed;
 /// Implementations of [`ModPowerOf2DivRoot`](malachite_base::polynomial::ModPowerOf2DivRoot) and
 /// [`ModPowerOf2DivRootAssign`](malachite_base::polynomial::ModPowerOf2DivRootAssign), for dividing
 /// a polynomial by $x - c$ modulo a power of 2.
@@ -280,11 +291,23 @@ pub mod mod_power_of_2_product;
 /// [`CheckedModPowerOf2Quotient`](malachite_base::polynomial::CheckedModPowerOf2Quotient), for
 /// finding the quotient of polynomials modulo a power of 2.
 pub mod mod_power_of_2_quotient;
+/// Implementations of
+/// [`ModPowerOf2QuotientPrecomputed`](malachite_base::polynomial::ModPowerOf2QuotientPrecomputed)
+/// and [`ModPowerOf2QuotientPrecomputedAssign`](
+/// malachite_base::polynomial::ModPowerOf2QuotientPrecomputedAssign), for finding the quotient of
+/// polynomials modulo a power of 2 with data precomputed from the divisor.
+pub mod mod_power_of_2_quotient_precomputed;
 /// Implementations of [`ModPowerOf2Rem`](malachite_base::polynomial::ModPowerOf2Rem),
 /// [`ModPowerOf2RemAssign`](malachite_base::polynomial::ModPowerOf2RemAssign), and
 /// [`CheckedModPowerOf2Rem`](malachite_base::polynomial::CheckedModPowerOf2Rem), for finding the
 /// remainder of polynomials modulo a power of 2.
 pub mod mod_power_of_2_rem;
+/// Implementations of
+/// [`ModPowerOf2RemPrecomputed`](malachite_base::polynomial::ModPowerOf2RemPrecomputed) and
+/// [`ModPowerOf2RemPrecomputedAssign`](
+/// malachite_base::polynomial::ModPowerOf2RemPrecomputedAssign), for finding the remainder of
+/// polynomials modulo a power of 2 with data precomputed from the divisor.
+pub mod mod_power_of_2_rem_precomputed;
 /// Implementations of
 /// [`ModPowerOf2RemovePower`](malachite_base::polynomial::ModPowerOf2RemovePower) and
 /// [`ModPowerOf2RemovePowerAssign`](malachite_base::polynomial::ModPowerOf2RemovePowerAssign), for
@@ -406,11 +429,20 @@ pub mod mod_product;
 /// [`CheckedModQuotient`](malachite_base::polynomial::CheckedModQuotient), for finding the quotient
 /// of polynomials modulo a number.
 pub mod mod_quotient;
+/// Implementations of
+/// [`ModQuotientPrecomputed`](malachite_base::polynomial::ModQuotientPrecomputed) and
+/// [`ModQuotientPrecomputedAssign`](malachite_base::polynomial::ModQuotientPrecomputedAssign), for
+/// finding the quotient of polynomials modulo a number with data precomputed from the divisor.
+pub mod mod_quotient_precomputed;
 /// Implementations of [`ModRem`](malachite_base::polynomial::ModRem),
 /// [`ModRemAssign`](malachite_base::polynomial::ModRemAssign), and
 /// [`CheckedModRem`](malachite_base::polynomial::CheckedModRem), for finding the remainder of
 /// polynomials modulo a number.
 pub mod mod_rem;
+/// Implementations of [`ModRemPrecomputed`](malachite_base::polynomial::ModRemPrecomputed) and
+/// [`ModRemPrecomputedAssign`](malachite_base::polynomial::ModRemPrecomputedAssign), for finding
+/// the remainder of polynomials modulo a number with data precomputed from the divisor.
+pub mod mod_rem_precomputed;
 /// Implementations of [`ModRemovePower`](malachite_base::polynomial::ModRemovePower) and
 /// [`ModRemovePowerAssign`](malachite_base::polynomial::ModRemovePowerAssign), for removing the
 /// largest power of a polynomial that divides another modulo a number.

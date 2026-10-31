@@ -244,6 +244,69 @@ pub(crate) fn mod_power_of_2_quotient_blocks<T: PrimitiveUnsigned>(
     qs
 }
 
+/// The inverse modulo $2^k$ of the reversal of the polynomial with coefficients `ys`, as a power
+/// series truncated to `ys.len()` coefficients, or `None` if `ys` is empty or its last coefficient
+/// is even. The coefficients must be reduced modulo $2^k$, where $k$ is `pow`, which must be
+/// positive and no greater than `T::WIDTH`.
+///
+/// This is not part of the public API; it is public so that `malachite-nz` can divide
+/// `NaturalPolynomial`s modulo a power of 2 with precomputed data.
+#[doc(hidden)]
+pub fn mod_power_of_2_polynomial_inverse_vec<T: PrimitiveUnsigned>(
+    ys: &[T],
+    pow: u64,
+) -> Option<Vec<T>> {
+    let lead_inverse = leading_inverse(ys, pow)?;
+    Some(reversed_inverse(ys, pow, lead_inverse))
+}
+
+/// The coefficients of the quotient and remainder modulo $2^k$ of the polynomials with coefficients
+/// `xs` and `ys`, without zeros at the end, where `inverse` is the result of
+/// `mod_power_of_2_polynomial_inverse_vec` for `ys` and `pow`. The coefficients must be reduced
+/// modulo $2^k$, where $k$ is `pow`, which must be positive and no greater than `T::WIDTH`, `ys`
+/// must be nonempty and no longer than `xs`, and neither `xs` nor `ys` may end with a zero.
+///
+/// This is not part of the public API; it is public so that `malachite-nz` can divide
+/// `NaturalPolynomial`s modulo a power of 2 with precomputed data.
+#[doc(hidden)]
+pub fn mod_power_of_2_div_rem_precomputed_vec<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    inverse: &[T],
+    pow: u64,
+) -> (Vec<T>, Vec<T>) {
+    let (qs, rs) = if ys.len() == 1 {
+        (
+            xs.iter().map(|&x| x.wrapping_mul(inverse[0])).collect(),
+            Vec::new(),
+        )
+    } else {
+        mod_power_of_2_div_rem_blocks(xs, ys, inverse, pow)
+    };
+    (reduced(qs, pow).coefficients, reduced(rs, pow).coefficients)
+}
+
+/// The coefficients of the quotient modulo $2^k$ of the polynomials with coefficients `xs` and
+/// `ys`, without zeros at the end, under the same conditions as
+/// `mod_power_of_2_div_rem_precomputed_vec`.
+///
+/// This is not part of the public API; it is public so that `malachite-nz` can divide
+/// `NaturalPolynomial`s modulo a power of 2 with precomputed data.
+#[doc(hidden)]
+pub fn mod_power_of_2_quotient_precomputed_vec<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    inverse: &[T],
+    pow: u64,
+) -> Vec<T> {
+    let qs = if ys.len() == 1 {
+        xs.iter().map(|&x| x.wrapping_mul(inverse[0])).collect()
+    } else {
+        mod_power_of_2_quotient_blocks(xs, ys, inverse, pow)
+    };
+    reduced(qs, pow).coefficients
+}
+
 // The data for dividing by `q` modulo $2^k$, where $k$ is `pow`.
 //
 // This is equivalent to preparing `Binv` for `nmod_poly_divrem_newton_n_preinv` from

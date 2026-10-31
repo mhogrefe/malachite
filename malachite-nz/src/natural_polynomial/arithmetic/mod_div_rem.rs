@@ -67,7 +67,12 @@ crate_test_fn! {mod_quotient_with(
 //
 // This is equivalent to the remainder step of `_gr_poly_divrem_newton` from
 // `gr_poly/divrem_newton.c`, FLINT 3.6.0, with coefficients modulo `m`.
-fn remainder(xs: &[Natural], ys: &[Natural], qs: &[Natural], m: &Natural) -> Vec<Natural> {
+pub(crate) fn remainder(
+    xs: &[Natural],
+    ys: &[Natural],
+    qs: &[Natural],
+    m: &Natural,
+) -> Vec<Natural> {
     let r_len = ys.len() - 1;
     if r_len == 0 {
         return Vec::new();

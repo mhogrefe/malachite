@@ -73,7 +73,7 @@ crate_test_fn! {mod_power_of_2_quotient_with(
 //
 // This is equivalent to the remainder step of `_gr_poly_divrem_newton` from
 // `gr_poly/divrem_newton.c`, FLINT 3.6.0, with coefficients modulo $2^k$.
-fn remainder(xs: &[Natural], ys: &[Natural], qs: &[Natural], pow: u64) -> Vec<Natural> {
+pub(crate) fn remainder(xs: &[Natural], ys: &[Natural], qs: &[Natural], pow: u64) -> Vec<Natural> {
     let r_len = ys.len() - 1;
     if r_len == 0 {
         return Vec::new();

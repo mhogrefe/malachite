@@ -307,6 +307,80 @@ pub(crate) fn mod_quotient_blocks<T: PrimitiveUnsigned>(
     qs
 }
 
+/// The inverse modulo `m` of the reversal of the polynomial with coefficients `ys`, as a power
+/// series truncated to `ys.len()` coefficients, or `None` if `ys` is empty or its last coefficient
+/// is not invertible modulo `m`. The coefficients must be reduced modulo `m`, which must be greater
+/// than 1.
+///
+/// This is not part of the public API; it is public so that `malachite-nz` can divide
+/// `NaturalPolynomial`s modulo a word with precomputed data.
+#[doc(hidden)]
+pub fn mod_polynomial_inverse_vec<T: PrimitiveUnsigned>(ys: &[T], m: T) -> Option<Vec<T>> {
+    let lead_inverse = leading_inverse(ys, m)?;
+    Some(reversed_inverse(ys, m, lead_inverse))
+}
+
+// The coefficients of the quotient and remainder modulo `m` of the polynomials with coefficients
+// `xs` and `ys`, untrimmed, where `ys` is nonempty and no longer than `xs` and `inverse` is as from
+// `mod_polynomial_inverse_vec`.
+fn div_rem_precomputed_untrimmed<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    inverse: &[T],
+    m: T,
+) -> (Vec<T>, Vec<T>) {
+    if ys.len() == 1 {
+        (
+            xs.iter().map(|&x| x.mod_mul(inverse[0], m)).collect(),
+            Vec::new(),
+        )
+    } else {
+        mod_div_rem_blocks(xs, ys, inverse, m)
+    }
+}
+
+/// The coefficients of the quotient and remainder modulo `m` of the polynomials with coefficients
+/// `xs` and `ys`, without zeros at the end, where `inverse` is the result of
+/// `mod_polynomial_inverse_vec` for `ys` and `m`. The coefficients must be reduced modulo `m`,
+/// which must be greater than 1, `ys` must be nonempty and no longer than `xs`, and neither `xs`
+/// nor `ys` may end with a zero.
+///
+/// This is not part of the public API; it is public so that `malachite-nz` can divide
+/// `NaturalPolynomial`s modulo a word with precomputed data.
+#[doc(hidden)]
+pub fn mod_div_rem_precomputed_vec<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    inverse: &[T],
+    m: T,
+) -> (Vec<T>, Vec<T>) {
+    let (qs, rs) = div_rem_precomputed_untrimmed(xs, ys, inverse, m);
+    (
+        from_coefficients_trimmed(qs).coefficients,
+        from_coefficients_trimmed(rs).coefficients,
+    )
+}
+
+/// The coefficients of the quotient modulo `m` of the polynomials with coefficients `xs` and `ys`,
+/// without zeros at the end, under the same conditions as `mod_div_rem_precomputed_vec`.
+///
+/// This is not part of the public API; it is public so that `malachite-nz` can divide
+/// `NaturalPolynomial`s modulo a word with precomputed data.
+#[doc(hidden)]
+pub fn mod_quotient_precomputed_vec<T: PrimitiveUnsigned>(
+    xs: &[T],
+    ys: &[T],
+    inverse: &[T],
+    m: T,
+) -> Vec<T> {
+    let qs = if ys.len() == 1 {
+        xs.iter().map(|&x| x.mod_mul(inverse[0], m)).collect()
+    } else {
+        mod_quotient_blocks(xs, ys, inverse, m)
+    };
+    from_coefficients_trimmed(qs).coefficients
+}
+
 // The data for dividing by `q` modulo `m`.
 //
 // This is equivalent to preparing `Binv` for `nmod_poly_divrem_newton_n_preinv` from

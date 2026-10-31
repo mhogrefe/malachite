@@ -1,0 +1,8 @@
+(0).mod_power_of_2_div_rem_precomputed(0, 0, &data) = (0, 0)
+(5).mod_power_of_2_div_rem_precomputed(3*x+2, 3, &data) = (0, 5)
+(x^4+7*x+5).mod_power_of_2_div_rem_precomputed(5*x^2+2, 3, &data) = (5*x^2+6, 7*x+1)
+(x^4+7*x+5).mod_power_of_2_div_rem_precomputed(5*x^2+3, 100, &data) = (1014120480182583521197362564301*x^2+152118072027387528179604384645, 7*x+811296384146066816957890051446)
+(5).mod_power_of_2_div_rem_precomputed(3*x+2, 200, &data) = (0, 5)
+(6*x^2+5).mod_power_of_2_div_rem_precomputed(3, 200, &data) = (2*x^2+535646014752996758513987364113720867507400997927597611767127, 0)
+(x^4+7*x+5).mod_power_of_2_div_rem_precomputed(5*x^2+3, 200, &data) = (1285550435407192220433569673872930082017762395026234268241101*x^2+192832565311078833065035451080939512302664359253935140236165, 7*x+1028440348325753776346855739098344065614209916020987414592886)
+(x^3+2*x+1).mod_power_of_2_div_rem_precomputed(x^2, 200, &data) = (x, 2*x+1)

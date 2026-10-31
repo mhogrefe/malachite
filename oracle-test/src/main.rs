@@ -2589,6 +2589,13 @@ fn test_against_flint() {
         "demo_natural_polynomial_mod_rem_ref_ref",
         "demo_natural_polynomial_mod_rem_assign",
         "demo_natural_polynomial_checked_mod_rem",
+        "demo_natural_polynomial_mod_div_rem_precomputed",
+        "demo_natural_polynomial_mod_div_rem_precomputed_ref_ref",
+        "demo_natural_polynomial_mod_div_assign_rem_precomputed",
+        "demo_natural_polynomial_mod_quotient_precomputed",
+        "demo_natural_polynomial_mod_quotient_precomputed_assign",
+        "demo_natural_polynomial_mod_rem_precomputed_ref_ref",
+        "demo_natural_polynomial_mod_rem_precomputed_assign",
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_div_rem");
     }
@@ -2604,6 +2611,13 @@ fn test_against_flint() {
         "demo_natural_polynomial_mod_power_of_2_rem_ref_ref",
         "demo_natural_polynomial_mod_power_of_2_rem_assign",
         "demo_natural_polynomial_checked_mod_power_of_2_rem",
+        "demo_natural_polynomial_mod_power_of_2_div_rem_precomputed",
+        "demo_natural_polynomial_mod_power_of_2_div_rem_precomputed_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_div_assign_rem_precomputed",
+        "demo_natural_polynomial_mod_power_of_2_quotient_precomputed",
+        "demo_natural_polynomial_mod_power_of_2_quotient_precomputed_assign",
+        "demo_natural_polynomial_mod_power_of_2_rem_precomputed_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_rem_precomputed_assign",
     ] {
         check_demo_against_flint(
             &oracle,
