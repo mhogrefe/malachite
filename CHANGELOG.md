@@ -898,6 +898,9 @@ documented by git history.
   belongs to the repeating part and whether it starts a repetition of it. Where the repeating part
   begins is found from the denominator in advance (`non_repeating_len`, `is_terminating`), and its
   length is never computed, so the digits stay lazy.
+- `Rational::to_digits`, `into_digits`, `to_power_of_2_digits`, and `into_power_of_2_digits` find
+  where the repeating part begins from the denominator, and so detect its end by comparing with one
+  saved remainder rather than storing every remainder of the expansion.
 
 ### malachite-float
 

@@ -7,8 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::rational::conversion::digits::foer_digits::{
+    fractional_digits_to_foer_sequence, non_repeating_len,
+};
 use crate::rational::conversion::digits::to_power_of_2_digits::to_power_of_2_digits_helper;
-use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::arithmetic::traits::{
@@ -17,30 +19,30 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::Digits;
 use malachite_nz::natural::Natural;
 
+// The digits after the point are found by long division. Where the repeating part begins, and
+// whether there is one, comes from the denominator, so the end of the repeating part is found by
+// comparing the remainder with one saved value rather than with every remainder seen.
 fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, FoerSequence<Natural>) {
     if let Some(log_base) = base.checked_log_base_2() {
         return to_power_of_2_digits_helper(x, log_base);
     }
     let floor = (&x).floor();
-    let mut remainder = x - Rational::from(&floor);
+    let remainder = x - Rational::from(&floor);
     let before_point = floor.unsigned_abs().to_digits_asc(base);
-    let mut state_map = BTreeMap::new();
-    let mut digits = Vec::new();
-    let base = Rational::from(base);
-    for i in 0.. {
-        if remainder == 0u32 {
-            return (before_point, FoerSequence::from_vec(digits));
-        }
-        if let Some(previous_i) = state_map.insert(remainder.clone(), i) {
-            let repeating = digits.drain(previous_i..).collect();
-            return (before_point, FoerSequence::from_vecs(digits, repeating));
-        }
-        remainder *= &base;
-        let floor = (&remainder).floor().unsigned_abs();
-        digits.push(floor.clone());
-        remainder -= Rational::from(floor);
+    if remainder == 0u32 {
+        return (before_point, FoerSequence::from_vec(Vec::new()));
     }
-    unreachable!()
+    let lengths = non_repeating_len(remainder.denominator_ref(), base);
+    let base = Rational::from(base);
+    (
+        before_point,
+        fractional_digits_to_foer_sequence(remainder, lengths, |remainder| {
+            *remainder *= &base;
+            let digit = (&*remainder).floor().unsigned_abs();
+            *remainder -= Rational::from(&digit);
+            digit
+        }),
+    )
 }
 
 impl Rational {

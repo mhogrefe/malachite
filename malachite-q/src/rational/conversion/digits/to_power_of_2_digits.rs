@@ -7,36 +7,36 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use alloc::collections::BTreeMap;
+use crate::rational::conversion::digits::foer_digits::{
+    fractional_digits_to_foer_sequence, power_of_2_non_repeating_len,
+};
 use alloc::vec::Vec;
 use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_nz::natural::Natural;
 
+// As `to_digits_helper` in `to_digits.rs`, for the base $2^k$, where `log_base` is $k$.
 pub(crate) fn to_power_of_2_digits_helper(
     x: Rational,
     log_base: u64,
 ) -> (Vec<Natural>, FoerSequence<Natural>) {
     let floor = (&x).floor();
-    let mut remainder = x - Rational::from(&floor);
+    let remainder = x - Rational::from(&floor);
     let before_point = floor.unsigned_abs().to_power_of_2_digits_asc(log_base);
-    let mut state_map = BTreeMap::new();
-    let mut digits = Vec::new();
-    for i in 0.. {
-        if remainder == 0u32 {
-            return (before_point, FoerSequence::from_vec(digits));
-        }
-        if let Some(previous_i) = state_map.insert(remainder.clone(), i) {
-            let repeating = digits.drain(previous_i..).collect();
-            return (before_point, FoerSequence::from_vecs(digits, repeating));
-        }
-        remainder <<= log_base;
-        let floor = (&remainder).floor().unsigned_abs();
-        digits.push(floor.clone());
-        remainder -= Rational::from(floor);
+    if remainder == 0u32 {
+        return (before_point, FoerSequence::from_vec(Vec::new()));
     }
-    unreachable!()
+    let lengths = power_of_2_non_repeating_len(remainder.denominator_ref(), log_base);
+    (
+        before_point,
+        fractional_digits_to_foer_sequence(remainder, lengths, |remainder| {
+            *remainder <<= log_base;
+            let digit = (&*remainder).floor().unsigned_abs();
+            *remainder -= Rational::from(&digit);
+            digit
+        }),
+    )
 }
 
 impl Rational {

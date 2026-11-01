@@ -15,6 +15,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_pair_gen_var_2;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_natural_pair_gen_var_2;
+use malachite_q::test_util::rational::conversion::digits::to_digits::to_digits_naive;
 use std::str::FromStr;
 
 #[test]
@@ -126,6 +127,10 @@ fn into_digits_fail_2() {
 fn to_digits_properties() {
     rational_natural_pair_gen_var_2().test_properties(|(x, base)| {
         let (before_point, after_point) = x.to_digits(&base);
+        assert_eq!(
+            to_digits_naive(&x, &base),
+            (before_point.clone(), after_point.clone())
+        );
         let (before_point_alt, after_point_alt) = x.clone().into_digits(&base);
         assert_eq!(before_point, before_point_alt);
         assert_eq!(after_point, after_point_alt);

@@ -9,6 +9,7 @@
 use crate::Rational;
 use crate::rational::conversion::digits::digits::RationalDigits;
 use alloc::vec::Vec;
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::arithmetic::traits::{CheckedLogBase2, DivExactAssign, Gcd, IsPowerOf2};
 use malachite_nz::natural::Natural;
 
@@ -91,10 +92,9 @@ impl Iterator for RationalFoerDigits {
 // $k$ with $q_1 \mid b^k$, and the expansion terminates exactly when $q_2 = 1$. Each division of
 // $q$ by $\gcd(q, b)$ removes one factor of $b$'s share, so $k$ is the number of divisions until
 // the GCD is 1, and what is left is $q_2$.
-fn non_repeating_len(denominator: &Natural, base: &Natural) -> (u64, bool) {
+pub(crate) fn non_repeating_len(denominator: &Natural, base: &Natural) -> (u64, bool) {
     if let Some(log_base) = base.checked_log_base_2() {
-        let twos = denominator.trailing_zeros().unwrap();
-        return (twos.div_ceil(log_base), denominator.is_power_of_2());
+        return power_of_2_non_repeating_len(denominator, log_base);
     }
     let mut q = denominator.clone();
     let mut k = 0;
@@ -105,6 +105,40 @@ fn non_repeating_len(denominator: &Natural, base: &Natural) -> (u64, bool) {
         }
         q.div_exact_assign(g);
         k += 1;
+    }
+}
+
+// As `non_repeating_len`, for the base $2^k$, where `log_base` is $k$: the count is the number of
+// factors of 2 in the denominator divided by $k$, rounded up.
+pub(crate) fn power_of_2_non_repeating_len(denominator: &Natural, log_base: u64) -> (u64, bool) {
+    (
+        denominator.trailing_zeros().unwrap().div_ceil(log_base),
+        denominator.is_power_of_2(),
+    )
+}
+
+// Returns the digits of `remainder`, in $[0, 1)$, as a `FoerSequence`, given the number of digits
+// before the repeating part and whether the expansion terminates, from `non_repeating_len`. `step`
+// produces the next digit, updating the remainder. The repeating part ends when the remainder
+// returns to its value at the start of the repeating part, so only that one value is kept.
+pub(crate) fn fractional_digits_to_foer_sequence(
+    mut remainder: Rational,
+    (non_repeating_len, terminating): (u64, bool),
+    mut step: impl FnMut(&mut Rational) -> Natural,
+) -> FoerSequence<Natural> {
+    let non_repeating: Vec<Natural> = (0..non_repeating_len)
+        .map(|_| step(&mut remainder))
+        .collect();
+    if terminating {
+        return FoerSequence::from_vec(non_repeating);
+    }
+    let start = remainder.clone();
+    let mut repeating = Vec::new();
+    loop {
+        repeating.push(step(&mut remainder));
+        if remainder == start {
+            return FoerSequence::from_vecs(non_repeating, repeating);
+        }
     }
 }
 

@@ -19,6 +19,7 @@ use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_7, rational_unsigned_pair_gen_var_2,
     rational_unsigned_pair_gen_var_3,
 };
+use malachite_q::test_util::rational::conversion::digits::to_power_of_2_digits::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_into_power_of_2_digits);
@@ -30,6 +31,7 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_rational_to_power_of_2_digits_evaluation_strategy
     );
+    register_bench!(runner, benchmark_rational_to_power_of_2_digits_algorithms);
     register_bench!(runner, benchmark_rational_power_of_2_digits);
 }
 
@@ -132,6 +134,31 @@ fn benchmark_rational_to_power_of_2_digits_evaluation_strategy(
                 "Rational.to_power_of_2_digits(log_base)",
                 &mut |(n, log_base)| no_out!(n.to_power_of_2_digits(log_base)),
             ),
+        ],
+    );
+}
+
+fn benchmark_rational_to_power_of_2_digits_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational.to_power_of_2_digits(u64)",
+        BenchmarkType::Algorithms,
+        rational_unsigned_pair_gen_var_2::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_bit_bucketer("x"),
+        &mut [
+            ("default", &mut |(n, log_base)| {
+                no_out!(n.to_power_of_2_digits(log_base));
+            }),
+            ("naive", &mut |(n, log_base)| {
+                no_out!(to_power_of_2_digits_naive(&n, log_base));
+            }),
         ],
     );
 }

@@ -16,6 +16,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_unsigned_pair_gen_var_7;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_2;
+use malachite_q::test_util::rational::conversion::digits::to_power_of_2_digits::*;
 use std::str::FromStr;
 
 #[test]
@@ -92,6 +93,10 @@ fn into_power_of_2_digits_fail() {
 fn to_power_of_2_digits_properties() {
     rational_unsigned_pair_gen_var_2().test_properties(|(x, log_base)| {
         let (before_point, after_point) = x.to_power_of_2_digits(log_base);
+        assert_eq!(
+            to_power_of_2_digits_naive(&x, log_base),
+            (before_point.clone(), after_point.clone())
+        );
         let (before_point_alt, after_point_alt) = x.clone().into_power_of_2_digits(log_base);
         assert_eq!(before_point, before_point_alt);
         assert_eq!(after_point, after_point_alt);

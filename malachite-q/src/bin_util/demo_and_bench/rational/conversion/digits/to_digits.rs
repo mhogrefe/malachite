@@ -19,6 +19,7 @@ use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_7, rational_natural_pair_gen_var_1,
     rational_natural_pair_gen_var_2,
 };
+use malachite_q::test_util::rational::conversion::digits::to_digits::to_digits_naive;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_into_digits);
@@ -27,6 +28,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_digits);
     register_demo!(runner, demo_rational_digits_decimal);
     register_bench!(runner, benchmark_rational_to_digits_evaluation_strategy);
+    register_bench!(runner, benchmark_rational_to_digits_algorithms);
     register_bench!(runner, benchmark_rational_digits);
 }
 
@@ -126,6 +128,31 @@ fn benchmark_rational_to_digits_evaluation_strategy(
             }),
             ("Rational.to_digits(&base)", &mut |(n, base)| {
                 no_out!(n.to_digits(&base));
+            }),
+        ],
+    );
+}
+
+fn benchmark_rational_to_digits_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational.to_digits(u64)",
+        BenchmarkType::Algorithms,
+        rational_natural_pair_gen_var_2().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_bit_bucketer("x"),
+        &mut [
+            ("default", &mut |(n, base)| {
+                no_out!(n.to_digits(&base));
+            }),
+            ("naive", &mut |(n, base)| {
+                no_out!(to_digits_naive(&n, &base));
             }),
         ],
     );
