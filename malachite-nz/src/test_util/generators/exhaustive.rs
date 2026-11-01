@@ -140,7 +140,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::OrdProducts;
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
@@ -319,6 +319,23 @@ pub fn exhaustive_integer_polynomial_pair_gen_var_5() -> It<(IntegerPolynomial, 
         exhaustive_integer_polynomial_pair_gen_var_4().filter(|(_, q)| {
             q.coefficients_asc().len() > 1 || q.coefficients_asc()[0].unsigned_abs_ref() != &1u32
         }),
+    )
+}
+
+pub fn exhaustive_integer_polynomial_pair_gen_var_6() -> It<(IntegerPolynomial, IntegerPolynomial)>
+{
+    Box::new(
+        exhaustive_triples_xxy(exhaustive_integer_polynomials(), exhaustive_bools()).map(
+            |(p, q, positive)| {
+                let mut ys = q.into_coefficients_asc();
+                ys.push(if positive {
+                    Integer::ONE
+                } else {
+                    Integer::NEGATIVE_ONE
+                });
+                (p, IntegerPolynomial::from_coefficients_asc(ys))
+            },
+        ),
     )
 }
 

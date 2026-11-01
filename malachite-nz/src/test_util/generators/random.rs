@@ -129,7 +129,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::OrdProducts;
 use malachite_base::num::conversion::string::options::ToSciOptions;
@@ -2121,6 +2121,35 @@ pub fn random_integer_polynomial_pair_gen_var_5(
     Box::new(
         random_integer_polynomial_pair_gen_var_4(config).filter(|(_, q)| {
             q.coefficients_asc().len() > 1 || q.coefficients_asc()[0].unsigned_abs_ref() != &1u32
+        }),
+    )
+}
+
+pub fn random_integer_polynomial_pair_gen_var_6(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_integer_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_bools,
+        )
+        .map(|(p, q, positive)| {
+            let mut ys = q.into_coefficients_asc();
+            ys.push(if positive {
+                Integer::ONE
+            } else {
+                Integer::NEGATIVE_ONE
+            });
+            (p, IntegerPolynomial::from_coefficients_asc(ys))
         }),
     )
 }

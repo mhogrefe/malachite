@@ -1752,6 +1752,40 @@ pub trait ModPowerOf2RemPrecomputedAssign<Rhs = Self>: ModPowerOf2RemPrecomputed
     fn mod_power_of_2_rem_precomputed_assign(&mut self, other: Rhs, pow: u64, data: &Self::Data);
 }
 
+/// Finds the remainder of one polynomial divided by another, using data precomputed from the
+/// divisor.
+///
+/// The data is precomputed once, with [`precompute_rem_data`](RemPrecomputed::precompute_rem_data),
+/// and may be reused for any number of dividends.
+pub trait RemPrecomputed<Rhs = Self> {
+    type Output;
+    type Data;
+
+    /// Precomputes the data for dividing by `other`.
+    fn precompute_rem_data(other: &Rhs) -> Self::Data;
+
+    /// Finds the remainder of a polynomial divided by another, using data precomputed from the
+    /// divisor.
+    ///
+    /// $$
+    /// f(a, b) = r, \quad a = bq + r, \quad \deg r < \deg b.
+    /// $$
+    fn rem_precomputed(self, other: Rhs, data: &Self::Data) -> Self::Output;
+}
+
+/// Replaces one polynomial with its remainder by another, using data precomputed from the divisor.
+///
+/// For precomputing the data, use [`precompute_rem_data`](RemPrecomputed::precompute_rem_data).
+pub trait RemPrecomputedAssign<Rhs = Self>: RemPrecomputed<Rhs> {
+    /// Replaces `self` with its remainder by another polynomial, using data precomputed from the
+    /// divisor.
+    ///
+    /// $$
+    /// a \gets r, \quad a = bq + r, \quad \deg r < \deg b.
+    /// $$
+    fn rem_precomputed_assign(&mut self, other: Rhs, data: &Self::Data);
+}
+
 /// Multiplies two polynomials modulo a polynomial $f$, with coefficients modulo $m$. Both factors
 /// must already be reduced modulo $f$, with degrees less than that of $f$, and their coefficients
 /// and those of $f$ must be reduced modulo $m$; the leading coefficient of $f$ must be invertible

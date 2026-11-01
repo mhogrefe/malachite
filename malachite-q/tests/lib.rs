@@ -320,6 +320,7 @@ pub mod rational_polynomial {
         pub mod pow;
         pub mod pow_truncated;
         pub mod rem;
+        pub mod rem_precomputed;
         pub mod remove_power;
         pub mod shl;
         pub mod shr;

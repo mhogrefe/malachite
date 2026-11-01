@@ -767,6 +767,14 @@ documented by git history.
   modulo $f$. Powers are found by binary exponentiation, and a base of $x$ is detected and raised by
   a sliding window that multiplies by powers of $x$ by shifting, as FLINT's `powmod_x` functions do.
   The precomputed forms take the data of `ModDivRemPrecomputed`.
+- New `RemPrecomputed` and `RemPrecomputedAssign` traits in malachite-base, implemented for
+  `IntegerPolynomial` and `RationalPolynomial` with every combination of arguments by value or by
+  reference: remainders by a fixed divisor using precomputed powers of $x$ modulo it, like FLINT's
+  `fmpz_poly_powers_precompute`/`fmpz_poly_rem_powers_precomp` and their `fmpq_poly` versions.
+  The data is the `RemPrecomputedData` of malachite-nz. An `IntegerPolynomial` divisor must have
+  leading coefficient 1 or $-1$ (FLINT's integer version is correct only for monic divisors);
+  a `RationalPolynomial` divisor may be any nonzero polynomial, and its remainders are in lowest
+  terms. Dividends at least twice as long as the divisor are reduced with the powers too.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

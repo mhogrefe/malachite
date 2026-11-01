@@ -918,6 +918,7 @@ pub mod integer_polynomial {
         pub mod pseudo_div_rem;
         pub mod pseudo_rem;
         pub mod rem;
+        pub mod rem_precomputed;
         pub mod remove_power;
         pub mod scalar_add_mul;
         pub mod shl;

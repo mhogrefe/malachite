@@ -186,6 +186,10 @@ pub mod pseudo_rem;
 /// [`CheckedRem`](malachite_base::polynomial::CheckedRem), for finding the remainder of two
 /// polynomials.
 pub mod rem;
+/// Implementations of [`RemPrecomputed`](malachite_base::polynomial::RemPrecomputed) and
+/// [`RemPrecomputedAssign`](malachite_base::polynomial::RemPrecomputedAssign), for finding
+/// remainders by a fixed divisor with precomputed powers of $x$.
+pub mod rem_precomputed;
 /// Implementations of [`RemovePower`](malachite_base::num::factorization::traits::RemovePower) and
 /// [`RemovePowerAssign`](malachite_base::num::factorization::traits::RemovePowerAssign), for
 /// removing the largest power of a polynomial that divides another.

@@ -57,6 +57,7 @@ pub(crate) fn register(runner: &mut Runner) {
     pseudo_div_rem::register(runner);
     pseudo_rem::register(runner);
     rem::register(runner);
+    rem_precomputed::register(runner);
     remove_power::register(runner);
     square::register(runner);
     square_truncated::register(runner);
@@ -107,6 +108,7 @@ mod pseudo_div;
 mod pseudo_div_rem;
 mod pseudo_rem;
 mod rem;
+mod rem_precomputed;
 mod remove_power;
 mod scalar_add_mul;
 mod shl;

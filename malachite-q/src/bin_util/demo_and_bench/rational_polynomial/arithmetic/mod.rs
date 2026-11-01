@@ -40,6 +40,7 @@ pub(crate) fn register(runner: &mut Runner) {
     pow::register(runner);
     pow_truncated::register(runner);
     rem::register(runner);
+    rem_precomputed::register(runner);
     remove_power::register(runner);
     shl::register(runner);
     shr::register(runner);
@@ -83,6 +84,7 @@ mod nth_derivative;
 mod pow;
 mod pow_truncated;
 mod rem;
+mod rem_precomputed;
 mod remove_power;
 mod shl;
 mod shr;
