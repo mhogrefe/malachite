@@ -13491,6 +13491,84 @@ pub fn special_random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_2<
     )
 }
 
+pub fn special_random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_3<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    T,
+)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(a, b, f, m)| (a % m, b % m, f % m, m))
+        .filter(|(_, b, f, m)| {
+            f.coefficients_asc()
+                .last()
+                .is_some_and(|y| y.coprime_with(*m))
+                && b.len() < f.len()
+        }),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_4<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    u64,
+)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(a, b, f, pow)| {
+            (
+                a.mod_power_of_2(pow),
+                b.mod_power_of_2(pow),
+                f.mod_power_of_2(pow),
+                pow,
+            )
+        })
+        .filter(|(_, b, f, _)| {
+            f.coefficients_asc().last().is_some_and(|y| y.odd()) && b.len() < f.len()
+        }),
+    )
+}
+
 pub fn special_random_unsigned_polynomial_unsigned_unsigned_polynomial_unsigned_quadruple_gen_var_1<
     T: PrimitiveUnsigned,
 >(

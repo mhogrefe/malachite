@@ -9186,6 +9186,27 @@ pub fn exhaustive_natural_polynomial_triple_natural_quadruple_gen_var_1() -> It<
     )
 }
 
+pub fn exhaustive_natural_polynomial_triple_natural_quadruple_gen_var_2() -> It<(
+    NaturalPolynomial,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    Natural,
+)> {
+    Box::new(
+        exhaustive_quadruples_xxxy(exhaustive_natural_polynomials(), exhaustive_naturals())
+            .map(|(a, b, f, m)| {
+                let m = max(max(a.height_ref(), b.height_ref()), f.height_ref()) + m + Natural::ONE;
+                (a, b, f, m)
+            })
+            .filter(|(_, b, f, m)| {
+                f.coefficients_asc()
+                    .last()
+                    .is_some_and(|y| y.coprime_with(m))
+                    && b.len() < f.len()
+            }),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_triple_unsigned_quadruple_gen_var_1()
 -> It<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial, u64)> {
     Box::new(
@@ -9204,6 +9225,26 @@ pub fn exhaustive_natural_polynomial_triple_unsigned_quadruple_gen_var_1()
             f.coefficients_asc().last().is_some_and(Parity::odd)
                 && a.len() < f.len()
                 && b.len() < f.len()
+        }),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_triple_unsigned_quadruple_gen_var_2()
+-> It<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxxy(
+            exhaustive_natural_polynomials(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(a, b, f, mut pow)| {
+            pow += max(
+                max(a.height_significant_bits(), b.height_significant_bits()),
+                f.height_significant_bits(),
+            );
+            (a, b, f, pow)
+        })
+        .filter(|(_, b, f, _)| {
+            f.coefficients_asc().last().is_some_and(Parity::odd) && b.len() < f.len()
         }),
     )
 }

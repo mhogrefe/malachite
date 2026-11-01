@@ -783,6 +783,19 @@ documented by git history.
   leading coefficient 1 or $-1$ (FLINT's integer version is correct only for monic divisors);
   a `RationalPolynomial` divisor may be any nonzero polynomial, and its remainders are in lowest
   terms. Dividends at least twice as long as the divisor are reduced with the powers too.
+- New `ModComposeModPolynomial`, `ModComposeModPolynomialAssign`,
+  `ModComposeModPolynomialPrecomputed`, `ModComposeModPolynomialPrecomputedAssign`, `ModComposeModPolynomialPrecomputedPowers`, and
+  `ModComposeModPolynomialPrecomputedPowersAssign` traits in malachite-base, and their `ModPowerOf2`
+  counterparts, implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` with every
+  combination of arguments by value or by reference: composing polynomials modulo a polynomial
+  $h$, $f(g) \bmod h$, with coefficients modulo $m$ or $2^k$, like FLINT's `nmod_poly_compose_mod`
+  and `fmpz_mod_poly_compose_mod` and their `_brent_kung_preinv` and `_brent_kung_precomp_preinv`
+  versions. The inner polynomial must already be reduced modulo $h$; the outer one may have any
+  degree. A short outer polynomial is composed by Horner's rule and a longer one by the Brent–Kung
+  algorithm, with block size chosen from its length and the rows evaluated by rectangular
+  splitting; the cutoff was tuned. The `Precomputed` forms take the data of `ModDivRemPrecomputed`,
+  and the `PrecomputedPowers` forms precompute the powers of a fixed inner polynomial.
+  `NaturalPolynomial`s with a word-sized modulus are composed with word-sized coefficients.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

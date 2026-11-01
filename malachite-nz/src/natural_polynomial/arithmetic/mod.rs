@@ -104,6 +104,12 @@ pub mod mod_add_truncated;
 /// [`ModComposeAssign`](malachite_base::polynomial::ModComposeAssign), for composing two
 /// polynomials modulo a [`Natural`](crate::natural::Natural).
 pub mod mod_compose;
+/// Modular composition of polynomials modulo a polynomial.
+pub mod mod_compose_mod_polynomial;
+/// Modular composition of polynomials modulo a polynomial.
+pub mod mod_compose_mod_polynomial_precomputed;
+/// Modular composition of polynomials modulo a polynomial.
+pub mod mod_compose_mod_polynomial_precomputed_powers;
 /// Implementations of [`ModComposeTruncated`](malachite_base::polynomial::ModComposeTruncated) and
 /// [`ModComposeTruncatedAssign`](malachite_base::polynomial::ModComposeTruncatedAssign), for
 /// composing two polynomials modulo $m$ as power series, keeping only the low coefficients of the
@@ -222,6 +228,12 @@ pub mod mod_power_of_2_add_truncated;
 /// [`ModPowerOf2ComposeAssign`](malachite_base::polynomial::ModPowerOf2ComposeAssign), for
 /// composing two polynomials modulo $2^k$.
 pub mod mod_power_of_2_compose;
+/// Modular composition of polynomials modulo a polynomial.
+pub mod mod_power_of_2_compose_mod_polynomial;
+/// Modular composition of polynomials modulo a polynomial.
+pub mod mod_power_of_2_compose_mod_polynomial_precomputed;
+/// Modular composition of polynomials modulo a polynomial.
+pub mod mod_power_of_2_compose_mod_polynomial_precomputed_powers;
 /// Implementations of
 /// [`ModPowerOf2ComposeTruncated`](malachite_base::polynomial::ModPowerOf2ComposeTruncated) and
 /// [`ModPowerOf2ComposeTruncatedAssign`](

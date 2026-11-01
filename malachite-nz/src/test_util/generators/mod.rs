@@ -7832,6 +7832,35 @@ pub fn natural_polynomial_triple_unsigned_quadruple_gen_var_1()
     )
 }
 
+// All `(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial, Natural)` where the `Natural` is
+// positive, the coefficients of all three polynomials are less than it, the third polynomial is
+// nonzero with a leading coefficient coprime to the `Natural`, and the second polynomial is shorter
+// than the third.
+pub fn natural_polynomial_triple_natural_quadruple_gen_var_2() -> Generator<(
+    NaturalPolynomial,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    Natural,
+)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_triple_natural_quadruple_gen_var_2,
+        &random_natural_polynomial_triple_natural_quadruple_gen_var_2,
+        &special_random_natural_polynomial_triple_natural_quadruple_gen_var_2,
+    )
+}
+
+// All `(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial, u64)` where the coefficients of
+// all three polynomials are less than 2 to the power of the `u64`, the third polynomial is nonzero
+// with an odd leading coefficient, and the second polynomial is shorter than the third.
+pub fn natural_polynomial_triple_unsigned_quadruple_gen_var_2()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_triple_unsigned_quadruple_gen_var_2,
+        &random_natural_polynomial_triple_unsigned_quadruple_gen_var_2,
+        &special_random_natural_polynomial_triple_unsigned_quadruple_gen_var_2,
+    )
+}
+
 // All `(NaturalPolynomial, u64, NaturalPolynomial, Natural)` where the `Natural` is positive, the
 // coefficients of both polynomials are less than it, the second polynomial is nonzero with a
 // leading coefficient coprime to it, and the first polynomial is shorter than the second.

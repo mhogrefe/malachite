@@ -1008,6 +1008,7 @@ pub mod natural_polynomial {
         pub mod mod_add;
         pub mod mod_add_truncated;
         pub mod mod_compose;
+        pub mod mod_compose_mod_polynomial;
         pub mod mod_compose_truncated;
         pub mod mod_derivative;
         pub mod mod_div_exact;
@@ -1035,6 +1036,7 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_add_truncated;
         pub mod mod_power_of_2_compose;
+        pub mod mod_power_of_2_compose_mod_polynomial;
         pub mod mod_power_of_2_compose_truncated;
         pub mod mod_power_of_2_derivative;
         pub mod mod_power_of_2_div_exact;

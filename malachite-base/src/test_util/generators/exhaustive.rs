@@ -8894,6 +8894,52 @@ pub fn exhaustive_unsigned_polynomial_triple_unsigned_quadruple_gen_var_2<T: Pri
     )
 }
 
+pub fn exhaustive_unsigned_polynomial_triple_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>()
+-> It<(
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    T,
+)> {
+    Box::new(
+        exhaustive_quadruples_xxxy(
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(a, b, f, m)| {
+            a.mod_is_reduced(m)
+                && b.mod_is_reduced(m)
+                && f.mod_is_reduced(m)
+                && f.coefficients_asc()
+                    .last()
+                    .is_some_and(|y| y.coprime_with(*m))
+                && b.len() < f.len()
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_triple_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>()
+-> It<(
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    u64,
+)> {
+    Box::new(
+        exhaustive_quadruples_xxxy(
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(a, b, f, pow)| {
+            a.mod_power_of_2_is_reduced(*pow)
+                && b.mod_power_of_2_is_reduced(*pow)
+                && f.mod_power_of_2_is_reduced(*pow)
+                && f.coefficients_asc().last().is_some_and(|y| y.odd())
+                && b.len() < f.len()
+        }),
+    )
+}
+
 pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_polynomial_unsigned_quadruple_gen_var_1<
     T: PrimitiveUnsigned,
 >() -> It<(UnsignedPolynomial<T>, u64, UnsignedPolynomial<T>, T)> {

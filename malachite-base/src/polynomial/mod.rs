@@ -1473,6 +1473,17 @@ pub struct ModPolynomialData<C> {
     pub inverse: alloc::vec::Vec<C>,
 }
 
+/// Data precomputed for composing polynomials with a fixed inner polynomial $g$ modulo a fixed
+/// polynomial $h$, with coefficients modulo $m$ or $2^k$: the powers $g^0, g^1, \ldots, g^{s-1}$
+/// modulo $h$, where $s = \lfloor\sqrt{\deg h}\rfloor + 1$, each padded to $\deg h$ coefficients,
+/// and the data for dividing by $h$.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[doc(hidden)]
+pub struct ModComposeModPolynomialData<C> {
+    pub powers: alloc::vec::Vec<alloc::vec::Vec<C>>,
+    pub division: ModPolynomialData<C>,
+}
+
 /// Divides one polynomial by another modulo $m$, returning the quotient and remainder, using data
 /// precomputed from the divisor and $m$. The coefficients must already be reduced modulo $m$, and
 /// the leading coefficient of the divisor must be invertible modulo $m$.
@@ -2105,6 +2116,230 @@ pub trait ModPowerOf2PowModPolynomialPrecomputedAssign<F = Self>:
         &mut self,
         exp: u64,
         f: F,
+        pow: u64,
+        data: &Self::Data,
+    );
+}
+
+/// Composes two polynomials modulo a polynomial $h$, with coefficients modulo $m$. The inner
+/// polynomial $g$ must already be reduced modulo $h$, with degree less than that of $h$, and the
+/// coefficients of all three must be reduced modulo $m$; the leading coefficient of $h$ must be
+/// invertible modulo $m$.
+pub trait ModComposeModPolynomial<G = Self, H = Self, M = Self> {
+    type Output;
+
+    /// Composes two polynomials modulo a polynomial $h$, with coefficients modulo $m$.
+    ///
+    /// $$
+    /// f(f, g, h) = r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_compose_mod_polynomial(self, g: G, h: H, m: M) -> Self::Output;
+}
+
+/// Replaces a polynomial with its composition with another modulo a polynomial $h$, with
+/// coefficients modulo $m$.
+pub trait ModComposeModPolynomialAssign<G = Self, H = Self, M = Self> {
+    /// Replaces `self` with its composition with another polynomial modulo a polynomial $h$, with
+    /// coefficients modulo $m$.
+    ///
+    /// $$
+    /// f \gets r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_compose_mod_polynomial_assign(&mut self, g: G, h: H, m: M);
+}
+
+/// Composes two polynomials modulo a polynomial $h$, with coefficients modulo $m$, using data
+/// precomputed from $h$.
+pub trait ModComposeModPolynomialPrecomputed<G = Self, H = Self, M = Self> {
+    type Output;
+    type Data;
+
+    /// Composes two polynomials modulo a polynomial $h$, with coefficients modulo $m$, using data
+    /// precomputed from $h$.
+    ///
+    /// $$
+    /// f(f, g, h) = r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_compose_mod_polynomial_precomputed(
+        self,
+        g: G,
+        h: H,
+        m: M,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Replaces a polynomial with its composition with another modulo a polynomial $h$, with
+/// coefficients modulo $m$, using data precomputed from $h$.
+pub trait ModComposeModPolynomialPrecomputedAssign<G = Self, H = Self, M = Self>:
+    ModComposeModPolynomialPrecomputed<G, H, M>
+{
+    /// Replaces `self` with its composition with another polynomial modulo a polynomial $h$, with
+    /// coefficients modulo $m$, using data precomputed from $h$.
+    ///
+    /// $$
+    /// f \gets r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_compose_mod_polynomial_precomputed_assign(
+        &mut self,
+        g: G,
+        h: H,
+        m: M,
+        data: &Self::Data,
+    );
+}
+
+/// Composes a polynomial with a fixed inner polynomial $g$ modulo a fixed polynomial $h$, with
+/// coefficients modulo $m$, using the powers of $g$ modulo $h$, precomputed.
+pub trait ModComposeModPolynomialPrecomputedPowers<H = Self, M = Self> {
+    type Output;
+    type Data;
+
+    /// Precomputes the powers of `g` modulo `h`, with coefficients modulo $m$.
+    fn precompute_mod_compose_mod_polynomial_powers_data(g: &H, h: &H, m: &M) -> Self::Data;
+
+    /// Composes a polynomial with the inner polynomial that `data` was precomputed from, modulo a
+    /// polynomial $h$, with coefficients modulo $m$.
+    ///
+    /// $$
+    /// f(f, h) = r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_compose_mod_polynomial_precomputed_powers(
+        self,
+        h: H,
+        m: M,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Replaces a polynomial with its composition with a fixed inner polynomial $g$ modulo a fixed
+/// polynomial $h$, with coefficients modulo $m$, using the powers of $g$ modulo $h$, precomputed.
+pub trait ModComposeModPolynomialPrecomputedPowersAssign<H = Self, M = Self>:
+    ModComposeModPolynomialPrecomputedPowers<H, M>
+{
+    /// Replaces `self` with its composition with the inner polynomial that `data` was precomputed
+    /// from, modulo a polynomial $h$, with coefficients modulo $m$.
+    ///
+    /// $$
+    /// f \gets r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_compose_mod_polynomial_precomputed_powers_assign(
+        &mut self,
+        h: H,
+        m: M,
+        data: &Self::Data,
+    );
+}
+
+/// Composes two polynomials modulo a polynomial $h$, with coefficients modulo $2^k$. The inner
+/// polynomial $g$ must already be reduced modulo $h$, with degree less than that of $h$, and the
+/// coefficients of all three must be reduced modulo $2^k$; the leading coefficient of $h$ must be
+/// invertible modulo $2^k$.
+pub trait ModPowerOf2ComposeModPolynomial<G = Self, H = Self> {
+    type Output;
+
+    /// Composes two polynomials modulo a polynomial $h$, with coefficients modulo $2^k$.
+    ///
+    /// $$
+    /// f(f, g, h) = r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_power_of_2_compose_mod_polynomial(self, g: G, h: H, pow: u64) -> Self::Output;
+}
+
+/// Replaces a polynomial with its composition with another modulo a polynomial $h$, with
+/// coefficients modulo $2^k$.
+pub trait ModPowerOf2ComposeModPolynomialAssign<G = Self, H = Self> {
+    /// Replaces `self` with its composition with another polynomial modulo a polynomial $h$, with
+    /// coefficients modulo $2^k$.
+    ///
+    /// $$
+    /// f \gets r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_power_of_2_compose_mod_polynomial_assign(&mut self, g: G, h: H, pow: u64);
+}
+
+/// Composes two polynomials modulo a polynomial $h$, with coefficients modulo $2^k$, using data
+/// precomputed from $h$.
+pub trait ModPowerOf2ComposeModPolynomialPrecomputed<G = Self, H = Self> {
+    type Output;
+    type Data;
+
+    /// Composes two polynomials modulo a polynomial $h$, with coefficients modulo $2^k$, using data
+    /// precomputed from $h$.
+    ///
+    /// $$
+    /// f(f, g, h) = r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_power_of_2_compose_mod_polynomial_precomputed(
+        self,
+        g: G,
+        h: H,
+        pow: u64,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Replaces a polynomial with its composition with another modulo a polynomial $h$, with
+/// coefficients modulo $2^k$, using data precomputed from $h$.
+pub trait ModPowerOf2ComposeModPolynomialPrecomputedAssign<G = Self, H = Self>:
+    ModPowerOf2ComposeModPolynomialPrecomputed<G, H>
+{
+    /// Replaces `self` with its composition with another polynomial modulo a polynomial $h$, with
+    /// coefficients modulo $2^k$, using data precomputed from $h$.
+    ///
+    /// $$
+    /// f \gets r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_power_of_2_compose_mod_polynomial_precomputed_assign(
+        &mut self,
+        g: G,
+        h: H,
+        pow: u64,
+        data: &Self::Data,
+    );
+}
+
+/// Composes a polynomial with a fixed inner polynomial $g$ modulo a fixed polynomial $h$, with
+/// coefficients modulo $2^k$, using the powers of $g$ modulo $h$, precomputed.
+pub trait ModPowerOf2ComposeModPolynomialPrecomputedPowers<H = Self> {
+    type Output;
+    type Data;
+
+    /// Precomputes the powers of `g` modulo `h`, with coefficients modulo $2^k$.
+    fn precompute_mod_power_of_2_compose_mod_polynomial_powers_data(
+        g: &H,
+        h: &H,
+        pow: &u64,
+    ) -> Self::Data;
+
+    /// Composes a polynomial with the inner polynomial that `data` was precomputed from, modulo a
+    /// polynomial $h$, with coefficients modulo $2^k$.
+    ///
+    /// $$
+    /// f(f, h) = r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_power_of_2_compose_mod_polynomial_precomputed_powers(
+        self,
+        h: H,
+        pow: u64,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Replaces a polynomial with its composition with a fixed inner polynomial $g$ modulo a fixed
+/// polynomial $h$, with coefficients modulo $2^k$, using the powers of $g$ modulo $h$, precomputed.
+pub trait ModPowerOf2ComposeModPolynomialPrecomputedPowersAssign<H = Self>:
+    ModPowerOf2ComposeModPolynomialPrecomputedPowers<H>
+{
+    /// Replaces `self` with its composition with the inner polynomial that `data` was precomputed
+    /// from, modulo a polynomial $h$, with coefficients modulo $2^k$.
+    ///
+    /// $$
+    /// f \gets r, \quad f(g) \equiv hq + r, \quad \deg r < \deg h.
+    /// $$
+    fn mod_power_of_2_compose_mod_polynomial_precomputed_powers_assign(
+        &mut self,
+        h: H,
         pow: u64,
         data: &Self::Data,
     );

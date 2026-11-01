@@ -6521,6 +6521,44 @@ pub fn unsigned_polynomial_triple_unsigned_quadruple_gen_var_2<T: PrimitiveUnsig
     )
 }
 
+// All `(UnsignedPolynomial<T>, UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)` where the `T` is
+// positive, the coefficients of all three polynomials are less than it, the third polynomial is
+// nonzero with a leading coefficient coprime to the `T`, and the second polynomial is shorter than
+// the third.
+pub fn unsigned_polynomial_triple_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>() -> Generator<
+    (
+        UnsignedPolynomial<T>,
+        UnsignedPolynomial<T>,
+        UnsignedPolynomial<T>,
+        T,
+    ),
+> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_triple_unsigned_quadruple_gen_var_3,
+        &random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_3,
+        &special_random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_3,
+    )
+}
+
+// All `(UnsignedPolynomial<T>, UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)` where the `u64`
+// is no greater than `T::WIDTH`, the coefficients of all three polynomials are less than 2 to the
+// power of the `u64`, the third polynomial is nonzero with an odd leading coefficient, and the
+// second polynomial is shorter than the third.
+pub fn unsigned_polynomial_triple_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>() -> Generator<
+    (
+        UnsignedPolynomial<T>,
+        UnsignedPolynomial<T>,
+        UnsignedPolynomial<T>,
+        u64,
+    ),
+> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_triple_unsigned_quadruple_gen_var_4,
+        &random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_4,
+        &special_random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_4,
+    )
+}
+
 // All `(UnsignedPolynomial<T>, u64, UnsignedPolynomial<T>, T)` where the last `T` is positive, the
 // coefficients of both polynomials are less than it, the second polynomial is nonzero with a
 // leading coefficient coprime to it, and the first polynomial is shorter than the second.

@@ -338,6 +338,10 @@ int run_mod_power_of_2_div_root(const char * arg);
 int run_mod_div_rem(const char * arg);
 int run_mod_power_of_2_div_rem(const char * arg);
 
+/* mod_compose_mod_polynomial.c */
+int run_mod_compose_mod_polynomial(const char * arg);
+int run_mod_power_of_2_compose_mod_polynomial(const char * arg);
+
 /* mod_mul_mod_polynomial.c */
 int run_mod_mul_mod_polynomial(const char * arg);
 int run_mod_power_of_2_mul_mod_polynomial(const char * arg);
