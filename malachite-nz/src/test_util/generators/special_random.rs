@@ -89,8 +89,8 @@ use crate::natural_vector::random::{
 };
 use crate::platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD};
 use crate::test_util::extra_variadic::{
-    random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xxyz,
-    random_quadruples_xyxz, random_quadruples_xyyx, random_quadruples_xyyz,
+    random_quadruples, random_quadruples_from_single, random_quadruples_xxxy,
+    random_quadruples_xxyz, random_quadruples_xyxz, random_quadruples_xyyx, random_quadruples_xyyz,
     random_quintuples_xyyyz, random_sextuples_from_single, random_triples,
     random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
 };
@@ -16962,6 +16962,111 @@ pub fn special_random_natural_polynomial_triple_unsigned_quadruple_gen_var_1(
             f.coefficients_asc().last().is_some_and(Parity::odd)
                 && a.len() < f.len()
                 && b.len() < f.len()
+        }),
+    )
+}
+
+pub fn special_random_natural_polynomial_unsigned_natural_polynomial_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64, NaturalPolynomial, Natural)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_exponent_n", 32),
+                    config.get_or("mean_exponent_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, e, f, m)| (a.mod_op(&m), e, f.mod_op(&m), m))
+        .filter(|(a, _, f, m)| {
+            f.coefficients_asc()
+                .last()
+                .is_some_and(|y| y.coprime_with(m))
+                && a.len() < f.len()
+        }),
+    )
+}
+
+pub fn special_random_natural_polynomial_unsigned_natural_polynomial_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64, NaturalPolynomial, u64)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_exponent_n", 32),
+                    config.get_or("mean_exponent_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(a, e, f, pow)| (a.mod_power_of_2(pow), e, f.mod_power_of_2(pow), pow))
+        .filter(|(a, _, f, _)| {
+            f.coefficients_asc().last().is_some_and(Parity::odd) && a.len() < f.len()
         }),
     )
 }

@@ -2669,6 +2669,49 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_power_of_2_mul_mod_polynomial");
     }
+    // The demos of powering modulo a polynomial of malachite-base's UnsignedPolynomial and
+    // malachite-nz's NaturalPolynomial, with coefficients modulo m and modulo powers of 2: by
+    // value, by reference, in place, and with precomputed data.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_pow_mod_polynomial_u8",
+        "demo_unsigned_polynomial_mod_pow_mod_polynomial_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_pow_mod_polynomial_assign_u128",
+        "demo_unsigned_polynomial_mod_pow_mod_polynomial_precomputed_u8",
+        "demo_unsigned_polynomial_mod_pow_mod_polynomial_precomputed_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_pow_mod_polynomial_precomputed_assign_u128",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_pow_mod_polynomial");
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_pow_mod_polynomial_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_pow_mod_polynomial_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_pow_mod_polynomial_assign_u128",
+        "demo_unsigned_polynomial_mod_power_of_2_pow_mod_polynomial_precomputed_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_pow_mod_polynomial_precomputed_ref_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_pow_mod_polynomial_precomputed_assign_u128",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_power_of_2_pow_mod_polynomial");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_pow_mod_polynomial",
+        "demo_natural_polynomial_mod_pow_mod_polynomial_ref_ref",
+        "demo_natural_polynomial_mod_pow_mod_polynomial_assign",
+        "demo_natural_polynomial_mod_pow_mod_polynomial_precomputed",
+        "demo_natural_polynomial_mod_pow_mod_polynomial_precomputed_ref_ref",
+        "demo_natural_polynomial_mod_pow_mod_polynomial_precomputed_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_pow_mod_polynomial");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_pow_mod_polynomial",
+        "demo_natural_polynomial_mod_power_of_2_pow_mod_polynomial_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_pow_mod_polynomial_assign",
+        "demo_natural_polynomial_mod_power_of_2_pow_mod_polynomial_precomputed",
+        "demo_natural_polynomial_mod_power_of_2_pow_mod_polynomial_precomputed_ref_ref",
+        "demo_natural_polynomial_mod_power_of_2_pow_mod_polynomial_precomputed_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_power_of_2_pow_mod_polynomial");
+    }
     // The power series division demos of malachite-base's UnsignedPolynomial and malachite-nz's
     // NaturalPolynomial, modulo m and modulo powers of 2: by value, by reference, in place, checked, and with lengths up to 1000.
     for demo_name in [

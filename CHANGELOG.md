@@ -758,6 +758,15 @@ documented by git history.
   modulo $f$; unlike FLINT's `mulmod`, a factor of higher degree panics. The product is reduced by
   Euclidean division, and the precomputed forms take the data of `ModDivRemPrecomputed`, from
   `precompute_mod_div_rem_data`, so one precomputation serves division and multiplication alike.
+- New `ModPowModPolynomial`, `ModPowModPolynomialAssign`, `ModPowModPolynomialPrecomputed`, and
+  `ModPowModPolynomialPrecomputedAssign` traits in malachite-base, and their `ModPowerOf2`
+  counterparts, implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` with every
+  combination of arguments by value or by reference: raising a polynomial to a `u64` power modulo a
+  polynomial $f$, with coefficients modulo $m$ or $2^k$, like FLINT's `nmod_poly_powmod_ui_binexp`,
+  `fmpz_mod_poly_powmod_ui_binexp`, and their `_preinv` versions. The base must already be reduced
+  modulo $f$. Powers are found by binary exponentiation, and a base of $x$ is detected and raised by
+  a sliding window that multiplies by powers of $x$ by shifting, as FLINT's `powmod_x` functions do.
+  The precomputed forms take the data of `ModDivRemPrecomputed`.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

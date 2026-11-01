@@ -1914,6 +1914,168 @@ pub trait ModPowerOf2MulModPolynomialPrecomputedAssign<Rhs = Self, F = Self>:
     );
 }
 
+/// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $m$. The base
+/// must already be reduced modulo $f$, with a degree less than that of $f$, and its coefficients
+/// and those of $f$ must be reduced modulo $m$; the leading coefficient of $f$ must be invertible
+/// modulo $m$.
+pub trait ModPowModPolynomial<F = Self, M = Self> {
+    type Output;
+
+    /// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $m$.
+    ///
+    /// $$
+    /// (a, n) \mapsto r, \quad a^n \equiv fq + r \\pmod{m}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_pow_mod_polynomial(self, exp: u64, f: F, m: M) -> Self::Output;
+}
+
+/// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $m$, in place.
+/// The base must already be reduced modulo $f$, with a degree less than that of $f$, and its
+/// coefficients and those of $f$ must be reduced modulo $m$; the leading coefficient of $f$ must be
+/// invertible modulo $m$.
+pub trait ModPowModPolynomialAssign<F = Self, M = Self> {
+    /// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $m$, in
+    /// place.
+    ///
+    /// $$
+    /// a \gets r, \quad a^n \equiv fq + r \\pmod{m}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_pow_mod_polynomial_assign(&mut self, exp: u64, f: F, m: M);
+}
+
+/// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $m$, using data
+/// precomputed from $f$ and $m$. The base must already be reduced modulo $f$, with a degree less
+/// than that of $f$, and its coefficients and those of $f$ must be reduced modulo $m$; the leading
+/// coefficient of $f$ must be invertible modulo $m$.
+///
+/// If many powers are taken modulo the same polynomial, it is quicker to precompute the data once,
+/// with [`precompute_mod_div_rem_data`](ModDivRemPrecomputed::precompute_mod_div_rem_data), and
+/// reuse it: the data is the same as for division.
+pub trait ModPowModPolynomialPrecomputed<F = Self, M = Self> {
+    type Output;
+    type Data;
+
+    /// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $m$, using
+    /// data precomputed from $f$ and $m$.
+    ///
+    /// $$
+    /// (a, n) \mapsto r, \quad a^n \equiv fq + r \\pmod{m}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_pow_mod_polynomial_precomputed(
+        self,
+        exp: u64,
+        f: F,
+        m: M,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $m$, in place,
+/// using data precomputed from $f$ and $m$. The base must already be reduced modulo $f$, with a
+/// degree less than that of $f$, and its coefficients and those of $f$ must be reduced modulo $m$;
+/// the leading coefficient of $f$ must be invertible modulo $m$.
+///
+/// For precomputing the data, use
+/// [`precompute_mod_div_rem_data`](ModDivRemPrecomputed::precompute_mod_div_rem_data).
+pub trait ModPowModPolynomialPrecomputedAssign<F = Self, M = Self>:
+    ModPowModPolynomialPrecomputed<F, M>
+{
+    /// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $m$, in
+    /// place, using data precomputed from $f$ and $m$.
+    ///
+    /// $$
+    /// a \gets r, \quad a^n \equiv fq + r \\pmod{m}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_pow_mod_polynomial_precomputed_assign(
+        &mut self,
+        exp: u64,
+        f: F,
+        m: M,
+        data: &Self::Data,
+    );
+}
+
+/// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $2^k$. The base
+/// must already be reduced modulo $f$, with a degree less than that of $f$, and its coefficients
+/// and those of $f$ must be reduced modulo $2^k$; the leading coefficient of $f$ must be odd.
+pub trait ModPowerOf2PowModPolynomial<F = Self> {
+    type Output;
+
+    /// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $2^k$.
+    ///
+    /// $$
+    /// (a, n) \mapsto r, \quad a^n \equiv fq + r \\pmod{2^k}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_power_of_2_pow_mod_polynomial(self, exp: u64, f: F, pow: u64) -> Self::Output;
+}
+
+/// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $2^k$, in
+/// place. The base must already be reduced modulo $f$, with a degree less than that of $f$, and its
+/// coefficients and those of $f$ must be reduced modulo $2^k$; the leading coefficient of $f$ must
+/// be odd.
+pub trait ModPowerOf2PowModPolynomialAssign<F = Self> {
+    /// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $2^k$, in
+    /// place.
+    ///
+    /// $$
+    /// a \gets r, \quad a^n \equiv fq + r \\pmod{2^k}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_power_of_2_pow_mod_polynomial_assign(&mut self, exp: u64, f: F, pow: u64);
+}
+
+/// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $2^k$, using
+/// data precomputed from $f$ and $k$. The base must already be reduced modulo $f$, with a degree
+/// less than that of $f$, and its coefficients and those of $f$ must be reduced modulo $2^k$; the
+/// leading coefficient of $f$ must be odd.
+///
+/// If many powers are taken modulo the same polynomial, it is quicker to precompute the data once,
+/// with [`precompute_mod_power_of_2_div_rem_data`](
+/// ModPowerOf2DivRemPrecomputed::precompute_mod_power_of_2_div_rem_data), and reuse it: the data is
+/// the same as for division.
+pub trait ModPowerOf2PowModPolynomialPrecomputed<F = Self> {
+    type Output;
+    type Data;
+
+    /// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $2^k$,
+    /// using data precomputed from $f$ and $k$.
+    ///
+    /// $$
+    /// (a, n) \mapsto r, \quad a^n \equiv fq + r \\pmod{2^k}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_power_of_2_pow_mod_polynomial_precomputed(
+        self,
+        exp: u64,
+        f: F,
+        pow: u64,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $2^k$, in
+/// place, using data precomputed from $f$ and $k$. The base must already be reduced modulo $f$,
+/// with a degree less than that of $f$, and its coefficients and those of $f$ must be reduced
+/// modulo $2^k$; the leading coefficient of $f$ must be odd.
+///
+/// For precomputing the data, use [`precompute_mod_power_of_2_div_rem_data`](
+/// ModPowerOf2DivRemPrecomputed::precompute_mod_power_of_2_div_rem_data).
+pub trait ModPowerOf2PowModPolynomialPrecomputedAssign<F = Self>:
+    ModPowerOf2PowModPolynomialPrecomputed<F>
+{
+    /// Raises a polynomial to a power modulo a polynomial $f$, with coefficients modulo $2^k$, in
+    /// place, using data precomputed from $f$ and $k$.
+    ///
+    /// $$
+    /// a \gets r, \quad a^n \equiv fq + r \\pmod{2^k}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_power_of_2_pow_mod_polynomial_precomputed_assign(
+        &mut self,
+        exp: u64,
+        f: F,
+        pow: u64,
+        data: &Self::Data,
+    );
+}
+
 /// Divides one polynomial by another if the second divides the first, returning `None` otherwise.
 pub trait CheckedDivExact<Rhs = Self> {
     type Output;

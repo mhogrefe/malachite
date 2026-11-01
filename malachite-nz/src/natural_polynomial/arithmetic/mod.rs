@@ -190,6 +190,17 @@ pub mod mod_op;
 /// [`ModPowAssign`](malachite_base::num::arithmetic::traits::ModPowAssign), for raising a
 /// polynomial to a power modulo a number.
 pub mod mod_pow;
+/// Implementations of [`ModPowModPolynomial`](malachite_base::polynomial::ModPowModPolynomial) and
+/// [`ModPowModPolynomialAssign`](malachite_base::polynomial::ModPowModPolynomialAssign), for
+/// raising polynomials to powers modulo a polynomial, with coefficients modulo a number.
+pub mod mod_pow_mod_polynomial;
+/// Implementations of [`ModPowModPolynomialPrecomputed`](
+/// malachite_base::polynomial::ModPowModPolynomialPrecomputed) and
+/// [`ModPowModPolynomialPrecomputedAssign`](
+/// malachite_base::polynomial::ModPowModPolynomialPrecomputedAssign), for raising polynomials to
+/// powers modulo a polynomial, with coefficients modulo a number, with data precomputed from the
+/// modulus.
+pub mod mod_pow_mod_polynomial_precomputed;
 /// Implementations of [`ModPowTruncated`](malachite_base::polynomial::ModPowTruncated) and
 /// [`ModPowTruncatedAssign`](malachite_base::polynomial::ModPowTruncatedAssign), for raising a
 /// polynomial to a power modulo a number and keeping only the low coefficients.
@@ -300,6 +311,19 @@ pub mod mod_power_of_2_nth_derivative;
 /// and [`ModPowerOf2PowAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign), for
 /// raising a polynomial to a power modulo a power of 2.
 pub mod mod_power_of_2_pow;
+/// Implementations of
+/// [`ModPowerOf2PowModPolynomial`](malachite_base::polynomial::ModPowerOf2PowModPolynomial) and
+/// [`ModPowerOf2PowModPolynomialAssign`](
+/// malachite_base::polynomial::ModPowerOf2PowModPolynomialAssign), for raising polynomials to
+/// powers modulo a polynomial, with coefficients modulo a power of 2.
+pub mod mod_power_of_2_pow_mod_polynomial;
+/// Implementations of [`ModPowerOf2PowModPolynomialPrecomputed`](
+/// malachite_base::polynomial::ModPowerOf2PowModPolynomialPrecomputed) and
+/// [`ModPowerOf2PowModPolynomialPrecomputedAssign`](
+/// malachite_base::polynomial::ModPowerOf2PowModPolynomialPrecomputedAssign), for raising
+/// polynomials to powers modulo a polynomial, with coefficients modulo a power of 2, with data
+/// precomputed from the modulus.
+pub mod mod_power_of_2_pow_mod_polynomial_precomputed;
 /// Implementations of
 /// [`ModPowerOf2PowTruncated`](malachite_base::polynomial::ModPowerOf2PowTruncated) and
 /// [`ModPowerOf2PowTruncatedAssign`](malachite_base::polynomial::ModPowerOf2PowTruncatedAssign),

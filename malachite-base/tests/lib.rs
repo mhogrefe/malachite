@@ -1072,6 +1072,8 @@ pub mod unsigned_polynomial {
         pub mod mod_nth_derivative;
         pub mod mod_op;
         pub mod mod_pow;
+        pub mod mod_pow_mod_polynomial;
+        pub mod mod_pow_mod_polynomial_precomputed;
         pub mod mod_pow_truncated;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
@@ -1095,6 +1097,8 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_nth_derivative;
         pub mod mod_power_of_2_pow;
+        pub mod mod_power_of_2_pow_mod_polynomial;
+        pub mod mod_power_of_2_pow_mod_polynomial_precomputed;
         pub mod mod_power_of_2_pow_truncated;
         pub mod mod_power_of_2_product;
         pub mod mod_power_of_2_quotient;

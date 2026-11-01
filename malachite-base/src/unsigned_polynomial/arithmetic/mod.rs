@@ -146,6 +146,15 @@ pub mod mod_op;
 /// [`ModPowAssign`](crate::num::arithmetic::traits::ModPowAssign), for raising a polynomial to a
 /// power modulo a number.
 pub mod mod_pow;
+/// Implementations of [`ModPowModPolynomial`](crate::polynomial::ModPowModPolynomial) and
+/// [`ModPowModPolynomialAssign`](crate::polynomial::ModPowModPolynomialAssign), for raising
+/// polynomials to powers modulo a polynomial, with coefficients modulo a number.
+pub mod mod_pow_mod_polynomial;
+/// Implementations of [`ModPowModPolynomialPrecomputed`](
+/// crate::polynomial::ModPowModPolynomialPrecomputed) and [`ModPowModPolynomialPrecomputedAssign`](
+/// crate::polynomial::ModPowModPolynomialPrecomputedAssign), for raising polynomials to powers
+/// modulo a polynomial, with coefficients modulo a number, with data precomputed from the modulus.
+pub mod mod_pow_mod_polynomial_precomputed;
 /// Implementations of [`ModPowTruncated`](crate::polynomial::ModPowTruncated) and
 /// [`ModPowTruncatedAssign`](crate::polynomial::ModPowTruncatedAssign), for raising a polynomial to
 /// a power modulo a number and keeping only the low coefficients.
@@ -252,6 +261,18 @@ pub mod mod_power_of_2_nth_derivative;
 /// [`ModPowerOf2PowAssign`](crate::num::arithmetic::traits::ModPowerOf2PowAssign), for raising a
 /// polynomial to a power modulo a power of 2.
 pub mod mod_power_of_2_pow;
+/// Implementations of
+/// [`ModPowerOf2PowModPolynomial`](crate::polynomial::ModPowerOf2PowModPolynomial) and
+/// [`ModPowerOf2PowModPolynomialAssign`](crate::polynomial::ModPowerOf2PowModPolynomialAssign), for
+/// raising polynomials to powers modulo a polynomial, with coefficients modulo a power of 2.
+pub mod mod_power_of_2_pow_mod_polynomial;
+/// Implementations of [`ModPowerOf2PowModPolynomialPrecomputed`](
+/// crate::polynomial::ModPowerOf2PowModPolynomialPrecomputed) and
+/// [`ModPowerOf2PowModPolynomialPrecomputedAssign`](
+/// crate::polynomial::ModPowerOf2PowModPolynomialPrecomputedAssign), for raising polynomials to
+/// powers modulo a polynomial, with coefficients modulo a power of 2, with data precomputed from
+/// the modulus.
+pub mod mod_power_of_2_pow_mod_polynomial_precomputed;
 /// Implementations of [`ModPowerOf2PowTruncated`](crate::polynomial::ModPowerOf2PowTruncated) and
 /// [`ModPowerOf2PowTruncatedAssign`](crate::polynomial::ModPowerOf2PowTruncatedAssign), for raising
 /// a polynomial to a power modulo a power of 2 and keeping only the low coefficients.

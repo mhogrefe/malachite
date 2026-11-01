@@ -11419,3 +11419,82 @@ pub fn random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_2<T: Primiti
         }),
     )
 }
+
+pub fn random_unsigned_polynomial_unsigned_unsigned_polynomial_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, UnsignedPolynomial<T>, T)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_exponent_n", 32),
+                    config.get_or("mean_exponent_d", 1),
+                )
+            },
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(a, e, f, m)| (a % m, e, f % m, m))
+        .filter(|(a, _, f, m)| {
+            f.coefficients_asc()
+                .last()
+                .is_some_and(|y| y.coprime_with(*m))
+                && a.len() < f.len()
+        }),
+    )
+}
+
+pub fn random_unsigned_polynomial_unsigned_unsigned_polynomial_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, UnsignedPolynomial<T>, u64)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_exponent_n", 32),
+                    config.get_or("mean_exponent_d", 1),
+                )
+            },
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(a, e, f, pow)| (a.mod_power_of_2(pow), e, f.mod_power_of_2(pow), pow))
+        .filter(|(a, _, f, _)| {
+            f.coefficients_asc().last().is_some_and(|y| y.odd()) && a.len() < f.len()
+        }),
+    )
+}

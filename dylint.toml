@@ -22,6 +22,8 @@ long_lines_exceptions = [
     { file = "malachite-base/src/test_util/generators/mod.rs", line = 6394 },
     { file = "malachite-base/src/test_util/generators/mod.rs", line = 6452 },
     { file = "malachite-base/src/test_util/generators/mod.rs", line = 6464 },
+    { file = "malachite-base/src/test_util/generators/mod.rs", line = 6533 },
+    { file = "malachite-base/src/test_util/generators/mod.rs", line = 6547 },
     { file = "malachite-base/src/test_util/generators/special_random.rs", line = 12652 },
     { file = "malachite-base/src/test_util/generators/special_random.rs", line = 13055 },
     { file = "malachite-base/src/test_util/generators/special_random.rs", line = 13377 },
