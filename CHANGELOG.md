@@ -893,6 +893,11 @@ documented by git history.
   `From<&NaturalVector>`, and `From<&IntegerVector>` for `RationalVector`, and
   `From<&UnsignedPolynomial<T>>`, `From<&NaturalPolynomial>`, and `From<&IntegerPolynomial>` for
   `RationalPolynomial`.
+- `Rational::foer_digits`, like `digits` but marking which digits after the point repeat: the
+  iterator, `RationalFoerDigits`, yields `FoerDigit`s, each a digit with flags saying whether it
+  belongs to the repeating part and whether it starts a repetition of it. Where the repeating part
+  begins is found from the denominator in advance (`non_repeating_len`, `is_terminating`), and its
+  length is never computed, so the digits stay lazy.
 
 ### malachite-float
 

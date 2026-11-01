@@ -44,6 +44,16 @@ pub enum RationalDigits {
     PowerOf2(RationalPowerOf2Digits),
 }
 
+impl RationalDigits {
+    // The fraction, in $[0, 1)$, whose digits remain to be produced.
+    pub(crate) const fn remainder(&self) -> &Rational {
+        match self {
+            Self::General(xs) => &xs.remainder,
+            Self::PowerOf2(xs) => xs.remainder(),
+        }
+    }
+}
+
 impl Iterator for RationalDigits {
     type Item = Natural;
 

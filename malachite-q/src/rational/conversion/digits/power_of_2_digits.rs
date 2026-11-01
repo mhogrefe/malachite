@@ -21,6 +21,13 @@ pub struct RationalPowerOf2Digits {
     remainder: Rational,
 }
 
+impl RationalPowerOf2Digits {
+    // The fraction, in $[0, 1)$, whose digits remain to be produced.
+    pub(crate) const fn remainder(&self) -> &Rational {
+        &self.remainder
+    }
+}
+
 impl Iterator for RationalPowerOf2Digits {
     type Item = Natural;
 
