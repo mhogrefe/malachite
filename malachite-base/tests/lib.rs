@@ -413,6 +413,7 @@ pub mod num {
     }
     pub mod conversion {
         pub mod digits {
+            pub mod factoradic_digits;
             pub mod general_digits {
                 pub mod from_digits;
                 pub mod to_digits;

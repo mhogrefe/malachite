@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    factoradic_digits::register(runner);
     foer_digits::register(runner);
     from_digits::register(runner);
     from_power_of_2_digits::register(runner);
@@ -16,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     to_power_of_2_digits::register(runner);
 }
 
+mod factoradic_digits;
 mod foer_digits;
 mod from_digits;
 mod from_power_of_2_digits;

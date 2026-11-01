@@ -226,7 +226,15 @@ documented by git history.
   `random_unsigned_matrices_from_elementary_operations_mod`, which applies random row and column
   additions and subtractions modulo $m$ to the matrices of another iterator. They are the
   counterparts of FLINT's `nmod_mat_randpermdiag`, `randrank`, `randtril`, `randtriu`, and
-  `randops`.  ### malachite-nz
+  `randops`.  
+- The `FactoradicDigits` trait, for the factorial number system: `to_factoradic_digits_asc` and
+  `to_factoradic_digits_desc` express a number as digits $d_i$ with $x = \sum_i d_i i!$ and
+  $0 \leq d_i \leq i$ (the always-zero $0!$ place omitted), and `from_factoradic_digits_asc` and
+  `from_factoradic_digits_desc` read such digits back, returning `None` for a digit too large for
+  its place or a value too large for the type. Digits are `u64`. Implemented for the unsigned
+  primitive types.
+
+### malachite-nz
 - Generators of `IntegerMatrix`s with a given structure, in `integer_matrix::random`:
   `random_integer_matrices_with_permuted_diagonal` (FLINT's `fmpz_mat_randpermdiag`),
   `random_integer_matrices_with_rank`, whose nonzero elements have exactly the given number of bits
@@ -840,6 +848,8 @@ documented by git history.
   `From<&UnsignedPolynomial<T>>` for `NaturalPolynomial` and `IntegerPolynomial`, and
   `From<&NaturalPolynomial>` for `IntegerPolynomial`, matching the narrowing conversions, which
   already took either.
+- `FactoradicDigits` for `Natural`, dividing by successive single-limb bases and evaluating by
+  Horner's rule.
 
 ### malachite-q
 
@@ -901,6 +911,11 @@ documented by git history.
 - `Rational::to_digits`, `into_digits`, `to_power_of_2_digits`, and `into_power_of_2_digits` find
   where the repeating part begins from the denominator, and so detect its end by comparing with one
   saved remainder rather than storing every remainder of the expansion.
+- `Rational::factoradic_digits`, which returns the factorial-number-system digits of the absolute
+  value: those of the integer portion as a `Vec`, and those of the fractional portion, the
+  coefficients of $1/2!$, $1/3!$, and so on, as a lazy iterator, `RationalFactoradicDigits`. Every
+  expansion is finite, but it ends only at the least $k$ whose factorial the denominator divides,
+  which may be very large. `Rational::from_factoradic_digits` reads such digits back.
 
 ### malachite-float
 

@@ -2307,7 +2307,7 @@ impl Natural {
         }
     }
 
-    private_test_fn! {div_assign_mod_limb(&mut self, other: Limb) -> Limb {
+    crate_test_fn! {div_assign_mod_limb(&mut self, other: Limb) -> Limb {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => 0,

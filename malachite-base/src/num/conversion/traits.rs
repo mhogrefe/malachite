@@ -37,6 +37,33 @@ pub trait Digits<T>: Sized {
     fn from_digits_desc<I: Iterator<Item = T>>(base: &T, digits: I) -> Option<Self>;
 }
 
+/// Expresses a value in the factorial number system, as a [`Vec`] of digits, or reads a value from
+/// an iterator of such digits.
+///
+/// In the factorial number system, a natural number $x$ is written as $\sum_{i=1}^k d_i i!$, where
+/// $0 \leq d_i \leq i$ for each $i$. The digit for $0!$ would always be 0, so it is omitted, and
+/// the first digit is the coefficient of $1!$.
+pub trait FactoradicDigits: Sized {
+    /// Returns a [`Vec`] containing the factorial-number-system digits of a value in ascending
+    /// order: the digit at index $i$ is the coefficient of $(i+1)!$.
+    fn to_factoradic_digits_asc(&self) -> Vec<u64>;
+
+    /// Returns a [`Vec`] containing the factorial-number-system digits of a value in descending
+    /// order: the last digit is the coefficient of $1!$.
+    fn to_factoradic_digits_desc(&self) -> Vec<u64>;
+
+    /// Converts an iterator of factorial-number-system digits into a value.
+    ///
+    /// The input digits are in ascending order: the digit at index $i$ is the coefficient of
+    /// $(i+1)!$.
+    fn from_factoradic_digits_asc<I: Iterator<Item = u64>>(digits: I) -> Option<Self>;
+
+    /// Converts an iterator of factorial-number-system digits into a value.
+    ///
+    /// The input digits are in descending order: the last digit is the coefficient of $1!$.
+    fn from_factoradic_digits_desc<I: Iterator<Item = u64>>(digits: I) -> Option<Self>;
+}
+
 /// An iterator over a value's base-$2^k$ digits.
 pub trait PowerOf2DigitIterator<T>: Iterator<Item = T> + DoubleEndedIterator<Item = T> {
     fn get_digit(&self, index: u64) -> T;

@@ -9,6 +9,9 @@
 /// Functions for producing iterators over the digits of a [`Rational`](crate::Rational).
 #[allow(clippy::module_inception)]
 pub mod digits;
+/// Functions for returning the factorial-number-system digits of a [`Rational`](crate::Rational)
+/// and for constructing a [`Rational`](crate::Rational) from them.
+pub mod factoradic_digits;
 /// Functions for producing iterators over the digits of a [`Rational`](crate::Rational) that mark
 /// which digits repeat.
 pub mod foer_digits;

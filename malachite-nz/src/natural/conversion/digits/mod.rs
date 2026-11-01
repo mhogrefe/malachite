@@ -6,6 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// An implementation of
+/// [`FactoradicDigits`](malachite_base::num::conversion::traits::FactoradicDigits), a trait for
+/// expressing [`Natural`](crate::natural::Natural)s in the factorial number system and constructing
+/// [`Natural`](crate::natural::Natural)s from such digits.
+pub mod factoradic_digits;
 /// Implementations of [`Digits`](malachite_base::num::conversion::traits::Digits), a trait for
 /// extracting digits from [`Natural`](crate::natural::Natural)s and constructing
 /// [`Natural`](crate::natural::Natural)s from digits.

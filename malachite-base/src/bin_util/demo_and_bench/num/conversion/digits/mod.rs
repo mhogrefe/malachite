@@ -9,9 +9,11 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    factoradic_digits::register(runner);
     general_digits::register(runner);
     power_of_2_digits::register(runner);
 }
 
+mod factoradic_digits;
 mod general_digits;
 mod power_of_2_digits;

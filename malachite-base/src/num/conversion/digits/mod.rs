@@ -6,6 +6,65 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// [`FactoradicDigits`](super::traits::FactoradicDigits), a trait for expressing numbers in the
+/// factorial number system and constructing numbers from such digits.
+///
+/// # to_factoradic_digits_asc
+/// ```
+/// use malachite_base::num::conversion::traits::FactoradicDigits;
+///
+/// assert!(0u8.to_factoradic_digits_asc().is_empty());
+/// assert_eq!(23u8.to_factoradic_digits_asc(), &[1, 2, 3]);
+/// assert_eq!(463u32.to_factoradic_digits_asc(), &[1, 0, 1, 4, 3]);
+/// ```
+///
+/// # to_factoradic_digits_desc
+/// ```
+/// use malachite_base::num::conversion::traits::FactoradicDigits;
+///
+/// assert!(0u8.to_factoradic_digits_desc().is_empty());
+/// assert_eq!(23u8.to_factoradic_digits_desc(), &[3, 2, 1]);
+/// assert_eq!(463u32.to_factoradic_digits_desc(), &[3, 4, 1, 0, 1]);
+/// ```
+///
+/// # from_factoradic_digits_asc
+/// ```
+/// use malachite_base::num::conversion::traits::FactoradicDigits;
+///
+/// assert_eq!(
+///     u8::from_factoradic_digits_asc([1, 2, 3].iter().cloned()),
+///     Some(23)
+/// );
+/// assert_eq!(
+///     u32::from_factoradic_digits_asc([1, 0, 1, 4, 3, 0, 0].iter().cloned()),
+///     Some(463)
+/// );
+///
+/// // The coefficient of 1! must be at most 1
+/// assert!(u8::from_factoradic_digits_asc([2].iter().cloned()).is_none());
+/// // 6! = 720 doesn't fit in a u8
+/// assert!(u8::from_factoradic_digits_asc([0, 0, 0, 0, 0, 1].iter().cloned()).is_none());
+/// ```
+///
+/// # from_factoradic_digits_desc
+/// ```
+/// use malachite_base::num::conversion::traits::FactoradicDigits;
+///
+/// assert_eq!(
+///     u8::from_factoradic_digits_desc([3, 2, 1].iter().cloned()),
+///     Some(23)
+/// );
+/// assert_eq!(
+///     u32::from_factoradic_digits_desc([0, 0, 3, 4, 1, 0, 1].iter().cloned()),
+///     Some(463)
+/// );
+///
+/// // The coefficient of 1! must be at most 1
+/// assert!(u8::from_factoradic_digits_desc([2].iter().cloned()).is_none());
+/// // 6! = 720 doesn't fit in a u8
+/// assert!(u8::from_factoradic_digits_desc([1, 0, 0, 0, 0, 0].iter().cloned()).is_none());
+/// ```
+pub mod factoradic_digits;
 /// [`Digits`](super::traits::Digits), a trait for extracting digits from numbers and constructing
 /// numbers from digits.
 ///

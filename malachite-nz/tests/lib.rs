@@ -781,6 +781,7 @@ pub mod natural {
     pub mod conversion {
         pub mod clone;
         pub mod digits {
+            pub mod factoradic_digits;
             pub mod from_digits;
             pub mod from_power_of_2_digits;
             pub mod power_of_2_digits;
