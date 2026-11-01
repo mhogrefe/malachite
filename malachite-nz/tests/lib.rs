@@ -1019,6 +1019,8 @@ pub mod natural_polynomial {
         pub mod mod_is_reduced;
         pub mod mod_make_monic;
         pub mod mod_mul;
+        pub mod mod_mul_mod_polynomial;
+        pub mod mod_mul_mod_polynomial_precomputed;
         pub mod mod_mul_truncated;
         pub mod mod_neg;
         pub mod mod_nth_derivative;
@@ -1040,6 +1042,8 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_integral;
         pub mod mod_power_of_2_inverse_truncated;
         pub mod mod_power_of_2_mul;
+        pub mod mod_power_of_2_mul_mod_polynomial;
+        pub mod mod_power_of_2_mul_mod_polynomial_precomputed;
         pub mod mod_power_of_2_mul_truncated;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_nth_derivative;

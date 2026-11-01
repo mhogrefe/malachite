@@ -15019,3 +15019,81 @@ pub fn random_natural_polynomial_natural_polynomial_unsigned_triple_gen_var_7(
             .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
     )
 }
+
+pub fn random_natural_polynomial_triple_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(
+    NaturalPolynomial,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    Natural,
+)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_positive_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, b, f, m)| (a.mod_op(&m), b.mod_op(&m), f.mod_op(&m), m))
+        .filter(|(a, b, f, m)| {
+            f.coefficients_asc()
+                .last()
+                .is_some_and(|y| y.coprime_with(m))
+                && a.len() < f.len()
+                && b.len() < f.len()
+        }),
+    )
+}
+
+pub fn random_natural_polynomial_triple_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial, u64)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(a, b, f, pow)| {
+            (
+                a.mod_power_of_2(pow),
+                b.mod_power_of_2(pow),
+                f.mod_power_of_2(pow),
+                pow,
+            )
+        })
+        .filter(|(a, b, f, _)| {
+            f.coefficients_asc().last().is_some_and(Parity::odd)
+                && a.len() < f.len()
+                && b.len() < f.len()
+        }),
+    )
+}

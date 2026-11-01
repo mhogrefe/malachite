@@ -749,6 +749,15 @@ documented by git history.
   coefficient exactly and reduce it once; modulo $2^k$ the arithmetic wraps and is reduced at the
   end. `NaturalPolynomial`s with a modulus of one or two limbs are divided in word arithmetic, as
   `UnsignedPolynomial`s.
+- New `ModMulModPolynomial`, `ModMulModPolynomialAssign`, `ModMulModPolynomialPrecomputed`, and
+  `ModMulModPolynomialPrecomputedAssign` traits in malachite-base, and their `ModPowerOf2`
+  counterparts, implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` with every
+  combination of arguments by value or by reference: multiplication modulo a polynomial $f$, with
+  coefficients modulo $m$ or $2^k$, like FLINT's `nmod_poly_mulmod`, `nmod_poly_mulmod_preinv`,
+  `fmpz_mod_poly_mulmod`, and `fmpz_mod_poly_mulmod_preinv`. Both factors must already be reduced
+  modulo $f$; unlike FLINT's `mulmod`, a factor of higher degree panics. The product is reduced by
+  Euclidean division, and the precomputed forms take the data of `ModDivRemPrecomputed`, from
+  `precompute_mod_div_rem_data`, so one precomputation serves division and multiplication alike.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

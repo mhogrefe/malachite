@@ -115,6 +115,16 @@ pub mod mod_make_monic;
 pub mod mod_mul;
 #[doc(hidden)]
 pub mod mod_mul_middle;
+/// Implementations of [`ModMulModPolynomial`](crate::polynomial::ModMulModPolynomial) and
+/// [`ModMulModPolynomialAssign`](crate::polynomial::ModMulModPolynomialAssign), for multiplying
+/// polynomials modulo a polynomial, with coefficients modulo a number.
+pub mod mod_mul_mod_polynomial;
+/// Implementations of
+/// [`ModMulModPolynomialPrecomputed`](crate::polynomial::ModMulModPolynomialPrecomputed) and
+/// [`ModMulModPolynomialPrecomputedAssign`](
+/// crate::polynomial::ModMulModPolynomialPrecomputedAssign), for multiplying polynomials modulo a
+/// polynomial, with coefficients modulo a number, with data precomputed from the modulus.
+pub mod mod_mul_mod_polynomial_precomputed;
 /// Implementations of [`ModMulTruncated`](crate::polynomial::ModMulTruncated) and
 /// [`ModMulTruncatedAssign`](crate::polynomial::ModMulTruncatedAssign), for multiplying two
 /// polynomials modulo a value and keeping the low coefficients of the product.
@@ -214,6 +224,18 @@ pub mod mod_power_of_2_mul;
 /// the public API.
 #[doc(hidden)]
 pub mod mod_power_of_2_mul_middle;
+/// Implementations of
+/// [`ModPowerOf2MulModPolynomial`](crate::polynomial::ModPowerOf2MulModPolynomial) and
+/// [`ModPowerOf2MulModPolynomialAssign`](crate::polynomial::ModPowerOf2MulModPolynomialAssign), for
+/// multiplying polynomials modulo a polynomial, with coefficients modulo a power of 2.
+pub mod mod_power_of_2_mul_mod_polynomial;
+/// Implementations of [`ModPowerOf2MulModPolynomialPrecomputed`](
+/// crate::polynomial::ModPowerOf2MulModPolynomialPrecomputed) and
+/// [`ModPowerOf2MulModPolynomialPrecomputedAssign`](
+/// crate::polynomial::ModPowerOf2MulModPolynomialPrecomputedAssign), for multiplying polynomials
+/// modulo a polynomial, with coefficients modulo a power of 2, with data precomputed from the
+/// modulus.
+pub mod mod_power_of_2_mul_mod_polynomial_precomputed;
 /// Implementations of [`ModPowerOf2MulTruncated`](crate::polynomial::ModPowerOf2MulTruncated) and
 /// [`ModPowerOf2MulTruncatedAssign`](crate::polynomial::ModPowerOf2MulTruncatedAssign), for
 /// multiplying two polynomials modulo $2^k$ and keeping the low coefficients of the product.

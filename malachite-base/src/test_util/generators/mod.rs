@@ -6482,3 +6482,41 @@ pub fn unsigned_vector_unsigned_vec_pair_gen_var_1() -> Generator<(UnsignedVecto
         &random_unsigned_vector_unsigned_vec_pair_gen_var_1,
     )
 }
+
+// All `(UnsignedPolynomial<T>, UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)` where the `T` is
+// positive, the coefficients of all three polynomials are less than it, the third polynomial is
+// nonzero with a leading coefficient coprime to the `T`, and the first two polynomials are shorter
+// than the third.
+pub fn unsigned_polynomial_triple_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<
+    (
+        UnsignedPolynomial<T>,
+        UnsignedPolynomial<T>,
+        UnsignedPolynomial<T>,
+        T,
+    ),
+> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_triple_unsigned_quadruple_gen_var_1,
+        &random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_1,
+        &special_random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// All `(UnsignedPolynomial<T>, UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)` where the `u64`
+// is no greater than `T::WIDTH`, the coefficients of all three polynomials are less than 2 to the
+// power of the `u64`, the third polynomial is nonzero with an odd leading coefficient, and the
+// first two polynomials are shorter than the third.
+pub fn unsigned_polynomial_triple_unsigned_quadruple_gen_var_2<T: PrimitiveUnsigned>() -> Generator<
+    (
+        UnsignedPolynomial<T>,
+        UnsignedPolynomial<T>,
+        UnsignedPolynomial<T>,
+        u64,
+    ),
+> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_triple_unsigned_quadruple_gen_var_2,
+        &random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_2,
+        &special_random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_2,
+    )
+}

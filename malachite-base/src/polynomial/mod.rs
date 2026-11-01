@@ -1752,6 +1752,168 @@ pub trait ModPowerOf2RemPrecomputedAssign<Rhs = Self>: ModPowerOf2RemPrecomputed
     fn mod_power_of_2_rem_precomputed_assign(&mut self, other: Rhs, pow: u64, data: &Self::Data);
 }
 
+/// Multiplies two polynomials modulo a polynomial $f$, with coefficients modulo $m$. Both factors
+/// must already be reduced modulo $f$, with degrees less than that of $f$, and their coefficients
+/// and those of $f$ must be reduced modulo $m$; the leading coefficient of $f$ must be invertible
+/// modulo $m$.
+pub trait ModMulModPolynomial<Rhs = Self, F = Self, M = Self> {
+    type Output;
+
+    /// Multiplies two polynomials modulo a polynomial $f$, with coefficients modulo $m$.
+    ///
+    /// $$
+    /// (a, b) \mapsto r, \quad ab \equiv fq + r \pmod{m}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_mul_mod_polynomial(self, other: Rhs, f: F, m: M) -> Self::Output;
+}
+
+/// Multiplies a polynomial by another modulo a polynomial $f$, with coefficients modulo $m$, in
+/// place. Both factors must already be reduced modulo $f$, with degrees less than that of $f$, and
+/// their coefficients and those of $f$ must be reduced modulo $m$; the leading coefficient of $f$
+/// must be invertible modulo $m$.
+pub trait ModMulModPolynomialAssign<Rhs = Self, F = Self, M = Self> {
+    /// Multiplies a polynomial by another modulo a polynomial $f$, with coefficients modulo $m$, in
+    /// place.
+    ///
+    /// $$
+    /// a \gets r, \quad ab \equiv fq + r \pmod{m}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_mul_mod_polynomial_assign(&mut self, other: Rhs, f: F, m: M);
+}
+
+/// Multiplies two polynomials modulo a polynomial $f$, with coefficients modulo $m$, using data
+/// precomputed from $f$ and $m$. Both factors must already be reduced modulo $f$, with degrees less
+/// than that of $f$, and their coefficients and those of $f$ must be reduced modulo $m$; the
+/// leading coefficient of $f$ must be invertible modulo $m$.
+///
+/// If many products are taken modulo the same polynomial, it is quicker to precompute the data
+/// once, with [`precompute_mod_div_rem_data`](ModDivRemPrecomputed::precompute_mod_div_rem_data),
+/// and reuse it. The data is the same as for [`ModDivRemPrecomputed`].
+pub trait ModMulModPolynomialPrecomputed<Rhs = Self, F = Self, M = Self> {
+    type Output;
+    type Data;
+
+    /// Multiplies two polynomials modulo a polynomial $f$, with coefficients modulo $m$, using data
+    /// precomputed from $f$ and $m$.
+    ///
+    /// $$
+    /// (a, b) \mapsto r, \quad ab \equiv fq + r \pmod{m}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_mul_mod_polynomial_precomputed(
+        self,
+        other: Rhs,
+        f: F,
+        m: M,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Multiplies a polynomial by another modulo a polynomial $f$, with coefficients modulo $m$, in
+/// place, using data precomputed from $f$ and $m$. Both factors must already be reduced modulo $f$,
+/// with degrees less than that of $f$, and their coefficients and those of $f$ must be reduced
+/// modulo $m$; the leading coefficient of $f$ must be invertible modulo $m$.
+///
+/// For precomputing the data, use
+/// [`precompute_mod_div_rem_data`](ModDivRemPrecomputed::precompute_mod_div_rem_data).
+pub trait ModMulModPolynomialPrecomputedAssign<Rhs = Self, F = Self, M = Self>:
+    ModMulModPolynomialPrecomputed<Rhs, F, M>
+{
+    /// Multiplies a polynomial by another modulo a polynomial $f$, with coefficients modulo $m$, in
+    /// place, using data precomputed from $f$ and $m$.
+    ///
+    /// $$
+    /// a \gets r, \quad ab \equiv fq + r \pmod{m}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_mul_mod_polynomial_precomputed_assign(
+        &mut self,
+        other: Rhs,
+        f: F,
+        m: M,
+        data: &Self::Data,
+    );
+}
+
+/// Multiplies two polynomials modulo a polynomial $f$, with coefficients modulo $2^k$. Both factors
+/// must already be reduced modulo $f$, with degrees less than that of $f$, and their coefficients
+/// and those of $f$ must be reduced modulo $2^k$; the leading coefficient of $f$ must be odd.
+pub trait ModPowerOf2MulModPolynomial<Rhs = Self, F = Self> {
+    type Output;
+
+    /// Multiplies two polynomials modulo a polynomial $f$, with coefficients modulo $2^k$.
+    ///
+    /// $$
+    /// (a, b) \mapsto r, \quad ab \equiv fq + r \pmod{2^k}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_power_of_2_mul_mod_polynomial(self, other: Rhs, f: F, pow: u64) -> Self::Output;
+}
+
+/// Multiplies a polynomial by another modulo a polynomial $f$, with coefficients modulo $2^k$, in
+/// place. Both factors must already be reduced modulo $f$, with degrees less than that of $f$, and
+/// their coefficients and those of $f$ must be reduced modulo $2^k$; the leading coefficient of $f$
+/// must be odd.
+pub trait ModPowerOf2MulModPolynomialAssign<Rhs = Self, F = Self> {
+    /// Multiplies a polynomial by another modulo a polynomial $f$, with coefficients modulo $2^k$,
+    /// in place.
+    ///
+    /// $$
+    /// a \gets r, \quad ab \equiv fq + r \pmod{2^k}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_power_of_2_mul_mod_polynomial_assign(&mut self, other: Rhs, f: F, pow: u64);
+}
+
+/// Multiplies two polynomials modulo a polynomial $f$, with coefficients modulo $2^k$, using data
+/// precomputed from $f$ and $k$. Both factors must already be reduced modulo $f$, with degrees less
+/// than that of $f$, and their coefficients and those of $f$ must be reduced modulo $2^k$; the
+/// leading coefficient of $f$ must be odd.
+///
+/// If many products are taken modulo the same polynomial, it is quicker to precompute the data
+/// once, with [`precompute_mod_power_of_2_div_rem_data`](
+/// ModPowerOf2DivRemPrecomputed::precompute_mod_power_of_2_div_rem_data), and reuse it. The data is
+/// the same as for [`ModPowerOf2DivRemPrecomputed`].
+pub trait ModPowerOf2MulModPolynomialPrecomputed<Rhs = Self, F = Self> {
+    type Output;
+    type Data;
+
+    /// Multiplies two polynomials modulo a polynomial $f$, with coefficients modulo $2^k$, using
+    /// data precomputed from $f$ and $k$.
+    ///
+    /// $$
+    /// (a, b) \mapsto r, \quad ab \equiv fq + r \pmod{2^k}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_power_of_2_mul_mod_polynomial_precomputed(
+        self,
+        other: Rhs,
+        f: F,
+        pow: u64,
+        data: &Self::Data,
+    ) -> Self::Output;
+}
+
+/// Multiplies a polynomial by another modulo a polynomial $f$, with coefficients modulo $2^k$, in
+/// place, using data precomputed from $f$ and $k$. Both factors must already be reduced modulo $f$,
+/// with degrees less than that of $f$, and their coefficients and those of $f$ must be reduced
+/// modulo $2^k$; the leading coefficient of $f$ must be odd.
+///
+/// For precomputing the data, use [`precompute_mod_power_of_2_div_rem_data`](
+/// ModPowerOf2DivRemPrecomputed::precompute_mod_power_of_2_div_rem_data).
+pub trait ModPowerOf2MulModPolynomialPrecomputedAssign<Rhs = Self, F = Self>:
+    ModPowerOf2MulModPolynomialPrecomputed<Rhs, F>
+{
+    /// Multiplies a polynomial by another modulo a polynomial $f$, with coefficients modulo $2^k$,
+    /// in place, using data precomputed from $f$ and $k$.
+    ///
+    /// $$
+    /// a \gets r, \quad ab \equiv fq + r \pmod{2^k}, \quad \deg r < \deg f.
+    /// $$
+    fn mod_power_of_2_mul_mod_polynomial_precomputed_assign(
+        &mut self,
+        other: Rhs,
+        f: F,
+        pow: u64,
+        data: &Self::Data,
+    );
+}
+
 /// Divides one polynomial by another if the second divides the first, returning `None` otherwise.
 pub trait CheckedDivExact<Rhs = Self> {
     type Output;

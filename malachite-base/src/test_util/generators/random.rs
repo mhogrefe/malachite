@@ -11352,3 +11352,70 @@ pub fn random_unsigned_vector_unsigned_vec_pair_gen_var_1(
 ) -> It<(UnsignedVector<u64>, Vec<u64>)> {
     random_vector_index_vec_pairs(random_unsigned_vector_gen(config), config)
 }
+
+pub fn random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    T,
+)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(a, b, f, m)| (a % m, b % m, f % m, m))
+        .filter(|(a, b, f, m)| {
+            f.coefficients_asc()
+                .last()
+                .is_some_and(|y| y.coprime_with(*m))
+                && a.len() < f.len()
+                && b.len() < f.len()
+        }),
+    )
+}
+
+pub fn random_unsigned_polynomial_triple_unsigned_quadruple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    u64,
+)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(a, b, f, pow)| {
+            (
+                a.mod_power_of_2(pow),
+                b.mod_power_of_2(pow),
+                f.mod_power_of_2(pow),
+                pow,
+            )
+        })
+        .filter(|(a, b, f, _)| {
+            f.coefficients_asc().last().is_some_and(|y| y.odd())
+                && a.len() < f.len()
+                && b.len() < f.len()
+        }),
+    )
+}

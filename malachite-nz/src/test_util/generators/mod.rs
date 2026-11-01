@@ -7793,3 +7793,32 @@ pub fn integer_vector_unsigned_vec_pair_gen_var_1() -> Generator<(IntegerVector,
         &random_integer_vector_unsigned_vec_pair_gen_var_1,
     )
 }
+
+// All `(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial, Natural)` where the `Natural` is
+// positive, the coefficients of all three polynomials are less than it, the third polynomial is
+// nonzero with a leading coefficient coprime to the `Natural`, and the first two polynomials are
+// shorter than the third.
+pub fn natural_polynomial_triple_natural_quadruple_gen_var_1() -> Generator<(
+    NaturalPolynomial,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    Natural,
+)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_triple_natural_quadruple_gen_var_1,
+        &random_natural_polynomial_triple_natural_quadruple_gen_var_1,
+        &special_random_natural_polynomial_triple_natural_quadruple_gen_var_1,
+    )
+}
+
+// All `(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial, u64)` where the coefficients of
+// all three polynomials are less than 2 to the power of the `u64`, the third polynomial is nonzero
+// with an odd leading coefficient, and the first two polynomials are shorter than the third.
+pub fn natural_polynomial_triple_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalPolynomial, NaturalPolynomial, NaturalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_triple_unsigned_quadruple_gen_var_1,
+        &random_natural_polynomial_triple_unsigned_quadruple_gen_var_1,
+        &special_random_natural_polynomial_triple_unsigned_quadruple_gen_var_1,
+    )
+}

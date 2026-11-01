@@ -180,6 +180,8 @@ static const oracle_mode modes[] = {
     {"mod_inverse_series", run_mod_inverse_series},
     {"mod_div_series", run_mod_div_series},
     {"mod_div_rem", run_mod_div_rem},
+    {"mod_mul_mod_polynomial", run_mod_mul_mod_polynomial},
+    {"mod_power_of_2_mul_mod_polynomial", run_mod_power_of_2_mul_mod_polynomial},
     {"mod_remove_power", run_mod_remove_power},
     {"mod_power_of_2_remove_power", run_mod_power_of_2_remove_power},
     {"mod_div_root", run_mod_div_root},

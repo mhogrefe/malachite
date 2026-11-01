@@ -158,6 +158,16 @@ pub mod mod_make_monic;
 /// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign), for multiplying two
 /// polynomials modulo a [`Natural`](crate::natural::Natural).
 pub mod mod_mul;
+/// Implementations of [`ModMulModPolynomial`](malachite_base::polynomial::ModMulModPolynomial) and
+/// [`ModMulModPolynomialAssign`](malachite_base::polynomial::ModMulModPolynomialAssign), for
+/// multiplying polynomials modulo a polynomial, with coefficients modulo a number.
+pub mod mod_mul_mod_polynomial;
+/// Implementations of
+/// [`ModMulModPolynomialPrecomputed`](malachite_base::polynomial::ModMulModPolynomialPrecomputed)
+/// and [`ModMulModPolynomialPrecomputedAssign`](
+/// malachite_base::polynomial::ModMulModPolynomialPrecomputedAssign), for multiplying polynomials
+/// modulo a polynomial, with coefficients modulo a number, with data precomputed from the modulus.
+pub mod mod_mul_mod_polynomial_precomputed;
 /// Implementations of [`ModMulTruncated`](malachite_base::polynomial::ModMulTruncated) and
 /// [`ModMulTruncatedAssign`](malachite_base::polynomial::ModMulTruncatedAssign), for multiplying
 /// two polynomials modulo a [`Natural`](crate::natural::Natural) and keeping only the low
@@ -258,6 +268,19 @@ pub mod mod_power_of_2_is_reduced;
 /// and [`ModPowerOf2MulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign), for
 /// multiplying two polynomials modulo $2^k$.
 pub mod mod_power_of_2_mul;
+/// Implementations of
+/// [`ModPowerOf2MulModPolynomial`](malachite_base::polynomial::ModPowerOf2MulModPolynomial) and
+/// [`ModPowerOf2MulModPolynomialAssign`](
+/// malachite_base::polynomial::ModPowerOf2MulModPolynomialAssign), for multiplying polynomials
+/// modulo a polynomial, with coefficients modulo a power of 2.
+pub mod mod_power_of_2_mul_mod_polynomial;
+/// Implementations of [`ModPowerOf2MulModPolynomialPrecomputed`](
+/// malachite_base::polynomial::ModPowerOf2MulModPolynomialPrecomputed) and
+/// [`ModPowerOf2MulModPolynomialPrecomputedAssign`](
+/// malachite_base::polynomial::ModPowerOf2MulModPolynomialPrecomputedAssign), for multiplying
+/// polynomials modulo a polynomial, with coefficients modulo a power of 2, with data precomputed
+/// from the modulus.
+pub mod mod_power_of_2_mul_mod_polynomial_precomputed;
 /// Implementations of
 /// [`ModPowerOf2MulTruncated`](malachite_base::polynomial::ModPowerOf2MulTruncated) and
 /// [`ModPowerOf2MulTruncatedAssign`](malachite_base::polynomial::ModPowerOf2MulTruncatedAssign),
