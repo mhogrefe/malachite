@@ -8,7 +8,7 @@
 
 use crate::rational::{Rational, SerdeRational};
 use alloc::string::{String, ToString};
-use malachite_base::num::arithmetic::traits::CoprimeWith;
+use malachite_base::num::number_theory::traits::CoprimeWith;
 
 impl From<Rational> for SerdeRational {
     #[inline]

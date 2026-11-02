@@ -7,10 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    Abs, DivRound, DivisibleBy, Parity, RoundToMultiple, RoundToMultipleAssign,
+    Abs, DivRound, Parity, RoundToMultiple, RoundToMultipleAssign,
 };
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::signed_signed_rounding_mode_triple_gen_var_2;
 use malachite_nz::integer::Integer;

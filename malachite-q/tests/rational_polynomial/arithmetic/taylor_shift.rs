@@ -9,7 +9,8 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Reciprocal;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{Evaluate, Polynomial, TaylorShift, TaylorShiftAssign};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{Evaluate, TaylorShift, TaylorShiftAssign};
 use malachite_base::test_util::generators::common::SMALL_LIMIT;
 use malachite_nz::integer::Integer;
 use malachite_q::Rational;

@@ -121,6 +121,12 @@ pub mod exhaustive;
 pub mod factorization;
 /// Traits for logic and bit manipulation.
 pub mod logic;
+/// Modular arithmetic on [`Integer`]s: reduction modulo $m$ and $2^k$, divisibility, and the
+/// Chinese remainder theorem.
+pub mod modular;
+/// Number-theoretic functions of [`Integer`]s: GCDs, Kronecker symbols, and combinatorial
+/// sequences.
+pub mod number_theory;
 #[cfg(feature = "random")]
 /// Iterators that generate [`Integer`]s randomly.
 pub mod random;

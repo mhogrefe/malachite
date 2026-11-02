@@ -6,15 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::float::arithmetic::log_base::{rational_log_base, rational_log_base_of_rational};
-use crate::float::arithmetic::log_base_1_plus_x::log_base_1_plus_x_rational;
-use crate::float::arithmetic::log_base_10::float_is_power_of_10;
-use crate::float::arithmetic::log_base_float_base::log_base_float_base_rational;
-use crate::float::arithmetic::log_base_float_base_1_plus_x::log_base_float_base_1_plus_x_rational;
-use crate::float::arithmetic::log_base_rational_base::rational_log_base_rational_base;
-use crate::float::arithmetic::log_base_rational_base_1_plus_x::*;
-use crate::float::arithmetic::log_base_rational_float_base::log_base_rational_float_base_rational;
-use crate::float::arithmetic::log_base_rational_rational_base::*;
 use crate::float::conversion::string::to_sci::to_sci_valid;
 use crate::float::exhaustive::{
     ExhaustivePositiveFiniteFloatsGenerator, ExhaustivePositiveFloatsWithSciExponent,
@@ -22,6 +13,15 @@ use crate::float::exhaustive::{
     exhaustive_nonzero_finite_floats, exhaustive_positive_finite_floats,
     exhaustive_positive_floats_with_precision, exhaustive_positive_floats_with_sci_exponent,
 };
+use crate::float::exponential::log_base::{rational_log_base, rational_log_base_of_rational};
+use crate::float::exponential::log_base_1_plus_x::log_base_1_plus_x_rational;
+use crate::float::exponential::log_base_10::float_is_power_of_10;
+use crate::float::exponential::log_base_float_base::log_base_float_base_rational;
+use crate::float::exponential::log_base_float_base_1_plus_x::log_base_float_base_1_plus_x_rational;
+use crate::float::exponential::log_base_rational_base::rational_log_base_rational_base;
+use crate::float::exponential::log_base_rational_base_1_plus_x::*;
+use crate::float::exponential::log_base_rational_float_base::log_base_rational_float_base_rational;
+use crate::float::exponential::log_base_rational_rational_base::*;
 use crate::test_util::extra_variadic::{
     exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy_custom_output,
     exhaustive_quadruples_xxyz_custom_output, exhaustive_quintuples_xxxxy_custom_output,
@@ -40,9 +40,7 @@ use core::cmp::Ordering::*;
 use core::iter::once;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::max;
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase, CheckedLogBase2, IsPowerOf2, Reciprocal, Square,
-};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, Reciprocal, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -59,6 +57,7 @@ use malachite_base::num::exhaustive::{
     exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
     exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
+use malachite_base::num::exponential::traits::{CheckedLogBase, CheckedLogBase2};
 use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::options::exhaustive::exhaustive_options;
@@ -4138,7 +4137,7 @@ pub fn log_base_power_of_2_1_plus_x_prec_round_valid(
         || !x.is_finite()
         || *x == 0u32
         || *x <= -1i32
-        || crate::float::arithmetic::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x)
+        || crate::float::exponential::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x)
             .is_some_and(|m| Float::from(m).div_prec(Float::from(pow), prec).1 == Equal)
 }
 
@@ -6087,7 +6086,7 @@ pub fn log_base_power_of_2_1_plus_x_round_valid(x: &Float, pow: i64, rm: Roundin
         || !x.is_finite()
         || *x == 0u32
         || *x <= -1i32
-        || crate::float::arithmetic::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x).is_some_and(
+        || crate::float::exponential::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x).is_some_and(
             |m| {
                 Float::from(m)
                     .div_prec(Float::from(pow), x.significant_bits())

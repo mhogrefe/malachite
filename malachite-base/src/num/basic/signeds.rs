@@ -7,9 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{
-    Abs, AbsAssign, BalancedMod, BalancedModAssign, BalancedModPowerOf2, BalancedModPowerOf2Assign,
-    CeilingDivAssignMod, CeilingDivMod, CeilingMod, CeilingModAssign, CeilingModPowerOf2,
-    CeilingModPowerOf2Assign, CheckedAbs, ExtendedGcd, NegAssign, OverflowingAbs,
+    Abs, AbsAssign, CeilingDivAssignMod, CeilingDivMod, CheckedAbs, NegAssign, OverflowingAbs,
     OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign,
     UnsignedAbs, WrappingAbs, WrappingAbsAssign,
 };
@@ -17,6 +15,11 @@ use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::traits::NegativeOne;
 use crate::num::comparison::traits::{EqAbs, OrdAbs, OrdAbsDouble, PartialOrdAbs};
 use crate::num::logic::traits::CheckedHammingDistance;
+use crate::num::modular::traits::{
+    BalancedMod, BalancedModAssign, BalancedModPowerOf2, BalancedModPowerOf2Assign, CeilingMod,
+    CeilingModAssign, CeilingModPowerOf2, CeilingModPowerOf2Assign,
+};
+use crate::num::number_theory::traits::ExtendedGcd;
 #[cfg(feature = "random")]
 use crate::num::random::{HasRandomSignedRange, RandomSignedChunkable};
 use core::ops::Neg;

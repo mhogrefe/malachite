@@ -9,11 +9,11 @@
 use crate::bools::random::{
     RandomBools, WeightedRandomBools, get_weighted_random_bool, random_bools, weighted_random_bools,
 };
-use crate::num::arithmetic::traits::Gcd;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactInto;
+use crate::num::number_theory::traits::Gcd;
 use crate::random::Seed;
 use std::fmt::Debug;
 

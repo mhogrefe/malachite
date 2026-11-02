@@ -8,9 +8,9 @@
 
 use crate::Rational;
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::FloorLogBase2;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::FloorLogBase2;
 
 macro_rules! impl_float {
     ($t: ident) => {

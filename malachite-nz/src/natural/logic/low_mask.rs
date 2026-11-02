@@ -10,9 +10,9 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::{Natural, bit_to_limb_count_ceiling};
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::ModPowerOf2Assign;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::LowMask;
+use malachite_base::num::modular::traits::ModPowerOf2Assign;
 
 // Returns the limbs of a `Natural`, where the lowest `bits` bits are set.
 //

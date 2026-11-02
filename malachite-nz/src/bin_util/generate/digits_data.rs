@@ -11,11 +11,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{FloorSqrt, ModPowerOf2, Parity, Pow, PowerOf2};
+use malachite_base::num::arithmetic::traits::{FloorSqrt, Parity, Pow, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 

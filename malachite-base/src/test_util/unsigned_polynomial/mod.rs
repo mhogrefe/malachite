@@ -7,4 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod arithmetic;
+pub mod calculus;
 pub mod comparison;
+pub mod mod_polynomial;
+pub mod modular;
+pub mod series;

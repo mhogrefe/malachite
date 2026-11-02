@@ -14,8 +14,9 @@ use crate::Rational;
 use core::iter::Product;
 use core::ops::{Mul, MulAssign};
 use malachite_base::iterators::balanced_fold;
-use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd, Square};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Square};
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::number_theory::traits::Gcd;
 
 impl Mul<Self> for Rational {
     type Output = Self;

@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use malachite_base::num::arithmetic::traits::{Abs, Factorial, Floor, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{Abs, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::number_theory::traits::Factorial;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::natural::conversion::digits::factoradic_digits::*;
 

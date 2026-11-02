@@ -20,10 +20,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::mod_pow::mul_mod_helper;
 use crate::num::arithmetic::traits::{
-    CoprimeWith, JacobiSymbol, ModAdd, ModInverse, ModMulPrecomputed, ModMulPrecomputedAssign,
-    ModSub, Parity, PowerOf2, WrappingAddAssign, WrappingMulSubMul, WrappingNegAssign, XMulYToZZ,
+    Parity, PowerOf2, WrappingAddAssign, WrappingMulSubMul, WrappingNegAssign, XMulYToZZ,
     XXAddYYToZZ,
 };
 use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
@@ -31,6 +29,11 @@ use crate::num::comparison::traits::PartialOrdAbs;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::factorization::traits::IsPrime;
 use crate::num::logic::traits::{BitAccess, LeadingZeros, SignificantBits, TrailingZeros};
+use crate::num::modular::mod_pow::mul_mod_helper;
+use crate::num::modular::traits::{
+    ModAdd, ModInverse, ModMulPrecomputed, ModMulPrecomputedAssign, ModSub,
+};
+use crate::num::number_theory::traits::{CoprimeWith, JacobiSymbol};
 
 // This is FLINT_ODD_PRIME_LOOKUP when FLINT64 is true, from ulong_extras/is_oddprime.c, FLINT
 // 3.1.2.

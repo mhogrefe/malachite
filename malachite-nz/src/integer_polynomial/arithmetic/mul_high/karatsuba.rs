@@ -16,9 +16,10 @@ use crate::integer_polynomial::arithmetic::mul_high::classical::mul_high_to_out_
 use crate::integer_vector::arithmetic::add::{vec_add, vec_add_assign};
 use crate::integer_vector::arithmetic::sub::vec_sub_assign;
 use alloc::vec;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Parity, PowerOf2};
+use malachite_base::num::arithmetic::traits::{Parity, PowerOf2};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 
 // Multiplication using truncated Karatsuba. Below length 7, classical truncated multiplication is
 // always theoretically faster, so it is the basecase. Above that, the ordinary (left/right)

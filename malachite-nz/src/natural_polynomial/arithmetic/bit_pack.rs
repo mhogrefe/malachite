@@ -16,7 +16,7 @@ use alloc::vec::Vec;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::polynomial::BitPack;
+use malachite_base::polynomial::arithmetic::traits::BitPack;
 
 // Adds each `x`, for `(i, x)` in `xs`, shifted left by `i * bits`, into a limb buffer, and returns
 // the buffer, or an empty one if `xs` is empty. The buffer is sized for the widest shifted `x` plus
@@ -72,7 +72,7 @@ impl BitPack for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::BitPack;
+    /// use malachite_base::polynomial::arithmetic::traits::BitPack;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// // 3 * 2^16 + 2 * 2^8 + 1
@@ -120,7 +120,7 @@ impl BitPack for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::BitPack;
+    /// use malachite_base::polynomial::arithmetic::traits::BitPack;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// // 3 * 2^16 + 2 * 2^8 + 1

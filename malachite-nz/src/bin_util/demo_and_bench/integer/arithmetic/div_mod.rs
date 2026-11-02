@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod,
-    DivModPrecomputed, DivRem, DivRound, Mod,
+    CeilingDivAssignMod, CeilingDivMod, DivAssignMod, DivAssignRem, DivMod, DivModPrecomputed,
+    DivRem, DivRound,
 };
+use malachite_base::num::modular::traits::{CeilingMod, Mod};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};

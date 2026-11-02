@@ -8,8 +8,9 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use malachite_base::num::arithmetic::traits::{
-    DivIAssign, ModPowerOf2, MulIAssign, MulIPow, MulIPowAssign, NegAssign,
+    DivIAssign, MulIAssign, MulIPow, MulIPowAssign, NegAssign,
 };
+use malachite_base::num::modular::traits::ModPowerOf2;
 
 impl MulIPow for GaussianInteger {
     type Output = Self;

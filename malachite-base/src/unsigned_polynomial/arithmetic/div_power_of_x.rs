@@ -9,7 +9,8 @@
 use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
-use crate::polynomial::{DivPowerOfX, DivPowerOfXAssign, Polynomial};
+use crate::polynomial::Polynomial;
+use crate::polynomial::arithmetic::traits::{DivPowerOfX, DivPowerOfXAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 
 impl<T: PrimitiveUnsigned> DivPowerOfX for UnsignedPolynomial<T> {
@@ -37,7 +38,7 @@ impl<T: PrimitiveUnsigned> DivPowerOfX for UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::DivPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DivPowerOfX;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("x^3+3*x^2+2*x+5").unwrap();
@@ -81,7 +82,7 @@ impl<T: PrimitiveUnsigned> DivPowerOfX for &UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::DivPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DivPowerOfX;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("x^3+3*x^2+2*x+5").unwrap();
@@ -127,7 +128,7 @@ impl<T: PrimitiveUnsigned> DivPowerOfXAssign for UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::DivPowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::DivPowerOfXAssign;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let mut p = UnsignedPolynomial::<u8>::from_str("x^3+3*x^2+2*x+5").unwrap();

@@ -8,18 +8,19 @@
 
 use crate::integer_polynomial::arithmetic::evaluate::evaluate;
 use crate::natural::Natural;
-use crate::natural::arithmetic::mod_mul::ModMulData;
+use crate::natural::modular::mod_mul::ModMulData;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::{
     ModAddAssign, ModIsReduced, ModMulPrecomputed, ModMulPrecomputedAssign, ModPowerOf2AddAssign,
     ModPowerOf2IsReduced, ModPowerOf2MulAssign,
 };
-use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::polynomial::{
-    Evaluate, EvaluateMany, ModEvaluate, ModEvaluateMany, ModPowerOf2Evaluate,
+use malachite_base::polynomial::arithmetic::traits::{Evaluate, EvaluateMany};
+use malachite_base::polynomial::modular::traits::{
+    ModEvaluate, ModEvaluateMany, ModPowerOf2Evaluate,
 };
 
 impl Evaluate<&Natural> for &NaturalPolynomial {
@@ -50,7 +51,7 @@ impl Evaluate<&Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Two, Zero};
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -104,7 +105,7 @@ impl Evaluate<Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Two, Zero};
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -205,7 +206,7 @@ impl ModPowerOf2Evaluate<&Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModPowerOf2Evaluate;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -253,7 +254,7 @@ impl ModPowerOf2Evaluate<Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModPowerOf2Evaluate;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -300,7 +301,7 @@ impl ModPowerOf2Evaluate<Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModPowerOf2Evaluate;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -351,7 +352,7 @@ impl ModPowerOf2Evaluate<&Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModPowerOf2Evaluate;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -458,7 +459,7 @@ impl ModEvaluate<&Natural, &Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -512,7 +513,7 @@ impl ModEvaluate<&Natural, Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -566,7 +567,7 @@ impl ModEvaluate<Natural, &Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -620,7 +621,7 @@ impl ModEvaluate<Natural, Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -674,7 +675,7 @@ impl ModEvaluate<&Natural, &Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -728,7 +729,7 @@ impl ModEvaluate<&Natural, Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -782,7 +783,7 @@ impl ModEvaluate<Natural, &Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -835,7 +836,7 @@ impl ModEvaluate<Natural, Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -894,8 +895,9 @@ impl ModEvaluateMany<Natural, &Natural> for &NaturalPolynomial {
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     ///
     /// The result is the same as calling
-    /// [`mod_evaluate`](malachite_base::polynomial::ModEvaluate::mod_evaluate) at each value, but
-    /// the polynomial is checked, and the data for modular multiplication by `m` computed, once.
+    /// [`mod_evaluate`](malachite_base::polynomial::modular::traits::ModEvaluate::mod_evaluate) at
+    /// each value, but the polynomial is checked, and the data for modular multiplication by `m`
+    /// computed, once.
     ///
     /// # Worst-case complexity
     /// $T(n, k, b) = O(nkb \log b \log\log b)$
@@ -912,7 +914,7 @@ impl ModEvaluateMany<Natural, &Natural> for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ModEvaluateMany;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluateMany;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -948,8 +950,9 @@ impl ModEvaluateMany<Natural, Natural> for &NaturalPolynomial {
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     ///
     /// The result is the same as calling
-    /// [`mod_evaluate`](malachite_base::polynomial::ModEvaluate::mod_evaluate) at each value, but
-    /// the polynomial is checked, and the data for modular multiplication by `m` computed, once.
+    /// [`mod_evaluate`](malachite_base::polynomial::modular::traits::ModEvaluate::mod_evaluate) at
+    /// each value, but the polynomial is checked, and the data for modular multiplication by `m`
+    /// computed, once.
     ///
     /// # Worst-case complexity
     /// $T(n, k, b) = O(nkb \log b \log\log b)$
@@ -966,7 +969,7 @@ impl ModEvaluateMany<Natural, Natural> for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ModEvaluateMany;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluateMany;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -998,9 +1001,10 @@ impl EvaluateMany<Natural> for &NaturalPolynomial {
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     ///
-    /// Each value is found as by [`evaluate`](malachite_base::polynomial::Evaluate::evaluate),
-    /// which chooses between Horner's rule and divide and conquer by the length of the polynomial
-    /// and the size of the value.
+    /// Each value is found as by
+    /// [`evaluate`](malachite_base::polynomial::arithmetic::traits::Evaluate::evaluate), which
+    /// chooses between Horner's rule and divide and conquer by the length of the polynomial and the
+    /// size of the value.
     ///
     /// # Worst-case complexity
     /// $T(n, k) = O(kn \log^2 n \log\log n)$
@@ -1014,7 +1018,7 @@ impl EvaluateMany<Natural> for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateMany;
+    /// use malachite_base::polynomial::arithmetic::traits::EvaluateMany;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///

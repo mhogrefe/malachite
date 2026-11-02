@@ -10,7 +10,6 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use crate::natural::arithmetic::div_exact::limbs_div_exact_limb_to_out;
-use crate::natural::arithmetic::mod_op::limbs_mod_limb;
 use crate::natural::arithmetic::mul::fft::{
     CRTData, Context, FFTContext, MAX_NPROFILES, MPN_CTX_NCRTS, MPN_CTX_TWO_POWER_TAB_SIZE,
     MPNToFFTFunc, ModData, SD_FFT_CTX_W2TAB_INIT, SerializedCRTData, SerializedContext,
@@ -29,6 +28,7 @@ use crate::natural::arithmetic::mul::{
     FFT_MUL_THRESHOLD, limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out_scratch_len,
     toom44_ok,
 };
+use crate::natural::modular::mod_op::limbs_mod_limb;
 use crate::platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD, MUL_TOOM22_THRESHOLD,
     MUL_TOOM32_TO_TOOM43_THRESHOLD, MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD,
@@ -36,15 +36,14 @@ use crate::platform::{
 };
 use alloc::borrow::Cow;
 use libm::scalbn;
-use malachite_base::num::arithmetic::traits::{
-    DivRound, ModPow, PowerOf2, XMulYToZZ, XXDivModYToQR,
-};
+use malachite_base::num::arithmetic::traits::{DivRound, PowerOf2, XMulYToZZ, XXDivModYToQR};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::factorization::traits::{IsPrime, PrimitiveRootPrime};
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
+use malachite_base::num::modular::traits::ModPow;
 use malachite_base::rounding_modes::RoundingMode::*;
 use wide::f64x4;
 

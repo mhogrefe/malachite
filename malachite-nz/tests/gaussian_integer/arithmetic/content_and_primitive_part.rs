@@ -8,10 +8,11 @@
 
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{
-    Conjugate, Content, ContentAndPrimitivePart, Gcd, MulI, PrimitivePart, PrimitivePartAssign,
-    Sign, UnsignedAbs,
+    Conjugate, Content, ContentAndPrimitivePart, MulI, PrimitivePart, PrimitivePartAssign, Sign,
+    UnsignedAbs,
 };
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

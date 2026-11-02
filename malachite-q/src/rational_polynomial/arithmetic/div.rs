@@ -19,7 +19,8 @@ use core::mem::take;
 use core::ops::{Div, DivAssign};
 use malachite_base::num::arithmetic::traits::CheckedDiv;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{Polynomial, PseudoDiv};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::PseudoDiv;
 use malachite_nz::integer::Integer;
 
 // The quotient of `p` by `q`, or `None` if `q` is 0.

@@ -11,7 +11,8 @@ use core::str::FromStr;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{Evaluate, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_q::Rational;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{

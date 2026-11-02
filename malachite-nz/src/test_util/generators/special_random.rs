@@ -38,10 +38,6 @@ use crate::natural::arithmetic::div_mod::{
     limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len, limbs_invert_limb,
     limbs_two_limb_inverse_helper,
 };
-use crate::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
-use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
-use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
-use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
 use crate::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
@@ -67,6 +63,10 @@ use crate::natural::arithmetic::square::{
 use crate::natural::conversion::digits::general_digits::{
     GET_STR_PRECOMPUTE_THRESHOLD, limbs_digit_count, limbs_per_digit_in_base,
 };
+use crate::natural::modular::eq_mod::limbs_eq_mod_ref_ref_ref;
+use crate::natural::modular::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
+use crate::natural::modular::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
+use crate::natural::number_theory::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural::random::{
     StripedRandomNaturalInclusiveRange, StripedRandomNaturalRangeToInfinity, StripedRandomNaturals,
     get_striped_random_natural_with_bits, get_striped_random_natural_with_up_to_bits,
@@ -119,16 +119,15 @@ use crate::test_util::generators::{
     T8, factors_of_limb_max, integer_vecs_mul_is_tiny_1, integer_vecs_mul_is_tiny_2,
     matrix_positions, natural_matrix_positions,
 };
-use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
+use crate::test_util::natural::number_theory::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
 use core::str::FromStr;
 use malachite_base::bools::random::{RandomBools, random_bools};
 use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::iterators::with_special_value;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
-    AddMul, ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy,
-    DivisibleByPowerOf2, EqMod, EqModPowerOf2, Height, HeightRef, Mod, ModMul, ModPowerOf2,
-    ModPowerOf2Mul, Parity, Pow, PowerOf2, RoundToMultipleOfPowerOf2Assign, Square,
+    AddMul, ArithmeticCheckedShl, DivRound, Height, HeightRef, Parity, Pow, PowerOf2,
+    RoundToMultipleOfPowerOf2Assign, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -141,10 +140,16 @@ use malachite_base::num::conversion::string::options::random::random_to_sci_opti
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, ToSci, WrappingFrom,
 };
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
+use malachite_base::num::modular::traits::{
+    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Mod, ModMul, ModPowerOf2,
+    ModPowerOf2Mul,
+};
+use malachite_base::num::number_theory::traits::CoprimeWith;
 use malachite_base::num::random::VariableRangeGenerator;
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
@@ -164,7 +169,8 @@ use malachite_base::num::random::{
     random_unsigned_inclusive_range, random_unsigned_range, random_unsigneds_less_than,
 };
 use malachite_base::options::random::{RandomOptions, random_options};
-use malachite_base::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{ComposePowerOfX, MulPowerOfX};
 use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;

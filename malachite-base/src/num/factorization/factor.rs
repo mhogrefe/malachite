@@ -12,12 +12,11 @@
 // Lesser General Public License (LGPL as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::mod_pow::mul_mod_helper;
 use crate::num::arithmetic::sqrt::{sqrt_rem_2_newton, sqrt_rem_newton};
 use crate::num::arithmetic::traits::{
-    DivMod, FloorRoot, FloorSqrt, Gcd, ModMulPrecomputed, ModSub, ModSubAssign, Parity, PowerOf2,
-    SqrtRem, Square, WrappingAddAssign, WrappingAddMul, WrappingMulAssign, WrappingSquare,
-    WrappingSubAssign, WrappingSubMul, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
+    DivMod, FloorRoot, FloorSqrt, Parity, PowerOf2, SqrtRem, Square, WrappingAddAssign,
+    WrappingAddMul, WrappingMulAssign, WrappingSquare, WrappingSubAssign, WrappingSubMul,
+    XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
 };
 use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
@@ -25,6 +24,9 @@ use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::factorization::primes::SMALL_PRIMES;
 use crate::num::factorization::traits::{Factor, IsPrime, IsSquare, Primes};
 use crate::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
+use crate::num::modular::mod_pow::mul_mod_helper;
+use crate::num::modular::traits::{ModMulPrecomputed, ModSub, ModSubAssign};
+use crate::num::number_theory::traits::Gcd;
 use core::mem::swap;
 
 pub(crate) const MAX_FACTORS_IN_U8: usize = 4;

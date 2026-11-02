@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use malachite_base::num::arithmetic::traits::{FloorLogBase2, IsPowerOf2};
+use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::FloorLogBase2;
 
 macro_rules! impl_float {
     ($t: ident) => {

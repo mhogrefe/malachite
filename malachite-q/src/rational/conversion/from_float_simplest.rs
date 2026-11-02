@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::rational::arithmetic::traits::SimplestRationalInInterval;
 use crate::rational::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
+use crate::rational::number_theory::traits::SimplestRationalInInterval;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
 

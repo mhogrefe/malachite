@@ -8,7 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Two, Zero};
-use malachite_base::polynomial::{Evaluate, Polynomial, TaylorShift, TaylorShiftAssign};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{Evaluate, TaylorShift, TaylorShiftAssign};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;

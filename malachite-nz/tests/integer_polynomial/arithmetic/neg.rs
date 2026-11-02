@@ -9,7 +9,8 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Content, NegAssign};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{Evaluate, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::{
     integer_polynomial_gen, integer_polynomial_integer_pair_gen,

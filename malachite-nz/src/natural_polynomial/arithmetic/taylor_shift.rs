@@ -12,7 +12,7 @@ use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
-use malachite_base::polynomial::{TaylorShift, TaylorShiftAssign};
+use malachite_base::polynomial::arithmetic::traits::{TaylorShift, TaylorShiftAssign};
 
 // Shifts the coefficients `xs` by `c` with the `Integer` kernel. A `Natural` becomes an `Integer`,
 // and a non-negative `Integer` becomes a `Natural` again, without copying its limbs, and a shift by
@@ -52,7 +52,7 @@ impl TaylorShift<&Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -107,7 +107,7 @@ impl TaylorShift<Natural> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -159,7 +159,7 @@ impl TaylorShift<&Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -215,7 +215,7 @@ impl TaylorShift<Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -269,7 +269,7 @@ impl TaylorShiftAssign<&Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::polynomial::TaylorShiftAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShiftAssign;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -313,7 +313,7 @@ impl TaylorShiftAssign<Natural> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::One;
-    /// use malachite_base::polynomial::TaylorShiftAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShiftAssign;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///

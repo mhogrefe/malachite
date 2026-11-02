@@ -17,7 +17,8 @@ use core::mem::take;
 use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow, SubMulAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::polynomial::{Polynomial, RemPrecomputed, RemPrecomputedAssign};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{RemPrecomputed, RemPrecomputedAssign};
 
 /// Data precomputed for finding remainders by a fixed polynomial divisor, with [`RemPrecomputed`]
 /// and [`RemPrecomputedAssign`].
@@ -217,7 +218,7 @@ impl RemPrecomputed<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();
@@ -266,7 +267,7 @@ impl RemPrecomputed<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();
@@ -314,7 +315,7 @@ impl RemPrecomputed<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();
@@ -364,7 +365,7 @@ impl RemPrecomputed<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();
@@ -412,7 +413,7 @@ impl RemPrecomputed<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();
@@ -462,7 +463,7 @@ impl RemPrecomputed<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();
@@ -514,7 +515,7 @@ impl RemPrecomputed<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();
@@ -563,7 +564,7 @@ impl RemPrecomputed<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();
@@ -622,7 +623,9 @@ impl RemPrecomputedAssign<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::{RemPrecomputed, RemPrecomputedAssign};
+    /// use malachite_base::polynomial::arithmetic::traits::{
+    ///     RemPrecomputed, RemPrecomputedAssign,
+    /// };
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();
@@ -676,7 +679,9 @@ impl RemPrecomputedAssign<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::{RemPrecomputed, RemPrecomputedAssign};
+    /// use malachite_base::polynomial::arithmetic::traits::{
+    ///     RemPrecomputed, RemPrecomputedAssign,
+    /// };
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let q = IntegerPolynomial::from_str("x^2+x-1").unwrap();

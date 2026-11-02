@@ -8,7 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{Content, ContentChained, Gcd};
+use malachite_base::num::arithmetic::traits::{Content, ContentChained};
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;

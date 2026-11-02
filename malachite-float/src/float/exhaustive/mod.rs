@@ -12,7 +12,7 @@ use alloc::vec::IntoIter;
 use core::iter::{Chain, Once, once};
 use core::mem::swap;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::exhaustive::{
@@ -21,6 +21,7 @@ use malachite_base::num::exhaustive::{
 };
 use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
 use malachite_base::num::logic::traits::{LowMask, NotAssign};
+use malachite_base::num::modular::traits::NegModPowerOf2;
 use malachite_base::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
     exhaustive_dependent_pairs, lex_dependent_pairs,

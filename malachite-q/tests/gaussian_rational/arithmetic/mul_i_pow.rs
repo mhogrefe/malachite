@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    AbsSquared, CanonicalUnitIPow, DivI, ModPowerOf2, MulI, MulIPow, MulIPowAssign,
+    AbsSquared, CanonicalUnitIPow, DivI, MulI, MulIPow, MulIPowAssign,
 };
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_q::gaussian_rational::GaussianRational;
 use malachite_q::test_util::generators::{
     gaussian_rational_gen, gaussian_rational_unsigned_pair_gen,

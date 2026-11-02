@@ -7,14 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::mod_mul::mod_mul_precompute_shoup;
-use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::polynomial::{
-    ModEvaluate, ModEvaluateGeometric, ModEvaluateMany, ModPowerOf2Evaluate, Polynomial,
+use malachite_base::num::modular::mod_mul::mod_mul_precompute_shoup;
+use malachite_base::num::modular::traits::ModPowerOf2;
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::modular::traits::{
+    ModEvaluate, ModEvaluateGeometric, ModEvaluateMany, ModPowerOf2Evaluate,
 };
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -24,7 +25,7 @@ use malachite_base::test_util::generators::{
     unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_base::test_util::unsigned_polynomial::arithmetic::evaluate::*;
-use malachite_base::test_util::unsigned_polynomial::arithmetic::mod_mul::*;
+use malachite_base::test_util::unsigned_polynomial::modular::mod_mul::*;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_polynomial::arithmetic::evaluate::*;
 

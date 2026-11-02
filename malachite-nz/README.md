@@ -33,15 +33,15 @@ and integers, ℕ and ℤ.
   - Various mathematical functions, like implementations of
     [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html)
     and
-    [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html);
+    [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html);
   - Modular arithmetic functions, like implementations of
-    [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html)
+    [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAdd.html)
     and
-    [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html),
+    [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html),
     and of traits for arithmetic modulo a power of 2, like
-    [`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Add.html)
+    [`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Add.html)
     and
-    [`ModPowerOf2Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Pow.html);
+    [`ModPowerOf2Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Pow.html);
   - Various functions for logic and bit manipulation, like
     [`BitAnd`](https://doc.rust-lang.org/nightly/core/ops/trait.BitAnd.html) and
     [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html).
@@ -111,7 +111,7 @@ terminology, since they're large digits. By default, the type of a `Limb` is
 This crate comes with a `bin` target that can be used for running demos and benchmarks.
 - Almost all of the public functions in this crate have an associated demo. Running a demo shows
   you a function's behavior on a large number of inputs. For example, to demo the
-  [`mod_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html#tymethod.mod_pow)
+  [`mod_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html#tymethod.mod_pow)
   function on [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)s, you can use the following command:
   ```text
   cargo run --features bin_build --release -- -l 10000 -m exhaustive -d demo_natural_mod_pow

@@ -14,7 +14,7 @@ use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::arithmetic::fraction_matrix::{
     Fraction, is_solution as is_fraction_solution,
 };
-use malachite_nz::integer_matrix::arithmetic::solve::solve_fflu;
+use malachite_nz::integer_matrix::linear_algebra::solve::solve_fflu;
 use malachite_nz::test_util::generators::integer_matrix_pair_gen_var_7;
 use malachite_q::Rational;
 use malachite_q::rational_matrix::RationalMatrix;

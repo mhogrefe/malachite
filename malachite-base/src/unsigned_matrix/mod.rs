@@ -8,9 +8,9 @@
 
 use crate::matrix::Matrix;
 use crate::named::Named;
-use crate::num::arithmetic::traits::DivisibleBy;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
+use crate::num::modular::traits::DivisibleBy;
 use crate::unsigned_vector::UnsignedVector;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -2209,6 +2209,11 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`UnsignedMatrix`]s without repetition.
 pub mod exhaustive;
+/// Linear algebra on [`UnsignedMatrix`]s: determinants, ranks, nullspaces, solving, decompositions,
+/// and normal forms.
+pub mod linear_algebra;
+/// Arithmetic on [`UnsignedMatrix`]s whose entries are reduced modulo $m$ or $2^k$.
+pub mod modular;
 /// Iterators that generate [`UnsignedMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;

@@ -63,8 +63,8 @@ macro_rules! impl_shr_unsigned {
             /// [`entrywise_shr_round`](crate::num::arithmetic::traits::EntrywiseShrRound).
             ///
             /// There is no corresponding non-modular left shift, since it could overflow; use
-            /// [`mod_power_of_2_shl`](crate::num::arithmetic::traits::ModPowerOf2Shl) or
-            /// [`mod_shl`](crate::num::arithmetic::traits::ModShl) instead.
+            /// [`mod_power_of_2_shl`](crate::num::modular::traits::ModPowerOf2Shl) or
+            /// [`mod_shl`](crate::num::modular::traits::ModShl) instead.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

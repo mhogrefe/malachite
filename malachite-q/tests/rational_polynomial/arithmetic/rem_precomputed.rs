@@ -7,7 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::polynomial::{Polynomial, RemPrecomputed, RemPrecomputedAssign};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{RemPrecomputed, RemPrecomputedAssign};
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::rational_polynomial_pair_gen_var_3;
 

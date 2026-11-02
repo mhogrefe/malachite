@@ -12,7 +12,8 @@ use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{ComposePowerOfX, ComposePowerOfXAssign, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{ComposePowerOfX, ComposePowerOfXAssign};
 
 // The value at 1, the sum of the coefficients.
 fn sum_of_coefficients(coefficients: &[Natural]) -> Natural {
@@ -65,7 +66,7 @@ impl ComposePowerOfX for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposePowerOfX;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();
@@ -110,7 +111,7 @@ impl ComposePowerOfX for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposePowerOfX;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();
@@ -160,7 +161,7 @@ impl ComposePowerOfXAssign for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposePowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposePowerOfXAssign;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();

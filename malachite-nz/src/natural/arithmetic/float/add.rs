@@ -28,10 +28,11 @@ use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
-    NegModPowerOf2, OverflowingAddAssign, Parity, PowerOf2, SaturatingAddAssign, WrappingAddAssign,
+    OverflowingAddAssign, Parity, PowerOf2, SaturatingAddAssign, WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::modular::traits::NegModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 

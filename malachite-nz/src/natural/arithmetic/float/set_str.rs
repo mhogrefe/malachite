@@ -23,9 +23,10 @@ use crate::natural::{bit_to_limb_count_ceiling, limb_to_bit_count};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, DivMod, Parity};
+use malachite_base::num::arithmetic::traits::{DivMod, Parity};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::{CeilingLogBase2, CheckedLogBase2};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 

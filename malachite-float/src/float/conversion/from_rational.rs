@@ -18,14 +18,16 @@ use crate::{Float, significand_bits};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, IsPowerOf2, NegAssign, NegModPowerOf2, RoundToMultipleOfPowerOf2, UnsignedAbs,
+    IsPowerOf2, NegAssign, RoundToMultipleOfPowerOf2, UnsignedAbs,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, RoundingFrom, SaturatingFrom,
 };
+use malachite_base::num::exponential::traits::CheckedLogBase2;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::NegModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;

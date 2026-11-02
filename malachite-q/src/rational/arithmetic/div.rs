@@ -14,10 +14,9 @@
 
 use crate::Rational;
 use core::ops::{Div, DivAssign};
-use malachite_base::num::arithmetic::traits::{
-    CheckedDiv, DivExact, DivExactAssign, Gcd, Reciprocal,
-};
+use malachite_base::num::arithmetic::traits::{CheckedDiv, DivExact, DivExactAssign, Reciprocal};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::Gcd;
 
 impl Div<Self> for Rational {
     type Output = Self;

@@ -11,4 +11,8 @@ pub mod comparison;
 pub mod constants;
 pub mod conversion;
 pub mod exhaustive;
+pub mod exponential;
+pub mod hyperbolic;
+pub mod number_theory;
 pub mod random;
+pub mod trigonometric;

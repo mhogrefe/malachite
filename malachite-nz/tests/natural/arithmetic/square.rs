@@ -6,10 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase, CheckedLogBase2, CheckedSqrt, PowerOf2, Square, SquareAssign,
-};
+use malachite_base::num::arithmetic::traits::{CheckedSqrt, PowerOf2, Square, SquareAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::exponential::traits::{CheckedLogBase, CheckedLogBase2};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::test_util::common::rle_decode;
 use malachite_base::test_util::generators::common::GenConfig;

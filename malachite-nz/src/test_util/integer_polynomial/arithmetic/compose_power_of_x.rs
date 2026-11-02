@@ -10,8 +10,8 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::polynomial::Polynomial;
 
 // Builds p(x^k) coefficient by coefficient, reading the coefficient i/k through `coefficient` where

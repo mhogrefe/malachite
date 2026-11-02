@@ -7,9 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::polynomial::{
-    DeflatePowerOfX, DeflatePowerOfXAssign, slice_deflate_power_of_x, vec_deflate_power_of_x,
-};
+use crate::polynomial::arithmetic::traits::{DeflatePowerOfX, DeflatePowerOfXAssign};
+use crate::polynomial::{slice_deflate_power_of_x, vec_deflate_power_of_x};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 
 impl<T: PrimitiveUnsigned> DeflatePowerOfX for UnsignedPolynomial<T> {
@@ -38,7 +37,7 @@ impl<T: PrimitiveUnsigned> DeflatePowerOfX for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DeflatePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DeflatePowerOfX;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("x^6+2*x^3+1").unwrap();
@@ -80,7 +79,7 @@ impl<T: PrimitiveUnsigned> DeflatePowerOfX for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DeflatePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DeflatePowerOfX;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("x^6+2*x^3+1").unwrap();
@@ -121,7 +120,7 @@ impl<T: PrimitiveUnsigned> DeflatePowerOfXAssign for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DeflatePowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::DeflatePowerOfXAssign;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let mut p = UnsignedPolynomial::<u8>::from_str("x^6+2*x^3+1").unwrap();

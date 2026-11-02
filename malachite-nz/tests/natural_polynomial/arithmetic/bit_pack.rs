@@ -8,7 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::conversion::traits::PowerOf2Digits;
-use malachite_base::polynomial::{BitPack, MulPowerOfX};
+use malachite_base::polynomial::arithmetic::traits::{BitPack, MulPowerOfX};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;

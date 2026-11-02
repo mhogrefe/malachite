@@ -7,10 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::named::Named;
-#[cfg(feature = "test_build")]
-use malachite_base::num::arithmetic::traits::CoprimeWith;
 use malachite_base::num::basic::traits::{NegativeOne, One, OneHalf, Two, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
+#[cfg(feature = "test_build")]
+use malachite_base::num::number_theory::traits::CoprimeWith;
 use malachite_nz::natural::Natural;
 
 /// A rational number.
@@ -148,6 +148,15 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`Rational`]s without repetition.
 pub mod exhaustive;
+/// Integer logarithms of [`Rational`]s.
+pub mod exponential;
+/// Expressing [`Rational`]s as powers.
+pub mod factorization;
+/// Reduction of [`Rational`]s modulo an integer, and rational reconstruction.
+pub mod modular;
+/// Number-theoretic functions of [`Rational`]s: GCDs, Farey neighbors, best approximations,
+/// harmonic numbers, and Dedekind sums.
+pub mod number_theory;
 #[cfg(feature = "random")]
 /// Iterators that generate [`Rational`]s randomly.
 pub mod random;

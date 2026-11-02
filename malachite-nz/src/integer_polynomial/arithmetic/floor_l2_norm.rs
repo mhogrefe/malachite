@@ -9,7 +9,7 @@
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::FloorSqrt;
-use malachite_base::polynomial::{FloorL2Norm, L2NormSquared};
+use malachite_base::polynomial::arithmetic::traits::{FloorL2Norm, L2NormSquared};
 
 impl FloorL2Norm for &IntegerPolynomial {
     type Output = Natural;
@@ -34,7 +34,7 @@ impl FloorL2Norm for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::FloorL2Norm;
+    /// use malachite_base::polynomial::arithmetic::traits::FloorL2Norm;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// assert_eq!(

@@ -7,15 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use crate::natural::logic::bit_access::limbs_slice_set_bit;
+use crate::natural::modular::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, PowerOf2, RoundToMultipleOfPowerOf2, ShrRound,
-};
+use malachite_base::num::arithmetic::traits::{PowerOf2, RoundToMultipleOfPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::iterators::iterator_to_bit_chunks;
 use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};

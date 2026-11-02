@@ -8,7 +8,7 @@
 
 use crate::rational_polynomial::{RationalPolynomial, reduce};
 use core::mem::take;
-use malachite_base::polynomial::{DivPowerOfX, DivPowerOfXAssign};
+use malachite_base::polynomial::arithmetic::traits::{DivPowerOfX, DivPowerOfXAssign};
 
 impl DivPowerOfX for RationalPolynomial {
     type Output = Self;
@@ -40,7 +40,7 @@ impl DivPowerOfX for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::DivPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DivPowerOfX;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("2*x^2+x+3/5").unwrap();
@@ -89,7 +89,7 @@ impl DivPowerOfX for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::DivPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DivPowerOfX;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("2*x^2+x+3/5").unwrap();
@@ -140,7 +140,7 @@ impl DivPowerOfXAssign for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::DivPowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::DivPowerOfXAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("2*x^2+x+3/5").unwrap();

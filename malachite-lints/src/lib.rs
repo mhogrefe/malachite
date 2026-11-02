@@ -245,7 +245,16 @@ fn assign_variant(
         return Some(inherent_ref);
     }
     let trait_name = format!("{}Assign", camel_case(base));
-    for module in ["arithmetic", "logic"] {
+    for module in [
+        "arithmetic",
+        "modular",
+        "number_theory",
+        "exponential",
+        "trigonometric",
+        "hyperbolic",
+        "linear_algebra",
+        "logic",
+    ] {
         let path = format!("malachite_base::num::{module}::traits::{trait_name}");
         if !clippy_utils::paths::lookup_path_str(cx.tcx, clippy_utils::paths::PathNS::Type, &path)
             .is_empty()
@@ -267,7 +276,16 @@ fn assign_trait_impl<'tcx>(
     base: &str,
 ) -> Option<String> {
     let trait_name = format!("{}Assign", camel_case(base));
-    for module in ["arithmetic", "logic"] {
+    for module in [
+        "arithmetic",
+        "modular",
+        "number_theory",
+        "exponential",
+        "trigonometric",
+        "hyperbolic",
+        "linear_algebra",
+        "logic",
+    ] {
         let path = format!("malachite_base::num::{module}::traits::{trait_name}");
         if implements_trait_by_path(cx, ty, &path) {
             return Some(format!("{base}_assign"));

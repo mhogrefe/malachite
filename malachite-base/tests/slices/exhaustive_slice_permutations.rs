@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::Factorial;
 use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::number_theory::traits::Factorial;
 use malachite_base::slices::exhaustive_slice_permutations;
 
 fn exhaustive_slice_permutations_helper(cs: &str, out: &[&str]) {

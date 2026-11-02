@@ -7,13 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
-use crate::integer_vector::arithmetic::multi_mod::integers_multi_mod;
 use crate::integer_vector::arithmetic::scalar_mul::{
     integers_mul_scalar_assign, integers_mul_scalar_to_out,
 };
+use crate::integer_vector::modular::multi_mod::integers_multi_mod;
 use crate::natural::InnerNatural::Small;
 use crate::natural::{LIMB_MAX_QUARTER, Natural, WIDTH_MINUS_2};
-use crate::natural_vector::arithmetic::multi_mod::naturals_multi_mod;
+use crate::natural_vector::modular::multi_mod::naturals_multi_mod;
 use crate::platform::{Limb, SignedDoubleLimb, SignedLimb};
 use alloc::borrow::Cow;
 use alloc::vec::Vec;

@@ -8,7 +8,10 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, OneHalf, Zero};
-use malachite_base::polynomial::{Compose, ComposeAssign, Evaluate, Polynomial, TaylorShift};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{
+    Compose, ComposeAssign, Evaluate, TaylorShift,
+};
 use malachite_base::test_util::generators::common::SMALL_LIMIT;
 use malachite_q::Rational;
 use malachite_q::rational_polynomial::RationalPolynomial;

@@ -57,7 +57,7 @@ declare_lint! {
 
 declare_lint_pass!(UseDeterminantSign => [USE_DETERMINANT_SIGN]);
 
-// Whether `fn_did` is `malachite_base::num::arithmetic::traits::Determinant::determinant`.
+// Whether `fn_did` is `malachite_base::num::linear_algebra::traits::Determinant::determinant`.
 fn is_determinant_fn(cx: &LateContext<'_>, fn_did: rustc_hir::def_id::DefId) -> bool {
     let Some(trait_did) = cx.tcx.trait_of_assoc(fn_did) else {
         return false;
@@ -66,7 +66,7 @@ fn is_determinant_fn(cx: &LateContext<'_>, fn_did: rustc_hir::def_id::DefId) -> 
     path.len() == 5
         && path[0].as_str() == "malachite_base"
         && path[1].as_str() == "num"
-        && path[2].as_str() == "arithmetic"
+        && path[2].as_str() == "linear_algebra"
         && path[3].as_str() == "traits"
         && path[4].as_str() == "Determinant"
 }
@@ -98,7 +98,7 @@ pub(crate) fn is_determinant_call<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'t
         && crate::implements_trait_by_path(
             cx,
             cx.typeck_results().expr_ty(matrix).peel_refs(),
-            "malachite_base::num::arithmetic::traits::DeterminantSign",
+            "malachite_base::num::linear_algebra::traits::DeterminantSign",
         )
 }
 

@@ -8,7 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{ComposePowerOfX, ExponentGcd, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{ComposePowerOfX, ExponentGcd};
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{
     rational_polynomial_gen, rational_polynomial_unsigned_pair_gen_var_1,

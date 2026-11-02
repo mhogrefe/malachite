@@ -13,13 +13,13 @@ use core::cmp::{
     Ordering::{self, *},
     min,
 };
-use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{
     ExactFrom, IntegerMantissaAndExponent, RawMantissaAndExponent, SciMantissaAndExponent,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::DivisibleByPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -485,8 +485,8 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     /// $$
     /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
     ///
-    /// The inverse operation is
-    /// [`from_integer_mantissa_and_exponent`](IntegerMantissaAndExponent::from_integer_mantissa_and_exponent).
+    /// The inverse operation is [`from_integer_mantissa_and_exponent`](
+    /// IntegerMantissaAndExponent::from_integer_mantissa_and_exponent).
     ///
     /// The integer exponent is less than or equal to $2^{30}-2$.
     ///
@@ -532,7 +532,6 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     ///     )
     /// );
     /// ```
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
         if let Self(Finite {
             exponent,
@@ -690,8 +689,8 @@ impl IntegerMantissaAndExponent<Natural, i64, Float> for &Float {
     /// $$
     /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
     ///
-    /// The inverse operation is
-    /// [`from_integer_mantissa_and_exponent`](IntegerMantissaAndExponent::from_integer_mantissa_and_exponent).
+    /// The inverse operation is [`from_integer_mantissa_and_exponent`](
+    /// IntegerMantissaAndExponent::from_integer_mantissa_and_exponent).
     ///
     /// The integer exponent is less than or equal to $2^{30}-2$.
     ///
@@ -736,7 +735,6 @@ impl IntegerMantissaAndExponent<Natural, i64, Float> for &Float {
     ///     )
     /// );
     /// ```
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     fn integer_mantissa_and_exponent(self) -> (Natural, i64) {
         if let Float(Finite {
             exponent,

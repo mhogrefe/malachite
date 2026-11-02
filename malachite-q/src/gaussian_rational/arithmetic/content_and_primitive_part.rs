@@ -9,9 +9,10 @@
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, DivExact, Lcm, PrimitivePart,
+    Content, ContentAndPrimitivePart, DivExact, PrimitivePart,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::Lcm;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

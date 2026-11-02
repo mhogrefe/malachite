@@ -12,4 +12,6 @@ pub mod exhaustive;
 pub mod factorization;
 pub mod float;
 pub mod logic;
+pub mod modular;
+pub mod number_theory;
 pub mod random;

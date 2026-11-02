@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use malachite_base::num::arithmetic::traits::{DivExact, Gcd, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{DivExact, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_nz::integer::Integer;
 
 /// A candidate fused `add_mul`, kept for benchmarking against the composition `x + y * z`.
@@ -28,7 +29,7 @@ use malachite_nz::integer::Integer;
 /// **It is slower, and this function exists to record that.** The appeal of the split is that a gcd
 /// costs more than linear time, so two gcds on $n$-bit operands should beat one against a $2n$-bit
 /// product. That reasoning does not survive contact with
-/// [`limbs_gcd_reduced`](malachite_nz::natural::arithmetic::gcd), which begins by reducing the
+/// [`limbs_gcd_reduced`](malachite_nz::natural::number_theory::gcd), which begins by reducing the
 /// larger operand modulo the smaller: the single gcd therefore costs one division plus a *balanced*
 /// gcd, and the split trades that cheap division for a second full gcd.
 ///

@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::fail_on_untested_path;
-use crate::num::arithmetic::mod_mul::{limbs_invert_limb_u32, limbs_invert_limb_u64};
 use crate::num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
     DivAssignModPrecomputed, DivAssignRem, DivMod, DivModPrecomputed, DivRem, UnsignedAbs,
@@ -17,6 +16,7 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use crate::num::logic::traits::LeadingZeros;
+use crate::num::modular::mod_mul::{limbs_invert_limb_u32, limbs_invert_limb_u64};
 
 fn div_mod_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> (T, T) {
     let q = x / other;

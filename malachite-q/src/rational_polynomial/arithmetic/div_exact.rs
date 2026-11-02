@@ -16,7 +16,7 @@ use alloc::borrow::Cow;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{Content, DivExact, DivExactAssign};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::CheckedDivExact;
+use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;
@@ -95,8 +95,7 @@ impl DivExact<Self> for RationalPolynomial {
 
     /// Divides a [`RationalPolynomial`] by another that divides it, taking both by value. If
     /// `other` does not divide `self`, the result is unspecified; use
-    /// [`checked_div_exact`](malachite_base::polynomial::CheckedDivExact::checked_div_exact) when
-    /// it may not.
+    /// [`checked_div_exact`](CheckedDivExact::checked_div_exact) when it may not.
     ///
     /// $$
     /// f(a, b) = a/b.
@@ -143,8 +142,7 @@ impl DivExact<&Self> for RationalPolynomial {
 
     /// Divides a [`RationalPolynomial`] by another that divides it, taking the first by value and
     /// the second by reference. If `other` does not divide `self`, the result is unspecified; use
-    /// [`checked_div_exact`](malachite_base::polynomial::CheckedDivExact::checked_div_exact) when
-    /// it may not.
+    /// [`checked_div_exact`](CheckedDivExact::checked_div_exact) when it may not.
     ///
     /// $$
     /// f(a, b) = a/b.
@@ -191,8 +189,7 @@ impl DivExact<RationalPolynomial> for &RationalPolynomial {
 
     /// Divides a [`RationalPolynomial`] by another that divides it, taking the first by reference
     /// and the second by value. If `other` does not divide `self`, the result is unspecified; use
-    /// [`checked_div_exact`](malachite_base::polynomial::CheckedDivExact::checked_div_exact) when
-    /// it may not.
+    /// [`checked_div_exact`](CheckedDivExact::checked_div_exact) when it may not.
     ///
     /// $$
     /// f(a, b) = a/b.
@@ -239,8 +236,7 @@ impl DivExact<&RationalPolynomial> for &RationalPolynomial {
 
     /// Divides a [`RationalPolynomial`] by another that divides it, taking both by reference. If
     /// `other` does not divide `self`, the result is unspecified; use
-    /// [`checked_div_exact`](malachite_base::polynomial::CheckedDivExact::checked_div_exact) when
-    /// it may not.
+    /// [`checked_div_exact`](CheckedDivExact::checked_div_exact) when it may not.
     ///
     /// $$
     /// f(a, b) = a/b.
@@ -385,7 +381,7 @@ impl CheckedDivExact<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivExact;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -438,7 +434,7 @@ impl CheckedDivExact<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivExact;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -491,7 +487,7 @@ impl CheckedDivExact<RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivExact;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -544,7 +540,7 @@ impl CheckedDivExact<&RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivExact;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(

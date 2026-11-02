@@ -8,7 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{L2NormSquared, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::L2NormSquared;
 use malachite_nz::test_util::generators::integer_polynomial_gen;
 use malachite_q::Rational;
 use malachite_q::rational_polynomial::RationalPolynomial;

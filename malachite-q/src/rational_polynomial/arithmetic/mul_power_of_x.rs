@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_polynomial::RationalPolynomial;
-use malachite_base::polynomial::{MulPowerOfX, MulPowerOfXAssign};
+use malachite_base::polynomial::arithmetic::traits::{MulPowerOfX, MulPowerOfXAssign};
 
 impl MulPowerOfX for RationalPolynomial {
     type Output = Self;
@@ -37,7 +37,7 @@ impl MulPowerOfX for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfX;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -96,7 +96,7 @@ impl MulPowerOfX for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfX;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -152,7 +152,7 @@ impl MulPowerOfXAssign for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfXAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("1/2*x^2-1/3").unwrap();

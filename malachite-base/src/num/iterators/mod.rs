@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-use crate::num::arithmetic::traits::{DivMod, DivisibleBy};
+use crate::num::arithmetic::traits::DivMod;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::modular::traits::DivisibleBy;
 use core::cmp::Ordering::*;
 use core::marker::PhantomData;
 

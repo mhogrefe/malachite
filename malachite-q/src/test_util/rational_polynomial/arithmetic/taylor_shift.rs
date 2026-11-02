@@ -9,8 +9,9 @@
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{AddMulAssign, BinomialCoefficient, Pow};
+use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::BinomialCoefficient;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::natural::Natural;
 

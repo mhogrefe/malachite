@@ -13,13 +13,12 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::ops::Deref;
 use malachite_base::named::Named;
-#[cfg(feature = "test_build")]
-use malachite_base::num::arithmetic::traits::CoprimeWith;
-use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, Gcd, GcdAssign, LcmAssign,
-};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+#[cfg(feature = "test_build")]
+use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::num::number_theory::traits::{Gcd, GcdAssign, LcmAssign};
 use malachite_base::polynomial::Polynomial;
 use malachite_base::vars::{Var, VarScheme};
 use malachite_nz::integer::Integer;
@@ -27,6 +26,8 @@ use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_vector::arithmetic::content_chained::integers_content_chained;
 use malachite_nz::natural::Natural;
 
+/// Derivatives and integrals of [`RationalPolynomial`]s.
+pub mod calculus;
 /// Iterators that generate [`RationalPolynomial`]s without repetition.
 pub mod exhaustive;
 #[cfg(feature = "random")]
@@ -42,6 +43,8 @@ pub mod comparison;
 pub mod conversion;
 /// Traits for logic and bit manipulation on [`RationalPolynomial`]s.
 pub mod logic;
+/// Operations on [`RationalPolynomial`]s as power series, truncated to a given number of terms.
+pub mod series;
 
 /// A polynomial in one variable whose coefficients are [`Rational`]s.
 ///

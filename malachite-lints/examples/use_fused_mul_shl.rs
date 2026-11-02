@@ -1,6 +1,7 @@
-use malachite_base::num::arithmetic::traits::{
-    AddMul, AddMulAssign, ModAdd, ModAddAssign, ModAddMul, ModMul, ModPowerOf2Add,
-    ModPowerOf2AddMul, ModPowerOf2Mul, ModPowerOf2Shl, ModPowerOf2Sub, ModShl, ModSub, SubMul,
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, SubMul};
+use malachite_base::num::modular::traits::{
+    ModAdd, ModAddAssign, ModAddMul, ModMul, ModPowerOf2Add, ModPowerOf2AddMul, ModPowerOf2Mul,
+    ModPowerOf2Shl, ModPowerOf2Sub, ModShl, ModSub,
 };
 use malachite_float::Float;
 use malachite_nz::integer::Integer;

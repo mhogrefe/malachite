@@ -6,12 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{CheckedSquare, DivisibleBy, Parity};
+use crate::num::arithmetic::traits::{CheckedSquare, Parity};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::factorization::prime_sieve::{id_to_n, limbs_count_ones, n_to_bit};
 use crate::num::factorization::traits::IsPrime;
 use crate::num::logic::traits::{NotAssign, TrailingZeros};
+use crate::num::modular::traits::DivisibleBy;
 use crate::slices::slice_leading_zeros;
 
 pub fn limbs_prime_sieve_naive_1<T: PrimitiveUnsigned>(bit_array: &mut [T], n: u64) -> u64 {

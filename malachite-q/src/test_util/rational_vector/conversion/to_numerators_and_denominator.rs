@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_vector::RationalVector;
-use malachite_base::num::arithmetic::traits::{DivExact, GcdAssign};
+use malachite_base::num::arithmetic::traits::DivExact;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::number_theory::traits::GcdAssign;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;

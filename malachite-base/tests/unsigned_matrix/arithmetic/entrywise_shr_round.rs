@@ -10,9 +10,10 @@ use core::ops::Shr;
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
-    EntrywiseShrRound, EntrywiseShrRoundAssign, ModPowerOf2Shl, ShrRound,
+    EntrywiseShrRound, EntrywiseShrRoundAssign, ShrRound,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::modular::traits::ModPowerOf2Shl;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_matrix_unsigned_pair_gen_var_14,

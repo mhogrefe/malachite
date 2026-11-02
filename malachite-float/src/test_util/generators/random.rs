@@ -94,7 +94,7 @@ use malachite_base::bools::random::{
     RandomBools, WeightedRandomBools, random_bools, weighted_random_bools,
 };
 use malachite_base::iterators::{WithSpecialValues, with_special_values};
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, NegModPowerOf2, Reciprocal};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, Reciprocal};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -104,6 +104,7 @@ use malachite_base::num::conversion::string::options::random::random_to_sci_opti
 use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::NegModPowerOf2;
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, geometric_random_natural_signeds,
     geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,

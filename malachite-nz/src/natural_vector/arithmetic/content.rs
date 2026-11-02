@@ -10,10 +10,10 @@ use crate::natural::Natural;
 use crate::natural_vector::NaturalVector;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, GcdAssign, PrimitivePart,
-    PrimitivePartAssign,
+    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, PrimitivePart, PrimitivePartAssign,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::GcdAssign;
 
 // The GCD of the elements. It stops as soon as it reaches 1, since nothing can lower it further.
 pub(crate) fn content(coefficients: &[Natural]) -> Natural {

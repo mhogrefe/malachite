@@ -17,8 +17,8 @@ use crate::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1::fft_mulm
 use crate::natural::arithmetic::mul::schonhage_strassen::normmod_2expp1::limbs_norm_mod_2expp1;
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 
 // Transforms, multiplies, and inverse-transforms row `i` of the matrix of residues, as the inner
 // step of the matrix Fourier convolution. If `jj` is `None`, the residues of `ii` are squared.

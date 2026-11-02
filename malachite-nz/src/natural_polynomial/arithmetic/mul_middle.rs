@@ -11,7 +11,7 @@ use crate::integer_polynomial::arithmetic::mul_middle::{
 };
 use crate::natural_polynomial::NaturalPolynomial;
 use core::mem::take;
-use malachite_base::polynomial::{MulMiddle, MulMiddleAssign};
+use malachite_base::polynomial::arithmetic::traits::{MulMiddle, MulMiddleAssign};
 
 impl MulMiddle<Self> for NaturalPolynomial {
     type Output = Self;
@@ -40,7 +40,7 @@ impl MulMiddle<Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddle;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// // (x^2+3*x+2)*(2*x+5) = 2*x^3+11*x^2+19*x+10.
@@ -97,7 +97,7 @@ impl MulMiddle<&Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddle;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// // (x^2+3*x+2)*(2*x+5) = 2*x^3+11*x^2+19*x+10.
@@ -154,7 +154,7 @@ impl MulMiddle<NaturalPolynomial> for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddle;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// // (x^2+3*x+2)*(2*x+5) = 2*x^3+11*x^2+19*x+10.
@@ -210,7 +210,7 @@ impl MulMiddle<&NaturalPolynomial> for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddle;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// // (x^2+3*x+2)*(2*x+5) = 2*x^3+11*x^2+19*x+10.
@@ -262,7 +262,7 @@ impl MulMiddleAssign<Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddleAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddleAssign;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();
@@ -302,7 +302,7 @@ impl MulMiddleAssign<&Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddleAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddleAssign;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();

@@ -11,13 +11,21 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     arithmetic::register(runner);
     basic::register(runner);
+    calculus::register(runner);
     comparison::register(runner);
     conversion::register(runner);
     logic::register(runner);
+    mod_polynomial::register(runner);
+    modular::register(runner);
+    series::register(runner);
 }
 
 mod arithmetic;
 mod basic;
+mod calculus;
 mod comparison;
 mod conversion;
 mod logic;
+mod mod_polynomial;
+mod modular;
+mod series;

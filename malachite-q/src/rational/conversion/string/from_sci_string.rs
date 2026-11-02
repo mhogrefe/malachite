@@ -7,8 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::rational::arithmetic::traits::SimplestRationalInInterval;
+use crate::rational::number_theory::traits::SimplestRationalInInterval;
 use malachite_base::num::arithmetic::traits::Pow;
+#[cfg(doc)]
+use malachite_base::num::arithmetic::traits::RoundToMultiple;
 use malachite_base::num::conversion::string::from_sci_string::preprocess_sci_string;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::FromSciString;
@@ -145,8 +147,7 @@ impl Rational {
     /// - Increase the scale of the input; `"0.10"` is converted to $1/10$.
     /// - Use [`from_sci_string_with_options`](Rational::from_sci_string_with_options), and round
     ///   the result manually using functions like
-    ///   [`round_to_multiple`](malachite_base::num::arithmetic::traits::RoundToMultiple::round_to_multiple)
-    ///   and
+    ///   [`round_to_multiple`](RoundToMultiple::round_to_multiple) and
     ///   [`simplest_rational_in_closed_interval`](Rational::simplest_rational_in_closed_interval).
     ///
     /// # Worst-case complexity
@@ -183,7 +184,6 @@ impl Rational {
     ///     "1/4105"
     /// );
     /// ```
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     pub fn from_sci_string_simplest_with_options(
         s: &str,
         options: FromSciStringOptions,
@@ -236,9 +236,7 @@ impl Rational {
     ///   input literally; it converts `"0.333"` to $333/1000$.
     /// - Increase the scale of the input; `"0.10"` is converted to $1/10$.
     /// - Use [`from_sci_string`](Rational::from_sci_string), and round the result manually using
-    ///   functions like
-    ///   [`round_to_multiple`](malachite_base::num::arithmetic::traits::RoundToMultiple::round_to_multiple)
-    ///   and
+    ///   functions like [`round_to_multiple`](RoundToMultiple::round_to_multiple) and
     ///   [`simplest_rational_in_closed_interval`](Rational::simplest_rational_in_closed_interval).
     ///
     /// # Worst-case complexity
@@ -284,7 +282,6 @@ impl Rational {
     /// );
     /// ```
     #[inline]
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     pub fn from_sci_string_simplest(s: &str) -> Option<Self> {
         Self::from_sci_string_simplest_with_options(s, FromSciStringOptions::default())
     }

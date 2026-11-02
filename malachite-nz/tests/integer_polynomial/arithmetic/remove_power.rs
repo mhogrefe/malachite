@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{DivisibleBy, Pow};
+use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::factorization::traits::{RemovePower, RemovePowerAssign};
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::*;
 use malachite_nz::test_util::integer_polynomial::arithmetic::pseudo_div_rem::*;

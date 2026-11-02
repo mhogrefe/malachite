@@ -8,7 +8,7 @@
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{MulMiddle, MulMiddleAssign};
+use malachite_base::polynomial::arithmetic::traits::{MulMiddle, MulMiddleAssign};
 use malachite_base::test_util::bench::bucketers::quadruple_1_2_vec_max_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};

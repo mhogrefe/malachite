@@ -21,6 +21,8 @@ use malachite_base::vars::{Var, VarScheme};
 
 /// Traits for arithmetic on [`IntegerPolynomial`]s.
 pub mod arithmetic;
+/// Derivatives and integrals of [`IntegerPolynomial`]s.
+pub mod calculus;
 /// Implementations of [`Ord`] and [`PartialOrd`] for [`IntegerPolynomial`], comparing two
 /// polynomials by their behavior for large arguments.
 pub mod comparison;
@@ -30,9 +32,13 @@ pub mod conversion;
 pub mod exhaustive;
 /// Traits for logic and bit manipulation on [`IntegerPolynomial`]s.
 pub mod logic;
+/// Arithmetic on [`IntegerPolynomial`]s whose coefficients are reduced modulo $m$ or $2^k$.
+pub mod modular;
 #[cfg(feature = "random")]
 /// Iterators that generate [`IntegerPolynomial`]s randomly.
 pub mod random;
+/// Operations on [`IntegerPolynomial`]s as power series, truncated to a given number of terms.
+pub mod series;
 
 // The zero `Integer`, as something a reference can be handed out to.
 //

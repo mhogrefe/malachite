@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_polynomial::RationalPolynomial;
-use malachite_base::polynomial::{DeflatePowerOfX, DeflatePowerOfXAssign};
+use malachite_base::polynomial::arithmetic::traits::{DeflatePowerOfX, DeflatePowerOfXAssign};
 
 impl DeflatePowerOfX for RationalPolynomial {
     type Output = Self;
@@ -36,7 +36,7 @@ impl DeflatePowerOfX for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DeflatePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DeflatePowerOfX;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^4-1/3").unwrap();
@@ -81,7 +81,7 @@ impl DeflatePowerOfX for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DeflatePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DeflatePowerOfX;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^4-1/3").unwrap();
@@ -124,7 +124,7 @@ impl DeflatePowerOfXAssign for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DeflatePowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::DeflatePowerOfXAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("1/2*x^4-1/3").unwrap();

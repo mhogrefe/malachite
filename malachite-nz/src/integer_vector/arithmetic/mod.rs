@@ -106,16 +106,6 @@ pub mod add_mul;
 /// [`AddMulShlAssign`](malachite_base::num::arithmetic::traits::AddMulShlAssign), for adding a
 /// scalar multiple of one vector, shifted left, to another.
 pub mod add_mul_shl;
-/// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod) and
-/// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), which reduce
-/// every element of a vector to the representative closest to zero modulo a number.
-pub mod balanced_mod;
-/// Implementations of
-/// [`BalancedModPowerOf2`](malachite_base::num::arithmetic::traits::BalancedModPowerOf2) and
-/// [`BalancedModPowerOf2Assign`](
-/// malachite_base::num::arithmetic::traits::BalancedModPowerOf2Assign), which reduce every element
-/// of a vector to the representative closest to zero modulo a power of 2.
-pub mod balanced_mod_power_of_2;
 /// Implementations of [`CanonicalPrimitivePart`](
 /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart),
 /// [`CanonicalPrimitivePartAssign`](
@@ -455,22 +445,6 @@ pub mod l1_norm;
 pub mod max_bits;
 #[doc(hidden)]
 pub mod max_limbs;
-/// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
-/// [`Rem`](core::ops::Rem), and [`RemAssign`](core::ops::RemAssign), for reducing every element of
-/// a vector modulo a number.
-pub mod mod_op;
-/// Implementations of [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2),
-/// [`RemPowerOf2`](malachite_base::num::arithmetic::traits::RemPowerOf2), and
-/// [`RemPowerOf2Assign`](malachite_base::num::arithmetic::traits::RemPowerOf2Assign), for reducing
-/// every element of a vector modulo a power of 2.
-pub mod mod_power_of_2;
-/// [`IntegerVector::multi_balanced_crt`](super::IntegerVector::multi_balanced_crt), which combines
-/// vectors of residues modulo many word-sized moduli into balanced representatives by the Chinese
-/// remainder theorem.
-pub mod multi_crt;
-/// [`IntegerVector::multi_mod`](super::IntegerVector::multi_mod), which reduces a vector modulo
-/// many word-sized moduli.
-pub mod multi_mod;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a vector.
 pub mod neg;

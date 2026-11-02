@@ -17,13 +17,13 @@ use core::cmp::{
     Ordering::{self, *},
     min,
 };
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, ModPowerOf2, MulShrRound, MulShrRoundAssign, Parity, ShrRound,
-};
+use malachite_base::num::arithmetic::traits::{MulShrRound, MulShrRoundAssign, Parity, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CheckedLogBase2;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 // Enough guard bits between the cut and the bottom of the short product's valid region to absorb

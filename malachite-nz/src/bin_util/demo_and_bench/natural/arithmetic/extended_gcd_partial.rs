@@ -9,7 +9,7 @@
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::arithmetic::gcd::extended_gcd_partial::extended_gcd_partial;
+use malachite_nz::natural::number_theory::gcd::extended_gcd_partial::extended_gcd_partial;
 use malachite_nz::test_util::bench::bucketers::triple_1_natural_bit_bucketer;
 use malachite_nz::test_util::generators::natural_triple_gen_var_10;
 

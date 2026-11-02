@@ -12,11 +12,10 @@
 // and that striping reaches the coefficients.
 
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::{
-    Height, ModIsReduced, ModPowerOf2IsReduced, PowerOf2,
-};
+use malachite_base::num::arithmetic::traits::{Height, PowerOf2};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::BitIterable;
+use malachite_base::num::modular::traits::{ModIsReduced, ModPowerOf2IsReduced};
 use malachite_base::polynomial::Polynomial;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_nz::natural::Natural;

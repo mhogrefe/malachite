@@ -8,8 +8,9 @@
 
 use itertools::Itertools;
 use malachite_base::iterators::prefix_to_string;
-use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOf2IsReduced, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::modular::traits::{ModIsReduced, ModPowerOf2IsReduced};
 use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::exhaustive::*;
 use malachite_nz::natural::Natural;

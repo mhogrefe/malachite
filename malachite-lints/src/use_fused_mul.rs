@@ -56,7 +56,16 @@ declare_lint! {
 
 declare_lint_pass!(UseFusedMul => [USE_FUSED_MUL]);
 
-const TRAIT_ROOT: &str = "malachite_base::num::arithmetic::traits";
+// The full path of the fused trait `name`: the modular ones (`ModAddMul`, `ModPowerOf2SubMulShl`,
+// ...) live in `num::modular`, the rest in `num::arithmetic`.
+pub(crate) fn trait_path(name: &str) -> String {
+    let module = if name.starts_with("Mod") {
+        "modular"
+    } else {
+        "arithmetic"
+    };
+    format!("malachite_base::num::{module}::traits::{name}")
+}
 
 // Whether rewriting the operator form is both sound and worth doing for values of type `ty`.
 //
@@ -219,7 +228,7 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
                 if as_mul(lhs).is_some() && as_mul(rhs).is_some() {
                     let fused = format!("mul_{name}_mul");
                     if !inside_own_definition(cx, expr, &fused)
-                        && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused)))
+                        && has_trait_impl(cx, ty, &trait_path(&camel(&fused)))
                     {
                         span_lint(
                             cx,
@@ -273,7 +282,7 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
                 }
                 let fused = format!("{name}_mul");
                 if !inside_own_definition(cx, expr, &fused)
-                    && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused)))
+                    && has_trait_impl(cx, ty, &trait_path(&camel(&fused)))
                 {
                     span_lint(
                         cx,
@@ -298,7 +307,7 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
                 }
                 let fused = format!("{name}_mul_assign");
                 if !inside_own_definition(cx, expr, &fused)
-                    && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused)))
+                    && has_trait_impl(cx, ty, &trait_path(&camel(&fused)))
                 {
                     span_lint(
                         cx,
@@ -345,7 +354,7 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
                         return;
                     };
                 if !inside_own_definition(cx, expr, &fused)
-                    && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused)))
+                    && has_trait_impl(cx, ty, &trait_path(&camel(&fused)))
                 {
                     span_lint(
                         cx,

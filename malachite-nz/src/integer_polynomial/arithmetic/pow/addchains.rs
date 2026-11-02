@@ -14,8 +14,8 @@ use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_polynomial::arithmetic::mul::mul_greater_to_out;
 use crate::integer_polynomial::arithmetic::square::square_to_out;
 use alloc::vec;
-use malachite_base::num::arithmetic::traits::FloorLogBase2;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::FloorLogBase2;
 
 // A tree with shortest addition chains (star chains, in fact) for all integers up to and including
 // 148. The entry at 0 is present to provide 1-based indexing. The integer 1 is the root of the

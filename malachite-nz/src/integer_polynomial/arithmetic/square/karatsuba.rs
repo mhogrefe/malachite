@@ -20,8 +20,9 @@ use crate::integer_vector::arithmetic::add::vec_add;
 use crate::integer_vector::arithmetic::sub::vec_sub_assign;
 use alloc::vec;
 use core::borrow::Borrow;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 
 // Karatsuba squaring of a polynomial in bit-reversed order: `xs` has length $2^b$, `out` has length
 // $2^{b+1}$, and `temp` has length at least $2^{b+1}$. See `mul/karatsuba.rs`.

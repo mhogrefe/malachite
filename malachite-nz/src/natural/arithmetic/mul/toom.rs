@@ -70,10 +70,11 @@ use crate::platform::{
 use core::cmp::Ordering::*;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, EqModPowerOf2, ShrRound, WrappingAddAssign, WrappingSubAssign,
+    ArithmeticCheckedShl, DivRound, ShrRound, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::NotAssign;
+use malachite_base::num::modular::traits::EqModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 

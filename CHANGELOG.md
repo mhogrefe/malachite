@@ -8,6 +8,56 @@ documented by git history.
 
 ## Unreleased
 
+### Breaking and behavioral changes
+
+- The `arithmetic` modules are being split up, since they had become catch-alls. The traits of
+  `malachite_base::num::arithmetic::traits` now live in six modules: `num::arithmetic::traits`
+  keeps the ring operations, rounding, shifts, roots, powers, and the `checked_`/`wrapping_`/
+  `saturating_`/`overflowing_` variants; `num::modular::traits` has every `Mod*` and `ModPowerOf2*`
+  trait along with reduction (`Mod`, `ModPowerOf2`, `NegMod`, `CeilingMod`, `RemPowerOf2`,
+  `BalancedMod*`), divisibility (`DivisibleBy*`, `EqMod*`), and `Crt`; `num::number_theory::traits`
+  has `Gcd`, `Lcm`, `ExtendedGcd`, `CoprimeWith`, the Kronecker, Jacobi, and Legendre symbols, and
+  the combinatorial sequences (factorials, `BinomialCoefficient`, `Fibonacci`, `BellNumber`,
+  `Primorial`, ...); `num::exponential::traits` has `Exp`, `Ln`, every `LogBase*` trait including
+  the integer `FloorLogBase*`, `CeilingLogBase*`, and `CheckedLogBase*` ones, `PowerOf10`,
+  `PowerOf2XMinus1`, `Agm`, and `Compound`; and `num::trigonometric::traits` and
+  `num::hyperbolic::traits` have the trigonometric and hyperbolic functions and their inverses.
+  Every moved trait is still re-exported from `num::arithmetic::traits` in this release, so
+  existing imports keep compiling; the re-exports will be removed in the next release. The
+  implementing modules moved the same way: in malachite-base, `num::modular`,
+  `num::number_theory`, and `num::exponential` hold the primitive-integer implementations that
+  were in `num::arithmetic`; in malachite-nz, `natural::modular`, `natural::number_theory`, and
+  `natural::exponential` hold the corresponding `Natural` implementations, and `integer::modular` and
+  `integer::number_theory` the `Integer` ones; in malachite-q, `rational::modular`,
+  `rational::number_theory`, `rational::exponential`, and a new `rational::factorization` (for
+  `express_as_power`) hold the `Rational` ones, and malachite-q's own traits (`Approximate`,
+  `SimplestRationalInInterval`, `DenominatorsInClosedInterval`) moved from
+  `rational::arithmetic::traits` to `rational::number_theory::traits`, with the same one-release
+  re-export; in malachite-float, `float::arithmetic` keeps the ring operations,
+  rounding, shifts, and roots, while `float::exponential`, `float::trigonometric`,
+  `float::hyperbolic`, and `float::number_theory` (for `factorial`) hold the rest. The
+  implementing modules matter for docs.rs paths and for `crate_test_fn` users.
+- The polynomial, vector, and matrix types and their traits are split the same way. In
+  `malachite_base::polynomial`, the traits now live in `polynomial::arithmetic::traits` (the ring
+  operations, division, composition, evaluation, and Taylor shifts), `polynomial::modular::traits`
+  (operations with coefficients modulo $m$ or $2^k$, including modular division and composition),
+  `polynomial::series::traits` (every `*Truncated` trait, including the modular ones and the
+  compositional inverses), `polynomial::mod_polynomial::traits` (every `*ModPolynomial*` trait),
+  and `polynomial::calculus::traits` (derivatives and integrals, including the modular ones); the
+  `Polynomial` trait stays at `malachite_base::polynomial`, and `ModPolynomialData` and
+  `ModComposeModPolynomialData` moved to `polynomial::modular` and `polynomial::mod_polynomial`.
+  The linear-algebra traits (`Determinant`, `Rank`, `Nullspace`, `Solve`, `CharacteristicPolynomial`,
+  `Permanent`, `Trace`, the LU decompositions, the echelon, Howell, Hermite, and Smith normal
+  forms, `ElementaryDivisors`, and their `Mod*` and `ModPowerOf2*` versions) moved to the new
+  `num::linear_algebra::traits`, and the modular vector and matrix traits (`ModDot`, `ModCross`,
+  `ModEntrywiseMul`, `ModKroneckerProduct`, `ModElementSum`, ...) to `num::modular::traits`. The
+  old paths keep resolving for this release. The implementing modules of `UnsignedPolynomial`,
+  `NaturalPolynomial`, `IntegerPolynomial`, and `RationalPolynomial` split into `arithmetic`,
+  `modular`, `series`, `mod_polynomial`, and `calculus`; those of the vector types into
+  `arithmetic` and `modular`; and those of the matrix types into `arithmetic`, `modular`, and
+  `linear_algebra`. When a name has both a coefficient modulus and an operation kind, the kind
+  decides, so `mod_mul_truncated` is in `series` and `mod_determinant` in `linear_algebra`.
+
 ### malachite-base
 
 - The `Matrix` trait (`malachite_base::matrix`), for what every matrix type has in common, as

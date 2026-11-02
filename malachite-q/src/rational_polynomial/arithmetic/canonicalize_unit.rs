@@ -8,7 +8,7 @@
 
 use crate::rational_polynomial::RationalPolynomial;
 use malachite_base::num::arithmetic::traits::{CanonicalizeUnit, CanonicalizeUnitAssign};
-use malachite_base::polynomial::{MakeMonic, MakeMonicAssign};
+use malachite_base::polynomial::arithmetic::traits::{MakeMonic, MakeMonicAssign};
 
 impl CanonicalizeUnit for RationalPolynomial {
     type Output = Self;

@@ -15,12 +15,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::exp::{
+use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::exponential::exp::{
     exp_overflow, exp_rational_near_one, exp_underflow, one_neighbor,
 };
-use crate::float::arithmetic::ln::ln_1_plus_rational_brackets;
-use crate::float::arithmetic::log_base_2::log_2_rational_brackets;
-use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::exponential::ln::ln_1_plus_rational_brackets;
+use crate::float::exponential::log_base_2::log_2_rational_brackets;
 use crate::{
     Float, TWICE_WIDTH, emulate_float_float_to_float_fn, emulate_float_to_float_fn,
     float_either_infinity, float_either_zero, float_nan, float_negative_zero, floor_and_ceiling,
@@ -30,8 +30,8 @@ use core::cmp::max;
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, AddMul, CeilingLogBase2, CheckedLogBase2, CheckedRoot, CheckedSqrt, DivisibleBy,
-    IsPowerOf2, NegAssign, Parity, Pow, PowAssign, Square, UnsignedAbs,
+    Abs, AddMul, CheckedRoot, CheckedSqrt, IsPowerOf2, NegAssign, Parity, Pow, PowAssign, Square,
+    UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -41,7 +41,9 @@ use malachite_base::num::basic::traits::{
 };
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom, SaturatingFrom};
+use malachite_base::num::exponential::traits::{CeilingLogBase2, CheckedLogBase2};
 use malachite_base::num::logic::traits::{BitAccess, BitIterable, SignificantBits};
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

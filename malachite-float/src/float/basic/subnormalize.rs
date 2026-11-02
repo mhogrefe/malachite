@@ -13,11 +13,12 @@
 use crate::Float;
 use crate::InnerFloat::Finite;
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, NegModPowerOf2, PowerOf2};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeZero, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};
+use malachite_base::num::modular::traits::NegModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

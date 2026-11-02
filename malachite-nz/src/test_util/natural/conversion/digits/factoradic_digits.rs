@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{AddMulAssign, DivAssignMod, Factorial};
+use malachite_base::num::arithmetic::traits::{AddMulAssign, DivAssignMod};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::number_theory::traits::Factorial;
 
 // Finds the largest factorial no greater than `x`, then peels off the digits from the top by
 // dividing by each factorial in turn.

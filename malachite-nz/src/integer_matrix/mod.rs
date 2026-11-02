@@ -16,10 +16,10 @@ use core::mem::{swap, take};
 use core::ops::{Deref, Range};
 use malachite_base::matrix::Matrix;
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::modular::traits::DivisibleBy;
 
 /// A matrix whose elements are [`Integer`]s.
 ///
@@ -2163,6 +2163,11 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`IntegerMatrix`]s without repetition.
 pub mod exhaustive;
+/// Linear algebra on [`IntegerMatrix`]s: determinants, ranks, nullspaces, solving, decompositions,
+/// and normal forms.
+pub mod linear_algebra;
+/// Arithmetic on [`IntegerMatrix`]s whose entries are reduced modulo $m$ or $2^k$.
+pub mod modular;
 /// Iterators that generate [`IntegerMatrix`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;

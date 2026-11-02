@@ -10,7 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::Evaluate;
+use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;
 use malachite_nz::integer_polynomial::arithmetic::square::classical::square_to_out_classical;

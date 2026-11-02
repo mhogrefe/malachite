@@ -6,11 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{ModPowerOf2, UnsignedAbs};
+use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
+use crate::num::modular::traits::ModPowerOf2;
 use core::cmp::min;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";

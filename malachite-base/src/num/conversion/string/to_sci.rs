@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{CheckedLogBase2, NegAssign, Pow, UnsignedAbs};
+use crate::num::arithmetic::traits::{NegAssign, Pow, UnsignedAbs};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
@@ -15,6 +15,7 @@ use crate::num::conversion::string::to_string::{
     BaseFmtWrapper, digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use crate::num::conversion::traits::{ExactFrom, ToSci};
+use crate::num::exponential::traits::CheckedLogBase2;
 use crate::rounding_modes::RoundingMode::*;
 use crate::slices::slice_trailing_zeros;
 use alloc::string::String;

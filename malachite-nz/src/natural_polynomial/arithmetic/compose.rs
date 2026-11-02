@@ -13,7 +13,8 @@ use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
-use malachite_base::polynomial::{Compose, ComposeAssign, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{Compose, ComposeAssign};
 
 // Composes the polynomial with coefficients `xs` with the one with coefficients `ys`, with the
 // `Integer` algorithms. A `Natural` becomes an `Integer`, and a non-negative `Integer` becomes a
@@ -66,7 +67,7 @@ impl Compose<Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// assert_eq!(
@@ -131,7 +132,7 @@ impl Compose<&Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// assert_eq!(
@@ -196,7 +197,7 @@ impl Compose<NaturalPolynomial> for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// assert_eq!(
@@ -257,7 +258,7 @@ impl Compose<&NaturalPolynomial> for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// assert_eq!(
@@ -317,7 +318,7 @@ impl ComposeAssign<Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposeAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposeAssign;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();
@@ -370,7 +371,7 @@ impl ComposeAssign<&Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposeAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposeAssign;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();

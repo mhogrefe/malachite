@@ -6,30 +6,32 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::ModAdd;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::polynomial::{
-    ModComposeTruncated, ModPowerOf2Compose, ModPowerOf2ComposeTruncated, Polynomial,
+use malachite_base::num::modular::traits::ModAdd;
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::modular::traits::ModPowerOf2Compose;
+use malachite_base::polynomial::series::traits::{
+    ModComposeTruncated, ModPowerOf2ComposeTruncated,
 };
-use malachite_base::test_util::unsigned_polynomial::arithmetic::mod_mul::{
+use malachite_base::test_util::unsigned_polynomial::modular::mod_mul::{
     mod_generated_coefficients, test_moduli,
 };
-use malachite_base::test_util::unsigned_polynomial::arithmetic::mod_power_of_2_mul::*;
+use malachite_base::test_util::unsigned_polynomial::modular::mod_power_of_2_mul::*;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
-use malachite_base::unsigned_polynomial::arithmetic::mod_mul::{
-    mod_mul_to_out, mod_mul_to_out_classical,
-};
-use malachite_base::unsigned_polynomial::arithmetic::mod_mul_truncated::mod_mul_truncated_to_out;
-use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_mul::*;
-use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::*;
-use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_square::*;
-use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_square_truncated::*;
-use malachite_base::unsigned_polynomial::arithmetic::mod_square::mod_square_to_out;
-use malachite_base::unsigned_polynomial::arithmetic::mod_square_truncated::*;
 use malachite_base::unsigned_polynomial::arithmetic::ntt::{
     mod_mul_truncated_many_by_fixed_ntt, mod_mul_truncated_ntt, mod_square_truncated_ntt,
     mul_truncated_many_by_fixed_ntt, mul_truncated_ntt, square_truncated_ntt,
 };
+use malachite_base::unsigned_polynomial::modular::mod_mul::{
+    mod_mul_to_out, mod_mul_to_out_classical,
+};
+use malachite_base::unsigned_polynomial::modular::mod_power_of_2_mul::*;
+use malachite_base::unsigned_polynomial::modular::mod_power_of_2_square::*;
+use malachite_base::unsigned_polynomial::modular::mod_square::mod_square_to_out;
+use malachite_base::unsigned_polynomial::series::mod_mul_truncated::mod_mul_truncated_to_out;
+use malachite_base::unsigned_polynomial::series::mod_power_of_2_mul_truncated::*;
+use malachite_base::unsigned_polynomial::series::mod_power_of_2_square_truncated::*;
+use malachite_base::unsigned_polynomial::series::mod_square_truncated::*;
 
 // Checks the number-theoretic transform products against schoolbook multiplication, for every
 // truncation of the product, with inputs that are reduced and with inputs that are not.

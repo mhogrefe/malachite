@@ -7,13 +7,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{Mod, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{
-    DivPowerOfX, MulMiddle, MulMiddleAssign, MulPowerOfX, MulTruncated, Polynomial,
+use malachite_base::num::modular::traits::Mod;
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{
+    DivPowerOfX, MulMiddle, MulMiddleAssign, MulPowerOfX,
 };
+use malachite_base::polynomial::series::traits::MulTruncated;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;

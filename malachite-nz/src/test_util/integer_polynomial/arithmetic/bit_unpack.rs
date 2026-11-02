@@ -10,8 +10,9 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::polynomial::Polynomial;
 
 // Peels off the low `bits` bits of |n|, shifting them out, until nothing is left; each field whose

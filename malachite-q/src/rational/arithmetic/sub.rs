@@ -12,9 +12,8 @@
 
 use crate::Rational;
 use core::ops::{Sub, SubAssign};
-use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, Gcd, GcdAssign, NegAssign, UnsignedAbs,
-};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, NegAssign, UnsignedAbs};
+use malachite_base::num::number_theory::traits::{Gcd, GcdAssign};
 use malachite_nz::integer::Integer;
 
 impl Sub<Self> for Rational {

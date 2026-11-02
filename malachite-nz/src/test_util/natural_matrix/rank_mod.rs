@@ -10,8 +10,8 @@ use crate::natural::Natural;
 use crate::natural_matrix::NaturalMatrix;
 use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{ModMul, ModSub};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::modular::traits::{ModMul, ModSub};
 
 // The rank of a matrix over the integers modulo a prime `p`, by fraction-free Gaussian elimination
 // modulo `p`. Every pivot is nonzero, hence invertible, so the combinations preserve the row space.

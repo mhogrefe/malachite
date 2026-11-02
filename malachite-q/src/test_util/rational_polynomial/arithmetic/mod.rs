@@ -7,31 +7,20 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod add;
-pub mod add_truncated;
 pub mod compose;
 pub mod compose_power_of_x;
-pub mod compose_truncated;
-pub mod compositional_inverse_truncated;
 pub mod deflate_power_of_x;
-pub mod derivative;
 pub mod div_power_of_x;
 pub mod div_rem;
-pub mod div_truncated;
 pub mod evaluate;
 pub mod exponent_gcd;
 pub mod height;
-pub mod integral;
 pub mod l2_norm_squared;
 pub mod mul;
 pub mod mul_power_of_x;
-pub mod mul_truncated;
-pub mod nth_derivative;
 pub mod pow;
-pub mod pow_truncated;
 pub mod shl;
 pub mod shr;
 pub mod square;
-pub mod square_truncated;
 pub mod sub;
-pub mod sub_truncated;
 pub mod taylor_shift;

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural_polynomial::NaturalPolynomial;
-use malachite_base::num::arithmetic::traits::Gcd;
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_base::polynomial::Polynomial;
 
 // Takes the GCD of every exponent with a nonzero coefficient, one at a time, with no skipping and

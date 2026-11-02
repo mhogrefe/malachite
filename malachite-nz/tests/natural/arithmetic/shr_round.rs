@@ -11,13 +11,14 @@ use core::cmp::Ordering::*;
 #[cfg(feature = "32_bit_limbs")]
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShr, DivRound, DivisibleByPowerOf2, ShlRound, ShrRound, ShrRoundAssign,
+    ArithmeticCheckedShr, DivRound, ShlRound, ShrRound, ShrRoundAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::modular::traits::DivisibleByPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{

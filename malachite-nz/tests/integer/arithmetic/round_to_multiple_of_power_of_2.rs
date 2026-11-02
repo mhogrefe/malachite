@@ -7,12 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    Abs, DivisibleByPowerOf2, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2,
-    RoundToMultipleOfPowerOf2Assign, ShrRound,
+    Abs, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign,
+    ShrRound,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::logic::traits::BitAccess;
+use malachite_base::num::modular::traits::DivisibleByPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_unsigned_rounding_mode_triple_gen_var_1, unsigned_rounding_mode_pair_gen,

@@ -28,8 +28,8 @@ use core::cmp::Ordering::{self, *};
 use core::cmp::{max, min};
 use core::fmt::Debug;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, DivRound, Mod, OverflowingAddAssign, OverflowingSubAssign, PowerOf2,
-    RoundToMultiple, RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
+    DivRound, OverflowingAddAssign, OverflowingSubAssign, PowerOf2, RoundToMultiple,
+    RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
@@ -38,7 +38,9 @@ use malachite_base::num::conversion::traits::JoinHalves;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::Mod;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_test_zero;
 use wide::f64x4;

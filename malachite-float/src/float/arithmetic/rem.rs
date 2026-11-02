@@ -19,13 +19,12 @@ use crate::{
 use core::cmp::Ordering::{self, *};
 use core::cmp::{max, min};
 use core::ops::{Rem, RemAssign};
-use malachite_base::num::arithmetic::traits::{
-    DivMod, ModPow, ModPowerOf2, NegAssign, Parity, PowerOf2,
-};
+use malachite_base::num::arithmetic::traits::{DivMod, NegAssign, Parity, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{NegativeZero, One, Two, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::{ModPow, ModPowerOf2};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

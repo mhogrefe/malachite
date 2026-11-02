@@ -9,9 +9,10 @@
 use crate::Rational;
 use alloc::vec::Vec;
 use malachite_base::foer_sequences::FoerSequence;
-use malachite_base::num::arithmetic::traits::{CheckedLogBase2, Pow};
+use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom};
+use malachite_base::num::exponential::traits::CheckedLogBase2;
 use malachite_nz::natural::Natural;
 
 impl Rational {

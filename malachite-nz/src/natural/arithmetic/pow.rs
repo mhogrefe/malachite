@@ -28,11 +28,9 @@ use crate::platform::DoubleLimb;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::{
-    EqModPowerOf2, Parity, Pow, PowAssign, Square, SquareAssign,
-};
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2};
+use malachite_base::num::arithmetic::traits::{Parity, Pow, PowAssign, Square, SquareAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 #[cfg(feature = "test_build")]
@@ -43,6 +41,7 @@ use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::num::logic::traits::{
     BitIterable, CountOnes, LeadingZeros, SignificantBits, TrailingZeros,
 };
+use malachite_base::num::modular::traits::EqModPowerOf2;
 use malachite_base::slices::slice_leading_zeros;
 
 // # Worst-case complexity

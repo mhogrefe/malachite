@@ -6,13 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::ExtendedGcd;
+use malachite_base::num::number_theory::traits::ExtendedGcd;
 use malachite_base::test_util::bench::bucketers::pair_vec_max_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_vec_pair_gen_var_11;
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::natural::arithmetic::gcd::extended_gcd::limbs_extended_gcd;
+use malachite_nz::natural::number_theory::gcd::extended_gcd::limbs_extended_gcd;
 use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
 };

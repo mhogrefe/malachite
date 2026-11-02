@@ -264,10 +264,6 @@ pub mod num {
         pub mod arithmetic_checked_shl;
         pub mod arithmetic_checked_shr;
         pub mod average;
-        pub mod balanced_mod;
-        pub mod balanced_mod_power_of_2;
-        pub mod bell_number;
-        pub mod binomial_coefficient;
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_gaussian_unit;
         pub mod canonicalize_unit;
@@ -279,72 +275,14 @@ pub mod num {
         pub mod checked_square;
         pub mod checked_sub_mul;
         pub mod conjugate;
-        pub mod coprime_with;
-        pub mod crt;
         pub mod div_euclidean;
         pub mod div_exact;
         pub mod div_mod;
         pub mod div_mod_euclidean;
         pub mod div_round;
-        pub mod divisible_by;
-        pub mod divisible_by_power_of_2;
-        pub mod eq_mod;
-        pub mod eq_mod_power_of_2;
-        pub mod extended_gcd;
-        pub mod factorial;
-        pub mod falling_factorial;
-        pub mod fibonacci;
         pub mod floor;
-        pub mod gcd;
         pub mod is_power_of_2;
         pub mod is_unit;
-        pub mod kronecker_symbol;
-        pub mod lcm;
-        pub mod log_base;
-        pub mod log_base_2;
-        pub mod log_base_power_of_2;
-        pub mod mod_abs_squared;
-        pub mod mod_add;
-        pub mod mod_add_mul;
-        pub mod mod_add_mul_shl;
-        pub mod mod_div;
-        pub mod mod_div_list;
-        pub mod mod_euclidean;
-        pub mod mod_inverse;
-        pub mod mod_is_reduced;
-        pub mod mod_mul;
-        pub mod mod_neg;
-        pub mod mod_op;
-        pub mod mod_pow;
-        pub mod mod_power_of_2;
-        pub mod mod_power_of_2_abs_squared;
-        pub mod mod_power_of_2_add;
-        pub mod mod_power_of_2_add_mul;
-        pub mod mod_power_of_2_add_mul_shl;
-        pub mod mod_power_of_2_div;
-        pub mod mod_power_of_2_inverse;
-        pub mod mod_power_of_2_is_reduced;
-        pub mod mod_power_of_2_mul;
-        pub mod mod_power_of_2_neg;
-        pub mod mod_power_of_2_pow;
-        pub mod mod_power_of_2_product;
-        pub mod mod_power_of_2_shl;
-        pub mod mod_power_of_2_shr;
-        pub mod mod_power_of_2_sqrt;
-        pub mod mod_power_of_2_square;
-        pub mod mod_power_of_2_sub;
-        pub mod mod_power_of_2_sub_mul;
-        pub mod mod_power_of_2_sub_mul_shl;
-        pub mod mod_power_of_2_sum;
-        pub mod mod_product;
-        pub mod mod_shl;
-        pub mod mod_shr;
-        pub mod mod_sqrt;
-        pub mod mod_square;
-        pub mod mod_sub;
-        pub mod mod_sub_mul;
-        pub mod mod_sub_mul_shl;
-        pub mod mod_sum;
         pub mod mul_add_mul;
         pub mod mul_shr_round;
         pub mod mul_sub_mul;
@@ -363,9 +301,7 @@ pub mod num {
         pub mod parity;
         pub mod pow;
         pub mod power_of_2;
-        pub mod primorial;
         pub mod reciprocal;
-        pub mod rising_factorial;
         pub mod root;
         pub mod rotate;
         pub mod round_to_multiple;
@@ -503,6 +439,11 @@ pub mod num {
         pub mod primitive_int_increasing_inclusive_range;
         pub mod primitive_int_increasing_range;
     }
+    pub mod exponential {
+        pub mod log_base;
+        pub mod log_base_2;
+        pub mod log_base_power_of_2;
+    }
     pub mod factorization {
         pub mod factor;
         pub mod is_power;
@@ -571,6 +512,71 @@ pub mod num {
         pub mod low_mask;
         pub mod not_assign;
         pub mod significant_bits;
+    }
+    pub mod modular {
+        pub mod balanced_mod;
+        pub mod balanced_mod_power_of_2;
+        pub mod crt;
+        pub mod divisible_by;
+        pub mod divisible_by_power_of_2;
+        pub mod eq_mod;
+        pub mod eq_mod_power_of_2;
+        pub mod mod_abs_squared;
+        pub mod mod_add;
+        pub mod mod_add_mul;
+        pub mod mod_add_mul_shl;
+        pub mod mod_div;
+        pub mod mod_div_list;
+        pub mod mod_euclidean;
+        pub mod mod_inverse;
+        pub mod mod_is_reduced;
+        pub mod mod_mul;
+        pub mod mod_neg;
+        pub mod mod_op;
+        pub mod mod_pow;
+        pub mod mod_power_of_2;
+        pub mod mod_power_of_2_abs_squared;
+        pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_add_mul;
+        pub mod mod_power_of_2_add_mul_shl;
+        pub mod mod_power_of_2_div;
+        pub mod mod_power_of_2_inverse;
+        pub mod mod_power_of_2_is_reduced;
+        pub mod mod_power_of_2_mul;
+        pub mod mod_power_of_2_neg;
+        pub mod mod_power_of_2_pow;
+        pub mod mod_power_of_2_product;
+        pub mod mod_power_of_2_shl;
+        pub mod mod_power_of_2_shr;
+        pub mod mod_power_of_2_sqrt;
+        pub mod mod_power_of_2_square;
+        pub mod mod_power_of_2_sub;
+        pub mod mod_power_of_2_sub_mul;
+        pub mod mod_power_of_2_sub_mul_shl;
+        pub mod mod_power_of_2_sum;
+        pub mod mod_product;
+        pub mod mod_shl;
+        pub mod mod_shr;
+        pub mod mod_sqrt;
+        pub mod mod_square;
+        pub mod mod_sub;
+        pub mod mod_sub_mul;
+        pub mod mod_sub_mul_shl;
+        pub mod mod_sum;
+    }
+    pub mod number_theory {
+        pub mod bell_number;
+        pub mod binomial_coefficient;
+        pub mod coprime_with;
+        pub mod extended_gcd;
+        pub mod factorial;
+        pub mod falling_factorial;
+        pub mod fibonacci;
+        pub mod gcd;
+        pub mod kronecker_symbol;
+        pub mod lcm;
+        pub mod primorial;
+        pub mod rising_factorial;
     }
     pub mod random {
         pub mod geometric {
@@ -898,63 +904,7 @@ pub mod unsigned_matrix {
         pub mod content_chained;
         pub mod div_exact;
         pub mod entrywise_shr_round;
-        pub mod mod_add;
-        pub mod mod_add_mul;
-        pub mod mod_characteristic_polynomial;
-        pub mod mod_determinant;
-        pub mod mod_howell_form;
-        pub mod mod_inverse;
-        pub mod mod_is_reduced;
-        pub mod mod_kronecker_product;
-        pub mod mod_lu_decomposition;
-        pub mod mod_mul;
-        pub mod mod_mul_matrix;
-        pub mod mod_mul_vector;
-        pub mod mod_neg;
-        pub mod mod_nullspace;
-        pub mod mod_op;
-        pub mod mod_permanent;
-        pub mod mod_pow;
-        pub mod mod_power_of_2;
-        pub mod mod_power_of_2_add;
-        pub mod mod_power_of_2_add_mul;
-        pub mod mod_power_of_2_characteristic_polynomial;
-        pub mod mod_power_of_2_determinant;
-        pub mod mod_power_of_2_howell_form;
-        pub mod mod_power_of_2_inverse;
-        pub mod mod_power_of_2_is_reduced;
-        pub mod mod_power_of_2_kronecker_product;
-        pub mod mod_power_of_2_mul;
-        pub mod mod_power_of_2_mul_matrix;
-        pub mod mod_power_of_2_mul_vector;
-        pub mod mod_power_of_2_neg;
-        pub mod mod_power_of_2_permanent;
-        pub mod mod_power_of_2_pow;
-        pub mod mod_power_of_2_shl;
-        pub mod mod_power_of_2_similarity_transform;
-        pub mod mod_power_of_2_smith_normal_form;
-        pub mod mod_power_of_2_solve;
-        pub mod mod_power_of_2_square;
-        pub mod mod_power_of_2_strong_echelon_form;
-        pub mod mod_power_of_2_sub;
-        pub mod mod_power_of_2_sub_mul;
-        pub mod mod_power_of_2_trace;
-        pub mod mod_rank;
-        pub mod mod_reduced_row_echelon_form;
-        pub mod mod_shl;
-        pub mod mod_similarity_transform;
-        pub mod mod_smith_normal_form;
-        pub mod mod_solve;
-        pub mod mod_solve_lower_triangular;
-        pub mod mod_solve_upper_triangular;
-        pub mod mod_square;
-        pub mod mod_strong_echelon_form;
-        pub mod mod_sub;
-        pub mod mod_sub_mul;
-        pub mod mod_trace;
         pub mod shr;
-        pub mod vector_mod_mul;
-        pub mod vector_mod_power_of_2_mul;
     }
     pub mod basic {
         pub mod named;
@@ -989,6 +939,66 @@ pub mod unsigned_matrix {
     pub mod equal_rows;
     pub mod exhaustive {
         pub mod exhaustive_unsigned_matrices;
+    }
+    pub mod linear_algebra {
+        pub mod mod_characteristic_polynomial;
+        pub mod mod_determinant;
+        pub mod mod_howell_form;
+        pub mod mod_inverse;
+        pub mod mod_lu_decomposition;
+        pub mod mod_nullspace;
+        pub mod mod_permanent;
+        pub mod mod_power_of_2_characteristic_polynomial;
+        pub mod mod_power_of_2_determinant;
+        pub mod mod_power_of_2_howell_form;
+        pub mod mod_power_of_2_inverse;
+        pub mod mod_power_of_2_permanent;
+        pub mod mod_power_of_2_similarity_transform;
+        pub mod mod_power_of_2_smith_normal_form;
+        pub mod mod_power_of_2_solve;
+        pub mod mod_power_of_2_strong_echelon_form;
+        pub mod mod_power_of_2_trace;
+        pub mod mod_rank;
+        pub mod mod_reduced_row_echelon_form;
+        pub mod mod_similarity_transform;
+        pub mod mod_smith_normal_form;
+        pub mod mod_solve;
+        pub mod mod_solve_lower_triangular;
+        pub mod mod_solve_upper_triangular;
+        pub mod mod_strong_echelon_form;
+        pub mod mod_trace;
+    }
+    pub mod modular {
+        pub mod mod_add;
+        pub mod mod_add_mul;
+        pub mod mod_is_reduced;
+        pub mod mod_kronecker_product;
+        pub mod mod_mul;
+        pub mod mod_mul_matrix;
+        pub mod mod_mul_vector;
+        pub mod mod_neg;
+        pub mod mod_op;
+        pub mod mod_pow;
+        pub mod mod_power_of_2;
+        pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_add_mul;
+        pub mod mod_power_of_2_is_reduced;
+        pub mod mod_power_of_2_kronecker_product;
+        pub mod mod_power_of_2_mul;
+        pub mod mod_power_of_2_mul_matrix;
+        pub mod mod_power_of_2_mul_vector;
+        pub mod mod_power_of_2_neg;
+        pub mod mod_power_of_2_pow;
+        pub mod mod_power_of_2_shl;
+        pub mod mod_power_of_2_square;
+        pub mod mod_power_of_2_sub;
+        pub mod mod_power_of_2_sub_mul;
+        pub mod mod_shl;
+        pub mod mod_square;
+        pub mod mod_sub;
+        pub mod mod_sub_mul;
+        pub mod vector_mod_mul;
+        pub mod vector_mod_power_of_2_mul;
     }
     pub mod identity;
     pub mod is_diagonal;
@@ -1049,88 +1059,6 @@ pub mod unsigned_polynomial {
         pub mod exponent_gcd;
         pub mod height;
         pub mod is_unit;
-        pub mod mod_add;
-        pub mod mod_add_truncated;
-        pub mod mod_compose;
-        pub mod mod_compose_mod_polynomial;
-        pub mod mod_compose_truncated;
-        pub mod mod_compositional_inverse_truncated;
-        pub mod mod_derivative;
-        pub mod mod_div_exact;
-        pub mod mod_div_rem;
-        pub mod mod_div_rem_precomputed;
-        pub mod mod_div_root;
-        pub mod mod_div_truncated;
-        pub mod mod_divisible_by;
-        pub mod mod_integral;
-        pub mod mod_inverse_truncated;
-        pub mod mod_is_reduced;
-        pub mod mod_make_monic;
-        pub mod mod_mul;
-        pub mod mod_mul_middle;
-        pub mod mod_mul_mod_polynomial;
-        pub mod mod_mul_mod_polynomial_precomputed;
-        pub mod mod_mul_truncated;
-        pub mod mod_neg;
-        pub mod mod_nth_derivative;
-        pub mod mod_op;
-        pub mod mod_pow;
-        pub mod mod_pow_mod_polynomial;
-        pub mod mod_pow_mod_polynomial_precomputed;
-        pub mod mod_pow_truncated;
-        pub mod mod_power_of_2;
-        pub mod mod_power_of_2_add;
-        pub mod mod_power_of_2_add_truncated;
-        pub mod mod_power_of_2_compose;
-        pub mod mod_power_of_2_compose_mod_polynomial;
-        pub mod mod_power_of_2_compose_truncated;
-        pub mod mod_power_of_2_compositional_inverse_truncated;
-        pub mod mod_power_of_2_derivative;
-        pub mod mod_power_of_2_div_exact;
-        pub mod mod_power_of_2_div_rem;
-        pub mod mod_power_of_2_div_rem_precomputed;
-        pub mod mod_power_of_2_div_root;
-        pub mod mod_power_of_2_div_truncated;
-        pub mod mod_power_of_2_divisible_by;
-        pub mod mod_power_of_2_integral;
-        pub mod mod_power_of_2_inverse_truncated;
-        pub mod mod_power_of_2_mul;
-        pub mod mod_power_of_2_mul_middle;
-        pub mod mod_power_of_2_mul_mod_polynomial;
-        pub mod mod_power_of_2_mul_mod_polynomial_precomputed;
-        pub mod mod_power_of_2_mul_truncated;
-        pub mod mod_power_of_2_neg;
-        pub mod mod_power_of_2_nth_derivative;
-        pub mod mod_power_of_2_pow;
-        pub mod mod_power_of_2_pow_mod_polynomial;
-        pub mod mod_power_of_2_pow_mod_polynomial_precomputed;
-        pub mod mod_power_of_2_pow_truncated;
-        pub mod mod_power_of_2_product;
-        pub mod mod_power_of_2_quotient;
-        pub mod mod_power_of_2_quotient_precomputed;
-        pub mod mod_power_of_2_rem;
-        pub mod mod_power_of_2_rem_precomputed;
-        pub mod mod_power_of_2_remove_power;
-        pub mod mod_power_of_2_shl;
-        pub mod mod_power_of_2_square;
-        pub mod mod_power_of_2_square_truncated;
-        pub mod mod_power_of_2_sub;
-        pub mod mod_power_of_2_sub_truncated;
-        pub mod mod_power_of_2_sum;
-        pub mod mod_power_of_2_taylor_shift;
-        pub mod mod_product;
-        pub mod mod_quotient;
-        pub mod mod_quotient_precomputed;
-        pub mod mod_rem;
-        pub mod mod_rem_precomputed;
-        pub mod mod_remove_power;
-        pub mod mod_shl;
-        pub mod mod_square;
-        pub mod mod_square_truncated;
-        pub mod mod_sub;
-        pub mod mod_sub_truncated;
-        pub mod mod_sum;
-        pub mod mod_taylor_shift;
         pub mod mul_power_of_x;
         pub mod ntt;
     }
@@ -1140,6 +1068,14 @@ pub mod unsigned_polynomial {
         pub mod mutate_coefficient;
         pub mod named;
         pub mod size;
+    }
+    pub mod calculus {
+        pub mod mod_derivative;
+        pub mod mod_integral;
+        pub mod mod_nth_derivative;
+        pub mod mod_power_of_2_derivative;
+        pub mod mod_power_of_2_integral;
+        pub mod mod_power_of_2_nth_derivative;
     }
     pub mod comparison {
         pub mod cmp;
@@ -1163,6 +1099,68 @@ pub mod unsigned_polynomial {
     pub mod logic {
         pub mod significant_bits;
     }
+    pub mod mod_polynomial {
+        pub mod mod_compose_mod_polynomial;
+        pub mod mod_mul_mod_polynomial;
+        pub mod mod_mul_mod_polynomial_precomputed;
+        pub mod mod_pow_mod_polynomial;
+        pub mod mod_pow_mod_polynomial_precomputed;
+        pub mod mod_power_of_2_compose_mod_polynomial;
+        pub mod mod_power_of_2_mul_mod_polynomial;
+        pub mod mod_power_of_2_mul_mod_polynomial_precomputed;
+        pub mod mod_power_of_2_pow_mod_polynomial;
+        pub mod mod_power_of_2_pow_mod_polynomial_precomputed;
+    }
+    pub mod modular {
+        pub mod mod_add;
+        pub mod mod_compose;
+        pub mod mod_div_exact;
+        pub mod mod_div_rem;
+        pub mod mod_div_rem_precomputed;
+        pub mod mod_div_root;
+        pub mod mod_divisible_by;
+        pub mod mod_is_reduced;
+        pub mod mod_make_monic;
+        pub mod mod_mul;
+        pub mod mod_mul_middle;
+        pub mod mod_neg;
+        pub mod mod_op;
+        pub mod mod_pow;
+        pub mod mod_power_of_2;
+        pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_compose;
+        pub mod mod_power_of_2_div_exact;
+        pub mod mod_power_of_2_div_rem;
+        pub mod mod_power_of_2_div_rem_precomputed;
+        pub mod mod_power_of_2_div_root;
+        pub mod mod_power_of_2_divisible_by;
+        pub mod mod_power_of_2_mul;
+        pub mod mod_power_of_2_mul_middle;
+        pub mod mod_power_of_2_neg;
+        pub mod mod_power_of_2_pow;
+        pub mod mod_power_of_2_product;
+        pub mod mod_power_of_2_quotient;
+        pub mod mod_power_of_2_quotient_precomputed;
+        pub mod mod_power_of_2_rem;
+        pub mod mod_power_of_2_rem_precomputed;
+        pub mod mod_power_of_2_remove_power;
+        pub mod mod_power_of_2_shl;
+        pub mod mod_power_of_2_square;
+        pub mod mod_power_of_2_sub;
+        pub mod mod_power_of_2_sum;
+        pub mod mod_power_of_2_taylor_shift;
+        pub mod mod_product;
+        pub mod mod_quotient;
+        pub mod mod_quotient_precomputed;
+        pub mod mod_rem;
+        pub mod mod_rem_precomputed;
+        pub mod mod_remove_power;
+        pub mod mod_shl;
+        pub mod mod_square;
+        pub mod mod_sub;
+        pub mod mod_sum;
+        pub mod mod_taylor_shift;
+    }
     pub mod random {
         pub mod properties;
         pub mod random_unsigned_polynomials;
@@ -1180,6 +1178,26 @@ pub mod unsigned_polynomial {
         pub mod striped_random_unsigned_polynomials_reduced_mod_power_of_2;
         pub mod striped_random_unsigned_polynomials_with_degree;
     }
+    pub mod series {
+        pub mod mod_add_truncated;
+        pub mod mod_compose_truncated;
+        pub mod mod_compositional_inverse_truncated;
+        pub mod mod_div_truncated;
+        pub mod mod_inverse_truncated;
+        pub mod mod_mul_truncated;
+        pub mod mod_pow_truncated;
+        pub mod mod_power_of_2_add_truncated;
+        pub mod mod_power_of_2_compose_truncated;
+        pub mod mod_power_of_2_compositional_inverse_truncated;
+        pub mod mod_power_of_2_div_truncated;
+        pub mod mod_power_of_2_inverse_truncated;
+        pub mod mod_power_of_2_mul_truncated;
+        pub mod mod_power_of_2_pow_truncated;
+        pub mod mod_power_of_2_square_truncated;
+        pub mod mod_power_of_2_sub_truncated;
+        pub mod mod_square_truncated;
+        pub mod mod_sub_truncated;
+    }
 }
 pub mod unsigned_vector {
     pub mod access;
@@ -1191,6 +1209,43 @@ pub mod unsigned_vector {
         pub mod entrywise_div_round;
         pub mod entrywise_shr_round;
         pub mod height;
+        pub mod scalar_div;
+        pub mod shr;
+    }
+    pub mod basic {
+        pub mod named;
+        pub mod size;
+    }
+    pub mod comparison {
+        pub mod entrywise_max;
+        pub mod entrywise_min;
+        pub mod shortlex_cmp;
+    }
+    pub mod conversion {
+        pub mod from_elements;
+        #[cfg(feature = "serde")]
+        pub mod from_iterator;
+        pub mod into_iterator;
+        pub mod serde;
+        pub mod string {
+            pub mod from_string;
+            pub mod latex;
+            pub mod to_string;
+            pub mod typst;
+        }
+        pub mod to_elements;
+    }
+    pub mod dimension;
+    pub mod exhaustive {
+        pub mod exhaustive_unsigned_vectors;
+    }
+    pub mod extend;
+    pub mod height_index;
+    pub mod is_zero;
+    pub mod logic {
+        pub mod significant_bits;
+    }
+    pub mod modular {
         pub mod mod_abs_squared;
         pub mod mod_add;
         pub mod mod_add_dot;
@@ -1241,41 +1296,6 @@ pub mod unsigned_vector {
         pub mod mod_sub_mul;
         pub mod mod_sub_mul_shl;
         pub mod mod_sum;
-        pub mod scalar_div;
-        pub mod shr;
-    }
-    pub mod basic {
-        pub mod named;
-        pub mod size;
-    }
-    pub mod comparison {
-        pub mod entrywise_max;
-        pub mod entrywise_min;
-        pub mod shortlex_cmp;
-    }
-    pub mod conversion {
-        pub mod from_elements;
-        #[cfg(feature = "serde")]
-        pub mod from_iterator;
-        pub mod into_iterator;
-        pub mod serde;
-        pub mod string {
-            pub mod from_string;
-            pub mod latex;
-            pub mod to_string;
-            pub mod typst;
-        }
-        pub mod to_elements;
-    }
-    pub mod dimension;
-    pub mod exhaustive {
-        pub mod exhaustive_unsigned_vectors;
-    }
-    pub mod extend;
-    pub mod height_index;
-    pub mod is_zero;
-    pub mod logic {
-        pub mod significant_bits;
     }
     pub mod max_bits;
     pub mod pivot;

@@ -16,15 +16,14 @@ use crate::natural::{
 };
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2, ModPowerOf2Assign, Parity, ShrRound, Sign,
-};
+use malachite_base::num::arithmetic::traits::{Parity, ShrRound, Sign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{
     ExactFrom, FromOtherTypeSlice, IntegerMantissaAndExponent, SciMantissaAndExponent, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2Assign};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
@@ -317,8 +316,8 @@ impl IntegerMantissaAndExponent<Natural, u64, Natural> for &Natural {
     /// $$
     /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
     ///
-    /// The inverse operation is
-    /// [`from_integer_mantissa_and_exponent`](IntegerMantissaAndExponent::from_integer_mantissa_and_exponent).
+    /// The inverse operation is [`from_integer_mantissa_and_exponent`](
+    /// IntegerMantissaAndExponent::from_integer_mantissa_and_exponent).
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -345,7 +344,6 @@ impl IntegerMantissaAndExponent<Natural, u64, Natural> for &Natural {
     /// );
     /// ```
     #[inline]
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     fn integer_mantissa_and_exponent(self) -> (Natural, u64) {
         let trailing_zeros = self.trailing_zeros().unwrap();
         (self >> trailing_zeros, trailing_zeros)
@@ -503,8 +501,8 @@ macro_rules! impl_mantissa_and_exponent {
             ///
             /// Some combinations of mantissas and exponents do not specify a [`Natural`], in which
             /// case the resulting value is rounded to a [`Natural`] using the `Nearest` rounding
-            /// mode. To specify other rounding modes, use
-            /// [`from_sci_mantissa_and_exponent_round`](Natural::from_sci_mantissa_and_exponent_round).
+            /// mode. To specify other rounding modes, use [`from_sci_mantissa_and_exponent_round`](
+            /// Natural::from_sci_mantissa_and_exponent_round).
             ///
             /// $$
             /// f(x) \approx 2^{e_s}m_s.

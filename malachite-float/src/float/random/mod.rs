@@ -12,15 +12,14 @@ use malachite_base::bools::random::{
     RandomBools, WeightedRandomBools, random_bools, weighted_random_bools,
 };
 use malachite_base::iterators::{WithSpecialValues, with_special_values};
-use malachite_base::num::arithmetic::traits::{
-    DivRound, IsPowerOf2, ModPowerOf2, NegAssign, NegModPowerOf2, PowerOf2,
-};
+use malachite_base::num::arithmetic::traits::{DivRound, IsPowerOf2, NegAssign, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask, NotAssign, SignificantBits};
+use malachite_base::num::modular::traits::{ModPowerOf2, NegModPowerOf2};
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, GeometricRandomSignedRange,
     geometric_random_signed_inclusive_range,

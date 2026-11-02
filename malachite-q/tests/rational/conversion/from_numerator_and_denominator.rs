@@ -6,12 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{CoprimeWith, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::number_theory::traits::CoprimeWith;
 use malachite_base::test_util::generators::{
     signed_gen, signed_pair_gen_var_6, unsigned_gen, unsigned_pair_gen_var_12,
     unsigned_unsigned_bool_triple_gen_var_2,

@@ -18,8 +18,7 @@ use crate::iterators::{NonzeroValues, with_special_value};
 use crate::maps::random::{random_b_tree_maps, random_hash_maps};
 use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, Mod, ModMul, ModPowerOf2, ModPowerOf2Mul, Parity, PowerOf2,
-    RoundToMultiple, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, DivRound, Parity, PowerOf2, RoundToMultiple, ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -36,6 +35,7 @@ use crate::num::conversion::traits::{
 use crate::num::factorization::traits::IsPrime;
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{BitAccess, BitBlockAccess, LeadingZeros};
+use crate::num::modular::traits::{Mod, ModMul, ModPowerOf2, ModPowerOf2Mul};
 use crate::num::random::geometric::{
     GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
     geometric_random_natural_signeds, geometric_random_nonzero_signeds,
@@ -64,7 +64,8 @@ use crate::num::random::{
     random_positive_unsigneds, random_primitive_float_inclusive_range,
     random_primitive_float_range, random_primitive_floats, random_unsigneds_less_than,
 };
-use crate::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
+use crate::polynomial::Polynomial;
+use crate::polynomial::arithmetic::traits::{ComposePowerOfX, MulPowerOfX};
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
@@ -93,7 +94,7 @@ use crate::test_util::generators::{
     shift_integer_mantissa_and_exponent, signed_assign_bits_valid, smallest_invalid_value,
     unsigned_assign_bits_valid, unsigned_matrix_positions,
 };
-use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
+use crate::test_util::num::modular::mod_mul::limbs_invert_limb_naive;
 use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
 use crate::unions::Union2;
 use crate::unions::random::random_union2s;

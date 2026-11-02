@@ -6,167 +6,91 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(doc)]
+use malachite_base::num::arithmetic::traits::{
+    AbsDiff, AbsDiffAssign, AbsSquared, AbsSquaredAssign, AddMul, AddMulAssign, AddMulShl,
+    AddMulShlAssign, Average, AverageAssign, CanonicalUnitIPow, CanonicalizeGaussianUnit,
+    CanonicalizeGaussianUnitAssign, CanonicalizeUnit, CanonicalizeUnitAssign, Ceiling,
+    CeilingAssign, CheckedRoot, CheckedSqrt, Conjugate, ConjugateAssign, Floor, FloorAssign,
+    IsPowerOf2, IsUnit, MulAddMul, MulAddMulAssign, MulSubMul, MulSubMulAssign, NextPowerOf2,
+    NextPowerOf2Assign, Pow, PowAssign, PowerOf2, Reciprocal, ReciprocalAssign, RoundToMultiple,
+    RoundToMultipleAssign, RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign, Sign,
+    Square, SquareAssign, SubMul, SubMulAssign, SubMulShl, SubMulShlAssign,
+};
+
 /// Absolute value of [`Rational`](super::Rational)s.
 pub mod abs;
-/// Implementations of [`AbsDiff`](malachite_base::num::arithmetic::traits::AbsDiff) and
-/// [`AbsDiffAssign`](malachite_base::num::arithmetic::traits::AbsDiffAssign), traits for getting
-/// the absolute value of the difference between two numbers.
+/// Implementations of [`AbsDiff`] and [`AbsDiffAssign`], traits for getting the absolute value of
+/// the difference between two numbers.
 pub mod abs_diff;
-/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared) and
-/// [`AbsSquaredAssign`](malachite_base::num::arithmetic::traits::AbsSquaredAssign), traits for
-/// computing the squared absolute value of a number. For real types this is the same as squaring.
+/// Implementations of [`AbsSquared`] and [`AbsSquaredAssign`], traits for computing the squared
+/// absolute value of a number. For real types this is the same as squaring.
 pub mod abs_squared;
 /// Addition of [`Rational`](super::Rational)s.
 pub mod add;
-/// Implementations of [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
-/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign), traits for adding a
-/// number and the product of two other numbers.
+/// Implementations of [`AddMul`] and [`AddMulAssign`], traits for adding a number and the product
+/// of two other numbers.
 pub mod add_mul;
-/// Implementations of [`AddMulShl`](malachite_base::num::arithmetic::traits::AddMulShl) and
-/// [`AddMulShlAssign`](malachite_base::num::arithmetic::traits::AddMulShlAssign), traits for adding
-/// a number and the product of two other numbers shifted left.
+/// Implementations of [`AddMulShl`] and [`AddMulShlAssign`], traits for adding a number and the
+/// product of two other numbers shifted left.
 pub mod add_mul_shl;
-/// Implementations of [`Approximate`](traits::Approximate) and
-/// [`ApproximateAssign`](traits::ApproximateAssign), traits for approximating a
-/// [`Rational`](super::Rational) by a [`Rational`](super::Rational) with a bounded denominator.
-pub mod approximate;
-/// [`Average`](malachite_base::num::arithmetic::traits::Average) and
-/// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign), traits for computing
-/// the average (arithmetic mean) of two numbers.
+/// [`Average`] and [`AverageAssign`], traits for computing the average (arithmetic mean) of two
+/// numbers.
 pub mod average;
-/// An implementation of
-/// [`CanonicalUnitIPow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow), a trait for
-/// finding the power of $i$ that brings a number into canonical unit form.
+/// An implementation of [`CanonicalUnitIPow`], a trait for finding the power of $i$ that brings a
+/// number into canonical unit form.
 pub mod canonical_unit_i_pow;
-/// Implementations of
-/// [`CanonicalizeGaussianUnit`](malachite_base::num::arithmetic::traits::CanonicalizeGaussianUnit)
-/// and [`CanonicalizeGaussianUnitAssign`](
-/// malachite_base::num::arithmetic::traits::CanonicalizeGaussianUnitAssign), traits for bringing a
-/// number into canonical Gaussian-unit form.
+/// Implementations of [`CanonicalizeGaussianUnit`] and [`CanonicalizeGaussianUnitAssign`], traits
+/// for bringing a number into canonical Gaussian-unit form.
 pub mod canonicalize_gaussian_unit;
-/// Implementations of
-/// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
-/// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
-/// traits for bringing a number into canonical unit form.
+/// Implementations of [`CanonicalizeUnit`] and [`CanonicalizeUnitAssign`], traits for bringing a
+/// number into canonical unit form.
 pub mod canonicalize_unit;
-/// Implementations of [`Ceiling`](malachite_base::num::arithmetic::traits::Ceiling) and
-/// [`CeilingAssign`](malachite_base::num::arithmetic::traits::CeilingAssign), traits for taking the
-/// ceiling of a number.
+/// Implementations of [`Ceiling`] and [`CeilingAssign`], traits for taking the ceiling of a number.
 pub mod ceiling;
-/// Implementations of [`Conjugate`](malachite_base::num::arithmetic::traits::Conjugate) and
-/// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
-/// computing the complex conjugate of a number. A real number is its own conjugate.
+/// Implementations of [`Conjugate`] and [`ConjugateAssign`], traits for computing the complex
+/// conjugate of a number. A real number is its own conjugate.
 pub mod conjugate;
-/// A function for computing Dedekind sums.
-pub mod dedekind_sum;
-/// Getting all denominators of [`Rational`](super::Rational)s that appear in a given closed
-/// interval.
-pub mod denominators_in_closed_interval;
 /// Division of [`Rational`](super::Rational)s.
 pub mod div;
-/// Implementation of
-/// [`ExpressAsPower`](malachite_base::num::factorization::traits::ExpressAsPower), a trait for
-/// expressing a number as a perfect power.
-pub mod express_as_power;
-/// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
-/// trait for computing the GCD of two numbers along with Bézout cofactors.
-pub mod extended_gcd;
-/// Finding the neighbors of a [`Rational`](super::Rational) in a Farey sequence.
-pub mod farey_neighbors;
-/// Implementations of [`Floor`](malachite_base::num::arithmetic::traits::Floor) and
-/// [`FloorAssign`](malachite_base::num::arithmetic::traits::FloorAssign), traits for taking the
-/// floor of a number.
+/// Implementations of [`Floor`] and [`FloorAssign`], traits for taking the floor of a number.
 pub mod floor;
-/// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
-/// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
-/// (greatest common divisor) of two numbers.
-pub mod gcd;
-/// A function for computing harmonic numbers.
-pub mod harmonic_number;
 /// An implementation of the height of a [`Rational`](crate::Rational): the larger of the absolute
 /// value of its numerator and its denominator.
 pub mod height;
-/// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
-/// trait for determining whether a number is an integer power of 2.
+/// An implementation of [`IsPowerOf2`], a trait for determining whether a number is an integer
+/// power of 2.
 pub mod is_power_of_2;
-/// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
-/// determining whether a number is a unit of its ring.
+/// An implementation of [`IsUnit`], a trait for determining whether a number is a unit of its ring.
 pub mod is_unit;
-/// Implementations of traits for taking the base-$b$ logarithm of a number.
-///
-/// The traits are [`FloorLogBase`](malachite_base::num::arithmetic::traits::FloorLogBase),
-/// [`CeilingLogBase`](malachite_base::num::arithmetic::traits::CeilingLogBase), and
-/// [`CheckedLogBase`](malachite_base::num::arithmetic::traits::CheckedLogBase).
-pub mod log_base;
-/// Implementations of traits for taking the base-2 logarithm of a number.
-///
-/// The traits are [`FloorLogBase2`](malachite_base::num::arithmetic::traits::FloorLogBase2),
-/// [`CeilingLogBase2`](malachite_base::num::arithmetic::traits::CeilingLogBase2), and
-/// [`CheckedLogBase2`](malachite_base::num::arithmetic::traits::CheckedLogBase2).
-pub mod log_base_2;
-/// Implementations of traits for taking the base-$2^k$ logarithm of a number.
-///
-/// The traits are
-/// [`FloorLogBasePowerOf2`](malachite_base::num::arithmetic::traits::FloorLogBasePowerOf2),
-/// [`CeilingLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CeilingLogBasePowerOf2), and
-/// [`CheckedLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2).
-pub mod log_base_power_of_2;
-/// Implementations of traits for finding the remainder of two numbers, subject to various rounding
-/// rules.
-///
-/// These are the traits:
-///
-/// | rounding          | by value or reference      | by mutable reference (assignment)      |
-/// |-------------------|----------------------------|----------------------------------------|
-/// | towards $-\infty$ | [`Mod`](malachite_base::num::arithmetic::traits::Mod) | [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign)       |
-/// | towards $\infty$ | [`CeilingMod`](malachite_base::num::arithmetic::traits::CeilingMod) | [`CeilingModAssign`](malachite_base::num::arithmetic::traits::CeilingModAssign) |
-///
-/// The [`Rem`](core::ops::Rem) trait in the standard library rounds towards 0.
-#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
-pub mod mod_op;
 /// Multiplication of [`Rational`](super::Rational)s.
 pub mod mul;
-/// Implementations of [`MulAddMul`](malachite_base::num::arithmetic::traits::MulAddMul) and
-/// [`MulAddMulAssign`](malachite_base::num::arithmetic::traits::MulAddMulAssign), traits for adding
-/// the products of two pairs of numbers.
+/// Implementations of [`MulAddMul`] and [`MulAddMulAssign`], traits for adding the products of two
+/// pairs of numbers.
 pub mod mul_add_mul;
-/// Implementations of [`MulSubMul`](malachite_base::num::arithmetic::traits::MulSubMul) and
-/// [`MulSubMulAssign`](malachite_base::num::arithmetic::traits::MulSubMulAssign), traits for
-/// subtracting the product of one pair of numbers from the product of another.
+/// Implementations of [`MulSubMul`] and [`MulSubMulAssign`], traits for subtracting the product of
+/// one pair of numbers from the product of another.
 pub mod mul_sub_mul;
 /// Negation of [`Rational`](super::Rational)s.
 pub mod neg;
-/// Implementations of [`NextPowerOf2`](malachite_base::num::arithmetic::traits::NextPowerOf2) and
-/// [`NextPowerOf2Assign`](malachite_base::num::arithmetic::traits::NextPowerOf2Assign), traits for
-/// getting the next-highest power of 2.
+/// Implementations of [`NextPowerOf2`] and [`NextPowerOf2Assign`], traits for getting the
+/// next-highest power of 2.
 pub mod next_power_of_2;
-/// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
-/// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), traits for raising a number
-/// to a power.
+/// Implementations of [`Pow`] and [`PowAssign`], traits for raising a number to a power.
 pub mod pow;
-/// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
-/// computing a power of 2.
+/// Implementations of [`PowerOf2`], a trait for computing a power of 2.
 pub mod power_of_2;
-/// Implementations of [`Reciprocal`](malachite_base::num::arithmetic::traits::Reciprocal) and
-/// [`ReciprocalAssign`](malachite_base::num::arithmetic::traits::ReciprocalAssign), traits for
-/// computing the reciprocal of a number.
+/// Implementations of [`Reciprocal`] and [`ReciprocalAssign`], traits for computing the reciprocal
+/// of a number.
 pub mod reciprocal;
-/// Rational reconstruction: recovering a [`Rational`](crate::Rational) from its residue modulo a
-/// [`Natural`](malachite_nz::natural::Natural).
-pub mod reconstruct;
-/// Implementations of [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot), a
-/// trait for computing the root of a number, if the number is a perfect power.
+/// Implementations of [`CheckedRoot`], a trait for computing the root of a number, if the number is
+/// a perfect power.
 pub mod root;
-/// Implementations of [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
-/// and [`RoundToMultipleAssign`](malachite_base::num::arithmetic::traits::RoundToMultipleAssign),
-/// traits for rounding a number to a multiple of another number.
+/// Implementations of [`RoundToMultiple`] and [`RoundToMultipleAssign`], traits for rounding a
+/// number to a multiple of another number.
 pub mod round_to_multiple;
-/// Implementations of
-/// [`RoundToMultipleOfPowerOf2`](malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2)
-/// and
-/// [`RoundToMultipleOfPowerOf2Assign`](malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign),
-/// traits for rounding a number to a multiple of a power of 2.
-#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+/// Implementations of [`RoundToMultipleOfPowerOf2`] and [`RoundToMultipleOfPowerOf2Assign`], traits
+/// for rounding a number to a multiple of a power of 2.
 pub mod round_to_multiple_of_power_of_2;
 /// Left-shifting a [`Rational`](super::Rational) (multiplying it by a power of 2).
 ///
@@ -324,28 +248,20 @@ pub mod shl;
 /// assert_eq!(x.to_string(), "14/11");
 /// ```
 pub mod shr;
-/// An implementation of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for
-/// determining the sign of a number.
+/// An implementation of [`Sign`], a trait for determining the sign of a number.
 pub mod sign;
-/// Functions for finding the simplest (lowest-denominator) [`Rational`](super::Rational) in an
-/// interval.
-pub mod simplest_rational_in_interval;
-/// Implementations of [`CheckedSqrt`](malachite_base::num::arithmetic::traits::CheckedSqrt), a
-/// trait for computing the root of a number, if the number is a perfect square.
+/// Implementations of [`CheckedSqrt`], a trait for computing the root of a number, if the number is
+/// a perfect square.
 pub mod sqrt;
-/// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
-/// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), traits for squaring a
-/// number.
+/// Implementations of [`Square`] and [`SquareAssign`], traits for squaring a number.
 pub mod square;
 /// Subtraction of [`Rational`](super::Rational)s.
 pub mod sub;
-/// Implementations of [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
-/// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign), traits for subtracting
-/// the product of two numbers from a number.
+/// Implementations of [`SubMul`] and [`SubMulAssign`], traits for subtracting the product of two
+/// numbers from a number.
 pub mod sub_mul;
-/// Implementations of [`SubMulShl`](malachite_base::num::arithmetic::traits::SubMulShl) and
-/// [`SubMulShlAssign`](malachite_base::num::arithmetic::traits::SubMulShlAssign), traits for
-/// subtracting the product of two numbers, shifted left, from a number.
+/// Implementations of [`SubMulShl`] and [`SubMulShlAssign`], traits for subtracting the product of
+/// two numbers, shifted left, from a number.
 pub mod sub_mul_shl;
 /// Various traits for performing arithmetic operations on numbers.
 pub mod traits;

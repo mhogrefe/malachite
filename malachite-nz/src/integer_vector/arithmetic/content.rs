@@ -11,10 +11,11 @@ use crate::integer_vector::IntegerVector;
 use crate::natural::Natural;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, GcdAssign, NegAssign,
-    PrimitivePart, PrimitivePartAssign,
+    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, NegAssign, PrimitivePart,
+    PrimitivePartAssign,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::GcdAssign;
 
 // The GCD of the elements' absolute values. It stops as soon as it reaches 1, since nothing can
 // lower it further.

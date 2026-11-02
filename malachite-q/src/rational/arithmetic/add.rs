@@ -14,10 +14,9 @@ use crate::Rational;
 use core::iter::Sum;
 use core::ops::{Add, AddAssign};
 use malachite_base::iterators::balanced_fold;
-use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, Gcd, GcdAssign, UnsignedAbs,
-};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::{Gcd, GcdAssign};
 use malachite_nz::integer::Integer;
 
 impl Add<Self> for Rational {

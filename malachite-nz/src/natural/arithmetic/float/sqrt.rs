@@ -21,7 +21,7 @@ use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
 use crate::natural::{TWICE_WIDTH, WIDTH_MINUS_1};
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{NegModPowerOf2, Parity, PowerOf2};
+use malachite_base::num::arithmetic::traits::{Parity, PowerOf2};
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::arithmetic::traits::{
     WrappingAddAssign, WrappingSubAssign, XMulYToZZ, XXAddYYToZZ, XXSubYYToZZ, XXXSubYYYToZZZ,
@@ -29,6 +29,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::modular::traits::NegModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 // For 257 <= d10 <= 1024, T[d10-257] = floor(sqrt(2 ^ 30 / d10)).

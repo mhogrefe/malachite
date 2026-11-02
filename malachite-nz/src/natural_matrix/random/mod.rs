@@ -16,9 +16,9 @@ use alloc::vec::Vec;
 use core::cmp::min;
 use core::iter::{Repeat, repeat};
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{ModAddAssign, ModIsReduced, ModSubAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::modular::traits::{ModAddAssign, ModIsReduced, ModSubAssign};
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, geometric_random_unsigneds,
 };

@@ -9,8 +9,9 @@
 use crate::Rational;
 use crate::rational::conversion::digits::power_of_2_digits::RationalPowerOf2Digits;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{Abs, CheckedLogBase2, Floor, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{Abs, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::Digits;
+use malachite_base::num::exponential::traits::CheckedLogBase2;
 use malachite_nz::natural::Natural;
 
 #[doc(hidden)]

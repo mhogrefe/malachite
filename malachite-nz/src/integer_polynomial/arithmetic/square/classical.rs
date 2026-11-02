@@ -15,7 +15,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::square_truncated::classical::*;
+use crate::integer_polynomial::series::square_truncated::classical::*;
 
 // Sets `out` to the coefficients of the square of the polynomial with coefficients `xs`, which is
 // nonempty. `out` must have length `2 * xs.len() - 1`, so this is the truncated square with nothing

@@ -8,9 +8,10 @@
 
 use crate::rational_polynomial::RationalPolynomial;
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{DivExact, Gcd, Height};
+use malachite_base::num::arithmetic::traits::{DivExact, Height};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_nz::natural::Natural;
 
 // The height of the `i`th coefficient, which is the larger of the magnitudes of that coefficient in

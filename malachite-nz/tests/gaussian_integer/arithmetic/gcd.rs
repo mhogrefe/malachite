@@ -6,10 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{
-    CanonicalizeUnit, Conjugate, DivExact, Gcd, GcdAssign, MulI,
-};
+use malachite_base::num::arithmetic::traits::{CanonicalizeUnit, Conjugate, DivExact, MulI};
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::number_theory::traits::{Gcd, GcdAssign};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::natural::Natural;

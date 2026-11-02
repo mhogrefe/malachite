@@ -10,7 +10,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::unsigned_matrix::arithmetic::similarity_over_ring::SimilarityRing;
+use crate::unsigned_matrix::linear_algebra::similarity_over_ring::SimilarityRing;
 use alloc::vec::Vec;
 
 // The similarity transform of `fmpz_mat_similarity` and its `nmod_mat` and `fmpz_mod_mat`

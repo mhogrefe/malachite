@@ -15,10 +15,11 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, Zero};
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, NegAssign, NegModPowerOf2};
+use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::{ModPowerOf2, NegModPowerOf2};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::platform::Limb;
 

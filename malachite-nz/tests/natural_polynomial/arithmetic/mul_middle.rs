@@ -9,9 +9,11 @@
 use core::str::FromStr;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{
-    DivPowerOfX, MulMiddle, MulMiddleAssign, MulPowerOfX, MulTruncated, Polynomial,
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{
+    DivPowerOfX, MulMiddle, MulMiddleAssign, MulPowerOfX,
 };
+use malachite_base::polynomial::series::traits::MulTruncated;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::classical::*;
 use malachite_nz::integer_polynomial::arithmetic::mul_middle::fft::mul_middle_to_out_fft;

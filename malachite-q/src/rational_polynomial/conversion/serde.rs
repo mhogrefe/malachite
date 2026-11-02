@@ -8,8 +8,8 @@
 
 use crate::rational_polynomial::{RationalPolynomial, SerdeRationalPolynomial, content};
 use alloc::string::{String, ToString};
-use malachite_base::num::arithmetic::traits::CoprimeWith;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::CoprimeWith;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 
 impl From<RationalPolynomial> for SerdeRationalPolynomial {

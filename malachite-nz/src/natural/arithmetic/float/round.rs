@@ -23,11 +23,12 @@ use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::min;
 use malachite_base::num::arithmetic::traits::{
-    IsPowerOf2, ModPowerOf2, NegModPowerOf2, Parity, PowerOf2, ShrRound, WrappingSubAssign,
+    IsPowerOf2, Parity, PowerOf2, ShrRound, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
+use malachite_base::num::modular::traits::{ModPowerOf2, NegModPowerOf2};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 

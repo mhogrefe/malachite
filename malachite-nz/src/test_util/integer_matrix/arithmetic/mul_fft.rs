@@ -33,11 +33,11 @@ use crate::platform::Limb;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::{max, min};
-use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, DivisibleBy, PowerOf2, WrappingAddAssign,
-};
+use malachite_base::num::arithmetic::traits::{PowerOf2, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::slices::slice_test_zero;
 
 // Sets `z` to the low `z.len()` limbs of the two's complement evaluation at $2^b$, where $b$ is

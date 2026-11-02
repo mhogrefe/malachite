@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{Abs, Floor, Reciprocal};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::cfrac_helpers::ball_get_cfrac_for_testing;
+use malachite_nz::natural::number_theory::cfrac_helpers::ball_get_cfrac_for_testing;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_pair_gen;
 

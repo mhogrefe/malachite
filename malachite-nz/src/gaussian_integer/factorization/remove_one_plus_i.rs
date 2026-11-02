@@ -13,8 +13,9 @@
 use crate::gaussian_integer::GaussianInteger;
 use core::cmp::Ordering::*;
 use core::mem::take;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, MulIPowAssign};
+use malachite_base::num::arithmetic::traits::MulIPowAssign;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::modular::traits::ModPowerOf2;
 
 // The largest power of 2 dividing both parts, and whether one more factor of 1 + i remains after
 // that power of 2 (which is (1 + i)^2 up to a unit) is removed. The input must be nonzero.

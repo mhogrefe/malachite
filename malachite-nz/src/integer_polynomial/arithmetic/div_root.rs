@@ -15,7 +15,7 @@ use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::AddMul;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{DivRoot, DivRootAssign};
+use malachite_base::polynomial::arithmetic::traits::{DivRoot, DivRootAssign};
 
 // The quotient and remainder of `p` by $x - c$, by Horner's rule: the remainder is the value of `p`
 // at `c`.
@@ -74,7 +74,7 @@ impl DivRoot<Integer> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DivRoot;
+    /// use malachite_base::polynomial::arithmetic::traits::DivRoot;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -117,7 +117,7 @@ impl DivRoot<&Integer> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DivRoot;
+    /// use malachite_base::polynomial::arithmetic::traits::DivRoot;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -160,7 +160,7 @@ impl DivRoot<Integer> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DivRoot;
+    /// use malachite_base::polynomial::arithmetic::traits::DivRoot;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -203,7 +203,7 @@ impl DivRoot<&Integer> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DivRoot;
+    /// use malachite_base::polynomial::arithmetic::traits::DivRoot;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -244,7 +244,7 @@ impl DivRootAssign<Integer> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DivRootAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::DivRootAssign;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -286,7 +286,7 @@ impl DivRootAssign<&Integer> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DivRootAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::DivRootAssign;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///

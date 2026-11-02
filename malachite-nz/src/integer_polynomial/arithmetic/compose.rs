@@ -25,7 +25,7 @@ use core::cmp::max;
 use core::mem::{swap, take};
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{Compose, ComposeAssign};
+use malachite_base::polynomial::arithmetic::traits::{Compose, ComposeAssign};
 
 // Whether a polynomial with `xs_len` coefficients is composed with Horner's rule rather than divide
 // and conquer, when the largest coefficient of either polynomial has `bits` bits. Divide and
@@ -219,7 +219,7 @@ impl Compose<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// assert_eq!(
@@ -284,7 +284,7 @@ impl Compose<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// assert_eq!(
@@ -349,7 +349,7 @@ impl Compose<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// assert_eq!(
@@ -410,7 +410,7 @@ impl Compose<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// assert_eq!(
@@ -470,7 +470,7 @@ impl ComposeAssign<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposeAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposeAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();
@@ -523,7 +523,7 @@ impl ComposeAssign<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposeAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposeAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();

@@ -9,9 +9,10 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{AddMulAssign, Mod, Pow};
+use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::modular::traits::Mod;
 
 // Evaluates a polynomial term by term, as the sum of $c_i x^i$, with each power of $x$ computed
 // from scratch. This shares nothing with Horner's rule or the divide-and-conquer scheme, so it can

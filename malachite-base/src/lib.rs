@@ -13,8 +13,8 @@
 //! - Traits that wrap functions from the standard library, like
 //!   [`CheckedAdd`](num::arithmetic::traits::CheckedAdd).
 //! - Traits that give extra functionality to primitive types, like
-//!   [`Gcd`](num::arithmetic::traits::Gcd), [`FloorSqrt`](num::arithmetic::traits::FloorSqrt), and
-//!   [`BitAccess`](num::logic::traits::BitAccess).
+//!   [`Gcd`](num::number_theory::traits::Gcd), [`FloorSqrt`](num::arithmetic::traits::FloorSqrt),
+//!   and [`BitAccess`](num::logic::traits::BitAccess).
 //! - Iterator-producing functions that let you generate values for testing. Here's an example of
 //!   an iterator that produces all pairs of [`u32`]s:
 //!   ```
@@ -50,7 +50,7 @@
 //!   the type's width and of the inputs' values.
 //! - Otherwise, the bound is written in terms of variables, describing how the work would scale
 //!   if the same algorithm were instantiated at an arbitrarily large width. For example,
-//!   [`mod_pow`](num::arithmetic::traits::ModPow::mod_pow) for primitive types is documented as
+//!   [`mod_pow`](num::modular::traits::ModPow::mod_pow) for primitive types is documented as
 //!   $T(n) = O(n)$, where $n$ is `exp.significant_bits()`: the work scales with the exponent's
 //!   bit length. Every such variable is bounded by the type's width, so these bounds may be read
 //!   as constants; the variable form tells you what the constant depends on.
@@ -59,7 +59,7 @@
 //! This crate comes with a `bin` target that can be used for running demos and benchmarks.
 //! - Almost all of the public functions in this crate have an associated demo. Running a demo
 //!   shows you a function's behavior on a large number of inputs. For example, to demo the
-//!   [`mod_pow`](num::arithmetic::traits::ModPow::mod_pow) function on [`u32`]s, you can use the
+//!   [`mod_pow`](num::modular::traits::ModPow::mod_pow) function on [`u32`]s, you can use the
 //!   following command:
 //!   ```text
 //!   cargo run --features bin_build --release -- -l 10000 -m exhaustive -d demo_mod_pow_u32
@@ -81,7 +81,8 @@
 //!
 //! The list of available demos and benchmarks is not documented anywhere; you must find them by
 //! browsing through
-//! [`bin_util/demo_and_bench`](https://github.com/mhogrefe/malachite/tree/master/malachite-base/src/bin_util/demo_and_bench).
+//! [`bin_util/demo_and_bench`](
+//! https://github.com/mhogrefe/malachite/tree/master/malachite-base/src/bin_util/demo_and_bench).
 //!
 //! # Features
 //! - `test_build`: A large proportion of the code in this crate is only used for testing. For a

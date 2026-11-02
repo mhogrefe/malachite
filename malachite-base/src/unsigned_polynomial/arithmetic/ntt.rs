@@ -25,16 +25,15 @@
 // bit-reversed order, so no bit reversal is ever done. The data stay in normal form; only the
 // twiddle factors are in Montgomery form, so multiplying by one is a Montgomery multiplication.
 
-use crate::num::arithmetic::traits::{
-    CeilingLogBase2, PowerOf2, WrappingMulAssign, WrappingSubMul, XMulYToZZ,
-};
+use crate::num::arithmetic::traits::{PowerOf2, WrappingMulAssign, WrappingSubMul, XMulYToZZ};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
+use crate::num::exponential::traits::CeilingLogBase2;
 use crate::num::logic::traits::BitIterable;
-use crate::unsigned_polynomial::arithmetic::mod_mul::mod_mul_to_out;
-use crate::unsigned_polynomial::arithmetic::mod_mul_truncated::mod_mul_truncated_to_out;
-use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul::mul_wrapping;
-use crate::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::mul_truncated_wrapping;
+use crate::unsigned_polynomial::modular::mod_mul::mod_mul_to_out;
+use crate::unsigned_polynomial::modular::mod_power_of_2_mul::mul_wrapping;
+use crate::unsigned_polynomial::series::mod_mul_truncated::mod_mul_truncated_to_out;
+use crate::unsigned_polynomial::series::mod_power_of_2_mul_truncated::mul_truncated_wrapping;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::min;

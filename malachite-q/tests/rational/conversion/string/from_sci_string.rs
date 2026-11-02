@@ -6,11 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Abs, FloorLogBase};
+use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::from_sci_string::preprocess_sci_string;
 use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::{ExactFrom, FromSciString, ToSci};
+use malachite_base::num::exponential::traits::FloorLogBase;
 use malachite_base::test_util::generators::{
     string_from_sci_string_options_pair_gen_var_2, string_from_sci_string_options_pair_gen_var_3,
     string_gen_var_14, string_gen_var_15,

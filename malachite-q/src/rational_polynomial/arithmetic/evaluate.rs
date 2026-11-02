@@ -12,14 +12,13 @@ use alloc::borrow::Cow;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{
-    AddMul, AddMulAssign, CoprimeWith, Square, UnsignedAbs,
-};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, Square, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
-use malachite_base::polynomial::{Evaluate, EvaluateMany};
+use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::polynomial::arithmetic::traits::{Evaluate, EvaluateMany};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::evaluate::divide_and_conquer_blocks;
@@ -262,7 +261,7 @@ impl Evaluate<&Rational> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     /// use malachite_q::Rational;
     ///
@@ -329,7 +328,7 @@ impl Evaluate<Rational> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     /// use malachite_q::Rational;
     ///
@@ -409,7 +408,7 @@ impl Evaluate<&Rational> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -472,7 +471,7 @@ impl Evaluate<Rational> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -543,7 +542,7 @@ impl Evaluate<&Integer> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -593,7 +592,7 @@ impl Evaluate<Integer> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -625,7 +624,7 @@ impl EvaluateMany<Rational> for &IntegerPolynomial {
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length. Each value is a
     /// [`Rational`] in lowest terms, found as by
-    /// [`evaluate`](malachite_base::polynomial::Evaluate::evaluate).
+    /// [`evaluate`](malachite_base::polynomial::arithmetic::traits::Evaluate::evaluate).
     ///
     /// # Worst-case complexity
     /// $T(n, k) = O(kn \log^2 n \log\log n)$
@@ -640,7 +639,7 @@ impl EvaluateMany<Rational> for &IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{NegativeOne, OneHalf};
-    /// use malachite_base::polynomial::EvaluateMany;
+    /// use malachite_base::polynomial::arithmetic::traits::EvaluateMany;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     /// use malachite_q::Rational;
     ///
@@ -668,7 +667,7 @@ impl EvaluateMany<Rational> for &RationalPolynomial {
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length. Each value is a
     /// [`Rational`] in lowest terms, found as by
-    /// [`evaluate`](malachite_base::polynomial::Evaluate::evaluate).
+    /// [`evaluate`](malachite_base::polynomial::arithmetic::traits::Evaluate::evaluate).
     ///
     /// # Worst-case complexity
     /// $T(n, k) = O(kn \log^2 n \log\log n)$
@@ -683,7 +682,7 @@ impl EvaluateMany<Rational> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Zero};
-    /// use malachite_base::polynomial::EvaluateMany;
+    /// use malachite_base::polynomial::arithmetic::traits::EvaluateMany;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -715,7 +714,7 @@ impl EvaluateMany<Integer> for &RationalPolynomial {
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length. Each value is a
     /// [`Rational`] in lowest terms, found as by
-    /// [`evaluate`](malachite_base::polynomial::Evaluate::evaluate).
+    /// [`evaluate`](malachite_base::polynomial::arithmetic::traits::Evaluate::evaluate).
     ///
     /// # Worst-case complexity
     /// $T(n, k) = O(kn \log^2 n \log\log n)$
@@ -729,7 +728,7 @@ impl EvaluateMany<Integer> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateMany;
+    /// use malachite_base::polynomial::arithmetic::traits::EvaluateMany;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;

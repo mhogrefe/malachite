@@ -44,10 +44,9 @@ use crate::platform::{
     AORSMUL_FASTER_AORS_AORSLSH, Limb,
 };
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOf2, Parity, WrappingAddAssign, WrappingSubAssign,
-};
+use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign, WrappingSubAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::modular::traits::DivisibleByPowerOf2;
 use malachite_base::slices::slice_test_zero;
 
 // A `Limb` with only its top two bits set.

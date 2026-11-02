@@ -11,11 +11,11 @@ use crate::InnerFloat::Finite;
 use alloc::string::String;
 use core::cmp::Ordering::{self, *};
 use core::ops::Deref;
-#[cfg(feature = "test_build")]
-use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 #[cfg(feature = "test_build")]
 use malachite_base::num::logic::traits::SignificantBits;
+#[cfg(feature = "test_build")]
+use malachite_base::num::modular::traits::DivisibleByPowerOf2;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -285,6 +285,15 @@ pub mod constants;
 pub mod conversion;
 /// Iterators that generate [`Float`]s without repetition.
 pub mod exhaustive;
+/// Exponential and logarithmic functions of [`Float`]s: `exp`, `ln`, logarithms to various bases,
+/// powers of 2 and 10, the arithmetic-geometric mean, and compound interest.
+pub mod exponential;
+/// Hyperbolic functions of [`Float`]s and their inverses.
+pub mod hyperbolic;
+/// Number-theoretic functions of [`Float`]s.
+pub mod number_theory;
 #[cfg(feature = "random")]
 /// Iterators that generate [`Float`]s randomly.
 pub mod random;
+/// Trigonometric functions of [`Float`]s and their inverses.
+pub mod trigonometric;

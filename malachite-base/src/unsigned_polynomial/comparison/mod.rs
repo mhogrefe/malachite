@@ -10,13 +10,13 @@
 /// [`UnsignedPolynomial`](super::UnsignedPolynomial), comparing two polynomials by their behavior
 /// for large arguments.
 pub mod cmp;
-/// Implementations of [`EqTruncated`](crate::polynomial::EqTruncated) for
+/// Implementations of [`EqTruncated`](crate::polynomial::series::traits::EqTruncated) for
 /// [`UnsignedPolynomial`](super::UnsignedPolynomial).
 ///
 /// # eq_truncated
 /// ```
 /// use core::str::FromStr;
-/// use malachite_base::polynomial::EqTruncated;
+/// use malachite_base::polynomial::series::traits::EqTruncated;
 /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 ///
 /// let p = UnsignedPolynomial::<u64>::from_str("x^3+2*x^2+3*x+4").unwrap();

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{ModAdd, ModSub};
+use malachite_base::num::modular::traits::{ModAdd, ModSub};
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_radix2::*;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::platform::Limb;

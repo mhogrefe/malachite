@@ -11,8 +11,9 @@ use crate::float::conversion::from_natural::{
     from_natural_prec_round_zero_exponent, from_natural_zero_exponent,
 };
 use core::cmp::Ordering;
-use malachite_base::num::arithmetic::traits::{FloorLogBase2, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, SaturatingFrom};
+use malachite_base::num::exponential::traits::FloorLogBase2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;

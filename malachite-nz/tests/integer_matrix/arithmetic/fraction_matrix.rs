@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{DivExact, Gcd, Lcm};
+use malachite_base::num::arithmetic::traits::DivExact;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::number_theory::traits::{Gcd, Lcm};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::arithmetic::fraction_matrix::*;
 use malachite_nz::natural::Natural;

@@ -14,9 +14,10 @@ use crate::gaussian_integer::GaussianInteger;
 use crate::gaussian_integer::arithmetic::div_rem::div_rem_approx;
 use crate::integer::Integer;
 use core::mem::take;
-use malachite_base::num::arithmetic::traits::{CanonicalizeUnit, Floor, Gcd, GcdAssign};
+use malachite_base::num::arithmetic::traits::{CanonicalizeUnit, Floor};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::number_theory::traits::{Gcd, GcdAssign};
 
 // When all four parts have at most this many bits, the whole GCD runs in double precision: the
 // products in the quotient estimate stay within a factor of 2 of the inputs, so every remainder is
@@ -108,7 +109,7 @@ impl Gcd<Self> for GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -150,7 +151,7 @@ impl Gcd<&Self> for GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -192,7 +193,7 @@ impl Gcd<GaussianInteger> for &GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -234,7 +235,7 @@ impl Gcd<&GaussianInteger> for &GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -274,7 +275,7 @@ impl GcdAssign<Self> for GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::GcdAssign;
+    /// use malachite_base::num::number_theory::traits::GcdAssign;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -314,7 +315,7 @@ impl GcdAssign<&Self> for GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::GcdAssign;
+    /// use malachite_base::num::number_theory::traits::GcdAssign;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///

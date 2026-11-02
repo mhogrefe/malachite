@@ -9,5 +9,8 @@
 pub mod arithmetic;
 pub mod comparison;
 pub mod conversion;
+pub mod exponential;
 pub mod logic;
+pub mod modular;
+pub mod number_theory;
 pub mod random;

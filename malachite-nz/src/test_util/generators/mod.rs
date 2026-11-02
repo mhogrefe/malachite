@@ -14,8 +14,8 @@ use crate::integer_polynomial::arithmetic::mul_dispatch::{TinyKernel, tiny_kerne
 use crate::integer_vector::IntegerVector;
 use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::Natural;
-use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
-use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
+use crate::natural::number_theory::factorial::FAC_DSC_THRESHOLD;
+use crate::natural::number_theory::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural_matrix::NaturalMatrix;
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_vector::NaturalVector;
@@ -31,7 +31,7 @@ use crate::test_util::generators::common::{
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
-use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
+use crate::test_util::natural::number_theory::gcd::OwnedHalfGcdMatrix;
 use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::floats::PrimitiveFloat;

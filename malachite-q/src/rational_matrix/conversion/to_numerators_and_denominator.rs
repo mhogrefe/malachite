@@ -8,8 +8,9 @@
 
 use crate::rational_matrix::RationalMatrix;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{DivExact, LcmAssign};
+use malachite_base::num::arithmetic::traits::DivExact;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::number_theory::traits::LcmAssign;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::natural::Natural;

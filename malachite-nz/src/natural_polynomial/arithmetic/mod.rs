@@ -6,27 +6,22 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(doc)]
+use malachite_base::polynomial::arithmetic::traits::{
+    BitPack, BitUnpack, Compose, ComposeAssign, ComposePowerOfX, ComposePowerOfXAssign,
+    DeflatePowerOfX, DeflatePowerOfXAssign, DivPowerOfX, DivPowerOfXAssign, Evaluate, ExponentGcd,
+    FloorL2Norm, L2NormSquared, MulMiddle, MulMiddleAssign, MulPowerOfX, MulPowerOfXAssign,
+    TaylorShift, TaylorShiftAssign,
+};
+
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// two polynomials.
 pub mod add;
-/// Implementations of [`AddTruncated`](malachite_base::polynomial::AddTruncated) and
-/// [`AddTruncatedAssign`](malachite_base::polynomial::AddTruncatedAssign), for adding two
-/// polynomials and keeping only their low coefficients.
-pub mod add_truncated;
-/// Implementations of [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), which
-/// reduces every coefficient of a polynomial to the representative closest to zero, producing an
-/// [`IntegerPolynomial`](crate::integer_polynomial::IntegerPolynomial).
-pub mod balanced_mod;
-/// Implementations of
-/// [`BalancedModPowerOf2`](malachite_base::num::arithmetic::traits::BalancedModPowerOf2), which
-/// reduce every coefficient of a polynomial to the representative closest to zero modulo a power of
-/// 2.
-pub mod balanced_mod_power_of_2;
-/// Implementations of [`BitPack`](malachite_base::polynomial::BitPack), which packs a polynomial's
-/// coefficients into fixed-width fields of a single number.
+/// Implementations of [`BitPack`], which packs a polynomial's coefficients into fixed-width fields
+/// of a single number.
 pub mod bit_pack;
-/// Implementations of [`BitUnpack`](malachite_base::polynomial::BitUnpack), which unpacks a
-/// polynomial from the fixed-width fields of a single number.
+/// Implementations of [`BitUnpack`], which unpacks a polynomial from the fixed-width fields of a
+/// single number.
 pub mod bit_unpack;
 /// Implementations of [`CanonicalPrimitivePart`](
 /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart),
@@ -41,45 +36,31 @@ pub mod canonical_primitive_part;
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
 /// which bring a polynomial into canonical unit form.
 pub mod canonicalize_unit;
-/// Implementations of [`Compose`](malachite_base::polynomial::Compose) and
-/// [`ComposeAssign`](malachite_base::polynomial::ComposeAssign), for composing two polynomials.
+/// Implementations of [`Compose`] and [`ComposeAssign`], for composing two polynomials.
 pub mod compose;
-/// Implementations of [`ComposePowerOfX`](malachite_base::polynomial::ComposePowerOfX) and
-/// [`ComposePowerOfXAssign`](malachite_base::polynomial::ComposePowerOfXAssign), for substituting a
-/// power of the variable into a polynomial.
+/// Implementations of [`ComposePowerOfX`] and [`ComposePowerOfXAssign`], for substituting a power
+/// of the variable into a polynomial.
 pub mod compose_power_of_x;
-/// Implementations of [`ComposeTruncated`](malachite_base::polynomial::ComposeTruncated) and
-/// [`ComposeTruncatedAssign`](malachite_base::polynomial::ComposeTruncatedAssign), for composing
-/// two polynomials as power series.
-pub mod compose_truncated;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart),
 /// [`PrimitivePartAssign`](malachite_base::num::arithmetic::traits::PrimitivePartAssign), and
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
 /// which compute the GCD of a polynomial's coefficients and the polynomial divided by it.
 pub mod content;
-/// Implementations of [`DeflatePowerOfX`](malachite_base::polynomial::DeflatePowerOfX) and
-/// [`DeflatePowerOfXAssign`](malachite_base::polynomial::DeflatePowerOfXAssign), for undoing the
+/// Implementations of [`DeflatePowerOfX`] and [`DeflatePowerOfXAssign`], for undoing the
 /// substitution of a power of the variable into a polynomial.
 pub mod deflate_power_of_x;
-/// Implementations of [`Derivative`](malachite_base::polynomial::Derivative) and
-/// [`DerivativeAssign`](malachite_base::polynomial::DerivativeAssign), for differentiating a
-/// polynomial.
-pub mod derivative;
-/// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
-/// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
-/// by a power of its variable and discarding the remainder.
+/// Implementations of [`DivPowerOfX`] and [`DivPowerOfXAssign`], for dividing a polynomial by a
+/// power of its variable and discarding the remainder.
 pub mod div_power_of_x;
-/// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate), which evaluates a
-/// polynomial at a value, and of
-/// [`ModPowerOf2Evaluate`](malachite_base::polynomial::ModPowerOf2Evaluate), which does so modulo a
-/// power of 2.
+/// Implementations of [`Evaluate`], which evaluates a polynomial at a value, and of
+/// [`ModPowerOf2Evaluate`](malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate), which
+/// does so modulo a power of 2.
 pub mod evaluate;
-/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
-/// common divisor of the exponents at which a polynomial has nonzero coefficients.
+/// An implementation of [`ExponentGcd`], the greatest common divisor of the exponents at which a
+/// polynomial has nonzero coefficients.
 pub mod exponent_gcd;
-/// An implementation of [`FloorL2Norm`](malachite_base::polynomial::FloorL2Norm), the floor of a
-/// polynomial's $L^2$ norm.
+/// An implementation of [`FloorL2Norm`], the floor of a polynomial's $L^2$ norm.
 pub mod floor_l2_norm;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
@@ -88,612 +69,21 @@ pub mod height;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
-/// An implementation of [`L2NormSquared`](malachite_base::polynomial::L2NormSquared), the sum of
-/// the squares of a polynomial's coefficients.
+/// An implementation of [`L2NormSquared`], the sum of the squares of a polynomial's coefficients.
 pub mod l2_norm_squared;
-/// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
-/// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), for adding two
-/// polynomials modulo a [`Natural`](crate::natural::Natural).
-pub mod mod_add;
-/// Implementations of [`ModAddTruncated`](malachite_base::polynomial::ModAddTruncated) and
-/// [`ModAddTruncatedAssign`](malachite_base::polynomial::ModAddTruncatedAssign), for adding two
-/// polynomials modulo a [`Natural`](crate::natural::Natural) and keeping only their low
-/// coefficients.
-pub mod mod_add_truncated;
-/// Implementations of [`ModCompose`](malachite_base::polynomial::ModCompose) and
-/// [`ModComposeAssign`](malachite_base::polynomial::ModComposeAssign), for composing two
-/// polynomials modulo a [`Natural`](crate::natural::Natural).
-pub mod mod_compose;
-/// Modular composition of polynomials modulo a polynomial.
-pub mod mod_compose_mod_polynomial;
-/// Modular composition of polynomials modulo a polynomial.
-pub mod mod_compose_mod_polynomial_precomputed;
-/// Modular composition of polynomials modulo a polynomial.
-pub mod mod_compose_mod_polynomial_precomputed_powers;
-/// Implementations of [`ModComposeTruncated`](malachite_base::polynomial::ModComposeTruncated) and
-/// [`ModComposeTruncatedAssign`](malachite_base::polynomial::ModComposeTruncatedAssign), for
-/// composing two polynomials modulo $m$ as power series, keeping only the low coefficients of the
-/// result.
-pub mod mod_compose_truncated;
-/// Series reversion modulo a number: the compositional inverse of a polynomial as a power series.
-pub mod mod_compositional_inverse_truncated;
-/// Implementations of [`ModDerivative`](malachite_base::polynomial::ModDerivative) and
-/// [`ModDerivativeAssign`](malachite_base::polynomial::ModDerivativeAssign), for differentiating a
-/// polynomial modulo a number.
-pub mod mod_derivative;
-/// Implementations of [`ModDivExact`](malachite_base::polynomial::ModDivExact),
-/// [`ModDivExactAssign`](malachite_base::polynomial::ModDivExactAssign), and
-/// [`CheckedModDivExact`](malachite_base::polynomial::CheckedModDivExact), for dividing polynomials
-/// modulo a number when the division is exact.
-pub mod mod_div_exact;
-/// Implementations of [`ModDivRem`](malachite_base::polynomial::ModDivRem),
-/// [`ModDivAssignRem`](malachite_base::polynomial::ModDivAssignRem), and
-/// [`CheckedModDivRem`](malachite_base::polynomial::CheckedModDivRem), for dividing polynomials
-/// modulo a number, returning the quotient and remainder.
-pub mod mod_div_rem;
-/// Implementations of [`ModDivRemPrecomputed`](malachite_base::polynomial::ModDivRemPrecomputed)
-/// and [`ModDivAssignRemPrecomputed`](malachite_base::polynomial::ModDivAssignRemPrecomputed), for
-/// dividing polynomials modulo a number with data precomputed from the divisor, returning the
-/// quotient and remainder.
-pub mod mod_div_rem_precomputed;
-/// Implementations of [`ModDivRoot`](malachite_base::polynomial::ModDivRoot) and
-/// [`ModDivRootAssign`](malachite_base::polynomial::ModDivRootAssign), for dividing a polynomial by
-/// $x - c$ modulo a number.
-pub mod mod_div_root;
-/// Implementations of [`ModDivTruncated`](malachite_base::polynomial::ModDivTruncated),
-/// [`ModDivTruncatedAssign`](malachite_base::polynomial::ModDivTruncatedAssign), and
-/// [`CheckedModDivTruncated`](malachite_base::polynomial::CheckedModDivTruncated), for dividing
-/// polynomials as power series modulo a number, keeping only the low coefficients.
-pub mod mod_div_truncated;
-/// Implementations of [`ModDivisibleBy`](malachite_base::polynomial::ModDivisibleBy), which
-/// determines whether one polynomial is divisible by another modulo a number.
-pub mod mod_divisible_by;
-/// Implementations of [`ModIntegral`](malachite_base::polynomial::ModIntegral) and
-/// [`ModIntegralAssign`](malachite_base::polynomial::ModIntegralAssign), for integrating a
-/// polynomial modulo a value.
-pub mod mod_integral;
-/// Implementations of [`ModInverseTruncated`](malachite_base::polynomial::ModInverseTruncated), for
-/// inverting a polynomial as a power series modulo a number, keeping only the low coefficients.
-pub mod mod_inverse_truncated;
-/// An implementation of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced),
-/// which checks whether every coefficient of a polynomial is less than a given modulus.
-pub mod mod_is_reduced;
-/// Implementations of [`ModMakeMonic`](malachite_base::polynomial::ModMakeMonic) and
-/// [`ModMakeMonicAssign`](malachite_base::polynomial::ModMakeMonicAssign), which make a polynomial
-/// monic modulo a value.
-pub mod mod_make_monic;
-/// Implementations of [`ModMul`](malachite_base::num::arithmetic::traits::ModMul) and
-/// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign), for multiplying two
-/// polynomials modulo a [`Natural`](crate::natural::Natural).
-pub mod mod_mul;
-/// Implementations of [`ModMulModPolynomial`](malachite_base::polynomial::ModMulModPolynomial) and
-/// [`ModMulModPolynomialAssign`](malachite_base::polynomial::ModMulModPolynomialAssign), for
-/// multiplying polynomials modulo a polynomial, with coefficients modulo a number.
-pub mod mod_mul_mod_polynomial;
-/// Implementations of
-/// [`ModMulModPolynomialPrecomputed`](malachite_base::polynomial::ModMulModPolynomialPrecomputed)
-/// and [`ModMulModPolynomialPrecomputedAssign`](
-/// malachite_base::polynomial::ModMulModPolynomialPrecomputedAssign), for multiplying polynomials
-/// modulo a polynomial, with coefficients modulo a number, with data precomputed from the modulus.
-pub mod mod_mul_mod_polynomial_precomputed;
-/// Implementations of [`ModMulTruncated`](malachite_base::polynomial::ModMulTruncated) and
-/// [`ModMulTruncatedAssign`](malachite_base::polynomial::ModMulTruncatedAssign), for multiplying
-/// two polynomials modulo a [`Natural`](crate::natural::Natural) and keeping only the low
-/// coefficients of the product.
-pub mod mod_mul_truncated;
-/// Implementations of [`ModNeg`](malachite_base::num::arithmetic::traits::ModNeg) and
-/// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), which negate a
-/// polynomial modulo a number.
-pub mod mod_neg;
-/// Implementations of [`ModNthDerivative`](malachite_base::polynomial::ModNthDerivative) and
-/// [`ModNthDerivativeAssign`](malachite_base::polynomial::ModNthDerivativeAssign), for
-/// differentiating a polynomial any number of times modulo a number.
-pub mod mod_nth_derivative;
-/// Implementations of [`Mod`](malachite_base::num::arithmetic::traits::Mod),
-/// [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign), [`Rem`](core::ops::Rem), and
-/// [`RemAssign`](core::ops::RemAssign), traits for reducing every coefficient of a polynomial
-/// modulo a number.
-pub mod mod_op;
-/// Implementations of [`ModPow`](malachite_base::num::arithmetic::traits::ModPow) and
-/// [`ModPowAssign`](malachite_base::num::arithmetic::traits::ModPowAssign), for raising a
-/// polynomial to a power modulo a number.
-pub mod mod_pow;
-/// Implementations of [`ModPowModPolynomial`](malachite_base::polynomial::ModPowModPolynomial) and
-/// [`ModPowModPolynomialAssign`](malachite_base::polynomial::ModPowModPolynomialAssign), for
-/// raising polynomials to powers modulo a polynomial, with coefficients modulo a number.
-pub mod mod_pow_mod_polynomial;
-/// Implementations of [`ModPowModPolynomialPrecomputed`](
-/// malachite_base::polynomial::ModPowModPolynomialPrecomputed) and
-/// [`ModPowModPolynomialPrecomputedAssign`](
-/// malachite_base::polynomial::ModPowModPolynomialPrecomputedAssign), for raising polynomials to
-/// powers modulo a polynomial, with coefficients modulo a number, with data precomputed from the
-/// modulus.
-pub mod mod_pow_mod_polynomial_precomputed;
-/// Implementations of [`ModPowTruncated`](malachite_base::polynomial::ModPowTruncated) and
-/// [`ModPowTruncatedAssign`](malachite_base::polynomial::ModPowTruncatedAssign), for raising a
-/// polynomial to a power modulo a number and keeping only the low coefficients.
-pub mod mod_pow_truncated;
-/// Implementations of [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2) and
-/// [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign), which reduce
-/// every coefficient of a polynomial modulo a power of 2.
-pub mod mod_power_of_2;
-/// Implementations of [`ModPowerOf2Add`](malachite_base::num::arithmetic::traits::ModPowerOf2Add)
-/// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign), for
-/// adding two polynomials modulo $2^k$.
-pub mod mod_power_of_2_add;
-/// Implementations of
-/// [`ModPowerOf2AddTruncated`](malachite_base::polynomial::ModPowerOf2AddTruncated) and
-/// [`ModPowerOf2AddTruncatedAssign`](malachite_base::polynomial::ModPowerOf2AddTruncatedAssign),
-/// for adding two polynomials modulo $2^k$ and keeping only their low coefficients.
-pub mod mod_power_of_2_add_truncated;
-/// Implementations of [`ModPowerOf2Compose`](malachite_base::polynomial::ModPowerOf2Compose) and
-/// [`ModPowerOf2ComposeAssign`](malachite_base::polynomial::ModPowerOf2ComposeAssign), for
-/// composing two polynomials modulo $2^k$.
-pub mod mod_power_of_2_compose;
-/// Modular composition of polynomials modulo a polynomial.
-pub mod mod_power_of_2_compose_mod_polynomial;
-/// Modular composition of polynomials modulo a polynomial.
-pub mod mod_power_of_2_compose_mod_polynomial_precomputed;
-/// Modular composition of polynomials modulo a polynomial.
-pub mod mod_power_of_2_compose_mod_polynomial_precomputed_powers;
-/// Implementations of
-/// [`ModPowerOf2ComposeTruncated`](malachite_base::polynomial::ModPowerOf2ComposeTruncated) and
-/// [`ModPowerOf2ComposeTruncatedAssign`](
-/// malachite_base::polynomial::ModPowerOf2ComposeTruncatedAssign), for composing two polynomials
-/// modulo $2^k$ as power series, keeping only the low coefficients of the result.
-pub mod mod_power_of_2_compose_truncated;
-/// Series reversion modulo a power of 2: the compositional inverse of a polynomial as a power
-/// series.
-pub mod mod_power_of_2_compositional_inverse_truncated;
-/// Implementations of [`ModPowerOf2Derivative`](malachite_base::polynomial::ModPowerOf2Derivative)
-/// and [`ModPowerOf2DerivativeAssign`](malachite_base::polynomial::ModPowerOf2DerivativeAssign),
-/// for differentiating a polynomial modulo a power of 2.
-pub mod mod_power_of_2_derivative;
-/// Implementations of [`ModPowerOf2DivExact`](malachite_base::polynomial::ModPowerOf2DivExact),
-/// [`ModPowerOf2DivExactAssign`](malachite_base::polynomial::ModPowerOf2DivExactAssign), and
-/// [`CheckedModPowerOf2DivExact`](malachite_base::polynomial::CheckedModPowerOf2DivExact), for
-/// dividing polynomials modulo a power of 2 when the division is exact.
-pub mod mod_power_of_2_div_exact;
-/// Implementations of [`ModPowerOf2DivRem`](malachite_base::polynomial::ModPowerOf2DivRem),
-/// [`ModPowerOf2DivAssignRem`](malachite_base::polynomial::ModPowerOf2DivAssignRem), and
-/// [`CheckedModPowerOf2DivRem`](malachite_base::polynomial::CheckedModPowerOf2DivRem), for dividing
-/// polynomials modulo a power of 2, returning the quotient and remainder.
-pub mod mod_power_of_2_div_rem;
-/// Implementations of
-/// [`ModPowerOf2DivRemPrecomputed`](malachite_base::polynomial::ModPowerOf2DivRemPrecomputed) and
-/// [`ModPowerOf2DivAssignRemPrecomputed`](
-/// malachite_base::polynomial::ModPowerOf2DivAssignRemPrecomputed), for dividing polynomials modulo
-/// a power of 2 with data precomputed from the divisor, returning the quotient and remainder.
-pub mod mod_power_of_2_div_rem_precomputed;
-/// Implementations of [`ModPowerOf2DivRoot`](malachite_base::polynomial::ModPowerOf2DivRoot) and
-/// [`ModPowerOf2DivRootAssign`](malachite_base::polynomial::ModPowerOf2DivRootAssign), for dividing
-/// a polynomial by $x - c$ modulo a power of 2.
-pub mod mod_power_of_2_div_root;
-/// Implementations of
-/// [`ModPowerOf2DivTruncated`](malachite_base::polynomial::ModPowerOf2DivTruncated),
-/// [`ModPowerOf2DivTruncatedAssign`](malachite_base::polynomial::ModPowerOf2DivTruncatedAssign),
-/// and
-/// [`CheckedModPowerOf2DivTruncated`](malachite_base::polynomial::CheckedModPowerOf2DivTruncated),
-/// for dividing polynomials as power series modulo a power of 2, keeping only the low coefficients.
-pub mod mod_power_of_2_div_truncated;
-/// Implementations of
-/// [`ModPowerOf2DivisibleBy`](malachite_base::polynomial::ModPowerOf2DivisibleBy), which determines
-/// whether one polynomial is divisible by another modulo a power of 2.
-pub mod mod_power_of_2_divisible_by;
-/// Implementations of [`ModPowerOf2Integral`](malachite_base::polynomial::ModPowerOf2Integral) and
-/// [`ModPowerOf2IntegralAssign`](malachite_base::polynomial::ModPowerOf2IntegralAssign), for
-/// integrating a polynomial modulo $2^k$.
-pub mod mod_power_of_2_integral;
-/// Implementations of
-/// [`ModPowerOf2InverseTruncated`](malachite_base::polynomial::ModPowerOf2InverseTruncated), for
-/// inverting a polynomial as a power series modulo a power of 2, keeping only the low coefficients.
-pub mod mod_power_of_2_inverse_truncated;
-/// An implementation of
-/// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), which
-/// checks whether every coefficient of a polynomial is less than a given power of 2.
-pub mod mod_power_of_2_is_reduced;
-/// Implementations of [`ModPowerOf2Mul`](malachite_base::num::arithmetic::traits::ModPowerOf2Mul)
-/// and [`ModPowerOf2MulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign), for
-/// multiplying two polynomials modulo $2^k$.
-pub mod mod_power_of_2_mul;
-/// Implementations of
-/// [`ModPowerOf2MulModPolynomial`](malachite_base::polynomial::ModPowerOf2MulModPolynomial) and
-/// [`ModPowerOf2MulModPolynomialAssign`](
-/// malachite_base::polynomial::ModPowerOf2MulModPolynomialAssign), for multiplying polynomials
-/// modulo a polynomial, with coefficients modulo a power of 2.
-pub mod mod_power_of_2_mul_mod_polynomial;
-/// Implementations of [`ModPowerOf2MulModPolynomialPrecomputed`](
-/// malachite_base::polynomial::ModPowerOf2MulModPolynomialPrecomputed) and
-/// [`ModPowerOf2MulModPolynomialPrecomputedAssign`](
-/// malachite_base::polynomial::ModPowerOf2MulModPolynomialPrecomputedAssign), for multiplying
-/// polynomials modulo a polynomial, with coefficients modulo a power of 2, with data precomputed
-/// from the modulus.
-pub mod mod_power_of_2_mul_mod_polynomial_precomputed;
-/// Implementations of
-/// [`ModPowerOf2MulTruncated`](malachite_base::polynomial::ModPowerOf2MulTruncated) and
-/// [`ModPowerOf2MulTruncatedAssign`](malachite_base::polynomial::ModPowerOf2MulTruncatedAssign),
-/// for multiplying two polynomials modulo $2^k$ and keeping only the low coefficients of the
-/// product.
-pub mod mod_power_of_2_mul_truncated;
-/// Implementations of [`ModPowerOf2Neg`](malachite_base::num::arithmetic::traits::ModPowerOf2Neg)
-/// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign),
-/// which negate a polynomial modulo a power of 2.
-pub mod mod_power_of_2_neg;
-/// Implementations of
-/// [`ModPowerOf2NthDerivative`](malachite_base::polynomial::ModPowerOf2NthDerivative) and
-/// [`ModPowerOf2NthDerivativeAssign`](malachite_base::polynomial::ModPowerOf2NthDerivativeAssign),
-/// for differentiating a polynomial any number of times modulo a power of 2.
-pub mod mod_power_of_2_nth_derivative;
-/// Implementations of [`ModPowerOf2Pow`](malachite_base::num::arithmetic::traits::ModPowerOf2Pow)
-/// and [`ModPowerOf2PowAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign), for
-/// raising a polynomial to a power modulo a power of 2.
-pub mod mod_power_of_2_pow;
-/// Implementations of
-/// [`ModPowerOf2PowModPolynomial`](malachite_base::polynomial::ModPowerOf2PowModPolynomial) and
-/// [`ModPowerOf2PowModPolynomialAssign`](
-/// malachite_base::polynomial::ModPowerOf2PowModPolynomialAssign), for raising polynomials to
-/// powers modulo a polynomial, with coefficients modulo a power of 2.
-pub mod mod_power_of_2_pow_mod_polynomial;
-/// Implementations of [`ModPowerOf2PowModPolynomialPrecomputed`](
-/// malachite_base::polynomial::ModPowerOf2PowModPolynomialPrecomputed) and
-/// [`ModPowerOf2PowModPolynomialPrecomputedAssign`](
-/// malachite_base::polynomial::ModPowerOf2PowModPolynomialPrecomputedAssign), for raising
-/// polynomials to powers modulo a polynomial, with coefficients modulo a power of 2, with data
-/// precomputed from the modulus.
-pub mod mod_power_of_2_pow_mod_polynomial_precomputed;
-/// Implementations of
-/// [`ModPowerOf2PowTruncated`](malachite_base::polynomial::ModPowerOf2PowTruncated) and
-/// [`ModPowerOf2PowTruncatedAssign`](malachite_base::polynomial::ModPowerOf2PowTruncatedAssign),
-/// for raising a polynomial to a power modulo a power of 2 and keeping only the low coefficients.
-pub mod mod_power_of_2_pow_truncated;
-/// Implementations of
-/// [`ModPowerOf2Product`](malachite_base::num::arithmetic::traits::ModPowerOf2Product), for
-/// multiplying polynomials together modulo a power of 2.
-pub mod mod_power_of_2_product;
-/// Implementations of [`ModPowerOf2Quotient`](malachite_base::polynomial::ModPowerOf2Quotient),
-/// [`ModPowerOf2QuotientAssign`](malachite_base::polynomial::ModPowerOf2QuotientAssign), and
-/// [`CheckedModPowerOf2Quotient`](malachite_base::polynomial::CheckedModPowerOf2Quotient), for
-/// finding the quotient of polynomials modulo a power of 2.
-pub mod mod_power_of_2_quotient;
-/// Implementations of
-/// [`ModPowerOf2QuotientPrecomputed`](malachite_base::polynomial::ModPowerOf2QuotientPrecomputed)
-/// and [`ModPowerOf2QuotientPrecomputedAssign`](
-/// malachite_base::polynomial::ModPowerOf2QuotientPrecomputedAssign), for finding the quotient of
-/// polynomials modulo a power of 2 with data precomputed from the divisor.
-pub mod mod_power_of_2_quotient_precomputed;
-/// Implementations of [`ModPowerOf2Rem`](malachite_base::polynomial::ModPowerOf2Rem),
-/// [`ModPowerOf2RemAssign`](malachite_base::polynomial::ModPowerOf2RemAssign), and
-/// [`CheckedModPowerOf2Rem`](malachite_base::polynomial::CheckedModPowerOf2Rem), for finding the
-/// remainder of polynomials modulo a power of 2.
-pub mod mod_power_of_2_rem;
-/// Implementations of
-/// [`ModPowerOf2RemPrecomputed`](malachite_base::polynomial::ModPowerOf2RemPrecomputed) and
-/// [`ModPowerOf2RemPrecomputedAssign`](
-/// malachite_base::polynomial::ModPowerOf2RemPrecomputedAssign), for finding the remainder of
-/// polynomials modulo a power of 2 with data precomputed from the divisor.
-pub mod mod_power_of_2_rem_precomputed;
-/// Implementations of
-/// [`ModPowerOf2RemovePower`](malachite_base::polynomial::ModPowerOf2RemovePower) and
-/// [`ModPowerOf2RemovePowerAssign`](malachite_base::polynomial::ModPowerOf2RemovePowerAssign), for
-/// removing the largest power of a polynomial that divides another modulo a power of 2.
-pub mod mod_power_of_2_remove_power;
-/// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
-/// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign), for
-/// left-shifting a polynomial modulo a power of 2.
-///
-/// # mod_power_of_2_shl
-/// ```
-/// use core::str::FromStr;
-/// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
-/// use malachite_nz::natural_polynomial::NaturalPolynomial;
-///
-/// let p = NaturalPolynomial::from_str("5*x^2+x+3").unwrap();
-/// assert_eq!(
-///     p.clone().mod_power_of_2_shl(1u8, 3).to_string(),
-///     "2*x^2+2*x+6"
-/// );
-/// assert_eq!(
-///     p.clone().mod_power_of_2_shl(2u16, 3).to_string(),
-///     "4*x^2+4*x+4"
-/// );
-/// assert_eq!(p.mod_power_of_2_shl(3u32, 3).to_string(), "0");
-/// assert_eq!(
-///     NaturalPolynomial::from_str("4*x^2+3")
-///         .unwrap()
-///         .mod_power_of_2_shl(1u64, 3)
-///         .to_string(),
-///     "6"
-/// );
-/// assert_eq!(
-///     NaturalPolynomial::from_str("x+1")
-///         .unwrap()
-///         .mod_power_of_2_shl(99u128, 100)
-///         .to_string(),
-///     "633825300114114700748351602688*x+633825300114114700748351602688"
-/// );
-///
-/// let p = NaturalPolynomial::from_str("5*x^2+x+3").unwrap();
-/// assert_eq!((&p).mod_power_of_2_shl(1u8, 3).to_string(), "2*x^2+2*x+6");
-/// assert_eq!((&p).mod_power_of_2_shl(2u16, 3).to_string(), "4*x^2+4*x+4");
-/// assert_eq!((&p).mod_power_of_2_shl(3u32, 3).to_string(), "0");
-/// assert_eq!(
-///     (&NaturalPolynomial::from_str("4*x^2+3").unwrap())
-///         .mod_power_of_2_shl(1u64, 3)
-///         .to_string(),
-///     "6"
-/// );
-/// assert_eq!(
-///     (&NaturalPolynomial::from_str("x+1").unwrap())
-///         .mod_power_of_2_shl(99u128, 100)
-///         .to_string(),
-///     "633825300114114700748351602688*x+633825300114114700748351602688"
-/// );
-/// ```
-///
-/// # mod_power_of_2_shl_assign
-/// ```
-/// use core::str::FromStr;
-/// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
-/// use malachite_nz::natural_polynomial::NaturalPolynomial;
-///
-/// let mut p = NaturalPolynomial::from_str("5*x^2+x+3").unwrap();
-/// p.mod_power_of_2_shl_assign(1u8, 3);
-/// assert_eq!(p.to_string(), "2*x^2+2*x+6");
-///
-/// let mut p = NaturalPolynomial::from_str("5*x^2+x+3").unwrap();
-/// p.mod_power_of_2_shl_assign(3u32, 3);
-/// assert_eq!(p.to_string(), "0");
-///
-/// let mut p = NaturalPolynomial::from_str("4*x^2+3").unwrap();
-/// p.mod_power_of_2_shl_assign(1u64, 3);
-/// assert_eq!(p.to_string(), "6");
-///
-/// let mut p = NaturalPolynomial::from_str("x+1").unwrap();
-/// p.mod_power_of_2_shl_assign(99u128, 100);
-/// assert_eq!(
-///     p.to_string(),
-///     "633825300114114700748351602688*x+633825300114114700748351602688"
-/// );
-/// ```
-pub mod mod_power_of_2_shl;
-/// Implementations of
-/// [`ModPowerOf2Square`](malachite_base::num::arithmetic::traits::ModPowerOf2Square) and
-/// [`ModPowerOf2SquareAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign),
-/// for squaring a polynomial modulo $2^k$.
-pub mod mod_power_of_2_square;
-/// Implementations of
-/// [`ModPowerOf2SquareTruncated`](malachite_base::polynomial::ModPowerOf2SquareTruncated) and
-/// [`ModPowerOf2SquareTruncatedAssign`](
-/// malachite_base::polynomial::ModPowerOf2SquareTruncatedAssign), for squaring a polynomial modulo
-/// $2^k$ and keeping only the low coefficients of the square.
-pub mod mod_power_of_2_square_truncated;
-/// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
-/// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign), for
-/// subtracting one polynomial from another modulo $2^k$.
-pub mod mod_power_of_2_sub;
-/// Implementations of
-/// [`ModPowerOf2SubTruncated`](malachite_base::polynomial::ModPowerOf2SubTruncated) and
-/// [`ModPowerOf2SubTruncatedAssign`](malachite_base::polynomial::ModPowerOf2SubTruncatedAssign),
-/// for subtracting one polynomial from another modulo $2^k$ and keeping only their low
-/// coefficients.
-pub mod mod_power_of_2_sub_truncated;
-/// Implementations of [`ModPowerOf2Sum`](malachite_base::num::arithmetic::traits::ModPowerOf2Sum),
-/// for adding up polynomials modulo a power of 2.
-pub mod mod_power_of_2_sum;
-/// Implementations of
-/// [`ModPowerOf2TaylorShift`](malachite_base::polynomial::ModPowerOf2TaylorShift) and
-/// [`ModPowerOf2TaylorShiftAssign`](malachite_base::polynomial::ModPowerOf2TaylorShiftAssign), for
-/// shifting a polynomial by a constant modulo $2^k$.
-pub mod mod_power_of_2_taylor_shift;
-/// Implementations of [`ModProduct`](malachite_base::num::arithmetic::traits::ModProduct), for
-/// multiplying polynomials together modulo a number.
-pub mod mod_product;
-/// Implementations of [`ModQuotient`](malachite_base::polynomial::ModQuotient),
-/// [`ModQuotientAssign`](malachite_base::polynomial::ModQuotientAssign), and
-/// [`CheckedModQuotient`](malachite_base::polynomial::CheckedModQuotient), for finding the quotient
-/// of polynomials modulo a number.
-pub mod mod_quotient;
-/// Implementations of
-/// [`ModQuotientPrecomputed`](malachite_base::polynomial::ModQuotientPrecomputed) and
-/// [`ModQuotientPrecomputedAssign`](malachite_base::polynomial::ModQuotientPrecomputedAssign), for
-/// finding the quotient of polynomials modulo a number with data precomputed from the divisor.
-pub mod mod_quotient_precomputed;
-/// Implementations of [`ModRem`](malachite_base::polynomial::ModRem),
-/// [`ModRemAssign`](malachite_base::polynomial::ModRemAssign), and
-/// [`CheckedModRem`](malachite_base::polynomial::CheckedModRem), for finding the remainder of
-/// polynomials modulo a number.
-pub mod mod_rem;
-/// Implementations of [`ModRemPrecomputed`](malachite_base::polynomial::ModRemPrecomputed) and
-/// [`ModRemPrecomputedAssign`](malachite_base::polynomial::ModRemPrecomputedAssign), for finding
-/// the remainder of polynomials modulo a number with data precomputed from the divisor.
-pub mod mod_rem_precomputed;
-/// Implementations of [`ModRemovePower`](malachite_base::polynomial::ModRemovePower) and
-/// [`ModRemovePowerAssign`](malachite_base::polynomial::ModRemovePowerAssign), for removing the
-/// largest power of a polynomial that divides another modulo a number.
-pub mod mod_remove_power;
-/// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
-/// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), for left-shifting a
-/// polynomial modulo a number.
-///
-/// # mod_shl
-/// ```
-/// use core::str::FromStr;
-/// use malachite_base::num::arithmetic::traits::{ModShl, Pow};
-/// use malachite_nz::natural::Natural;
-/// use malachite_nz::natural_polynomial::NaturalPolynomial;
-///
-/// let p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
-/// assert_eq!(
-///     p.clone().mod_shl(1u8, Natural::from(10u32)).to_string(),
-///     "6*x^2+2*x+4"
-/// );
-/// assert_eq!(
-///     p.mod_shl(3u16, Natural::from(10u32)).to_string(),
-///     "4*x^2+8*x+6"
-/// );
-/// assert_eq!(
-///     NaturalPolynomial::from_str("3*x^2+5")
-///         .unwrap()
-///         .mod_shl(2u32, Natural::from(12u32))
-///         .to_string(),
-///     "8"
-/// );
-/// assert_eq!(
-///     NaturalPolynomial::from_str("x+1")
-///         .unwrap()
-///         .mod_shl(100u64, Natural::from(10u32).pow(30))
-///         .to_string(),
-///     "267650600228229401496703205376*x+267650600228229401496703205376"
-/// );
-///
-/// let p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
-/// assert_eq!(
-///     p.clone().mod_shl(1u8, &Natural::from(10u32)).to_string(),
-///     "6*x^2+2*x+4"
-/// );
-/// assert_eq!(
-///     p.mod_shl(3u16, &Natural::from(10u32)).to_string(),
-///     "4*x^2+8*x+6"
-/// );
-/// assert_eq!(
-///     NaturalPolynomial::from_str("3*x^2+5")
-///         .unwrap()
-///         .mod_shl(2u32, &Natural::from(12u32))
-///         .to_string(),
-///     "8"
-/// );
-/// assert_eq!(
-///     NaturalPolynomial::from_str("x+1")
-///         .unwrap()
-///         .mod_shl(100u64, &Natural::from(10u32).pow(30))
-///         .to_string(),
-///     "267650600228229401496703205376*x+267650600228229401496703205376"
-/// );
-///
-/// let p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
-/// assert_eq!(
-///     (&p).mod_shl(1u8, Natural::from(10u32)).to_string(),
-///     "6*x^2+2*x+4"
-/// );
-/// assert_eq!(
-///     (&p).mod_shl(3u16, Natural::from(10u32)).to_string(),
-///     "4*x^2+8*x+6"
-/// );
-/// assert_eq!(
-///     (&NaturalPolynomial::from_str("3*x^2+5").unwrap())
-///         .mod_shl(2u32, Natural::from(12u32))
-///         .to_string(),
-///     "8"
-/// );
-/// assert_eq!(
-///     (&NaturalPolynomial::from_str("x+1").unwrap())
-///         .mod_shl(100u64, Natural::from(10u32).pow(30))
-///         .to_string(),
-///     "267650600228229401496703205376*x+267650600228229401496703205376"
-/// );
-///
-/// let p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
-/// assert_eq!(
-///     (&p).mod_shl(1u8, &Natural::from(10u32)).to_string(),
-///     "6*x^2+2*x+4"
-/// );
-/// assert_eq!(
-///     (&p).mod_shl(3u16, &Natural::from(10u32)).to_string(),
-///     "4*x^2+8*x+6"
-/// );
-/// assert_eq!(
-///     (&NaturalPolynomial::from_str("3*x^2+5").unwrap())
-///         .mod_shl(2u32, &Natural::from(12u32))
-///         .to_string(),
-///     "8"
-/// );
-/// assert_eq!(
-///     (&NaturalPolynomial::from_str("x+1").unwrap())
-///         .mod_shl(100u64, &Natural::from(10u32).pow(30))
-///         .to_string(),
-///     "267650600228229401496703205376*x+267650600228229401496703205376"
-/// );
-/// ```
-///
-/// # mod_shl_assign
-/// ```
-/// use core::str::FromStr;
-/// use malachite_base::num::arithmetic::traits::{ModShlAssign, Pow};
-/// use malachite_nz::natural::Natural;
-/// use malachite_nz::natural_polynomial::NaturalPolynomial;
-///
-/// let mut p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
-/// p.mod_shl_assign(1u8, Natural::from(10u32));
-/// assert_eq!(p.to_string(), "6*x^2+2*x+4");
-///
-/// let mut p = NaturalPolynomial::from_str("3*x^2+x+7").unwrap();
-/// p.mod_shl_assign(3u16, &Natural::from(10u32));
-/// assert_eq!(p.to_string(), "4*x^2+8*x+6");
-///
-/// let mut p = NaturalPolynomial::from_str("3*x^2+5").unwrap();
-/// p.mod_shl_assign(2u32, Natural::from(12u32));
-/// assert_eq!(p.to_string(), "8");
-///
-/// let mut p = NaturalPolynomial::from_str("x+1").unwrap();
-/// p.mod_shl_assign(100u64, &Natural::from(10u32).pow(30));
-/// assert_eq!(
-///     p.to_string(),
-///     "267650600228229401496703205376*x+267650600228229401496703205376"
-/// );
-/// ```
-pub mod mod_shl;
-/// Implementations of [`ModSquare`](malachite_base::num::arithmetic::traits::ModSquare) and
-/// [`ModSquareAssign`](malachite_base::num::arithmetic::traits::ModSquareAssign), for squaring a
-/// polynomial modulo a [`Natural`](crate::natural::Natural).
-pub mod mod_square;
-/// Implementations of [`ModSquareTruncated`](malachite_base::polynomial::ModSquareTruncated) and
-/// [`ModSquareTruncatedAssign`](malachite_base::polynomial::ModSquareTruncatedAssign), for squaring
-/// a polynomial modulo a [`Natural`](crate::natural::Natural) and keeping only the low coefficients
-/// of the square.
-pub mod mod_square_truncated;
-/// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
-/// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), for subtracting one
-/// polynomial from another modulo a [`Natural`](crate::natural::Natural).
-pub mod mod_sub;
-/// Implementations of [`ModSubTruncated`](malachite_base::polynomial::ModSubTruncated) and
-/// [`ModSubTruncatedAssign`](malachite_base::polynomial::ModSubTruncatedAssign), for subtracting
-/// one polynomial from another modulo a [`Natural`](crate::natural::Natural) and keeping only their
-/// low coefficients.
-pub mod mod_sub_truncated;
-/// Implementations of [`ModSum`](malachite_base::num::arithmetic::traits::ModSum), for adding up
-/// polynomials modulo a number.
-pub mod mod_sum;
-/// Implementations of [`ModTaylorShift`](malachite_base::polynomial::ModTaylorShift) and
-/// [`ModTaylorShiftAssign`](malachite_base::polynomial::ModTaylorShiftAssign), for shifting a
-/// polynomial by a constant modulo a [`Natural`](crate::natural::Natural).
-pub mod mod_taylor_shift;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying two polynomials.
 pub mod mul;
-/// Implementations of [`MulMiddle`](malachite_base::polynomial::MulMiddle) and
-/// [`MulMiddleAssign`](malachite_base::polynomial::MulMiddleAssign), for multiplying two
-/// polynomials and keeping only a middle range of coefficients of the product.
+/// Implementations of [`MulMiddle`] and [`MulMiddleAssign`], for multiplying two polynomials and
+/// keeping only a middle range of coefficients of the product.
 pub mod mul_middle;
-/// Implementations of [`MulPowerOfX`](malachite_base::polynomial::MulPowerOfX) and
-/// [`MulPowerOfXAssign`](malachite_base::polynomial::MulPowerOfXAssign), for multiplying a
-/// polynomial by a power of its variable.
+/// Implementations of [`MulPowerOfX`] and [`MulPowerOfXAssign`], for multiplying a polynomial by a
+/// power of its variable.
 pub mod mul_power_of_x;
-/// Implementations of [`MulTruncated`](malachite_base::polynomial::MulTruncated) and
-/// [`MulTruncatedAssign`](malachite_base::polynomial::MulTruncatedAssign), for multiplying two
-/// polynomials and keeping only the low coefficients of the product.
-pub mod mul_truncated;
-/// Implementations of [`NthDerivative`](malachite_base::polynomial::NthDerivative) and
-/// [`NthDerivativeAssign`](malachite_base::polynomial::NthDerivativeAssign), for differentiating a
-/// polynomial any number of times.
-pub mod nth_derivative;
 /// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
 /// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a polynomial to a
 /// power.
 pub mod pow;
-/// Implementations of [`PowTruncated`](malachite_base::polynomial::PowTruncated) and
-/// [`PowTruncatedAssign`](malachite_base::polynomial::PowTruncatedAssign), for raising a polynomial
-/// to a power and keeping only the low coefficients of the power.
-pub mod pow_truncated;
 /// Left-shifting a [`NaturalPolynomial`](super::NaturalPolynomial) (multiplying it by a power of
 /// 2), by shifting every coefficient.
 ///
@@ -765,11 +155,6 @@ pub mod shl;
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a
 /// polynomial.
 pub mod square;
-/// Implementations of [`SquareTruncated`](malachite_base::polynomial::SquareTruncated) and
-/// [`SquareTruncatedAssign`](malachite_base::polynomial::SquareTruncatedAssign), for squaring a
-/// polynomial and keeping only the low coefficients of the square.
-pub mod square_truncated;
-/// Implementations of [`TaylorShift`](malachite_base::polynomial::TaylorShift) and
-/// [`TaylorShiftAssign`](malachite_base::polynomial::TaylorShiftAssign), for shifting a polynomial
-/// by a constant.
+/// Implementations of [`TaylorShift`] and [`TaylorShiftAssign`], for shifting a polynomial by a
+/// constant.
 pub mod taylor_shift;

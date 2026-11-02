@@ -7,7 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use malachite_base::num::arithmetic::traits::{DivExactAssign, Gcd};
+use malachite_base::num::arithmetic::traits::DivExactAssign;
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_nz::natural::Natural;
 
 impl Rational {

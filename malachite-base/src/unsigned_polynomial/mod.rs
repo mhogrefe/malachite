@@ -20,6 +20,8 @@ use alloc::vec::Vec;
 
 /// Traits for arithmetic on [`UnsignedPolynomial`]s.
 pub mod arithmetic;
+/// Derivatives and integrals of [`UnsignedPolynomial`]s.
+pub mod calculus;
 /// Implementations of [`Ord`] and [`PartialOrd`] for [`UnsignedPolynomial`], comparing two
 /// polynomials by their behavior for large arguments.
 pub mod comparison;
@@ -29,9 +31,16 @@ pub mod conversion;
 pub mod exhaustive;
 /// Traits for logic and bit manipulation on [`UnsignedPolynomial`]s.
 pub mod logic;
+/// Arithmetic on [`UnsignedPolynomial`]s modulo a polynomial, with coefficients reduced modulo $m$
+/// or $2^k$.
+pub mod mod_polynomial;
+/// Arithmetic on [`UnsignedPolynomial`]s whose coefficients are reduced modulo $m$ or $2^k$.
+pub mod modular;
 #[cfg(feature = "random")]
 /// Iterators that generate [`UnsignedPolynomial`]s randomly.
 pub mod random;
+/// Operations on [`UnsignedPolynomial`]s as power series, truncated to a given number of terms.
+pub mod series;
 
 /// A polynomial in one variable whose coefficients are unsigned primitive integers.
 ///

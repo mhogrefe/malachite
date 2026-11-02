@@ -8,7 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::DivRem;
-use malachite_base::polynomial::{CheckedDivRem, CheckedRem};
+use malachite_base::polynomial::arithmetic::traits::{CheckedDivRem, CheckedRem};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::{
     integer_polynomial_pair_gen, integer_polynomial_pair_gen_var_4,

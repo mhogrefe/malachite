@@ -8,7 +8,8 @@
 
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
-use crate::polynomial::{ComposePowerOfX, ComposePowerOfXAssign, Polynomial};
+use crate::polynomial::Polynomial;
+use crate::polynomial::arithmetic::traits::{ComposePowerOfX, ComposePowerOfXAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -70,7 +71,7 @@ impl<T: PrimitiveUnsigned> ComposePowerOfX for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposePowerOfX;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap();
@@ -115,7 +116,7 @@ impl<T: PrimitiveUnsigned> ComposePowerOfX for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposePowerOfX;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap();
@@ -165,7 +166,7 @@ impl<T: PrimitiveUnsigned> ComposePowerOfXAssign for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposePowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposePowerOfXAssign;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let mut p = UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap();

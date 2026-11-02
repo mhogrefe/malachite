@@ -7,14 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::rational::arithmetic::denominators_in_closed_interval::*;
-use crate::rational::arithmetic::traits::DenominatorsInClosedInterval;
+use crate::rational::number_theory::denominators_in_closed_interval::*;
+use crate::rational::number_theory::traits::DenominatorsInClosedInterval;
 use core::iter::{Chain, Once, once};
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::{CoprimeWith, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
+use malachite_base::num::number_theory::traits::CoprimeWith;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, exhaustive_dependent_pairs,

@@ -159,7 +159,16 @@ fn plain_variant_exists(
         return true;
     }
     let trait_name = crate::camel_case(stem);
-    for module in ["arithmetic", "logic"] {
+    for module in [
+        "arithmetic",
+        "modular",
+        "number_theory",
+        "exponential",
+        "trigonometric",
+        "hyperbolic",
+        "linear_algebra",
+        "logic",
+    ] {
         let path = format!("malachite_base::num::{module}::traits::{trait_name}");
         if !clippy_utils::paths::lookup_path_str(cx.tcx, clippy_utils::paths::PathNS::Type, &path)
             .is_empty()

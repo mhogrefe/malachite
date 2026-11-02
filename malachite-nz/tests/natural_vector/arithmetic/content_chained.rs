@@ -7,8 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{Content, ContentChained, DivisibleBy, Gcd};
+use malachite_base::num::arithmetic::traits::{Content, ContentChained};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_base::test_util::generators::unsigned_vec_unsigned_pair_gen;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vector::Vector;

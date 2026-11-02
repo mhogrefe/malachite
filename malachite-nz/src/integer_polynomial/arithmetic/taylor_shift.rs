@@ -28,7 +28,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::polynomial::{TaylorShift, TaylorShiftAssign};
+use malachite_base::polynomial::arithmetic::traits::{TaylorShift, TaylorShiftAssign};
 
 // The side of the square blocks in which `sweep` does its additions when the elements are large, to
 // improve cache locality.
@@ -306,7 +306,7 @@ impl TaylorShift<&Integer> for &IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{NegativeOne, One};
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -360,7 +360,7 @@ impl TaylorShift<Integer> for &IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{NegativeOne, One};
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -413,7 +413,7 @@ impl TaylorShift<&Integer> for IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{NegativeOne, One};
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -470,7 +470,7 @@ impl TaylorShift<Integer> for IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{NegativeOne, One};
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -525,7 +525,7 @@ impl TaylorShiftAssign<&Integer> for IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{NegativeOne, One};
-    /// use malachite_base::polynomial::TaylorShiftAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShiftAssign;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -574,7 +574,7 @@ impl TaylorShiftAssign<Integer> for IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{NegativeOne, One};
-    /// use malachite_base::polynomial::TaylorShiftAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShiftAssign;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///

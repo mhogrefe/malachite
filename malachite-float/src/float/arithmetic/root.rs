@@ -17,15 +17,16 @@ use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floa
 use core::cmp::Ordering::{self, *};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, CheckedRoot, DivRound, DivisibleBy, IsPowerOf2, Parity, Reciprocal, Root,
-    RootAssign, RootRem, Sign,
+    Abs, CheckedRoot, DivRound, IsPowerOf2, Parity, Reciprocal, Root, RootAssign, RootRem, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;

@@ -8,7 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, OneHalf};
-use malachite_base::polynomial::{EqTruncated, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::series::traits::EqTruncated;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural_polynomial::NaturalPolynomial;

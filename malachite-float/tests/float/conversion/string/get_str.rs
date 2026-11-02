@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, Equal, Greater, Less};
-use malachite_base::num::arithmetic::traits::{Abs, CheckedLogBase2, DivRound, Pow, PowerOf2};
+use malachite_base::num::arithmetic::traits::{Abs, DivRound, Pow, PowerOf2};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
+use malachite_base::num::exponential::traits::CheckedLogBase2;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::float::conversion::string::get_str::{get_str, get_str_digit_count};

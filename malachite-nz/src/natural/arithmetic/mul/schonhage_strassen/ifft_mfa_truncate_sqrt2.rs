@@ -30,9 +30,9 @@ use crate::natural::arithmetic::sub::{
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 
 // Sets `u[..=limbs]` to $2^{-b_1}s + 2^{-b_2}t$ and `v[..=limbs]` to $2^{-b_1}s - 2^{-b_2}t$ modulo
 // $2^{\text{limbs}\cdot\text{W}} + 1$, where W is `Limb::WIDTH`, and $b_1$ and $b_2$ are less than

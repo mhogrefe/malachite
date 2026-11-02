@@ -17,17 +17,18 @@ use crate::platform::{Limb, SignedLimb};
 use core::cmp::Ordering::*;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, DivisibleBy, FloorLogBase, ModPowerOf2, Parity, Pow, PowerOf2, Rank,
-};
+use malachite_base::num::arithmetic::traits::{Parity, Pow, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::comparison::traits::OrdDouble;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::exhaustive::{
     exhaustive_signed_inclusive_range, exhaustive_unsigneds, primitive_int_increasing_range,
 };
+use malachite_base::num::exponential::traits::{CeilingLogBase2, FloorLogBase};
 use malachite_base::num::iterators::bit_distributor_sequence;
+use malachite_base::num::linear_algebra::traits::Rank;
 use malachite_base::num::logic::traits::BitAccess;
+use malachite_base::num::modular::traits::{DivisibleBy, ModPowerOf2};
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, geometric_random_unsigneds,
 };

@@ -7,18 +7,18 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::rational::arithmetic::log_base::log_base_helper;
+use crate::rational::exponential::log_base::log_base_helper;
 use alloc::string::String;
 use core::cmp::{Ordering::*, max};
 use core::fmt::{Formatter, Write};
-use malachite_base::num::arithmetic::traits::{
-    Abs, CheckedLogBase2, DivExact, DivExactAssign, DivRound, DivisibleBy, Pow, Sign,
-};
+use malachite_base::num::arithmetic::traits::{Abs, DivExact, DivExactAssign, DivRound, Pow, Sign};
 use malachite_base::num::conversion::string::options::{SciSizeOptions, ToSciOptions};
 use malachite_base::num::conversion::string::to_sci::write_exponent;
 use malachite_base::num::conversion::traits::{
     ExactFrom, IsInteger, RoundingFrom, ToSci, ToStringBase, WrappingFrom,
 };
+use malachite_base::num::exponential::traits::CheckedLogBase2;
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

@@ -10,7 +10,9 @@ use crate::Rational;
 use crate::rational::conversion::digits::digits::RationalDigits;
 use alloc::vec::Vec;
 use malachite_base::foer_sequences::FoerSequence;
-use malachite_base::num::arithmetic::traits::{CheckedLogBase2, DivExactAssign, Gcd, IsPowerOf2};
+use malachite_base::num::arithmetic::traits::{DivExactAssign, IsPowerOf2};
+use malachite_base::num::exponential::traits::CheckedLogBase2;
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_nz::natural::Natural;
 
 /// A digit after the point of a [`Rational`], produced by [`RationalFoerDigits`], together with its

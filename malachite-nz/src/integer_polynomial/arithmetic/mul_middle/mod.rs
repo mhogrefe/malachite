@@ -29,7 +29,7 @@ use crate::integer_polynomial::arithmetic::mul_middle::schonhage_strassen::*;
 use crate::integer_polynomial::arithmetic::mul_middle::tiny::{
     mul_middle_to_out_tiny_1, mul_middle_to_out_tiny_2,
 };
-use crate::integer_polynomial::arithmetic::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
+use crate::integer_polynomial::series::mul_truncated::karatsuba::mul_truncated_to_out_karatsuba;
 use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -37,7 +37,7 @@ use core::cmp::min;
 use core::mem::{swap, take};
 use core::ptr;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{MulMiddle, MulMiddleAssign};
+use malachite_base::polynomial::arithmetic::traits::{MulMiddle, MulMiddleAssign};
 
 pub mod classical;
 pub mod fft;
@@ -231,7 +231,7 @@ impl MulMiddle<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddle;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// // (x^2-3*x+2)*(2*x+5) = 2*x^3-x^2-11*x+10.
@@ -288,7 +288,7 @@ impl MulMiddle<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddle;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// // (x^2-3*x+2)*(2*x+5) = 2*x^3-x^2-11*x+10.
@@ -345,7 +345,7 @@ impl MulMiddle<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddle;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// // (x^2-3*x+2)*(2*x+5) = 2*x^3-x^2-11*x+10.
@@ -401,7 +401,7 @@ impl MulMiddle<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddle;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddle;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// // (x^2-3*x+2)*(2*x+5) = 2*x^3-x^2-11*x+10.
@@ -453,7 +453,7 @@ impl MulMiddleAssign<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddleAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddleAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();
@@ -493,7 +493,7 @@ impl MulMiddleAssign<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MulMiddleAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::MulMiddleAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();

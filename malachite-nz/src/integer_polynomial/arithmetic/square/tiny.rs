@@ -13,7 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::square_truncated::tiny::square_truncated_to_out_tiny;
+use crate::integer_polynomial::series::square_truncated::tiny::square_truncated_to_out_tiny;
 use crate::platform::{SignedDoubleLimb, SignedLimb};
 
 // Sets `out` to the coefficients of the square of the polynomial with coefficients `xs`, which is

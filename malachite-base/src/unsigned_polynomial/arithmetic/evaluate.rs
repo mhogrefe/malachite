@@ -6,18 +6,18 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::mod_mul::{
-    mod_mul_precompute_shoup, mod_mul_shoup, mod_mul_shoup_lazy,
-};
-use crate::num::arithmetic::traits::{ModIsReduced, ModPowerOf2IsReduced};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
-use crate::polynomial::{ModEvaluate, ModEvaluateGeometric, ModEvaluateMany, ModPowerOf2Evaluate};
+use crate::num::modular::mod_mul::{mod_mul_precompute_shoup, mod_mul_shoup, mod_mul_shoup_lazy};
+use crate::num::modular::traits::{ModIsReduced, ModPowerOf2IsReduced};
+use crate::polynomial::modular::traits::{
+    ModEvaluate, ModEvaluateGeometric, ModEvaluateMany, ModPowerOf2Evaluate,
+};
 use crate::unsigned_polynomial::UnsignedPolynomial;
-use crate::unsigned_polynomial::arithmetic::mod_mul_middle::mod_mul_middle_karatsuba;
-use crate::unsigned_polynomial::arithmetic::mod_mul_truncated::mod_mul_truncated_to_out;
-use crate::unsigned_vector::arithmetic::mod_dot::ModData;
+use crate::unsigned_polynomial::modular::mod_mul_middle::mod_mul_middle_karatsuba;
+use crate::unsigned_polynomial::series::mod_mul_truncated::mod_mul_truncated_to_out;
+use crate::unsigned_vector::modular::mod_dot::ModData;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::max;
@@ -73,7 +73,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Evaluate<T> for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ModPowerOf2Evaluate;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
@@ -124,7 +124,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2Evaluate<T> for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ModPowerOf2Evaluate;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
@@ -290,7 +290,7 @@ impl<T: PrimitiveUnsigned> ModEvaluate<T> for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
@@ -343,7 +343,7 @@ impl<T: PrimitiveUnsigned> ModEvaluate<T> for UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
@@ -525,11 +525,11 @@ impl<T: PrimitiveUnsigned> ModEvaluateMany<T> for &UnsignedPolynomial<T> {
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     ///
     /// The result is the same as calling
-    /// [`mod_evaluate`](crate::polynomial::ModEvaluate::mod_evaluate) at each value, with the same
-    /// choice between Horner's rule and Shoup's method, but the polynomial is checked once, and
-    /// several values are evaluated together in each pass over the coefficients. Horner's rule is a
-    /// chain of dependent multiplications, so interleaving independent chains keeps the processor's
-    /// multipliers busy.
+    /// [`mod_evaluate`](crate::polynomial::modular::traits::ModEvaluate::mod_evaluate) at each
+    /// value, with the same choice between Horner's rule and Shoup's method, but the polynomial is
+    /// checked once, and several values are evaluated together in each pass over the coefficients.
+    /// Horner's rule is a chain of dependent multiplications, so interleaving independent chains
+    /// keeps the processor's multipliers busy.
     ///
     /// # Worst-case complexity
     /// $T(n, k) = O(nk)$
@@ -545,7 +545,7 @@ impl<T: PrimitiveUnsigned> ModEvaluateMany<T> for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ModEvaluateMany;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluateMany;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();
@@ -783,7 +783,7 @@ impl<T: PrimitiveUnsigned> ModEvaluateGeometric<T> for &UnsignedPolynomial<T> {
     ///
     /// The powers of `q` are computed with Shoup's method when the top bit of `m` is clear, since
     /// every multiplication is by `q`, and are then evaluated as by
-    /// [`mod_evaluate_many`](crate::polynomial::ModEvaluateMany::mod_evaluate_many), in place.
+    /// [`mod_evaluate_many`](ModEvaluateMany::mod_evaluate_many), in place.
     ///
     /// # Worst-case complexity
     /// $T(n, k) = O(nk)$
@@ -798,7 +798,7 @@ impl<T: PrimitiveUnsigned> ModEvaluateGeometric<T> for &UnsignedPolynomial<T> {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ModEvaluateGeometric;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluateGeometric;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let p = UnsignedPolynomial::<u8>::from_str("5*x^2+3*x+7").unwrap();

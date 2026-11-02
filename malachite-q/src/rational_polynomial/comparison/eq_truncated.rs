@@ -7,9 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_polynomial::RationalPolynomial;
-use malachite_base::num::arithmetic::traits::{DivExact, Gcd};
+use malachite_base::num::arithmetic::traits::DivExact;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::polynomial::{EqTruncated, slices_eq_truncated};
+use malachite_base::num::number_theory::traits::Gcd;
+use malachite_base::polynomial::series::traits::EqTruncated;
+use malachite_base::polynomial::slices_eq_truncated;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;

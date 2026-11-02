@@ -15,7 +15,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::{PolynomialCoefficient, small_value};
-use crate::integer_polynomial::arithmetic::mul_truncated::tiny::TINY_STACK_LEN;
+use crate::integer_polynomial::series::mul_truncated::tiny::TINY_STACK_LEN;
 use crate::platform::{SignedDoubleLimb, SignedLimb};
 use alloc::vec;
 use core::cmp::min;

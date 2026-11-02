@@ -23,15 +23,16 @@ use malachite_base::fail_on_untested_path;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, DivRound, DivisibleByPowerOf2, FloorLogBase2, ModInverse, ModPow, Parity,
-    PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ,
-    XXAddYYToZZ,
+    DivRound, Parity, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2, WrappingAddAssign,
+    XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::SplitInHalf;
+use malachite_base::num::exponential::traits::{CeilingLogBase2, FloorLogBase2};
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits};
+use malachite_base::num::modular::traits::{DivisibleByPowerOf2, ModInverse, ModPow};
 
 // The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride
 //

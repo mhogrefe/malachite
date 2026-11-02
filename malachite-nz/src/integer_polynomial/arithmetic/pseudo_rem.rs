@@ -14,7 +14,7 @@
 
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::pseudo_div_rem::helper;
-use malachite_base::polynomial::{PseudoRem, PseudoRemAssign};
+use malachite_base::polynomial::arithmetic::traits::{PseudoRem, PseudoRemAssign};
 
 fn pseudo_rem_helper(p: &IntegerPolynomial, q: &IntegerPolynomial) -> (IntegerPolynomial, u64) {
     let (_, r, d) = helper(p, q);
@@ -55,7 +55,7 @@ impl PseudoRem<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::PseudoRem;
+    /// use malachite_base::polynomial::arithmetic::traits::PseudoRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("x^4+x+1").unwrap();
@@ -106,7 +106,7 @@ impl PseudoRem<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::PseudoRem;
+    /// use malachite_base::polynomial::arithmetic::traits::PseudoRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("x^4+x+1").unwrap();
@@ -157,7 +157,7 @@ impl PseudoRem<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::PseudoRem;
+    /// use malachite_base::polynomial::arithmetic::traits::PseudoRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("x^4+x+1").unwrap();
@@ -208,7 +208,7 @@ impl PseudoRem<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::PseudoRem;
+    /// use malachite_base::polynomial::arithmetic::traits::PseudoRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("x^4+x+1").unwrap();
@@ -257,7 +257,7 @@ impl PseudoRemAssign<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::PseudoRemAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::PseudoRemAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("x^4+x+1").unwrap();
@@ -307,7 +307,7 @@ impl PseudoRemAssign<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::PseudoRemAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::PseudoRemAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("x^4+x+1").unwrap();

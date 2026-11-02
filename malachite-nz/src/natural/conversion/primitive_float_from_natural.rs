@@ -9,12 +9,12 @@
 use crate::natural::Natural;
 use core::cmp::Ordering::{self, *};
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, RawMantissaAndExponent, RoundingFrom, SciMantissaAndExponent,
     WrappingFrom,
 };
+use malachite_base::num::modular::traits::DivisibleByPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

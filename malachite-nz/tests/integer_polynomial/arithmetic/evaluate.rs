@@ -7,10 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::Mod;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{Evaluate, EvaluateMany, ModEvaluate, Polynomial};
+use malachite_base::num::modular::traits::Mod;
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{Evaluate, EvaluateMany};
+use malachite_base::polynomial::modular::traits::ModEvaluate;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::evaluate::{

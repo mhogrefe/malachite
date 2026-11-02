@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{
+use malachite_base::num::modular::traits::{
     ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
 };
 use malachite_nz::natural::Natural;

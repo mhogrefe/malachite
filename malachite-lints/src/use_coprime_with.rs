@@ -94,7 +94,7 @@ impl<'tcx> LateLintPass<'tcx> for UseCoprimeWith {
         if !crate::implements_trait_with_self_rhs(
             cx,
             ty,
-            "malachite_base::num::arithmetic::traits::CoprimeWith",
+            "malachite_base::num::number_theory::traits::CoprimeWith",
         ) {
             return;
         }

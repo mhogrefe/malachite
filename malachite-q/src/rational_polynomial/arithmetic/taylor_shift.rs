@@ -11,7 +11,8 @@ use crate::rational_polynomial::{RationalPolynomial, reduce};
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::One;
-use malachite_base::polynomial::{Polynomial, TaylorShift, TaylorShiftAssign};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{TaylorShift, TaylorShiftAssign};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;
@@ -99,7 +100,7 @@ impl TaylorShift<&Rational> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, OneHalf};
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -156,7 +157,7 @@ impl TaylorShift<Rational> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, OneHalf};
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -212,7 +213,7 @@ impl TaylorShift<&Rational> for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, OneHalf};
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -270,7 +271,7 @@ impl TaylorShift<Rational> for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, OneHalf};
-    /// use malachite_base::polynomial::TaylorShift;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShift;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -326,7 +327,7 @@ impl TaylorShiftAssign<&Rational> for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::OneHalf;
-    /// use malachite_base::polynomial::TaylorShiftAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShiftAssign;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
@@ -374,7 +375,7 @@ impl TaylorShiftAssign<Rational> for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::OneHalf;
-    /// use malachite_base::polynomial::TaylorShiftAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::TaylorShiftAssign;
     /// use malachite_q::Rational;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///

@@ -9,8 +9,8 @@
 extern crate malachite_base;
 
 // Another crate reached through `crate::`: flagged, once for the braced list.
-use crate::malachite_base::num::arithmetic::traits::Mod;
 use crate::malachite_base::num::basic::traits::{One, Zero};
+use crate::malachite_base::num::modular::traits::Mod;
 // Another crate named directly: fine.
 use malachite_base::num::arithmetic::traits::Parity;
 
@@ -21,7 +21,7 @@ mod inner {
 
 fn helper() -> u32 {
     // Flagged in an expression too.
-    crate::malachite_base::num::arithmetic::traits::Mod::mod_op(5u32, 3)
+    crate::malachite_base::num::modular::traits::Mod::mod_op(5u32, 3)
 }
 
 fn main() {

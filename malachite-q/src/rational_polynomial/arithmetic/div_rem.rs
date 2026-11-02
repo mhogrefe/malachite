@@ -15,7 +15,8 @@ use alloc::borrow::Cow;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{DivAssignRem, DivRem, Pow, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{CheckedDivRem, Polynomial, PseudoDivRem};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{CheckedDivRem, PseudoDivRem};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_vector::arithmetic::scalar_mul::integers_mul_scalar_assign;
@@ -389,7 +390,7 @@ impl CheckedDivRem<Self> for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::CheckedDivRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let (q, r) = (RationalPolynomial::from_str("x^2+1").unwrap())
@@ -439,7 +440,7 @@ impl CheckedDivRem<&Self> for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::CheckedDivRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let (q, r) = (RationalPolynomial::from_str("x^2+1").unwrap())
@@ -489,7 +490,7 @@ impl CheckedDivRem<RationalPolynomial> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::CheckedDivRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let (q, r) = (&RationalPolynomial::from_str("x^2+1").unwrap())
@@ -542,7 +543,7 @@ impl CheckedDivRem<&RationalPolynomial> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::CheckedDivRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let (q, r) = (&RationalPolynomial::from_str("x^2+1").unwrap())

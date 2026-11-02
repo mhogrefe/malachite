@@ -11,12 +11,14 @@ use crate::integer::Integer;
 use crate::natural::Natural;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    CanonicalizeUnit, CheckedRoot, CheckedSqrt, ContentAndPrimitivePart, DivRem, Gcd, ModPowerOf2,
-    MulIPow, MulIPowAssign, Parity, Pow, PowerOf2, Square,
+    CanonicalizeUnit, CheckedRoot, CheckedSqrt, ContentAndPrimitivePart, DivRem, MulIPow,
+    MulIPowAssign, Parity, Pow, PowerOf2, Square,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::num::modular::traits::ModPowerOf2;
+use malachite_base::num::number_theory::traits::Gcd;
 
 fn norm(z: &GaussianInteger) -> Natural {
     z.real.unsigned_abs_ref().square() + z.imaginary.unsigned_abs_ref().square()

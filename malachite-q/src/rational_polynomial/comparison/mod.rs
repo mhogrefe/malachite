@@ -10,8 +10,8 @@
 /// [`RationalPolynomial`](super::RationalPolynomial), comparing two polynomials by their behavior
 /// for large arguments.
 pub mod cmp;
-/// Implementations of [`EqTruncated`](malachite_base::polynomial::EqTruncated) between
-/// [`RationalPolynomial`](super::RationalPolynomial)s, and between them and
+/// Implementations of [`EqTruncated`](malachite_base::polynomial::series::traits::EqTruncated)
+/// between [`RationalPolynomial`](super::RationalPolynomial)s, and between them and
 /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s,
 /// [`NaturalPolynomial`](malachite_nz::natural_polynomial::NaturalPolynomial)s, and
 /// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial)s.
@@ -19,7 +19,7 @@ pub mod cmp;
 /// # eq_truncated
 /// ```
 /// use core::str::FromStr;
-/// use malachite_base::polynomial::EqTruncated;
+/// use malachite_base::polynomial::series::traits::EqTruncated;
 /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 /// use malachite_nz::integer_polynomial::IntegerPolynomial;
 /// use malachite_nz::natural_polynomial::NaturalPolynomial;

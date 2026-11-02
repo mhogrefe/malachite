@@ -9,10 +9,11 @@
 use crate::InnerFloat::{Finite, Infinity, Zero};
 use crate::{Float, significand_bits};
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShrRound};
+use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::basic::traits::{One, Zero as ZeroTrait};
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
+use malachite_base::num::modular::traits::DivisibleByPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 

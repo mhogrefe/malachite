@@ -10,10 +10,11 @@ use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, Gcd, PrimitivePart,
-    PrimitivePartAssign, UnsignedAbs,
+    Content, ContentAndPrimitivePart, DivExact, DivExactAssign, PrimitivePart, PrimitivePartAssign,
+    UnsignedAbs,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::Gcd;
 
 fn content_and_primitive_part_val(x: GaussianInteger) -> (Natural, GaussianInteger) {
     let g = x

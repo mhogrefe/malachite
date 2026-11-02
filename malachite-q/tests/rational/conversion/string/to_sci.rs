@@ -6,12 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Abs, FloorLogBase, Pow, PowerOf2, RoundToMultiple};
+use malachite_base::num::arithmetic::traits::{Abs, Pow, PowerOf2, RoundToMultiple};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::string::options::{
     FromSciStringOptions, SciSizeOptions, ToSciOptions,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, FromSciString, ToSci};
+use malachite_base::num::exponential::traits::FloorLogBase;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::strings::string_is_subset;
 use malachite_base::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;

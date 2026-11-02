@@ -12,7 +12,7 @@ use alloc::vec::Vec;
 use core::iter::repeat_with;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{MulPowerOfX, MulPowerOfXAssign};
+use malachite_base::polynomial::arithmetic::traits::{MulPowerOfX, MulPowerOfXAssign};
 
 impl MulPowerOfX for NaturalPolynomial {
     type Output = Self;
@@ -41,7 +41,7 @@ impl MulPowerOfX for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfX;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// assert_eq!(
@@ -99,7 +99,7 @@ impl MulPowerOfX for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfX;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// assert_eq!(
@@ -158,7 +158,7 @@ impl MulPowerOfXAssign for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfXAssign;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("x^2+3*x+2").unwrap();

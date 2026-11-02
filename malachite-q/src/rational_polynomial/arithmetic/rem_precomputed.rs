@@ -14,7 +14,8 @@ use crate::rational_polynomial::{RationalPolynomial, reduce};
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{CanonicalPrimitivePart, Pow};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{Polynomial, RemPrecomputed, RemPrecomputedAssign};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{RemPrecomputed, RemPrecomputedAssign};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::rem_precomputed::{
     RemPrecomputedData, precompute_rem_powers, rem_by_powers,
@@ -89,7 +90,7 @@ impl RemPrecomputed<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();
@@ -142,7 +143,7 @@ impl RemPrecomputed<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();
@@ -194,7 +195,7 @@ impl RemPrecomputed<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();
@@ -247,7 +248,7 @@ impl RemPrecomputed<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();
@@ -299,7 +300,7 @@ impl RemPrecomputed<RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();
@@ -352,7 +353,7 @@ impl RemPrecomputed<RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();
@@ -408,7 +409,7 @@ impl RemPrecomputed<&RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();
@@ -461,7 +462,7 @@ impl RemPrecomputed<&RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::RemPrecomputed;
+    /// use malachite_base::polynomial::arithmetic::traits::RemPrecomputed;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();
@@ -521,7 +522,9 @@ impl RemPrecomputedAssign<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::{RemPrecomputed, RemPrecomputedAssign};
+    /// use malachite_base::polynomial::arithmetic::traits::{
+    ///     RemPrecomputed, RemPrecomputedAssign,
+    /// };
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();
@@ -576,7 +579,9 @@ impl RemPrecomputedAssign<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::{RemPrecomputed, RemPrecomputedAssign};
+    /// use malachite_base::polynomial::arithmetic::traits::{
+    ///     RemPrecomputed, RemPrecomputedAssign,
+    /// };
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let q = RationalPolynomial::from_str("2*x^2+x+1").unwrap();

@@ -9,7 +9,7 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::DivisibleBy;
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::polynomial::Polynomial;
 
 // Returns `None` when some exponent with a nonzero coefficient is not a multiple of `n`, checking

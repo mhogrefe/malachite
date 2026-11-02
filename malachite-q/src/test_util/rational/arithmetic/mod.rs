@@ -9,13 +9,8 @@
 pub mod add;
 pub mod add_mul;
 pub mod add_mul_shl;
-pub mod approximate;
-pub mod dedekind_sum;
 pub mod div;
-pub mod harmonic_number;
-pub mod mod_op;
 pub mod mul;
 pub mod sign;
-pub mod simplest_rational_in_interval;
 pub mod sub;
 pub mod sub_mul_shl;

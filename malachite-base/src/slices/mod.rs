@@ -10,10 +10,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::DivisibleBy;
 use crate::num::basic::traits::Zero;
 #[cfg(feature = "random")]
 use crate::num::conversion::traits::ExactFrom;
+use crate::num::modular::traits::DivisibleBy;
 #[cfg(feature = "random")]
 use crate::num::random::{RandomUnsignedsLessThan, random_unsigneds_less_than};
 #[cfg(feature = "random")]

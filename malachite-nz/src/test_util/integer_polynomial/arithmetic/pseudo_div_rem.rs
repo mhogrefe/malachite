@@ -15,8 +15,9 @@
 use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::pseudo_div_rem::*;
-use malachite_base::num::arithmetic::traits::{DivExact, DivisibleBy, Pow, SubMulAssign};
+use malachite_base::num::arithmetic::traits::{DivExact, Pow, SubMulAssign};
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::polynomial::Polynomial;
 
 // The pseudo-quotient and pseudo-remainder of `p` by `q` with the exponent `deg p - deg q + 1`: the

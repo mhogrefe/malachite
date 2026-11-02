@@ -7,10 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::*;
-use malachite_base::num::arithmetic::traits::{DivExact, Gcd};
+use malachite_base::num::arithmetic::traits::DivExact;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::OrdProducts;
-use malachite_base::polynomial::{EqTruncated, MulPowerOfX, Polynomial, slices_eq_truncated};
+use malachite_base::num::number_theory::traits::Gcd;
+use malachite_base::polynomial::arithmetic::traits::MulPowerOfX;
+use malachite_base::polynomial::series::traits::EqTruncated;
+use malachite_base::polynomial::{Polynomial, slices_eq_truncated};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;

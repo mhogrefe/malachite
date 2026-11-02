@@ -16,7 +16,8 @@ use alloc::borrow::Cow;
 use core::mem::take;
 use core::ops::{Rem, RemAssign};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{CheckedRem, Polynomial, PseudoRem};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{CheckedRem, PseudoRem};
 
 // The remainder of `p` by `q`, or `None` if `q` is 0.
 //
@@ -288,7 +289,7 @@ impl CheckedRem<Self> for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::CheckedRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedRem;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -331,7 +332,7 @@ impl CheckedRem<&Self> for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::CheckedRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedRem;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -374,7 +375,7 @@ impl CheckedRem<RationalPolynomial> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::CheckedRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedRem;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -417,7 +418,7 @@ impl CheckedRem<&RationalPolynomial> for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::CheckedRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedRem;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(

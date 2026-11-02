@@ -6,11 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Gcd, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::gcd::extended_gcd_partial::extended_gcd_partial;
+use malachite_nz::natural::number_theory::gcd::extended_gcd_partial::extended_gcd_partial;
 use malachite_nz::test_util::generators::natural_triple_gen_var_10;
 use std::str::FromStr;
 

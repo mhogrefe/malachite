@@ -9,7 +9,7 @@
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use malachite_base::num::arithmetic::traits::PowerOf2;
-use malachite_base::polynomial::Evaluate;
+use malachite_base::polynomial::arithmetic::traits::Evaluate;
 
 // Evaluates the polynomial at 2^bits with Horner's method. Nothing is shared with the
 // implementation.

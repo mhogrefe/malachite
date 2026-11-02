@@ -28,7 +28,7 @@ use malachite_base::test_util::bench::tune::{
     INPUT_SETS, find_crossover_spec, interleaved_min_pair,
 };
 use malachite_float::Float;
-use malachite_float::test_util::float::arithmetic::sin_cos::{
+use malachite_float::test_util::float::trigonometric::sin_cos::{
     cos_basic_for_tuning, cos_fast_for_tuning, sin_basic_for_tuning, sin_cos_basic_for_tuning,
     sin_cos_fast_for_tuning, sin_fast_for_tuning,
 };

@@ -10,9 +10,7 @@
 // Lesser General Public License (LGPL as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{
-    CheckedRoot, DivAssignMod, DivMod, GcdAssign, Parity, RootRem, SqrtRem,
-};
+use crate::num::arithmetic::traits::{CheckedRoot, DivAssignMod, DivMod, Parity, RootRem, SqrtRem};
 use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::factorization::primes::SMALL_PRIMES;
@@ -20,6 +18,7 @@ use crate::num::factorization::traits::{
     ExpressAsPower, Factor, IsPower, IsPrime, IsSquare, Primes,
 };
 use crate::num::logic::traits::{SignificantBits, TrailingZeros};
+use crate::num::number_theory::traits::GcdAssign;
 
 // The following arrays are bitmasks indicating whether an integer is a 2, 3, or 5th power residue.
 // For example, modulo 31 we have:

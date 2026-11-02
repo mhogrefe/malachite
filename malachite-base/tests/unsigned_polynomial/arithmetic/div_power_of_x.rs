@@ -7,7 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::polynomial::{DivPowerOfX, DivPowerOfXAssign, MulPowerOfX, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{DivPowerOfX, DivPowerOfXAssign, MulPowerOfX};
 use malachite_base::test_util::generators::unsigned_polynomial_unsigned_pair_gen_var_1;
 use malachite_base::test_util::unsigned_polynomial::arithmetic::div_power_of_x::*;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;

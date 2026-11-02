@@ -11,7 +11,7 @@
 // prime, which a list of values does not show.
 
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::ModIsReduced;
+use malachite_base::num::modular::traits::ModIsReduced;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::test_util::unsigned_matrix::rank_mod::naive_rank_mod_prime;
 use malachite_base::unsigned_matrix::UnsignedMatrix;

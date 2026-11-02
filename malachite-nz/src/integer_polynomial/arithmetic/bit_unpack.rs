@@ -23,14 +23,14 @@ use crate::natural::logic::not::limbs_not_in_place;
 use crate::platform::{Limb, SignedLimb};
 use alloc::vec;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2Assign, NegAssign, PowerOf2, WrappingAddAssign,
-};
+use malachite_base::num::arithmetic::traits::{NegAssign, PowerOf2, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits, WrappingFrom};
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
-use malachite_base::polynomial::{BitUnpack, Polynomial};
+use malachite_base::num::modular::traits::ModPowerOf2Assign;
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::BitUnpack;
 
 // The limbs of the `bits`-bit field of `arr` that starts at bit `shift` of `arr[0]`, as an unsigned
 // number with `ceil(bits / Limb::WIDTH)` limbs.
@@ -282,8 +282,8 @@ impl BitUnpack<Integer> for IntegerPolynomial {
     /// The fields of $|n|$ are read as signed $b$-bit numbers, in two's complement, and each
     /// negative one borrows 1 from the field above, so the coefficients lie in $[-2^{b-1},
     /// 2^{b-1}]$; if $n$ is negative, every coefficient is then negated. This inverts
-    /// [`bit_pack`](malachite_base::polynomial::BitPack::bit_pack) on polynomials whose
-    /// coefficients' absolute values are less than $2^{b-1}$.
+    /// [`bit_pack`](malachite_base::polynomial::arithmetic::traits::BitPack::bit_pack) on
+    /// polynomials whose coefficients' absolute values are less than $2^{b-1}$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -297,7 +297,7 @@ impl BitUnpack<Integer> for IntegerPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::polynomial::BitUnpack;
+    /// use malachite_base::polynomial::arithmetic::traits::BitUnpack;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -339,8 +339,8 @@ impl BitUnpack<&Integer> for IntegerPolynomial {
     /// The fields of $|n|$ are read as signed $b$-bit numbers, in two's complement, and each
     /// negative one borrows 1 from the field above, so the coefficients lie in $[-2^{b-1},
     /// 2^{b-1}]$; if $n$ is negative, every coefficient is then negated. This inverts
-    /// [`bit_pack`](malachite_base::polynomial::BitPack::bit_pack) on polynomials whose
-    /// coefficients' absolute values are less than $2^{b-1}$.
+    /// [`bit_pack`](malachite_base::polynomial::arithmetic::traits::BitPack::bit_pack) on
+    /// polynomials whose coefficients' absolute values are less than $2^{b-1}$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -354,7 +354,7 @@ impl BitUnpack<&Integer> for IntegerPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::polynomial::BitUnpack;
+    /// use malachite_base::polynomial::arithmetic::traits::BitUnpack;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///

@@ -51,9 +51,8 @@ use core::cmp::Ordering::*;
 use itertools::Itertools;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    AddMul, CheckedLogBase2, CheckedMul, DivAssignMod, DivAssignModPrecomputed, DivModPrecomputed,
-    DivisibleByPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, ShrRound, ShrRoundAssign,
-    SquareAssign, XMulYToZZ,
+    AddMul, CheckedMul, DivAssignMod, DivAssignModPrecomputed, DivModPrecomputed, Parity, PowerOf2,
+    ShrRound, ShrRoundAssign, SquareAssign, XMulYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -61,7 +60,9 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, Digits, ExactFrom, ExactInto, PowerOf2Digits, WrappingFrom, WrappingInto,
 };
+use malachite_base::num::exponential::traits::CheckedLogBase2;
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
+use malachite_base::num::modular::traits::{DivisibleByPowerOf2, ModPowerOf2Assign};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 

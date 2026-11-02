@@ -13,10 +13,9 @@ use crate::rational::conversion::digits::foer_digits::{
 use crate::rational::conversion::digits::to_power_of_2_digits::to_power_of_2_digits_helper;
 use alloc::vec::Vec;
 use malachite_base::foer_sequences::FoerSequence;
-use malachite_base::num::arithmetic::traits::{
-    Abs, AbsAssign, CheckedLogBase2, Floor, UnsignedAbs,
-};
+use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::Digits;
+use malachite_base::num::exponential::traits::CheckedLogBase2;
 use malachite_nz::natural::Natural;
 
 // The digits after the point are found by long division. Where the repeating part begins, and

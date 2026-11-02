@@ -33,6 +33,8 @@ pub mod exhaustive;
 pub mod extend;
 /// Traits for logic and bit manipulation on [`UnsignedVector`]s.
 pub mod logic;
+/// Arithmetic on [`UnsignedVector`]s whose entries are reduced modulo $m$ or $2^k$.
+pub mod modular;
 #[cfg(feature = "random")]
 /// Iterators that generate [`UnsignedVector`]s randomly.
 pub mod random;

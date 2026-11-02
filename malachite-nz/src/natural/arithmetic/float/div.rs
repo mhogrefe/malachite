@@ -45,12 +45,14 @@ use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, NegModPowerOf2, OverflowingAddAssign, OverflowingNegAssign, Parity, PowerOf2,
-    WrappingAddAssign, WrappingNegAssign, WrappingSubAssign, XMulYToZZ, XXSubYYToZZ,
+    OverflowingAddAssign, OverflowingNegAssign, Parity, PowerOf2, WrappingAddAssign,
+    WrappingNegAssign, WrappingSubAssign, XMulYToZZ, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base::num::modular::traits::NegModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 

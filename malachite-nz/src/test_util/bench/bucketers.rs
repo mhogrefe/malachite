@@ -17,7 +17,7 @@ use crate::natural_matrix::NaturalMatrix;
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_vector::NaturalVector;
 use crate::platform::Limb;
-use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
+use crate::test_util::natural::number_theory::gcd::OwnedHalfGcdMatrix;
 use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::matrix::Matrix;
 use malachite_base::max;

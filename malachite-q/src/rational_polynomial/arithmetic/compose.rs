@@ -10,7 +10,8 @@ use crate::rational_polynomial::{RationalPolynomial, reduce};
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::One;
-use malachite_base::polynomial::{Compose, ComposeAssign, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{Compose, ComposeAssign};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;
@@ -84,7 +85,7 @@ impl Compose<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -148,7 +149,7 @@ impl Compose<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -212,7 +213,7 @@ impl Compose<RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -272,7 +273,7 @@ impl Compose<&RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::Compose;
+    /// use malachite_base::polynomial::arithmetic::traits::Compose;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(
@@ -331,7 +332,7 @@ impl ComposeAssign<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposeAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposeAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("1/2*x^2+1/3").unwrap();
@@ -388,7 +389,7 @@ impl ComposeAssign<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposeAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposeAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("1/2*x^2+1/3").unwrap();

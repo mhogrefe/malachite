@@ -8,9 +8,6 @@
 
 pub mod add;
 pub mod add_mul_shl;
-pub mod crt;
-pub mod divisible_by;
-pub mod falling_factorial;
 pub mod mul;
 pub mod sign;
 pub mod sub_mul_shl;

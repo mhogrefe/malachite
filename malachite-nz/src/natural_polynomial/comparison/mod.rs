@@ -10,14 +10,14 @@
 /// [`NaturalPolynomial`](super::NaturalPolynomial), comparing two polynomials by their behavior for
 /// large arguments.
 pub mod cmp;
-/// Implementations of [`EqTruncated`](malachite_base::polynomial::EqTruncated) between
-/// [`NaturalPolynomial`](super::NaturalPolynomial)s, and between them and
+/// Implementations of [`EqTruncated`](malachite_base::polynomial::series::traits::EqTruncated)
+/// between [`NaturalPolynomial`](super::NaturalPolynomial)s, and between them and
 /// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial)s.
 ///
 /// # eq_truncated
 /// ```
 /// use core::str::FromStr;
-/// use malachite_base::polynomial::EqTruncated;
+/// use malachite_base::polynomial::series::traits::EqTruncated;
 /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 /// use malachite_nz::natural_polynomial::NaturalPolynomial;
 ///

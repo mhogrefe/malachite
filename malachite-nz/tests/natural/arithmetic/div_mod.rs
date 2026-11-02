@@ -9,7 +9,7 @@
 use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignModPrecomputed, DivAssignRem,
-    DivMod, DivModPrecomputed, DivRem, DivRound, NegMod, PowerOf2,
+    DivMod, DivModPrecomputed, DivRem, DivRound, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
@@ -17,6 +17,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, WrappingFro
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::num::logic::traits::LowMask;
+use malachite_base::num::modular::traits::NegMod;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{

@@ -17,8 +17,7 @@ use crate::iterators::with_special_value;
 use crate::maps::random::{random_b_tree_maps, random_hash_maps};
 use crate::matrix::Matrix;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CoprimeWith, DivRound, Mod, ModMul, ModPowerOf2, ModPowerOf2Mul, Parity,
-    PowerOf2, RoundToMultiple, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, DivRound, Parity, PowerOf2, RoundToMultiple, ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -36,6 +35,8 @@ use crate::num::conversion::traits::{
 use crate::num::factorization::traits::IsPrime;
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
+use crate::num::modular::traits::{Mod, ModMul, ModPowerOf2, ModPowerOf2Mul};
+use crate::num::number_theory::traits::CoprimeWith;
 use crate::num::random::geometric::{
     GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
     geometric_random_natural_signeds, geometric_random_negative_signeds,
@@ -59,7 +60,8 @@ use crate::num::random::{
 };
 use crate::options::random::random_options;
 use crate::orderings::random::random_orderings;
-use crate::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
+use crate::polynomial::Polynomial;
+use crate::polynomial::arithmetic::traits::{ComposePowerOfX, MulPowerOfX};
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
@@ -90,9 +92,9 @@ use crate::test_util::generators::{
     signed_assign_bits_valid, smallest_invalid_value, unsigned_assign_bits_valid,
     unsigned_matrix_positions,
 };
-use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
 use crate::test_util::num::float::PRIMITIVE_FLOAT_CHARS;
+use crate::test_util::num::modular::mod_mul::limbs_invert_limb_naive;
 use crate::test_util::rounding_modes::ROUNDING_MODE_CHARS;
 use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
 use crate::unions::Union2;

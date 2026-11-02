@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
-use crate::float::arithmetic::cos::round_bracket;
+use crate::float::trigonometric::cos::round_bracket;
 use core::cmp::{Ordering, min};
 use malachite_base::num::arithmetic::traits::{Abs, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;

@@ -12,7 +12,7 @@ use alloc::vec::Vec;
 use core::iter::repeat_with;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{MulPowerOfX, MulPowerOfXAssign};
+use malachite_base::polynomial::arithmetic::traits::{MulPowerOfX, MulPowerOfXAssign};
 
 impl MulPowerOfX for IntegerPolynomial {
     type Output = Self;
@@ -41,7 +41,7 @@ impl MulPowerOfX for IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfX;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// assert_eq!(
@@ -99,7 +99,7 @@ impl MulPowerOfX for &IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfX;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// assert_eq!(
@@ -158,7 +158,7 @@ impl MulPowerOfXAssign for IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfXAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("x^2-3*x+2").unwrap();

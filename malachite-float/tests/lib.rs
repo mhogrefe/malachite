@@ -65,95 +65,43 @@ pub mod float {
     pub mod arithmetic {
         pub mod abs;
         pub mod abs_squared;
-        pub mod acos;
-        pub mod acosh;
-        pub mod acot;
-        pub mod acoth;
-        pub mod acsc;
-        pub mod acsch;
         pub mod add;
         pub mod add_mul;
-        pub mod agm;
-        pub mod asec;
-        pub mod asech;
-        pub mod asin;
-        pub mod asinh;
-        pub mod atan;
-        pub mod atan2;
-        pub mod atanh;
         pub mod average;
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_gaussian_unit;
         pub mod canonicalize_unit;
         pub mod cbrt;
-        pub mod compound;
         pub mod conjugate;
-        pub mod cos;
-        pub mod cosh;
-        pub mod cot;
-        pub mod coth;
-        pub mod csc;
-        pub mod csch;
         pub mod div;
         pub mod dot;
-        pub mod exp;
-        pub mod exp_x_minus_1;
-        pub mod factorial;
         pub mod fractional_part;
         pub mod hypot;
         pub mod is_power_of_2;
         pub mod is_unit;
-        pub mod ln;
-        pub mod ln_1_plus_x;
-        pub mod log_base;
-        pub mod log_base_10;
-        pub mod log_base_10_1_plus_x;
-        pub mod log_base_1_plus_x;
-        pub mod log_base_2;
-        pub mod log_base_2_1_plus_x;
-        pub mod log_base_float_base;
-        pub mod log_base_float_base_1_plus_x;
-        pub mod log_base_power_of_2;
-        pub mod log_base_power_of_2_1_plus_x;
-        pub mod log_base_rational_base;
-        pub mod log_base_rational_base_1_plus_x;
-        pub mod log_base_rational_float_base;
-        pub mod log_base_rational_rational_base;
         pub mod mul;
         pub mod mul_add_mul;
         pub mod mul_sub_mul;
         pub mod neg;
         pub mod positive_difference;
         pub mod pow;
-        pub mod power_of_10;
-        pub mod power_of_10_x_minus_1;
         pub mod power_of_2;
-        pub mod power_of_2_of_float;
-        pub mod power_of_2_x_minus_1;
         pub mod product;
         pub mod reciprocal;
         pub mod reciprocal_sqrt;
         pub mod rem;
         pub mod root;
         pub mod round_to_integer;
-        pub mod sec;
-        pub mod sech;
         pub mod shl;
         pub mod shl_round;
         pub mod shr;
         pub mod shr_round;
         pub mod sign;
-        pub mod sin;
-        pub mod sin_cos;
-        pub mod sinh;
-        pub mod sinh_cosh;
         pub mod sqrt;
         pub mod square;
         pub mod sub;
         pub mod sub_mul;
         pub mod sum;
-        pub mod tan;
-        pub mod tanh;
     }
     pub mod basic {
         pub mod can_round;
@@ -293,6 +241,50 @@ pub mod float {
         pub mod exhaustive_positive_floats_with_sci_exponent;
         pub mod exhaustive_positive_floats_with_sci_exponent_and_precision;
     }
+    pub mod exponential {
+        pub mod agm;
+        pub mod compound;
+        pub mod exp;
+        pub mod exp_x_minus_1;
+        pub mod ln;
+        pub mod ln_1_plus_x;
+        pub mod log_base;
+        pub mod log_base_10;
+        pub mod log_base_10_1_plus_x;
+        pub mod log_base_1_plus_x;
+        pub mod log_base_2;
+        pub mod log_base_2_1_plus_x;
+        pub mod log_base_float_base;
+        pub mod log_base_float_base_1_plus_x;
+        pub mod log_base_power_of_2;
+        pub mod log_base_power_of_2_1_plus_x;
+        pub mod log_base_rational_base;
+        pub mod log_base_rational_base_1_plus_x;
+        pub mod log_base_rational_float_base;
+        pub mod log_base_rational_rational_base;
+        pub mod power_of_10;
+        pub mod power_of_10_x_minus_1;
+        pub mod power_of_2_of_float;
+        pub mod power_of_2_x_minus_1;
+    }
+    pub mod hyperbolic {
+        pub mod acosh;
+        pub mod acoth;
+        pub mod acsch;
+        pub mod asech;
+        pub mod asinh;
+        pub mod atanh;
+        pub mod cosh;
+        pub mod coth;
+        pub mod csch;
+        pub mod sech;
+        pub mod sinh;
+        pub mod sinh_cosh;
+        pub mod tanh;
+    }
+    pub mod number_theory {
+        pub mod factorial;
+    }
     pub mod random {
         pub mod exponential_random_floats;
         pub mod normal_random_floats;
@@ -314,5 +306,21 @@ pub mod float {
         pub mod striped_random_positive_floats_with_precision;
         pub mod uniform_random_non_negative_floats_at_most_one;
         pub mod uniform_random_non_negative_floats_less_than_one;
+    }
+    pub mod trigonometric {
+        pub mod acos;
+        pub mod acot;
+        pub mod acsc;
+        pub mod asec;
+        pub mod asin;
+        pub mod atan;
+        pub mod atan2;
+        pub mod cos;
+        pub mod cot;
+        pub mod csc;
+        pub mod sec;
+        pub mod sin;
+        pub mod sin_cos;
+        pub mod tan;
     }
 }

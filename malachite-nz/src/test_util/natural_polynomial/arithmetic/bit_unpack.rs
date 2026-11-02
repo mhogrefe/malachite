@@ -9,7 +9,7 @@
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::ModPowerOf2;
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::polynomial::Polynomial;
 
 // Peels off the low `bits` bits of `n` as the next coefficient, and shifts them out, until nothing

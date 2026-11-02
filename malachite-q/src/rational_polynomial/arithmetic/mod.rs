@@ -6,13 +6,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(doc)]
+use malachite_base::polynomial::arithmetic::traits::{
+    CheckedDivExact, CheckedDivRem, CheckedRem, Compose, ComposeAssign, ComposePowerOfX,
+    ComposePowerOfXAssign, DeflatePowerOfX, DeflatePowerOfXAssign, DivPowerOfX, DivPowerOfXAssign,
+    Evaluate, ExponentGcd, L2NormSquared, MakeMonic, MakeMonicAssign, MulPowerOfX,
+    MulPowerOfXAssign, RemPrecomputed, RemPrecomputedAssign, TaylorShift, TaylorShiftAssign,
+};
+
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
 /// two polynomials.
 pub mod add;
-/// Implementations of [`AddTruncated`](malachite_base::polynomial::AddTruncated) and
-/// [`AddTruncatedAssign`](malachite_base::polynomial::AddTruncatedAssign), for adding two
-/// polynomials and keeping only their low coefficients.
-pub mod add_truncated;
 /// Implementations of [`CanonicalPrimitivePart`](
 /// malachite_base::num::arithmetic::traits::CanonicalPrimitivePart) and
 /// [`ContentAndCanonicalPrimitivePart`](
@@ -25,118 +29,75 @@ pub mod canonical_primitive_part;
 /// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
 /// which bring a polynomial into canonical unit form.
 pub mod canonicalize_unit;
-/// Implementations of [`Compose`](malachite_base::polynomial::Compose) and
-/// [`ComposeAssign`](malachite_base::polynomial::ComposeAssign), for composing two polynomials.
+/// Implementations of [`Compose`] and [`ComposeAssign`], for composing two polynomials.
 pub mod compose;
-/// Implementations of [`ComposePowerOfX`](malachite_base::polynomial::ComposePowerOfX) and
-/// [`ComposePowerOfXAssign`](malachite_base::polynomial::ComposePowerOfXAssign), for substituting a
-/// power of the variable into a polynomial.
+/// Implementations of [`ComposePowerOfX`] and [`ComposePowerOfXAssign`], for substituting a power
+/// of the variable into a polynomial.
 pub mod compose_power_of_x;
-/// Implementations of [`ComposeTruncated`](malachite_base::polynomial::ComposeTruncated) and
-/// [`ComposeTruncatedAssign`](malachite_base::polynomial::ComposeTruncatedAssign), for composing
-/// two polynomials as power series.
-pub mod compose_truncated;
-/// Series reversion: the compositional inverse of a polynomial as a power series.
-pub mod compositional_inverse_truncated;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), and
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart)
 /// for [`RationalPolynomial`](super::RationalPolynomial)s.
 pub mod content;
-/// Implementations of [`DeflatePowerOfX`](malachite_base::polynomial::DeflatePowerOfX) and
-/// [`DeflatePowerOfXAssign`](malachite_base::polynomial::DeflatePowerOfXAssign), for undoing the
+/// Implementations of [`DeflatePowerOfX`] and [`DeflatePowerOfXAssign`], for undoing the
 /// substitution of a power of the variable into a polynomial.
 pub mod deflate_power_of_x;
-/// Implementations of [`Derivative`](malachite_base::polynomial::Derivative) and
-/// [`DerivativeAssign`](malachite_base::polynomial::DerivativeAssign), for differentiating a
-/// polynomial.
-pub mod derivative;
 /// Implementations of [`Div`](core::ops::Div), [`DivAssign`](core::ops::DivAssign), and
 /// [`CheckedDiv`](malachite_base::num::arithmetic::traits::CheckedDiv), for finding the quotient of
 /// two polynomials.
 pub mod div;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact),
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), and
-/// [`CheckedDivExact`](malachite_base::polynomial::CheckedDivExact), for dividing a polynomial by
-/// one that divides it.
+/// [`CheckedDivExact`], for dividing a polynomial by one that divides it.
 pub mod div_exact;
-/// Implementations of [`DivPowerOfX`](malachite_base::polynomial::DivPowerOfX) and
-/// [`DivPowerOfXAssign`](malachite_base::polynomial::DivPowerOfXAssign), for dividing a polynomial
-/// by a power of its variable and discarding the remainder.
+/// Implementations of [`DivPowerOfX`] and [`DivPowerOfXAssign`], for dividing a polynomial by a
+/// power of its variable and discarding the remainder.
 pub mod div_power_of_x;
 /// Implementations of [`DivRem`](malachite_base::num::arithmetic::traits::DivRem),
-/// [`DivAssignRem`](malachite_base::num::arithmetic::traits::DivAssignRem), and
-/// [`CheckedDivRem`](malachite_base::polynomial::CheckedDivRem), for dividing polynomials.
+/// [`DivAssignRem`](malachite_base::num::arithmetic::traits::DivAssignRem), and [`CheckedDivRem`],
+/// for dividing polynomials.
 pub mod div_rem;
-/// Implementations of [`DivTruncated`](malachite_base::polynomial::DivTruncated),
-/// [`DivTruncatedAssign`](malachite_base::polynomial::DivTruncatedAssign), and
-/// [`CheckedDivTruncated`](malachite_base::polynomial::CheckedDivTruncated), for dividing two
-/// polynomials as power series.
-pub mod div_truncated;
-/// Implementations of [`DivisibleBy`](malachite_base::num::arithmetic::traits::DivisibleBy), for
+/// Implementations of [`DivisibleBy`](malachite_base::num::modular::traits::DivisibleBy), for
 /// determining whether one polynomial is divisible by another.
 pub mod divisible_by;
-/// Implementations of [`Evaluate`](malachite_base::polynomial::Evaluate) for
+/// Implementations of [`Evaluate`] for
 /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s and
 /// [`RationalPolynomial`](super::RationalPolynomial)s at [`Rational`](crate::Rational)s, and for
 /// [`RationalPolynomial`](super::RationalPolynomial)s at
 /// [`Integer`](malachite_nz::integer::Integer)s.
 pub mod evaluate;
-/// An implementation of [`ExponentGcd`](malachite_base::polynomial::ExponentGcd), the greatest
-/// common divisor of the exponents at which a polynomial has nonzero coefficients.
+/// An implementation of [`ExponentGcd`], the greatest common divisor of the exponents at which a
+/// polynomial has nonzero coefficients.
 pub mod exponent_gcd;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height), the largest of
 /// the heights of a polynomial's coefficients.
 pub mod height;
-/// Implementations of [`Integral`](malachite_base::polynomial::Integral) and
-/// [`IntegralAssign`](malachite_base::polynomial::IntegralAssign), for integrating a polynomial.
-pub mod integral;
-/// Implementations of [`InverseTruncated`](malachite_base::polynomial::InverseTruncated), for
-/// inverting a polynomial as a power series.
-pub mod inverse_truncated;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
-/// An implementation of [`L2NormSquared`](malachite_base::polynomial::L2NormSquared), the sum of
-/// the squares of a polynomial's coefficients.
+/// An implementation of [`L2NormSquared`], the sum of the squares of a polynomial's coefficients.
 pub mod l2_norm_squared;
-/// Implementations of [`MakeMonic`](malachite_base::polynomial::MakeMonic) and
-/// [`MakeMonicAssign`](malachite_base::polynomial::MakeMonicAssign), which divide a polynomial by
-/// its leading coefficient.
+/// Implementations of [`MakeMonic`] and [`MakeMonicAssign`], which divide a polynomial by its
+/// leading coefficient.
 pub mod make_monic;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying two polynomials.
 pub mod mul;
-/// Implementations of [`MulPowerOfX`](malachite_base::polynomial::MulPowerOfX) and
-/// [`MulPowerOfXAssign`](malachite_base::polynomial::MulPowerOfXAssign), for multiplying a
-/// polynomial by a power of its variable.
+/// Implementations of [`MulPowerOfX`] and [`MulPowerOfXAssign`], for multiplying a polynomial by a
+/// power of its variable.
 pub mod mul_power_of_x;
-/// Implementations of [`MulTruncated`](malachite_base::polynomial::MulTruncated) and
-/// [`MulTruncatedAssign`](malachite_base::polynomial::MulTruncatedAssign), for multiplying two
-/// polynomials and keeping the low coefficients of the product.
-pub mod mul_truncated;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a polynomial.
 pub mod neg;
-/// Implementations of [`NthDerivative`](malachite_base::polynomial::NthDerivative) and
-/// [`NthDerivativeAssign`](malachite_base::polynomial::NthDerivativeAssign), for differentiating a
-/// polynomial any number of times.
-pub mod nth_derivative;
 /// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
 /// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a polynomial to a
 /// power.
 pub mod pow;
-/// Implementations of [`PowTruncated`](malachite_base::polynomial::PowTruncated) and
-/// [`PowTruncatedAssign`](malachite_base::polynomial::PowTruncatedAssign), for raising a polynomial
-/// to a power and keeping only the low coefficients of the power.
-pub mod pow_truncated;
 /// Implementations of [`Rem`](core::ops::Rem), [`RemAssign`](core::ops::RemAssign), and
-/// [`CheckedRem`](malachite_base::polynomial::CheckedRem), for finding the remainder of two
-/// polynomials.
+/// [`CheckedRem`], for finding the remainder of two polynomials.
 pub mod rem;
-/// Implementations of [`RemPrecomputed`](malachite_base::polynomial::RemPrecomputed) and
-/// [`RemPrecomputedAssign`](malachite_base::polynomial::RemPrecomputedAssign), for finding
-/// remainders by a fixed divisor with precomputed powers of $x$.
+/// Implementations of [`RemPrecomputed`] and [`RemPrecomputedAssign`], for finding remainders by a
+/// fixed divisor with precomputed powers of $x$.
 pub mod rem_precomputed;
 /// Implementations of [`RemovePower`](malachite_base::num::factorization::traits::RemovePower) and
 /// [`RemovePowerAssign`](malachite_base::num::factorization::traits::RemovePowerAssign), for
@@ -364,18 +325,9 @@ pub mod shr;
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a
 /// polynomial.
 pub mod square;
-/// Implementations of [`SquareTruncated`](malachite_base::polynomial::SquareTruncated) and
-/// [`SquareTruncatedAssign`](malachite_base::polynomial::SquareTruncatedAssign), for squaring a
-/// polynomial and keeping the low coefficients of the square.
-pub mod square_truncated;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting one polynomial from another.
 pub mod sub;
-/// Implementations of [`SubTruncated`](malachite_base::polynomial::SubTruncated) and
-/// [`SubTruncatedAssign`](malachite_base::polynomial::SubTruncatedAssign), for subtracting one
-/// polynomial from another and keeping only their low coefficients.
-pub mod sub_truncated;
-/// Implementations of [`TaylorShift`](malachite_base::polynomial::TaylorShift) and
-/// [`TaylorShiftAssign`](malachite_base::polynomial::TaylorShiftAssign), for shifting a polynomial
-/// by a constant.
+/// Implementations of [`TaylorShift`] and [`TaylorShiftAssign`], for shifting a polynomial by a
+/// constant.
 pub mod taylor_shift;

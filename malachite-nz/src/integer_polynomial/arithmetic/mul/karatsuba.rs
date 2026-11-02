@@ -16,9 +16,10 @@ use crate::integer_vector::arithmetic::sub::vec_sub_assign;
 use alloc::vec;
 use core::borrow::Borrow;
 use core::mem::take;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::LowMask;
 
 // This is the "odd/even" Karatsuba algorithm. Let $f(x) = f_1(x^2) + xf_2(x^2)$ and $g(x) =

@@ -8,7 +8,8 @@
 
 use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
-use malachite_base::num::arithmetic::traits::{Content, ContentChained, Gcd};
+use malachite_base::num::arithmetic::traits::{Content, ContentChained};
+use malachite_base::num::number_theory::traits::Gcd;
 
 impl ContentChained<Rational> for RationalMatrix {
     type Output = Rational;

@@ -9,7 +9,7 @@
 use crate::num::basic::traits::Zero;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
-use crate::polynomial::{MulPowerOfX, MulPowerOfXAssign};
+use crate::polynomial::arithmetic::traits::{MulPowerOfX, MulPowerOfXAssign};
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use alloc::vec::Vec;
 use core::iter::repeat_n;
@@ -40,7 +40,7 @@ impl<T: PrimitiveUnsigned> MulPowerOfX for UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfX;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// assert_eq!(
@@ -97,7 +97,7 @@ impl<T: PrimitiveUnsigned> MulPowerOfX for &UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfX;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// assert_eq!(
@@ -155,7 +155,7 @@ impl<T: PrimitiveUnsigned> MulPowerOfXAssign for UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MulPowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::MulPowerOfXAssign;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let mut p = UnsignedPolynomial::<u8>::from_str("x^2+3*x+2").unwrap();

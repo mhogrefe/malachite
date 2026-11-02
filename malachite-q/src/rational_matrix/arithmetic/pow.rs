@@ -14,11 +14,10 @@ use crate::rational_matrix::conversion::to_numerators_and_row_denominators::{
 use alloc::vec;
 use core::iter::repeat_n;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{
-    Inverse, LcmAssign, Pow, PowAssign, Square, SquareAssign,
-};
+use malachite_base::num::arithmetic::traits::{Inverse, Pow, PowAssign, Square, SquareAssign};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::num::number_theory::traits::LcmAssign;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::natural::Natural;
 

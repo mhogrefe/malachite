@@ -34,13 +34,13 @@ use core::cmp::Ordering::*;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CheckedRoot, CheckedSqrt, DivMod, DivRound,
-    FloorRoot, FloorRootAssign, FloorSqrt, ModPowerOf2Assign, PowerOf2, RootAssignRem, RootRem,
-    SqrtRem,
+    FloorRoot, FloorRootAssign, FloorSqrt, PowerOf2, RootAssignRem, RootRem, SqrtRem,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
+use malachite_base::num::modular::traits::ModPowerOf2Assign;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_set_zero, slice_trailing_zeros};
 

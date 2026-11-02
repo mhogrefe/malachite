@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, IsPowerOf2, NextPowerOf2, NextPowerOf2Assign, PowerOf2,
+    IsPowerOf2, NextPowerOf2, NextPowerOf2Assign, PowerOf2,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_nz::test_util::generators::natural_gen_var_2;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_gen_var_2;

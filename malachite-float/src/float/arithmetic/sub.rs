@@ -19,10 +19,11 @@ use crate::{
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use core::ops::{Sub, SubAssign};
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, NegAssign};
+use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;

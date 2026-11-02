@@ -13,11 +13,11 @@
 
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::arithmetic::add::limbs_vec_add_limb_in_place;
-use crate::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::natural::arithmetic::shr::{
     limbs_shr, limbs_slice_shr_in_place, limbs_vec_shr_in_place,
 };
 use crate::natural::logic::bit_access::limbs_get_bit;
+use crate::natural::modular::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;

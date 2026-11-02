@@ -39,7 +39,7 @@ use crate::test_util::generators::rational_matrix_positions;
 use itertools::Itertools;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{DeterminantSign, IsPowerOf2, Square};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -54,9 +54,11 @@ use malachite_base::num::exhaustive::{
     exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
     exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
+use malachite_base::num::linear_algebra::traits::DeterminantSign;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::options::exhaustive::exhaustive_options;
-use malachite_base::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{ComposePowerOfX, MulPowerOfX};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};

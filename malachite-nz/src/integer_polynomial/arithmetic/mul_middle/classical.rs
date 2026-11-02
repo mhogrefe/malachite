@@ -13,8 +13,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::mul_truncated::classical::product_coefficient_to_out;
-use crate::integer_polynomial::arithmetic::square_truncated::classical::square_coefficient_to_out;
+use crate::integer_polynomial::series::mul_truncated::classical::product_coefficient_to_out;
+use crate::integer_polynomial::series::square_truncated::classical::square_coefficient_to_out;
 use crate::integer_vector::arithmetic::dot_general::DotScratch;
 use core::ptr;
 

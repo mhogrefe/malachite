@@ -16,10 +16,10 @@
 
 use crate::integer::Integer;
 use crate::integer_matrix::IntegerMatrix;
-use crate::integer_matrix::arithmetic::mod_op::integers_mod_word;
+use crate::integer_matrix::modular::mod_op::integers_mod_word;
 use crate::integer_vector::IntegerVector;
 use crate::natural::Natural;
-use crate::natural::arithmetic::reconstruct::{
+use crate::natural::modular::reconstruct::{
     rational_reconstruct_with_bounds, rational_reconstruction_balanced_bound,
 };
 use crate::platform::Limb;
@@ -28,18 +28,19 @@ use alloc::vec::Vec;
 use core::cmp::Ordering;
 use core::ops::Mul;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{DivExact, DivModPrecomputed, Gcd, LcmAssign};
+use malachite_base::num::arithmetic::traits::{DivExact, DivModPrecomputed};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::OrdProduct;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::number_theory::traits::{Gcd, LcmAssign};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 
-pub use crate::integer_matrix::arithmetic::can_solve_dixon::can_solve_dixon;
-pub use crate::integer_matrix::arithmetic::can_solve_multi_mod::can_solve_multi_mod;
-pub use crate::integer_matrix::arithmetic::solve::{can_solve_fflu, solve_nonsingular};
-pub use crate::integer_matrix::arithmetic::solve_dixon::solve_dixon;
-pub use crate::integer_matrix::arithmetic::solve_multi_mod::solve_multi_mod;
+pub use crate::integer_matrix::linear_algebra::can_solve_dixon::can_solve_dixon;
+pub use crate::integer_matrix::linear_algebra::can_solve_multi_mod::can_solve_multi_mod;
+pub use crate::integer_matrix::linear_algebra::solve::{can_solve_fflu, solve_nonsingular};
+pub use crate::integer_matrix::linear_algebra::solve_dixon::solve_dixon;
+pub use crate::integer_matrix::linear_algebra::solve_multi_mod::solve_multi_mod;
 
 /// The right-hand side $B$ of a linear system $AX = B$, borrowed: the elements of a matrix in
 /// row-major order, with its height and width. A vector is borrowed as a matrix with one column, so

@@ -27,9 +27,10 @@ use crate::natural::{
     bit_to_limb_count_floor, limb_to_bit_count,
 };
 use crate::platform::Limb;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, PowerOf2, Square, XMulYToZZ};
+use malachite_base::num::arithmetic::traits::{PowerOf2, Square, XMulYToZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::modular::traits::ModPowerOf2;
 
 // the following T1 and T2 are bipartite tables giving initial approximation for the inverse square
 // root, with 13-bit input split in 5 + 4 + 4, and 11-bit output. More precisely, if 2048 <= i <

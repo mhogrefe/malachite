@@ -22,7 +22,7 @@ use core::fmt::Write;
 use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};
 #[cfg(feature = "test_build")]
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::{DivRound, ModPowerOf2, Parity, ShrRound};
+use malachite_base::num::arithmetic::traits::{DivRound, Parity, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::to_string::{
     BaseFmtWrapper as BaseBaseFmtWrapper, digit_to_display_byte_large, digit_to_display_byte_lower,
@@ -33,6 +33,7 @@ use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToStringBase, WrappingFrom};
 #[cfg(feature = "test_build")]
 use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::*;
 
 /// A `struct` that allows for formatting a [`Natural`] or [`Integer`](crate::integer::Integer) and

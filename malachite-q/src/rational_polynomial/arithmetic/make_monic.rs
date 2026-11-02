@@ -9,7 +9,8 @@
 use crate::rational_polynomial::RationalPolynomial;
 use malachite_base::num::arithmetic::traits::{CanonicalPrimitivePart, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::{MakeMonic, MakeMonicAssign, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{MakeMonic, MakeMonicAssign};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 
 // For p = A/d, the monic multiple of p is A/lc(A). Dividing numerator and denominator by cont(A),
@@ -48,7 +49,7 @@ impl MakeMonic for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MakeMonic;
+    /// use malachite_base::polynomial::arithmetic::traits::MakeMonic;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("6*x+4").unwrap();
@@ -87,7 +88,7 @@ impl MakeMonic for &RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::MakeMonic;
+    /// use malachite_base::polynomial::arithmetic::traits::MakeMonic;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("6*x+4").unwrap();
@@ -120,7 +121,7 @@ impl MakeMonicAssign for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::MakeMonicAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::MakeMonicAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("6*x+4").unwrap();

@@ -1,5 +1,5 @@
-use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::Two;
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 

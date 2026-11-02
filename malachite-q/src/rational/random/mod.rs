@@ -7,18 +7,17 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::rational::arithmetic::denominators_in_closed_interval::*;
-use crate::rational::arithmetic::traits::DenominatorsInClosedInterval;
 use crate::rational::exhaustive::RationalsWithDenominator;
+use crate::rational::number_theory::denominators_in_closed_interval::*;
+use crate::rational::number_theory::traits::DenominatorsInClosedInterval;
 use core::cmp::min;
 use malachite_base::bools::random::{RandomBools, random_bools};
 use malachite_base::iterators::iterator_cache::IteratorCache;
-use malachite_base::num::arithmetic::traits::{
-    CoprimeWith, Reciprocal, RoundToMultiple, UnsignedAbs,
-};
+use malachite_base::num::arithmetic::traits::{Reciprocal, RoundToMultiple, UnsignedAbs};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::number_theory::traits::CoprimeWith;
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, geometric_random_unsigneds,
 };

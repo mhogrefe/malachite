@@ -20,8 +20,9 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::min;
 use core::ops::{Div, DivAssign};
-use malachite_base::num::arithmetic::traits::{CheckedDiv, DivExact, DivisibleBy, SubMulAssign};
+use malachite_base::num::arithmetic::traits::{CheckedDiv, DivExact, SubMulAssign};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::modular::traits::DivisibleBy;
 
 // The length of divisor at and below which the divide-and-conquer quotients divide one coefficient
 // at a time.

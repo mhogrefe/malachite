@@ -27,11 +27,10 @@ use crate::platform::Limb;
 use alloc::vec;
 use core::cmp::Ordering;
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, NegAssign, PowerOf2, Sign, WrappingNegAssign,
-};
+use malachite_base::num::arithmetic::traits::{NegAssign, PowerOf2, Sign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};

@@ -12,24 +12,6 @@ pub mod abs;
 /// [`AbsSquaredAssign`](malachite_base::num::arithmetic::traits::AbsSquaredAssign), traits for
 /// computing the squared absolute value of a number. For real types this is the same as squaring.
 pub mod abs_squared;
-/// Implementations of [`Acos`](malachite_base::num::arithmetic::traits::Acos) and
-/// [`AcosAssign`](malachite_base::num::arithmetic::traits::AcosAssign), traits for computing the
-/// arccosine of [`Float`](super::Float)s.
-pub mod acos;
-/// Implementations of [`Acosh`](malachite_base::num::arithmetic::traits::Acosh) and
-/// [`AcoshAssign`](malachite_base::num::arithmetic::traits::AcoshAssign), traits for computing the
-/// inverse hyperbolic cosine of [`Float`](super::Float)s.
-pub mod acosh;
-pub mod acot;
-/// Implementations of [`Acoth`](malachite_base::num::arithmetic::traits::Acoth) and
-/// [`AcothAssign`](malachite_base::num::arithmetic::traits::AcothAssign), traits for computing the
-/// inverse hyperbolic cotangent of [`Float`](super::Float)s.
-pub mod acoth;
-pub mod acsc;
-/// Implementations of [`Acsch`](malachite_base::num::arithmetic::traits::Acsch) and
-/// [`AcschAssign`](malachite_base::num::arithmetic::traits::AcschAssign), traits for computing the
-/// inverse hyperbolic cosecant of [`Float`](super::Float)s.
-pub mod acsch;
 /// Addition of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod add;
@@ -39,37 +21,6 @@ pub mod add;
 /// [`Float`](super::Float) and a [`Rational`](malachite_q::Rational) — with a single rounding
 /// (fused multiply-add), and the associated precision- and rounding-mode-aware functions.
 pub mod add_mul;
-/// Taking the AGM (arithmetic-geometric mean) of two [`Float`](super::Float)s, and of
-/// [`Float`](super::Float)s with [`Rational`](malachite_q::Rational)s.
-pub mod agm;
-/// Implementations of [`Asec`](malachite_base::num::arithmetic::traits::Asec) and
-/// [`AsecAssign`](malachite_base::num::arithmetic::traits::AsecAssign), traits for computing the
-/// arcsecant of [`Float`](super::Float)s.
-pub mod asec;
-/// Implementations of [`Asech`](malachite_base::num::arithmetic::traits::Asech) and
-/// [`AsechAssign`](malachite_base::num::arithmetic::traits::AsechAssign), traits for computing the
-/// inverse hyperbolic secant of [`Float`](super::Float)s.
-pub mod asech;
-/// Implementations of [`Asin`](malachite_base::num::arithmetic::traits::Asin) and
-/// [`AsinAssign`](malachite_base::num::arithmetic::traits::AsinAssign), traits for computing the
-/// arcsine of [`Float`](super::Float)s.
-pub mod asin;
-/// Implementations of [`Asinh`](malachite_base::num::arithmetic::traits::Asinh) and
-/// [`AsinhAssign`](malachite_base::num::arithmetic::traits::AsinhAssign), traits for computing the
-/// inverse hyperbolic sine of [`Float`](super::Float)s.
-pub mod asinh;
-/// Implementations of [`Atan`](malachite_base::num::arithmetic::traits::Atan) and
-/// [`AtanAssign`](malachite_base::num::arithmetic::traits::AtanAssign), traits for computing the
-/// arctangent of [`Float`](super::Float)s.
-pub mod atan;
-/// Implementations of [`Atan2`](malachite_base::num::arithmetic::traits::Atan2) and
-/// [`Atan2Assign`](malachite_base::num::arithmetic::traits::Atan2Assign), traits for computing the
-/// angle of a point given by two [`Float`](super::Float) coordinates.
-pub mod atan2;
-/// Implementations of [`Atanh`](malachite_base::num::arithmetic::traits::Atanh) and
-/// [`AtanhAssign`](malachite_base::num::arithmetic::traits::AtanhAssign), traits for computing the
-/// inverse hyperbolic tangent of [`Float`](super::Float)s.
-pub mod atanh;
 /// [`Average`](malachite_base::num::arithmetic::traits::Average) and
 /// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign), traits for computing
 /// the average (arithmetic mean) of two numbers, and the associated precision- and
@@ -212,38 +163,10 @@ pub mod canonicalize_gaussian_unit;
 pub mod canonicalize_unit;
 /// Cube root of [`Float`](super::Float)s and of [`Rational`](malachite_q::Rational)s.
 pub mod cbrt;
-/// [`Compound`](malachite_base::num::arithmetic::traits::Compound) and
-/// [`CompoundAssign`](malachite_base::num::arithmetic::traits::CompoundAssign), traits for
-/// computing the compound function $(1+x)^n$ for [`Float`](super::Float)s.
-pub mod compound;
 /// Implementations of [`Conjugate`](malachite_base::num::arithmetic::traits::Conjugate) and
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number. A real number is its own conjugate.
 pub mod conjugate;
-/// Implementations of [`Cos`](malachite_base::num::arithmetic::traits::Cos) and
-/// [`CosAssign`](malachite_base::num::arithmetic::traits::CosAssign), traits for computing the
-/// cosine of [`Float`](super::Float)s.
-pub mod cos;
-/// Implementations of [`Cosh`](malachite_base::num::arithmetic::traits::Cosh) and
-/// [`CoshAssign`](malachite_base::num::arithmetic::traits::CoshAssign), traits for computing the
-/// hyperbolic cosine of [`Float`](super::Float)s.
-pub mod cosh;
-/// Implementations of [`Cot`](malachite_base::num::arithmetic::traits::Cot) and
-/// [`CotAssign`](malachite_base::num::arithmetic::traits::CotAssign), traits for computing the
-/// cotangent of [`Float`](super::Float)s.
-pub mod cot;
-/// Implementations of [`Coth`](malachite_base::num::arithmetic::traits::Coth) and
-/// [`CothAssign`](malachite_base::num::arithmetic::traits::CothAssign), traits for computing the
-/// hyperbolic cotangent of [`Float`](super::Float)s.
-pub mod coth;
-/// Implementations of [`Csc`](malachite_base::num::arithmetic::traits::Csc) and
-/// [`CscAssign`](malachite_base::num::arithmetic::traits::CscAssign), traits for computing the
-/// cosecant of [`Float`](super::Float)s.
-pub mod csc;
-/// Implementations of [`Csch`](malachite_base::num::arithmetic::traits::Csch) and
-/// [`CschAssign`](malachite_base::num::arithmetic::traits::CschAssign), traits for computing the
-/// hyperbolic cosecant of [`Float`](super::Float)s.
-pub mod csch;
 /// Division of [`Float`](super::Float)s, of [`Float`](super::Float)s by
 /// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
 /// [`Float`](super::Float)s.
@@ -252,17 +175,6 @@ pub mod div;
 /// exactly and a single rounding at the end, so that intermediate overflow and underflow cannot
 /// occur.
 pub mod dot;
-/// [`Exp`](malachite_base::num::arithmetic::traits::Exp) and
-/// [`ExpAssign`](malachite_base::num::arithmetic::traits::ExpAssign), traits for computing $e^x$
-/// for [`Float`](super::Float)s.
-pub mod exp;
-/// [`ExpXMinus1`](malachite_base::num::arithmetic::traits::ExpXMinus1) and
-/// [`ExpXMinus1Assign`](malachite_base::num::arithmetic::traits::ExpXMinus1Assign), traits for
-/// computing $e^x-1$ for [`Float`](super::Float)s.
-pub mod exp_x_minus_1;
-/// [`factorial_prec_round`](super::Float::factorial_prec_round) and
-/// [`factorial_prec`](super::Float::factorial_prec), for computing correctly-rounded factorials.
-pub mod factorial;
 /// Fractional parts of [`Float`](super::Float)s: the `fractional_part` and
 /// `integer_and_fractional_parts` families.
 pub mod fractional_part;
@@ -288,75 +200,6 @@ pub mod is_power_of_2;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring.
 pub mod is_unit;
-/// [`Ln`](malachite_base::num::arithmetic::traits::Ln) and
-/// [`LnAssign`](malachite_base::num::arithmetic::traits::LnAssign), traits for computing the
-/// natural logarithm of [`Float`](super::Float)s.
-pub mod ln;
-/// [`Ln1PlusX`](malachite_base::num::arithmetic::traits::Ln1PlusX) and
-/// [`Ln1PlusXAssign`](malachite_base::num::arithmetic::traits::Ln1PlusXAssign), traits for
-/// computing $\ln(1+x)$ for [`Float`](super::Float)s.
-pub mod ln_1_plus_x;
-/// [`LogBase`](malachite_base::num::arithmetic::traits::LogBase) and
-/// [`LogBaseAssign`](malachite_base::num::arithmetic::traits::LogBaseAssign), traits for computing
-/// the base-$b$ logarithm of [`Float`](super::Float)s for an arbitrary integer base $b>1$.
-pub mod log_base;
-/// [`LogBase10`](malachite_base::num::arithmetic::traits::LogBase10) and
-/// [`LogBase10Assign`](malachite_base::num::arithmetic::traits::LogBase10Assign), traits for
-/// computing the base-10 logarithm of [`Float`](super::Float)s.
-pub mod log_base_10;
-/// [`LogBase10Of1PlusX`](malachite_base::num::arithmetic::traits::LogBase10Of1PlusX) and
-/// [`LogBase10Of1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBase10Of1PlusXAssign),
-/// traits for computing $\log_{10}(1+x)$ of [`Float`](super::Float)s.
-pub mod log_base_10_1_plus_x;
-/// [`LogBaseOf1PlusX`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusX) and
-/// [`LogBaseOf1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusXAssign),
-/// traits for computing $\log_b(1+x)$ of [`Float`](super::Float)s for an arbitrary integer base
-/// $b>1$.
-pub mod log_base_1_plus_x;
-/// [`LogBase2`](malachite_base::num::arithmetic::traits::LogBase2) and
-/// [`LogBase2Assign`](malachite_base::num::arithmetic::traits::LogBase2Assign), traits for
-/// computing the base-2 logarithm of [`Float`](super::Float)s.
-pub mod log_base_2;
-/// [`LogBase2Of1PlusX`](malachite_base::num::arithmetic::traits::LogBase2Of1PlusX) and
-/// [`LogBase2Of1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBase2Of1PlusXAssign),
-/// traits for computing $\log_2(1+x)$ for [`Float`](super::Float)s.
-pub mod log_base_2_1_plus_x;
-/// [`LogBase`](malachite_base::num::arithmetic::traits::LogBase) and
-/// [`LogBaseAssign`](malachite_base::num::arithmetic::traits::LogBaseAssign), implemented for a
-/// [`Float`](super::Float) base, for computing $\log_b x$ of a [`Float`](super::Float) with an
-/// arbitrary [`Float`](super::Float) base.
-pub mod log_base_float_base;
-/// [`LogBaseOf1PlusX`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusX) and
-/// [`LogBaseOf1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusXAssign),
-/// implemented for a [`Float`](super::Float) base, for computing $\log_b(1+x)$ of a
-/// [`Float`](super::Float) with an arbitrary [`Float`](super::Float) base.
-pub mod log_base_float_base_1_plus_x;
-/// [`LogBasePowerOf2`](malachite_base::num::arithmetic::traits::LogBasePowerOf2) and
-/// [`LogBasePowerOf2Assign`](malachite_base::num::arithmetic::traits::LogBasePowerOf2Assign),
-/// traits for computing $\log_{2^k} x$ for [`Float`](super::Float)s.
-pub mod log_base_power_of_2;
-/// [`LogBasePowerOf2Of1PlusX`](malachite_base::num::arithmetic::traits::LogBasePowerOf2Of1PlusX)
-/// and
-/// [`LogBasePowerOf2Of1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBasePowerOf2Of1PlusXAssign),
-/// traits for computing $\log_{2^k}(1+x)$ for [`Float`](super::Float)s.
-#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
-pub mod log_base_power_of_2_1_plus_x;
-/// [`LogBase`](malachite_base::num::arithmetic::traits::LogBase) and
-/// [`LogBaseAssign`](malachite_base::num::arithmetic::traits::LogBaseAssign), implemented for a
-/// [`Rational`](malachite_q::Rational) base, for computing $\log_b x$ of a [`Float`](super::Float)
-/// with an arbitrary rational base $b>1$.
-pub mod log_base_rational_base;
-/// [`LogBaseOf1PlusX`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusX) and
-/// [`LogBaseOf1PlusXAssign`](malachite_base::num::arithmetic::traits::LogBaseOf1PlusXAssign),
-/// implemented for a [`Rational`](malachite_q::Rational) base, for computing $\log_b(1+x)$ of a
-/// [`Float`](super::Float) with an arbitrary rational base $b>1$.
-pub mod log_base_rational_base_1_plus_x;
-/// Functions for computing $\log_b x$ of a [`Rational`](malachite_q::Rational) $x$ with an
-/// arbitrary [`Float`](super::Float) base, returning a [`Float`](super::Float).
-pub mod log_base_rational_float_base;
-/// Functions for computing $\log_b x$ of a [`Rational`](malachite_q::Rational) $x$ with an
-/// arbitrary [`Rational`](malachite_q::Rational) base $b>1$, returning a [`Float`](super::Float).
-pub mod log_base_rational_rational_base;
 /// Multiplication of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod mul;
@@ -378,16 +221,7 @@ pub mod positive_difference;
 /// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
 /// computing a power of 2.
 pub mod pow;
-/// An implementation of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2) with a
-/// [`Float`](super::Float) exponent, computing $2^x$ for [`Float`](super::Float)s.
-pub mod power_of_10;
-pub mod power_of_10_x_minus_1;
 pub mod power_of_2;
-pub mod power_of_2_of_float;
-/// Implementations of [`PowerOf2XMinus1`](malachite_base::num::arithmetic::traits::PowerOf2XMinus1)
-/// and [`PowerOf2XMinus1Assign`](malachite_base::num::arithmetic::traits::PowerOf2XMinus1Assign),
-/// traits for computing $2^x-1$.
-pub mod power_of_2_x_minus_1;
 /// Correctly-rounded multiplication of any number of [`Float`](super::Float)s: functions computing
 /// a slice's product with a single rounding at the end, and the [`Product`](core::iter::Product)
 /// implementations built on them.
@@ -408,14 +242,6 @@ pub mod rem;
 pub mod root;
 pub(crate) mod round_near_x;
 pub mod round_to_integer;
-/// Implementations of [`Sec`](malachite_base::num::arithmetic::traits::Sec) and
-/// [`SecAssign`](malachite_base::num::arithmetic::traits::SecAssign), traits for computing the
-/// secant of [`Float`](super::Float)s.
-pub mod sec;
-/// Implementations of [`Sech`](malachite_base::num::arithmetic::traits::Sech) and
-/// [`SechAssign`](malachite_base::num::arithmetic::traits::SechAssign), traits for computing the
-/// hyperbolic secant of [`Float`](super::Float)s.
-pub mod sech;
 /// Left-shifting a [`Float`](super::Float) (multiplying it by a power of 2).
 ///
 /// # shl
@@ -883,22 +709,6 @@ pub mod shr_round;
 /// An implementation of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for
 /// determining the sign of a number.
 pub mod sign;
-/// Implementations of [`Sin`](malachite_base::num::arithmetic::traits::Sin) and
-/// [`SinAssign`](malachite_base::num::arithmetic::traits::SinAssign), traits for computing the sine
-/// of [`Float`](super::Float)s.
-pub mod sin;
-/// Implementations of [`SinCos`](malachite_base::num::arithmetic::traits::SinCos) and
-/// [`SinCosAssign`](malachite_base::num::arithmetic::traits::SinCosAssign), traits for computing
-/// the sine and cosine of [`Float`](super::Float)s together.
-pub mod sin_cos;
-/// Implementations of [`Sinh`](malachite_base::num::arithmetic::traits::Sinh) and
-/// [`SinhAssign`](malachite_base::num::arithmetic::traits::SinhAssign), traits for computing the
-/// hyperbolic sine of [`Float`](super::Float)s.
-pub mod sinh;
-/// Implementations of [`SinhCosh`](malachite_base::num::arithmetic::traits::SinhCosh) and
-/// [`SinhCoshAssign`](malachite_base::num::arithmetic::traits::SinhCoshAssign), traits for
-/// computing the hyperbolic sine and cosine of [`Float`](super::Float)s together.
-pub mod sinh_cosh;
 /// [`Sqrt`](malachite_base::num::arithmetic::traits::Sqrt) and
 /// [`SqrtAssign`](malachite_base::num::arithmetic::traits::SqrtAssign), traits for computing the
 /// square root of [`Float`](super::Float)s.
@@ -920,8 +730,3 @@ pub mod sub_mul;
 /// slice's sum with a single rounding at the end, and the [`Sum`](core::iter::Sum) implementations
 /// built on them.
 pub mod sum;
-pub mod tan;
-/// Implementations of [`Tanh`](malachite_base::num::arithmetic::traits::Tanh) and
-/// [`TanhAssign`](malachite_base::num::arithmetic::traits::TanhAssign), traits for computing the
-/// hyperbolic tangent of [`Float`](super::Float)s.
-pub mod tanh;

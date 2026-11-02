@@ -34,6 +34,8 @@ pub mod exhaustive;
 pub mod extend;
 /// Traits for logic and bit manipulation on [`NaturalVector`]s.
 pub mod logic;
+/// Arithmetic on [`NaturalVector`]s whose entries are reduced modulo $m$ or $2^k$.
+pub mod modular;
 /// Iterators that generate [`NaturalVector`]s randomly.
 #[cfg(feature = "random")]
 pub mod random;

@@ -7,11 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::{FloorLogBasePowerOf2, Pow};
+use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
+use malachite_base::num::exponential::traits::FloorLogBasePowerOf2;
 use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{

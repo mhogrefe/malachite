@@ -362,8 +362,8 @@ pub type ExhaustiveNaturalPolynomialsReducedModPowerOf2 =
 /// A polynomial is reduced modulo $2^k$ when every one of its coefficients is, so these are the
 /// polynomials whose coefficients are all less than $2^k$ — which is to say, those for which
 /// [`mod_power_of_2_is_reduced`](
-/// malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced::mod_power_of_2_is_reduced)
-/// returns `true`.
+/// malachite_base::num::modular::traits::ModPowerOf2IsReduced::mod_power_of_2_is_reduced) returns
+/// `true`.
 ///
 /// The output is infinite: restricting the coefficients does not bound the degree. The zero
 /// polynomial, having no coefficients, is reduced modulo every power of 2 and comes first.
@@ -414,8 +414,8 @@ pub type ExhaustiveNaturalPolynomialsReducedMod =
 ///
 /// A polynomial is reduced modulo $m$ when every one of its coefficients is, so these are the
 /// polynomials whose coefficients are all less than $m$ — which is to say, those for which
-/// [`mod_is_reduced`](malachite_base::num::arithmetic::traits::ModIsReduced::mod_is_reduced)
-/// returns `true`.
+/// [`mod_is_reduced`](malachite_base::num::modular::traits::ModIsReduced::mod_is_reduced) returns
+/// `true`.
 ///
 /// The output is infinite: restricting the coefficients does not bound the degree. The zero
 /// polynomial, having no coefficients, is reduced modulo every $m$ and comes first.

@@ -16,7 +16,7 @@ use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::pseudo_div_rem::{div_rem_divide_and_conquer, trimmed};
 use malachite_base::num::arithmetic::traits::{DivAssignRem, DivRem};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::CheckedDivRem;
+use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
 
 // The quotient and remainder of `p` by `q`, or `None` if `q` is 0 or the quotient over the
 // rationals is not integral: the divisor's leading coefficient must divide the leading coefficient
@@ -60,7 +60,8 @@ impl DivRem<Self> for IntegerPolynomial {
     /// The division is possible exactly when the quotient over the rationals has integer
     /// coefficients: when the divisor's leading coefficient divides the leading coefficient of
     /// every remainder along the way. Use [`CheckedDivRem`] or
-    /// [`PseudoDivRem`](malachite_base::polynomial::PseudoDivRem) when it may not be.
+    /// [`PseudoDivRem`](malachite_base::polynomial::arithmetic::traits::PseudoDivRem) when it may
+    /// not be.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^2 \log n \log\log n)$
@@ -108,7 +109,8 @@ impl DivRem<&Self> for IntegerPolynomial {
     /// The division is possible exactly when the quotient over the rationals has integer
     /// coefficients: when the divisor's leading coefficient divides the leading coefficient of
     /// every remainder along the way. Use [`CheckedDivRem`] or
-    /// [`PseudoDivRem`](malachite_base::polynomial::PseudoDivRem) when it may not be.
+    /// [`PseudoDivRem`](malachite_base::polynomial::arithmetic::traits::PseudoDivRem) when it may
+    /// not be.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^2 \log n \log\log n)$
@@ -156,7 +158,8 @@ impl DivRem<IntegerPolynomial> for &IntegerPolynomial {
     /// The division is possible exactly when the quotient over the rationals has integer
     /// coefficients: when the divisor's leading coefficient divides the leading coefficient of
     /// every remainder along the way. Use [`CheckedDivRem`] or
-    /// [`PseudoDivRem`](malachite_base::polynomial::PseudoDivRem) when it may not be.
+    /// [`PseudoDivRem`](malachite_base::polynomial::arithmetic::traits::PseudoDivRem) when it may
+    /// not be.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^2 \log n \log\log n)$
@@ -204,7 +207,8 @@ impl DivRem<&IntegerPolynomial> for &IntegerPolynomial {
     /// The division is possible exactly when the quotient over the rationals has integer
     /// coefficients: when the divisor's leading coefficient divides the leading coefficient of
     /// every remainder along the way. Use [`CheckedDivRem`] or
-    /// [`PseudoDivRem`](malachite_base::polynomial::PseudoDivRem) when it may not be.
+    /// [`PseudoDivRem`](malachite_base::polynomial::arithmetic::traits::PseudoDivRem) when it may
+    /// not be.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^2 \log n \log\log n)$
@@ -364,7 +368,7 @@ impl CheckedDivRem<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+3*x+4").unwrap();
@@ -416,7 +420,7 @@ impl CheckedDivRem<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+3*x+4").unwrap();
@@ -468,7 +472,7 @@ impl CheckedDivRem<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+3*x+4").unwrap();
@@ -523,7 +527,7 @@ impl CheckedDivRem<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+3*x+4").unwrap();

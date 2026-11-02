@@ -32,11 +32,11 @@ use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Parity, PowerOf2, WrappingAddAssign, WrappingAddMulAssign,
-    WrappingSubMulAssign, XXAddYYToZZ,
+    Parity, PowerOf2, WrappingAddAssign, WrappingAddMulAssign, WrappingSubMulAssign, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::split_into_chunks_mut;
 
 // The amount subtracted from half the depth of the outer transform to get the depth of the inner

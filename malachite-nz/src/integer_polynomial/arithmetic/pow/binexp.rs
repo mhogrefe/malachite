@@ -15,7 +15,8 @@ use crate::integer_polynomial::arithmetic::mul::mul_greater_to_out;
 use crate::integer_polynomial::arithmetic::square::square_to_out;
 use alloc::vec;
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::{FloorLogBase2, Parity, PowerOf2};
+use malachite_base::num::arithmetic::traits::{Parity, PowerOf2};
+use malachite_base::num::exponential::traits::FloorLogBase2;
 
 // Returns the bit of `e` one place below its most significant bit, where binary exponentiation
 // starts, and whether the exponentiation swaps its two buffers an odd number of times. It swaps

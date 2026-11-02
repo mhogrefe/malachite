@@ -8,10 +8,11 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, DivisibleBy, PrimitivePart, PrimitivePartAssign,
+    Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::unsigned_polynomial_gen;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;

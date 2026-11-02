@@ -7,16 +7,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::logic::not::limbs_not_in_place;
+use crate::natural::modular::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::{Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::slices::slice_set_zero;
 use malachite_base::vecs::vec_delete_left;
 

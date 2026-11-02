@@ -6,95 +6,67 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-/// Implementations of [`AbsDiff`](malachite_base::num::arithmetic::traits::AbsDiff) and
-/// [`AbsDiffAssign`](malachite_base::num::arithmetic::traits::AbsDiffAssign), traits for getting
-/// the absolute value of the difference between two numbers.
+#[cfg(doc)]
+use malachite_base::num::arithmetic::traits::{
+    AbsDiff, AbsDiffAssign, AbsSquared, AbsSquaredAssign, AddMul, AddMulAssign, AddMulShl,
+    AddMulShlAssign, Average, AverageAssign, AverageRound, AverageRoundAssign, CanonicalUnitIPow,
+    CanonicalizeGaussianUnit, CanonicalizeGaussianUnitAssign, CanonicalizeUnit,
+    CanonicalizeUnitAssign, CeilingDivAssignNegMod, CeilingDivNegMod, CeilingRoot,
+    CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedRoot, CheckedSqrt, CheckedSub,
+    CheckedSubMul, Conjugate, ConjugateAssign, DivAssignMod, DivAssignModEuclidean, DivAssignRem,
+    DivEuclidean, DivEuclideanAssign, DivExact, DivExactAssign, DivMod, DivModEuclidean, DivRem,
+    DivRound, DivRoundAssign, FloorRoot, FloorRootAssign, FloorSqrt, FloorSqrtAssign, IsPowerOf2,
+    IsUnit, MulShrRound, MulShrRoundAssign, NextPowerOf2, NextPowerOf2Assign, Parity, Pow,
+    PowAssign, PowerOf2, RootAssignRem, RootRem, RoundToMultiple, RoundToMultipleAssign,
+    RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign, SaturatingSub, SaturatingSubAssign,
+    SaturatingSubMul, SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign,
+    Sign, SqrtAssignRem, SqrtRem, Square, SquareAssign, SubMul, SubMulAssign,
+    WideningElementProduct,
+};
+
+/// Implementations of [`AbsDiff`] and [`AbsDiffAssign`], traits for getting the absolute value of
+/// the difference between two numbers.
 pub mod abs_diff;
-/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared) and
-/// [`AbsSquaredAssign`](malachite_base::num::arithmetic::traits::AbsSquaredAssign), traits for
-/// computing the squared absolute value of a number. For real types this is the same as squaring.
+/// Implementations of [`AbsSquared`] and [`AbsSquaredAssign`], traits for computing the squared
+/// absolute value of a number. For real types this is the same as squaring.
 pub mod abs_squared;
 /// Addition of [`Natural`](super::Natural)s.
 pub mod add;
-/// Implementations of [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
-/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign), traits for adding a
-/// number and the product of two other numbers.
+/// Implementations of [`AddMul`] and [`AddMulAssign`], traits for adding a number and the product
+/// of two other numbers.
 pub mod add_mul;
-/// Implementations of [`AddMulShl`](malachite_base::num::arithmetic::traits::AddMulShl) and
-/// [`AddMulShlAssign`](malachite_base::num::arithmetic::traits::AddMulShlAssign), traits for adding
-/// a number and the product of two other numbers shifted left.
+/// Implementations of [`AddMulShl`] and [`AddMulShlAssign`], traits for adding a number and the
+/// product of two other numbers shifted left.
 pub mod add_mul_shl;
-/// [`Average`](malachite_base::num::arithmetic::traits::Average),
-/// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign),
-/// [`AverageRound`](malachite_base::num::arithmetic::traits::AverageRound), and
-/// [`AverageRoundAssign`](malachite_base::num::arithmetic::traits::AverageRoundAssign), traits for
+/// [`Average`], [`AverageAssign`], [`AverageRound`], and [`AverageRoundAssign`], traits for
 /// computing the average (arithmetic mean) of two numbers.
 pub mod average;
-/// [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod), a trait for finding the
-/// representative of a number modulo another number that is closest to zero.
-pub mod balanced_mod;
-/// [`BalancedModPowerOf2`](malachite_base::num::arithmetic::traits::BalancedModPowerOf2), a trait
-/// for finding the representative of a number modulo $2^k$ that is closest to zero.
-pub mod balanced_mod_power_of_2;
-/// An implementation of [`BellNumber`](malachite_base::num::arithmetic::traits::BellNumber), a
-/// trait for computing the number of ways to partition a set.
-pub mod bell_number;
-/// Implementations of
-/// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
-/// for computing the binomial coefficient of two numbers.
-pub mod binomial_coefficient;
-/// An implementation of
-/// [`CanonicalUnitIPow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow), a trait for
-/// finding the power of $i$ that brings a number into canonical unit form.
+/// An implementation of [`CanonicalUnitIPow`], a trait for finding the power of $i$ that brings a
+/// number into canonical unit form.
 pub mod canonical_unit_i_pow;
-/// Implementations of
-/// [`CanonicalizeGaussianUnit`](malachite_base::num::arithmetic::traits::CanonicalizeGaussianUnit)
-/// and [`CanonicalizeGaussianUnitAssign`](
-/// malachite_base::num::arithmetic::traits::CanonicalizeGaussianUnitAssign), traits for bringing a
-/// number into canonical Gaussian-unit form.
+/// Implementations of [`CanonicalizeGaussianUnit`] and [`CanonicalizeGaussianUnitAssign`], traits
+/// for bringing a number into canonical Gaussian-unit form.
 pub mod canonicalize_gaussian_unit;
-/// Implementations of
-/// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
-/// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
-/// traits for bringing a number into canonical unit form.
+/// Implementations of [`CanonicalizeUnit`] and [`CanonicalizeUnitAssign`], traits for bringing a
+/// number into canonical unit form.
 pub mod canonicalize_unit;
-/// The continued-fraction and half-gcd machinery, adopted from FLINT, shared by rational
-/// reconstruction and, in malachite-q, the simplest rational in an interval.
-#[doc(hidden)]
-pub mod cfrac_helpers;
 pub mod checked_mul_sub_mul;
-/// Implementations of [`CheckedSub`](malachite_base::num::arithmetic::traits::CheckedSub), a trait
-/// for subtracting two numbers and checking whether the result is representable.
-pub mod checked_sub;
-/// Implementations of [`CheckedSubMul`](malachite_base::num::arithmetic::traits::CheckedSubMul), a
-/// trait for subtracting the product of two numbers from another number, and checking whether the
+/// Implementations of [`CheckedSub`], a trait for subtracting two numbers and checking whether the
 /// result is representable.
+pub mod checked_sub;
+/// Implementations of [`CheckedSubMul`], a trait for subtracting the product of two numbers from
+/// another number, and checking whether the result is representable.
 pub mod checked_sub_mul;
-/// Implementations of [`Conjugate`](malachite_base::num::arithmetic::traits::Conjugate) and
-/// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
-/// computing the complex conjugate of a number. A real number is its own conjugate.
+/// Implementations of [`Conjugate`] and [`ConjugateAssign`], traits for computing the complex
+/// conjugate of a number. A real number is its own conjugate.
 pub mod conjugate;
-/// Implementations of [`CoprimeWith`](malachite_base::num::arithmetic::traits::CoprimeWith), a
-/// trait for determining whether two numbers are coprime.
-pub mod coprime_with;
-/// Implementations of [`Crt`](malachite_base::num::arithmetic::traits::Crt), a trait for combining
-/// two congruences by the Chinese remainder theorem.
-pub mod crt;
-crate_test_mod! {
-    /// `CrtComb`, a precomputed context for reducing a number modulo many word-sized moduli at once
-    /// and combining word residues back, by the Chinese remainder theorem. Internal machinery for
-    /// future multimodular algorithms, public only under `test_build`.
-    crt_comb
-}
 /// Division of [`Natural`](super::Natural)s.
 pub mod div;
-/// Implementations of [`DivEuclidean`](malachite_base::num::arithmetic::traits::DivEuclidean) and
-/// [`DivEuclideanAssign`](malachite_base::num::arithmetic::traits::DivEuclideanAssign), traits for
-/// finding the quotient of two numbers, rounded so that the remainder would be nonnegative.
+/// Implementations of [`DivEuclidean`] and [`DivEuclideanAssign`], traits for finding the quotient
+/// of two numbers, rounded so that the remainder would be nonnegative.
 pub mod div_euclidean;
-/// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
-/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for dividing
-/// two numbers when it's known that the division is exact.
+/// Implementations of [`DivExact`] and [`DivExactAssign`], traits for dividing two numbers when
+/// it's known that the division is exact.
 pub mod div_exact;
 /// Implementations of raits for simultaneously finding the quotient and remainder of two numbers,
 /// subject to various rounding rules.
@@ -103,680 +75,63 @@ pub mod div_exact;
 ///
 /// | rounding     | by value or reference           | by mutable reference (assignment)      |
 /// |--------------|---------------------------------|----------------------------------------|
-/// | towards $-\infty$ | [`DivMod`](malachite_base::num::arithmetic::traits::DivMod) | [`DivAssignMod`](malachite_base::num::arithmetic::traits::DivAssignMod) |
-/// | towards 0         | [`DivRem`](malachite_base::num::arithmetic::traits::DivRem) | [`DivAssignRem`](malachite_base::num::arithmetic::traits::DivAssignRem) |
-/// | towards $\infty$  | [`CeilingDivNegMod`](malachite_base::num::arithmetic::traits::CeilingDivNegMod) | [`CeilingDivAssignNegMod`](malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod) |
+/// | towards $-\infty$ | [`DivMod`] | [`DivAssignMod`] |
+/// | towards 0         | [`DivRem`] | [`DivAssignRem`] |
+/// | towards $\infty$  | [`CeilingDivNegMod`] | [`CeilingDivAssignNegMod`] |
 ///
-/// [`CeilingDivNegMod`](malachite_base::num::arithmetic::traits::CeilingDivNegMod) returns a
-/// remainder greater than or equal to zero. This allows the remainder to have an unsigned type, but
-/// modifies the usual relation $x = qy + r$ to $x = qy - r$.
-#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+/// [`CeilingDivNegMod`] returns a remainder greater than or equal to zero. This allows the
+/// remainder to have an unsigned type, but modifies the usual relation $x = qy + r$ to $x = qy -
+/// r$.
 pub mod div_mod;
-/// Implementations of [`DivModEuclidean`](malachite_base::num::arithmetic::traits::DivModEuclidean)
-/// and [`DivAssignModEuclidean`](malachite_base::num::arithmetic::traits::DivAssignModEuclidean),
-/// traits for simultaneously finding the quotient and remainder of two numbers, where the remainder
-/// is nonnegative.
+/// Implementations of [`DivModEuclidean`] and [`DivAssignModEuclidean`], traits for simultaneously
+/// finding the quotient and remainder of two numbers, where the remainder is nonnegative.
 pub mod div_mod_euclidean;
-/// Implementations of [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) and
-/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivRoundAssign), traits for dividing
-/// two numbers according to a specified
-/// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
+/// Implementations of [`DivRound`] and [`DivExactAssign`](DivRoundAssign), traits for dividing two
+/// numbers according to a specified [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
 pub mod div_round;
-/// Implementations of [`DivisibleBy`](malachite_base::num::arithmetic::traits::DivisibleBy), a
-/// trait for determining whether one number is divisible by another.
-pub mod divisible_by;
-/// Implementations of
-/// [`DivisibleByPowerOf2`](malachite_base::num::arithmetic::traits::DivisibleByPowerOf2), a trait
-/// for determining whether a number is divisible by $2^k$.
-pub mod divisible_by_power_of_2;
-/// Implementations of [`EqMod`](malachite_base::num::arithmetic::traits::EqMod), a trait for
-/// determining whether one number is equal by another modulo a third.
-pub mod eq_mod;
-/// Implementations of [`EqModPowerOf2`](malachite_base::num::arithmetic::traits::EqModPowerOf2), a
-/// trait for determining whether one number is equal to another modulo $2^k$.
-pub mod eq_mod_power_of_2;
-/// Implementations of [`Factorial`](malachite_base::num::arithmetic::traits::Factorial),
-/// [`DoubleFactorial`](malachite_base::num::arithmetic::traits::DoubleFactorial),
-/// [`Multifactorial`](malachite_base::num::arithmetic::traits::Multifactorial), and
-/// [`Subfactorial`](malachite_base::num::arithmetic::traits::Subfactorial).
-pub mod factorial;
-/// Implementations of
-/// [`FallingFactorial`](malachite_base::num::arithmetic::traits::FallingFactorial), a trait for
-/// computing the falling factorial of a number.
-pub mod falling_factorial;
-/// [`Fibonacci`](malachite_base::num::arithmetic::traits::Fibonacci) and
-/// [`LucasNumber`](malachite_base::num::arithmetic::traits::LucasNumber), traits for computing
-/// Fibonacci and Lucas numbers.
-pub mod fibonacci;
 #[cfg(feature = "float_helpers")]
 pub mod float;
-/// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
-/// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
-/// (greatest common divisor) of two numbers.
-pub mod gcd;
-/// Implementations of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a trait
-/// for determining whether a number is an integer power of 2.
+/// Implementations of [`IsPowerOf2`], a trait for determining whether a number is an integer power
+/// of 2.
 pub mod is_power_of_2;
-/// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
-/// determining whether a number is a unit of its ring.
+/// An implementation of [`IsUnit`], a trait for determining whether a number is a unit of its ring.
 pub mod is_unit;
-/// Implementations of [`LegendreSymbol`](malachite_base::num::arithmetic::traits::LegendreSymbol),
-/// [`JacobiSymbol`](malachite_base::num::arithmetic::traits::JacobiSymbol), and
-/// [`KroneckerSymbol`](malachite_base::num::arithmetic::traits::KroneckerSymbol), traits for
-/// computing the Legendre, Jacobi, and Kronecker symbols of two numbers.
-pub mod kronecker_symbol;
-/// A function for computing Landau's function.
-pub mod landau_function;
-/// Implementations of [`Lcm`](malachite_base::num::arithmetic::traits::Lcm),
-/// [`LcmAssign`](malachite_base::num::arithmetic::traits::LcmAssign), and
-/// [`CheckedLcm`](malachite_base::num::arithmetic::traits::CheckedLcm), traits for computing the
-/// LCM (least common multiple) of two numbers.
-pub mod lcm;
-/// Implementations of traits for taking the base-$b$ logarithm of a number.
-///
-/// The traits are [`FloorLogBase`](malachite_base::num::arithmetic::traits::FloorLogBase),
-/// [`CeilingLogBase`](malachite_base::num::arithmetic::traits::CeilingLogBase), and
-/// [`CheckedLogBase`](malachite_base::num::arithmetic::traits::CheckedLogBase).
-pub mod log_base;
-/// Implementations of traits for taking the base-2 logarithm of a number.
-///
-/// The traits are [`FloorLogBase2`](malachite_base::num::arithmetic::traits::FloorLogBase2),
-/// [`CeilingLogBase2`](malachite_base::num::arithmetic::traits::CeilingLogBase2), and
-/// [`CheckedLogBase2`](malachite_base::num::arithmetic::traits::CheckedLogBase2).
-pub mod log_base_2;
-/// Implementations of traits for taking the base-$2^k$ logarithm of a number.
-///
-/// The traits are
-/// [`FloorLogBasePowerOf2`](malachite_base::num::arithmetic::traits::FloorLogBasePowerOf2),
-/// [`CeilingLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CeilingLogBasePowerOf2), and
-/// [`CheckedLogBasePowerOf2`](malachite_base::num::arithmetic::traits::CheckedLogBasePowerOf2).
-pub mod log_base_power_of_2;
-/// Implementations of [`ModAbsSquared`](malachite_base::num::arithmetic::traits::ModAbsSquared) and
-/// [`ModAbsSquaredAssign`](malachite_base::num::arithmetic::traits::ModAbsSquaredAssign), traits
-/// for computing the squared absolute value of a number modulo another number.
-pub mod mod_abs_squared;
-/// Implementations of [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
-/// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), traits for adding two
-/// numbers modulo another number.
-pub mod mod_add;
-/// Implementations of [`ModAddMul`](malachite_base::num::arithmetic::traits::ModAddMul) and
-/// [`ModAddMulAssign`](malachite_base::num::arithmetic::traits::ModAddMulAssign), traits for adding
-/// a number and the product of two other numbers modulo another number.
-pub mod mod_add_mul;
-/// Implementations of [`ModAddMulShl`](malachite_base::num::arithmetic::traits::ModAddMulShl) and
-/// [`ModAddMulShlAssign`](malachite_base::num::arithmetic::traits::ModAddMulShlAssign), traits for
-/// adding a number and the product of two other numbers, shifted left, modulo another number.
-pub mod mod_add_mul_shl;
-/// Implementations of [`ModDiv`](malachite_base::num::arithmetic::traits::ModDiv), a trait for
-/// dividing two numbers modulo another number.
-pub mod mod_div;
-/// Implementations of [`ModDivList`](malachite_base::num::arithmetic::traits::ModDivList), a trait
-/// for finding all quotients of two numbers modulo another number.
-pub mod mod_div_list;
-/// Implementations of [`ModEuclidean`](malachite_base::num::arithmetic::traits::ModEuclidean) and
-/// [`ModEuclideanAssign`](malachite_base::num::arithmetic::traits::ModEuclideanAssign), traits for
-/// finding the remainder of two numbers, where the remainder is nonnegative.
-pub mod mod_euclidean;
-/// Implementations of [`ModInverse`](malachite_base::num::arithmetic::traits::ModInverse), a trait
-/// for finding the multiplicative inverse of a number modulo another number.
-pub mod mod_inverse;
-/// Implementations of [`ModIsReduced`](malachite_base::num::arithmetic::traits::ModIsReduced), a
-/// trait for checking whether a number is reduced modulo another number.
-pub mod mod_is_reduced;
-/// Implementations of traits for multiplying two numbers modulo another number.
-///
-/// The traits are [`ModMul`](malachite_base::num::arithmetic::traits::ModMul),
-/// [`ModMulAssign`](malachite_base::num::arithmetic::traits::ModMulAssign),
-/// [`ModMulPrecomputed`](malachite_base::num::arithmetic::traits::ModMulPrecomputed), and
-/// [`ModMulPrecomputedAssign`](malachite_base::num::arithmetic::traits::ModMulPrecomputedAssign).
-/// [`ModMulPrecomputed`](malachite_base::num::arithmetic::traits::ModMulPrecomputed) and
-/// [`ModMulPrecomputedAssign`](malachite_base::num::arithmetic::traits::ModMulPrecomputedAssign)
-/// are useful when having to make several multiplications modulo the same modulus.
-pub mod mod_mul;
-/// Implementations of [`ModNeg`](malachite_base::num::arithmetic::traits::ModNeg) and
-/// [`ModNegAssign`](malachite_base::num::arithmetic::traits::ModNegAssign), traits for negating a
-/// number modulo another number.
-pub mod mod_neg;
-/// Implementations of traits for finding the remainder of two numbers, subject to various rounding
-/// rules.
-///
-/// These are the traits:
-///
-/// | rounding          | by value or reference      | by mutable reference (assignment)      |
-/// |-------------------|----------------------------|----------------------------------------|
-/// | towards $-\infty$ | [`Mod`](malachite_base::num::arithmetic::traits::Mod)       | [`ModAssign`](malachite_base::num::arithmetic::traits::ModAssign)       |
-/// | towards $\infty$  | [`NegMod`](malachite_base::num::arithmetic::traits::NegMod) | [`NegModAssign`](malachite_base::num::arithmetic::traits::NegModAssign) |
-///
-/// [`NegMod`](malachite_base::num::arithmetic::traits::NegMod) returns a remainder greater than or
-/// equal to zero. This allows the remainder to have an unsigned type, but modifies the usual
-/// relation $x = qy + r$ to $x = qy - r$.
-///
-/// The [`Rem`](core::ops::Rem) trait in the standard library rounds towards 0.
-#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
-pub mod mod_op;
-/// Implementations of traits for raising a number to a power modulo another number.
-///
-/// The traits are [`ModPow`](malachite_base::num::arithmetic::traits::ModPow),
-/// [`ModPowAssign`](malachite_base::num::arithmetic::traits::ModPowAssign), and
-/// [`ModPowPrecomputed`](malachite_base::num::arithmetic::traits::ModPowPrecomputed).
-/// [`ModPowPrecomputed`](malachite_base::num::arithmetic::traits::ModPowPrecomputed) is useful when
-/// having to make several exponentiations modulo the same modulus.
-pub mod mod_pow;
-/// Implementations of traits for finding the remainder of a number divided by $2^k$, subject to
-/// various rounding rules.
-///
-/// These are the traits:
-///
-/// | rounding | by value or reference | by mutable reference (assignment) |
-/// |----------|-----------------------|-----------------------------------|
-/// | towards $-\infty$ | [`ModPowerOf2`](malachite_base::num::arithmetic::traits::ModPowerOf2) | [`ModPowerOf2Assign`](malachite_base::num::arithmetic::traits::ModPowerOf2Assign)       |
-/// | towards 0 | [`RemPowerOf2`](malachite_base::num::arithmetic::traits::RemPowerOf2) | [`RemPowerOf2Assign`](malachite_base::num::arithmetic::traits::RemPowerOf2Assign)       |
-/// | towards $\infty$  | [`NegModPowerOf2`](malachite_base::num::arithmetic::traits::NegModPowerOf2) | [`NegModPowerOf2Assign`](malachite_base::num::arithmetic::traits::NegModPowerOf2Assign) |
-///
-/// [`NegModPowerOf2`](malachite_base::num::arithmetic::traits::NegModPowerOf2) returns a remainder
-/// greater than or equal to zero. This allows the remainder to have an unsigned type, but modifies
-/// the usual relation $x = q2^k + r$ to $x = q2^k - r$.
-#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
-pub mod mod_power_of_2;
-/// Implementations of
-/// [`ModPowerOf2AbsSquared`](malachite_base::num::arithmetic::traits::ModPowerOf2AbsSquared) and
-/// [`ModPowerOf2AbsSquaredAssign`](
-/// malachite_base::num::arithmetic::traits::ModPowerOf2AbsSquaredAssign), traits for computing the
-/// squared absolute value of a number modulo $2^k$.
-pub mod mod_power_of_2_abs_squared;
-/// Implementations of [`ModPowerOf2Add`](malachite_base::num::arithmetic::traits::ModPowerOf2Add)
-/// and [`ModPowerOf2AddAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign),
-/// traits for adding two numbers modulo $2^k$.
-pub mod mod_power_of_2_add;
-/// Implementations of
-/// [`ModPowerOf2AddMul`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMul) and
-/// [`ModPowerOf2AddMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMulAssign),
-/// traits for adding a number and the product of two other numbers modulo $2^k$.
-pub mod mod_power_of_2_add_mul;
-/// Implementations of
-/// [`ModPowerOf2AddMulShl`](malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShl) and
-/// [`ModPowerOf2AddMulShlAssign`](
-/// malachite_base::num::arithmetic::traits::ModPowerOf2AddMulShlAssign), traits for adding a number
-/// and the product of two other numbers, shifted left, modulo $2^k$.
-pub mod mod_power_of_2_add_mul_shl;
-/// Implementations of [`ModPowerOf2Div`](malachite_base::num::arithmetic::traits::ModPowerOf2Div),
-/// a trait for dividing two numbers modulo $2^k$.
-pub mod mod_power_of_2_div;
-/// Implementations of
-/// [`ModPowerOf2Inverse`](malachite_base::num::arithmetic::traits::ModPowerOf2Inverse), a trait for
-/// finding the multiplicative inverse of a number modulo $2^k$.
-pub mod mod_power_of_2_inverse;
-/// Implementations of
-/// [`ModPowerOf2IsReduced`](malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced), a trait
-/// for checking whether a number is reduced modulo $2^k$.
-pub mod mod_power_of_2_is_reduced;
-/// Implementations of [`ModPowerOf2Mul`](malachite_base::num::arithmetic::traits::ModPowerOf2Mul)
-/// and [`ModPowerOf2MulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign),
-/// traits for multiplying two numbers modulo $2^k$.
-pub mod mod_power_of_2_mul;
-/// Implementations of [`ModPowerOf2Neg`](malachite_base::num::arithmetic::traits::ModPowerOf2Neg)
-/// and [`ModPowerOf2NegAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign),
-/// traits for negating a number modulo $2^k$.
-pub mod mod_power_of_2_neg;
-/// Implementations of [`ModPowerOf2Pow`](malachite_base::num::arithmetic::traits::ModPowerOf2Pow)
-/// and [`ModPowerOf2PowAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign),
-/// traits for raising a number to a power modulo $2^k$.
-pub mod mod_power_of_2_pow;
-/// Implementations of
-/// [`ModPowerOf2Product`](malachite_base::num::arithmetic::traits::ModPowerOf2Product), a trait for
-/// multiplying together the numbers in an iterator modulo $2^k$.
-pub mod mod_power_of_2_product;
-/// Implementations of [`ModPowerOf2Shl`](malachite_base::num::arithmetic::traits::ModPowerOf2Shl)
-/// and [`ModPowerOf2ShlAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign),
-/// traits for left-shifting a number modulo $2^k$.
-///
-/// # mod_power_of_2_shl
-/// ```
-/// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(Natural::from(123u32).mod_power_of_2_shl(5u16, 8), 96);
-/// assert_eq!(Natural::from(123u32).mod_power_of_2_shl(100u64, 80), 0);
-/// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shl(5u16, 8), 96);
-/// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shl(100u64, 80), 0);
-///
-/// assert_eq!(Natural::from(123u32).mod_power_of_2_shl(5i16, 8), 96);
-/// assert_eq!(Natural::from(123u32).mod_power_of_2_shl(100i64, 80), 0);
-/// assert_eq!(Natural::from(123u32).mod_power_of_2_shl(-2i8, 8), 30);
-/// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shl(5i16, 8), 96);
-/// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shl(100i64, 80), 0);
-/// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shl(-2i8, 8), 30);
-/// ```
-///
-/// # mod_power_of_2_shl_assign
-/// ```
-/// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut n = Natural::from(123u32);
-/// n.mod_power_of_2_shl_assign(5u16, 8);
-/// assert_eq!(n, 96);
-///
-/// let mut n = Natural::from(123u32);
-/// n.mod_power_of_2_shl_assign(100u64, 80);
-/// assert_eq!(n, 0);
-///
-/// let mut n = Natural::from(123u32);
-/// n.mod_power_of_2_shl_assign(5i16, 8);
-/// assert_eq!(n, 96);
-///
-/// let mut n = Natural::from(123u32);
-/// n.mod_power_of_2_shl_assign(100i64, 80);
-/// assert_eq!(n, 0);
-///
-/// let mut n = Natural::from(123u32);
-/// n.mod_power_of_2_shl_assign(-2i8, 8);
-/// assert_eq!(n, 30);
-/// ```
-pub mod mod_power_of_2_shl;
-/// Implementations of [`ModPowerOf2Shr`](malachite_base::num::arithmetic::traits::ModPowerOf2Shr)
-/// and [`ModPowerOf2ShrAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2ShrAssign),
-/// traits for right-shifting a number modulo $2^k$.
-///
-/// # mod_power_of_2_shr
-/// ```
-/// use malachite_base::num::arithmetic::traits::ModPowerOf2Shr;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(Natural::from(123u32).mod_power_of_2_shr(-5i16, 8), 96);
-/// assert_eq!(Natural::from(123u32).mod_power_of_2_shr(-100i64, 80), 0);
-/// assert_eq!(Natural::from(123u32).mod_power_of_2_shr(2i8, 8), 30);
-/// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shr(-5i16, 8), 96);
-/// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shr(-100i64, 80), 0);
-/// assert_eq!((&Natural::from(123u32)).mod_power_of_2_shr(2i8, 8), 30);
-/// ```
-///
-/// # mod_power_of_2_shr_assign
-/// ```
-/// use malachite_base::num::arithmetic::traits::ModPowerOf2ShrAssign;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut n = Natural::from(123u32);
-/// n.mod_power_of_2_shr_assign(-5i16, 8);
-/// assert_eq!(n, 96);
-///
-/// let mut n = Natural::from(123u32);
-/// n.mod_power_of_2_shr_assign(-100i64, 80);
-/// assert_eq!(n, 0);
-///
-/// let mut n = Natural::from(123u32);
-/// n.mod_power_of_2_shr_assign(2i8, 8);
-/// assert_eq!(n, 30);
-/// ```
-pub mod mod_power_of_2_shr;
-/// An implementation of
-/// [`ModPowerOf2Sqrt`](malachite_base::num::arithmetic::traits::ModPowerOf2Sqrt), a trait for
-/// finding the least square root of a number modulo $2^k$.
-///
-/// # mod_power_of_2_sqrt
-/// ```
-/// use malachite_base::num::arithmetic::traits::ModPowerOf2Sqrt;
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// // The roots of 17 modulo 32 are 7, 9, 23, and 25.
-/// assert_eq!(
-///     Natural::from(17u32).mod_power_of_2_sqrt(5),
-///     Some(Natural::from(7u32))
-/// );
-/// assert_eq!(
-///     (&Natural::from(17u32)).mod_power_of_2_sqrt(64),
-///     Some(Natural::from(405959429219100393u64))
-/// );
-/// assert_eq!(
-///     Natural::from(17u32 << 20).mod_power_of_2_sqrt(64),
-///     Some(Natural::from(2195515552539648u64))
-/// );
-/// // 3 is not 1 mod 8, and 8 = 2 ^ 3 has an odd power of 2.
-/// assert_eq!(Natural::from(3u32).mod_power_of_2_sqrt(4), None);
-/// assert_eq!(Natural::from(8u32).mod_power_of_2_sqrt(4), None);
-/// assert_eq!(Natural::ZERO.mod_power_of_2_sqrt(10), Some(Natural::ZERO));
-/// ```
-pub mod mod_power_of_2_sqrt;
-/// Implementations of
-/// `ModPowerOf2Square`](malachite_base::num::arithmetic::traits::ModPowerOf2Square) and
-/// [`ModPowerOf2SquareAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign),
-/// traits for squaring a number modulo $2^k$.
-pub mod mod_power_of_2_square;
-/// Implementations of [`ModPowerOf2Sub`](malachite_base::num::arithmetic::traits::ModPowerOf2Sub)
-/// and [`ModPowerOf2SubAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign),
-/// traits for subtracting one number by another modulo $2^k$.
-pub mod mod_power_of_2_sub;
-/// Implementations of
-/// [`ModPowerOf2SubMul`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMul) and
-/// [`ModPowerOf2SubMulAssign`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMulAssign),
-/// traits for subtracting the product of two numbers from a number modulo $2^k$.
-pub mod mod_power_of_2_sub_mul;
-/// Implementations of
-/// [`ModPowerOf2SubMulShl`](malachite_base::num::arithmetic::traits::ModPowerOf2SubMulShl) and
-/// [`ModPowerOf2SubMulShlAssign`](
-/// malachite_base::num::arithmetic::traits::ModPowerOf2SubMulShlAssign), traits for subtracting the
-/// product of two numbers, shifted left, from a number modulo $2^k$.
-pub mod mod_power_of_2_sub_mul_shl;
-/// Implementations of [`ModPowerOf2Sum`](malachite_base::num::arithmetic::traits::ModPowerOf2Sum),
-/// a trait for adding up the numbers in an iterator modulo $2^k$.
-pub mod mod_power_of_2_sum;
-/// Implementations of [`ModProduct`](malachite_base::num::arithmetic::traits::ModProduct), a trait
-/// for multiplying together the numbers in an iterator modulo another number.
-pub mod mod_product;
-/// Implementations of [`ModShl`](malachite_base::num::arithmetic::traits::ModShl) and
-/// [`ModShlAssign`](malachite_base::num::arithmetic::traits::ModShlAssign), traits for
-/// left-shifting a number modulo another number.
-///
-/// # mod_shl
-/// ```
-/// use core::str::FromStr;
-/// use malachite_base::num::arithmetic::traits::ModShl;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(Natural::from(8u32).mod_shl(2u16, Natural::from(10u32)), 2);
-/// assert_eq!(
-///     Natural::from(123456u32).mod_shl(100u64, Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// assert_eq!(Natural::from(8u32).mod_shl(2u16, &Natural::from(10u32)), 2);
-/// assert_eq!(
-///     Natural::from(123456u32).mod_shl(100u64, &Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// assert_eq!(
-///     (&Natural::from(8u32)).mod_shl(2u16, Natural::from(10u32)),
-///     2
-/// );
-/// assert_eq!(
-///     (&Natural::from(123456u32))
-///         .mod_shl(100u64, Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// assert_eq!(
-///     (&Natural::from(8u32)).mod_shl(2u16, &Natural::from(10u32)),
-///     2
-/// );
-/// assert_eq!(
-///     (&Natural::from(123456u32))
-///         .mod_shl(100u64, &Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-///
-/// assert_eq!(Natural::from(8u32).mod_shl(2i8, Natural::from(10u32)), 2);
-/// assert_eq!(
-///     Natural::from(5u32).mod_shl(-100i32, Natural::from(10u32)),
-///     0
-/// );
-/// assert_eq!(
-///     Natural::from(123456u32).mod_shl(100i64, Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// assert_eq!(Natural::from(8u32).mod_shl(2i8, &Natural::from(10u32)), 2);
-/// assert_eq!(
-///     Natural::from(5u32).mod_shl(-100i32, &Natural::from(10u32)),
-///     0
-/// );
-/// assert_eq!(
-///     Natural::from(123456u32).mod_shl(100i64, &Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// assert_eq!((&Natural::from(8u32)).mod_shl(2i8, Natural::from(10u32)), 2);
-/// assert_eq!(
-///     (&Natural::from(5u32)).mod_shl(-100i32, Natural::from(10u32)),
-///     0
-/// );
-/// assert_eq!(
-///     (&Natural::from(123456u32))
-///         .mod_shl(100i64, Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// assert_eq!(
-///     (&Natural::from(8u32)).mod_shl(2i8, &Natural::from(10u32)),
-///     2
-/// );
-/// assert_eq!(
-///     (&Natural::from(5u32)).mod_shl(-100i32, &Natural::from(10u32)),
-///     0
-/// );
-/// assert_eq!(
-///     (&Natural::from(123456u32))
-///         .mod_shl(100i64, &Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// ```
-///
-/// # mod_shl_assign
-/// ```
-/// use core::str::FromStr;
-/// use malachite_base::num::arithmetic::traits::ModShlAssign;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::from(8u32);
-/// x.mod_shl_assign(2u16, Natural::from(10u32));
-/// assert_eq!(x, 2);
-///
-/// let mut x = Natural::from(123456u32);
-/// x.mod_shl_assign(100u64, Natural::from_str("12345678987654321").unwrap());
-/// assert_eq!(x, 7436663564915145u64);
-///
-/// let mut x = Natural::from(8u32);
-/// x.mod_shl_assign(2u16, &Natural::from(10u32));
-/// assert_eq!(x, 2);
-///
-/// let mut x = Natural::from(123456u32);
-/// x.mod_shl_assign(100u64, &Natural::from_str("12345678987654321").unwrap());
-/// assert_eq!(x, 7436663564915145u64);
-///
-/// let mut x = Natural::from(8u32);
-/// x.mod_shl_assign(2i8, Natural::from(10u32));
-/// assert_eq!(x, 2);
-///
-/// let mut x = Natural::from(5u32);
-/// x.mod_shl_assign(-100i32, Natural::from(10u32));
-/// assert_eq!(x, 0);
-///
-/// let mut x = Natural::from(123456u32);
-/// x.mod_shl_assign(100i64, Natural::from_str("12345678987654321").unwrap());
-/// assert_eq!(x, 7436663564915145u64);
-///
-/// let mut x = Natural::from(8u32);
-/// x.mod_shl_assign(2i8, &Natural::from(10u32));
-/// assert_eq!(x, 2);
-///
-/// let mut x = Natural::from(5u32);
-/// x.mod_shl_assign(-100i32, &Natural::from(10u32));
-/// assert_eq!(x, 0);
-///
-/// let mut x = Natural::from(123456u32);
-/// x.mod_shl_assign(100i64, &Natural::from_str("12345678987654321").unwrap());
-/// assert_eq!(x, 7436663564915145u64);
-/// ```
-pub mod mod_shl;
-/// Implementations of [`ModShr`](malachite_base::num::arithmetic::traits::ModShr) and
-/// [`ModShrAssign`](malachite_base::num::arithmetic::traits::ModShrAssign), traits for
-/// right-shifting a number modulo another number.
-///
-/// # mod_shr
-/// ```
-/// use core::str::FromStr;
-/// use malachite_base::num::arithmetic::traits::ModShr;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(Natural::from(8u32).mod_shr(-2i8, Natural::from(10u32)), 2);
-/// assert_eq!(Natural::from(5u32).mod_shr(100i32, Natural::from(10u32)), 0);
-/// assert_eq!(
-///     Natural::from(123456u32).mod_shr(-100i64, Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// assert_eq!(Natural::from(8u32).mod_shr(-2i8, &Natural::from(10u32)), 2);
-/// assert_eq!(
-///     Natural::from(5u32).mod_shr(100i32, &Natural::from(10u32)),
-///     0
-/// );
-/// assert_eq!(
-///     Natural::from(123456u32).mod_shr(-100i64, &Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// assert_eq!(
-///     (&Natural::from(8u32)).mod_shr(-2i8, Natural::from(10u32)),
-///     2
-/// );
-/// assert_eq!(
-///     (&Natural::from(5u32)).mod_shr(100i32, Natural::from(10u32)),
-///     0
-/// );
-/// assert_eq!(
-///     (&Natural::from(123456u32))
-///         .mod_shr(-100i64, Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// assert_eq!(
-///     (&Natural::from(8u32)).mod_shr(-2i8, &Natural::from(10u32)),
-///     2
-/// );
-/// assert_eq!(
-///     (&Natural::from(5u32)).mod_shr(100i32, &Natural::from(10u32)),
-///     0
-/// );
-/// assert_eq!(
-///     (&Natural::from(123456u32))
-///         .mod_shr(-100i64, &Natural::from_str("12345678987654321").unwrap()),
-///     7436663564915145u64
-/// );
-/// ```
-///
-/// # mod_shr_assign
-/// ```
-/// use core::str::FromStr;
-/// use malachite_base::num::arithmetic::traits::ModShrAssign;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::from(8u32);
-/// x.mod_shr_assign(-2i8, Natural::from(10u32));
-/// assert_eq!(x, 2);
-///
-/// let mut x = Natural::from(5u32);
-/// x.mod_shr_assign(100i32, Natural::from(10u32));
-/// assert_eq!(x, 0);
-///
-/// let mut x = Natural::from(123456u32);
-/// x.mod_shr_assign(-100i64, Natural::from_str("12345678987654321").unwrap());
-/// assert_eq!(x, 7436663564915145u64);
-///
-/// let mut x = Natural::from(8u32);
-/// x.mod_shr_assign(-2i8, &Natural::from(10u32));
-/// assert_eq!(x, 2);
-///
-/// let mut x = Natural::from(5u32);
-/// x.mod_shr_assign(100i32, &Natural::from(10u32));
-/// assert_eq!(x, 0);
-///
-/// let mut x = Natural::from(123456u32);
-/// x.mod_shr_assign(-100i64, &Natural::from_str("12345678987654321").unwrap());
-/// assert_eq!(x, 7436663564915145u64);
-/// ```
-pub mod mod_shr;
-/// Implementations of [`ModSqrt`](malachite_base::num::arithmetic::traits::ModSqrt), a trait for
-/// computing a square root of a number modulo another number.
-pub mod mod_sqrt;
-/// Implementations of traits for squaring a number modulo another number.
-///
-/// The traits are [`ModSquare`](malachite_base::num::arithmetic::traits::ModSquare),
-/// [`ModSquareAssign`](malachite_base::num::arithmetic::traits::ModSquareAssign), and
-/// [`ModSquarePrecomputed`](malachite_base::num::arithmetic::traits::ModSquarePrecomputed).
-/// [`ModSquarePrecomputed`](malachite_base::num::arithmetic::traits::ModSquarePrecomputed) is
-/// useful when having to make several squarings modulo the same modulus.
-pub mod mod_square;
-/// Implementations of [`ModSub`](malachite_base::num::arithmetic::traits::ModSub) and
-/// [`ModSubAssign`](malachite_base::num::arithmetic::traits::ModSubAssign), traits for subtracting
-/// two numbers modulo another number.
-pub mod mod_sub;
-/// Implementations of [`ModSubMul`](malachite_base::num::arithmetic::traits::ModSubMul) and
-/// [`ModSubMulAssign`](malachite_base::num::arithmetic::traits::ModSubMulAssign), traits for
-/// subtracting the product of two numbers from a number modulo another number.
-pub mod mod_sub_mul;
-/// Implementations of [`ModSubMulShl`](malachite_base::num::arithmetic::traits::ModSubMulShl) and
-/// [`ModSubMulShlAssign`](malachite_base::num::arithmetic::traits::ModSubMulShlAssign), traits for
-/// subtracting the product of two numbers, shifted left, from a number modulo another number.
-pub mod mod_sub_mul_shl;
-/// Implementations of [`ModSum`](malachite_base::num::arithmetic::traits::ModSum), a trait for
-/// adding up the numbers in an iterator modulo another number.
-pub mod mod_sum;
 /// Multiplication of [`Natural`](super::Natural)s.
 pub mod mul;
 pub mod mul_add_mul;
-/// Implementations of [`MulShrRound`](malachite_base::num::arithmetic::traits::MulShrRound) and
-/// [`MulShrRoundAssign`](malachite_base::num::arithmetic::traits::MulShrRoundAssign), traits for
-/// multiplying two numbers and right-shifting the product with a specified rounding mode. When most
-/// of the product is discarded, a short product avoids computing the rest.
+/// Implementations of [`MulShrRound`] and [`MulShrRoundAssign`], traits for multiplying two numbers
+/// and right-shifting the product with a specified rounding mode. When most of the product is
+/// discarded, a short product avoids computing the rest.
 pub mod mul_shr_round;
 pub mod mul_sub_mul;
-crate_test_mod! {
-    /// `MultiCrt`, a precomputed context for combining many congruences by the Chinese remainder
-    /// theorem, and the home of the public one-shot
-    /// [`Natural::multi_crt`](super::Natural::multi_crt). The context itself is internal machinery
-    /// for future multimodular algorithms, public only under `test_build`.
-    multi_crt
-}
 /// Negation of a [`Natural`](super::Natural), returning an [`Integer`](crate::integer::Integer).
 pub mod neg;
-/// Implementations of [`NextPowerOf2`](malachite_base::num::arithmetic::traits::NextPowerOf2) and
-/// [`NextPowerOf2Assign`](malachite_base::num::arithmetic::traits::NextPowerOf2Assign), traits for
-/// getting the next-highest power of 2.
+/// Implementations of [`NextPowerOf2`] and [`NextPowerOf2Assign`], traits for getting the
+/// next-highest power of 2.
 pub mod next_power_of_2;
-/// Implementations of [`Parity`](malachite_base::num::arithmetic::traits::Parity), a trait for
-/// determining whether a number is even or odd.
+/// Implementations of [`Parity`], a trait for determining whether a number is even or odd.
 pub mod parity;
-/// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
-/// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), traits for raising a number
-/// to a power.
+/// Implementations of [`Pow`] and [`PowAssign`], traits for raising a number to a power.
 pub mod pow;
-/// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
-/// computing a power of 2.
+/// Implementations of [`PowerOf2`], a trait for computing a power of 2.
 pub mod power_of_2;
-/// An implementation of [`Primorial`](malachite_base::num::arithmetic::traits::Primorial), a trait
-/// for computing the primorial of a number.
-pub mod primorial;
-/// The kernel of rational reconstruction, adopted from FLINT, used by malachite-q's
-/// `Rational::reconstruct` and by the integer matrix solvers.
-#[doc(hidden)]
-pub mod reconstruct;
-/// Implementations of
-/// [`RisingFactorial`](malachite_base::num::arithmetic::traits::RisingFactorial), a trait for
-/// computing the rising factorial of a number.
-pub mod rising_factorial;
 /// Implementations of traits for taking the $n$th root of a number.
 ///
-/// The traits are [`FloorRoot`](malachite_base::num::arithmetic::traits::FloorRoot),
-/// [`FloorRootAssign`](malachite_base::num::arithmetic::traits::FloorRootAssign),
-/// [`CeilingRoot`](malachite_base::num::arithmetic::traits::CeilingRoot),
-/// [`CeilingRootAssign`](malachite_base::num::arithmetic::traits::CeilingRootAssign),
-/// [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot),
-/// [`RootRem`](malachite_base::num::arithmetic::traits::RootRem), and
-/// [`RootAssignRem`](malachite_base::num::arithmetic::traits::RootAssignRem).
+/// The traits are [`FloorRoot`], [`FloorRootAssign`], [`CeilingRoot`], [`CeilingRootAssign`],
+/// [`CheckedRoot`], [`RootRem`], and [`RootAssignRem`].
 pub mod root;
-/// Implementations of [`RoundToMultiple`](malachite_base::num::arithmetic::traits::RoundToMultiple)
-/// and [`RoundToMultipleAssign`](malachite_base::num::arithmetic::traits::RoundToMultipleAssign),
-/// traits for rounding a number to a multiple of another number.
+/// Implementations of [`RoundToMultiple`] and [`RoundToMultipleAssign`], traits for rounding a
+/// number to a multiple of another number.
 pub mod round_to_multiple;
-/// Implementations of
-/// [`RoundToMultipleOfPowerOf2`](malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2)
-/// and
-/// [`RoundToMultipleOfPowerOf2Assign`](malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign),
-/// traits for rounding a number to a multiple of a power of 2.
-#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+/// Implementations of [`RoundToMultipleOfPowerOf2`] and [`RoundToMultipleOfPowerOf2Assign`], traits
+/// for rounding a number to a multiple of a power of 2.
 pub mod round_to_multiple_of_power_of_2;
 pub mod saturating_mul_sub_mul;
-/// Implementations of [`SaturatingSub`](malachite_base::num::arithmetic::traits::SaturatingSub) and
-/// [`SaturatingSubAssign`](malachite_base::num::arithmetic::traits::SaturatingSubAssign), traits
-/// for subtracting two numbers and saturating at numeric bounds instead of overflowing.
+/// Implementations of [`SaturatingSub`] and [`SaturatingSubAssign`], traits for subtracting two
+/// numbers and saturating at numeric bounds instead of overflowing.
 pub mod saturating_sub;
-/// Implementations of
-/// [`SaturatingSubMul`](malachite_base::num::arithmetic::traits::SaturatingSubMul) and
-/// [`SaturatingSubMulAssign`](malachite_base::num::arithmetic::traits::SaturatingSubMulAssign),
-/// traits for subtracting a number by the product of two numbers and saturating at numeric bounds
-/// instead of overflowing.
+/// Implementations of [`SaturatingSubMul`] and [`SaturatingSubMulAssign`], traits for subtracting a
+/// number by the product of two numbers and saturating at numeric bounds instead of overflowing.
 pub mod saturating_sub_mul;
 /// Left-shifting a [`Natural`](super::Natural) (multiplying it by a power of 2).
 ///
@@ -845,9 +200,8 @@ pub mod saturating_sub_mul;
 /// assert_eq!(x, 1);
 /// ```
 pub mod shl;
-/// Implementations of [`ShlRound`](malachite_base::num::arithmetic::traits::ShlRound) and
-/// [`ShlRoundAssign`](malachite_base::num::arithmetic::traits::ShlRoundAssign), traits for
-/// multiplying a number by a power of 2 and rounding according to a specified
+/// Implementations of [`ShlRound`] and [`ShlRoundAssign`], traits for multiplying a number by a
+/// power of 2 and rounding according to a specified
 /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
 ///
 /// # shl_round
@@ -1099,9 +453,8 @@ pub mod shl_round;
 /// assert_eq!(x, 1);
 /// ```
 pub mod shr;
-/// Implementations of [`ShrRound`](malachite_base::num::arithmetic::traits::ShrRound) and
-/// [`ShrRoundAssign`](malachite_base::num::arithmetic::traits::ShrRoundAssign), traits for dividing
-/// a number by a power of 2 and rounding according to a specified
+/// Implementations of [`ShrRound`] and [`ShrRoundAssign`], traits for dividing a number by a power
+/// of 2 and rounding according to a specified
 /// [`RoundingMode`](malachite_base::rounding_modes::RoundingMode).
 ///
 /// # shr_round
@@ -1419,31 +772,21 @@ pub mod shr;
 /// assert_eq!(x, 1024);
 /// ```
 pub mod shr_round;
-/// Implementations of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for
-/// determining the sign of a number.
+/// Implementations of [`Sign`], a trait for determining the sign of a number.
 pub mod sign;
 /// Implementations of traits for taking the square root of a number.
 ///
-/// The traits are [`FloorSqrt`](malachite_base::num::arithmetic::traits::FloorSqrt),
-/// [`FloorSqrtAssign`](malachite_base::num::arithmetic::traits::FloorSqrtAssign),
-/// [`CeilingSqrt`](malachite_base::num::arithmetic::traits::CeilingSqrt),
-/// [`CeilingSqrtAssign`](malachite_base::num::arithmetic::traits::CeilingSqrtAssign),
-/// [`CheckedSqrt`](malachite_base::num::arithmetic::traits::CheckedSqrt),
-/// [`SqrtRem`](malachite_base::num::arithmetic::traits::SqrtRem), and
-/// [`SqrtAssignRem`](malachite_base::num::arithmetic::traits::SqrtAssignRem).
+/// The traits are [`FloorSqrt`], [`FloorSqrtAssign`], [`CeilingSqrt`], [`CeilingSqrtAssign`],
+/// [`CheckedSqrt`], [`SqrtRem`], and [`SqrtAssignRem`].
 pub mod sqrt;
-/// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
-/// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), traits for squaring a
-/// number.
+/// Implementations of [`Square`] and [`SquareAssign`], traits for squaring a number.
 pub mod square;
 /// Subtraction of [`Natural`](super::Natural)s.
 pub mod sub;
-/// Implementations of [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
-/// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign), traits for subtracting
-/// the product of two numbers from a number.
+/// Implementations of [`SubMul`] and [`SubMulAssign`], traits for subtracting the product of two
+/// numbers from a number.
 pub mod sub_mul;
-/// An implementation of
-/// [`WideningElementProduct`](malachite_base::num::arithmetic::traits::WideningElementProduct) for
+/// An implementation of [`WideningElementProduct`] for
 /// [`UnsignedVector`](malachite_base::unsigned_vector::UnsignedVector), the product of the elements
 /// as a [`Natural`](crate::natural::Natural).
 pub mod widening_element_product;

@@ -15,12 +15,11 @@ use crate::{
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use core::iter::Product;
-use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, NegAssign, PowerOf2, ShlRoundAssign, ShrRound,
-};
+use malachite_base::num::arithmetic::traits::{NegAssign, PowerOf2, ShlRoundAssign, ShrRound};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;

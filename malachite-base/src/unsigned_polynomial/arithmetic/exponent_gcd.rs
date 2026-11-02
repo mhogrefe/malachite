@@ -7,7 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::polynomial::{ExponentGcd, slice_exponent_gcd};
+#[cfg(doc)]
+use crate::polynomial::arithmetic::traits::ComposePowerOfX;
+use crate::polynomial::arithmetic::traits::ExponentGcd;
+use crate::polynomial::slice_exponent_gcd;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 
 impl<T: PrimitiveUnsigned> ExponentGcd for UnsignedPolynomial<T> {
@@ -19,9 +22,8 @@ impl<T: PrimitiveUnsigned> ExponentGcd for UnsignedPolynomial<T> {
     /// $$
     ///
     /// When the polynomial is not constant, this is the largest $k$ such that $p(x) = q(x^k)$ for
-    /// some polynomial $q$, and
-    /// [`compose_power_of_x`](crate::polynomial::ComposePowerOfX::compose_power_of_x) with $k$
-    /// recovers $p$ from $q$. A constant polynomial, including zero, gives 0.
+    /// some polynomial $q$, and [`compose_power_of_x`](ComposePowerOfX::compose_power_of_x) with
+    /// $k$ recovers $p$ from $q$. A constant polynomial, including zero, gives 0.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -34,7 +36,7 @@ impl<T: PrimitiveUnsigned> ExponentGcd for UnsignedPolynomial<T> {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::ExponentGcd;
+    /// use malachite_base::polynomial::arithmetic::traits::ExponentGcd;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// assert_eq!(

@@ -10,12 +10,13 @@ use crate::natural::InnerNatural::Small;
 use crate::natural::{Natural, WIDTH_MINUS_1, WIDTH_MINUS_2, WIDTH_MINUS_3};
 use crate::platform::{LIMB_WIDTH_USIZE, Limb, MAX_DIGITS_PER_LIMB};
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
+use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::from_string::{
     digit_from_display_byte, digit_from_display_byte_large,
 };
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, FromStringBase, WrappingFrom};
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::*;
 
 const LOG_WIDTH_MINUS_2: u64 = Limb::LOG_WIDTH - 2;

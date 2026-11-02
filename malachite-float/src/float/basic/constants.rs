@@ -10,15 +10,14 @@ use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{
-    IsPowerOf2, NegModPowerOf2, PowerOf2, RoundToMultipleOfPowerOf2,
-};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2, RoundToMultipleOfPowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeOne, NegativeZero, One,
     OneHalf, Two, Zero as ZeroTrait,
 };
 use malachite_base::num::logic::traits::{BitScan, LowMask};
+use malachite_base::num::modular::traits::NegModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;

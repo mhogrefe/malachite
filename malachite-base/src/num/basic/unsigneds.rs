@@ -7,29 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{
-    AbsDiff, AbsDiffAssign, BalancedMod, BalancedModPowerOf2, BellNumber, CeilingDivAssignNegMod,
-    CeilingDivNegMod, CeilingLogBase, CeilingLogBase2, CeilingLogBasePowerOf2, CheckedBellNumber,
-    CheckedDoubleFactorial, CheckedFactorial, CheckedFibonacci, CheckedLcm, CheckedLogBase,
-    CheckedLogBase2, CheckedLogBasePowerOf2, CheckedLucasNumber, CheckedMultifactorial,
-    CheckedNextPowerOf2, CheckedPrimorial, CheckedSubfactorial, CoprimeWith, DoubleFactorial,
-    ExtendedGcd, Factorial, Fibonacci, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, Gcd,
-    GcdAssign, Lcm, LcmAssign, LucasNumber, ModAbsSquared, ModAbsSquaredAssign, ModAdd,
-    ModAddAssign, ModAddMul, ModAddMulAssign, ModAddMulShl, ModAddMulShlAssign, ModDiv, ModInverse,
-    ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg,
-    ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2,
-    ModPowerOf2AbsSquared, ModPowerOf2AbsSquaredAssign, ModPowerOf2Add, ModPowerOf2AddAssign,
-    ModPowerOf2AddMul, ModPowerOf2AddMulAssign, ModPowerOf2AddMulShl, ModPowerOf2AddMulShlAssign,
-    ModPowerOf2Div, ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign,
-    ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Product,
-    ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Sqrt,
-    ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign,
-    ModPowerOf2SubMul, ModPowerOf2SubMulAssign, ModPowerOf2SubMulShl, ModPowerOf2SubMulShlAssign,
-    ModPowerOf2Sum, ModProduct, ModSquare, ModSquareAssign, ModSquarePrecomputed,
-    ModSquarePrecomputedAssign, ModSub, ModSubAssign, ModSubMul, ModSubMulAssign, ModSubMulShl,
-    ModSubMulShlAssign, ModSum, Multifactorial, NegMod, NegModAssign, NegModPowerOf2,
-    NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, Primorial, RootAssignRem, RootRem,
-    SqrtAssignRem, SqrtRem, Subfactorial, UnsignedAbs, XMulYToZZ, XXAddYYToZZ, XXDivModYToQR,
-    XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
+    AbsDiff, AbsDiffAssign, CeilingDivAssignNegMod, CeilingDivNegMod, CheckedNextPowerOf2,
+    NextPowerOf2, NextPowerOf2Assign, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, UnsignedAbs,
+    XMulYToZZ, XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ,
+    XXXXAddYYYYToZZZZ,
 };
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
@@ -38,9 +19,35 @@ use crate::num::conversion::traits::{
     Digits, FromOtherTypeSlice, IntegerMantissaAndExponent, PowerOf2DigitIterable, PowerOf2Digits,
     SciMantissaAndExponent, VecFromOtherType, VecFromOtherTypeSlice,
 };
+use crate::num::exponential::traits::{
+    CeilingLogBase, CeilingLogBase2, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
+    CheckedLogBasePowerOf2, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2,
+};
 use crate::num::factorization::primes::{PrimesIterator, PrimesLessThanIterator};
 use crate::num::factorization::traits::Primes;
 use crate::num::logic::traits::{BitBlockAccess, HammingDistance};
+use crate::num::modular::traits::{
+    BalancedMod, BalancedModPowerOf2, ModAbsSquared, ModAbsSquaredAssign, ModAdd, ModAddAssign,
+    ModAddMul, ModAddMulAssign, ModAddMulShl, ModAddMulShlAssign, ModDiv, ModInverse, ModIsReduced,
+    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow,
+    ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2AbsSquared,
+    ModPowerOf2AbsSquaredAssign, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2AddMul,
+    ModPowerOf2AddMulAssign, ModPowerOf2AddMulShl, ModPowerOf2AddMulShlAssign, ModPowerOf2Div,
+    ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg,
+    ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Product, ModPowerOf2Shl,
+    ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Sqrt, ModPowerOf2Square,
+    ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModPowerOf2SubMul,
+    ModPowerOf2SubMulAssign, ModPowerOf2SubMulShl, ModPowerOf2SubMulShlAssign, ModPowerOf2Sum,
+    ModProduct, ModSquare, ModSquareAssign, ModSquarePrecomputed, ModSquarePrecomputedAssign,
+    ModSub, ModSubAssign, ModSubMul, ModSubMulAssign, ModSubMulShl, ModSubMulShlAssign, ModSum,
+    NegMod, NegModAssign, NegModPowerOf2, NegModPowerOf2Assign,
+};
+use crate::num::number_theory::traits::{
+    BellNumber, CheckedBellNumber, CheckedDoubleFactorial, CheckedFactorial, CheckedFibonacci,
+    CheckedLcm, CheckedLucasNumber, CheckedMultifactorial, CheckedPrimorial, CheckedSubfactorial,
+    CoprimeWith, DoubleFactorial, ExtendedGcd, Factorial, Fibonacci, Gcd, GcdAssign, Lcm,
+    LcmAssign, LucasNumber, Multifactorial, Primorial, Subfactorial,
+};
 
 /// Defines functions on primitive unsigned integer types: uxx and usize.
 pub trait PrimitiveUnsigned:

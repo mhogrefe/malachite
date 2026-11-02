@@ -68,9 +68,9 @@ pub mod div_i;
 /// [`DivAssignRem`](malachite_base::num::arithmetic::traits::DivAssignRem), traits for dividing two
 /// numbers and returning the quotient and remainder.
 pub mod div_rem;
-/// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
-/// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
-/// (greatest common divisor) of two numbers.
+/// Implementations of [`Gcd`](malachite_base::num::number_theory::traits::Gcd) and
+/// [`GcdAssign`](malachite_base::num::number_theory::traits::GcdAssign), traits for computing the
+/// GCD (greatest common divisor) of two numbers.
 pub mod gcd;
 /// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
 /// determining whether a number is a unit of its ring. Implementations of

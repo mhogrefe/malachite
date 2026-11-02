@@ -11,11 +11,10 @@ use crate::named::Named;
 use crate::num::arithmetic::traits::{
     Abs, AbsAssign, AbsSquared, AbsSquaredAssign, AddMul, AddMulAssign, Average, AverageAssign,
     CanonicalUnitIPow, CanonicalizeGaussianUnit, CanonicalizeGaussianUnitAssign, CanonicalizeUnit,
-    CanonicalizeUnitAssign, Ceiling, CeilingAssign, CeilingLogBase2, CeilingLogBasePowerOf2,
-    CheckedLogBase2, CheckedLogBasePowerOf2, Conjugate, ConjugateAssign, Floor, FloorAssign,
-    FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, IsUnit, NegAssign, NextPowerOf2,
-    NextPowerOf2Assign, Pow, PowAssign, PowerOf2, Reciprocal, ReciprocalAssign, Sign, Sqrt,
-    SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
+    CanonicalizeUnitAssign, Ceiling, CeilingAssign, Conjugate, ConjugateAssign, Floor, FloorAssign,
+    IsPowerOf2, IsUnit, NegAssign, NextPowerOf2, NextPowerOf2Assign, Pow, PowAssign, PowerOf2,
+    Reciprocal, ReciprocalAssign, Sign, Sqrt, SqrtAssign, Square, SquareAssign, SubMul,
+    SubMulAssign,
 };
 use crate::num::basic::traits::{
     CatalansConstant, ChampernowneConstant, CopelandErdosConstant, DottieNumber, EulersConstant,
@@ -30,6 +29,10 @@ use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
     ConvertibleFrom, ExactInto, IntegerMantissaAndExponent, IsGaussianInteger, IsInteger, IsReal,
     RawMantissaAndExponent, RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
+};
+use crate::num::exponential::traits::{
+    CeilingLogBase2, CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2,
+    FloorLogBase2, FloorLogBasePowerOf2,
 };
 use crate::num::float::FmtRyuString;
 use crate::num::logic::traits::{BitAccess, LowMask, SignificantBits, TrailingZeros};

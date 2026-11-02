@@ -197,10 +197,18 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`Natural`]s without repetition.
 pub mod exhaustive;
+/// Integer logarithms of [`Natural`]s.
+pub mod exponential;
 /// Traits for generating primes, primality testing, and factorization (TODO!)
 pub mod factorization;
 /// Traits for logic and bit manipulation.
 pub mod logic;
+/// Modular arithmetic on [`Natural`]s: operations on residues modulo $m$ and $2^k$, reduction,
+/// divisibility, and the Chinese remainder theorem.
+pub mod modular;
+/// Number-theoretic functions of [`Natural`]s: GCDs, Kronecker symbols, and combinatorial
+/// sequences.
+pub mod number_theory;
 #[cfg(feature = "random")]
 /// Iterators that generate [`Natural`]s randomly.
 pub mod random;

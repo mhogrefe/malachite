@@ -7,9 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural_polynomial::NaturalPolynomial;
-use malachite_base::polynomial::{
-    DeflatePowerOfX, DeflatePowerOfXAssign, slice_deflate_power_of_x, vec_deflate_power_of_x,
-};
+use malachite_base::polynomial::arithmetic::traits::{DeflatePowerOfX, DeflatePowerOfXAssign};
+use malachite_base::polynomial::{slice_deflate_power_of_x, vec_deflate_power_of_x};
 
 impl DeflatePowerOfX for NaturalPolynomial {
     type Output = Self;
@@ -37,7 +36,7 @@ impl DeflatePowerOfX for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DeflatePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DeflatePowerOfX;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("x^6+2*x^3+1").unwrap();
@@ -80,7 +79,7 @@ impl DeflatePowerOfX for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DeflatePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DeflatePowerOfX;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("x^6+2*x^3+1").unwrap();
@@ -121,7 +120,7 @@ impl DeflatePowerOfXAssign for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::DeflatePowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::DeflatePowerOfXAssign;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let mut p = NaturalPolynomial::from_str("x^6+2*x^3+1").unwrap();

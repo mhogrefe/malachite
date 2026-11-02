@@ -33,9 +33,6 @@ use crate::integer_vector::exhaustive::{
 };
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place};
-use crate::natural::arithmetic::binomial_coefficient::{
-    BIN_GOETGHELUCK_THRESHOLD, BIN_UIUI_RECURSIVE_SMALLDC,
-};
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -43,14 +40,6 @@ use crate::natural::arithmetic::div_mod::{
     limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len, limbs_invert_limb,
     limbs_two_limb_inverse_helper,
 };
-use crate::natural::arithmetic::eq_mod::{
-    limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref, limbs_eq_mod_limb_ref_ref,
-    limbs_eq_mod_ref_ref_ref,
-};
-use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
-use crate::natural::arithmetic::mod_mul::limbs_precompute_mod_mul_two_limbs;
-use crate::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
-use crate::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
 use crate::natural::arithmetic::mul::limb::{
     limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
 };
@@ -85,6 +74,17 @@ use crate::natural::exhaustive::{
     exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::modular::eq_mod::{
+    limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref, limbs_eq_mod_limb_ref_ref,
+    limbs_eq_mod_ref_ref_ref,
+};
+use crate::natural::modular::mod_mul::limbs_precompute_mod_mul_two_limbs;
+use crate::natural::modular::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
+use crate::natural::modular::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
+use crate::natural::number_theory::binomial_coefficient::{
+    BIN_GOETGHELUCK_THRESHOLD, BIN_UIUI_RECURSIVE_SMALLDC,
+};
+use crate::natural::number_theory::gcd::half_gcd::HalfGcdMatrix1;
 use crate::natural_matrix::NaturalMatrix;
 use crate::natural_matrix::exhaustive::{
     exhaustive_natural_matrices, exhaustive_natural_matrices_with_dimensions,
@@ -123,8 +123,8 @@ use crate::test_util::generators::{
     factors_of_limb_max, integer_vecs_mul_is_tiny_1, integer_vecs_mul_is_tiny_2,
     limbs_odd_factorial_valid, matrix_positions, natural_matrix_positions,
 };
-use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
-use crate::test_util::natural_matrix::arithmetic::mod_solve::natural_matrix_mod_solve_naive;
+use crate::test_util::natural::number_theory::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
+use crate::test_util::natural_matrix::linear_algebra::mod_solve::natural_matrix_mod_solve_naive;
 use core::str::FromStr;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::{ExhaustiveBools, exhaustive_bools};
@@ -134,8 +134,7 @@ use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
-    AddMul, ArithmeticCheckedShl, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
-    EqModPowerOf2, Height, HeightRef, ModMul, ModPowerOf2Mul, Parity, PowerOf2, Square,
+    AddMul, ArithmeticCheckedShl, DivRound, Height, HeightRef, Parity, PowerOf2, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -159,8 +158,13 @@ use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
+use malachite_base::num::modular::traits::{
+    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, ModMul, ModPowerOf2Mul,
+};
+use malachite_base::num::number_theory::traits::CoprimeWith;
 use malachite_base::options::exhaustive::exhaustive_options;
-use malachite_base::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{ComposePowerOfX, MulPowerOfX};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::slices::slice_trailing_zeros;

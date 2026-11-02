@@ -8,8 +8,9 @@
 
 use crate::natural::Natural;
 use crate::natural_vector::NaturalVector;
-use malachite_base::num::arithmetic::traits::{ElementLcm, LcmAssign};
+use malachite_base::num::arithmetic::traits::ElementLcm;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::number_theory::traits::LcmAssign;
 
 impl ElementLcm for NaturalVector {
     type Output = Natural;

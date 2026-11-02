@@ -20,6 +20,8 @@ use malachite_base::vars::{Var, VarScheme};
 
 /// Traits for arithmetic on [`NaturalPolynomial`]s.
 pub mod arithmetic;
+/// Derivatives and integrals of [`NaturalPolynomial`]s.
+pub mod calculus;
 /// Implementations of [`Ord`] and [`PartialOrd`] for [`NaturalPolynomial`], comparing two
 /// polynomials by their behavior for large arguments.
 pub mod comparison;
@@ -29,9 +31,16 @@ pub mod conversion;
 pub mod exhaustive;
 /// Traits for logic and bit manipulation on [`NaturalPolynomial`]s.
 pub mod logic;
+/// Arithmetic on [`NaturalPolynomial`]s modulo a polynomial, with coefficients reduced modulo $m$
+/// or $2^k$.
+pub mod mod_polynomial;
+/// Arithmetic on [`NaturalPolynomial`]s whose coefficients are reduced modulo $m$ or $2^k$.
+pub mod modular;
 #[cfg(feature = "random")]
 /// Iterators that generate [`NaturalPolynomial`]s randomly.
 pub mod random;
+/// Operations on [`NaturalPolynomial`]s as power series, truncated to a given number of terms.
+pub mod series;
 
 // The zero `Natural`, as something a reference can be handed out to.
 //

@@ -23,7 +23,7 @@ use malachite_q::rational_polynomial::arithmetic::evaluate::{
 use std::hint::black_box;
 
 fn random_natural(seed: &str, bits: u64) -> Natural {
-    use malachite_base::num::arithmetic::traits::ModPowerOf2;
+    use malachite_base::num::modular::traits::ModPowerOf2;
     let limbs: Vec<Limb> = random_primitive_ints(EXAMPLE_SEED.fork(seed))
         .take(usize::try_from(bits.div_ceil(Limb::WIDTH)).unwrap())
         .collect();
@@ -154,7 +154,7 @@ fn dense_series(
 // time to the Newton step's at each length.
 #[allow(clippy::print_stdout)]
 fn tune_inverse_truncated_rational() {
-    use malachite_q::rational_polynomial::arithmetic::inverse_truncated::*;
+    use malachite_q::rational_polynomial::series::inverse_truncated::*;
     let lens = [4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256];
     for (numerator_bits, denominator_bits) in
         [(1u64, 2u64), (4, 4), (16, 16), (64, 64), (8, 64), (64, 8), (256, 256)]
@@ -200,8 +200,8 @@ fn tune_inverse_truncated_rational() {
 // division's at each length; above 1, division is faster.
 #[allow(clippy::print_stdout)]
 fn tune_div_truncated_rational() {
-    use malachite_base::polynomial::MulTruncated;
-    use malachite_q::rational_polynomial::arithmetic::div_truncated::*;
+    use malachite_base::polynomial::series::traits::MulTruncated;
+    use malachite_q::rational_polynomial::series::div_truncated::*;
     let lens = [2, 4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256];
     for (numerator_bits, denominator_bits) in [(1u64, 1u64), (4, 4), (16, 16), (64, 64), (256, 256)]
     {

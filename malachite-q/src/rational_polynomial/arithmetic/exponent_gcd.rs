@@ -7,7 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_polynomial::RationalPolynomial;
-use malachite_base::polynomial::{ExponentGcd, slice_exponent_gcd};
+#[cfg(doc)]
+use malachite_base::polynomial::arithmetic::traits::ComposePowerOfX;
+use malachite_base::polynomial::arithmetic::traits::ExponentGcd;
+use malachite_base::polynomial::slice_exponent_gcd;
 
 impl ExponentGcd for RationalPolynomial {
     /// Computes the greatest common divisor of the exponents at which a [`RationalPolynomial`] has
@@ -18,8 +21,7 @@ impl ExponentGcd for RationalPolynomial {
     /// $$
     ///
     /// When the polynomial is not constant, this is the largest $k$ such that $p(x) = q(x^k)$ for
-    /// some polynomial $q$, and
-    /// [`compose_power_of_x`](malachite_base::polynomial::ComposePowerOfX::compose_power_of_x) with
+    /// some polynomial $q$, and [`compose_power_of_x`](ComposePowerOfX::compose_power_of_x) with
     /// $k$ recovers $p$ from $q$. A constant polynomial, including zero, gives 0.
     ///
     /// The denominator makes no difference, so this is the same as for the numerator.
@@ -35,7 +37,7 @@ impl ExponentGcd for RationalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::ExponentGcd;
+    /// use malachite_base::polynomial::arithmetic::traits::ExponentGcd;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(

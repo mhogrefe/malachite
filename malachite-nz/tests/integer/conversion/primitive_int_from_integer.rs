@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -15,6 +15,7 @@ use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::conversion::primitive_int_from_integer::{
     SignedFromIntegerError, UnsignedFromIntegerError,

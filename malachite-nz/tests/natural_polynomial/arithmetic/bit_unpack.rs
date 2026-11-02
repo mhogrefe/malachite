@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced;
-use malachite_base::polynomial::{BitPack, BitUnpack};
+use malachite_base::num::modular::traits::ModPowerOf2IsReduced;
+use malachite_base::polynomial::arithmetic::traits::{BitPack, BitUnpack};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 use malachite_nz::test_util::generators::{

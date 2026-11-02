@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::Mod;
+use malachite_base::num::modular::traits::Mod;
 use malachite_nz::integer;
 use malachite_nz::natural::Natural;
 
@@ -15,7 +15,7 @@ fn main() {
     // Full paths to Malachite items in code: flagged.
     let _ = malachite_nz::natural::Natural::from(k);
     let _: malachite_nz::integer::Integer = malachite_nz::integer::Integer::from(k);
-    let _ = malachite_base::num::arithmetic::traits::Mod::mod_op(5u32, k);
+    let _ = malachite_base::num::modular::traits::Mod::mod_op(5u32, k);
     let _ = malachite_q::Rational::from(k);
     // Imported items, and paths through an imported module: fine.
     let _ = Natural::from(k);

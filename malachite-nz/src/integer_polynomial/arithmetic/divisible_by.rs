@@ -14,8 +14,8 @@
 
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::div_exact::checked_div_exact_helper;
-use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::modular::traits::DivisibleBy;
 
 // Whether `q` divides `p`. 0 is divisible by every polynomial, and only 0 is divisible by 0.
 //
@@ -46,7 +46,7 @@ impl DivisibleBy<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::modular::traits::DivisibleBy;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+13*x+5").unwrap();
@@ -87,7 +87,7 @@ impl DivisibleBy<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::modular::traits::DivisibleBy;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+13*x+5").unwrap();
@@ -128,7 +128,7 @@ impl DivisibleBy<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::modular::traits::DivisibleBy;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+13*x+5").unwrap();
@@ -169,7 +169,7 @@ impl DivisibleBy<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::modular::traits::DivisibleBy;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+13*x+5").unwrap();

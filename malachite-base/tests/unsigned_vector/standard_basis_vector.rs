@@ -6,9 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOf2IsReduced};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::modular::traits::{ModIsReduced, ModPowerOf2IsReduced};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_51;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vector::Vector;

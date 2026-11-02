@@ -45,12 +45,13 @@ use alloc::vec::Vec;
 use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::sqrt::{sqrt_rem_2_newton, sqrt_rem_newton};
 use malachite_base::num::arithmetic::traits::{
-    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
-    ShrRound, SqrtAssignRem, SqrtRem, Square, WrappingSquare, WrappingSubAssign,
+    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, Parity, ShrRound,
+    SqrtAssignRem, SqrtRem, Square, WrappingSquare, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_test_zero;
 

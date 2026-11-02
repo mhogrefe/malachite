@@ -9,7 +9,7 @@
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
 use malachite_base::num::arithmetic::traits::Square;
-use malachite_base::polynomial::L2NormSquared;
+use malachite_base::polynomial::arithmetic::traits::L2NormSquared;
 
 impl L2NormSquared for &RationalPolynomial {
     type Output = Rational;
@@ -35,7 +35,7 @@ impl L2NormSquared for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::L2NormSquared;
+    /// use malachite_base::polynomial::arithmetic::traits::L2NormSquared;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert_eq!(

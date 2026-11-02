@@ -10,18 +10,18 @@ use crate::integer::Integer;
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::arithmetic::add::limbs_vec_add_limb_in_place;
-use crate::natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
 use crate::natural::logic::bit_block_access::limbs_assign_bits_helper;
 use crate::natural::logic::not::limbs_not_in_place;
 use crate::natural::logic::trailing_zeros::limbs_trailing_zeros;
+use crate::natural::modular::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use crate::natural::{Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros, TrailingZeros};
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::vecs::vec_delete_left;
 
 // Returns the limbs obtained by taking a slice of bits beginning at index `start` of the negative

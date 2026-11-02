@@ -8,7 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{Content, ContentChained, Gcd};
+use malachite_base::num::arithmetic::traits::{Content, ContentChained};
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_base::test_util::generators::unsigned_matrix_unsigned_pair_gen_var_6;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 use malachite_base::unsigned_vector::UnsignedVector;

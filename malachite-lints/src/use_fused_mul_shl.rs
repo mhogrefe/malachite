@@ -6,7 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::use_fused_mul::{as_mul, camel, has_trait_impl, inside_own_definition, operand_ty};
+use crate::use_fused_mul::{
+    as_mul, camel, has_trait_impl, inside_own_definition, operand_ty, trait_path,
+};
 use clippy_utils::diagnostics::span_lint;
 use clippy_utils::eq_expr_value;
 use rustc_hir::{AssignOpKind, BinOpKind, Expr, ExprKind};
@@ -62,8 +64,6 @@ declare_lint! {
 }
 
 declare_lint_pass!(UseFusedMulShl => [USE_FUSED_MUL_SHL]);
-
-const TRAIT_ROOT: &str = "malachite_base::num::arithmetic::traits";
 
 fn is_unsigned<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> bool {
     matches!(
@@ -169,8 +169,7 @@ fn suggest<'tcx>(
     fused: &str,
 ) {
     let ty = operand_ty(cx, receiver);
-    if !inside_own_definition(cx, expr, fused)
-        && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(fused)))
+    if !inside_own_definition(cx, expr, fused) && has_trait_impl(cx, ty, &trait_path(&camel(fused)))
     {
         span_lint(
             cx,

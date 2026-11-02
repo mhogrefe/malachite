@@ -1,7 +1,8 @@
 use core::cmp::Ordering::*;
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{Determinant, DeterminantSign, Sign};
+use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::linear_algebra::traits::{Determinant, DeterminantSign};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::natural_matrix::NaturalMatrix;

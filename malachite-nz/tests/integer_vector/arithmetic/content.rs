@@ -8,10 +8,11 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{
-    Content, ContentAndPrimitivePart, DivisibleBy, Gcd, PrimitivePart, PrimitivePartAssign,
-    UnsignedAbs,
+    Content, ContentAndPrimitivePart, PrimitivePart, PrimitivePartAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::IntegerVector;

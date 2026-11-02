@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::matrix::Matrix;
-use crate::num::arithmetic::traits::ModIsReduced;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
+use crate::num::modular::traits::ModIsReduced;
 use crate::num::random::geometric::{GeometricRandomNaturalValues, geometric_random_unsigneds};
 use crate::num::random::striped::{StripedRandomUnsignedBitChunks, striped_random_unsigneds};
 use crate::num::random::{

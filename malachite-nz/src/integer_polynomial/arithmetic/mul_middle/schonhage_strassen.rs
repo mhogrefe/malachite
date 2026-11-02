@@ -29,9 +29,10 @@ use alloc::vec::Vec;
 use core::cmp::min;
 use core::mem::swap;
 use core::ptr;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::slices::slice_test_zero;
 
 // Writes the coefficients `xs` into the residues `coeffs_f`, each of `limbs + 1` limbs, in two's

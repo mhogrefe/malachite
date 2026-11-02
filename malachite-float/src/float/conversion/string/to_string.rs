@@ -12,9 +12,10 @@ use crate::float::conversion::string::to_sci::to_sci_string;
 use crate::{ComparableFloat, ComparableFloatRef, Float};
 use alloc::string::String;
 use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
-use malachite_base::num::arithmetic::traits::{DivRound, Mod, PowerOf2};
+use malachite_base::num::arithmetic::traits::{DivRound, PowerOf2};
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ExactFrom, ToStringBase};
+use malachite_base::num::modular::traits::Mod;
 use malachite_base::rounding_modes::RoundingMode::Ceiling;
 
 // The number of base-2^`digit_bits` digits that exactly cover a `Float` with binary exponent

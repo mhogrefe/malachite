@@ -8,4 +8,6 @@
 
 pub mod arithmetic;
 pub mod conversion;
+pub mod modular;
+pub mod number_theory;
 pub mod random;

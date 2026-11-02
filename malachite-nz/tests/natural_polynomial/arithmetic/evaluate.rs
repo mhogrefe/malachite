@@ -7,10 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2IsReduced, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::polynomial::{
-    Evaluate, EvaluateMany, ModEvaluate, ModEvaluateMany, ModPowerOf2Evaluate, Polynomial,
+use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2IsReduced};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{Evaluate, EvaluateMany};
+use malachite_base::polynomial::modular::traits::{
+    ModEvaluate, ModEvaluateMany, ModPowerOf2Evaluate,
 };
 use malachite_base::test_util::generators::{
     unsigned_polynomial_unsigned_unsigned_triple_gen_var_1,

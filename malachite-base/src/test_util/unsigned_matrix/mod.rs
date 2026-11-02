@@ -8,4 +8,6 @@
 
 pub mod arithmetic;
 pub mod comparison;
+pub mod linear_algebra;
+pub mod modular;
 pub mod rank_mod;

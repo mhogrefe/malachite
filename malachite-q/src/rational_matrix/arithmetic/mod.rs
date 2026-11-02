@@ -93,10 +93,6 @@ pub mod add_mul;
 /// malachite_base::num::arithmetic::traits::ContentAndCanonicalPrimitivePart), which compute the
 /// primitive part of a matrix with its first nonzero element, in row-major order, made positive.
 pub mod canonical_primitive_part;
-/// Implementations of
-/// [`CharacteristicPolynomial`](malachite_base::num::arithmetic::traits::CharacteristicPolynomial),
-/// for computing the characteristic polynomial of a square matrix.
-pub mod characteristic_polynomial;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), and
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
@@ -105,20 +101,10 @@ pub mod content;
 /// Implementations of [`ContentChained`](malachite_base::num::arithmetic::traits::ContentChained),
 /// which computes the GCD of a number and a matrix's elements.
 pub mod content_chained;
-/// Implementations of [`Determinant`](malachite_base::num::arithmetic::traits::Determinant), for
-/// computing the determinants of square rational matrices.
-pub mod determinant;
-/// Implementations of
-/// [`DeterminantSign`](malachite_base::num::arithmetic::traits::DeterminantSign), for determining
-/// the signs of the determinants of square rational matrices.
-pub mod determinant_sign;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying an
 /// [`IntegerMatrix`](malachite_nz::integer_matrix::IntegerMatrix) by a
 /// [`RationalMatrix`](super::RationalMatrix).
 pub mod integer_matrix_mul;
-/// Implementations of [`Inverse`](malachite_base::num::arithmetic::traits::Inverse), for inverting
-/// square rational matrices.
-pub mod inverse;
 /// Implementations of
 /// [`KroneckerProduct`](malachite_base::num::arithmetic::traits::KroneckerProduct) and
 /// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
@@ -138,30 +124,10 @@ pub mod mul_vector;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign), for negating a matrix.
 pub mod neg;
-/// Implementations of [`Nullspace`](malachite_base::num::arithmetic::traits::Nullspace), for
-/// finding bases of the right nullspaces of rational matrices.
-pub mod nullspace;
-/// Implementations of [`Permanent`](malachite_base::num::arithmetic::traits::Permanent), for
-/// computing the permanents of square rational matrices.
-pub mod permanent;
 /// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
 /// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), for raising a square
 /// [`RationalMatrix`](super::RationalMatrix) to a power.
 pub mod pow;
-/// Implementations of [`Rank`](malachite_base::num::arithmetic::traits::Rank), for finding the
-/// ranks of rational matrices.
-pub mod rank;
-/// The methods [`reconstruct`](super::RationalMatrix::reconstruct) and
-/// [`reconstruct_ref`](super::RationalMatrix::reconstruct_ref), for recovering a rational matrix
-/// from its residues by rational reconstruction.
-pub mod reconstruct;
-
-/// Implementations of
-/// [`ReducedRowEchelonForm`](malachite_base::num::arithmetic::traits::ReducedRowEchelonForm) and
-/// [`ReducedRowEchelonFormAssign`](
-/// malachite_base::num::arithmetic::traits::ReducedRowEchelonFormAssign), for finding the reduced
-/// row echelon forms of rational matrices.
-pub mod reduced_row_echelon_form;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying a [`RationalMatrix`](super::RationalMatrix) by a scalar on either side.
 pub mod scalar_mul;
@@ -263,15 +229,6 @@ pub mod shl;
 /// assert_eq!(a.to_string(), "[2, -3, 12]");
 /// ```
 pub mod shr;
-/// Implementations of
-/// [`SimilarityTransform`](malachite_base::num::arithmetic::traits::SimilarityTransform) and
-/// [`SimilarityTransformAssign`](
-/// malachite_base::num::arithmetic::traits::SimilarityTransformAssign), for applying the similarity
-/// transform of FLINT's `fmpq_mat_similarity` to a square matrix.
-pub mod similarity_transform;
-/// Implementations of [`Solve`](malachite_base::num::arithmetic::traits::Solve), for solving linear
-/// systems with rational matrices.
-pub mod solve;
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), for squaring a square
 /// [`RationalMatrix`](super::RationalMatrix).
@@ -279,7 +236,6 @@ pub mod square;
 /// Implementations of [`Sub`](core::ops::Sub) and [`SubAssign`](core::ops::SubAssign), for
 /// subtracting matrices of the same shape.
 pub mod sub;
-
 /// Subtracting a multiple of one matrix from another, by implementations of
 /// [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
 /// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign).
@@ -358,9 +314,6 @@ pub mod sub;
 /// assert_eq!(a.to_string(), "[-11/2, -5/2, 12]");
 /// ```
 pub mod sub_mul;
-/// An implementation of [`Trace`](malachite_base::num::arithmetic::traits::Trace), the sum of the
-/// diagonal elements of a square matrix.
-pub mod trace;
 /// Implementations of [`Mul`](core::ops::Mul) for multiplying a
 /// [`RationalVector`](crate::rational_vector::RationalVector) by a
 /// [`RationalMatrix`](super::RationalMatrix) on the right.

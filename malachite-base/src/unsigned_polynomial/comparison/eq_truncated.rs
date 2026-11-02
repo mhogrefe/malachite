@@ -7,7 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::polynomial::{EqTruncated, slices_eq_truncated};
+use crate::polynomial::series::traits::EqTruncated;
+use crate::polynomial::slices_eq_truncated;
 use crate::unsigned_polynomial::UnsignedPolynomial;
 
 impl<T: PrimitiveUnsigned> EqTruncated for UnsignedPolynomial<T> {

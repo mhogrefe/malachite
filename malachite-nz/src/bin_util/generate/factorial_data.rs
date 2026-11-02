@@ -13,12 +13,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, BinomialCoefficient, CheckedDoubleFactorial, DivExactAssign, FloorRoot,
-    ModPowerOf2Inverse, OverflowingMulAssign, WrappingMulAssign,
+    ArithmeticCheckedShl, DivExactAssign, FloorRoot, OverflowingMulAssign, WrappingMulAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::CountOnes;
+use malachite_base::num::modular::traits::ModPowerOf2Inverse;
+use malachite_base::num::number_theory::traits::{BinomialCoefficient, CheckedDoubleFactorial};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 

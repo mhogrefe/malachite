@@ -8,7 +8,8 @@
 
 use crate::rational_polynomial::RationalPolynomial;
 use alloc::vec;
-use malachite_base::polynomial::{ComposePowerOfX, ComposePowerOfXAssign, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{ComposePowerOfX, ComposePowerOfXAssign};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 
@@ -50,7 +51,7 @@ impl ComposePowerOfX for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposePowerOfX;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/3").unwrap();
@@ -97,7 +98,7 @@ impl ComposePowerOfX for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposePowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposePowerOfX;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/3").unwrap();
@@ -146,7 +147,7 @@ impl ComposePowerOfXAssign for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ComposePowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::ComposePowerOfXAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("1/2*x^2-1/3").unwrap();

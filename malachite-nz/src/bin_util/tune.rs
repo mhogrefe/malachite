@@ -46,9 +46,6 @@ use malachite_nz::natural::arithmetic::div_mod::{
     limbs_invert_approx_scratch_len, limbs_invert_basecase_approx, limbs_invert_newton_approx,
     limbs_two_limb_inverse_helper,
 };
-use malachite_nz::natural::arithmetic::mod_power_of_2_square::{
-    limbs_square_low_basecase, limbs_square_low_divide_and_conquer, limbs_square_low_scratch_len,
-};
 use malachite_nz::natural::arithmetic::mul::fft::{
     mpn_mul_fft_for_tuning, mpn_square_fft_for_tuning,
 };
@@ -93,6 +90,9 @@ use malachite_nz::natural::arithmetic::square::{
 };
 use malachite_nz::natural::conversion::digits::general_digits::{
     GET_STR_PRECOMPUTE_THRESHOLD, limbs_to_digits_small_base_basecase,
+};
+use malachite_nz::natural::modular::mod_power_of_2_square::{
+    limbs_square_low_basecase, limbs_square_low_divide_and_conquer, limbs_square_low_scratch_len,
 };
 use malachite_nz::platform::Limb;
 use std::hint::black_box;
@@ -619,27 +619,27 @@ fn tune_mu_divappr_q() {
 // slow there.
 fn tune_poly_mod_mul_grid() {
     use malachite_base::num::conversion::traits::ExactFrom;
-    use malachite_base::unsigned_polynomial::arithmetic::mod_mul::{
+    use malachite_base::unsigned_polynomial::modular::mod_mul::{
         mod_mul_to_out_classical as word_mul_classical,
         mod_mul_to_out_karatsuba as word_mul_karatsuba,
     };
-    use malachite_base::unsigned_polynomial::arithmetic::mod_mul_truncated::{
-        mod_mul_truncated_to_out_classical as word_mul_truncated_classical,
-        mod_mul_truncated_to_out_karatsuba as word_mul_truncated_karatsuba,
-    };
-    use malachite_base::unsigned_polynomial::arithmetic::mod_square::{
+    use malachite_base::unsigned_polynomial::modular::mod_square::{
         mod_square_to_out_classical as word_square_classical,
         mod_square_to_out_karatsuba as word_square_karatsuba,
     };
-    use malachite_base::unsigned_polynomial::arithmetic::mod_square_truncated::{
+    use malachite_base::unsigned_polynomial::series::mod_mul_truncated::{
+        mod_mul_truncated_to_out_classical as word_mul_truncated_classical,
+        mod_mul_truncated_to_out_karatsuba as word_mul_truncated_karatsuba,
+    };
+    use malachite_base::unsigned_polynomial::series::mod_square_truncated::{
         mod_square_truncated_to_out_classical as word_square_truncated_classical,
         mod_square_truncated_to_out_karatsuba as word_square_truncated_karatsuba,
     };
     use malachite_nz::natural::Natural;
-    use malachite_nz::natural_polynomial::arithmetic::mod_mul::*;
-    use malachite_nz::natural_polynomial::arithmetic::mod_mul_truncated::*;
-    use malachite_nz::natural_polynomial::arithmetic::mod_square::*;
-    use malachite_nz::natural_polynomial::arithmetic::mod_square_truncated::*;
+    use malachite_nz::natural_polynomial::modular::mod_mul::*;
+    use malachite_nz::natural_polynomial::modular::mod_square::*;
+    use malachite_nz::natural_polynomial::series::mod_mul_truncated::*;
+    use malachite_nz::natural_polynomial::series::mod_square_truncated::*;
     use std::time::Instant;
     fn reduced(seed: &str, n: usize, m: Limb) -> Vec<Natural> {
         random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed))
@@ -815,7 +815,7 @@ fn tune_poly_mod_mul_grid() {
 // exactly the given number of bits and is odd, and the ratio is a unit. A batch is calibrated to at
 // least 20 ms, and the best of 5 is kept.
 fn tune_poly_mod_evaluate_geometric_grid() {
-    use malachite_base::num::arithmetic::traits::ModInverse;
+    use malachite_base::num::modular::traits::ModInverse;
     use malachite_base::unsigned_polynomial::arithmetic::evaluate::{
         mod_evaluate_geometric_fast, mod_evaluate_geometric_fast_truncated,
         mod_evaluate_geometric_iter,
@@ -936,7 +936,7 @@ fn tune_poly_mod_evaluate_geometric_grid() {
 // length. POLY_GRID_LENS and POLY_GRID_BITS (comma-separated) replace the default grid. A batch is
 // calibrated to at least 20 ms, and the best of 5 is kept.
 fn tune_poly_mod_mul_middle_grid() {
-    use malachite_base::unsigned_polynomial::arithmetic::mod_mul_middle::{
+    use malachite_base::unsigned_polynomial::modular::mod_mul_middle::{
         mod_mul_middle_to_out_classical, mod_mul_middle_to_out_karatsuba,
     };
     use std::time::Instant;
@@ -1021,8 +1021,9 @@ fn tune_poly_mod_mul_middle_grid() {
 // POW_GRID_LENS, POW_GRID_BITS, and POW_GRID_EXPS; configurations whose power would have more than
 // POW_GRID_MAX_BITS bits in total (default 2^27) are skipped.
 fn tune_poly_pow_grid() {
-    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::arithmetic::traits::Parity;
     use malachite_base::num::logic::traits::BitAccess;
+    use malachite_base::num::modular::traits::ModPowerOf2;
     use malachite_nz::integer::Integer;
     use malachite_nz::integer_polynomial::arithmetic::pow::binexp::pow_to_out_binexp;
     use malachite_nz::integer_polynomial::arithmetic::pow::binomial::pow_to_out_binomial;
@@ -1155,9 +1156,10 @@ fn tune_poly_pow_grid() {
 // a range of lengths; the cutoff in `taylor_shift_divide_and_conquer` should be near the smallest
 // length from which the split wins. Grids are overridable through TS_GRID_LENS and TS_GRID_BITS.
 fn tune_poly_taylor_shift_grid() {
-    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::arithmetic::traits::Parity;
     use malachite_base::num::basic::traits::{NegativeOne, One};
     use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+    use malachite_base::num::modular::traits::ModPowerOf2;
     use malachite_nz::integer::Integer;
     use malachite_nz::integer_polynomial::arithmetic::taylor_shift::{
         taylor_shift_divide_and_conquer_split, taylor_shift_horner,
@@ -1265,10 +1267,10 @@ fn tune_poly_taylor_shift_grid() {
 // of lengths; MOD_POWER_OF_2_TAYLOR_SHIFT_DC_THRESHOLD should be near the smallest length from
 // which the split wins. Grids are overridable through MTS_GRID_LENS and MTS_GRID_POWS.
 fn tune_poly_mod_power_of_2_taylor_shift_grid() {
-    use malachite_base::num::arithmetic::traits::ModPowerOf2;
     use malachite_base::num::basic::traits::One;
+    use malachite_base::num::modular::traits::ModPowerOf2;
     use malachite_nz::natural::Natural;
-    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_taylor_shift::{
+    use malachite_nz::natural_polynomial::modular::mod_power_of_2_taylor_shift::{
         mod_power_of_2_taylor_shift_divide_and_conquer_split, mod_power_of_2_taylor_shift_horner,
     };
     use std::time::Instant;
@@ -1420,7 +1422,7 @@ const LONG_SHIFT_GRID_LENS: [u64; 20] = [
 // UMTS_GRID_LENS and UMTS_GRID_POWS.
 fn tune_poly_unsigned_mod_power_of_2_taylor_shift_grid() {
     use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_taylor_shift::{
+    use malachite_base::unsigned_polynomial::modular::mod_power_of_2_taylor_shift::{
         mod_power_of_2_taylor_shift_divide_and_conquer_split, mod_power_of_2_taylor_shift_horner,
     };
     fn run<T: PrimitiveUnsigned>(lens: &[u64], pows: &[u64]) {
@@ -1467,7 +1469,7 @@ fn tune_poly_unsigned_mod_power_of_2_taylor_shift_grid() {
 // numbers of bits. Grids are overridable through UMODTS_GRID_LENS and UMODTS_GRID_BITS.
 fn tune_poly_unsigned_mod_taylor_shift_grid() {
     use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-    use malachite_base::unsigned_polynomial::arithmetic::mod_taylor_shift::{
+    use malachite_base::unsigned_polynomial::modular::mod_taylor_shift::{
         mod_taylor_shift_divide_and_conquer_split, mod_taylor_shift_horner,
     };
     fn run<T: PrimitiveUnsigned>(lens: &[u64], bits: &[u64]) {
@@ -1520,7 +1522,7 @@ fn tune_poly_mod_taylor_shift_grid() {
     use malachite_base::num::arithmetic::traits::PowerOf2;
     use malachite_base::num::basic::traits::One;
     use malachite_nz::natural::Natural;
-    use malachite_nz::natural_polynomial::arithmetic::mod_taylor_shift::{
+    use malachite_nz::natural_polynomial::modular::mod_taylor_shift::{
         mod_taylor_shift_divide_and_conquer_split, mod_taylor_shift_horner,
     };
     fn random_below(seed: &str, n: usize, m: &Natural, bits: u64) -> Vec<Natural> {
@@ -1570,8 +1572,8 @@ fn tune_poly_mod_taylor_shift_grid() {
 // shortest outer length at which divide and conquer wins. Grids are overridable through
 // COMPOSE_GRID_LENS1, COMPOSE_GRID_LENS2, and COMPOSE_GRID_BITS.
 fn tune_poly_compose_grid() {
-    use malachite_base::num::arithmetic::traits::ModPowerOf2Assign;
     use malachite_base::num::logic::traits::BitAccess;
+    use malachite_base::num::modular::traits::ModPowerOf2Assign;
     use malachite_nz::integer::Integer;
     use malachite_nz::integer_polynomial::arithmetic::compose::{
         compose_divide_and_conquer, compose_horner,
@@ -1657,7 +1659,7 @@ const COMPOSE_GRID_LENS2: [u64; 4] = [3, 4, 8, 16];
 // modulus does not matter. Grids are overridable through UMP2C_GRID_LENS1 and UMP2C_GRID_LENS2.
 fn tune_poly_unsigned_mod_power_of_2_compose_grid() {
     use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_compose::{
+    use malachite_base::unsigned_polynomial::modular::mod_power_of_2_compose::{
         mod_power_of_2_compose_divide_and_conquer, mod_power_of_2_compose_horner,
     };
     fn run<T: PrimitiveUnsigned>(lens1: &[u64], lens2: &[u64]) {
@@ -1697,7 +1699,7 @@ fn tune_poly_unsigned_mod_power_of_2_compose_grid() {
 // overridable through UMC_GRID_LENS1, UMC_GRID_LENS2, and UMC_GRID_BITS.
 fn tune_poly_unsigned_mod_compose_grid() {
     use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-    use malachite_base::unsigned_polynomial::arithmetic::mod_compose::{
+    use malachite_base::unsigned_polynomial::modular::mod_compose::{
         mod_compose_divide_and_conquer, mod_compose_horner,
     };
     fn run<T: PrimitiveUnsigned>(lens1: &[u64], lens2: &[u64], bits: &[u64]) {
@@ -1759,7 +1761,7 @@ fn tune_poly_mod_power_of_2_compose_grid() {
     use malachite_base::polynomial::Polynomial;
     use malachite_nz::natural::Natural;
     use malachite_nz::natural_polynomial::NaturalPolynomial;
-    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_compose::{
+    use malachite_nz::natural_polynomial::modular::mod_power_of_2_compose::{
         mod_power_of_2_compose_divide_and_conquer, mod_power_of_2_compose_horner,
     };
     let lens1 = shift_grid("NMP2C_GRID_LENS1", &COMPOSE_GRID_LENS1);
@@ -1803,7 +1805,7 @@ fn tune_poly_mod_compose_grid() {
     use malachite_base::polynomial::Polynomial;
     use malachite_nz::natural::Natural;
     use malachite_nz::natural_polynomial::NaturalPolynomial;
-    use malachite_nz::natural_polynomial::arithmetic::mod_compose::{
+    use malachite_nz::natural_polynomial::modular::mod_compose::{
         mod_compose_divide_and_conquer, mod_compose_horner,
     };
     let lens1 = shift_grid("NMC_GRID_LENS1", &COMPOSE_GRID_LENS1);
@@ -1842,8 +1844,9 @@ fn tune_poly_mod_compose_grid() {
 // the two below, the precomputed multiples, the sum split by sign, and FLINT's single signed sum.
 // Grids are overridable through POW_GRID_LENS, POW_GRID_BITS, and POW_GRID_EXPS.
 fn tune_poly_pow_multinomial_grid() {
-    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::arithmetic::traits::Parity;
     use malachite_base::num::logic::traits::BitAccess;
+    use malachite_base::num::modular::traits::ModPowerOf2;
     use malachite_nz::integer::Integer;
     use malachite_nz::integer_polynomial::arithmetic::pow::multinomial::*;
     use malachite_nz::integer_polynomial::arithmetic::pow::pow_ref_with_kernel;
@@ -1946,8 +1949,9 @@ fn tune_poly_pow_multinomial_grid() {
 // Times binary exponentiation against addition chains for IntegerPolynomial powering, over
 // exponents that are not powers of 2. A ratio above 1 means binary exponentiation is slower.
 fn tune_poly_pow_chain_grid() {
-    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::arithmetic::traits::Parity;
     use malachite_base::num::logic::traits::BitAccess;
+    use malachite_base::num::modular::traits::ModPowerOf2;
     use malachite_nz::integer::Integer;
     use malachite_nz::integer_polynomial::arithmetic::pow::binexp::pow_to_out_binexp;
     use malachite_nz::integer_polynomial::arithmetic::pow::{
@@ -2080,30 +2084,30 @@ fn tune_mul_fft_probe() {
 // POLY_GRID_POWS (comma-separated) replace the default grid. A batch is calibrated to at least 20
 // ms, and the best of 5 is kept; `-` means the kernel was skipped as too slow there.
 fn tune_poly_mod_power_of_2_mul_grid() {
-    use malachite_base::num::arithmetic::traits::ModPowerOf2;
     use malachite_base::num::basic::traits::Zero;
     use malachite_base::num::conversion::traits::ExactFrom;
-    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_mul::{
+    use malachite_base::num::modular::traits::ModPowerOf2;
+    use malachite_base::unsigned_polynomial::modular::mod_power_of_2_mul::{
         mod_power_of_2_mul_to_out_classical as word_mul_classical,
         mod_power_of_2_mul_to_out_karatsuba as word_mul_karatsuba,
     };
-    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_mul_truncated::{
-        mod_power_of_2_mul_truncated_to_out_classical as word_mul_truncated_classical,
-        mod_power_of_2_mul_truncated_to_out_karatsuba as word_mul_truncated_karatsuba,
-    };
-    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_square::{
+    use malachite_base::unsigned_polynomial::modular::mod_power_of_2_square::{
         mod_power_of_2_square_to_out_classical as word_square_classical,
         mod_power_of_2_square_to_out_karatsuba as word_square_karatsuba,
     };
-    use malachite_base::unsigned_polynomial::arithmetic::mod_power_of_2_square_truncated::{
+    use malachite_base::unsigned_polynomial::series::mod_power_of_2_mul_truncated::{
+        mod_power_of_2_mul_truncated_to_out_classical as word_mul_truncated_classical,
+        mod_power_of_2_mul_truncated_to_out_karatsuba as word_mul_truncated_karatsuba,
+    };
+    use malachite_base::unsigned_polynomial::series::mod_power_of_2_square_truncated::{
         mod_power_of_2_square_truncated_to_out_classical as word_square_truncated_classical,
         mod_power_of_2_square_truncated_to_out_karatsuba as word_square_truncated_karatsuba,
     };
     use malachite_nz::natural::Natural;
-    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_mul::*;
-    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_mul_truncated::*;
-    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_square::*;
-    use malachite_nz::natural_polynomial::arithmetic::mod_power_of_2_square_truncated::*;
+    use malachite_nz::natural_polynomial::modular::mod_power_of_2_mul::*;
+    use malachite_nz::natural_polynomial::modular::mod_power_of_2_square::*;
+    use malachite_nz::natural_polynomial::series::mod_power_of_2_mul_truncated::*;
+    use malachite_nz::natural_polynomial::series::mod_power_of_2_square_truncated::*;
     use std::time::Instant;
     fn reduced(seed: &str, n: usize, pow: u64) -> Vec<Natural> {
         let mut limbs = random_primitive_ints::<Limb>(EXAMPLE_SEED.fork(seed));
@@ -2343,13 +2347,14 @@ fn tune_poly_mod_power_of_2_mul_grid() {
 // alternative` in nanoseconds, and `kind nb crossover n` when the alternative has won at two
 // consecutive lengths. DIV_CUTOFF_BITS (comma-separated) replaces the default sizes.
 fn tune_div_truncated_cutoff() {
-    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::arithmetic::traits::Parity;
     use malachite_base::num::basic::traits::Zero;
     use malachite_base::num::logic::traits::BitAccess;
+    use malachite_base::num::modular::traits::ModPowerOf2;
     use malachite_nz::integer::Integer;
-    use malachite_nz::integer_polynomial::arithmetic::div_truncated::*;
-    use malachite_nz::integer_polynomial::arithmetic::inverse_truncated::inverse_truncated_dispatch;
-    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::mul_truncated_to_out;
+    use malachite_nz::integer_polynomial::series::div_truncated::*;
+    use malachite_nz::integer_polynomial::series::inverse_truncated::inverse_truncated_dispatch;
+    use malachite_nz::integer_polynomial::series::mul_truncated::mul_truncated_to_out;
     use malachite_nz::natural::Natural;
     use std::time::Instant;
     fn time_ns(f: &mut dyn FnMut()) -> f64 {
@@ -2475,11 +2480,12 @@ fn tune_div_truncated_cutoff() {
 // has won at two consecutive lengths. INVERSE_CUTOFF_BITS (comma-separated) replaces the default
 // sizes.
 fn tune_inverse_truncated_cutoff() {
-    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::arithmetic::traits::Parity;
     use malachite_base::num::basic::traits::One;
     use malachite_base::num::logic::traits::BitAccess;
+    use malachite_base::num::modular::traits::ModPowerOf2;
     use malachite_nz::integer::Integer;
-    use malachite_nz::integer_polynomial::arithmetic::inverse_truncated::*;
+    use malachite_nz::integer_polynomial::series::inverse_truncated::*;
     use malachite_nz::natural::Natural;
     use std::time::Instant;
     fn time_ns(f: &mut dyn FnMut()) -> f64 {
@@ -2562,7 +2568,7 @@ fn tune_inverse_truncated_cutoff() {
 // best of 5). Prints `id n nb default basecase newton` in nanoseconds.
 fn tune_inverse_truncated_grid() {
     use malachite_nz::integer::Integer;
-    use malachite_nz::integer_polynomial::arithmetic::inverse_truncated::*;
+    use malachite_nz::integer_polynomial::series::inverse_truncated::*;
     use std::str::FromStr;
     use std::time::Instant;
     fn time_ns(f: &mut dyn FnMut()) -> f64 {
@@ -2622,9 +2628,10 @@ fn tune_inverse_truncated_grid() {
 // for line. There is one more column, the small-prime FFT kernel, which FLINT's harness reaches
 // only through its dispatcher; `-` means the kernel declined.
 fn tune_poly_mul_grid() {
-    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::arithmetic::traits::Parity;
     use malachite_base::num::basic::traits::Zero;
     use malachite_base::num::logic::traits::BitAccess;
+    use malachite_base::num::modular::traits::ModPowerOf2;
     use malachite_nz::integer::Integer;
     use malachite_nz::integer_polynomial::arithmetic::mul::classical::mul_to_out_classical;
     use malachite_nz::integer_polynomial::arithmetic::mul::karatsuba::mul_to_out_karatsuba;
@@ -2636,21 +2643,21 @@ fn tune_poly_mul_grid() {
     use malachite_nz::integer_polynomial::arithmetic::mul_middle::kronecker::*;
     use malachite_nz::integer_polynomial::arithmetic::mul_middle::mul_middle_to_out;
     use malachite_nz::integer_polynomial::arithmetic::mul_middle::schonhage_strassen::*;
-    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::classical::*;
-    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::karatsuba::*;
-    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::kronecker::*;
-    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::mul_truncated_to_out;
-    use malachite_nz::integer_polynomial::arithmetic::mul_truncated::schonhage_strassen::*;
     use malachite_nz::integer_polynomial::arithmetic::square::classical::square_to_out_classical;
     use malachite_nz::integer_polynomial::arithmetic::square::karatsuba::square_to_out_karatsuba;
     use malachite_nz::integer_polynomial::arithmetic::square::kronecker::square_to_out_kronecker;
     use malachite_nz::integer_polynomial::arithmetic::square::schonhage_strassen::*;
     use malachite_nz::integer_polynomial::arithmetic::square::square_to_out;
-    use malachite_nz::integer_polynomial::arithmetic::square_truncated::classical::*;
-    use malachite_nz::integer_polynomial::arithmetic::square_truncated::karatsuba::*;
-    use malachite_nz::integer_polynomial::arithmetic::square_truncated::kronecker::*;
-    use malachite_nz::integer_polynomial::arithmetic::square_truncated::schonhage_strassen::*;
-    use malachite_nz::integer_polynomial::arithmetic::square_truncated::square_truncated_to_out;
+    use malachite_nz::integer_polynomial::series::mul_truncated::classical::*;
+    use malachite_nz::integer_polynomial::series::mul_truncated::karatsuba::*;
+    use malachite_nz::integer_polynomial::series::mul_truncated::kronecker::*;
+    use malachite_nz::integer_polynomial::series::mul_truncated::mul_truncated_to_out;
+    use malachite_nz::integer_polynomial::series::mul_truncated::schonhage_strassen::*;
+    use malachite_nz::integer_polynomial::series::square_truncated::classical::*;
+    use malachite_nz::integer_polynomial::series::square_truncated::karatsuba::*;
+    use malachite_nz::integer_polynomial::series::square_truncated::kronecker::*;
+    use malachite_nz::integer_polynomial::series::square_truncated::schonhage_strassen::*;
+    use malachite_nz::integer_polynomial::series::square_truncated::square_truncated_to_out;
     use malachite_nz::natural::Natural;
     use std::time::Instant;
     fn dense(seed: &str, n: usize, bits: u64) -> Vec<Integer> {
@@ -2948,7 +2955,7 @@ fn tune_small_kernel_probe() {
 // The Malachite side of the gcd comparison; the C side is perf/scratch/gcd_gmp.c (make gcd-gmp /
 // gcd-gmp-noasm). Identical operands via the shared LCG.
 fn tune_gcd_probe() {
-    use malachite_base::num::arithmetic::traits::Gcd;
+    use malachite_base::num::number_theory::traits::Gcd;
     use malachite_nz::natural::Natural;
     for n in [10usize, 25, 50, 100, 200, 400, 800, 1600, 3200, 6400] {
         let mut xs = vec![0; n];
@@ -2974,7 +2981,7 @@ fn tune_gcd_probe() {
 
 // Extended-gcd timing at n-limb operand sizes, for the GCDEXT_DC / MATRIX22_STRASSEN sweeps.
 fn tune_xgcd_probe() {
-    use malachite_base::num::arithmetic::traits::ExtendedGcd;
+    use malachite_base::num::number_theory::traits::ExtendedGcd;
     use malachite_nz::natural::Natural;
     for n in [25usize, 50, 100, 200, 400, 800, 1600, 3200] {
         let mut xs = vec![0; n];
@@ -3702,7 +3709,7 @@ fn tune_mu_bdiv_q_vs_schoolbook() {
 // normalized and unnormalized (< 2^(W - 2)) divisors, from which the MOD_1* thresholds and
 // MOD_1_1P_METHOD are read off manually (the dispatch conditions are multi-way).
 fn tune_mod_1_shootout() {
-    use malachite_nz::natural::arithmetic::mod_op::{
+    use malachite_nz::natural::modular::mod_op::{
         limbs_mod_limb_any_leading_zeros_1, limbs_mod_limb_any_leading_zeros_2,
         limbs_mod_limb_at_least_1_leading_zero, limbs_mod_limb_at_least_2_leading_zeros,
         limbs_mod_limb_small_normalized, limbs_mod_limb_small_unnormalized,
@@ -4595,8 +4602,9 @@ fn tune_add() {
 // `integer_polynomial::arithmetic::evaluate` are read off it.
 #[allow(clippy::print_stdout)]
 fn tune_evaluate() {
-    use malachite_base::num::arithmetic::traits::{ModPowerOf2, Parity};
+    use malachite_base::num::arithmetic::traits::Parity;
     use malachite_base::num::logic::traits::BitAccess;
+    use malachite_base::num::modular::traits::ModPowerOf2;
     use malachite_nz::integer::Integer;
     use malachite_nz::integer_polynomial::arithmetic::evaluate::{
         evaluate_divide_and_conquer, evaluate_horner,

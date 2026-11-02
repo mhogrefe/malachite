@@ -37,7 +37,7 @@ use crate::test_util::extra_variadic::{
 use crate::test_util::generators::{rational_matrix_positions, round_to_multiple_rational_filter};
 use malachite_base::bools::random::random_bools;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{DeterminantSign, IsPowerOf2, Square};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -47,6 +47,7 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, IsInteger, ToSci};
+use malachite_base::num::linear_algebra::traits::DeterminantSign;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::VariableRangeGenerator;
 use malachite_base::num::random::geometric::{
@@ -62,7 +63,8 @@ use malachite_base::num::random::{
     random_primitive_floats, random_primitive_ints, random_signed_inclusive_range,
     random_unsigned_inclusive_range,
 };
-use malachite_base::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{ComposePowerOfX, MulPowerOfX};
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;

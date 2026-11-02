@@ -6,8 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Abs, DivisibleBy, Factorial, Floor, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{Abs, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::{ExactFrom, FactoradicDigits};
+use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::num::number_theory::traits::Factorial;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::unsigned_vec_pair_gen;
 use malachite_nz::natural::Natural;

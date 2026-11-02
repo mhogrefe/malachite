@@ -33,11 +33,11 @@ use core::cmp::{
     min,
 };
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, OverflowingAddAssign, Parity, PowerOf2, Sign, WrappingAddAssign, XMulYToZZ,
-    XXAddYYToZZ,
+    OverflowingAddAssign, Parity, PowerOf2, Sign, WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_leading_zeros;
 

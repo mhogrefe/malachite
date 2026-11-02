@@ -13,19 +13,20 @@
 use crate::integer_matrix::arithmetic::mul::ProductShape;
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
 use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
-use crate::integer_vector::arithmetic::multi_crt::multi_balanced_crt_elements;
+use crate::integer_vector::modular::multi_crt::multi_balanced_crt_elements;
 use crate::natural::{LIMB_HIGH_BIT, WIDTH_MINUS_1};
-use crate::natural_vector::arithmetic::multi_crt::multi_crt_elements;
+use crate::natural_vector::modular::multi_crt::multi_crt_elements;
 use crate::platform::Limb;
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{ModMul, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::ModMul;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
 
 // The number of bits of the primes, other than the first modulus, that the multimodular algorithm

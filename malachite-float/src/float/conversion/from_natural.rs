@@ -10,13 +10,14 @@ use crate::Float;
 use crate::InnerFloat::Finite;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOf2, FloorLogBase2, ModPowerOf2, NegModPowerOf2, PowerOf2,
-    RoundToMultipleOfPowerOf2Assign, SaturatingSubAssign,
+    PowerOf2, RoundToMultipleOfPowerOf2Assign, SaturatingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
+use malachite_base::num::exponential::traits::FloorLogBase2;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::num::modular::traits::{DivisibleByPowerOf2, ModPowerOf2, NegModPowerOf2};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::{Natural, bit_to_limb_count_ceiling};
 use malachite_nz::platform::Limb;

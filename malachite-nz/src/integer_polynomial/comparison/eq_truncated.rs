@@ -10,7 +10,8 @@ use crate::integer::Integer;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural_polynomial::NaturalPolynomial;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::polynomial::{EqTruncated, slices_eq_truncated};
+use malachite_base::polynomial::series::traits::EqTruncated;
+use malachite_base::polynomial::slices_eq_truncated;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 
 // Whether a coefficient is zero. This is a function rather than a closure because inside the impls

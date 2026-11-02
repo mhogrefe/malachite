@@ -10,7 +10,7 @@ use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use gmp_mpfr_sys::mpfr::{self, rnd_t};
 use malachite_base::assert_panic;
-use malachite_base::num::arithmetic::traits::{Abs, ModPowerOf2, NegAssign, PowerOf2};
+use malachite_base::num::arithmetic::traits::{Abs, NegAssign, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Zero,
@@ -19,6 +19,7 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;

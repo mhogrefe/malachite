@@ -6,10 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, DivMod, PowerOf2, Square, UnsignedAbs,
-};
+use malachite_base::num::arithmetic::traits::{DivMod, PowerOf2, Square, UnsignedAbs};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::exponential::traits::CheckedLogBase2;
 use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;

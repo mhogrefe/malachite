@@ -7,10 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::assert_panic;
-use malachite_base::num::arithmetic::traits::{DivisibleBy, Pow};
+use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::{RemovePower, RemovePowerAssign};
+use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::factorization::remove_power::limbs_remove;

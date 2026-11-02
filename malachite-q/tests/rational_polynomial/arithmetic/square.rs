@@ -8,7 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
-use malachite_base::polynomial::Evaluate;
+use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_nz::test_util::generators::integer_polynomial_gen;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{

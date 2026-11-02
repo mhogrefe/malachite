@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rational_polynomial::RationalPolynomial;
-use malachite_base::num::arithmetic::traits::{DivExact, Gcd};
+use malachite_base::num::arithmetic::traits::DivExact;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::number_theory::traits::Gcd;
 
 impl SignificantBits for &RationalPolynomial {
     /// Returns the sum of the numbers of significant bits of the coefficients of a

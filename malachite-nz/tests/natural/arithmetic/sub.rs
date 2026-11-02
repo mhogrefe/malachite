@@ -6,10 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Neg, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2Neg};
 use malachite_base::slices::slice_test_zero;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{

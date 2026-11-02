@@ -17,8 +17,8 @@ use crate::rational_matrix::conversion::to_numerators_and_row_denominators::{
 use alloc::vec::Vec;
 
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::LcmAssign;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::number_theory::traits::LcmAssign;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_vector::NaturalVector;

@@ -10,11 +10,12 @@
 
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{CheckedRoot, DivAssignMod, DivMod, GcdAssign};
+use malachite_base::num::arithmetic::traits::{CheckedRoot, DivAssignMod, DivMod};
 use malachite_base::num::factorization::traits::{
     ExpressAsPower, Factor, IsPower, IsPrime, Primes,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::number_theory::traits::GcdAssign;
 
 const PRIMES: [u32; 168] = [
     2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,

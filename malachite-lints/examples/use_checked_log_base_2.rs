@@ -1,4 +1,5 @@
-use malachite_base::num::arithmetic::traits::{FloorLogBase2, IsPowerOf2};
+use malachite_base::num::arithmetic::traits::IsPowerOf2;
+use malachite_base::num::exponential::traits::FloorLogBase2;
 use malachite_q::Rational;
 
 fn f(x: Rational, y: Rational, n: u64) -> i64 {

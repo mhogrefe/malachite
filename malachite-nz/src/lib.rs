@@ -19,13 +19,13 @@
 //!     [`RoundingMode`](malachite_base::rounding_modes::RoundingMode);
 //!   - Various mathematical functions, like implementations of
 //!     [`FloorSqrt`](malachite_base::num::arithmetic::traits::FloorSqrt) and
-//!     [`Gcd`](malachite_base::num::arithmetic::traits::Gcd);
+//!     [`Gcd`](malachite_base::num::number_theory::traits::Gcd);
 //!   - Modular arithmetic functions, like implementations of
-//!     [`ModAdd`](malachite_base::num::arithmetic::traits::ModAdd) and
-//!     [`ModPow`](malachite_base::num::arithmetic::traits::ModPow), and of traits for arithmetic
+//!     [`ModAdd`](malachite_base::num::modular::traits::ModAdd) and
+//!     [`ModPow`](malachite_base::num::modular::traits::ModPow), and of traits for arithmetic
 //!     modulo a power of 2, like
-//!     [`ModPowerOf2Add`](malachite_base::num::arithmetic::traits::ModPowerOf2Add) and
-//!     [`ModPowerOf2Pow`](malachite_base::num::arithmetic::traits::ModPowerOf2Pow);
+//!     [`ModPowerOf2Add`](malachite_base::num::modular::traits::ModPowerOf2Add) and
+//!     [`ModPowerOf2Pow`](malachite_base::num::modular::traits::ModPowerOf2Pow);
 //!   - Various functions for logic and bit manipulation, like [`BitAnd`](core::ops::BitAnd) and
 //!     [`BitAccess`](malachite_base::num::logic::traits::BitAccess).
 //! - The implementations of these functions use high-performance algorithms that work efficiently
@@ -33,7 +33,8 @@
 //!   13 variants of
 //!   [Toom-Cook multiplication](https://en.wikipedia.org/wiki/Toom%E2%80%93Cook_multiplication),
 //!   or
-//!   [Schönhage-Strassen (FFT) multiplication](https://en.wikipedia.org/wiki/Schonhage-Strassen_algorithm),
+//!   [Schönhage-Strassen (FFT) multiplication](
+//! https://en.wikipedia.org/wiki/Schonhage-Strassen_algorithm),
 //!   depending on the input size.
 //! - Small numbers are also handled efficiently. Any [`Natural`](natural::Natural) smaller than
 //!   $2^{64}$ does not use any allocated memory, and working with such numbers is almost as fast
@@ -78,7 +79,7 @@
 //! This crate comes with a `bin` target that can be used for running demos and benchmarks.
 //! - Almost all of the public functions in this crate have an associated demo. Running a demo
 //!   shows you a function's behavior on a large number of inputs. For example, to demo the
-//!   [`mod_pow`](malachite_base::num::arithmetic::traits::ModPow::mod_pow) function on
+//!   [`mod_pow`](malachite_base::num::modular::traits::ModPow::mod_pow) function on
 //!   [`Natural`](natural::Natural)s, you can use the following command:
 //!   ```text
 //!   cargo run --features bin_build --release -- -l 10000 -m exhaustive -d demo_natural_mod_pow
@@ -105,7 +106,8 @@
 //!
 //! The list of available demos and benchmarks is not documented anywhere; you must find them by
 //! browsing through
-//! [`bin_util/demo_and_bench`](https://github.com/mhogrefe/malachite/tree/master/malachite-nz/src/bin_util/demo_and_bench).
+//! [`bin_util/demo_and_bench`](
+//! https://github.com/mhogrefe/malachite/tree/master/malachite-nz/src/bin_util/demo_and_bench).
 //!
 //! # Features
 //! - `32_bit_limbs`: Sets the type of [`Limb`](crate#limbs) to [`u32`] instead of the default,

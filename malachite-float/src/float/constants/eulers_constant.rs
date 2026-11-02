@@ -14,12 +14,11 @@
 
 use crate::Float;
 use core::cmp::Ordering;
-use malachite_base::num::arithmetic::traits::{
-    AddMul, CeilingLogBase2, DivRound, MulAddMul, Pow, Square,
-};
+use malachite_base::num::arithmetic::traits::{AddMul, DivRound, MulAddMul, Pow, Square};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;

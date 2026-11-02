@@ -7,15 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use crate::natural::arithmetic::log_base::log_base_helper_with_pow;
 use crate::natural::conversion::string::to_string::BaseFmtWrapper;
+use crate::natural::exponential::log_base::log_base_helper_with_pow;
 use crate::natural::slice_trailing_zeros;
 use alloc::string::String;
 use core::fmt::{Display, Formatter, Write};
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, DivExact, DivRound, DivisibleBy, DivisibleByPowerOf2, FloorLogBase,
-    FloorLogBasePowerOf2, Pow, ShrRound,
-};
+use malachite_base::num::arithmetic::traits::{DivExact, DivRound, Pow, ShrRound};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::string::options::{SciSizeOptions, ToSciOptions};
 use malachite_base::num::conversion::string::to_sci::write_exponent;
@@ -23,6 +20,10 @@ use malachite_base::num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToSci};
+use malachite_base::num::exponential::traits::{
+    CheckedLogBase2, FloorLogBase, FloorLogBasePowerOf2,
+};
+use malachite_base::num::modular::traits::{DivisibleBy, DivisibleByPowerOf2};
 use malachite_base::rounding_modes::RoundingMode::*;
 
 fn write_helper<T>(x: &T, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result

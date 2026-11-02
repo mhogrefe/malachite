@@ -8,8 +8,8 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::Gcd;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 use malachite_q::rational_matrix::RationalMatrix;

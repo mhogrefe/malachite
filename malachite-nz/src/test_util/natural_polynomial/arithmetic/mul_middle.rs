@@ -8,7 +8,8 @@
 
 use crate::natural_polynomial::NaturalPolynomial;
 use crate::test_util::natural_polynomial::arithmetic::mul::mul_naive;
-use malachite_base::polynomial::{DivPowerOfX, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::DivPowerOfX;
 
 // Multiplies the whole polynomials by schoolbook multiplication, truncates the product, and then
 // divides it by a power of $x$.

@@ -17,8 +17,7 @@ use crate::maps::exhaustive::{exhaustive_b_tree_maps, exhaustive_hash_maps};
 use crate::matrix::Matrix;
 use crate::max;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CheckedNeg, CoprimeWith, DivRound, ModIsReduced, ModMul,
-    ModPowerOf2IsReduced, ModPowerOf2Mul, Parity, PowerOf2, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, CheckedNeg, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -44,9 +43,12 @@ use crate::num::exhaustive::{
 use crate::num::float::NiceFloat;
 use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
+use crate::num::modular::traits::{ModIsReduced, ModMul, ModPowerOf2IsReduced, ModPowerOf2Mul};
+use crate::num::number_theory::traits::CoprimeWith;
 use crate::options::exhaustive::exhaustive_options;
 use crate::orderings::exhaustive::exhaustive_orderings;
-use crate::polynomial::{ComposePowerOfX, MulPowerOfX, Polynomial};
+use crate::polynomial::Polynomial;
+use crate::polynomial::arithmetic::traits::{ComposePowerOfX, MulPowerOfX};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::sets::exhaustive::{exhaustive_b_tree_sets, exhaustive_hash_sets};
@@ -73,11 +75,11 @@ use crate::test_util::generators::{
     signed_assign_bits_valid, smallest_invalid_value, unsigned_assign_bits_valid,
     unsigned_matrix_positions,
 };
-use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
 use crate::test_util::num::float::PRIMITIVE_FLOAT_CHARS;
+use crate::test_util::num::modular::mod_mul::limbs_invert_limb_naive;
 use crate::test_util::rounding_modes::ROUNDING_MODE_CHARS;
-use crate::test_util::unsigned_matrix::arithmetic::mod_solve::unsigned_matrix_mod_solve_naive;
+use crate::test_util::unsigned_matrix::linear_algebra::mod_solve::unsigned_matrix_mod_solve_naive;
 use crate::tuples::exhaustive::{
     ExhaustiveDependentPairsYsGenerator, ExhaustivePairs, ExhaustivePairs1Input,
     ExhaustiveQuadruples, ExhaustiveTriples, ExhaustiveTriplesXYY, exhaustive_dependent_pairs,

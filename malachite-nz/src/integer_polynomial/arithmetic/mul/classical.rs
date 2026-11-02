@@ -13,7 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_polynomial::arithmetic::coefficient::PolynomialCoefficient;
-use crate::integer_polynomial::arithmetic::mul_truncated::classical::mul_truncated_to_out_classical;
+use crate::integer_polynomial::series::mul_truncated::classical::mul_truncated_to_out_classical;
 
 // Sets `out` to the coefficients of the product of the polynomials with coefficients `xs` and `ys`,
 // both nonempty. `out` must have length `xs.len() + ys.len() - 1`, so this is the truncated product

@@ -169,32 +169,22 @@ pub mod rational_matrix {
         pub mod add;
         pub mod add_mul;
         pub mod canonical_primitive_part;
-        pub mod characteristic_polynomial;
         pub mod content;
         pub mod content_chained;
-        pub mod determinant;
-        pub mod determinant_sign;
         pub mod integer_matrix_mul;
-        pub mod inverse;
         pub mod is_solution;
         pub mod kronecker_product;
         pub mod mul;
         pub mod mul_integer_matrix;
         pub mod mul_vector;
         pub mod neg;
-        pub mod permanent;
         pub mod pow;
-        pub mod reconstruct;
-        pub mod reduced_row_echelon_form;
         pub mod scalar_mul;
         pub mod shl;
         pub mod shr;
-        pub mod similarity_transform;
-        pub mod solve;
         pub mod square;
         pub mod sub;
         pub mod sub_mul;
-        pub mod trace;
         pub mod vector_mul;
     }
     pub mod basic {
@@ -245,6 +235,20 @@ pub mod rational_matrix {
     pub mod exhaustive {
         pub mod exhaustive_rational_matrices;
     }
+    pub mod linear_algebra {
+        pub mod characteristic_polynomial;
+        pub mod determinant;
+        pub mod determinant_sign;
+        pub mod inverse;
+        pub mod permanent;
+        pub mod reduced_row_echelon_form;
+        pub mod similarity_transform;
+        pub mod solve;
+        pub mod trace;
+    }
+    pub mod modular {
+        pub mod reconstruct;
+    }
     pub mod identity;
     pub mod is_diagonal;
     pub mod is_empty;
@@ -289,46 +293,34 @@ pub mod rational_matrix {
 pub mod rational_polynomial {
     pub mod arithmetic {
         pub mod add;
-        pub mod add_truncated;
         pub mod canonical_primitive_part;
         pub mod canonicalize_unit;
         pub mod compose;
         pub mod compose_power_of_x;
-        pub mod compose_truncated;
-        pub mod compositional_inverse_truncated;
         pub mod content;
         pub mod deflate_power_of_x;
-        pub mod derivative;
         pub mod div;
         pub mod div_exact_by_polynomial;
         pub mod div_power_of_x;
         pub mod div_rem;
-        pub mod div_truncated;
         pub mod divisible_by;
         pub mod evaluate;
         pub mod exponent_gcd;
         pub mod height;
-        pub mod integral;
-        pub mod inverse_truncated;
         pub mod is_unit;
         pub mod l2_norm_squared;
         pub mod make_monic;
         pub mod mul;
         pub mod mul_power_of_x;
-        pub mod mul_truncated;
         pub mod neg;
-        pub mod nth_derivative;
         pub mod pow;
-        pub mod pow_truncated;
         pub mod rem;
         pub mod rem_precomputed;
         pub mod remove_power;
         pub mod shl;
         pub mod shr;
         pub mod square;
-        pub mod square_truncated;
         pub mod sub;
-        pub mod sub_truncated;
         pub mod taylor_shift;
     }
     pub mod basic {
@@ -337,6 +329,11 @@ pub mod rational_polynomial {
         pub mod mutate_coefficient;
         pub mod named;
         pub mod size;
+    }
+    pub mod calculus {
+        pub mod derivative;
+        pub mod integral;
+        pub mod nth_derivative;
     }
     pub mod comparison {
         pub mod cmp;
@@ -389,6 +386,17 @@ pub mod rational_polynomial {
         pub mod striped_random_rational_polynomials_min_degree;
         pub mod striped_random_rational_polynomials_with_degree;
     }
+    pub mod series {
+        pub mod add_truncated;
+        pub mod compose_truncated;
+        pub mod compositional_inverse_truncated;
+        pub mod div_truncated;
+        pub mod inverse_truncated;
+        pub mod mul_truncated;
+        pub mod pow_truncated;
+        pub mod square_truncated;
+        pub mod sub_truncated;
+    }
 }
 pub mod rational {
     pub mod arithmetic {
@@ -398,7 +406,6 @@ pub mod rational {
         pub mod add;
         pub mod add_mul;
         pub mod add_mul_shl;
-        pub mod approximate;
         pub mod average;
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_gaussian_unit;
@@ -406,21 +413,11 @@ pub mod rational {
         pub mod ceiling;
         pub mod cfrac_helpers;
         pub mod conjugate;
-        pub mod dedekind_sum;
-        pub mod denominators_in_closed_interval;
         pub mod div;
-        pub mod express_as_power;
-        pub mod farey_neighbors;
         pub mod floor;
-        pub mod gcd;
-        pub mod harmonic_number;
         pub mod height;
         pub mod is_power_of_2;
         pub mod is_unit;
-        pub mod log_base;
-        pub mod log_base_2;
-        pub mod log_base_power_of_2;
-        pub mod mod_op;
         pub mod mul;
         pub mod mul_add_mul;
         pub mod mul_sub_mul;
@@ -429,14 +426,12 @@ pub mod rational {
         pub mod pow;
         pub mod power_of_2;
         pub mod reciprocal;
-        pub mod reconstruct;
         pub mod root;
         pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_2;
         pub mod shl;
         pub mod shr;
         pub mod sign;
-        pub mod simplest_rational_in_interval;
         pub mod sqrt;
         pub mod square;
         pub mod sub;
@@ -537,6 +532,27 @@ pub mod rational {
         pub mod exhaustive_rationals_with_denominator_range;
         pub mod exhaustive_rationals_with_denominator_range_to_infinity;
         pub mod exhaustive_rationals_with_denominator_range_to_negative_infinity;
+    }
+    pub mod exponential {
+        pub mod log_base;
+        pub mod log_base_2;
+        pub mod log_base_power_of_2;
+    }
+    pub mod factorization {
+        pub mod express_as_power;
+    }
+    pub mod modular {
+        pub mod mod_op;
+        pub mod reconstruct;
+    }
+    pub mod number_theory {
+        pub mod approximate;
+        pub mod dedekind_sum;
+        pub mod denominators_in_closed_interval;
+        pub mod farey_neighbors;
+        pub mod gcd;
+        pub mod harmonic_number;
+        pub mod simplest_rational_in_interval;
     }
     pub mod random {
         pub mod random_negative_rationals;

@@ -13,9 +13,17 @@ pub(crate) fn register(runner: &mut Runner) {
     basic::register(runner);
     comparison::register(runner);
     conversion::register(runner);
+    exponential::register(runner);
+    factorization::register(runner);
+    modular::register(runner);
+    number_theory::register(runner);
 }
 
 mod arithmetic;
 mod basic;
 mod comparison;
 mod conversion;
+mod exponential;
+mod factorization;
+mod modular;
+mod number_theory;

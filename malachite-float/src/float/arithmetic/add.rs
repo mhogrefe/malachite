@@ -21,10 +21,11 @@ use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use core::mem::swap;
 use core::ops::{Add, AddAssign};
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, IsPowerOf2, NegAssign};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, NegAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::add::{

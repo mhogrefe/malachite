@@ -9,7 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{FloorSqrt, Height, Square};
 use malachite_base::num::basic::traits::One;
-use malachite_base::polynomial::{FloorL2Norm, L2NormSquared};
+use malachite_base::polynomial::arithmetic::traits::{FloorL2Norm, L2NormSquared};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_polynomial_gen;

@@ -9,8 +9,9 @@
 use crate::integer::Integer;
 use crate::integer_vector::IntegerVector;
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{ContentChained, Gcd, GcdAssign};
+use malachite_base::num::arithmetic::traits::ContentChained;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::number_theory::traits::{Gcd, GcdAssign};
 
 // Returns the GCD of `gcd` and the absolute values of the elements of `xs`, where `abs` gives the
 // absolute value of an element.

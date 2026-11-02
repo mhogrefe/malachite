@@ -20,12 +20,12 @@ use crate::integer_polynomial::arithmetic::pseudo_div_rem::{div_rem_divide_and_c
 use crate::natural::Natural;
 use alloc::vec::Vec;
 use core::cmp::min;
-use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, DivisibleBy, NegAssign, SubMulAssign,
-};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, NegAssign, SubMulAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::polynomial::{CheckedDivExact, Polynomial};
+use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
 
 // The quotient of the polynomials with coefficients `xs` and `ys`, assuming that the division is
 // exact, where `ys` is nonempty, its last coefficient is nonzero, and `xs` is at least as long: the
@@ -750,7 +750,7 @@ impl CheckedDivExact<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivExact;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+13*x+5").unwrap();
@@ -797,7 +797,7 @@ impl CheckedDivExact<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivExact;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+13*x+5").unwrap();
@@ -844,7 +844,7 @@ impl CheckedDivExact<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivExact;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+13*x+5").unwrap();
@@ -891,7 +891,7 @@ impl CheckedDivExact<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedDivExact;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+13*x+5").unwrap();

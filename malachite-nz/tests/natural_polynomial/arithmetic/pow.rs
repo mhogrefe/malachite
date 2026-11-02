@@ -9,7 +9,8 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Content, Pow, PowAssign, Square};
 use malachite_base::num::basic::traits::{One, Two};
-use malachite_base::polynomial::{Evaluate, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::integer_polynomial::arithmetic::pow::binexp::pow_to_out_binexp;
 use malachite_nz::integer_polynomial::arithmetic::pow::binomial::pow_to_out_binomial;

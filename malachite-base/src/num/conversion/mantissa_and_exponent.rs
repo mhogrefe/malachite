@@ -6,9 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivisibleByPowerOf2, ModPowerOf2, ShrRound,
-};
+use crate::num::arithmetic::traits::{ArithmeticCheckedShl, ShrRound};
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
@@ -17,6 +15,7 @@ use crate::num::conversion::traits::{
     WrappingFrom,
 };
 use crate::num::logic::traits::{BitAccess, LeadingZeros, LowMask, SignificantBits, TrailingZeros};
+use crate::num::modular::traits::{DivisibleByPowerOf2, ModPowerOf2};
 use crate::rounding_modes::RoundingMode::{self, *};
 use core::cmp::Ordering::{self, *};
 

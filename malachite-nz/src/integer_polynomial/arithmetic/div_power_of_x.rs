@@ -9,7 +9,8 @@
 use crate::integer_polynomial::IntegerPolynomial;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::polynomial::{DivPowerOfX, DivPowerOfXAssign, Polynomial};
+use malachite_base::polynomial::Polynomial;
+use malachite_base::polynomial::arithmetic::traits::{DivPowerOfX, DivPowerOfXAssign};
 
 impl DivPowerOfX for IntegerPolynomial {
     type Output = Self;
@@ -37,7 +38,7 @@ impl DivPowerOfX for IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::DivPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DivPowerOfX;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("x^3-3*x^2+2*x-5").unwrap();
@@ -82,7 +83,7 @@ impl DivPowerOfX for &IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::DivPowerOfX;
+    /// use malachite_base::polynomial::arithmetic::traits::DivPowerOfX;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("x^3-3*x^2+2*x-5").unwrap();
@@ -129,7 +130,7 @@ impl DivPowerOfXAssign for IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::DivPowerOfXAssign;
+    /// use malachite_base::polynomial::arithmetic::traits::DivPowerOfXAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("x^3-3*x^2+2*x-5").unwrap();

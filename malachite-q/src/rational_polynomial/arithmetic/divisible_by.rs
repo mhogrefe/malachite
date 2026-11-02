@@ -13,8 +13,8 @@
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::arithmetic::div_exact::checked_div_exact_helper;
 use alloc::borrow::Cow;
-use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::modular::traits::DivisibleBy;
 
 // Whether `q` divides `p`. Zero divides only zero.
 //
@@ -43,7 +43,7 @@ impl DivisibleBy<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::modular::traits::DivisibleBy;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert!(
@@ -84,7 +84,7 @@ impl DivisibleBy<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::modular::traits::DivisibleBy;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert!(
@@ -125,7 +125,7 @@ impl DivisibleBy<RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::modular::traits::DivisibleBy;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert!(
@@ -165,7 +165,7 @@ impl DivisibleBy<&RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::modular::traits::DivisibleBy;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// assert!(

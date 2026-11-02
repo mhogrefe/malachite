@@ -36,14 +36,15 @@ use core::cmp::{
 };
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
-    IsPowerOf2, ModPowerOf2, ModPowerOf2Sub, NegAssign, NegModPowerOf2, OverflowingAddAssign,
-    OverflowingNegAssign, Parity, PowerOf2, SaturatingAddAssign, SaturatingSubAssign, Sign,
-    WrappingAddAssign, WrappingNegAssign, WrappingSubAssign,
+    IsPowerOf2, NegAssign, OverflowingAddAssign, OverflowingNegAssign, Parity, PowerOf2,
+    SaturatingAddAssign, SaturatingSubAssign, Sign, WrappingAddAssign, WrappingNegAssign,
+    WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
 use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2Sub, NegModPowerOf2};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 

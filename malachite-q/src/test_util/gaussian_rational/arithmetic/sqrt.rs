@@ -8,8 +8,9 @@
 
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
-use malachite_base::num::arithmetic::traits::{DivExact, Lcm, Square, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{DivExact, Square, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::Lcm;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::gaussian_integer::arithmetic::sqrt::*;

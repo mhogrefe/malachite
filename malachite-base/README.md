@@ -16,7 +16,7 @@ This crate contains many utilities that are used by the
 - Traits that wrap functions from the standard library, like
   [`CheckedAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedAdd.html).
 - Traits that give extra functionality to primitive types, like
-  [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html),
+  [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html),
   [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html),
   and
   [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html).
@@ -50,7 +50,7 @@ This crate contains many utilities that are used by the
 This crate comes with a `bin` target that can be used for running demos and benchmarks.
 - Almost all of the public functions in this crate have an associated demo. Running a demo
   shows you a function's behavior on a large number of inputs. For example, to demo the
-  [`mod_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html#tymethod.mod_pow)
+  [`mod_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html#tymethod.mod_pow)
   function on [`u32`](https://doc.rust-lang.org/nightly/std/primitive.u32.html)s, you can use the
   following command:
   ```

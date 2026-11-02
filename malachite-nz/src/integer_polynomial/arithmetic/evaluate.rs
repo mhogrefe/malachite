@@ -19,7 +19,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use malachite_base::polynomial::{Evaluate, EvaluateMany, ModEvaluate};
+use malachite_base::polynomial::arithmetic::traits::{Evaluate, EvaluateMany};
+use malachite_base::polynomial::modular::traits::ModEvaluate;
 use malachite_base::unsigned_polynomial::arithmetic::evaluate::mod_evaluate_slice;
 
 // Evaluates a polynomial, given by its coefficients in ascending order, at `x` with Horner's rule.
@@ -236,7 +237,7 @@ impl Evaluate<&Integer> for &IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Two, Zero};
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -290,7 +291,7 @@ impl Evaluate<Integer> for &IntegerPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::num::basic::traits::{One, Two, Zero};
-    /// use malachite_base::polynomial::Evaluate;
+    /// use malachite_base::polynomial::arithmetic::traits::Evaluate;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
@@ -336,8 +337,8 @@ impl ModEvaluate<u64> for &IntegerPolynomial {
     /// m)$. The zero polynomial evaluates to 0 everywhere.
     ///
     /// Each coefficient is reduced to a word, and the words are then evaluated as by
-    /// [`UnsignedPolynomial::mod_evaluate`](malachite_base::polynomial::ModEvaluate::mod_evaluate),
-    /// with Horner's rule and, for longer polynomials, Shoup's method.
+    /// [`UnsignedPolynomial::mod_evaluate`](ModEvaluate::mod_evaluate), with Horner's rule and, for
+    /// longer polynomials, Shoup's method.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n + m)$
@@ -353,7 +354,7 @@ impl ModEvaluate<u64> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::ModEvaluate;
+    /// use malachite_base::polynomial::modular::traits::ModEvaluate;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("-5*x^2+3*x-7").unwrap();
@@ -395,9 +396,10 @@ impl EvaluateMany<Integer> for &IntegerPolynomial {
     ///
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     ///
-    /// Each value is found as by [`evaluate`](malachite_base::polynomial::Evaluate::evaluate),
-    /// which chooses between Horner's rule and divide and conquer by the length of the polynomial
-    /// and the size of the value.
+    /// Each value is found as by
+    /// [`evaluate`](malachite_base::polynomial::arithmetic::traits::Evaluate::evaluate), which
+    /// chooses between Horner's rule and divide and conquer by the length of the polynomial and the
+    /// size of the value.
     ///
     /// # Worst-case complexity
     /// $T(n, k) = O(kn \log^2 n \log\log n)$
@@ -411,7 +413,7 @@ impl EvaluateMany<Integer> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::EvaluateMany;
+    /// use malachite_base::polynomial::arithmetic::traits::EvaluateMany;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///

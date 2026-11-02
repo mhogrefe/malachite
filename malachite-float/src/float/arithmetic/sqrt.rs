@@ -15,14 +15,13 @@ use crate::{
     float_negative_zero, float_zero,
 };
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, CheckedSqrt, FloorLogBase2, Parity, Sqrt, SqrtAssign,
-};
+use malachite_base::num::arithmetic::traits::{CheckedSqrt, Parity, Sqrt, SqrtAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::NaN as NanTrait;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::exponential::traits::{CheckedLogBase2, FloorLogBase2};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;

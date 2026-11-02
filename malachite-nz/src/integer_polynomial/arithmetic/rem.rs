@@ -15,7 +15,7 @@
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::div_rem::{checked_div_rem_helper, div_rem_helper};
 use core::ops::{Rem, RemAssign};
-use malachite_base::polynomial::CheckedRem;
+use malachite_base::polynomial::arithmetic::traits::CheckedRem;
 
 impl Rem<Self> for IntegerPolynomial {
     type Output = Self;
@@ -299,7 +299,7 @@ impl CheckedRem<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+3*x+4").unwrap();
@@ -341,7 +341,7 @@ impl CheckedRem<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+3*x+4").unwrap();
@@ -383,7 +383,7 @@ impl CheckedRem<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+3*x+4").unwrap();
@@ -425,7 +425,7 @@ impl CheckedRem<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::CheckedRem;
+    /// use malachite_base::polynomial::arithmetic::traits::CheckedRem;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x^2+3*x+4").unwrap();

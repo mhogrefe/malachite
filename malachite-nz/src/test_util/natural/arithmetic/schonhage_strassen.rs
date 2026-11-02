@@ -16,12 +16,14 @@ use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::platform::{Limb, SignedLimb};
 use malachite_base::num::arithmetic::traits::{
-    Mod, ModAddAssign, ModMul, ModNeg, ModPowerOf2, ModSub, Parity, PowerOf2, WrappingAddAssign,
-    WrappingSubAssign,
+    Parity, PowerOf2, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::modular::traits::{
+    Mod, ModAddAssign, ModMul, ModNeg, ModPowerOf2, ModSub,
+};
 use malachite_base::slices::slice_test_zero;
 
 // $N$, the number of bits below the overflow limb.

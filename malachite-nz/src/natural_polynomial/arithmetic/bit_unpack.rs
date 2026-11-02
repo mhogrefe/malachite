@@ -9,7 +9,7 @@
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use malachite_base::num::conversion::traits::PowerOf2Digits;
-use malachite_base::polynomial::BitUnpack;
+use malachite_base::polynomial::arithmetic::traits::BitUnpack;
 
 impl BitUnpack<Natural> for NaturalPolynomial {
     /// Unpacks a [`NaturalPolynomial`] from the `bits`-bit fields of a [`Natural`], taking it by
@@ -21,8 +21,8 @@ impl BitUnpack<Natural> for NaturalPolynomial {
     /// x^i.
     /// $$
     ///
-    /// This inverts [`bit_pack`](malachite_base::polynomial::BitPack::bit_pack) on polynomials
-    /// whose coefficients are less than $2^b$.
+    /// This inverts [`bit_pack`](malachite_base::polynomial::arithmetic::traits::BitPack::bit_pack)
+    /// on polynomials whose coefficients are less than $2^b$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -37,7 +37,7 @@ impl BitUnpack<Natural> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::BitUnpack;
+    /// use malachite_base::polynomial::arithmetic::traits::BitUnpack;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -74,8 +74,8 @@ impl BitUnpack<&Natural> for NaturalPolynomial {
     /// x^i.
     /// $$
     ///
-    /// This inverts [`bit_pack`](malachite_base::polynomial::BitPack::bit_pack) on polynomials
-    /// whose coefficients are less than $2^b$.
+    /// This inverts [`bit_pack`](malachite_base::polynomial::arithmetic::traits::BitPack::bit_pack)
+    /// on polynomials whose coefficients are less than $2^b$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -90,7 +90,7 @@ impl BitUnpack<&Natural> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::polynomial::BitUnpack;
+    /// use malachite_base::polynomial::arithmetic::traits::BitUnpack;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///

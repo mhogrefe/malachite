@@ -7,12 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod, DivAssignMod,
-    DivAssignModPrecomputed, DivAssignRem, DivMod, DivModPrecomputed, DivRem, DivRound, Mod,
+    CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod, DivAssignModPrecomputed,
+    DivAssignRem, DivMod, DivModPrecomputed, DivRem, DivRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::modular::traits::{CeilingMod, Mod};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::signed_pair_gen_var_4;

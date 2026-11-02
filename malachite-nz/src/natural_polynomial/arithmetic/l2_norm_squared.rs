@@ -10,7 +10,7 @@ use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
 use malachite_base::num::arithmetic::traits::AddMulAssign;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::L2NormSquared;
+use malachite_base::polynomial::arithmetic::traits::L2NormSquared;
 
 impl L2NormSquared for &NaturalPolynomial {
     type Output = Natural;
@@ -33,7 +33,7 @@ impl L2NormSquared for &NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::L2NormSquared;
+    /// use malachite_base::polynomial::arithmetic::traits::L2NormSquared;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// assert_eq!(

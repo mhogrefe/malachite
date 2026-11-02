@@ -21,14 +21,27 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate numbers without repetition.
 pub mod exhaustive;
+/// Exponential and logarithmic functions, and integer logarithms.
+pub mod exponential;
 /// Traits for generating primes, primality testing, and factorization.
 pub mod factorization;
 /// [`NiceFloat`](float::NiceFloat), a wrapper around primitive floats.
 pub mod float;
+/// Hyperbolic functions and their inverses.
+pub mod hyperbolic;
 /// Iterators related to numbers.
 pub mod iterators;
+/// Linear algebra: determinants, ranks, nullspaces, solving, decompositions, and normal forms.
+pub mod linear_algebra;
 /// Traits for logic and bit manipulation.
 pub mod logic;
+/// Modular arithmetic: operations on residues modulo $m$ and $2^k$, reduction, divisibility, and
+/// the Chinese remainder theorem.
+pub mod modular;
+/// Number theory: GCDs, Kronecker symbols, and combinatorial sequences.
+pub mod number_theory;
 #[cfg(feature = "random")]
 /// Iterators that generate numbers randomly.
 pub mod random;
+/// Trigonometric functions and their inverses.
+pub mod trigonometric;

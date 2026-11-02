@@ -19,13 +19,12 @@ use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use core::mem::swap;
 use core::ops::{Div, DivAssign};
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, FloorLogBase2, IsPowerOf2, NegAssign, Sign,
-};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, NegAssign, Sign};
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::{CheckedLogBase2, FloorLogBase2};
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::div::{

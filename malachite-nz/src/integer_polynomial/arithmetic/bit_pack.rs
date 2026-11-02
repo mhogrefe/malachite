@@ -20,11 +20,12 @@ use crate::natural::arithmetic::sub::limbs_sub_limb_in_place;
 use crate::natural::logic::not::limbs_not_to_out;
 use crate::natural_polynomial::arithmetic::bit_pack::limbs_bit_pack;
 use crate::platform::Limb;
-use malachite_base::num::arithmetic::traits::{ModPowerOf2Assign, PowerOf2, WrappingAddAssign};
+use malachite_base::num::arithmetic::traits::{PowerOf2, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::polynomial::BitPack;
+use malachite_base::num::modular::traits::ModPowerOf2Assign;
+use malachite_base::polynomial::arithmetic::traits::BitPack;
 
 // The limb in which field `i` of consecutive `bits`-bit fields starts, and the bit within that
 // limb.
@@ -259,7 +260,7 @@ impl BitPack for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::BitPack;
+    /// use malachite_base::polynomial::arithmetic::traits::BitPack;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// // 3 * 2^16 + 2 * 2^8 + 1
@@ -311,7 +312,7 @@ impl BitPack for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::BitPack;
+    /// use malachite_base::polynomial::arithmetic::traits::BitPack;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// // 3 * 2^16 + 2 * 2^8 + 1

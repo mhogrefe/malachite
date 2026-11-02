@@ -14,17 +14,19 @@ use crate::platform::Limb;
 use core::cmp::{Ordering::*, min};
 use core::marker::PhantomData;
 use core::slice::Chunks;
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, DivRound, FloorLogBase2, ModPowerOf2, PowerOf2, SaturatingSubAssign, ShrRound,
-};
+use malachite_base::num::arithmetic::traits::{DivRound, PowerOf2, SaturatingSubAssign, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::digits::power_of_2_digit_iterable::*;
+#[cfg(doc)]
+use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_base::num::conversion::traits::{
     ExactFrom, PowerOf2DigitIterable, PowerOf2DigitIterator,
 };
+use malachite_base::num::exponential::traits::{CheckedLogBase2, FloorLogBase2};
 use malachite_base::num::logic::traits::LowMask;
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::*;
 
 #[doc(hidden)]
@@ -525,10 +527,8 @@ macro_rules! iterables {
             /// trailing zero digits going forward, or leading zero digits going backward.
             ///
             /// If it's necessary to get a [`Vec`] of all the digits, consider using
-            /// [`to_power_of_2_digits_asc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_asc)
-            /// or
-            /// [`to_power_of_2_digits_desc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_desc)
-            /// instead.
+            /// [`to_power_of_2_digits_asc`](PowerOf2Digits::to_power_of_2_digits_asc) or
+            /// [`to_power_of_2_digits_desc`](PowerOf2Digits::to_power_of_2_digits_desc) instead.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -828,10 +828,8 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     /// trailing zero digits going forward, or leading zero digits going backward.
     ///
     /// If it's necessary to get a [`Vec`] of all the digits, consider using
-    /// [`to_power_of_2_digits_asc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_asc)
-    /// or
-    /// [`to_power_of_2_digits_desc`](malachite_base::num::conversion::traits::PowerOf2Digits::to_power_of_2_digits_desc)
-    /// instead.
+    /// [`to_power_of_2_digits_asc`](PowerOf2Digits::to_power_of_2_digits_asc) or
+    /// [`to_power_of_2_digits_desc`](PowerOf2Digits::to_power_of_2_digits_desc) instead.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
@@ -883,7 +881,6 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     ///     ]
     /// );
     /// ```
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     fn power_of_2_digits(self, log_base: u64) -> NaturalPowerOf2DigitIterator<'a> {
         assert_ne!(log_base, 0);
         match self {

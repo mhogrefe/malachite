@@ -8,10 +8,11 @@
 
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod,
-    DivModPrecomputed, DivRem, DivRound, NegMod,
+    DivModPrecomputed, DivRem, DivRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::BitAccess;
+use malachite_base::num::modular::traits::NegMod;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, quadruple_2_3_diff_vec_len_bucketer, quadruple_2_vec_len_bucketer,

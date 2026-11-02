@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::FloorLogBase;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -16,6 +15,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom,
 };
+use malachite_base::num::exponential::traits::FloorLogBase;
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::slices::slice_leading_zeros;
 use malachite_base::test_util::generators::common::GenConfig;

@@ -9,7 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::polynomial::CheckedRem;
+use malachite_base::polynomial::arithmetic::traits::CheckedRem;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{
     rational_polynomial_pair_gen, rational_polynomial_pair_gen_var_3,

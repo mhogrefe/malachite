@@ -8,7 +8,7 @@
 
 use crate::integer::Integer;
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::Gcd;
+use malachite_base::num::number_theory::traits::Gcd;
 
 // The GCD of `x` and the absolute values of the elements of `xs`, taken one element at a time with
 // none of the shortcuts.
