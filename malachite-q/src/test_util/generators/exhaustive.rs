@@ -1933,3 +1933,10 @@ pub fn exhaustive_rational_matrix_unsigned_rational_triple_gen_var_2()
 -> It<(RationalMatrix, u64, Rational)> {
     exhaustive_rational_matrix_unsigned_rational_triple_gen_var_1()
 }
+
+pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_5() -> It<(RationalPolynomial, u64)> {
+    Box::new(
+        exhaustive_rational_polynomial_unsigned_pair_gen_var_4()
+            .map(|(q, len)| (q.mul_power_of_x(1), len)),
+    )
+}

@@ -36,6 +36,8 @@ pub mod compose_power_of_x;
 /// [`ComposeTruncatedAssign`](malachite_base::polynomial::ComposeTruncatedAssign), for composing
 /// two polynomials as power series.
 pub mod compose_truncated;
+/// Series reversion: the compositional inverse of a polynomial as a power series.
+pub mod compositional_inverse_truncated;
 /// Implementations of [`Content`](malachite_base::num::arithmetic::traits::Content),
 /// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), and
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart)

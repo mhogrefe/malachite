@@ -1,0 +1,12 @@
+(x).compositional_inverse_truncated(0) = 0
+(1/2*x).compositional_inverse_truncated(1) = 0
+(x^2+1/3*x).compositional_inverse_truncated(2) = 3*x
+(1/3*x^2+1/2*x).compositional_inverse_truncated(5) = -640/27*x^4+64/9*x^3-8/3*x^2+2*x
+(x^2+2*x).compositional_inverse_truncated(6) = 7/256*x^5-5/128*x^4+1/16*x^3-1/8*x^2+1/2*x
+(x^2+x).compositional_inverse_truncated(6) = 14*x^5-5*x^4+2*x^3-x^2+x
+(1/2*x^3-x).compositional_inverse_truncated(8) = -3/2*x^7-3/4*x^5-1/2*x^3-x
+(1/2*x^2+x).compositional_inverse_truncated(21) = -883631595/262144*x^20+119409675/65536*x^19-64822395/65536*x^18+17678835/32768*x^17-9694845/32768*x^16+334305/2048*x^15-185725/2048*x^14+52003/1024*x^13-29393/1024*x^12+4199/256*x^11-2431/256*x^10+715/128*x^9-429/128*x^8+33/16*x^7-21/16*x^6+7/8*x^5-5/8*x^4+1/2*x^3-1/2*x^2+x
+(x+1/2).compositional_inverse_truncated(5) = None
+(1/2*x^2).compositional_inverse_truncated(5) = None
+(0).compositional_inverse_truncated(5) = None
+(1/3*x^2+1/2*x).compositional_inverse_truncated(12) = 35223764992/59049*x^11-2549088256/19683*x^10+187432960/6561*x^9-4685824/729*x^8+360448/243*x^7-28672/81*x^6+7168/81*x^5-640/27*x^4+64/9*x^3-8/3*x^2+2*x

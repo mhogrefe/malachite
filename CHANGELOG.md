@@ -796,6 +796,20 @@ documented by git history.
   splitting; the cutoff was tuned. The `Precomputed` forms take the data of `ModDivRemPrecomputed`,
   and the `PrecomputedPowers` forms precompute the powers of a fixed inner polynomial.
   `NaturalPolynomial`s with a word-sized modulus are composed with word-sized coefficients.
+- New `CompositionalInverseTruncated`, `ModCompositionalInverseTruncated`, and
+  `ModPowerOf2CompositionalInverseTruncated` traits in malachite-base: series reversion, the power
+  series $q$ with $p(q(x)) \equiv x \bmod x^n$, like FLINT's `nmod_poly_revert_series`,
+  `fmpz_poly_revert_series`, and `fmpq_poly_revert_series`. They are implemented, by value and by
+  reference, for `UnsignedPolynomial<T>` and `NaturalPolynomial` modulo $m$ and modulo $2^k$ (FLINT
+  has no `fmpz_mod_poly` version), for `IntegerPolynomial`, and, in malachite-q, for
+  `RationalPolynomial`. They return `None` unless the constant coefficient is 0 and the coefficient
+  of $x$ is a unit (1 or $-1$ over the integers), where FLINT throws. The fast Lagrange algorithm
+  and Newton's iteration are both available; Newton's iteration is chosen at once when a modulus has
+  a prime factor less than $n$ (always modulo $2^k$), and the cutoffs were measured: 2500 terms for
+  words and integers, 8192 for multi-limb moduli, and, for rationals, Newton's iteration only from 10
+  to 19 terms. Rational reversion keeps a common denominator as FLINT does, and integer inputs with
+  coefficient of $x$ equal to $\pm 1$ are reverted over the integers. Moduli and powers of 2 that fit
+  in two limbs are handled in word arithmetic.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

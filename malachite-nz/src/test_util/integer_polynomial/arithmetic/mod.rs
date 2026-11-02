@@ -13,6 +13,7 @@ pub mod bit_unpack;
 pub mod compose;
 pub mod compose_power_of_x;
 pub mod compose_truncated;
+pub mod compositional_inverse_truncated;
 pub mod deflate_power_of_x;
 pub mod derivative;
 pub mod div_power_of_x;

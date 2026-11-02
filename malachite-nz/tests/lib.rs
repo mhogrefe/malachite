@@ -886,6 +886,7 @@ pub mod integer_polynomial {
         pub mod compose;
         pub mod compose_power_of_x;
         pub mod compose_truncated;
+        pub mod compositional_inverse_truncated;
         pub mod content;
         pub mod deflate_power_of_x;
         pub mod derivative;
@@ -1010,6 +1011,7 @@ pub mod natural_polynomial {
         pub mod mod_compose;
         pub mod mod_compose_mod_polynomial;
         pub mod mod_compose_truncated;
+        pub mod mod_compositional_inverse_truncated;
         pub mod mod_derivative;
         pub mod mod_div_exact;
         pub mod mod_div_rem;
@@ -1038,6 +1040,7 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_compose;
         pub mod mod_power_of_2_compose_mod_polynomial;
         pub mod mod_power_of_2_compose_truncated;
+        pub mod mod_power_of_2_compositional_inverse_truncated;
         pub mod mod_power_of_2_derivative;
         pub mod mod_power_of_2_div_exact;
         pub mod mod_power_of_2_div_rem;

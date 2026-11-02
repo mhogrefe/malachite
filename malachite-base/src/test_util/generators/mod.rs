@@ -6585,3 +6585,27 @@ pub fn unsigned_polynomial_unsigned_unsigned_polynomial_unsigned_quadruple_gen_v
         &special_random_unsigned_polynomial_unsigned_unsigned_polynomial_unsigned_quadruple_gen_var_2,
     )
 }
+
+// All `(UnsignedPolynomial<T>, u64, T)` where the `T` is positive, the polynomial's coefficients
+// are less than it, its constant coefficient is 0, its coefficient of $x$ is coprime to the `T`,
+// and the `u64` is small.
+pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_16<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, u64, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_16,
+        &random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_16,
+        &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_16,
+    )
+}
+
+// All `(UnsignedPolynomial<T>, u64, u64)` where the last `u64` is no greater than `T::WIDTH`, the
+// polynomial's coefficients are less than 2 to the power of it, its constant coefficient is 0, its
+// coefficient of $x$ is odd, and the first `u64` is small.
+pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_17<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_17,
+        &random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_17,
+        &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_17,
+    )
+}

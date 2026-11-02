@@ -332,6 +332,21 @@ pub trait InverseTruncated {
     fn inverse_truncated(self, len: u64) -> Option<Self::Output>;
 }
 
+/// Finds the compositional inverse of a polynomial as a power series, truncated to its first `len`
+/// coefficients: the series $q$ with $p(q(x)) = x$. The constant coefficient of $p$ must be 0 and
+/// its coefficient of $x$ must be a unit; otherwise there is no inverse.
+pub trait CompositionalInverseTruncated {
+    type Output;
+
+    /// Finds the compositional inverse of a polynomial as a power series, truncated to its first
+    /// `len` coefficients.
+    ///
+    /// $$
+    /// f(p, n) = q \bmod x^n, \quad p(q(x)) \equiv q(p(x)) \equiv x \pmod{x^n}.
+    /// $$
+    fn compositional_inverse_truncated(self, len: u64) -> Option<Self::Output>;
+}
+
 /// Divides one polynomial by another as power series, keeping only the coefficients of $x^i$ for
 /// $i$ less than a given length. The constant coefficient of the divisor must be nonzero, and the
 /// quotient must have coefficients in the polynomials' coefficient ring.
@@ -639,6 +654,25 @@ pub trait ModPowerOf2InverseTruncated {
     /// f(p, n, k) = q \bmod x^n, \quad pq \equiv 1 \pmod{x^n, 2^k}.
     /// $$
     fn mod_power_of_2_inverse_truncated(self, len: u64, pow: u64) -> Option<Self::Output>;
+}
+
+/// Finds the compositional inverse of a polynomial as a power series modulo $2^k$, truncated to its
+/// first `len` coefficients. The constant coefficient must be 0 and the coefficient of $x$ must be
+/// odd; otherwise there is no inverse.
+pub trait ModPowerOf2CompositionalInverseTruncated {
+    type Output;
+
+    /// Finds the compositional inverse of a polynomial as a power series modulo $2^k$, truncated to
+    /// its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, n, k) = q \bmod x^n, \quad p(q(x)) \equiv x \pmod{x^n, 2^k}.
+    /// $$
+    fn mod_power_of_2_compositional_inverse_truncated(
+        self,
+        len: u64,
+        pow: u64,
+    ) -> Option<Self::Output>;
 }
 
 /// Divides one polynomial by another as power series modulo $2^k$, keeping only the coefficients of
@@ -1151,6 +1185,21 @@ pub trait ModInverseTruncated<M = Self> {
     /// f(p, n, m) = q \bmod x^n, \quad pq \equiv 1 \pmod{x^n, m}.
     /// $$
     fn mod_inverse_truncated(self, len: u64, m: M) -> Option<Self::Output>;
+}
+
+/// Finds the compositional inverse of a polynomial as a power series modulo $m$, truncated to its
+/// first `len` coefficients. The constant coefficient must be 0 and the coefficient of $x$ must be
+/// invertible modulo $m$; otherwise there is no inverse.
+pub trait ModCompositionalInverseTruncated<M = Self> {
+    type Output;
+
+    /// Finds the compositional inverse of a polynomial as a power series modulo $m$, truncated to
+    /// its first `len` coefficients.
+    ///
+    /// $$
+    /// f(p, n, m) = q \bmod x^n, \quad p(q(x)) \equiv x \pmod{x^n, m}.
+    /// $$
+    fn mod_compositional_inverse_truncated(self, len: u64, m: M) -> Option<Self::Output>;
 }
 
 /// Divides one polynomial by another as power series modulo $m$, keeping only the coefficients of

@@ -15296,3 +15296,36 @@ pub fn random_natural_polynomial_unsigned_natural_polynomial_unsigned_quadruple_
         }),
     )
 }
+
+pub fn random_natural_polynomial_unsigned_natural_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64, Natural)> {
+    Box::new(
+        random_natural_polynomial_unsigned_natural_triple_gen_var_3(config)
+            .filter(|(q, _, m)| {
+                q.coefficients_asc()
+                    .first()
+                    .is_some_and(|c| c.coprime_with(m))
+            })
+            .map(|(q, len, m)| (q.mul_power_of_x(1), len, m)),
+    )
+}
+
+pub fn random_natural_polynomial_unsigned_unsigned_triple_gen_var_7(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, u64, u64)> {
+    Box::new(
+        random_natural_polynomial_unsigned_unsigned_triple_gen_var_4(config)
+            .filter(|(q, _, _)| q.coefficients_asc().first().is_some_and(Parity::odd))
+            .map(|(q, len, pow)| (q.mul_power_of_x(1), len, pow)),
+    )
+}
+
+pub fn random_integer_polynomial_unsigned_pair_gen_var_8(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64)> {
+    Box::new(
+        random_integer_polynomial_unsigned_pair_gen_var_7(config)
+            .map(|(q, len)| (q.mul_power_of_x(1), len)),
+    )
+}

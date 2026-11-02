@@ -226,7 +226,7 @@ const fn divide_and_conquer_preferred(len1: usize, len2: usize, n: usize) -> boo
 // with coefficients modulo `m`, except that the monomial case allows a monomial of any degree, that
 // the choice of algorithm was measured (see `horner_preferred` and `divide_and_conquer_preferred`),
 // and that the Kinoshita–Li algorithm is not used.
-fn mod_compose_truncated_dispatch(
+pub(crate) fn mod_compose_truncated_dispatch(
     xs: &[Natural],
     ys: &[Natural],
     n: usize,

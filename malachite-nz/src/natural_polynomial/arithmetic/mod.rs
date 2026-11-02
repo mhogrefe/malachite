@@ -115,6 +115,8 @@ pub mod mod_compose_mod_polynomial_precomputed_powers;
 /// composing two polynomials modulo $m$ as power series, keeping only the low coefficients of the
 /// result.
 pub mod mod_compose_truncated;
+/// Series reversion modulo a number: the compositional inverse of a polynomial as a power series.
+pub mod mod_compositional_inverse_truncated;
 /// Implementations of [`ModDerivative`](malachite_base::polynomial::ModDerivative) and
 /// [`ModDerivativeAssign`](malachite_base::polynomial::ModDerivativeAssign), for differentiating a
 /// polynomial modulo a number.
@@ -240,6 +242,9 @@ pub mod mod_power_of_2_compose_mod_polynomial_precomputed_powers;
 /// malachite_base::polynomial::ModPowerOf2ComposeTruncatedAssign), for composing two polynomials
 /// modulo $2^k$ as power series, keeping only the low coefficients of the result.
 pub mod mod_power_of_2_compose_truncated;
+/// Series reversion modulo a power of 2: the compositional inverse of a polynomial as a power
+/// series.
+pub mod mod_power_of_2_compositional_inverse_truncated;
 /// Implementations of [`ModPowerOf2Derivative`](malachite_base::polynomial::ModPowerOf2Derivative)
 /// and [`ModPowerOf2DerivativeAssign`](malachite_base::polynomial::ModPowerOf2DerivativeAssign),
 /// for differentiating a polynomial modulo a power of 2.

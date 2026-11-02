@@ -11562,3 +11562,27 @@ pub fn random_unsigned_polynomial_unsigned_unsigned_polynomial_unsigned_quadrupl
         }),
     )
 }
+
+pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_16<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, T)> {
+    Box::new(
+        random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_8::<T>(config)
+            .filter(|(q, _, m)| {
+                q.coefficients_asc()
+                    .first()
+                    .is_some_and(|c| c.coprime_with(*m))
+            })
+            .map(|(q, len, m)| (q.mul_power_of_x(1), len, m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_17<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, u64, u64)> {
+    Box::new(
+        random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_7::<T>(config)
+            .filter(|(q, _, _)| q.coefficients_asc().first().is_some_and(|c| c.odd()))
+            .map(|(q, len, pow)| (q.mul_power_of_x(1), len, pow)),
+    )
+}

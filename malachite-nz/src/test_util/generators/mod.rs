@@ -7884,3 +7884,37 @@ pub fn natural_polynomial_unsigned_natural_polynomial_unsigned_quadruple_gen_var
         &special_random_natural_polynomial_unsigned_natural_polynomial_unsigned_quadruple_gen_var_1,
     )
 }
+
+// All `(NaturalPolynomial, u64, Natural)` where the polynomial's coefficients are less than the
+// `Natural`, its constant coefficient is 0, its coefficient of $x$ is coprime to the `Natural`, and
+// the `u64` is small.
+pub fn natural_polynomial_unsigned_natural_triple_gen_var_5()
+-> Generator<(NaturalPolynomial, u64, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_natural_triple_gen_var_5,
+        &random_natural_polynomial_unsigned_natural_triple_gen_var_5,
+        &special_random_natural_polynomial_unsigned_natural_triple_gen_var_5,
+    )
+}
+
+// All `(NaturalPolynomial, u64, u64)` where the polynomial's coefficients are less than 2 to the
+// power of the last `u64`, its constant coefficient is 0, its coefficient of $x$ is odd, and the
+// first `u64` is small.
+pub fn natural_polynomial_unsigned_unsigned_triple_gen_var_7()
+-> Generator<(NaturalPolynomial, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_unsigned_unsigned_triple_gen_var_7,
+        &random_natural_polynomial_unsigned_unsigned_triple_gen_var_7,
+        &special_random_natural_polynomial_unsigned_unsigned_triple_gen_var_7,
+    )
+}
+
+// All `(IntegerPolynomial, u64)` where the polynomial's constant coefficient is 0, its coefficient
+// of $x$ is 1 or -1, and the `u64` is at most 19.
+pub fn integer_polynomial_unsigned_pair_gen_var_8() -> Generator<(IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_unsigned_pair_gen_var_8,
+        &random_integer_polynomial_unsigned_pair_gen_var_8,
+        &special_random_integer_polynomial_unsigned_pair_gen_var_8,
+    )
+}

@@ -2245,3 +2245,13 @@ pub fn rational_vector_unsigned_vec_pair_gen_var_1() -> Generator<(RationalVecto
         &random_rational_vector_unsigned_vec_pair_gen_var_1,
     )
 }
+
+// All pairs `(p, len)` where the constant coefficient of `p` is 0, its coefficient of $x$ is
+// nonzero, and `len` is at most 19.
+pub fn rational_polynomial_unsigned_pair_gen_var_5() -> Generator<(RationalPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_unsigned_pair_gen_var_5,
+        &random_rational_polynomial_unsigned_pair_gen_var_5,
+        &special_random_rational_polynomial_unsigned_pair_gen_var_5,
+    )
+}

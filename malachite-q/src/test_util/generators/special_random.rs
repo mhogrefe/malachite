@@ -4752,3 +4752,12 @@ pub fn special_random_rational_matrix_unsigned_rational_triple_gen_var_2(
         }),
     )
 }
+
+pub fn special_random_rational_polynomial_unsigned_pair_gen_var_5(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, u64)> {
+    Box::new(
+        special_random_rational_polynomial_unsigned_pair_gen_var_4(config)
+            .map(|(q, len)| (q.mul_power_of_x(1), len)),
+    )
+}

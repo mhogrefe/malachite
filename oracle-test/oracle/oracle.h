@@ -342,6 +342,12 @@ int run_mod_power_of_2_div_rem(const char * arg);
 int run_mod_compose_mod_polynomial(const char * arg);
 int run_mod_power_of_2_compose_mod_polynomial(const char * arg);
 
+/* revert_series.c */
+int run_mod_revert_series(const char * arg);
+int run_mod_power_of_2_revert_series(const char * arg);
+int run_fmpz_poly_revert_series(const char * arg);
+int run_fmpq_poly_revert_series(const char * arg);
+
 /* mod_mul_mod_polynomial.c */
 int run_mod_mul_mod_polynomial(const char * arg);
 int run_mod_power_of_2_mul_mod_polynomial(const char * arg);

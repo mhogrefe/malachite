@@ -2720,6 +2720,49 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_power_of_2_compose_mod_polynomial");
     }
+    // The demos of series reversion of malachite-base's UnsignedPolynomial and malachite-nz's
+    // NaturalPolynomial, with coefficients modulo m and modulo powers of 2, of malachite-nz's
+    // IntegerPolynomial, and of malachite-q's RationalPolynomial: by value and by reference.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_compositional_inverse_truncated_u8",
+        "demo_unsigned_polynomial_mod_compositional_inverse_truncated_ref_u64",
+        "demo_unsigned_polynomial_mod_compositional_inverse_truncated_u128",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_revert_series");
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_compositional_inverse_truncated_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_compositional_inverse_truncated_ref_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_compositional_inverse_truncated_u128",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_power_of_2_revert_series");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_compositional_inverse_truncated",
+        "demo_natural_polynomial_mod_compositional_inverse_truncated_val_ref",
+        "demo_natural_polynomial_mod_compositional_inverse_truncated_ref_val",
+        "demo_natural_polynomial_mod_compositional_inverse_truncated_ref_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_revert_series");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_compositional_inverse_truncated",
+        "demo_natural_polynomial_mod_power_of_2_compositional_inverse_truncated_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_power_of_2_revert_series");
+    }
+    for demo_name in [
+        "demo_integer_polynomial_compositional_inverse_truncated",
+        "demo_integer_polynomial_compositional_inverse_truncated_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_revert_series");
+    }
+    for demo_name in [
+        "demo_rational_polynomial_compositional_inverse_truncated",
+        "demo_rational_polynomial_compositional_inverse_truncated_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-q", demo_name, "fmpq_poly_revert_series");
+    }
     // The demos of powering modulo a polynomial of malachite-base's UnsignedPolynomial and
     // malachite-nz's NaturalPolynomial, with coefficients modulo m and modulo powers of 2: by
     // value, by reference, in place, and with precomputed data.
