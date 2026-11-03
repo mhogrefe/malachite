@@ -1055,7 +1055,6 @@ pub mod unsigned_polynomial {
         pub mod content;
         pub mod deflate_power_of_x;
         pub mod div_power_of_x;
-        pub mod evaluate;
         pub mod exponent_gcd;
         pub mod height;
         pub mod is_unit;
@@ -1119,6 +1118,11 @@ pub mod unsigned_polynomial {
         pub mod mod_div_rem_precomputed;
         pub mod mod_div_root;
         pub mod mod_divisible_by;
+        pub mod mod_evaluate;
+        pub mod mod_evaluate_geometric;
+        pub mod mod_evaluate_many;
+        pub mod mod_evaluate_many_precomputed;
+        pub mod mod_from_roots;
         pub mod mod_is_reduced;
         pub mod mod_make_monic;
         pub mod mod_mul;
@@ -1134,6 +1138,10 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_div_rem_precomputed;
         pub mod mod_power_of_2_div_root;
         pub mod mod_power_of_2_divisible_by;
+        pub mod mod_power_of_2_evaluate;
+        pub mod mod_power_of_2_evaluate_many;
+        pub mod mod_power_of_2_evaluate_many_precomputed;
+        pub mod mod_power_of_2_from_roots;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_mul_middle;
         pub mod mod_power_of_2_neg;

@@ -813,6 +813,17 @@ pub fn natural_polynomial_natural_vec_natural_triple_gen_var_1()
     )
 }
 
+// All `(NaturalPolynomial, Vec<Natural>, u64)` where the polynomial's coefficients and the values
+// in the `Vec` are less than 2 to the power of the `u64`.
+pub fn natural_polynomial_natural_vec_unsigned_triple_gen_var_1()
+-> Generator<(NaturalPolynomial, Vec<Natural>, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_vec_unsigned_triple_gen_var_1,
+        &random_natural_polynomial_natural_vec_unsigned_triple_gen_var_1,
+        &special_random_natural_polynomial_natural_vec_unsigned_triple_gen_var_1,
+    )
+}
+
 pub fn natural_polynomial_gaussian_integer_pair_gen()
 -> Generator<(NaturalPolynomial, GaussianInteger)> {
     Generator::new(

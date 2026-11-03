@@ -35,10 +35,6 @@ pub mod deflate_power_of_x;
 /// [`DivPowerOfXAssign`](crate::polynomial::arithmetic::traits::DivPowerOfXAssign), for dividing a
 /// polynomial by a power of its variable and discarding the remainder.
 pub mod div_power_of_x;
-/// Implementations of [`ModEvaluate`](crate::polynomial::modular::traits::ModEvaluate) and
-/// [`ModPowerOf2Evaluate`](crate::polynomial::modular::traits::ModPowerOf2Evaluate), which evaluate
-/// a polynomial at a value modulo a value or a power of 2.
-pub mod evaluate;
 /// An implementation of [`ExponentGcd`](crate::polynomial::arithmetic::traits::ExponentGcd), the
 /// greatest common divisor of the exponents at which a polynomial has nonzero coefficients.
 pub mod exponent_gcd;

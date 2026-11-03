@@ -816,7 +816,7 @@ fn tune_poly_mod_mul_grid() {
 // least 20 ms, and the best of 5 is kept.
 fn tune_poly_mod_evaluate_geometric_grid() {
     use malachite_base::num::modular::traits::ModInverse;
-    use malachite_base::unsigned_polynomial::arithmetic::evaluate::{
+    use malachite_base::unsigned_polynomial::modular::mod_evaluate_geometric::{
         mod_evaluate_geometric_fast, mod_evaluate_geometric_fast_truncated,
         mod_evaluate_geometric_iter,
     };

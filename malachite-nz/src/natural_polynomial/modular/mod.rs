@@ -12,10 +12,12 @@ use malachite_base::polynomial::modular::traits::{
     CheckedModPowerOf2Quotient, CheckedModPowerOf2Rem, CheckedModQuotient, CheckedModRem,
     ModCompose, ModComposeAssign, ModDivAssignRem, ModDivAssignRemPrecomputed, ModDivExact,
     ModDivExactAssign, ModDivRem, ModDivRemPrecomputed, ModDivRoot, ModDivRootAssign,
-    ModDivisibleBy, ModMakeMonic, ModMakeMonicAssign, ModPowerOf2Compose, ModPowerOf2ComposeAssign,
+    ModDivisibleBy, ModEvaluate, ModEvaluateMany, ModEvaluateManyPrecomputed, ModFromRoots,
+    ModMakeMonic, ModMakeMonicAssign, ModPowerOf2Compose, ModPowerOf2ComposeAssign,
     ModPowerOf2DivAssignRem, ModPowerOf2DivAssignRemPrecomputed, ModPowerOf2DivExact,
     ModPowerOf2DivExactAssign, ModPowerOf2DivRem, ModPowerOf2DivRemPrecomputed, ModPowerOf2DivRoot,
-    ModPowerOf2DivRootAssign, ModPowerOf2DivisibleBy, ModPowerOf2Quotient,
+    ModPowerOf2DivRootAssign, ModPowerOf2DivisibleBy, ModPowerOf2Evaluate, ModPowerOf2EvaluateMany,
+    ModPowerOf2EvaluateManyPrecomputed, ModPowerOf2FromRoots, ModPowerOf2Quotient,
     ModPowerOf2QuotientAssign, ModPowerOf2QuotientPrecomputed,
     ModPowerOf2QuotientPrecomputedAssign, ModPowerOf2Rem, ModPowerOf2RemAssign,
     ModPowerOf2RemPrecomputed, ModPowerOf2RemPrecomputedAssign, ModPowerOf2RemovePower,
@@ -24,6 +26,30 @@ use malachite_base::polynomial::modular::traits::{
     ModRemAssign, ModRemPrecomputed, ModRemPrecomputedAssign, ModRemovePower, ModRemovePowerAssign,
     ModTaylorShift, ModTaylorShiftAssign,
 };
+
+use crate::natural::Natural;
+use crate::platform::{DoubleLimb, Limb};
+use malachite_base::polynomial::modular::ModEvaluateManyData;
+
+/// Data precomputed for evaluating `NaturalPolynomial`s modulo $m$ at a fixed set of points: their
+/// subproduct tree, with coefficients in a limb or two when $m$ fits in them.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[doc(hidden)]
+pub enum NaturalModEvaluateManyData {
+    Limb(ModEvaluateManyData<Limb, Limb>),
+    DoubleLimb(ModEvaluateManyData<DoubleLimb, DoubleLimb>),
+    Natural(ModEvaluateManyData<Natural, Natural>),
+}
+
+/// Data precomputed for evaluating `NaturalPolynomial`s modulo $2^k$ at a fixed set of points:
+/// their subproduct tree, with coefficients in a limb or two when $2^k$ fits in them.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[doc(hidden)]
+pub enum NaturalModPowerOf2EvaluateManyData {
+    Limb(ModEvaluateManyData<Limb, u64>),
+    DoubleLimb(ModEvaluateManyData<DoubleLimb, u64>),
+    Natural(ModEvaluateManyData<Natural, u64>),
+}
 
 /// Implementations of [`BalancedMod`](malachite_base::num::modular::traits::BalancedMod), which
 /// reduces every coefficient of a polynomial to the representative closest to zero, producing an
@@ -35,10 +61,10 @@ pub mod balanced_mod;
 pub mod balanced_mod_power_of_2;
 /// Implementations of [`ModAdd`](malachite_base::num::modular::traits::ModAdd) and
 /// [`ModAddAssign`](malachite_base::num::modular::traits::ModAddAssign), for adding two polynomials
-/// modulo a [`Natural`](crate::natural::Natural).
+/// modulo a [`Natural`].
 pub mod mod_add;
 /// Implementations of [`ModCompose`] and [`ModComposeAssign`], for composing two polynomials modulo
-/// a [`Natural`](crate::natural::Natural).
+/// a [`Natural`].
 pub mod mod_compose;
 /// Implementations of [`ModDivExact`], [`ModDivExactAssign`], and [`CheckedModDivExact`], for
 /// dividing polynomials modulo a number when the division is exact.
@@ -56,6 +82,17 @@ pub mod mod_div_root;
 /// Implementations of [`ModDivisibleBy`], which determines whether one polynomial is divisible by
 /// another modulo a number.
 pub mod mod_divisible_by;
+/// Implementations of [`ModEvaluate`], for evaluating a polynomial at a value modulo a [`Natural`].
+pub mod mod_evaluate;
+/// Implementations of [`ModEvaluateMany`], for evaluating a polynomial at many points modulo a
+/// [`Natural`].
+pub mod mod_evaluate_many;
+/// Implementations of [`ModEvaluateManyPrecomputed`], for evaluating a polynomial at many points
+/// modulo a [`Natural`], with a subproduct tree precomputed from the points.
+pub mod mod_evaluate_many_precomputed;
+/// Implementations of [`ModFromRoots`], which build the monic polynomial with given roots modulo a
+/// [`Natural`].
+pub mod mod_from_roots;
 /// An implementation of [`ModIsReduced`](malachite_base::num::modular::traits::ModIsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
@@ -64,7 +101,7 @@ pub mod mod_is_reduced;
 pub mod mod_make_monic;
 /// Implementations of [`ModMul`](malachite_base::num::modular::traits::ModMul) and
 /// [`ModMulAssign`](malachite_base::num::modular::traits::ModMulAssign), for multiplying two
-/// polynomials modulo a [`Natural`](crate::natural::Natural).
+/// polynomials modulo a [`Natural`].
 pub mod mod_mul;
 /// Implementations of [`ModNeg`](malachite_base::num::modular::traits::ModNeg) and
 /// [`ModNegAssign`](malachite_base::num::modular::traits::ModNegAssign), which negate a polynomial
@@ -108,6 +145,18 @@ pub mod mod_power_of_2_div_root;
 /// Implementations of [`ModPowerOf2DivisibleBy`], which determines whether one polynomial is
 /// divisible by another modulo a power of 2.
 pub mod mod_power_of_2_divisible_by;
+/// Implementations of [`ModPowerOf2Evaluate`], for evaluating a polynomial at a value modulo a
+/// power of 2.
+pub mod mod_power_of_2_evaluate;
+/// An implementation of [`ModPowerOf2EvaluateMany`], for evaluating a polynomial at many points
+/// modulo a power of 2.
+pub mod mod_power_of_2_evaluate_many;
+/// Implementations of [`ModPowerOf2EvaluateManyPrecomputed`], for evaluating a polynomial at many
+/// points modulo a power of 2, with a subproduct tree precomputed from the points.
+pub mod mod_power_of_2_evaluate_many_precomputed;
+/// An implementation of [`ModPowerOf2FromRoots`], which builds the monic polynomial with given
+/// roots modulo a power of 2.
+pub mod mod_power_of_2_from_roots;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::modular::traits::ModPowerOf2IsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given power of 2.
@@ -391,15 +440,19 @@ pub mod mod_remove_power;
 pub mod mod_shl;
 /// Implementations of [`ModSquare`](malachite_base::num::modular::traits::ModSquare) and
 /// [`ModSquareAssign`](malachite_base::num::modular::traits::ModSquareAssign), for squaring a
-/// polynomial modulo a [`Natural`](crate::natural::Natural).
+/// polynomial modulo a [`Natural`].
 pub mod mod_square;
 /// Implementations of [`ModSub`](malachite_base::num::modular::traits::ModSub) and
 /// [`ModSubAssign`](malachite_base::num::modular::traits::ModSubAssign), for subtracting one
-/// polynomial from another modulo a [`Natural`](crate::natural::Natural).
+/// polynomial from another modulo a [`Natural`].
 pub mod mod_sub;
 /// Implementations of [`ModSum`](malachite_base::num::modular::traits::ModSum), for adding up
 /// polynomials modulo a number.
 pub mod mod_sum;
 /// Implementations of [`ModTaylorShift`] and [`ModTaylorShiftAssign`], for shifting a polynomial by
-/// a constant modulo a [`Natural`](crate::natural::Natural).
+/// a constant modulo a [`Natural`].
 pub mod mod_taylor_shift;
+/// Subproduct trees of linear factors modulo a [`Natural`] or a power of 2, for evaluation at many
+/// points.
+#[doc(hidden)]
+pub mod subproduct_tree;

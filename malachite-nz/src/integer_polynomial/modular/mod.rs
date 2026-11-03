@@ -16,6 +16,9 @@ pub mod balanced_mod;
 /// which reduce every coefficient of a polynomial to the representative closest to zero modulo a
 /// power of 2.
 pub mod balanced_mod_power_of_2;
+/// An implementation of [`ModEvaluate`](malachite_base::polynomial::modular::traits::ModEvaluate),
+/// which evaluates a polynomial at a value modulo a [`u64`].
+pub mod mod_evaluate;
 /// Implementations of [`Mod`](malachite_base::num::modular::traits::Mod), which reduces every
 /// coefficient of a polynomial into $[0, m)$, producing a
 /// [`NaturalPolynomial`](crate::natural_polynomial::NaturalPolynomial) or an

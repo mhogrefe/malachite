@@ -908,8 +908,10 @@ pub mod integer_polynomial {
         pub mod div_root;
         pub mod divisible_by;
         pub mod evaluate;
+        pub mod evaluate_many;
         pub mod exponent_gcd;
         pub mod floor_l2_norm;
+        pub mod from_roots;
         pub mod height;
         pub mod is_unit;
         pub mod l2_norm_squared;
@@ -977,6 +979,7 @@ pub mod integer_polynomial {
     pub mod modular {
         pub mod balanced_mod;
         pub mod balanced_mod_power_of_2;
+        pub mod mod_evaluate;
         pub mod mod_op;
         pub mod mod_power_of_2;
     }
@@ -1018,6 +1021,7 @@ pub mod natural_polynomial {
         pub mod deflate_power_of_x;
         pub mod div_power_of_x;
         pub mod evaluate;
+        pub mod evaluate_many;
         pub mod exponent_gcd;
         pub mod floor_l2_norm;
         pub mod height;
@@ -1098,6 +1102,10 @@ pub mod natural_polynomial {
         pub mod mod_div_rem_precomputed;
         pub mod mod_div_root;
         pub mod mod_divisible_by;
+        pub mod mod_evaluate;
+        pub mod mod_evaluate_many;
+        pub mod mod_evaluate_many_precomputed;
+        pub mod mod_from_roots;
         pub mod mod_is_reduced;
         pub mod mod_make_monic;
         pub mod mod_mul;
@@ -1112,6 +1120,10 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_div_rem_precomputed;
         pub mod mod_power_of_2_div_root;
         pub mod mod_power_of_2_divisible_by;
+        pub mod mod_power_of_2_evaluate;
+        pub mod mod_power_of_2_evaluate_many;
+        pub mod mod_power_of_2_evaluate_many_precomputed;
+        pub mod mod_power_of_2_from_roots;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_pow;

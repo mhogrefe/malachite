@@ -188,6 +188,15 @@ pub fn pair_1_integer_polynomial_bit_bucketer<T>(
     }
 }
 
+pub fn triple_1_natural_polynomial_len_bucketer<T, U>(
+    var_name: &str,
+) -> Bucketer<'_, (NaturalPolynomial, T, U)> {
+    Bucketer {
+        bucketing_function: &|(p, _, _)| p.coefficients_asc().len(),
+        bucketing_label: format!("{var_name}.len()"),
+    }
+}
+
 pub fn triple_1_natural_polynomial_bit_bucketer<T, U>(
     var_name: &str,
 ) -> Bucketer<'_, (NaturalPolynomial, T, U)> {

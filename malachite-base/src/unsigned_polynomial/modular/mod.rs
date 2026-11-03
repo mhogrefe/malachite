@@ -12,10 +12,12 @@ use crate::polynomial::modular::traits::{
     CheckedModPowerOf2Quotient, CheckedModPowerOf2Rem, CheckedModQuotient, CheckedModRem,
     ModCompose, ModComposeAssign, ModDivAssignRem, ModDivAssignRemPrecomputed, ModDivExact,
     ModDivExactAssign, ModDivRem, ModDivRemPrecomputed, ModDivRoot, ModDivRootAssign,
-    ModDivisibleBy, ModMakeMonic, ModMakeMonicAssign, ModPowerOf2Compose, ModPowerOf2ComposeAssign,
+    ModDivisibleBy, ModEvaluate, ModEvaluateGeometric, ModEvaluateMany, ModEvaluateManyPrecomputed,
+    ModFromRoots, ModMakeMonic, ModMakeMonicAssign, ModPowerOf2Compose, ModPowerOf2ComposeAssign,
     ModPowerOf2DivAssignRem, ModPowerOf2DivAssignRemPrecomputed, ModPowerOf2DivExact,
     ModPowerOf2DivExactAssign, ModPowerOf2DivRem, ModPowerOf2DivRemPrecomputed, ModPowerOf2DivRoot,
-    ModPowerOf2DivRootAssign, ModPowerOf2DivisibleBy, ModPowerOf2Quotient,
+    ModPowerOf2DivRootAssign, ModPowerOf2DivisibleBy, ModPowerOf2Evaluate, ModPowerOf2EvaluateMany,
+    ModPowerOf2EvaluateManyPrecomputed, ModPowerOf2FromRoots, ModPowerOf2Quotient,
     ModPowerOf2QuotientAssign, ModPowerOf2QuotientPrecomputed,
     ModPowerOf2QuotientPrecomputedAssign, ModPowerOf2Rem, ModPowerOf2RemAssign,
     ModPowerOf2RemPrecomputed, ModPowerOf2RemPrecomputedAssign, ModPowerOf2RemovePower,
@@ -48,6 +50,20 @@ pub mod mod_div_root;
 /// An implementation of [`ModDivisibleBy`], which determines whether one polynomial is divisible by
 /// another modulo a number.
 pub mod mod_divisible_by;
+/// Implementations of [`ModEvaluate`], for evaluating a polynomial at a value modulo a number.
+pub mod mod_evaluate;
+/// An implementation of [`ModEvaluateGeometric`], for evaluating a polynomial modulo a number at
+/// the powers of a value.
+pub mod mod_evaluate_geometric;
+/// An implementation of [`ModEvaluateMany`], for evaluating a polynomial at many points modulo a
+/// number.
+pub mod mod_evaluate_many;
+/// An implementation of [`ModEvaluateManyPrecomputed`], for evaluating a polynomial at many points
+/// modulo a number, with a subproduct tree precomputed from the points.
+pub mod mod_evaluate_many_precomputed;
+/// An implementation of [`ModFromRoots`], which builds the monic polynomial with given roots modulo
+/// a number.
+pub mod mod_from_roots;
 /// An implementation of [`ModIsReduced`](crate::num::modular::traits::ModIsReduced), which checks
 /// whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
@@ -102,6 +118,18 @@ pub mod mod_power_of_2_div_root;
 /// An implementation of [`ModPowerOf2DivisibleBy`], which determines whether one polynomial is
 /// divisible by another modulo a power of 2.
 pub mod mod_power_of_2_divisible_by;
+/// Implementations of [`ModPowerOf2Evaluate`], for evaluating a polynomial at a value modulo a
+/// power of 2.
+pub mod mod_power_of_2_evaluate;
+/// An implementation of [`ModPowerOf2EvaluateMany`], for evaluating a polynomial at many points
+/// modulo a power of 2.
+pub mod mod_power_of_2_evaluate_many;
+/// An implementation of [`ModPowerOf2EvaluateManyPrecomputed`], for evaluating a polynomial at many
+/// points modulo a power of 2, with a subproduct tree precomputed from the points.
+pub mod mod_power_of_2_evaluate_many_precomputed;
+/// An implementation of [`ModPowerOf2FromRoots`], which builds the monic polynomial with given
+/// roots modulo a power of 2.
+pub mod mod_power_of_2_from_roots;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](crate::num::modular::traits::ModPowerOf2IsReduced), which checks
 /// whether every coefficient of a polynomial is less than a given power of 2.
@@ -331,3 +359,7 @@ pub mod mod_sum;
 /// Implementations of [`ModTaylorShift`] and [`ModTaylorShiftAssign`], for shifting a polynomial by
 /// a constant modulo a number.
 pub mod mod_taylor_shift;
+/// Subproduct trees of linear factors modulo a number or a power of 2, for evaluation at many
+/// points.
+#[doc(hidden)]
+pub mod subproduct_tree;

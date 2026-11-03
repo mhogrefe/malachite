@@ -505,4 +505,10 @@ int run_fmpz_mat_inv(const char * arg);
 int run_fmpz_mat_rref_upper_certify_lu_mod_p(const char * arg);
 int run_fmpq_mat_set_fmpz_mat_mod_fmpz(const char * arg);
 
+/* multipoint.c */
+int run_mod_evaluate_many(const char * arg);
+int run_mod_power_of_2_evaluate_many(const char * arg);
+int run_mod_from_roots(const char * arg);
+int run_from_roots(const char * arg);
+
 #endif

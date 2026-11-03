@@ -8,11 +8,9 @@
 
 use crate::natural::Natural;
 use crate::natural_polynomial::NaturalPolynomial;
-use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{AddMulAssign, Pow};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::modular::traits::ModPowerOf2;
 
 // Evaluates a polynomial term by term, as the sum of $c_i x^i$, with each power of $x$ computed
 // from scratch. This shares nothing with Horner's rule or the divide-and-conquer scheme, so it can
@@ -23,25 +21,4 @@ pub fn evaluate_naive(p: &NaturalPolynomial, x: &Natural) -> Natural {
         sum.add_mul_assign(c, x.pow(u64::exact_from(i)));
     }
     sum
-}
-
-// Evaluates a polynomial at x in full and then reduces the value modulo 2^pow. The modular
-// evaluation never forms the full value, so this checks it independently.
-pub fn mod_power_of_2_evaluate_naive(p: &NaturalPolynomial, x: &Natural, pow: u64) -> Natural {
-    evaluate_naive(p, x).mod_power_of_2(pow)
-}
-
-// Evaluates a polynomial at x in full and then reduces the value modulo m.
-pub fn mod_evaluate_naive(p: &NaturalPolynomial, x: &Natural, m: &Natural) -> Natural {
-    evaluate_naive(p, x) % m
-}
-
-// Evaluates a polynomial at each of `xs` with `evaluate_naive`.
-pub fn evaluate_many_naive(p: &NaturalPolynomial, xs: &[Natural]) -> Vec<Natural> {
-    xs.iter().map(|x| evaluate_naive(p, x)).collect()
-}
-
-// Evaluates a polynomial at each of `xs` modulo `m` with `mod_evaluate_naive`.
-pub fn mod_evaluate_many_naive(p: &NaturalPolynomial, xs: &[Natural], m: &Natural) -> Vec<Natural> {
-    xs.iter().map(|x| mod_evaluate_naive(p, x, m)).collect()
 }

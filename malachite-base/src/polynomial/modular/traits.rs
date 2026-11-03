@@ -997,3 +997,93 @@ pub trait ModEvaluateGeometric<T, M = T> {
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     fn mod_evaluate_geometric(self, q: T, k: u64, m: M) -> Vec<Self::Output>;
 }
+
+/// Builds the monic polynomial with given roots modulo $m$: $(x - r_0)(x - r_1) \cdots (x -
+/// r_{n-1}) \bmod m$. The roots must already be reduced modulo $m$.
+pub trait ModFromRoots<T, M = T> {
+    /// Builds the monic polynomial, with coefficients reduced modulo $m$, whose roots, with
+    /// multiplicity, are the values in `roots`.
+    ///
+    /// $$
+    /// f((r_i)_{i=0}^{n-1}, m) = \prod_{i=0}^{n-1} (x - r_i) \bmod m.
+    /// $$
+    fn mod_from_roots(roots: &[T], m: M) -> Self;
+}
+
+/// Builds the monic polynomial with given roots modulo $2^k$: $(x - r_0)(x - r_1) \cdots (x -
+/// r_{n-1}) \bmod 2^k$. The roots must already be reduced modulo $2^k$.
+pub trait ModPowerOf2FromRoots<T> {
+    /// Builds the monic polynomial, with coefficients reduced modulo $2^k$, whose roots, with
+    /// multiplicity, are the values in `roots`.
+    ///
+    /// $$
+    /// f((r_i)_{i=0}^{n-1}, k) = \prod_{i=0}^{n-1} (x - r_i) \bmod 2^k.
+    /// $$
+    fn mod_power_of_2_from_roots(roots: &[T], pow: u64) -> Self;
+}
+
+/// Evaluates polynomials modulo $m$ at a fixed set of values, using data precomputed from the
+/// values and $m$: the subproduct tree of the linear factors $x - x_j$.
+pub trait ModEvaluateManyPrecomputed<T, M = T> {
+    /// The type of the polynomial's values.
+    type Output;
+    type Data;
+
+    /// Precomputes the data for evaluating at each value in `xs` modulo `m`.
+    fn precompute_mod_evaluate_many_data(xs: &[T], m: &M) -> Self::Data;
+
+    /// Evaluates a polynomial modulo `m` at each value the data was precomputed from, returning the
+    /// values in the same order.
+    ///
+    /// $$
+    /// f(p, m) = \left ( \sum_{i=0}^{n-1} c_i x_j^i \bmod m \right )_{j=0}^{k-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$, $n$ is its length, and the $x_j$ are the
+    /// values the data was precomputed from.
+    fn mod_evaluate_many_precomputed(self, m: M, data: &Self::Data) -> Vec<Self::Output>;
+}
+
+/// Evaluates a polynomial modulo $2^k$ at several values of the coefficient type. The coefficients
+/// and the values must already be reduced modulo $2^k$.
+pub trait ModPowerOf2EvaluateMany<T> {
+    /// The type of the polynomial's values.
+    type Output;
+
+    /// Evaluates a polynomial at each value in `xs`, modulo $2^k$, returning the values in the same
+    /// order.
+    ///
+    /// $$
+    /// f(p, (x_j)_{j=0}^{l-1}, k) = \left ( \sum_{i=0}^{n-1} c_i x_j^i \bmod 2^k
+    /// \right )_{j=0}^{l-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
+    fn mod_power_of_2_evaluate_many(self, xs: &[T], pow: u64) -> Vec<Self::Output>;
+}
+
+/// Evaluates polynomials modulo $2^k$ at a fixed set of values, using data precomputed from the
+/// values and $k$: the subproduct tree of the linear factors $x - x_j$.
+pub trait ModPowerOf2EvaluateManyPrecomputed<T> {
+    /// The type of the polynomial's values.
+    type Output;
+    type Data;
+
+    /// Precomputes the data for evaluating at each value in `xs` modulo $2^k$.
+    fn precompute_mod_power_of_2_evaluate_many_data(xs: &[T], pow: u64) -> Self::Data;
+
+    /// Evaluates a polynomial modulo $2^k$ at each value the data was precomputed from, returning
+    /// the values in the same order.
+    ///
+    /// $$
+    /// f(p, k) = \left ( \sum_{i=0}^{n-1} c_i x_j^i \bmod 2^k \right )_{j=0}^{l-1},
+    /// $$
+    ///
+    /// where $c_i$ is the coefficient of $x^i$ in $p$, $n$ is its length, and the $x_j$ are the $l$
+    /// values the data was precomputed from.
+    fn mod_power_of_2_evaluate_many_precomputed(
+        self,
+        pow: u64,
+        data: &Self::Data,
+    ) -> Vec<Self::Output>;
+}

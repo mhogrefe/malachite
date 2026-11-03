@@ -62,7 +62,11 @@ pub(crate) const SPARSE_MIN_LENGTH: usize = 20;
 // This is equivalent to `nmod_poly_inv_series` applied to `nmod_poly_reverse` of the divisor, as in
 // the preparation of `Binv` for `nmod_poly_divrem_newton_n_preinv` from
 // `nmod_poly/divrem_newton_n_preinv.c`, FLINT 3.6.0, with the modulus $2^k$.
-fn reversed_inverse<T: PrimitiveUnsigned>(ys: &[T], pow: u64, lead_inverse: T) -> Vec<T> {
+pub(crate) fn reversed_inverse<T: PrimitiveUnsigned>(
+    ys: &[T],
+    pow: u64,
+    lead_inverse: T,
+) -> Vec<T> {
     let ys_reversed: Vec<T> = ys.iter().rev().copied().collect();
     let mut inverse =
         mod_power_of_2_inverse_truncated_dispatch(&ys_reversed, ys.len(), pow, lead_inverse);

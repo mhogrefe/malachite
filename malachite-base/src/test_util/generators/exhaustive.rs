@@ -4666,6 +4666,16 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_22<T: PrimitiveUnsigned, U:
     ))
 }
 
+pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_34<T: PrimitiveUnsigned>() -> It<(Vec<T>, T)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_vecs(exhaustive_unsigneds::<T>()),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(xs, m)| xs.iter().all(|x| x < m)),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>()
@@ -7037,6 +7047,21 @@ pub fn exhaustive_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1<
             exhaustive_positive_primitive_ints::<T>(),
         )
         .filter(|(p, xs, m)| p.mod_is_reduced(m) && xs.iter().all(|x| x < m)),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> It<(UnsignedPolynomial<T>, Vec<T>, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_vecs(exhaustive_unsigneds::<T>()),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(p, xs, pow)| {
+            p.mod_power_of_2_is_reduced(*pow) && xs.iter().all(|x| x.significant_bits() <= *pow)
+        }),
     )
 }
 

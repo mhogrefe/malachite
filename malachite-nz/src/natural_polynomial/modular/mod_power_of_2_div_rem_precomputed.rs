@@ -47,7 +47,7 @@ use malachite_base::unsigned_polynomial::modular::mod_power_of_2_div_rem_precomp
 // This is equivalent to `fmpz_mod_poly_inv_series` applied to `fmpz_mod_poly_reverse` of the
 // divisor, as in the preparation of `Binv` for `fmpz_mod_poly_divrem_newton_n_preinv` from
 // `fmpz_mod_poly/divrem_newton_n_preinv.c`, FLINT 3.6.0, with the modulus $2^k$.
-fn reversed_inverse(ys: &[Natural], pow: u64, lead_inverse: &Natural) -> Vec<Natural> {
+pub(crate) fn reversed_inverse(ys: &[Natural], pow: u64, lead_inverse: &Natural) -> Vec<Natural> {
     let ys_reversed: Vec<Natural> = ys.iter().rev().cloned().collect();
     mod_power_of_2_inverse_truncated_dispatch(&ys_reversed, ys.len(), pow, lead_inverse)
 }

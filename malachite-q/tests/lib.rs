@@ -305,7 +305,10 @@ pub mod rational_polynomial {
         pub mod div_rem;
         pub mod divisible_by;
         pub mod evaluate;
+        pub mod evaluate_many;
         pub mod exponent_gcd;
+        pub mod from_rational_roots;
+        pub mod from_roots;
         pub mod height;
         pub mod is_unit;
         pub mod l2_norm_squared;

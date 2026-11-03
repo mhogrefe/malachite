@@ -6245,6 +6245,26 @@ pub fn random_primitive_int_vec_unsigned_pair_gen_var_20<T: PrimitiveInt, U: Pri
     ))
 }
 
+pub fn random_unsigned_vec_unsigned_pair_gen_var_34<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, T)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &random_primitive_ints::<T>,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_positive_unsigneds::<T>,
+        )
+        .map(|(xs, m)| (xs.into_iter().map(|x| x % m).collect(), m)),
+    )
+}
+
 // --(Vec<PrimitiveInt>, PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn random_primitive_int_vec_unsigned_primitive_int_triple_gen_var_1<
@@ -9474,6 +9494,39 @@ pub fn random_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1<T: Prim
             &random_positive_unsigneds::<T>,
         )
         .map(|(p, xs, m)| (p % m, xs.into_iter().map(|x| x % m).collect(), m)),
+    )
+}
+
+pub fn random_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, Vec<T>, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &random_primitive_ints::<T>,
+                    config.get_or("mean_points_n", 8),
+                    config.get_or("mean_points_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(p, xs, pow)| {
+            (
+                p.mod_power_of_2(pow),
+                xs.into_iter().map(|x| x.mod_power_of_2(pow)).collect(),
+                pow,
+            )
+        }),
     )
 }
 

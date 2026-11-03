@@ -11,11 +11,13 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     balanced_mod::register(runner);
     balanced_mod_power_of_2::register(runner);
+    mod_evaluate::register(runner);
     mod_op::register(runner);
     mod_power_of_2::register(runner);
 }
 
 mod balanced_mod;
 mod balanced_mod_power_of_2;
+mod mod_evaluate;
 mod mod_op;
 mod mod_power_of_2;

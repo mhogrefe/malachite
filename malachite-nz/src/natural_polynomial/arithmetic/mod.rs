@@ -9,9 +9,9 @@
 #[cfg(doc)]
 use malachite_base::polynomial::arithmetic::traits::{
     BitPack, BitUnpack, Compose, ComposeAssign, ComposePowerOfX, ComposePowerOfXAssign,
-    DeflatePowerOfX, DeflatePowerOfXAssign, DivPowerOfX, DivPowerOfXAssign, Evaluate, ExponentGcd,
-    FloorL2Norm, L2NormSquared, MulMiddle, MulMiddleAssign, MulPowerOfX, MulPowerOfXAssign,
-    TaylorShift, TaylorShiftAssign,
+    DeflatePowerOfX, DeflatePowerOfXAssign, DivPowerOfX, DivPowerOfXAssign, Evaluate, EvaluateMany,
+    ExponentGcd, FloorL2Norm, L2NormSquared, MulMiddle, MulMiddleAssign, MulPowerOfX,
+    MulPowerOfXAssign, TaylorShift, TaylorShiftAssign,
 };
 
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
@@ -53,10 +53,10 @@ pub mod deflate_power_of_x;
 /// Implementations of [`DivPowerOfX`] and [`DivPowerOfXAssign`], for dividing a polynomial by a
 /// power of its variable and discarding the remainder.
 pub mod div_power_of_x;
-/// Implementations of [`Evaluate`], which evaluates a polynomial at a value, and of
-/// [`ModPowerOf2Evaluate`](malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate), which
-/// does so modulo a power of 2.
+/// Implementations of [`Evaluate`], which evaluates a polynomial at a value.
 pub mod evaluate;
+/// An implementation of [`EvaluateMany`], which evaluates a polynomial at several values.
+pub mod evaluate_many;
 /// An implementation of [`ExponentGcd`], the greatest common divisor of the exponents at which a
 /// polynomial has nonzero coefficients.
 pub mod exponent_gcd;

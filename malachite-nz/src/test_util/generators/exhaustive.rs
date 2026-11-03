@@ -1278,6 +1278,24 @@ pub fn exhaustive_natural_polynomial_natural_vec_natural_triple_gen_var_1()
     )
 }
 
+pub fn exhaustive_natural_polynomial_natural_vec_unsigned_triple_gen_var_1()
+-> It<(NaturalPolynomial, Vec<Natural>, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials(),
+            exhaustive_vecs(exhaustive_naturals()),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, xs, mut pow)| {
+            pow += xs
+                .iter()
+                .map(SignificantBits::significant_bits)
+                .fold(p.height_significant_bits(), max);
+            (p, xs, pow)
+        }),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_gaussian_integer_pair_gen()
 -> It<(NaturalPolynomial, GaussianInteger)> {
     Box::new(exhaustive_pairs(

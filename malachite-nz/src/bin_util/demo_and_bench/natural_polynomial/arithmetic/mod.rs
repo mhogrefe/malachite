@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     deflate_power_of_x::register(runner);
     div_power_of_x::register(runner);
     evaluate::register(runner);
+    evaluate_many::register(runner);
     exponent_gcd::register(runner);
     floor_l2_norm::register(runner);
     height::register(runner);
@@ -45,6 +46,7 @@ mod content;
 mod deflate_power_of_x;
 mod div_power_of_x;
 mod evaluate;
+mod evaluate_many;
 mod exponent_gcd;
 mod floor_l2_norm;
 mod height;

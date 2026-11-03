@@ -10,8 +10,9 @@
 use malachite_base::polynomial::arithmetic::traits::{
     CheckedDivExact, CheckedDivRem, CheckedRem, Compose, ComposeAssign, ComposePowerOfX,
     ComposePowerOfXAssign, DeflatePowerOfX, DeflatePowerOfXAssign, DivPowerOfX, DivPowerOfXAssign,
-    Evaluate, ExponentGcd, L2NormSquared, MakeMonic, MakeMonicAssign, MulPowerOfX,
-    MulPowerOfXAssign, RemPrecomputed, RemPrecomputedAssign, TaylorShift, TaylorShiftAssign,
+    Evaluate, EvaluateMany, ExponentGcd, FromRationalRoots, FromRoots, L2NormSquared, MakeMonic,
+    MakeMonicAssign, MulPowerOfX, MulPowerOfXAssign, RemPrecomputed, RemPrecomputedAssign,
+    TaylorShift, TaylorShiftAssign,
 };
 
 /// Implementations of [`Add`](core::ops::Add) and [`AddAssign`](core::ops::AddAssign), for adding
@@ -66,9 +67,21 @@ pub mod divisible_by;
 /// [`RationalPolynomial`](super::RationalPolynomial)s at
 /// [`Integer`](malachite_nz::integer::Integer)s.
 pub mod evaluate;
+/// Implementations of [`EvaluateMany`] for
+/// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s and
+/// [`RationalPolynomial`](super::RationalPolynomial)s at [`Rational`](crate::Rational)s, and for
+/// [`RationalPolynomial`](super::RationalPolynomial)s at
+/// [`Integer`](malachite_nz::integer::Integer)s, which evaluate a polynomial at several values.
+pub mod evaluate_many;
 /// An implementation of [`ExponentGcd`], the greatest common divisor of the exponents at which a
 /// polynomial has nonzero coefficients.
 pub mod exponent_gcd;
+/// An implementation of [`FromRationalRoots`] for
+/// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial), which builds the
+/// primitive polynomial with given rational roots.
+pub mod from_rational_roots;
+/// An implementation of [`FromRoots`], which builds the monic polynomial with given roots.
+pub mod from_roots;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height), the largest of
 /// the heights of a polynomial's coefficients.
 pub mod height;

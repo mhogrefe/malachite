@@ -2941,6 +2941,79 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_compose");
     }
+    // Multipoint evaluation, plain and with precomputed subproduct trees, modulo m and modulo 2^k,
+    // against fmpz_mod_poly_evaluate_fmpz_vec and nmod_poly_evaluate_nmod_vec_fast.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_evaluate_many",
+        "demo_unsigned_polynomial_mod_evaluate_many_precomputed_u8",
+        "demo_unsigned_polynomial_mod_evaluate_many_precomputed_u64",
+        "demo_unsigned_polynomial_mod_evaluate_many_precomputed_ref_u64",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_evaluate_many");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_evaluate_many",
+        "demo_natural_polynomial_mod_evaluate_many_precomputed",
+        "demo_natural_polynomial_mod_evaluate_many_precomputed_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_evaluate_many");
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_power_of_2_evaluate_many_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_evaluate_many_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_evaluate_many_precomputed_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_evaluate_many_precomputed_ref_u64",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "mod_power_of_2_evaluate_many",
+        );
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_power_of_2_evaluate_many",
+        "demo_natural_polynomial_mod_power_of_2_evaluate_many_precomputed",
+        "demo_natural_polynomial_mod_power_of_2_evaluate_many_precomputed_ref",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
+            demo_name,
+            "mod_power_of_2_evaluate_many",
+        );
+    }
+    // Products of linear factors modulo m and modulo 2^k, against
+    // fmpz_mod_poly_product_roots_fmpz_vec and nmod_poly_product_roots_nmod_vec, and over the
+    // integers and rationals, against fmpz_poly_product_roots_fmpz_vec and
+    // fmpz_poly_product_roots_fmpq_vec.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_from_roots_u8",
+        "demo_unsigned_polynomial_mod_from_roots_u64",
+        "demo_unsigned_polynomial_mod_power_of_2_from_roots_u8",
+        "demo_unsigned_polynomial_mod_power_of_2_from_roots_u64",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_from_roots");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_from_roots",
+        "demo_natural_polynomial_mod_from_roots_ref",
+        "demo_natural_polynomial_mod_power_of_2_from_roots",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_from_roots");
+    }
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_polynomial_from_roots",
+        "from_roots",
+    );
+    for demo_name in [
+        "demo_integer_polynomial_from_rational_roots",
+        "demo_rational_polynomial_from_roots",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-q", demo_name, "from_roots");
+    }
     // The generated cases from compose_properties in malachite-q's RationalPolynomial tests: all six
     // forms, long polynomials, and linear inner polynomials.
     for demo_name in [

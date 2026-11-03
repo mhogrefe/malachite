@@ -1975,6 +1975,53 @@ pub fn random_natural_polynomial_natural_vec_natural_triple_gen_var_1(
     )
 }
 
+pub fn random_natural_polynomial_natural_vec_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Vec<Natural>, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &|seed_2| {
+                        random_naturals(
+                            seed_2,
+                            config.get_or("mean_bits_n", 64),
+                            config.get_or("mean_bits_d", 1),
+                        )
+                    },
+                    config.get_or("mean_points_n", 8),
+                    config.get_or("mean_points_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, xs, mut pow)| {
+            pow += xs
+                .iter()
+                .map(SignificantBits::significant_bits)
+                .fold(p.height_significant_bits(), max);
+            (p, xs, pow)
+        }),
+    )
+}
+
 pub fn random_natural_polynomial_gaussian_integer_pair_gen(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, GaussianInteger)> {

@@ -860,6 +860,27 @@ documented by git history.
   to 19 terms. Rational reversion keeps a common denominator as FLINT does, and integer inputs with
   coefficient of $x$ equal to $\pm 1$ are reverted over the integers. Moduli and powers of 2 that fit
   in two limbs are handled in word arithmetic.
+- Fast multipoint evaluation and products of linear factors. New `ModEvaluateManyPrecomputed` and
+  `ModPowerOf2EvaluateManyPrecomputed` traits in malachite-base evaluate polynomials modulo $m$ or
+  $2^k$ at a fixed set of points, using a subproduct tree of the points precomputed once, as FLINT's
+  `_nmod_poly_tree_build` and `_nmod_poly_evaluate_nmod_vec_fast_precomp` do; the precomputed data
+  also holds the inverses of the tree's nodes, so that each remainder down the tree is a truncated
+  multiplication (20% to 37% faster from 4096 points on). The new `ModPowerOf2EvaluateMany` trait
+  evaluates modulo $2^k$ at several points. `mod_evaluate_many` and `mod_power_of_2_evaluate_many`
+  switch to the subproduct tree for long polynomials and many points; the switch depends on the
+  polynomial's length, the number of points, and the modulus, and was measured. Modulo a word-sized
+  $m$, FLINT's switch at a polynomial length of 32 is much too early, since Horner's rule with
+  Shoup's multiplication, several points at a time, stays faster up to lengths in the thousands
+  unless the top bit of $m$ is set. Modulo $2^k$, Horner's rule now runs several points at a time
+  as well, which is about 1.4 times as fast for long polynomials. For `NaturalPolynomial`s, a modulus
+  that fits in one or two limbs now goes through the word-sized code, where `Natural` arithmetic
+  had been used. New `FromRoots`, `FromRationalRoots`, `ModFromRoots`, and `ModPowerOf2FromRoots`
+  traits build the monic polynomial with given roots, like FLINT's `nmod_poly_product_roots_nmod_vec`,
+  `fmpz_mod_poly_product_roots_fmpz_vec`, and `fmpz_poly_product_roots_fmpz_vec`: they are
+  implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` modulo $m$ and $2^k$, for
+  `IntegerPolynomial` from `Integer` roots, and, in malachite-q, for `RationalPolynomial` from
+  `Rational` roots, while `IntegerPolynomial::from_rational_roots` gives the primitive polynomial
+  $\prod_i (q_i x - p_i)$, like `fmpz_poly_product_roots_fmpq_vec`.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

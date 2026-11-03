@@ -524,3 +524,25 @@ pub trait EvaluateMany<T> {
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     fn evaluate_many(self, xs: &[T]) -> Vec<Self::Output>;
 }
+
+/// Builds the monic polynomial with given roots: $(x - r_0)(x - r_1) \cdots (x - r_{n-1})$.
+pub trait FromRoots<T> {
+    /// Builds the monic polynomial whose roots, with multiplicity, are the values in `roots`.
+    ///
+    /// $$
+    /// f((r_i)_{i=0}^{n-1}) = \prod_{i=0}^{n-1} (x - r_i).
+    /// $$
+    fn from_roots(roots: &[T]) -> Self;
+}
+
+/// Builds the primitive polynomial with integer coefficients and given rational roots: $(q_0 x -
+/// p_0)(q_1 x - p_1) \cdots (q_{n-1} x - p_{n-1})$, where $r_i = p_i/q_i$ in lowest terms.
+pub trait FromRationalRoots<T> {
+    /// Builds the primitive integer polynomial, with positive leading coefficient, whose roots,
+    /// with multiplicity, are the values in `roots`.
+    ///
+    /// $$
+    /// f((p_i/q_i)_{i=0}^{n-1}) = \prod_{i=0}^{n-1} (q_i x - p_i).
+    /// $$
+    fn from_rational_roots(roots: &[T]) -> Self;
+}

@@ -4021,6 +4021,15 @@ pub fn unsigned_vec_unsigned_pair_gen_var_33<T: PrimitiveUnsigned, U: PrimitiveI
     )
 }
 
+// All `(Vec<T>, T)` where the `T` is positive and every value in the `Vec` is less than it.
+pub fn unsigned_vec_unsigned_pair_gen_var_34<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_pair_gen_var_34,
+        &random_unsigned_vec_unsigned_pair_gen_var_34,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_34,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 type T1<T> = Generator<(Vec<T>, T, T)>;
@@ -5454,6 +5463,17 @@ pub fn unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1<T: PrimitiveUn
         &exhaustive_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1,
         &random_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1,
         &special_random_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(UnsignedPolynomial<T>, Vec<T>, u64)` where the `u64` is no greater than `T::WIDTH`, and the
+// polynomial's coefficients and the values in the `Vec` are less than 2 to the power of the `u64`.
+pub fn unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(UnsignedPolynomial<T>, Vec<T>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_2,
+        &random_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_2,
+        &special_random_unsigned_polynomial_unsigned_vec_unsigned_triple_gen_var_2,
     )
 }
 

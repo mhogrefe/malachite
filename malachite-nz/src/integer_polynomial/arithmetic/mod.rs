@@ -10,9 +10,9 @@
 use malachite_base::polynomial::arithmetic::traits::{
     BitPack, BitUnpack, CheckedDivRem, CheckedRem, Compose, ComposeAssign, ComposePowerOfX,
     ComposePowerOfXAssign, DeflatePowerOfX, DeflatePowerOfXAssign, DivPowerOfX, DivPowerOfXAssign,
-    DivRoot, DivRootAssign, Evaluate, ExponentGcd, FloorL2Norm, L2NormSquared, MulMiddle,
-    MulMiddleAssign, MulPowerOfX, MulPowerOfXAssign, PseudoDiv, PseudoDivAssign,
-    PseudoDivAssignRem, PseudoDivRem, PseudoRem, PseudoRemAssign, RemPrecomputed,
+    DivRoot, DivRootAssign, Evaluate, EvaluateMany, ExponentGcd, FloorL2Norm, FromRoots,
+    L2NormSquared, MulMiddle, MulMiddleAssign, MulPowerOfX, MulPowerOfXAssign, PseudoDiv,
+    PseudoDivAssign, PseudoDivAssignRem, PseudoDivRem, PseudoRem, PseudoRemAssign, RemPrecomputed,
     RemPrecomputedAssign, TaylorShift, TaylorShiftAssign,
 };
 
@@ -76,11 +76,15 @@ pub mod div_root;
 pub mod divisible_by;
 /// Implementations of [`Evaluate`], which evaluates a polynomial at a value.
 pub mod evaluate;
+/// An implementation of [`EvaluateMany`], which evaluates a polynomial at several values.
+pub mod evaluate_many;
 /// An implementation of [`ExponentGcd`], the greatest common divisor of the exponents at which a
 /// polynomial has nonzero coefficients.
 pub mod exponent_gcd;
 /// An implementation of [`FloorL2Norm`], the floor of a polynomial's $L^2$ norm.
 pub mod floor_l2_norm;
+/// An implementation of [`FromRoots`], which builds the monic polynomial with given roots.
+pub mod from_roots;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
 /// of a polynomial's coefficients.
