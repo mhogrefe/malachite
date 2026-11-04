@@ -899,6 +899,7 @@ pub mod integer_polynomial {
         pub mod compose;
         pub mod compose_power_of_x;
         pub mod content;
+        pub mod coprime_with;
         pub mod deflate_power_of_x;
         pub mod div;
         pub mod div_exact;
@@ -1100,6 +1101,7 @@ pub mod natural_polynomial {
         pub mod balanced_mod_power_of_2;
         pub mod mod_add;
         pub mod mod_compose;
+        pub mod mod_coprime_with;
         pub mod mod_div_exact;
         pub mod mod_div_rem;
         pub mod mod_div_rem_precomputed;
@@ -1121,6 +1123,7 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_compose;
+        pub mod mod_power_of_2_coprime_with;
         pub mod mod_power_of_2_div_exact;
         pub mod mod_power_of_2_div_rem;
         pub mod mod_power_of_2_div_rem_precomputed;

@@ -12,11 +12,11 @@ use crate::polynomial::modular::traits::{
     CheckedModPowerOf2DivExact, CheckedModPowerOf2DivRem, CheckedModPowerOf2ExtendedGcd,
     CheckedModPowerOf2Gcd, CheckedModPowerOf2Lcm, CheckedModPowerOf2Quotient,
     CheckedModPowerOf2Rem, CheckedModQuotient, CheckedModRem, ModCompose, ModComposeAssign,
-    ModDivAssignRem, ModDivAssignRemPrecomputed, ModDivExact, ModDivExactAssign, ModDivRem,
-    ModDivRemPrecomputed, ModDivRoot, ModDivRootAssign, ModDivisibleBy, ModEvaluate,
+    ModCoprimeWith, ModDivAssignRem, ModDivAssignRemPrecomputed, ModDivExact, ModDivExactAssign,
+    ModDivRem, ModDivRemPrecomputed, ModDivRoot, ModDivRootAssign, ModDivisibleBy, ModEvaluate,
     ModEvaluateGeometric, ModEvaluateMany, ModEvaluateManyPrecomputed, ModExtendedGcd,
     ModFromRoots, ModGcd, ModGcdAssign, ModLcm, ModLcmAssign, ModMakeMonic, ModMakeMonicAssign,
-    ModPowerOf2Compose, ModPowerOf2ComposeAssign, ModPowerOf2DivAssignRem,
+    ModPowerOf2Compose, ModPowerOf2ComposeAssign, ModPowerOf2CoprimeWith, ModPowerOf2DivAssignRem,
     ModPowerOf2DivAssignRemPrecomputed, ModPowerOf2DivExact, ModPowerOf2DivExactAssign,
     ModPowerOf2DivRem, ModPowerOf2DivRemPrecomputed, ModPowerOf2DivRoot, ModPowerOf2DivRootAssign,
     ModPowerOf2DivisibleBy, ModPowerOf2Evaluate, ModPowerOf2EvaluateMany,
@@ -40,6 +40,9 @@ pub mod mod_add;
 /// Implementations of [`ModCompose`] and [`ModComposeAssign`], for composing two polynomials modulo
 /// a number.
 pub mod mod_compose;
+/// Implementations of [`ModCoprimeWith`], which determines whether two polynomials are coprime
+/// modulo a number.
+pub mod mod_coprime_with;
 /// Implementations of [`ModDivExact`], [`ModDivExactAssign`], and [`CheckedModDivExact`], for
 /// dividing polynomials modulo a number when the division is exact.
 pub mod mod_div_exact;
@@ -115,6 +118,9 @@ pub mod mod_power_of_2_add;
 /// Implementations of [`ModPowerOf2Compose`] and [`ModPowerOf2ComposeAssign`], for composing two
 /// polynomials modulo $2^k$.
 pub mod mod_power_of_2_compose;
+/// Implementations of [`ModPowerOf2CoprimeWith`], which determines whether two polynomials are
+/// coprime modulo a power of 2.
+pub mod mod_power_of_2_coprime_with;
 /// Implementations of [`ModPowerOf2DivExact`], [`ModPowerOf2DivExactAssign`], and
 /// [`CheckedModPowerOf2DivExact`], for dividing polynomials modulo a power of 2 when the division
 /// is exact.

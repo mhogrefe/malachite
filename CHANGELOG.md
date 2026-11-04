@@ -899,6 +899,14 @@ documented by git history.
   over the integers that also yields the resultant, which is not exposed yet. The new oracle-test
   modes `mod_gcd`, `mod_power_of_2_gcd`, `polynomial_gcd`, and `rational_polynomial_gcd` check all of
   these against FLINT.
+- Coprimality tests for polynomials, which FLINT does not have. New `ModCoprimeWith` and
+  `ModPowerOf2CoprimeWith` traits in malachite-base are implemented for `UnsignedPolynomial<T>` and
+  `NaturalPolynomial`: two polynomials are coprime modulo $m$ when $sa + tb \equiv 1$ for some $s$
+  and $t$. Every input gets an answer, even for a composite $m$: when Euclid's algorithm meets a
+  leading coefficient $c$ that is not invertible, $\gcd(c, m)$ splits $m$, and the polynomials are
+  tested modulo both factors, so $m$ is never factored. Modulo $2^k$ only the coefficients' low bits
+  matter, since 2 is nilpotent. `CoprimeWith` is implemented for `IntegerPolynomial` and, in
+  malachite-q, `RationalPolynomial`, testing whether the GCD is 1.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

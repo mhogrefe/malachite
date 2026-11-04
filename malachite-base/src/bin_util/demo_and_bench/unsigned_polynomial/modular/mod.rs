@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     mod_add::register(runner);
     mod_compose::register(runner);
+    mod_coprime_with::register(runner);
     mod_div_exact::register(runner);
     mod_div_rem::register(runner);
     mod_div_rem_precomputed::register(runner);
@@ -33,6 +34,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2::register(runner);
     mod_power_of_2_add::register(runner);
     mod_power_of_2_compose::register(runner);
+    mod_power_of_2_coprime_with::register(runner);
     mod_power_of_2_div_exact::register(runner);
     mod_power_of_2_div_rem::register(runner);
     mod_power_of_2_div_rem_precomputed::register(runner);
@@ -74,6 +76,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod mod_add;
 mod mod_compose;
+mod mod_coprime_with;
 mod mod_div_exact;
 mod mod_div_rem;
 mod mod_div_rem_precomputed;
@@ -96,6 +99,7 @@ mod mod_pow;
 mod mod_power_of_2;
 mod mod_power_of_2_add;
 mod mod_power_of_2_compose;
+mod mod_power_of_2_coprime_with;
 mod mod_power_of_2_div_exact;
 mod mod_power_of_2_div_rem;
 mod mod_power_of_2_div_rem_precomputed;

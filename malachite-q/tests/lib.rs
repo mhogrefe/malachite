@@ -298,6 +298,7 @@ pub mod rational_polynomial {
         pub mod compose;
         pub mod compose_power_of_x;
         pub mod content;
+        pub mod coprime_with;
         pub mod deflate_power_of_x;
         pub mod div;
         pub mod div_exact_by_polynomial;

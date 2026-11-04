@@ -36,8 +36,8 @@ impl CheckedModPowerOf2ExtendedGcd<Self> for NaturalPolynomial {
     /// $$
     ///
     /// where $sa + tb \equiv g \pmod{2^k}$ and $g$ is the monic polynomial that generates the same
-    /// ideal of $(\mathbb{Z}/2^k\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0, as computed by
-    /// `checked_mod_power_of_2_gcd`.
+    /// ideal of $(\mathbb{Z}/2^k\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0, as computed
+    /// by `checked_mod_power_of_2_gcd`.
     ///
     /// If $a$ and $b$ are nonzero and $\deg g < \min(\deg a, \deg b)$, then $\deg s < \deg b - \deg
     /// g$ and $\deg t < \deg a - \deg g$. If $b$ is 0, the result is $(a/c, 1/c, 0)$, where $c$ is
@@ -111,8 +111,8 @@ impl CheckedModPowerOf2ExtendedGcd<&Self> for NaturalPolynomial {
     /// $$
     ///
     /// where $sa + tb \equiv g \pmod{2^k}$ and $g$ is the monic polynomial that generates the same
-    /// ideal of $(\mathbb{Z}/2^k\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0, as computed by
-    /// `checked_mod_power_of_2_gcd`.
+    /// ideal of $(\mathbb{Z}/2^k\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0, as computed
+    /// by `checked_mod_power_of_2_gcd`.
     ///
     /// If $a$ and $b$ are nonzero and $\deg g < \min(\deg a, \deg b)$, then $\deg s < \deg b - \deg
     /// g$ and $\deg t < \deg a - \deg g$. If $b$ is 0, the result is $(a/c, 1/c, 0)$, where $c$ is
@@ -186,8 +186,8 @@ impl CheckedModPowerOf2ExtendedGcd<NaturalPolynomial> for &NaturalPolynomial {
     /// $$
     ///
     /// where $sa + tb \equiv g \pmod{2^k}$ and $g$ is the monic polynomial that generates the same
-    /// ideal of $(\mathbb{Z}/2^k\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0, as computed by
-    /// `checked_mod_power_of_2_gcd`.
+    /// ideal of $(\mathbb{Z}/2^k\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0, as computed
+    /// by `checked_mod_power_of_2_gcd`.
     ///
     /// If $a$ and $b$ are nonzero and $\deg g < \min(\deg a, \deg b)$, then $\deg s < \deg b - \deg
     /// g$ and $\deg t < \deg a - \deg g$. If $b$ is 0, the result is $(a/c, 1/c, 0)$, where $c$ is
@@ -260,8 +260,8 @@ impl CheckedModPowerOf2ExtendedGcd<&NaturalPolynomial> for &NaturalPolynomial {
     /// $$
     ///
     /// where $sa + tb \equiv g \pmod{2^k}$ and $g$ is the monic polynomial that generates the same
-    /// ideal of $(\mathbb{Z}/2^k\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0, as computed by
-    /// `checked_mod_power_of_2_gcd`.
+    /// ideal of $(\mathbb{Z}/2^k\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0, as computed
+    /// by `checked_mod_power_of_2_gcd`.
     ///
     /// If $a$ and $b$ are nonzero and $\deg g < \min(\deg a, \deg b)$, then $\deg s < \deg b - \deg
     /// g$ and $\deg t < \deg a - \deg g$. If $b$ is 0, the result is $(a/c, 1/c, 0)$, where $c$ is

@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     compose::register(runner);
     compose_power_of_x::register(runner);
     content::register(runner);
+    coprime_with::register(runner);
     deflate_power_of_x::register(runner);
     div::register(runner);
     div_exact::register(runner);
@@ -62,6 +63,7 @@ mod canonicalize_unit;
 mod compose;
 mod compose_power_of_x;
 mod content;
+mod coprime_with;
 mod deflate_power_of_x;
 mod div;
 mod div_exact;

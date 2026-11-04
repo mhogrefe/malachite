@@ -335,8 +335,8 @@ impl<T: PrimitiveUnsigned> ModGcd<Self, T> for UnsignedPolynomial<T> {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -386,8 +386,8 @@ impl<T: PrimitiveUnsigned> ModGcd<&Self, T> for UnsignedPolynomial<T> {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -438,8 +438,8 @@ impl<T: PrimitiveUnsigned> ModGcd<UnsignedPolynomial<T>, T> for &UnsignedPolynom
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -489,8 +489,8 @@ impl<T: PrimitiveUnsigned> ModGcd<&UnsignedPolynomial<T>, T> for &UnsignedPolyno
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -538,8 +538,8 @@ impl<T: PrimitiveUnsigned> ModGcdAssign<Self, T> for UnsignedPolynomial<T> {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -588,8 +588,8 @@ impl<T: PrimitiveUnsigned> ModGcdAssign<&Self, T> for UnsignedPolynomial<T> {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -645,8 +645,8 @@ impl<T: PrimitiveUnsigned> CheckedModGcd<Self, T> for UnsignedPolynomial<T> {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -706,8 +706,8 @@ impl<T: PrimitiveUnsigned> CheckedModGcd<&Self, T> for UnsignedPolynomial<T> {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -767,8 +767,8 @@ impl<T: PrimitiveUnsigned> CheckedModGcd<UnsignedPolynomial<T>, T> for &Unsigned
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -827,8 +827,8 @@ impl<T: PrimitiveUnsigned> CheckedModGcd<&UnsignedPolynomial<T>, T> for &Unsigne
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///

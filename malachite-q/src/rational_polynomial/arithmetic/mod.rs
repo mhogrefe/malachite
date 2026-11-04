@@ -40,6 +40,9 @@ pub mod compose_power_of_x;
 /// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart)
 /// for [`RationalPolynomial`](super::RationalPolynomial)s.
 pub mod content;
+/// Implementations of [`CoprimeWith`](malachite_base::num::number_theory::traits::CoprimeWith),
+/// which determines whether two polynomials are coprime.
+pub mod coprime_with;
 /// Implementations of [`DeflatePowerOfX`] and [`DeflatePowerOfXAssign`], for undoing the
 /// substitution of a power of the variable into a polynomial.
 pub mod deflate_power_of_x;

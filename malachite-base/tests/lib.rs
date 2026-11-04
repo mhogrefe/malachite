@@ -1114,6 +1114,7 @@ pub mod unsigned_polynomial {
         pub mod hgcd;
         pub mod mod_add;
         pub mod mod_compose;
+        pub mod mod_coprime_with;
         pub mod mod_div_exact;
         pub mod mod_div_rem;
         pub mod mod_div_rem_precomputed;
@@ -1137,6 +1138,7 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_compose;
+        pub mod mod_power_of_2_coprime_with;
         pub mod mod_power_of_2_div_exact;
         pub mod mod_power_of_2_div_rem;
         pub mod mod_power_of_2_div_rem_precomputed;

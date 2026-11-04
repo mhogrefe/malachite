@@ -8,6 +8,7 @@
 
 pub mod mod_add;
 pub mod mod_compose;
+pub mod mod_coprime_with;
 pub mod mod_div_exact;
 pub mod mod_div_rem;
 pub mod mod_div_root;
@@ -23,6 +24,7 @@ pub mod mod_mul_middle;
 pub mod mod_pow;
 pub mod mod_power_of_2_add;
 pub mod mod_power_of_2_compose;
+pub mod mod_power_of_2_coprime_with;
 pub mod mod_power_of_2_div_exact;
 pub mod mod_power_of_2_div_rem;
 pub mod mod_power_of_2_div_root;

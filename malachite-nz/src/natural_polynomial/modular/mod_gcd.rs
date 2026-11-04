@@ -300,8 +300,8 @@ impl ModGcd<Self, Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -356,8 +356,8 @@ impl ModGcd<Self, &Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -412,8 +412,8 @@ impl ModGcd<&Self, Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -468,8 +468,8 @@ impl ModGcd<&Self, &Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -524,8 +524,8 @@ impl ModGcd<NaturalPolynomial, Natural> for &NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -580,8 +580,8 @@ impl ModGcd<NaturalPolynomial, &Natural> for &NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -636,8 +636,8 @@ impl ModGcd<&NaturalPolynomial, Natural> for &NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -692,8 +692,8 @@ impl ModGcd<&NaturalPolynomial, &Natural> for &NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -746,8 +746,8 @@ impl ModGcdAssign<Self, Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -801,8 +801,8 @@ impl ModGcdAssign<Self, &Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -856,8 +856,8 @@ impl ModGcdAssign<&Self, Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -911,8 +911,8 @@ impl ModGcdAssign<&Self, &Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -973,8 +973,8 @@ impl CheckedModGcd<Self, Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -1043,8 +1043,8 @@ impl CheckedModGcd<Self, &Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -1113,8 +1113,8 @@ impl CheckedModGcd<&Self, Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -1183,8 +1183,8 @@ impl CheckedModGcd<&Self, &Natural> for NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -1253,8 +1253,8 @@ impl CheckedModGcd<NaturalPolynomial, Natural> for &NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -1323,8 +1323,8 @@ impl CheckedModGcd<NaturalPolynomial, &Natural> for &NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -1393,8 +1393,8 @@ impl CheckedModGcd<&NaturalPolynomial, Natural> for &NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///
@@ -1463,8 +1463,8 @@ impl CheckedModGcd<&NaturalPolynomial, &Natural> for &NaturalPolynomial {
     /// $$
     ///
     /// where $g$ is the monic polynomial that generates the same ideal of
-    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and every
-    /// common divisor of $a$ and $b$ divides it.
+    /// $(\mathbb{Z}/m\mathbb{Z})\[x\]$ as $a$ and $b$, or 0 if both are 0. It divides both, and
+    /// every common divisor of $a$ and $b$ divides it.
     ///
     /// When $m$ is 1, every polynomial is 0, and so is the result.
     ///

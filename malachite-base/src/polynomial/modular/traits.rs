@@ -1224,3 +1224,27 @@ pub trait CheckedModPowerOf2Lcm<Rhs = Self> {
     /// met along the way is even.
     fn checked_mod_power_of_2_lcm(self, other: Rhs, pow: u64) -> Option<Self::Output>;
 }
+
+/// Determines whether two polynomials are coprime modulo $m$: whether the ideal they generate is
+/// the whole ring, so that $sa + tb \equiv 1 \pmod{m}$ for some polynomials $s$ and $t$. The
+/// coefficients must already be reduced modulo $m$.
+pub trait ModCoprimeWith<Rhs = Self, M = Self> {
+    /// Determines whether two polynomials are coprime modulo $m$.
+    ///
+    /// $$
+    /// f(a, b, m) = (\exists s, t : sa + tb \equiv 1 \pmod{m}).
+    /// $$
+    fn mod_coprime_with(self, other: Rhs, m: M) -> bool;
+}
+
+/// Determines whether two polynomials are coprime modulo $2^k$: whether the ideal they generate is
+/// the whole ring, so that $sa + tb \equiv 1 \pmod{2^k}$ for some polynomials $s$ and $t$. The
+/// coefficients must already be reduced modulo $2^k$.
+pub trait ModPowerOf2CoprimeWith<Rhs = Self> {
+    /// Determines whether two polynomials are coprime modulo $2^k$.
+    ///
+    /// $$
+    /// f(a, b, k) = (\exists s, t : sa + tb \equiv 1 \pmod{2^k}).
+    /// $$
+    fn mod_power_of_2_coprime_with(self, other: Rhs, pow: u64) -> bool;
+}
