@@ -1913,6 +1913,16 @@ pub fn rational_polynomial_pair_gen_var_2() -> Generator<(RationalPolynomial, Ra
     )
 }
 
+// All pairs of `RationalPolynomial`s. In the random modes, both polynomials are multiplied by a
+// common random factor, so that their GCDs are often nontrivial.
+pub fn rational_polynomial_pair_gen_var_6() -> Generator<(RationalPolynomial, RationalPolynomial)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_pair_gen_var_6,
+        &random_rational_polynomial_pair_gen_var_6,
+        &special_random_rational_polynomial_pair_gen_var_6,
+    )
+}
+
 // All `(RationalPolynomial, RationalPolynomial, u64)` where the `u64` is a small length.
 pub fn rational_polynomial_rational_polynomial_unsigned_triple_gen_var_1()
 -> Generator<(RationalPolynomial, RationalPolynomial, u64)> {

@@ -8,15 +8,18 @@
 
 #[cfg(doc)]
 use malachite_base::polynomial::modular::traits::{
-    CheckedModDivExact, CheckedModDivRem, CheckedModPowerOf2DivExact, CheckedModPowerOf2DivRem,
-    CheckedModPowerOf2Quotient, CheckedModPowerOf2Rem, CheckedModQuotient, CheckedModRem,
-    ModCompose, ModComposeAssign, ModDivAssignRem, ModDivAssignRemPrecomputed, ModDivExact,
-    ModDivExactAssign, ModDivRem, ModDivRemPrecomputed, ModDivRoot, ModDivRootAssign,
-    ModDivisibleBy, ModEvaluate, ModEvaluateMany, ModEvaluateManyPrecomputed, ModFromRoots,
-    ModMakeMonic, ModMakeMonicAssign, ModPowerOf2Compose, ModPowerOf2ComposeAssign,
-    ModPowerOf2DivAssignRem, ModPowerOf2DivAssignRemPrecomputed, ModPowerOf2DivExact,
-    ModPowerOf2DivExactAssign, ModPowerOf2DivRem, ModPowerOf2DivRemPrecomputed, ModPowerOf2DivRoot,
-    ModPowerOf2DivRootAssign, ModPowerOf2DivisibleBy, ModPowerOf2Evaluate, ModPowerOf2EvaluateMany,
+    CheckedModDivExact, CheckedModDivRem, CheckedModExtendedGcd, CheckedModGcd, CheckedModLcm,
+    CheckedModPowerOf2DivExact, CheckedModPowerOf2DivRem, CheckedModPowerOf2ExtendedGcd,
+    CheckedModPowerOf2Gcd, CheckedModPowerOf2Lcm, CheckedModPowerOf2Quotient,
+    CheckedModPowerOf2Rem, CheckedModQuotient, CheckedModRem, ModCompose, ModComposeAssign,
+    ModDivAssignRem, ModDivAssignRemPrecomputed, ModDivExact, ModDivExactAssign, ModDivRem,
+    ModDivRemPrecomputed, ModDivRoot, ModDivRootAssign, ModDivisibleBy, ModEvaluate,
+    ModEvaluateMany, ModEvaluateManyPrecomputed, ModExtendedGcd, ModFromRoots, ModGcd,
+    ModGcdAssign, ModLcm, ModLcmAssign, ModMakeMonic, ModMakeMonicAssign, ModPowerOf2Compose,
+    ModPowerOf2ComposeAssign, ModPowerOf2DivAssignRem, ModPowerOf2DivAssignRemPrecomputed,
+    ModPowerOf2DivExact, ModPowerOf2DivExactAssign, ModPowerOf2DivRem,
+    ModPowerOf2DivRemPrecomputed, ModPowerOf2DivRoot, ModPowerOf2DivRootAssign,
+    ModPowerOf2DivisibleBy, ModPowerOf2Evaluate, ModPowerOf2EvaluateMany,
     ModPowerOf2EvaluateManyPrecomputed, ModPowerOf2FromRoots, ModPowerOf2Quotient,
     ModPowerOf2QuotientAssign, ModPowerOf2QuotientPrecomputed,
     ModPowerOf2QuotientPrecomputedAssign, ModPowerOf2Rem, ModPowerOf2RemAssign,
@@ -90,12 +93,21 @@ pub mod mod_evaluate_many;
 /// Implementations of [`ModEvaluateManyPrecomputed`], for evaluating a polynomial at many points
 /// modulo a [`Natural`], with a subproduct tree precomputed from the points.
 pub mod mod_evaluate_many_precomputed;
+/// Implementations of [`ModExtendedGcd`] and [`CheckedModExtendedGcd`], for computing extended GCDs
+/// of polynomials modulo a number.
+pub mod mod_extended_gcd;
 /// Implementations of [`ModFromRoots`], which build the monic polynomial with given roots modulo a
 /// [`Natural`].
 pub mod mod_from_roots;
+/// Implementations of [`ModGcd`], [`ModGcdAssign`], and [`CheckedModGcd`], for the monic GCD of two
+/// polynomials modulo a number.
+pub mod mod_gcd;
 /// An implementation of [`ModIsReduced`](malachite_base::num::modular::traits::ModIsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given modulus.
 pub mod mod_is_reduced;
+/// Implementations of [`ModLcm`], [`ModLcmAssign`], and [`CheckedModLcm`], for computing LCMs of
+/// polynomials modulo a number.
+pub mod mod_lcm;
 /// Implementations of [`ModMakeMonic`] and [`ModMakeMonicAssign`], which make a polynomial monic
 /// modulo a value.
 pub mod mod_make_monic;
@@ -154,13 +166,22 @@ pub mod mod_power_of_2_evaluate_many;
 /// Implementations of [`ModPowerOf2EvaluateManyPrecomputed`], for evaluating a polynomial at many
 /// points modulo a power of 2, with a subproduct tree precomputed from the points.
 pub mod mod_power_of_2_evaluate_many_precomputed;
+/// Implementations of [`CheckedModPowerOf2ExtendedGcd`], for computing extended GCDs of polynomials
+/// modulo a power of 2.
+pub mod mod_power_of_2_extended_gcd;
 /// An implementation of [`ModPowerOf2FromRoots`], which builds the monic polynomial with given
 /// roots modulo a power of 2.
 pub mod mod_power_of_2_from_roots;
+/// Implementations of [`CheckedModPowerOf2Gcd`], for the monic GCD of two polynomials modulo a
+/// power of 2.
+pub mod mod_power_of_2_gcd;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::modular::traits::ModPowerOf2IsReduced), which
 /// checks whether every coefficient of a polynomial is less than a given power of 2.
 pub mod mod_power_of_2_is_reduced;
+/// Implementations of [`CheckedModPowerOf2Lcm`], for computing LCMs of polynomials modulo a power
+/// of 2.
+pub mod mod_power_of_2_lcm;
 /// Implementations of [`ModPowerOf2Mul`](malachite_base::num::modular::traits::ModPowerOf2Mul) and
 /// [`ModPowerOf2MulAssign`](malachite_base::num::modular::traits::ModPowerOf2MulAssign), for
 /// multiplying two polynomials modulo $2^k$.

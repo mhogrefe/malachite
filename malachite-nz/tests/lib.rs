@@ -912,9 +912,11 @@ pub mod integer_polynomial {
         pub mod exponent_gcd;
         pub mod floor_l2_norm;
         pub mod from_roots;
+        pub mod gcd;
         pub mod height;
         pub mod is_unit;
         pub mod l2_norm_squared;
+        pub mod lcm;
         pub mod mul;
         pub mod mul_high;
         pub mod mul_middle;
@@ -927,6 +929,7 @@ pub mod integer_polynomial {
         pub mod rem;
         pub mod rem_precomputed;
         pub mod remove_power;
+        pub mod resultant;
         pub mod scalar_add_mul;
         pub mod shl;
         pub mod square;
@@ -1105,8 +1108,11 @@ pub mod natural_polynomial {
         pub mod mod_evaluate;
         pub mod mod_evaluate_many;
         pub mod mod_evaluate_many_precomputed;
+        pub mod mod_extended_gcd;
         pub mod mod_from_roots;
+        pub mod mod_gcd;
         pub mod mod_is_reduced;
+        pub mod mod_lcm;
         pub mod mod_make_monic;
         pub mod mod_mul;
         pub mod mod_neg;
@@ -1123,7 +1129,10 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_evaluate;
         pub mod mod_power_of_2_evaluate_many;
         pub mod mod_power_of_2_evaluate_many_precomputed;
+        pub mod mod_power_of_2_extended_gcd;
         pub mod mod_power_of_2_from_roots;
+        pub mod mod_power_of_2_gcd;
+        pub mod mod_power_of_2_lcm;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_pow;

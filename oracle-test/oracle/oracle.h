@@ -511,4 +511,10 @@ int run_mod_power_of_2_evaluate_many(const char * arg);
 int run_mod_from_roots(const char * arg);
 int run_from_roots(const char * arg);
 
+/* gcd.c */
+int run_mod_gcd(const char * arg);
+int run_mod_power_of_2_gcd(const char * arg);
+int run_polynomial_gcd(const char * arg);
+int run_rational_polynomial_gcd(const char * arg);
+
 #endif

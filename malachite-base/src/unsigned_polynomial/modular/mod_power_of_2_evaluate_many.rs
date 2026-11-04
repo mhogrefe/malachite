@@ -104,13 +104,13 @@ impl<T: PrimitiveUnsigned> ModPowerOf2EvaluateMany<T> for &UnsignedPolynomial<T>
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     ///
     /// The result is the same as calling
-    /// [`mod_power_of_2_evaluate`](ModPowerOf2Evaluate::mod_power_of_2_evaluate)
-    /// at each value, but the polynomial is checked once. Reducing modulo $2^k$ commutes with
-    /// wrapping arithmetic, so Horner's rule is carried out with wrapping multiplications and
-    /// additions, for several values together in each pass over the coefficients when the
-    /// polynomial is long enough. For a long polynomial and many values, the polynomial is instead
-    /// reduced modulo the products of the linear factors $x - x_j$ in a subproduct tree, from the
-    /// top down, as with [`mod_power_of_2_evaluate_many_precomputed`](
+    /// [`mod_power_of_2_evaluate`](ModPowerOf2Evaluate::mod_power_of_2_evaluate) at each value, but
+    /// the polynomial is checked once. Reducing modulo $2^k$ commutes with wrapping arithmetic, so
+    /// Horner's rule is carried out with wrapping multiplications and additions, for several values
+    /// together in each pass over the coefficients when the polynomial is long enough. For a long
+    /// polynomial and many values, the polynomial is instead reduced modulo the products of the
+    /// linear factors $x - x_j$ in a subproduct tree, from the top down, as with
+    /// [`mod_power_of_2_evaluate_many_precomputed`](
     /// ModPowerOf2EvaluateManyPrecomputed::mod_power_of_2_evaluate_many_precomputed).
     ///
     /// # Worst-case complexity

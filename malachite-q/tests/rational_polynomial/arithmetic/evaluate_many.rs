@@ -13,8 +13,7 @@ use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_q::Rational;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{
-    integer_polynomial_rational_vec_pair_gen,
-    rational_polynomial_integer_vec_pair_gen,
+    integer_polynomial_rational_vec_pair_gen, rational_polynomial_integer_vec_pair_gen,
     rational_polynomial_rational_vec_pair_gen,
 };
 use malachite_q::test_util::rational_polynomial::arithmetic::evaluate_many::*;

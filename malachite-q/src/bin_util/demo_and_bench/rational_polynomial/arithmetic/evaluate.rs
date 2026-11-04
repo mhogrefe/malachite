@@ -17,7 +17,8 @@ use malachite_q::rational_polynomial::arithmetic::evaluate::{
 };
 use malachite_q::test_util::bench::bucketers::pair_1_rational_polynomial_bit_bucketer;
 use malachite_q::test_util::generators::{
-    integer_polynomial_rational_pair_gen, integer_polynomial_rational_pair_gen_var_1, rational_polynomial_integer_pair_gen, rational_polynomial_rational_pair_gen,
+    integer_polynomial_rational_pair_gen, integer_polynomial_rational_pair_gen_var_1,
+    rational_polynomial_integer_pair_gen, rational_polynomial_rational_pair_gen,
 };
 use malachite_q::test_util::rational_polynomial::arithmetic::evaluate::*;
 

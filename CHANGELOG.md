@@ -881,6 +881,24 @@ documented by git history.
   `IntegerPolynomial` from `Integer` roots, and, in malachite-q, for `RationalPolynomial` from
   `Rational` roots, while `IntegerPolynomial::from_rational_roots` gives the primitive polynomial
   $\prod_i (q_i x - p_i)$, like `fmpz_poly_product_roots_fmpq_vec`.
+- Polynomial GCDs, extended GCDs, and LCMs. New `ModGcd`, `ModGcdAssign`, `CheckedModGcd`,
+  `ModExtendedGcd`, `CheckedModExtendedGcd`, `ModLcm`, `ModLcmAssign`, and `CheckedModLcm` traits in
+  malachite-base, and `CheckedModPowerOf2Gcd`, `CheckedModPowerOf2ExtendedGcd`, and
+  `CheckedModPowerOf2Lcm`, are implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial`:
+  monic GCDs, with minimal-degree cofactors, and monic LCMs modulo $m$ or $2^k$, like FLINT's
+  `nmod_poly_gcd`, `nmod_poly_xgcd`, `fmpz_mod_poly_gcd`, and `fmpz_mod_poly_xgcd`. Short
+  polynomials use Euclid's algorithm and long ones the half-GCD algorithm, as in FLINT's
+  `gr_poly/hgcd.c`, at crossovers measured for each modulus size rather than FLINT's. Both divide
+  only by invertible leading coefficients: for a composite $m$ the panicking functions panic and the
+  checked ones return `None` when one is not, and modulo $2^k$, where FLINT has no GCD, only checked
+  functions exist. `Gcd`, `GcdAssign`, `Lcm`, and `LcmAssign` are implemented for
+  `IntegerPolynomial`, like `fmpz_poly_gcd` and `fmpz_poly_lcm`, choosing among the subresultant,
+  heuristic, and multimodular algorithms as FLINT does, and, in malachite-q, `Gcd`, `GcdAssign`,
+  `ExtendedGcd`, `Lcm`, and `LcmAssign` for `RationalPolynomial`, like `fmpq_poly_gcd`,
+  `fmpq_poly_xgcd`, and `fmpq_poly_lcm`; the rational extended GCD uses a multimodular extended GCD
+  over the integers that also yields the resultant, which is not exposed yet. The new oracle-test
+  modes `mod_gcd`, `mod_power_of_2_gcd`, `polynomial_gcd`, and `rational_polynomial_gcd` check all of
+  these against FLINT.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

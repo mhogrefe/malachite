@@ -16,7 +16,7 @@ use malachite_nz::integer_polynomial::IntegerPolynomial;
 // For p = A/d, the monic multiple of p is A/lc(A). Dividing numerator and denominator by cont(A),
 // which divides lc(A), gives pp(A)/lc(pp(A)) up to sign, and that pair is already canonical: pp(A)
 // has content 1. So the denominator of p plays no part, and no GCD is needed beyond the content.
-fn monic_from_primitive_part(primitive_part: IntegerPolynomial) -> RationalPolynomial {
+pub(crate) fn monic_from_primitive_part(primitive_part: IntegerPolynomial) -> RationalPolynomial {
     if primitive_part == IntegerPolynomial::ZERO {
         return RationalPolynomial::ZERO;
     }

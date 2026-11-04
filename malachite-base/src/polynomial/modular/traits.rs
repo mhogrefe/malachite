@@ -1087,3 +1087,140 @@ pub trait ModPowerOf2EvaluateManyPrecomputed<T> {
         data: &Self::Data,
     ) -> Vec<Self::Output>;
 }
+
+/// Computes the monic greatest common divisor of two polynomials modulo $m$. The coefficients must
+/// already be reduced modulo $m$, and every leading coefficient met by Euclid's algorithm must be
+/// invertible modulo $m$, as it always is when $m$ is prime.
+pub trait ModGcd<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Computes the monic GCD of two polynomials modulo $m$; the GCD of 0 and 0 is 0.
+    ///
+    /// $$
+    /// f(a, b, m) = g, \quad g \mid a, \quad g \mid b, \quad (g) = (a, b) \pmod{m}.
+    /// $$
+    fn mod_gcd(self, other: Rhs, m: M) -> Self::Output;
+}
+
+/// Replaces a polynomial with the monic greatest common divisor of it and another polynomial modulo
+/// $m$. The coefficients must already be reduced modulo $m$, and every leading coefficient met by
+/// Euclid's algorithm must be invertible modulo $m$.
+pub trait ModGcdAssign<Rhs = Self, M = Self> {
+    /// Replaces `self` with its monic GCD with another polynomial modulo $m$.
+    fn mod_gcd_assign(&mut self, other: Rhs, m: M);
+}
+
+/// Computes the monic greatest common divisor of two polynomials modulo $m$, or `None` if Euclid's
+/// algorithm meets a leading coefficient that is not invertible modulo $m$. The coefficients must
+/// already be reduced modulo $m$.
+pub trait CheckedModGcd<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Computes the monic GCD of two polynomials modulo $m$, or `None` if a leading coefficient met
+    /// along the way is not invertible.
+    fn checked_mod_gcd(self, other: Rhs, m: M) -> Option<Self::Output>;
+}
+
+/// Computes the monic greatest common divisor of two polynomials modulo $2^k$, or `None` if
+/// Euclid's algorithm meets an even leading coefficient. The coefficients must already be reduced
+/// modulo $2^k$.
+pub trait CheckedModPowerOf2Gcd<Rhs = Self> {
+    type Output;
+
+    /// Computes the monic GCD of two polynomials modulo $2^k$, or `None` if a leading coefficient
+    /// met along the way is even.
+    fn checked_mod_power_of_2_gcd(self, other: Rhs, pow: u64) -> Option<Self::Output>;
+}
+
+/// Computes the monic greatest common divisor of two polynomials modulo $m$, together with
+/// cofactors. The coefficients must already be reduced modulo $m$, and every leading coefficient
+/// met by Euclid's algorithm must be invertible modulo $m$, as it always is when $m$ is prime.
+pub trait ModExtendedGcd<Rhs = Self, M = Self> {
+    type Gcd;
+    type Cofactor;
+
+    /// Computes the monic GCD $g$ of two polynomials $a$ and $b$ modulo $m$, together with
+    /// cofactors $s$ and $t$.
+    ///
+    /// $$
+    /// f(a, b, m) = (g, s, t), \quad sa + tb \equiv g \pmod{m}.
+    /// $$
+    fn mod_extended_gcd(self, other: Rhs, m: M) -> (Self::Gcd, Self::Cofactor, Self::Cofactor);
+}
+
+/// Computes the monic greatest common divisor of two polynomials modulo $m$, together with
+/// cofactors, or `None` if Euclid's algorithm meets a leading coefficient that is not invertible
+/// modulo $m$. The coefficients must already be reduced modulo $m$.
+pub trait CheckedModExtendedGcd<Rhs = Self, M = Self> {
+    type Gcd;
+    type Cofactor;
+
+    /// Computes the monic GCD of two polynomials modulo $m$, together with cofactors, or `None` if
+    /// a leading coefficient met along the way is not invertible.
+    #[allow(clippy::type_complexity)]
+    fn checked_mod_extended_gcd(
+        self,
+        other: Rhs,
+        m: M,
+    ) -> Option<(Self::Gcd, Self::Cofactor, Self::Cofactor)>;
+}
+
+/// Computes the monic greatest common divisor of two polynomials modulo $2^k$, together with
+/// cofactors, or `None` if Euclid's algorithm meets an even leading coefficient. The coefficients
+/// must already be reduced modulo $2^k$.
+pub trait CheckedModPowerOf2ExtendedGcd<Rhs = Self> {
+    type Gcd;
+    type Cofactor;
+
+    /// Computes the monic GCD of two polynomials modulo $2^k$, together with cofactors, or `None`
+    /// if a leading coefficient met along the way is even.
+    #[allow(clippy::type_complexity)]
+    fn checked_mod_power_of_2_extended_gcd(
+        self,
+        other: Rhs,
+        pow: u64,
+    ) -> Option<(Self::Gcd, Self::Cofactor, Self::Cofactor)>;
+}
+
+/// Computes the monic least common multiple of two polynomials modulo $m$. The coefficients must
+/// already be reduced modulo $m$, and every leading coefficient met along the way must be
+/// invertible modulo $m$, as it always is when $m$ is prime.
+pub trait ModLcm<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Computes the monic LCM of two polynomials modulo $m$; the LCM of 0 and any polynomial is 0.
+    ///
+    /// $$
+    /// f(a, b, m) = l, \quad a \mid l, \quad b \mid l, \quad (l) = (a) \cap (b) \pmod{m}.
+    /// $$
+    fn mod_lcm(self, other: Rhs, m: M) -> Self::Output;
+}
+
+/// Replaces a polynomial with the monic least common multiple of it and another polynomial modulo
+/// $m$. The coefficients must already be reduced modulo $m$, and every leading coefficient met
+/// along the way must be invertible modulo $m$.
+pub trait ModLcmAssign<Rhs = Self, M = Self> {
+    /// Replaces `self` with its monic LCM with another polynomial modulo $m$.
+    fn mod_lcm_assign(&mut self, other: Rhs, m: M);
+}
+
+/// Computes the monic least common multiple of two polynomials modulo $m$, or `None` if a leading
+/// coefficient met along the way is not invertible modulo $m$. The coefficients must already be
+/// reduced modulo $m$.
+pub trait CheckedModLcm<Rhs = Self, M = Self> {
+    type Output;
+
+    /// Computes the monic LCM of two polynomials modulo $m$, or `None` if a leading coefficient met
+    /// along the way is not invertible.
+    fn checked_mod_lcm(self, other: Rhs, m: M) -> Option<Self::Output>;
+}
+
+/// Computes the monic least common multiple of two polynomials modulo $2^k$, or `None` if a leading
+/// coefficient met along the way is even. The coefficients must already be reduced modulo $2^k$.
+pub trait CheckedModPowerOf2Lcm<Rhs = Self> {
+    type Output;
+
+    /// Computes the monic LCM of two polynomials modulo $2^k$, or `None` if a leading coefficient
+    /// met along the way is even.
+    fn checked_mod_power_of_2_lcm(self, other: Rhs, pow: u64) -> Option<Self::Output>;
+}

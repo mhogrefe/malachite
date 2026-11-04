@@ -1,0 +1,14 @@
+(0).lcm(0) = 0
+p := 0; p.lcm_assign(0); p = 0
+(0).lcm(2*x-4) = 0
+p := 0; p.lcm_assign(2*x-4); p = 0
+(6).lcm(-4) = 12
+p := 6; p.lcm_assign(-4); p = 12
+(x^2+1).lcm(x+1) = x^3+x^2+x+1
+p := x^2+1; p.lcm_assign(x+1); p = x^3+x^2+x+1
+(x^2-1).lcm(x^2+2*x+1) = x^3+x^2-x-1
+p := x^2-1; p.lcm_assign(x^2+2*x+1); p = x^3+x^2-x-1
+(6*x+6).lcm(4*x^2-4) = 12*x^2-12
+p := 6*x+6; p.lcm_assign(4*x^2-4); p = 12*x^2-12
+(-x^2+1).lcm(x+1) = x^2-1
+p := -x^2+1; p.lcm_assign(x+1); p = x^2-1

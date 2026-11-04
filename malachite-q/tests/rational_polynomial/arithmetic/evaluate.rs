@@ -22,7 +22,8 @@ use malachite_q::rational_polynomial::arithmetic::evaluate::{
     evaluate_integer_polynomial_divide_and_conquer, evaluate_integer_polynomial_horner,
 };
 use malachite_q::test_util::generators::{
-    integer_polynomial_rational_pair_gen, integer_polynomial_rational_pair_gen_var_1, rational_polynomial_integer_pair_gen, rational_polynomial_rational_pair_gen,
+    integer_polynomial_rational_pair_gen, integer_polynomial_rational_pair_gen_var_1,
+    rational_polynomial_integer_pair_gen, rational_polynomial_rational_pair_gen,
 };
 use malachite_q::test_util::rational_polynomial::arithmetic::evaluate::*;
 

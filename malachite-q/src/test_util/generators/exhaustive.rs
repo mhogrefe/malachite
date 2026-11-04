@@ -1558,6 +1558,11 @@ pub fn exhaustive_rational_polynomial_pair_gen() -> It<(RationalPolynomial, Rati
     ))
 }
 
+pub fn exhaustive_rational_polynomial_pair_gen_var_6()
+-> It<(RationalPolynomial, RationalPolynomial)> {
+    exhaustive_rational_polynomial_pair_gen()
+}
+
 // Pairs `(p * q, q)` of `RationalPolynomial`s where `q` is not constant.
 pub fn exhaustive_rational_polynomial_pair_gen_var_5()
 -> It<(RationalPolynomial, RationalPolynomial)> {

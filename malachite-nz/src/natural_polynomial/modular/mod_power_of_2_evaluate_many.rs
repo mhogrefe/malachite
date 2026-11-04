@@ -83,11 +83,11 @@ impl ModPowerOf2EvaluateMany<Natural> for &NaturalPolynomial {
     /// where $c_i$ is the coefficient of $x^i$ in $p$ and $n$ is its length.
     ///
     /// The result is the same as calling
-    /// [`mod_power_of_2_evaluate`](ModPowerOf2Evaluate::mod_power_of_2_evaluate)
-    /// at each value, but the polynomial is checked once. When $2^k$ fits in one or two limbs, the
-    /// evaluation is done in words. Otherwise, Horner's rule is used at each value, or, for a long
-    /// polynomial and many values, the polynomial is reduced modulo the products of the linear
-    /// factors $x - x_j$ in a subproduct tree, from the top down.
+    /// [`mod_power_of_2_evaluate`](ModPowerOf2Evaluate::mod_power_of_2_evaluate) at each value, but
+    /// the polynomial is checked once. When $2^k$ fits in one or two limbs, the evaluation is done
+    /// in words. Otherwise, Horner's rule is used at each value, or, for a long polynomial and many
+    /// values, the polynomial is reduced modulo the products of the linear factors $x - x_j$ in a
+    /// subproduct tree, from the top down.
     ///
     /// # Worst-case complexity
     /// $T(n, l, k) = O(\min(nlk \log k \log\log k, N \log^2 N \log\log N))$

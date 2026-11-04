@@ -5034,6 +5034,17 @@ pub fn unsigned_polynomial_unsigned_pair_gen_var_3() -> Generator<(UnsignedPolyn
     )
 }
 
+// All `(UnsignedPolynomial<T>, T)` where the `T` is prime and the coefficients of the polynomial
+// are less than it.
+pub fn unsigned_polynomial_unsigned_pair_gen_var_4<T: PrimitiveUnsigned + IsPrime>()
+-> Generator<(UnsignedPolynomial<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_pair_gen_var_4,
+        &random_unsigned_polynomial_unsigned_pair_gen_var_4,
+        &special_random_unsigned_polynomial_unsigned_pair_gen_var_4,
+    )
+}
+
 // All `(UnsignedPolynomial<T>, T, u64)` where the `u64` is no greater than `T::WIDTH`, and the
 // polynomial's coefficients and the `T` are less than 2 to the power of the `u64`.
 pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
@@ -5246,6 +5257,19 @@ pub fn unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9<T: Prim
         &exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9,
         &random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9,
         &special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9,
+    )
+}
+
+// All `(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)` where the `T` is prime and the
+// coefficients of both polynomials are less than it. In the random modes, both polynomials are
+// multiplied by a common random factor, so that their GCDs are often nontrivial.
+pub fn unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_10<
+    T: PrimitiveUnsigned + IsPrime,
+>() -> Generator<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_10,
+        &random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_10,
+        &special_random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_10,
     )
 }
 

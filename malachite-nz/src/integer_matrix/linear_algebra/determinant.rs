@@ -105,25 +105,56 @@ const BAREISS_MAX_DIMENSION: usize = 24;
 // without a divisor.
 const MODULAR_MAX_DIMENSION: usize = 59;
 
+// The data for combining values modulo a product M with residues modulo the prime word `p`, which
+// does not divide M: M times `p`, and the inverse of M modulo `p`.
+pub(crate) struct BalancedCrtWord<'a> {
+    product: &'a Natural,
+    new_product: Natural,
+    p: Limb,
+    inverse: Limb,
+}
+
+impl<'a> BalancedCrtWord<'a> {
+    pub(crate) fn new(product: &'a Natural, p: Limb) -> Self {
+        BalancedCrtWord {
+            product,
+            new_product: product * Natural::from(p),
+            p,
+            inverse: product.rem_limb_ref(p).mod_inverse(p).unwrap(),
+        }
+    }
+
+    // The unique y with y ≡ x (mod M), y ≡ `r` (mod p), and -Mp/2 < y <= Mp/2, given x with
+    // -M/2 < x <= M/2.
+    //
+    // This is equivalent to `_fmpz_CRT_ui_precomp` from `fmpz/CRT.c`, FLINT 3.6.0, with `sign = 1`.
+    pub(crate) fn combine(&self, x: &Integer, r: Limb) -> Integer {
+        let p = self.p;
+        let x_mod = x.abs.rem_limb_ref(p);
+        let x_mod = if x.sign { x_mod } else { x_mod.mod_neg(p) };
+        let s = r.mod_sub(x_mod, p).mod_mul(self.inverse, p);
+        let y = x + Integer::from(self.product * Natural::from(s));
+        // y > Mp/2 exactly when 2y > Mp.
+        if y > 0u32 && self.new_product.cmp_double(y.unsigned_abs_ref()) == Less {
+            y - Integer::from(&self.new_product)
+        } else {
+            y
+        }
+    }
+
+    // Mp, the product the combined values are reduced modulo.
+    pub(crate) fn into_new_product(self) -> Natural {
+        self.new_product
+    }
+}
+
 // The unique y with y ≡ x (mod `product`), y ≡ `r` (mod `p`), and -Mp/2 < y <= Mp/2, where M is
 // `product`, given x with -M/2 < x <= M/2 and the prime `p`, which does not divide M.
 //
 // This is equivalent to `fmpz_CRT_ui` from `fmpz/CRT.c`, FLINT 3.6.0, with `sign = 1`, computed
 // with word-sized residues.
 pub(crate) fn balanced_crt_word(x: &Integer, product: &Natural, r: Limb, p: Limb) -> Integer {
-    let x_mod = x.abs.rem_limb_ref(p);
-    let x_mod = if x.sign { x_mod } else { x_mod.mod_neg(p) };
-    let s = r
-        .mod_sub(x_mod, p)
-        .mod_mul(product.rem_limb_ref(p).mod_inverse(p).unwrap(), p);
-    let y = x + Integer::from(product * Natural::from(s));
-    let new_product = product * Natural::from(p);
-    // y > M/2 exactly when 2y > M.
-    if y > 0u32 && new_product.cmp_double(y.unsigned_abs_ref()) == Less {
-        y - Integer::from(new_product)
-    } else {
-        y
-    }
+    BalancedCrtWord::new(product, p).combine(x, r)
 }
 
 // Returns the determinant of the square matrix `a`, given `d`, a divisor of it: the quotient

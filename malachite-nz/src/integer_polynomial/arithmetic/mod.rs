@@ -85,6 +85,10 @@ pub mod exponent_gcd;
 pub mod floor_l2_norm;
 /// An implementation of [`FromRoots`], which builds the monic polynomial with given roots.
 pub mod from_roots;
+/// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
+/// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), for computing GCDs of
+/// polynomials.
+pub mod gcd;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
 /// of a polynomial's coefficients.
@@ -94,6 +98,10 @@ pub mod height;
 pub mod is_unit;
 /// An implementation of [`L2NormSquared`], the sum of the squares of a polynomial's coefficients.
 pub mod l2_norm_squared;
+/// Implementations of [`Lcm`](malachite_base::num::arithmetic::traits::Lcm) and
+/// [`LcmAssign`](malachite_base::num::arithmetic::traits::LcmAssign), for computing LCMs of
+/// polynomials.
+pub mod lcm;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying two polynomials.
 pub mod mul;
@@ -133,6 +141,12 @@ pub mod rem_precomputed;
 /// [`RemovePowerAssign`](malachite_base::num::factorization::traits::RemovePowerAssign), for
 /// removing the largest power of a polynomial that divides another.
 pub mod remove_power;
+/// Resultants of polynomials.
+#[doc(hidden)]
+pub mod resultant;
+/// Resultants of polynomials, together with the cofactors that combine the polynomials into them.
+#[doc(hidden)]
+pub mod resultant_extended_gcd;
 pub mod scalar_add_mul;
 /// Left-shifting an [`IntegerPolynomial`](super::IntegerPolynomial) (multiplying it by a power of
 /// 2), by shifting every coefficient.

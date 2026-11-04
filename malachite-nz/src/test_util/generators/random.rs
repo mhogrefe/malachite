@@ -115,6 +115,7 @@ use crate::test_util::generators::{
     limbs_odd_factorial_valid, matrix_positions, natural_matrix_positions,
 };
 use crate::test_util::natural::number_theory::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
+use core::iter::repeat_with;
 use core::str::FromStr;
 use itertools::Itertools;
 use malachite_base::bools::random::{RandomBools, random_bools};
@@ -852,6 +853,15 @@ pub fn random_natural_polynomial_natural_pair_gen_var_3(
     ))
 }
 
+pub fn random_natural_polynomial_natural_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, Natural)> {
+    Box::new(
+        random_natural_polynomial_natural_polynomial_natural_triple_gen_var_5(config)
+            .map(|(p, _, m)| (p, m)),
+    )
+}
+
 pub fn random_natural_polynomial_natural_unsigned_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, Natural, u64)> {
@@ -1531,6 +1541,59 @@ pub fn random_natural_polynomial_natural_polynomial_natural_triple_gen_var_4(
     )
 }
 
+pub fn random_natural_polynomial_natural_polynomial_natural_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalPolynomial, Natural)> {
+    let large_primes: Vec<Natural> = LARGE_PRIMES
+        .iter()
+        .map(|p| Natural::from_str(p).unwrap())
+        .collect();
+    let mut use_large = random_bools(EXAMPLE_SEED.fork("use_large"));
+    let mut indices =
+        random_unsigned_range::<usize>(EXAMPLE_SEED.fork("indices"), 0, LARGE_PRIMES.len());
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 2, u64::WIDTH);
+    let mut candidates = random_primitive_ints::<u64>(EXAMPLE_SEED.fork("candidates"));
+    let mut polynomials = random_natural_polynomials(
+        EXAMPLE_SEED.fork("polynomials"),
+        config.get_or("mean_bits_n", 512),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    );
+    let mut factors = random_natural_polynomials(
+        EXAMPLE_SEED.fork("factors"),
+        config.get_or("mean_bits_n", 512),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_factor_length_n", 2),
+        config.get_or("mean_factor_length_d", 1),
+    );
+    Box::new(repeat_with(move || {
+        // A large prime from the list half the time, and otherwise a prime that fits in a `u64`,
+        // with a random number of bits.
+        let m = if use_large.next().unwrap() {
+            large_primes[indices.next().unwrap()].clone()
+        } else {
+            let bits = bit_lengths.next().unwrap();
+            Natural::from(loop {
+                let x =
+                    (candidates.next().unwrap() >> (u64::WIDTH - bits)) | u64::power_of_2(bits - 1);
+                if x.is_prime() {
+                    break x;
+                }
+            })
+        };
+        let p = polynomials.next().unwrap().mod_op(&m);
+        let q = polynomials.next().unwrap().mod_op(&m);
+        let c = factors.next().unwrap().mod_op(&m);
+        if c == NaturalPolynomial::ZERO {
+            (p, q, m)
+        } else {
+            (p.mod_mul(&c, &m), q.mod_mul(c, &m), m)
+        }
+    }))
+}
+
 pub fn random_natural_polynomial_natural_natural_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalPolynomial, Natural, Natural)> {
@@ -2089,6 +2152,35 @@ pub fn random_integer_polynomial_pair_gen(
         config.get_or("mean_length_n", 4),
         config.get_or("mean_length_d", 1),
     )))
+}
+
+pub fn random_integer_polynomial_pair_gen_var_7(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerPolynomial)> {
+    let mut polynomials = random_integer_polynomials(
+        EXAMPLE_SEED.fork("polynomials"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    );
+    let mut factors = random_integer_polynomials(
+        EXAMPLE_SEED.fork("factors"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_factor_length_n", 2),
+        config.get_or("mean_factor_length_d", 1),
+    );
+    Box::new(repeat_with(move || {
+        let p = polynomials.next().unwrap();
+        let q = polynomials.next().unwrap();
+        let c = factors.next().unwrap();
+        if c == IntegerPolynomial::ZERO {
+            (p, q)
+        } else {
+            (p * &c, q * c)
+        }
+    }))
 }
 
 pub fn random_integer_polynomial_pair_gen_var_1(

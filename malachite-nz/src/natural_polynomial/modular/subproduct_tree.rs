@@ -66,8 +66,8 @@ mod_power_of_2_evaluate_many_tree_preferred(n: usize, k: usize) -> bool {
 
 // A modulus $m > 1$ that does not fit in two limbs, with the data for multiplying modulo it.
 pub(crate) struct NaturalModulus<'a> {
-    m: &'a Natural,
-    data: ModMulData,
+    pub(crate) m: &'a Natural,
+    pub(crate) data: ModMulData,
 }
 
 impl<'a> NaturalModulus<'a> {

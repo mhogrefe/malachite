@@ -40,6 +40,7 @@ use crate::num::exhaustive::{
     exhaustive_signed_inclusive_range, exhaustive_signed_range, exhaustive_signeds,
     exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
 };
+use crate::num::factorization::traits::IsPrime;
 use crate::num::float::NiceFloat;
 use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
@@ -6564,6 +6565,17 @@ pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_3() -> It<(UnsignedP
     )
 }
 
+pub fn exhaustive_unsigned_polynomial_unsigned_pair_gen_var_4<T: PrimitiveUnsigned + IsPrime>()
+-> It<(UnsignedPolynomial<T>, T)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_unsigned_gen_var_28::<T>(),
+        )
+        .filter(|(p, m)| p.mod_is_reduced(m)),
+    )
+}
+
 pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>()
 -> It<(UnsignedPolynomial<T>, T, u64)> {
     Box::new(
@@ -6795,6 +6807,18 @@ pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_va
     Box::new(
         exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_7::<T>()
             .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_10<
+    T: PrimitiveUnsigned + IsPrime,
+>() -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_unsigned_gen_var_28::<T>(),
+        )
+        .filter(|(p, q, m)| p.mod_is_reduced(m) && q.mod_is_reduced(m)),
     )
 }
 

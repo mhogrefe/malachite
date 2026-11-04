@@ -307,11 +307,14 @@ pub mod rational_polynomial {
         pub mod evaluate;
         pub mod evaluate_many;
         pub mod exponent_gcd;
+        pub mod extended_gcd;
         pub mod from_rational_roots;
         pub mod from_roots;
+        pub mod gcd;
         pub mod height;
         pub mod is_unit;
         pub mod l2_norm_squared;
+        pub mod lcm;
         pub mod make_monic;
         pub mod mul;
         pub mod mul_power_of_x;

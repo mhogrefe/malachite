@@ -1111,6 +1111,7 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_pow_mod_polynomial_precomputed;
     }
     pub mod modular {
+        pub mod hgcd;
         pub mod mod_add;
         pub mod mod_compose;
         pub mod mod_div_exact;
@@ -1122,8 +1123,11 @@ pub mod unsigned_polynomial {
         pub mod mod_evaluate_geometric;
         pub mod mod_evaluate_many;
         pub mod mod_evaluate_many_precomputed;
+        pub mod mod_extended_gcd;
         pub mod mod_from_roots;
+        pub mod mod_gcd;
         pub mod mod_is_reduced;
+        pub mod mod_lcm;
         pub mod mod_make_monic;
         pub mod mod_mul;
         pub mod mod_mul_middle;
@@ -1141,7 +1145,10 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_evaluate;
         pub mod mod_power_of_2_evaluate_many;
         pub mod mod_power_of_2_evaluate_many_precomputed;
+        pub mod mod_power_of_2_extended_gcd;
         pub mod mod_power_of_2_from_roots;
+        pub mod mod_power_of_2_gcd;
+        pub mod mod_power_of_2_lcm;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_mul_middle;
         pub mod mod_power_of_2_neg;
@@ -1163,6 +1170,7 @@ pub mod unsigned_polynomial {
         pub mod mod_rem;
         pub mod mod_rem_precomputed;
         pub mod mod_remove_power;
+        pub mod mod_resultant;
         pub mod mod_shl;
         pub mod mod_square;
         pub mod mod_sub;

@@ -131,10 +131,15 @@ pub(crate) fn checked_div_exact_helper(
     if *q == IntegerPolynomial::ZERO {
         return None;
     }
-    if *p == IntegerPolynomial::ZERO {
-        return Some(IntegerPolynomial::ZERO);
+    checked_div_exact_slices(&p.coefficients, &q.coefficients).map(trimmed)
+}
+
+// The exact quotient of the polynomials with coefficients `xs` and `ys`, neither ending with a zero
+// and `ys` nonempty, or `None` if `ys` does not divide `xs`.
+pub(crate) fn checked_div_exact_slices(xs: &[Integer], ys: &[Integer]) -> Option<Vec<Integer>> {
+    if xs.is_empty() {
+        return Some(Vec::new());
     }
-    let (xs, ys) = (&p.coefficients, &q.coefficients);
     if xs.len() < ys.len()
         || !(&xs[0]).divisible_by(&ys[0])
         || xs.len() > 1 && !sum(xs).divisible_by(sum(ys))
@@ -145,7 +150,7 @@ pub(crate) fn checked_div_exact_helper(
     if rs.iter().any(|r| *r != 0u32) {
         None
     } else {
-        Some(trimmed(qs))
+        Some(qs)
     }
 }
 

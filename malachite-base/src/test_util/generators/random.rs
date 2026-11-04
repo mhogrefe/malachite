@@ -117,6 +117,7 @@ use crate::vecs::random_values_from_vec;
 use crate::vector::Vector;
 use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
+use core::iter::repeat_with;
 
 #[cfg(not(feature = "std"))]
 use hashbrown::{HashMap, HashSet};
@@ -8697,6 +8698,15 @@ pub fn random_unsigned_polynomial_unsigned_pair_gen_var_3(
     )
 }
 
+pub fn random_unsigned_polynomial_unsigned_pair_gen_var_4<T: PrimitiveUnsigned + IsPrime>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, T)> {
+    Box::new(
+        random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_10::<T>(config)
+            .map(|(p, _, m)| (p, m)),
+    )
+}
+
 pub fn random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(UnsignedPolynomial<T>, T, u64)> {
@@ -9084,6 +9094,44 @@ pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_9<
         random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_7::<T>(config)
             .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
     )
+}
+
+pub fn random_unsigned_polynomial_unsigned_polynomial_unsigned_triple_gen_var_10<
+    T: PrimitiveUnsigned + IsPrime,
+>(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)> {
+    let mut bit_lengths =
+        random_unsigned_inclusive_range::<u64>(EXAMPLE_SEED.fork("bits"), 2, T::WIDTH);
+    let mut candidates = random_primitive_ints::<T>(EXAMPLE_SEED.fork("m"));
+    let mut polynomials = random_unsigned_polynomials::<T>(
+        EXAMPLE_SEED.fork("polynomials"),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    );
+    let mut factors = random_unsigned_polynomials::<T>(
+        EXAMPLE_SEED.fork("factors"),
+        config.get_or("mean_factor_length_n", 2),
+        config.get_or("mean_factor_length_d", 1),
+    );
+    Box::new(repeat_with(move || {
+        // A prime with a random number of bits, at least 2.
+        let bits = bit_lengths.next().unwrap();
+        let m = loop {
+            let x = (candidates.next().unwrap() >> (T::WIDTH - bits)) | T::power_of_2(bits - 1);
+            if x.is_prime() {
+                break x;
+            }
+        };
+        let p = polynomials.next().unwrap() % m;
+        let q = polynomials.next().unwrap() % m;
+        let c = factors.next().unwrap() % m;
+        if c.coefficients_asc().is_empty() {
+            (p, q, m)
+        } else {
+            (p.mod_mul(&c, m), q.mod_mul(c, m), m)
+        }
+    }))
 }
 
 pub fn random_unsigned_polynomial_pair_unsigned_unsigned_quadruple_gen_var_1<

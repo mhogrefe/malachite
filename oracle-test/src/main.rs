@@ -3014,6 +3014,100 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-q", demo_name, "from_roots");
     }
+    // GCDs, extended GCDs, and LCMs modulo m and modulo 2^k, against fmpz_mod_poly's Euclidean
+    // functions, which report non-invertible leading coefficients as Malachite's checked functions
+    // do, and, for the panicking functions' prime moduli, against fmpz_mod_poly_gcd,
+    // fmpz_mod_poly_xgcd, nmod_poly_gcd, and nmod_poly_xgcd.
+    for demo_name in [
+        "demo_unsigned_polynomial_mod_gcd_u8",
+        "demo_unsigned_polynomial_mod_gcd_u64",
+        "demo_unsigned_polynomial_mod_gcd_ref_ref_u32",
+        "demo_unsigned_polynomial_mod_gcd_assign_u16",
+        "demo_unsigned_polynomial_checked_mod_gcd_u8",
+        "demo_unsigned_polynomial_checked_mod_gcd_u64",
+        "demo_unsigned_polynomial_checked_mod_gcd_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_extended_gcd_u8",
+        "demo_unsigned_polynomial_mod_extended_gcd_u64",
+        "demo_unsigned_polynomial_mod_extended_gcd_ref_ref_u32",
+        "demo_unsigned_polynomial_checked_mod_extended_gcd_u8",
+        "demo_unsigned_polynomial_checked_mod_extended_gcd_u64",
+        "demo_unsigned_polynomial_checked_mod_extended_gcd_ref_ref_u128",
+        "demo_unsigned_polynomial_mod_lcm_u8",
+        "demo_unsigned_polynomial_mod_lcm_u64",
+        "demo_unsigned_polynomial_mod_lcm_ref_ref_u32",
+        "demo_unsigned_polynomial_mod_lcm_assign_u16",
+        "demo_unsigned_polynomial_checked_mod_lcm_u8",
+        "demo_unsigned_polynomial_checked_mod_lcm_u64",
+        "demo_unsigned_polynomial_checked_mod_lcm_ref_ref_u128",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_gcd");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_mod_gcd",
+        "demo_natural_polynomial_mod_gcd_ref_ref",
+        "demo_natural_polynomial_mod_gcd_assign",
+        "demo_natural_polynomial_checked_mod_gcd",
+        "demo_natural_polynomial_checked_mod_gcd_ref_ref",
+        "demo_natural_polynomial_mod_extended_gcd",
+        "demo_natural_polynomial_mod_extended_gcd_ref_ref",
+        "demo_natural_polynomial_checked_mod_extended_gcd",
+        "demo_natural_polynomial_checked_mod_extended_gcd_ref_ref",
+        "demo_natural_polynomial_mod_lcm",
+        "demo_natural_polynomial_mod_lcm_ref_ref",
+        "demo_natural_polynomial_mod_lcm_assign",
+        "demo_natural_polynomial_checked_mod_lcm",
+        "demo_natural_polynomial_checked_mod_lcm_ref_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_gcd");
+    }
+    for demo_name in [
+        "demo_unsigned_polynomial_checked_mod_power_of_2_gcd_u8",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_gcd_u64",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_gcd_ref_ref_u128",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_extended_gcd_u8",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_extended_gcd_u64",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_extended_gcd_ref_ref_u128",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_lcm_u8",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_lcm_u64",
+        "demo_unsigned_polynomial_checked_mod_power_of_2_lcm_ref_ref_u128",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "mod_power_of_2_gcd");
+    }
+    for demo_name in [
+        "demo_natural_polynomial_checked_mod_power_of_2_gcd",
+        "demo_natural_polynomial_checked_mod_power_of_2_gcd_ref_ref",
+        "demo_natural_polynomial_checked_mod_power_of_2_extended_gcd",
+        "demo_natural_polynomial_checked_mod_power_of_2_extended_gcd_ref_ref",
+        "demo_natural_polynomial_checked_mod_power_of_2_lcm",
+        "demo_natural_polynomial_checked_mod_power_of_2_lcm_ref_ref",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_power_of_2_gcd");
+    }
+    // GCDs and LCMs over the integers, against fmpz_poly_gcd and fmpz_poly_lcm, and GCDs,
+    // extended GCDs, and LCMs over the rationals, against fmpq_poly_gcd, fmpq_poly_xgcd, and
+    // fmpq_poly_lcm.
+    for demo_name in [
+        "demo_integer_polynomial_gcd",
+        "demo_integer_polynomial_gcd_ref_ref",
+        "demo_integer_polynomial_gcd_assign",
+        "demo_integer_polynomial_lcm",
+        "demo_integer_polynomial_lcm_ref_ref",
+        "demo_integer_polynomial_lcm_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "polynomial_gcd");
+    }
+    for demo_name in [
+        "demo_rational_polynomial_gcd",
+        "demo_rational_polynomial_gcd_ref_ref",
+        "demo_rational_polynomial_gcd_assign",
+        "demo_rational_polynomial_extended_gcd",
+        "demo_rational_polynomial_extended_gcd_ref_ref",
+        "demo_rational_polynomial_lcm",
+        "demo_rational_polynomial_lcm_ref_ref",
+        "demo_rational_polynomial_lcm_assign",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-q", demo_name, "rational_polynomial_gcd");
+    }
     // The generated cases from compose_properties in malachite-q's RationalPolynomial tests: all six
     // forms, long polynomials, and linear inner polynomials.
     for demo_name in [

@@ -159,7 +159,7 @@ use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
 use malachite_base::num::modular::traits::{
-    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, ModMul, ModPowerOf2Mul,
+    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, ModIsReduced, ModMul, ModPowerOf2Mul,
 };
 use malachite_base::num::number_theory::traits::CoprimeWith;
 use malachite_base::options::exhaustive::exhaustive_options;
@@ -283,6 +283,11 @@ pub fn exhaustive_integer_polynomial_pair_gen() -> It<(IntegerPolynomial, Intege
     Box::new(exhaustive_pairs_from_single(
         exhaustive_integer_polynomials(),
     ))
+}
+
+pub fn exhaustive_integer_polynomial_pair_gen_var_7() -> It<(IntegerPolynomial, IntegerPolynomial)>
+{
+    exhaustive_integer_polynomial_pair_gen()
 }
 
 pub fn exhaustive_integer_polynomial_pair_gen_var_1() -> It<(IntegerPolynomial, IntegerPolynomial)>
@@ -748,6 +753,16 @@ pub fn exhaustive_natural_polynomial_natural_pair_gen_var_3() -> It<(NaturalPoly
     ))
 }
 
+pub fn exhaustive_natural_polynomial_natural_pair_gen_var_4() -> It<(NaturalPolynomial, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_natural_polynomials(),
+            exhaustive_prime_naturals(),
+        )
+        .filter(|(p, m)| p.mod_is_reduced(m)),
+    )
+}
+
 pub fn exhaustive_natural_polynomial_natural_unsigned_triple_gen_var_1()
 -> It<(NaturalPolynomial, Natural, u64)> {
     Box::new(
@@ -1085,6 +1100,17 @@ pub fn exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_4
     Box::new(
         exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_3()
             .filter(|(_, q, _)| q.coefficients_asc().len() > 1),
+    )
+}
+
+pub fn exhaustive_natural_polynomial_natural_polynomial_natural_triple_gen_var_5()
+-> It<(NaturalPolynomial, NaturalPolynomial, Natural)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_natural_polynomials(),
+            exhaustive_prime_naturals(),
+        )
+        .filter(|(p, q, m)| p.mod_is_reduced(m) && q.mod_is_reduced(m)),
     )
 }
 

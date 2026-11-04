@@ -132,10 +132,9 @@ impl ModEvaluateManyPrecomputed<Natural, Natural> for NaturalPolynomial {
     type Data = NaturalModEvaluateManyData;
 
     /// Precomputes the data for evaluating [`NaturalPolynomial`]s at each value in `xs` modulo $m$
-    /// with
-    /// [`mod_evaluate_many_precomputed`](
-    /// ModEvaluateManyPrecomputed::mod_evaluate_many_precomputed).
-    /// The values must already be reduced modulo $m$.
+    /// with [`mod_evaluate_many_precomputed`](
+    /// ModEvaluateManyPrecomputed::mod_evaluate_many_precomputed). The values must already be
+    /// reduced modulo $m$.
     ///
     /// The data is the subproduct tree of the linear factors $x - x_j$: the products of $2^i$
     /// consecutive factors, for each $i$ up to the height of the tree, with the inverse of each
@@ -195,12 +194,10 @@ impl ModEvaluateManyPrecomputed<Natural, Natural> for NaturalPolynomial {
     /// where $c_i$ is the coefficient of $x^i$ in $p$, $n$ is its length, and the $x_j$ are the $k$
     /// values the data was precomputed from.
     ///
-    /// The data should be obtained with
-    /// [`precompute_mod_evaluate_many_data`](
-    /// ModEvaluateManyPrecomputed::precompute_mod_evaluate_many_data).
-    /// The polynomial is reduced modulo the products of the tree's top level, and each remainder is
-    /// reduced modulo the two products below it, down to the linear factors, where the remainders
-    /// are the values.
+    /// The data should be obtained with [`precompute_mod_evaluate_many_data`](
+    /// ModEvaluateManyPrecomputed::precompute_mod_evaluate_many_data). The polynomial is reduced
+    /// modulo the products of the tree's top level, and each remainder is reduced modulo the two
+    /// products below it, down to the linear factors, where the remainders are the values.
     ///
     /// # Worst-case complexity
     /// $T(n, k, b) = O(N \log^2 N \log\log N)$
@@ -247,10 +244,9 @@ impl ModEvaluateManyPrecomputed<Natural, &Natural> for NaturalPolynomial {
     type Data = NaturalModEvaluateManyData;
 
     /// Precomputes the data for evaluating [`NaturalPolynomial`]s at each value in `xs` modulo $m$
-    /// with
-    /// [`mod_evaluate_many_precomputed`](
-    /// ModEvaluateManyPrecomputed::mod_evaluate_many_precomputed).
-    /// The values must already be reduced modulo $m$.
+    /// with [`mod_evaluate_many_precomputed`](
+    /// ModEvaluateManyPrecomputed::mod_evaluate_many_precomputed). The values must already be
+    /// reduced modulo $m$.
     ///
     /// The data is the subproduct tree of the linear factors $x - x_j$: the products of $2^i$
     /// consecutive factors, for each $i$ up to the height of the tree, with the inverse of each
@@ -310,12 +306,10 @@ impl ModEvaluateManyPrecomputed<Natural, &Natural> for NaturalPolynomial {
     /// where $c_i$ is the coefficient of $x^i$ in $p$, $n$ is its length, and the $x_j$ are the $k$
     /// values the data was precomputed from.
     ///
-    /// The data should be obtained with
-    /// [`precompute_mod_evaluate_many_data`](
-    /// ModEvaluateManyPrecomputed::precompute_mod_evaluate_many_data).
-    /// The polynomial is reduced modulo the products of the tree's top level, and each remainder is
-    /// reduced modulo the two products below it, down to the linear factors, where the remainders
-    /// are the values.
+    /// The data should be obtained with [`precompute_mod_evaluate_many_data`](
+    /// ModEvaluateManyPrecomputed::precompute_mod_evaluate_many_data). The polynomial is reduced
+    /// modulo the products of the tree's top level, and each remainder is reduced modulo the two
+    /// products below it, down to the linear factors, where the remainders are the values.
     ///
     /// # Worst-case complexity
     /// $T(n, k, b) = O(N \log^2 N \log\log N)$
@@ -362,10 +356,9 @@ impl ModEvaluateManyPrecomputed<Natural, Natural> for &NaturalPolynomial {
     type Data = NaturalModEvaluateManyData;
 
     /// Precomputes the data for evaluating [`NaturalPolynomial`]s at each value in `xs` modulo $m$
-    /// with
-    /// [`mod_evaluate_many_precomputed`](
-    /// ModEvaluateManyPrecomputed::mod_evaluate_many_precomputed).
-    /// The values must already be reduced modulo $m$.
+    /// with [`mod_evaluate_many_precomputed`](
+    /// ModEvaluateManyPrecomputed::mod_evaluate_many_precomputed). The values must already be
+    /// reduced modulo $m$.
     ///
     /// The data is the subproduct tree of the linear factors $x - x_j$: the products of $2^i$
     /// consecutive factors, for each $i$ up to the height of the tree, with the inverse of each
@@ -425,12 +418,10 @@ impl ModEvaluateManyPrecomputed<Natural, Natural> for &NaturalPolynomial {
     /// where $c_i$ is the coefficient of $x^i$ in $p$, $n$ is its length, and the $x_j$ are the $k$
     /// values the data was precomputed from.
     ///
-    /// The data should be obtained with
-    /// [`precompute_mod_evaluate_many_data`](
-    /// ModEvaluateManyPrecomputed::precompute_mod_evaluate_many_data).
-    /// The polynomial is reduced modulo the products of the tree's top level, and each remainder is
-    /// reduced modulo the two products below it, down to the linear factors, where the remainders
-    /// are the values.
+    /// The data should be obtained with [`precompute_mod_evaluate_many_data`](
+    /// ModEvaluateManyPrecomputed::precompute_mod_evaluate_many_data). The polynomial is reduced
+    /// modulo the products of the tree's top level, and each remainder is reduced modulo the two
+    /// products below it, down to the linear factors, where the remainders are the values.
     ///
     /// # Worst-case complexity
     /// $T(n, k, b) = O(N \log^2 N \log\log N)$
@@ -478,10 +469,9 @@ impl ModEvaluateManyPrecomputed<Natural, &Natural> for &NaturalPolynomial {
     type Data = NaturalModEvaluateManyData;
 
     /// Precomputes the data for evaluating [`NaturalPolynomial`]s at each value in `xs` modulo $m$
-    /// with
-    /// [`mod_evaluate_many_precomputed`](
-    /// ModEvaluateManyPrecomputed::mod_evaluate_many_precomputed).
-    /// The values must already be reduced modulo $m$.
+    /// with [`mod_evaluate_many_precomputed`](
+    /// ModEvaluateManyPrecomputed::mod_evaluate_many_precomputed). The values must already be
+    /// reduced modulo $m$.
     ///
     /// The data is the subproduct tree of the linear factors $x - x_j$: the products of $2^i$
     /// consecutive factors, for each $i$ up to the height of the tree, with the inverse of each
@@ -541,12 +531,10 @@ impl ModEvaluateManyPrecomputed<Natural, &Natural> for &NaturalPolynomial {
     /// where $c_i$ is the coefficient of $x^i$ in $p$, $n$ is its length, and the $x_j$ are the $k$
     /// values the data was precomputed from.
     ///
-    /// The data should be obtained with
-    /// [`precompute_mod_evaluate_many_data`](
-    /// ModEvaluateManyPrecomputed::precompute_mod_evaluate_many_data).
-    /// The polynomial is reduced modulo the products of the tree's top level, and each remainder is
-    /// reduced modulo the two products below it, down to the linear factors, where the remainders
-    /// are the values.
+    /// The data should be obtained with [`precompute_mod_evaluate_many_data`](
+    /// ModEvaluateManyPrecomputed::precompute_mod_evaluate_many_data). The polynomial is reduced
+    /// modulo the products of the tree's top level, and each remainder is reduced modulo the two
+    /// products below it, down to the linear factors, where the remainders are the values.
     ///
     /// # Worst-case complexity
     /// $T(n, k, b) = O(N \log^2 N \log\log N)$

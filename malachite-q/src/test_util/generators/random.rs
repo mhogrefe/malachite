@@ -31,13 +31,14 @@ use crate::test_util::extra_variadic::{
     random_triples_xxy, random_triples_xyy,
 };
 use crate::test_util::generators::{rational_matrix_positions, round_to_multiple_rational_filter};
+use core::iter::repeat_with;
 use malachite_base::bools::random::random_bools;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{One, Two};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::string::options::ToSciOptions;
@@ -3255,6 +3256,35 @@ pub fn random_rational_polynomial_pair_gen(
         config.get_or("mean_length_n", 4),
         config.get_or("mean_length_d", 1),
     )))
+}
+
+pub fn random_rational_polynomial_pair_gen_var_6(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, RationalPolynomial)> {
+    let mut polynomials = random_rational_polynomials(
+        EXAMPLE_SEED.fork("polynomials"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    );
+    let mut factors = random_rational_polynomials(
+        EXAMPLE_SEED.fork("factors"),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_factor_length_n", 2),
+        config.get_or("mean_factor_length_d", 1),
+    );
+    Box::new(repeat_with(move || {
+        let p = polynomials.next().unwrap();
+        let q = polynomials.next().unwrap();
+        let c = factors.next().unwrap();
+        if c == RationalPolynomial::ZERO {
+            (p, q)
+        } else {
+            (p * &c, q * c)
+        }
+    }))
 }
 
 // Pairs `(p * q, q)` of `RationalPolynomial`s where `q` is not constant.
