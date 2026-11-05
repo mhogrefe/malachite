@@ -8,6 +8,7 @@
 
 use crate::chars::crement::char_to_contiguous_range;
 use crate::foer_sequences::FoerSequence;
+use crate::matrix::Matrix;
 use crate::max;
 use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::floats::PrimitiveFloat;
@@ -1305,5 +1306,19 @@ pub fn quadruple_1_unsigned_matrix_size_bucketer<T: PrimitiveUnsigned, U, V, W>(
     Bucketer {
         bucketing_function: &|(m, _, _, _)| m.elements.len(),
         bucketing_label: format!("{var_name}.elements.len()"),
+    }
+}
+
+pub fn triple_1_2_unsigned_polynomial_len_times_matrix_height_bucketer<
+    'a,
+    T: PrimitiveUnsigned,
+    U,
+>(
+    p_name: &'a str,
+    a_name: &'a str,
+) -> Bucketer<'a, (UnsignedPolynomial<T>, UnsignedMatrix<T>, U)> {
+    Bucketer {
+        bucketing_function: &|(p, a, _)| p.coefficients_asc().len() * usize::exact_from(a.height()),
+        bucketing_label: format!("{p_name}.len() * {a_name}.height()"),
     }
 }

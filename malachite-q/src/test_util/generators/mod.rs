@@ -2265,3 +2265,16 @@ pub fn rational_polynomial_unsigned_pair_gen_var_5() -> Generator<(RationalPolyn
         &special_random_rational_polynomial_unsigned_pair_gen_var_5,
     )
 }
+
+// -- (RationalPolynomial, RationalMatrix) --
+
+// All `(RationalPolynomial, RationalMatrix)` where the matrix is square and of dimension at most 8,
+// with small coefficients and elements in the random modes.
+pub fn rational_polynomial_rational_matrix_pair_gen_var_1()
+-> Generator<(RationalPolynomial, RationalMatrix)> {
+    Generator::new(
+        &exhaustive_rational_polynomial_rational_matrix_pair_gen_var_1,
+        &random_rational_polynomial_rational_matrix_pair_gen_var_1,
+        &special_random_rational_polynomial_rational_matrix_pair_gen_var_1,
+    )
+}

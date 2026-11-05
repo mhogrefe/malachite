@@ -79,6 +79,10 @@ pub mod div_root;
 pub mod divisible_by;
 /// Implementations of [`Evaluate`], which evaluates a polynomial at a value.
 pub mod evaluate;
+/// Implementations of [`Evaluate`] at a square
+/// [`IntegerMatrix`](crate::integer_matrix::IntegerMatrix), for evaluating a polynomial at a
+/// matrix.
+pub mod evaluate_at_matrix;
 /// An implementation of [`EvaluateMany`], which evaluates a polynomial at several values.
 pub mod evaluate_many;
 /// An implementation of [`ExponentGcd`], the greatest common divisor of the exponents at which a

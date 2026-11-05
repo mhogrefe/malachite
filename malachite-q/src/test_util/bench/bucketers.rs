@@ -16,6 +16,7 @@ use malachite_base::max;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::bench::bucketers::Bucketer;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
@@ -843,5 +844,15 @@ pub fn triple_1_rational_matrix_bit_bucketer<T, U>(
             )
         },
         bucketing_label: format!("{var_name}'s total element bits"),
+    }
+}
+
+pub fn pair_rational_polynomial_len_times_matrix_height_bucketer<'a>(
+    p_name: &'a str,
+    a_name: &'a str,
+) -> Bucketer<'a, (RationalPolynomial, RationalMatrix)> {
+    Bucketer {
+        bucketing_function: &|(p, a)| usize::exact_from(p.len()) * usize::exact_from(a.height()),
+        bucketing_label: format!("{p_name}.len() * {a_name}.height()"),
     }
 }

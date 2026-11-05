@@ -23,6 +23,7 @@ pub(crate) fn register(runner: &mut Runner) {
     div_rem::register(runner);
     divisible_by::register(runner);
     evaluate::register(runner);
+    evaluate_at_matrix::register(runner);
     evaluate_many::register(runner);
     exponent_gcd::register(runner);
     extended_gcd::register(runner);
@@ -62,6 +63,7 @@ mod div_power_of_x;
 mod div_rem;
 mod divisible_by;
 mod evaluate;
+mod evaluate_at_matrix;
 mod evaluate_many;
 mod exponent_gcd;
 mod extended_gcd;

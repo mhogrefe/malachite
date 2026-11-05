@@ -4797,3 +4797,38 @@ pub fn special_random_rational_polynomial_unsigned_pair_gen_var_5(
             .map(|(q, len)| (q.mul_power_of_x(1), len)),
     )
 }
+
+// -- (RationalPolynomial, RationalMatrix) --
+
+pub fn special_random_rational_polynomial_rational_matrix_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(RationalPolynomial, RationalMatrix)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rational_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 8),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_rational_square_matrices(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 8),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_size_n", 4),
+                    config.get_or("mean_size_d", 1),
+                )
+            },
+        )
+        .filter(|(_, a)| a.height() <= 8),
+    )
+}

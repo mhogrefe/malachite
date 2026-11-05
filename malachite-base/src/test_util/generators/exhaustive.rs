@@ -43,7 +43,7 @@ use crate::num::exhaustive::{
 use crate::num::factorization::traits::IsPrime;
 use crate::num::float::NiceFloat;
 use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
-use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
+use crate::num::logic::traits::{BitBlockAccess, LeadingZeros, LowMask};
 use crate::num::modular::traits::{ModIsReduced, ModMul, ModPowerOf2IsReduced, ModPowerOf2Mul};
 use crate::num::number_theory::traits::CoprimeWith;
 use crate::options::exhaustive::exhaustive_options;
@@ -98,7 +98,8 @@ use crate::unsigned_matrix::exhaustive::{
 };
 use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::exhaustive::{
-    exhaustive_unsigned_polynomials, exhaustive_unsigned_polynomials_min_degree,
+    exhaustive_unsigned_polynomials, exhaustive_unsigned_polynomials_from_iterators,
+    exhaustive_unsigned_polynomials_min_degree,
 };
 use crate::unsigned_vector::UnsignedVector;
 use crate::unsigned_vector::exhaustive::*;
@@ -9050,5 +9051,47 @@ pub fn exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_17<T: Pri
         exhaustive_unsigned_polynomial_unsigned_unsigned_triple_gen_var_7::<T>()
             .filter(|(q, _, _)| q.coefficients_asc().first().is_some_and(|c| c.odd()))
             .map(|(q, len, pow)| (q.mul_power_of_x(1), len, pow)),
+    )
+}
+
+// -- (UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64) --
+
+pub fn exhaustive_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_1()
+-> It<(UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64)> {
+    fn ps((_, m): (UnsignedMatrix<u64>, u64)) -> It<UnsignedPolynomial<u64>> {
+        Box::new(exhaustive_unsigned_polynomials_from_iterators(
+            residues_mod(m),
+            primitive_int_increasing_range(1, m),
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn_balanced(
+            exhaustive_unsigned_matrix_unsigned_pair_gen_var_11(),
+            ps,
+        )
+        .map(|((a, m), p)| (p, a, m)),
+    )
+}
+
+pub fn exhaustive_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_2()
+-> It<(UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64)> {
+    fn ps((_, pow): (UnsignedMatrix<u64>, u64)) -> It<UnsignedPolynomial<u64>> {
+        // The positive residues; there are none modulo 2^0.
+        let leading = if pow == 0 {
+            primitive_int_increasing_range(1, 1)
+        } else {
+            primitive_int_increasing_inclusive_range(1, <u64 as LowMask>::low_mask(pow))
+        };
+        Box::new(exhaustive_unsigned_polynomials_from_iterators(
+            residues_mod_power_of_2(pow),
+            leading,
+        ))
+    }
+    Box::new(
+        exhaustive_dependent_pairs_from_fn_balanced(
+            exhaustive_unsigned_matrix_unsigned_pair_gen_var_7(),
+            ps,
+        )
+        .map(|((a, pow), p)| (p, a, pow)),
     )
 }

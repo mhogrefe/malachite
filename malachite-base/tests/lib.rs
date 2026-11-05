@@ -1123,6 +1123,7 @@ pub mod unsigned_polynomial {
         pub mod mod_div_root;
         pub mod mod_divisible_by;
         pub mod mod_evaluate;
+        pub mod mod_evaluate_at_matrix;
         pub mod mod_evaluate_geometric;
         pub mod mod_evaluate_many;
         pub mod mod_evaluate_many_precomputed;
@@ -1147,6 +1148,7 @@ pub mod unsigned_polynomial {
         pub mod mod_power_of_2_div_root;
         pub mod mod_power_of_2_divisible_by;
         pub mod mod_power_of_2_evaluate;
+        pub mod mod_power_of_2_evaluate_at_matrix;
         pub mod mod_power_of_2_evaluate_many;
         pub mod mod_power_of_2_evaluate_many_precomputed;
         pub mod mod_power_of_2_extended_gcd;

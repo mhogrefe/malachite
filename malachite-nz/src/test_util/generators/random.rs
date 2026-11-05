@@ -15474,3 +15474,127 @@ pub fn random_integer_polynomial_unsigned_pair_gen_var_8(
             .map(|(q, len)| (q.mul_power_of_x(1), len)),
     )
 }
+
+// -- (NaturalPolynomial, NaturalMatrix, Natural) --
+
+pub fn random_natural_polynomial_natural_matrix_natural_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalMatrix, Natural)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_natural_square_matrices(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(p, a, k)| {
+            let m = p
+                .coefficients_asc()
+                .iter()
+                .chain(a.elements.iter())
+                .max()
+                .cloned()
+                .unwrap_or_default()
+                + k
+                + Natural::ONE;
+            (p, a, m)
+        }),
+    )
+}
+
+// -- (NaturalPolynomial, NaturalMatrix, u64) --
+
+pub fn random_natural_polynomial_natural_matrix_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalPolynomial, NaturalMatrix, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                random_natural_square_matrices(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_dimension_n", 4),
+                    config.get_or("mean_dimension_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(p, a, k)| {
+            let bits = p
+                .coefficients_asc()
+                .iter()
+                .chain(a.elements.iter())
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (p, a, k + bits)
+        }),
+    )
+}
+
+// -- (IntegerPolynomial, IntegerMatrix) --
+
+pub fn random_integer_polynomial_integer_matrix_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, IntegerMatrix)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 8),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_integer_square_matrices(
+                seed,
+                config.get_or("mean_bits_n", 8),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_size_n", 4),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+    ))
+}

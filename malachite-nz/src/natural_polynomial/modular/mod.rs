@@ -90,6 +90,10 @@ pub mod mod_div_root;
 pub mod mod_divisible_by;
 /// Implementations of [`ModEvaluate`], for evaluating a polynomial at a value modulo a [`Natural`].
 pub mod mod_evaluate;
+/// Implementations of [`ModEvaluate`] at a square
+/// [`NaturalMatrix`](crate::natural_matrix::NaturalMatrix), for evaluating a polynomial at a matrix
+/// modulo a [`Natural`].
+pub mod mod_evaluate_at_matrix;
 /// Implementations of [`ModEvaluateMany`], for evaluating a polynomial at many points modulo a
 /// [`Natural`].
 pub mod mod_evaluate_many;
@@ -166,6 +170,10 @@ pub mod mod_power_of_2_divisible_by;
 /// Implementations of [`ModPowerOf2Evaluate`], for evaluating a polynomial at a value modulo a
 /// power of 2.
 pub mod mod_power_of_2_evaluate;
+/// Implementations of [`ModPowerOf2Evaluate`] at a square
+/// [`NaturalMatrix`](crate::natural_matrix::NaturalMatrix), for evaluating a polynomial at a matrix
+/// modulo $2^k$.
+pub mod mod_power_of_2_evaluate_at_matrix;
 /// An implementation of [`ModPowerOf2EvaluateMany`], for evaluating a polynomial at many points
 /// modulo a power of 2.
 pub mod mod_power_of_2_evaluate_many;

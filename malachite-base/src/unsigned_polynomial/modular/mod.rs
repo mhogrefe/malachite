@@ -61,6 +61,10 @@ pub mod mod_div_root;
 pub mod mod_divisible_by;
 /// Implementations of [`ModEvaluate`], for evaluating a polynomial at a value modulo a number.
 pub mod mod_evaluate;
+/// Implementations of [`ModEvaluate`] at a square
+/// [`UnsignedMatrix`](crate::unsigned_matrix::UnsignedMatrix), for evaluating a polynomial at a
+/// matrix modulo a number.
+pub mod mod_evaluate_at_matrix;
 /// An implementation of [`ModEvaluateGeometric`], for evaluating a polynomial modulo a number at
 /// the powers of a value.
 pub mod mod_evaluate_geometric;
@@ -142,6 +146,10 @@ pub mod mod_power_of_2_divisible_by;
 /// Implementations of [`ModPowerOf2Evaluate`], for evaluating a polynomial at a value modulo a
 /// power of 2.
 pub mod mod_power_of_2_evaluate;
+/// Implementations of [`ModPowerOf2Evaluate`] at a square
+/// [`UnsignedMatrix`](crate::unsigned_matrix::UnsignedMatrix), for evaluating a polynomial at a
+/// matrix modulo a power of 2.
+pub mod mod_power_of_2_evaluate_at_matrix;
 /// An implementation of [`ModPowerOf2EvaluateMany`], for evaluating a polynomial at many points
 /// modulo a power of 2.
 pub mod mod_power_of_2_evaluate_many;

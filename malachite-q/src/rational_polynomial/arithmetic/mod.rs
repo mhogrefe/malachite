@@ -70,6 +70,10 @@ pub mod divisible_by;
 /// [`RationalPolynomial`](super::RationalPolynomial)s at
 /// [`Integer`](malachite_nz::integer::Integer)s.
 pub mod evaluate;
+/// Implementations of [`Evaluate`] at a square
+/// [`RationalMatrix`](crate::rational_matrix::RationalMatrix), for evaluating a polynomial at a
+/// matrix.
+pub mod evaluate_at_matrix;
 /// Implementations of [`EvaluateMany`] for
 /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s and
 /// [`RationalPolynomial`](super::RationalPolynomial)s at [`Rational`](crate::Rational)s, and for

@@ -307,6 +307,7 @@ pub mod rational_polynomial {
         pub mod div_rem;
         pub mod divisible_by;
         pub mod evaluate;
+        pub mod evaluate_at_matrix;
         pub mod evaluate_many;
         pub mod exponent_gcd;
         pub mod extended_gcd;

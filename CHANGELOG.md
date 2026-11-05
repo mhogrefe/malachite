@@ -919,6 +919,15 @@ documented by git history.
   divide by is not invertible modulo $m$ or $2^k$, including when a nonzero column is orthogonal to
   itself, so no primality test is needed. One implementation serves every modulus; for a
   `NaturalMatrix`, moduli of one or two limbs use word arithmetic.
+- Evaluation of polynomials at square matrices, through new implementations of existing traits:
+  `ModEvaluate` and `ModPowerOf2Evaluate` for `UnsignedPolynomial<T>` at an `UnsignedMatrix<T>` and
+  for `NaturalPolynomial` at a `NaturalMatrix`, like FLINT's `nmod_poly_evaluate_mat`, and, beyond
+  FLINT, `Evaluate` for `IntegerPolynomial` at an `IntegerMatrix` and, in malachite-q, for
+  `RationalPolynomial` at a `RationalMatrix`. Short polynomials and small matrices use Horner's
+  rule and the rest the Paterson–Stockmeyer algorithm, with FLINT's threshold; Horner's rule starts
+  from the leading coefficient times the matrix, saving a matrix multiplication. A
+  `NaturalPolynomial` modulo a one-limb $m$ is evaluated with word arithmetic, and a
+  `RationalPolynomial` by evaluating its integer numerator and dividing once.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

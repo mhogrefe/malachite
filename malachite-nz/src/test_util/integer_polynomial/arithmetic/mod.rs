@@ -14,6 +14,7 @@ pub mod compose_power_of_x;
 pub mod deflate_power_of_x;
 pub mod div_power_of_x;
 pub mod evaluate;
+pub mod evaluate_at_matrix;
 pub mod evaluate_many;
 pub mod exponent_gcd;
 pub mod from_roots;

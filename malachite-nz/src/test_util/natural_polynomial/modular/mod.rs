@@ -12,6 +12,7 @@ pub mod mod_div_exact;
 pub mod mod_div_rem;
 pub mod mod_div_root;
 pub mod mod_evaluate;
+pub mod mod_evaluate_at_matrix;
 pub mod mod_evaluate_many;
 pub mod mod_extended_gcd;
 pub mod mod_from_roots;

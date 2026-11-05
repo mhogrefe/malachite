@@ -6653,3 +6653,29 @@ pub fn unsigned_polynomial_unsigned_unsigned_triple_gen_var_17<T: PrimitiveUnsig
         &special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_17,
     )
 }
+
+// -- (UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64) --
+
+// All `(UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64)` where the matrix is square, the `u64`
+// is positive, and the coefficients of the polynomial and the elements of the matrix are less than
+// it.
+pub fn unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_1()
+-> Generator<(UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_1,
+        &random_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_1,
+        &special_random_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64)` where the matrix is square, the `u64`
+// is no greater than 64, and the coefficients of the polynomial and the elements of the matrix are
+// less than 2 to the power of the `u64`.
+pub fn unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_2()
+-> Generator<(UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_2,
+        &random_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_2,
+        &special_random_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_2,
+    )
+}

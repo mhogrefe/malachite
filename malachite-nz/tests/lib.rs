@@ -909,6 +909,7 @@ pub mod integer_polynomial {
         pub mod div_root;
         pub mod divisible_by;
         pub mod evaluate;
+        pub mod evaluate_at_matrix;
         pub mod evaluate_many;
         pub mod exponent_gcd;
         pub mod floor_l2_norm;
@@ -1108,6 +1109,7 @@ pub mod natural_polynomial {
         pub mod mod_div_root;
         pub mod mod_divisible_by;
         pub mod mod_evaluate;
+        pub mod mod_evaluate_at_matrix;
         pub mod mod_evaluate_many;
         pub mod mod_evaluate_many_precomputed;
         pub mod mod_extended_gcd;
@@ -1130,6 +1132,7 @@ pub mod natural_polynomial {
         pub mod mod_power_of_2_div_root;
         pub mod mod_power_of_2_divisible_by;
         pub mod mod_power_of_2_evaluate;
+        pub mod mod_power_of_2_evaluate_at_matrix;
         pub mod mod_power_of_2_evaluate_many;
         pub mod mod_power_of_2_evaluate_many_precomputed;
         pub mod mod_power_of_2_extended_gcd;

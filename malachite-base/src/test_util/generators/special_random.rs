@@ -13817,3 +13817,37 @@ pub fn special_random_unsigned_polynomial_unsigned_unsigned_triple_gen_var_17<
             .map(|(q, len, pow)| (q.mul_power_of_x(1), len, pow)),
     )
 }
+
+// -- (UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64) --
+
+pub fn special_random_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64)> {
+    let mut ps = striped_random_unsigned_polynomials::<u64>(
+        EXAMPLE_SEED.fork("polynomials"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    );
+    Box::new(
+        special_random_unsigned_matrix_unsigned_pair_gen_var_11(config)
+            .map(move |(a, m)| (ps.next().unwrap() % m, a, m)),
+    )
+}
+
+pub fn special_random_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(UnsignedPolynomial<u64>, UnsignedMatrix<u64>, u64)> {
+    let mut ps = striped_random_unsigned_polynomials::<u64>(
+        EXAMPLE_SEED.fork("polynomials"),
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    );
+    Box::new(
+        special_random_unsigned_matrix_unsigned_pair_gen_var_7(config)
+            .map(move |(a, pow)| (ps.next().unwrap().mod_power_of_2(pow), a, pow)),
+    )
+}

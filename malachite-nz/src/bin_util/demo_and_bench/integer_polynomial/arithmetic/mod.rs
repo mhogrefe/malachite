@@ -27,6 +27,7 @@ pub(crate) fn register(runner: &mut Runner) {
     div_root::register(runner);
     divisible_by::register(runner);
     evaluate::register(runner);
+    evaluate_at_matrix::register(runner);
     evaluate_many::register(runner);
     exponent_gcd::register(runner);
     floor_l2_norm::register(runner);
@@ -73,6 +74,7 @@ mod div_rem;
 mod div_root;
 mod divisible_by;
 mod evaluate;
+mod evaluate_at_matrix;
 mod evaluate_many;
 mod exponent_gcd;
 mod floor_l2_norm;

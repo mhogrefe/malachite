@@ -7962,3 +7962,42 @@ pub fn integer_polynomial_unsigned_pair_gen_var_8() -> Generator<(IntegerPolynom
         &special_random_integer_polynomial_unsigned_pair_gen_var_8,
     )
 }
+
+// -- (NaturalPolynomial, NaturalMatrix, Natural) --
+
+// All `(NaturalPolynomial, NaturalMatrix, Natural)` where the matrix is square and the coefficients
+// of the polynomial and the elements of the matrix are less than the `Natural`.
+pub fn natural_polynomial_natural_matrix_natural_triple_gen_var_1()
+-> Generator<(NaturalPolynomial, NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_matrix_natural_triple_gen_var_1,
+        &random_natural_polynomial_natural_matrix_natural_triple_gen_var_1,
+        &special_random_natural_polynomial_natural_matrix_natural_triple_gen_var_1,
+    )
+}
+
+// -- (NaturalPolynomial, NaturalMatrix, u64) --
+
+// All `(NaturalPolynomial, NaturalMatrix, u64)` where the matrix is square and the coefficients of
+// the polynomial and the elements of the matrix are less than 2 to the power of the `u64`.
+pub fn natural_polynomial_natural_matrix_unsigned_triple_gen_var_1()
+-> Generator<(NaturalPolynomial, NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_natural_matrix_unsigned_triple_gen_var_1,
+        &random_natural_polynomial_natural_matrix_unsigned_triple_gen_var_1,
+        &special_random_natural_polynomial_natural_matrix_unsigned_triple_gen_var_1,
+    )
+}
+
+// -- (IntegerPolynomial, IntegerMatrix) --
+
+// All `(IntegerPolynomial, IntegerMatrix)` where the matrix is square, with small coefficients and
+// elements in the random modes.
+pub fn integer_polynomial_integer_matrix_pair_gen_var_1()
+-> Generator<(IntegerPolynomial, IntegerMatrix)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_integer_matrix_pair_gen_var_1,
+        &random_integer_polynomial_integer_matrix_pair_gen_var_1,
+        &special_random_integer_polynomial_integer_matrix_pair_gen_var_1,
+    )
+}

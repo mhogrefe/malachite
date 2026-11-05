@@ -31,6 +31,10 @@ use alloc::vec::Vec;
 pub mod arithmetic;
 /// Traits for derivatives and integrals of polynomials.
 pub mod calculus;
+/// The evaluation of polynomials at square matrices, shared by all the polynomial types and generic
+/// over the ring of coefficients.
+#[doc(hidden)]
+pub mod evaluate_at_matrix;
 /// Traits for operations on polynomials modulo a polynomial.
 pub mod mod_polynomial;
 /// Traits for operations on polynomials whose coefficients are reduced modulo $m$ or $2^k$.

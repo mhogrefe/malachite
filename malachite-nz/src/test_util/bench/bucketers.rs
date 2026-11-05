@@ -1695,3 +1695,23 @@ pub fn triple_3_vec_natural_sum_bits_bucketer<'a, T, U>() -> Bucketer<'a, (T, U,
         bucketing_label: "xs.map(|x| x.significant_bits()).sum()".to_string(),
     }
 }
+
+pub fn triple_1_2_natural_polynomial_len_times_matrix_height_bucketer<'a, U>(
+    p_name: &'a str,
+    a_name: &'a str,
+) -> Bucketer<'a, (NaturalPolynomial, NaturalMatrix, U)> {
+    Bucketer {
+        bucketing_function: &|(p, a, _)| p.coefficients_asc().len() * usize::exact_from(a.height()),
+        bucketing_label: format!("{p_name}.len() * {a_name}.height()"),
+    }
+}
+
+pub fn pair_integer_polynomial_len_times_matrix_height_bucketer<'a>(
+    p_name: &'a str,
+    a_name: &'a str,
+) -> Bucketer<'a, (IntegerPolynomial, IntegerMatrix)> {
+    Bucketer {
+        bucketing_function: &|(p, a)| p.coefficients_asc().len() * usize::exact_from(a.height()),
+        bucketing_label: format!("{p_name}.len() * {a_name}.height()"),
+    }
+}

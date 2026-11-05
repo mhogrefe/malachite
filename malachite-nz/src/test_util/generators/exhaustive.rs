@@ -9366,3 +9366,61 @@ pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_8() -> It<(IntegerPol
             .map(|(q, len)| (q.mul_power_of_x(1), len)),
     )
 }
+
+// -- (NaturalPolynomial, NaturalMatrix, Natural) --
+
+pub fn exhaustive_natural_polynomial_natural_matrix_natural_triple_gen_var_1()
+-> It<(NaturalPolynomial, NaturalMatrix, Natural)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials(),
+            exhaustive_natural_square_matrices(),
+            exhaustive_naturals(),
+        )
+        .map(|(p, a, k)| {
+            let m = p
+                .coefficients_asc()
+                .iter()
+                .chain(a.elements.iter())
+                .max()
+                .cloned()
+                .unwrap_or_default()
+                + k
+                + Natural::ONE;
+            (p, a, m)
+        }),
+    )
+}
+
+// -- (NaturalPolynomial, NaturalMatrix, u64) --
+
+pub fn exhaustive_natural_polynomial_natural_matrix_unsigned_triple_gen_var_1()
+-> It<(NaturalPolynomial, NaturalMatrix, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_natural_polynomials(),
+            exhaustive_natural_square_matrices(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(p, a, k)| {
+            let bits = p
+                .coefficients_asc()
+                .iter()
+                .chain(a.elements.iter())
+                .map(SignificantBits::significant_bits)
+                .max()
+                .unwrap_or(0);
+            (p, a, k + bits)
+        }),
+    )
+}
+
+// -- (IntegerPolynomial, IntegerMatrix) --
+
+pub fn exhaustive_integer_polynomial_integer_matrix_pair_gen_var_1()
+-> It<(IntegerPolynomial, IntegerMatrix)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integer_polynomials(),
+        exhaustive_integer_square_matrices(),
+    ))
+}

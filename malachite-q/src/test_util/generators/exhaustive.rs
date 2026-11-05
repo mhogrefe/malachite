@@ -1947,3 +1947,16 @@ pub fn exhaustive_rational_polynomial_unsigned_pair_gen_var_5() -> It<(RationalP
             .map(|(q, len)| (q.mul_power_of_x(1), len)),
     )
 }
+
+// -- (RationalPolynomial, RationalMatrix) --
+
+pub fn exhaustive_rational_polynomial_rational_matrix_pair_gen_var_1()
+-> It<(RationalPolynomial, RationalMatrix)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_rational_polynomials(),
+            exhaustive_rational_square_matrices(),
+        )
+        .filter(|(_, a)| a.height() <= 8),
+    )
+}
