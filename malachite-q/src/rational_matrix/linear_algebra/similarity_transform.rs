@@ -19,8 +19,9 @@ use malachite_base::unsigned_matrix::linear_algebra::similarity_over_ring::{
     SimilarityRing, similarity_transform_in_place,
 };
 
-// The rationals, for `similarity_transform_in_place`.
-struct RationalRing;
+// The rationals, for `similarity_transform_in_place`, and for the reference Gram-Schmidt process in
+// the tests.
+pub(crate) struct RationalRing;
 
 impl SimilarityRing for RationalRing {
     type Element = Rational;

@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     characteristic_polynomial::register(runner);
     determinant::register(runner);
     determinant_sign::register(runner);
+    gram_schmidt::register(runner);
     inverse::register(runner);
     permanent::register(runner);
     reduced_row_echelon_form::register(runner);
@@ -23,6 +24,7 @@ pub(crate) fn register(runner: &mut Runner) {
 mod characteristic_polynomial;
 mod determinant;
 mod determinant_sign;
+mod gram_schmidt;
 mod inverse;
 mod permanent;
 mod reduced_row_echelon_form;

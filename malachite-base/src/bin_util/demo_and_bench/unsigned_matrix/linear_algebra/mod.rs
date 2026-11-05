@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     mod_characteristic_polynomial::register(runner);
     mod_determinant::register(runner);
+    mod_gram_schmidt::register(runner);
     mod_howell_form::register(runner);
     mod_inverse::register(runner);
     mod_left_nullspace::register(runner);
@@ -19,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_permanent::register(runner);
     mod_power_of_2_characteristic_polynomial::register(runner);
     mod_power_of_2_determinant::register(runner);
+    mod_power_of_2_gram_schmidt::register(runner);
     mod_power_of_2_howell_form::register(runner);
     mod_power_of_2_inverse::register(runner);
     mod_power_of_2_permanent::register(runner);
@@ -40,6 +42,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod mod_characteristic_polynomial;
 mod mod_determinant;
+mod mod_gram_schmidt;
 mod mod_howell_form;
 mod mod_inverse;
 mod mod_left_nullspace;
@@ -48,6 +51,7 @@ mod mod_nullspace;
 mod mod_permanent;
 mod mod_power_of_2_characteristic_polynomial;
 mod mod_power_of_2_determinant;
+mod mod_power_of_2_gram_schmidt;
 mod mod_power_of_2_howell_form;
 mod mod_power_of_2_inverse;
 mod mod_power_of_2_permanent;

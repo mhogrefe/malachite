@@ -8,9 +8,9 @@
 
 #[cfg(doc)]
 use malachite_base::num::linear_algebra::traits::{
-    CharacteristicPolynomial, Determinant, DeterminantSign, Nullspace, Permanent, Rank,
-    ReducedRowEchelonForm, ReducedRowEchelonFormAssign, SimilarityTransform,
-    SimilarityTransformAssign, Solve, Trace,
+    CharacteristicPolynomial, Determinant, DeterminantSign, GramSchmidt, GramSchmidtAssign,
+    Nullspace, Permanent, Rank, ReducedRowEchelonForm, ReducedRowEchelonFormAssign,
+    SimilarityTransform, SimilarityTransformAssign, Solve, Trace,
 };
 
 /// Implementations of [`CharacteristicPolynomial`], for computing the characteristic polynomial of
@@ -21,6 +21,9 @@ pub mod determinant;
 /// Implementations of [`DeterminantSign`], for determining the signs of the determinants of square
 /// rational matrices.
 pub mod determinant_sign;
+/// Implementations of [`GramSchmidt`] and [`GramSchmidtAssign`], for applying the Gram-Schmidt
+/// process to the columns of a rational matrix.
+pub mod gram_schmidt;
 /// Implementations of [`Inverse`](malachite_base::num::arithmetic::traits::Inverse), for inverting
 /// square rational matrices.
 pub mod inverse;

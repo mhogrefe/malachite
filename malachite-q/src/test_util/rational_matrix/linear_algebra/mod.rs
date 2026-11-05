@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod characteristic_polynomial;
+pub mod gram_schmidt;
 pub mod permanent;
 pub mod similarity_transform;
 pub mod solve;

@@ -8,15 +8,15 @@
 
 #[cfg(doc)]
 use crate::num::linear_algebra::traits::{
-    ModCharacteristicPolynomial, ModDeterminant, ModHowellForm, ModHowellFormAssign,
-    ModLeftNullspace, ModLuDecomposition, ModNullspace, ModPermanent,
-    ModPowerOf2CharacteristicPolynomial, ModPowerOf2Determinant, ModPowerOf2HowellForm,
-    ModPowerOf2HowellFormAssign, ModPowerOf2Permanent, ModPowerOf2SimilarityTransform,
-    ModPowerOf2SimilarityTransformAssign, ModPowerOf2SmithNormalForm,
-    ModPowerOf2SmithNormalFormAssign, ModPowerOf2Solve, ModPowerOf2StrongEchelonForm,
-    ModPowerOf2StrongEchelonFormAssign, ModPowerOf2Trace, ModRank, ModSimilarityTransform,
-    ModSimilarityTransformAssign, ModSmithNormalForm, ModSmithNormalFormAssign, ModSolve,
-    ModSolveLowerTriangular, ModSolveUpperTriangular, ModTrace,
+    ModCharacteristicPolynomial, ModDeterminant, ModGramSchmidt, ModHowellForm,
+    ModHowellFormAssign, ModLeftNullspace, ModLuDecomposition, ModNullspace, ModPermanent,
+    ModPowerOf2CharacteristicPolynomial, ModPowerOf2Determinant, ModPowerOf2GramSchmidt,
+    ModPowerOf2HowellForm, ModPowerOf2HowellFormAssign, ModPowerOf2Permanent,
+    ModPowerOf2SimilarityTransform, ModPowerOf2SimilarityTransformAssign,
+    ModPowerOf2SmithNormalForm, ModPowerOf2SmithNormalFormAssign, ModPowerOf2Solve,
+    ModPowerOf2StrongEchelonForm, ModPowerOf2StrongEchelonFormAssign, ModPowerOf2Trace, ModRank,
+    ModSimilarityTransform, ModSimilarityTransformAssign, ModSmithNormalForm,
+    ModSmithNormalFormAssign, ModSolve, ModSolveLowerTriangular, ModSolveUpperTriangular, ModTrace,
 };
 
 /// Berkowitz's division-free algorithm for characteristic polynomials, generic over the ring of
@@ -27,12 +27,19 @@ pub mod berkowitz_over_ring;
 /// over the ring of elements.
 #[doc(hidden)]
 pub mod charpoly_over_ring;
+/// The Gram-Schmidt process shared by the Gram-Schmidt orthogonalizations of all the matrix types,
+/// generic over the ring of elements.
+#[doc(hidden)]
+pub mod gram_schmidt_over_ring;
 /// Implementations of [`ModCharacteristicPolynomial`], for computing characteristic polynomials of
 /// square matrices modulo a number.
 pub mod mod_characteristic_polynomial;
 /// Implementations of [`ModDeterminant`], for computing the determinant of a square matrix modulo a
 /// number.
 pub mod mod_determinant;
+/// Implementations of [`ModGramSchmidt`], for applying the Gram-Schmidt process to the columns of a
+/// matrix modulo a number.
+pub mod mod_gram_schmidt;
 /// Implementations of [`ModHowellForm`] and [`ModHowellFormAssign`], for computing the Howell form
 /// of an [`UnsignedMatrix`](super::UnsignedMatrix) modulo a number.
 ///
@@ -93,6 +100,9 @@ pub mod mod_power_of_2_characteristic_polynomial;
 /// Implementations of [`ModPowerOf2Determinant`], for computing determinants of square matrices
 /// modulo powers of 2.
 pub mod mod_power_of_2_determinant;
+/// Implementations of [`ModPowerOf2GramSchmidt`], for applying the Gram-Schmidt process to the
+/// columns of a matrix modulo a power of 2.
+pub mod mod_power_of_2_gram_schmidt;
 /// Implementations of [`ModPowerOf2HowellForm`] and [`ModPowerOf2HowellFormAssign`], for computing
 /// Howell forms of matrices modulo powers of 2.
 pub mod mod_power_of_2_howell_form;

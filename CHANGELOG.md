@@ -907,6 +907,18 @@ documented by git history.
   tested modulo both factors, so $m$ is never factored. Modulo $2^k$ only the coefficients' low bits
   matter, since 2 is nilpotent. `CoprimeWith` is implemented for `IntegerPolynomial` and, in
   malachite-q, `RationalPolynomial`, testing whether the GCD is 1.
+- Gram-Schmidt orthogonalization. New `GramSchmidt` and `GramSchmidtAssign` traits in
+  malachite-base, implemented in malachite-q for `RationalMatrix` by value or by reference, like
+  FLINT's `fmpq_mat_gso`: each column of the result is the same column of the matrix minus its
+  projections onto the earlier columns of the result, without normalization, and a column that
+  depends on the earlier ones becomes 0. The result is FLINT's, but each column is first scaled to
+  integers by the LCM of its denominators and the integral columns are orthogonalized without
+  fractions, by exact divisions by Gram determinants. New `ModGramSchmidt` and
+  `ModPowerOf2GramSchmidt` traits, which FLINT does not have, are implemented for
+  `UnsignedMatrix<T>` and `NaturalMatrix`: they return `None` when a squared length they need to
+  divide by is not invertible modulo $m$ or $2^k$, including when a nonzero column is orthogonal to
+  itself, so no primality test is needed. One implementation serves every modulus; for a
+  `NaturalMatrix`, moduli of one or two limbs use word arithmetic.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

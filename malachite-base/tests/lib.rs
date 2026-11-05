@@ -943,6 +943,7 @@ pub mod unsigned_matrix {
     pub mod linear_algebra {
         pub mod mod_characteristic_polynomial;
         pub mod mod_determinant;
+        pub mod mod_gram_schmidt;
         pub mod mod_howell_form;
         pub mod mod_inverse;
         pub mod mod_lu_decomposition;
@@ -950,6 +951,7 @@ pub mod unsigned_matrix {
         pub mod mod_permanent;
         pub mod mod_power_of_2_characteristic_polynomial;
         pub mod mod_power_of_2_determinant;
+        pub mod mod_power_of_2_gram_schmidt;
         pub mod mod_power_of_2_howell_form;
         pub mod mod_power_of_2_inverse;
         pub mod mod_power_of_2_permanent;

@@ -439,3 +439,33 @@ pub trait ModSolveUpperTriangular<RHS = Self, M = Self> {
 
     fn mod_solve_upper_triangular(self, b: RHS, m: M, unit_diagonal: bool) -> Self::Output;
 }
+
+/// Applies the Gram-Schmidt process to the columns of a matrix, without normalizing them.
+pub trait GramSchmidt {
+    type Output;
+
+    fn gram_schmidt(self) -> Self::Output;
+}
+
+/// Applies the Gram-Schmidt process to the columns of a matrix, in place, without normalizing them.
+pub trait GramSchmidtAssign {
+    fn gram_schmidt_assign(&mut self);
+}
+
+/// Applies the Gram-Schmidt process to the columns of a matrix modulo $m$, without normalizing
+/// them, or returns `None` if a squared length it needs to divide by is not invertible modulo $m$.
+/// The elements of the matrix must already be reduced modulo $m$.
+pub trait ModGramSchmidt<M = Self> {
+    type Output;
+
+    fn mod_gram_schmidt(self, m: M) -> Option<Self::Output>;
+}
+
+/// Applies the Gram-Schmidt process to the columns of a matrix modulo $2^k$, without normalizing
+/// them, or returns `None` if a squared length it needs to divide by is even. The elements of the
+/// matrix must already be reduced modulo $2^k$.
+pub trait ModPowerOf2GramSchmidt {
+    type Output;
+
+    fn mod_power_of_2_gram_schmidt(self, pow: u64) -> Option<Self::Output>;
+}

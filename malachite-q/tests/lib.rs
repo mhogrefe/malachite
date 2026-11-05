@@ -239,6 +239,7 @@ pub mod rational_matrix {
         pub mod characteristic_polynomial;
         pub mod determinant;
         pub mod determinant_sign;
+        pub mod gram_schmidt;
         pub mod inverse;
         pub mod permanent;
         pub mod reduced_row_echelon_form;

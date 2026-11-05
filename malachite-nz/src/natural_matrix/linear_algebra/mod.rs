@@ -9,15 +9,16 @@
 #[cfg(doc)]
 use malachite_base::num::linear_algebra::traits::{
     CharacteristicPolynomial, Determinant, DeterminantSign, ElementaryDivisors,
-    ModCharacteristicPolynomial, ModDeterminant, ModLeftNullspace, ModLuDecomposition,
-    ModNullspace, ModPermanent, ModPowerOf2CharacteristicPolynomial, ModPowerOf2Determinant,
-    ModPowerOf2HowellForm, ModPowerOf2HowellFormAssign, ModPowerOf2Permanent,
-    ModPowerOf2SimilarityTransform, ModPowerOf2SimilarityTransformAssign,
-    ModPowerOf2SmithNormalForm, ModPowerOf2SmithNormalFormAssign, ModPowerOf2Solve,
-    ModPowerOf2StrongEchelonForm, ModPowerOf2StrongEchelonFormAssign, ModPowerOf2Trace, ModRank,
-    ModSimilarityTransform, ModSimilarityTransformAssign, ModSmithNormalForm,
-    ModSmithNormalFormAssign, ModSolve, ModSolveLowerTriangular, ModSolveUpperTriangular, ModTrace,
-    Permanent, Rank, SmithNormalForm, SmithNormalFormAssign, Trace,
+    ModCharacteristicPolynomial, ModDeterminant, ModGramSchmidt, ModLeftNullspace,
+    ModLuDecomposition, ModNullspace, ModPermanent, ModPowerOf2CharacteristicPolynomial,
+    ModPowerOf2Determinant, ModPowerOf2GramSchmidt, ModPowerOf2HowellForm,
+    ModPowerOf2HowellFormAssign, ModPowerOf2Permanent, ModPowerOf2SimilarityTransform,
+    ModPowerOf2SimilarityTransformAssign, ModPowerOf2SmithNormalForm,
+    ModPowerOf2SmithNormalFormAssign, ModPowerOf2Solve, ModPowerOf2StrongEchelonForm,
+    ModPowerOf2StrongEchelonFormAssign, ModPowerOf2Trace, ModRank, ModSimilarityTransform,
+    ModSimilarityTransformAssign, ModSmithNormalForm, ModSmithNormalFormAssign, ModSolve,
+    ModSolveLowerTriangular, ModSolveUpperTriangular, ModTrace, Permanent, Rank, SmithNormalForm,
+    SmithNormalFormAssign, Trace,
 };
 
 /// Implementations of [`CharacteristicPolynomial`], for computing the characteristic polynomial of
@@ -38,6 +39,9 @@ pub mod mod_characteristic_polynomial;
 /// Implementations of [`ModDeterminant`], for computing the determinant of a square matrix modulo a
 /// number.
 pub mod mod_determinant;
+/// Implementations of [`ModGramSchmidt`], for applying the Gram-Schmidt process to the columns of a
+/// matrix modulo a [`Natural`](crate::natural::Natural).
+pub mod mod_gram_schmidt;
 /// Implementations of [`ModHowellForm`][hf] and [`ModHowellFormAssign`][hfa], for computing the
 /// Howell form of a [`NaturalMatrix`](super::NaturalMatrix) modulo a number.
 ///
@@ -66,6 +70,9 @@ pub mod mod_power_of_2_characteristic_polynomial;
 /// Implementations of [`ModPowerOf2Determinant`], for computing determinants of square matrices of
 /// naturals modulo powers of 2.
 pub mod mod_power_of_2_determinant;
+/// Implementations of [`ModPowerOf2GramSchmidt`], for applying the Gram-Schmidt process to the
+/// columns of a matrix modulo a power of 2.
+pub mod mod_power_of_2_gram_schmidt;
 /// Implementations of [`ModPowerOf2HowellForm`] and [`ModPowerOf2HowellFormAssign`], for computing
 /// Howell forms of matrices of naturals modulo powers of 2.
 pub mod mod_power_of_2_howell_form;
