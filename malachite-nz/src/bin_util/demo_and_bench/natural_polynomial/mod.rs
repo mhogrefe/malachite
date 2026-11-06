@@ -18,6 +18,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_polynomial::register(runner);
     modular::register(runner);
     series::register(runner);
+    special::register(runner);
 }
 
 mod arithmetic;
@@ -29,3 +30,4 @@ mod logic;
 mod mod_polynomial;
 mod modular;
 mod series;
+mod special;

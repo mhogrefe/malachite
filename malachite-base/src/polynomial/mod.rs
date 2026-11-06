@@ -41,6 +41,9 @@ pub mod mod_polynomial;
 pub mod modular;
 /// Traits for operations on polynomials as power series, truncated to a given number of terms.
 pub mod series;
+/// Traits for special polynomials, such as those whose coefficients are rows of combinatorial
+/// triangles.
+pub mod special;
 
 /// What every polynomial type has in common: a polynomial in one variable, stored as its
 /// coefficients in ascending order with no trailing zeros.

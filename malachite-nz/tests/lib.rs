@@ -1209,6 +1209,9 @@ pub mod natural_polynomial {
         pub mod pow_truncated;
         pub mod square_truncated;
     }
+    pub mod special {
+        pub mod touchard_polynomial;
+    }
 }
 pub mod natural_matrix {
     pub mod access;

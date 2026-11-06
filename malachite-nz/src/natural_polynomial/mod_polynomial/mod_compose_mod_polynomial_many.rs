@@ -119,8 +119,7 @@ impl ModComposeModPolynomial<NaturalPolynomial, NaturalPolynomial, Natural>
     /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
     /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
     /// of the reversal of $h$ as a power series, computed once. When $m$ fits in a limb, the work
-    /// is done with word-sized coefficients, as for
-    /// [`UnsignedPolynomial`].
+    /// is done with word-sized coefficients, as for [`UnsignedPolynomial`].
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, m) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)m \log m \log\log m)$
@@ -200,8 +199,7 @@ impl ModComposeModPolynomial<NaturalPolynomial, NaturalPolynomial, &Natural>
     /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
     /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
     /// of the reversal of $h$ as a power series, computed once. When $m$ fits in a limb, the work
-    /// is done with word-sized coefficients, as for
-    /// [`UnsignedPolynomial`].
+    /// is done with word-sized coefficients, as for [`UnsignedPolynomial`].
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, m) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)m \log m \log\log m)$
@@ -281,8 +279,7 @@ impl ModComposeModPolynomial<NaturalPolynomial, &NaturalPolynomial, Natural>
     /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
     /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
     /// of the reversal of $h$ as a power series, computed once. When $m$ fits in a limb, the work
-    /// is done with word-sized coefficients, as for
-    /// [`UnsignedPolynomial`].
+    /// is done with word-sized coefficients, as for [`UnsignedPolynomial`].
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, m) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)m \log m \log\log m)$
@@ -362,8 +359,7 @@ impl ModComposeModPolynomial<NaturalPolynomial, &NaturalPolynomial, &Natural>
     /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
     /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
     /// of the reversal of $h$ as a power series, computed once. When $m$ fits in a limb, the work
-    /// is done with word-sized coefficients, as for
-    /// [`UnsignedPolynomial`].
+    /// is done with word-sized coefficients, as for [`UnsignedPolynomial`].
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, m) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)m \log m \log\log m)$
@@ -443,8 +439,7 @@ impl ModComposeModPolynomial<&NaturalPolynomial, NaturalPolynomial, Natural>
     /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
     /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
     /// of the reversal of $h$ as a power series, computed once. When $m$ fits in a limb, the work
-    /// is done with word-sized coefficients, as for
-    /// [`UnsignedPolynomial`].
+    /// is done with word-sized coefficients, as for [`UnsignedPolynomial`].
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, m) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)m \log m \log\log m)$
@@ -524,8 +519,7 @@ impl ModComposeModPolynomial<&NaturalPolynomial, NaturalPolynomial, &Natural>
     /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
     /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
     /// of the reversal of $h$ as a power series, computed once. When $m$ fits in a limb, the work
-    /// is done with word-sized coefficients, as for
-    /// [`UnsignedPolynomial`].
+    /// is done with word-sized coefficients, as for [`UnsignedPolynomial`].
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, m) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)m \log m \log\log m)$
@@ -605,8 +599,7 @@ impl ModComposeModPolynomial<&NaturalPolynomial, &NaturalPolynomial, Natural>
     /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
     /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
     /// of the reversal of $h$ as a power series, computed once. When $m$ fits in a limb, the work
-    /// is done with word-sized coefficients, as for
-    /// [`UnsignedPolynomial`].
+    /// is done with word-sized coefficients, as for [`UnsignedPolynomial`].
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, m) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)m \log m \log\log m)$
@@ -685,8 +678,7 @@ impl ModComposeModPolynomial<&NaturalPolynomial, &NaturalPolynomial, &Natural>
     /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
     /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
     /// of the reversal of $h$ as a power series, computed once. When $m$ fits in a limb, the work
-    /// is done with word-sized coefficients, as for
-    /// [`UnsignedPolynomial`].
+    /// is done with word-sized coefficients, as for [`UnsignedPolynomial`].
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, m) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)m \log m \log\log m)$

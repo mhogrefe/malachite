@@ -12,3 +12,4 @@ pub mod comparison;
 pub mod mod_polynomial;
 pub mod modular;
 pub mod series;
+pub mod special;

@@ -3314,6 +3314,18 @@ fn test_against_flint() {
         "demo_natural_landau_function_prefix",
         "arith_landau_function_vec",
     );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_polynomial_touchard_polynomial",
+        "arith_stirling_number_2_vec",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_polynomial_touchard_polynomial_truncated",
+        "arith_stirling_number_2_vec",
+    );
     check_demo_against_flint(
         &oracle,
         "../malachite-q",

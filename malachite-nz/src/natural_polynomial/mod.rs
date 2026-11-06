@@ -41,6 +41,8 @@ pub mod modular;
 pub mod random;
 /// Operations on [`NaturalPolynomial`]s as power series, truncated to a given number of terms.
 pub mod series;
+/// Special polynomials, such as those whose coefficients are rows of combinatorial triangles.
+pub mod special;
 
 // The zero `Natural`, as something a reference can be handed out to.
 //

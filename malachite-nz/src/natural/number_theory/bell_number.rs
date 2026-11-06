@@ -138,7 +138,7 @@ fn bell_number_size(n: u64) -> u64 {
 // For each index, the factor pair the power sieve uses: (1, i) when i must be computed directly,
 // and a nontrivial factorization (j, i / j) otherwise. This is divisor_table from
 // arith/bell_number_multi_mod.c, FLINT 3.6.0.
-fn divisor_table(len: usize) -> Vec<(u32, u32)> {
+pub(crate) fn divisor_table(len: usize) -> Vec<(u32, u32)> {
     let mut tab: Vec<(u32, u32)> = (0..len).map(|i| (1, i as u32)).collect();
     for i in 2..len {
         let mut j = 2;

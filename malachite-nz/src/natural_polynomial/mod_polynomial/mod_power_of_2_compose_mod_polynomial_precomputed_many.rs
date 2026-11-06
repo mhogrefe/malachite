@@ -35,16 +35,16 @@ impl ModPowerOf2ComposeModPolynomialPrecomputed<NaturalPolynomial, NaturalPolyno
     ///
     /// The data should be obtained with `precompute_mod_power_of_2_div_rem_data` of
     /// [`ModPowerOf2DivRemPrecomputed`](
-    /// malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed),
-    /// as for division. A single polynomial, or polynomials with few coefficients in all, are
-    /// composed one at a time. Otherwise all of them are composed together by the Brent–Kung
-    /// algorithm: about $\sqrt{l}$ powers of $g$ modulo $h$ are computed once, where $l$ is the sum
-    /// of the lengths of the outer polynomials, the blocks of that many coefficients of all the
-    /// outer polynomials are composed with $g$ at once, with one matrix product, and each
-    /// polynomial's blocks are combined by evaluation at the next power of $g$. Every reduction
-    /// modulo $h$ uses the inverse of the reversal of $h$ as a power series, given by the data.
-    /// When $k$ is at most the width of a limb, the work is done with word-sized coefficients, as
-    /// for [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
+    /// malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed), as for division.
+    /// A single polynomial, or polynomials with few coefficients in all, are composed one at a
+    /// time. Otherwise all of them are composed together by the Brent–Kung algorithm: about
+    /// $\sqrt{l}$ powers of $g$ modulo $h$ are computed once, where $l$ is the sum of the lengths
+    /// of the outer polynomials, the blocks of that many coefficients of all the outer polynomials
+    /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
+    /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
+    /// of the reversal of $h$ as a power series, given by the data. When $k$ is at most the width
+    /// of a limb, the work is done with word-sized coefficients, as for
+    /// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, k) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)k \log k \log\log k)$
@@ -122,16 +122,16 @@ impl ModPowerOf2ComposeModPolynomialPrecomputed<NaturalPolynomial, &NaturalPolyn
     ///
     /// The data should be obtained with `precompute_mod_power_of_2_div_rem_data` of
     /// [`ModPowerOf2DivRemPrecomputed`](
-    /// malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed),
-    /// as for division. A single polynomial, or polynomials with few coefficients in all, are
-    /// composed one at a time. Otherwise all of them are composed together by the Brent–Kung
-    /// algorithm: about $\sqrt{l}$ powers of $g$ modulo $h$ are computed once, where $l$ is the sum
-    /// of the lengths of the outer polynomials, the blocks of that many coefficients of all the
-    /// outer polynomials are composed with $g$ at once, with one matrix product, and each
-    /// polynomial's blocks are combined by evaluation at the next power of $g$. Every reduction
-    /// modulo $h$ uses the inverse of the reversal of $h$ as a power series, given by the data.
-    /// When $k$ is at most the width of a limb, the work is done with word-sized coefficients, as
-    /// for [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
+    /// malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed), as for division.
+    /// A single polynomial, or polynomials with few coefficients in all, are composed one at a
+    /// time. Otherwise all of them are composed together by the Brent–Kung algorithm: about
+    /// $\sqrt{l}$ powers of $g$ modulo $h$ are computed once, where $l$ is the sum of the lengths
+    /// of the outer polynomials, the blocks of that many coefficients of all the outer polynomials
+    /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
+    /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
+    /// of the reversal of $h$ as a power series, given by the data. When $k$ is at most the width
+    /// of a limb, the work is done with word-sized coefficients, as for
+    /// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, k) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)k \log k \log\log k)$
@@ -209,16 +209,16 @@ impl ModPowerOf2ComposeModPolynomialPrecomputed<&NaturalPolynomial, NaturalPolyn
     ///
     /// The data should be obtained with `precompute_mod_power_of_2_div_rem_data` of
     /// [`ModPowerOf2DivRemPrecomputed`](
-    /// malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed),
-    /// as for division. A single polynomial, or polynomials with few coefficients in all, are
-    /// composed one at a time. Otherwise all of them are composed together by the Brent–Kung
-    /// algorithm: about $\sqrt{l}$ powers of $g$ modulo $h$ are computed once, where $l$ is the sum
-    /// of the lengths of the outer polynomials, the blocks of that many coefficients of all the
-    /// outer polynomials are composed with $g$ at once, with one matrix product, and each
-    /// polynomial's blocks are combined by evaluation at the next power of $g$. Every reduction
-    /// modulo $h$ uses the inverse of the reversal of $h$ as a power series, given by the data.
-    /// When $k$ is at most the width of a limb, the work is done with word-sized coefficients, as
-    /// for [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
+    /// malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed), as for division.
+    /// A single polynomial, or polynomials with few coefficients in all, are composed one at a
+    /// time. Otherwise all of them are composed together by the Brent–Kung algorithm: about
+    /// $\sqrt{l}$ powers of $g$ modulo $h$ are computed once, where $l$ is the sum of the lengths
+    /// of the outer polynomials, the blocks of that many coefficients of all the outer polynomials
+    /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
+    /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
+    /// of the reversal of $h$ as a power series, given by the data. When $k$ is at most the width
+    /// of a limb, the work is done with word-sized coefficients, as for
+    /// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, k) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)k \log k \log\log k)$
@@ -296,16 +296,16 @@ impl ModPowerOf2ComposeModPolynomialPrecomputed<&NaturalPolynomial, &NaturalPoly
     ///
     /// The data should be obtained with `precompute_mod_power_of_2_div_rem_data` of
     /// [`ModPowerOf2DivRemPrecomputed`](
-    /// malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed),
-    /// as for division. A single polynomial, or polynomials with few coefficients in all, are
-    /// composed one at a time. Otherwise all of them are composed together by the Brent–Kung
-    /// algorithm: about $\sqrt{l}$ powers of $g$ modulo $h$ are computed once, where $l$ is the sum
-    /// of the lengths of the outer polynomials, the blocks of that many coefficients of all the
-    /// outer polynomials are composed with $g$ at once, with one matrix product, and each
-    /// polynomial's blocks are combined by evaluation at the next power of $g$. Every reduction
-    /// modulo $h$ uses the inverse of the reversal of $h$ as a power series, given by the data.
-    /// When $k$ is at most the width of a limb, the work is done with word-sized coefficients, as
-    /// for [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
+    /// malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed), as for division.
+    /// A single polynomial, or polynomials with few coefficients in all, are composed one at a
+    /// time. Otherwise all of them are composed together by the Brent–Kung algorithm: about
+    /// $\sqrt{l}$ powers of $g$ modulo $h$ are computed once, where $l$ is the sum of the lengths
+    /// of the outer polynomials, the blocks of that many coefficients of all the outer polynomials
+    /// are composed with $g$ at once, with one matrix product, and each polynomial's blocks are
+    /// combined by evaluation at the next power of $g$. Every reduction modulo $h$ uses the inverse
+    /// of the reversal of $h$ as a power series, given by the data. When $k$ is at most the width
+    /// of a limb, the work is done with word-sized coefficients, as for
+    /// [`UnsignedPolynomial`](malachite_base::unsigned_polynomial::UnsignedPolynomial).
     ///
     /// # Worst-case complexity
     /// $T(n, l, c, k) = O((n\sqrt{l} \log n + (l + c\sqrt{l})n)k \log k \log\log k)$

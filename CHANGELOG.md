@@ -936,6 +936,14 @@ documented by git history.
   The polynomials share the powers of the inner polynomial and a single matrix product, with a block
   size chosen from their total length; a single polynomial, or a few short ones, are composed one at
   a time, and, unlike FLINT, outer polynomials may be at least as long as the modulus polynomial.
+- Touchard polynomials, whose coefficients are the Stirling numbers of the second kind. New
+  `TouchardPolynomial` and `TouchardPolynomialTruncated` traits in malachite-base, in a new
+  `polynomial::special` module, are implemented for `NaturalPolynomial`, like FLINT's
+  `arith_stirling_number_2_vec`, which fills a row of the triangle. The three algorithms are FLINT's
+  (the recurrence, with word-sized kernels while the numbers fit; a convolution for short prefixes;
+  and a multimodular computation with the Chinese remainder theorem), with thresholds measured for
+  Malachite, which keep the recurrence for longer rows than FLINT does. A new oracle-test mode,
+  `arith_stirling_number_2_vec`, checks them against FLINT.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's
