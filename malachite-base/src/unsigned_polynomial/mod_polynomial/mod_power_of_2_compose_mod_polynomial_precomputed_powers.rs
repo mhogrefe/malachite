@@ -41,7 +41,7 @@ pub(crate) fn precompute_power_of_2_powers_helper<T: PrimitiveUnsigned>(
     h: &UnsignedPolynomial<T>,
     pow: u64,
 ) -> ModComposeModPolynomialData<T> {
-    if assert_power_of_2_compose_mod_polynomial_arguments(&UnsignedPolynomial::ZERO, g, h, pow)
+    if assert_power_of_2_compose_mod_polynomial_inner_and_modulus_arguments(g, h, pow)
         || h.len() == 1
     {
         return ModComposeModPolynomialData {

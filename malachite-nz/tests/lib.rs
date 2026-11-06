@@ -1087,11 +1087,13 @@ pub mod natural_polynomial {
     }
     pub mod mod_polynomial {
         pub mod mod_compose_mod_polynomial;
+        pub mod mod_compose_mod_polynomial_many;
         pub mod mod_mul_mod_polynomial;
         pub mod mod_mul_mod_polynomial_precomputed;
         pub mod mod_pow_mod_polynomial;
         pub mod mod_pow_mod_polynomial_precomputed;
         pub mod mod_power_of_2_compose_mod_polynomial;
+        pub mod mod_power_of_2_compose_mod_polynomial_many;
         pub mod mod_power_of_2_mul_mod_polynomial;
         pub mod mod_power_of_2_mul_mod_polynomial_precomputed;
         pub mod mod_power_of_2_pow_mod_polynomial;

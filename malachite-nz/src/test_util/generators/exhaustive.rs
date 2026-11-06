@@ -9424,3 +9424,67 @@ pub fn exhaustive_integer_polynomial_integer_matrix_pair_gen_var_1()
         exhaustive_integer_square_matrices(),
     ))
 }
+
+// -- (Vec<NaturalPolynomial>, NaturalPolynomial, NaturalPolynomial, Natural) --
+
+pub fn exhaustive_natural_polynomial_vec_natural_polynomial_pair_natural_quadruple_gen_var_1()
+-> It<(
+    Vec<NaturalPolynomial>,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    Natural,
+)> {
+    Box::new(
+        exhaustive_quadruples_xyyz(
+            exhaustive_vecs(exhaustive_natural_polynomials()),
+            exhaustive_natural_polynomials(),
+            exhaustive_naturals(),
+        )
+        .map(|(fs, g, h, m)| {
+            let height = fs
+                .iter()
+                .map(NaturalPolynomial::height_ref)
+                .chain([g.height_ref(), h.height_ref()])
+                .max()
+                .unwrap()
+                .clone();
+            (fs, g, h, height + m + Natural::ONE)
+        })
+        .filter(|(_, g, h, m)| {
+            h.coefficients_asc()
+                .last()
+                .is_some_and(|y| y.coprime_with(m))
+                && g.len() < h.len()
+        }),
+    )
+}
+
+// -- (Vec<NaturalPolynomial>, NaturalPolynomial, NaturalPolynomial, u64) --
+
+pub fn exhaustive_natural_polynomial_vec_natural_polynomial_pair_unsigned_quadruple_gen_var_1()
+-> It<(
+    Vec<NaturalPolynomial>,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    u64,
+)> {
+    Box::new(
+        exhaustive_quadruples_xyyz(
+            exhaustive_vecs(exhaustive_natural_polynomials()),
+            exhaustive_natural_polynomials(),
+            exhaustive_unsigneds::<u64>(),
+        )
+        .map(|(fs, g, h, pow)| {
+            let bits = fs
+                .iter()
+                .map(NaturalPolynomial::height_significant_bits)
+                .chain([g.height_significant_bits(), h.height_significant_bits()])
+                .max()
+                .unwrap();
+            (fs, g, h, pow + bits)
+        })
+        .filter(|(_, g, h, _)| {
+            h.coefficients_asc().last().is_some_and(Parity::odd) && g.len() < h.len()
+        }),
+    )
+}

@@ -1178,6 +1178,25 @@ pub fn triple_1_2_unsigned_polynomial_max_len_bucketer<'a, T: PrimitiveUnsigned,
     }
 }
 
+pub fn triple_1_2_unsigned_polynomial_vec_total_len_max_len_bucketer<
+    'a,
+    T: PrimitiveUnsigned,
+    U,
+>(
+    xs_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Vec<UnsignedPolynomial<T>>, UnsignedPolynomial<T>, U)> {
+    Bucketer {
+        bucketing_function: &|(ps, q, _)| {
+            max(
+                ps.iter().map(|p| p.coefficients_asc().len()).sum(),
+                q.coefficients_asc().len(),
+            )
+        },
+        bucketing_label: format!("max(sum of {xs_name}[i].len(), {y_name}.len())"),
+    }
+}
+
 pub fn quadruple_1_2_unsigned_polynomial_max_len_bucketer<'a, T, U>(
     x_name: &'a str,
     y_name: &'a str,

@@ -574,6 +574,29 @@ pub fn pair_natural_polynomial_max_bit_bucketer<'a>(
     }
 }
 
+pub fn triple_1_2_natural_polynomial_vec_max_bit_bucketer<'a, T>(
+    xs_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Vec<NaturalPolynomial>, NaturalPolynomial, T)> {
+    Bucketer {
+        bucketing_function: &|(ps, q, _)| {
+            usize::exact_from(max(
+                ps.iter()
+                    .flat_map(NaturalPolynomial::coefficients_asc)
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+                q.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            ))
+        },
+        bucketing_label: format!(
+            "max({xs_name}'s total coefficient bits, {y_name}'s total coefficient bits)"
+        ),
+    }
+}
+
 pub fn triple_1_2_natural_polynomial_max_bit_bucketer<'a, T>(
     x_name: &'a str,
     y_name: &'a str,

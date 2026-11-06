@@ -19,8 +19,13 @@ use crate::polynomial::mod_polynomial::traits::{
 
 /// Modular composition of polynomials modulo a polynomial.
 pub mod mod_compose_mod_polynomial;
+/// Modular composition of several polynomials with the same inner polynomial modulo a polynomial.
+pub mod mod_compose_mod_polynomial_many;
 /// Modular composition of polynomials modulo a polynomial, using precomputed data for division.
 pub mod mod_compose_mod_polynomial_precomputed;
+/// Modular composition of several polynomials with the same inner polynomial modulo a polynomial,
+/// using precomputed data for division.
+pub mod mod_compose_mod_polynomial_precomputed_many;
 /// Modular composition of polynomials modulo a polynomial, using precomputed powers of the inner
 /// polynomial.
 pub mod mod_compose_mod_polynomial_precomputed_powers;
@@ -40,9 +45,15 @@ pub mod mod_pow_mod_polynomial;
 pub mod mod_pow_mod_polynomial_precomputed;
 /// Modular composition of polynomials modulo a polynomial, with coefficients modulo a power of 2.
 pub mod mod_power_of_2_compose_mod_polynomial;
+/// Modular composition of several polynomials with the same inner polynomial modulo a polynomial,
+/// with coefficients modulo a power of 2.
+pub mod mod_power_of_2_compose_mod_polynomial_many;
 /// Modular composition of polynomials modulo a polynomial, with coefficients modulo a power of 2,
 /// using precomputed data for division.
 pub mod mod_power_of_2_compose_mod_polynomial_precomputed;
+/// Modular composition of several polynomials with the same inner polynomial modulo a polynomial,
+/// with coefficients modulo a power of 2, using precomputed data for division.
+pub mod mod_power_of_2_compose_mod_polynomial_precomputed_many;
 /// Modular composition of polynomials modulo a polynomial, with coefficients modulo a power of 2,
 /// using precomputed powers of the inner polynomial.
 pub mod mod_power_of_2_compose_mod_polynomial_precomputed_powers;

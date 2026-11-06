@@ -17514,3 +17514,136 @@ pub fn special_random_integer_polynomial_integer_matrix_pair_gen_var_1(
         },
     ))
 }
+
+// -- (Vec<NaturalPolynomial>, NaturalPolynomial, NaturalPolynomial, Natural) --
+
+pub fn special_random_natural_polynomial_vec_natural_polynomial_pair_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(
+    Vec<NaturalPolynomial>,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    Natural,
+)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &|seed| {
+                        striped_random_natural_polynomials(
+                            seed,
+                            config.get_or("mean_stripe_n", 32),
+                            config.get_or("mean_stripe_d", 1),
+                            config.get_or("mean_bits_n", 64),
+                            config.get_or("mean_bits_d", 1),
+                            config.get_or("mean_length_n", 4),
+                            config.get_or("mean_length_d", 1),
+                        )
+                    },
+                    config.get_or("mean_count_n", 4),
+                    config.get_or("mean_count_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(fs, g, h, m)| {
+            (
+                fs.into_iter().map(|f| f.mod_op(&m)).collect(),
+                g.mod_op(&m),
+                h.mod_op(&m),
+                m,
+            )
+        })
+        .filter(|(_, g, h, m)| {
+            h.coefficients_asc()
+                .last()
+                .is_some_and(|y| y.coprime_with(m))
+                && g.len() < h.len()
+        }),
+    )
+}
+
+// -- (Vec<NaturalPolynomial>, NaturalPolynomial, NaturalPolynomial, u64) --
+
+pub fn special_random_natural_polynomial_vec_natural_polynomial_pair_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(
+    Vec<NaturalPolynomial>,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    u64,
+)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &|seed| {
+                        striped_random_natural_polynomials(
+                            seed,
+                            config.get_or("mean_stripe_n", 32),
+                            config.get_or("mean_stripe_d", 1),
+                            config.get_or("mean_bits_n", 64),
+                            config.get_or("mean_bits_d", 1),
+                            config.get_or("mean_length_n", 4),
+                            config.get_or("mean_length_d", 1),
+                        )
+                    },
+                    config.get_or("mean_count_n", 4),
+                    config.get_or("mean_count_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_natural_polynomials(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(fs, g, h, pow)| {
+            (
+                fs.into_iter().map(|f| f.mod_power_of_2(pow)).collect(),
+                g.mod_power_of_2(pow),
+                h.mod_power_of_2(pow),
+                pow,
+            )
+        })
+        .filter(|(_, g, h, _)| {
+            h.coefficients_asc().last().is_some_and(Parity::odd) && g.len() < h.len()
+        }),
+    )
+}

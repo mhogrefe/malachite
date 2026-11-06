@@ -127,18 +127,14 @@ impl ComposeModRing for NaturalModPowerOf2Ring<'_> {
     }
 }
 
-// Checks that `f`, `g`, and `h` are reduced modulo $2^k$, that `h` is nonzero with an odd leading
-// coefficient, unless $k$ is 0, and that `g` is shorter than `h`, and returns whether $k$ is 0.
-pub(crate) fn assert_power_of_2_compose_mod_polynomial_arguments(
-    f: &NaturalPolynomial,
+// Checks that `g` and `h` are reduced modulo $2^k$, that $k$ is valid, that `h` is nonzero with an
+// odd leading coefficient, unless $k$ is 0, and that `g` is shorter than `h`, and returns whether
+// $k$ is 0.
+pub(crate) fn assert_power_of_2_compose_mod_polynomial_inner_and_modulus_arguments(
     g: &NaturalPolynomial,
     h: &NaturalPolynomial,
     pow: u64,
 ) -> bool {
-    assert!(
-        f.mod_power_of_2_is_reduced(pow),
-        "self must be reduced mod 2^pow, but {f} has a coefficient >= 2^{pow}"
-    );
     assert!(
         g.mod_power_of_2_is_reduced(pow),
         "g must be reduced mod 2^pow, but {g} has a coefficient >= 2^{pow}"
@@ -160,6 +156,22 @@ pub(crate) fn assert_power_of_2_compose_mod_polynomial_arguments(
         "g must be reduced mod h, but {g} has a degree >= that of {h}"
     );
     false
+}
+
+// Checks that `f` is reduced, and the other arguments as
+// `assert_power_of_2_compose_mod_polynomial_inner_and_modulus_arguments` does, and returns its
+// result.
+pub(crate) fn assert_power_of_2_compose_mod_polynomial_arguments(
+    f: &NaturalPolynomial,
+    g: &NaturalPolynomial,
+    h: &NaturalPolynomial,
+    pow: u64,
+) -> bool {
+    assert!(
+        f.mod_power_of_2_is_reduced(pow),
+        "self must be reduced mod 2^pow, but {f} has a coefficient >= 2^{pow}"
+    );
+    assert_power_of_2_compose_mod_polynomial_inner_and_modulus_arguments(g, h, pow)
 }
 
 // The composition $f(g)$ modulo $h$, with coefficients modulo $2^k$, reducing with `data` if it is

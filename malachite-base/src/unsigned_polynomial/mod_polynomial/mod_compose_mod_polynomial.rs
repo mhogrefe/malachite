@@ -309,6 +309,119 @@ pub fn compose_mod_dispatch<R: ComposeModRing>(
     }
 }
 
+// The block size for composing polynomials of the lengths `lens` with the same polynomial by the
+// Brent–Kung algorithm: the $m \geq 2$ that minimizes the number of multiplications modulo $h$,
+// $m - 1$ for the powers $g^2, \ldots, g^m$ and $\lceil l/m \rceil - 1$ for combining the blocks of
+// each polynomial of length $l$. The search starts from $\lfloor\sqrt{s}\rfloor + 1$, where $s$ is
+// the sum of the lengths minus their number, and stops at twice that.
+fn brent_kung_vec_block_size(lens: &[usize]) -> usize {
+    let s: usize = lens.iter().map(|len| len - 1).sum();
+    let cost = |m: usize| m - 1 + lens.iter().map(|len| len.div_ceil(m) - 1).sum::<usize>();
+    let start = s.floor_sqrt() + 1;
+    let mut best = start;
+    let mut best_cost = cost(start);
+    for m in 2..=start << 1 {
+        let c = cost(m);
+        if c < best_cost {
+            best = m;
+            best_cost = c;
+        }
+    }
+    best
+}
+
+// The compositions $f_i(g)$ modulo $h$ of the polynomials $f_i$ in `fs` with the same `g`, by the
+// Brent–Kung algorithm: the powers $g^0, \ldots, g^{m-1}$ are computed once, the blocks of $m$
+// coefficients of all the $f_i$ are stacked into one matrix, which is multiplied by the matrix of
+// powers in a single product, and each $f_i$'s rows of the product are combined by evaluation at
+// $g^m$. $m$ is chosen by `brent_kung_vec_block_size`. `g` has length $n$, and each result has
+// length $n$.
+//
+// This is equivalent to `_nmod_poly_compose_mod_brent_kung_vec_preinv` from
+// `nmod_poly/compose_mod_brent_kung_vec_preinv.c`, FLINT 3.6.0, except that the $f_i$ may have any
+// lengths, so the block size depends on their lengths rather than on that of $h$; that the $f_i$
+// that need no matrix, as in `compose_mod_special`, are composed directly; and that $g^m$ is only
+// computed if some $f_i$ has more than one block.
+#[doc(hidden)]
+pub fn compose_mod_brent_kung_vec<R: ComposeModRing, F: AsRef<[R::C]>>(
+    ring: &R,
+    fs: &[F],
+    g: &[R::C],
+    n: usize,
+) -> Vec<Vec<R::C>> {
+    let res: Vec<Option<Vec<R::C>>> = fs
+        .iter()
+        .map(|f| compose_mod_special(ring, f.as_ref(), g, n))
+        .collect();
+    let lens: Vec<usize> = fs
+        .iter()
+        .zip(&res)
+        .filter(|(_, r)| r.is_none())
+        .map(|(f, _)| f.as_ref().len())
+        .collect();
+    if lens.is_empty() {
+        return res.into_iter().map(Option::unwrap).collect();
+    }
+    let m = brent_kung_vec_block_size(&lens);
+    let a = powers_mod(ring, g, n, m);
+    // Set rows of b to the segments of the polynomials
+    let mut b = Vec::new();
+    for (f, r) in fs.iter().zip(&res) {
+        if r.is_none() {
+            for chunk in f.as_ref().chunks(m) {
+                let mut row = chunk.to_vec();
+                row.resize(m, ring.zero());
+                b.push(row);
+            }
+        }
+    }
+    let mut c = ring.matrix_mul(&b, &a).into_iter();
+    let h = if lens.iter().any(|&len| len > m) {
+        Some(ring.mul_mod(&a[m >> 1], &a[m - (m >> 1)]))
+    } else {
+        None
+    };
+    let mut lens = lens.into_iter();
+    // Evaluate block composition
+    res.into_iter()
+        .map(|r| {
+            r.unwrap_or_else(|| {
+                let mut rows: Vec<Vec<R::C>> =
+                    c.by_ref().take(lens.next().unwrap().div_ceil(m)).collect();
+                if rows.len() == 1 {
+                    rows.pop().unwrap()
+                } else {
+                    mod_matrix_rows_evaluate(ring, &rows, h.as_ref().unwrap(), n)
+                }
+            })
+        })
+        .collect()
+}
+
+// The least total length of the polynomials composed by `compose_mod_dispatch_vec` for which
+// composing them together by the Brent–Kung algorithm is faster than composing each on its own.
+// Measured with 64-bit coefficients, modulo a number and modulo a power of 2, 2026-11-06.
+const BRENT_KUNG_VEC_CUTOFF: usize = 11;
+
+// The compositions $f_i(g)$ modulo $h$ of the polynomials $f_i$ in `fs` with the same `g`: a single
+// polynomial, or polynomials whose total length is less than `BRENT_KUNG_VEC_CUTOFF`, are composed
+// one at a time by `compose_mod_dispatch`, and the rest together by `compose_mod_brent_kung_vec`.
+#[doc(hidden)]
+pub fn compose_mod_dispatch_vec<R: ComposeModRing, F: AsRef<[R::C]>>(
+    ring: &R,
+    fs: &[F],
+    g: &[R::C],
+    n: usize,
+) -> Vec<Vec<R::C>> {
+    if fs.len() == 1 || fs.iter().map(|f| f.as_ref().len()).sum::<usize>() < BRENT_KUNG_VEC_CUTOFF {
+        fs.iter()
+            .map(|f| compose_mod_dispatch(ring, f.as_ref(), g, n))
+            .collect()
+    } else {
+        compose_mod_brent_kung_vec(ring, fs, g, n)
+    }
+}
+
 // The ring of polynomials with coefficients modulo $m$, modulo a polynomial with coefficients `h`,
 // with at least 3 of them, whose reversal has the inverse `inverse` as a power series.
 pub(crate) struct ModRing<'a, T: PrimitiveUnsigned> {
@@ -385,19 +498,13 @@ impl<T: PrimitiveUnsigned> ComposeModRing for ModRing<'_, T> {
     }
 }
 
-// Checks that `f`, `g`, and `h` are reduced modulo $m$, that `h` is nonzero with an invertible
-// leading coefficient, unless $m$ is 1, and that `g` is shorter than `h`, and returns whether $m$
-// is 1.
-pub(crate) fn assert_compose_mod_polynomial_arguments<T: PrimitiveUnsigned>(
-    f: &UnsignedPolynomial<T>,
+// Checks that `g` and `h` are reduced modulo $m$, that `h` is nonzero with an invertible leading
+// coefficient, unless $m$ is 1, and that `g` is shorter than `h`, and returns whether $m$ is 1.
+pub(crate) fn assert_compose_mod_polynomial_inner_and_modulus_arguments<T: PrimitiveUnsigned>(
     g: &UnsignedPolynomial<T>,
     h: &UnsignedPolynomial<T>,
     m: T,
 ) -> bool {
-    assert!(
-        f.mod_is_reduced(&m),
-        "self must be reduced mod m, but {f} has a coefficient >= {m}"
-    );
     assert!(
         g.mod_is_reduced(&m),
         "g must be reduced mod m, but {g} has a coefficient >= {m}"
@@ -419,6 +526,21 @@ pub(crate) fn assert_compose_mod_polynomial_arguments<T: PrimitiveUnsigned>(
         "g must be reduced mod h, but {g} has a degree >= that of {h}"
     );
     false
+}
+
+// Checks that `f` is reduced, and the other arguments as
+// `assert_compose_mod_polynomial_inner_and_modulus_arguments` does, and returns its result.
+pub(crate) fn assert_compose_mod_polynomial_arguments<T: PrimitiveUnsigned>(
+    f: &UnsignedPolynomial<T>,
+    g: &UnsignedPolynomial<T>,
+    h: &UnsignedPolynomial<T>,
+    m: T,
+) -> bool {
+    assert!(
+        f.mod_is_reduced(&m),
+        "self must be reduced mod m, but {f} has a coefficient >= {m}"
+    );
+    assert_compose_mod_polynomial_inner_and_modulus_arguments(g, h, m)
 }
 
 // The composition $f(g)$ modulo $h$, with coefficients modulo $m$, using `data` if it is given and

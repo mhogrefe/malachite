@@ -37,7 +37,7 @@ pub(crate) fn precompute_powers_helper<T: PrimitiveUnsigned>(
     h: &UnsignedPolynomial<T>,
     m: T,
 ) -> ModComposeModPolynomialData<T> {
-    if assert_compose_mod_polynomial_arguments(&UnsignedPolynomial::ZERO, g, h, m) || h.len() == 1 {
+    if assert_compose_mod_polynomial_inner_and_modulus_arguments(g, h, m) || h.len() == 1 {
         return ModComposeModPolynomialData {
             powers: Vec::new(),
             division: ModPolynomialData {

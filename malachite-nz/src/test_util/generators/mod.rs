@@ -8001,3 +8001,40 @@ pub fn integer_polynomial_integer_matrix_pair_gen_var_1()
         &special_random_integer_polynomial_integer_matrix_pair_gen_var_1,
     )
 }
+
+// -- (Vec<NaturalPolynomial>, NaturalPolynomial, NaturalPolynomial, Natural) --
+
+// All `(Vec<NaturalPolynomial>, NaturalPolynomial, NaturalPolynomial, Natural)` where the `Natural`
+// is positive, the coefficients of all the polynomials are less than it, the last polynomial is
+// nonzero with a leading coefficient coprime to the `Natural`, and the second-to-last polynomial is
+// shorter than the last.
+pub fn natural_polynomial_vec_natural_polynomial_pair_natural_quadruple_gen_var_1() -> Generator<(
+    Vec<NaturalPolynomial>,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    Natural,
+)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_vec_natural_polynomial_pair_natural_quadruple_gen_var_1,
+        &random_natural_polynomial_vec_natural_polynomial_pair_natural_quadruple_gen_var_1,
+        &special_random_natural_polynomial_vec_natural_polynomial_pair_natural_quadruple_gen_var_1,
+    )
+}
+
+// -- (Vec<NaturalPolynomial>, NaturalPolynomial, NaturalPolynomial, u64) --
+
+// All `(Vec<NaturalPolynomial>, NaturalPolynomial, NaturalPolynomial, u64)` where the coefficients
+// of all the polynomials are less than 2 to the power of the `u64`, the last polynomial is nonzero
+// with an odd leading coefficient, and the second-to-last polynomial is shorter than the last.
+pub fn natural_polynomial_vec_natural_polynomial_pair_unsigned_quadruple_gen_var_1() -> Generator<(
+    Vec<NaturalPolynomial>,
+    NaturalPolynomial,
+    NaturalPolynomial,
+    u64,
+)> {
+    Generator::new(
+        &exhaustive_natural_polynomial_vec_natural_polynomial_pair_unsigned_quadruple_gen_var_1,
+        &random_natural_polynomial_vec_natural_polynomial_pair_unsigned_quadruple_gen_var_1,
+        &special_random_natural_polynomial_vec_natural_polynomial_pair_unsigned_quadruple_gen_var_1,
+    )
+}

@@ -6679,3 +6679,47 @@ pub fn unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_2()
         &special_random_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_2,
     )
 }
+
+// -- (Vec<UnsignedPolynomial<PrimitiveUnsigned>>, UnsignedPolynomial<PrimitiveUnsigned>,
+// UnsignedPolynomial<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+// All `(Vec<UnsignedPolynomial<T>>, UnsignedPolynomial<T>, UnsignedPolynomial<T>, T)` where the `T`
+// is positive, the coefficients of all the polynomials are less than it, the last polynomial is
+// nonzero with a leading coefficient coprime to the `T`, and the second-to-last polynomial is
+// shorter than the last.
+pub fn unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> Generator<(
+    Vec<UnsignedPolynomial<T>>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    T,
+)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_1,
+        &random_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_1,
+        &special_random_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// -- (Vec<UnsignedPolynomial<PrimitiveUnsigned>>, UnsignedPolynomial<PrimitiveUnsigned>,
+// UnsignedPolynomial<PrimitiveUnsigned>, u64) --
+
+// All `(Vec<UnsignedPolynomial<T>>, UnsignedPolynomial<T>, UnsignedPolynomial<T>, u64)` where the
+// `u64` is no greater than `T::WIDTH`, the coefficients of all the polynomials are less than 2 to
+// the power of the `u64`, the last polynomial is nonzero with an odd leading coefficient, and the
+// second-to-last polynomial is shorter than the last.
+pub fn unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> Generator<(
+    Vec<UnsignedPolynomial<T>>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    u64,
+)> {
+    Generator::new(
+        &exhaustive_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_2,
+        &random_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_2,
+        &special_random_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_2,
+    )
+}

@@ -9095,3 +9095,59 @@ pub fn exhaustive_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_var_2(
         .map(|((a, pow), p)| (p, a, pow)),
     )
 }
+
+// -- (Vec<UnsignedPolynomial<PrimitiveUnsigned>>, UnsignedPolynomial<PrimitiveUnsigned>,
+// UnsignedPolynomial<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+pub fn exhaustive_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(
+    Vec<UnsignedPolynomial<T>>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    T,
+)> {
+    Box::new(
+        exhaustive_quadruples_xyyz(
+            exhaustive_vecs(exhaustive_unsigned_polynomials::<T>()),
+            exhaustive_unsigned_polynomials::<T>(),
+            exhaustive_positive_primitive_ints::<T>(),
+        )
+        .filter(|(fs, g, h, m)| {
+            fs.iter().all(|f| f.mod_is_reduced(m))
+                && g.mod_is_reduced(m)
+                && h.mod_is_reduced(m)
+                && h.coefficients_asc()
+                    .last()
+                    .is_some_and(|y| y.coprime_with(*m))
+                && g.len() < h.len()
+        }),
+    )
+}
+
+// -- (Vec<UnsignedPolynomial<PrimitiveUnsigned>>, UnsignedPolynomial<PrimitiveUnsigned>,
+// UnsignedPolynomial<PrimitiveUnsigned>, u64) --
+
+pub fn exhaustive_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>() -> It<(
+    Vec<UnsignedPolynomial<T>>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    u64,
+)> {
+    Box::new(
+        exhaustive_quadruples_xyyz(
+            exhaustive_vecs(exhaustive_unsigned_polynomials::<T>()),
+            exhaustive_unsigned_polynomials::<T>(),
+            primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        )
+        .filter(|(fs, g, h, pow)| {
+            fs.iter().all(|f| f.mod_power_of_2_is_reduced(*pow))
+                && g.mod_power_of_2_is_reduced(*pow)
+                && h.mod_power_of_2_is_reduced(*pow)
+                && h.coefficients_asc().last().is_some_and(|y| y.odd())
+                && g.len() < h.len()
+        }),
+    )
+}

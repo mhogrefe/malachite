@@ -135,19 +135,13 @@ impl ComposeModRing for NaturalModRing<'_> {
     }
 }
 
-// Checks that `f`, `g`, and `h` are reduced modulo $m$, that `h` is nonzero with an invertible
-// leading coefficient, unless $m$ is 1, and that `g` is shorter than `h`, and returns whether $m$
-// is 1.
-pub(crate) fn assert_compose_mod_polynomial_arguments(
-    f: &NaturalPolynomial,
+// Checks that `g` and `h` are reduced modulo $m$, that `h` is nonzero with an invertible leading
+// coefficient, unless $m$ is 1, and that `g` is shorter than `h`, and returns whether $m$ is 1.
+pub(crate) fn assert_compose_mod_polynomial_inner_and_modulus_arguments(
     g: &NaturalPolynomial,
     h: &NaturalPolynomial,
     m: &Natural,
 ) -> bool {
-    assert!(
-        f.mod_is_reduced(m),
-        "self must be reduced mod m, but {f} has a coefficient >= {m}"
-    );
     assert!(
         g.mod_is_reduced(m),
         "g must be reduced mod m, but {g} has a coefficient >= {m}"
@@ -169,6 +163,21 @@ pub(crate) fn assert_compose_mod_polynomial_arguments(
         "g must be reduced mod h, but {g} has a degree >= that of {h}"
     );
     false
+}
+
+// Checks that `f` is reduced, and the other arguments as
+// `assert_compose_mod_polynomial_inner_and_modulus_arguments` does, and returns its result.
+pub(crate) fn assert_compose_mod_polynomial_arguments(
+    f: &NaturalPolynomial,
+    g: &NaturalPolynomial,
+    h: &NaturalPolynomial,
+    m: &Natural,
+) -> bool {
+    assert!(
+        f.mod_is_reduced(m),
+        "self must be reduced mod m, but {f} has a coefficient >= {m}"
+    );
+    assert_compose_mod_polynomial_inner_and_modulus_arguments(g, h, m)
 }
 
 // The composition $f(g)$ modulo $h$, with coefficients modulo $m$, reducing with `data` if it is

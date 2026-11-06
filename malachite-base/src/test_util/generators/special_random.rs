@@ -13851,3 +13851,119 @@ pub fn special_random_unsigned_polynomial_unsigned_matrix_unsigned_triple_gen_va
             .map(move |(a, pow)| (ps.next().unwrap().mod_power_of_2(pow), a, pow)),
     )
 }
+
+// -- (Vec<UnsignedPolynomial<PrimitiveUnsigned>>, UnsignedPolynomial<PrimitiveUnsigned>,
+// UnsignedPolynomial<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+pub fn special_random_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(
+    Vec<UnsignedPolynomial<T>>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    T,
+)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &|seed| {
+                        striped_random_unsigned_polynomials::<T>(
+                            seed,
+                            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                            config.get_or("mean_stripe_d", 1),
+                            config.get_or("mean_length_n", 4),
+                            config.get_or("mean_length_d", 1),
+                        )
+                    },
+                    config.get_or("mean_count_n", 4),
+                    config.get_or("mean_count_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(fs, g, h, m)| (fs.into_iter().map(|f| f % m).collect(), g % m, h % m, m))
+        .filter(|(_, g, h, m)| {
+            h.coefficients_asc()
+                .last()
+                .is_some_and(|y| y.coprime_with(*m))
+                && g.len() < h.len()
+        }),
+    )
+}
+
+// -- (Vec<UnsignedPolynomial<PrimitiveUnsigned>>, UnsignedPolynomial<PrimitiveUnsigned>,
+// UnsignedPolynomial<PrimitiveUnsigned>, u64) --
+
+pub fn special_random_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadruple_gen_var_2<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(
+    Vec<UnsignedPolynomial<T>>,
+    UnsignedPolynomial<T>,
+    UnsignedPolynomial<T>,
+    u64,
+)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &|seed| {
+                        striped_random_unsigned_polynomials::<T>(
+                            seed,
+                            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                            config.get_or("mean_stripe_d", 1),
+                            config.get_or("mean_length_n", 4),
+                            config.get_or("mean_length_d", 1),
+                        )
+                    },
+                    config.get_or("mean_count_n", 4),
+                    config.get_or("mean_count_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigned_polynomials::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| random_unsigned_inclusive_range(seed, 0, T::WIDTH),
+        )
+        .map(|(fs, g, h, pow)| {
+            (
+                fs.into_iter().map(|f| f.mod_power_of_2(pow)).collect(),
+                g.mod_power_of_2(pow),
+                h.mod_power_of_2(pow),
+                pow,
+            )
+        })
+        .filter(|(_, g, h, _)| {
+            h.coefficients_asc().last().is_some_and(|y| y.odd()) && g.len() < h.len()
+        }),
+    )
+}

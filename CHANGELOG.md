@@ -928,6 +928,14 @@ documented by git history.
   from the leading coefficient times the matrix, saving a matrix multiplication. A
   `NaturalPolynomial` modulo a one-limb $m$ is evaluated with word arithmetic, and a
   `RationalPolynomial` by evaluating its integer numerator and dividing once.
+- Composition of several polynomials with the same inner polynomial modulo a polynomial, through new
+  implementations of existing traits: `ModComposeModPolynomial` and
+  `ModComposeModPolynomialPrecomputed`, and their `ModPowerOf2` counterparts, for slices of
+  `UnsignedPolynomial<T>` and of `NaturalPolynomial`, returning a `Vec`, like FLINT's
+  `nmod_poly_compose_mod_brent_kung_vec_preinv` and `fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`.
+  The polynomials share the powers of the inner polynomial and a single matrix product, with a block
+  size chosen from their total length; a single polynomial, or a few short ones, are composed one at
+  a time, and, unlike FLINT, outer polynomials may be at least as long as the modulus polynomial.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's
