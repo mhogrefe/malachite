@@ -3317,6 +3317,18 @@ fn test_against_flint() {
     check_demo_against_flint_no_special(
         &oracle,
         "../malachite-nz",
+        "demo_natural_polynomial_rising_factorial_polynomial",
+        "arith_stirling_number_1u_vec",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_polynomial_rising_factorial_polynomial_truncated",
+        "arith_stirling_number_1u_vec",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
         "demo_natural_polynomial_touchard_polynomial",
         "arith_stirling_number_2_vec",
     );

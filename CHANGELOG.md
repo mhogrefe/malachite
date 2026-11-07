@@ -952,6 +952,13 @@ documented by git history.
   computation; the primitive versions use closed forms and a recurrence over the band of the
   triangle that the result depends on, which stops at the first overflow. A new oracle-test mode,
   `arith_stirling_number_2`, checks `Natural`'s against FLINT.
+- Rising factorial polynomials $x(x + 1) \cdots (x + n - 1)$, whose coefficients are the unsigned
+  Stirling numbers of the first kind. New `RisingFactorialPolynomial` and
+  `RisingFactorialPolynomialTruncated` traits in malachite-base's `polynomial::special` module are
+  implemented for `NaturalPolynomial`, like FLINT's `arith_stirling_number_1u_vec`, which fills a
+  row of the triangle. The product is found by FLINT's binary splitting, with groups of factors
+  expanded in double words as well as single words. A new oracle-test mode,
+  `arith_stirling_number_1u_vec`, checks them against FLINT.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

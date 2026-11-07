@@ -10,7 +10,10 @@
 
     Diffs `touchard_polynomial(n) = p` and `touchard_polynomial_truncated(n, len) = p` lines
     against arith_stirling_number_2_vec, whose row of S(n, k) for k < len is the coefficients of
-    the truncated Touchard polynomial, and `S(n, k) = s` lines against arith_stirling_number_2.
+    the truncated Touchard polynomial; `rising_factorial_polynomial(n) = p` and
+    `rising_factorial_polynomial_truncated(n, len) = p` lines against arith_stirling_number_1u_vec,
+    whose row is the coefficients of the truncated rising factorial polynomial; and `S(n, k) = s`
+    lines against arith_stirling_number_2.
 */
 
 #include <stdlib.h>
@@ -23,11 +26,16 @@
 
 #include "oracle.h"
 
+typedef void (*row_fn)(fmpz *, ulong, slong);
+
+/* `name` is the Malachite function, without "_truncated" */
 static int
-check_touchard_line(char * line, int line_number)
+check_row_line(char * line, int line_number, const char * name, row_fn row_function)
 {
-    const char * full = "touchard_polynomial(";
-    const char * truncated = "touchard_polynomial_truncated(";
+    char full[64];
+    char truncated[80];
+    flint_sprintf(full, "%s(", name);
+    flint_sprintf(truncated, "%s_truncated(", name);
     line[strcspn(line, "\n")] = '\0';
     char * needle = strstr(line, ") = ");
     ulong n, len;
@@ -66,7 +74,7 @@ check_touchard_line(char * line, int line_number)
     if (fmpz_poly_set_str_malachite(actual, p_str))
     {
         fmpz * row = _fmpz_vec_init(len);
-        arith_stirling_number_2_vec(row, n, len);
+        row_function(row, n, len);
         fmpz_poly_fit_length(expected, len);
         _fmpz_vec_set(expected->coeffs, row, len);
         _fmpz_poly_set_length(expected, len);
@@ -75,8 +83,8 @@ check_touchard_line(char * line, int line_number)
         if (fmpz_poly_equal(expected, actual))
             result = 0;
         else
-            flint_printf("line %d: touchard_polynomial_truncated(%wu, %wu) mismatch\n",
-                         line_number, n, len);
+            flint_printf("line %d: %s_truncated(%wu, %wu) mismatch\n", line_number, name, n,
+                         len);
     }
     else
     {
@@ -87,10 +95,29 @@ check_touchard_line(char * line, int line_number)
     return result;
 }
 
+static int
+check_touchard_line(char * line, int line_number)
+{
+    return check_row_line(line, line_number, "touchard_polynomial", arith_stirling_number_2_vec);
+}
+
 int
 run_arith_stirling_number_2_vec(const char * arg)
 {
     return for_each_line(arg, check_touchard_line);
+}
+
+static int
+check_rising_factorial_line(char * line, int line_number)
+{
+    return check_row_line(line, line_number, "rising_factorial_polynomial",
+                          arith_stirling_number_1u_vec);
+}
+
+int
+run_arith_stirling_number_1u_vec(const char * arg)
+{
+    return for_each_line(arg, check_rising_factorial_line);
 }
 
 static int

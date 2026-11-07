@@ -1211,6 +1211,7 @@ pub mod natural_polynomial {
         pub mod square_truncated;
     }
     pub mod special {
+        pub mod rising_factorial_polynomial;
         pub mod touchard_polynomial;
     }
 }

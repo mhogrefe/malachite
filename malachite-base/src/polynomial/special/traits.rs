@@ -17,3 +17,16 @@ pub trait TouchardPolynomial {
 pub trait TouchardPolynomialTruncated {
     fn touchard_polynomial_truncated(n: u64, len: u64) -> Self;
 }
+
+/// Computes the $n$th rising factorial polynomial $x(x + 1) \cdots (x + n - 1)$, whose coefficients
+/// are the unsigned Stirling numbers of the first kind $\left[{n \atop k}\right]$.
+pub trait RisingFactorialPolynomial {
+    fn rising_factorial_polynomial(n: u64) -> Self;
+}
+
+/// Computes the $n$th rising factorial polynomial truncated to its first `len` coefficients, which
+/// are the unsigned Stirling numbers of the first kind $\left[{n \atop k}\right]$ for $k <
+/// \text{len}$.
+pub trait RisingFactorialPolynomialTruncated {
+    fn rising_factorial_polynomial_truncated(n: u64, len: u64) -> Self;
+}

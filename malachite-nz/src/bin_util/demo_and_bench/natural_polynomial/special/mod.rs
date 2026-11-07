@@ -9,7 +9,9 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    rising_factorial_polynomial::register(runner);
     touchard_polynomial::register(runner);
 }
 
+mod rising_factorial_polynomial;
 mod touchard_polynomial;
