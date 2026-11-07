@@ -977,6 +977,13 @@ documented by git history.
   `arith_stirling_number_1`. Both apply the signs $(-1)^{n + k}$ to the unsigned values. New
   oracle-test modes, `arith_stirling_number_1` and `arith_stirling_number_1_vec`, check them against
   FLINT.
+- Stirling matrices: the `height`-by-`width` truncations of the Stirling triangles. New
+  `UnsignedStirlingMatrixOfTheFirstKind`, `StirlingMatrixOfTheFirstKind`, and
+  `StirlingMatrixOfTheSecondKind` traits in malachite-base are implemented for `NaturalMatrix` (the
+  unsigned first kind and the second kind) and `IntegerMatrix` (the signed first kind), like
+  FLINT's `arith_stirling_matrix_1u`, `arith_stirling_matrix_1`, and `arith_stirling_matrix_2`. The
+  rows are filled in turn by the triangles' recurrences, as in FLINT. New oracle-test modes check
+  all three against FLINT.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

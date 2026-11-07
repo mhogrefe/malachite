@@ -169,6 +169,22 @@ fn check_demo_against_flint_random_modes_with_limit(
     }
 }
 
+// Like `check_demo_against_flint_no_special`, but with a line limit other than `LIMIT`, for demos
+// whose lines are long.
+fn check_demo_against_flint_no_special_with_limit(
+    oracle: &Path,
+    crate_dir: &str,
+    demo_name: &str,
+    flint_mode: &str,
+    limit: usize,
+) {
+    for mode in &MODES[..2] {
+        println!("testing {demo_name} in mode {mode}");
+        run_demo_with_limit(crate_dir, demo_name, mode, limit);
+        run_oracle(oracle, flint_mode, Some(TEST_OUT));
+    }
+}
+
 // For demos whose generators do not support the special_random mode, such as those built on
 // primitive-integer generators declared with new_no_special.
 fn check_demo_against_flint_no_special(
@@ -3356,6 +3372,22 @@ fn test_against_flint() {
         "demo_integer_stirling_number_of_the_first_kind",
         "arith_stirling_number_1",
     );
+    for (demo, mode) in [
+        (
+            "demo_natural_matrix_unsigned_stirling_matrix_of_the_first_kind",
+            "arith_stirling_matrix_1u",
+        ),
+        (
+            "demo_integer_matrix_stirling_matrix_of_the_first_kind",
+            "arith_stirling_matrix_1",
+        ),
+        (
+            "demo_natural_matrix_stirling_matrix_of_the_second_kind",
+            "arith_stirling_matrix_2",
+        ),
+    ] {
+        check_demo_against_flint_no_special_with_limit(&oracle, "../malachite-nz", demo, mode, 1000);
+    }
     check_demo_against_flint_no_special(
         &oracle,
         "../malachite-nz",

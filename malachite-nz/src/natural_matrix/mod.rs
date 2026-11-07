@@ -2179,3 +2179,5 @@ pub mod rows;
 pub mod set_column;
 /// Functions for replacing a row of a [`NaturalMatrix`] with the elements of a [`NaturalVector`].
 pub mod set_row;
+/// Special matrices, such as those whose entries are combinatorial triangles.
+pub mod special;

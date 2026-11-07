@@ -2182,3 +2182,5 @@ pub mod rows;
 pub mod set_column;
 /// Functions for replacing a row of an [`IntegerMatrix`] with the elements of an [`IntegerVector`].
 pub mod set_row;
+/// Special matrices, such as those whose entries are combinatorial triangles.
+pub mod special;

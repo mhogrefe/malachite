@@ -74,6 +74,24 @@ pub trait CheckedUnsignedStirlingNumberOfTheFirstKind: Sized {
     fn checked_unsigned_stirling_number_of_the_first_kind(n: u64, k: u64) -> Option<Self>;
 }
 
+/// Computes the `height`-by-`width` matrix of unsigned Stirling numbers of the first kind, whose
+/// entry in row $n$ and column $k$ is $\left[{n \atop k}\right]$.
+pub trait UnsignedStirlingMatrixOfTheFirstKind {
+    fn unsigned_stirling_matrix_of_the_first_kind(height: u64, width: u64) -> Self;
+}
+
+/// Computes the `height`-by-`width` matrix of Stirling numbers of the first kind, whose entry in
+/// row $n$ and column $k$ is $s(n, k)$.
+pub trait StirlingMatrixOfTheFirstKind {
+    fn stirling_matrix_of_the_first_kind(height: u64, width: u64) -> Self;
+}
+
+/// Computes the `height`-by-`width` matrix of Stirling numbers of the second kind, whose entry in
+/// row $n$ and column $k$ is $S(n, k)$.
+pub trait StirlingMatrixOfTheSecondKind {
+    fn stirling_matrix_of_the_second_kind(height: u64, width: u64) -> Self;
+}
+
 /// Computes the Stirling number of the second kind $S(n, k)$: the number of ways to partition a set
 /// of $n$ elements into $k$ nonempty subsets.
 pub trait StirlingNumberOfTheSecondKind {

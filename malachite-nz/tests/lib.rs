@@ -494,6 +494,9 @@ pub mod integer_matrix {
     pub mod set_row;
     pub mod set_window;
     pub mod set_zero;
+    pub mod special {
+        pub mod stirling_matrix;
+    }
     pub mod standard_basis_index;
     pub mod standard_basis_matrix;
     pub mod swap_columns;
@@ -1392,6 +1395,9 @@ pub mod natural_matrix {
     pub mod set_row;
     pub mod set_window;
     pub mod set_zero;
+    pub mod special {
+        pub mod stirling_matrix;
+    }
     pub mod standard_basis_index;
     pub mod standard_basis_matrix;
     pub mod swap_columns;
