@@ -3350,6 +3350,24 @@ fn test_against_flint() {
         "demo_natural_unsigned_stirling_number_of_the_first_kind",
         "arith_stirling_number_1u",
     );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_stirling_number_of_the_first_kind",
+        "arith_stirling_number_1",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_polynomial_falling_factorial_polynomial",
+        "arith_stirling_number_1_vec",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_polynomial_falling_factorial_polynomial_truncated",
+        "arith_stirling_number_1_vec",
+    );
     check_demo_against_flint(
         &oracle,
         "../malachite-q",

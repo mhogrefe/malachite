@@ -50,6 +50,18 @@ pub trait CheckedBellNumber: Sized {
     fn checked_bell_number(n: u64) -> Option<Self>;
 }
 
+/// Computes the Stirling number of the first kind $s(n, k) = (-1)^{n + k} \left[{n \atop
+/// k}\right]$, the coefficient of $x^k$ in the falling factorial $x(x - 1) \cdots (x - n + 1)$.
+pub trait StirlingNumberOfTheFirstKind {
+    fn stirling_number_of_the_first_kind(n: u64, k: u64) -> Self;
+}
+
+/// Computes the Stirling number of the first kind $s(n, k)$, returning `None` if the result is too
+/// large to be represented.
+pub trait CheckedStirlingNumberOfTheFirstKind: Sized {
+    fn checked_stirling_number_of_the_first_kind(n: u64, k: u64) -> Option<Self>;
+}
+
 /// Computes the unsigned Stirling number of the first kind $\left[{n \atop k}\right]$: the number
 /// of permutations of $n$ elements with $k$ cycles.
 pub trait UnsignedStirlingNumberOfTheFirstKind {

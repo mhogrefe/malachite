@@ -13,7 +13,9 @@
     the truncated Touchard polynomial; `rising_factorial_polynomial(n) = p` and
     `rising_factorial_polynomial_truncated(n, len) = p` lines against arith_stirling_number_1u_vec,
     whose row is the coefficients of the truncated rising factorial polynomial; `S(n, k) = s`
-    lines against arith_stirling_number_2; and `[n, k] = s` lines against arith_stirling_number_1u.
+    lines against arith_stirling_number_2; `[n, k] = s` lines against arith_stirling_number_1u; and
+    `s(n, k) = s` and `falling_factorial_polynomial(n) = p` lines (and the truncated form) against
+    arith_stirling_number_1 and arith_stirling_number_1_vec.
 */
 
 #include <stdlib.h>
@@ -186,6 +188,31 @@ int
 run_arith_stirling_number_1u(const char * arg)
 {
     return for_each_line(arg, check_stirling_1u_line);
+}
+
+static int
+check_stirling_1_line(char * line, int line_number)
+{
+    return check_value_line(line, line_number, "s(", ")", arith_stirling_number_1);
+}
+
+int
+run_arith_stirling_number_1(const char * arg)
+{
+    return for_each_line(arg, check_stirling_1_line);
+}
+
+static int
+check_falling_factorial_line(char * line, int line_number)
+{
+    return check_row_line(line, line_number, "falling_factorial_polynomial",
+                          arith_stirling_number_1_vec);
+}
+
+int
+run_arith_stirling_number_1_vec(const char * arg)
+{
+    return for_each_line(arg, check_falling_factorial_line);
 }
 
 int

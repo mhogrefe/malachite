@@ -19,7 +19,9 @@ use crate::num::modular::traits::{
     BalancedMod, BalancedModAssign, BalancedModPowerOf2, BalancedModPowerOf2Assign, CeilingMod,
     CeilingModAssign, CeilingModPowerOf2, CeilingModPowerOf2Assign,
 };
-use crate::num::number_theory::traits::ExtendedGcd;
+use crate::num::number_theory::traits::{
+    CheckedStirlingNumberOfTheFirstKind, ExtendedGcd, StirlingNumberOfTheFirstKind,
+};
 #[cfg(feature = "random")]
 use crate::num::random::{HasRandomSignedRange, RandomSignedChunkable};
 use core::ops::Neg;
@@ -63,6 +65,7 @@ pub trait PrimitiveSigned:
     + CeilingModPowerOf2Assign
     + CheckedAbs<Output = Self>
     + CheckedHammingDistance
+    + CheckedStirlingNumberOfTheFirstKind
     + EqAbs<Self>
     + ExtendedGcd<Self, Cofactor = Self>
     + From<i8>
@@ -80,6 +83,7 @@ pub trait PrimitiveSigned:
     + SaturatingAbsAssign
     + SaturatingNeg<Output = Self>
     + SaturatingNegAssign
+    + StirlingNumberOfTheFirstKind
     + UnsignedAbs
     + WrappingAbs<Output = Self>
     + WrappingAbsAssign

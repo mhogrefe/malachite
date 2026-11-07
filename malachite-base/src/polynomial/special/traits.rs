@@ -30,3 +30,15 @@ pub trait RisingFactorialPolynomial {
 pub trait RisingFactorialPolynomialTruncated {
     fn rising_factorial_polynomial_truncated(n: u64, len: u64) -> Self;
 }
+
+/// Computes the $n$th falling factorial polynomial $x(x - 1) \cdots (x - n + 1)$, whose
+/// coefficients are the Stirling numbers of the first kind $s(n, k)$.
+pub trait FallingFactorialPolynomial {
+    fn falling_factorial_polynomial(n: u64) -> Self;
+}
+
+/// Computes the $n$th falling factorial polynomial truncated to its first `len` coefficients, which
+/// are the Stirling numbers of the first kind $s(n, k)$ for $k < \text{len}$.
+pub trait FallingFactorialPolynomialTruncated {
+    fn falling_factorial_polynomial_truncated(n: u64, len: u64) -> Self;
+}

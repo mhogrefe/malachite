@@ -580,6 +580,41 @@ pub mod primorial;
 /// assert_eq!((-5i32).checked_rising_factorial(3), Some(-60));
 /// ```
 pub mod rising_factorial;
+/// [`StirlingNumberOfTheFirstKind`](traits::StirlingNumberOfTheFirstKind) and
+/// [`CheckedStirlingNumberOfTheFirstKind`](traits::CheckedStirlingNumberOfTheFirstKind), traits for
+/// computing Stirling numbers of the first kind. The first panics if the result cannot be
+/// represented; the second returns `None` in that case.
+///
+/// # stirling_number_of_the_first_kind
+/// ```
+/// use malachite_base::num::number_theory::traits::StirlingNumberOfTheFirstKind;
+///
+/// assert_eq!(i8::stirling_number_of_the_first_kind(0, 0), 1);
+/// assert_eq!(i8::stirling_number_of_the_first_kind(5, 0), 0);
+/// assert_eq!(i8::stirling_number_of_the_first_kind(3, 5), 0);
+/// assert_eq!(i8::stirling_number_of_the_first_kind(5, 1), 24);
+/// assert_eq!(i8::stirling_number_of_the_first_kind(5, 2), -50);
+/// assert_eq!(i8::stirling_number_of_the_first_kind(6, 1), -120);
+/// assert_eq!(i32::stirling_number_of_the_first_kind(10, 5), -269325);
+/// ```
+///
+/// # checked_stirling_number_of_the_first_kind
+/// ```
+/// use malachite_base::num::number_theory::traits::CheckedStirlingNumberOfTheFirstKind;
+///
+/// assert_eq!(
+///     i8::checked_stirling_number_of_the_first_kind(5, 3),
+///     Some(35)
+/// );
+/// assert_eq!(i8::checked_stirling_number_of_the_first_kind(6, 3), None);
+/// assert_eq!(i8::checked_stirling_number_of_the_first_kind(7, 5), None);
+/// assert_eq!(
+///     i32::checked_stirling_number_of_the_first_kind(13, 6),
+///     Some(-206070150)
+/// );
+/// assert_eq!(i32::checked_stirling_number_of_the_first_kind(16, 8), None);
+/// ```
+pub mod stirling_number_of_the_first_kind;
 /// [`StirlingNumberOfTheSecondKind`](traits::StirlingNumberOfTheSecondKind) and
 /// [`CheckedStirlingNumberOfTheSecondKind`](traits::CheckedStirlingNumberOfTheSecondKind), traits
 /// for computing Stirling numbers of the second kind. The first panics if the result cannot be
@@ -625,9 +660,9 @@ pub mod traits;
 /// Various traits for number-theoretic functions.
 /// [`UnsignedStirlingNumberOfTheFirstKind`](traits::UnsignedStirlingNumberOfTheFirstKind) and
 /// [`CheckedUnsignedStirlingNumberOfTheFirstKind`](
-/// traits::CheckedUnsignedStirlingNumberOfTheFirstKind),
-/// traits for computing unsigned Stirling numbers of the first kind. The first panics if the result
-/// cannot be represented; the second returns `None` in that case.
+/// traits::CheckedUnsignedStirlingNumberOfTheFirstKind), traits for computing unsigned Stirling
+/// numbers of the first kind. The first panics if the result cannot be represented; the second
+/// returns `None` in that case.
 ///
 /// # unsigned_stirling_number_of_the_first_kind
 /// ```

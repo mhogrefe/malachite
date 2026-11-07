@@ -969,6 +969,14 @@ documented by git history.
   place of FLINT's exponential generating function; the primitive versions use closed forms and a
   band recurrence, like the second kind. A new oracle-test mode, `arith_stirling_number_1u`, checks
   `Natural`'s against FLINT.
+- Signed Stirling numbers of the first kind. New `FallingFactorialPolynomial` and
+  `FallingFactorialPolynomialTruncated` traits in malachite-base are implemented for
+  `IntegerPolynomial`, like FLINT's `arith_stirling_number_1_vec`, and new
+  `StirlingNumberOfTheFirstKind` and `CheckedStirlingNumberOfTheFirstKind` traits are implemented
+  for the primitive signed types, with `StirlingNumberOfTheFirstKind` for `Integer`, like
+  `arith_stirling_number_1`. Both apply the signs $(-1)^{n + k}$ to the unsigned values. New
+  oracle-test modes, `arith_stirling_number_1` and `arith_stirling_number_1_vec`, check them against
+  FLINT.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

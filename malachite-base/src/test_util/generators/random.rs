@@ -11836,3 +11836,10 @@ pub fn random_unsigned_pair_gen_var_55<T: PrimitiveUnsigned>(config: &GenConfig)
         }),
     )
 }
+
+pub fn random_unsigned_pair_gen_var_56<T: PrimitiveSigned>(config: &GenConfig) -> It<(u64, u64)> {
+    Box::new(
+        random_unsigned_pair_gen_var_17::<u64, u64>(config)
+            .filter(|&(n, k)| T::checked_stirling_number_of_the_first_kind(n, k).is_some()),
+    )
+}

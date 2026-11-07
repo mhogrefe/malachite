@@ -319,6 +319,7 @@ pub mod integer {
         pub mod gcd;
         pub mod kronecker_symbol;
         pub mod rising_factorial;
+        pub mod stirling_number_of_the_first_kind;
     }
     pub mod random {
         pub mod get_random_integer_from_range_to_infinity;
@@ -1013,6 +1014,9 @@ pub mod integer_polynomial {
         pub mod pow_truncated;
         pub mod square_truncated;
         pub mod sub_truncated;
+    }
+    pub mod special {
+        pub mod falling_factorial_polynomial;
     }
 }
 pub mod natural_polynomial {

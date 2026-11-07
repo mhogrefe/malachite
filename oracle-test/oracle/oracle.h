@@ -141,6 +141,8 @@ int run_fmpq_gcd_cofactors(const char * arg);
 int run_fmpq_farey_neighbors(const char * arg);
 int run_arith_bell_number(const char * arg);
 int run_arith_landau_function_vec(const char * arg);
+int run_arith_stirling_number_1(const char * arg);
+int run_arith_stirling_number_1_vec(const char * arg);
 int run_arith_stirling_number_1u(const char * arg);
 int run_arith_stirling_number_1u_vec(const char * arg);
 int run_arith_stirling_number_2(const char * arg);

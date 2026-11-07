@@ -9166,3 +9166,10 @@ pub fn exhaustive_unsigned_pair_gen_var_55<T: PrimitiveUnsigned>() -> It<(u64, u
         }),
     )
 }
+
+pub fn exhaustive_unsigned_pair_gen_var_56<T: PrimitiveSigned>() -> It<(u64, u64)> {
+    Box::new(
+        exhaustive_unsigned_pair_gen::<u64, u64>()
+            .filter(|&(n, k)| T::checked_stirling_number_of_the_first_kind(n, k).is_some()),
+    )
+}

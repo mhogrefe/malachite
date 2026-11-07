@@ -577,6 +577,7 @@ pub mod num {
         pub mod lcm;
         pub mod primorial;
         pub mod rising_factorial;
+        pub mod stirling_number_of_the_first_kind;
         pub mod stirling_number_of_the_second_kind;
         pub mod unsigned_stirling_number_of_the_first_kind;
     }

@@ -31,3 +31,7 @@ pub mod kronecker_symbol;
 /// [`RisingFactorial`](malachite_base::num::number_theory::traits::RisingFactorial), a trait for
 /// computing the rising factorial of a number.
 pub mod rising_factorial;
+/// An implementation of [`StirlingNumberOfTheFirstKind`](
+/// malachite_base::num::number_theory::traits::StirlingNumberOfTheFirstKind), a trait for computing
+/// Stirling numbers of the first kind.
+pub mod stirling_number_of_the_first_kind;

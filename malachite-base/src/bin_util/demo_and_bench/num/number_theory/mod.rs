@@ -21,6 +21,7 @@ pub(crate) fn register(runner: &mut Runner) {
     lcm::register(runner);
     primorial::register(runner);
     rising_factorial::register(runner);
+    stirling_number_of_the_first_kind::register(runner);
     stirling_number_of_the_second_kind::register(runner);
     unsigned_stirling_number_of_the_first_kind::register(runner);
 }
@@ -37,5 +38,6 @@ mod kronecker_symbol;
 mod lcm;
 mod primorial;
 mod rising_factorial;
+mod stirling_number_of_the_first_kind;
 mod stirling_number_of_the_second_kind;
 mod unsigned_stirling_number_of_the_first_kind;

@@ -39,6 +39,8 @@ pub mod modular;
 pub mod random;
 /// Operations on [`IntegerPolynomial`]s as power series, truncated to a given number of terms.
 pub mod series;
+/// Special polynomials, such as those whose coefficients are rows of combinatorial triangles.
+pub mod special;
 
 // The zero `Integer`, as something a reference can be handed out to.
 //

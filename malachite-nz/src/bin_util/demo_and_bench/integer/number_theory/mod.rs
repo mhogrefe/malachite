@@ -15,6 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
     gcd::register(runner);
     kronecker_symbol::register(runner);
     rising_factorial::register(runner);
+    stirling_number_of_the_first_kind::register(runner);
 }
 
 mod binomial_coefficient;
@@ -23,3 +24,4 @@ mod falling_factorial;
 mod gcd;
 mod kronecker_symbol;
 mod rising_factorial;
+mod stirling_number_of_the_first_kind;
