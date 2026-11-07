@@ -580,5 +580,46 @@ pub mod primorial;
 /// assert_eq!((-5i32).checked_rising_factorial(3), Some(-60));
 /// ```
 pub mod rising_factorial;
+/// [`StirlingNumberOfTheSecondKind`](traits::StirlingNumberOfTheSecondKind) and
+/// [`CheckedStirlingNumberOfTheSecondKind`](traits::CheckedStirlingNumberOfTheSecondKind), traits
+/// for computing Stirling numbers of the second kind. The first panics if the result cannot be
+/// represented; the second returns `None` in that case.
+///
+/// # stirling_number_of_the_second_kind
+/// ```
+/// use malachite_base::num::number_theory::traits::StirlingNumberOfTheSecondKind;
+///
+/// assert_eq!(u8::stirling_number_of_the_second_kind(0, 0), 1);
+/// assert_eq!(u8::stirling_number_of_the_second_kind(5, 0), 0);
+/// assert_eq!(u8::stirling_number_of_the_second_kind(3, 5), 0);
+/// assert_eq!(u8::stirling_number_of_the_second_kind(5, 2), 15);
+/// assert_eq!(u8::stirling_number_of_the_second_kind(6, 3), 90);
+/// assert_eq!(u32::stirling_number_of_the_second_kind(10, 5), 42525);
+/// assert_eq!(
+///     u64::stirling_number_of_the_second_kind(30, 5),
+///     7713000216608565075
+/// );
+/// ```
+///
+/// # checked_stirling_number_of_the_second_kind
+/// ```
+/// use malachite_base::num::number_theory::traits::CheckedStirlingNumberOfTheSecondKind;
+///
+/// assert_eq!(
+///     u8::checked_stirling_number_of_the_second_kind(6, 3),
+///     Some(90)
+/// );
+/// assert_eq!(u8::checked_stirling_number_of_the_second_kind(7, 3), None);
+/// assert_eq!(
+///     u32::checked_stirling_number_of_the_second_kind(16, 8),
+///     Some(2141764053)
+/// );
+/// assert_eq!(u32::checked_stirling_number_of_the_second_kind(18, 9), None);
+/// assert_eq!(
+///     u64::checked_stirling_number_of_the_second_kind(u64::MAX, u64::MAX),
+///     Some(1)
+/// );
+/// ```
+pub mod stirling_number_of_the_second_kind;
 /// Various traits for number-theoretic functions.
 pub mod traits;

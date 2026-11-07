@@ -1,3 +1,4 @@
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -40,8 +41,26 @@ fn f(x: u64, k: u64) -> (u64, bool, bool, u64, u64, u64, u64, u64, u64) {
     (a, b, c, d, e, g, h, i, m)
 }
 
+fn power_of_2_minus_one(k: u64) -> (u64, Natural, u64, Rational) {
+    // `power_of_2(n) - 1`: the same low-bit mask, for a primitive and a bignum: flagged.
+    let a = u64::power_of_2(k) - 1;
+    let b = Natural::power_of_2(k) - Natural::ONE;
+    // `power_of_2(n) - 2` is not a mask: fine.
+    let c = u64::power_of_2(k) - 2;
+    // `Rational` has no `LowMask`: fine.
+    let d = Rational::power_of_2(k) - Rational::ONE;
+    (a, b, c, d)
+}
+
+// A `low_mask` implementation may define the mask this way: fine.
+fn low_mask(k: u64) -> u64 {
+    u64::power_of_2(k) - 1
+}
+
 fn main() {
     let _ = f(std::hint::black_box(5), std::hint::black_box(3));
+    let _ = power_of_2_minus_one(std::hint::black_box(3));
+    let _ = low_mask(std::hint::black_box(3));
     let _ = g(
         &Natural::from(std::hint::black_box(5u32)),
         std::hint::black_box(3),

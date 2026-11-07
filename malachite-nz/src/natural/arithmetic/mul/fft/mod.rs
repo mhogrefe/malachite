@@ -1231,7 +1231,7 @@ macro_rules! set_j_bits_and_j_mr {
             (0, 0)
         } else {
             let j_bits = n_nbits_nz!($j);
-            (j_bits, usize::power_of_2(j_bits) - 1 - $j)
+            (j_bits, usize::low_mask(j_bits) - $j)
         };
     };
 }

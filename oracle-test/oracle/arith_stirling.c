@@ -10,7 +10,7 @@
 
     Diffs `touchard_polynomial(n) = p` and `touchard_polynomial_truncated(n, len) = p` lines
     against arith_stirling_number_2_vec, whose row of S(n, k) for k < len is the coefficients of
-    the truncated Touchard polynomial.
+    the truncated Touchard polynomial, and `S(n, k) = s` lines against arith_stirling_number_2.
 */
 
 #include <stdlib.h>
@@ -91,4 +91,54 @@ int
 run_arith_stirling_number_2_vec(const char * arg)
 {
     return for_each_line(arg, check_touchard_line);
+}
+
+static int
+check_stirling_2_line(char * line, int line_number)
+{
+    line[strcspn(line, "\n")] = '\0';
+    char * comma;
+    char * close;
+    if (strncmp(line, "S(", 2) != 0)
+    {
+        flint_printf("line %d: unreadable line\n", line_number);
+        return 1;
+    }
+    ulong n = strtoul(line + 2, &comma, 10);
+    if (strncmp(comma, ", ", 2) != 0)
+    {
+        flint_printf("line %d: unreadable arguments\n", line_number);
+        return 1;
+    }
+    ulong k = strtoul(comma + 2, &close, 10);
+    if (strncmp(close, ") = ", 4) != 0)
+    {
+        flint_printf("line %d: unreadable line\n", line_number);
+        return 1;
+    }
+    fmpz_t actual, expected;
+    fmpz_init(actual);
+    fmpz_init(expected);
+    int result = 1;
+    if (fmpz_set_str(actual, close + 4, 10) == 0)
+    {
+        arith_stirling_number_2(expected, n, k);
+        if (fmpz_equal(expected, actual))
+            result = 0;
+        else
+            flint_printf("line %d: S(%wu, %wu) mismatch\n", line_number, n, k);
+    }
+    else
+    {
+        flint_printf("line %d: unreadable value\n", line_number);
+    }
+    fmpz_clear(actual);
+    fmpz_clear(expected);
+    return result;
+}
+
+int
+run_arith_stirling_number_2(const char * arg)
+{
+    return for_each_line(arg, check_stirling_2_line);
 }

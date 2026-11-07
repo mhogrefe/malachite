@@ -50,6 +50,16 @@ pub(crate) fn next_prime<T: PrimitiveUnsigned + IsPrime>(n: T) -> T {
     p
 }
 
+// The `count` smallest primes greater than `n`, in ascending order.
+pub(crate) fn primes_above<T: PrimitiveUnsigned + IsPrime>(mut n: T, count: usize) -> Vec<T> {
+    let mut primes = Vec::with_capacity(count);
+    for _ in 0..count {
+        n = next_prime(n);
+        primes.push(n);
+    }
+    primes
+}
+
 // The moduli that the multimodular algorithm works modulo, for products whose elements have at most
 // `bits` significant bits, counting a sign bit if they may be negative: a single power of 2 when
 // that fits in a word, and otherwise $2^{W-1}$, where $W$ is the limb width, followed by primes

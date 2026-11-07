@@ -53,6 +53,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
+    /// use malachite_base::num::logic::traits::LowMask;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
@@ -81,11 +82,11 @@ impl Float {
     /// assert_eq!(p.to_string(), "7.8886090522101180541172856528279e-31");
     /// assert_eq!(o, Equal);
     ///
-    /// let (p, o) = Float::power_of_2_prec_round(i64::power_of_2(30) - 1, 10, Floor);
+    /// let (p, o) = Float::power_of_2_prec_round(i64::low_mask(30), 10, Floor);
     /// assert_eq!(p.to_string(), "2.0965e323228496");
     /// assert_eq!(o, Less);
     ///
-    /// let (p, o) = Float::power_of_2_prec_round(i64::power_of_2(30) - 1, 10, Ceiling);
+    /// let (p, o) = Float::power_of_2_prec_round(i64::low_mask(30), 10, Ceiling);
     /// assert_eq!(p.to_string(), "Infinity");
     /// assert_eq!(o, Greater);
     ///
@@ -153,6 +154,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
+    /// use malachite_base::num::logic::traits::LowMask;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -180,7 +182,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "7.8886090522101180541172856528279e-31");
     /// assert_eq!(o, Equal);
     ///
-    /// let (p, o) = Float::power_of_2_prec(i64::power_of_2(30) - 1, 10);
+    /// let (p, o) = Float::power_of_2_prec(i64::low_mask(30), 10);
     /// assert_eq!(p.to_string(), "Infinity");
     /// assert_eq!(o, Greater);
     ///
@@ -209,15 +211,13 @@ impl PowerOf2<u64> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
+    /// use malachite_base::num::logic::traits::LowMask;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::power_of_2(0u64).to_string(), "1.0");
     /// assert_eq!(Float::power_of_2(3u64).to_string(), "8.0");
     /// assert_eq!(Float::power_of_2(100u64).to_string(), "1.3e30");
-    /// assert_eq!(
-    ///     Float::power_of_2(u64::power_of_2(30) - 1).to_string(),
-    ///     "Infinity"
-    /// );
+    /// assert_eq!(Float::power_of_2(u64::low_mask(30)).to_string(), "Infinity");
     /// ```
     fn power_of_2(pow: u64) -> Self {
         if let Ok(exponent) = i32::try_from(pow)
@@ -251,6 +251,7 @@ impl PowerOf2<i64> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
+    /// use malachite_base::num::logic::traits::LowMask;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::power_of_2(0i64).to_string(), "1.0");
@@ -258,10 +259,7 @@ impl PowerOf2<i64> for Float {
     /// assert_eq!(Float::power_of_2(100i64).to_string(), "1.3e30");
     /// assert_eq!(Float::power_of_2(-3i64).to_string(), "0.12");
     /// assert_eq!(Float::power_of_2(-100i64).to_string(), "7.9e-31");
-    /// assert_eq!(
-    ///     Float::power_of_2(i64::power_of_2(30) - 1).to_string(),
-    ///     "Infinity"
-    /// );
+    /// assert_eq!(Float::power_of_2(i64::low_mask(30)).to_string(), "Infinity");
     /// assert_eq!(
     ///     Float::power_of_2(-i64::power_of_2(30) - 1).to_string(),
     ///     "0.0"

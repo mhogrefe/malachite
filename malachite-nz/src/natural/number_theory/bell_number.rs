@@ -10,13 +10,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer_matrix::arithmetic::mul::multi_mod::primes_above;
 use crate::natural::Natural;
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::num::modular::traits::{
     ModAddAssign, ModInverse, ModMulPrecomputed, ModPowPrecomputed, ModSquare, ModSubAssign,
 };
@@ -216,15 +216,7 @@ fn bell_number_multi_mod(n: u64) -> Natural {
     let prime_bits = 61;
     let num_primes = usize::exact_from(size.div_ceil(prime_bits));
     let divtab = divisor_table(usize::exact_from(n) + 1);
-    let mut primes = Vec::with_capacity(num_primes);
-    let mut p = 1u64 << prime_bits;
-    for _ in 0..num_primes {
-        p += 1;
-        while !p.is_prime() {
-            p += 1;
-        }
-        primes.push(p);
-    }
+    let primes = primes_above(1u64 << prime_bits, num_primes);
     let residues: Vec<Natural> = primes
         .iter()
         .map(|&p| Natural::from(bell_number_mod(n, p, &divtab)))
@@ -341,15 +333,7 @@ crate_test_fn! {bell_numbers_prefix_multi_mod(len: usize) -> Vec<Natural> {
     let size = bell_number_size(u64::exact_from(len)) + 1;
     let prime_bits = 61;
     let num_primes = usize::exact_from(size.div_ceil(prime_bits));
-    let mut primes = Vec::with_capacity(num_primes);
-    let mut p = 1u64 << prime_bits;
-    for _ in 0..num_primes {
-        p += 1;
-        while !p.is_prime() {
-            p += 1;
-        }
-        primes.push(p);
-    }
+    let primes = primes_above(1u64 << prime_bits, num_primes);
     let residue_vecs: Vec<Vec<u64>> = primes.iter().map(|&p| bell_numbers_mod(len, p)).collect();
     let moduli: Vec<Natural> = primes.iter().map(|&p| Natural::from(p)).collect();
     (0..len)

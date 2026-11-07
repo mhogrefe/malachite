@@ -11,6 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::integer_matrix::arithmetic::mul::multi_mod::primes_above;
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::modular::crt_comb::CrtComb;
 use crate::natural::number_theory::bell_number::divisor_table;
@@ -23,7 +24,6 @@ use malachite_base::num::arithmetic::traits::{DivExact, Parity, Pow, PowerOf2, S
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::num::modular::traits::{
     ModInverse, ModMulPrecomputed, ModMulPrecomputedAssign, ModNegAssign, ModPowPrecomputed,
 };
@@ -61,8 +61,11 @@ fn stirling_2_bound_2exp_vec(bound: &mut [i64], n: u64, len: usize) -> i64 {
 }
 
 // The largest n for which every S(n, k) fits in one word, and in two.
-const MAX_N_1LIMB: usize = 26;
-const MAX_N_2LIMB: usize = 43;
+pub(crate) const MAX_N_1LIMB: usize = 26;
+pub(crate) const MAX_N_2LIMB: usize = 43;
+
+// The bit size of the primes used by the multimodular algorithms.
+pub(crate) const PRIME_BITS: i64 = WIDTH_MINUS_1 as i64;
 
 // Advances c from row `from` of the triangle to row n: afterwards c[k] = S(n, k) for k < klen.
 fn triangular_step<T: PrimitiveUnsigned>(c: &mut [T], from: usize, n: usize, klen: usize) {
@@ -80,7 +83,7 @@ fn triangular_step<T: PrimitiveUnsigned>(c: &mut [T], from: usize, n: usize, kle
 // 3.
 //
 // This is `triangular_1` from `arith/stirling2.c`, FLINT 3.6.0.
-fn triangular_1(c: &mut [u64], n: usize, klen: usize) {
+pub(crate) fn triangular_1(c: &mut [u64], n: usize, klen: usize) {
     c[..4].copy_from_slice(&[0, 1, 3, 1]);
     triangular_step(c, 3, n, klen);
 }
@@ -90,7 +93,7 @@ fn triangular_1(c: &mut [u64], n: usize, klen: usize) {
 //
 // This is `triangular_2` from `arith/stirling2.c`, FLINT 3.6.0, with a `u128` for each pair of
 // words.
-fn triangular_2(c: &mut [u128], n: usize, klen: usize) {
+pub(crate) fn triangular_2(c: &mut [u128], n: usize, klen: usize) {
     let mut c1 = [0u64; MAX_N_2LIMB + 1];
     triangular_1(&mut c1, MAX_N_1LIMB, klen);
     for (x, &y) in c.iter_mut().zip(&c1[..=MAX_N_1LIMB.min(klen - 1)]) {
@@ -276,18 +279,9 @@ crate_test_fn! {stirling_2_vec_multi_mod(res: &mut [Natural], n: u64, mut klen: 
         bounds[k] = bounds[k].max(bounds[k + 1]);
     }
     let resolution = (un >> 4).clamp(1, CRT_MAX_RESOLUTION);
-    let prime_bits = const { WIDTH_MINUS_1 as i64 };
-    let num_primes = usize::exact_from((need_bits + prime_bits - 1) / prime_bits);
+    let num_primes = usize::exact_from((need_bits + PRIME_BITS - 1) / PRIME_BITS);
     let divtab = divisor_table(len);
-    let mut primes = Vec::with_capacity(num_primes);
-    let mut p = Limb::power_of_2(WIDTH_MINUS_1);
-    for _ in 0..num_primes {
-        p += 1;
-        while !p.is_prime() {
-            p += 1;
-        }
-        primes.push(p);
-    }
+    let primes = primes_above(Limb::power_of_2(WIDTH_MINUS_1), num_primes);
     // levels[i] = (the number of primes of level i, the number of coefficients it needs)
     let mut levels = vec![(0, 0); resolution];
     // combs[comb_index[i]] combines the residues of level i; levels with the same number of primes
@@ -309,7 +303,7 @@ crate_test_fn! {stirling_2_vec_multi_mod(res: &mut [Natural], n: u64, mut klen: 
         levels[i].1 = len;
         if i > 0 {
             while levels[i].1 > 0
-                && bounds[levels[i].1 - 1] < prime_bits * i64::exact_from(levels[i - 1].0)
+                && bounds[levels[i].1 - 1] < PRIME_BITS * i64::exact_from(levels[i - 1].0)
             {
                 levels[i].1 -= 1;
             }
@@ -329,7 +323,7 @@ crate_test_fn! {stirling_2_vec_multi_mod(res: &mut [Natural], n: u64, mut klen: 
     let mut residues = vec![0; num_primes];
     for k in 0..len {
         let mut i = 0;
-        while i + 1 < resolution && bounds[k] >= i64::exact_from(levels[i].0) * prime_bits {
+        while i + 1 < resolution && bounds[k] >= i64::exact_from(levels[i].0) * PRIME_BITS {
             i += 1;
         }
         // Use only as large a comb as needed

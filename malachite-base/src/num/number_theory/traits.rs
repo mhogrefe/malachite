@@ -50,6 +50,18 @@ pub trait CheckedBellNumber: Sized {
     fn checked_bell_number(n: u64) -> Option<Self>;
 }
 
+/// Computes the Stirling number of the second kind $S(n, k)$: the number of ways to partition a set
+/// of $n$ elements into $k$ nonempty subsets.
+pub trait StirlingNumberOfTheSecondKind {
+    fn stirling_number_of_the_second_kind(n: u64, k: u64) -> Self;
+}
+
+/// Computes the Stirling number of the second kind $S(n, k)$, returning `None` if the result is too
+/// large to be represented.
+pub trait CheckedStirlingNumberOfTheSecondKind: Sized {
+    fn checked_stirling_number_of_the_second_kind(n: u64, k: u64) -> Option<Self>;
+}
+
 /// Computes the factorial of a `u64`.
 pub trait Factorial {
     fn factorial(n: u64) -> Self;

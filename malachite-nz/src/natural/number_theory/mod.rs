@@ -57,3 +57,7 @@ pub mod primorial;
 /// [`RisingFactorial`](malachite_base::num::number_theory::traits::RisingFactorial), a trait for
 /// computing the rising factorial of a number.
 pub mod rising_factorial;
+/// An implementation of [`StirlingNumberOfTheSecondKind`](
+/// malachite_base::num::number_theory::traits::StirlingNumberOfTheSecondKind), a trait for
+/// computing Stirling numbers of the second kind.
+pub mod stirling_number_of_the_second_kind;

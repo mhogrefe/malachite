@@ -11821,3 +11821,10 @@ pub fn random_unsigned_polynomial_vec_unsigned_polynomial_pair_unsigned_quadrupl
         }),
     )
 }
+
+pub fn random_unsigned_pair_gen_var_54<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(u64, u64)> {
+    Box::new(
+        random_unsigned_pair_gen_var_17::<u64, u64>(config)
+            .filter(|&(n, k)| T::checked_stirling_number_of_the_second_kind(n, k).is_some()),
+    )
+}

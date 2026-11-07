@@ -944,6 +944,14 @@ documented by git history.
   and a multimodular computation with the Chinese remainder theorem), with thresholds measured for
   Malachite, which keep the recurrence for longer rows than FLINT does. A new oracle-test mode,
   `arith_stirling_number_2_vec`, checks them against FLINT.
+- Single Stirling numbers of the second kind. New `StirlingNumberOfTheSecondKind` and
+  `CheckedStirlingNumberOfTheSecondKind` traits in malachite-base are implemented for the primitive
+  unsigned types, and `StirlingNumberOfTheSecondKind` for `Natural`, like FLINT's
+  `arith_stirling_number_2`. `Natural` uses FLINT's closed forms, word-sized recurrences, and
+  dispatch among an alternating power sum, the exponential generating function, and a multimodular
+  computation; the primitive versions use closed forms and a recurrence over the band of the
+  triangle that the result depends on, which stops at the first overflow. A new oracle-test mode,
+  `arith_stirling_number_2`, checks `Natural`'s against FLINT.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

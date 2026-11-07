@@ -31,7 +31,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::num::exponential::traits::{CeilingLogBase2, FloorLogBase2};
-use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits};
+use malachite_base::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
 use malachite_base::num::modular::traits::{DivisibleByPowerOf2, ModInverse, ModPow};
 
 // The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride
@@ -1827,7 +1827,7 @@ fn radix_4_moth_inv_trunc_block_3_3_1(
     gap: usize,
 ) {
     split_into_chunks_mut!(xs, gap, [xs0, xs1, xs2], xs3);
-    let j_mr = usize::power_of_2(j_bits) - 1 - j;
+    let j_mr = usize::low_mask(j_bits) - j;
     let n = f64x8::splat(q.p);
     let ninv = f64x8::splat(q.pinv);
     let j_bits = usize::exact_from(j_bits);
@@ -1886,7 +1886,7 @@ fn radix_4_moth_inv_trunc_block_3_3_0(
     gap: usize,
 ) {
     split_into_chunks_mut!(xs, gap, [xs0, xs1], xs2);
-    let j_mr = usize::power_of_2(j_bits) - 1 - j;
+    let j_mr = usize::low_mask(j_bits) - j;
     let n = f64x8::splat(q.p);
     let ninv = f64x8::splat(q.pinv);
     let j_bits = usize::exact_from(j_bits);
@@ -2048,7 +2048,7 @@ fn radix_4_moth_inv_trunc_block_2_2_1(
     gap: usize,
 ) {
     split_into_chunks_mut!(xs, gap, [xs0, xs1], xs2);
-    let j_mr = usize::power_of_2(j_bits) - 1 - j;
+    let j_mr = usize::low_mask(j_bits) - j;
     let n = f64x8::splat(q.p);
     let ninv = f64x8::splat(q.pinv);
     let j_bits = usize::exact_from(j_bits);
@@ -2093,7 +2093,7 @@ fn radix_4_moth_inv_trunc_block_2_2_0(
 ) {
     fail_on_untested_path("radix_4_moth_inv_trunc_block_2_2_0");
     let (xs0, xs1) = xs.split_at_mut(gap);
-    let j_mr = usize::power_of_2(j_bits) - 1 - j;
+    let j_mr = usize::low_mask(j_bits) - j;
     let n = f64x8::splat(q.p);
     let ninv = f64x8::splat(q.pinv);
     let j_bits = usize::exact_from(j_bits);

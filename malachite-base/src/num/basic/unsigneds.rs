@@ -44,9 +44,10 @@ use crate::num::modular::traits::{
 };
 use crate::num::number_theory::traits::{
     BellNumber, CheckedBellNumber, CheckedDoubleFactorial, CheckedFactorial, CheckedFibonacci,
-    CheckedLcm, CheckedLucasNumber, CheckedMultifactorial, CheckedPrimorial, CheckedSubfactorial,
-    CoprimeWith, DoubleFactorial, ExtendedGcd, Factorial, Fibonacci, Gcd, GcdAssign, Lcm,
-    LcmAssign, LucasNumber, Multifactorial, Primorial, Subfactorial,
+    CheckedLcm, CheckedLucasNumber, CheckedMultifactorial, CheckedPrimorial,
+    CheckedStirlingNumberOfTheSecondKind, CheckedSubfactorial, CoprimeWith, DoubleFactorial,
+    ExtendedGcd, Factorial, Fibonacci, Gcd, GcdAssign, Lcm, LcmAssign, LucasNumber, Multifactorial,
+    Primorial, StirlingNumberOfTheSecondKind, Subfactorial,
 };
 
 /// Defines functions on primitive unsigned integer types: uxx and usize.
@@ -69,6 +70,7 @@ pub trait PrimitiveUnsigned:
     + CheckedMultifactorial
     + CheckedLucasNumber
     + CheckedPrimorial
+    + CheckedStirlingNumberOfTheSecondKind
     + CheckedSubfactorial
     + CheckedLcm<Self, Output = Self>
     + CheckedLogBase<Output = u64>
@@ -231,6 +233,7 @@ pub trait PrimitiveUnsigned:
     + SciMantissaAndExponent<f64, u64>
     + SqrtRem<SqrtOutput = Self, RemOutput = Self>
     + SqrtAssignRem<RemOutput = Self>
+    + StirlingNumberOfTheSecondKind
     + Subfactorial
     + VecFromOtherType<u8>
     + VecFromOtherType<u16>

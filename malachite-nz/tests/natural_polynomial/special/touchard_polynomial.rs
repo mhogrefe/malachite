@@ -6,8 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{BinomialCoefficient, PowerOf2};
+use malachite_base::num::arithmetic::traits::BinomialCoefficient;
 use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::logic::traits::LowMask;
 use malachite_base::num::number_theory::traits::BellNumber;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{Evaluate, MulPowerOfX};
@@ -240,7 +241,7 @@ fn touchard_polynomial_properties() {
             );
         }
         if n >= 2 {
-            assert_eq!(*p.coefficient(2), Natural::power_of_2(n - 1) - Natural::ONE);
+            assert_eq!(*p.coefficient(2), Natural::low_mask(n - 1));
         }
         // T_(n + 1)(x) = x(T_n(x) + T_n'(x)).
         assert_eq!(

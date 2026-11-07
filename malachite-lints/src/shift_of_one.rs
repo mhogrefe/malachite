@@ -22,14 +22,15 @@ declare_lint! {
     /// the same thing more clearly:
     ///
     /// - `(1 << n) - 1` builds a mask of the low `n` bits — use `T::low_mask(n)`.
+    /// - `T::power_of_2(n) - 1` is the same mask — use `T::low_mask(n)`.
     /// - `x & (1 << n) != 0` / `== 0` tests bit `n` — use `x.get_bit(n)` / `!x.get_bit(n)`.
     /// - any other `1 << n` is the value two-to-the-`n` — use `T::power_of_2(n)`.
     ///
     /// `T` may be a primitive integer or one of the Malachite bignum types with a `PowerOf2`
     /// implementation (`Natural`, `Integer`, `Rational`, and `GaussianInteger`); the mask and bit
     /// forms are suggested only where `LowMask` and `BitAccess` exist (the primitives, `Natural`,
-    /// and `Integer`). The bodies of `power_of_2` functions themselves, which define the operation
-    /// as a shift, are exempt.
+    /// and `Integer`). The bodies of `power_of_2` and `low_mask` functions themselves, which define
+    /// those operations this way, are exempt.
     ///
     /// ### Why is this bad?
     ///
@@ -48,6 +49,7 @@ declare_lint! {
     ///
     /// ```rust,ignore
     /// let mask = (Limb::ONE << k) - 1;
+    /// let other_mask = Limb::power_of_2(k) - 1;
     /// let set = x & (Limb::ONE << k) != 0;
     /// let p = Limb::ONE << k;
     /// let q = Integer::ONE << k;
@@ -57,13 +59,14 @@ declare_lint! {
     ///
     /// ```rust,ignore
     /// let mask = Limb::low_mask(k);
+    /// let other_mask = Limb::low_mask(k);
     /// let set = x.get_bit(k);
     /// let p = Limb::power_of_2(k);
     /// let q = Integer::power_of_2(k);
     /// ```
     pub SHIFT_OF_ONE,
     Deny,
-    "`1 << n` bit tricks instead of `low_mask`, `get_bit`, or `power_of_2`"
+    "`1 << n` bit tricks, or `power_of_2(n) - 1`, instead of `low_mask`, `get_bit`, or `power_of_2`"
 }
 
 declare_lint_pass!(ShiftOfOne => [SHIFT_OF_ONE]);
@@ -105,13 +108,36 @@ fn shift_target<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> Option<bool> {
     }
 }
 
-// Whether `e` is inside a function named `power_of_2`: the `PowerOf2` implementations define the
-// operation as a shift, and must not be told to call themselves.
-fn in_power_of_2_fn(cx: &LateContext<'_>, e: &Expr<'_>) -> bool {
+// Whether `e` is inside a function named `name`: the `PowerOf2` and `LowMask` implementations define
+// those operations as a shift and as a power of two minus one, and must not be told to call
+// themselves.
+fn in_fn_named(cx: &LateContext<'_>, e: &Expr<'_>, name: &str) -> bool {
     let owner = cx.tcx.hir_enclosing_body_owner(e.hir_id);
     cx.tcx
         .opt_item_name(owner.to_def_id())
-        .is_some_and(|name| name.as_str() == "power_of_2")
+        .is_some_and(|n| n.as_str() == name)
+}
+
+// If `e` is a call `<path>::power_of_2(<n>)` whose type has `LowMask` (see `shift_target`), returns
+// the path prefix to name in a `low_mask` suggestion, and `<n>`.
+fn power_of_2_call<'tcx>(
+    cx: &LateContext<'tcx>,
+    e: &'tcx Expr<'tcx>,
+) -> Option<(String, &'tcx Expr<'tcx>)> {
+    let ExprKind::Call(func, [n]) = e.kind else {
+        return None;
+    };
+    let ExprKind::Path(ref qpath) = func.kind else {
+        return None;
+    };
+    if crate::qpath_last_segment_name(qpath) != Some("power_of_2")
+        || shift_target(cx, cx.typeck_results().expr_ty(e)) != Some(true)
+    {
+        return None;
+    }
+    let path = snippet(cx, func.span, "");
+    let prefix = path.strip_suffix("::power_of_2")?.to_string();
+    Some((prefix, n))
 }
 
 // If `e` is `<one> << <n>` (`<one>` being the literal 1 or a `T::ONE` constant) with a primitive
@@ -135,7 +161,7 @@ fn shift_of_one<'tcx>(
     if !crate::is_int_const(cx, lhs, 1, "ONE")
         || is_const_amount(cx, rhs)
         || crate::in_const_context(cx, e)
-        || in_power_of_2_fn(cx, e)
+        || in_fn_named(cx, e, "power_of_2")
     {
         return None;
     }
@@ -213,6 +239,27 @@ impl<'tcx> LateLintPass<'tcx> for ShiftOfOne {
                 format!(
                     "use `{}::low_mask({})`",
                     int_type_name(cx, one, lhs),
+                    snippet(cx, n.span, "..")
+                ),
+            );
+            return;
+        }
+
+        // (d) `T::power_of_2(<n>) - 1` -> `T::low_mask(<n>)`.
+        if let ExprKind::Binary(op, lhs, rhs) = expr.kind
+            && op.node == BinOpKind::Sub
+            && crate::is_int_const(cx, rhs, 1, "ONE")
+            && let Some((prefix, n)) = power_of_2_call(cx, lhs)
+            && !in_fn_named(cx, expr, "low_mask")
+        {
+            span_lint_and_help(
+                cx,
+                SHIFT_OF_ONE,
+                expr.span,
+                "`power_of_2(n) - 1` builds a mask of the low `n` bits",
+                None,
+                format!(
+                    "use `{prefix}::low_mask({})`",
                     snippet(cx, n.span, "..")
                 ),
             );

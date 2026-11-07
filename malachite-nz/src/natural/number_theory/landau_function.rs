@@ -10,12 +10,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::integer_matrix::arithmetic::mul::multi_mod::next_prime;
 use crate::natural::Natural;
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::factorization::traits::IsPrime;
 
 /// Computes the first `len` values of Landau's function: $g(0)$ through $g(\mathrm{len} - 1)$,
 /// where $g(n)$ is the largest order of a permutation of $n$ elements, or equivalently the largest
@@ -73,10 +73,7 @@ pub fn landau_function_prefix(len: u64) -> Vec<Natural> {
                 }
             }
         }
-        p += 1;
-        while !p.is_prime() {
-            p += 1;
-        }
+        p = next_prime(p);
     }
     res
 }

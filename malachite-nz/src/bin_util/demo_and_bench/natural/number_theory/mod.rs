@@ -21,6 +21,7 @@ pub(crate) fn register(runner: &mut Runner) {
     lcm::register(runner);
     primorial::register(runner);
     rising_factorial::register(runner);
+    stirling_number_of_the_second_kind::register(runner);
 }
 
 mod bell_number;
@@ -35,3 +36,4 @@ mod landau_function;
 mod lcm;
 mod primorial;
 mod rising_factorial;
+mod stirling_number_of_the_second_kind;
