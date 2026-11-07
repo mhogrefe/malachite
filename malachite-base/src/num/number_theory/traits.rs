@@ -50,6 +50,18 @@ pub trait CheckedBellNumber: Sized {
     fn checked_bell_number(n: u64) -> Option<Self>;
 }
 
+/// Computes the unsigned Stirling number of the first kind $\left[{n \atop k}\right]$: the number
+/// of permutations of $n$ elements with $k$ cycles.
+pub trait UnsignedStirlingNumberOfTheFirstKind {
+    fn unsigned_stirling_number_of_the_first_kind(n: u64, k: u64) -> Self;
+}
+
+/// Computes the unsigned Stirling number of the first kind $\left[{n \atop k}\right]$, returning
+/// `None` if the result is too large to be represented.
+pub trait CheckedUnsignedStirlingNumberOfTheFirstKind: Sized {
+    fn checked_unsigned_stirling_number_of_the_first_kind(n: u64, k: u64) -> Option<Self>;
+}
+
 /// Computes the Stirling number of the second kind $S(n, k)$: the number of ways to partition a set
 /// of $n$ elements into $k$ nonempty subsets.
 pub trait StirlingNumberOfTheSecondKind {

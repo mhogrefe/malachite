@@ -19,19 +19,22 @@ use malachite_base::test_util::generators::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::number_theory::stirling_number_of_the_second_kind::{
-    stirling_2_by_egf, stirling_2_by_multi_mod, stirling_2_by_powsum,
+    stirling_2_by_multi_mod, stirling_2_by_powsum, stirling_2_by_small_difference,
 };
 use malachite_nz::natural_polynomial::NaturalPolynomial;
 
-// Checks S(n, k) against the default dispatch and, when 2 <= k <= n - 2, against each of the three
-// general algorithms.
+// Checks S(n, k) against the default dispatch; when 2 <= k <= n - 2 and n <= 10000, against the
+// power sum and the multimodular computation; and, when 1 <= n - k <= 300, against the second-order
+// Eulerian numbers.
 fn verify(n: u64, k: u64) -> Natural {
     let s = Natural::stirling_number_of_the_second_kind(n, k);
     assert!(s.is_valid());
-    if k >= 2 && n >= 2 && k <= n - 2 {
+    if k >= 2 && n >= 2 && k <= n - 2 && n <= 10000 {
         assert_eq!(stirling_2_by_powsum(n, k), s);
-        assert_eq!(stirling_2_by_egf(n, k), s);
         assert_eq!(stirling_2_by_multi_mod(n, k), s);
+    }
+    if k >= 1 && k < n && n - k <= 300 {
+        assert_eq!(stirling_2_by_small_difference(n, k), s);
     }
     s
 }
@@ -69,45 +72,35 @@ fn test_stirling_number_of_the_second_kind() {
     test(27, 13, "29206898819153109600");
     test(43, 21, "517331687359579810443886364399481286");
     test(43, 41, "382571");
-    // - 43 < n < 200: the power sum when k <= 0.9n, including k = 0.9n exactly
-    test(44, 3, "164128474901175516606");
+    // - n > 43 and n - k <= 1.4n^(2/3): the second-order Eulerian numbers, including the edge of
+    //   the range at n = 100
     test(44, 39, "3327037093380");
+    test(44, 40, "22810647783");
+    test(44, 42, "420497");
     test(
         100,
-        50,
-        "430983237009366340421514301547258695943520289614340613912441741131280319058853783145598261\
-        659992013900",
+        70,
+        "3854780456384571708670924253144698954834479464589039847762751042647666800",
     );
     test(100, 90, "692829506156717558646880139550");
+    test(100, 91, "1807667046447663759097479740");
     test(
         199,
         179,
         "2223812842617126351423145443474821076696412053331578777012003405258",
     );
-    // - 43 < n < 200: the exponential generating function when k > 0.9n
-    test(44, 40, "22810647783");
-    test(44, 42, "420497");
-    test(100, 91, "1807667046447663759097479740");
     test(
         199,
         180,
         "2962489312062730172038282351031162364558010185240697850169160500",
     );
     test(199, 197, "191467452");
-    // - n >= 200: the power sum below the low cutoff (0.8n at n = 200)
-    test(
-        200,
-        3,
-        "442689981459791282231302203392966036680698866460706115581147807859341138891155336076676988\
-        56646",
-    );
     test(
         200,
         160,
         "123021820054213140368587083275260707681718981483945239147131474350081670678478464381419873\
         328027773599645565088723381658",
     );
-    // - n >= 200: multi-mod between the cutoffs (161 through 189 at n = 200)
     test(
         200,
         161,
@@ -115,9 +108,58 @@ fn test_stirling_number_of_the_second_kind() {
         871262221503491373209078365",
     );
     test(200, 189, "2289727105691680085214347215800042258000");
-    // - n >= 200: the exponential generating function above the high cutoff
     test(200, 190, "1452971373681263576920687191333103600");
     test(200, 198, "195368250");
+    test(
+        5000,
+        4968,
+        "365569727530899823892320491284263838046913453011242899363185580939322432861579999595471592\
+        950501110343188636834761029623240903623090244184115618462932746363726878133639241273246402\
+        421683264750",
+    );
+    test(
+        u64::MAX,
+        u64::MAX - 2,
+        "14474011154664524421146179579417084321985095863088265868262062449909771010050",
+    );
+    test(
+        u64::MAX,
+        u64::MAX - 3,
+        "820875129091551649499317926864336300373167598048938657951148428125284112177258814021260843\
+        469246634348786445451270",
+    );
+    test(
+        u64::MAX - 1,
+        u64::MAX - 4,
+        "820875129091551649232319547374222540315023404022153384005534645309543241839056342884501142\
+        458994728626759627964466",
+    );
+    test(
+        1000000000000000000,
+        999999999999999995,
+        "260416666666666658420138888888889002604166666666665772395833333333337741927083333333319248\
+        697916666666695713541666666666629570486111111111137541666666666666658750000000000000000",
+    );
+    // - n > 43, n - k > 1.4n^(2/3), and k at most the low cutoff (0.9n below n = 200): the power
+    //   sum
+    test(44, 3, "164128474901175516606");
+    test(
+        100,
+        50,
+        "430983237009366340421514301547258695943520289614340613912441741131280319058853783145598261\
+        659992013900",
+    );
+    test(
+        100,
+        69,
+        "225190644950877101514772492660618497248676334052039508594771842560549774500",
+    );
+    test(
+        200,
+        3,
+        "442689981459791282231302203392966036680698866460706115581147807859341138891155336076676988\
+        56646",
+    );
     // - extreme arguments with closed forms
     test(u64::MAX, u64::MAX, "1");
     test(u64::MAX, 1, "1");
@@ -138,15 +180,15 @@ fn test_stirling_number_of_the_second_kind() {
 fn test_stirling_number_of_the_second_kind_large() {
     // the values here run to thousands of digits, so they are checked against the coefficients of
     // the Touchard polynomial, which are computed by different algorithms. Only the dispatched
-    // algorithm runs: the exponential generating function, for example, would form (n - k + 1)!^k,
-    // which is far too large away from k close to n
+    // algorithm runs, since each of the others is far slower somewhere in this range
     let test = |n, k| {
         assert_eq!(
             Natural::stirling_number_of_the_second_kind(n, k),
             *NaturalPolynomial::touchard_polynomial_truncated(n, k + 1).coefficient(k)
         );
     };
-    // - 200 <= n < 3000: the power sum, multi-mod, and the exponential generating function
+    // - 200 <= n < 3000: the power sum, the multimodular computation (between the low cutoff and n
+    //   - 1.4n^(2/3)), and the second-order Eulerian numbers
     test(1000, 500);
     test(1000, 800);
     test(1000, 990);

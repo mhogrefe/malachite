@@ -621,5 +621,57 @@ pub mod rising_factorial;
 /// );
 /// ```
 pub mod stirling_number_of_the_second_kind;
-/// Various traits for number-theoretic functions.
 pub mod traits;
+/// Various traits for number-theoretic functions.
+/// [`UnsignedStirlingNumberOfTheFirstKind`](traits::UnsignedStirlingNumberOfTheFirstKind) and
+/// [`CheckedUnsignedStirlingNumberOfTheFirstKind`](
+/// traits::CheckedUnsignedStirlingNumberOfTheFirstKind),
+/// traits for computing unsigned Stirling numbers of the first kind. The first panics if the result
+/// cannot be represented; the second returns `None` in that case.
+///
+/// # unsigned_stirling_number_of_the_first_kind
+/// ```
+/// use malachite_base::num::number_theory::traits::UnsignedStirlingNumberOfTheFirstKind;
+///
+/// assert_eq!(u8::unsigned_stirling_number_of_the_first_kind(0, 0), 1);
+/// assert_eq!(u8::unsigned_stirling_number_of_the_first_kind(5, 0), 0);
+/// assert_eq!(u8::unsigned_stirling_number_of_the_first_kind(3, 5), 0);
+/// assert_eq!(u8::unsigned_stirling_number_of_the_first_kind(5, 1), 24);
+/// assert_eq!(u8::unsigned_stirling_number_of_the_first_kind(5, 2), 50);
+/// assert_eq!(u8::unsigned_stirling_number_of_the_first_kind(6, 3), 225);
+/// assert_eq!(
+///     u32::unsigned_stirling_number_of_the_first_kind(10, 5),
+///     269325
+/// );
+/// assert_eq!(
+///     u64::unsigned_stirling_number_of_the_first_kind(21, 1),
+///     2432902008176640000
+/// );
+/// ```
+///
+/// # checked_unsigned_stirling_number_of_the_first_kind
+/// ```
+/// use malachite_base::num::number_theory::traits::CheckedUnsignedStirlingNumberOfTheFirstKind;
+///
+/// assert_eq!(
+///     u8::checked_unsigned_stirling_number_of_the_first_kind(6, 3),
+///     Some(225)
+/// );
+/// assert_eq!(
+///     u8::checked_unsigned_stirling_number_of_the_first_kind(7, 3),
+///     None
+/// );
+/// assert_eq!(
+///     u32::checked_unsigned_stirling_number_of_the_first_kind(13, 6),
+///     Some(206070150)
+/// );
+/// assert_eq!(
+///     u32::checked_unsigned_stirling_number_of_the_first_kind(16, 8),
+///     None
+/// );
+/// assert_eq!(
+///     u64::checked_unsigned_stirling_number_of_the_first_kind(22, 1),
+///     None
+/// );
+/// ```
+pub mod unsigned_stirling_number_of_the_first_kind;

@@ -13,8 +13,10 @@
 use crate::integer::Integer;
 use crate::integer_matrix::arithmetic::mul::multi_mod::primes_above;
 use crate::natural::number_theory::bell_number::divisor_table;
+use crate::natural::number_theory::unsigned_stirling_number_of_the_first_kind::{
+    second_order_eulerian_numbers, weighted_binomial_sum,
+};
 use crate::natural::{Natural, WIDTH_MINUS_1};
-use crate::natural_polynomial::NaturalPolynomial;
 use crate::natural_polynomial::special::touchard_polynomial::{
     MAX_N_1LIMB, MAX_N_2LIMB, PRIME_BITS, triangular_1, triangular_2,
 };
@@ -29,11 +31,7 @@ use malachite_base::num::modular::traits::{
     ModAdd, ModAddAssign, ModInverse, ModMulPrecomputed, ModMulPrecomputedAssign, ModNegAssign,
     ModPowPrecomputed, ModSquarePrecomputed, ModSubAssign,
 };
-use malachite_base::num::number_theory::traits::{
-    Factorial, RisingFactorial, StirlingNumberOfTheSecondKind,
-};
-use malachite_base::polynomial::Polynomial;
-use malachite_base::polynomial::series::traits::PowTruncated;
+use malachite_base::num::number_theory::traits::{Factorial, StirlingNumberOfTheSecondKind};
 
 // An upper bound for the binary logarithm of S(n, k), which is bounded by (1/2) binomial(n, k) k^(n
 // - k).
@@ -52,26 +50,6 @@ fn stirling_2_bound_2exp(n: u64, k: u64) -> i64 {
     // (1/2) * binomial(n,k) * k^(n-k); add instead of subtract 1 to ensure an upper bound in
     // floating point
     bnk_exp + ((n - k) as f64 * libm::log(k as f64) * core::f64::consts::LOG2_E) as i64 + 1
-}
-
-// S(n, k) = n!/k! [x^(n - k)] ((e^x - 1)/x)^k, with the series kept as integer coefficients over
-// the common denominator len!, where len = n - k + 1. k must satisfy 0 < k < n.
-//
-// This is `stirling_2_egf` from `arith/stirling2.c`, FLINT 3.6.0, except that the power of the
-// series is computed with integer coefficients and the denominator (len!)^k, without reducing the
-// fraction, since `malachite-nz` has no rational polynomials.
-fn stirling_2_egf(n: u64, k: u64) -> Natural {
-    let len = usize::exact_from(n - k + 1);
-    // num[i] / den = 1/(i + 1)!, with den = len!
-    let mut num = vec![Natural::ZERO; len];
-    num[len - 1] = Natural::ONE;
-    for i in (0..len - 1).rev() {
-        num[i] = &num[i + 1] * Natural::from(i + 2);
-    }
-    let den = num[0].clone();
-    let power = NaturalPolynomial::from_coefficients_asc(num).pow_truncated(k, n - k + 1);
-    let coefficient = power.coefficient(n - k).clone();
-    (Natural::from(k + 1).rising_factorial(n - k) * coefficient).div_exact(den.pow(k))
 }
 
 // S(n, k) = (1/k!) sum_{j odd} sum_{m = 2^p j <= k} (-1)^(k + m) C(k, m) j^n 2^(pn), grouping the
@@ -192,7 +170,19 @@ fn stirling_2_multi_mod(n: u64, k: u64) -> Natural {
     Natural::multi_crt(&moduli, &residues).unwrap()
 }
 
-// This is `arith_stirling_number_2` from `arith/stirling2.c`, FLINT 3.6.0.
+// S(n, n - d) = sum_{j < d} <<d, j>> C(n + d - 1 - j, 2d), for 0 < d < n.
+fn stirling_2_small_difference(n: u64, d: u64) -> Natural {
+    let mut weights = second_order_eulerian_numbers(d);
+    weights.reverse();
+    weighted_binomial_sum(n, &weights)
+}
+
+// This is `arith_stirling_number_2` from `arith/stirling2.c`, FLINT 3.6.0, except that the
+// exponential generating function is replaced by the second-order Eulerian numbers. Their cost,
+// about (n - k)^3 log(n - k), does not grow with n otherwise, and, measured in Malachite, they beat
+// the power sum and the multimodular computation when n - k <= 1.4n^(2/3), which keeps their cost
+// within O(n^2 log n). The exponential generating function was slower than the multimodular
+// computation everywhere it was measured, so the multimodular computation takes its place.
 crate_test_fn! {stirling_number_of_the_second_kind(n: u64, k: u64) -> Natural {
     if k >= n {
         Natural::from(u32::from(n == k))
@@ -217,35 +207,30 @@ crate_test_fn! {stirling_number_of_the_second_kind(n: u64, k: u64) -> Natural {
         let mut c = [0u128; MAX_N_2LIMB + 1];
         triangular_2(&mut c, usize::exact_from(n), usize::exact_from(k) + 1);
         Natural::from(c[usize::exact_from(k)])
+    } else if (n - k) as f64 <= 1.4 * libm::cbrt(n as f64 * n as f64) {
+        stirling_2_small_difference(n, n - k)
     } else {
-        let (low_cutoff, high_cutoff) = if n < 200 {
-            (0.9, 0.9)
+        let low_cutoff = if n < 200 {
+            0.9
+        } else if n < 3000 {
+            (0.95 * libm::exp(-0.00022 * n as f64)).clamp(0.0002, 0.8)
         } else {
-            let low_cutoff: f64 = if n < 3000 {
-                0.95 * libm::exp(-0.00022 * n as f64)
-            } else {
-                1500.0 / n as f64
-            };
-            let low_cutoff = low_cutoff.clamp(0.0002, 0.8);
-            let high_cutoff = (0.92 + 0.005 * libm::log(n as f64)).min(0.98);
-            (low_cutoff, high_cutoff)
+            (1500.0 / n as f64).clamp(0.0002, 0.8)
         };
         if k as f64 <= low_cutoff * n as f64 {
             stirling_2_powsum(n, k)
-        } else if k as f64 >= high_cutoff * n as f64 {
-            stirling_2_egf(n, k)
         } else {
             stirling_2_multi_mod(n, k)
         }
     }
 }}
 
-crate_test_fn! {stirling_2_by_powsum(n: u64, k: u64) -> Natural {
-    stirling_2_powsum(n, k)
+crate_test_fn! {stirling_2_by_small_difference(n: u64, k: u64) -> Natural {
+    stirling_2_small_difference(n, n - k)
 }}
 
-crate_test_fn! {stirling_2_by_egf(n: u64, k: u64) -> Natural {
-    stirling_2_egf(n, k)
+crate_test_fn! {stirling_2_by_powsum(n: u64, k: u64) -> Natural {
+    stirling_2_powsum(n, k)
 }}
 
 crate_test_fn! {stirling_2_by_multi_mod(n: u64, k: u64) -> Natural {
@@ -257,15 +242,16 @@ impl StirlingNumberOfTheSecondKind for Natural {
     /// set of $n$ elements into $k$ nonempty subsets.
     ///
     /// Small cases have closed forms or come from the recurrence $S(n, k) = kS(n - 1, k) + S(n - 1,
-    /// k - 1)$ in fixed-width accumulators. Otherwise, depending on how $k$ compares with $n$, the
-    /// result comes from an alternating sum of powers $i^n$, from the exponential generating
-    /// function $((e^x - 1)/x)^k$, or from its residues modulo enough word-sized primes, recombined
-    /// by the Chinese remainder theorem.
+    /// k - 1)$ in fixed-width accumulators. When $n - k$ is small, the result is found from the
+    /// second-order Eulerian numbers, as $\sum_j \left\langle\!\left\langle {n - k \atop j}
+    /// \right\rangle\!\right\rangle \binom{n + (n - k) - 1 - j}{2(n - k)}$, in time that hardly
+    /// depends on $n$; otherwise it comes from an alternating sum of powers $i^n$ or from its
+    /// residues modulo enough word-sized primes, recombined by the Chinese remainder theorem.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^3 (\log n)^2)$
+    /// $T(n) = O(n^2 (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n^2 \log n)$
+    /// $M(n) = O(n^2)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
     ///
@@ -283,9 +269,14 @@ impl StirlingNumberOfTheSecondKind for Natural {
     ///     Natural::stirling_number_of_the_second_kind(42, 8).to_string(),
     ///     "2048320078742103108851269258081470"
     /// );
+    /// assert_eq!(
+    ///     Natural::stirling_number_of_the_second_kind(u64::MAX, u64::MAX - 2).to_string(),
+    ///     "14474011154664524421146179579417084321985095863088265868262062449909771010050"
+    /// );
     /// ```
     ///
-    /// This is equivalent to `arith_stirling_number_2` from `arith/stirling2.c`, FLINT 3.6.0.
+    /// This is equivalent to `arith_stirling_number_2` from `arith/stirling2.c`, FLINT 3.6.0,
+    /// except that the second-order Eulerian numbers replace its exponential generating function.
     #[inline]
     fn stirling_number_of_the_second_kind(n: u64, k: u64) -> Self {
         stirling_number_of_the_second_kind(n, k)

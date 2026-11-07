@@ -61,3 +61,7 @@ pub mod rising_factorial;
 /// malachite_base::num::number_theory::traits::StirlingNumberOfTheSecondKind), a trait for
 /// computing Stirling numbers of the second kind.
 pub mod stirling_number_of_the_second_kind;
+/// An implementation of [`UnsignedStirlingNumberOfTheFirstKind`](
+/// malachite_base::num::number_theory::traits::UnsignedStirlingNumberOfTheFirstKind), a trait for
+/// computing unsigned Stirling numbers of the first kind.
+pub mod unsigned_stirling_number_of_the_first_kind;

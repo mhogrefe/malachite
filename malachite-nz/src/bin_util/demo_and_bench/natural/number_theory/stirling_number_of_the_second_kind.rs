@@ -65,8 +65,8 @@ fn benchmark_natural_stirling_number_of_the_second_kind_algorithms(
             ("power sum", &mut |(n, k)| {
                 no_out!(stirling_2_by_powsum(n, k));
             }),
-            ("exponential generating function", &mut |(n, k)| {
-                no_out!(stirling_2_by_egf(n, k));
+            ("second-order Eulerian numbers", &mut |(n, k)| {
+                no_out!(stirling_2_by_small_difference(n, k));
             }),
             ("multi-mod", &mut |(n, k)| {
                 no_out!(stirling_2_by_multi_mod(n, k));

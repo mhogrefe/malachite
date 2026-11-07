@@ -51,6 +51,7 @@ static const oracle_mode modes[] = {
     {"arith_bell_number", run_arith_bell_number},
     {"arith_bell_number_vec", run_arith_bell_number_vec},
     {"arith_landau_function_vec", run_arith_landau_function_vec},
+    {"arith_stirling_number_1u", run_arith_stirling_number_1u},
     {"arith_stirling_number_1u_vec", run_arith_stirling_number_1u_vec},
     {"arith_stirling_number_2", run_arith_stirling_number_2},
     {"arith_stirling_number_2_vec", run_arith_stirling_number_2_vec},

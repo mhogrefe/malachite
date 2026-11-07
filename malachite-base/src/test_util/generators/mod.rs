@@ -2446,6 +2446,15 @@ pub fn unsigned_pair_gen_var_54<T: PrimitiveUnsigned>() -> Generator<(u64, u64)>
     )
 }
 
+// All `(u64, u64)` where both `u64`s are small and the unsigned Stirling number of the first kind
+// with them as arguments fits in a `T`.
+pub fn unsigned_pair_gen_var_55<T: PrimitiveUnsigned>() -> Generator<(u64, u64)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_55::<T>,
+        &random_unsigned_pair_gen_var_55::<T>,
+    )
+}
+
 // All pairs of unsigneds of the same type, where each value is greater than 1.
 pub fn unsigned_pair_gen_var_50<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     Generator::new(

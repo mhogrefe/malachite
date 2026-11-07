@@ -3344,6 +3344,12 @@ fn test_against_flint() {
         "demo_natural_stirling_number_of_the_second_kind",
         "arith_stirling_number_2",
     );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_unsigned_stirling_number_of_the_first_kind",
+        "arith_stirling_number_1u",
+    );
     check_demo_against_flint(
         &oracle,
         "../malachite-q",

@@ -947,10 +947,12 @@ documented by git history.
 - Single Stirling numbers of the second kind. New `StirlingNumberOfTheSecondKind` and
   `CheckedStirlingNumberOfTheSecondKind` traits in malachite-base are implemented for the primitive
   unsigned types, and `StirlingNumberOfTheSecondKind` for `Natural`, like FLINT's
-  `arith_stirling_number_2`. `Natural` uses FLINT's closed forms, word-sized recurrences, and
-  dispatch among an alternating power sum, the exponential generating function, and a multimodular
-  computation; the primitive versions use closed forms and a recurrence over the band of the
-  triangle that the result depends on, which stops at the first overflow. A new oracle-test mode,
+  `arith_stirling_number_2`. `Natural` uses FLINT's closed forms, word-sized recurrences, an
+  alternating power sum, and a multimodular computation; when $n - k$ is small, a sum over the
+  second-order Eulerian numbers, whose cost depends on $n - k$ alone, replaces FLINT's exponential
+  generating function, with cutoffs measured for Malachite. The primitive versions use closed forms
+  and a recurrence over the band of the triangle that the result depends on, which stops at the
+  first overflow. A new oracle-test mode,
   `arith_stirling_number_2`, checks `Natural`'s against FLINT.
 - Rising factorial polynomials $x(x + 1) \cdots (x + n - 1)$, whose coefficients are the unsigned
   Stirling numbers of the first kind. New `RisingFactorialPolynomial` and
@@ -959,6 +961,14 @@ documented by git history.
   row of the triangle. The product is found by FLINT's binary splitting, with groups of factors
   expanded in double words as well as single words. A new oracle-test mode,
   `arith_stirling_number_1u_vec`, checks them against FLINT.
+- Single unsigned Stirling numbers of the first kind. New `UnsignedStirlingNumberOfTheFirstKind`
+  and `CheckedUnsignedStirlingNumberOfTheFirstKind` traits in malachite-base are implemented for the
+  primitive unsigned types, and `UnsignedStirlingNumberOfTheFirstKind` for `Natural`, like FLINT's
+  `arith_stirling_number_1u`. `Natural` expands only the needed part of the rising factorial by
+  FLINT's binary splitting, and uses the second-order Eulerian numbers when $n - k$ is small, in
+  place of FLINT's exponential generating function; the primitive versions use closed forms and a
+  band recurrence, like the second kind. A new oracle-test mode, `arith_stirling_number_1u`, checks
+  `Natural`'s against FLINT.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

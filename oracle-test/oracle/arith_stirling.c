@@ -12,8 +12,8 @@
     against arith_stirling_number_2_vec, whose row of S(n, k) for k < len is the coefficients of
     the truncated Touchard polynomial; `rising_factorial_polynomial(n) = p` and
     `rising_factorial_polynomial_truncated(n, len) = p` lines against arith_stirling_number_1u_vec,
-    whose row is the coefficients of the truncated rising factorial polynomial; and `S(n, k) = s`
-    lines against arith_stirling_number_2.
+    whose row is the coefficients of the truncated rising factorial polynomial; `S(n, k) = s`
+    lines against arith_stirling_number_2; and `[n, k] = s` lines against arith_stirling_number_1u.
 */
 
 #include <stdlib.h>
@@ -120,25 +120,31 @@ run_arith_stirling_number_1u_vec(const char * arg)
     return for_each_line(arg, check_rising_factorial_line);
 }
 
+typedef void (*value_fn)(fmpz_t, ulong, ulong);
+
+/* Lines are `<open>n, k<close> = s`, such as `S(n, k) = s` or `[n, k] = s`. */
 static int
-check_stirling_2_line(char * line, int line_number)
+check_value_line(char * line, int line_number, const char * open, const char * close_str,
+                 value_fn value_function)
 {
     line[strcspn(line, "\n")] = '\0';
     char * comma;
     char * close;
-    if (strncmp(line, "S(", 2) != 0)
+    char suffix[16];
+    flint_sprintf(suffix, "%s = ", close_str);
+    if (strncmp(line, open, strlen(open)) != 0)
     {
         flint_printf("line %d: unreadable line\n", line_number);
         return 1;
     }
-    ulong n = strtoul(line + 2, &comma, 10);
+    ulong n = strtoul(line + strlen(open), &comma, 10);
     if (strncmp(comma, ", ", 2) != 0)
     {
         flint_printf("line %d: unreadable arguments\n", line_number);
         return 1;
     }
     ulong k = strtoul(comma + 2, &close, 10);
-    if (strncmp(close, ") = ", 4) != 0)
+    if (strncmp(close, suffix, strlen(suffix)) != 0)
     {
         flint_printf("line %d: unreadable line\n", line_number);
         return 1;
@@ -147,13 +153,13 @@ check_stirling_2_line(char * line, int line_number)
     fmpz_init(actual);
     fmpz_init(expected);
     int result = 1;
-    if (fmpz_set_str(actual, close + 4, 10) == 0)
+    if (fmpz_set_str(actual, close + strlen(suffix), 10) == 0)
     {
-        arith_stirling_number_2(expected, n, k);
+        value_function(expected, n, k);
         if (fmpz_equal(expected, actual))
             result = 0;
         else
-            flint_printf("line %d: S(%wu, %wu) mismatch\n", line_number, n, k);
+            flint_printf("line %d: %s%wu, %wu%s mismatch\n", line_number, open, n, k, close_str);
     }
     else
     {
@@ -162,6 +168,24 @@ check_stirling_2_line(char * line, int line_number)
     fmpz_clear(actual);
     fmpz_clear(expected);
     return result;
+}
+
+static int
+check_stirling_2_line(char * line, int line_number)
+{
+    return check_value_line(line, line_number, "S(", ")", arith_stirling_number_2);
+}
+
+static int
+check_stirling_1u_line(char * line, int line_number)
+{
+    return check_value_line(line, line_number, "[", "]", arith_stirling_number_1u);
+}
+
+int
+run_arith_stirling_number_1u(const char * arg)
+{
+    return for_each_line(arg, check_stirling_1u_line);
 }
 
 int
