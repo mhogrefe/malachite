@@ -8,31 +8,13 @@ achieves high performance in part by using algorithms derived from [GMP](https:/
 
 The documentation for Malachite is [here](https://docs.rs/malachite/latest/malachite/), and its crate is [here](https://crates.io/crates/malachite).
 
-**Coming from another arithmetic library?** The [mapping pages](/mapping/) list each library's
-functions next to their Malachite counterparts, section by section, and mark the ones Malachite does
-not have yet. They cover GMP's [integers](/mapping/gmp-integers/) and
-[rationals](/mapping/gmp-rationals/); FLINT's [integers](/mapping/flint-integers/), [integers mod
-n](/mapping/flint-integers-mod-n/), [rationals](/mapping/flint-rationals/), [Gaussian
-integers](/mapping/flint-gaussian-integers/), [integer
-polynomials](/mapping/flint-integer-polynomials/), [rational
-polynomials](/mapping/flint-rational-polynomials/), [modular
-polynomials](/mapping/flint-modular-polynomials/), [word-sized modular
-polynomials](/mapping/flint-word-sized-modular-polynomials/), [integer
-vectors](/mapping/flint-integer-vectors/), [rational vectors](/mapping/flint-rational-vectors/),
-[integer vectors mod n](/mapping/flint-integer-vectors-mod-n/), [word-sized integer vectors mod
-n](/mapping/flint-word-sized-integer-vectors-mod-n/), and [arithmetic
-functions](/mapping/flint-arithmetic-functions/); MPFR's [floats](/mapping/mpfr-floats/); num's
-[integers](/mapping/num-integers/), [rationals](/mapping/num-rationals/), and
-[traits](/mapping/num-traits/); and the formally verified Lean library Azurite's
-[naturals](/mapping/azurite-naturals/), [integers](/mapping/azurite-integers/), [integers modulo a
-power of 2](/mapping/azurite-mod-power-of-2/), [integers modulo a natural](/mapping/azurite-mod/),
-[rationals](/mapping/azurite-rationals/), and [floats](/mapping/azurite-floats/).
+**Coming from another arithmetic library?** The [mapping pages](/mapping/) list the functions of
+GMP, FLINT, MPFR, num, and the formally verified Lean library Azurite next to their Malachite
+counterparts, section by section, and mark the ones Malachite does not have yet.
 
 **How is Malachite tested?** The [verification pages](/verification/) record, function by
 function, which independent implementations each Malachite operation is checked against
-([Azurite](https://github.com/mhogrefe/azurite), FLINT, GMP, MPFR, and num), for
-[naturals](/verification/naturals/), [integers](/verification/integers/),
-[rationals](/verification/rationals/), and [floats](/verification/floats/).
+([Azurite](https://github.com/mhogrefe/azurite), FLINT, GMP, MPFR, and num).
 
 ```rust
 use malachite::base::num::arithmetic::traits::Factorial;
