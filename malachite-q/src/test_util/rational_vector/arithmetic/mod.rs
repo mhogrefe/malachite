@@ -10,3 +10,5 @@ pub mod abs_squared;
 pub mod checked_abs;
 pub mod cross;
 pub mod dot;
+
+pub mod generalized_cross;

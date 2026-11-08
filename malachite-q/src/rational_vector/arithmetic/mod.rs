@@ -149,6 +149,10 @@ pub mod entrywise_abs;
 /// [`EntrywiseMul`](malachite_base::num::arithmetic::traits::EntrywiseMul) and
 /// [`EntrywiseMulAssign`](malachite_base::num::arithmetic::traits::EntrywiseMulAssign).
 pub mod entrywise_mul;
+/// An implementation of
+/// [`GeneralizedCross`](malachite_base::num::arithmetic::traits::GeneralizedCross), for computing
+/// the generalized cross product of $n - 1$ vectors of dimension $n$.
+pub mod generalized_cross;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
 /// element.

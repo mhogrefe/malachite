@@ -185,6 +185,20 @@ pub trait Matrix: Sized {
     /// The result equals what [`window`](Self::window) returns.
     fn into_window(self, rows: Range<u64>, columns: Range<u64>) -> Self;
 
+    /// Returns the matrix obtained by deleting row `i` and column `j`, cloning the other elements.
+    ///
+    /// The determinant of the result, for a square matrix, is the minor of the matrix at row `i`
+    /// and column `j`.
+    fn without_row_and_column(&self, i: u64, j: u64) -> Self
+    where
+        Self::Element: Clone;
+
+    /// Returns the matrix obtained by deleting row `i` and column `j`, taking ownership of the
+    /// matrix and reusing its storage.
+    ///
+    /// The result equals what [`without_row_and_column`](Self::without_row_and_column) returns.
+    fn into_without_row_and_column(self, i: u64, j: u64) -> Self;
+
     /// Overwrites a window of a matrix with the elements of another matrix, cloning them.
     ///
     /// The window starts in row `i` and column `j` and has the shape of `w`: the element of the

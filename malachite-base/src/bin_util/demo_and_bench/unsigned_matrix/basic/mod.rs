@@ -46,6 +46,7 @@ pub(crate) fn register(runner: &mut Runner) {
     swap_rows::register(runner);
     transpose::register(runner);
     window::register(runner);
+    without_row_and_column::register(runner);
     zero::register(runner);
 }
 
@@ -86,4 +87,5 @@ mod swap_columns;
 mod swap_rows;
 mod transpose;
 mod window;
+mod without_row_and_column;
 mod zero;

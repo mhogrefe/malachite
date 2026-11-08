@@ -12,6 +12,7 @@ pub mod content_chained;
 pub mod cross;
 pub mod dot;
 pub mod dot_general;
+pub mod generalized_cross;
 pub mod max_bits;
 pub mod max_limbs;
 pub mod scalar_mul;

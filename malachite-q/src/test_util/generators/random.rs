@@ -66,6 +66,7 @@ use malachite_base::test_util::generators::common::{GenConfig, It};
 use malachite_base::test_util::generators::random::{
     random_vector_index_vec_pairs, random_window_bounds,
 };
+use malachite_base::test_util::generators::square_matrix_positions;
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
 };
@@ -2246,6 +2247,10 @@ pub fn random_rational_matrix_gen(config: &GenConfig) -> It<RationalMatrix> {
     ))
 }
 
+pub fn random_rational_matrix_gen_var_5(config: &GenConfig) -> It<RationalMatrix> {
+    Box::new(random_rational_matrix_gen(config).filter(|a| a.width() == a.height() + 1))
+}
+
 // A random matrix with at least one column, and two of its column indices drawn uniformly.
 pub fn random_rational_matrix_unsigned_unsigned_triple_gen_var_3(
     config: &GenConfig,
@@ -4178,6 +4183,12 @@ pub fn random_rational_matrix_gen_var_2(config: &GenConfig) -> It<RationalMatrix
         config.get_or("mean_size_n", 4),
         config.get_or("mean_size_d", 1),
     ))
+}
+
+pub fn random_rational_matrix_unsigned_unsigned_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(RationalMatrix, u64, u64)> {
+    Box::new(random_rational_matrix_gen_var_2(config).flat_map(square_matrix_positions))
 }
 
 pub fn random_rational_matrix_gen_var_4(config: &GenConfig) -> It<RationalMatrix> {

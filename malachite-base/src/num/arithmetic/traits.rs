@@ -948,6 +948,26 @@ pub trait CrossAssign<RHS = Self> {
     fn cross_assign(&mut self, other: RHS);
 }
 
+/// Computes the generalized cross product of $n - 1$ vectors of dimension $n$: the vector
+/// perpendicular to all of them whose length is the $(n - 1)$-dimensional volume of the
+/// parallelotope they span, and which follows them in a positively oriented basis when they are
+/// linearly independent.
+///
+/// $n - 1$ vectors of dimension $n$ determine the vector $w$ with
+///
+/// $$
+/// w_i = (-1)^{n - 1 + i} \det A_{(i)},
+/// $$
+///
+/// where $A$ is the $(n - 1) \times n$ matrix whose rows are the vectors and $A_{(i)}$ is $A$
+/// without column $i$, so that $w \cdot x = \det \begin{pmatrix} A \\ x \end{pmatrix}$ for every
+/// $x$. For $n = 2$ it rotates the vector a quarter turn counterclockwise, $(a, b) \mapsto (-b,
+/// a)$; for $n = 3$ it is the cross product $v \times w$. The dimension is determined by the number
+/// of vectors, so no vectors give the 1-dimensional vector $(1)$.
+pub trait GeneralizedCross: Sized {
+    fn generalized_cross(xs: &[Self]) -> Self;
+}
+
 /// Adds the dot product of two vectors to a number: $x + \sum_i v_iw_i$.
 ///
 /// The vectors must have the same dimension. Computing the sum and the products together can avoid

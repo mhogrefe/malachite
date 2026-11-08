@@ -4285,6 +4285,16 @@ pub fn integer_matrix_gen() -> Generator<IntegerMatrix> {
     )
 }
 
+// All `IntegerMatrix`s with one more column than rows, whose rows are $n - 1$ vectors of dimension
+// $n$.
+pub fn integer_matrix_gen_var_5() -> Generator<IntegerMatrix> {
+    Generator::new(
+        &exhaustive_integer_matrix_gen_var_5,
+        &random_integer_matrix_gen_var_5,
+        &special_random_integer_matrix_gen_var_5,
+    )
+}
+
 // All `(m, i, j)` with `i` and `j` column indices of `m`.
 pub fn integer_matrix_unsigned_unsigned_triple_gen_var_3() -> Generator<(IntegerMatrix, u64, u64)> {
     Generator::new(
@@ -4338,6 +4348,16 @@ pub fn integer_matrix_gen_var_1() -> Generator<IntegerMatrix> {
         &exhaustive_integer_matrix_gen_var_1,
         &random_integer_matrix_gen_var_1,
         &special_random_integer_matrix_gen_var_1,
+    )
+}
+
+// All `(IntegerMatrix, u64, u64)` where the matrix is square and the `u64`s are a row index and a
+// column index of it.
+pub fn integer_matrix_unsigned_unsigned_triple_gen_var_4() -> Generator<(IntegerMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_integer_matrix_unsigned_unsigned_triple_gen_var_4,
+        &random_integer_matrix_unsigned_unsigned_triple_gen_var_4,
+        &special_random_integer_matrix_unsigned_unsigned_triple_gen_var_4,
     )
 }
 
@@ -5041,6 +5061,27 @@ pub fn natural_matrix_natural_pair_gen_var_3() -> Generator<(NaturalMatrix, Natu
     )
 }
 
+// All `(NaturalMatrix, Natural)` where the matrix is square with dimension at most 8 and every
+// element of the matrix is less than the `Natural`.
+pub fn natural_matrix_natural_pair_gen_var_9() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_9,
+        &random_natural_matrix_natural_pair_gen_var_9,
+        &special_random_natural_matrix_natural_pair_gen_var_9,
+    )
+}
+
+// All `(NaturalMatrix, u64, u64, Natural)` where the matrix is square, the `u64`s are a row index
+// and a column index of it, and the matrix's elements are less than the `Natural`.
+pub fn natural_matrix_unsigned_unsigned_natural_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, u64, u64, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_natural_quadruple_gen_var_1,
+        &random_natural_matrix_unsigned_unsigned_natural_quadruple_gen_var_1,
+        &special_random_natural_matrix_unsigned_unsigned_natural_quadruple_gen_var_1,
+    )
+}
+
 // All `(NaturalMatrix, Natural)` where every element of the matrix is less than the `Natural`, with
 // the random modes choosing moduli of the form `2^a * 3^b * 5^c * k` for small `k`, which have
 // repeated prime factors and often more than 64 bits.
@@ -5049,6 +5090,16 @@ pub fn natural_matrix_natural_pair_gen_var_4() -> Generator<(NaturalMatrix, Natu
         &exhaustive_natural_matrix_natural_pair_gen_var_2,
         &random_natural_matrix_natural_pair_gen_var_4,
         &special_random_natural_matrix_natural_pair_gen_var_4,
+    )
+}
+
+// All `(NaturalMatrix, Natural)` where the matrix has one more column than rows and every element
+// of the matrix is less than the `Natural`.
+pub fn natural_matrix_natural_pair_gen_var_10() -> Generator<(NaturalMatrix, Natural)> {
+    Generator::new(
+        &exhaustive_natural_matrix_natural_pair_gen_var_10,
+        &random_natural_matrix_natural_pair_gen_var_10,
+        &special_random_natural_matrix_natural_pair_gen_var_10,
     )
 }
 
@@ -5266,6 +5317,16 @@ pub fn natural_matrix_gen_var_1() -> Generator<NaturalMatrix> {
         &exhaustive_natural_matrix_gen_var_1,
         &random_natural_matrix_gen_var_1,
         &special_random_natural_matrix_gen_var_1,
+    )
+}
+
+// All `(NaturalMatrix, u64, u64)` where the matrix is square and the `u64`s are a row index and a
+// column index of it.
+pub fn natural_matrix_unsigned_unsigned_triple_gen_var_6() -> Generator<(NaturalMatrix, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_6,
+        &random_natural_matrix_unsigned_unsigned_triple_gen_var_6,
+        &special_random_natural_matrix_unsigned_unsigned_triple_gen_var_6,
     )
 }
 
@@ -5600,6 +5661,16 @@ pub fn natural_matrix_unsigned_pair_gen_var_4() -> Generator<(NaturalMatrix, u64
     )
 }
 
+// All `(NaturalMatrix, u64)` where the matrix has one more column than rows and every element is
+// less than 2 to the power of the `u64`.
+pub fn natural_matrix_unsigned_pair_gen_var_9() -> Generator<(NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_pair_gen_var_9,
+        &random_natural_matrix_unsigned_pair_gen_var_9,
+        &special_random_natural_matrix_unsigned_pair_gen_var_9,
+    )
+}
+
 // All `(NaturalMatrix, u64)` where the matrix is square and every element is less than 2 to the
 // power of the `u64`.
 pub fn natural_matrix_unsigned_pair_gen_var_6() -> Generator<(NaturalMatrix, u64)> {
@@ -5607,6 +5678,28 @@ pub fn natural_matrix_unsigned_pair_gen_var_6() -> Generator<(NaturalMatrix, u64
         &exhaustive_natural_matrix_unsigned_pair_gen_var_6,
         &random_natural_matrix_unsigned_pair_gen_var_6,
         &special_random_natural_matrix_unsigned_pair_gen_var_6,
+    )
+}
+
+// All `(NaturalMatrix, u64)` where the matrix is square with dimension at most 8 and every element
+// is less than 2 to the power of the `u64`.
+pub fn natural_matrix_unsigned_pair_gen_var_8() -> Generator<(NaturalMatrix, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_pair_gen_var_8,
+        &random_natural_matrix_unsigned_pair_gen_var_8,
+        &special_random_natural_matrix_unsigned_pair_gen_var_8,
+    )
+}
+
+// All `(NaturalMatrix, u64, u64, u64)` where the matrix is square, the first two `u64`s are a row
+// index and a column index of it, and the matrix's elements are less than 2 to the power of the
+// last `u64`.
+pub fn natural_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1()
+-> Generator<(NaturalMatrix, u64, u64, u64)> {
+    Generator::new(
+        &exhaustive_natural_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+        &random_natural_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+        &special_random_natural_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1,
     )
 }
 

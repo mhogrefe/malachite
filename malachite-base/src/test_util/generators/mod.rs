@@ -5539,6 +5539,27 @@ pub fn unsigned_polynomial_unsigned_unsigned_unsigned_quadruple_gen_var_1<T: Pri
     )
 }
 
+// A square matrix paired with each of its positions, row by row.
+pub fn square_matrix_positions<M: Clone + Matrix>(a: M) -> impl Iterator<Item = (M, u64, u64)> {
+    let n = a.height();
+    (0..n).flat_map(move |i| {
+        let a = a.clone();
+        (0..n).map(move |j| (a.clone(), i, j))
+    })
+}
+
+// A square matrix and another value, paired with each of the matrix's positions, row by row.
+pub fn square_matrix_positions_with<M: Clone + Matrix, X: Clone>(
+    a: M,
+    x: X,
+) -> impl Iterator<Item = (M, u64, u64, X)> {
+    let n = a.height();
+    (0..n).flat_map(move |i| {
+        let (a, x) = (a.clone(), x.clone());
+        (0..n).map(move |j| (a.clone(), i, j, x.clone()))
+    })
+}
+
 // -- UnsignedVector<u64> --
 
 // A matrix paired with each of its positions, row by row.
@@ -5714,6 +5735,16 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_4() -> Generator<(UnsignedMatrix<u6
     )
 }
 
+// All `(UnsignedMatrix<u64>, u64)` where the matrix has one more column than rows, the `u64` is no
+// greater than 64, and the matrix's elements are less than 2 to the power of the `u64`.
+pub fn unsigned_matrix_unsigned_pair_gen_var_18() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_18,
+        &random_unsigned_matrix_unsigned_pair_gen_var_18,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_18,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, u64, u64)` where the last `u64` is no greater than 64, and every
 // element of the matrix, and the first `u64`, is less than 2 to the power of the last `u64`.
 pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_2()
@@ -5792,6 +5823,28 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_7() -> Generator<(UnsignedMatrix<u6
     )
 }
 
+// All `(UnsignedMatrix<u64>, u64)` where the matrix is square with dimension at most 8, the `u64`
+// is no greater than 64, and the matrix's elements are less than 2 to the power of the `u64`.
+pub fn unsigned_matrix_unsigned_pair_gen_var_16() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_16,
+        &random_unsigned_matrix_unsigned_pair_gen_var_16,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_16,
+    )
+}
+
+// All `(UnsignedMatrix<u64>, u64, u64, u64)` where the matrix is square, the middle `u64`s are a
+// row index and a column index of it, the last `u64` is no greater than 64, and the matrix's
+// elements are less than 2 to its power.
+pub fn unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_4()
+-> Generator<(UnsignedMatrix<u64>, u64, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_4,
+        &random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_4,
+        &special_random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_4,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, u64, u64)` where the matrix is square, the last `u64` is no greater
 // than 64, and the matrix's elements are less than 2 to its power.
 pub fn unsigned_matrix_unsigned_unsigned_triple_gen_var_8()
@@ -5824,6 +5877,28 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_8() -> Generator<(UnsignedMatrix<u6
     )
 }
 
+// All `(UnsignedMatrix<u64>, u64)` where the matrix is square with dimension at most 8, the `u64`
+// is positive, and the matrix's elements are less than it.
+pub fn unsigned_matrix_unsigned_pair_gen_var_15() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_15,
+        &random_unsigned_matrix_unsigned_pair_gen_var_15,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_15,
+    )
+}
+
+// All `(UnsignedMatrix<u64>, u64, u64, u64)` where the matrix is square, the middle `u64`s are a
+// row index and a column index of it, the last `u64` is positive, and the matrix's elements are
+// less than it.
+pub fn unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_3()
+-> Generator<(UnsignedMatrix<u64>, u64, u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_3,
+        &random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_3,
+        &special_random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_3,
+    )
+}
+
 // All `(UnsignedMatrix<u64>, u64)` where the `u64` is positive and the matrix's elements are less
 // than it, with the random modes choosing small moduli, which often have repeated prime factors.
 pub fn unsigned_matrix_unsigned_pair_gen_var_9() -> Generator<(UnsignedMatrix<u64>, u64)> {
@@ -5831,6 +5906,17 @@ pub fn unsigned_matrix_unsigned_pair_gen_var_9() -> Generator<(UnsignedMatrix<u6
         &exhaustive_unsigned_matrix_unsigned_pair_gen_var_5,
         &random_unsigned_matrix_unsigned_pair_gen_var_9,
         &special_random_unsigned_matrix_unsigned_pair_gen_var_9,
+    )
+}
+
+// All `(UnsignedMatrix<u64>, u64)` where the matrix has one more column than rows, the `u64` is
+// positive, and the matrix's elements are less than it, with the random modes choosing small
+// moduli.
+pub fn unsigned_matrix_unsigned_pair_gen_var_17() -> Generator<(UnsignedMatrix<u64>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_matrix_unsigned_pair_gen_var_17,
+        &random_unsigned_matrix_unsigned_pair_gen_var_17,
+        &special_random_unsigned_matrix_unsigned_pair_gen_var_17,
     )
 }
 

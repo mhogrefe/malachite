@@ -944,19 +944,25 @@ pub mod unsigned_matrix {
         pub mod exhaustive_unsigned_matrices;
     }
     pub mod linear_algebra {
+        pub mod mod_adjugate;
         pub mod mod_characteristic_polynomial;
+        pub mod mod_cofactor;
         pub mod mod_determinant;
         pub mod mod_gram_schmidt;
         pub mod mod_howell_form;
         pub mod mod_inverse;
         pub mod mod_lu_decomposition;
+        pub mod mod_minor;
         pub mod mod_nullspace;
         pub mod mod_permanent;
+        pub mod mod_power_of_2_adjugate;
         pub mod mod_power_of_2_characteristic_polynomial;
+        pub mod mod_power_of_2_cofactor;
         pub mod mod_power_of_2_determinant;
         pub mod mod_power_of_2_gram_schmidt;
         pub mod mod_power_of_2_howell_form;
         pub mod mod_power_of_2_inverse;
+        pub mod mod_power_of_2_minor;
         pub mod mod_power_of_2_permanent;
         pub mod mod_power_of_2_similarity_transform;
         pub mod mod_power_of_2_smith_normal_form;
@@ -1050,6 +1056,7 @@ pub mod unsigned_matrix {
     pub mod swap_rows;
     pub mod transpose;
     pub mod window;
+    pub mod without_row_and_column;
     pub mod zero;
 }
 pub mod unsigned_polynomial {
@@ -1293,6 +1300,7 @@ pub mod unsigned_vector {
         pub mod mod_element_sum;
         pub mod mod_entrywise_inverse;
         pub mod mod_entrywise_mul;
+        pub mod mod_generalized_cross;
         pub mod mod_is_reduced;
         pub mod mod_mul;
         pub mod mod_neg;
@@ -1312,6 +1320,7 @@ pub mod unsigned_vector {
         pub mod mod_power_of_2_element_sum;
         pub mod mod_power_of_2_entrywise_inverse;
         pub mod mod_power_of_2_entrywise_mul;
+        pub mod mod_power_of_2_generalized_cross;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;

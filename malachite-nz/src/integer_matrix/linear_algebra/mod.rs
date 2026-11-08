@@ -8,10 +8,11 @@
 
 #[cfg(doc)]
 use malachite_base::num::linear_algebra::traits::{
-    CharacteristicPolynomial, Determinant, DeterminantSign, ElementaryDivisors, HermiteNormalForm,
-    HermiteNormalFormAssign, Nullspace, Permanent, Rank, ReducedRowEchelonForm,
-    ReducedRowEchelonFormAssign, SimilarityTransform, SimilarityTransformAssign, SmithNormalForm,
-    SmithNormalFormAndTransforms, SmithNormalFormAssign, Solve, Trace,
+    Adjugate, CharacteristicPolynomial, Cofactor, Determinant, DeterminantSign, ElementaryDivisors,
+    HermiteNormalForm, HermiteNormalFormAssign, Minor, Nullspace, Permanent, Rank,
+    ReducedRowEchelonForm, ReducedRowEchelonFormAssign, SimilarityTransform,
+    SimilarityTransformAssign, SmithNormalForm, SmithNormalFormAndTransforms,
+    SmithNormalFormAssign, Solve, Trace,
 };
 
 crate_test_mod! {
@@ -29,11 +30,15 @@ crate_test_mod! {
     /// machinery for [`Solve`], public only under `test_build`.
     certify_lu_mod_p
 }
+/// Implementations of [`Adjugate`], for computing the adjugates of square matrices.
+pub mod adjugate;
 /// Implementations of [`CharacteristicPolynomial`], for computing the characteristic polynomial of
 /// a square matrix.
 pub mod characteristic_polynomial;
 /// A bound on the coefficients of the characteristic polynomial of a square matrix.
 pub mod characteristic_polynomial_bound;
+/// Implementations of [`Cofactor`], for computing the cofactors of square matrices.
+pub mod cofactor;
 /// Implementations of [`Determinant`], for computing the determinants of square integer matrices.
 pub mod determinant;
 /// The method [`determinant_bound`](super::IntegerMatrix::determinant_bound), an upper bound for
@@ -83,6 +88,8 @@ crate_test_mod! {
 /// The method [`is_in_smith_normal_form`](super::IntegerMatrix::is_in_smith_normal_form), which
 /// checks whether a matrix is in Smith normal form.
 pub mod is_in_smith_normal_form;
+/// Implementations of [`Minor`], for computing the minors of square matrices.
+pub mod minor;
 /// Implementations of [`Nullspace`], for finding bases of the right nullspaces of integer matrices.
 pub mod nullspace;
 /// Implementations of [`Permanent`], for computing the permanents of square integer matrices.

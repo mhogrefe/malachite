@@ -1002,6 +1002,25 @@ documented by git history.
   was measured to be faster for them. `NaturalVector`s modulo $2^k$ are first reduced modulo 2, into
   words, since for $k > 0$ points are affinely independent modulo $2^k$ exactly when they are
   modulo 2.
+- New `Matrix::without_row_and_column` and `Matrix::into_without_row_and_column` methods, which
+  delete one row and one column of a matrix, implemented for `UnsignedMatrix<T>`, `NaturalMatrix`,
+  `IntegerMatrix`, and `RationalMatrix`.
+- Minors, cofactors, and adjugates of square matrices. New `Minor`, `Cofactor`, and `Adjugate`
+  traits in malachite-base are implemented for `IntegerMatrix`, `NaturalMatrix` (with `Integer`
+  results), and `RationalMatrix`, and their `Mod` and `ModPowerOf2` counterparts for
+  `UnsignedMatrix<T>` and `NaturalMatrix`, for any modulus. Each minor is a determinant of the
+  matrix without one row and one column, and each element of the adjugate is a separate cofactor.
+- Generalized cross products: the vector perpendicular to $n - 1$ given vectors of dimension $n$
+  whose length is the volume of the parallelotope they span and which follows them in a positively
+  oriented basis; in two dimensions it rotates a vector a quarter turn counterclockwise, and in
+  three it is the cross product. New `GeneralizedCross`, `ModGeneralizedCross`, and
+  `ModPowerOf2GeneralizedCross` traits in malachite-base take a slice of vectors and are
+  implemented for the types with cross products: `IntegerVector` and `RationalVector`, and,
+  modulo $m$ or $2^k$, `UnsignedVector<T>` and `NaturalVector`. Each element is a cofactor of the
+  matrix whose rows are the vectors followed by a zero row; over the integers, the product is
+  found from the nullspace of the vectors and a single cofactor, rational vectors have their
+  denominators cleared first, and `NaturalVector`s are multiplied over the integers and reduced,
+  which was measured to be faster than finding each cofactor modulo $m$ or $2^k$.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

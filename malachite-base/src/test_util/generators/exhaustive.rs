@@ -73,8 +73,8 @@ use crate::test_util::generators::common::{
 };
 use crate::test_util::generators::{
     digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, large_exponent,
-    signed_assign_bits_valid, smallest_invalid_value, unsigned_assign_bits_valid,
-    unsigned_matrix_positions,
+    signed_assign_bits_valid, smallest_invalid_value, square_matrix_positions_with,
+    unsigned_assign_bits_valid, unsigned_matrix_positions,
 };
 use crate::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
 use crate::test_util::num::float::PRIMITIVE_FLOAT_CHARS;
@@ -7311,6 +7311,13 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_4() -> It<(UnsignedMatri
     )
 }
 
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_18() -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        exhaustive_unsigned_matrix_unsigned_pair_gen_var_4()
+            .filter(|(a, _)| a.width() == a.height() + 1),
+    )
+}
+
 pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_7() -> It<(UnsignedMatrix<u64>, u64)> {
     fn ys((size, pow): (u64, u64)) -> It<UnsignedMatrix<u64>> {
         Box::new(exhaustive_unsigned_matrices_with_dimensions_from_iterator(
@@ -7328,6 +7335,18 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_7() -> It<(UnsignedMatri
             ys,
         )
         .map(|((_, pow), m)| (m, pow)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_16() -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(exhaustive_unsigned_matrix_unsigned_pair_gen_var_7().filter(|(a, _)| a.height() <= 8))
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_4()
+-> It<(UnsignedMatrix<u64>, u64, u64, u64)> {
+    Box::new(
+        exhaustive_unsigned_matrix_unsigned_pair_gen_var_7()
+            .flat_map(|(a, x)| square_matrix_positions_with(a, x)),
     )
 }
 
@@ -7376,6 +7395,13 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_5() -> It<(UnsignedMatri
     )
 }
 
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_17() -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        exhaustive_unsigned_matrix_unsigned_pair_gen_var_5()
+            .filter(|(a, _)| a.width() == a.height() + 1),
+    )
+}
+
 pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_8() -> It<(UnsignedMatrix<u64>, u64)> {
     fn ys((size, m): (u64, u64)) -> It<UnsignedMatrix<u64>> {
         Box::new(exhaustive_unsigned_matrices_with_dimensions_from_iterator(
@@ -7393,6 +7419,18 @@ pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_8() -> It<(UnsignedMatri
             ys,
         )
         .map(|((_, m), a)| (a, m)),
+    )
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_pair_gen_var_15() -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(exhaustive_unsigned_matrix_unsigned_pair_gen_var_8().filter(|(a, _)| a.height() <= 8))
+}
+
+pub fn exhaustive_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_3()
+-> It<(UnsignedMatrix<u64>, u64, u64, u64)> {
+    Box::new(
+        exhaustive_unsigned_matrix_unsigned_pair_gen_var_8()
+            .flat_map(|(a, x)| square_matrix_positions_with(a, x)),
     )
 }
 

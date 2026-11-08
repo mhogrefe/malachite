@@ -1287,6 +1287,16 @@ pub fn rational_matrix_gen() -> Generator<RationalMatrix> {
     )
 }
 
+// All `RationalMatrix`s with one more column than rows, whose rows are $n - 1$ vectors of dimension
+// $n$.
+pub fn rational_matrix_gen_var_5() -> Generator<RationalMatrix> {
+    Generator::new(
+        &exhaustive_rational_matrix_gen_var_5,
+        &random_rational_matrix_gen_var_5,
+        &special_random_rational_matrix_gen_var_5,
+    )
+}
+
 // All `(m, i, j)` with `i` and `j` column indices of `m`.
 pub fn rational_matrix_unsigned_unsigned_triple_gen_var_3() -> Generator<(RationalMatrix, u64, u64)>
 {
@@ -1459,6 +1469,17 @@ pub fn rational_matrix_gen_var_2() -> Generator<RationalMatrix> {
         &exhaustive_rational_matrix_gen_var_2,
         &random_rational_matrix_gen_var_2,
         &special_random_rational_matrix_gen_var_2,
+    )
+}
+
+// All `(RationalMatrix, u64, u64)` where the matrix is square, with small elements in the random
+// modes, and the `u64`s are a row index and a column index of it.
+pub fn rational_matrix_unsigned_unsigned_triple_gen_var_4() -> Generator<(RationalMatrix, u64, u64)>
+{
+    Generator::new(
+        &exhaustive_rational_matrix_unsigned_unsigned_triple_gen_var_4,
+        &random_rational_matrix_unsigned_unsigned_triple_gen_var_4,
+        &special_random_rational_matrix_unsigned_unsigned_triple_gen_var_4,
     )
 }
 

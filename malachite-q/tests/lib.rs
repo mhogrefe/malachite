@@ -236,11 +236,14 @@ pub mod rational_matrix {
         pub mod exhaustive_rational_matrices;
     }
     pub mod linear_algebra {
+        pub mod adjugate;
         pub mod characteristic_polynomial;
+        pub mod cofactor;
         pub mod determinant;
         pub mod determinant_sign;
         pub mod gram_schmidt;
         pub mod inverse;
+        pub mod minor;
         pub mod permanent;
         pub mod reduced_row_echelon_form;
         pub mod similarity_transform;
@@ -289,6 +292,7 @@ pub mod rational_matrix {
     pub mod swap_rows;
     pub mod transpose;
     pub mod window;
+    pub mod without_row_and_column;
     pub mod zero;
 }
 pub mod rational_polynomial {
@@ -608,6 +612,7 @@ pub mod rational_vector {
         pub mod element_sum;
         pub mod entrywise_abs;
         pub mod entrywise_mul;
+        pub mod generalized_cross;
         pub mod height;
         pub mod l1_norm;
         pub mod neg;

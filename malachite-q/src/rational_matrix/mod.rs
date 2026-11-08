@@ -70,6 +70,20 @@ fn shape(height: u64, width: u64) -> (usize, usize, usize) {
     (height, width, element_count(height, width))
 }
 
+// Converts a row index and a column index of a matrix with the given dimensions to `usize`,
+// panicking if either is out of bounds.
+fn row_and_column(height: usize, width: usize, i: u64, j: u64) -> (usize, usize) {
+    assert!(
+        i < u64::exact_from(height),
+        "row {i} is out of bounds for a matrix with {height} rows"
+    );
+    assert!(
+        j < u64::exact_from(width),
+        "column {j} is out of bounds for a matrix with {width} columns"
+    );
+    (usize::exact_from(i), usize::exact_from(j))
+}
+
 // Converts the row and column ranges of a window of a matrix with the given dimensions to `usize`
 // ranges, panicking if either range is decreasing or extends past the matrix.
 fn window_ranges(
@@ -1709,6 +1723,132 @@ impl Matrix for RationalMatrix {
         }
         self.height = rows.len();
         self.width = width;
+        self
+    }
+
+    /// Returns the [`RationalMatrix`] obtained by deleting row `i` and column `j` of an
+    /// [`RationalMatrix`], cloning the other elements.
+    ///
+    /// The result has one fewer row and one fewer column, and keeps the order of the remaining rows
+    /// and columns. For a square matrix, its determinant is the minor of the matrix at row `i` and
+    /// column `j`. The matrix need not be square.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(nm)$
+    ///
+    /// $M(n, m) = O(nm)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is the number of elements of the matrix,
+    /// and $m$ is the maximum bit length of its elements.
+    ///
+    /// # Panics
+    /// Panics if `i >= self.height()` or `j >= self.width()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let m = RationalMatrix::from_str("[1/2, -2, 3; 4, 5/3, -6; 7, -8, 9]").unwrap();
+    /// assert_eq!(
+    ///     m.without_row_and_column(1, 2).to_string(),
+    ///     "[1/2, -2; 7, -8]"
+    /// );
+    /// assert_eq!(
+    ///     m.without_row_and_column(0, 0).to_string(),
+    ///     "[5/3, -6; -8, 9]"
+    /// );
+    /// assert_eq!(
+    ///     RationalMatrix::from_str("[1/2, -2, 3; 4, 5/3, -6]")
+    ///         .unwrap()
+    ///         .without_row_and_column(0, 1)
+    ///         .to_string(),
+    ///     "[4, -6]"
+    /// );
+    /// assert_eq!(
+    ///     RationalMatrix::from_str("[5]")
+    ///         .unwrap()
+    ///         .without_row_and_column(0, 0)
+    ///         .to_string(),
+    ///     "[]_{0,0}"
+    /// );
+    /// ```
+    fn without_row_and_column(&self, i: u64, j: u64) -> Self {
+        let (i, j) = row_and_column(self.height, self.width, i, j);
+        let mut elements = Vec::with_capacity((self.height - 1) * (self.width - 1));
+        for (k, row) in self.elements.chunks_exact(self.width).enumerate() {
+            if k != i {
+                elements.extend_from_slice(&row[..j]);
+                elements.extend_from_slice(&row[j + 1..]);
+            }
+        }
+        Self {
+            elements,
+            height: self.height - 1,
+            width: self.width - 1,
+        }
+    }
+
+    /// Returns the [`RationalMatrix`] obtained by deleting row `i` and column `j` of an
+    /// [`RationalMatrix`], taking ownership of the matrix and reusing its storage.
+    ///
+    /// The result equals what [`without_row_and_column`](Self::without_row_and_column) returns, but
+    /// no element is cloned: the remaining elements are moved to the front of the element [`Vec`]
+    /// in a single pass.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of elements of the
+    /// matrix.
+    ///
+    /// # Panics
+    /// Panics if `i >= self.height()` or `j >= self.width()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_base::matrix::Matrix;
+    /// use malachite_q::rational_matrix::RationalMatrix;
+    ///
+    /// let m = RationalMatrix::from_str("[1/2, -2, 3; 4, 5/3, -6; 7, -8, 9]").unwrap();
+    /// assert_eq!(
+    ///     m.clone().into_without_row_and_column(1, 2).to_string(),
+    ///     "[1/2, -2; 7, -8]"
+    /// );
+    /// assert_eq!(
+    ///     m.into_without_row_and_column(0, 0).to_string(),
+    ///     "[5/3, -6; -8, 9]"
+    /// );
+    /// assert_eq!(
+    ///     RationalMatrix::from_str("[1/2, -2, 3; 4, 5/3, -6]")
+    ///         .unwrap()
+    ///         .into_without_row_and_column(0, 1)
+    ///         .to_string(),
+    ///     "[4, -6]"
+    /// );
+    /// assert_eq!(
+    ///     RationalMatrix::from_str("[5]")
+    ///         .unwrap()
+    ///         .into_without_row_and_column(0, 0)
+    ///         .to_string(),
+    ///     "[]_{0,0}"
+    /// );
+    /// ```
+    fn into_without_row_and_column(mut self, i: u64, j: u64) -> Self {
+        let (i, j) = row_and_column(self.height, self.width, i, j);
+        let width = self.width;
+        let mut k = 0;
+        self.elements.retain(|_| {
+            let keep = k / width != i && k % width != j;
+            k += 1;
+            keep
+        });
+        self.height -= 1;
+        self.width -= 1;
         self
     }
 

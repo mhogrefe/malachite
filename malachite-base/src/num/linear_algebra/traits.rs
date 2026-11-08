@@ -127,6 +127,30 @@ pub trait Determinant {
     fn determinant(self) -> Self::Output;
 }
 
+/// Computes the minor of a square matrix at row $i$ and column $j$: the determinant of the matrix
+/// obtained by deleting row $i$ and column $j$.
+pub trait Minor {
+    type Output;
+
+    fn minor(self, i: u64, j: u64) -> Self::Output;
+}
+
+/// Computes the cofactor of a square matrix at row $i$ and column $j$: $(-1)^{i + j}$ times its
+/// minor there, so that expanding along row $i$ gives $\det A = \sum_j A_{i, j} C_{i, j}$.
+pub trait Cofactor {
+    type Output;
+
+    fn cofactor(self, i: u64, j: u64) -> Self::Output;
+}
+
+/// Computes the adjugate of a square matrix: the transpose of its matrix of cofactors, which
+/// satisfies $A \operatorname{adj}(A) = \operatorname{adj}(A) A = (\det A) I$.
+pub trait Adjugate {
+    type Output;
+
+    fn adjugate(self) -> Self::Output;
+}
+
 /// Applies the similarity transform $A \mapsto P^{-1}AP$ of FLINT's `fmpz_mat_similarity` to a
 /// square matrix, where $P$ is the identity matrix with some of the elements of row `r` replaced by
 /// `d`. See the implementations for exactly which.
@@ -364,6 +388,60 @@ pub trait ModPowerOf2Determinant {
     type Output;
 
     fn mod_power_of_2_determinant(self, pow: u64) -> Self::Output;
+}
+
+/// Computes the minor of a square matrix at row $i$ and column $j$ modulo $m$: the determinant
+/// modulo $m$ of the matrix obtained by deleting row $i$ and column $j$. The elements of the matrix
+/// must already be reduced modulo $m$.
+pub trait ModMinor<M = Self> {
+    type Output;
+
+    fn mod_minor(self, i: u64, j: u64, m: M) -> Self::Output;
+}
+
+/// Computes the cofactor of a square matrix at row $i$ and column $j$ modulo $m$: $(-1)^{i + j}$
+/// times its minor there, modulo $m$. The elements of the matrix must already be reduced modulo
+/// $m$.
+pub trait ModCofactor<M = Self> {
+    type Output;
+
+    fn mod_cofactor(self, i: u64, j: u64, m: M) -> Self::Output;
+}
+
+/// Computes the adjugate of a square matrix modulo $m$: the transpose of its matrix of cofactors
+/// modulo $m$, which satisfies $A \operatorname{adj}(A) \equiv \operatorname{adj}(A) A \equiv (\det
+/// A) I \pmod m$. The elements of the matrix must already be reduced modulo $m$.
+pub trait ModAdjugate<M = Self> {
+    type Output;
+
+    fn mod_adjugate(self, m: M) -> Self::Output;
+}
+
+/// Computes the minor of a square matrix at row $i$ and column $j$ modulo $2^k$: the determinant
+/// modulo $2^k$ of the matrix obtained by deleting row $i$ and column $j$. The elements of the
+/// matrix must already be reduced modulo $2^k$.
+pub trait ModPowerOf2Minor {
+    type Output;
+
+    fn mod_power_of_2_minor(self, i: u64, j: u64, pow: u64) -> Self::Output;
+}
+
+/// Computes the cofactor of a square matrix at row $i$ and column $j$ modulo $2^k$: $(-1)^{i + j}$
+/// times its minor there, modulo $2^k$. The elements of the matrix must already be reduced modulo
+/// $2^k$.
+pub trait ModPowerOf2Cofactor {
+    type Output;
+
+    fn mod_power_of_2_cofactor(self, i: u64, j: u64, pow: u64) -> Self::Output;
+}
+
+/// Computes the adjugate of a square matrix modulo $2^k$: the transpose of its matrix of cofactors
+/// modulo $2^k$, which satisfies $A \operatorname{adj}(A) \equiv \operatorname{adj}(A) A \equiv
+/// (\det A) I \pmod{2^k}$. The elements of the matrix must already be reduced modulo $2^k$.
+pub trait ModPowerOf2Adjugate {
+    type Output;
+
+    fn mod_power_of_2_adjugate(self, pow: u64) -> Self::Output;
 }
 
 /// Computes the reduced row echelon form of a matrix modulo a prime $m$. The elements of the matrix

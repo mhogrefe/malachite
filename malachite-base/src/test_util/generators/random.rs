@@ -89,8 +89,8 @@ use crate::test_util::generators::exhaustive::{
 use crate::test_util::generators::{
     digits_valid, large_exponent, round_to_multiple_of_power_of_2_filter_map,
     round_to_multiple_signed_filter_map, round_to_multiple_unsigned_filter_map,
-    signed_assign_bits_valid, smallest_invalid_value, unsigned_assign_bits_valid,
-    unsigned_matrix_positions,
+    signed_assign_bits_valid, smallest_invalid_value, square_matrix_positions_with,
+    unsigned_assign_bits_valid, unsigned_matrix_positions,
 };
 use crate::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
 use crate::test_util::num::float::PRIMITIVE_FLOAT_CHARS;
@@ -10057,6 +10057,15 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_4(
     )
 }
 
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_18(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_pair_gen_var_4(config)
+            .filter(|(a, _)| a.width() == a.height() + 1),
+    )
+}
+
 pub fn random_unsigned_matrix_unsigned_pair_gen_var_7(
     config: &GenConfig,
 ) -> It<(UnsignedMatrix<u64>, u64)> {
@@ -10073,6 +10082,23 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_7(
             &|seed| random_unsigned_inclusive_range(seed, 0, u64::WIDTH),
         )
         .map(|(m, pow)| (m.mod_power_of_2(pow), pow)),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_16(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_pair_gen_var_7(config).filter(|(a, _)| a.height() <= 8),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_4(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64, u64, u64)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_pair_gen_var_7(config)
+            .flat_map(|(a, x)| square_matrix_positions_with(a, x)),
     )
 }
 
@@ -10211,6 +10237,23 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_8(
             &random_positive_unsigneds::<u64>,
         )
         .map(|(a, m)| (a % m, m)),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_15(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_pair_gen_var_8(config).filter(|(a, _)| a.height() <= 8),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_3(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64, u64, u64)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_pair_gen_var_8(config)
+            .flat_map(|(a, x)| square_matrix_positions_with(a, x)),
     )
 }
 
@@ -10684,6 +10727,15 @@ pub fn random_unsigned_matrix_unsigned_pair_gen_var_9(
             );
             (a, m)
         }),
+    )
+}
+
+pub fn random_unsigned_matrix_unsigned_pair_gen_var_17(
+    config: &GenConfig,
+) -> It<(UnsignedMatrix<u64>, u64)> {
+    Box::new(
+        random_unsigned_matrix_unsigned_pair_gen_var_9(config)
+            .filter(|(a, _)| a.width() == a.height() + 1),
     )
 }
 

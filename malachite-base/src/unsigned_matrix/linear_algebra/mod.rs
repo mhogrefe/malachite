@@ -8,10 +8,11 @@
 
 #[cfg(doc)]
 use crate::num::linear_algebra::traits::{
-    ModCharacteristicPolynomial, ModDeterminant, ModGramSchmidt, ModHowellForm,
-    ModHowellFormAssign, ModLeftNullspace, ModLuDecomposition, ModNullspace, ModPermanent,
-    ModPowerOf2CharacteristicPolynomial, ModPowerOf2Determinant, ModPowerOf2GramSchmidt,
-    ModPowerOf2HowellForm, ModPowerOf2HowellFormAssign, ModPowerOf2Permanent,
+    ModAdjugate, ModCharacteristicPolynomial, ModCofactor, ModDeterminant, ModGramSchmidt,
+    ModHowellForm, ModHowellFormAssign, ModLeftNullspace, ModLuDecomposition, ModMinor,
+    ModNullspace, ModPermanent, ModPowerOf2Adjugate, ModPowerOf2CharacteristicPolynomial,
+    ModPowerOf2Cofactor, ModPowerOf2Determinant, ModPowerOf2GramSchmidt, ModPowerOf2HowellForm,
+    ModPowerOf2HowellFormAssign, ModPowerOf2Minor, ModPowerOf2Permanent,
     ModPowerOf2SimilarityTransform, ModPowerOf2SimilarityTransformAssign,
     ModPowerOf2SmithNormalForm, ModPowerOf2SmithNormalFormAssign, ModPowerOf2Solve,
     ModPowerOf2StrongEchelonForm, ModPowerOf2StrongEchelonFormAssign, ModPowerOf2Trace, ModRank,
@@ -31,9 +32,15 @@ pub mod charpoly_over_ring;
 /// generic over the ring of elements.
 #[doc(hidden)]
 pub mod gram_schmidt_over_ring;
+/// Implementations of [`ModAdjugate`], for computing the adjugates of square matrices modulo a
+/// number.
+pub mod mod_adjugate;
 /// Implementations of [`ModCharacteristicPolynomial`], for computing characteristic polynomials of
 /// square matrices modulo a number.
 pub mod mod_characteristic_polynomial;
+/// Implementations of [`ModCofactor`], for computing the cofactors of square matrices modulo a
+/// number.
+pub mod mod_cofactor;
 /// Implementations of [`ModDeterminant`], for computing the determinant of a square matrix modulo a
 /// number.
 pub mod mod_determinant;
@@ -88,15 +95,23 @@ pub mod mod_left_nullspace;
 /// Implementations of [`ModLuDecomposition`], for computing an LU decomposition of a matrix modulo
 /// a prime.
 pub mod mod_lu_decomposition;
+/// Implementations of [`ModMinor`], for computing the minors of square matrices modulo a number.
+pub mod mod_minor;
 /// Implementations of [`ModNullspace`], for computing a basis of the right nullspace of a matrix
 /// modulo a prime.
 pub mod mod_nullspace;
 /// Implementations of [`ModPermanent`], for computing the permanents of square matrices of unsigned
 /// integers modulo a number.
 pub mod mod_permanent;
+/// Implementations of [`ModPowerOf2Adjugate`], for computing the adjugates of square matrices
+/// modulo powers of 2.
+pub mod mod_power_of_2_adjugate;
 /// Implementations of [`ModPowerOf2CharacteristicPolynomial`], for computing characteristic
 /// polynomials of square matrices modulo powers of 2.
 pub mod mod_power_of_2_characteristic_polynomial;
+/// Implementations of [`ModPowerOf2Cofactor`], for computing the cofactors of square matrices
+/// modulo powers of 2.
+pub mod mod_power_of_2_cofactor;
 /// Implementations of [`ModPowerOf2Determinant`], for computing determinants of square matrices
 /// modulo powers of 2.
 pub mod mod_power_of_2_determinant;
@@ -109,6 +124,9 @@ pub mod mod_power_of_2_howell_form;
 /// Implementations of [`ModPowerOf2Inverse`](crate::num::modular::traits::ModPowerOf2Inverse), for
 /// inverting square matrices modulo powers of 2.
 pub mod mod_power_of_2_inverse;
+/// Implementations of [`ModPowerOf2Minor`], for computing the minors of square matrices modulo
+/// powers of 2.
+pub mod mod_power_of_2_minor;
 /// Implementations of [`ModPowerOf2Permanent`], for computing the permanents of square matrices of
 /// unsigned integers modulo a power of 2.
 pub mod mod_power_of_2_permanent;

@@ -34,6 +34,7 @@ pub(crate) fn register(runner: &mut Runner) {
     entrywise_mul::register(runner);
     entrywise_shl_round::register(runner);
     entrywise_shr_round::register(runner);
+    generalized_cross::register(runner);
     height::register(runner);
     l1_norm::register(runner);
     max_bits::register(runner);
@@ -76,6 +77,7 @@ mod entrywise_div_round;
 mod entrywise_mul;
 mod entrywise_shl_round;
 mod entrywise_shr_round;
+mod generalized_cross;
 mod height;
 mod l1_norm;
 mod max_bits;

@@ -64,6 +64,10 @@ pub mod mod_entrywise_inverse;
 /// [`ModEntrywiseMul`](malachite_base::num::modular::traits::ModEntrywiseMul) and
 /// [`ModEntrywiseMulAssign`](malachite_base::num::modular::traits::ModEntrywiseMulAssign).
 pub mod mod_entrywise_mul;
+/// Implementations of
+/// [`ModGeneralizedCross`](malachite_base::num::modular::traits::ModGeneralizedCross), for
+/// computing the generalized cross product of $n - 1$ vectors of dimension $n$ modulo a number.
+pub mod mod_generalized_cross;
 /// An implementation of [`ModIsReduced`](malachite_base::num::modular::traits::ModIsReduced), which
 /// checks whether every element of a vector is less than a given modulus.
 pub mod mod_is_reduced;
@@ -145,6 +149,10 @@ pub mod mod_power_of_2_entrywise_inverse;
 /// [`ModPowerOf2EntrywiseMulAssign`](
 /// malachite_base::num::modular::traits::ModPowerOf2EntrywiseMulAssign).
 pub mod mod_power_of_2_entrywise_mul;
+/// Implementations of [`ModPowerOf2GeneralizedCross`](
+/// malachite_base::num::modular::traits::ModPowerOf2GeneralizedCross), for computing the
+/// generalized cross product of $n - 1$ vectors of dimension $n$ modulo $2^k$.
+pub mod mod_power_of_2_generalized_cross;
 /// An implementation of
 /// [`ModPowerOf2IsReduced`](malachite_base::num::modular::traits::ModPowerOf2IsReduced), which
 /// checks whether every element of a vector is less than a given power of 2.

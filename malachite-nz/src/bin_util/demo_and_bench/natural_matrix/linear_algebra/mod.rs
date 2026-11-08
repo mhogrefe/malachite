@@ -9,24 +9,33 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    adjugate::register(runner);
     characteristic_polynomial::register(runner);
+    cofactor::register(runner);
     determinant::register(runner);
     determinant_sign::register(runner);
     elementary_divisors::register(runner);
+    minor::register(runner);
+    mod_adjugate::register(runner);
     mod_characteristic_polynomial::register(runner);
+    mod_cofactor::register(runner);
     mod_determinant::register(runner);
     mod_gram_schmidt::register(runner);
     mod_howell_form::register(runner);
     mod_inverse::register(runner);
     mod_left_nullspace::register(runner);
     mod_lu_decomposition::register(runner);
+    mod_minor::register(runner);
     mod_nullspace::register(runner);
     mod_permanent::register(runner);
+    mod_power_of_2_adjugate::register(runner);
     mod_power_of_2_characteristic_polynomial::register(runner);
+    mod_power_of_2_cofactor::register(runner);
     mod_power_of_2_determinant::register(runner);
     mod_power_of_2_gram_schmidt::register(runner);
     mod_power_of_2_howell_form::register(runner);
     mod_power_of_2_inverse::register(runner);
+    mod_power_of_2_minor::register(runner);
     mod_power_of_2_permanent::register(runner);
     mod_power_of_2_similarity_transform::register(runner);
     mod_power_of_2_smith_normal_form::register(runner);
@@ -48,24 +57,33 @@ pub(crate) fn register(runner: &mut Runner) {
     trace::register(runner);
 }
 
+mod adjugate;
 mod characteristic_polynomial;
+mod cofactor;
 mod determinant;
 mod determinant_sign;
 mod elementary_divisors;
+mod minor;
+mod mod_adjugate;
 mod mod_characteristic_polynomial;
+mod mod_cofactor;
 mod mod_determinant;
 mod mod_gram_schmidt;
 mod mod_howell_form;
 mod mod_inverse;
 mod mod_left_nullspace;
 mod mod_lu_decomposition;
+mod mod_minor;
 mod mod_nullspace;
 mod mod_permanent;
+mod mod_power_of_2_adjugate;
 mod mod_power_of_2_characteristic_polynomial;
+mod mod_power_of_2_cofactor;
 mod mod_power_of_2_determinant;
 mod mod_power_of_2_gram_schmidt;
 mod mod_power_of_2_howell_form;
 mod mod_power_of_2_inverse;
+mod mod_power_of_2_minor;
 mod mod_power_of_2_permanent;
 mod mod_power_of_2_similarity_transform;
 mod mod_power_of_2_smith_normal_form;

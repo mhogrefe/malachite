@@ -181,7 +181,8 @@ use malachite_base::test_util::generators::exhaustive::{
     exhaustive_unsigned_vec_unsigned_pair_gen_var_17, exhaustive_window_bounds,
 };
 use malachite_base::test_util::generators::{
-    exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
+    exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, square_matrix_positions,
+    square_matrix_positions_with,
 };
 use malachite_base::tuples::exhaustive::{
     ExhaustiveDependentPairsYsGenerator, exhaustive_dependent_pairs,
@@ -3976,6 +3977,10 @@ pub fn exhaustive_integer_matrix_gen() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_matrices())
 }
 
+pub fn exhaustive_integer_matrix_gen_var_5() -> It<IntegerMatrix> {
+    Box::new(exhaustive_integer_matrix_gen().filter(|a| a.width() == a.height() + 1))
+}
+
 // Each matrix paired with each pair of its column indices. A matrix has finitely many, so this
 // reaches every triple exactly once.
 pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen_var_3()
@@ -4037,6 +4042,11 @@ pub fn exhaustive_integer_matrix_natural_matrix_pair_gen() -> It<(IntegerMatrix,
 
 pub fn exhaustive_integer_matrix_gen_var_1() -> It<IntegerMatrix> {
     Box::new(exhaustive_integer_square_matrices())
+}
+
+pub fn exhaustive_integer_matrix_unsigned_unsigned_triple_gen_var_4()
+-> It<(IntegerMatrix, u64, u64)> {
+    Box::new(exhaustive_integer_matrix_gen_var_1().flat_map(square_matrix_positions))
 }
 
 pub fn exhaustive_integer_matrix_gen_var_4() -> It<IntegerMatrix> {
@@ -4726,6 +4736,13 @@ pub fn exhaustive_natural_matrix_natural_pair_gen_var_2() -> It<(NaturalMatrix, 
     )
 }
 
+pub fn exhaustive_natural_matrix_natural_pair_gen_var_10() -> It<(NaturalMatrix, Natural)> {
+    Box::new(
+        exhaustive_natural_matrix_natural_pair_gen_var_2()
+            .filter(|(a, _)| a.width() == a.height() + 1),
+    )
+}
+
 pub fn exhaustive_natural_matrix_natural_pair_gen_var_8() -> It<(NaturalMatrix, Natural)> {
     Box::new(exhaustive_natural_matrix_natural_pair_gen_var_2().filter(|(_, m)| *m > 2u32))
 }
@@ -4738,6 +4755,18 @@ pub fn exhaustive_natural_matrix_natural_pair_gen_var_3() -> It<(NaturalMatrix, 
                 (a, m)
             },
         ),
+    )
+}
+
+pub fn exhaustive_natural_matrix_natural_pair_gen_var_9() -> It<(NaturalMatrix, Natural)> {
+    Box::new(exhaustive_natural_matrix_natural_pair_gen_var_3().filter(|(a, _)| a.height() <= 8))
+}
+
+pub fn exhaustive_natural_matrix_unsigned_unsigned_natural_quadruple_gen_var_1()
+-> It<(NaturalMatrix, u64, u64, Natural)> {
+    Box::new(
+        exhaustive_natural_matrix_natural_pair_gen_var_3()
+            .flat_map(|(a, x)| square_matrix_positions_with(a, x)),
     )
 }
 
@@ -5112,6 +5141,11 @@ pub fn exhaustive_integer_matrix_unsigned_matrix_pair_gen<T: PrimitiveUnsigned>(
 
 pub fn exhaustive_natural_matrix_gen_var_1() -> It<NaturalMatrix> {
     Box::new(exhaustive_natural_square_matrices())
+}
+
+pub fn exhaustive_natural_matrix_unsigned_unsigned_triple_gen_var_6()
+-> It<(NaturalMatrix, u64, u64)> {
+    Box::new(exhaustive_natural_matrix_gen_var_1().flat_map(square_matrix_positions))
 }
 
 pub fn exhaustive_natural_matrix_gen_var_2() -> It<NaturalMatrix> {
@@ -5568,6 +5602,13 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_4() -> It<(NaturalMatrix,
     )
 }
 
+pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_9() -> It<(NaturalMatrix, u64)> {
+    Box::new(
+        exhaustive_natural_matrix_unsigned_pair_gen_var_4()
+            .filter(|(a, _)| a.width() == a.height() + 1),
+    )
+}
+
 pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_6() -> It<(NaturalMatrix, u64)> {
     Box::new(
         exhaustive_pairs_big_tiny(
@@ -5583,6 +5624,18 @@ pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_6() -> It<(NaturalMatrix,
                 .unwrap_or(0);
             (m, pow + bits)
         }),
+    )
+}
+
+pub fn exhaustive_natural_matrix_unsigned_pair_gen_var_8() -> It<(NaturalMatrix, u64)> {
+    Box::new(exhaustive_natural_matrix_unsigned_pair_gen_var_6().filter(|(a, _)| a.height() <= 8))
+}
+
+pub fn exhaustive_natural_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1()
+-> It<(NaturalMatrix, u64, u64, u64)> {
+    Box::new(
+        exhaustive_natural_matrix_unsigned_pair_gen_var_6()
+            .flat_map(|(a, x)| square_matrix_positions_with(a, x)),
     )
 }
 

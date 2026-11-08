@@ -419,10 +419,12 @@ pub mod integer_matrix {
         pub mod exhaustive_integer_matrices;
     }
     pub mod linear_algebra {
+        pub mod adjugate;
         pub mod can_solve_dixon;
         pub mod can_solve_multi_mod;
         pub mod certify_lu_mod_p;
         pub mod characteristic_polynomial;
+        pub mod cofactor;
         pub mod determinant;
         pub mod determinant_bound;
         pub mod determinant_sign;
@@ -434,6 +436,7 @@ pub mod integer_matrix {
         pub mod is_in_hermite_normal_form;
         pub mod is_in_reduced_row_echelon_form_with_rank;
         pub mod is_in_smith_normal_form;
+        pub mod minor;
         pub mod permanent;
         pub mod reduced_row_echelon_form;
         pub mod similarity_transform;
@@ -503,6 +506,7 @@ pub mod integer_matrix {
     pub mod swap_rows;
     pub mod transpose;
     pub mod window;
+    pub mod without_row_and_column;
     pub mod zero;
 }
 pub mod integer_vector {
@@ -533,6 +537,7 @@ pub mod integer_vector {
         pub mod entrywise_mul;
         pub mod entrywise_shl_round;
         pub mod entrywise_shr_round;
+        pub mod generalized_cross;
         pub mod height;
         pub mod l1_norm;
         pub mod max_bits;
@@ -1286,23 +1291,32 @@ pub mod natural_matrix {
         pub mod exhaustive_natural_matrices;
     }
     pub mod linear_algebra {
+        pub mod adjugate;
         pub mod characteristic_polynomial;
+        pub mod cofactor;
         pub mod determinant;
         pub mod determinant_sign;
         pub mod elementary_divisors;
+        pub mod minor;
+        pub mod mod_adjugate;
         pub mod mod_characteristic_polynomial;
+        pub mod mod_cofactor;
         pub mod mod_determinant;
         pub mod mod_gram_schmidt;
         pub mod mod_howell_form;
         pub mod mod_inverse;
         pub mod mod_lu_decomposition;
+        pub mod mod_minor;
         pub mod mod_nullspace;
         pub mod mod_permanent;
+        pub mod mod_power_of_2_adjugate;
         pub mod mod_power_of_2_characteristic_polynomial;
+        pub mod mod_power_of_2_cofactor;
         pub mod mod_power_of_2_determinant;
         pub mod mod_power_of_2_gram_schmidt;
         pub mod mod_power_of_2_howell_form;
         pub mod mod_power_of_2_inverse;
+        pub mod mod_power_of_2_minor;
         pub mod mod_power_of_2_permanent;
         pub mod mod_power_of_2_similarity_transform;
         pub mod mod_power_of_2_smith_normal_form;
@@ -1408,6 +1422,7 @@ pub mod natural_matrix {
     pub mod swap_rows;
     pub mod transpose;
     pub mod window;
+    pub mod without_row_and_column;
     pub mod zero;
 }
 pub mod natural_vector {
@@ -1505,6 +1520,7 @@ pub mod natural_vector {
         pub mod mod_element_sum;
         pub mod mod_entrywise_inverse;
         pub mod mod_entrywise_mul;
+        pub mod mod_generalized_cross;
         pub mod mod_is_reduced;
         pub mod mod_mul;
         pub mod mod_neg;
@@ -1524,6 +1540,7 @@ pub mod natural_vector {
         pub mod mod_power_of_2_element_sum;
         pub mod mod_power_of_2_entrywise_inverse;
         pub mod mod_power_of_2_entrywise_mul;
+        pub mod mod_power_of_2_generalized_cross;
         pub mod mod_power_of_2_is_reduced;
         pub mod mod_power_of_2_mul;
         pub mod mod_power_of_2_neg;

@@ -184,6 +184,9 @@ use malachite_base::test_util::generators::special_random::{
     UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
     special_random_unsigned_vec_unsigned_pair_gen_var_17,
 };
+use malachite_base::test_util::generators::{
+    square_matrix_positions, square_matrix_positions_with,
+};
 use malachite_base::tuples::random::{
     random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
 };
@@ -8660,6 +8663,10 @@ pub fn special_random_integer_matrix_gen(config: &GenConfig) -> It<IntegerMatrix
     ))
 }
 
+pub fn special_random_integer_matrix_gen_var_5(config: &GenConfig) -> It<IntegerMatrix> {
+    Box::new(special_random_integer_matrix_gen(config).filter(|a| a.width() == a.height() + 1))
+}
+
 // A random matrix with at least one column, and two of its column indices drawn uniformly.
 pub fn special_random_integer_matrix_unsigned_unsigned_triple_gen_var_3(
     config: &GenConfig,
@@ -8801,6 +8808,12 @@ pub fn special_random_integer_matrix_gen_var_1(config: &GenConfig) -> It<Integer
         config.get_or("mean_size_n", 4),
         config.get_or("mean_size_d", 1),
     ))
+}
+
+pub fn special_random_integer_matrix_unsigned_unsigned_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(IntegerMatrix, u64, u64)> {
+    Box::new(special_random_integer_matrix_gen_var_1(config).flat_map(square_matrix_positions))
 }
 
 pub fn special_random_integer_matrix_gen_var_4(config: &GenConfig) -> It<IntegerMatrix> {
@@ -10161,6 +10174,24 @@ pub fn special_random_natural_matrix_natural_pair_gen_var_3(
     )
 }
 
+pub fn special_random_natural_matrix_natural_pair_gen_var_9(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    Box::new(
+        special_random_natural_matrix_natural_pair_gen_var_3(config)
+            .filter(|(a, _)| a.height() <= 8),
+    )
+}
+
+pub fn special_random_natural_matrix_unsigned_unsigned_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, u64, Natural)> {
+    Box::new(
+        special_random_natural_matrix_natural_pair_gen_var_3(config)
+            .flat_map(|(a, x)| square_matrix_positions_with(a, x)),
+    )
+}
+
 pub fn special_random_natural_matrix_natural_matrix_unsigned_triple_gen_var_1(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, NaturalMatrix, u64)> {
@@ -10591,6 +10622,12 @@ pub fn special_random_natural_matrix_gen_var_1(config: &GenConfig) -> It<Natural
     ))
 }
 
+pub fn special_random_natural_matrix_unsigned_unsigned_triple_gen_var_6(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, u64)> {
+    Box::new(special_random_natural_matrix_gen_var_1(config).flat_map(square_matrix_positions))
+}
+
 pub fn special_random_natural_matrix_gen_var_2(config: &GenConfig) -> It<NaturalMatrix> {
     Box::new(special_random_natural_matrix_gen_var_1(config).filter(|a| a.height() <= 8))
 }
@@ -10671,6 +10708,15 @@ pub fn special_random_natural_matrix_natural_pair_gen_var_4(
             );
             (a, m)
         }),
+    )
+}
+
+pub fn special_random_natural_matrix_natural_pair_gen_var_10(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, Natural)> {
+    Box::new(
+        special_random_natural_matrix_natural_pair_gen_var_4(config)
+            .filter(|(a, _)| a.width() == a.height() + 1),
     )
 }
 
@@ -11466,6 +11512,15 @@ pub fn special_random_natural_matrix_unsigned_pair_gen_var_4(
     )
 }
 
+pub fn special_random_natural_matrix_unsigned_pair_gen_var_9(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64)> {
+    Box::new(
+        special_random_natural_matrix_unsigned_pair_gen_var_4(config)
+            .filter(|(a, _)| a.width() == a.height() + 1),
+    )
+}
+
 pub fn special_random_natural_matrix_unsigned_pair_gen_var_6(
     config: &GenConfig,
 ) -> It<(NaturalMatrix, u64)> {
@@ -11500,6 +11555,24 @@ pub fn special_random_natural_matrix_unsigned_pair_gen_var_6(
                 .unwrap_or(0);
             (m, pow + bits)
         }),
+    )
+}
+
+pub fn special_random_natural_matrix_unsigned_pair_gen_var_8(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64)> {
+    Box::new(
+        special_random_natural_matrix_unsigned_pair_gen_var_6(config)
+            .filter(|(a, _)| a.height() <= 8),
+    )
+}
+
+pub fn special_random_natural_matrix_unsigned_unsigned_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(NaturalMatrix, u64, u64, u64)> {
+    Box::new(
+        special_random_natural_matrix_unsigned_pair_gen_var_6(config)
+            .flat_map(|(a, x)| square_matrix_positions_with(a, x)),
     )
 }
 

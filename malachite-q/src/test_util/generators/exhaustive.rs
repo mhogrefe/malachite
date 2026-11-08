@@ -67,7 +67,7 @@ use malachite_base::test_util::generators::exhaustive::{
     exhaustive_window_bounds,
 };
 use malachite_base::test_util::generators::{
-    exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
+    exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, square_matrix_positions,
 };
 use malachite_base::tuples::exhaustive::{
     exhaustive_ordered_unique_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
@@ -1019,6 +1019,10 @@ pub fn exhaustive_rational_matrix_gen() -> It<RationalMatrix> {
     Box::new(exhaustive_rational_matrices())
 }
 
+pub fn exhaustive_rational_matrix_gen_var_5() -> It<RationalMatrix> {
+    Box::new(exhaustive_rational_matrix_gen().filter(|a| a.width() == a.height() + 1))
+}
+
 // Each matrix paired with each pair of its column indices. A matrix has finitely many, so this
 // reaches every triple exactly once.
 pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen_var_3()
@@ -1916,6 +1920,11 @@ pub fn exhaustive_rational_vector_unsigned_vec_pair_gen_var_1() -> It<(RationalV
 
 pub fn exhaustive_rational_matrix_gen_var_2() -> It<RationalMatrix> {
     exhaustive_rational_matrix_gen_var_1()
+}
+
+pub fn exhaustive_rational_matrix_unsigned_unsigned_triple_gen_var_4()
+-> It<(RationalMatrix, u64, u64)> {
+    Box::new(exhaustive_rational_matrix_gen_var_2().flat_map(square_matrix_positions))
 }
 
 pub fn exhaustive_rational_matrix_gen_var_4() -> It<RationalMatrix> {

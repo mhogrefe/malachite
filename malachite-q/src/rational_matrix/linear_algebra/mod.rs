@@ -8,14 +8,18 @@
 
 #[cfg(doc)]
 use malachite_base::num::linear_algebra::traits::{
-    CharacteristicPolynomial, Determinant, DeterminantSign, GramSchmidt, GramSchmidtAssign,
-    Nullspace, Permanent, Rank, ReducedRowEchelonForm, ReducedRowEchelonFormAssign,
-    SimilarityTransform, SimilarityTransformAssign, Solve, Trace,
+    Adjugate, CharacteristicPolynomial, Cofactor, Determinant, DeterminantSign, GramSchmidt,
+    GramSchmidtAssign, Minor, Nullspace, Permanent, Rank, ReducedRowEchelonForm,
+    ReducedRowEchelonFormAssign, SimilarityTransform, SimilarityTransformAssign, Solve, Trace,
 };
 
+/// Implementations of [`Adjugate`], for computing the adjugates of square matrices.
+pub mod adjugate;
 /// Implementations of [`CharacteristicPolynomial`], for computing the characteristic polynomial of
 /// a square matrix.
 pub mod characteristic_polynomial;
+/// Implementations of [`Cofactor`], for computing the cofactors of square matrices.
+pub mod cofactor;
 /// Implementations of [`Determinant`], for computing the determinants of square rational matrices.
 pub mod determinant;
 /// Implementations of [`DeterminantSign`], for determining the signs of the determinants of square
@@ -27,6 +31,8 @@ pub mod gram_schmidt;
 /// Implementations of [`Inverse`](malachite_base::num::arithmetic::traits::Inverse), for inverting
 /// square rational matrices.
 pub mod inverse;
+/// Implementations of [`Minor`], for computing the minors of square matrices.
+pub mod minor;
 /// Implementations of [`Nullspace`], for finding bases of the right nullspaces of rational
 /// matrices.
 pub mod nullspace;

@@ -9,9 +9,11 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    adjugate::register(runner);
     can_solve_multi_mod::register(runner);
     certify_lu_mod_p::register(runner);
     characteristic_polynomial::register(runner);
+    cofactor::register(runner);
     determinant::register(runner);
     determinant_bound::register(runner);
     determinant_divisor::register(runner);
@@ -24,6 +26,7 @@ pub(crate) fn register(runner: &mut Runner) {
     is_in_hermite_normal_form::register(runner);
     is_in_reduced_row_echelon_form_with_rank::register(runner);
     is_in_smith_normal_form::register(runner);
+    minor::register(runner);
     nullspace::register(runner);
     permanent::register(runner);
     rank::register(runner);
@@ -39,9 +42,11 @@ pub(crate) fn register(runner: &mut Runner) {
     trace::register(runner);
 }
 
+mod adjugate;
 mod can_solve_multi_mod;
 mod certify_lu_mod_p;
 mod characteristic_polynomial;
+mod cofactor;
 mod determinant;
 mod determinant_bound;
 mod determinant_divisor;
@@ -54,6 +59,7 @@ mod inverse;
 mod is_in_hermite_normal_form;
 mod is_in_reduced_row_echelon_form_with_rank;
 mod is_in_smith_normal_form;
+mod minor;
 mod nullspace;
 mod permanent;
 mod rank;

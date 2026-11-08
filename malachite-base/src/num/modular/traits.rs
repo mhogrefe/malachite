@@ -1057,6 +1057,24 @@ pub trait ModCrossAssign<RHS = Self, M = Self> {
     fn mod_cross_assign(&mut self, other: RHS, m: M);
 }
 
+/// Computes the generalized cross product of $n - 1$ vectors of dimension $n$ modulo $m$. The
+/// entries must be already reduced modulo $m$.
+///
+/// $n - 1$ vectors of dimension $n$ determine the vector $w$ with
+///
+/// $$
+/// w_i = (-1)^{n - 1 + i} \det A_{(i)} \bmod m,
+/// $$
+///
+/// where $A$ is the $(n - 1) \times n$ matrix whose rows are the vectors and $A_{(i)}$ is $A$
+/// without column $i$, so that $w \cdot x = \det \begin{pmatrix} A \\ x \end{pmatrix}$ for every
+/// $x$. For $n = 2$ it rotates the vector a quarter turn counterclockwise, $(a, b) \mapsto (-b, a)
+/// \bmod m$; for $n = 3$ it is the cross product $v \times w \bmod m$; and no vectors give the
+/// 1-dimensional vector $(1 \bmod m)$.
+pub trait ModGeneralizedCross<M = Self>: Sized {
+    fn mod_generalized_cross(xs: &[Self], m: M) -> Self;
+}
+
 /// Finds the multiplicative inverses of all the entries of a value, such as a vector, modulo a
 /// number $m$, returning `None` if any entry is not invertible. The entries must be already reduced
 /// modulo $m$.
@@ -1102,6 +1120,24 @@ pub trait ModPowerOf2Cross<RHS = Self> {
 /// $$
 pub trait ModPowerOf2CrossAssign<RHS = Self> {
     fn mod_power_of_2_cross_assign(&mut self, other: RHS, pow: u64);
+}
+
+/// Computes the generalized cross product of $n - 1$ vectors of dimension $n$ modulo $2^k$. The
+/// entries must be already reduced modulo $2^k$.
+///
+/// $n - 1$ vectors of dimension $n$ determine the vector $w$ with
+///
+/// $$
+/// w_i = (-1)^{n - 1 + i} \det A_{(i)} \bmod 2^k,
+/// $$
+///
+/// where $A$ is the $(n - 1) \times n$ matrix whose rows are the vectors and $A_{(i)}$ is $A$
+/// without column $i$, so that $w \cdot x = \det \begin{pmatrix} A \\ x \end{pmatrix}$ for every
+/// $x$. For $n = 2$ it rotates the vector a quarter turn counterclockwise, $(a, b) \mapsto (-b, a)
+/// \bmod 2^k$; for $n = 3$ it is the cross product $v \times w \bmod 2^k$; and no vectors give the
+/// 1-dimensional vector $(1 \bmod 2^k)$.
+pub trait ModPowerOf2GeneralizedCross: Sized {
+    fn mod_power_of_2_generalized_cross(xs: &[Self], pow: u64) -> Self;
 }
 
 /// Finds the multiplicative inverses of all the entries of a value, such as a vector, modulo $2^k$,

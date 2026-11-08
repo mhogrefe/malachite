@@ -434,6 +434,10 @@ pub mod entrywise_shl_round;
 /// assert_eq!(v.to_string(), "(0, 1, -2, 2)");
 /// ```
 pub mod entrywise_shr_round;
+/// An implementation of
+/// [`GeneralizedCross`](malachite_base::num::arithmetic::traits::GeneralizedCross), for computing
+/// the generalized cross product of $n - 1$ vectors of dimension $n$.
+pub mod generalized_cross;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height) and
 /// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest height of any
 /// element.
