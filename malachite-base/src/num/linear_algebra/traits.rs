@@ -491,3 +491,26 @@ pub trait ModAreLinearlyIndependent<M = Self>: Sized {
 pub trait ModPowerOf2AreLinearlyIndependent: Sized {
     fn mod_power_of_2_are_linearly_independent(xs: &[Self], pow: u64) -> bool;
 }
+
+/// Determines whether points, given as vectors, are affinely independent: whether no nontrivial
+/// linear combination of them whose coefficients sum to zero is zero. The points are given as a
+/// slice, and must all have the same dimension.
+pub trait AreAffinelyIndependent: Sized {
+    fn are_affinely_independent(xs: &[Self]) -> bool;
+}
+
+/// Determines whether points, given as vectors, are affinely independent modulo $m$: whether no
+/// nontrivial linear combination of them, with coefficients in $\mathbb{Z}/m\mathbb{Z}$ that sum to
+/// zero, is zero modulo $m$. The points are given as a slice, must all have the same dimension, and
+/// must already be reduced modulo $m$.
+pub trait ModAreAffinelyIndependent<M = Self>: Sized {
+    fn mod_are_affinely_independent(xs: &[Self], m: M) -> bool;
+}
+
+/// Determines whether points, given as vectors, are affinely independent modulo $2^k$: whether no
+/// nontrivial linear combination of them, with coefficients in $\mathbb{Z}/2^k\mathbb{Z}$ that sum
+/// to zero, is zero modulo $2^k$. The points are given as a slice, must all have the same
+/// dimension, and must already be reduced modulo $2^k$.
+pub trait ModPowerOf2AreAffinelyIndependent: Sized {
+    fn mod_power_of_2_are_affinely_independent(xs: &[Self], pow: u64) -> bool;
+}

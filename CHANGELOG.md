@@ -991,7 +991,17 @@ documented by git history.
   modular traits are implemented for `UnsignedVector<T>` and `NaturalVector`. The modulus need not
   be prime: vectors are independent modulo $m$ when no nontrivial combination over
   $\mathbb{Z}/m\mathbb{Z}$ vanishes, which is decided, without factoring $m$, from the Howell form
-  of the vectors with an identity block appended; modulo $2^k$, it is decided by the rank modulo 2.
+  of the vectors with an identity block appended; modulo $2^k$, it is decided by the rank modulo 2,
+  computed in words.
+- Affine independence of points. New `AreAffinelyIndependent`, `ModAreAffinelyIndependent`, and
+  `ModPowerOf2AreAffinelyIndependent` traits in malachite-base take a slice of points, given as
+  vectors of one dimension, and are implemented for the same types as their linear counterparts.
+  The points are affinely independent when their differences from the simplest point (the one with
+  the fewest bits, or, modulo $m$ or $2^k$, the most zero elements) are linearly independent; for
+  `RationalVector`s, it is decided in homogeneous coordinates, by appending 1 to each point, which
+  was measured to be faster for them. `NaturalVector`s modulo $2^k$ are first reduced modulo 2, into
+  words, since for $k > 0$ points are affinely independent modulo $2^k$ exactly when they are
+  modulo 2.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

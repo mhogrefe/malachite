@@ -1270,7 +1270,9 @@ pub mod unsigned_vector {
     pub mod height_index;
     pub mod is_zero;
     pub mod linear_algebra {
+        pub mod mod_are_affinely_independent;
         pub mod mod_are_linearly_independent;
+        pub mod mod_power_of_2_are_affinely_independent;
         pub mod mod_power_of_2_are_linearly_independent;
     }
     pub mod logic {

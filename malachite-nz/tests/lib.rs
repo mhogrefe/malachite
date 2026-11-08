@@ -586,6 +586,7 @@ pub mod integer_vector {
     pub mod height_index;
     pub mod is_zero;
     pub mod linear_algebra {
+        pub mod are_affinely_independent;
         pub mod are_linearly_independent;
     }
     pub mod logic {
@@ -1477,8 +1478,11 @@ pub mod natural_vector {
     pub mod height_index;
     pub mod is_zero;
     pub mod linear_algebra {
+        pub mod are_affinely_independent;
         pub mod are_linearly_independent;
+        pub mod mod_are_affinely_independent;
         pub mod mod_are_linearly_independent;
+        pub mod mod_power_of_2_are_affinely_independent;
         pub mod mod_power_of_2_are_linearly_independent;
     }
     pub mod logic {

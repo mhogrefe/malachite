@@ -15,6 +15,7 @@ use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vector::Vector;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_vector::NaturalVector;
+use malachite_nz::natural_vector::linear_algebra::mod_power_of_2_are_linearly_independent::*;
 use malachite_nz::test_util::generators::natural_matrix_unsigned_pair_gen_var_4;
 use std::panic::catch_unwind;
 
@@ -30,6 +31,10 @@ fn test_mod_power_of_2_are_linearly_independent() {
         let xs = vectors(xs);
         assert_eq!(
             NaturalVector::mod_power_of_2_are_linearly_independent(&xs, pow),
+            out
+        );
+        assert_eq!(
+            mod_power_of_2_are_linearly_independent_by_natural_rank(&xs, pow),
             out
         );
         assert_eq!(
@@ -69,6 +74,10 @@ fn mod_power_of_2_are_linearly_independent_properties() {
             .map(|row| NaturalVector::from_elements(row.as_slice()))
             .collect();
         let independent = NaturalVector::mod_power_of_2_are_linearly_independent(&xs, pow);
+        assert_eq!(
+            mod_power_of_2_are_linearly_independent_by_natural_rank(&xs, pow),
+            independent
+        );
         assert_eq!(
             NaturalVector::mod_are_linearly_independent(&xs, Natural::power_of_2(pow)),
             independent

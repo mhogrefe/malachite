@@ -16,6 +16,54 @@ use malachite_base::num::basic::traits::Two;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::linear_algebra::traits::{ModPowerOf2AreLinearlyIndependent, ModRank};
 use malachite_base::num::modular::traits::ModPowerOf2IsReduced;
+use malachite_base::unsigned_matrix::UnsignedMatrix;
+
+// Checks the vectors' dimensions and reducedness, and returns the answer if it is already known: no
+// vectors, or any vectors modulo 1, are linearly independent, and more vectors than their dimension
+// are not. Otherwise, returns the number of vectors and their dimension.
+fn known_answer(xs: &[NaturalVector], pow: u64) -> Result<bool, (u64, u64)> {
+    let d = common_dimension(xs, "vectors");
+    assert!(
+        xs.iter().all(|x| x.mod_power_of_2_is_reduced(pow)),
+        "each vector must be reduced modulo 2^{pow}"
+    );
+    let r = xs.len();
+    if r == 0 || pow == 0 {
+        Ok(true)
+    } else if r > d {
+        Ok(false)
+    } else {
+        Err((u64::exact_from(r), u64::exact_from(d)))
+    }
+}
+
+crate_test_fn! {
+#[allow(dead_code)]
+mod_power_of_2_are_linearly_independent_by_natural_rank(xs: &[NaturalVector], pow: u64) -> bool {
+    let (r, d) = match known_answer(xs, pow) {
+        Ok(independent) => return independent,
+        Err(shape) => shape,
+    };
+    let elements: Vec<Natural> = xs
+        .iter()
+        .flat_map(|x| x.elements.iter().map(|e| Natural::from(e.odd())))
+        .collect();
+    NaturalMatrix::from_elements(r, d, &elements).mod_rank(Natural::TWO) == r
+}}
+
+crate_test_fn! {
+#[allow(dead_code)]
+mod_power_of_2_are_linearly_independent_by_word_rank(xs: &[NaturalVector], pow: u64) -> bool {
+    let (r, d) = match known_answer(xs, pow) {
+        Ok(independent) => return independent,
+        Err(shape) => shape,
+    };
+    let elements: Vec<u64> = xs
+        .iter()
+        .flat_map(|x| x.elements.iter().map(|e| u64::from(e.odd())))
+        .collect();
+    UnsignedMatrix::from_elements(r, d, &elements).mod_rank(2) == r
+}}
 
 impl ModPowerOf2AreLinearlyIndependent for NaturalVector {
     /// Determines whether [`NaturalVector`]s are linearly independent modulo $2^k$: whether no
@@ -61,25 +109,8 @@ impl ModPowerOf2AreLinearlyIndependent for NaturalVector {
     ///     2
     /// ));
     /// ```
+    #[inline]
     fn mod_power_of_2_are_linearly_independent(xs: &[Self], pow: u64) -> bool {
-        let d = common_dimension(xs, "vectors");
-        assert!(
-            xs.iter().all(|x| x.mod_power_of_2_is_reduced(pow)),
-            "each vector must be reduced modulo 2^{pow}"
-        );
-        let r = xs.len();
-        if r == 0 || pow == 0 {
-            return true;
-        }
-        if r > d {
-            return false;
-        }
-        let elements: Vec<Natural> = xs
-            .iter()
-            .flat_map(|x| x.elements.iter().map(|e| Natural::from(e.odd())))
-            .collect();
-        NaturalMatrix::from_elements(u64::exact_from(r), u64::exact_from(d), &elements)
-            .mod_rank(Natural::TWO)
-            == u64::exact_from(r)
+        mod_power_of_2_are_linearly_independent_by_word_rank(xs, pow)
     }
 }

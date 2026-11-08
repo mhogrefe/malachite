@@ -9,9 +9,13 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    mod_are_affinely_independent::register(runner);
     mod_are_linearly_independent::register(runner);
+    mod_power_of_2_are_affinely_independent::register(runner);
     mod_power_of_2_are_linearly_independent::register(runner);
 }
 
+mod mod_are_affinely_independent;
 mod mod_are_linearly_independent;
+mod mod_power_of_2_are_affinely_independent;
 mod mod_power_of_2_are_linearly_independent;

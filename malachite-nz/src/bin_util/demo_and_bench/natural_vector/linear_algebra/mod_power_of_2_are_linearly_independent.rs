@@ -13,6 +13,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_base::vector::Vector;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::natural_vector::NaturalVector;
+use malachite_nz::natural_vector::linear_algebra::mod_power_of_2_are_linearly_independent::*;
 use malachite_nz::test_util::bench::bucketers::pair_1_natural_matrix_bit_bucketer;
 use malachite_nz::test_util::generators::natural_matrix_unsigned_pair_gen_var_4;
 
@@ -23,7 +24,7 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_bench!(
         runner,
-        benchmark_natural_vector_mod_power_of_2_are_linearly_independent
+        benchmark_natural_vector_mod_power_of_2_are_linearly_independent_algorithms
     );
 }
 
@@ -52,7 +53,7 @@ fn demo_natural_vector_mod_power_of_2_are_linearly_independent(
     }
 }
 
-fn benchmark_natural_vector_mod_power_of_2_are_linearly_independent(
+fn benchmark_natural_vector_mod_power_of_2_are_linearly_independent_algorithms(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -60,17 +61,25 @@ fn benchmark_natural_vector_mod_power_of_2_are_linearly_independent(
 ) {
     run_benchmark(
         "NaturalVector::mod_power_of_2_are_linearly_independent",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         natural_matrix_unsigned_pair_gen_var_4().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_1_natural_matrix_bit_bucketer("a"),
-        &mut [("Malachite", &mut |(matrix, pow)| {
-            no_out!(NaturalVector::mod_power_of_2_are_linearly_independent(
-                &rows(&matrix),
-                pow
-            ));
-        })],
+        &mut [
+            ("rank of words", &mut |(matrix, pow)| {
+                no_out!(mod_power_of_2_are_linearly_independent_by_word_rank(
+                    &rows(&matrix),
+                    pow
+                ));
+            }),
+            ("rank of Naturals", &mut |(matrix, pow)| {
+                no_out!(mod_power_of_2_are_linearly_independent_by_natural_rank(
+                    &rows(&matrix),
+                    pow
+                ));
+            }),
+        ],
     );
 }
