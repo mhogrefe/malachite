@@ -93,7 +93,9 @@ mod_power_of_2_are_affinely_independent_by_reduction_mod_2<T: PrimitiveUnsigned>
     let parities: Vec<UnsignedVector<T>> = xs
         .iter()
         .map(|x| {
-            UnsignedVector::from_owned_elements(x.elements.iter().map(|&e| T::from(e.odd())).collect())
+            UnsignedVector::from_owned_elements(
+                x.elements.iter().map(|&e| T::from(e.odd())).collect(),
+            )
         })
         .collect();
     mod_power_of_2_are_affinely_independent_by_subtraction(&parities, 1)
