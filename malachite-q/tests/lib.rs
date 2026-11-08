@@ -663,6 +663,9 @@ pub mod rational_vector {
     pub mod extend;
     pub mod height_index;
     pub mod is_zero;
+    pub mod linear_algebra {
+        pub mod are_linearly_independent;
+    }
     pub mod logic {
         pub mod significant_bits;
     }

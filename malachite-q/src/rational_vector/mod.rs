@@ -32,6 +32,8 @@ pub mod exhaustive;
 /// An implementation of [`Extend`], for appending the elements produced by an iterator to a
 /// [`RationalVector`].
 pub mod extend;
+/// Linear algebra on collections of [`RationalVector`]s.
+pub mod linear_algebra;
 /// Traits for logic and bit manipulation on [`RationalVector`]s.
 pub mod logic;
 /// Iterators that generate [`RationalVector`]s randomly.

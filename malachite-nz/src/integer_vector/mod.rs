@@ -32,6 +32,8 @@ pub mod exhaustive;
 /// An implementation of [`Extend`], for appending the elements produced by an iterator to an
 /// [`IntegerVector`].
 pub mod extend;
+/// Linear algebra on collections of [`IntegerVector`]s.
+pub mod linear_algebra;
 /// Traits for logic and bit manipulation on [`IntegerVector`]s.
 pub mod logic;
 /// Arithmetic on [`IntegerVector`]s whose entries are reduced modulo $m$ or $2^k$.

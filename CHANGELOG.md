@@ -984,6 +984,14 @@ documented by git history.
   FLINT's `arith_stirling_matrix_1u`, `arith_stirling_matrix_1`, and `arith_stirling_matrix_2`. The
   rows are filled in turn by the triangles' recurrences, as in FLINT. New oracle-test modes check
   all three against FLINT.
+- Linear independence of vectors. New `AreLinearlyIndependent`, `ModAreLinearlyIndependent`, and
+  `ModPowerOf2AreLinearlyIndependent` traits in malachite-base take a slice of vectors of one
+  dimension. `AreLinearlyIndependent` (over the rationals) is implemented for `NaturalVector`,
+  `IntegerVector`, and `RationalVector`, by the rank of the matrix whose rows are the vectors; the
+  modular traits are implemented for `UnsignedVector<T>` and `NaturalVector`. The modulus need not
+  be prime: vectors are independent modulo $m$ when no nontrivial combination over
+  $\mathbb{Z}/m\mathbb{Z}$ vanishes, which is decided, without factoring $m$, from the Howell form
+  of the vectors with an identity block appended; modulo $2^k$, it is decided by the rank modulo 2.
 - New `ModDivExact`, `ModDivExactAssign`, `CheckedModDivExact`, and `ModDivisibleBy` traits in
   malachite-base, and their `ModPowerOf2` counterparts, implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: exact division of polynomials modulo $m$ or $2^k$, like FLINT's

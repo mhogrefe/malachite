@@ -469,3 +469,25 @@ pub trait ModPowerOf2GramSchmidt {
 
     fn mod_power_of_2_gram_schmidt(self, pow: u64) -> Option<Self::Output>;
 }
+
+/// Determines whether vectors are linearly independent: whether no nontrivial linear combination of
+/// them is zero. The vectors are given as a slice, and must all have the same dimension.
+pub trait AreLinearlyIndependent: Sized {
+    fn are_linearly_independent(xs: &[Self]) -> bool;
+}
+
+/// Determines whether vectors are linearly independent modulo $m$: whether no nontrivial linear
+/// combination of them, with coefficients in $\mathbb{Z}/m\mathbb{Z}$, is zero modulo $m$. The
+/// vectors are given as a slice, must all have the same dimension, and must already be reduced
+/// modulo $m$.
+pub trait ModAreLinearlyIndependent<M = Self>: Sized {
+    fn mod_are_linearly_independent(xs: &[Self], m: M) -> bool;
+}
+
+/// Determines whether vectors are linearly independent modulo $2^k$: whether no nontrivial linear
+/// combination of them, with coefficients in $\mathbb{Z}/2^k\mathbb{Z}$, is zero modulo $2^k$. The
+/// vectors are given as a slice, must all have the same dimension, and must already be reduced
+/// modulo $2^k$.
+pub trait ModPowerOf2AreLinearlyIndependent: Sized {
+    fn mod_power_of_2_are_linearly_independent(xs: &[Self], pow: u64) -> bool;
+}

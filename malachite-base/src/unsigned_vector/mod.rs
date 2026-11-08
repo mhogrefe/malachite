@@ -31,6 +31,8 @@ pub mod exhaustive;
 /// An implementation of [`Extend`], for appending the elements produced by an iterator to an
 /// [`UnsignedVector`].
 pub mod extend;
+/// Linear algebra on collections of [`UnsignedVector`]s.
+pub mod linear_algebra;
 /// Traits for logic and bit manipulation on [`UnsignedVector`]s.
 pub mod logic;
 /// Arithmetic on [`UnsignedVector`]s whose entries are reduced modulo $m$ or $2^k$.

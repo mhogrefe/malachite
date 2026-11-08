@@ -2182,7 +2182,10 @@ pub(crate) fn write_rows<T: PrimitiveUnsigned>(
 }
 
 // The dimension shared by all of `vectors`, or 0 if there are none, panicking if they differ.
-fn common_dimension<T: PrimitiveUnsigned>(vectors: &[UnsignedVector<T>], what: &str) -> usize {
+pub(crate) fn common_dimension<T: PrimitiveUnsigned>(
+    vectors: &[UnsignedVector<T>],
+    what: &str,
+) -> usize {
     let dimension = vectors.first().map_or(0, |v| v.elements.len());
     assert!(
         vectors.iter().all(|v| v.elements.len() == dimension),

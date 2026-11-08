@@ -32,6 +32,8 @@ pub mod exhaustive;
 /// An implementation of [`Extend`], for appending the elements produced by an iterator to a
 /// [`NaturalVector`].
 pub mod extend;
+/// Linear algebra on collections of [`NaturalVector`]s.
+pub mod linear_algebra;
 /// Traits for logic and bit manipulation on [`NaturalVector`]s.
 pub mod logic;
 /// Arithmetic on [`NaturalVector`]s whose entries are reduced modulo $m$ or $2^k$.
