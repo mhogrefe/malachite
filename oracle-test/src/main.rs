@@ -757,6 +757,176 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ("demo_natural_cmp_products", "az_nat_cmp_products"),
     ("demo_natural_vector_dot_sign", "az_nat_dot_sign"),
     ("demo_natural_vector_dot_sign_ref_ref", "az_nat_dot_sign"),
+    ("demo_natural_vector_add", "az_nat_vector_add"),
+    ("demo_natural_vector_add_val_ref", "az_nat_vector_add"),
+    ("demo_natural_vector_add_ref_val", "az_nat_vector_add"),
+    ("demo_natural_vector_add_ref_ref", "az_nat_vector_add"),
+    ("demo_natural_vector_add_assign", "az_nat_vector_add"),
+    ("demo_natural_vector_add_assign_ref", "az_nat_vector_add"),
+    ("demo_natural_vector_mul_scalar", "az_nat_vector_mul_scalar"),
+    (
+        "demo_natural_vector_mul_scalar_ref",
+        "az_nat_vector_mul_scalar",
+    ),
+    (
+        "demo_natural_vector_scalar_mul_ref",
+        "az_nat_vector_mul_scalar",
+    ),
+    (
+        "demo_natural_vector_mul_scalar_assign",
+        "az_nat_vector_mul_scalar",
+    ),
+    ("demo_natural_vector_dot", "az_nat_vector_dot"),
+    ("demo_natural_vector_dot_val_ref", "az_nat_vector_dot"),
+    ("demo_natural_vector_dot_ref_val", "az_nat_vector_dot"),
+    ("demo_natural_vector_dot_ref_ref", "az_nat_vector_dot"),
+    (
+        "demo_natural_vector_abs_squared",
+        "az_nat_vector_abs_squared",
+    ),
+    (
+        "demo_natural_vector_abs_squared_ref",
+        "az_nat_vector_abs_squared",
+    ),
+    ("demo_natural_vector_index", "az_nat_vector_index"),
+    ("demo_natural_vector_to_string", "az_nat_vector_to_string"),
+    (
+        "demo_natural_vector_to_debug_string",
+        "az_nat_vector_to_string",
+    ),
+    ("demo_natural_vector_from_str", "az_nat_vector_from_str"),
+    (
+        "demo_natural_vector_from_str_targeted",
+        "az_nat_vector_from_str",
+    ),
+    ("demo_natural_vector_mod_add", "az_nat_vector_mod_add"),
+    (
+        "demo_natural_vector_mod_add_ref_ref",
+        "az_nat_vector_mod_add",
+    ),
+    (
+        "demo_natural_vector_mod_add_assign",
+        "az_nat_vector_mod_add",
+    ),
+    ("demo_natural_vector_mod_sub", "az_nat_vector_mod_sub"),
+    (
+        "demo_natural_vector_mod_sub_ref_ref",
+        "az_nat_vector_mod_sub",
+    ),
+    (
+        "demo_natural_vector_mod_sub_assign",
+        "az_nat_vector_mod_sub",
+    ),
+    ("demo_natural_vector_mod_neg", "az_nat_vector_mod_neg"),
+    ("demo_natural_vector_mod_neg_ref", "az_nat_vector_mod_neg"),
+    (
+        "demo_natural_vector_mod_neg_assign",
+        "az_nat_vector_mod_neg",
+    ),
+    ("demo_natural_vector_mod_mul", "az_nat_vector_mod_mul"),
+    ("demo_natural_vector_mod_mul_ref", "az_nat_vector_mod_mul"),
+    (
+        "demo_natural_vector_mod_mul_assign",
+        "az_nat_vector_mod_mul",
+    ),
+    ("demo_natural_vector_mod_dot", "az_nat_vector_mod_dot"),
+    (
+        "demo_natural_vector_mod_dot_ref_ref",
+        "az_nat_vector_mod_dot",
+    ),
+    (
+        "demo_natural_vector_mod_abs_squared",
+        "az_nat_vector_mod_abs_squared",
+    ),
+    (
+        "demo_natural_vector_mod_abs_squared_ref",
+        "az_nat_vector_mod_abs_squared",
+    ),
+    ("demo_natural_vector_mod_cross", "az_nat_vector_mod_cross"),
+    (
+        "demo_natural_vector_mod_cross_ref",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_natural_vector_mod_cross_assign",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_add",
+        "az_nat_vector_mod_power_of_2_add",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_add_ref_ref",
+        "az_nat_vector_mod_power_of_2_add",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_add_assign",
+        "az_nat_vector_mod_power_of_2_add",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_sub",
+        "az_nat_vector_mod_power_of_2_sub",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_sub_ref_ref",
+        "az_nat_vector_mod_power_of_2_sub",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_sub_assign",
+        "az_nat_vector_mod_power_of_2_sub",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_neg",
+        "az_nat_vector_mod_power_of_2_neg",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_neg_ref",
+        "az_nat_vector_mod_power_of_2_neg",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_neg_assign",
+        "az_nat_vector_mod_power_of_2_neg",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_mul",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_mul_ref",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_mul_assign",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_dot",
+        "az_nat_vector_mod_power_of_2_dot",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_dot_ref_ref",
+        "az_nat_vector_mod_power_of_2_dot",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_abs_squared",
+        "az_nat_vector_mod_power_of_2_abs_squared",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_abs_squared_ref",
+        "az_nat_vector_mod_power_of_2_abs_squared",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_cross",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_cross_ref",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_natural_vector_mod_power_of_2_cross_assign",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
     ("demo_natural_sum", "az_nat_sum"),
     ("demo_natural_ref_sum", "az_nat_sum"),
     ("demo_natural_product", "az_nat_product"),
@@ -819,6 +989,11 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
 
 // The demos whose generators have no `special_random` mode.
 const AZURITE_NATURAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
+    ("demo_natural_vector_zero", "az_nat_vector_zero"),
+    (
+        "demo_natural_vector_standard_basis_vector",
+        "az_nat_vector_standard_basis_vector",
+    ),
     ("demo_natural_power_of_2", "az_nat_power_of_2"),
     ("demo_natural_low_mask", "az_nat_low_mask"),
     (
@@ -1086,6 +1261,373 @@ const AZURITE_INTEGER_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
         "az_int_from_string_base",
     ),
     ("demo_integer_from_str_targeted", "az_int_from_str"),
+];
+
+// The UnsignedVector modular demos checked against Azurite, read by the same modes as the
+// NaturalVector ones.
+const AZURITE_UNSIGNED_VECTOR_STAGES: &[(&str, &str)] = &[
+    ("demo_unsigned_vector_mod_add", "az_nat_vector_mod_add"),
+    (
+        "demo_unsigned_vector_mod_add_ref_ref",
+        "az_nat_vector_mod_add",
+    ),
+    (
+        "demo_unsigned_vector_mod_add_assign",
+        "az_nat_vector_mod_add",
+    ),
+    ("demo_unsigned_vector_mod_sub", "az_nat_vector_mod_sub"),
+    (
+        "demo_unsigned_vector_mod_sub_ref_ref",
+        "az_nat_vector_mod_sub",
+    ),
+    (
+        "demo_unsigned_vector_mod_sub_assign",
+        "az_nat_vector_mod_sub",
+    ),
+    ("demo_unsigned_vector_mod_neg", "az_nat_vector_mod_neg"),
+    ("demo_unsigned_vector_mod_neg_ref", "az_nat_vector_mod_neg"),
+    (
+        "demo_unsigned_vector_mod_neg_assign",
+        "az_nat_vector_mod_neg",
+    ),
+    ("demo_unsigned_vector_mod_mul_u8", "az_nat_vector_mod_mul"),
+    ("demo_unsigned_vector_mod_mul_u16", "az_nat_vector_mod_mul"),
+    ("demo_unsigned_vector_mod_mul_u32", "az_nat_vector_mod_mul"),
+    ("demo_unsigned_vector_mod_mul_u64", "az_nat_vector_mod_mul"),
+    ("demo_unsigned_vector_mod_mul_u128", "az_nat_vector_mod_mul"),
+    (
+        "demo_unsigned_vector_mod_mul_usize",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_ref_u8",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_ref_u16",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_ref_u32",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_ref_u64",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_ref_u128",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_ref_usize",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_assign_u8",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_assign_u16",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_assign_u32",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_assign_u64",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_assign_u128",
+        "az_nat_vector_mod_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_mul_assign_usize",
+        "az_nat_vector_mod_mul",
+    ),
+    ("demo_unsigned_vector_mod_dot", "az_nat_vector_mod_dot"),
+    (
+        "demo_unsigned_vector_mod_dot_ref_ref",
+        "az_nat_vector_mod_dot",
+    ),
+    (
+        "demo_unsigned_vector_mod_abs_squared",
+        "az_nat_vector_mod_abs_squared",
+    ),
+    (
+        "demo_unsigned_vector_mod_abs_squared_ref",
+        "az_nat_vector_mod_abs_squared",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_u8",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_u16",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_u32",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_u64",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_u128",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_usize",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_ref_u8",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_ref_u16",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_ref_u32",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_ref_u64",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_ref_u128",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_ref_usize",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_assign_u8",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_assign_u16",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_assign_u32",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_assign_u64",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_assign_u128",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_cross_assign_usize",
+        "az_nat_vector_mod_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_add",
+        "az_nat_vector_mod_power_of_2_add",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_add_ref_ref",
+        "az_nat_vector_mod_power_of_2_add",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_add_assign",
+        "az_nat_vector_mod_power_of_2_add",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_sub",
+        "az_nat_vector_mod_power_of_2_sub",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_sub_ref_ref",
+        "az_nat_vector_mod_power_of_2_sub",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_sub_assign",
+        "az_nat_vector_mod_power_of_2_sub",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_neg",
+        "az_nat_vector_mod_power_of_2_neg",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_neg_ref",
+        "az_nat_vector_mod_power_of_2_neg",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_neg_assign",
+        "az_nat_vector_mod_power_of_2_neg",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_u8",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_u16",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_u32",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_u64",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_u128",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_usize",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_ref_u8",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_ref_u16",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_ref_u32",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_ref_u64",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_ref_u128",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_ref_usize",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_assign_u8",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_assign_u16",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_assign_u32",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_assign_u64",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_assign_u128",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_mul_assign_usize",
+        "az_nat_vector_mod_power_of_2_mul",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_dot",
+        "az_nat_vector_mod_power_of_2_dot",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_dot_ref_ref",
+        "az_nat_vector_mod_power_of_2_dot",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_abs_squared",
+        "az_nat_vector_mod_power_of_2_abs_squared",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_abs_squared_ref",
+        "az_nat_vector_mod_power_of_2_abs_squared",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_u8",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_u16",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_u32",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_u64",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_u128",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_usize",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_ref_u8",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_ref_u16",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_ref_u32",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_ref_u64",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_ref_u128",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_ref_usize",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_assign_u8",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_assign_u16",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_assign_u32",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_assign_u64",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_assign_u128",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
+    (
+        "demo_unsigned_vector_mod_power_of_2_cross_assign_usize",
+        "az_nat_vector_mod_power_of_2_cross",
+    ),
 ];
 
 // The `mod_power_of_2_*` demos checked against Azurite's `AzZModPow2` type, with the oracle mode
@@ -2048,6 +2590,9 @@ fn test_against_azurite() {
         "demo_mod_power_of_2_sqrt_usize",
     ] {
         check_demo_against_azurite(&oracle, "../malachite-base", demo, "az_zmod_pow2_sqrt");
+    }
+    for (demo, mode) in AZURITE_UNSIGNED_VECTOR_STAGES {
+        check_demo_against_azurite(&oracle, "../malachite-base", demo, mode);
     }
     for (demo, mode) in AZURITE_MOD_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
