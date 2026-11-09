@@ -1263,8 +1263,9 @@ const AZURITE_INTEGER_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ("demo_integer_from_str_targeted", "az_int_from_str"),
 ];
 
-// The UnsignedVector modular demos checked against Azurite, read by the same modes as the
-// NaturalVector ones.
+// The UnsignedVector demos checked against Azurite: the modular ones, read by the same modes as
+// the NaturalVector ones, and those of UnsignedVector<u64>'s interface and strings, read as
+// vectors of AzZModPow2 64.
 const AZURITE_UNSIGNED_VECTOR_STAGES: &[(&str, &str)] = &[
     ("demo_unsigned_vector_mod_add", "az_nat_vector_mod_add"),
     (
@@ -1627,6 +1628,27 @@ const AZURITE_UNSIGNED_VECTOR_STAGES: &[(&str, &str)] = &[
     (
         "demo_unsigned_vector_mod_power_of_2_cross_assign_usize",
         "az_nat_vector_mod_power_of_2_cross",
+    ),
+    ("demo_unsigned_vector_index", "az_u64_vector_index"),
+    ("demo_unsigned_vector_index_mut", "az_u64_vector_index_mut"),
+    ("demo_unsigned_vector_to_string", "az_u64_vector_to_string"),
+    (
+        "demo_unsigned_vector_to_debug_string",
+        "az_u64_vector_to_string",
+    ),
+    ("demo_unsigned_vector_from_str", "az_u64_vector_from_str"),
+    (
+        "demo_unsigned_vector_from_str_targeted",
+        "az_u64_vector_from_str",
+    ),
+];
+
+// The UnsignedVector demos with no special_random mode.
+const AZURITE_UNSIGNED_VECTOR_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
+    ("demo_unsigned_vector_zero", "az_u64_vector_zero"),
+    (
+        "demo_unsigned_vector_standard_basis_vector",
+        "az_u64_vector_standard_basis_vector",
     ),
 ];
 
@@ -1993,6 +2015,70 @@ const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
     ("demo_rational_cmp_products_neg", "az_rat_cmp_products"),
     ("demo_rational_vector_dot_sign", "az_rat_dot_sign"),
     ("demo_rational_vector_dot_sign_ref_ref", "az_rat_dot_sign"),
+    ("demo_rational_vector_add", "az_rat_vector_add"),
+    ("demo_rational_vector_add_val_ref", "az_rat_vector_add"),
+    ("demo_rational_vector_add_ref_val", "az_rat_vector_add"),
+    ("demo_rational_vector_add_ref_ref", "az_rat_vector_add"),
+    ("demo_rational_vector_add_assign", "az_rat_vector_add"),
+    ("demo_rational_vector_add_assign_ref", "az_rat_vector_add"),
+    ("demo_rational_vector_sub", "az_rat_vector_sub"),
+    ("demo_rational_vector_sub_val_ref", "az_rat_vector_sub"),
+    ("demo_rational_vector_sub_ref_val", "az_rat_vector_sub"),
+    ("demo_rational_vector_sub_ref_ref", "az_rat_vector_sub"),
+    ("demo_rational_vector_sub_assign", "az_rat_vector_sub"),
+    ("demo_rational_vector_sub_assign_ref", "az_rat_vector_sub"),
+    ("demo_rational_vector_neg", "az_rat_vector_neg"),
+    ("demo_rational_vector_neg_ref", "az_rat_vector_neg"),
+    ("demo_rational_vector_neg_assign", "az_rat_vector_neg"),
+    (
+        "demo_rational_vector_mul_scalar",
+        "az_rat_vector_mul_scalar",
+    ),
+    (
+        "demo_rational_vector_mul_scalar_ref",
+        "az_rat_vector_mul_scalar",
+    ),
+    (
+        "demo_rational_vector_scalar_mul_ref",
+        "az_rat_vector_mul_scalar",
+    ),
+    (
+        "demo_rational_vector_mul_scalar_assign",
+        "az_rat_vector_mul_scalar",
+    ),
+    ("demo_rational_vector_dot", "az_rat_vector_dot"),
+    ("demo_rational_vector_dot_val_ref", "az_rat_vector_dot"),
+    ("demo_rational_vector_dot_ref_val", "az_rat_vector_dot"),
+    ("demo_rational_vector_dot_ref_ref", "az_rat_vector_dot"),
+    (
+        "demo_rational_vector_abs_squared",
+        "az_rat_vector_abs_squared",
+    ),
+    (
+        "demo_rational_vector_abs_squared_ref",
+        "az_rat_vector_abs_squared",
+    ),
+    ("demo_rational_vector_cross", "az_rat_vector_cross"),
+    ("demo_rational_vector_cross_val_ref", "az_rat_vector_cross"),
+    ("demo_rational_vector_cross_ref_val", "az_rat_vector_cross"),
+    ("demo_rational_vector_cross_ref_ref", "az_rat_vector_cross"),
+    ("demo_rational_vector_cross_assign", "az_rat_vector_cross"),
+    (
+        "demo_rational_vector_cross_assign_ref",
+        "az_rat_vector_cross",
+    ),
+    ("demo_rational_vector_from_str", "az_rat_vector_from_str"),
+    (
+        "demo_rational_vector_from_str_targeted",
+        "az_rat_vector_from_str",
+    ),
+    ("demo_rational_vector_index", "az_rat_vector_index"),
+    ("demo_rational_vector_index_mut", "az_rat_vector_index_mut"),
+    ("demo_rational_vector_to_string", "az_rat_vector_to_string"),
+    (
+        "demo_rational_vector_to_debug_string",
+        "az_rat_vector_to_string",
+    ),
     ("demo_rational_partial_cmp_natural", "az_rat_cmp_integer"),
     ("demo_rational_partial_cmp_integer", "az_rat_cmp_integer"),
     (
@@ -2051,6 +2137,11 @@ const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
 
 // The Rational demos whose generators have no `special_random` mode.
 const AZURITE_RATIONAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
+    (
+        "demo_rational_vector_standard_basis_vector",
+        "az_rat_vector_standard_basis_vector",
+    ),
+    ("demo_rational_vector_zero", "az_rat_vector_zero"),
     ("demo_rational_from_str_targeted", "az_rat_from_str"),
     (
         "demo_rational_from_sci_string_targeted",
@@ -2593,6 +2684,9 @@ fn test_against_azurite() {
     }
     for (demo, mode) in AZURITE_UNSIGNED_VECTOR_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-base", demo, mode);
+    }
+    for (demo, mode) in AZURITE_UNSIGNED_VECTOR_STAGES_NO_SPECIAL {
+        check_demo_against_azurite_in_modes(&oracle, "../malachite-base", demo, mode, &MODES[..2]);
     }
     for (demo, mode) in AZURITE_MOD_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
