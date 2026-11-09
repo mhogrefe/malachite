@@ -196,6 +196,7 @@ pub mod integer {
         pub mod shl_round;
         pub mod shr;
         pub mod shr_round;
+        pub mod shr_round_with_ordering;
         pub mod sign;
         pub mod sqrt;
         pub mod square;
@@ -707,6 +708,7 @@ pub mod natural {
         pub mod shl_round;
         pub mod shr;
         pub mod shr_round;
+        pub mod shr_round_with_ordering;
         pub mod sign;
         pub mod sqrt;
         pub mod square;

@@ -103,6 +103,7 @@ use crate::test_util::generators::common::{
     ss_spec_var_47, ss_spec_var_49, ss_spec_var_50, ss_spec_var_51, ss_spec_var_52, ss_spec_var_53,
     ss_spec_var_54, ss_spec_var_55, ss_spec_var_56, ss_spec_var_58,
 };
+use crate::test_util::generators::exhaustive::shr_round_with_ordering_natural_valid;
 use crate::test_util::generators::exhaustive::{
     filter_helper_1, filter_helper_2, filter_helper_3, filter_helper_4, filter_helper_5,
     filter_helper_6, filter_map_helper_1, filter_map_helper_2, filter_map_helper_3,
@@ -170,6 +171,7 @@ use malachite_base::num::random::{
     random_unsigned_inclusive_range, random_unsigned_range, random_unsigneds_less_than,
 };
 use malachite_base::options::random::{RandomOptions, random_options};
+use malachite_base::orderings::random::random_orderings;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{ComposePowerOfX, MulPowerOfX};
 use malachite_base::random::{EXAMPLE_SEED, Seed};
@@ -202,7 +204,10 @@ use malachite_base::vecs::random::{random_vecs, random_vecs_min_length};
 use malachite_base::vecs::{RandomValuesFromVec, random_values_from_vec};
 use malachite_base::vector::Vector;
 use num::{BigInt, BigUint};
-use std::cmp::{Ordering::*, max};
+use std::cmp::{
+    Ordering::{self, *},
+    max,
+};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
@@ -5157,6 +5162,19 @@ pub fn special_random_integer_unsigned_rounding_mode_triple_gen_var_5<T: Primiti
     ))
 }
 
+// -- (Integer, u64, RoundingMode, Ordering) --
+
+pub fn special_random_integer_unsigned_rounding_mode_ordering_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Integer, u64, RoundingMode, Ordering)> {
+    Box::new(
+        special_random_integer_unsigned_rounding_mode_triple_gen_var_2::<u64>(config)
+            .zip(random_orderings(EXAMPLE_SEED.fork("orderings")))
+            .filter(|((_, _, rm), o)| *o == Equal || *rm != Exact)
+            .map(|((n, bits, rm), o)| (n, bits, rm, o)),
+    )
+}
+
 // -- (Integer, RoundingMode) --
 
 pub fn special_random_integer_rounding_mode_pair_gen(
@@ -7889,6 +7907,19 @@ pub fn special_random_natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt
             config.get_or("mean_stripe_d", 1),
         ),
     })
+}
+
+// -- (Natural, u64, RoundingMode, Ordering) --
+
+pub fn special_random_natural_unsigned_rounding_mode_ordering_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, u64, RoundingMode, Ordering)> {
+    Box::new(
+        special_random_natural_unsigned_rounding_mode_triple_gen_var_1::<u64>(config)
+            .zip(random_orderings(EXAMPLE_SEED.fork("orderings")))
+            .filter(|((n, _, rm), o)| shr_round_with_ordering_natural_valid(n, *rm, *o))
+            .map(|((n, bits, rm), o)| (n, bits, rm, o)),
+    )
 }
 
 // -- (Natural, RoundingMode) --

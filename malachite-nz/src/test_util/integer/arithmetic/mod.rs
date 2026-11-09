@@ -9,5 +9,6 @@
 pub mod add;
 pub mod add_mul_shl;
 pub mod mul;
+pub mod shr_round_with_ordering;
 pub mod sign;
 pub mod sub_mul_shl;

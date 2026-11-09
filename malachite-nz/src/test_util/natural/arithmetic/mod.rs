@@ -18,6 +18,7 @@ pub mod neg;
 pub mod pow;
 pub mod root;
 pub mod schonhage_strassen;
+pub mod shr_round_with_ordering;
 pub mod sqrt;
 pub mod square;
 pub mod sub;

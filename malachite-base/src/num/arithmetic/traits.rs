@@ -1826,6 +1826,42 @@ pub trait ShrRoundAssign<RHS> {
     fn shr_round_assign(&mut self, other: RHS, rm: RoundingMode) -> Ordering;
 }
 
+/// Right-shifts a number (divides it by a power of 2) that is itself an approximation of an exact
+/// value, rounding the result according to a specified rounding mode. The approximation's
+/// [`Ordering`] against the exact value is passed in, and an [`Ordering`] is returned, indicating
+/// whether the returned value is less than, equal to, or greater than the shifted exact value.
+///
+/// The exact value is taken to lie just above the number if the passed-in [`Ordering`] is `Less`,
+/// just below it if `Greater`, and to equal it if `Equal`. This is what is needed to round a value
+/// a second time, to a coarser grid, without double-rounding error.
+pub trait ShrRoundWithOrdering {
+    type Output;
+
+    fn shr_round_with_ordering(
+        self,
+        bits: u64,
+        rm: RoundingMode,
+        o: Ordering,
+    ) -> (Self::Output, Ordering);
+}
+
+/// Right-shifts a number (divides it by a power of 2) in place, where the number is itself an
+/// approximation of an exact value, rounding the result according to a specified rounding mode. The
+/// approximation's [`Ordering`] against the exact value is passed in, and an [`Ordering`] is
+/// returned, indicating whether the assigned value is less than, equal to, or greater than the
+/// shifted exact value.
+///
+/// The exact value is taken to lie just above the number if the passed-in [`Ordering`] is `Less`,
+/// just below it if `Greater`, and to equal it if `Equal`.
+pub trait ShrRoundWithOrderingAssign {
+    fn shr_round_with_ordering_assign(
+        &mut self,
+        bits: u64,
+        rm: RoundingMode,
+        o: Ordering,
+    ) -> Ordering;
+}
+
 /// Returns `Greater`, `Equal`, or `Less`, depending on whether a number is positive, zero, or
 /// negative, respectively.
 pub trait Sign {

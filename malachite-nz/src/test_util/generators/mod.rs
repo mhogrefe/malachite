@@ -48,7 +48,7 @@ use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
 use num::{BigInt, BigUint};
-use std::cmp::min;
+use std::cmp::{Ordering, min};
 use std::ops::{Shl, Shr};
 
 // -- GaussianInteger --
@@ -2283,6 +2283,19 @@ pub fn integer_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>()
     )
 }
 
+// -- (Integer, u64, RoundingMode, Ordering) --
+
+// All `(Integer, u64, RoundingMode, Ordering)` that are valid inputs to
+// `Integer::shr_round_with_ordering`.
+pub fn integer_unsigned_rounding_mode_ordering_quadruple_gen_var_1()
+-> Generator<(Integer, u64, RoundingMode, Ordering)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_rounding_mode_ordering_quadruple_gen_var_1,
+        &random_integer_unsigned_rounding_mode_ordering_quadruple_gen_var_1,
+        &special_random_integer_unsigned_rounding_mode_ordering_quadruple_gen_var_1,
+    )
+}
+
 // -- (Integer, RoundingMode) --
 
 pub fn integer_rounding_mode_pair_gen() -> Generator<(Integer, RoundingMode)> {
@@ -3728,6 +3741,19 @@ where
 }
 
 // var 2 is in malachite-float
+
+// -- (Natural, u64, RoundingMode, Ordering) --
+
+// All `(Natural, u64, RoundingMode, Ordering)` that are valid inputs to
+// `Natural::shr_round_with_ordering`.
+pub fn natural_unsigned_rounding_mode_ordering_quadruple_gen_var_1()
+-> Generator<(Natural, u64, RoundingMode, Ordering)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_rounding_mode_ordering_quadruple_gen_var_1,
+        &random_natural_unsigned_rounding_mode_ordering_quadruple_gen_var_1,
+        &special_random_natural_unsigned_rounding_mode_ordering_quadruple_gen_var_1,
+    )
+}
 
 // -- (Natural, PrimitiveUnsigned, Vec<bool>) --
 

@@ -62,6 +62,9 @@ documented by git history.
 
 ### malachite-base
 
+- The `ShrRoundWithOrdering` and `ShrRoundWithOrderingAssign` traits, in
+  `num::arithmetic::traits`, for right-shifting a number that is itself an approximation of an
+  exact value, given its `Ordering` against that value, and rounding the result.
 - The `Matrix` trait (`malachite_base::matrix`), for what every matrix type has in common, as
   `Vector` is for vectors: `from_elements`, `from_owned_elements` and their column-major forms,
   `from_row_slices` (from a `&[&[T]]` of rows),
@@ -686,6 +689,12 @@ documented by git history.
 
 ### malachite-nz
 
+- `ShrRoundWithOrdering` and `ShrRoundWithOrderingAssign` for `Natural` and `Integer`, by value
+  and by reference. Each takes, along with the shift and the rounding mode, the value's `Ordering`
+  against an exact value it approximates, and rounds as though that exact value lay just above or
+  below it; a value already rounded to an integer can then be rounded again to a coarser grid with
+  no double-rounding error, in every rounding mode. Under `Nearest` this is Azurite's
+  `shiftRightNearestTernary`, against which the oracle tests check it.
 - `AddMul`, `AddMulAssign`, `SubMul`, and `SubMulAssign` for `IntegerMatrix` with an `Integer`
   scalar, and `AddMul` and `AddMulAssign` for `NaturalMatrix` with a `Natural` scalar, in every
   combination of value and reference: $A + cB$ and $A - cB$ element by element, for matrices of the

@@ -365,6 +365,18 @@ const AZURITE_NATURAL_STAGES: &[(&str, &str)] = &[
     ),
     ("demo_natural_shr_round_signed_i8", "az_nat_shr_round"),
     ("demo_natural_shr_round_signed_i64", "az_nat_shr_round"),
+    (
+        "demo_natural_shr_round_with_ordering",
+        "az_nat_shr_round_with_ordering",
+    ),
+    (
+        "demo_natural_shr_round_with_ordering_ref",
+        "az_nat_shr_round_with_ordering",
+    ),
+    (
+        "demo_natural_shr_round_with_ordering_assign",
+        "az_nat_shr_round_with_ordering",
+    ),
     ("demo_natural_shr_round_signed_ref_i64", "az_nat_shr_round"),
     ("demo_natural_gcd", "az_nat_gcd"),
     ("demo_natural_gcd_val_ref", "az_nat_gcd"),
@@ -1108,6 +1120,18 @@ const AZURITE_INTEGER_STAGES: &[(&str, &str)] = &[
     ("demo_integer_shr_round_signed_i8", "az_int_shr_round"),
     ("demo_integer_shr_round_signed_i64", "az_int_shr_round"),
     ("demo_integer_shr_round_ref_signed_i64", "az_int_shr_round"),
+    (
+        "demo_integer_shr_round_with_ordering",
+        "az_int_shr_round_with_ordering",
+    ),
+    (
+        "demo_integer_shr_round_with_ordering_ref",
+        "az_int_shr_round_with_ordering",
+    ),
+    (
+        "demo_integer_shr_round_with_ordering_assign",
+        "az_int_shr_round_with_ordering",
+    ),
     ("demo_integer_pow", "az_int_pow"),
     ("demo_integer_pow_ref", "az_int_pow"),
     ("demo_integer_gcd", "az_int_gcd"),
@@ -2095,6 +2119,7 @@ const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
     ("demo_rational_partial_eq_natural", "az_rat_eq_integer"),
     ("demo_rational_partial_eq_integer", "az_rat_eq_integer"),
     ("demo_rational_sign", "az_rat_sign"),
+    ("demo_rational_is_power_of_2", "az_rat_is_power_of_2"),
     ("demo_from_naturals", "az_rat_from_naturals"),
     ("demo_from_naturals_ref", "az_rat_from_naturals"),
     ("demo_from_integers", "az_rat_from_integers"),

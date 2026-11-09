@@ -980,6 +980,24 @@ pub fn triple_1_natural_bit_bucketer<T, U>(var_name: &str) -> Bucketer<'_, (Natu
     }
 }
 
+pub fn quadruple_1_natural_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (Natural, T, U, V)> {
+    Bucketer {
+        bucketing_function: &|(x, _, _, _)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{var_name}.significant_bits()"),
+    }
+}
+
+pub fn quadruple_1_integer_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (Integer, T, U, V)> {
+    Bucketer {
+        bucketing_function: &|(x, _, _, _)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{var_name}.significant_bits()"),
+    }
+}
+
 pub fn triple_3_natural_bit_bucketer<T, U>(var_name: &str) -> Bucketer<'_, (T, U, Natural)> {
     Bucketer {
         bucketing_function: &|(_, _, x)| usize::exact_from(x.significant_bits()),

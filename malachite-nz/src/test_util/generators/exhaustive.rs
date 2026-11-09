@@ -163,6 +163,7 @@ use malachite_base::num::modular::traits::{
 };
 use malachite_base::num::number_theory::traits::CoprimeWith;
 use malachite_base::options::exhaustive::exhaustive_options;
+use malachite_base::orderings::exhaustive::exhaustive_orderings;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{ComposePowerOfX, MulPowerOfX};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -204,7 +205,10 @@ use malachite_base::vecs::exhaustive::{
     exhaustive_vecs_min_length, lex_vecs_fixed_length_from_single,
 };
 use num::{BigInt, BigUint};
-use std::cmp::{Ordering::*, max};
+use std::cmp::{
+    Ordering::{self, *},
+    max,
+};
 use std::iter::once;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
@@ -2159,6 +2163,20 @@ pub fn exhaustive_integer_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUn
     ))
 }
 
+// -- (Integer, u64, RoundingMode, Ordering) --
+
+pub fn exhaustive_integer_unsigned_rounding_mode_ordering_quadruple_gen_var_1()
+-> It<(Integer, u64, RoundingMode, Ordering)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_integer_unsigned_rounding_mode_triple_gen_var_2::<u64>(),
+            exhaustive_orderings(),
+        )
+        .filter(|((_, _, rm), o)| *o == Equal || *rm != Exact)
+        .map(|((n, bits, rm), o)| (n, bits, rm, o)),
+    )
+}
+
 // -- (Integer, RoundingMode) --
 
 pub fn exhaustive_integer_rounding_mode_pair_gen() -> It<(Integer, RoundingMode)> {
@@ -3364,6 +3382,30 @@ where
 }
 
 // var 2 is in malachite-float
+
+// -- (Natural, u64, RoundingMode, Ordering) --
+
+// Valid inputs to `Natural::shr_round_with_ordering`: an inexact `Ordering` excludes `Exact`, and
+// excludes `Floor` and `Down` for 0 when the exact value lies just below it.
+pub(crate) fn shr_round_with_ordering_natural_valid(
+    n: &Natural,
+    rm: RoundingMode,
+    o: Ordering,
+) -> bool {
+    o == Equal || rm != Exact && !(o == Greater && *n == 0u32 && (rm == Floor || rm == Down))
+}
+
+pub fn exhaustive_natural_unsigned_rounding_mode_ordering_quadruple_gen_var_1()
+-> It<(Natural, u64, RoundingMode, Ordering)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_natural_unsigned_rounding_mode_triple_gen_var_1::<u64>(),
+            exhaustive_orderings(),
+        )
+        .filter(|((n, _, rm), o)| shr_round_with_ordering_natural_valid(n, *rm, *o))
+        .map(|((n, bits, rm), o)| (n, bits, rm, o)),
+    )
+}
 
 // -- (Natural, PrimitiveUnsigned, Vec<bool>) --
 
