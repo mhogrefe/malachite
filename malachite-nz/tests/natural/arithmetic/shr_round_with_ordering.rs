@@ -10,6 +10,7 @@ use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{
     ShrRound, ShrRoundWithOrdering, ShrRoundWithOrderingAssign,
 };
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -109,11 +110,11 @@ fn shr_round_with_ordering_fail() {
     assert_panic!(Natural::from(512u32).shr_round_with_ordering(8, Exact, Less));
     assert_panic!(Natural::from(512u32).shr_round_with_ordering(8, Exact, Greater));
     assert_panic!(Natural::from(385u32).shr_round_with_ordering(8, Exact, Equal));
-    assert_panic!(Natural::from(0u32).shr_round_with_ordering(8, Floor, Greater));
-    assert_panic!(Natural::from(0u32).shr_round_with_ordering(8, Down, Greater));
-    assert_panic!((&Natural::from(0u32)).shr_round_with_ordering(0, Floor, Greater));
+    assert_panic!(Natural::ZERO.shr_round_with_ordering(8, Floor, Greater));
+    assert_panic!(Natural::ZERO.shr_round_with_ordering(8, Down, Greater));
+    assert_panic!((&Natural::ZERO).shr_round_with_ordering(0, Floor, Greater));
     assert_panic!({
-        let mut x = Natural::from(0u32);
+        let mut x = Natural::ZERO;
         x.shr_round_with_ordering_assign(8, Down, Greater)
     });
 }
@@ -148,9 +149,9 @@ fn shr_round_with_ordering_properties() {
             let c = (&q << bits).cmp(&n);
             assert_eq!(o_q, if c == Equal { o } else { c });
             // The result is within 1 of the shifted value.
-            let (floor, _) = (&n).shr_round(bits, Floor);
-            let (ceiling, _) = (&n).shr_round(bits, Ceiling);
-            assert!(&q + Natural::from(1u32) >= floor && q <= ceiling + Natural::from(1u32));
+            let floor = (&n).shr_round(bits, Floor).0;
+            let ceiling = (&n).shr_round(bits, Ceiling).0;
+            assert!(&q + Natural::ONE >= floor && q <= ceiling + Natural::ONE);
             // The Integer function agrees, unless the exact value lies just below zero, where
             // Integer's `Up` rounds away from zero to -1 but Natural's is `Ceiling`.
             if n != 0u32 || o != Greater {

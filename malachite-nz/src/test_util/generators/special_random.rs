@@ -103,13 +103,13 @@ use crate::test_util::generators::common::{
     ss_spec_var_47, ss_spec_var_49, ss_spec_var_50, ss_spec_var_51, ss_spec_var_52, ss_spec_var_53,
     ss_spec_var_54, ss_spec_var_55, ss_spec_var_56, ss_spec_var_58,
 };
-use crate::test_util::generators::exhaustive::shr_round_with_ordering_natural_valid;
 use crate::test_util::generators::exhaustive::{
     filter_helper_1, filter_helper_2, filter_helper_3, filter_helper_4, filter_helper_5,
     filter_helper_6, filter_map_helper_1, filter_map_helper_2, filter_map_helper_3,
     gcd_input_filter, large_type_filter_map_1, limbs_eq_mod_map, limbs_significant_bits_helper,
     map_helper_1, map_helper_2, map_helper_3, mul_shr_round_valid,
     round_to_multiple_integer_filter_map, round_to_multiple_natural_filter_map,
+    shr_round_with_ordering_natural_valid,
 };
 use crate::test_util::generators::random::{
     integer_vec_pair_len, integer_vec_square_len, random_gmp_format_strings,

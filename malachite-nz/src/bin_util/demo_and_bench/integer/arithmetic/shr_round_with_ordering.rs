@@ -11,7 +11,7 @@ use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::test_util::bench::bucketers::quadruple_1_integer_bit_bucketer;
-use malachite_nz::test_util::generators::integer_unsigned_rounding_mode_ordering_quadruple_gen_var_1;
+use malachite_nz::test_util::generators::*;
 use malachite_nz::test_util::integer::arithmetic::shr_round_with_ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -56,10 +56,10 @@ fn demo_integer_shr_round_with_ordering_assign(gm: GenMode, config: &GenConfig, 
         .get(gm, config)
         .take(limit)
     {
-        let x_old = x.clone();
-        let o_out = x.shr_round_with_ordering_assign(bits, rm, o);
+        let old = x.clone();
+        let p = x.shr_round_with_ordering_assign(bits, rm, o);
         println!(
-            "x := {x_old}; x.shr_round_with_ordering_assign({bits}, {rm}, {o:?}) = {o_out:?}; x = {x}"
+            "x := {old}; x.shr_round_with_ordering_assign({bits}, {rm}, {o:?}) = {p:?}; x = {x}"
         );
     }
 }

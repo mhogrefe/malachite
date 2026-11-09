@@ -10,6 +10,7 @@ use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{
     ShrRound, ShrRoundWithOrdering, ShrRoundWithOrderingAssign,
 };
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::{
@@ -95,9 +96,9 @@ fn shr_round_with_ordering_fail() {
     assert_panic!(Integer::from(-512).shr_round_with_ordering(8, Exact, Less));
     assert_panic!(Integer::from(-512).shr_round_with_ordering(8, Exact, Greater));
     assert_panic!(Integer::from(-385).shr_round_with_ordering(8, Exact, Equal));
-    assert_panic!((&Integer::from(0)).shr_round_with_ordering(8, Exact, Greater));
+    assert_panic!((&Integer::ZERO).shr_round_with_ordering(8, Exact, Greater));
     assert_panic!({
-        let mut x = Integer::from(0);
+        let mut x = Integer::ZERO;
         x.shr_round_with_ordering_assign(8, Exact, Less)
     });
 }

@@ -18,8 +18,8 @@ use malachite_base::num::arithmetic::traits::{
     FloorRootAssign, FloorSqrt, FloorSqrtAssign, IsPowerOf2, IsUnit, MulShrRound,
     MulShrRoundAssign, Parity, Pow, PowAssign, PowerOf2, RoundToMultiple, RoundToMultipleAssign,
     RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign, ShlRound, ShlRoundAssign, ShrRound,
-    ShrRoundAssign, Sign, Square, SquareAssign, SubMul, SubMulAssign, SubMulShl, SubMulShlAssign,
-    UnsignedAbs,
+    ShrRoundAssign, ShrRoundWithOrdering, ShrRoundWithOrderingAssign, Sign, Square, SquareAssign,
+    SubMul, SubMulAssign, SubMulShl, SubMulShlAssign, UnsignedAbs,
 };
 
 /// Absolute value of [`Integer`](super::Integer)s, including implementations of [`UnsignedAbs`].
@@ -802,10 +802,8 @@ pub mod shr;
 /// assert_eq!(x, 1024);
 /// ```
 pub mod shr_round;
-/// Implementations of [`ShrRoundWithOrdering`](malachite_base::num::arithmetic::traits::ShrRoundWithOrdering)
-/// and
-/// [`ShrRoundWithOrderingAssign`](malachite_base::num::arithmetic::traits::ShrRoundWithOrderingAssign),
-/// traits for right-shifting a number that is itself an approximation of an exact value, whose
+/// Implementations of [`ShrRoundWithOrdering`] and [`ShrRoundWithOrderingAssign`], traits for
+/// right-shifting a number that is itself an approximation of an exact value, whose
 /// [`Ordering`](core::cmp::Ordering) against the exact value is known, so that a value can be
 /// rounded a second time without double-rounding error.
 pub mod shr_round_with_ordering;

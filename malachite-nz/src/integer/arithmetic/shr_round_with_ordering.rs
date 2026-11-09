@@ -87,6 +87,7 @@ impl ShrRoundWithOrdering for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ShrRoundWithOrdering;
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::integer::Integer;
@@ -108,13 +109,13 @@ impl ShrRoundWithOrdering for Integer {
     /// );
     /// // the exact value lies just below 0
     /// assert_eq!(
-    ///     Integer::from(0)
+    ///     Integer::ZERO
     ///         .shr_round_with_ordering(8, Floor, Greater)
     ///         .to_debug_string(),
     ///     "(-1, Less)"
     /// );
     /// assert_eq!(
-    ///     Integer::from(0)
+    ///     Integer::ZERO
     ///         .shr_round_with_ordering(8, Down, Greater)
     ///         .to_debug_string(),
     ///     "(0, Greater)"
