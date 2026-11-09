@@ -109,6 +109,15 @@ pub fn quadruple_1_rational_bit_bucketer<T, U, V>(
     }
 }
 
+pub fn quadruple_4_rational_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (T, U, V, Rational)> {
+    Bucketer {
+        bucketing_function: &|(_, _, _, x)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{var_name}.significant_bits()"),
+    }
+}
+
 pub fn pair_gaussian_rational_gaussian_integer_max_bit_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,

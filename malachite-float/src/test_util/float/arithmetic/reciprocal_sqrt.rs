@@ -8,9 +8,7 @@
 
 use crate::Float;
 use crate::test_util::common::rug_float_significant_bits;
-use crate::test_util::float::arithmetic::sqrt::{
-    sqrt_rational_prec_round_generic, sqrt_rational_prec_round_simple,
-};
+use crate::test_util::float::arithmetic::sqrt::sqrt_rational_prec_round_generic;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Reciprocal;
 use malachite_base::num::basic::traits::Infinity;
@@ -51,15 +49,4 @@ pub fn reciprocal_sqrt_rational_prec_round_generic(
         return (Float::INFINITY, Equal);
     }
     sqrt_rational_prec_round_generic(&x.reciprocal(), prec, rm)
-}
-
-pub fn reciprocal_sqrt_rational_prec_round_simple(
-    x: &Rational,
-    prec: u64,
-    rm: RoundingMode,
-) -> (Float, Ordering) {
-    if *x == 0u32 {
-        return (Float::INFINITY, Equal);
-    }
-    sqrt_rational_prec_round_simple(&x.reciprocal(), prec, rm)
 }

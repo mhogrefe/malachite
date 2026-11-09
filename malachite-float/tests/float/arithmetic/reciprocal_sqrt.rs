@@ -33,9 +33,8 @@ use malachite_float::test_util::common::{
     test_constant, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::reciprocal_sqrt::{
-    reciprocal_sqrt_rational_prec_round_generic, reciprocal_sqrt_rational_prec_round_simple,
-    rug_reciprocal_sqrt, rug_reciprocal_sqrt_prec, rug_reciprocal_sqrt_prec_round,
-    rug_reciprocal_sqrt_round,
+    reciprocal_sqrt_rational_prec_round_generic, rug_reciprocal_sqrt, rug_reciprocal_sqrt_prec,
+    rug_reciprocal_sqrt_prec_round, rug_reciprocal_sqrt_round,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_12, float_rounding_mode_pair_gen_var_30,
@@ -1247,12 +1246,6 @@ fn test_reciprocal_sqrt_rational_prec() {
         assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
         assert_eq!(o, out_o);
 
-        let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_simple(&u, prec, Nearest);
-        assert!(reciprocal_sqrt.is_valid());
-        assert_eq!(reciprocal_sqrt.to_string(), out);
-        assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
-        assert_eq!(o, out_o);
-
         if reciprocal_sqrt.is_normal() {
             let square = Rational::exact_from(&reciprocal_sqrt).square().reciprocal();
             match o {
@@ -1331,12 +1324,6 @@ fn test_reciprocal_sqrt_rational_prec() {
         assert_eq!(o, out_o);
 
         let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_generic(&u, prec, Nearest);
-        assert!(reciprocal_sqrt.is_valid());
-        assert_eq!(reciprocal_sqrt.to_string(), out);
-        assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
-        assert_eq!(o, out_o);
-
-        let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_simple(&u, prec, Nearest);
         assert!(reciprocal_sqrt.is_valid());
         assert_eq!(reciprocal_sqrt.to_string(), out);
         assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
@@ -1518,12 +1505,6 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         assert_eq!(o, out_o);
 
         let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_generic(&u, prec, rm);
-        assert!(reciprocal_sqrt.is_valid());
-        assert_eq!(reciprocal_sqrt.to_string(), out);
-        assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
-        assert_eq!(o, out_o);
-
-        let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_simple(&u, prec, rm);
         assert!(reciprocal_sqrt.is_valid());
         assert_eq!(reciprocal_sqrt.to_string(), out);
         assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
@@ -1887,12 +1868,6 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         assert_eq!(o, out_o);
 
         let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_generic(&u, prec, rm);
-        assert!(reciprocal_sqrt.is_valid());
-        assert_eq!(reciprocal_sqrt.to_string(), out);
-        assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
-        assert_eq!(o, out_o);
-
-        let (reciprocal_sqrt, o) = reciprocal_sqrt_rational_prec_round_simple(&u, prec, rm);
         assert!(reciprocal_sqrt.is_valid());
         assert_eq!(reciprocal_sqrt.to_string(), out);
         assert_eq!(to_hex_string(&reciprocal_sqrt), out_hex);
@@ -3320,15 +3295,6 @@ fn reciprocal_sqrt_rational_prec_properties() {
         );
         assert_eq!(o, o_alt);
 
-        let (reciprocal_sqrt_alt, o_alt) =
-            reciprocal_sqrt_rational_prec_round_simple(&x, prec, Nearest);
-        assert!(reciprocal_sqrt_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&reciprocal_sqrt_alt),
-            ComparableFloatRef(&reciprocal_sqrt)
-        );
-        assert_eq!(o, o_alt);
-
         if !reciprocal_sqrt.is_nan() {
             assert_eq!(
                 reciprocal_sqrt.get_prec(),
@@ -3389,14 +3355,6 @@ fn reciprocal_sqrt_rational_prec_round_properties() {
 
         let (reciprocal_sqrt_alt, o_alt) =
             reciprocal_sqrt_rational_prec_round_generic(&x, prec, rm);
-        assert!(reciprocal_sqrt_alt.is_valid());
-        assert_eq!(
-            ComparableFloatRef(&reciprocal_sqrt_alt),
-            ComparableFloatRef(&reciprocal_sqrt)
-        );
-        assert_eq!(o, o_alt);
-
-        let (reciprocal_sqrt_alt, o_alt) = reciprocal_sqrt_rational_prec_round_simple(&x, prec, rm);
         assert!(reciprocal_sqrt_alt.is_valid());
         assert_eq!(
             ComparableFloatRef(&reciprocal_sqrt_alt),

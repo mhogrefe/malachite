@@ -894,6 +894,36 @@ pub fn random_rational_primitive_float_primitive_float_triple_gen<T: PrimitiveFl
     ))
 }
 
+// -- (PrimitiveFloat, PrimitiveFloat, PrimitiveFloat, Rational) --
+
+pub fn random_primitive_float_primitive_float_primitive_float_rational_quadruple_gen<
+    T: PrimitiveFloat,
+>(
+    config: &GenConfig,
+) -> It<(T, T, T, Rational)> {
+    Box::new(crate::test_util::extra_variadic::random_quadruples_xxxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            special_random_primitive_floats(
+                seed,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+                config.get_or("special_p_mean_n", 1),
+                config.get_or("special_p_mean_d", 64),
+            )
+        },
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Rational, PrimitiveInt) --
 
 pub fn random_rational_primitive_int_pair_gen<T: PrimitiveInt>(

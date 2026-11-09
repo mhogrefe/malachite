@@ -481,6 +481,17 @@ pub fn rational_primitive_float_pair_gen_rm<T: PrimitiveFloat>()
     )
 }
 
+// -- (PrimitiveFloat, PrimitiveFloat, PrimitiveFloat, Rational) --
+
+pub fn primitive_float_primitive_float_primitive_float_rational_quadruple_gen<T: PrimitiveFloat>()
+-> Generator<(T, T, T, Rational)> {
+    Generator::new(
+        &exhaustive_primitive_float_primitive_float_primitive_float_rational_quadruple_gen,
+        &random_primitive_float_primitive_float_primitive_float_rational_quadruple_gen,
+        &special_random_primitive_float_primitive_float_primitive_float_rational_quadruple_gen,
+    )
+}
+
 // -- (Rational, PrimitiveFloat, PrimitiveFloat) --
 
 pub fn rational_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>()

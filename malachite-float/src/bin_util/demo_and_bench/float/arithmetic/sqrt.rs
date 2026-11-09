@@ -24,7 +24,6 @@ use malachite_float::test_util::bench::bucketers::{
 };
 use malachite_float::test_util::float::arithmetic::sqrt::{
     rug_sqrt, rug_sqrt_prec, rug_sqrt_prec_round, rug_sqrt_round, sqrt_rational_prec_round_generic,
-    sqrt_rational_prec_round_simple,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_24,
@@ -1001,9 +1000,6 @@ fn benchmark_float_sqrt_rational_prec_round_algorithms(
             }),
             ("generic", &mut |(n, prec, rm)| {
                 no_out!(sqrt_rational_prec_round_generic(&n, prec, rm));
-            }),
-            ("simple", &mut |(n, prec, rm)| {
-                no_out!(sqrt_rational_prec_round_simple(&n, prec, rm));
             }),
         ],
     );

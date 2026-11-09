@@ -30,7 +30,6 @@ use malachite_float::test_util::common::{
 };
 use malachite_float::test_util::float::arithmetic::sqrt::{
     rug_sqrt, rug_sqrt_prec, rug_sqrt_prec_round, rug_sqrt_round, sqrt_rational_prec_round_generic,
-    sqrt_rational_prec_round_simple,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_11,
@@ -1559,12 +1558,6 @@ fn test_sqrt_rational_prec() {
         assert_eq!(to_hex_string(&sqrt), out_hex);
         assert_eq!(o, out_o);
 
-        let (sqrt, o) = sqrt_rational_prec_round_simple(&u, prec, Nearest);
-        assert!(sqrt.is_valid());
-        assert_eq!(sqrt.to_string(), out);
-        assert_eq!(to_hex_string(&sqrt), out_hex);
-        assert_eq!(o, out_o);
-
         if sqrt.is_normal() {
             let square = Rational::exact_from(&sqrt).square();
             match o {
@@ -1638,12 +1631,6 @@ fn test_sqrt_rational_prec() {
         assert_eq!(o, out_o);
 
         let (sqrt, o) = sqrt_rational_prec_round_generic(&u, prec, Nearest);
-        assert!(sqrt.is_valid());
-        assert_eq!(sqrt.to_string(), out);
-        assert_eq!(to_hex_string(&sqrt), out_hex);
-        assert_eq!(o, out_o);
-
-        let (sqrt, o) = sqrt_rational_prec_round_simple(&u, prec, Nearest);
         assert!(sqrt.is_valid());
         assert_eq!(sqrt.to_string(), out);
         assert_eq!(to_hex_string(&sqrt), out_hex);
@@ -1815,12 +1802,6 @@ fn test_sqrt_rational_prec_round() {
         assert_eq!(o, out_o);
 
         let (sqrt, o) = sqrt_rational_prec_round_generic(&u, prec, rm);
-        assert!(sqrt.is_valid());
-        assert_eq!(sqrt.to_string(), out);
-        assert_eq!(to_hex_string(&sqrt), out_hex);
-        assert_eq!(o, out_o);
-
-        let (sqrt, o) = sqrt_rational_prec_round_simple(&u, prec, rm);
         assert!(sqrt.is_valid());
         assert_eq!(sqrt.to_string(), out);
         assert_eq!(to_hex_string(&sqrt), out_hex);
@@ -2180,12 +2161,6 @@ fn test_sqrt_rational_prec_round() {
         assert_eq!(o, out_o);
 
         let (sqrt, o) = sqrt_rational_prec_round_generic(&u, prec, rm);
-        assert!(sqrt.is_valid());
-        assert_eq!(sqrt.to_string(), out);
-        assert_eq!(to_hex_string(&sqrt), out_hex);
-        assert_eq!(o, out_o);
-
-        let (sqrt, o) = sqrt_rational_prec_round_simple(&u, prec, rm);
         assert!(sqrt.is_valid());
         assert_eq!(sqrt.to_string(), out);
         assert_eq!(to_hex_string(&sqrt), out_hex);
@@ -3493,11 +3468,6 @@ fn sqrt_rational_prec_properties() {
         assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
         assert_eq!(o, o_alt);
 
-        let (sqrt_alt, o_alt) = sqrt_rational_prec_round_simple(&x, prec, Nearest);
-        assert!(sqrt_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
-        assert_eq!(o, o_alt);
-
         if !sqrt.is_nan() {
             assert_eq!(sqrt.get_prec(), if x == 0u32 { None } else { Some(prec) });
         }
@@ -3558,11 +3528,6 @@ fn sqrt_rational_prec_round_properties() {
         }
 
         let (sqrt_alt, o_alt) = sqrt_rational_prec_round_generic(&x, prec, rm);
-        assert!(sqrt_alt.is_valid());
-        assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
-        assert_eq!(o, o_alt);
-
-        let (sqrt_alt, o_alt) = sqrt_rational_prec_round_simple(&x, prec, rm);
         assert!(sqrt_alt.is_valid());
         assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
         assert_eq!(o, o_alt);

@@ -27,9 +27,8 @@ use malachite_float::test_util::bench::bucketers::{
     triple_1_2_float_primitive_int_max_complexity_bucketer,
 };
 use malachite_float::test_util::float::arithmetic::reciprocal_sqrt::{
-    reciprocal_sqrt_rational_prec_round_generic, reciprocal_sqrt_rational_prec_round_simple,
-    rug_reciprocal_sqrt, rug_reciprocal_sqrt_prec, rug_reciprocal_sqrt_prec_round,
-    rug_reciprocal_sqrt_round,
+    reciprocal_sqrt_rational_prec_round_generic, rug_reciprocal_sqrt, rug_reciprocal_sqrt_prec,
+    rug_reciprocal_sqrt_prec_round, rug_reciprocal_sqrt_round,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_30,
@@ -1142,9 +1141,6 @@ fn benchmark_float_reciprocal_sqrt_rational_prec_round_algorithms(
             }),
             ("generic", &mut |(n, prec, rm)| {
                 no_out!(reciprocal_sqrt_rational_prec_round_generic(&n, prec, rm));
-            }),
-            ("simple", &mut |(n, prec, rm)| {
-                no_out!(reciprocal_sqrt_rational_prec_round_simple(&n, prec, rm));
             }),
         ],
     );

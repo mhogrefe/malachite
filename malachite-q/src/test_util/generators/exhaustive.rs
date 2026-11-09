@@ -432,6 +432,19 @@ pub fn exhaustive_rational_primitive_float_primitive_float_triple_gen<T: Primiti
     ))
 }
 
+// -- (PrimitiveFloat, PrimitiveFloat, PrimitiveFloat, Rational) --
+
+pub fn exhaustive_primitive_float_primitive_float_primitive_float_rational_quadruple_gen<
+    T: PrimitiveFloat,
+>() -> It<(T, T, T, Rational)> {
+    Box::new(
+        crate::test_util::extra_variadic::exhaustive_quadruples_xxxy(
+            exhaustive_primitive_floats(),
+            exhaustive_rationals(),
+        ),
+    )
+}
+
 // -- (Rational, PrimitiveSigned) --
 
 pub fn exhaustive_rational_signed_pair_gen<T: PrimitiveSigned>() -> It<(Rational, T)> {

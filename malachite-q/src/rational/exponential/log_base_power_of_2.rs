@@ -140,7 +140,7 @@ impl CheckedLogBasePowerOf2<i64> for &Rational {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `self` is 0 or `pow` is 0.
+    /// Panics if `self` is less than or equal to 0 or `pow` is 0.
     ///
     /// # Examples
     /// ```

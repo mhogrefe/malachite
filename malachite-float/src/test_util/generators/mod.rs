@@ -6691,3 +6691,69 @@ pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_11()
         &special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
     )
 }
+
+// -- (Float, RoundingMode, u64, RoundingMode) and the round_to_integer inputs --
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.round_to_integer_prec_round`:
+// the precision is positive and the `RoundingMode` is not `Exact`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_56() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_56,
+        &random_float_unsigned_rounding_mode_triple_gen_var_56,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_56,
+    )
+}
+
+// All `(Float, RoundingMode)` where the `RoundingMode` is not `Exact`: valid inputs to
+// `Float.round_to_integer_round`.
+pub fn float_rounding_mode_pair_gen_var_53() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_53,
+        &random_float_rounding_mode_pair_gen_var_53,
+        &special_random_float_rounding_mode_pair_gen_var_53,
+    )
+}
+
+// All `(Float, RoundingMode, u64, RoundingMode)` that are valid inputs to
+// `Float.round_to_integer_then_prec_round`.
+pub fn float_rounding_mode_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(Float, RoundingMode, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_float_rounding_mode_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_float_rounding_mode_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+// -- (Float, Rational, u64, RoundingMode) and (Float, Rational, RoundingMode) for agm --
+
+// All `(Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::agm_float_rational_prec_round`.
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_25()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_25,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_25,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_25,
+    )
+}
+
+// All `(Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::agm_float_rational_prec_round`, where the `Float` is extreme.
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_26()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_26,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_26,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_26,
+    )
+}
+
+// All `(Float, Rational, RoundingMode)` that are valid inputs to `Float::agm_float_rational_round`.
+pub fn float_rational_rounding_mode_triple_gen_var_24() -> FRR {
+    Generator::new(
+        &exhaustive_float_rational_rounding_mode_triple_gen_var_24,
+        &random_float_rational_rounding_mode_triple_gen_var_24,
+        &special_random_float_rational_rounding_mode_triple_gen_var_24,
+    )
+}
