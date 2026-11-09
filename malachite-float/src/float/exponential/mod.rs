@@ -15,9 +15,6 @@ use malachite_base::num::exponential::traits::{
     LogBasePowerOf2Of1PlusX, LogBasePowerOf2Of1PlusXAssign, PowerOf2XMinus1, PowerOf2XMinus1Assign,
 };
 
-/// Taking the AGM (arithmetic-geometric mean) of two [`Float`](super::Float)s, and of
-/// [`Float`](super::Float)s with [`Rational`](malachite_q::Rational)s.
-pub mod agm;
 /// [`Compound`] and [`CompoundAssign`], traits for computing the compound function $(1+x)^n$ for
 /// [`Float`](super::Float)s.
 pub mod compound;

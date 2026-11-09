@@ -9,7 +9,6 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    agm::register(runner);
     compound::register(runner);
     exp::register(runner);
     exp_x_minus_1::register(runner);
@@ -35,7 +34,6 @@ pub(crate) fn register(runner: &mut Runner) {
     power_of_2_x_minus_1::register(runner);
 }
 
-mod agm;
 mod compound;
 mod exp;
 mod exp_x_minus_1;

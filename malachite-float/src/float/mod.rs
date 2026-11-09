@@ -283,10 +283,12 @@ pub mod constants;
 /// Traits for converting to and from [`Float`]s, including converting [`Float`]s to and from
 /// strings.
 pub mod conversion;
+/// Elliptic integrals of [`Float`]s and related functions, such as the arithmetic-geometric mean.
+pub mod elliptic;
 /// Iterators that generate [`Float`]s without repetition.
 pub mod exhaustive;
 /// Exponential and logarithmic functions of [`Float`]s: `exp`, `ln`, logarithms to various bases,
-/// powers of 2 and 10, the arithmetic-geometric mean, and compound interest.
+/// powers of 2 and 10, and compound interest.
 pub mod exponential;
 /// Hyperbolic functions of [`Float`]s and their inverses.
 pub mod hyperbolic;

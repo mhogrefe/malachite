@@ -12,18 +12,18 @@ use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, OneHalf, Two, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
-use malachite_base::num::exponential::traits::{Agm, AgmAssign};
+use malachite_base::num::elliptic::traits::{Agm, AgmAssign};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
-use malachite_float::float::exponential::agm::{primitive_float_agm, primitive_float_agm_rational};
+use malachite_float::float::elliptic::agm::{primitive_float_agm, primitive_float_agm_rational};
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
 };
-use malachite_float::test_util::float::exponential::agm::{
+use malachite_float::test_util::float::elliptic::agm::{
     agm_prec_round_extended, rug_agm, rug_agm_prec, rug_agm_prec_round, rug_agm_round,
 };
 use malachite_float::test_util::generators::{

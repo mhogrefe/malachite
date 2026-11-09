@@ -27,7 +27,8 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SaturatingFrom};
-use malachite_base::num::exponential::traits::{Agm, AgmAssign, CeilingLogBase2};
+use malachite_base::num::elliptic::traits::{Agm, AgmAssign};
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
@@ -2625,7 +2626,7 @@ impl Agm<Self> for Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::exponential::traits::Agm;
+    /// use malachite_base::num::elliptic::traits::Agm;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(
@@ -2688,7 +2689,7 @@ impl Agm<&Self> for Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::exponential::traits::Agm;
+    /// use malachite_base::num::elliptic::traits::Agm;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(
@@ -2751,7 +2752,7 @@ impl Agm<Float> for &Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::exponential::traits::Agm;
+    /// use malachite_base::num::elliptic::traits::Agm;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(
@@ -2812,7 +2813,7 @@ impl Agm<&Float> for &Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::exponential::traits::Agm;
+    /// use malachite_base::num::elliptic::traits::Agm;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(
@@ -2866,7 +2867,7 @@ impl AgmAssign<Self> for Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::exponential::traits::AgmAssign;
+    /// use malachite_base::num::elliptic::traits::AgmAssign;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
@@ -2917,7 +2918,7 @@ impl AgmAssign<&Self> for Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::exponential::traits::AgmAssign;
+    /// use malachite_base::num::elliptic::traits::AgmAssign;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
@@ -2957,7 +2958,7 @@ impl AgmAssign<&Self> for Float {
 /// # Examples
 /// ```
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::float::exponential::agm::primitive_float_agm;
+/// use malachite_float::float::elliptic::agm::primitive_float_agm;
 ///
 /// assert_eq!(
 ///     NiceFloat(primitive_float_agm(24.0, 6.0)),
@@ -3003,7 +3004,7 @@ where
 /// # Examples
 /// ```
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::float::exponential::agm::primitive_float_agm_rational;
+/// use malachite_float::float::elliptic::agm::primitive_float_agm_rational;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(

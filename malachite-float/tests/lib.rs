@@ -228,6 +228,9 @@ pub mod float {
             pub mod typst;
         }
     }
+    pub mod elliptic {
+        pub mod agm;
+    }
     pub mod exhaustive {
         pub mod exhaustive_finite_floats;
         pub mod exhaustive_floats;
@@ -242,7 +245,6 @@ pub mod float {
         pub mod exhaustive_positive_floats_with_sci_exponent_and_precision;
     }
     pub mod exponential {
-        pub mod agm;
         pub mod compound;
         pub mod exp;
         pub mod exp_x_minus_1;

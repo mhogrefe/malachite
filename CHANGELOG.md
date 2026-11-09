@@ -20,8 +20,9 @@ documented by git history.
   the combinatorial sequences (factorials, `BinomialCoefficient`, `Fibonacci`, `BellNumber`,
   `Primorial`, ...); `num::exponential::traits` has `Exp`, `Ln`, every `LogBase*` trait including
   the integer `FloorLogBase*`, `CeilingLogBase*`, and `CheckedLogBase*` ones, `PowerOf10`,
-  `PowerOf2XMinus1`, `Agm`, and `Compound`; and `num::trigonometric::traits` and
-  `num::hyperbolic::traits` have the trigonometric and hyperbolic functions and their inverses.
+  `PowerOf2XMinus1`, and `Compound`; `num::elliptic::traits` has `Agm`, the first of the
+  elliptic-integral functions; and `num::trigonometric::traits` and `num::hyperbolic::traits` have
+  the trigonometric and hyperbolic functions and their inverses.
   Every moved trait is still re-exported from `num::arithmetic::traits` in this release, so
   existing imports keep compiling; the re-exports will be removed in the next release. The
   implementing modules moved the same way: in malachite-base, `num::modular`,
@@ -34,8 +35,9 @@ documented by git history.
   `SimplestRationalInInterval`, `DenominatorsInClosedInterval`) moved from
   `rational::arithmetic::traits` to `rational::number_theory::traits`, with the same one-release
   re-export; in malachite-float, `float::arithmetic` keeps the ring operations,
-  rounding, shifts, and roots, while `float::exponential`, `float::trigonometric`,
-  `float::hyperbolic`, and `float::number_theory` (for `factorial`) hold the rest. The
+  rounding, shifts, and roots, while `float::exponential`, `float::elliptic` (for `agm`),
+  `float::trigonometric`, `float::hyperbolic`, and `float::number_theory` (for `factorial`) hold the
+  rest. The
   implementing modules matter for docs.rs paths and for `crate_test_fn` users.
 - The polynomial, vector, and matrix types and their traits are split the same way. In
   `malachite_base::polynomial`, the traits now live in `polynomial::arithmetic::traits` (the ring

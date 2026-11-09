@@ -10,6 +10,7 @@ pub mod arithmetic;
 pub mod comparison;
 pub mod constants;
 pub mod conversion;
+pub mod elliptic;
 pub mod exhaustive;
 pub mod exponential;
 pub mod hyperbolic;

@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod agm;
 pub mod compound;
 pub mod exp;
 pub mod exp_x_minus_1;

@@ -19,6 +19,8 @@ pub mod comparison;
 /// Traits for converting to and from numbers, converting to and from strings, and extracting
 /// digits.
 pub mod conversion;
+/// Elliptic integrals and related functions, such as the arithmetic-geometric mean.
+pub mod elliptic;
 /// Iterators that generate numbers without repetition.
 pub mod exhaustive;
 /// Exponential and logarithmic functions, and integer logarithms.

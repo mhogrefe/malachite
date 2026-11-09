@@ -10,9 +10,10 @@ use crate::rounding_modes::RoundingMode;
 use core::cmp::Ordering;
 
 // Until the next release, the traits that moved to `num::modular`, `num::number_theory`,
-// `num::exponential`, `num::trigonometric`, `num::hyperbolic`, and `num::linear_algebra` are also
-// re-exported here, so that paths through this module keep resolving. These re-exports will then be
-// removed.
+// `num::exponential`, `num::elliptic`, `num::trigonometric`, `num::hyperbolic`, and
+// `num::linear_algebra` are also re-exported here, so that paths through this module keep
+// resolving. These re-exports will then be removed.
+pub use crate::num::elliptic::traits::*;
 pub use crate::num::exponential::traits::*;
 pub use crate::num::hyperbolic::traits::*;
 pub use crate::num::linear_algebra::traits::*;

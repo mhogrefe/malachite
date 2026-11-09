@@ -8,7 +8,7 @@
 
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
-use malachite_base::num::exponential::traits::{Agm, AgmAssign};
+use malachite_base::num::elliptic::traits::{Agm, AgmAssign};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::*;
@@ -20,7 +20,7 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::float::basic::extended::{
     ExtendedFloat, agm_prec_round_normal_ref_ref_extended,
 };
-use malachite_float::float::exponential::agm::{primitive_float_agm, primitive_float_agm_rational};
+use malachite_float::float::elliptic::agm::{primitive_float_agm, primitive_float_agm_rational};
 use malachite_float::test_util::bench::bucketers::{
     pair_2_pair_float_max_complexity_bucketer,
     pair_2_quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer,
@@ -31,7 +31,7 @@ use malachite_float::test_util::bench::bucketers::{
     triple_1_2_float_max_complexity_bucketer,
     triple_float_float_primitive_int_max_complexity_bucketer,
 };
-use malachite_float::test_util::float::exponential::agm::{
+use malachite_float::test_util::float::elliptic::agm::{
     rug_agm, rug_agm_prec, rug_agm_prec_round, rug_agm_round,
 };
 use malachite_float::test_util::generators::{
