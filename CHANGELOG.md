@@ -1171,6 +1171,16 @@ documented by git history.
 - `Float::reciprocal_sqrt_rational_prec_round` and its `_ref` form now compute $\sqrt{1/x}$ with
   `sqrt_rational_prec_round`, since inverting a `Rational` is exact; results are unchanged, and the
   duplicated implementation is gone.
+- `Float::agm_float_rational_prec_round`, `agm_float_rational_prec`, and `agm_float_rational_round`,
+  with their `_val_ref`, `_ref_val`, `_ref_ref`, and `_assign` forms, which compute the
+  arithmetic-geometric mean of a `Float` and a `Rational`, along with `Agm<Rational>` and
+  `AgmAssign<Rational>` for `Float`, which round to the `Float`'s precision. (The two-`Rational`
+  form is the existing `Float::agm_rational_prec_round`.) The special cases follow those of
+  `agm_prec_round`: after `NaN` and the infinities, a zero argument gives $0.0$ even when the other
+  argument is negative.
+- The documentation of `Float`'s `agm` functions now gives the correct result for an infinite
+  argument: $\text{AGM}(\infty, x) = \infty$ when $x > 0$. It had said `NaN` for every finite $x$,
+  though the functions have always returned $\infty$.
 
 ## 0.14.0 — 2026-10-13
 
