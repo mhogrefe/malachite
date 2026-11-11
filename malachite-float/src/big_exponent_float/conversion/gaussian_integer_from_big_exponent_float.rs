@@ -97,7 +97,6 @@ impl ConvertibleFrom<&BigExponentFloat> for GaussianInteger {
     /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_float::{BigExponentFloat, Float};
     /// use malachite_nz::gaussian_integer::GaussianInteger;
-    /// use malachite_nz::integer::Integer;
     ///
     /// assert!(GaussianInteger::convertible_from(&BigExponentFloat::from(
     ///     Float::from(-4.0)

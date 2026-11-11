@@ -126,6 +126,99 @@ pub fn exhaustive_big_exponent_float_rounding_mode_pair_gen_var_1()
     )
 }
 
+// -- (BigExponentFloat, BigExponentFloat) --
+
+pub fn exhaustive_big_exponent_float_pair_gen() -> It<(BigExponentFloat, BigExponentFloat)> {
+    Box::new(exhaustive_pairs_from_single(
+        exhaustive_big_exponent_floats(),
+    ))
+}
+
+// -- (BigExponentFloat, BigExponentFloat, BigExponentFloat) --
+
+pub fn exhaustive_big_exponent_float_triple_gen()
+-> It<(BigExponentFloat, BigExponentFloat, BigExponentFloat)> {
+    Box::new(exhaustive_triples_from_single(
+        exhaustive_big_exponent_floats(),
+    ))
+}
+
+// -- (BigExponentFloat, Natural) --
+
+pub fn exhaustive_big_exponent_float_natural_pair_gen() -> It<(BigExponentFloat, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_naturals(),
+    ))
+}
+
+// -- (BigExponentFloat, Integer) --
+
+pub fn exhaustive_big_exponent_float_integer_pair_gen() -> It<(BigExponentFloat, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_integers(),
+    ))
+}
+
+// -- (BigExponentFloat, Rational) --
+
+pub fn exhaustive_big_exponent_float_rational_pair_gen() -> It<(BigExponentFloat, Rational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_rationals(),
+    ))
+}
+
+// -- (BigExponentFloat, T) for other numeric types T --
+
+pub fn exhaustive_big_exponent_float_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> It<(BigExponentFloat, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_big_exponent_float_signed_pair_gen<T: PrimitiveSigned>()
+-> It<(BigExponentFloat, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_big_exponent_float_primitive_float_pair_gen<T: PrimitiveFloat>()
+-> It<(BigExponentFloat, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_primitive_floats(),
+    ))
+}
+
+pub fn exhaustive_big_exponent_float_gaussian_integer_pair_gen()
+-> It<(BigExponentFloat, GaussianInteger)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_gaussian_integers(),
+    ))
+}
+
+pub fn exhaustive_big_exponent_float_gaussian_rational_pair_gen()
+-> It<(BigExponentFloat, GaussianRational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_gaussian_rationals(),
+    ))
+}
+
+pub fn exhaustive_big_exponent_float_float_pair_gen() -> It<(BigExponentFloat, Float)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_floats(),
+    ))
+}
+
 // -- (BigExponentFloat, PrimitiveUnsigned) --
 
 // The unsigned is positive.
@@ -155,6 +248,98 @@ pub fn exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_1()
         )
         .filter(|&((ref x, p), rm)| round_to_prec_round_valid(x, p, rm)),
     ))
+}
+
+// -- (BigExponentFloat, BigExponentFloat, PrimitiveUnsigned) --
+
+// The unsigned is positive.
+pub fn exhaustive_big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+-> It<(BigExponentFloat, BigExponentFloat, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_pairs_from_single(exhaustive_big_exponent_floats()),
+            exhaustive_positive_primitive_ints(),
+        )
+        .map(|((x, y), p)| (x, y, p)),
+    )
+}
+
+// -- (BigExponentFloat, BigExponentFloat, PrimitiveUnsigned, RoundingMode) --
+
+// Whether rounding either of two `BigExponentFloat`s to `p` bits with `rm` is valid: `Exact` is
+// allowed only when both are representable with `p` bits.
+pub fn round_pair_to_prec_round_valid(
+    x: &BigExponentFloat,
+    y: &BigExponentFloat,
+    p: u64,
+    rm: RoundingMode,
+) -> bool {
+    round_to_prec_round_valid(x, p, rm) && round_to_prec_round_valid(y, p, rm)
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if rounding either
+// `BigExponentFloat` is exact.
+pub fn exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs_from_single(exhaustive_big_exponent_floats()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((x, y), p), rm)| (x, y, p, rm))
+        .filter(|(x, y, p, rm)| round_pair_to_prec_round_valid(x, y, *p, *rm)),
+    )
+}
+
+// -- (BigExponentFloat, Rational, PrimitiveUnsigned) --
+
+// The unsigned is positive.
+pub fn exhaustive_big_exponent_float_rational_unsigned_triple_gen_var_1()
+-> It<(BigExponentFloat, Rational, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_pairs(exhaustive_big_exponent_floats(), exhaustive_rationals()),
+            exhaustive_positive_primitive_ints(),
+        )
+        .map(|((x, y), p)| (x, y, p)),
+    )
+}
+
+// -- (BigExponentFloat, Rational, PrimitiveUnsigned, RoundingMode) --
+
+// Whether rounding a `BigExponentFloat` or a `Rational` to `p` bits with `rm` is valid: `Exact` is
+// allowed only when both are representable with `p` bits.
+pub fn round_big_exponent_float_and_rational_to_prec_round_valid(
+    x: &BigExponentFloat,
+    y: &Rational,
+    p: u64,
+    rm: RoundingMode,
+) -> bool {
+    round_to_prec_round_valid(x, p, rm)
+        && (rm != Exact
+            || BigExponentFloat::try_from(y).is_ok_and(|y| y.get_prec().is_none_or(|q| q <= p)))
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if rounding either the
+// `BigExponentFloat` or the `Rational` is exact.
+pub fn exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs(exhaustive_big_exponent_floats(), exhaustive_rationals()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((x, y), p), rm)| (x, y, p, rm))
+        .filter(|(x, y, p, rm)| {
+            round_big_exponent_float_and_rational_to_prec_round_valid(x, y, *p, *rm)
+        }),
+    )
 }
 
 // -- Float --

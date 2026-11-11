@@ -78,6 +78,122 @@ pub fn pair_2_max_triple_1_big_exponent_float_complexity_triple_2_bucketer<'a, T
     }
 }
 
+pub fn pair_big_exponent_float_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, BigExponentFloat)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.complexity(), y.complexity())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.complexity())"),
+    }
+}
+
+pub fn pair_2_pair_big_exponent_float_max_complexity_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, (BigExponentFloat, BigExponentFloat))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y))| usize::exact_from(max(x.complexity(), y.complexity())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.complexity())"),
+    }
+}
+
+pub fn pair_big_exponent_float_float_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, Float)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.complexity(), y.complexity())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.complexity())"),
+    }
+}
+
+pub fn pair_big_exponent_float_natural_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, Natural)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.complexity(), y.significant_bits())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_big_exponent_float_integer_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, Integer)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.complexity(), y.significant_bits())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_big_exponent_float_rational_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, Rational)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.complexity(), y.significant_bits())),
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn triple_1_2_3_big_exponent_float_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, BigExponentFloat, u64)> {
+    Bucketer {
+        bucketing_function: &|(x, y, p)| {
+            usize::exact_from(max!(x.complexity(), y.complexity(), *p))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.complexity(), {p_name})"),
+    }
+}
+
+pub fn quadruple_1_2_3_big_exponent_float_max_complexity_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, BigExponentFloat, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, p, _)| {
+            usize::exact_from(max!(x.complexity(), y.complexity(), *p))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.complexity(), {p_name})"),
+    }
+}
+
+pub fn triple_1_2_3_big_exponent_float_rational_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, Rational, u64)> {
+    Bucketer {
+        bucketing_function: &|(x, y, p)| {
+            usize::exact_from(max!(x.complexity(), y.significant_bits(), *p))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.significant_bits(), {p_name})"
+        ),
+    }
+}
+
+pub fn quadruple_1_2_3_big_exponent_float_rational_max_complexity_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, Rational, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, p, _)| {
+            usize::exact_from(max!(x.complexity(), y.significant_bits(), *p))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.significant_bits(), {p_name})"
+        ),
+    }
+}
+
 pub fn pair_1_float_complexity_bucketer<T>(var_name: &str) -> Bucketer<'_, (Float, T)> {
     Bucketer {
         bucketing_function: &|(x, _)| usize::exact_from(x.complexity()),

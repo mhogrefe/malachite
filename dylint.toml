@@ -7,6 +7,8 @@ max_line_length = 100
 # inside `macro_rules!` bodies (each expansion would need to fulfill the expectation separately).
 # An entry whose line is no longer too long is itself flagged, so this list cannot go stale.
 long_lines_exceptions = [
+    { file = "malachite-float/src/test_util/generators/mod.rs", line = 163 },
+    { file = "malachite-float/src/test_util/generators/mod.rs", line = 165 },
     { file = "malachite-base/src/num/arithmetic/round_to_multiple_of_power_of_2.rs", line = 118 },
     { file = "malachite-base/src/num/number_theory/stirling_number_of_the_second_kind.rs", line = 107 },
     { file = "malachite-base/src/num/number_theory/stirling_number_of_the_second_kind.rs", line = 130 },

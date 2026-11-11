@@ -9,7 +9,8 @@
 use crate::Float;
 use crate::big_exponent_float::BigExponentFloat;
 use crate::test_util::generators::common::{
-    big_exponent_float_float, big_exponent_float_unsigned_rounding_mode_triple_float,
+    big_exponent_float_float, big_exponent_float_pair_float,
+    big_exponent_float_unsigned_rounding_mode_triple_float,
     float_float_anything_rounding_mode_quadruple_rm, float_float_anything_triple_rm,
     float_float_float_anything_quadruple_rm, float_float_float_anything_rounding_mode_quintuple_rm,
     float_float_float_float_anything_quintuple_rm,
@@ -93,6 +94,146 @@ pub fn big_exponent_float_rounding_mode_pair_gen_var_1()
 }
 
 // -- (BigExponentFloat, PrimitiveUnsigned) --
+
+pub fn big_exponent_float_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(BigExponentFloat, T)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_pair_gen::<T>,
+        &random_big_exponent_float_unsigned_pair_gen::<T>,
+        &special_random_big_exponent_float_unsigned_pair_gen::<T>,
+    )
+}
+
+pub fn big_exponent_float_signed_pair_gen<T: PrimitiveSigned>() -> Generator<(BigExponentFloat, T)>
+{
+    Generator::new(
+        &exhaustive_big_exponent_float_signed_pair_gen::<T>,
+        &random_big_exponent_float_signed_pair_gen::<T>,
+        &special_random_big_exponent_float_signed_pair_gen::<T>,
+    )
+}
+
+pub fn big_exponent_float_primitive_float_pair_gen<T: PrimitiveFloat>()
+-> Generator<(BigExponentFloat, T)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_primitive_float_pair_gen::<T>,
+        &random_big_exponent_float_primitive_float_pair_gen::<T>,
+        &special_random_big_exponent_float_primitive_float_pair_gen::<T>,
+    )
+}
+
+pub fn big_exponent_float_gaussian_integer_pair_gen()
+-> Generator<(BigExponentFloat, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_gaussian_integer_pair_gen,
+        &random_big_exponent_float_gaussian_integer_pair_gen,
+        &special_random_big_exponent_float_gaussian_integer_pair_gen,
+    )
+}
+
+pub fn big_exponent_float_gaussian_rational_pair_gen()
+-> Generator<(BigExponentFloat, GaussianRational)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_gaussian_rational_pair_gen,
+        &random_big_exponent_float_gaussian_rational_pair_gen,
+        &special_random_big_exponent_float_gaussian_rational_pair_gen,
+    )
+}
+
+pub fn big_exponent_float_float_pair_gen() -> Generator<(BigExponentFloat, Float)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_float_pair_gen,
+        &random_big_exponent_float_float_pair_gen,
+        &special_random_big_exponent_float_float_pair_gen,
+    )
+}
+
+pub fn big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+-> Generator<(BigExponentFloat, BigExponentFloat, u64)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1,
+        &random_big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1,
+        &special_random_big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1,
+    )
+}
+
+pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+pub fn big_exponent_float_rational_unsigned_triple_gen_var_1()
+-> Generator<(BigExponentFloat, Rational, u64)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_rational_unsigned_triple_gen_var_1,
+        &random_big_exponent_float_rational_unsigned_triple_gen_var_1,
+        &special_random_big_exponent_float_rational_unsigned_triple_gen_var_1,
+    )
+}
+
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+// Like `big_exponent_float_pair_gen`, keeping only pairs whose values have `Float` counterparts.
+pub fn big_exponent_float_pair_gen_var_1_float()
+-> Generator<((Float, Float), (BigExponentFloat, BigExponentFloat))> {
+    Generator::new(
+        &|| big_exponent_float_pair_float(exhaustive_big_exponent_float_pair_gen()),
+        &|config| big_exponent_float_pair_float(random_big_exponent_float_pair_gen(config)),
+        &|config| big_exponent_float_pair_float(special_random_big_exponent_float_pair_gen(config)),
+    )
+}
+
+pub fn big_exponent_float_pair_gen() -> Generator<(BigExponentFloat, BigExponentFloat)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_pair_gen,
+        &random_big_exponent_float_pair_gen,
+        &special_random_big_exponent_float_pair_gen,
+    )
+}
+
+pub fn big_exponent_float_triple_gen()
+-> Generator<(BigExponentFloat, BigExponentFloat, BigExponentFloat)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_triple_gen,
+        &random_big_exponent_float_triple_gen,
+        &special_random_big_exponent_float_triple_gen,
+    )
+}
+
+pub fn big_exponent_float_natural_pair_gen() -> Generator<(BigExponentFloat, Natural)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_natural_pair_gen,
+        &random_big_exponent_float_natural_pair_gen,
+        &special_random_big_exponent_float_natural_pair_gen,
+    )
+}
+
+pub fn big_exponent_float_integer_pair_gen() -> Generator<(BigExponentFloat, Integer)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_integer_pair_gen,
+        &random_big_exponent_float_integer_pair_gen,
+        &special_random_big_exponent_float_integer_pair_gen,
+    )
+}
+
+pub fn big_exponent_float_rational_pair_gen() -> Generator<(BigExponentFloat, Rational)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_rational_pair_gen,
+        &random_big_exponent_float_rational_pair_gen,
+        &special_random_big_exponent_float_rational_pair_gen,
+    )
+}
 
 // The unsigned is positive.
 pub fn big_exponent_float_unsigned_pair_gen_var_1() -> Generator<(BigExponentFloat, u64)> {

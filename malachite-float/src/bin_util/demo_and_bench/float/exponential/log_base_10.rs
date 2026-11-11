@@ -830,7 +830,7 @@ fn demo_float_log_base_10_rational_prec(gm: GenMode, config: &GenConfig, limit: 
         .take(limit)
     {
         println!(
-            "log_base_10_rational_prec({}, {}) = {:?}",
+            "Float::log_base_10_rational_prec({}, {}) = {:?}",
             x.clone(),
             prec,
             Float::log_base_10_rational_prec(x, prec)
@@ -845,7 +845,7 @@ fn demo_float_log_base_10_rational_prec_debug(gm: GenMode, config: &GenConfig, l
     {
         let (log, o) = Float::log_base_10_rational_prec(x.clone(), prec);
         println!(
-            "log_base_10_rational_prec({}, {}) = ({:#x}, {:?})",
+            "Float::log_base_10_rational_prec({}, {}) = ({:#x}, {:?})",
             x,
             prec,
             ComparableFloat(log),
@@ -860,7 +860,7 @@ fn demo_float_log_base_10_rational_prec_ref(gm: GenMode, config: &GenConfig, lim
         .take(limit)
     {
         println!(
-            "log_base_10_rational_prec_ref(&{}, {}) = {:?}",
+            "Float::log_base_10_rational_prec_ref(&{}, {}) = {:?}",
             x,
             prec,
             Float::log_base_10_rational_prec_ref(&x, prec)
@@ -875,7 +875,7 @@ fn demo_float_log_base_10_rational_prec_ref_debug(gm: GenMode, config: &GenConfi
     {
         let (log, o) = Float::log_base_10_rational_prec_ref(&x, prec);
         println!(
-            "log_base_10_rational_prec_ref(&{}, {}) = ({:#x}, {:?})",
+            "Float::log_base_10_rational_prec_ref(&{}, {}) = ({:#x}, {:?})",
             x,
             prec,
             ComparableFloat(log),
@@ -890,7 +890,7 @@ fn demo_float_log_base_10_rational_prec_round(gm: GenMode, config: &GenConfig, l
         .take(limit)
     {
         println!(
-            "log_base_10_rational_prec_round({}, {}, {}) = {:?}",
+            "Float::log_base_10_rational_prec_round({}, {}, {}) = {:?}",
             x.clone(),
             prec,
             rm,
@@ -906,7 +906,7 @@ fn demo_float_log_base_10_rational_prec_round_debug(gm: GenMode, config: &GenCon
     {
         let (log, o) = Float::log_base_10_rational_prec_round(x.clone(), prec, rm);
         println!(
-            "log_base_10_rational_prec_round({}, {}, {}) = ({:#x}, {:?})",
+            "Float::log_base_10_rational_prec_round({}, {}, {}) = ({:#x}, {:?})",
             x,
             prec,
             rm,
@@ -922,7 +922,7 @@ fn demo_float_log_base_10_rational_prec_round_ref(gm: GenMode, config: &GenConfi
         .take(limit)
     {
         println!(
-            "log_base_10_rational_prec_round_ref(&{}, {}, {}) = {:?}",
+            "Float::log_base_10_rational_prec_round_ref(&{}, {}, {}) = {:?}",
             x,
             prec,
             rm,
@@ -942,7 +942,7 @@ fn demo_float_log_base_10_rational_prec_round_ref_debug(
     {
         let (log, o) = Float::log_base_10_rational_prec_round_ref(&x, prec, rm);
         println!(
-            "log_base_10_rational_prec_round_ref(&{}, {}, {}) = ({:#x}, {:?})",
+            "Float::log_base_10_rational_prec_round_ref(&{}, {}, {}) = ({:#x}, {:?})",
             x,
             prec,
             rm,

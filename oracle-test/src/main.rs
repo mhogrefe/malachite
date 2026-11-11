@@ -3485,6 +3485,138 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "demo_float_log_base_2_1_plus_x_prec_round_extreme_debug",
         "az_float_log_base_2_1_plus_x",
     ),
+    ("demo_float_log_base_10_debug", "az_float_log_base_10"),
+    (
+        "demo_float_log_base_10_extreme_debug",
+        "az_float_log_base_10",
+    ),
+    ("demo_float_log_base_10_ref_debug", "az_float_log_base_10"),
+    (
+        "demo_float_log_base_10_assign_debug",
+        "az_float_log_base_10",
+    ),
+    ("demo_float_log_base_10_prec_debug", "az_float_log_base_10"),
+    (
+        "demo_float_log_base_10_prec_extreme_debug",
+        "az_float_log_base_10",
+    ),
+    (
+        "demo_float_log_base_10_prec_ref_debug",
+        "az_float_log_base_10",
+    ),
+    (
+        "demo_float_log_base_10_prec_assign_debug",
+        "az_float_log_base_10",
+    ),
+    ("demo_float_log_base_10_round_debug", "az_float_log_base_10"),
+    (
+        "demo_float_log_base_10_round_extreme_debug",
+        "az_float_log_base_10",
+    ),
+    (
+        "demo_float_log_base_10_round_ref_debug",
+        "az_float_log_base_10",
+    ),
+    (
+        "demo_float_log_base_10_round_assign_debug",
+        "az_float_log_base_10",
+    ),
+    (
+        "demo_float_log_base_10_prec_round_debug",
+        "az_float_log_base_10",
+    ),
+    (
+        "demo_float_log_base_10_prec_round_extreme_debug",
+        "az_float_log_base_10",
+    ),
+    (
+        "demo_float_log_base_10_prec_round_ref_debug",
+        "az_float_log_base_10",
+    ),
+    (
+        "demo_float_log_base_10_prec_round_assign_debug",
+        "az_float_log_base_10",
+    ),
+    (
+        "demo_float_log_base_10_rational_prec_debug",
+        "az_float_log_base_10_rational",
+    ),
+    (
+        "demo_float_log_base_10_rational_prec_ref_debug",
+        "az_float_log_base_10_rational",
+    ),
+    (
+        "demo_float_log_base_10_rational_prec_round_debug",
+        "az_float_log_base_10_rational",
+    ),
+    (
+        "demo_float_log_base_10_rational_prec_round_ref_debug",
+        "az_float_log_base_10_rational",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_ref_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_assign_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_prec_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_prec_ref_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_prec_assign_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_round_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_round_ref_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_round_assign_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_prec_round_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_prec_round_ref_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_prec_round_assign_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_extreme_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_prec_extreme_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_round_extreme_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_10_1_plus_x_prec_round_extreme_debug",
+        "az_float_log_base_10_1_plus_x",
+    ),
     ("demo_float_reciprocal_debug", "az_float_reciprocal"),
     ("demo_float_reciprocal_extreme_debug", "az_float_reciprocal"),
     ("demo_float_reciprocal_prec_debug", "az_float_reciprocal"),
@@ -7387,6 +7519,223 @@ fn test_against_flint() {
         ("demo_big_exponent_float_to_binary_string", "arf_string"),
         ("demo_big_exponent_float_to_octal_string", "arf_string"),
         ("demo_big_exponent_float_from_string_base", "arf_string"),
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, flint_mode);
+    }
+    // `BigExponentFloat`'s comparisons.
+    for (demo_name, flint_mode) in [
+        ("demo_big_exponent_float_eq", "arf_cmp"),
+        ("demo_big_exponent_float_eq_abs", "arf_cmp"),
+        ("demo_big_exponent_float_eq_abs_float", "arf_cmp"),
+        ("demo_big_exponent_float_eq_abs_gaussian_integer", "arf_cmp"),
+        (
+            "demo_big_exponent_float_eq_abs_gaussian_rational",
+            "arf_cmp",
+        ),
+        ("demo_big_exponent_float_eq_abs_integer", "arf_cmp"),
+        ("demo_big_exponent_float_eq_abs_natural", "arf_cmp"),
+        (
+            "demo_big_exponent_float_eq_abs_primitive_float_f32",
+            "arf_cmp",
+        ),
+        (
+            "demo_big_exponent_float_eq_abs_primitive_float_f64",
+            "arf_cmp",
+        ),
+        ("demo_big_exponent_float_eq_abs_rational", "arf_cmp"),
+        ("demo_big_exponent_float_eq_abs_signed_i128", "arf_cmp"),
+        ("demo_big_exponent_float_eq_abs_signed_i64", "arf_cmp"),
+        ("demo_big_exponent_float_eq_abs_unsigned_u64", "arf_cmp"),
+        ("demo_big_exponent_float_eq_abs_unsigned_u8", "arf_cmp"),
+        ("demo_big_exponent_float_eq_float", "arf_cmp"),
+        ("demo_big_exponent_float_eq_gaussian_integer", "arf_cmp"),
+        ("demo_big_exponent_float_eq_gaussian_rational", "arf_cmp"),
+        ("demo_big_exponent_float_eq_integer", "arf_cmp"),
+        ("demo_big_exponent_float_eq_natural", "arf_cmp"),
+        ("demo_big_exponent_float_eq_primitive_float_f32", "arf_cmp"),
+        ("demo_big_exponent_float_eq_primitive_float_f64", "arf_cmp"),
+        ("demo_big_exponent_float_eq_rational", "arf_cmp"),
+        ("demo_big_exponent_float_eq_signed_i128", "arf_cmp"),
+        ("demo_big_exponent_float_eq_signed_i64", "arf_cmp"),
+        ("demo_big_exponent_float_eq_unsigned_u64", "arf_cmp"),
+        ("demo_big_exponent_float_eq_unsigned_u8", "arf_cmp"),
+        ("demo_big_exponent_float_partial_cmp", "arf_cmp"),
+        ("demo_big_exponent_float_partial_cmp_abs", "arf_cmp"),
+        ("demo_big_exponent_float_partial_cmp_abs_float", "arf_cmp"),
+        (
+            "demo_big_exponent_float_partial_cmp_abs_gaussian_integer",
+            "arf_cmp",
+        ),
+        (
+            "demo_big_exponent_float_partial_cmp_abs_gaussian_rational",
+            "arf_cmp",
+        ),
+        ("demo_big_exponent_float_partial_cmp_abs_integer", "arf_cmp"),
+        ("demo_big_exponent_float_partial_cmp_abs_natural", "arf_cmp"),
+        (
+            "demo_big_exponent_float_partial_cmp_abs_primitive_float_f32",
+            "arf_cmp",
+        ),
+        (
+            "demo_big_exponent_float_partial_cmp_abs_primitive_float_f64",
+            "arf_cmp",
+        ),
+        (
+            "demo_big_exponent_float_partial_cmp_abs_rational",
+            "arf_cmp",
+        ),
+        (
+            "demo_big_exponent_float_partial_cmp_abs_signed_i128",
+            "arf_cmp",
+        ),
+        (
+            "demo_big_exponent_float_partial_cmp_abs_signed_i64",
+            "arf_cmp",
+        ),
+        (
+            "demo_big_exponent_float_partial_cmp_abs_unsigned_u64",
+            "arf_cmp",
+        ),
+        (
+            "demo_big_exponent_float_partial_cmp_abs_unsigned_u8",
+            "arf_cmp",
+        ),
+        ("demo_big_exponent_float_partial_cmp_float", "arf_cmp"),
+        ("demo_big_exponent_float_partial_cmp_integer", "arf_cmp"),
+        ("demo_big_exponent_float_partial_cmp_natural", "arf_cmp"),
+        (
+            "demo_big_exponent_float_partial_cmp_primitive_float_f32",
+            "arf_cmp",
+        ),
+        (
+            "demo_big_exponent_float_partial_cmp_primitive_float_f64",
+            "arf_cmp",
+        ),
+        ("demo_big_exponent_float_partial_cmp_rational", "arf_cmp"),
+        ("demo_big_exponent_float_partial_cmp_signed_i128", "arf_cmp"),
+        ("demo_big_exponent_float_partial_cmp_signed_i64", "arf_cmp"),
+        (
+            "demo_big_exponent_float_partial_cmp_unsigned_u64",
+            "arf_cmp",
+        ),
+        ("demo_big_exponent_float_partial_cmp_unsigned_u8", "arf_cmp"),
+        ("demo_float_eq_abs_big_exponent_float", "arf_cmp"),
+        ("demo_float_eq_big_exponent_float", "arf_cmp"),
+        ("demo_float_partial_cmp_abs_big_exponent_float", "arf_cmp"),
+        ("demo_float_partial_cmp_big_exponent_float", "arf_cmp"),
+        ("demo_gaussian_integer_eq_abs_big_exponent_float", "arf_cmp"),
+        ("demo_gaussian_integer_eq_big_exponent_float", "arf_cmp"),
+        (
+            "demo_gaussian_integer_partial_cmp_abs_big_exponent_float",
+            "arf_cmp",
+        ),
+        (
+            "demo_gaussian_rational_eq_abs_big_exponent_float",
+            "arf_cmp",
+        ),
+        ("demo_gaussian_rational_eq_big_exponent_float", "arf_cmp"),
+        (
+            "demo_gaussian_rational_partial_cmp_abs_big_exponent_float",
+            "arf_cmp",
+        ),
+        ("demo_integer_eq_abs_big_exponent_float", "arf_cmp"),
+        ("demo_integer_eq_big_exponent_float", "arf_cmp"),
+        ("demo_integer_partial_cmp_abs_big_exponent_float", "arf_cmp"),
+        ("demo_integer_partial_cmp_big_exponent_float", "arf_cmp"),
+        ("demo_natural_eq_abs_big_exponent_float", "arf_cmp"),
+        ("demo_natural_eq_big_exponent_float", "arf_cmp"),
+        ("demo_natural_partial_cmp_abs_big_exponent_float", "arf_cmp"),
+        ("demo_natural_partial_cmp_big_exponent_float", "arf_cmp"),
+        (
+            "demo_primitive_float_eq_abs_big_exponent_float_f32",
+            "arf_cmp",
+        ),
+        (
+            "demo_primitive_float_eq_abs_big_exponent_float_f64",
+            "arf_cmp",
+        ),
+        ("demo_primitive_float_eq_big_exponent_float_f32", "arf_cmp"),
+        ("demo_primitive_float_eq_big_exponent_float_f64", "arf_cmp"),
+        (
+            "demo_primitive_float_partial_cmp_abs_big_exponent_float_f32",
+            "arf_cmp",
+        ),
+        (
+            "demo_primitive_float_partial_cmp_abs_big_exponent_float_f64",
+            "arf_cmp",
+        ),
+        (
+            "demo_primitive_float_partial_cmp_big_exponent_float_f32",
+            "arf_cmp",
+        ),
+        (
+            "demo_primitive_float_partial_cmp_big_exponent_float_f64",
+            "arf_cmp",
+        ),
+        ("demo_rational_eq_abs_big_exponent_float", "arf_cmp"),
+        ("demo_rational_eq_big_exponent_float", "arf_cmp"),
+        (
+            "demo_rational_partial_cmp_abs_big_exponent_float",
+            "arf_cmp",
+        ),
+        ("demo_rational_partial_cmp_big_exponent_float", "arf_cmp"),
+        ("demo_signed_eq_abs_big_exponent_float_i128", "arf_cmp"),
+        ("demo_signed_eq_abs_big_exponent_float_i64", "arf_cmp"),
+        ("demo_signed_eq_big_exponent_float_i128", "arf_cmp"),
+        ("demo_signed_eq_big_exponent_float_i64", "arf_cmp"),
+        (
+            "demo_signed_partial_cmp_abs_big_exponent_float_i128",
+            "arf_cmp",
+        ),
+        (
+            "demo_signed_partial_cmp_abs_big_exponent_float_i64",
+            "arf_cmp",
+        ),
+        ("demo_signed_partial_cmp_big_exponent_float_i128", "arf_cmp"),
+        ("demo_signed_partial_cmp_big_exponent_float_i64", "arf_cmp"),
+        ("demo_unsigned_eq_abs_big_exponent_float_u64", "arf_cmp"),
+        ("demo_unsigned_eq_abs_big_exponent_float_u8", "arf_cmp"),
+        ("demo_unsigned_eq_big_exponent_float_u64", "arf_cmp"),
+        ("demo_unsigned_eq_big_exponent_float_u8", "arf_cmp"),
+        (
+            "demo_unsigned_partial_cmp_abs_big_exponent_float_u64",
+            "arf_cmp",
+        ),
+        (
+            "demo_unsigned_partial_cmp_abs_big_exponent_float_u8",
+            "arf_cmp",
+        ),
+        (
+            "demo_unsigned_partial_cmp_big_exponent_float_u64",
+            "arf_cmp",
+        ),
+        ("demo_unsigned_partial_cmp_big_exponent_float_u8", "arf_cmp"),
+        ("demo_comparable_big_exponent_float_cmp", "arf_cmp_total"),
+        (
+            "demo_comparable_big_exponent_float_ref_cmp",
+            "arf_cmp_total",
+        ),
+        (
+            "demo_comparable_big_exponent_float_ref_cmp_abs",
+            "arf_cmp_total",
+        ),
+        ("demo_comparable_big_exponent_float_ref_eq", "arf_cmp_total"),
+        ("demo_big_exponent_float_max", "arf_min_max"),
+        ("demo_big_exponent_float_max_prec", "arf_min_max"),
+        ("demo_big_exponent_float_max_prec_round", "arf_min_max"),
+        ("demo_big_exponent_float_max_rational_prec", "arf_min_max"),
+        (
+            "demo_big_exponent_float_max_rational_prec_round",
+            "arf_min_max",
+        ),
+        ("demo_big_exponent_float_min", "arf_min_max"),
+        ("demo_big_exponent_float_min_prec", "arf_min_max"),
+        ("demo_big_exponent_float_min_prec_round", "arf_min_max"),
+        ("demo_big_exponent_float_min_rational_prec", "arf_min_max"),
+        (
+            "demo_big_exponent_float_min_rational_prec_round",
+            "arf_min_max",
+        ),
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, flint_mode);
     }

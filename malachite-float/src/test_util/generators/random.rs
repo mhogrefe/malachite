@@ -86,6 +86,7 @@ use crate::test_util::generators::exhaustive::{
     reciprocal_sqrt_round_valid, rem_prec_round_valid, rem_rational_prec_round_valid,
     rem_rational_round_valid, rem_round_valid, root_s_prec_round_valid,
     root_s_rational_prec_round_valid, root_u_prec_round_valid, root_u_rational_prec_round_valid,
+    round_big_exponent_float_and_rational_to_prec_round_valid, round_pair_to_prec_round_valid,
     round_to_integer_then_prec_round_valid, round_to_prec_round_valid, set_prec_round_valid,
     shl_prec_round_valid, shl_round_valid, shr_prec_round_valid, shr_round_valid,
     signed_rounding_from_float_valid, sin_with_period_prec_round_valid,
@@ -222,6 +223,276 @@ pub fn random_big_exponent_float_rounding_mode_pair_gen_var_1(
     )
 }
 
+// -- (BigExponentFloat, BigExponentFloat) --
+
+pub fn random_big_exponent_float_pair_gen(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, BigExponentFloat)> {
+    Box::new(random_pairs_from_single(random_big_exponent_floats(
+        EXAMPLE_SEED,
+        config.get_or("mean_exponent_bits_n", 8),
+        config.get_or("mean_exponent_bits_d", 1),
+        config.get_or("mean_precision_n", 64),
+        config.get_or("mean_precision_d", 1),
+        config.get_or("mean_special_p_n", 1),
+        config.get_or("mean_special_p_d", 64),
+    )))
+}
+
+// -- (BigExponentFloat, BigExponentFloat, BigExponentFloat) --
+
+pub fn random_big_exponent_float_triple_gen(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, BigExponentFloat, BigExponentFloat)> {
+    Box::new(random_triples_from_single(random_big_exponent_floats(
+        EXAMPLE_SEED,
+        config.get_or("mean_exponent_bits_n", 8),
+        config.get_or("mean_exponent_bits_d", 1),
+        config.get_or("mean_precision_n", 64),
+        config.get_or("mean_precision_d", 1),
+        config.get_or("mean_special_p_n", 1),
+        config.get_or("mean_special_p_d", 64),
+    )))
+}
+
+// -- (BigExponentFloat, Natural) --
+
+pub fn random_big_exponent_float_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (BigExponentFloat, Integer) --
+
+pub fn random_big_exponent_float_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (BigExponentFloat, Rational) --
+
+pub fn random_big_exponent_float_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (BigExponentFloat, T) for other numeric types T --
+
+pub fn random_big_exponent_float_unsigned_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+pub fn random_big_exponent_float_signed_pair_gen<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+pub fn random_big_exponent_float_primitive_float_pair_gen<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            special_random_primitive_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+    ))
+}
+
+pub fn random_big_exponent_float_gaussian_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, GaussianInteger)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_big_exponent_float_gaussian_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, GaussianRational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_big_exponent_float_float_pair_gen(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, Float)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+    ))
+}
+
 // -- (BigExponentFloat, PrimitiveUnsigned) --
 
 // The unsigned is positive.
@@ -281,6 +552,148 @@ pub fn random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_1(
             &random_rounding_modes,
         )
         .filter(|(x, p, rm)| round_to_prec_round_valid(x, *p, *rm)),
+    )
+}
+
+// -- (BigExponentFloat, BigExponentFloat, PrimitiveUnsigned) --
+
+// The unsigned is positive.
+pub fn random_big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, BigExponentFloat, u64)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (BigExponentFloat, BigExponentFloat, PrimitiveUnsigned, RoundingMode) --
+
+// The unsigned is positive, and the rounding mode is `Exact` only if rounding either
+// `BigExponentFloat` is exact.
+pub fn random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, p, rm)| round_pair_to_prec_round_valid(x, y, *p, *rm)),
+    )
+}
+
+// -- (BigExponentFloat, Rational, PrimitiveUnsigned) --
+
+// The unsigned is positive.
+pub fn random_big_exponent_float_rational_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, Rational, u64)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (BigExponentFloat, Rational, PrimitiveUnsigned, RoundingMode) --
+
+// The unsigned is positive, and the rounding mode is `Exact` only if rounding either the
+// `BigExponentFloat` or the `Rational` is exact.
+pub fn random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, p, rm)| {
+            round_big_exponent_float_and_rational_to_prec_round_valid(x, y, *p, *rm)
+        }),
     )
 }
 

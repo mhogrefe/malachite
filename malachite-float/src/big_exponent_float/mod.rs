@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use core::ops::Deref;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 #[cfg(feature = "test_build")]
@@ -45,7 +46,9 @@ pub struct BigExponentFloat(pub(crate) InnerBigExponentFloat);
 #[serde(transparent)]
 pub(crate) struct SerdeBigExponentFloat(alloc::string::String);
 
-#[derive(Clone)]
+// Every value has a single representation, so structural equality and hashing are value equality
+// and hashing, apart from NaN, which `PartialEq` for `BigExponentFloat` treats separately.
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub(crate) enum InnerBigExponentFloat {
     NaN,
     Infinity {
@@ -121,8 +124,96 @@ impl BigExponentFloat {
     }
 }
 
+/// `ComparableBigExponentFloat` is a wrapper around a [`BigExponentFloat`], taking the
+/// [`BigExponentFloat`] by value.
+///
+/// [`BigExponentFloat`] implements [`PartialEq`] and [`PartialOrd`] following IEEE 754, so NaN is
+/// not equal to itself and is not comparable to anything. `ComparableBigExponentFloat` implements
+/// [`Eq`], [`Ord`], and [`Hash`](core::hash::Hash) instead:
+/// - NaN is equal to itself, and to no other value.
+/// - The ordering is total: NaN is ordered just below zero, above every negative value. (This
+///   agrees with [`ComparableFloat`](crate::ComparableFloat), which places NaN between the two
+///   zeros.)
+/// - The hash is compatible with equality.
+///
+/// A [`BigExponentFloat`] has no stored precision and only one zero, so, unlike
+/// [`ComparableFloat`](crate::ComparableFloat), equal values are never distinguished.
+///
+/// `ComparableBigExponentFloat` owns its value, which is useful, for example, for keys in a hash
+/// map. In other situations, [`ComparableBigExponentFloatRef`] may be better, since it only holds a
+/// reference.
+#[derive(Clone)]
+pub struct ComparableBigExponentFloat(pub BigExponentFloat);
+
+/// `ComparableBigExponentFloatRef` is a wrapper around a [`BigExponentFloat`], taking the
+/// [`BigExponentFloat`] by reference.
+///
+/// See the [`ComparableBigExponentFloat`] documentation for details.
+#[derive(Clone)]
+pub struct ComparableBigExponentFloatRef<'a>(pub &'a BigExponentFloat);
+
+impl ComparableBigExponentFloat {
+    /// Returns a [`ComparableBigExponentFloatRef`] referring to the wrapped value.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloat;
+    ///
+    /// let x = ComparableBigExponentFloat(BigExponentFloat::ONE);
+    /// assert_eq!(format!("{:?}", x.as_ref().0), "0x1.0");
+    /// ```
+    pub const fn as_ref(&self) -> ComparableBigExponentFloatRef<'_> {
+        ComparableBigExponentFloatRef(&self.0)
+    }
+}
+
+impl Deref for ComparableBigExponentFloat {
+    type Target = BigExponentFloat;
+
+    /// Allows a [`ComparableBigExponentFloat`] to dereference to a [`BigExponentFloat`].
+    ///
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloat;
+    ///
+    /// let x = ComparableBigExponentFloat(BigExponentFloat::ONE);
+    /// assert_eq!(*x, BigExponentFloat::ONE);
+    /// ```
+    fn deref(&self) -> &BigExponentFloat {
+        &self.0
+    }
+}
+
+impl Deref for ComparableBigExponentFloatRef<'_> {
+    type Target = BigExponentFloat;
+
+    /// Allows a [`ComparableBigExponentFloatRef`] to dereference to a [`BigExponentFloat`].
+    ///
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+    ///
+    /// let x = BigExponentFloat::ONE;
+    /// let y = ComparableBigExponentFloatRef(&x);
+    /// assert_eq!(*y, BigExponentFloat::ONE);
+    /// ```
+    fn deref(&self) -> &BigExponentFloat {
+        self.0
+    }
+}
+
 /// Basic functions for working with [`BigExponentFloat`]s.
 pub mod basic;
+/// Traits for comparing [`BigExponentFloat`]s for equality or order, with each other and with other
+/// numeric types.
+pub mod comparison;
 /// Functions for converting [`BigExponentFloat`]s to and from other types, including strings.
 pub mod conversion;
 /// Iterators that generate [`BigExponentFloat`]s without repetition.

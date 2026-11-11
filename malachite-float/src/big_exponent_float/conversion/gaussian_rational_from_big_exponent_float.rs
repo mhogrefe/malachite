@@ -98,7 +98,6 @@ impl ConvertibleFrom<&BigExponentFloat> for GaussianRational {
     /// ```
     /// use malachite_base::num::conversion::traits::ConvertibleFrom;
     /// use malachite_float::{BigExponentFloat, Float};
-    /// use malachite_q::Rational;
     /// use malachite_q::gaussian_rational::GaussianRational;
     ///
     /// assert!(GaussianRational::convertible_from(&BigExponentFloat::from(

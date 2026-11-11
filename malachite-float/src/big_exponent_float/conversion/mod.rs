@@ -61,10 +61,9 @@ impl BigExponentFloat {
     }
 }
 
-/// Functions for converting a [`Float`](crate::Float) to a [`BigExponentFloat`].
+/// Functions for converting a [`Float`] to a [`BigExponentFloat`].
 pub mod big_exponent_float_from_float;
-/// Functions for converting a [`BigExponentFloat`] to a [`Float`](crate::Float), exactly or with
-/// rounding.
+/// Functions for converting a [`BigExponentFloat`] to a [`Float`], exactly or with rounding.
 pub mod float_from_big_exponent_float;
 /// Functions for approximating a real number, given its bits, with a [`BigExponentFloat`].
 pub mod from_bits;

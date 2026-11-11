@@ -312,6 +312,21 @@ pub fn big_exponent_float_float(xs: It<BigExponentFloat>) -> It<(Float, BigExpon
     Box::new(xs.filter_map(|x| big_exponent_float_to_float(&x).map(|f| (f, x))))
 }
 
+// Like `big_exponent_float_float`, for pairs; both values must have `Float` counterparts.
+pub fn big_exponent_float_pair_float(
+    xs: It<(BigExponentFloat, BigExponentFloat)>,
+) -> It<((Float, Float), (BigExponentFloat, BigExponentFloat))> {
+    Box::new(xs.filter_map(|(x, y)| {
+        Some((
+            (
+                big_exponent_float_to_float(&x)?,
+                big_exponent_float_to_float(&y)?,
+            ),
+            (x, y),
+        ))
+    }))
+}
+
 // Like `big_exponent_float_float`, for (x, precision, rounding mode) triples.
 pub fn big_exponent_float_unsigned_rounding_mode_triple_float(
     xs: It<(BigExponentFloat, u64, RoundingMode)>,

@@ -102,7 +102,6 @@ impl BigExponentFloat {
     /// ```
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
     /// use malachite_float::BigExponentFloat;
-    /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(BigExponentFloat::NAN.significand_ref(), None);
     /// assert_eq!(BigExponentFloat::INFINITY.significand_ref(), None);

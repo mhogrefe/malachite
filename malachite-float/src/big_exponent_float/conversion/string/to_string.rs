@@ -6,8 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::big_exponent_float::BigExponentFloat;
 use crate::big_exponent_float::InnerBigExponentFloat::Finite;
+use crate::big_exponent_float::{
+    BigExponentFloat, ComparableBigExponentFloat, ComparableBigExponentFloatRef,
+};
 use crate::{Float, InnerFloat};
 use alloc::format;
 use alloc::string::String;
@@ -343,5 +345,255 @@ impl Debug for BigExponentFloat {
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "{self:#x}")
+    }
+}
+
+impl Debug for ComparableBigExponentFloat {
+    /// Formats a [`ComparableBigExponentFloat`] as [`Debug`] does for the wrapped
+    /// [`BigExponentFloat`]: exactly, in hexadecimal.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloat;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:?}", ComparableBigExponentFloat(x)), "0x1.8");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Debug::fmt(&self.0, f)
+    }
+}
+
+impl LowerHex for ComparableBigExponentFloat {
+    /// Formats a [`ComparableBigExponentFloat`] as [`LowerHex`] does for the wrapped
+    /// [`BigExponentFloat`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloat;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:x}", ComparableBigExponentFloat(x)), "1.8");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        LowerHex::fmt(&self.0, f)
+    }
+}
+
+impl UpperHex for ComparableBigExponentFloat {
+    /// Formats a [`ComparableBigExponentFloat`] as [`UpperHex`] does for the wrapped
+    /// [`BigExponentFloat`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloat;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:X}", ComparableBigExponentFloat(x)), "1.8");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        UpperHex::fmt(&self.0, f)
+    }
+}
+
+impl Binary for ComparableBigExponentFloat {
+    /// Formats a [`ComparableBigExponentFloat`] as [`Binary`] does for the wrapped
+    /// [`BigExponentFloat`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloat;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:b}", ComparableBigExponentFloat(x)), "1.1");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Binary::fmt(&self.0, f)
+    }
+}
+
+impl Octal for ComparableBigExponentFloat {
+    /// Formats a [`ComparableBigExponentFloat`] as [`Octal`] does for the wrapped
+    /// [`BigExponentFloat`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloat;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:o}", ComparableBigExponentFloat(x)), "1.4");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Octal::fmt(&self.0, f)
+    }
+}
+
+impl Debug for ComparableBigExponentFloatRef<'_> {
+    /// Formats a [`ComparableBigExponentFloatRef`] as [`Debug`] does for the wrapped
+    /// [`BigExponentFloat`]: exactly, in hexadecimal.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:?}", ComparableBigExponentFloatRef(&x)), "0x1.8");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Debug::fmt(self.0, f)
+    }
+}
+
+impl LowerHex for ComparableBigExponentFloatRef<'_> {
+    /// Formats a [`ComparableBigExponentFloatRef`] as [`LowerHex`] does for the wrapped
+    /// [`BigExponentFloat`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:x}", ComparableBigExponentFloatRef(&x)), "1.8");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        LowerHex::fmt(self.0, f)
+    }
+}
+
+impl UpperHex for ComparableBigExponentFloatRef<'_> {
+    /// Formats a [`ComparableBigExponentFloatRef`] as [`UpperHex`] does for the wrapped
+    /// [`BigExponentFloat`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:X}", ComparableBigExponentFloatRef(&x)), "1.8");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        UpperHex::fmt(self.0, f)
+    }
+}
+
+impl Binary for ComparableBigExponentFloatRef<'_> {
+    /// Formats a [`ComparableBigExponentFloatRef`] as [`Binary`] does for the wrapped
+    /// [`BigExponentFloat`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:b}", ComparableBigExponentFloatRef(&x)), "1.1");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Binary::fmt(self.0, f)
+    }
+}
+
+impl Octal for ComparableBigExponentFloatRef<'_> {
+    /// Formats a [`ComparableBigExponentFloatRef`] as [`Octal`] does for the wrapped
+    /// [`BigExponentFloat`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+    ///
+    /// let x = BigExponentFloat::from(1.5);
+    /// assert_eq!(format!("{:o}", ComparableBigExponentFloatRef(&x)), "1.4");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Octal::fmt(self.0, f)
     }
 }

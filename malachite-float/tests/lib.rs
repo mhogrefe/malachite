@@ -71,6 +71,44 @@ pub mod big_exponent_float {
         pub mod named;
         pub mod size;
     }
+    pub mod comparison {
+        pub mod cmp;
+        pub mod cmp_abs;
+        pub mod eq;
+        pub mod eq_abs;
+        pub mod eq_abs_float;
+        pub mod eq_abs_gaussian_integer;
+        pub mod eq_abs_gaussian_rational;
+        pub mod eq_abs_integer;
+        pub mod eq_abs_natural;
+        pub mod eq_abs_primitive_float;
+        pub mod eq_abs_primitive_int;
+        pub mod eq_abs_rational;
+        pub mod hash;
+        pub mod min_max;
+        pub mod partial_cmp_abs_float;
+        pub mod partial_cmp_abs_gaussian_integer;
+        pub mod partial_cmp_abs_gaussian_rational;
+        pub mod partial_cmp_abs_integer;
+        pub mod partial_cmp_abs_natural;
+        pub mod partial_cmp_abs_primitive_float;
+        pub mod partial_cmp_abs_primitive_int;
+        pub mod partial_cmp_abs_rational;
+        pub mod partial_cmp_float;
+        pub mod partial_cmp_integer;
+        pub mod partial_cmp_natural;
+        pub mod partial_cmp_primitive_float;
+        pub mod partial_cmp_primitive_int;
+        pub mod partial_cmp_rational;
+        pub mod partial_eq_float;
+        pub mod partial_eq_gaussian_integer;
+        pub mod partial_eq_gaussian_rational;
+        pub mod partial_eq_integer;
+        pub mod partial_eq_natural;
+        pub mod partial_eq_primitive_float;
+        pub mod partial_eq_primitive_int;
+        pub mod partial_eq_rational;
+    }
     pub mod conversion {
         pub mod big_exponent_float_from_float;
         pub mod float_from_big_exponent_float;
