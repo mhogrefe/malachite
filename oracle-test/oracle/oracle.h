@@ -125,6 +125,16 @@ int run_fmpz_rfac(const char * arg);
 int run_fmpz_ui_vec_prod(const char * arg);
 int run__fmpz_vec_content_chained(const char * arg);
 int run__fmpz_vec_lcm(const char * arg);
+int run_mag_set_ui(const char * arg);
+int run_mag_set_ui_lower(const char * arg);
+int run_mag_set_fmpz(const char * arg);
+int run_mag_get_fmpz(const char * arg);
+int run_mag_cmp(const char * arg);
+int run_mag_mul(const char * arg);
+int run_mag_mul_ui(const char * arg);
+int run_mag_fast_addmul(const char * arg);
+int run_mag_div_ui(const char * arg);
+int run_mag_sqrt(const char * arg);
 
 /* xgcd_partial.c */
 int run_fmpz_xgcd_partial(const char * arg);

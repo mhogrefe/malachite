@@ -254,6 +254,12 @@ pub mod natural_polynomial;
 /// [`NaturalVector`](natural_vector::NaturalVector), a type representing vectors whose elements are
 /// [`Natural`](natural::Natural)s.
 pub mod natural_vector;
+crate_test_mod! {
+    /// `Mag`, an upper bound for a nonnegative real number with a 30-bit mantissa and an `i64`
+    /// exponent, used for error bounds. This is FLINT's `mag_t`, internal to Malachite and public
+    /// only under `test_build`.
+    mag
+}
 
 #[cfg(feature = "test_build")]
 pub mod test_util;

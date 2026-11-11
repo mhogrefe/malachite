@@ -629,6 +629,29 @@ pub mod integer_vector {
     pub mod sum_max_bits;
     pub mod zero;
 }
+pub mod mag {
+    pub mod add_mul;
+    pub mod ceiling;
+    pub mod cmp;
+    pub mod div;
+    pub mod exhaustive {
+        pub mod exhaustive_mag_mantissas;
+        pub mod exhaustive_mags;
+        pub mod exhaustive_positive_mags;
+    }
+    pub mod from_natural;
+    pub mod from_string;
+    pub mod from_u64;
+    pub mod mul;
+    pub mod random {
+        pub mod random_mags;
+        pub mod random_positive_mags;
+        pub mod striped_random_mags;
+        pub mod striped_random_positive_mags;
+    }
+    pub mod sqrt;
+    pub mod to_string;
+}
 pub mod natural {
     pub mod arithmetic {
         pub mod abs_diff;

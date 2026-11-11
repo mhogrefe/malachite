@@ -1,0 +1,8 @@
+Mag::from_u64_lower(0) = 0
+Mag::from_u64_lower(1) = 1
+Mag::from_u64_lower(12) = 3*2^2
+Mag::from_u64_lower(1073741823) = 1073741823
+Mag::from_u64_lower(2147483647) = 1073741823*2^1
+Mag::from_u64_lower(2147483648) = 1*2^31
+Mag::from_u64_lower(2147483649) = 1*2^31
+Mag::from_u64_lower(18446744073709551615) = 1073741823*2^34

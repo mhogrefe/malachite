@@ -11,7 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_matrix::IntegerMatrix;
-use crate::integer_matrix::arithmetic::mag::Mag;
+use crate::mag::Mag;
 use crate::natural::Natural;
 use alloc::vec;
 use malachite_base::num::basic::traits::One;
@@ -31,7 +31,7 @@ pub(crate) fn determinant_bound_helper(a: &IntegerMatrix, include_zero_norms: bo
     let (row_norms, column_norms) = norms.split_at_mut(height);
     for (i, row) in a.elements.chunks_exact(width).enumerate() {
         for (j, x) in row.iter().enumerate() {
-            let t = Mag::from_natural(x.unsigned_abs_ref());
+            let t = Mag::from(x.unsigned_abs_ref());
             row_norms[i].add_mul_assign(t, t);
             column_norms[j].add_mul_assign(t, t);
         }
@@ -42,7 +42,8 @@ pub(crate) fn determinant_bound_helper(a: &IntegerMatrix, include_zero_norms: bo
             .filter(|n| include_zero_norms || !n.is_zero())
             .fold(Mag::ONE, |p, &n| Mag::mul(p, n))
     };
-    Mag::min(product(row_norms), product(column_norms))
+    product(row_norms)
+        .min(product(column_norms))
         .sqrt()
         .ceiling()
 }

@@ -31,6 +31,8 @@ use crate::integer_vector::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_vector::exhaustive::{
     exhaustive_integer_vectors, exhaustive_integer_vectors_with_dimension,
 };
+use crate::mag::Mag;
+use crate::mag::exhaustive::exhaustive_mags;
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place};
 use crate::natural::arithmetic::div_exact::{
@@ -2293,6 +2295,43 @@ pub fn exhaustive_integer_bool_vec_pair_gen_var_2() -> It<(Integer, Vec<bool>)> 
         ),
         exhaustive_integers(),
         IntegerBoolVecPairGenerator2,
+    ))
+}
+
+// -- Mag --
+
+pub fn exhaustive_mag_gen() -> It<Mag> {
+    Box::new(exhaustive_mags())
+}
+
+// Zero or at least 1.
+pub fn exhaustive_mag_gen_var_1() -> It<Mag> {
+    Box::new(exhaustive_mags().filter(|x| x.is_zero() || x.mantissa_and_exponent().1 > 0))
+}
+
+// -- (Mag, Mag) --
+
+pub fn exhaustive_mag_pair_gen() -> It<(Mag, Mag)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_mags()))
+}
+
+// -- (Mag, Mag, Mag) --
+
+pub fn exhaustive_mag_triple_gen() -> It<(Mag, Mag, Mag)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_mags()))
+}
+
+// -- (Mag, PrimitiveUnsigned) --
+
+pub fn exhaustive_mag_unsigned_pair_gen() -> It<(Mag, u64)> {
+    Box::new(exhaustive_pairs(exhaustive_mags(), exhaustive_unsigneds()))
+}
+
+// The unsigned is positive.
+pub fn exhaustive_mag_unsigned_pair_gen_var_1() -> It<(Mag, u64)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_mags(),
+        exhaustive_positive_primitive_ints(),
     ))
 }
 

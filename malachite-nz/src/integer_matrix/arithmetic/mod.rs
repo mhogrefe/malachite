@@ -332,7 +332,6 @@ pub mod fraction_matrix;
 /// [`KroneckerProductAssign`](malachite_base::num::arithmetic::traits::KroneckerProductAssign), for
 /// computing the Kronecker product of two [`IntegerMatrix`](super::IntegerMatrix)s.
 pub mod kronecker_product;
-pub(crate) mod mag;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for
 /// multiplying two matrices.
 pub mod mul;

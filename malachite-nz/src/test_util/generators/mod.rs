@@ -13,6 +13,7 @@ use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::mul_dispatch::{TinyKernel, tiny_kernel};
 use crate::integer_vector::IntegerVector;
 use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
+use crate::mag::Mag;
 use crate::natural::Natural;
 use crate::natural::number_theory::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::number_theory::gcd::half_gcd::HalfGcdMatrix1;
@@ -2376,6 +2377,64 @@ pub fn integer_bool_vec_pair_gen_var_2() -> Generator<(Integer, Vec<bool>)> {
         &exhaustive_integer_bool_vec_pair_gen_var_2,
         &random_integer_bool_vec_pair_gen_var_2,
         &special_random_integer_bool_vec_pair_gen_var_2,
+    )
+}
+
+// -- Mag --
+
+pub fn mag_gen() -> Generator<Mag> {
+    Generator::new(
+        &exhaustive_mag_gen,
+        &random_mag_gen,
+        &special_random_mag_gen,
+    )
+}
+
+// Zero or at least 1.
+pub fn mag_gen_var_1() -> Generator<Mag> {
+    Generator::new(
+        &exhaustive_mag_gen_var_1,
+        &random_mag_gen_var_1,
+        &special_random_mag_gen_var_1,
+    )
+}
+
+// -- (Mag, Mag) --
+
+pub fn mag_pair_gen() -> Generator<(Mag, Mag)> {
+    Generator::new(
+        &exhaustive_mag_pair_gen,
+        &random_mag_pair_gen,
+        &special_random_mag_pair_gen,
+    )
+}
+
+// -- (Mag, Mag, Mag) --
+
+pub fn mag_triple_gen() -> Generator<(Mag, Mag, Mag)> {
+    Generator::new(
+        &exhaustive_mag_triple_gen,
+        &random_mag_triple_gen,
+        &special_random_mag_triple_gen,
+    )
+}
+
+// -- (Mag, PrimitiveUnsigned) --
+
+pub fn mag_unsigned_pair_gen() -> Generator<(Mag, u64)> {
+    Generator::new(
+        &exhaustive_mag_unsigned_pair_gen,
+        &random_mag_unsigned_pair_gen,
+        &special_random_mag_unsigned_pair_gen,
+    )
+}
+
+// The unsigned is positive.
+pub fn mag_unsigned_pair_gen_var_1() -> Generator<(Mag, u64)> {
+    Generator::new(
+        &exhaustive_mag_unsigned_pair_gen_var_1,
+        &random_mag_unsigned_pair_gen_var_1,
+        &special_random_mag_unsigned_pair_gen_var_1,
     )
 }
 

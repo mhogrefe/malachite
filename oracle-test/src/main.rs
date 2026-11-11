@@ -7211,6 +7211,23 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_fmpz_vec_lcm");
     }
+    // Malachite's internal `Mag` (FLINT's `mag_t`).
+    for (demo_name, flint_mode) in [
+        ("demo_mag_from_u64", "mag_set_ui"),
+        ("demo_mag_from_u64_lower", "mag_set_ui_lower"),
+        ("demo_mag_from_natural", "mag_set_fmpz"),
+        ("demo_mag_ceiling", "mag_get_fmpz"),
+        ("demo_mag_cmp", "mag_cmp"),
+        ("demo_mag_max", "mag_cmp"),
+        ("demo_mag_min", "mag_cmp"),
+        ("demo_mag_mul", "mag_mul"),
+        ("demo_mag_mul_u64", "mag_mul_ui"),
+        ("demo_mag_add_mul_assign", "mag_fast_addmul"),
+        ("demo_mag_div_u64", "mag_div_ui"),
+        ("demo_mag_sqrt", "mag_sqrt"),
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, flint_mode);
+    }
     for demo_name in [
         "demo_unsigned_vector_content_chained",
         "demo_unsigned_vector_content_chained_ref",

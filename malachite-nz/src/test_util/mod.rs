@@ -15,6 +15,7 @@ pub mod integer;
 pub mod integer_matrix;
 pub mod integer_polynomial;
 pub mod integer_vector;
+pub mod mag;
 pub mod natural;
 pub mod natural_matrix;
 pub mod natural_polynomial;

@@ -11,7 +11,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer_matrix::IntegerMatrix;
-use crate::integer_matrix::arithmetic::mag::Mag;
+use crate::mag::Mag;
 use crate::natural::Natural;
 use alloc::vec;
 use malachite_base::num::basic::traits::One;
@@ -32,7 +32,7 @@ pub(crate) fn characteristic_polynomial_bound_helper(a: &IntegerMatrix) -> Natur
     let (row_norms, column_norms) = norms.split_at_mut(n);
     for (i, row) in a.elements.chunks_exact(n).enumerate() {
         for (j, x) in row.iter().enumerate() {
-            let t = Mag::from_natural(x.unsigned_abs_ref());
+            let t = Mag::from(x.unsigned_abs_ref());
             row_norms[i].add_mul_assign(t, t);
             column_norms[j].add_mul_assign(t, t);
         }
@@ -41,12 +41,12 @@ pub(crate) fn characteristic_polynomial_bound_helper(a: &IntegerMatrix) -> Natur
         *x = x.sqrt();
     }
     // Sort the norms in ascending order; they are read in reverse.
-    row_norms.sort_unstable_by(|&x, &y| Mag::cmp(x, y));
-    column_norms.sort_unstable_by(|&x, &y| Mag::cmp(x, y));
+    row_norms.sort_unstable();
+    column_norms.sort_unstable();
     let n_u64 = u64::wrapping_from(n);
     let mut binomials = vec![Mag::ZERO; (n >> 1) + 2];
     binomials[0] = Mag::ONE;
-    binomials[1] = Mag::from_u64(n_u64);
+    binomials[1] = Mag::from(n_u64);
     for i in 2..=n >> 1 {
         let i_u64 = u64::wrapping_from(i);
         binomials[i] = binomials[i - 1].mul_u64(n_u64 - i_u64 + 1).div_u64(i_u64);
@@ -60,10 +60,10 @@ pub(crate) fn characteristic_polynomial_bound_helper(a: &IntegerMatrix) -> Natur
         let binomial = binomials[if k <= n >> 1 { k } else { n - k }];
         row_product = Mag::mul(row_product, row_norms[n - 1 - j]);
         column_product = Mag::mul(column_product, column_norms[n - 1 - j]);
-        row_bound = Mag::max(row_bound, Mag::mul(binomial, row_product));
-        column_bound = Mag::max(column_bound, Mag::mul(binomial, column_product));
+        row_bound = row_bound.max(Mag::mul(binomial, row_product));
+        column_bound = column_bound.max(Mag::mul(binomial, column_product));
     }
-    Mag::min(row_bound, column_bound).ceiling()
+    row_bound.min(column_bound).ceiling()
 }
 
 impl IntegerMatrix {

@@ -31,6 +31,8 @@ use crate::integer_vector::arithmetic::scalar_mul::integers_mul_scalar;
 use crate::integer_vector::random::{
     striped_random_integer_vectors, striped_random_integer_vectors_with_dimension,
 };
+use crate::mag::Mag;
+use crate::mag::random::striped_random_mags;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -5383,6 +5385,115 @@ pub fn special_random_integer_bool_vec_pair_gen_var_2(
             config.get_or("mean_stripe_d", 1),
         ),
     })
+}
+
+// -- Mag --
+
+pub fn special_random_mag_gen(config: &GenConfig) -> It<Mag> {
+    Box::new(striped_random_mags(
+        EXAMPLE_SEED,
+        config.get_or("mean_exponent_n", 64),
+        config.get_or("mean_exponent_d", 1),
+        config.get_or("mean_stripe_n", 16),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_zero_p_n", 1),
+        config.get_or("mean_zero_p_d", 64),
+    ))
+}
+
+// Zero or at least 1.
+pub fn special_random_mag_gen_var_1(config: &GenConfig) -> It<Mag> {
+    Box::new(
+        striped_random_mags(
+            EXAMPLE_SEED,
+            config.get_or("mean_exponent_n", 64),
+            config.get_or("mean_exponent_d", 1),
+            config.get_or("mean_stripe_n", 16),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_zero_p_n", 1),
+            config.get_or("mean_zero_p_d", 64),
+        )
+        .filter(|x| x.is_zero() || x.mantissa_and_exponent().1 > 0),
+    )
+}
+
+// -- (Mag, Mag) --
+
+pub fn special_random_mag_pair_gen(config: &GenConfig) -> It<(Mag, Mag)> {
+    Box::new(random_pairs_from_single(striped_random_mags(
+        EXAMPLE_SEED,
+        config.get_or("mean_exponent_n", 64),
+        config.get_or("mean_exponent_d", 1),
+        config.get_or("mean_stripe_n", 16),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_zero_p_n", 1),
+        config.get_or("mean_zero_p_d", 64),
+    )))
+}
+
+// -- (Mag, Mag, Mag) --
+
+pub fn special_random_mag_triple_gen(config: &GenConfig) -> It<(Mag, Mag, Mag)> {
+    Box::new(random_triples_from_single(striped_random_mags(
+        EXAMPLE_SEED,
+        config.get_or("mean_exponent_n", 64),
+        config.get_or("mean_exponent_d", 1),
+        config.get_or("mean_stripe_n", 16),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_zero_p_n", 1),
+        config.get_or("mean_zero_p_d", 64),
+    )))
+}
+
+// -- (Mag, PrimitiveUnsigned) --
+
+pub fn special_random_mag_unsigned_pair_gen(config: &GenConfig) -> It<(Mag, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_mags(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 16),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
+// The unsigned is positive.
+pub fn special_random_mag_unsigned_pair_gen_var_1(config: &GenConfig) -> It<(Mag, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_mags(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 16),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
 }
 
 // -- Natural --

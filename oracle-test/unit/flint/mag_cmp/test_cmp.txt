@@ -1,0 +1,16 @@
+(0).cmp(&0) = Equal
+(0).cmp(&0) = Equal
+(0).cmp(&1) = Less
+(1).cmp(&0) = Greater
+(1).cmp(&1) = Equal
+(1).cmp(&1) = Equal
+(1).cmp(&3*2^-1) = Less
+(3*2^-1).cmp(&1) = Greater
+(3*2^-1).cmp(&5*2^-2) = Greater
+(5*2^-2).cmp(&3*2^-1) = Less
+(1073741823*2^-30).cmp(&1) = Less
+(1).cmp(&1073741823*2^-30) = Greater
+(1*2^-100).cmp(&0) = Greater
+(0).cmp(&1*2^-100) = Less
+(1*2^100).cmp(&1*2^99) = Greater
+(1*2^99).cmp(&1*2^100) = Less

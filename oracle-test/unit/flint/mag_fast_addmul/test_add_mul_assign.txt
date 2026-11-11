@@ -1,0 +1,8 @@
+z := 0; z.add_mul_assign(3, 5); z = 503316481*2^-25
+z := 7; z.add_mul_assign(0, 5); z = 7
+z := 7; z.add_mul_assign(3, 0); z = 7
+z := 7; z.add_mul_assign(3, 5); z = 369098753*2^-24
+z := 1*2^100; z.add_mul_assign(3, 5); z = 536870913*2^71
+z := 7; z.add_mul_assign(3*2^10, 5); z = 251772929*2^-14
+z := 7; z.add_mul_assign(3*2^100, 5); z = 251658241*2^76
+z := 1073741823*2^-30; z.add_mul_assign(1*2^-31, 1); z = 1
