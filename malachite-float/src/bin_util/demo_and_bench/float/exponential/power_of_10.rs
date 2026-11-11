@@ -117,7 +117,7 @@ fn demo_float_power_of_10_of_float_prec_round(gm: GenMode, config: &GenConfig, l
         .take(limit)
     {
         println!(
-            "power_of_10_of_float_prec_round({}, {}, {}) = {:?}",
+            "Float::power_of_10_of_float_prec_round({}, {}, {}) = {:?}",
             x.clone(),
             prec,
             rm,
@@ -133,7 +133,7 @@ fn demo_float_power_of_10_of_float_prec_round_debug(gm: GenMode, config: &GenCon
     {
         let (p, o) = Float::power_of_10_of_float_prec_round(x.clone(), prec, rm);
         println!(
-            "power_of_10_of_float_prec_round({:#x}, {}, {}) = ({:#x}, {:?})",
+            "Float::power_of_10_of_float_prec_round({:#x}, {}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             prec,
             rm,
@@ -149,7 +149,7 @@ fn demo_float_power_of_10_of_float_prec_round_ref(gm: GenMode, config: &GenConfi
         .take(limit)
     {
         println!(
-            "power_of_10_of_float_prec_round_ref(&{}, {}, {}) = {:?}",
+            "Float::power_of_10_of_float_prec_round_ref(&{}, {}, {}) = {:?}",
             x,
             prec,
             rm,
@@ -169,7 +169,7 @@ fn demo_float_power_of_10_of_float_prec_round_ref_debug(
     {
         let (p, o) = Float::power_of_10_of_float_prec_round_ref(&x, prec, rm);
         println!(
-            "power_of_10_of_float_prec_round_ref(&{:#x}, {}, {}) = ({:#x}, {:?})",
+            "Float::power_of_10_of_float_prec_round_ref(&{:#x}, {}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             prec,
             rm,
@@ -223,7 +223,7 @@ fn demo_float_power_of_10_of_float_prec_round_assign_debug(
 fn demo_float_power_of_10_of_float_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
-            "power_of_10_of_float_prec({}, {}) = {:?}",
+            "Float::power_of_10_of_float_prec({}, {}) = {:?}",
             x.clone(),
             prec,
             Float::power_of_10_of_float_prec(x, prec)
@@ -235,7 +235,7 @@ fn demo_float_power_of_10_of_float_prec_debug(gm: GenMode, config: &GenConfig, l
     for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
         let (p, o) = Float::power_of_10_of_float_prec(x.clone(), prec);
         println!(
-            "power_of_10_of_float_prec({:#x}, {}) = ({:#x}, {:?})",
+            "Float::power_of_10_of_float_prec({:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             prec,
             ComparableFloat(p),
@@ -247,7 +247,7 @@ fn demo_float_power_of_10_of_float_prec_debug(gm: GenMode, config: &GenConfig, l
 fn demo_float_power_of_10_of_float_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
-            "power_of_10_of_float_prec_ref(&{}, {}) = {:?}",
+            "Float::power_of_10_of_float_prec_ref(&{}, {}) = {:?}",
             x,
             prec,
             Float::power_of_10_of_float_prec_ref(&x, prec)
@@ -259,7 +259,7 @@ fn demo_float_power_of_10_of_float_prec_ref_debug(gm: GenMode, config: &GenConfi
     for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
         let (p, o) = Float::power_of_10_of_float_prec_ref(&x, prec);
         println!(
-            "power_of_10_of_float_prec_ref(&{:#x}, {}) = ({:#x}, {:?})",
+            "Float::power_of_10_of_float_prec_ref(&{:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             prec,
             ComparableFloat(p),
@@ -302,7 +302,7 @@ fn demo_float_power_of_10_of_float_round(gm: GenMode, config: &GenConfig, limit:
         .take(limit)
     {
         println!(
-            "power_of_10_of_float_round({}, {}) = {:?}",
+            "Float::power_of_10_of_float_round({}, {}) = {:?}",
             x.clone(),
             rm,
             Float::power_of_10_of_float_round(x, rm)
@@ -317,7 +317,7 @@ fn demo_float_power_of_10_of_float_round_debug(gm: GenMode, config: &GenConfig, 
     {
         let (p, o) = Float::power_of_10_of_float_round(x.clone(), rm);
         println!(
-            "power_of_10_of_float_round({:#x}, {}) = ({:#x}, {:?})",
+            "Float::power_of_10_of_float_round({:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             rm,
             ComparableFloat(p),
@@ -332,7 +332,7 @@ fn demo_float_power_of_10_of_float_round_ref(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         println!(
-            "power_of_10_of_float_round_ref(&{}, {}) = {:?}",
+            "Float::power_of_10_of_float_round_ref(&{}, {}) = {:?}",
             x,
             rm,
             Float::power_of_10_of_float_round_ref(&x, rm)
@@ -347,7 +347,7 @@ fn demo_float_power_of_10_of_float_round_ref_debug(gm: GenMode, config: &GenConf
     {
         let (p, o) = Float::power_of_10_of_float_round_ref(&x, rm);
         println!(
-            "power_of_10_of_float_round_ref(&{:#x}, {}) = ({:#x}, {:?})",
+            "Float::power_of_10_of_float_round_ref(&{:#x}, {}) = ({:#x}, {:?})",
             ComparableFloat(x),
             rm,
             ComparableFloat(p),
@@ -392,14 +392,18 @@ fn demo_float_power_of_10_of_float_round_assign_debug(
 
 fn demo_float_power_of_10_of_float(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
-        println!("power_of_10({}) = {}", x.clone(), Float::power_of_10(x));
+        println!(
+            "Float::power_of_10({}) = {}",
+            x.clone(),
+            Float::power_of_10(x)
+        );
     }
 }
 
 fn demo_float_power_of_10_of_float_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         println!(
-            "power_of_10({:#x}) = {:#x}",
+            "Float::power_of_10({:#x}) = {:#x}",
             ComparableFloat(x.clone()),
             ComparableFloat(Float::power_of_10(x))
         );
@@ -408,14 +412,14 @@ fn demo_float_power_of_10_of_float_debug(gm: GenMode, config: &GenConfig, limit:
 
 fn demo_float_power_of_10_of_float_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
-        println!("power_of_10(&{}) = {}", x, Float::power_of_10(&x));
+        println!("Float::power_of_10(&{}) = {}", x, Float::power_of_10(&x));
     }
 }
 
 fn demo_float_power_of_10_of_float_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         println!(
-            "power_of_10(&{:#x}) = {:#x}",
+            "Float::power_of_10(&{:#x}) = {:#x}",
             ComparableFloat(x.clone()),
             ComparableFloat(Float::power_of_10(&x))
         );

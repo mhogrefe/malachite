@@ -2852,6 +2852,624 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_log_base_2_1_plus_x",
     ),
     (
+        "demo_float_log_base_power_of_2_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_extreme_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_ref_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_assign_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_prec_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_prec_ref_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_prec_assign_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_round_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_round_extreme_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_round_ref_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_round_assign_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_prec_round_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_prec_round_extreme_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_prec_round_ref_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_prec_round_assign_debug",
+        "az_float_log_base_power_of_2",
+    ),
+    (
+        "demo_float_log_base_power_of_2_rational_prec_debug",
+        "az_float_log_base_power_of_2_rational",
+    ),
+    (
+        "demo_float_log_base_power_of_2_rational_prec_ref_debug",
+        "az_float_log_base_power_of_2_rational",
+    ),
+    (
+        "demo_float_log_base_power_of_2_rational_prec_round_debug",
+        "az_float_log_base_power_of_2_rational",
+    ),
+    (
+        "demo_float_log_base_power_of_2_rational_prec_round_ref_debug",
+        "az_float_log_base_power_of_2_rational",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_extreme_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_ref_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_assign_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_prec_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_prec_ref_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_prec_assign_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_round_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_round_extreme_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_round_ref_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_round_assign_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_prec_round_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_prec_round_extreme_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_prec_round_ref_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_power_of_2_1_plus_x_prec_round_assign_debug",
+        "az_float_log_base_power_of_2_1_plus_x",
+    ),
+    ("demo_float_log_base_debug", "az_float_log_base"),
+    ("demo_float_log_base_extreme_debug", "az_float_log_base"),
+    ("demo_float_log_base_ref_debug", "az_float_log_base"),
+    ("demo_float_log_base_assign_debug", "az_float_log_base"),
+    ("demo_float_log_base_prec_debug", "az_float_log_base"),
+    ("demo_float_log_base_prec_ref_debug", "az_float_log_base"),
+    ("demo_float_log_base_prec_assign_debug", "az_float_log_base"),
+    ("demo_float_log_base_round_debug", "az_float_log_base"),
+    (
+        "demo_float_log_base_round_extreme_debug",
+        "az_float_log_base",
+    ),
+    ("demo_float_log_base_round_ref_debug", "az_float_log_base"),
+    (
+        "demo_float_log_base_round_assign_debug",
+        "az_float_log_base",
+    ),
+    ("demo_float_log_base_prec_round_debug", "az_float_log_base"),
+    (
+        "demo_float_log_base_prec_round_extreme_debug",
+        "az_float_log_base",
+    ),
+    (
+        "demo_float_log_base_prec_round_ref_debug",
+        "az_float_log_base",
+    ),
+    (
+        "demo_float_log_base_prec_round_assign_debug",
+        "az_float_log_base",
+    ),
+    (
+        "demo_float_log_base_rational_prec_debug",
+        "az_float_log_base_rational",
+    ),
+    (
+        "demo_float_log_base_rational_prec_ref_debug",
+        "az_float_log_base_rational",
+    ),
+    (
+        "demo_float_log_base_rational_prec_round_debug",
+        "az_float_log_base_rational",
+    ),
+    (
+        "demo_float_log_base_rational_prec_round_ref_debug",
+        "az_float_log_base_rational",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_extreme_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_ref_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_assign_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_prec_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_prec_ref_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_prec_assign_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_round_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_round_extreme_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_round_ref_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_round_assign_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_prec_round_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_prec_round_extreme_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_prec_round_ref_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_1_plus_x_prec_round_assign_debug",
+        "az_float_log_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_float_base_debug",
+        "az_float_log_base_float_base",
+    ),
+    (
+        "demo_float_log_base_float_base_prec_debug",
+        "az_float_log_base_float_base",
+    ),
+    (
+        "demo_float_log_base_float_base_round_debug",
+        "az_float_log_base_float_base",
+    ),
+    (
+        "demo_float_log_base_float_base_prec_round_debug",
+        "az_float_log_base_float_base",
+    ),
+    (
+        "demo_float_log_base_float_base_1_plus_x_debug",
+        "az_float_log_base_float_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_float_base_1_plus_x_prec_debug",
+        "az_float_log_base_float_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_float_base_1_plus_x_round_debug",
+        "az_float_log_base_float_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_float_base_1_plus_x_prec_round_debug",
+        "az_float_log_base_float_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_rational_float_base_prec_debug",
+        "az_float_log_base_rational_float_base",
+    ),
+    (
+        "demo_float_log_base_rational_float_base_prec_round_debug",
+        "az_float_log_base_rational_float_base",
+    ),
+    (
+        "demo_float_log_base_rational_base_debug",
+        "az_float_log_base_rational_base",
+    ),
+    (
+        "demo_float_log_base_rational_base_prec_debug",
+        "az_float_log_base_rational_base",
+    ),
+    (
+        "demo_float_log_base_rational_base_round_debug",
+        "az_float_log_base_rational_base",
+    ),
+    (
+        "demo_float_log_base_rational_base_prec_round_debug",
+        "az_float_log_base_rational_base",
+    ),
+    (
+        "demo_float_log_base_rational_base_1_plus_x_debug",
+        "az_float_log_base_rational_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_rational_base_1_plus_x_prec_debug",
+        "az_float_log_base_rational_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_rational_base_1_plus_x_round_debug",
+        "az_float_log_base_rational_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_rational_base_1_plus_x_prec_round_debug",
+        "az_float_log_base_rational_base_1_plus_x",
+    ),
+    (
+        "demo_float_log_base_rational_rational_base_prec_debug",
+        "az_float_log_base_rational_rational_base",
+    ),
+    (
+        "demo_float_log_base_rational_rational_base_prec_round_debug",
+        "az_float_log_base_rational_rational_base",
+    ),
+    ("demo_float_exp_debug", "az_float_exp"),
+    ("demo_float_exp_extreme_debug", "az_float_exp"),
+    ("demo_float_exp_ref_debug", "az_float_exp"),
+    ("demo_float_exp_assign_debug", "az_float_exp"),
+    ("demo_float_exp_prec_debug", "az_float_exp"),
+    ("demo_float_exp_round_debug", "az_float_exp"),
+    ("demo_float_exp_prec_round_debug", "az_float_exp"),
+    (
+        "demo_float_exp_rational_prec_debug",
+        "az_float_exp_rational",
+    ),
+    (
+        "demo_float_exp_rational_prec_ref_debug",
+        "az_float_exp_rational",
+    ),
+    (
+        "demo_float_exp_rational_prec_round_debug",
+        "az_float_exp_rational",
+    ),
+    (
+        "demo_float_exp_rational_prec_round_ref_debug",
+        "az_float_exp_rational",
+    ),
+    ("demo_float_exp_x_minus_1_debug", "az_float_exp_x_minus_1"),
+    (
+        "demo_float_exp_x_minus_1_extreme_debug",
+        "az_float_exp_x_minus_1",
+    ),
+    (
+        "demo_float_exp_x_minus_1_ref_debug",
+        "az_float_exp_x_minus_1",
+    ),
+    (
+        "demo_float_exp_x_minus_1_assign_debug",
+        "az_float_exp_x_minus_1",
+    ),
+    (
+        "demo_float_exp_x_minus_1_prec_debug",
+        "az_float_exp_x_minus_1",
+    ),
+    (
+        "demo_float_exp_x_minus_1_round_debug",
+        "az_float_exp_x_minus_1",
+    ),
+    (
+        "demo_float_exp_x_minus_1_prec_round_debug",
+        "az_float_exp_x_minus_1",
+    ),
+    (
+        "demo_float_exp_x_minus_1_rational_prec_debug",
+        "az_float_exp_x_minus_1_rational",
+    ),
+    (
+        "demo_float_exp_x_minus_1_rational_prec_ref_debug",
+        "az_float_exp_x_minus_1_rational",
+    ),
+    (
+        "demo_float_exp_x_minus_1_rational_prec_round_debug",
+        "az_float_exp_x_minus_1_rational",
+    ),
+    (
+        "demo_float_exp_x_minus_1_rational_prec_round_ref_debug",
+        "az_float_exp_x_minus_1_rational",
+    ),
+    (
+        "demo_float_power_of_2_of_float_prec_round_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_prec_round_ref_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_prec_round_assign_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_prec_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_prec_ref_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_prec_assign_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_round_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_round_ref_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_round_assign_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_ref_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_of_float_assign_debug",
+        "az_float_power_of_2_of_float",
+    ),
+    (
+        "demo_float_power_of_2_rational_prec_debug",
+        "az_float_power_of_2_rational",
+    ),
+    (
+        "demo_float_power_of_2_rational_prec_ref_debug",
+        "az_float_power_of_2_rational",
+    ),
+    (
+        "demo_float_power_of_2_rational_prec_round_debug",
+        "az_float_power_of_2_rational",
+    ),
+    (
+        "demo_float_power_of_2_rational_prec_round_ref_debug",
+        "az_float_power_of_2_rational",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_debug",
+        "az_float_power_of_2_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_ref_debug",
+        "az_float_power_of_2_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_assign_debug",
+        "az_float_power_of_2_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_prec_debug",
+        "az_float_power_of_2_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_round_debug",
+        "az_float_power_of_2_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_prec_round_debug",
+        "az_float_power_of_2_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_rational_prec_debug",
+        "az_float_power_of_2_x_minus_1_rational",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_rational_prec_ref_debug",
+        "az_float_power_of_2_x_minus_1_rational",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_rational_prec_round_debug",
+        "az_float_power_of_2_x_minus_1_rational",
+    ),
+    (
+        "demo_float_power_of_2_x_minus_1_rational_prec_round_ref_debug",
+        "az_float_power_of_2_x_minus_1_rational",
+    ),
+    (
+        "demo_float_unsigned_pow_rational_prec_round_debug",
+        "az_float_unsigned_pow_rational",
+    ),
+    (
+        "demo_float_unsigned_pow_rational_prec_debug",
+        "az_float_unsigned_pow_rational",
+    ),
+    (
+        "demo_float_unsigned_pow_prec_round_debug",
+        "az_float_unsigned_pow",
+    ),
+    (
+        "demo_float_unsigned_pow_prec_debug",
+        "az_float_unsigned_pow",
+    ),
+    (
+        "demo_float_unsigned_pow_unsigned_prec_round_debug",
+        "az_float_unsigned_pow_unsigned",
+    ),
+    (
+        "demo_float_unsigned_pow_unsigned_prec_debug",
+        "az_float_unsigned_pow_unsigned",
+    ),
+    (
+        "demo_float_power_of_10_of_float_prec_round_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_prec_round_ref_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_prec_round_assign_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_prec_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_prec_ref_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_prec_assign_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_round_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_round_ref_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_round_assign_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_ref_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_of_float_assign_debug",
+        "az_float_power_of_10_of_float",
+    ),
+    (
+        "demo_float_power_of_10_rational_prec_debug",
+        "az_float_power_of_10_rational",
+    ),
+    (
+        "demo_float_power_of_10_rational_prec_ref_debug",
+        "az_float_power_of_10_rational",
+    ),
+    (
+        "demo_float_power_of_10_rational_prec_round_debug",
+        "az_float_power_of_10_rational",
+    ),
+    (
+        "demo_float_power_of_10_rational_prec_round_ref_debug",
+        "az_float_power_of_10_rational",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_debug",
+        "az_float_power_of_10_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_ref_debug",
+        "az_float_power_of_10_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_assign_debug",
+        "az_float_power_of_10_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_prec_debug",
+        "az_float_power_of_10_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_round_debug",
+        "az_float_power_of_10_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_prec_round_debug",
+        "az_float_power_of_10_x_minus_1",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_rational_prec_debug",
+        "az_float_power_of_10_x_minus_1_rational",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_rational_prec_ref_debug",
+        "az_float_power_of_10_x_minus_1_rational",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_rational_prec_round_debug",
+        "az_float_power_of_10_x_minus_1_rational",
+    ),
+    (
+        "demo_float_power_of_10_x_minus_1_rational_prec_round_ref_debug",
+        "az_float_power_of_10_x_minus_1_rational",
+    ),
+    (
         "demo_float_log_base_2_1_plus_x_extreme_debug",
         "az_float_log_base_2_1_plus_x",
     ),
@@ -4586,6 +5204,218 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "demo_float_from_rational_prec_round_debug",
         "az_float_from_rational",
     ),
+    (
+        "demo_float_pow_integer_prec_round_debug",
+        "az_float_pow_integer",
+    ),
+    ("demo_float_pow_integer_prec_debug", "az_float_pow_integer"),
+    ("demo_float_pow_integer_round_debug", "az_float_pow_integer"),
+    ("demo_float_pow_integer_debug", "az_float_pow_integer"),
+    ("demo_float_pow_s_prec_round_debug", "az_float_pow_s"),
+    ("demo_float_pow_s_prec_debug", "az_float_pow_s"),
+    ("demo_float_pow_s_round_debug", "az_float_pow_s"),
+    ("demo_float_pow_s_debug", "az_float_pow_s"),
+    ("demo_float_pow_u_prec_round_debug", "az_float_pow_u"),
+    ("demo_float_pow_u_prec_debug", "az_float_pow_u"),
+    ("demo_float_pow_u_round_debug", "az_float_pow_u"),
+    ("demo_float_pow_u_debug", "az_float_pow_u"),
+    ("demo_float_cbrt_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_ref_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_assign_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_prec_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_prec_ref_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_prec_assign_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_round_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_round_ref_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_round_assign_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_prec_round_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_prec_round_ref_debug", "az_float_cbrt"),
+    ("demo_float_cbrt_prec_round_assign_debug", "az_float_cbrt"),
+    (
+        "demo_float_cbrt_rational_prec_debug",
+        "az_float_cbrt_rational",
+    ),
+    (
+        "demo_float_cbrt_rational_prec_ref_debug",
+        "az_float_cbrt_rational",
+    ),
+    ("demo_float_pow_debug", "az_float_pow"),
+    ("demo_float_pow_val_ref_debug", "az_float_pow"),
+    ("demo_float_pow_ref_val_debug", "az_float_pow"),
+    ("demo_float_pow_ref_ref_debug", "az_float_pow"),
+    ("demo_float_pow_assign_debug", "az_float_pow"),
+    ("demo_float_pow_assign_ref_debug", "az_float_pow"),
+    ("demo_float_pow_prec_debug", "az_float_pow"),
+    ("demo_float_pow_prec_val_ref_debug", "az_float_pow"),
+    ("demo_float_pow_prec_ref_val_debug", "az_float_pow"),
+    ("demo_float_pow_prec_ref_ref_debug", "az_float_pow"),
+    ("demo_float_pow_prec_assign_debug", "az_float_pow"),
+    ("demo_float_pow_prec_assign_ref_debug", "az_float_pow"),
+    ("demo_float_pow_round_debug", "az_float_pow"),
+    ("demo_float_pow_round_val_ref_debug", "az_float_pow"),
+    ("demo_float_pow_round_ref_val_debug", "az_float_pow"),
+    ("demo_float_pow_round_ref_ref_debug", "az_float_pow"),
+    ("demo_float_pow_round_assign_debug", "az_float_pow"),
+    ("demo_float_pow_round_assign_ref_debug", "az_float_pow"),
+    ("demo_float_pow_prec_round_debug", "az_float_pow"),
+    ("demo_float_pow_prec_round_val_ref_debug", "az_float_pow"),
+    ("demo_float_pow_prec_round_ref_val_debug", "az_float_pow"),
+    ("demo_float_pow_prec_round_ref_ref_debug", "az_float_pow"),
+    ("demo_float_pow_prec_round_assign_debug", "az_float_pow"),
+    ("demo_float_pow_prec_round_assign_ref_debug", "az_float_pow"),
+    ("demo_float_pow_extreme_debug", "az_float_pow"),
+    ("demo_float_pow_prec_extreme_debug", "az_float_pow"),
+    ("demo_float_pow_round_extreme_debug", "az_float_pow"),
+    ("demo_float_pow_prec_round_extreme_debug", "az_float_pow"),
+    (
+        "demo_float_pow_rational_prec_round_debug",
+        "az_float_pow_rational",
+    ),
+    (
+        "demo_float_pow_rational_prec_debug",
+        "az_float_pow_rational",
+    ),
+    ("demo_float_pow_rational_debug", "az_float_pow_rational"),
+    (
+        "demo_float_rational_pow_prec_round_debug",
+        "az_float_rational_pow",
+    ),
+    (
+        "demo_float_rational_pow_prec_debug",
+        "az_float_rational_pow",
+    ),
+    (
+        "demo_float_rational_pow_rational_prec_round_debug",
+        "az_float_rational_pow_rational",
+    ),
+    (
+        "demo_float_rational_pow_rational_prec_debug",
+        "az_float_rational_pow_rational",
+    ),
+    ("demo_float_cos_debug", "az_float_cos"),
+    ("demo_float_cos_ref_debug", "az_float_cos"),
+    ("demo_float_cos_assign_debug", "az_float_cos"),
+    ("demo_float_cos_prec_debug", "az_float_cos"),
+    ("demo_float_cos_round_debug", "az_float_cos"),
+    ("demo_float_cos_prec_round_debug", "az_float_cos"),
+    (
+        "demo_float_cos_rational_prec_debug",
+        "az_float_cos_rational",
+    ),
+    (
+        "demo_float_cos_rational_prec_ref_debug",
+        "az_float_cos_rational",
+    ),
+    (
+        "demo_float_cos_rational_prec_round_debug",
+        "az_float_cos_rational",
+    ),
+    (
+        "demo_float_cos_rational_prec_round_ref_debug",
+        "az_float_cos_rational",
+    ),
+    (
+        "demo_float_cos_with_period_debug",
+        "az_float_cos_with_period",
+    ),
+    (
+        "demo_float_cos_with_period_prec_debug",
+        "az_float_cos_with_period",
+    ),
+    (
+        "demo_float_cos_with_period_round_debug",
+        "az_float_cos_with_period",
+    ),
+    (
+        "demo_float_cos_with_period_prec_round_debug",
+        "az_float_cos_with_period",
+    ),
+    (
+        "demo_float_cos_with_period_prec_round_extreme_debug",
+        "az_float_cos_with_period",
+    ),
+    (
+        "demo_float_cos_with_period_rational_prec_debug",
+        "az_float_cos_with_period_rational",
+    ),
+    (
+        "demo_float_cos_with_period_rational_prec_round_debug",
+        "az_float_cos_with_period_rational",
+    ),
+    ("demo_float_cos_pi_debug", "az_float_cos_pi"),
+    ("demo_float_cos_pi_prec_debug", "az_float_cos_pi"),
+    ("demo_float_cos_pi_round_debug", "az_float_cos_pi"),
+    ("demo_float_cos_pi_prec_round_debug", "az_float_cos_pi"),
+    (
+        "demo_float_cos_pi_rational_prec_debug",
+        "az_float_cos_pi_rational",
+    ),
+    (
+        "demo_float_cos_pi_rational_prec_round_debug",
+        "az_float_cos_pi_rational",
+    ),
+    ("demo_float_sin_debug", "az_float_sin"),
+    ("demo_float_sin_ref_debug", "az_float_sin"),
+    ("demo_float_sin_assign_debug", "az_float_sin"),
+    ("demo_float_sin_prec_debug", "az_float_sin"),
+    ("demo_float_sin_round_debug", "az_float_sin"),
+    ("demo_float_sin_prec_round_debug", "az_float_sin"),
+    (
+        "demo_float_sin_rational_prec_debug",
+        "az_float_sin_rational",
+    ),
+    (
+        "demo_float_sin_rational_prec_ref_debug",
+        "az_float_sin_rational",
+    ),
+    (
+        "demo_float_sin_rational_prec_round_debug",
+        "az_float_sin_rational",
+    ),
+    (
+        "demo_float_sin_rational_prec_round_ref_debug",
+        "az_float_sin_rational",
+    ),
+    (
+        "demo_float_sin_with_period_debug",
+        "az_float_sin_with_period",
+    ),
+    (
+        "demo_float_sin_with_period_prec_debug",
+        "az_float_sin_with_period",
+    ),
+    (
+        "demo_float_sin_with_period_round_debug",
+        "az_float_sin_with_period",
+    ),
+    (
+        "demo_float_sin_with_period_prec_round_debug",
+        "az_float_sin_with_period",
+    ),
+    (
+        "demo_float_sin_with_period_prec_round_extreme_debug",
+        "az_float_sin_with_period",
+    ),
+    (
+        "demo_float_sin_with_period_rational_prec_debug",
+        "az_float_sin_with_period_rational",
+    ),
+    (
+        "demo_float_sin_with_period_rational_prec_round_debug",
+        "az_float_sin_with_period_rational",
+    ),
+    ("demo_float_sin_pi_debug", "az_float_sin_pi"),
+    ("demo_float_sin_pi_prec_debug", "az_float_sin_pi"),
+    ("demo_float_sin_pi_round_debug", "az_float_sin_pi"),
+    ("demo_float_sin_pi_prec_round_debug", "az_float_sin_pi"),
+    (
+        "demo_float_sin_pi_rational_prec_debug",
+        "az_float_sin_pi_rational",
+    ),
+    (
+        "demo_float_sin_pi_rational_prec_round_debug",
+        "az_float_sin_pi_rational",
+    ),
 ];
 
 // Float demos whose extreme inputs make each line slow on Malachite's side (about a tenth of a
@@ -4942,6 +5772,22 @@ const AZURITE_FLOAT_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ),
     (
         "demo_float_eulers_constant_prec_debug",
+        "az_float_irrational_constant",
+    ),
+    (
+        "demo_float_cbrt_2_prec_round_debug",
+        "az_float_irrational_constant",
+    ),
+    (
+        "demo_float_cbrt_2_prec_debug",
+        "az_float_irrational_constant",
+    ),
+    (
+        "demo_float_dottie_number_prec_round_debug",
+        "az_float_irrational_constant",
+    ),
+    (
+        "demo_float_dottie_number_prec_debug",
         "az_float_irrational_constant",
     ),
 ];

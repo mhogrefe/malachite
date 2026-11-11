@@ -50,11 +50,11 @@ fn demo_float_log_base_rational_float_base_prec(gm: GenMode, config: &GenConfig,
         .take(limit)
     {
         println!(
-            "log_base_{}({}) = {:?} (prec {})",
-            base.clone(),
+            "Float::log_base_rational_float_base_prec({}, {}, {}) = {:?}",
             x.clone(),
-            Float::log_base_rational_float_base_prec(x, base, prec),
-            prec
+            base.clone(),
+            prec,
+            Float::log_base_rational_float_base_prec(x, base, prec)
         );
     }
 }
@@ -70,12 +70,12 @@ fn demo_float_log_base_rational_float_base_prec_debug(
     {
         let (log, o) = Float::log_base_rational_float_base_prec(x.clone(), base.clone(), prec);
         println!(
-            "log_base_{:#x}({}) = ({:#x}, {:?}) (prec {})",
-            ComparableFloat(base),
+            "Float::log_base_rational_float_base_prec({}, {:#x}, {}) = ({:#x}, {:?})",
             x,
+            ComparableFloat(base),
+            prec,
             ComparableFloat(log),
-            o,
-            prec
+            o
         );
     }
 }
@@ -90,12 +90,12 @@ fn demo_float_log_base_rational_float_base_prec_round(
         .take(limit)
     {
         println!(
-            "log_base_{}({}) = {:?} (prec {}, {})",
-            base.clone(),
+            "Float::log_base_rational_float_base_prec_round({}, {}, {}, {}) = {:?}",
             x.clone(),
-            Float::log_base_rational_float_base_prec_round(x, base, prec, rm),
+            base.clone(),
             prec,
-            rm
+            rm,
+            Float::log_base_rational_float_base_prec_round(x, base, prec, rm)
         );
     }
 }
@@ -112,13 +112,13 @@ fn demo_float_log_base_rational_float_base_prec_round_debug(
         let (log, o) =
             Float::log_base_rational_float_base_prec_round(x.clone(), base.clone(), prec, rm);
         println!(
-            "log_base_{:#x}({}) = ({:#x}, {:?}) (prec {}, {})",
-            ComparableFloat(base),
+            "Float::log_base_rational_float_base_prec_round({}, {:#x}, {}, {}) = ({:#x}, {:?})",
             x,
-            ComparableFloat(log),
-            o,
+            ComparableFloat(base),
             prec,
-            rm
+            rm,
+            ComparableFloat(log),
+            o
         );
     }
 }
