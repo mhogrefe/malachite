@@ -61,6 +61,49 @@
 #[macro_use]
 extern crate malachite_base;
 
+pub mod big_exponent_float {
+    pub mod basic {
+        pub mod can_round;
+        pub mod classification;
+        pub mod complexity;
+        pub mod constants;
+        pub mod get_and_set;
+    }
+    pub mod conversion {
+        pub mod string {
+            pub mod to_string;
+        }
+    }
+    pub mod exhaustive {
+        pub mod exhaustive_big_exponent_floats;
+        pub mod exhaustive_big_exponent_floats_with_precision;
+        pub mod exhaustive_finite_big_exponent_floats;
+        pub mod exhaustive_negative_finite_big_exponent_floats;
+        pub mod exhaustive_non_negative_finite_big_exponent_floats;
+        pub mod exhaustive_non_positive_finite_big_exponent_floats;
+        pub mod exhaustive_nonzero_finite_big_exponent_floats;
+        pub mod exhaustive_positive_big_exponent_floats_with_precision;
+        pub mod exhaustive_positive_big_exponent_floats_with_sci_exponent;
+        pub mod exhaustive_positive_big_exponent_floats_with_sci_exponent_and_precision;
+        pub mod exhaustive_positive_finite_big_exponent_floats;
+    }
+    pub mod random {
+        pub mod random_big_exponent_floats;
+        pub mod random_finite_big_exponent_floats;
+        pub mod random_negative_finite_big_exponent_floats;
+        pub mod random_non_negative_finite_big_exponent_floats;
+        pub mod random_non_positive_finite_big_exponent_floats;
+        pub mod random_nonzero_finite_big_exponent_floats;
+        pub mod random_positive_finite_big_exponent_floats;
+        pub mod striped_random_big_exponent_floats;
+        pub mod striped_random_finite_big_exponent_floats;
+        pub mod striped_random_negative_finite_big_exponent_floats;
+        pub mod striped_random_non_negative_finite_big_exponent_floats;
+        pub mod striped_random_non_positive_finite_big_exponent_floats;
+        pub mod striped_random_nonzero_finite_big_exponent_floats;
+        pub mod striped_random_positive_finite_big_exponent_floats;
+    }
+}
 pub mod float {
     pub mod arithmetic {
         pub mod abs;

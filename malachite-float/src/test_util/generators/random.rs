@@ -8,11 +8,14 @@
 
 use crate::Float;
 use crate::InnerFloat::Finite;
+use crate::big_exponent_float::BigExponentFloat;
+use crate::big_exponent_float::random::random_big_exponent_floats;
 use crate::float::random::{
     RandomPositiveFiniteFloats, random_finite_floats, random_floats,
     random_non_negative_finite_floats, random_nonzero_finite_floats, random_positive_finite_floats,
     random_positive_floats_with_precision,
 };
+use crate::test_util::big_exponent_float::big_exponent_float_to_float;
 use crate::test_util::extra_variadic::{
     random_quadruples, random_quadruples_from_single, random_quadruples_xxxy,
     random_quadruples_xxyz, random_quintuples_xxxxy, random_quintuples_xxxyz,
@@ -81,14 +84,15 @@ use crate::test_util::generators::exhaustive::{
     reciprocal_sqrt_round_valid, rem_prec_round_valid, rem_rational_prec_round_valid,
     rem_rational_round_valid, rem_round_valid, root_s_prec_round_valid,
     root_s_rational_prec_round_valid, root_u_prec_round_valid, root_u_rational_prec_round_valid,
-    round_to_integer_then_prec_round_valid, set_prec_round_valid, shl_prec_round_valid,
-    shl_round_valid, shr_prec_round_valid, shr_round_valid, signed_rounding_from_float_valid,
-    sin_with_period_prec_round_valid, sin_with_period_rational_prec_round_valid,
-    sin_with_period_round_valid, sqrt_prec_round_valid, sqrt_rational_prec_round_valid,
-    sqrt_round_valid, square_prec_round_valid, square_round_valid, sub_prec_round_valid,
-    sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid, sum_prec_round_valid,
-    sum_round_valid, unsigned_pow_prec_round_valid, unsigned_pow_rational_prec_round_valid,
-    unsigned_pow_unsigned_prec_round_valid, unsigned_rounding_from_float_valid,
+    round_to_integer_then_prec_round_valid, round_to_prec_round_valid, set_prec_round_valid,
+    shl_prec_round_valid, shl_round_valid, shr_prec_round_valid, shr_round_valid,
+    signed_rounding_from_float_valid, sin_with_period_prec_round_valid,
+    sin_with_period_rational_prec_round_valid, sin_with_period_round_valid, sqrt_prec_round_valid,
+    sqrt_rational_prec_round_valid, sqrt_round_valid, square_prec_round_valid, square_round_valid,
+    sub_prec_round_valid, sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
+    sum_prec_round_valid, sum_round_valid, unsigned_pow_prec_round_valid,
+    unsigned_pow_rational_prec_round_valid, unsigned_pow_unsigned_prec_round_valid,
+    unsigned_rounding_from_float_valid,
 };
 use malachite_base::bools::random::{
     RandomBools, WeightedRandomBools, random_bools, weighted_random_bools,
@@ -142,6 +146,98 @@ use malachite_q::gaussian_rational::random::random_gaussian_rationals;
 use malachite_q::rational::random::{random_non_negative_rationals, random_rationals};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+
+// -- BigExponentFloat --
+
+pub fn random_big_exponent_float_gen(config: &GenConfig) -> It<BigExponentFloat> {
+    Box::new(random_big_exponent_floats(
+        EXAMPLE_SEED,
+        config.get_or("mean_exponent_bits_n", 8),
+        config.get_or("mean_exponent_bits_d", 1),
+        config.get_or("mean_precision_n", 64),
+        config.get_or("mean_precision_d", 1),
+        config.get_or("mean_special_p_n", 1),
+        config.get_or("mean_special_p_d", 64),
+    ))
+}
+
+// The exponent is in `Float`'s range, so the value has a `Float` counterpart.
+pub fn random_big_exponent_float_gen_var_1(config: &GenConfig) -> It<BigExponentFloat> {
+    Box::new(
+        random_big_exponent_floats(
+            EXAMPLE_SEED,
+            config.get_or("mean_exponent_bits_n", 8),
+            config.get_or("mean_exponent_bits_d", 1),
+            config.get_or("mean_precision_n", 64),
+            config.get_or("mean_precision_d", 1),
+            config.get_or("mean_special_p_n", 1),
+            config.get_or("mean_special_p_d", 64),
+        )
+        .filter(|x| big_exponent_float_to_float(x).is_some()),
+    )
+}
+
+// -- (BigExponentFloat, PrimitiveUnsigned) --
+
+// The unsigned is positive.
+pub fn random_big_exponent_float_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (BigExponentFloat, PrimitiveUnsigned, RoundingMode) --
+
+// The unsigned is positive, and the rounding mode is `Exact` only if rounding is exact.
+pub fn random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, p, rm)| round_to_prec_round_valid(x, *p, *rm)),
+    )
+}
 
 // -- Float --
 

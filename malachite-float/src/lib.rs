@@ -478,6 +478,11 @@ pub fn test_underflow(result: &Float, o: Ordering) -> bool {
         || *result < 0u32 && result.abs_is_min_positive_value() && o == Less
 }
 
+/// [`BigExponentFloat`], a floating-point type with an unbounded exponent and no stored precision,
+/// and everything defined on it.
+pub mod big_exponent_float;
+pub use big_exponent_float::BigExponentFloat;
+
 /// [`Float`], the crate's floating-point type, and everything defined on it.
 #[macro_use]
 pub mod float;

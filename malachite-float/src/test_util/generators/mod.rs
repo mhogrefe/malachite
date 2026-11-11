@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use crate::big_exponent_float::BigExponentFloat;
 use crate::test_util::generators::common::{
     float_float_anything_rounding_mode_quadruple_rm, float_float_anything_triple_rm,
     float_float_float_anything_quadruple_rm, float_float_float_anything_rounding_mode_quintuple_rm,
@@ -39,6 +40,48 @@ use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 use malachite_q::gaussian_rational::GaussianRational;
 use std::cmp::Ordering;
+
+// -- BigExponentFloat --
+
+pub fn big_exponent_float_gen() -> Generator<BigExponentFloat> {
+    Generator::new(
+        &exhaustive_big_exponent_float_gen,
+        &random_big_exponent_float_gen,
+        &special_random_big_exponent_float_gen,
+    )
+}
+
+// The exponent is in `Float`'s range, so the value has a `Float` counterpart.
+pub fn big_exponent_float_gen_var_1() -> Generator<BigExponentFloat> {
+    Generator::new(
+        &exhaustive_big_exponent_float_gen_var_1,
+        &random_big_exponent_float_gen_var_1,
+        &special_random_big_exponent_float_gen_var_1,
+    )
+}
+
+// -- (BigExponentFloat, PrimitiveUnsigned) --
+
+// The unsigned is positive.
+pub fn big_exponent_float_unsigned_pair_gen_var_1() -> Generator<(BigExponentFloat, u64)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_pair_gen_var_1,
+        &random_big_exponent_float_unsigned_pair_gen_var_1,
+        &special_random_big_exponent_float_unsigned_pair_gen_var_1,
+    )
+}
+
+// -- (BigExponentFloat, PrimitiveUnsigned, RoundingMode) --
+
+// The unsigned is positive, and the rounding mode is `Exact` only if rounding is exact.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_1()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_1,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
 
 // -- Float --
 

@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::big_exponent_float::BigExponentFloat;
+use crate::big_exponent_float::exhaustive::exhaustive_big_exponent_floats;
 use crate::float::conversion::string::to_sci::to_sci_valid;
 use crate::float::exhaustive::{
     ExhaustivePositiveFiniteFloatsGenerator, ExhaustivePositiveFloatsWithSciExponent,
@@ -22,6 +24,7 @@ use crate::float::exponential::log_base_rational_base::rational_log_base_rationa
 use crate::float::exponential::log_base_rational_base_1_plus_x::*;
 use crate::float::exponential::log_base_rational_float_base::log_base_rational_float_base_rational;
 use crate::float::exponential::log_base_rational_rational_base::*;
+use crate::test_util::big_exponent_float::big_exponent_float_to_float;
 use crate::test_util::extra_variadic::{
     exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy_custom_output,
     exhaustive_quadruples_xxyz_custom_output, exhaustive_quintuples_xxxxy_custom_output,
@@ -89,6 +92,48 @@ use malachite_q::rational::exhaustive::{exhaustive_non_negative_rationals, exhau
 use std::cmp::{Ordering, max};
 use std::iter::Chain;
 use std::mem::swap;
+
+// -- BigExponentFloat --
+
+pub fn exhaustive_big_exponent_float_gen() -> It<BigExponentFloat> {
+    Box::new(exhaustive_big_exponent_floats())
+}
+
+// The exponent is in `Float`'s range, so the value has a `Float` counterpart.
+pub fn exhaustive_big_exponent_float_gen_var_1() -> It<BigExponentFloat> {
+    Box::new(exhaustive_big_exponent_floats().filter(|x| big_exponent_float_to_float(x).is_some()))
+}
+
+// -- (BigExponentFloat, PrimitiveUnsigned) --
+
+// The unsigned is positive.
+pub fn exhaustive_big_exponent_float_unsigned_pair_gen_var_1() -> It<(BigExponentFloat, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_big_exponent_floats(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+// -- (BigExponentFloat, PrimitiveUnsigned, RoundingMode) --
+
+pub fn round_to_prec_round_valid(x: &BigExponentFloat, p: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.get_prec().is_none_or(|q| q <= p)
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if rounding is exact.
+pub fn exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_1()
+-> It<(BigExponentFloat, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_big_exponent_floats(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| round_to_prec_round_valid(x, p, rm)),
+    ))
+}
 
 // -- Float --
 
