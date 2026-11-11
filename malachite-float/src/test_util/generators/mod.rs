@@ -70,6 +70,28 @@ pub fn big_exponent_float_gen_var_1_float() -> Generator<(Float, BigExponentFloa
     )
 }
 
+// The exponent is less than 2^16 in absolute value, so exact integer and rational conversions are
+// cheap.
+pub fn big_exponent_float_gen_var_2() -> Generator<BigExponentFloat> {
+    Generator::new(
+        &exhaustive_big_exponent_float_gen_var_2,
+        &random_big_exponent_float_gen_var_2,
+        &special_random_big_exponent_float_gen_var_2,
+    )
+}
+
+// -- (BigExponentFloat, RoundingMode) --
+
+// The exponent is less than 2^16 in absolute value.
+pub fn big_exponent_float_rounding_mode_pair_gen_var_1()
+-> Generator<(BigExponentFloat, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_rounding_mode_pair_gen_var_1,
+        &random_big_exponent_float_rounding_mode_pair_gen_var_1,
+        &special_random_big_exponent_float_rounding_mode_pair_gen_var_1,
+    )
+}
+
 // -- (BigExponentFloat, PrimitiveUnsigned) --
 
 // The unsigned is positive.

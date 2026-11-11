@@ -30,6 +30,15 @@ pub fn big_exponent_float_complexity_bucketer(var_name: &str) -> Bucketer<'_, Bi
     }
 }
 
+pub fn pair_1_big_exponent_float_complexity_bucketer<T>(
+    var_name: &str,
+) -> Bucketer<'_, (BigExponentFloat, T)> {
+    Bucketer {
+        bucketing_function: &|(x, _)| usize::exact_from(x.complexity()),
+        bucketing_label: format!("{var_name}.complexity()"),
+    }
+}
+
 pub fn pair_2_big_exponent_float_complexity_bucketer<T>(
     var_name: &str,
 ) -> Bucketer<'_, (T, BigExponentFloat)> {

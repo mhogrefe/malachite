@@ -17,6 +17,7 @@
 #define MALACHITE_ORACLE_H
 
 #include <flint/flint.h>
+#include <flint/arf.h>
 #include <flint/fmpz.h>
 #include <flint/fmpz_mat.h>
 #include <flint/fmpq_mat.h>
@@ -125,7 +126,16 @@ int run_fmpz_rfac(const char * arg);
 int run_fmpz_ui_vec_prod(const char * arg);
 int run__fmpz_vec_content_chained(const char * arg);
 int run__fmpz_vec_lcm(const char * arg);
+int arf_parse_base(const char * s, int log_base, arf_t x);
+int arf_parse_exact(const char * s, arf_t x);
 int run_arf_classification(const char * arg);
+int run_arf_set_fmpz(const char * arg);
+int run_arf_set_d(const char * arg);
+int run_arf_fmpq(const char * arg);
+int run_arf_get_fmpz(const char * arg);
+int run_arf_get_d(const char * arg);
+int run_arf_mantissa(const char * arg);
+int run_arf_string(const char * arg);
 int run_arf_get(const char * arg);
 int run_arf_set_round(const char * arg);
 int run_arf_hex(const char * arg);

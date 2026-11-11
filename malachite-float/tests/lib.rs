@@ -72,7 +72,31 @@ pub mod big_exponent_float {
         pub mod size;
     }
     pub mod conversion {
+        pub mod big_exponent_float_from_float;
+        pub mod float_from_big_exponent_float;
+        pub mod from_bits;
+        pub mod from_digits;
+        pub mod from_gaussian_integer;
+        pub mod from_gaussian_rational;
+        pub mod from_integer;
+        pub mod from_natural;
+        pub mod from_primitive_float;
+        pub mod from_primitive_int;
+        pub mod from_rational;
+        pub mod gaussian_integer_from_big_exponent_float;
+        pub mod gaussian_rational_from_big_exponent_float;
+        pub mod integer_from_big_exponent_float;
+        pub mod is_gaussian_integer;
+        pub mod is_integer;
+        pub mod is_real;
+        pub mod mantissa_and_exponent;
+        pub mod natural_from_big_exponent_float;
+        pub mod primitive_float_from_big_exponent_float;
+        pub mod primitive_int_from_big_exponent_float;
+        pub mod rational_from_big_exponent_float;
+        pub mod serde;
         pub mod string {
+            pub mod from_string;
             pub mod to_string;
         }
     }
@@ -96,16 +120,16 @@ pub mod big_exponent_float {
         pub mod random_non_negative_finite_big_exponent_floats;
         pub mod random_non_positive_finite_big_exponent_floats;
         pub mod random_nonzero_finite_big_exponent_floats;
-        pub mod random_positive_finite_big_exponent_floats;
         pub mod random_positive_big_exponent_floats_with_precision;
+        pub mod random_positive_finite_big_exponent_floats;
         pub mod striped_random_big_exponent_floats;
         pub mod striped_random_finite_big_exponent_floats;
         pub mod striped_random_negative_finite_big_exponent_floats;
         pub mod striped_random_non_negative_finite_big_exponent_floats;
         pub mod striped_random_non_positive_finite_big_exponent_floats;
         pub mod striped_random_nonzero_finite_big_exponent_floats;
-        pub mod striped_random_positive_finite_big_exponent_floats;
         pub mod striped_random_positive_big_exponent_floats_with_precision;
+        pub mod striped_random_positive_finite_big_exponent_floats;
     }
 }
 pub mod float {

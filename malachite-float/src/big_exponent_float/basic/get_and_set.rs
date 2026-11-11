@@ -248,8 +248,8 @@ impl BigExponentFloat {
     }
 
     /// Rounds a [`BigExponentFloat`] to a given precision, using the specified rounding mode. The
-    /// [`BigExponentFloat`] is taken by value. An [`Ordering`] is also returned, indicating
-    /// whether the rounded value is less than, equal to, or greater than the original value.
+    /// [`BigExponentFloat`] is taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded value is less than, equal to, or greater than the original value.
     ///
     /// See [`BigExponentFloat::round_to_prec_round_assign`] for details.
     ///
@@ -315,8 +315,8 @@ impl BigExponentFloat {
     }
 
     /// Rounds a [`BigExponentFloat`] to a given precision, in place, rounding to the nearest value
-    /// and breaking ties to even. An [`Ordering`] is returned, indicating whether the rounded
-    /// value is less than, equal to, or greater than the original value.
+    /// and breaking ties to even. An [`Ordering`] is returned, indicating whether the rounded value
+    /// is less than, equal to, or greater than the original value.
     ///
     /// See [`BigExponentFloat::round_to_prec_round_assign`] for details.
     ///

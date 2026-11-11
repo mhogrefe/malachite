@@ -12,8 +12,10 @@ use crate::big_exponent_float::exhaustive::*;
 use crate::{Float, InnerFloat};
 use itertools::Itertools;
 use malachite_base::num::basic::traits::{Infinity as _, NaN as _, NegativeInfinity, Zero as _};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 
 // The `Float` with the same value as `x` and with `x`'s precision, if `x`'s exponent is in
 // `Float`'s range. NaN, infinities, and zero map to the corresponding `Float`s (zero to positive
@@ -101,8 +103,8 @@ pub fn random_big_exponent_floats_helper_helper<I: Clone + Iterator<Item = BigEx
     );
 }
 
-// Parses `Float`'s hexadecimal format, as `parse_hex_string` does, into the `BigExponentFloat`
-// with the same value.
+// Parses `Float`'s hexadecimal format, as `parse_hex_string` does, into the `BigExponentFloat` with
+// the same value.
 pub fn parse_big_exponent_float_hex(s: &str) -> BigExponentFloat {
     float_to_big_exponent_float(&crate::test_util::common::parse_hex_string(s))
 }
@@ -112,4 +114,30 @@ pub fn big_exponent_float_power_of_2(sci_exponent: Integer) -> BigExponentFloat 
     exhaustive_positive_big_exponent_floats_with_sci_exponent_and_precision(sci_exponent, 1)
         .next()
         .unwrap()
+}
+
+// The negative of `x`. This stands in for `Neg`, which comes with the arithmetic module.
+pub fn big_exponent_float_negate(x: BigExponentFloat) -> BigExponentFloat {
+    x.negate()
+}
+
+// Whether converting `x` to an exact `Natural`, `Integer`, or `Rational` is cheap: whether its
+// exponent is less than 2^16 in absolute value. An exact conversion of a value with a huge exponent
+// would need a huge amount of memory, so property tests skip those.
+pub fn big_exponent_float_exponent_is_small(x: &BigExponentFloat) -> bool {
+    x.get_exponent()
+        .is_none_or(|e| e.unsigned_abs_ref() < &Natural::from(1u32 << 16))
+}
+
+// The exact value of `x`, written independently of the power-of-2-base formatters: `NaN`,
+// `Infinity`, `-Infinity`, `0x0.0`, or `±m*2^k` with `m` odd.
+pub fn big_exponent_float_exact_string(x: &BigExponentFloat) -> String {
+    let Some(significand) = x.significand_ref() else {
+        return format!("{x:#x}");
+    };
+    let zeros = significand.trailing_zeros().unwrap();
+    let m = significand >> zeros;
+    let k = x.get_exponent().unwrap() - Integer::from(m.significant_bits());
+    let sign = if x.is_sign_negative() { "-" } else { "" };
+    format!("{sign}{m}*2^{k}")
 }

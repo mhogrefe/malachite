@@ -7,43 +7,34 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::big_exponent_float::BigExponentFloat;
-use crate::big_exponent_float::InnerBigExponentFloat::{Finite, Infinity, NaN, Zero};
+use crate::big_exponent_float::InnerBigExponentFloat::Finite;
 use crate::{Float, InnerFloat};
 use alloc::format;
 use alloc::string::String;
-use core::fmt::{Debug, Formatter, LowerHex, Result, UpperHex};
+use core::fmt::{Binary, Debug, Formatter, LowerHex, Octal, Result, UpperHex};
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::ModPowerOf2;
-use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::strings::{ToLowerHexString, ToUpperHexString};
+use malachite_base::num::arithmetic::traits::{DivExact, Mod};
+use malachite_base::num::conversion::traits::{ExactFrom, ToStringBase};
+use malachite_base::strings::{ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString};
 use malachite_nz::integer::Integer;
 
-// `Float`'s hexadecimal string for `x`, as `{:x}`, `{:#x}`, `{:X}`, or `{:#X}` would write it.
-fn float_hex(x: &Float, alternate: bool, uppercase: bool) -> String {
-    match (alternate, uppercase) {
-        (false, false) => x.to_lower_hex_string(),
-        (true, false) => format!("{x:#x}"),
-        (false, true) => x.to_upper_hex_string(),
-        (true, true) => format!("{x:#X}"),
-    }
-}
-
-// Writes `x` in base 16, exactly, as `Float`'s `LowerHex` and `UpperHex` do. A finite nonzero `x`
-// with an exponent in `Float`'s range is written as the `Float` of the same value. Otherwise, the
-// exponent is shifted into range by a multiple of 4, which changes neither the hexadecimal digits
-// nor where they start, and the shift is added back to the exponent after the `E`.
-fn fmt_hex(x: &BigExponentFloat, f: &mut Formatter, uppercase: bool) -> Result {
-    let alternate = f.alternate();
+// The string for `x` in base 2^`log_base`, exactly, as `render` writes the `Float` of the same
+// value and precision. A finite nonzero `x` with an exponent in `Float`'s range is written as that
+// `Float`. Otherwise, the exponent is shifted into range by a multiple of `log_base`, which changes
+// neither the digits nor where they start, and the shift, in digits, is added back to the exponent
+// after the `E`.
+pub(crate) fn power_of_2_base_string(
+    x: &BigExponentFloat,
+    log_base: u64,
+    render: &dyn Fn(&Float) -> String,
+) -> String {
     let (sign, exponent, significand) = match x {
-        BigExponentFloat(NaN) => return f.write_str("NaN"),
-        BigExponentFloat(Infinity { sign: true }) => return f.write_str("Infinity"),
-        BigExponentFloat(Infinity { sign: false }) => return f.write_str("-Infinity"),
-        BigExponentFloat(Zero) => return f.write_str(if alternate { "0x0.0" } else { "0.0" }),
         BigExponentFloat(Finite {
             sign,
             exponent,
             significand,
         }) => (*sign, exponent, significand),
+        _ => return render(&x.to_float_clamped()),
     };
     let float = |exponent: i32| {
         Float(InnerFloat::Finite {
@@ -56,23 +47,31 @@ fn fmt_hex(x: &BigExponentFloat, f: &mut Formatter, uppercase: bool) -> Result {
     if let Ok(e) = i32::try_from(exponent)
         && (Float::MIN_EXPONENT..=Float::MAX_EXPONENT).contains(&e)
     {
-        return f.write_str(&float_hex(&float(e), alternate, uppercase));
+        return render(&float(e));
     }
     // A target exponent near the end of `Float`'s range, where `Float` writes an `E`, and congruent
-    // to `exponent` mod 4.
-    let base = if *exponent > 0u32 {
-        Float::MAX_EXPONENT - 3
+    // to `exponent` mod `log_base`.
+    let k = Integer::from(log_base);
+    let target = if *exponent > 0u32 {
+        Float::MAX_EXPONENT
+            - i32::exact_from(&(Integer::from(Float::MAX_EXPONENT) - exponent).mod_op(&k))
     } else {
-        Float::MIN_EXPONENT + 3
+        Float::MIN_EXPONENT
+            + i32::exact_from(&(exponent - Integer::from(Float::MIN_EXPONENT)).mod_op(&k))
     };
-    let target = base + i32::wrapping_from(&(exponent - Integer::from(base)).mod_power_of_2(2u64));
-    let shift = (exponent - Integer::from(target)) >> 2u32;
-    let s = float_hex(&float(target), alternate, uppercase);
+    let shift = (exponent - Integer::from(target)).div_exact(k);
+    let s = render(&float(target));
     let e_index = s.rfind('E').unwrap();
-    let printed = Integer::from_str(s[e_index + 1..].trim_start_matches('+')).unwrap();
-    let new_exponent = printed + shift;
-    let plus = if new_exponent >= 0u32 { "+" } else { "" };
-    write!(f, "{}E{plus}{new_exponent}", &s[..e_index])
+    let printed = &s[e_index + 1..];
+    // `Float` writes the sign of a positive exponent only in bases where `E` is also a digit.
+    let signed = printed.starts_with(['+', '-']);
+    let new_exponent = Integer::from_str(printed.trim_start_matches('+')).unwrap() + shift;
+    let plus = if signed && new_exponent >= 0u32 {
+        "+"
+    } else {
+        ""
+    };
+    format!("{}E{plus}{new_exponent}", &s[..e_index])
 }
 
 impl LowerHex for BigExponentFloat {
@@ -109,7 +108,12 @@ impl LowerHex for BigExponentFloat {
     /// ```
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
-        fmt_hex(self, f, false)
+        let render: &dyn Fn(&Float) -> String = if f.alternate() {
+            &|x| format!("{x:#x}")
+        } else {
+            &|x| x.to_lower_hex_string()
+        };
+        f.write_str(&power_of_2_base_string(self, 4, render))
     }
 }
 
@@ -141,7 +145,177 @@ impl UpperHex for BigExponentFloat {
     /// ```
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
-        fmt_hex(self, f, true)
+        let render: &dyn Fn(&Float) -> String = if f.alternate() {
+            &|x| format!("{x:#X}")
+        } else {
+            &|x| x.to_upper_hex_string()
+        };
+        f.write_str(&power_of_2_base_string(self, 4, render))
+    }
+}
+
+impl Binary for BigExponentFloat {
+    /// Converts a [`BigExponentFloat`] to a binary [`String`].
+    ///
+    /// Using the `#` format flag prepends `"0b"` to the string, after any sign.
+    ///
+    /// Every [`BigExponentFloat`] is exactly representable in binary: the output has exactly as
+    /// many digits as are needed to write the value. The exponent, when one is shown, is a decimal
+    /// number following an `E`. The output is that of [`Float`]'s [`Binary`] for a [`Float`] with
+    /// the same value and precision, continued to exponents outside [`Float`]'s range.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{NaN, One, Zero};
+    /// use malachite_base::strings::ToBinaryString;
+    /// use malachite_float::{BigExponentFloat, Float};
+    ///
+    /// assert_eq!(BigExponentFloat::NAN.to_binary_string(), "NaN");
+    /// assert_eq!(BigExponentFloat::ZERO.to_binary_string(), "0.0");
+    /// assert_eq!(BigExponentFloat::ONE.to_binary_string(), "1.0");
+    /// assert_eq!(
+    ///     BigExponentFloat::from(Float::from(1.5)).to_binary_string(),
+    ///     "1.1"
+    /// );
+    /// assert_eq!(
+    ///     format!("{:#b}", BigExponentFloat::from(Float::from(-1.5))),
+    ///     "-0b1.1"
+    /// );
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        let render: &dyn Fn(&Float) -> String = if f.alternate() {
+            &|x| format!("{x:#b}")
+        } else {
+            &|x| x.to_binary_string()
+        };
+        f.write_str(&power_of_2_base_string(self, 1, render))
+    }
+}
+
+impl Octal for BigExponentFloat {
+    /// Converts a [`BigExponentFloat`] to an octal [`String`].
+    ///
+    /// Using the `#` format flag prepends `"0o"` to the string, after any sign.
+    ///
+    /// Every [`BigExponentFloat`] is exactly representable in octal: the output has exactly as many
+    /// digits as are needed to write the value. The exponent, when one is shown, is a decimal
+    /// number following an `E`. The output is that of [`Float`]'s [`Octal`] for a [`Float`] with
+    /// the same value and precision, continued to exponents outside [`Float`]'s range.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{NaN, One, Zero};
+    /// use malachite_base::strings::ToOctalString;
+    /// use malachite_float::{BigExponentFloat, Float};
+    ///
+    /// assert_eq!(BigExponentFloat::NAN.to_octal_string(), "NaN");
+    /// assert_eq!(BigExponentFloat::ZERO.to_octal_string(), "0.0");
+    /// assert_eq!(BigExponentFloat::ONE.to_octal_string(), "1.0");
+    /// assert_eq!(
+    ///     BigExponentFloat::from(Float::from(1.5)).to_octal_string(),
+    ///     "1.4"
+    /// );
+    /// assert_eq!(
+    ///     format!("{:#o}", BigExponentFloat::from(Float::from(-1.5))),
+    ///     "-0o1.4"
+    /// );
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        let render: &dyn Fn(&Float) -> String = if f.alternate() {
+            &|x| format!("{x:#o}")
+        } else {
+            &|x| x.to_octal_string()
+        };
+        f.write_str(&power_of_2_base_string(self, 3, render))
+    }
+}
+
+// The base-2 logarithm of `base`, which must be a power of 2 from 2 to 32.
+pub(crate) fn power_of_2_base_log(base: u8) -> u64 {
+    assert!(
+        base.is_power_of_two() && (2..=32).contains(&base),
+        "BigExponentFloat supports only power-of-2 bases from 2 to 32 for now, not {base}"
+    );
+    u64::from(base.trailing_zeros())
+}
+
+impl ToStringBase for BigExponentFloat {
+    /// Converts a [`BigExponentFloat`] to a [`String`] using a specified base, which must for now
+    /// be a power of 2: 2, 4, 8, 16, or 32. Digits from 10 to 31 become the lowercase [`char`]s
+    /// `'a'` to `'v'`.
+    ///
+    /// In a power-of-2 base every [`BigExponentFloat`] is exactly representable, so the output has
+    /// exactly as many digits as are needed to write the value. The output is that of [`Float`]'s
+    /// [`ToStringBase`] for a [`Float`] with the same value and precision, continued to exponents
+    /// outside [`Float`]'s range. Other bases need arithmetic to scale huge exponents, and will be
+    /// supported once [`BigExponentFloat`] has it.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
+    ///
+    /// # Panics
+    /// Panics if `base` is not 2, 4, 8, 16, or 32.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::conversion::traits::ToStringBase;
+    /// use malachite_float::{BigExponentFloat, Float};
+    ///
+    /// let x = BigExponentFloat::from(Float::from(1.5));
+    /// assert_eq!(x.to_string_base(2), "1.1");
+    /// assert_eq!(x.to_string_base(4), "1.2");
+    /// assert_eq!(x.to_string_base(32), "1.g");
+    /// ```
+    fn to_string_base(&self, base: u8) -> String {
+        let log_base = power_of_2_base_log(base);
+        power_of_2_base_string(self, log_base, &|x| x.to_string_base(base))
+    }
+
+    /// Converts a [`BigExponentFloat`] to a [`String`] using a specified base, which must for now
+    /// be a power of 2: 2, 4, 8, 16, or 32. Digits from 10 to 31 become the uppercase [`char`]s
+    /// `'A'` to `'V'`.
+    ///
+    /// See [`ToStringBase::to_string_base`] for details.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
+    ///
+    /// # Panics
+    /// Panics if `base` is not 2, 4, 8, 16, or 32.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::conversion::traits::ToStringBase;
+    /// use malachite_float::{BigExponentFloat, Float};
+    ///
+    /// let x = BigExponentFloat::from(Float::from(1.5));
+    /// assert_eq!(x.to_string_base_upper(32), "1.G");
+    /// ```
+    fn to_string_base_upper(&self, base: u8) -> String {
+        let log_base = power_of_2_base_log(base);
+        power_of_2_base_string(self, log_base, &|x| x.to_string_base_upper(base))
     }
 }
 

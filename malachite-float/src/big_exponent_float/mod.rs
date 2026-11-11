@@ -7,11 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::integers::PrimitiveInt;
-#[cfg(feature = "random")]
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 #[cfg(feature = "test_build")]
 use malachite_base::num::modular::traits::DivisibleByPowerOf2;
-#[cfg(feature = "random")]
 use malachite_base::num::modular::traits::NegModPowerOf2;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -23,8 +21,8 @@ use malachite_nz::platform::Limb;
 /// m2^e$, where $m$ is a positive integer and $e$ is an [`Integer`] of any size. Unlike a
 /// [`Float`](crate::Float), it differs in three ways:
 /// - Its exponent is unbounded, so no operation overflows or underflows.
-/// - It has no stored precision: its significand is exactly as long as its value requires, and
-///   each operation takes the precision and rounding mode of its result as arguments.
+/// - It has no stored precision: its significand is exactly as long as its value requires, and each
+///   operation takes the precision and rounding mode of its result as arguments.
 /// - It has no negative zero.
 ///
 /// This is the counterpart of FLINT's `arf_t`.
@@ -34,7 +32,18 @@ use malachite_nz::platform::Limb;
 /// [`Float`](crate::Float)'s, and whose lowest limb is nonzero. A finite nonzero value with
 /// exponent $e$ lies in $[2^{e-1}, 2^e)$ in absolute value, as for [`Float`](crate::Float).
 #[derive(Clone)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(try_from = "SerdeBigExponentFloat", into = "SerdeBigExponentFloat")
+)]
 pub struct BigExponentFloat(pub(crate) InnerBigExponentFloat);
+
+// The serialized form of a `BigExponentFloat`: its exact hexadecimal string.
+#[cfg(feature = "serde")]
+#[derive(Serialize, Deserialize)]
+#[serde(transparent)]
+pub(crate) struct SerdeBigExponentFloat(alloc::string::String);
 
 #[derive(Clone)]
 pub(crate) enum InnerBigExponentFloat {
@@ -55,7 +64,6 @@ impl BigExponentFloat {
     // bits of the positive `m`, so that `exponent` is e: the value lies in [2^(e - 1), 2^e) in
     // absolute value. Trailing zeros of `m` are removed, and what is left is aligned to the top of
     // its limbs.
-    #[cfg(feature = "random")]
     pub(crate) fn from_parts(sign: bool, exponent: Integer, mut m: Natural) -> Self {
         assert_ne!(m, 0u32);
         let zeros = m.trailing_zeros().unwrap();
@@ -67,6 +75,17 @@ impl BigExponentFloat {
             exponent,
             significand: m,
         })
+    }
+
+    // The negative of `self`; zero, NaN, and the infinities' magnitudes are unchanged.
+    pub(crate) fn negate(mut self) -> Self {
+        if let Self(
+            InnerBigExponentFloat::Finite { sign, .. } | InnerBigExponentFloat::Infinity { sign },
+        ) = &mut self
+        {
+            sign.not_assign();
+        }
+        self
     }
 
     // Removes the trailing zero limbs of a significand whose top limb's high bit is set.

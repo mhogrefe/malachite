@@ -6,8 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::ModPowerOf2;
+use malachite_base::num::arithmetic::traits::{DivExact, Mod, ModPowerOf2};
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeOne, One, Zero};
+use malachite_base::num::conversion::traits::ToStringBase;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::strings::{ToLowerHexString, ToUpperHexString};
 use malachite_float::BigExponentFloat;
@@ -114,4 +115,43 @@ fn to_hex_string_properties() {
             );
         }
     });
+}
+
+#[test]
+fn power_of_2_base_properties() {
+    // - agreement with `Float`
+    big_exponent_float_gen_var_1().test_properties(|x| {
+        let f = big_exponent_float_to_float(&x).unwrap();
+        assert_eq!(format!("{x:b}"), format!("{f:b}"));
+        assert_eq!(format!("{x:#b}"), format!("{f:#b}"));
+        assert_eq!(format!("{x:o}"), format!("{f:o}"));
+        assert_eq!(format!("{x:#o}"), format!("{f:#o}"));
+        for base in [2, 4, 8, 16, 32] {
+            assert_eq!(x.to_string_base(base), f.to_string_base(base));
+            assert_eq!(x.to_string_base_upper(base), f.to_string_base_upper(base));
+        }
+    });
+
+    // - in base 2^k, 2^s is 2^(s mod k) * (2^k)^floor(s / k), for exponents beyond `Float`'s range
+    integer_gen().test_properties(|s| {
+        if s.unsigned_abs_ref().significant_bits() <= 31 {
+            return;
+        }
+        let x = big_exponent_float_power_of_2(s.clone());
+        for (base, k) in [(2u8, 1u32), (4, 2), (8, 3), (32, 5)] {
+            let kk = Integer::from(k);
+            let r = u32::try_from(&(&s).mod_op(&kk)).unwrap();
+            let q = (&s - Integer::from(r)).div_exact(&kk);
+            let digit = std::char::from_digit(1 << r, u32::from(base)).unwrap();
+            // - only base 32, where `E` is also a digit, writes the sign of a positive exponent
+            let plus = if base == 32 && q >= 0u32 { "+" } else { "" };
+            assert_eq!(x.to_string_base(base), format!("{digit}.0E{plus}{q}"));
+        }
+    });
+}
+
+#[test]
+#[should_panic]
+fn to_string_base_fail() {
+    BigExponentFloat::ONE.to_string_base(10);
 }

@@ -15,7 +15,9 @@ use crate::float::random::{
     random_non_negative_finite_floats, random_nonzero_finite_floats, random_positive_finite_floats,
     random_positive_floats_with_precision,
 };
-use crate::test_util::big_exponent_float::big_exponent_float_to_float;
+use crate::test_util::big_exponent_float::{
+    big_exponent_float_exponent_is_small, big_exponent_float_to_float,
+};
 use crate::test_util::extra_variadic::{
     random_quadruples, random_quadruples_from_single, random_quadruples_xxxy,
     random_quadruples_xxyz, random_quintuples_xxxxy, random_quintuples_xxxyz,
@@ -174,6 +176,49 @@ pub fn random_big_exponent_float_gen_var_1(config: &GenConfig) -> It<BigExponent
             config.get_or("mean_special_p_d", 64),
         )
         .filter(|x| big_exponent_float_to_float(x).is_some()),
+    )
+}
+
+// The exponent is less than 2^16 in absolute value, so exact integer and rational conversions are
+// cheap.
+pub fn random_big_exponent_float_gen_var_2(config: &GenConfig) -> It<BigExponentFloat> {
+    Box::new(
+        random_big_exponent_floats(
+            EXAMPLE_SEED,
+            config.get_or("mean_exponent_bits_n", 8),
+            config.get_or("mean_exponent_bits_d", 1),
+            config.get_or("mean_precision_n", 64),
+            config.get_or("mean_precision_d", 1),
+            config.get_or("mean_special_p_n", 1),
+            config.get_or("mean_special_p_d", 64),
+        )
+        .filter(big_exponent_float_exponent_is_small),
+    )
+}
+
+// -- (BigExponentFloat, RoundingMode) --
+
+// The exponent is less than 2^16 in absolute value.
+pub fn random_big_exponent_float_rounding_mode_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, _)| big_exponent_float_exponent_is_small(x)),
     )
 }
 

@@ -24,7 +24,9 @@ use crate::float::exponential::log_base_rational_base::rational_log_base_rationa
 use crate::float::exponential::log_base_rational_base_1_plus_x::*;
 use crate::float::exponential::log_base_rational_float_base::log_base_rational_float_base_rational;
 use crate::float::exponential::log_base_rational_rational_base::*;
-use crate::test_util::big_exponent_float::big_exponent_float_to_float;
+use crate::test_util::big_exponent_float::{
+    big_exponent_float_exponent_is_small, big_exponent_float_to_float,
+};
 use crate::test_util::extra_variadic::{
     exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy_custom_output,
     exhaustive_quadruples_xxyz_custom_output, exhaustive_quintuples_xxxxy_custom_output,
@@ -102,6 +104,26 @@ pub fn exhaustive_big_exponent_float_gen() -> It<BigExponentFloat> {
 // The exponent is in `Float`'s range, so the value has a `Float` counterpart.
 pub fn exhaustive_big_exponent_float_gen_var_1() -> It<BigExponentFloat> {
     Box::new(exhaustive_big_exponent_floats().filter(|x| big_exponent_float_to_float(x).is_some()))
+}
+
+// The exponent is less than 2^16 in absolute value, so exact integer and rational conversions are
+// cheap.
+pub fn exhaustive_big_exponent_float_gen_var_2() -> It<BigExponentFloat> {
+    Box::new(exhaustive_big_exponent_floats().filter(big_exponent_float_exponent_is_small))
+}
+
+// -- (BigExponentFloat, RoundingMode) --
+
+// The exponent is less than 2^16 in absolute value.
+pub fn exhaustive_big_exponent_float_rounding_mode_pair_gen_var_1()
+-> It<(BigExponentFloat, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_big_exponent_floats(),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(x, _)| big_exponent_float_exponent_is_small(x)),
+    )
 }
 
 // -- (BigExponentFloat, PrimitiveUnsigned) --

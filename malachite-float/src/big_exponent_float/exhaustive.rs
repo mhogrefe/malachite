@@ -35,14 +35,6 @@ use malachite_nz::platform::Limb;
 // The type of `exhaustive_integers`.
 type ExhaustiveIntegers = Chain<Once<Integer>, IntegerUpDown>;
 
-// Negates a `BigExponentFloat` without needing `Neg`.
-fn negate(mut x: BigExponentFloat) -> BigExponentFloat {
-    if let BigExponentFloat(Finite { sign, .. }) = &mut x {
-        sign.not_assign();
-    }
-    x
-}
-
 /// Generates all positive [`BigExponentFloat`]s with a specified `sci_exponent` and precision.
 ///
 /// This `struct` is created by
@@ -311,8 +303,8 @@ impl Iterator for ExhaustivePositiveBigExponentFloatsWithPrecision {
 ///
 /// $M(n, m) = O(n + m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is the number of bits of
-/// the output's exponent.
+/// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is the number of bits of the
+/// output's exponent.
 ///
 /// # Panics
 /// Panics if `prec` is zero.
@@ -360,7 +352,7 @@ impl<I: Iterator<Item = BigExponentFloat>> Iterator for WithNegatives<I> {
         } else {
             let mut out = BigExponentFloat::NAN;
             swap(&mut out, &mut self.x);
-            negate(out)
+            out.negate()
         })
     }
 }
@@ -383,8 +375,7 @@ impl Iterator for ExhaustiveBigExponentFloatsWithPrecision {
     }
 }
 
-/// Generates all nonzero [`BigExponentFloat`]s with a specified precision. (Zero has no
-/// precision.)
+/// Generates all nonzero [`BigExponentFloat`]s with a specified precision. (Zero has no precision.)
 ///
 /// Each positive value is followed by its negative.
 ///
@@ -395,8 +386,8 @@ impl Iterator for ExhaustiveBigExponentFloatsWithPrecision {
 ///
 /// $M(n, m) = O(n + m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is the number of bits of
-/// the output's exponent.
+/// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is the number of bits of the
+/// output's exponent.
 ///
 /// # Panics
 /// Panics if `prec` is zero.
@@ -519,7 +510,7 @@ impl Iterator for ExhaustiveNegativeFiniteBigExponentFloats {
 
     #[inline]
     fn next(&mut self) -> Option<BigExponentFloat> {
-        self.0.next().map(negate)
+        self.0.next().map(BigExponentFloat::negate)
     }
 }
 

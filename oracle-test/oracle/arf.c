@@ -50,10 +50,16 @@ static long checked;
 static arf_kind kind;
 static const char * mode_name;
 
-/* Parses Malachite's hexadecimal BigExponentFloat format into `x`. Returns 0 on success. */
-static int
-parse_hex(const char * s, arf_t x)
+/* Parses Malachite's BigExponentFloat format in base 2^`log_base`, for `log_base` from 1 to 5, into
+   `x`, independently of Malachite: `NaN`, `Infinity`, `-Infinity`, or an optional `-`, an optional
+   prefix (`0b` in base 2, `0o` in base 8, `0x` in base 16), digits in either case with an optional
+   `.`, and an optional exponent of the base, written as `E` or `e` and a decimal number. The
+   exponent's sign is optional in bases below 15, where `E` is not a digit, and mandatory in the
+   others. Returns 0 on success. */
+int
+arf_parse_base(const char * s, int log_base, arf_t x)
 {
+    int base = 1 << log_base;
     if (strcmp(s, "NaN") == 0)
     {
         arf_nan(x);
@@ -73,7 +79,8 @@ parse_hex(const char * s, arf_t x)
             arf_pos_inf(x);
         return 0;
     }
-    if (strncmp(s, "0x", 2) == 0)
+    const char * prefix = base == 2 ? "0b" : base == 8 ? "0o" : base == 16 ? "0x" : NULL;
+    if (prefix != NULL && strncmp(s, prefix, 2) == 0)
     {
         s += 2;
     }
@@ -84,7 +91,8 @@ parse_hex(const char * s, arf_t x)
     const char * e = NULL;
     for (const char * p = s; *p != '\0'; p++)
     {
-        if (*p == 'E' && (p[1] == '+' || p[1] == '-'))
+        if ((*p == 'E' || *p == 'e')
+            && (base < 15 || p[1] == '+' || p[1] == '-'))
         {
             e = p + 1;
             break;
@@ -99,7 +107,9 @@ parse_hex(const char * s, arf_t x)
             frac = 0;
             continue;
         }
-        if (!isxdigit((unsigned char) *p))
+        int v = isdigit((unsigned char) *p) ? *p - '0'
+                : isalpha((unsigned char) *p) ? tolower((unsigned char) *p) - 'a' + 10 : 99;
+        if (v >= base)
         {
             flint_free(digits);
             return 1;
@@ -109,7 +119,9 @@ parse_hex(const char * s, arf_t x)
             frac++;
     }
     digits[d] = '\0';
-    if (d == 0 || frac <= 0)
+    if (frac < 0)
+        frac = 0;
+    if (d == 0)
     {
         flint_free(digits);
         return 1;
@@ -117,16 +129,25 @@ parse_hex(const char * s, arf_t x)
     fmpz_t m, exp;
     fmpz_init(m);
     fmpz_init(exp);
-    int result = fmpz_set_str(m, digits, 16);
+    int result = fmpz_set_str(m, digits, base);
     if (result == 0 && e != NULL)
     {
-        result = fmpz_set_str(exp, *e == '+' ? e + 1 : e, 10);
+        const char * t = *e == '+' ? e + 1 : e;
+        /* the exponent must be a nonempty decimal number with an optional minus sign */
+        const char * u = *t == '-' ? t + 1 : t;
+        if (*u == '\0')
+            result = 1;
+        for (const char * q = u; *q != '\0' && result == 0; q++)
+            if (!isdigit((unsigned char) *q))
+                result = 1;
+        if (result == 0)
+            result = fmpz_set_str(exp, t, 10);
     }
     if (result == 0)
     {
-        /* the value is m * 16^(exp - frac) */
+        /* the value is m * base^(exp - frac) */
         fmpz_sub_si(exp, exp, frac);
-        fmpz_mul_2exp(exp, exp, 2);
+        fmpz_mul_ui(exp, exp, log_base);
         arf_set_fmpz_2exp(x, m, exp);
         if (negative)
             arf_neg(x, x);
@@ -137,9 +158,16 @@ parse_hex(const char * s, arf_t x)
     return result == 0 ? 0 : 1;
 }
 
-/* Parses `m*2^k` (or a special value, in the hexadecimal format) into `x`. */
+/* Parses Malachite's hexadecimal BigExponentFloat format into `x`. Returns 0 on success. */
 static int
-parse_exact(const char * s, arf_t x)
+parse_hex(const char * s, arf_t x)
+{
+    return arf_parse_base(s, 4, x);
+}
+
+/* Parses `m*2^k` (or a special value, in the hexadecimal format) into `x`. */
+int
+arf_parse_exact(const char * s, arf_t x)
 {
     const char * star = strstr(s, "*2^");
     if (star == NULL)
@@ -498,7 +526,7 @@ check_hex(char * line, int line_number)
     arf_init(x);
     arf_init(y);
     int result;
-    if (parse_exact(v, x) || parse_hex(s, y))
+    if (arf_parse_exact(v, x) || parse_hex(s, y))
     {
         result = report(line_number, "unreadable value");
     }

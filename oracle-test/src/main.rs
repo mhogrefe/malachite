@@ -7262,6 +7262,134 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, flint_mode);
     }
+    // `BigExponentFloat`'s conversions (FLINT's `arf_t`).
+    for (demo_name, flint_mode) in [
+        ("demo_big_exponent_float_from_natural", "arf_set_fmpz"),
+        (
+            "demo_big_exponent_float_from_natural_prec_round",
+            "arf_set_fmpz",
+        ),
+        ("demo_big_exponent_float_from_natural_prec", "arf_set_fmpz"),
+        ("demo_big_exponent_float_from_integer", "arf_set_fmpz"),
+        (
+            "demo_big_exponent_float_from_integer_prec_round",
+            "arf_set_fmpz",
+        ),
+        ("demo_big_exponent_float_from_integer_prec", "arf_set_fmpz"),
+        ("demo_big_exponent_float_from_u64", "arf_set_fmpz"),
+        ("demo_big_exponent_float_from_i64", "arf_set_fmpz"),
+        (
+            "demo_big_exponent_float_const_from_unsigned",
+            "arf_set_fmpz",
+        ),
+        ("demo_big_exponent_float_const_from_signed", "arf_set_fmpz"),
+        (
+            "demo_big_exponent_float_from_unsigned_prec_round",
+            "arf_set_fmpz",
+        ),
+        (
+            "demo_big_exponent_float_from_signed_prec_round",
+            "arf_set_fmpz",
+        ),
+        ("demo_big_exponent_float_from_f64", "arf_set_d"),
+        (
+            "demo_big_exponent_float_from_primitive_float_prec_round",
+            "arf_set_d",
+        ),
+        (
+            "demo_big_exponent_float_from_rational_prec_round",
+            "arf_fmpq",
+        ),
+        ("demo_big_exponent_float_from_rational_prec", "arf_fmpq"),
+        ("demo_big_exponent_float_try_from_rational", "arf_fmpq"),
+        (
+            "demo_big_exponent_float_convertible_from_rational",
+            "arf_fmpq",
+        ),
+        (
+            "demo_big_exponent_float_natural_rounding_from",
+            "arf_get_fmpz",
+        ),
+        ("demo_big_exponent_float_natural_try_from", "arf_get_fmpz"),
+        (
+            "demo_big_exponent_float_natural_convertible_from",
+            "arf_get_fmpz",
+        ),
+        (
+            "demo_big_exponent_float_integer_rounding_from",
+            "arf_get_fmpz",
+        ),
+        ("demo_big_exponent_float_integer_try_from", "arf_get_fmpz"),
+        (
+            "demo_big_exponent_float_integer_convertible_from",
+            "arf_get_fmpz",
+        ),
+        ("demo_big_exponent_float_rational_try_from", "arf_get_fmpz"),
+        (
+            "demo_big_exponent_float_rational_convertible_from",
+            "arf_get_fmpz",
+        ),
+        (
+            "demo_big_exponent_float_gaussian_integer_try_from",
+            "arf_get_fmpz",
+        ),
+        (
+            "demo_big_exponent_float_gaussian_integer_convertible_from",
+            "arf_get_fmpz",
+        ),
+        (
+            "demo_big_exponent_float_gaussian_rational_try_from",
+            "arf_get_fmpz",
+        ),
+        (
+            "demo_big_exponent_float_gaussian_rational_convertible_from",
+            "arf_get_fmpz",
+        ),
+        ("demo_big_exponent_float_u64_rounding_from", "arf_get_fmpz"),
+        ("demo_big_exponent_float_i64_rounding_from", "arf_get_fmpz"),
+        ("demo_big_exponent_float_u64_try_from", "arf_get_fmpz"),
+        ("demo_big_exponent_float_i64_try_from", "arf_get_fmpz"),
+        (
+            "demo_big_exponent_float_u64_convertible_from",
+            "arf_get_fmpz",
+        ),
+        ("demo_big_exponent_float_is_integer", "arf_get_fmpz"),
+        ("demo_big_exponent_float_is_real", "arf_get_fmpz"),
+        (
+            "demo_big_exponent_float_is_gaussian_integer",
+            "arf_get_fmpz",
+        ),
+        ("demo_big_exponent_float_f64_rounding_from", "arf_get_d"),
+        ("demo_big_exponent_float_f64_try_from", "arf_get_d"),
+        ("demo_big_exponent_float_f64_convertible_from", "arf_get_d"),
+        (
+            "demo_big_exponent_float_raw_mantissa_and_exponent",
+            "arf_mantissa",
+        ),
+        (
+            "demo_big_exponent_float_integer_mantissa_and_exponent",
+            "arf_mantissa",
+        ),
+        (
+            "demo_big_exponent_float_from_integer_mantissa_and_exponent",
+            "arf_mantissa",
+        ),
+        (
+            "demo_big_exponent_float_sci_mantissa_and_exponent",
+            "arf_mantissa",
+        ),
+        (
+            "demo_big_exponent_float_sci_mantissa_and_exponent_round",
+            "arf_mantissa",
+        ),
+        ("demo_big_exponent_float_to_string_base", "arf_string"),
+        ("demo_big_exponent_float_to_string_base_upper", "arf_string"),
+        ("demo_big_exponent_float_to_binary_string", "arf_string"),
+        ("demo_big_exponent_float_to_octal_string", "arf_string"),
+        ("demo_big_exponent_float_from_string_base", "arf_string"),
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, flint_mode);
+    }
     // Malachite's internal `Mag` (FLINT's `mag_t`).
     for (demo_name, flint_mode) in [
         ("demo_mag_from_u64", "mag_set_ui"),
