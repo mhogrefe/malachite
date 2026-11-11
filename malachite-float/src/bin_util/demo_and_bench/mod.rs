@@ -9,7 +9,9 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    big_exponent_float::register(runner);
     float::register(runner);
 }
 
+mod big_exponent_float;
 mod float;

@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::comparison::traits::{Max, Min};
-use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, One, OneHalf, Two, Zero,
 };
@@ -30,7 +29,6 @@ fn test_constants() {
     test(BigExponentFloat::default(), "NaN");
     test(BigExponentFloat::MIN, "-Infinity");
     test(BigExponentFloat::MAX, "Infinity");
-    assert_eq!(BigExponentFloat::NAME, "BigExponentFloat");
     for x in [
         BigExponentFloat::ONE,
         BigExponentFloat::TWO,

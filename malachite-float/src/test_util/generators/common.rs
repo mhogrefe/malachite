@@ -7,8 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use crate::big_exponent_float::BigExponentFloat;
 use crate::float::conversion::string::get_str::get_str;
 use crate::float::conversion::string::strtofr::strtofr;
+use crate::test_util::big_exponent_float::big_exponent_float_to_float;
 use crate::test_util::common::rug_round_exact_from_rounding_mode;
 use alloc::string::{String, ToString};
 use core::cmp::Ordering::Equal;
@@ -302,6 +304,26 @@ pub fn format_string_from_parts(combo: u16, width: Option<u64>, prec: Option<u64
     s.push(FLOAT_FORMAT_CONV_CHARS[conv]);
     // `s` is ASCII by construction
     String::from_utf8(s).unwrap()
+}
+
+// Pairs each `BigExponentFloat` whose exponent is in `Float`'s range with the `Float` of the same
+// value and precision, dropping the others.
+pub fn big_exponent_float_float(xs: It<BigExponentFloat>) -> It<(Float, BigExponentFloat)> {
+    Box::new(xs.filter_map(|x| big_exponent_float_to_float(&x).map(|f| (f, x))))
+}
+
+// Like `big_exponent_float_float`, for (x, precision, rounding mode) triples.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_float(
+    xs: It<(BigExponentFloat, u64, RoundingMode)>,
+) -> It<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Box::new(
+        xs.filter_map(|(x, p, rm)| {
+            big_exponent_float_to_float(&x).map(|f| ((f, p, rm), (x, p, rm)))
+        }),
+    )
 }
 
 pub fn float_rm(xs: It<Float>) -> It<(rug::Float, Float)> {

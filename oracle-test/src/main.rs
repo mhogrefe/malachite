@@ -7211,6 +7211,57 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_fmpz_vec_lcm");
     }
+    // `BigExponentFloat`'s basic functions (FLINT's `arf_t`).
+    for (demo_name, flint_mode) in [
+        ("demo_big_exponent_float_is_nan", "arf_classification"),
+        ("demo_big_exponent_float_is_finite", "arf_classification"),
+        ("demo_big_exponent_float_is_infinite", "arf_classification"),
+        ("demo_big_exponent_float_is_zero", "arf_classification"),
+        ("demo_big_exponent_float_is_normal", "arf_classification"),
+        (
+            "demo_big_exponent_float_is_sign_positive",
+            "arf_classification",
+        ),
+        (
+            "demo_big_exponent_float_is_sign_negative",
+            "arf_classification",
+        ),
+        ("demo_big_exponent_float_classify", "arf_classification"),
+        ("demo_big_exponent_float_into_non_nan", "arf_classification"),
+        ("demo_big_exponent_float_to_non_nan", "arf_classification"),
+        ("demo_big_exponent_float_into_finite", "arf_classification"),
+        ("demo_big_exponent_float_to_finite", "arf_classification"),
+        ("demo_big_exponent_float_get_exponent", "arf_get"),
+        ("demo_big_exponent_float_get_prec", "arf_get"),
+        ("demo_big_exponent_float_to_significand", "arf_get"),
+        ("demo_big_exponent_float_into_significand", "arf_get"),
+        ("demo_big_exponent_float_significand_ref", "arf_get"),
+        ("demo_big_exponent_float_complexity", "arf_get"),
+        ("demo_big_exponent_float_significant_bits", "arf_get"),
+        (
+            "demo_big_exponent_float_round_to_prec_round",
+            "arf_set_round",
+        ),
+        (
+            "demo_big_exponent_float_round_to_prec_round_ref",
+            "arf_set_round",
+        ),
+        (
+            "demo_big_exponent_float_round_to_prec_round_assign",
+            "arf_set_round",
+        ),
+        ("demo_big_exponent_float_round_to_prec", "arf_set_round"),
+        ("demo_big_exponent_float_round_to_prec_ref", "arf_set_round"),
+        (
+            "demo_big_exponent_float_round_to_prec_assign",
+            "arf_set_round",
+        ),
+        ("demo_big_exponent_float_to_lower_hex_string", "arf_hex"),
+        ("demo_big_exponent_float_to_upper_hex_string", "arf_hex"),
+        ("demo_big_exponent_float_debug", "arf_hex"),
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, flint_mode);
+    }
     // Malachite's internal `Mag` (FLINT's `mag_t`).
     for (demo_name, flint_mode) in [
         ("demo_mag_from_u64", "mag_set_ui"),

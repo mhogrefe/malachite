@@ -68,6 +68,8 @@ pub mod big_exponent_float {
         pub mod complexity;
         pub mod constants;
         pub mod get_and_set;
+        pub mod named;
+        pub mod size;
     }
     pub mod conversion {
         pub mod string {
@@ -95,6 +97,7 @@ pub mod big_exponent_float {
         pub mod random_non_positive_finite_big_exponent_floats;
         pub mod random_nonzero_finite_big_exponent_floats;
         pub mod random_positive_finite_big_exponent_floats;
+        pub mod random_positive_big_exponent_floats_with_precision;
         pub mod striped_random_big_exponent_floats;
         pub mod striped_random_finite_big_exponent_floats;
         pub mod striped_random_negative_finite_big_exponent_floats;
@@ -102,6 +105,7 @@ pub mod big_exponent_float {
         pub mod striped_random_non_positive_finite_big_exponent_floats;
         pub mod striped_random_nonzero_finite_big_exponent_floats;
         pub mod striped_random_positive_finite_big_exponent_floats;
+        pub mod striped_random_positive_big_exponent_floats_with_precision;
     }
 }
 pub mod float {
