@@ -142,6 +142,7 @@ int run_arf_hex(const char * arg);
 int run_arf_cmp(const char * arg);
 int run_arf_cmp_total(const char * arg);
 int run_arf_min_max(const char * arg);
+int run_arf_arithmetic(const char * arg);
 int run_mag_set_ui(const char * arg);
 int run_mag_set_ui_lower(const char * arg);
 int run_mag_set_fmpz(const char * arg);

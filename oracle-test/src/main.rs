@@ -7739,6 +7739,56 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, flint_mode);
     }
+    // `BigExponentFloat`'s arithmetic (FLINT's `arf_t`).
+    for demo_name in [
+        "demo_big_exponent_float_abs",
+        "demo_big_exponent_float_neg",
+        "demo_big_exponent_float_sign",
+        "demo_big_exponent_float_shl_unsigned_u8",
+        "demo_big_exponent_float_shl_unsigned_u16",
+        "demo_big_exponent_float_shl_unsigned_u32",
+        "demo_big_exponent_float_shl_unsigned_u64",
+        "demo_big_exponent_float_shl_unsigned_u128",
+        "demo_big_exponent_float_shl_unsigned_usize",
+        "demo_big_exponent_float_shl_signed_i8",
+        "demo_big_exponent_float_shl_signed_i16",
+        "demo_big_exponent_float_shl_signed_i32",
+        "demo_big_exponent_float_shl_signed_i64",
+        "demo_big_exponent_float_shl_signed_i128",
+        "demo_big_exponent_float_shl_signed_isize",
+        "demo_big_exponent_float_shr_unsigned_u8",
+        "demo_big_exponent_float_shr_unsigned_u16",
+        "demo_big_exponent_float_shr_unsigned_u32",
+        "demo_big_exponent_float_shr_unsigned_u64",
+        "demo_big_exponent_float_shr_unsigned_u128",
+        "demo_big_exponent_float_shr_unsigned_usize",
+        "demo_big_exponent_float_shr_signed_i8",
+        "demo_big_exponent_float_shr_signed_i16",
+        "demo_big_exponent_float_shr_signed_i32",
+        "demo_big_exponent_float_shr_signed_i64",
+        "demo_big_exponent_float_shr_signed_i128",
+        "demo_big_exponent_float_shr_signed_isize",
+        "demo_big_exponent_float_add",
+        "demo_big_exponent_float_add_prec_round",
+        "demo_big_exponent_float_add_prec",
+        "demo_big_exponent_float_sub",
+        "demo_big_exponent_float_sub_prec_round",
+        "demo_big_exponent_float_sub_prec",
+        "demo_big_exponent_float_mul",
+        "demo_big_exponent_float_mul_prec_round",
+        "demo_big_exponent_float_mul_prec",
+        "demo_big_exponent_float_square",
+        "demo_big_exponent_float_square_prec_round",
+        "demo_big_exponent_float_square_prec",
+        "demo_big_exponent_float_div_prec_round",
+        "demo_big_exponent_float_div_prec",
+        "demo_big_exponent_float_reciprocal_prec_round",
+        "demo_big_exponent_float_reciprocal_prec",
+        "demo_big_exponent_float_sqrt_prec_round",
+        "demo_big_exponent_float_sqrt_prec",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_arithmetic");
+    }
     // Malachite's internal `Mag` (FLINT's `mag_t`).
     for (demo_name, flint_mode) in [
         ("demo_mag_from_u64", "mag_set_ui"),

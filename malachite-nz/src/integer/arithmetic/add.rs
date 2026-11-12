@@ -7,11 +7,35 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::platform::{Limb, SignedDoubleLimb};
+use alloc::vec;
 use core::iter::Sum;
 use core::mem::swap;
 use core::ops::{Add, AddAssign};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::SplitInHalf;
+
+// The sum of two `Integer`s whose absolute values each fit in a `Limb`, given as signs and absolute
+// values. Both are converted to `SignedDoubleLimb`s, so the sum is formed without branching on the
+// signs, which are often unpredictable when such sums are computed in a loop.
+#[inline]
+pub(crate) fn add_small_integers(sx: bool, ax: Limb, sy: bool, ay: Limb) -> Integer {
+    let x = SignedDoubleLimb::from(ax);
+    let y = SignedDoubleLimb::from(ay);
+    let sum = (if sx { x } else { -x }) + (if sy { y } else { -y });
+    let abs = sum.unsigned_abs();
+    let (hi, lo) = abs.split_in_half();
+    Integer {
+        sign: sum >= 0,
+        abs: Natural(if hi == 0 {
+            Small(lo)
+        } else {
+            Large(vec![lo, hi])
+        }),
+    }
+}
 
 impl Add<Self> for Integer {
     type Output = Self;
@@ -45,6 +69,9 @@ impl Add<Self> for Integer {
     /// );
     /// ```
     fn add(mut self, mut other: Self) -> Self {
+        if let (Natural(Small(ax)), Natural(Small(ay))) = (&self.abs, &other.abs) {
+            return add_small_integers(self.sign, *ax, other.sign, *ay);
+        }
         if self.abs.limb_count() >= other.abs.limb_count() {
             self += other;
             self
@@ -164,6 +191,16 @@ impl Add<&Integer> for &Integer {
     /// ```
     fn add(self, other: &Integer) -> Integer {
         match (self, other) {
+            (
+                &Integer {
+                    sign: sx,
+                    abs: Natural(Small(ax)),
+                },
+                &Integer {
+                    sign: sy,
+                    abs: Natural(Small(ay)),
+                },
+            ) => add_small_integers(sx, ax, sy, ay),
             (x, y) if core::ptr::eq(x, y) => x << 1u32,
             (&integer_zero!(), y) => y.clone(),
             (x, &integer_zero!()) => x.clone(),
@@ -238,6 +275,16 @@ impl AddAssign<Self> for Integer {
     /// ```
     fn add_assign(&mut self, mut other: Self) {
         match (&mut *self, &other) {
+            (
+                &mut Self {
+                    sign: sx,
+                    abs: Natural(Small(ax)),
+                },
+                &Self {
+                    sign: sy,
+                    abs: Natural(Small(ay)),
+                },
+            ) => *self = add_small_integers(sx, ax, sy, ay),
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), _) => {
                 *self = other;
@@ -301,6 +348,16 @@ impl AddAssign<&Self> for Integer {
     /// ```
     fn add_assign(&mut self, other: &Self) {
         match (&mut *self, other) {
+            (
+                &mut Self {
+                    sign: sx,
+                    abs: Natural(Small(ax)),
+                },
+                &Self {
+                    sign: sy,
+                    abs: Natural(Small(ay)),
+                },
+            ) => *self = add_small_integers(sx, ax, sy, ay),
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), _) => {
                 *self = other.clone();

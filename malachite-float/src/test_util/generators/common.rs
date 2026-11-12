@@ -341,6 +341,43 @@ pub fn big_exponent_float_unsigned_rounding_mode_triple_float(
     )
 }
 
+// Like `big_exponent_float_unsigned_rounding_mode_triple_float`, without `Exact`: an exact `Float`
+// result of an operation such as squaring can still overflow or underflow, which panics.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+    xs: It<(BigExponentFloat, u64, RoundingMode)>,
+) -> It<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    big_exponent_float_unsigned_rounding_mode_triple_float(Box::new(
+        xs.filter(|(_, _, rm)| *rm != Exact),
+    ))
+}
+
+// Like `big_exponent_float_float`, for (x, y, precision, rounding mode) quadruples. `Exact` is
+// excluded: an exact `Float` result can still overflow or underflow, which panics.
+pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_float(
+    xs: It<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)>,
+) -> It<(
+    (Float, Float, u64, RoundingMode),
+    (BigExponentFloat, BigExponentFloat, u64, RoundingMode),
+)> {
+    Box::new(xs.filter_map(|(x, y, p, rm)| {
+        if rm == Exact {
+            return None;
+        }
+        Some((
+            (
+                big_exponent_float_to_float(&x)?,
+                big_exponent_float_to_float(&y)?,
+                p,
+                rm,
+            ),
+            (x, y, p, rm),
+        ))
+    }))
+}
+
 pub fn float_rm(xs: It<Float>) -> It<(rug::Float, Float)> {
     Box::new(xs.map(|x| (rug::Float::exact_from(&x), x)))
 }

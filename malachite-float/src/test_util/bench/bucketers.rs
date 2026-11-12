@@ -164,6 +164,19 @@ pub fn quadruple_1_2_3_big_exponent_float_max_complexity_bucketer<'a, T>(
     }
 }
 
+pub fn pair_2_quadruple_1_2_3_big_exponent_float_max_complexity_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (T, (BigExponentFloat, BigExponentFloat, u64, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, p, _))| {
+            usize::exact_from(max!(x.complexity(), y.complexity(), *p))
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.complexity(), {p_name})"),
+    }
+}
+
 pub fn triple_1_2_3_big_exponent_float_rational_max_complexity_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,

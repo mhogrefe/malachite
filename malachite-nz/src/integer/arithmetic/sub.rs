@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::integer::arithmetic::add::add_small_integers;
+use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use core::mem::swap;
 use core::ops::{Sub, SubAssign};
@@ -162,6 +164,16 @@ impl Sub<&Integer> for &Integer {
     /// ```
     fn sub(self, other: &Integer) -> Integer {
         match (self, other) {
+            (
+                &Integer {
+                    sign: sx,
+                    abs: Natural(Small(ax)),
+                },
+                &Integer {
+                    sign: sy,
+                    abs: Natural(Small(ay)),
+                },
+            ) => add_small_integers(sx, ax, !sy, ay),
             (x, y) if core::ptr::eq(x, y) => Integer::ZERO,
             (integer_zero!(), y) => -y.clone(),
             (x, &integer_zero!()) => x.clone(),
@@ -236,6 +248,16 @@ impl SubAssign<Self> for Integer {
     /// ```
     fn sub_assign(&mut self, mut other: Self) {
         match (&mut *self, &other) {
+            (
+                &mut Self {
+                    sign: sx,
+                    abs: Natural(Small(ax)),
+                },
+                &Self {
+                    sign: sy,
+                    abs: Natural(Small(ay)),
+                },
+            ) => *self = add_small_integers(sx, ax, !sy, ay),
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), _) => {
                 *self = other;
@@ -301,6 +323,16 @@ impl SubAssign<&Self> for Integer {
     /// ```
     fn sub_assign(&mut self, other: &Self) {
         match (&mut *self, other) {
+            (
+                &mut Self {
+                    sign: sx,
+                    abs: Natural(Small(ax)),
+                },
+                &Self {
+                    sign: sy,
+                    abs: Natural(Small(ay)),
+                },
+            ) => *self = add_small_integers(sx, ax, !sy, ay),
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), y) => *self = -y.clone(),
             // e.g. 10 - -5 or -10 - 5; sign of self is unchanged

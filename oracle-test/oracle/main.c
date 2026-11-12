@@ -56,6 +56,7 @@ static const oracle_mode modes[] = {
     {"arf_cmp", run_arf_cmp},
     {"arf_cmp_total", run_arf_cmp_total},
     {"arf_min_max", run_arf_min_max},
+    {"arf_arithmetic", run_arf_arithmetic},
     {"mag_set_ui", run_mag_set_ui},
     {"mag_set_ui_lower", run_mag_set_ui_lower},
     {"mag_set_fmpz", run_mag_set_fmpz},

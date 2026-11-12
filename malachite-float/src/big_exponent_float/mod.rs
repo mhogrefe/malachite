@@ -91,10 +91,11 @@ impl BigExponentFloat {
         self
     }
 
-    // Removes the trailing zero limbs of a significand whose top limb's high bit is set.
+    // Removes the trailing zero limbs of a significand whose top limb's high bit is set. The lowest
+    // limb is checked first, since it is usually nonzero.
     pub(crate) fn trim_significand(significand: &mut Natural) {
-        let zero_limbs = significand.trailing_zeros().unwrap() >> Limb::LOG_WIDTH;
-        if zero_limbs != 0 {
+        if significand.limbs()[0] == 0 {
+            let zero_limbs = significand.trailing_zeros().unwrap() >> Limb::LOG_WIDTH;
             *significand >>= zero_limbs << Limb::LOG_WIDTH;
         }
     }
@@ -209,6 +210,8 @@ impl Deref for ComparableBigExponentFloatRef<'_> {
     }
 }
 
+/// Arithmetic of [`BigExponentFloat`]s.
+pub mod arithmetic;
 /// Basic functions for working with [`BigExponentFloat`]s.
 pub mod basic;
 /// Traits for comparing [`BigExponentFloat`]s for equality or order, with each other and with other

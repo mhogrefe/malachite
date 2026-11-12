@@ -62,6 +62,20 @@
 extern crate malachite_base;
 
 pub mod big_exponent_float {
+    pub mod arithmetic {
+        pub mod abs;
+        pub mod add;
+        pub mod div;
+        pub mod mul;
+        pub mod neg;
+        pub mod reciprocal;
+        pub mod shl;
+        pub mod shr;
+        pub mod sign;
+        pub mod sqrt;
+        pub mod square;
+        pub mod sub;
+    }
     pub mod basic {
         pub mod can_round;
         pub mod classification;
