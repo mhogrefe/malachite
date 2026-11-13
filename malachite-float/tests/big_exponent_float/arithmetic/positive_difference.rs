@@ -12,7 +12,8 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2, float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
+    float_to_big_exponent_float,
 };
 use malachite_float::test_util::generators::*;
 use malachite_float::{BigExponentFloat, Float};
@@ -194,11 +195,23 @@ fn positive_difference_rational_all(
     prec: u64,
     rm: RoundingMode,
 ) -> (BigExponentFloat, Ordering) {
-    let r = x.clone().positive_difference_rational_prec_round(y.clone(), prec, rm);
+    let r = x
+        .clone()
+        .positive_difference_rational_prec_round(y.clone(), prec, rm);
     assert!(r.0.is_valid());
-    assert!(same_pair(&x.clone().positive_difference_rational_prec_round_val_ref(y, prec, rm), &r));
-    assert!(same_pair(&x.positive_difference_rational_prec_round_ref_val(y.clone(), prec, rm), &r));
-    assert!(same_pair(&x.positive_difference_rational_prec_round_ref_ref(y, prec, rm), &r));
+    assert!(same_pair(
+        &x.clone()
+            .positive_difference_rational_prec_round_val_ref(y, prec, rm),
+        &r
+    ));
+    assert!(same_pair(
+        &x.positive_difference_rational_prec_round_ref_val(y.clone(), prec, rm),
+        &r
+    ));
+    assert!(same_pair(
+        &x.positive_difference_rational_prec_round_ref_ref(y, prec, rm),
+        &r
+    ));
     let mut z = x.clone();
     let o = z.positive_difference_rational_prec_round_assign(y.clone(), prec, rm);
     assert!(same_pair(&(z, o), &r));
@@ -206,10 +219,22 @@ fn positive_difference_rational_all(
     let o = z.positive_difference_rational_prec_round_assign_ref(y, prec, rm);
     assert!(same_pair(&(z, o), &r));
     if rm == Nearest {
-        assert!(same_pair(&x.clone().positive_difference_rational_prec(y.clone(), prec), &r));
-        assert!(same_pair(&x.clone().positive_difference_rational_prec_val_ref(y, prec), &r));
-        assert!(same_pair(&x.positive_difference_rational_prec_ref_val(y.clone(), prec), &r));
-        assert!(same_pair(&x.positive_difference_rational_prec_ref_ref(y, prec), &r));
+        assert!(same_pair(
+            &x.clone().positive_difference_rational_prec(y.clone(), prec),
+            &r
+        ));
+        assert!(same_pair(
+            &x.clone().positive_difference_rational_prec_val_ref(y, prec),
+            &r
+        ));
+        assert!(same_pair(
+            &x.positive_difference_rational_prec_ref_val(y.clone(), prec),
+            &r
+        ));
+        assert!(same_pair(
+            &x.positive_difference_rational_prec_ref_ref(y, prec),
+            &r
+        ));
         let mut z = x.clone();
         let o = z.positive_difference_rational_prec_assign(y.clone(), prec);
         assert!(same_pair(&(z, o), &r));
@@ -299,14 +324,19 @@ fn test_positive_difference_rational() {
     assert!(r.0.is_nan());
     let r = positive_difference_rational_all(&BigExponentFloat::INFINITY, &third, 10, Nearest);
     assert!(same(&r.0, &BigExponentFloat::INFINITY));
-    for x in [BigExponentFloat::NEGATIVE_INFINITY, BigExponentFloat::from(0.25), BigExponentFloat::ZERO] {
+    for x in
+        [BigExponentFloat::NEGATIVE_INFINITY, BigExponentFloat::from(0.25), BigExponentFloat::ZERO]
+    {
         let r = positive_difference_rational_all(&x, &third, 10, Nearest);
         assert!(same(&r.0, &BigExponentFloat::ZERO));
         assert_eq!(r.1, Equal);
     }
     // 1/2 - 1/3 = 1/6
     let r = positive_difference_rational_all(&BigExponentFloat::from(0.5), &third, 10, Floor);
-    assert!(same_pair(&r, &BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 6), 10, Floor)));
+    assert!(same_pair(
+        &r,
+        &BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 6), 10, Floor)
+    ));
     // 2^N - 1/3 rounds to 2^N at any moderate precision.
     let r = positive_difference_rational_all(&p2(big()), &third, 10, Nearest);
     assert!(same(&r.0, &p2(big())));
@@ -318,7 +348,8 @@ fn test_rational_positive_difference() {
     let third = Rational::from_unsigneds(1u8, 3);
     let r = rational_positive_difference_all(&third, &BigExponentFloat::NAN, 10, Nearest);
     assert!(r.0.is_nan());
-    let r = rational_positive_difference_all(&third, &BigExponentFloat::NEGATIVE_INFINITY, 10, Nearest);
+    let r =
+        rational_positive_difference_all(&third, &BigExponentFloat::NEGATIVE_INFINITY, 10, Nearest);
     assert!(same(&r.0, &BigExponentFloat::INFINITY));
     for y in [BigExponentFloat::INFINITY, BigExponentFloat::from(0.5), p2(big())] {
         let r = rational_positive_difference_all(&third, &y, 10, Nearest);
@@ -328,7 +359,10 @@ fn test_rational_positive_difference() {
     // 1/3 - 1/4 = 1/12, rounded in each direction.
     for rm in [Floor, Ceiling, Down, Up, Nearest] {
         let r = rational_positive_difference_all(&third, &BigExponentFloat::from(0.25), 10, rm);
-        assert!(same_pair(&r, &BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 12), 10, rm)));
+        assert!(same_pair(
+            &r,
+            &BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 12), 10, rm)
+        ));
     }
     // 1/3 + 2^N rounds to 2^N at any moderate precision.
     let r = rational_positive_difference_all(&third, &-p2(big()), 10, Nearest);
@@ -344,7 +378,10 @@ fn positive_difference_rational_prec_round_properties() {
             if x.is_finite() && big_exponent_float_exponent_is_small(&x) {
                 let d = Rational::exact_from(&x) - &y;
                 let exact = if d > 0u32 { d } else { Rational::ZERO };
-                assert!(same_pair(&r, &BigExponentFloat::from_rational_prec_round(exact, prec, rm)));
+                assert!(same_pair(
+                    &r,
+                    &BigExponentFloat::from_rational_prec_round(exact, prec, rm)
+                ));
             }
         },
     );
@@ -354,7 +391,10 @@ fn positive_difference_rational_prec_round_properties() {
             if y.is_finite() && big_exponent_float_exponent_is_small(&y) {
                 let d = &x - Rational::exact_from(&y);
                 let exact = if d > 0u32 { d } else { Rational::ZERO };
-                assert!(same_pair(&r, &BigExponentFloat::from_rational_prec_round(exact, prec, rm)));
+                assert!(same_pair(
+                    &r,
+                    &BigExponentFloat::from_rational_prec_round(exact, prec, rm)
+                ));
             }
         },
     );
@@ -374,7 +414,8 @@ fn positive_difference_rational_float_agreement_properties() {
     );
     big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_8_float().test_properties(
         |((fy, x, prec, rm), (y, _, _, _))| {
-            let (f, fo) = Float::rational_positive_difference_float_prec_round_ref_ref(&x, &fy, prec, rm);
+            let (f, fo) =
+                Float::rational_positive_difference_float_prec_round_ref_ref(&x, &fy, prec, rm);
             if float_result_comparable(&f, fo) {
                 let r = rational_positive_difference_all(&x, &y, prec, rm);
                 assert!(same(&r.0, &float_to_big_exponent_float(&f)));

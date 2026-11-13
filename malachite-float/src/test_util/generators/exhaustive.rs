@@ -1063,8 +1063,8 @@ pub fn big_exponent_float_ieee_remainder_rational_prec_round_valid(
     rm != Exact || x.ieee_remainder_rational_prec_round_ref_ref(y, p, Floor).1 == Equal
 }
 
-// Like `add_prec_round_valid`, for
-// `BigExponentFloat::rational_rem_big_exponent_float_prec_round(y, x, p, rm)`.
+// Like `add_prec_round_valid`, for `BigExponentFloat::rational_rem_big_exponent_float_prec_round(y,
+// x, p, rm)`.
 pub fn big_exponent_float_rational_rem_prec_round_valid(
     x: &BigExponentFloat,
     y: &Rational,

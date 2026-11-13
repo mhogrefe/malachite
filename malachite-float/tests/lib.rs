@@ -79,6 +79,7 @@ pub mod big_exponent_float {
         pub mod dot;
         pub mod fractional_part;
         pub mod hypot;
+        pub mod is_power_of_2;
         pub mod is_unit;
         pub mod mul;
         pub mod mul_add_mul;
@@ -87,6 +88,7 @@ pub mod big_exponent_float {
         pub mod neg;
         pub mod positive_difference;
         pub mod pow;
+        pub mod power_of_2;
         pub mod product;
         pub mod rational_div_big_exponent_float;
         pub mod reciprocal;

@@ -7894,6 +7894,9 @@ fn test_against_flint() {
         "demo_big_exponent_float_rem_unsigned",
         "demo_big_exponent_float_rem_unsigned_prec",
         "demo_big_exponent_float_rem_unsigned_prec_round",
+        "demo_big_exponent_float_power_of_2_u64",
+        "demo_big_exponent_float_power_of_2_i64",
+        "demo_big_exponent_float_is_power_of_2",
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_misc");
     }

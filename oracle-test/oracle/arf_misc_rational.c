@@ -14,19 +14,20 @@
     - `X.op_prec_round(Q, p, rm) = R` and `X.op_prec(Q, p) = R`, for op one of
       positive_difference_rational, rem_rational, ieee_remainder_rational,
       rem_rational_and_quotient_bits, and ieee_remainder_rational_and_quotient_bits;
-    - `BigExponentFloat::op_prec_round(Q, Y, p, rm) = R` and `BigExponentFloat::op_prec(Q, Y, p) = R`,
-      for op one of rational_positive_difference_big_exponent_float,
-      rational_rem_big_exponent_float, rational_ieee_remainder_big_exponent_float, and their
-      `_and_quotient_bits` versions (except for the positive difference);
+    - `BigExponentFloat::op_prec_round(Q, Y, p, rm) = R` and
+      `BigExponentFloat::op_prec(Q, Y, p) = R`, for op one of
+      rational_positive_difference_big_exponent_float, rational_rem_big_exponent_float,
+      rational_ieee_remainder_big_exponent_float, and their `_and_quotient_bits` versions (except
+      for the positive difference);
 
     where X and Y are BigExponentFloats in Malachite's exact hexadecimal format, Q is a Rational
     written as `a/b` or `a`, and R is `(Z, O)` or, with quotient bits, `(Z, O, q)`.
 
     When the BigExponentFloat's exponent is moderate (below 2^16 in magnitude), the exact result is
-    computed with fmpq arithmetic: the quotient is rounded toward zero or to the nearest integer with
-    ties to even, the remainder is x - y * q, and the low quotient bits are ±(|q| mod 2^63), with
-    q's sign. The exact result is rounded with arf_fmpz_div_fmpz, and the ordering found by comparing
-    the rounded value with the exact one.
+    computed with fmpq arithmetic: the quotient is rounded toward zero or to the nearest integer
+    with ties to even, the remainder is x - y * q, and the low quotient bits are ±(|q| mod 2^63),
+    with q's sign. The exact result is rounded with arf_fmpz_div_fmpz, and the ordering found by
+    comparing the rounded value with the exact one.
 
     A BigExponentFloat with a huge exponent is far larger or far smaller than the Rational. A far
     smaller operand is its own remainder, with quotient 0, and is negligible in a difference; there,
@@ -284,8 +285,8 @@ low_quotient_bits(const fmpz_t quo, int sign)
 }
 
 /* For the magnitudes N / D (the dividend) and A / D (the divisor), with remainder R = N mod A and
-   truncated quotient `quo`: applies the nearest-quotient adjustment when `nearest` is set, turning R
-   into R - A (negative) and incrementing quo exactly when 2R > A, or 2R = A and quo is odd. */
+   truncated quotient `quo`: applies the nearest-quotient adjustment when `nearest` is set, turning
+   R into R - A (negative) and incrementing quo exactly when 2R > A, or 2R = A and quo is odd. */
 static void
 nearest_adjust(fmpz_t r, fmpz_t quo, const fmpz_t a, int nearest)
 {
@@ -461,10 +462,20 @@ positive_difference(arf_t z, const arf_t b, const fmpq_t q, int flip, slong prec
             result = round_arf_plus_tiny(z, sb, -s * fmpq_sgn(q), prec, rnd);
         arf_clear(sb);
     }
+    else if (fmpq_is_zero(q))
+    {
+        /* s * (b - 0) = s * b, exactly. */
+        arf_t sb;
+        arf_init(sb);
+        arf_set(sb, b);
+        if (flip)
+            arf_neg(sb, sb);
+        result = round_arf(z, sb, prec, rnd);
+        arf_clear(sb);
+    }
     else
     {
-        /* b is far smaller than q (which is nonzero, since b - q has the sign of s): s * (b - q) =
-           -s * q + s * b, with b negligible. */
+        /* b is far smaller than the nonzero q: s * (b - q) = -s * q + s * b, with b negligible. */
         if (-rational_log_bound(q) + 64 >= 1 << 16)
             flint_abort();
         fmpq_t t;

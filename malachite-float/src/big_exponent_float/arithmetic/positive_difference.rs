@@ -1263,16 +1263,25 @@ impl BigExponentFloat {
 }
 
 impl BigExponentFloat {
-    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=\text{NaN}$
@@ -1280,17 +1289,20 @@ impl BigExponentFloat {
     /// - $f(-\infty,y,p,m)=0$
     /// - $f(x,y,p,m)=0$ if $x\leq y$
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::positive_difference_rational_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::positive_difference_rational_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -1358,16 +1370,25 @@ impl BigExponentFloat {
         positive_difference_rational_helper(Cow::Owned(self), Cow::Owned(other), prec, rm)
     }
 
-    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=\text{NaN}$
@@ -1380,10 +1401,12 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -1451,16 +1474,25 @@ impl BigExponentFloat {
         positive_difference_rational_helper(Cow::Owned(self), Cow::Borrowed(other), prec, rm)
     }
 
-    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value.
+    /// An [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=\text{NaN}$
@@ -1473,10 +1505,12 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -1544,16 +1578,25 @@ impl BigExponentFloat {
         positive_difference_rational_helper(Cow::Borrowed(self), Cow::Owned(other), prec, rm)
     }
 
-    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=\text{NaN}$
@@ -1566,10 +1609,12 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -1637,26 +1682,37 @@ impl BigExponentFloat {
         positive_difference_rational_helper(Cow::Borrowed(self), Cow::Borrowed(other), prec, rm)
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the positive difference of $x$ and a [`Rational`] $y$, $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] on the right-hand side is taken by value. An [`Ordering`] is returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the positive difference of $x$ and a [`Rational`]
+    /// $y$, $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with
+    /// the specified rounding mode. The [`Rational`] on the right-hand side is taken by value. An
+    /// [`Ordering`] is returned, indicating whether the rounded positive difference is less than,
+    /// equal to, or greater than the exact positive difference. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN`
+    /// it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// x \gets \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -1746,26 +1802,37 @@ impl BigExponentFloat {
         o
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the positive difference of $x$ and a [`Rational`] $y$, $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] on the right-hand side is taken by reference. An [`Ordering`] is returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the positive difference of $x$ and a [`Rational`]
+    /// $y$, $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with
+    /// the specified rounding mode. The [`Rational`] on the right-hand side is taken by reference.
+    /// An [`Ordering`] is returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`]
+    /// to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// x \gets \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -1855,13 +1922,20 @@ impl BigExponentFloat {
         o
     }
 
-    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision.
+    /// The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded positive difference is less than, equal to, or
+    /// greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=\text{NaN}$
@@ -1869,14 +1943,16 @@ impl BigExponentFloat {
     /// - $f(-\infty,y,p)=0$
     /// - $f(x,y,p)=0$ if $x\leq y$
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::positive_difference_rational_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::positive_difference_rational_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -1903,13 +1979,21 @@ impl BigExponentFloat {
         positive_difference_rational_helper(Cow::Owned(self), Cow::Owned(other), prec, Nearest)
     }
 
-    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision.
+    /// The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=\text{NaN}$
@@ -1922,7 +2006,8 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -1953,13 +2038,21 @@ impl BigExponentFloat {
         positive_difference_rational_helper(Cow::Owned(self), Cow::Borrowed(other), prec, Nearest)
     }
 
-    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision.
+    /// The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=\text{NaN}$
@@ -1972,7 +2065,8 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -2003,13 +2097,20 @@ impl BigExponentFloat {
         positive_difference_rational_helper(Cow::Borrowed(self), Cow::Owned(other), prec, Nearest)
     }
 
-    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`BigExponentFloat`] and a [`Rational`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision.
+    /// The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded positive difference is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=\text{NaN}$
@@ -2022,7 +2123,8 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -2058,20 +2160,29 @@ impl BigExponentFloat {
         )
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the positive difference of $x$ and a [`Rational`] $y$, $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`Rational`] on the right-hand side is taken by value. An [`Ordering`] is returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the positive difference of $x$ and a [`Rational`]
+    /// $y$, $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the
+    /// specified precision. The [`Rational`] on the right-hand side is taken by value. An
+    /// [`Ordering`] is returned, indicating whether the rounded positive difference is less than,
+    /// equal to, or greater than the exact positive difference. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN`
+    /// it also returns `Equal`.
     ///
     /// $$
     /// x \gets \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -2110,20 +2221,29 @@ impl BigExponentFloat {
         o
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the positive difference of $x$ and a [`Rational`] $y$, $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`Rational`] on the right-hand side is taken by reference. An [`Ordering`] is returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the positive difference of $x$ and a [`Rational`]
+    /// $y$, $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the
+    /// specified precision. The [`Rational`] on the right-hand side is taken by reference. An
+    /// [`Ordering`] is returned, indicating whether the rounded positive difference is less than,
+    /// equal to, or greater than the exact positive difference. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN`
+    /// it also returns `Equal`.
     ///
     /// $$
     /// x \gets \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -2162,16 +2282,25 @@ impl BigExponentFloat {
         o
     }
 
-    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=\text{NaN}$
@@ -2179,17 +2308,20 @@ impl BigExponentFloat {
     /// - $f(x,-\infty,p,m)=\infty$
     /// - $f(x,y,p,m)=0$ if $x\leq y$
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::rational_positive_difference_big_exponent_float_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::rational_positive_difference_big_exponent_float_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -2263,16 +2395,25 @@ impl BigExponentFloat {
         rational_positive_difference_helper(Cow::Owned(x), Cow::Owned(y), prec, rm)
     }
 
-    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=\text{NaN}$
@@ -2285,10 +2426,12 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -2368,16 +2511,25 @@ impl BigExponentFloat {
         rational_positive_difference_helper(Cow::Owned(x), Cow::Borrowed(y), prec, rm)
     }
 
-    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value.
+    /// An [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=\text{NaN}$
@@ -2390,10 +2542,12 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -2473,16 +2627,25 @@ impl BigExponentFloat {
         rational_positive_difference_helper(Cow::Borrowed(x), Cow::Owned(y), prec, rm)
     }
 
-    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
-    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    /// - If $\max(x-y,0)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=\text{NaN}$
@@ -2495,10 +2658,12 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the positive difference cannot be
+    /// represented exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -2578,13 +2743,20 @@ impl BigExponentFloat {
         rational_positive_difference_helper(Cow::Borrowed(x), Cow::Borrowed(y), prec, rm)
     }
 
-    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded positive difference is less than, equal to, or
+    /// greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=\text{NaN}$
@@ -2592,14 +2764,16 @@ impl BigExponentFloat {
     /// - $f(x,-\infty,p)=\infty$
     /// - $f(x,y,p)=0$ if $x\leq y$
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::rational_positive_difference_big_exponent_float_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::rational_positive_difference_big_exponent_float_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -2636,13 +2810,21 @@ impl BigExponentFloat {
         rational_positive_difference_helper(Cow::Owned(x), Cow::Owned(y), prec, Nearest)
     }
 
-    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=\text{NaN}$
@@ -2655,7 +2837,8 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -2692,13 +2875,21 @@ impl BigExponentFloat {
         rational_positive_difference_helper(Cow::Owned(x), Cow::Borrowed(y), prec, Nearest)
     }
 
-    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded positive difference is less
+    /// than, equal to, or greater than the exact positive difference. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=\text{NaN}$
@@ -2711,7 +2902,8 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -2748,13 +2940,20 @@ impl BigExponentFloat {
         rational_positive_difference_helper(Cow::Borrowed(x), Cow::Owned(y), prec, Nearest)
     }
 
-    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded positive difference is less than, equal to, or greater than the exact positive difference. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the positive difference of a [`Rational`] and a [`BigExponentFloat`], $x-y$ if
+    /// $x>y$ and 0 otherwise, rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded positive difference is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = \max(x-y,0)+\varepsilon.
     /// $$
-    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    /// - If $\max(x-y,0)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $\max(x-y,0)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (x-y)\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=\text{NaN}$
@@ -2767,7 +2966,8 @@ impl BigExponentFloat {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.

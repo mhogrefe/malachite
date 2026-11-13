@@ -455,11 +455,13 @@ fn ieee_remainder_and_quotient_bits_prec_round_all(
     ));
     if rm == Nearest {
         assert!(same_triple(
-            &x.clone().ieee_remainder_and_quotient_bits_prec(y.clone(), prec),
+            &x.clone()
+                .ieee_remainder_and_quotient_bits_prec(y.clone(), prec),
             &r
         ));
         assert!(same_triple(
-            &x.clone().ieee_remainder_and_quotient_bits_prec_val_ref(y, prec),
+            &x.clone()
+                .ieee_remainder_and_quotient_bits_prec_val_ref(y, prec),
             &r
         ));
         assert!(same_triple(
@@ -481,8 +483,12 @@ fn ieee_remainder_and_quotient_bits_exact_all(
     let r = x.clone().ieee_remainder_and_quotient_bits(y.clone());
     assert!(r.0.is_valid());
     let same2 = |a: &(BigExponentFloat, i64)| same(&a.0, &r.0) && a.1 == r.1;
-    assert!(same2(&x.clone().ieee_remainder_and_quotient_bits_val_ref(y)));
-    assert!(same2(&x.ieee_remainder_and_quotient_bits_ref_val(y.clone())));
+    assert!(same2(
+        &x.clone().ieee_remainder_and_quotient_bits_val_ref(y)
+    ));
+    assert!(same2(
+        &x.ieee_remainder_and_quotient_bits_ref_val(y.clone())
+    ));
     assert!(same2(&x.ieee_remainder_and_quotient_bits_ref_ref(y)));
     r
 }
@@ -516,16 +522,40 @@ fn rem_rational_all(
     prec: u64,
     rm: RoundingMode,
 ) -> (BigExponentFloat, Ordering, i64) {
-    let r = x.clone().rem_rational_and_quotient_bits_prec_round(y.clone(), prec, rm);
+    let r = x
+        .clone()
+        .rem_rational_and_quotient_bits_prec_round(y.clone(), prec, rm);
     assert!(r.0.is_valid());
-    assert!(same_triple(&x.clone().rem_rational_and_quotient_bits_prec_round_val_ref(y, prec, rm), &r));
-    assert!(same_triple(&x.rem_rational_and_quotient_bits_prec_round_ref_val(y.clone(), prec, rm), &r));
-    assert!(same_triple(&x.rem_rational_and_quotient_bits_prec_round_ref_ref(y, prec, rm), &r));
+    assert!(same_triple(
+        &x.clone()
+            .rem_rational_and_quotient_bits_prec_round_val_ref(y, prec, rm),
+        &r
+    ));
+    assert!(same_triple(
+        &x.rem_rational_and_quotient_bits_prec_round_ref_val(y.clone(), prec, rm),
+        &r
+    ));
+    assert!(same_triple(
+        &x.rem_rational_and_quotient_bits_prec_round_ref_ref(y, prec, rm),
+        &r
+    ));
     let p = (r.0.clone(), r.1);
-    assert!(same_pair(&x.clone().rem_rational_prec_round(y.clone(), prec, rm), &p));
-    assert!(same_pair(&x.clone().rem_rational_prec_round_val_ref(y, prec, rm), &p));
-    assert!(same_pair(&x.rem_rational_prec_round_ref_val(y.clone(), prec, rm), &p));
-    assert!(same_pair(&x.rem_rational_prec_round_ref_ref(y, prec, rm), &p));
+    assert!(same_pair(
+        &x.clone().rem_rational_prec_round(y.clone(), prec, rm),
+        &p
+    ));
+    assert!(same_pair(
+        &x.clone().rem_rational_prec_round_val_ref(y, prec, rm),
+        &p
+    ));
+    assert!(same_pair(
+        &x.rem_rational_prec_round_ref_val(y.clone(), prec, rm),
+        &p
+    ));
+    assert!(same_pair(
+        &x.rem_rational_prec_round_ref_ref(y, prec, rm),
+        &p
+    ));
     let mut z = x.clone();
     let o = z.rem_rational_prec_round_assign(y.clone(), prec, rm);
     assert!(same_pair(&(z, o), &p));
@@ -533,10 +563,24 @@ fn rem_rational_all(
     let o = z.rem_rational_prec_round_assign_ref(y, prec, rm);
     assert!(same_pair(&(z, o), &p));
     if rm == Nearest {
-        assert!(same_triple(&x.clone().rem_rational_and_quotient_bits_prec(y.clone(), prec), &r));
-        assert!(same_triple(&x.clone().rem_rational_and_quotient_bits_prec_val_ref(y, prec), &r));
-        assert!(same_triple(&x.rem_rational_and_quotient_bits_prec_ref_val(y.clone(), prec), &r));
-        assert!(same_triple(&x.rem_rational_and_quotient_bits_prec_ref_ref(y, prec), &r));
+        assert!(same_triple(
+            &x.clone()
+                .rem_rational_and_quotient_bits_prec(y.clone(), prec),
+            &r
+        ));
+        assert!(same_triple(
+            &x.clone()
+                .rem_rational_and_quotient_bits_prec_val_ref(y, prec),
+            &r
+        ));
+        assert!(same_triple(
+            &x.rem_rational_and_quotient_bits_prec_ref_val(y.clone(), prec),
+            &r
+        ));
+        assert!(same_triple(
+            &x.rem_rational_and_quotient_bits_prec_ref_ref(y, prec),
+            &r
+        ));
         assert!(same_pair(&x.clone().rem_rational_prec(y.clone(), prec), &p));
         assert!(same_pair(&x.clone().rem_rational_prec_val_ref(y, prec), &p));
         assert!(same_pair(&x.rem_rational_prec_ref_val(y.clone(), prec), &p));
@@ -557,16 +601,42 @@ fn ieee_remainder_rational_all(
     prec: u64,
     rm: RoundingMode,
 ) -> (BigExponentFloat, Ordering, i64) {
-    let r = x.clone().ieee_remainder_rational_and_quotient_bits_prec_round(y.clone(), prec, rm);
+    let r = x
+        .clone()
+        .ieee_remainder_rational_and_quotient_bits_prec_round(y.clone(), prec, rm);
     assert!(r.0.is_valid());
-    assert!(same_triple(&x.clone().ieee_remainder_rational_and_quotient_bits_prec_round_val_ref(y, prec, rm), &r));
-    assert!(same_triple(&x.ieee_remainder_rational_and_quotient_bits_prec_round_ref_val(y.clone(), prec, rm), &r));
-    assert!(same_triple(&x.ieee_remainder_rational_and_quotient_bits_prec_round_ref_ref(y, prec, rm), &r));
+    assert!(same_triple(
+        &x.clone()
+            .ieee_remainder_rational_and_quotient_bits_prec_round_val_ref(y, prec, rm),
+        &r
+    ));
+    assert!(same_triple(
+        &x.ieee_remainder_rational_and_quotient_bits_prec_round_ref_val(y.clone(), prec, rm),
+        &r
+    ));
+    assert!(same_triple(
+        &x.ieee_remainder_rational_and_quotient_bits_prec_round_ref_ref(y, prec, rm),
+        &r
+    ));
     let p = (r.0.clone(), r.1);
-    assert!(same_pair(&x.clone().ieee_remainder_rational_prec_round(y.clone(), prec, rm), &p));
-    assert!(same_pair(&x.clone().ieee_remainder_rational_prec_round_val_ref(y, prec, rm), &p));
-    assert!(same_pair(&x.ieee_remainder_rational_prec_round_ref_val(y.clone(), prec, rm), &p));
-    assert!(same_pair(&x.ieee_remainder_rational_prec_round_ref_ref(y, prec, rm), &p));
+    assert!(same_pair(
+        &x.clone()
+            .ieee_remainder_rational_prec_round(y.clone(), prec, rm),
+        &p
+    ));
+    assert!(same_pair(
+        &x.clone()
+            .ieee_remainder_rational_prec_round_val_ref(y, prec, rm),
+        &p
+    ));
+    assert!(same_pair(
+        &x.ieee_remainder_rational_prec_round_ref_val(y.clone(), prec, rm),
+        &p
+    ));
+    assert!(same_pair(
+        &x.ieee_remainder_rational_prec_round_ref_ref(y, prec, rm),
+        &p
+    ));
     let mut z = x.clone();
     let o = z.ieee_remainder_rational_prec_round_assign(y.clone(), prec, rm);
     assert!(same_pair(&(z, o), &p));
@@ -574,14 +644,40 @@ fn ieee_remainder_rational_all(
     let o = z.ieee_remainder_rational_prec_round_assign_ref(y, prec, rm);
     assert!(same_pair(&(z, o), &p));
     if rm == Nearest {
-        assert!(same_triple(&x.clone().ieee_remainder_rational_and_quotient_bits_prec(y.clone(), prec), &r));
-        assert!(same_triple(&x.clone().ieee_remainder_rational_and_quotient_bits_prec_val_ref(y, prec), &r));
-        assert!(same_triple(&x.ieee_remainder_rational_and_quotient_bits_prec_ref_val(y.clone(), prec), &r));
-        assert!(same_triple(&x.ieee_remainder_rational_and_quotient_bits_prec_ref_ref(y, prec), &r));
-        assert!(same_pair(&x.clone().ieee_remainder_rational_prec(y.clone(), prec), &p));
-        assert!(same_pair(&x.clone().ieee_remainder_rational_prec_val_ref(y, prec), &p));
-        assert!(same_pair(&x.ieee_remainder_rational_prec_ref_val(y.clone(), prec), &p));
-        assert!(same_pair(&x.ieee_remainder_rational_prec_ref_ref(y, prec), &p));
+        assert!(same_triple(
+            &x.clone()
+                .ieee_remainder_rational_and_quotient_bits_prec(y.clone(), prec),
+            &r
+        ));
+        assert!(same_triple(
+            &x.clone()
+                .ieee_remainder_rational_and_quotient_bits_prec_val_ref(y, prec),
+            &r
+        ));
+        assert!(same_triple(
+            &x.ieee_remainder_rational_and_quotient_bits_prec_ref_val(y.clone(), prec),
+            &r
+        ));
+        assert!(same_triple(
+            &x.ieee_remainder_rational_and_quotient_bits_prec_ref_ref(y, prec),
+            &r
+        ));
+        assert!(same_pair(
+            &x.clone().ieee_remainder_rational_prec(y.clone(), prec),
+            &p
+        ));
+        assert!(same_pair(
+            &x.clone().ieee_remainder_rational_prec_val_ref(y, prec),
+            &p
+        ));
+        assert!(same_pair(
+            &x.ieee_remainder_rational_prec_ref_val(y.clone(), prec),
+            &p
+        ));
+        assert!(same_pair(
+            &x.ieee_remainder_rational_prec_ref_ref(y, prec),
+            &p
+        ));
         let mut z = x.clone();
         let o = z.ieee_remainder_rational_prec_assign(y.clone(), prec);
         assert!(same_pair(&(z, o), &p));
@@ -598,25 +694,116 @@ fn rational_rem_all(
     prec: u64,
     rm: RoundingMode,
 ) -> (BigExponentFloat, Ordering, i64) {
-    let r = BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round(x.clone(), y.clone(), prec, rm);
+    let r = BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round(
+        x.clone(),
+        y.clone(),
+        prec,
+        rm,
+    );
     assert!(r.0.is_valid());
-    assert!(same_triple(&BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round_val_ref(x.clone(), y, prec, rm), &r));
-    assert!(same_triple(&BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round_ref_val(x, y.clone(), prec, rm), &r));
-    assert!(same_triple(&BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round_ref_ref(x, y, prec, rm), &r));
+    assert!(same_triple(
+        &BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round_val_ref(
+            x.clone(),
+            y,
+            prec,
+            rm
+        ),
+        &r
+    ));
+    assert!(same_triple(
+        &BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round_ref_val(
+            x,
+            y.clone(),
+            prec,
+            rm
+        ),
+        &r
+    ));
+    assert!(same_triple(
+        &BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round_ref_ref(
+            x, y, prec, rm
+        ),
+        &r
+    ));
     let p = (r.0.clone(), r.1);
-    assert!(same_pair(&BigExponentFloat::rational_rem_big_exponent_float_prec_round(x.clone(), y.clone(), prec, rm), &p));
-    assert!(same_pair(&BigExponentFloat::rational_rem_big_exponent_float_prec_round_val_ref(x.clone(), y, prec, rm), &p));
-    assert!(same_pair(&BigExponentFloat::rational_rem_big_exponent_float_prec_round_ref_val(x, y.clone(), prec, rm), &p));
-    assert!(same_pair(&BigExponentFloat::rational_rem_big_exponent_float_prec_round_ref_ref(x, y, prec, rm), &p));
+    assert!(same_pair(
+        &BigExponentFloat::rational_rem_big_exponent_float_prec_round(
+            x.clone(),
+            y.clone(),
+            prec,
+            rm
+        ),
+        &p
+    ));
+    assert!(same_pair(
+        &BigExponentFloat::rational_rem_big_exponent_float_prec_round_val_ref(
+            x.clone(),
+            y,
+            prec,
+            rm
+        ),
+        &p
+    ));
+    assert!(same_pair(
+        &BigExponentFloat::rational_rem_big_exponent_float_prec_round_ref_val(
+            x,
+            y.clone(),
+            prec,
+            rm
+        ),
+        &p
+    ));
+    assert!(same_pair(
+        &BigExponentFloat::rational_rem_big_exponent_float_prec_round_ref_ref(x, y, prec, rm),
+        &p
+    ));
     if rm == Nearest {
-        assert!(same_triple(&BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec(x.clone(), y.clone(), prec), &r));
-        assert!(same_triple(&BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_val_ref(x.clone(), y, prec), &r));
-        assert!(same_triple(&BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_ref_val(x, y.clone(), prec), &r));
-        assert!(same_triple(&BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_ref_ref(x, y, prec), &r));
-        assert!(same_pair(&BigExponentFloat::rational_rem_big_exponent_float_prec(x.clone(), y.clone(), prec), &p));
-        assert!(same_pair(&BigExponentFloat::rational_rem_big_exponent_float_prec_val_ref(x.clone(), y, prec), &p));
-        assert!(same_pair(&BigExponentFloat::rational_rem_big_exponent_float_prec_ref_val(x, y.clone(), prec), &p));
-        assert!(same_pair(&BigExponentFloat::rational_rem_big_exponent_float_prec_ref_ref(x, y, prec), &p));
+        assert!(same_triple(
+            &BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec(
+                x.clone(),
+                y.clone(),
+                prec
+            ),
+            &r
+        ));
+        assert!(same_triple(
+            &BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_val_ref(
+                x.clone(),
+                y,
+                prec
+            ),
+            &r
+        ));
+        assert!(same_triple(
+            &BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_ref_val(
+                x,
+                y.clone(),
+                prec
+            ),
+            &r
+        ));
+        assert!(same_triple(
+            &BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_ref_ref(
+                x, y, prec
+            ),
+            &r
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::rational_rem_big_exponent_float_prec(x.clone(), y.clone(), prec),
+            &p
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::rational_rem_big_exponent_float_prec_val_ref(x.clone(), y, prec),
+            &p
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::rational_rem_big_exponent_float_prec_ref_val(x, y.clone(), prec),
+            &p
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::rational_rem_big_exponent_float_prec_ref_ref(x, y, prec),
+            &p
+        ));
     }
     r
 }
@@ -627,25 +814,91 @@ fn rational_ieee_remainder_all(
     prec: u64,
     rm: RoundingMode,
 ) -> (BigExponentFloat, Ordering, i64) {
-    let r = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round(x.clone(), y.clone(), prec, rm);
+    let r =
+        BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round(
+            x.clone(),
+            y.clone(),
+            prec,
+            rm,
+        );
     assert!(r.0.is_valid());
     assert!(same_triple(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(x.clone(), y, prec, rm), &r));
     assert!(same_triple(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(x, y.clone(), prec, rm), &r));
     assert!(same_triple(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(x, y, prec, rm), &r));
     let p = (r.0.clone(), r.1);
-    assert!(same_pair(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round(x.clone(), y.clone(), prec, rm), &p));
-    assert!(same_pair(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round_val_ref(x.clone(), y, prec, rm), &p));
-    assert!(same_pair(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round_ref_val(x, y.clone(), prec, rm), &p));
-    assert!(same_pair(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round_ref_ref(x, y, prec, rm), &p));
+    assert!(same_pair(
+        &BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round(
+            x.clone(),
+            y.clone(),
+            prec,
+            rm
+        ),
+        &p
+    ));
+    assert!(same_pair(
+        &BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round_val_ref(
+            x.clone(),
+            y,
+            prec,
+            rm
+        ),
+        &p
+    ));
+    assert!(same_pair(
+        &BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round_ref_val(
+            x,
+            y.clone(),
+            prec,
+            rm
+        ),
+        &p
+    ));
+    assert!(same_pair(
+        &BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round_ref_ref(
+            x, y, prec, rm
+        ),
+        &p
+    ));
     if rm == Nearest {
-        assert!(same_triple(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec(x.clone(), y.clone(), prec), &r));
+        assert!(same_triple(
+            &BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec(
+                x.clone(),
+                y.clone(),
+                prec
+            ),
+            &r
+        ));
         assert!(same_triple(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_val_ref(x.clone(), y, prec), &r));
         assert!(same_triple(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_ref_val(x, y.clone(), prec), &r));
         assert!(same_triple(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_ref_ref(x, y, prec), &r));
-        assert!(same_pair(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec(x.clone(), y.clone(), prec), &p));
-        assert!(same_pair(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_val_ref(x.clone(), y, prec), &p));
-        assert!(same_pair(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_ref_val(x, y.clone(), prec), &p));
-        assert!(same_pair(&BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_ref_ref(x, y, prec), &p));
+        assert!(same_pair(
+            &BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec(
+                x.clone(),
+                y.clone(),
+                prec
+            ),
+            &p
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_val_ref(
+                x.clone(),
+                y,
+                prec
+            ),
+            &p
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_ref_val(
+                x,
+                y.clone(),
+                prec
+            ),
+            &p
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_ref_ref(x, y, prec),
+            &p
+        ));
     }
     r
 }
@@ -699,11 +952,15 @@ fn test_rem_rational() {
     assert!(same(&r.0, &BigExponentFloat::from(-1)));
     assert_eq!(r.2, minus_two_thirds_mod_2_63() + 1);
     // 2^k mod 3/2 = (2^(k + 1) mod 3) / 2, and k + 1 is even.
-    let r = rem_rational_all(&p2(huge_odd.clone()), &Rational::from_unsigneds(3u8, 2), 10, Nearest);
+    let r = rem_rational_all(
+        &p2(huge_odd.clone()),
+        &Rational::from_unsigneds(3u8, 2),
+        10,
+        Nearest,
+    );
     assert!(same(&r.0, &BigExponentFloat::from(0.5)));
     // 2^N mod 5 for N = 10^20, computed independently.
-    let expected =
-        Natural::TWO.mod_pow(Natural::exact_from(&big()), Natural::from(5u32));
+    let expected = Natural::TWO.mod_pow(Natural::exact_from(&big()), Natural::from(5u32));
     let r = rem_rational_all(&p2(big()), &Rational::from(5), 10, Nearest);
     assert!(same(&r.0, &BigExponentFloat::from(&expected)));
     // A tiny x is its own truncated and nearest remainder.
@@ -714,17 +971,34 @@ fn test_rem_rational() {
     let r = ieee_remainder_rational_all(&-&tiny, &third, 10, Nearest);
     assert!(same(&r.0, &-&tiny));
     // Signs: the remainder has x's sign, and the quotient bits have the quotient's sign.
-    let r = rem_rational_all(&BigExponentFloat::from(-10.5), &Rational::from(3), 10, Nearest);
+    let r = rem_rational_all(
+        &BigExponentFloat::from(-10.5),
+        &Rational::from(3),
+        10,
+        Nearest,
+    );
     assert!(same(&r.0, &BigExponentFloat::from(-1.5)));
     assert_eq!(r.2, -3);
-    let r = rem_rational_all(&BigExponentFloat::from(10.5), &Rational::from(-3), 10, Nearest);
+    let r = rem_rational_all(
+        &BigExponentFloat::from(10.5),
+        &Rational::from(-3),
+        10,
+        Nearest,
+    );
     assert!(same(&r.0, &BigExponentFloat::from(1.5)));
     assert_eq!(r.2, -3);
-    let r = ieee_remainder_rational_all(&BigExponentFloat::from(10.5), &Rational::from(3), 10, Nearest);
+    let r = ieee_remainder_rational_all(
+        &BigExponentFloat::from(10.5),
+        &Rational::from(3),
+        10,
+        Nearest,
+    );
     assert!(same(&r.0, &BigExponentFloat::from(-1.5)));
     assert_eq!(r.2, 4);
     // Special cases
-    for x in [BigExponentFloat::NAN, BigExponentFloat::INFINITY, BigExponentFloat::NEGATIVE_INFINITY] {
+    for x in
+        [BigExponentFloat::NAN, BigExponentFloat::INFINITY, BigExponentFloat::NEGATIVE_INFINITY]
+    {
         let r = rem_rational_all(&x, &third, 10, Nearest);
         assert!(r.0.is_nan());
         assert_eq!((r.1, r.2), (Equal, 0));
@@ -740,8 +1014,8 @@ fn test_rational_rem() {
     let t = Integer::from(i64::MAX);
     let tiny = p2(-t.clone());
     let third = Rational::from_unsigneds(1u8, 3);
-    // 1/3 mod 2^-t = ((2^t mod 3) / 3) * 2^-t = (2/3) * 2^-t for odd t, and the quotient is
-    // (2^t - 2) / 3.
+    // 1/3 mod 2^-t = ((2^t mod 3) / 3) * 2^-t = (2/3) * 2^-t for odd t, and the quotient is (2^t -
+    // 2) / 3.
     for (prec, rm) in [(10, Nearest), (5, Floor), (5, Ceiling)] {
         let r = rational_rem_all(&third, &tiny, prec, rm);
         let (e, o) =
@@ -752,17 +1026,26 @@ fn test_rational_rem() {
     }
     // The nearest quotient rounds up, since 2/3 > 1/2, leaving -(1/3) * 2^-t.
     let r = rational_ieee_remainder_all(&third, &tiny, 10, Nearest);
-    let e = BigExponentFloat::from_rational_prec_round(Rational::from_signeds(-1i8, 3), 10, Nearest).0;
+    let e =
+        BigExponentFloat::from_rational_prec_round(Rational::from_signeds(-1i8, 3), 10, Nearest).0;
     assert!(same(&r.0, &(e * &tiny)));
     assert_eq!(r.2, minus_two_thirds_mod_2_63() + 1);
     // 1/5 mod 2^-N = ((2^N mod 5) / 5) * 2^-N for N = 10^20.
     let k = Natural::TWO.mod_pow(Natural::exact_from(&big()), Natural::from(5u32));
     let r = rational_rem_all(&Rational::from_unsigneds(1u8, 5), &p2(-big()), 10, Nearest);
-    let e = BigExponentFloat::from_rational_prec_round(Rational::from_naturals(k, Natural::from(5u32)), 10, Nearest).0;
+    let e = BigExponentFloat::from_rational_prec_round(
+        Rational::from_naturals(k, Natural::from(5u32)),
+        10,
+        Nearest,
+    )
+    .0;
     assert!(same(&r.0, &(e * p2(-big()))));
     // A huge y leaves x.
     let r = rational_rem_all(&third, &p2(big()), 10, Nearest);
-    assert!(same_pair(&(r.0, r.1), &BigExponentFloat::from_rational_prec_round(third.clone(), 10, Nearest)));
+    assert!(same_pair(
+        &(r.0, r.1),
+        &BigExponentFloat::from_rational_prec_round(third.clone(), 10, Nearest)
+    ));
     // Special cases
     for y in [BigExponentFloat::NAN, BigExponentFloat::ZERO] {
         let r = rational_rem_all(&third, &y, 10, Nearest);
@@ -771,7 +1054,10 @@ fn test_rational_rem() {
     }
     for y in [BigExponentFloat::INFINITY, BigExponentFloat::NEGATIVE_INFINITY] {
         let r = rational_rem_all(&third, &y, 10, Nearest);
-        assert!(same_pair(&(r.0, r.1), &BigExponentFloat::from_rational_prec_round(third.clone(), 10, Nearest)));
+        assert!(same_pair(
+            &(r.0, r.1),
+            &BigExponentFloat::from_rational_prec_round(third.clone(), 10, Nearest)
+        ));
         assert_eq!(r.2, 0);
     }
     let r = rational_rem_all(&Rational::ZERO, &BigExponentFloat::ONE, 10, Nearest);
@@ -780,17 +1066,35 @@ fn test_rational_rem() {
 
 #[test]
 fn test_rem_unsigned_and_ieee_quotient_bits() {
-    assert!(same(&rem_unsigned_exact_all(&BigExponentFloat::from(10.5), 3), &BigExponentFloat::from(1.5)));
-    assert!(same(&rem_unsigned_exact_all(&BigExponentFloat::from(-10.5), 3), &BigExponentFloat::from(-1.5)));
-    assert!(same(&rem_unsigned_exact_all(&p2(Integer::from(i64::MAX)), 3), &BigExponentFloat::from(2)));
+    assert!(same(
+        &rem_unsigned_exact_all(&BigExponentFloat::from(10.5), 3),
+        &BigExponentFloat::from(1.5)
+    ));
+    assert!(same(
+        &rem_unsigned_exact_all(&BigExponentFloat::from(-10.5), 3),
+        &BigExponentFloat::from(-1.5)
+    ));
+    assert!(same(
+        &rem_unsigned_exact_all(&p2(Integer::from(i64::MAX)), 3),
+        &BigExponentFloat::from(2)
+    ));
     assert!(rem_unsigned_exact_all(&BigExponentFloat::from(10.5), 0).is_nan());
     assert!(rem_unsigned_exact_all(&BigExponentFloat::INFINITY, 3).is_nan());
     assert!(rem_unsigned_exact_all(&BigExponentFloat::NAN, 3).is_nan());
-    assert!(same(&rem_unsigned_exact_all(&BigExponentFloat::ZERO, 3), &BigExponentFloat::ZERO));
-    let (r, q) = ieee_remainder_and_quotient_bits_exact_all(&p2(Integer::from(i64::MAX)), &BigExponentFloat::from(3));
+    assert!(same(
+        &rem_unsigned_exact_all(&BigExponentFloat::ZERO, 3),
+        &BigExponentFloat::ZERO
+    ));
+    let (r, q) = ieee_remainder_and_quotient_bits_exact_all(
+        &p2(Integer::from(i64::MAX)),
+        &BigExponentFloat::from(3),
+    );
     assert!(same(&r, &BigExponentFloat::from(-1)));
     assert_eq!(q, minus_two_thirds_mod_2_63() + 1);
-    let (r, q) = ieee_remainder_and_quotient_bits_exact_all(&BigExponentFloat::from(-10.5), &BigExponentFloat::from(3));
+    let (r, q) = ieee_remainder_and_quotient_bits_exact_all(
+        &BigExponentFloat::from(-10.5),
+        &BigExponentFloat::from(3),
+    );
     assert!(same(&r, &BigExponentFloat::from(1.5)));
     assert_eq!(q, -4);
 }
@@ -812,7 +1116,11 @@ fn rem_rational_prec_round_properties() {
             if r.0.is_nan() || r.0.is_zero() {
                 assert_eq!(r.1, Equal);
             }
-            if x.is_finite() && !x.is_zero() && y != 0u32 && big_exponent_float_exponent_is_small(&x) {
+            if x.is_finite()
+                && !x.is_zero()
+                && y != 0u32
+                && big_exponent_float_exponent_is_small(&x)
+            {
                 check_rational_rem(&Rational::exact_from(&x), &y, nearest, prec, rm, &r);
             }
         });
@@ -848,7 +1156,10 @@ fn rem_unsigned_prec_round_properties() {
     big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_3().test_properties(
         |(x, n, prec, rm)| {
             let r = rem_unsigned_prec_round_all(&x, n, prec, rm);
-            assert!(same_pair(&r, &x.rem_prec_round_ref_val(BigExponentFloat::from(n), prec, rm)));
+            assert!(same_pair(
+                &r,
+                &x.rem_prec_round_ref_val(BigExponentFloat::from(n), prec, rm)
+            ));
         },
     );
     big_exponent_float_unsigned_pair_gen::<u64>().test_properties(|(x, n)| {
@@ -862,7 +1173,10 @@ fn ieee_remainder_and_quotient_bits_properties() {
     big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_10()
         .test_properties(|(x, y, prec, rm)| {
             let r = ieee_remainder_and_quotient_bits_prec_round_all(&x, &y, prec, rm);
-            assert!(same_pair(&(r.0.clone(), r.1), &x.ieee_remainder_prec_round_ref_ref(&y, prec, rm)));
+            assert!(same_pair(
+                &(r.0.clone(), r.1),
+                &x.ieee_remainder_prec_round_ref_ref(&y, prec, rm)
+            ));
             if x.is_finite()
                 && !x.is_zero()
                 && y.is_finite()
@@ -877,7 +1191,7 @@ fn ieee_remainder_and_quotient_bits_properties() {
         let (r, q) = ieee_remainder_and_quotient_bits_exact_all(&x, &y);
         assert!(same(&r, &x.ieee_remainder_ref_ref(&y)));
         // The nearest quotient is the truncated one, or one more in magnitude.
-        let (_, tq) = x.rem_and_quotient_bits_ref_ref(&y);
+        let tq = x.rem_and_quotient_bits_ref_ref(&y).1;
         let d = q.wrapping_sub(tq);
         assert!(d == 0 || d.unsigned_abs() == 1 || d.unsigned_abs() == (1 << 63) - 1);
     });
@@ -895,8 +1209,8 @@ fn rem_rational_float_agreement_properties() {
             }
         },
     );
-    big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_10_float().test_properties(
-        |((fx, y, prec, rm), (x, _, _, _))| {
+    big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_10_float()
+        .test_properties(|((fx, y, prec, rm), (x, _, _, _))| {
             let (f, fo, fq) =
                 fx.ieee_remainder_rational_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
             if float_result_comparable(&f, fo) {
@@ -904,10 +1218,9 @@ fn rem_rational_float_agreement_properties() {
                 assert!(same(&r.0, &float_to_big_exponent_float(&f)));
                 assert_eq!((r.1, r.2), (fo, fq));
             }
-        },
-    );
-    big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_11_float().test_properties(
-        |((fy, x, prec, rm), (y, _, _, _))| {
+        });
+    big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_11_float()
+        .test_properties(|((fy, x, prec, rm), (y, _, _, _))| {
             let (f, fo, fq) =
                 Float::rational_rem_float_and_quotient_bits_prec_round_ref_ref(&x, &fy, prec, rm);
             if float_result_comparable(&f, fo) {
@@ -915,20 +1228,19 @@ fn rem_rational_float_agreement_properties() {
                 assert!(same(&r.0, &float_to_big_exponent_float(&f)));
                 assert_eq!((r.1, r.2), (fo, fq));
             }
-        },
-    );
-    big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_12_float().test_properties(
-        |((fy, x, prec, rm), (y, _, _, _))| {
-            let (f, fo, fq) = Float::rational_ieee_remainder_float_and_quotient_bits_prec_round_ref_ref(
-                &x, &fy, prec, rm,
-            );
+        });
+    big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_12_float()
+        .test_properties(|((fy, x, prec, rm), (y, _, _, _))| {
+            let (f, fo, fq) =
+                Float::rational_ieee_remainder_float_and_quotient_bits_prec_round_ref_ref(
+                    &x, &fy, prec, rm,
+                );
             if float_result_comparable(&f, fo) {
                 let r = rational_ieee_remainder_all(&x, &y, prec, rm);
                 assert!(same(&r.0, &float_to_big_exponent_float(&f)));
                 assert_eq!((r.1, r.2), (fo, fq));
             }
-        },
-    );
+        });
     big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_3_float().test_properties(
         |((fx, n, prec, rm), (x, _, _, _))| {
             let (f, fo) = fx.rem_unsigned_prec_round_ref(n, prec, rm);

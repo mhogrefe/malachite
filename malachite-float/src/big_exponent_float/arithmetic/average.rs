@@ -46,8 +46,8 @@ impl BigExponentFloat {
     ///   2^{\lfloor\log_2 |x+y|/2\rfloor-p}$.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=\text{NaN}$
-    ///   $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=\text{NaN}$
+    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=
+    ///   \text{NaN}$
     /// - $f(\infty,y,p,m)=f(y,\infty,p,m)=\infty$ if $y$ is not `NaN` or $-\infty$
     /// - $f(-\infty,y,p,m)=f(y,-\infty,p,m)=-\infty$ if $y$ is not `NaN` or $\infty$
     ///
@@ -132,8 +132,8 @@ impl BigExponentFloat {
     ///   2^{\lfloor\log_2 |x+y|/2\rfloor-p}$.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=\text{NaN}$
-    ///   $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=\text{NaN}$
+    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=
+    ///   \text{NaN}$
     /// - $f(\infty,y,p,m)=f(y,\infty,p,m)=\infty$ if $y$ is not `NaN` or $-\infty$
     /// - $f(-\infty,y,p,m)=f(y,-\infty,p,m)=-\infty$ if $y$ is not `NaN` or $\infty$
     ///
@@ -238,8 +238,8 @@ impl BigExponentFloat {
     ///   2^{\lfloor\log_2 |x+y|/2\rfloor-p}$.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=\text{NaN}$
-    ///   $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=\text{NaN}$
+    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=
+    ///   \text{NaN}$
     /// - $f(\infty,y,p,m)=f(y,\infty,p,m)=\infty$ if $y$ is not `NaN` or $-\infty$
     /// - $f(-\infty,y,p,m)=f(y,-\infty,p,m)=-\infty$ if $y$ is not `NaN` or $\infty$
     ///
@@ -344,8 +344,8 @@ impl BigExponentFloat {
     ///   2^{\lfloor\log_2 |x+y|/2\rfloor-p}$.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=\text{NaN}$
-    ///   $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=\text{NaN}$
+    /// - $f(\text{NaN},y,p,m)=f(x,\text{NaN},p,m)=f(\infty,-\infty,p,m)=f(-\infty,\infty,p,m)=
+    ///   \text{NaN}$
     /// - $f(\infty,y,p,m)=f(y,\infty,p,m)=\infty$ if $y$ is not `NaN` or $-\infty$
     /// - $f(-\infty,y,p,m)=f(y,-\infty,p,m)=-\infty$ if $y$ is not `NaN` or $\infty$
     ///

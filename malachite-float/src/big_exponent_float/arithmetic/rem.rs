@@ -16,7 +16,7 @@ use core::cmp::Ordering::{self, *};
 use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{Abs, DivMod, ModPow, ModPowerOf2, Parity};
 use malachite_base::num::basic::traits::{NaN as NaNTrait, Two, Zero as ZeroTrait};
-use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::comparison::traits::{OrdDouble, PartialOrdAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -27,9 +27,9 @@ use malachite_q::Rational;
 // The number of low bits of the quotient that are reported.
 const QUOTIENT_BITS: u64 = 63;
 
-// c * 2^e mod m. An exponent of up to 3 times the modulus's length is cheapest to apply
-// by shifting, as in MPFR's `mpfr_rem1`; a larger one is reduced by modular exponentiation, so that
-// no number with e bits is formed.
+// c * 2^e mod m. An exponent of up to 3 times the modulus's length is cheapest to apply by
+// shifting, as in MPFR's `mpfr_rem1`; a larger one is reduced by modular exponentiation, so that no
+// number with e bits is formed.
 fn mul_power_of_2_mod(c: Natural, e: &Natural, m: &Natural) -> Natural {
     if *e <= 3 * m.significant_bits() {
         (c << u64::exact_from(e)) % m
@@ -46,9 +46,9 @@ fn mul_power_of_2_mod(c: Natural, e: &Natural, m: &Natural) -> Natural {
 //
 // Write |x| = a * 2^s and |y| = b * 2^t with a and b odd. If s >= t, then |x| / |y| = a * 2^(s - t)
 // / b, so the remainder is (a * 2^(s - t) mod b) * 2^t. To get the quotient q modulo 2^k as well,
-// for k = `q_bits`, the reduction is done modulo M = b * 2^k: if a * 2^(s - t) = M * j + r', then
-// q = 2^k * j + floor(r' / b), and the remainder is r' mod b. For a large gap s - t, 2^(s - t) mod
-// M is computed by modular exponentiation, so that no number with s - t bits is formed. If s < t,
+// for k = `q_bits`, the reduction is done modulo M = b * 2^k: if a * 2^(s - t) = M * j + r', then q
+// = 2^k * j + floor(r' / b), and the remainder is r' mod b. For a large gap s - t, 2^(s - t) mod M
+// is computed by modular exponentiation, so that no number with s - t bits is formed. If s < t,
 // then |x| >= |y| implies a >= b * 2^(t - s), so that t - s < bits(a), and the division a / (b *
 // 2^(t - s)) is done directly; the remainder is then scaled by 2^s.
 fn finite_rem_abs(
@@ -174,9 +174,9 @@ fn mul_power_of_2_integer(mut x: BigExponentFloat, k: &Integer) -> BigExponentFl
 
 // Given the remainder R = N mod A and the quotient's low bits q = (N div A) mod 2^`q_bits` of a
 // division of magnitudes N / A, where |y| corresponds to A, returns the remainder for a quotient
-// rounded toward zero or, if `nearest` is set, to the nearest integer with ties to even, as a signed
-// multiple of the same unit, together with the adjusted quotient bits. Rounding the quotient up
-// replaces R with R - A, which is negative.
+// rounded toward zero or, if `nearest` is set, to the nearest integer with ties to even, as a
+// signed multiple of the same unit, together with the adjusted quotient bits. Rounding the quotient
+// up replaces R with R - A, which is negative.
 fn nearest_quotient_adjust(
     r: Natural,
     a: &Natural,
@@ -184,16 +184,17 @@ fn nearest_quotient_adjust(
     nearest: bool,
     q_bits: u64,
 ) -> (Integer, u64) {
-    let mut r = Integer::from(r);
-    let mut q = q;
     if nearest && r != 0u32 {
-        let cmp = (&r << 1u32).partial_cmp(a).unwrap();
+        // Compare 2R with A.
+        let cmp = a.cmp_double(&r).reverse();
         if cmp == Greater || cmp == Equal && q.odd() {
-            r -= Integer::from(a);
-            q = (q + 1).mod_power_of_2(q_bits);
+            return (
+                Integer::from(r) - Integer::from(a),
+                (q + 1).mod_power_of_2(q_bits),
+            );
         }
     }
-    (r, q)
+    (Integer::from(r), q)
 }
 
 // The remainder R / den, with R as returned by `nearest_quotient_adjust`, given the sign of x; and
@@ -243,7 +244,7 @@ pub(crate) fn rem_rational_with_quotient_bits(
     };
     let y_sign = *y > 0u32;
     if x.lt_abs(y) {
-        if nearest && (&*x << 1u32).gt_abs(y) {
+        if nearest && x.gt_abs(&(y >> 1u32)) {
             // x - y * (±1), with the sign of the quotient x / y
             let y_abs = y.abs();
             let (r, o) =
@@ -292,14 +293,14 @@ pub(crate) fn rem_rational_with_quotient_bits(
 // since a `BigExponentFloat` has no exponent range: no number with t bits is formed.
 pub(crate) fn rational_rem_with_quotient_bits(
     x: &Rational,
-    y: Cow<'_, BigExponentFloat>,
+    y: &BigExponentFloat,
     nearest: bool,
     prec: u64,
     rm: RoundingMode,
     q_bits: u64,
 ) -> (BigExponentFloat, Ordering, i64) {
     assert_ne!(prec, 0);
-    let y_sign = match &*y {
+    let y_sign = match y {
         BigExponentFloat(NaN | Zero) => return (BigExponentFloat::NAN, Equal, 0),
         BigExponentFloat(Infinity { .. }) => {
             let (r, o) = BigExponentFloat::from_rational_prec_round_ref(x, prec, rm);
@@ -311,10 +312,10 @@ pub(crate) fn rational_rem_with_quotient_bits(
         return (BigExponentFloat::ZERO, Equal, 0);
     }
     let x_sign = *x > 0u32;
-    if x.lt_abs(&*y) {
-        if nearest && (x << 1u32).gt_abs(&*y) {
+    if x.lt_abs(y) {
+        if nearest && x.gt_abs(&(y >> 1u32)) {
             // Here |y| < 2|x|, so y's exponent is small and y converts to a `Rational`.
-            let y_abs = Rational::exact_from(&*y).abs();
+            let y_abs = Rational::exact_from(y).abs();
             let r = if x_sign { x - y_abs } else { x + y_abs };
             let (r, o) = BigExponentFloat::from_rational_prec_round(r, prec, rm);
             return (r, o, if x_sign == y_sign { 1 } else { -1 });
@@ -322,7 +323,7 @@ pub(crate) fn rational_rem_with_quotient_bits(
         let (r, o) = BigExponentFloat::from_rational_prec_round_ref(x, prec, rm);
         return (r, o, 0);
     }
-    let (m, s) = finite_odd_part(&y);
+    let (m, s) = finite_odd_part(y);
     let (a, b) = (x.numerator_ref(), x.denominator_ref());
     let (r, m, scale, q) = if s >= 0u32 {
         let m = (m * b) << u64::exact_from(&s);
@@ -3483,13 +3484,22 @@ impl RemAssign<&Self> for BigExponentFloat {
 }
 
 impl BigExponentFloat {
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the remainder to the specified precision and with the specified rounding mode. Both [`BigExponentFloat`]s are taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`, rounding the remainder to the specified precision and with the specified rounding
+    /// mode. Both [`BigExponentFloat`]s are taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -3501,7 +3511,8 @@ impl BigExponentFloat {
     /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -3563,13 +3574,22 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the remainder to the specified precision and with the specified rounding mode. The first [`BigExponentFloat`] is taken by value and the second by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`, rounding the remainder to the specified precision and with the specified rounding
+    /// mode. The first [`BigExponentFloat`] is taken by value and the second by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -3581,7 +3601,8 @@ impl BigExponentFloat {
     /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -3666,13 +3687,22 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the remainder to the specified precision and with the specified rounding mode. The first [`BigExponentFloat`] is taken by reference and the second by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`, rounding the remainder to the specified precision and with the specified rounding
+    /// mode. The first [`BigExponentFloat`] is taken by reference and the second by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -3684,7 +3714,8 @@ impl BigExponentFloat {
     /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -3770,13 +3801,22 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the remainder to the specified precision and with the specified rounding mode. Both [`BigExponentFloat`]s are taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`, rounding the remainder to the specified precision and with the specified rounding
+    /// mode. Both [`BigExponentFloat`]s are taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -3788,7 +3828,8 @@ impl BigExponentFloat {
     /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -3873,11 +3914,20 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the remainder to the nearest value of the specified precision. Both [`BigExponentFloat`]s are taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`, rounding the remainder to the nearest value of the specified precision. Both
+    /// [`BigExponentFloat`]s are taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded remainder is less than, equal to, or greater than the exact remainder.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -3925,11 +3975,20 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the remainder to the nearest value of the specified precision. The first [`BigExponentFloat`] is taken by value and the second by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`, rounding the remainder to the nearest value of the specified precision. The first
+    /// [`BigExponentFloat`] is taken by value and the second by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -3976,11 +4035,20 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the remainder to the nearest value of the specified precision. The first [`BigExponentFloat`] is taken by reference and the second by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`, rounding the remainder to the nearest value of the specified precision. The first
+    /// [`BigExponentFloat`] is taken by reference and the second by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -4028,11 +4096,20 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the remainder to the nearest value of the specified precision. Both [`BigExponentFloat`]s are taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`, rounding the remainder to the nearest value of the specified precision. Both
+    /// [`BigExponentFloat`]s are taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded remainder is less than, equal to, or greater than the exact remainder.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -4079,11 +4156,16 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`. The remainder is exact. Both [`BigExponentFloat`]s are taken by value.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`. The remainder is exact. Both [`BigExponentFloat`]s are taken by value.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -4110,11 +4192,17 @@ impl BigExponentFloat {
         (r, q)
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`. The remainder is exact. The first [`BigExponentFloat`] is taken by value and the second by reference.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`. The remainder is exact. The first [`BigExponentFloat`] is taken by value and the
+    /// second by reference.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -4140,11 +4228,17 @@ impl BigExponentFloat {
         (r, q)
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`. The remainder is exact. The first [`BigExponentFloat`] is taken by reference and the second by value.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`. The remainder is exact. The first [`BigExponentFloat`] is taken by reference and
+    /// the second by value.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -4172,11 +4266,16 @@ impl BigExponentFloat {
         (r, q)
     }
 
-    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`. The remainder is exact. Both [`BigExponentFloat`]s are taken by reference.
+    /// Computes the remainder of two [`BigExponentFloat`]s, with the quotient rounded to the
+    /// nearest integer (with ties to even), along with the low bits of that quotient, as for C's
+    /// `remquo`. The remainder is exact. Both [`BigExponentFloat`]s are taken by reference.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
-    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same special cases. In all of the special cases, the quotient bits are 0.
+    /// The remainder is as for [`BigExponentFloat::ieee_remainder_prec_round`], and has the same
+    /// special cases. In all of the special cases, the quotient bits are 0.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
@@ -4203,34 +4302,46 @@ impl BigExponentFloat {
         (r, q)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient
+    /// rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and
+    /// with the specified rounding mode. The [`BigExponentFloat`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,n,p,m) = x-n\operatorname{trunc}(x/n)+\varepsilon.
     /// $$
-    /// - If $x-n\operatorname{trunc}(x/n)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p+1}$.
-    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p}$.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p+1}$.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},n,p,m)=f(\pm\infty,n,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,n,p,m)=0$ if $n\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed exactly before rounding, without forming the quotient.
+    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed
+    /// exactly before rounding, without forming the quotient.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::rem_unsigned_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::rem_unsigned_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), prec)`,
+    /// and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -4277,32 +4388,43 @@ impl BigExponentFloat {
         rem_unsigned_helper(Cow::Owned(self), other, Some((prec, rm)))
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient
+    /// rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and
+    /// with the specified rounding mode. The [`BigExponentFloat`] is taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,n,p,m) = x-n\operatorname{trunc}(x/n)+\varepsilon.
     /// $$
-    /// - If $x-n\operatorname{trunc}(x/n)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p+1}$.
-    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p}$.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p+1}$.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},n,p,m)=f(\pm\infty,n,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,n,p,m)=0$ if $n\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed exactly before rounding, without forming the quotient.
+    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed
+    /// exactly before rounding, without forming the quotient.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), prec)`,
+    /// and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -4350,28 +4472,38 @@ impl BigExponentFloat {
         rem_unsigned_helper(Cow::Borrowed(self), other, Some((prec, rm)))
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient
+    /// rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the
+    /// specified precision. The [`BigExponentFloat`] is taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,n,p) = x-n\operatorname{trunc}(x/n)+\varepsilon.
     /// $$
-    /// - If $x-n\operatorname{trunc}(x/n)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p}$.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},n,p)=f(\pm\infty,n,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,n,p)=0$ if $n\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed exactly before rounding, without forming the quotient.
+    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed
+    /// exactly before rounding, without forming the quotient.
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::rem_unsigned_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::rem_unsigned_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), prec)`,
+    /// and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -4394,26 +4526,35 @@ impl BigExponentFloat {
         rem_unsigned_helper(Cow::Owned(self), other, Some((prec, Nearest)))
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient
+    /// rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the
+    /// specified precision. The [`BigExponentFloat`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,n,p) = x-n\operatorname{trunc}(x/n)+\varepsilon.
     /// $$
-    /// - If $x-n\operatorname{trunc}(x/n)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p}$.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-n\operatorname{trunc}(x/n)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-n\operatorname{trunc}(x/n)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},n,p)=f(\pm\infty,n,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,n,p)=0$ if $n\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed exactly before rounding, without forming the quotient.
+    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed
+    /// exactly before rounding, without forming the quotient.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), prec)`,
+    /// and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -4436,7 +4577,9 @@ impl BigExponentFloat {
         rem_unsigned_helper(Cow::Borrowed(self), other, Some((prec, Nearest)))
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient rounded toward zero, as for C's `fmod`. The remainder is exact. The [`BigExponentFloat`] is taken by value.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient
+    /// rounded toward zero, as for C's `fmod`. The remainder is exact. The [`BigExponentFloat`] is
+    /// taken by value.
     ///
     /// $$
     /// f(x,n) = x-n\operatorname{trunc}(x/n).
@@ -4446,14 +4589,16 @@ impl BigExponentFloat {
     /// - $f(\text{NaN},n)=f(\pm\infty,n)=f(x,0)=\text{NaN}$
     /// - $f(0,n)=0$ if $n\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed without forming the quotient, even when $x/n$ is enormous.
+    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed
+    /// without forming the quotient, even when $x/n$ is enormous.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// the absolute value of `self`'s exponent, or 1 if it is smaller.
     ///
     /// # Examples
     /// ```
@@ -4463,17 +4608,16 @@ impl BigExponentFloat {
     ///     format!("{:?}", BigExponentFloat::from(10.5).rem_unsigned(3)),
     ///     "0x1.8"
     /// );
-    /// assert_eq!(
-    ///     BigExponentFloat::from(10.5).rem_unsigned(0).to_string(),
-    ///     "NaN"
-    /// );
+    /// assert!(BigExponentFloat::from(10.5).rem_unsigned(0).is_nan());
     /// ```
     #[inline]
     pub fn rem_unsigned(self, other: u64) -> Self {
         rem_unsigned_helper(Cow::Owned(self), other, None).0
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient rounded toward zero, as for C's `fmod`. The remainder is exact. The [`BigExponentFloat`] is taken by reference.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a `u64`, with the quotient
+    /// rounded toward zero, as for C's `fmod`. The remainder is exact. The [`BigExponentFloat`] is
+    /// taken by reference.
     ///
     /// $$
     /// f(x,n) = x-n\operatorname{trunc}(x/n).
@@ -4483,14 +4627,16 @@ impl BigExponentFloat {
     /// - $f(\text{NaN},n)=f(\pm\infty,n)=f(x,0)=\text{NaN}$
     /// - $f(0,n)=0$ if $n\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed without forming the quotient, even when $x/n$ is enormous.
+    /// The remainder has the sign of $x$ and is smaller than $n$ in magnitude. It is computed
+    /// without forming the quotient, even when $x/n$ is enormous.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $m$ is
+    /// the absolute value of `self`'s exponent, or 1 if it is smaller.
     ///
     /// # Examples
     /// ```
@@ -4500,44 +4646,55 @@ impl BigExponentFloat {
     ///     format!("{:?}", (&BigExponentFloat::from(10.5)).rem_unsigned_ref(3)),
     ///     "0x1.8"
     /// );
-    /// assert_eq!(
-    ///     BigExponentFloat::from(10.5).rem_unsigned_ref(0).to_string(),
-    ///     "NaN"
-    /// );
+    /// assert!(BigExponentFloat::from(10.5).rem_unsigned_ref(0).is_nan());
     /// ```
     #[inline]
     pub fn rem_unsigned_ref(&self, other: u64) -> Self {
         rem_unsigned_helper(Cow::Borrowed(self), other, None).0
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`BigExponentFloat`] and the
+    /// [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded remainder is less than, equal to, or greater than the exact remainder. Although
+    /// `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::rem_rational_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::rem_rational_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -4607,32 +4764,45 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by value
+    /// and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded remainder is less than, equal to, or greater than the exact remainder. Although
+    /// `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -4701,32 +4871,45 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by
+    /// reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded remainder is less than, equal to, or greater than the exact remainder.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -4796,32 +4979,45 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`BigExponentFloat`] and the
+    /// [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded remainder is less than, equal to, or greater than the exact remainder.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -4890,26 +5086,38 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$, with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] on the right-hand side is taken by value. An [`Ordering`] is returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$,
+    /// with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the
+    /// specified precision and with the specified rounding mode. The [`Rational`] on the right-hand
+    /// side is taken by value. An [`Ordering`] is returned, indicating whether the rounded
+    /// remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are
+    /// not comparable to any [`BigExponentFloat`], whenever this function sets the
+    /// [`BigExponentFloat`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// x \gets x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -4975,26 +5183,38 @@ impl BigExponentFloat {
         o
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$, with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] on the right-hand side is taken by reference. An [`Ordering`] is returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$,
+    /// with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the
+    /// specified precision and with the specified rounding mode. The [`Rational`] on the right-hand
+    /// side is taken by reference. An [`Ordering`] is returned, indicating whether the rounded
+    /// remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are
+    /// not comparable to any [`BigExponentFloat`], whenever this function sets the
+    /// [`BigExponentFloat`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// x \gets x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -5059,28 +5279,39 @@ impl BigExponentFloat {
         o
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of
+    /// the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less
+    /// than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to
+    /// any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::rem_rational_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::rem_rational_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5109,26 +5340,36 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of
+    /// the specified precision. The [`BigExponentFloat`] is taken by value and the [`Rational`] by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is
+    /// less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5156,26 +5397,36 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of
+    /// the specified precision. The [`BigExponentFloat`] is taken by reference and the [`Rational`]
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less
+    /// than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to
+    /// any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5204,26 +5455,36 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of
+    /// the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is
+    /// less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5251,20 +5512,30 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$, with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`Rational`] on the right-hand side is taken by value. An [`Ordering`] is returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$,
+    /// with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest
+    /// value of the specified precision. The [`Rational`] on the right-hand side is taken by value.
+    /// An [`Ordering`] is returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also
+    /// returns `Equal`.
     ///
     /// $$
     /// x \gets x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5299,20 +5570,30 @@ impl BigExponentFloat {
         o
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$, with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`Rational`] on the right-hand side is taken by reference. An [`Ordering`] is returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$,
+    /// with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest
+    /// value of the specified precision. The [`Rational`] on the right-hand side is taken by
+    /// reference. An [`Ordering`] is returned, indicating whether the rounded remainder is less
+    /// than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to
+    /// any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it
+    /// also returns `Equal`.
     ///
     /// $$
     /// x \gets x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5346,35 +5627,49 @@ impl BigExponentFloat {
         o
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Rational`] and the
+    /// [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded remainder is less than, equal to, or greater than the exact remainder.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(x,\pm\infty,p,m)=x$, rounded
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::rational_rem_big_exponent_float_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::rational_rem_big_exponent_float_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -5446,37 +5741,50 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(&x, Cow::Owned(y), false, prec, rm, 0);
+        let (r, o, _) = rational_rem_with_quotient_bits(&x, &y, false, prec, rm, 0);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Rational`] is taken by value and the
+    /// [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded remainder is less than, equal to, or greater than the exact remainder. Although
+    /// `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(x,\pm\infty,p,m)=x$, rounded
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -5548,37 +5856,50 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(&x, Cow::Borrowed(y), false, prec, rm, 0);
+        let (r, o, _) = rational_rem_with_quotient_bits(&x, y, false, prec, rm, 0);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Rational`] is taken by reference and
+    /// the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded remainder is less than, equal to, or greater than the exact remainder. Although
+    /// `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(x,\pm\infty,p,m)=x$, rounded
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -5642,6 +5963,7 @@ impl BigExponentFloat {
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// ```
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn rational_rem_big_exponent_float_prec_round_ref_val(
         x: &Rational,
@@ -5649,37 +5971,50 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(x, Cow::Owned(y), false, prec, rm, 0);
+        let (r, o, _) = rational_rem_with_quotient_bits(x, &y, false, prec, rm, 0);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Rational`] and the
+    /// [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(x,\pm\infty,p,m)=x$, rounded
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -5750,33 +6085,44 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(x, Cow::Borrowed(y), false, prec, rm, 0);
+        let (r, o, _) = rational_rem_with_quotient_bits(x, y, false, prec, rm, 0);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of
+    /// the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less
+    /// than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to
+    /// any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
     /// - $f(x,\pm\infty,p)=x$, rounded
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::rational_rem_big_exponent_float_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::rational_rem_big_exponent_float_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5811,31 +6157,41 @@ impl BigExponentFloat {
         y: Self,
         prec: u64,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(&x, Cow::Owned(y), false, prec, Nearest, 0);
+        let (r, o, _) = rational_rem_with_quotient_bits(&x, &y, false, prec, Nearest, 0);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of
+    /// the specified precision. The [`Rational`] is taken by value and the [`BigExponentFloat`] by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is
+    /// less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
     /// - $f(x,\pm\infty,p)=x$, rounded
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5870,32 +6226,41 @@ impl BigExponentFloat {
         y: &Self,
         prec: u64,
     ) -> (Self, Ordering) {
-        let (r, o, _) =
-            rational_rem_with_quotient_bits(&x, Cow::Borrowed(y), false, prec, Nearest, 0);
+        let (r, o, _) = rational_rem_with_quotient_bits(&x, y, false, prec, Nearest, 0);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of
+    /// the specified precision. The [`Rational`] is taken by reference and the [`BigExponentFloat`]
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less
+    /// than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to
+    /// any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
     /// - $f(x,\pm\infty,p)=x$, rounded
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5923,37 +6288,48 @@ impl BigExponentFloat {
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// ```
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn rational_rem_big_exponent_float_prec_ref_val(
         x: &Rational,
         y: Self,
         prec: u64,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(x, Cow::Owned(y), false, prec, Nearest, 0);
+        let (r, o, _) = rational_rem_with_quotient_bits(x, &y, false, prec, Nearest, 0);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, as for C's `fmod`, rounding the result to the nearest value of
+    /// the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is
+    /// less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
     /// - $f(x,\pm\infty,p)=x$, rounded
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -5987,42 +6363,57 @@ impl BigExponentFloat {
         y: &Self,
         prec: u64,
     ) -> (Self, Ordering) {
-        let (r, o, _) =
-            rational_rem_with_quotient_bits(x, Cow::Borrowed(y), false, prec, Nearest, 0);
+        let (r, o, _) = rational_rem_with_quotient_bits(x, y, false, prec, Nearest, 0);
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::rem_rational_and_quotient_bits_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::rem_rational_and_quotient_bits_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -6098,35 +6489,50 @@ impl BigExponentFloat {
         rem_rational_with_quotient_bits(Cow::Owned(self), &other, false, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -6205,35 +6611,50 @@ impl BigExponentFloat {
         rem_rational_with_quotient_bits(Cow::Owned(self), other, false, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -6313,35 +6734,50 @@ impl BigExponentFloat {
         rem_rational_with_quotient_bits(Cow::Borrowed(self), &other, false, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -6420,31 +6856,45 @@ impl BigExponentFloat {
         rem_rational_with_quotient_bits(Cow::Borrowed(self), other, false, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the nearest value of the specified precision. The
+    /// [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::rem_rational_and_quotient_bits_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::rem_rational_and_quotient_bits_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -6484,29 +6934,42 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the nearest value of the specified precision. The
+    /// [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -6545,29 +7008,42 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the nearest value of the specified precision. The
+    /// [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -6607,29 +7083,42 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the nearest value of the specified precision. The
+    /// [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -6668,18 +7157,29 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
@@ -6687,19 +7187,24 @@ impl BigExponentFloat {
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -6783,21 +7288,32 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(&x, Cow::Owned(y), false, prec, rm, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(&x, &y, false, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
@@ -6805,17 +7321,21 @@ impl BigExponentFloat {
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -6899,21 +7419,32 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(&x, Cow::Borrowed(y), false, prec, rm, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(&x, y, false, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
@@ -6921,17 +7452,21 @@ impl BigExponentFloat {
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -7007,6 +7542,7 @@ impl BigExponentFloat {
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     /// ```
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn rational_rem_big_exponent_float_and_quotient_bits_prec_round_ref_val(
         x: &Rational,
@@ -7014,21 +7550,32 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(x, Cow::Owned(y), false, prec, rm, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(x, &y, false, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
@@ -7036,17 +7583,21 @@ impl BigExponentFloat {
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -7129,18 +7680,28 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(x, Cow::Borrowed(y), false, prec, rm, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(x, y, false, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the nearest value of the specified precision. The [`Rational`] and
+    /// the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
@@ -7148,16 +7709,20 @@ impl BigExponentFloat {
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -7194,18 +7759,28 @@ impl BigExponentFloat {
         y: Self,
         prec: u64,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(&x, Cow::Owned(y), false, prec, Nearest, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(&x, &y, false, prec, Nearest, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the nearest value of the specified precision. The [`Rational`] is
+    /// taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
@@ -7213,14 +7788,17 @@ impl BigExponentFloat {
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -7259,18 +7837,28 @@ impl BigExponentFloat {
         y: &Self,
         prec: u64,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(&x, Cow::Borrowed(y), false, prec, Nearest, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(&x, y, false, prec, Nearest, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the nearest value of the specified precision. The [`Rational`] is
+    /// taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
@@ -7278,14 +7866,17 @@ impl BigExponentFloat {
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -7317,24 +7908,35 @@ impl BigExponentFloat {
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     /// ```
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn rational_rem_big_exponent_float_and_quotient_bits_prec_ref_val(
         x: &Rational,
         y: Self,
         prec: u64,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(x, Cow::Owned(y), false, prec, Nearest, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(x, &y, false, prec, Nearest, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded toward zero, along with the low bits of that quotient, as for C's `remquo`,
+    /// rounding the result to the nearest value of the specified precision. The [`Rational`] and
+    /// the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{trunc}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{trunc}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{trunc}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
@@ -7342,14 +7944,17 @@ impl BigExponentFloat {
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder has the sign of $x$ and is smaller than $y$ in magnitude. It is computed
+    /// exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -7387,37 +7992,51 @@ impl BigExponentFloat {
         y: &Self,
         prec: u64,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(x, Cow::Borrowed(y), false, prec, Nearest, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(x, y, false, prec, Nearest, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::ieee_remainder_rational_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::ieee_remainder_rational_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -7487,32 +8106,45 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -7586,32 +8218,45 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -7687,32 +8332,45 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -7787,26 +8445,38 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$, with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] on the right-hand side is taken by value. An [`Ordering`] is returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$,
+    /// with the quotient rounded to the nearest integer (with ties to even), as for C's
+    /// `remainder`, rounding the result to the specified precision and with the specified rounding
+    /// mode. The [`Rational`] on the right-hand side is taken by value. An [`Ordering`] is
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// x \gets x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -7896,26 +8566,38 @@ impl BigExponentFloat {
         o
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$, with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] on the right-hand side is taken by reference. An [`Ordering`] is returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$,
+    /// with the quotient rounded to the nearest integer (with ties to even), as for C's
+    /// `remainder`, rounding the result to the specified precision and with the specified rounding
+    /// mode. The [`Rational`] on the right-hand side is taken by reference. An [`Ordering`] is
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// x \gets x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -8004,28 +8686,40 @@ impl BigExponentFloat {
         o
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the nearest value of the specified precision. The
+    /// [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::ieee_remainder_rational_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::ieee_remainder_rational_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8054,26 +8748,37 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the nearest value of the specified precision. The
+    /// [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8105,26 +8810,37 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the nearest value of the specified precision. The
+    /// [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8157,26 +8873,37 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the nearest value of the specified precision. The
+    /// [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8208,20 +8935,30 @@ impl BigExponentFloat {
         (r, o)
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$, with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`Rational`] on the right-hand side is taken by value. An [`Ordering`] is returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$,
+    /// with the quotient rounded to the nearest integer (with ties to even), as for C's
+    /// `remainder`, rounding the result to the nearest value of the specified precision. The
+    /// [`Rational`] on the right-hand side is taken by value. An [`Ordering`] is returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
     ///
     /// $$
     /// x \gets x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8256,20 +8993,30 @@ impl BigExponentFloat {
         o
     }
 
-    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$, with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`Rational`] on the right-hand side is taken by reference. An [`Ordering`] is returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    /// Replaces a [`BigExponentFloat`] $x$ with the remainder of $x$ divided by a [`Rational`] $y$,
+    /// with the quotient rounded to the nearest integer (with ties to even), as for C's
+    /// `remainder`, rounding the result to the nearest value of the specified precision. The
+    /// [`Rational`] on the right-hand side is taken by reference. An [`Ordering`] is returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
     ///
     /// $$
     /// x \gets x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8307,35 +9054,49 @@ impl BigExponentFloat {
         o
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded remainder is less than, equal to, or greater than
+    /// the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(x,\pm\infty,p,m)=x$, rounded
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -8407,37 +9168,50 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(&x, Cow::Owned(y), true, prec, rm, 1);
+        let (r, o, _) = rational_rem_with_quotient_bits(&x, &y, true, prec, rm, 1);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(x,\pm\infty,p,m)=x$, rounded
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -8515,37 +9289,50 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(&x, Cow::Borrowed(y), true, prec, rm, 1);
+        let (r, o, _) = rational_rem_with_quotient_bits(&x, y, true, prec, rm, 1);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(x,\pm\infty,p,m)=x$, rounded
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -8615,6 +9402,7 @@ impl BigExponentFloat {
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// ```
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn rational_ieee_remainder_big_exponent_float_prec_round_ref_val(
         x: &Rational,
@@ -8622,37 +9410,50 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(x, Cow::Owned(y), true, prec, rm, 1);
+        let (r, o, _) = rational_rem_with_quotient_bits(x, &y, true, prec, rm, 1);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded remainder is less than, equal to, or greater
+    /// than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(x,\pm\infty,p,m)=x$, rounded
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -8729,33 +9530,45 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(x, Cow::Borrowed(y), true, prec, rm, 1);
+        let (r, o, _) = rational_rem_with_quotient_bits(x, y, true, prec, rm, 1);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the nearest value of the specified precision. The [`Rational`] and
+    /// the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
     /// - $f(x,\pm\infty,p)=x$, rounded
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8790,31 +9603,42 @@ impl BigExponentFloat {
         y: Self,
         prec: u64,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(&x, Cow::Owned(y), true, prec, Nearest, 1);
+        let (r, o, _) = rational_rem_with_quotient_bits(&x, &y, true, prec, Nearest, 1);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the nearest value of the specified precision. The [`Rational`] is
+    /// taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
     /// - $f(x,\pm\infty,p)=x$, rounded
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8849,32 +9673,42 @@ impl BigExponentFloat {
         y: &Self,
         prec: u64,
     ) -> (Self, Ordering) {
-        let (r, o, _) =
-            rational_rem_with_quotient_bits(&x, Cow::Borrowed(y), true, prec, Nearest, 1);
+        let (r, o, _) = rational_rem_with_quotient_bits(&x, y, true, prec, Nearest, 1);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the nearest value of the specified precision. The [`Rational`] is
+    /// taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
     /// - $f(x,\pm\infty,p)=x$, rounded
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8902,37 +9736,49 @@ impl BigExponentFloat {
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// ```
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn rational_ieee_remainder_big_exponent_float_prec_ref_val(
         x: &Rational,
         y: Self,
         prec: u64,
     ) -> (Self, Ordering) {
-        let (r, o, _) = rational_rem_with_quotient_bits(x, Cow::Owned(y), true, prec, Nearest, 1);
+        let (r, o, _) = rational_rem_with_quotient_bits(x, &y, true, prec, Nearest, 1);
         (r, o)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), as for C's `remainder`, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), as for C's `remainder`,
+    /// rounding the result to the nearest value of the specified precision. The [`Rational`] and
+    /// the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded remainder is less than, equal to, or greater than the exact
+    /// remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
     /// - $f(x,\pm\infty,p)=x$, rounded
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -8966,42 +9812,57 @@ impl BigExponentFloat {
         y: &Self,
         prec: u64,
     ) -> (Self, Ordering) {
-        let (r, o, _) =
-            rational_rem_with_quotient_bits(x, Cow::Borrowed(y), true, prec, Nearest, 1);
+        let (r, o, _) = rational_rem_with_quotient_bits(x, y, true, prec, Nearest, 1);
         (r, o)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less
+    /// than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to
+    /// any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::ieee_remainder_rational_and_quotient_bits_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::ieee_remainder_rational_and_quotient_bits_prec`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -9081,35 +9942,50 @@ impl BigExponentFloat {
         rem_rational_with_quotient_bits(Cow::Owned(self), &other, true, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`BigExponentFloat`] is taken by value and the [`Rational`] by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is
+    /// less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -9188,35 +10064,50 @@ impl BigExponentFloat {
         rem_rational_with_quotient_bits(Cow::Owned(self), other, true, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`BigExponentFloat`] is taken by reference and the [`Rational`]
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less
+    /// than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to
+    /// any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -9296,35 +10187,50 @@ impl BigExponentFloat {
         rem_rational_with_quotient_bits(Cow::Borrowed(self), &other, true, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`BigExponentFloat`] and the [`Rational`] are both taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is
+    /// less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p,m)=f(\pm\infty,y,p,m)=f(x,0,p,m)=\text{NaN}$
     /// - $f(0,y,p,m)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -9403,31 +10309,45 @@ impl BigExponentFloat {
         rem_rational_with_quotient_bits(Cow::Borrowed(self), other, true, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the nearest value of the specified
+    /// precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::ieee_remainder_rational_and_quotient_bits_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::ieee_remainder_rational_and_quotient_bits_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -9467,29 +10387,42 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the nearest value of the specified
+    /// precision. The [`BigExponentFloat`] is taken by value and the [`Rational`] by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -9527,29 +10460,42 @@ impl BigExponentFloat {
         rem_rational_with_quotient_bits(Cow::Owned(self), other, true, prec, Nearest, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the nearest value of the specified
+    /// precision. The [`BigExponentFloat`] is taken by reference and the [`Rational`] by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -9595,29 +10541,42 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`BigExponentFloat`] divided by a [`Rational`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the nearest value of the specified
+    /// precision. The [`BigExponentFloat`] and the [`Rational`] are both taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(\text{NaN},y,p)=f(\pm\infty,y,p)=f(x,0,p)=\text{NaN}$
     /// - $f(0,y,p)=0$ if $y\neq0$
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(),
+    /// other.significant_bits(), prec)`, and $m$ is the absolute value of `self`'s exponent, or 1
+    /// if it is smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -9662,18 +10621,29 @@ impl BigExponentFloat {
         )
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less
+    /// than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to
+    /// any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
@@ -9681,19 +10651,25 @@ impl BigExponentFloat {
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec`] instead.
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec`]
+    /// instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -9741,21 +10717,32 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(&x, Cow::Owned(y), true, prec, rm, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(&x, &y, true, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`Rational`] is taken by value and the [`BigExponentFloat`] by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is
+    /// less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
@@ -9763,52 +10750,92 @@ impl BigExponentFloat {
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::E;
     /// use malachite_base::rounding_modes::RoundingMode::*;
-    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::BigExponentFloat as Bef;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 5, Floor);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(
+    ///         Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         5,
+    ///         Floor,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1d");
     /// assert_eq!(o, Less);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 5, Ceiling);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(
+    ///         Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         5,
+    ///         Ceiling,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1e");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 5, Nearest);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(
+    ///         Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         5,
+    ///         Nearest,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1e");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 20, Floor);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(
+    ///         Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         20,
+    ///         Floor,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1de02");
     /// assert_eq!(o, Less);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 20, Ceiling);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(
+    ///         Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         20,
+    ///         Ceiling,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 20, Nearest);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_val_ref(
+    ///         Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         20,
+    ///         Nearest,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
@@ -9821,21 +10848,32 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(&x, Cow::Borrowed(y), true, prec, rm, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(&x, y, true, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`Rational`] is taken by reference and the [`BigExponentFloat`]
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less
+    /// than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to
+    /// any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
@@ -9843,56 +10881,97 @@ impl BigExponentFloat {
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::E;
     /// use malachite_base::rounding_modes::RoundingMode::*;
-    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::BigExponentFloat as Bef;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(&Rational::from_unsigneds(31416u16, 7), BigExponentFloat::from(E), 5, Floor);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         Bef::from(E),
+    ///         5,
+    ///         Floor,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1d");
     /// assert_eq!(o, Less);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(&Rational::from_unsigneds(31416u16, 7), BigExponentFloat::from(E), 5, Ceiling);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         Bef::from(E),
+    ///         5,
+    ///         Ceiling,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1e");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(&Rational::from_unsigneds(31416u16, 7), BigExponentFloat::from(E), 5, Nearest);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         Bef::from(E),
+    ///         5,
+    ///         Nearest,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1e");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(&Rational::from_unsigneds(31416u16, 7), BigExponentFloat::from(E), 20, Floor);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         Bef::from(E),
+    ///         20,
+    ///         Floor,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1de02");
     /// assert_eq!(o, Less);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(&Rational::from_unsigneds(31416u16, 7), BigExponentFloat::from(E), 20, Ceiling);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         Bef::from(E),
+    ///         20,
+    ///         Ceiling,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(&Rational::from_unsigneds(31416u16, 7), BigExponentFloat::from(E), 20, Nearest);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         Bef::from(E),
+    ///         20,
+    ///         Nearest,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     /// ```
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_val(
         x: &Rational,
@@ -9900,21 +10979,32 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(x, Cow::Owned(y), true, prec, rm, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(x, &y, true, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the specified precision and with the specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`Rational`] and the [`BigExponentFloat`] are both taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is
+    /// less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable
+    /// to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
     /// $$
     /// f(x,y,p,m) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is not `Nearest`, then
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p+1}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, and $m$ is `Nearest`, then
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p,m)=f(x,0,p,m)=\text{NaN}$
@@ -9922,52 +11012,92 @@ impl BigExponentFloat {
     /// - $f(0,y,p,m)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented exactly with `prec` bits.
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the remainder cannot be represented
+    /// exactly with `prec` bits.
     ///
     /// # Examples
     /// ```
     /// use core::f64::consts::E;
     /// use malachite_base::rounding_modes::RoundingMode::*;
-    /// use malachite_float::BigExponentFloat;
+    /// use malachite_float::BigExponentFloat as Bef;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(&Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 5, Floor);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         5,
+    ///         Floor,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1d");
     /// assert_eq!(o, Less);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(&Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 5, Ceiling);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         5,
+    ///         Ceiling,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1e");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(&Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 5, Nearest);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         5,
+    ///         Nearest,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1e");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(&Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 20, Floor);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         20,
+    ///         Floor,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1de02");
     /// assert_eq!(o, Less);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(&Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 20, Ceiling);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         20,
+    ///         Ceiling,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     ///
-    /// let (r, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(&Rational::from_unsigneds(31416u16, 7), &BigExponentFloat::from(E), 20, Nearest);
+    /// let (r, o, q) =
+    ///     Bef::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(
+    ///         &Rational::from_unsigneds(31416u16, 7),
+    ///         &Bef::from(E),
+    ///         20,
+    ///         Nearest,
+    ///     );
     /// assert_eq!(format!("{r:?}"), "0x0.1de022");
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
@@ -9979,18 +11109,28 @@ impl BigExponentFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(x, Cow::Borrowed(y), true, prec, rm, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(x, y, true, prec, rm, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the nearest value of the specified
+    /// precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
@@ -9998,16 +11138,21 @@ impl BigExponentFloat {
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
-    /// If you want to use a rounding mode other than `Nearest`, consider using [`BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round`] instead.
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round`]
+    /// instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -10046,18 +11191,28 @@ impl BigExponentFloat {
         y: Self,
         prec: u64,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(&x, Cow::Owned(y), true, prec, Nearest, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(&x, &y, true, prec, Nearest, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the nearest value of the specified
+    /// precision. The [`Rational`] is taken by value and the [`BigExponentFloat`] by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
@@ -10065,14 +11220,17 @@ impl BigExponentFloat {
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -10101,18 +11259,28 @@ impl BigExponentFloat {
         y: &Self,
         prec: u64,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(&x, Cow::Borrowed(y), true, prec, Nearest, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(&x, y, true, prec, Nearest, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the nearest value of the specified
+    /// precision. The [`Rational`] is taken by reference and the [`BigExponentFloat`] by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
@@ -10120,14 +11288,17 @@ impl BigExponentFloat {
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -10149,24 +11320,35 @@ impl BigExponentFloat {
     /// assert_eq!(o, Greater);
     /// assert_eq!(q, 1651);
     /// ```
+    #[allow(clippy::needless_pass_by_value)]
     #[inline]
     pub fn rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_ref_val(
         x: &Rational,
         y: Self,
         prec: u64,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(x, Cow::Owned(y), true, prec, Nearest, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(x, &y, true, prec, Nearest, QUOTIENT_BITS)
     }
 
-    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the quotient rounded to the nearest integer (with ties to even), along with the low bits of that quotient, as for C's `remquo`, rounding the result to the nearest value of the specified precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal to, or greater than the exact remainder. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    /// Computes the remainder of a [`Rational`] divided by a [`BigExponentFloat`], with the
+    /// quotient rounded to the nearest integer (with ties to even), along with the low bits of that
+    /// quotient, as for C's `remquo`, rounding the result to the nearest value of the specified
+    /// precision. The [`Rational`] and the [`BigExponentFloat`] are both taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded remainder is less than, equal
+    /// to, or greater than the exact remainder. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign: it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an enormous number of bits.
+    /// The returned `i64` agrees with the exact quotient $q$ in its low 63 bits and has $q$'s sign:
+    /// it equals $\pm(|q|\bmod 2^{63})$. It is computed without forming $q$, which may have an
+    /// enormous number of bits.
     ///
     /// $$
     /// f(x,y,p) = x-y\operatorname{round}(x/y)+\varepsilon.
     /// $$
-    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
+    /// - If $x-y\operatorname{round}(x/y)$ is infinite, zero, or `NaN`, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - If $x-y\operatorname{round}(x/y)$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x-y\operatorname{round}(x/y)|\rfloor-p}$.
     ///
     /// Special cases:
     /// - $f(x,\text{NaN},p)=f(x,0,p)=\text{NaN}$
@@ -10174,14 +11356,17 @@ impl BigExponentFloat {
     /// - $f(0,y,p)=0$ if $y$ is not `NaN` or 0
     /// - In all of the above special cases, the quotient bits are 0.
     ///
-    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even when $x/y$ is enormous: the quotient is never formed.
+    /// The remainder is at most $|y|/2$ in magnitude. It is computed exactly before rounding, even
+    /// when $x/y$ is enormous: the quotient is never formed.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n \log m)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(), y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is smaller.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(x.significant_bits(),
+    /// y.significant_bits(), prec)`, and $m$ is the absolute value of `y`'s exponent, or 1 if it is
+    /// smaller.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -10209,6 +11394,6 @@ impl BigExponentFloat {
         y: &Self,
         prec: u64,
     ) -> (Self, Ordering, i64) {
-        rational_rem_with_quotient_bits(x, Cow::Borrowed(y), true, prec, Nearest, QUOTIENT_BITS)
+        rational_rem_with_quotient_bits(x, y, true, prec, Nearest, QUOTIENT_BITS)
     }
 }

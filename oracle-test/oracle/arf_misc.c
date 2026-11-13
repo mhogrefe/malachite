@@ -15,7 +15,9 @@
     - `X.op_prec_round(args, p, rm) = R`, `X.op_prec(args, p) = R`, and `X.op(args) = R`, where
       the args are values, integers, and rounding modes, and R is a value, an integer, `true` or
       `false`, an ordering, or a parenthesized tuple of these (possibly nested);
-    - `X % Y = Z`, the exact remainder.
+    - `X % Y = Z`, the exact remainder;
+    - `BigExponentFloat::power_of_2(k) = X`, checked against 2^k built with arf_mul_2exp_fmpz;
+    - `X is a power of 2` and `X is not a power of 2`.
 
     A remainder by a `u64`, `rem_unsigned`, is checked as the remainder by the exact value of the
     `u64`.
@@ -44,12 +46,14 @@
     The special cases follow Malachite's documentation where they differ from MPFR's: there is no
     negative zero; rounding NaN or an infinity to an integer gives it back, as a non-integer; the
     fractional part of an infinity is zero; and the remainders' quotient bits are 0 in the special
-    cases. An exact remainder is computed at a precision large enough to hold it, and the oracle
-    aborts if that precision would exceed 2^20 bits.
+    cases. MPFR's quotient bits of -2^63, which it reports for a quotient whose magnitude is a
+    multiple of 2^63, are read as 0. An exact remainder is computed at a precision large enough to
+    hold it, and the oracle aborts if that precision would exceed 2^20 bits.
 
     Any other nonempty line is an error, as is an input with no lines at all.
 */
 
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -637,6 +641,10 @@ compute(leaf_t * out, const char * name, const arf_t x, arf_srcptr ys, int n_ys,
         }
         if (!finite)
             q = 0;
+        /* MPFR reports a quotient whose magnitude is a positive multiple of 2^63 as LONG_MIN,
+           -2^63, rather than as 0, its low 63 bits; Malachite reports ±(|q| mod 2^63). */
+        if (q == LONG_MIN)
+            q = 0;
         arf_clear(xs);
         arf_clear(yy);
         fmpz_clear(shift);
@@ -810,7 +818,69 @@ check_line(char * line, int line_number)
         line[len - 1] = '\0';
     if (line[0] == '\0')
         return 0;
+    /* `X is a power of 2` and `X is not a power of 2`: a positive value with a one-bit
+       significand. */
+    const char * pow2_suffixes[2] = {" is a power of 2", " is not a power of 2"};
+    for (int k = 0; k < 2; k++)
+    {
+        size_t ll = strlen(line), sl = strlen(pow2_suffixes[k]);
+        if (ll > sl && strcmp(line + ll - sl, pow2_suffixes[k]) == 0)
+        {
+            line[ll - sl] = '\0';
+            arf_t v;
+            arf_init(v);
+            int res = 0;
+            if (arf_parse_base(line, 4, v))
+                res = report(line_number, "unreadable value");
+            else
+            {
+                int is = arf_is_finite(v) && arf_sgn(v) > 0 && arf_bits(v) == 1;
+                if (is != (k == 0))
+                    res = report(line_number, "wrong power-of-2 test");
+            }
+            arf_clear(v);
+            if (res == 0)
+                checked++;
+            return res;
+        }
+    }
     char * result = split(line, " = ");
+    /* `BigExponentFloat::power_of_2(k) = X`: X must be 2^k, exactly. */
+    const char * pow2_prefix = "BigExponentFloat::power_of_2(";
+    if (result != NULL && strncmp(line, pow2_prefix, strlen(pow2_prefix)) == 0)
+    {
+        char * k = line + strlen(pow2_prefix);
+        size_t kl = strlen(k);
+        int res = 0;
+        fmpz_t e;
+        arf_t expected, v;
+        fmpz_init(e);
+        arf_init(expected);
+        arf_init(v);
+        if (kl == 0 || k[kl - 1] != ')')
+            res = report(line_number, "unrecognized line");
+        else
+        {
+            k[kl - 1] = '\0';
+            if (fmpz_set_str(e, k, 10) != 0)
+                res = report(line_number, "unreadable exponent");
+            else if (arf_parse_base(result, 4, v))
+                res = report(line_number, "unreadable value");
+            else
+            {
+                arf_one(expected);
+                arf_mul_2exp_fmpz(expected, expected, e);
+                if (!arf_equal(expected, v))
+                    res = report(line_number, "wrong value");
+            }
+        }
+        fmpz_clear(e);
+        arf_clear(expected);
+        arf_clear(v);
+        if (res == 0)
+            checked++;
+        return res;
+    }
     if (result == NULL)
         return report(line_number, "unrecognized line");
     leaf_t out[MAX_LEAVES];
