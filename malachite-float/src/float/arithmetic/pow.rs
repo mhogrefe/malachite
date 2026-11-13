@@ -310,6 +310,24 @@ fn pow_integer_underflow_nearest(x: &Float, z: &Integer, prec: u64) -> (Float, O
     (Float::from_float_prec_round(y2, prec, Exact).0, o)
 }
 
+// Whether z * log2|x| is certainly far enough inside the exponent range that none of the exponent
+// pre-bounds in `pow_integer` can fire, so that the 64-bit logarithm they need can be skipped.
+// Since |x| lies in [2^(e - 1), 2^e), where e is x's exponent, z * log2|x| lies between z * (e - 1)
+// and z * e; it suffices that both lie in [MIN_EXPONENT - 63, MAX_EXPONENT - 68]. Then |z *
+// log2|x|| < 2^31, so the `f64` estimate in `pow_integer`, whose relative error is below 2^-51, is
+// within 1 of it: at least MIN_EXPONENT - 64 and below MAX_EXPONENT - 66, where none of the bounds
+// apply.
+fn pow_integer_far_from_limits(x: &Float, z: &Integer) -> bool {
+    let Ok(z) = i64::try_from(z) else {
+        return false;
+    };
+    let z = i128::from(z);
+    let e = i128::from(x.get_exponent().unwrap());
+    let (a, b) = (z * (e - 1), z * e);
+    a.min(b) >= const { Float::MIN_EXPONENT as i128 - 63 }
+        && a.max(b) <= const { Float::MAX_EXPONENT as i128 - 68 }
+}
+
 // This is `mpfr_pow_z` from `pow_z.c`, MPFR 4.3.0.
 fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     if *z == 0u32 {
@@ -395,7 +413,7 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         NearOne::JumpStart(extra) => jump_extra = extra,
         NearOne::No => {}
     }
-    if jump_extra == 0 {
+    if jump_extra == 0 && !pow_integer_far_from_limits(x, z) {
         // Pre-bound the result exponent: result_exp ~ z * log2|x|. When it is far outside the
         // exponent range (with a wide margin for the estimate's error), report the exception
         // directly instead of letting the exponentiation saturate; this mirrors the role of MPFR's

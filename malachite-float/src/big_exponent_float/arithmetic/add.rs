@@ -247,7 +247,7 @@ crate_test_fn! {
     }
 }
 
-fn add_helper_with(
+pub(crate) fn add_helper_with(
     x: Cow<'_, BigExponentFloat>,
     y: Cow<'_, BigExponentFloat>,
     negate_y: bool,

@@ -6,19 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-/// Absolute value of [`BigExponentFloat`](super::BigExponentFloat)s.
-pub mod abs;
-/// Addition of [`BigExponentFloat`](super::BigExponentFloat)s, exact or rounded to a given
-/// precision.
-pub mod add;
-pub mod div;
+/// Absolute value of [`BigExponentFloat`](super::BigExponentFloat)s. Addition of
+/// [`BigExponentFloat`](super::BigExponentFloat)s, exact or rounded to a given precision.
 /// Multiplication of [`BigExponentFloat`](super::BigExponentFloat)s, exact or rounded to a given
-/// precision.
-pub mod mul;
-/// Negation of [`BigExponentFloat`](super::BigExponentFloat)s.
-pub mod neg;
-pub mod reciprocal;
-/// Left-shifting a [`BigExponentFloat`](super::BigExponentFloat) (multiplying it by a power of 2).
+/// precision. Negation of [`BigExponentFloat`](super::BigExponentFloat)s. Left-shifting a
+/// [`BigExponentFloat`](super::BigExponentFloat) (multiplying it by a power of 2).
 ///
 /// # shl
 /// ```
@@ -72,7 +64,6 @@ pub mod reciprocal;
 /// x <<= -10;
 /// assert_eq!(format!("{x:?}"), "0x0.006");
 /// ```
-pub mod shl;
 /// Right-shifting a [`BigExponentFloat`](super::BigExponentFloat) (dividing it by a power of 2).
 ///
 /// # shr
@@ -127,14 +118,49 @@ pub mod shl;
 /// x >>= -10;
 /// assert_eq!(format!("{x:?}"), "0x6.0E+2");
 /// ```
-pub mod shr;
 /// An implementation of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for
-/// determining the sign of a number.
+/// determining the sign of a number. Squaring of [`BigExponentFloat`](super::BigExponentFloat)s,
+/// exact or rounded to a given precision. Subtraction of
+/// [`BigExponentFloat`](super::BigExponentFloat)s, exact or rounded to a given precision.
+pub mod abs;
+pub mod abs_squared;
+pub mod add;
+pub mod add_mul;
+pub mod add_rational;
+pub mod average;
+pub mod canonical_unit_i_pow;
+pub mod canonicalize_gaussian_unit;
+pub mod canonicalize_unit;
+pub mod cbrt;
+pub mod conjugate;
+pub mod div;
+pub mod div_rational;
+pub mod dot;
+pub mod fractional_part;
+pub mod hypot;
+pub mod is_power_of_2;
+pub mod is_unit;
+pub mod mul;
+pub mod mul_add_mul;
+pub mod mul_rational;
+pub mod mul_sub_mul;
+pub mod neg;
+pub mod positive_difference;
+pub mod pow;
+pub mod power_of_2;
+pub mod product;
+pub mod rational_div_big_exponent_float;
+pub mod reciprocal;
+pub mod reciprocal_sqrt;
+pub mod rem;
+pub mod root;
+pub mod round_to_integer;
+pub mod shl;
+pub mod shr;
 pub mod sign;
 pub mod sqrt;
-/// Squaring of [`BigExponentFloat`](super::BigExponentFloat)s, exact or rounded to a given
-/// precision.
 pub mod square;
-/// Subtraction of [`BigExponentFloat`](super::BigExponentFloat)s, exact or rounded to a given
-/// precision.
 pub mod sub;
+pub mod sub_mul;
+pub mod sub_rational;
+pub mod sum;

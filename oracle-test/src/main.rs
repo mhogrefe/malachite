@@ -10,7 +10,8 @@
 // output is captured to a text file, and an oracle recomputes every line and fails on the first
 // disagreement. The FLINT oracle is a small C program (the sources in `oracle/`) built against a
 // FLINT source tree located through the `MALACHITE_FLINT_DIR` environment variable, defaulting to
-// `../../flint-3.6.0`. The Azurite oracle is the `oracle` executable of the Azurite repository
+// `../../flint-3.6.0`, and against the MPFR installation that FLINT links, located through
+// `MALACHITE_MPFR_DIR`, defaulting to Homebrew's `/opt/homebrew/opt/mpfr`. The Azurite oracle is the `oracle` executable of the Azurite repository
 // (formally verified Lean arithmetic), located through `MALACHITE_AZURITE_DIR`, defaulting to
 // `../../../azurite`. `cargo run --release -- flint` or `-- azurite` runs one backend; with no
 // argument both run. See README.md.
@@ -35,11 +36,20 @@ fn flint_dir() -> PathBuf {
     })
 }
 
+fn mpfr_dir() -> PathBuf {
+    let dir =
+        env::var("MALACHITE_MPFR_DIR").unwrap_or_else(|_| "/opt/homebrew/opt/mpfr".to_string());
+    fs::canonicalize(&dir).unwrap_or_else(|_| {
+        panic!("no MPFR installation at {dir}; set MALACHITE_MPFR_DIR to the one that FLINT links")
+    })
+}
+
 // Compiles the oracle sources in `oracle/` against the FLINT tree if the binary is missing or
 // stale (judged against the newest source or header), returning
 // the binary's path.
 fn build_oracle() -> PathBuf {
     let flint = flint_dir();
+    let mpfr = mpfr_dir();
     let binary = Path::new("target").join("flint-oracle");
     let mut sources = Vec::new();
     let mut newest = None;
@@ -67,13 +77,17 @@ fn build_oracle() -> PathBuf {
             .args(&sources)
             .arg("-o")
             .arg(&binary)
+            .arg(format!("-I{}", mpfr.join("include").display()))
             .arg(format!(
                 "-I{}",
                 flint.join("build").join("include").display()
             ))
             .arg(format!("-L{}", flint.display()))
             .arg(format!("-Wl,-rpath,{}", flint.display()))
+            .arg(format!("-L{}", mpfr.join("lib").display()))
+            .arg(format!("-Wl,-rpath,{}", mpfr.join("lib").display()))
             .arg("-lflint")
+            .arg("-lmpfr")
             .status()
             .expect("failed to run cc");
         assert!(status.success(), "failed to build flint-oracle");
@@ -7786,8 +7800,132 @@ fn test_against_flint() {
         "demo_big_exponent_float_reciprocal_prec",
         "demo_big_exponent_float_sqrt_prec_round",
         "demo_big_exponent_float_sqrt_prec",
+        "demo_big_exponent_float_add_mul",
+        "demo_big_exponent_float_add_mul_prec_round",
+        "demo_big_exponent_float_add_mul_prec",
+        "demo_big_exponent_float_sub_mul",
+        "demo_big_exponent_float_sub_mul_prec_round",
+        "demo_big_exponent_float_sub_mul_prec",
+        "demo_big_exponent_float_mul_add_mul",
+        "demo_big_exponent_float_mul_add_mul_prec_round",
+        "demo_big_exponent_float_mul_add_mul_prec",
+        "demo_big_exponent_float_mul_sub_mul",
+        "demo_big_exponent_float_mul_sub_mul_prec_round",
+        "demo_big_exponent_float_mul_sub_mul_prec",
+        "demo_big_exponent_float_sum",
+        "demo_big_exponent_float_sum_prec_round",
+        "demo_big_exponent_float_sum_prec",
+        "demo_big_exponent_float_product",
+        "demo_big_exponent_float_product_prec_round",
+        "demo_big_exponent_float_product_prec",
+        "demo_big_exponent_float_dot",
+        "demo_big_exponent_float_dot_prec_round",
+        "demo_big_exponent_float_dot_prec",
+        "demo_big_exponent_float_add_rational_prec_round",
+        "demo_big_exponent_float_add_rational_prec",
+        "demo_big_exponent_float_sub_rational_prec_round",
+        "demo_big_exponent_float_sub_rational_prec",
+        "demo_big_exponent_float_mul_rational_prec_round",
+        "demo_big_exponent_float_mul_rational_prec",
+        "demo_big_exponent_float_div_rational_prec_round",
+        "demo_big_exponent_float_div_rational_prec",
+        "demo_big_exponent_float_rational_div_big_exponent_float_prec_round",
+        "demo_big_exponent_float_rational_div_big_exponent_float_prec",
+        "demo_big_exponent_float_reciprocal_sqrt_prec_round",
+        "demo_big_exponent_float_reciprocal_sqrt_prec",
+        "demo_big_exponent_float_cbrt_prec_round",
+        "demo_big_exponent_float_cbrt_prec",
+        "demo_big_exponent_float_root_u_prec_round",
+        "demo_big_exponent_float_root_u_prec",
+        "demo_big_exponent_float_root_s_prec_round",
+        "demo_big_exponent_float_root_s_prec",
+        "demo_big_exponent_float_pow_u_prec_round",
+        "demo_big_exponent_float_pow_u_prec",
+        "demo_big_exponent_float_pow_s_prec_round",
+        "demo_big_exponent_float_pow_s_prec",
+        "demo_big_exponent_float_pow_integer_prec_round",
+        "demo_big_exponent_float_pow_integer_prec",
+        "demo_big_exponent_float_pow",
+        "demo_big_exponent_float_hypot_prec_round",
+        "demo_big_exponent_float_hypot_prec",
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_arithmetic");
+    }
+    // `BigExponentFloat`'s averages, positive differences, remainders, rounding to integers,
+    // fractional parts, and unit functions (MPFR and FLINT's `arf_t`).
+    for demo_name in [
+        "demo_big_exponent_float_average_prec_round",
+        "demo_big_exponent_float_average_prec",
+        "demo_big_exponent_float_positive_difference_prec_round",
+        "demo_big_exponent_float_positive_difference_prec",
+        "demo_big_exponent_float_rem_prec_round",
+        "demo_big_exponent_float_rem_prec",
+        "demo_big_exponent_float_ieee_remainder_prec_round",
+        "demo_big_exponent_float_ieee_remainder_prec",
+        "demo_big_exponent_float_rem_and_quotient_bits_prec_round",
+        "demo_big_exponent_float_rem_and_quotient_bits_prec",
+        "demo_big_exponent_float_average",
+        "demo_big_exponent_float_positive_difference",
+        "demo_big_exponent_float_rem",
+        "demo_big_exponent_float_ieee_remainder",
+        "demo_big_exponent_float_rem_and_quotient_bits",
+        "demo_big_exponent_float_round_to_integer_prec_round",
+        "demo_big_exponent_float_round_to_integer_prec",
+        "demo_big_exponent_float_round_to_integer_ties_away_prec",
+        "demo_big_exponent_float_round_to_integer_round",
+        "demo_big_exponent_float_round_to_integer",
+        "demo_big_exponent_float_round_to_integer_ties_away",
+        "demo_big_exponent_float_round_to_integer_then_prec_round",
+        "demo_big_exponent_float_round_to_integer_ties_away_then_prec_round",
+        "demo_big_exponent_float_fractional_part_prec_round",
+        "demo_big_exponent_float_fractional_part_prec",
+        "demo_big_exponent_float_fractional_part",
+        "demo_big_exponent_float_integer_and_fractional_parts_prec_round",
+        "demo_big_exponent_float_integer_and_fractional_parts",
+        "demo_big_exponent_float_conjugate",
+        "demo_big_exponent_float_abs_squared",
+        "demo_big_exponent_float_is_unit",
+        "demo_big_exponent_float_canonicalize_unit",
+        "demo_big_exponent_float_canonicalize_gaussian_unit",
+        "demo_big_exponent_float_canonical_unit_i_pow",
+        "demo_big_exponent_float_ieee_remainder_and_quotient_bits",
+        "demo_big_exponent_float_ieee_remainder_and_quotient_bits_prec",
+        "demo_big_exponent_float_ieee_remainder_and_quotient_bits_prec_round",
+        "demo_big_exponent_float_rem_unsigned",
+        "demo_big_exponent_float_rem_unsigned_prec",
+        "demo_big_exponent_float_rem_unsigned_prec_round",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_misc");
+    }
+    // `BigExponentFloat`'s positive differences and remainders mixed with a `Rational`.
+    for demo_name in [
+        "demo_big_exponent_float_ieee_remainder_rational_and_quotient_bits_prec",
+        "demo_big_exponent_float_ieee_remainder_rational_and_quotient_bits_prec_round",
+        "demo_big_exponent_float_ieee_remainder_rational_prec",
+        "demo_big_exponent_float_ieee_remainder_rational_prec_round",
+        "demo_big_exponent_float_positive_difference_rational_prec",
+        "demo_big_exponent_float_positive_difference_rational_prec_round",
+        "demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec",
+        "demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round",
+        "demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_prec",
+        "demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_prec_round",
+        "demo_big_exponent_float_rational_positive_difference_big_exponent_float_prec",
+        "demo_big_exponent_float_rational_positive_difference_big_exponent_float_prec_round",
+        "demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_prec",
+        "demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_prec_round",
+        "demo_big_exponent_float_rational_rem_big_exponent_float_prec",
+        "demo_big_exponent_float_rational_rem_big_exponent_float_prec_round",
+        "demo_big_exponent_float_rem_rational_and_quotient_bits_prec",
+        "demo_big_exponent_float_rem_rational_and_quotient_bits_prec_round",
+        "demo_big_exponent_float_rem_rational_prec",
+        "demo_big_exponent_float_rem_rational_prec_round",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-float",
+            demo_name,
+            "arf_misc_rational",
+        );
     }
     // Malachite's internal `Mag` (FLINT's `mag_t`).
     for (demo_name, flint_mode) in [

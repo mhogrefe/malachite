@@ -78,6 +78,36 @@ pub fn pair_2_max_triple_1_big_exponent_float_complexity_triple_2_bucketer<'a, T
     }
 }
 
+pub fn max_triple_1_big_exponent_float_complexity_triple_3_bucketer<'a, T>(
+    x_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, T, u64)> {
+    Bucketer {
+        bucketing_function: &|(x, _, p)| usize::exact_from(max(x.complexity(), *p)),
+        bucketing_label: format!("max({x_name}.complexity(), {p_name})"),
+    }
+}
+
+pub fn max_quadruple_1_big_exponent_float_complexity_quadruple_3_bucketer<'a, T, U>(
+    x_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, T, u64, U)> {
+    Bucketer {
+        bucketing_function: &|(x, _, p, _)| usize::exact_from(max(x.complexity(), *p)),
+        bucketing_label: format!("max({x_name}.complexity(), {p_name})"),
+    }
+}
+
+pub fn pair_2_max_quadruple_1_big_exponent_float_complexity_quadruple_3_bucketer<'a, T, U, V>(
+    x_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (T, (BigExponentFloat, U, u64, V))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, _, p, _))| usize::exact_from(max(x.complexity(), *p)),
+        bucketing_label: format!("max({x_name}.complexity(), {p_name})"),
+    }
+}
+
 pub fn pair_big_exponent_float_max_complexity_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,
@@ -199,6 +229,21 @@ pub fn quadruple_1_2_3_big_exponent_float_rational_max_complexity_bucketer<'a, T
 ) -> Bucketer<'a, (BigExponentFloat, Rational, u64, T)> {
     Bucketer {
         bucketing_function: &|(x, y, p, _)| {
+            usize::exact_from(max!(x.complexity(), y.significant_bits(), *p))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.significant_bits(), {p_name})"
+        ),
+    }
+}
+
+pub fn pair_2_quadruple_1_2_3_big_exponent_float_rational_max_complexity_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (T, (BigExponentFloat, Rational, u64, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, p, _))| {
             usize::exact_from(max!(x.complexity(), y.significant_bits(), *p))
         },
         bucketing_label: format!(
@@ -1173,5 +1218,263 @@ pub fn pair_2_max_pair_1_complexity_pair_2_bucketer<'a, T>(
     Bucketer {
         bucketing_function: &|(_, (x, y))| usize::exact_from(max(x.complexity(), *y)),
         bucketing_label: format!("max({x_name}.complexity(), {y_name})"),
+    }
+}
+
+pub fn quintuple_1_2_3_4_big_exponent_float_max_complexity_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, BigExponentFloat, BigExponentFloat, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, p, _)| {
+            usize::exact_from(max!(x.complexity(), y.complexity(), z.complexity(), *p))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.complexity(), {p_name})"
+        ),
+    }
+}
+
+pub fn pair_2_quintuple_1_2_3_4_big_exponent_float_max_complexity_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<
+    'a,
+    (
+        T,
+        (BigExponentFloat, BigExponentFloat, BigExponentFloat, u64, U),
+    ),
+> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, z, p, _))| {
+            usize::exact_from(max!(x.complexity(), y.complexity(), z.complexity(), *p))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.complexity(), {p_name})"
+        ),
+    }
+}
+
+pub fn quadruple_1_2_3_4_big_exponent_float_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, BigExponentFloat, BigExponentFloat, u64)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, p)| {
+            usize::exact_from(max!(x.complexity(), y.complexity(), z.complexity(), *p))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.complexity(), {p_name})"
+        ),
+    }
+}
+
+pub fn sextuple_1_2_3_4_5_big_exponent_float_max_complexity_bucketer<'a, T>(
+    p_name: &'a str,
+) -> Bucketer<
+    'a,
+    (
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        u64,
+        T,
+    ),
+> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, w, p, _)| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.complexity(),
+                z.complexity(),
+                w.complexity(),
+                *p
+            ))
+        },
+        bucketing_label: format!(
+            "max(x.complexity(), y.complexity(), z.complexity(), w.complexity(), {p_name})"
+        ),
+    }
+}
+
+pub fn pair_2_sextuple_1_2_3_4_5_big_exponent_float_max_complexity_bucketer<'a, T, U>(
+    p_name: &'a str,
+) -> Bucketer<
+    'a,
+    (
+        T,
+        (
+            BigExponentFloat,
+            BigExponentFloat,
+            BigExponentFloat,
+            BigExponentFloat,
+            u64,
+            U,
+        ),
+    ),
+> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, z, w, p, _))| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.complexity(),
+                z.complexity(),
+                w.complexity(),
+                *p
+            ))
+        },
+        bucketing_label: format!(
+            "max(x.complexity(), y.complexity(), z.complexity(), w.complexity(), {p_name})"
+        ),
+    }
+}
+
+pub fn quintuple_1_2_3_4_5_big_exponent_float_max_complexity_bucketer<'a>(
+    p_name: &'a str,
+) -> Bucketer<
+    'a,
+    (
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        u64,
+    ),
+> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, w, p)| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.complexity(),
+                z.complexity(),
+                w.complexity(),
+                *p
+            ))
+        },
+        bucketing_label: format!(
+            "max(x.complexity(), y.complexity(), z.complexity(), w.complexity(), {p_name})"
+        ),
+    }
+}
+
+fn big_exponent_float_slice_complexity(xs: &[BigExponentFloat]) -> u64 {
+    xs.iter().map(BigExponentFloat::complexity).sum()
+}
+
+pub fn triple_1_2_big_exponent_float_vec_sum_complexity_bucketer<'a, T>(
+    xs_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (Vec<BigExponentFloat>, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(xs, p, _)| {
+            usize::exact_from(max(big_exponent_float_slice_complexity(xs), *p))
+        },
+        bucketing_label: format!("max(sum of {xs_name} complexities, {p_name})"),
+    }
+}
+
+pub fn pair_2_triple_1_2_big_exponent_float_vec_sum_complexity_bucketer<'a, T, U>(
+    xs_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (T, (Vec<BigExponentFloat>, u64, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (xs, p, _))| {
+            usize::exact_from(max(big_exponent_float_slice_complexity(xs), *p))
+        },
+        bucketing_label: format!("max(sum of {xs_name} complexities, {p_name})"),
+    }
+}
+
+pub fn pair_big_exponent_float_vec_sum_complexity_bucketer<'a>(
+    xs_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (Vec<BigExponentFloat>, u64)> {
+    Bucketer {
+        bucketing_function: &|(xs, p)| {
+            usize::exact_from(max(big_exponent_float_slice_complexity(xs), *p))
+        },
+        bucketing_label: format!("max(sum of {xs_name} complexities, {p_name})"),
+    }
+}
+
+pub fn quadruple_1_2_3_big_exponent_float_vec_pair_sum_complexity_bucketer<'a, T>(
+    p_name: &'a str,
+) -> Bucketer<'a, (Vec<BigExponentFloat>, Vec<BigExponentFloat>, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(xs, ys, p, _)| {
+            usize::exact_from(max(
+                big_exponent_float_slice_complexity(xs) + big_exponent_float_slice_complexity(ys),
+                *p,
+            ))
+        },
+        bucketing_label: format!("max(sum of xs and ys complexities, {p_name})"),
+    }
+}
+
+pub fn pair_2_quadruple_1_2_3_big_exponent_float_vec_pair_sum_complexity_bucketer<'a, T, U>(
+    p_name: &'a str,
+) -> Bucketer<'a, (T, (Vec<BigExponentFloat>, Vec<BigExponentFloat>, u64, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (xs, ys, p, _))| {
+            usize::exact_from(max(
+                big_exponent_float_slice_complexity(xs) + big_exponent_float_slice_complexity(ys),
+                *p,
+            ))
+        },
+        bucketing_label: format!("max(sum of xs and ys complexities, {p_name})"),
+    }
+}
+
+pub fn triple_1_2_3_big_exponent_float_vec_pair_sum_complexity_bucketer<'a>(
+    p_name: &'a str,
+) -> Bucketer<'a, (Vec<BigExponentFloat>, Vec<BigExponentFloat>, u64)> {
+    Bucketer {
+        bucketing_function: &|(xs, ys, p)| {
+            usize::exact_from(max(
+                big_exponent_float_slice_complexity(xs) + big_exponent_float_slice_complexity(ys),
+                *p,
+            ))
+        },
+        bucketing_label: format!("max(sum of xs and ys complexities, {p_name})"),
+    }
+}
+
+pub fn triple_big_exponent_float_max_complexity_bucketer<'a>()
+-> Bucketer<'a, (BigExponentFloat, BigExponentFloat, BigExponentFloat)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z)| {
+            usize::exact_from(max!(x.complexity(), y.complexity(), z.complexity()))
+        },
+        bucketing_label: "max(x.complexity(), y.complexity(), z.complexity())".to_string(),
+    }
+}
+
+pub fn quadruple_big_exponent_float_max_complexity_bucketer<'a>() -> Bucketer<
+    'a,
+    (
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+    ),
+> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, w)| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.complexity(),
+                z.complexity(),
+                w.complexity()
+            ))
+        },
+        bucketing_label: "max(x.complexity(), y.complexity(), z.complexity(), w.complexity())"
+            .to_string(),
     }
 }

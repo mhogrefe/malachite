@@ -378,6 +378,42 @@ pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_fl
     }))
 }
 
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_float(
+    xs: It<(BigExponentFloat, Rational, u64, RoundingMode)>,
+) -> It<(
+    (Float, Rational, u64, RoundingMode),
+    (BigExponentFloat, Rational, u64, RoundingMode),
+)> {
+    Box::new(xs.filter_map(|(x, y, p, rm)| {
+        if rm == Exact {
+            return None;
+        }
+        Some((
+            (big_exponent_float_to_float(&x)?, y.clone(), p, rm),
+            (x, y, p, rm),
+        ))
+    }))
+}
+
+// Like `big_exponent_float_float`, for (x, t, precision, rounding mode) quadruples with any `t`.
+// `Exact` is excluded: an exact `Float` result can still overflow or underflow, which panics.
+pub fn big_exponent_float_value_unsigned_rounding_mode_quadruple_float<T: Clone + 'static>(
+    xs: It<(BigExponentFloat, T, u64, RoundingMode)>,
+) -> It<(
+    (Float, T, u64, RoundingMode),
+    (BigExponentFloat, T, u64, RoundingMode),
+)> {
+    Box::new(xs.filter_map(|(x, t, p, rm)| {
+        if rm == Exact {
+            return None;
+        }
+        Some((
+            (big_exponent_float_to_float(&x)?, t.clone(), p, rm),
+            (x, t, p, rm),
+        ))
+    }))
+}
+
 pub fn float_rm(xs: It<Float>) -> It<(rug::Float, Float)> {
     Box::new(xs.map(|x| (rug::Float::exact_from(&x), x)))
 }
@@ -849,4 +885,134 @@ pub fn float_rational_anything_rounding_mode_quadruple_rm<T: Clone + 'static>(
                 )
             }),
     )
+}
+
+// Pairs each generated value with its `Float` counterparts, dropping `Exact` (which `Float` does
+// not allow when a result overflows) and values outside a `Float`'s range.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn big_exponent_float_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quintuple_float(
+    xs: It<(
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        u64,
+        RoundingMode,
+    )>,
+) -> It<(
+    (Float, Float, Float, u64, RoundingMode),
+    (
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        u64,
+        RoundingMode,
+    ),
+)> {
+    Box::new(xs.filter_map(|(x, y, z, p, rm)| {
+        if rm == Exact {
+            return None;
+        }
+        Some((
+            (
+                big_exponent_float_to_float(&x)?,
+                big_exponent_float_to_float(&y)?,
+                big_exponent_float_to_float(&z)?,
+                p,
+                rm,
+            ),
+            (x, y, z, p, rm),
+        ))
+    }))
+}
+
+// Like the function above, for four values.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn big_exponent_float_big_exponent_float_big_exponent_float_big_exponent_float_unsigned_rounding_mode_sextuple_float(
+    xs: It<(
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        u64,
+        RoundingMode,
+    )>,
+) -> It<(
+    (Float, Float, Float, Float, u64, RoundingMode),
+    (
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        u64,
+        RoundingMode,
+    ),
+)> {
+    Box::new(xs.filter_map(|(x, y, z, w, p, rm)| {
+        if rm == Exact {
+            return None;
+        }
+        Some((
+            (
+                big_exponent_float_to_float(&x)?,
+                big_exponent_float_to_float(&y)?,
+                big_exponent_float_to_float(&z)?,
+                big_exponent_float_to_float(&w)?,
+                p,
+                rm,
+            ),
+            (x, y, z, w, p, rm),
+        ))
+    }))
+}
+
+// Like the functions above, for a vector.
+pub fn big_exponent_float_vec_unsigned_rounding_mode_triple_float(
+    xs: It<(Vec<BigExponentFloat>, u64, RoundingMode)>,
+) -> It<(
+    (Vec<Float>, u64, RoundingMode),
+    (Vec<BigExponentFloat>, u64, RoundingMode),
+)> {
+    Box::new(xs.filter_map(|(xs, p, rm)| {
+        if rm == Exact {
+            return None;
+        }
+        let fs = xs
+            .iter()
+            .map(big_exponent_float_to_float)
+            .collect::<Option<Vec<_>>>()?;
+        Some(((fs, p, rm), (xs, p, rm)))
+    }))
+}
+
+// Like the functions above, for two vectors.
+pub fn big_exponent_float_vec_pair_unsigned_rounding_mode_quadruple_float(
+    xs: It<(
+        Vec<BigExponentFloat>,
+        Vec<BigExponentFloat>,
+        u64,
+        RoundingMode,
+    )>,
+) -> It<(
+    (Vec<Float>, Vec<Float>, u64, RoundingMode),
+    (
+        Vec<BigExponentFloat>,
+        Vec<BigExponentFloat>,
+        u64,
+        RoundingMode,
+    ),
+)> {
+    Box::new(xs.filter_map(|(xs, ys, p, rm)| {
+        if rm == Exact {
+            return None;
+        }
+        let fs = xs
+            .iter()
+            .map(big_exponent_float_to_float)
+            .collect::<Option<Vec<_>>>()?;
+        let gs = ys
+            .iter()
+            .map(big_exponent_float_to_float)
+            .collect::<Option<Vec<_>>>()?;
+        Some(((fs, gs, p, rm), (xs, ys, p, rm)))
+    }))
 }

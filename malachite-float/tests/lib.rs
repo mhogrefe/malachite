@@ -64,17 +64,45 @@ extern crate malachite_base;
 pub mod big_exponent_float {
     pub mod arithmetic {
         pub mod abs;
+        pub mod abs_squared;
         pub mod add;
+        pub mod add_mul;
+        pub mod add_rational;
+        pub mod average;
+        pub mod canonical_unit_i_pow;
+        pub mod canonicalize_gaussian_unit;
+        pub mod canonicalize_unit;
+        pub mod cbrt;
+        pub mod conjugate;
         pub mod div;
+        pub mod div_rational;
+        pub mod dot;
+        pub mod fractional_part;
+        pub mod hypot;
+        pub mod is_unit;
         pub mod mul;
+        pub mod mul_add_mul;
+        pub mod mul_rational;
+        pub mod mul_sub_mul;
         pub mod neg;
+        pub mod positive_difference;
+        pub mod pow;
+        pub mod product;
+        pub mod rational_div_big_exponent_float;
         pub mod reciprocal;
+        pub mod reciprocal_sqrt;
+        pub mod rem;
+        pub mod root;
+        pub mod round_to_integer;
         pub mod shl;
         pub mod shr;
         pub mod sign;
         pub mod sqrt;
         pub mod square;
         pub mod sub;
+        pub mod sub_mul;
+        pub mod sub_rational;
+        pub mod sum;
     }
     pub mod basic {
         pub mod can_round;

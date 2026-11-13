@@ -166,6 +166,41 @@ string in a unit file is printed bare, exactly as the demo would print it.
 | `fmpz_mod_mat_similarity` | `fmpz_mod_mat_similarity` | `demo_natural_matrix_mod_similarity_transform` (malachite-nz); modulo 1 the result must be 0 |
 | `fmpz_mod_mat_similarity_power_of_2` | `fmpz_mod_mat_similarity` modulo $2^k$ | `demo_unsigned_matrix_mod_power_of_2_similarity_transform_u64` (malachite-base) and `demo_natural_matrix_mod_power_of_2_similarity_transform` (malachite-nz); modulo $2^0 = 1$ the result must be 0 |
 
+| `arf_classification` | the `arf_t` predicates `arf_is_nan`, `arf_is_inf`, `arf_is_zero`, `arf_is_finite`, `arf_is_normal`, and `arf_sgn` | `demo_big_exponent_float_is_nan`, `_is_finite`, `_is_infinite`, `_is_zero`, `_is_normal`, `_is_sign_positive`, `_is_sign_negative`, `_classify`, `_into_non_nan`, `_to_non_nan`, `_into_finite`, and `_to_finite` (malachite-float) |
+| `arf_get` | `arf_get_fmpz_2exp` and `arf_bits` | `demo_big_exponent_float_get_exponent`, `_get_prec`, `_to_significand`, `_into_significand`, `_significand_ref`, `_complexity`, and `_significant_bits` (malachite-float) |
+| `arf_set_round` | `arf_set_round` | `demo_big_exponent_float_round_to_prec_round` and `_round_to_prec`, each with `_ref` and `_assign` versions (malachite-float) |
+| `arf_hex` | `arf_get_fmpz_2exp`, with the hexadecimal text built independently | `demo_big_exponent_float_to_lower_hex_string`, `_to_upper_hex_string`, and `_debug` (malachite-float) |
+| `arf_set_fmpz` | `arf_set_fmpz`, rounded with `arf_set_round` | `demo_big_exponent_float_from_natural`, `_from_integer`, `_from_u64`, and `_from_i64`, the `_prec` and `_prec_round` versions of the first two, `_const_from_unsigned`, `_const_from_signed`, `_from_unsigned_prec_round`, and `_from_signed_prec_round` (malachite-float) |
+| `arf_set_d` | `arf_set_d`, rounded with `arf_set_round` | `demo_big_exponent_float_from_f64` and `_from_primitive_float_prec_round` (malachite-float) |
+| `arf_fmpq` | `arf_fmpz_div_fmpz` | `demo_big_exponent_float_from_rational_prec_round`, `_from_rational_prec`, `_try_from_rational`, and `_convertible_from_rational` (malachite-float) |
+| `arf_get_fmpz` | `arf_get_fmpz` and `arf_get_fmpq` | the conversions of `BigExponentFloat` to `Natural`, `Integer`, `Rational`, the Gaussian types, `u64`, and `i64` (`rounding_from`, `try_from`, and `convertible_from` demos), and `demo_big_exponent_float_is_integer`, `_is_real`, and `_is_gaussian_integer` (malachite-float) |
+| `arf_get_d` | `arf_get_d` | `demo_big_exponent_float_f64_rounding_from`, `_f64_try_from`, and `_f64_convertible_from` (malachite-float) |
+| `arf_mantissa` | `arf_get_fmpz_2exp` and `arf_frexp` | `demo_big_exponent_float_raw_mantissa_and_exponent`, `_integer_mantissa_and_exponent`, `_from_integer_mantissa_and_exponent`, `_sci_mantissa_and_exponent`, and `_sci_mantissa_and_exponent_round` (malachite-float) |
+| `arf_string` | a reparse of the output in base 2^k (`arf_parse_base`), compared with `arf_equal` | `demo_big_exponent_float_to_string_base`, `_to_string_base_upper`, `_to_binary_string`, `_to_octal_string`, and `_from_string_base` (malachite-float) |
+| `arf_cmp` | `arf_cmp` and `arf_cmpabs`, and exact comparisons with rationals through `arf_get_fmpq` | the 96 equality and comparison demos of `BigExponentFloat` with itself, `Float`, `Natural`, `Integer`, `Rational`, the Gaussian types, and primitive integers and floats, by value and by absolute value (malachite-float) |
+| `arf_cmp_total` | the total order of `ComparableBigExponentFloat`, built on `arf_cmp` | `demo_comparable_big_exponent_float_cmp`, `demo_comparable_big_exponent_float_ref_cmp`, `_ref_cmp_abs`, and `_ref_eq` (malachite-float) |
+| `arf_min_max` | selection with `arf_cmp`, then `arf_set_round` or `arf_fmpz_div_fmpz` | `demo_big_exponent_float_min` and `_max`, with their `_prec`, `_prec_round`, `_rational_prec`, and `_rational_prec_round` versions (malachite-float) |
+| `arf_arithmetic` | `arf_add`, `arf_sub`, `arf_mul`, `arf_div`, `arf_ui_div`, `arf_sqrt`, `arf_rsqrt`, `arf_addmul`, `arf_submul`, `arf_sum`, and `arb_pow_fmpz`; MPFR's `mpfr_rootn_ui`, `mpfr_rootn_si`, and `mpfr_pow_si` for roots and powers | the `BigExponentFloat` arithmetic demos: negation, absolute value, sign, shifts, addition, subtraction, multiplication, squaring, division, reciprocals, square roots, the fused operations, sums, products, dot products, the `Rational`-mixed operations, reciprocal square roots, cube roots, `root_u`, `root_s`, `pow_u`, `pow_s`, `pow_integer`, and `hypot` (malachite-float) |
+| `arf_misc` | MPFR's `mpfr_fmodquo`, `mpfr_remainder`, `mpfr_remquo`, `mpfr_rint`, `mpfr_round`, `mpfr_rint_round`, `mpfr_rint_trunc`, and `mpfr_frac`, and FLINT's `arf_add` and `arf_sub` | `demo_big_exponent_float_average`, `_positive_difference`, `_rem`, `_ieee_remainder`, and `_rem_and_quotient_bits` (exact and rounded), the `round_to_integer` family, `_fractional_part`, `_integer_and_fractional_parts`, `_conjugate`, `_abs_squared`, `_is_unit`, `_canonicalize_unit`, `_canonicalize_gaussian_unit`, `_canonical_unit_i_pow`, `_rem_unsigned` (exact and rounded, checked as the remainder by the exact `u64`), and `_ieee_remainder_and_quotient_bits` (exact and rounded, with `mpfr_remquo`) (malachite-float) |
+| `arf_misc_rational` | exact `fmpq` arithmetic, with `fmpz_powm` for huge exponents | `demo_big_exponent_float_positive_difference_rational`, `_rem_rational`, `_ieee_remainder_rational`, `_rem_rational_and_quotient_bits`, and `_ieee_remainder_rational_and_quotient_bits`, and `demo_big_exponent_float_rational_positive_difference_big_exponent_float`, `_rational_rem_big_exponent_float`, `_rational_ieee_remainder_big_exponent_float`, and the last two's `_and_quotient_bits` versions, each in `_prec_round` and `_prec` forms (malachite-float) |
+| `mag_set_ui` | `mag_set_ui` | `demo_mag_from_u64` (malachite-nz) |
+| `mag_set_ui_lower` | `mag_set_ui_lower` | `demo_mag_from_u64_lower` (malachite-nz) |
+| `mag_set_fmpz` | `mag_set_fmpz` | `demo_mag_from_natural` (malachite-nz) |
+| `mag_get_fmpz` | `mag_get_fmpz` | `demo_mag_ceiling` (malachite-nz) |
+| `mag_cmp` | `mag_cmp`, `mag_max`, and `mag_min` | `demo_mag_cmp`, `demo_mag_max`, and `demo_mag_min` (malachite-nz) |
+| `mag_mul` | `mag_mul` | `demo_mag_mul` (malachite-nz) |
+| `mag_mul_ui` | `mag_mul_ui` | `demo_mag_mul_u64` (malachite-nz) |
+| `mag_fast_addmul` | `mag_fast_addmul` | `demo_mag_add_mul_assign` (malachite-nz) |
+| `mag_div_ui` | `mag_div_ui` | `demo_mag_div_u64` (malachite-nz) |
+| `mag_sqrt` | `mag_sqrt` | `demo_mag_sqrt` (malachite-nz) |
+
+The `arf_*` modes read `BigExponentFloat`s from Malachite's hexadecimal format exactly, whatever the
+size of the exponent. Where MPFR is the reference, the oracle raises MPFR's exponent range to its
+maximum, and lines whose exponents lie beyond even that are reduced exactly before the comparison
+instead of being skipped: for example, a remainder is scaled by a power of 2, and a huge exponent
+gap is reduced with `fmpz_powm`. The `mag_*` modes check Malachite's internal `Mag` type, the
+counterpart of FLINT's `mag_t`.
+
 The `sqrtmod` modes skip documented divergence windows, noted in comments in
 `oracle/sqrtmod.c`;
 all involve only composite moduli, where Malachite computes the mathematically expected value
