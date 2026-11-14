@@ -153,6 +153,49 @@ pub mod big_exponent_float {
         pub mod partial_eq_primitive_int;
         pub mod partial_eq_rational;
     }
+    pub mod constants {
+        pub mod catalans_constant;
+        pub mod cbrt_2;
+        pub mod champernowne_constant;
+        pub mod copeland_erdos_constant;
+        pub mod dottie_number;
+        pub mod e;
+        pub mod eulers_constant;
+        pub mod gauss_constant;
+        pub mod gelfond_schneider_constant;
+        pub mod gelfonds_constant;
+        pub mod lemniscate_constant;
+        pub mod liouvilles_constant;
+        pub mod ln_10;
+        pub mod ln_2;
+        pub mod log_10_2;
+        pub mod log_10_e;
+        pub mod log_2_10;
+        pub mod log_2_e;
+        pub mod one_over_pi;
+        pub mod one_over_sqrt_pi;
+        pub mod one_over_sqrt_tau;
+        pub mod phi;
+        pub mod pi;
+        pub mod pi_over_2;
+        pub mod pi_over_3;
+        pub mod pi_over_4;
+        pub mod pi_over_6;
+        pub mod pi_over_8;
+        pub mod prime_constant;
+        pub mod prouhet_thue_morse_constant;
+        pub mod ramanujans_constant;
+        pub mod sqrt_2;
+        pub mod sqrt_2_over_2;
+        pub mod sqrt_3;
+        pub mod sqrt_3_over_3;
+        pub mod sqrt_5;
+        pub mod sqrt_5_over_5;
+        pub mod sqrt_pi;
+        pub mod tau;
+        pub mod two_over_pi;
+        pub mod two_over_sqrt_pi;
+    }
     pub mod conversion {
         pub mod big_exponent_float_from_float;
         pub mod float_from_big_exponent_float;

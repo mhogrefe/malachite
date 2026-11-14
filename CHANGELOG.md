@@ -1199,6 +1199,10 @@ documented by git history.
   `log_base_power_of_2_1_plus_x_prec_round` when the base is a power of 2. Previously, for an $x$
   such as $2^k$ their Ziv loop needed a working precision of about $k$ bits, so $x = 2^{2^{26}}$
   took gigabytes. Results are unchanged.
+- Corrected formulas in the documentation of three `Float` constants: the golden ratio
+  (`phi_prec_round` and `phi_prec`) is $(1+\sqrt{5})/2$, not $(1+\sqrt{2})/2$; `two_over_sqrt_pi`'s
+  docs now render $2/\sqrt{\pi}$; and the series for the Prouhet–Thue–Morse constant now sums over
+  the same index $n$ that its terms use.
 
 ## 0.14.0 — 2026-10-13
 

@@ -7,6 +7,15 @@ max_line_length = 100
 # inside `macro_rules!` bodies (each expansion would need to fulfill the expectation separately).
 # An entry whose line is no longer too long is itself flagged, so this list cannot go stale.
 long_lines_exceptions = [
+    { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/constants/champernowne_constant.rs", line = 67 },
+    { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/constants/copeland_erdos_constant.rs", line = 67 },
+    { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/constants/liouvilles_constant.rs", line = 67 },
+    { file = "malachite-float/src/big_exponent_float/constants/champernowne_constant.rs", line = 74 },
+    { file = "malachite-float/src/big_exponent_float/constants/champernowne_constant.rs", line = 127 },
+    { file = "malachite-float/src/big_exponent_float/constants/copeland_erdos_constant.rs", line = 75 },
+    { file = "malachite-float/src/big_exponent_float/constants/copeland_erdos_constant.rs", line = 129 },
+    { file = "malachite-float/src/big_exponent_float/constants/liouvilles_constant.rs", line = 75 },
+    { file = "malachite-float/src/big_exponent_float/constants/liouvilles_constant.rs", line = 128 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/log_base.rs", line = 202 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/log_base.rs", line = 228 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/log_base.rs", line = 257 },

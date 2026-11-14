@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     arithmetic::register(runner);
     basic::register(runner);
     comparison::register(runner);
+    constants::register(runner);
     conversion::register(runner);
     exponential::register(runner);
 }
@@ -19,5 +20,6 @@ pub(crate) fn register(runner: &mut Runner) {
 mod arithmetic;
 mod basic;
 mod comparison;
+mod constants;
 mod conversion;
 mod exponential;

@@ -217,12 +217,15 @@ pub mod basic;
 /// Traits for comparing [`BigExponentFloat`]s for equality or order, with each other and with other
 /// numeric types.
 pub mod comparison;
+/// Functions that produce [`BigExponentFloat`] approximations of mathematical constants, using a
+/// given precision and rounding mode.
+pub mod constants;
 /// Functions for converting [`BigExponentFloat`]s to and from other types, including strings.
 pub mod conversion;
 /// Iterators that generate [`BigExponentFloat`]s without repetition.
 pub mod exhaustive;
-/// Exponential functions of [`BigExponentFloat`]s: $e^x$, $2^x$, $10^x$, and their counterparts
-/// minus 1.
+/// Exponential and logarithmic functions of [`BigExponentFloat`]s: `exp`, `ln`, logarithms to
+/// various bases, powers of 2 and 10, and compound interest.
 pub mod exponential;
 #[cfg(feature = "random")]
 /// Iterators that generate [`BigExponentFloat`]s randomly.

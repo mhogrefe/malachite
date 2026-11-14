@@ -17,13 +17,13 @@ use core::cmp::Ordering;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 impl Float {
-    /// Returns an approximation of $2/\sqrt{pi}$, with the given precision and rounded using the
+    /// Returns an approximation of $2/\sqrt{\pi}$, with the given precision and rounded using the
     /// given [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the rounded
     /// value is less than or greater than the exact value of the constant. (Since the constant is
     /// irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// x = 2/\sqrt{pi}+\varepsilon.
+    /// x = 2/\sqrt{\pi}+\varepsilon.
     /// $$
     /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{-p+1}$.
     /// - If $m$ is `Nearest`, then $|\varepsilon| < 2^{-p}$.
@@ -68,13 +68,13 @@ impl Float {
         (pi << 1u32, o)
     }
 
-    /// Returns an approximation of $2/\sqrt{pi}$, with the given precision and rounded to the
+    /// Returns an approximation of $2/\sqrt{\pi}$, with the given precision and rounded to the
     /// nearest [`Float`] of that precision. An [`Ordering`] is also returned, indicating whether
     /// the rounded value is less than or greater than the exact value of the constant. (Since the
     /// constant is irrational, the rounded value is never equal to the exact value.)
     ///
     /// $$
-    /// x = 2/\sqrt{pi}+\varepsilon.
+    /// x = 2/\sqrt{\pi}+\varepsilon.
     /// $$
     /// - $|\varepsilon| < 2^{-p}$.
     ///
